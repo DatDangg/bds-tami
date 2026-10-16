@@ -88,23 +88,30 @@ Một repo, một app Next.js có nhúng Payload:
 ├── src/
 │   ├── app/
 │   │   ├── (frontend)/[locale]/  # Website công khai (Trang chủ, Dự án, Cho thuê, ...), dùng chung cho vi / en
-│   │   └── (payload)/         # /admin và /api do Payload sinh
+│   │   └── (payload)/         # /admin và /api do Payload sinh; api/health/route.ts (health check, route tĩnh thắng catch-all /api/[...slug])
 │   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
-│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log
+│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/)
 │   ├── endpoints/             # Endpoint tuỳ biến: gửi lead, ứng tuyển, tìm kiếm, đếm click
-│   │   └── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
+│   │   ├── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
+│   │   └── public/            # Endpoint công khai: click-events (đã có), leads, job-applications
 │   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu
 │   ├── lib/
 │   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
 │   │   ├── security/          # rate-limit (Redis Lua), turnstile, client-ip, ip-hash
 │   │   ├── email/             # adapter SMTP Brevo, allowlist ngoài production, template email nội bộ (tiếng Việt)
 │   │   ├── http/              # ok() / fail() theo response contract (API_SPEC §2)
+│   │   ├── audit/             # Ghi audit-logs
+│   │   ├── upload/            # Kiểm loại/cỡ file upload (media, private-files)
+│   │   ├── session/           # Phiên admin 8 giờ không hoạt động (keepalive)
+│   │   ├── health/            # runHealthChecks + probe DB/Redis/S3 cho /api/health
+│   │   ├── click-stats/       # Gộp lượt bấm (hàm thuần cho job aggregate-click-stats)
+│   │   ├── s3-config.ts       # Cấu hình S3 client (SeaweedFS) dùng chung
 │   │   ├── translation/       # TranslationService: gọi Claude API, dịch richText theo node, thuật ngữ, hạn mức chi phí
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
 │   │   └── seo/               # Sinh metadata, JSON-LD, sitemap
-│   ├── components/            # UI dùng chung
+│   ├── components/            # UI dùng chung: ui/ (shadcn), admin/ (logo, icon, keepalive), media/ (Gallery, Lightbox, LazyMap, VideoFacade, ResponsiveImage), forms/ (FormField, ConsentCheckbox, TurnstileWidget, FormStatus, use-public-form)
 │   ├── i18n/                  # routing.ts (locales, pathnames vi ↔ en), request.ts, messages/vi.json, messages/en.json
 │   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
 │   └── payload.config.ts
@@ -188,7 +195,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 | `expire-offers` | Hằng ngày 00:05 | Bài Đăng tin BĐS quá hạn ưu đãi thì gắn "Đã kết thúc", xoá cache trang (BR-06) |
 | `close-job-postings` | Hằng ngày 00:10 | Ẩn tin tuyển dụng quá hạn nộp |
 | `data-retention` | Hằng tuần | Ẩn danh lead quá 24 tháng, xoá CV quá 12 tháng (BR-31) |
-| `aggregate-click-stats` | Hằng giờ | Gộp số lượt bấm hotline/Zalo/fanpage cho dashboard |
+| `aggregate-click-stats` | Hằng giờ (cron `0 0 * * * *`, 6 trường) | Gộp số lượt bấm hotline/Zalo/fanpage cho dashboard; xoá `click-events` > 90 ngày đã gộp. Cộng dồn đọc-rồi-ghi, chỉ đúng khi có **1 process `jobs`** (Decision 3) |
 | `translate-content` | Ngay khi lưu bản `vi` đang xuất bản / global, hoặc bấm "Dịch lại bằng AI" | Dịch các trường đã đổi sang `en` (bỏ qua bản `enSource = manual`), sinh slug `en`, bật `hasEnglish`, xoá cache `/en`. Gộp nhiều lần lưu liên tiếp của cùng bài (chờ ~1 phút). Thử lại 3 lần (backoff); lỗi thì `translation.status = failed`. Kiểm hạn mức tháng trước khi gọi (BR-08) |
 
 ---
@@ -221,7 +228,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 |---|---|---|---|
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | 1 bản (có thể chạy 2) | 1 bản | 512MB–1GB / bản |
-| `jobs` | cùng image app, lệnh `pnpm jobs` (`payload run scripts/jobs-runner.ts`, poll 5s, dừng an toàn bằng SIGTERM/SIGINT; đặt `stop_grace_period` ~60s) | cùng image | 256MB |
+| `jobs` | cùng image app, lệnh `pnpm jobs` (`payload run scripts/jobs-runner.ts`, poll 5s, dừng an toàn bằng SIGTERM/SIGINT; đặt `stop_grace_period` ~60s). **Chỉ 1 bản** (job gộp click không nguyên tử) | cùng image | 256MB |
 | `postgres` | riêng | riêng | 1–2GB / 256–512MB |
 | `redis` | riêng | riêng | 128MB |
 | `seaweedfs` | dùng chung giữa prod/staging, bucket riêng | bucket riêng | 256MB |

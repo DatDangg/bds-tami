@@ -33,11 +33,11 @@ Nhật ký thao tác chỉ thêm, util `writeAuditLog` dùng chung, và luồng 
 Mở khoá cho: `layer-3-task-02`, `layer-6-task-10`, `layer-8-task-02`, `layer-9-task-03`, `layer-9-task-05`, `layer-9-task-06`, `layer-10-task-02`
 
 ## Acceptance Criteria
-- [ ] `audit-logs` chỉ admin đọc; không ai update/delete qua API (kể cả admin)
-- [ ] `writeAuditLog({actor, action, collection, docId, summary, meta, req})` ghi `ipHash`, không chứa mật khẩu/token
-- [ ] Ghi audit: `staff.create`, `staff.update_role`, `staff.deactivate`, `staff.reset_password`, `auth.login_failed`
-- [ ] Hệ thống luôn còn ≥ 1 admin `active`: chặn khoá/hạ quyền/xoá admin cuối cùng
-- [ ] Admin tạo sale, khoá (`active=false`), đặt lại mật khẩu; sale không làm được các việc này
+- [x] `audit-logs` chỉ admin đọc; không ai update/delete qua API (kể cả admin)
+- [x] `writeAuditLog({actor, action, collection, docId, summary, meta, req})` ghi `ipHash`, không chứa mật khẩu/token
+- [x] Ghi audit: `staff.create`, `staff.update_role`, `staff.deactivate`, `staff.reset_password`, `auth.login_failed`
+- [x] Hệ thống luôn còn ≥ 1 admin `active`: chặn khoá/hạ quyền/xoá admin cuối cùng
+- [x] Admin tạo sale, khoá (`active=false`), đặt lại mật khẩu; sale không làm được các việc này
 
 ## Tests cần viết
 - Integration: mỗi action ghi đúng 1 bản audit
@@ -65,7 +65,7 @@ Mở khoá cho: `layer-3-task-02`, `layer-6-task-10`, `layer-8-task-02`, `layer-
 - Verify commands + result (attempt 2): lint OK · typecheck OK · test 34 files / 362 tests PASS (thêm 6 integration bulk/cờ mật khẩu) · build OK
 - Reviewer verdict: STRICT PASS round 2 (round 1 FAIL MAJOR-1 bulk bypass last-admin guard → đã sửa) — `.context/review-reports/build-tami-website-layer-2-task-03-round-2-review.md`
 - Residual risk: `auth.login_failed` không ghi cho Local API `payload.login`; khe thời gian nhỏ ở check bulk `beforeOperation` (ngoài lock); `disableTransaction: true` bỏ qua advisory lock; cảnh báo deprecation `pg` (query chồng trên 1 connection, lỗi ở pg@9); MINOR-4 test "tái dùng req sau lỗi" không chứng minh được (password ngắn bị chặn trước khi set cờ); MINOR-5 test file 521 dòng
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ERD.md` §4.13 (thêm `staff.activate`, `staff.delete`; index `audit_logs` thực tế) + `docs/PERMISSION.md` §3.4 (luật admin cuối + chặn bulk chạm admin) và §6 (mở lại/xoá tài khoản)

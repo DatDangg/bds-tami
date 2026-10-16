@@ -84,5 +84,6 @@ Mở khoá cho: `layer-4-task-06`, `layer-14-task-01`
 - .env.example (`GLITCHTIP_DSN`, `METRICS_TOKEN`)
 
 ## Notes
+- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G4 — app/jobs không được chết khi DB sập: getPayload lúc DB down sinh unhandled rejection; kiểm/ cài handler hoặc healthcheck restart hợp lý. G5 — integration test chập chờn ~1/3: tests/integration/session-refresh.test.ts:41-44 afterAll xoá không kiểm staffId.
 - Stack giám sát (Prometheus/Grafana/Loki/GlitchTip/Uptime Kuma) dựng ở task monitoring-stack.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.

@@ -31,9 +31,9 @@ build (initial)
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] Màn đăng nhập và thanh bên hiện logo TAMI; tiêu đề tab "TAMI Admin"
-- [ ] Màu nhấn `#8C6733`, font Montserrat; chữ trên nút đạt AA
-- [ ] Admin chỉ có tiếng Việt (không có bộ chọn ngôn ngữ giao diện); bộ chọn locale nội dung VI/EN vẫn có
+- [x] Màn đăng nhập và thanh bên hiện logo TAMI; tiêu đề tab "TAMI Admin"
+- [x] Màu nhấn `#8C6733`, font Montserrat; chữ trên nút đạt AA
+- [x] Admin chỉ có tiếng Việt (không có bộ chọn ngôn ngữ giao diện); bộ chọn locale nội dung VI/EN vẫn có
 
 ## Tests cần viết
 - Smoke: build PASS, render component Logo
@@ -58,7 +58,7 @@ Mở khoá cho: `layer-12-task-01`
 - Verify commands + result (attempt 1): pnpm lint PASS · typecheck PASS · test PASS (38 files / 388 tests) · build PASS · generate:importmap đã chạy
 - Reviewer verdict: FAST PASS round 3 (.context/review-reports/build-tami-website-layer-2-task-05-round-3-review.md); round 1-2 FAIL (contrast dark, font portal, diff-create 4.39). Residual: chưa kiểm trực quan /admin; integration test round 3 env-blocked (Docker off), round 2 PASS 388 với hạ tầng — rerun pnpm test khi Docker bật.
 - Verify sau commit (2026-10-16T16:19:21.000Z, Docker dev tami-* bật): pnpm test 44 files / 420 tests PASS, 0 unhandled rejection — residual env-blocked đã đóng.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: no doc impact (chỉ giao diện admin, không đổi API/schema/flow)
@@ -76,7 +76,7 @@ Mở khoá cho: `layer-12-task-01`
 - [x] Reviewer độc lập PASS (mức FAST)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/admin/Logo.tsx, Icon.tsx

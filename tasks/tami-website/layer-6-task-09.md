@@ -89,5 +89,6 @@ Mở khoá cho: `layer-7-task-04`
 - src/lib/email/templates/new-application.ts
 
 ## Notes
+- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G3 — form client nhận lỗi captcha bằng chữ "captcha" trong message (src/components/forms/submit-helpers.ts:90-92): khi làm lỗi theo locale phải giữ chữ "captcha" ở cả vi/en hoặc thêm mã lỗi `captcha_failed` vào API_SPEC §2 + client.
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.

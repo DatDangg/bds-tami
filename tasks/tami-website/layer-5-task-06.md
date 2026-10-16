@@ -91,5 +91,6 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - src/app/global-error.tsx
 
 ## Notes
+- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G2 — click-events chưa giới hạn refCollection/refId (src/endpoints/public/click-events.ts:13): giới hạn refCollection theo danh sách collection ERD §2 để không sinh dòng rác trong click-stats-daily; chặn pagePath bắt đầu "//".
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.

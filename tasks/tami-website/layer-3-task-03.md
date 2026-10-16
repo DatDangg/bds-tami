@@ -91,6 +91,7 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
 - .env.example (khối staging/prod)
 
 ## Notes
+- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G1 (MEDIUM, CẦN USER CHỐT trước khi làm task này) — ảnh đang serve qua /api/media/file/* (payload.config.ts:74-79 không generateFileURL) trong khi ARCHITECTURE §5.1 cấm cache /api/*: hoặc thêm ngoại lệ cache immutable cho /api/media/file/* (task này + layer-4-task-03 + rule Cloudflare layer-6-task-01), hoặc đổi cách phục vụ ảnh.
 - KHÔNG SSH vào server ở task này. Mọi thao tác trên server làm ở task deploy-staging/production có user duyệt.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 

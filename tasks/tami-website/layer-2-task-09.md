@@ -34,10 +34,10 @@ Primitive form client: FormField (label, helper, lỗi `aria-describedby`/`aria-
 Mở khoá cho: `layer-7-task-04`, `layer-10-task-01`
 
 ## Acceptance Criteria
-- [ ] Consent không tick thì nút gửi không submit, hiện lỗi đúng ngôn ngữ
-- [ ] Turnstile script chỉ tải khi form vào viewport hoặc focus ô đầu tiên
-- [ ] Lỗi từ API (`details`) hiện cạnh đúng field; lỗi chung `role="alert"`; thành công chuyển focus tới tiêu đề thông báo
-- [ ] Không dùng `placeholder` thay label
+- [x] Consent không tick thì nút gửi không submit, hiện lỗi đúng ngôn ngữ
+- [x] Turnstile script chỉ tải khi form vào viewport hoặc focus ô đầu tiên
+- [x] Lỗi từ API (`details`) hiện cạnh đúng field; lỗi chung `role="alert"`; thành công chuyển focus tới tiêu đề thông báo
+- [x] Không dùng `placeholder` thay label
 
 ## Tests cần viết
 - RTL: submit thiếu consent bị chặn
@@ -62,7 +62,7 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-01`
 - Verify commands + result (attempt 2): `pnpm lint` PASS · `pnpm typecheck` PASS · `pnpm test` PASS (52 file / 524 test, gồm integration trên Docker dev) · `pnpm build` PASS
 - Fix attempt 2: parseDetails giữ item chỉ có message (field rỗng) vào tóm tắt; 400 không detail hiện `error` của server, chỉ gán captcha khi message nhắc captcha (pipeline không có mã máy đọc được); Thử lại dùng requestSubmit; xoá lastSubmit khi thành công; extra multipart number/boolean -> String, object -> JSON; cờ in-flight bằng useRef; loadTurnstile không cache thất bại; bỏ reset trùng ở expired-callback; khử trùng key FormStatus; thêm test tương ứng + unmount remove
 - Reviewer verdict: STRICT PASS round 2 (.context/review-reports/build-tami-website-layer-2-task-09-round-2-review.md); round 1 FAIL (400 validate hiện nhầm captcha). MINOR còn lại không chặn: tên test retry cũ, nhận diện captcha theo message (đề xuất code "captcha_failed" ở API_SPEC §2 khi làm endpoint), pipeline hard-code message tiếng Việt cho 400 ở /en (ngoài scope), usePublicForm dài. Residual: chưa kiểm trên browser thật (widget Cloudflare thật, 375px); nhánh file trống collectFields chưa test được trong jsdom.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: no doc impact
@@ -80,7 +80,7 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-01`
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/forms/FormField.tsx, ConsentCheckbox.tsx, TurnstileWidget.tsx, FormStatus.tsx

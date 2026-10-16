@@ -31,11 +31,11 @@ Payload `tokenExpiration` tính tuyệt đối; để đạt "8 giờ không ho�
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] Token hết hạn sau 8 giờ nếu không có hoạt động
-- [ ] Có hoạt động trong admin → gọi refresh tối đa 1 lần mỗi 15 phút (throttle), token mới có hạn +8 giờ
-- [ ] Tab ẩn/không thao tác không gọi refresh (không "giữ sống" vô hạn)
-- [ ] Refresh thất bại (401) → chuyển về màn đăng nhập, không vòng lặp
-- [ ] Cookie `payload-token` HttpOnly, Secure (production), SameSite=Lax
+- [x] Token hết hạn sau 8 giờ nếu không có hoạt động
+- [x] Có hoạt động trong admin → gọi refresh tối đa 1 lần mỗi 15 phút (throttle), token mới có hạn +8 giờ
+- [x] Tab ẩn/không thao tác không gọi refresh (không "giữ sống" vô hạn)
+- [x] Refresh thất bại (401) → chuyển về màn đăng nhập, không vòng lặp
+- [x] Cookie `payload-token` HttpOnly, Secure (production), SameSite=Lax
 
 ## Tests cần viết
 - Unit (fake timers): nhiều sự kiện trong 15 phút → 1 lần refresh; không sự kiện → 0
@@ -60,7 +60,7 @@ Mở khoá cho: `layer-12-task-01`
 - Verify commands + result (attempt 3): `pnpm lint` PASS · `pnpm typecheck` PASS · `pnpm test` PASS 37 files / 386 tests (lần 1) và 386 tests (lần 2) · `pnpm build` PASS
 - Reviewer verdict: round 1 FAIL (F1, F2) · round 2 FAIL (N1 MAJOR) · round 3 STRICT PASS — `.context/review-reports/build-tami-website-layer-2-task-04-round-3-review.md`
 - Residual risk: chưa E2E trình duyệt (đa tab suy từ source Payload); 401 đi qua màn inactivity trước login; Secure phụ thuộc NODE_ENV=production ở staging/prod; test integration flaky 1/3 lần (jobs-email hoặc session-refresh — `afterAll` session-refresh không guard `staffId`); importMap.js regen thêm `S3ClientUploadHandler` còn thiếu từ layer-2-task-01
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/PERMISSION.md` §7 ghi cơ chế thực tế

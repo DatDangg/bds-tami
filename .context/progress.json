@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 2,
+  "currentLayer": 3,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -156,9 +156,14 @@
       "date": "2026-10-16T16:16:54.000Z",
       "decision": "layer-2-task-07 làm tiếp dù Docker off; integration + migration apply env-blocked, chạy lại khi bật Docker trước promote staging",
       "reason": "User: làm tiếp đi"
+    },
+    {
+      "date": "2026-10-16T17:30:44.000Z",
+      "decision": "Đóng layer 2 (trừ task-02 blocked) và sang layer 3, chỉ làm task không phụ thuộc layer-2-task-02 (19 task chạy được: L3 01-03, L4 01-07, L5 02,03,05-08, L6 03,06,07)",
+      "reason": "User: PASS thì sang layer 3 với task không phụ thuộc task-02"
     }
   ],
-  "lastUpdated": "2026-10-16T17:16:57.000Z",
+  "lastUpdated": "2026-10-16T17:30:44.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -201,6 +206,12 @@
       "layer": 1,
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-1.md"
+    },
+    {
+      "layer": 2,
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-2.md",
+      "note": "trừ layer-2-task-02 (blocked chờ data địa giới); gap G1 cần user chốt trước layer-3-task-03"
     }
   ]
 }

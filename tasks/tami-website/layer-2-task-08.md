@@ -33,11 +33,11 @@ Ba client component dùng lại ở chi tiết dự án, cho thuê, Đăng tin B
 Mở khoá cho: `layer-6-task-05`, `layer-6-task-07`, `layer-7-task-03`, `layer-8-task-04`, `layer-9-task-01`, `layer-14-task-01`
 
 ## Acceptance Criteria
-- [ ] Gallery: ảnh đầu `priority` nếu là LCP, còn lại lazy; tỉ lệ cố định (CLS 0); lightbox bàn phím (←/→/Esc), bẫy focus, trả focus
-- [ ] LazyMap: trước khi vào viewport chỉ hiện ảnh tĩnh + nút "Xem bản đồ / View map"; MapLibre import động; không cần API key
-- [ ] VideoFacade: chỉ nhúng iframe khi bấm; không tải trên Save-Data
-- [ ] Mọi nút chỉ icon có `aria-label` theo locale; touch target ≥ 44px
-- [ ] Không cuộn ngang ở 375px
+- [x] Gallery: ảnh đầu `priority` nếu là LCP, còn lại lazy; tỉ lệ cố định (CLS 0); lightbox bàn phím (←/→/Esc), bẫy focus, trả focus
+- [x] LazyMap: trước khi vào viewport chỉ hiện ảnh tĩnh + nút "Xem bản đồ / View map"; MapLibre import động; không cần API key
+- [x] VideoFacade: chỉ nhúng iframe khi bấm; không tải trên Save-Data
+- [x] Mọi nút chỉ icon có `aria-label` theo locale; touch target ≥ 44px
+- [x] Không cuộn ngang ở 375px
 
 ## Tests cần viết
 - RTL: lightbox mở/đóng/điều hướng bàn phím
@@ -68,7 +68,7 @@ Mở khoá cho: `layer-6-task-05`, `layer-6-task-07`, `layer-7-task-03`, `layer-
   - m1: bento 3 ảnh (2 ô rộng 2 cột) và 4 ảnh (ô 2 rộng 2 cột) phủ kín lưới 4x2. m3: Lightbox không có returnFocusRef thì trả focus về phần tử đang focus lúc mở. m4: CSS `pointer: coarse` đặt control zoom MapLibre 44px (globals.css). m2 giữ nguyên (2 ảnh coi là dữ liệu lỗi). m5: thumbnail i.ytimg.com là request bên thứ ba trước khi bấm, ghi nhận cho chính sách privacy (residual).
   - Verify attempt 2: `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` 49 file / 491 test PASS (gồm integration Docker dev) · `pnpm build` OK
 - Reviewer verdict: STRICT PASS round 2 (.context/review-reports/build-tami-website-layer-2-task-08-round-2-review.md); round 1 FAIL (C1 map bị remove sau ready, M1 lộ toạ độ, M2 srcset ảnh gốc, M3 aria carousel). MINOR còn lại không chặn: n1 cân nhắc lưới 0,002° cho ẩn địa chỉ, n3 carousel attrs khi 1–2 ảnh, n4 không hiện loading khi đổi toạ độ, n5 setSlideIndex mỗi scroll. Residual: chưa route nào dùng nên chưa kiểm bundling MapLibre/CSS động + trực quan 375/768/1280 — kiểm khi layer 6/7 gắn component; tile OSM không hợp traffic lớn; thumbnail i.ytimg.com là request bên thứ ba trước khi bấm.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: no doc impact (API/ERD/DESIGN); thêm acceptance contract approximateLocation vào tasks/tami-website/layer-7-task-03.md
@@ -86,7 +86,7 @@ Mở khoá cho: `layer-6-task-05`, `layer-6-task-07`, `layer-7-task-03`, `layer-
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/media/Gallery.tsx, Lightbox.tsx

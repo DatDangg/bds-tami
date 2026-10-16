@@ -65,7 +65,7 @@ Mở khoá cho: `layer-4-task-01`, `layer-4-task-02`, `layer-5-task-01`, `layer-
 - Acceptance criteria: PASS (reviewer xác minh)
 - Verify commands + result: install --frozen-lockfile/lint/typecheck/test (325; media-upload 18 test, S3 + DB thật)/build = PASS; audit high exit 0; migrate:down + migrate trên dev OK (builder)
 - Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-2-task-01-round-2-review.md`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: docs/ERD.md §4.1 staff.avatar đã có — đúng thiết kế, no doc change

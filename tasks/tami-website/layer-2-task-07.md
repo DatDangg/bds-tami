@@ -35,11 +35,11 @@ Lưu lượt bấm nút liên hệ nổi, gộp theo giờ cho dashboard, xoá d
 Mở khoá cho: `layer-5-task-06`, `layer-9-task-06`, `layer-13-task-01`
 
 ## Acceptance Criteria
-- [ ] `POST /api/public/click-events` body `{ type, pagePath, refCollection?, refId? }` validate zod → 204; rate limit 30/phút/IP (không cần Turnstile)
-- [ ] `type` ∉ {hotline, zalo, fanpage} → 400
-- [ ] Job hằng giờ gộp vào `click-stats-daily` (unique 5 cột, upsert cộng dồn, idempotent khi chạy lại)
-- [ ] Xoá `click-events` > 90 ngày sau khi đã gộp
-- [ ] Chỉ admin đọc 2 collection; không ai sửa qua API
+- [x] `POST /api/public/click-events` body `{ type, pagePath, refCollection?, refId? }` validate zod → 204; rate limit 30/phút/IP (không cần Turnstile)
+- [x] `type` ∉ {hotline, zalo, fanpage} → 400
+- [x] Job hằng giờ gộp vào `click-stats-daily` (unique 5 cột, upsert cộng dồn, idempotent khi chạy lại)
+- [x] Xoá `click-events` > 90 ngày sau khi đã gộp
+- [x] Chỉ admin đọc 2 collection; không ai sửa qua API
 
 ## Tests cần viết
 - Integration: gửi 3 sự kiện → job gộp ra count 3; chạy job lần 2 không cộng trùng
@@ -65,7 +65,7 @@ Mở khoá cho: `layer-5-task-06`, `layer-9-task-06`, `layer-13-task-01`
 - Verify commands + result: pnpm lint PASS; pnpm typecheck PASS; pnpm build PASS; pnpm test: unit PASS (31 test mới/liên quan ở aggregate.test.ts + click-events.test.ts), integration ENV-BLOCKED (ECONNREFUSED 127.0.0.1:5433; tests/integration/click-events.test.ts cùng 9 file integration cũ fail vì thiếu hạ tầng). migrate:create click_events tạo được không cần DB: migrations/20261016_160726_click_events.{ts,json} (additive; kèm payload_jobs_stats + payload_jobs.meta + ADD VALUE enum task_slug do schedule của Jobs).
 - Reviewer verdict: STRICT PASS round 1 (.context/review-reports/build-tami-website-layer-2-task-07-round-1-review.md), 7 MINOR không chặn (refCollection tuỳ ý, pagePath "//", đọc body trước khi kiểm độ dài, cộng dồn không nguyên tử — giả định 1 runner, thiếu test refCollection "" tách dòng, xoá quá hạn không chia lô). Residual: integration + migration apply chưa chạy trên DB thật (Docker off) — phải chạy tests/integration/click-events.test.ts + migrate trên dev trước khi promote staging.
 - Verify sau commit (2026-10-16T16:19:21.000Z, Docker dev tami-* bật, pnpm payload migrate áp 20261016_160726_click_events lên DB dev OK 26ms): pnpm test 44 files / 420 tests PASS, 0 unhandled rejection — residual env-blocked đã đóng.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (PASS) — .context/review-reports/spec-validation-build-tami-website-layer-2.md
 
 ## Doc / Decision Impact
 - Doc impact result: ERD §4.13 + §7 (aggregatedAt, unique 4 cột, "" thay null, ngày giờ VN, xoá chỉ khi đã gộp); API_SPEC §3.4 (ràng buộc body, text/plain, ≤2000 ký tự, 400/429/503)
@@ -83,7 +83,7 @@ Mở khoá cho: `layer-5-task-06`, `layer-9-task-06`, `layer-13-task-01`
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/ClickEvents.ts, ClickStatsDaily.ts
