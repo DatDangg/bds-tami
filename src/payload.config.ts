@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
+import { AuditLogs } from "./collections/AuditLogs";
 import { Media } from "./collections/Media";
 import { PrivateFiles } from "./collections/PrivateFiles";
 import { Staff } from "./collections/Staff";
@@ -33,7 +34,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles],
+  collections: [Staff, Media, PrivateFiles, AuditLogs],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
   jobs: jobsConfig,

@@ -452,7 +452,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `actor` | `rel→staff` | |
-| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
+| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `staff.activate` · `staff.delete` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
 | `collection` | text | |
 | `docId` | text | |
 | `summary` | text | Mô tả ngắn |
@@ -521,7 +521,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `news` | `(status, category_id, published_at DESC)` | Danh sách tin tức |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |
 | `leads` | `(status, assigned_to_id, created_at DESC)` | Danh sách lead trong admin |
-| `audit_logs` | `(created_at DESC)`, `(collection, doc_id)` | Tra cứu nhật ký |
+| `audit_logs` | `(created_at)` (btree, Postgres quét ngược cho mới-nhất-trước), `(collection, doc_id)`, `actor`, `action` | Tra cứu nhật ký |
 
 Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (partial index `WHERE deleted_at IS NULL`, nếu dùng trường `deletedAt`).
 

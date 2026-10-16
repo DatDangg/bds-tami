@@ -70,6 +70,7 @@ export interface Config {
     staff: Staff;
     media: Media;
     'private-files': PrivateFile;
+    'audit-logs': AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -81,6 +82,7 @@ export interface Config {
     staff: StaffSelect<false> | StaffSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
+    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -236,6 +238,45 @@ export interface PrivateFile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs".
+ */
+export interface AuditLog {
+  id: string;
+  actor?: (string | null) | Staff;
+  action:
+    | 'lead.assign'
+    | 'lead.export'
+    | 'content.delete'
+    | 'content.restore'
+    | 'content.purge'
+    | 'staff.create'
+    | 'staff.reset_password'
+    | 'staff.update_role'
+    | 'staff.deactivate'
+    | 'staff.activate'
+    | 'staff.delete'
+    | 'auth.login_failed'
+    | 'application.view_cv'
+    | 'content.retranslate'
+    | 'content.approve_translation';
+  collection?: string | null;
+  docId?: string | null;
+  summary: string;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  ipHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -361,6 +402,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'private-files';
         value: string | PrivateFile;
+      } | null)
+    | ({
+        relationTo: 'audit-logs';
+        value: string | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -515,6 +560,21 @@ export interface PrivateFilesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  actor?: T;
+  action?: T;
+  collection?: T;
+  docId?: T;
+  summary?: T;
+  meta?: T;
+  ipHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

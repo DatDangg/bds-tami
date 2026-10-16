@@ -72,7 +72,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 | Collection | Sale | Admin |
 |---|---|---|
-| `staff` | Đọc + sửa **hồ sơ của chính mình** (tên, SĐT, ảnh, mật khẩu) | ✔ (tạo, khoá, đặt lại mật khẩu, đổi vai trò) |
+| `staff` | Đọc + sửa **hồ sơ của chính mình** (tên, SĐT, ảnh, mật khẩu) | ✔ (tạo, khoá, đặt lại mật khẩu, đổi vai trò). Luôn còn ≥ 1 admin hoạt động: chặn khoá / hạ quyền / xoá admin cuối (kể cả `overrideAccess`). Sửa hàng loạt (`where`) đổi `role`/`active` hoặc xoá mà chạm admin đang hoạt động bị từ chối — đổi admin phải làm từng người |
 | `audit-logs` | — | Chỉ đọc (không ai sửa/xoá) |
 | `click-events`, `click-stats-daily` | — | Chỉ đọc |
 | `translation-usage` | — | Chỉ đọc |
@@ -109,7 +109,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 ## 6. Thao tác bắt buộc ghi audit log
 
-Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá tài khoản, đổi vai trò, đặt lại mật khẩu · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.
+Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá / mở lại / xoá tài khoản, đổi vai trò, đặt lại mật khẩu · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.
 
 ## 7. Bảo vệ trang `/admin`
 

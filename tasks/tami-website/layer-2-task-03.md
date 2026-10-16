@@ -55,20 +55,21 @@ Mở khoá cho: `layer-3-task-02`, `layer-6-task-10`, `layer-8-task-02`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
-- Error memory entry: none
+- Attempt: 2 (sau Reviewer round 1 FAIL)
+- Last failure type: review FAIL MAJOR-1 (guard afterChange/afterDelete bị vô hiệu ở bulk update/delete: Payload bulk gom lỗi từng doc rồi vẫn commit)
+- Error memory entry: guard phải chạy TRƯỚC khi ghi (beforeChange/beforeDelete) + từ chối bulk chạm admin active ở beforeOperation; cờ req.context phải khoá theo doc id. Đã fix, tests bulk thêm vào audit-staff.test.ts.
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 đạt
+- Verify commands + result (attempt 2): lint OK · typecheck OK · test 34 files / 362 tests PASS (thêm 6 integration bulk/cờ mật khẩu) · build OK
+- Reviewer verdict: STRICT PASS round 2 (round 1 FAIL MAJOR-1 bulk bypass last-admin guard → đã sửa) — `.context/review-reports/build-tami-website-layer-2-task-03-round-2-review.md`
+- Residual risk: `auth.login_failed` không ghi cho Local API `payload.login`; khe thời gian nhỏ ở check bulk `beforeOperation` (ngoài lock); `disableTransaction: true` bỏ qua advisory lock; cảnh báo deprecation `pg` (query chồng trên 1 connection, lỗi ở pg@9); MINOR-4 test "tái dùng req sau lỗi" không chứng minh được (password ngắn bị chặn trước khi set cờ); MINOR-5 test file 521 dòng
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: PERMISSION §6 nếu danh sách action đổi)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.13 (thêm `staff.activate`, `staff.delete`; index `audit_logs` thực tế) + `docs/PERMISSION.md` §3.4 (luật admin cuối + chặn bulk chạm admin) và §6 (mở lại/xoá tài khoản)
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-2): task-03 audit` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -76,13 +77,13 @@ Mở khoá cho: `layer-3-task-02`, `layer-6-task-10`, `layer-8-task-02`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-03` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/AuditLogs.ts

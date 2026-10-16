@@ -9,6 +9,11 @@ import type {
 } from "payload";
 
 import { DEFAULT_ROLE, isAdmin, isStaff, ownedByUserOrAdmin, ROLE_VALUES } from "../access";
+import { auditFailedLogin } from "../hooks/staff/audit-login-failed";
+import { auditStaffChanges, auditStaffDelete } from "../hooks/staff/audit-staff-changes";
+import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-reset";
+import { flagPasswordChange } from "../hooks/staff/flag-password-change";
+import { guardLastAdminOnDelete, guardLastAdminOnUpdate, rejectBulkChangeOfActiveAdmins } from "../hooks/staff/last-admin-guard";
 
 const MIN_PASSWORD_LENGTH = 10;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -68,13 +73,15 @@ const resetPasswordWithLengthCheck: Endpoint = {
     if (ownIndex < 0 || !defaultEndpoint) {
       throw new Error("Không tìm thấy handler reset-password mặc định của Payload.");
     }
-    return defaultEndpoint.handler(req);
+    const response = await defaultEndpoint.handler(req);
+    await auditTokenPasswordReset(response, req);
+    return response;
   },
 };
 
 /**
  * Ghi thời điểm đăng nhập thành công. Ghi thẳng DB, không qua `payload.update`, để không chạy hook update
- * (sau này audit-log sẽ coi đó là "sửa hồ sơ").
+ * (audit-log sẽ coi đó là "sửa hồ sơ").
  */
 const recordLastLogin: CollectionAfterLoginHook = async ({ user, req }) => {
   await req.payload.db.updateOne({
@@ -110,9 +117,16 @@ export const Staff: CollectionConfig = {
   },
   endpoints: [resetPasswordWithLengthCheck],
   hooks: {
-    beforeValidate: [enforcePasswordLength],
+    beforeValidate: [enforcePasswordLength, flagPasswordChange],
+    // Guard chạy TRƯỚC khi ghi (cả byID lẫn bulk) nên thao tác bị chặn không đổi gì và không để lại audit.
+    beforeOperation: [rejectBulkChangeOfActiveAdmins],
+    beforeChange: [guardLastAdminOnUpdate],
+    beforeDelete: [guardLastAdminOnDelete],
+    afterChange: [auditStaffChanges],
+    afterDelete: [auditStaffDelete],
     beforeLogin: [blockInactiveLogin],
     afterLogin: [recordLastLogin],
+    afterError: [auditFailedLogin],
   },
   fields: [
     // Khai báo lại để khoá quyền sửa: sale không tự đổi email đăng nhập (PERMISSION §3.4).
