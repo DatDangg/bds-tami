@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.2.1
+- **spec_version:** 1.2.2
 - **updated_at:** 2026-10-16
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -34,7 +34,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 | Hạ tầng | Docker Compose trên server công ty (dùng chung), Nginx có sẵn trên host, Cloudflare (free) |
 | Email | Brevo SMTP |
 | Bản đồ | OpenStreetMap + MapLibre GL (không cần API key trả phí) |
-| Analytics | Google Analytics 4 + Google Search Console (chỉ tải GA4 khi khách đồng ý cookie, xem Q7) |
+| Analytics | Google Analytics 4 + Google Search Console (banner đồng ý cookie; chỉ tải GA4 sau khi khách đồng ý, chốt 16/10/2026) |
 | Giám sát | Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma |
 | CI/CD | GitHub Actions (staging → duyệt → production) |
 | Package manager | pnpm |
@@ -46,13 +46,13 @@ Lý do lựa chọn: `docs/ARCHITECTURE.md` §3.
 Mã yêu cầu theo `docs/BRD.md`. Mức ưu tiên: mọi FR là **Must**, trừ **Should**: FR-PUB-16 (trang đích khu vực), FR-PUB-17 (khối đối tác), FR-ADM-14 (dashboard), FR-ADM-15 (redirect 301) · **Could**: FR-ADM-16 (hẹn giờ xuất bản). Graph xếp Should/Could vào layer sau Must.
 
 ### F1. Trang chủ (giới thiệu TAMI): FR-PUB-01, FR-PUB-17
-Các khối Hero slide (1–8), Về TAMI (kèm số liệu), Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Đối tác, Footer liên hệ. Admin bật/tắt và sắp xếp khối qua global `homepage`.
+Các khối Hero slide (1–8; ảnh bắt buộc, video tuỳ chọn từng slide), Về TAMI (kèm số liệu), Dự án nổi bật, Dịch vụ (thẻ ảnh), Ưu đãi nổi bật, Đối tác, banner CTA "Nhận tư vấn", Footer liên hệ. Admin bật/tắt và sắp xếp khối qua global `homepage`.
 
 ### F2. Dự án: FR-PUB-02, FR-PUB-03, FR-ADM-01
 Danh sách lọc theo loại hình / tỉnh / trạng thái mở bán, có phân trang, chỉ dự án đã xuất bản. Chi tiết: tổng quan, chủ đầu tư, bản đồ, tiện ích, mặt bằng, pháp lý, chính sách bán hàng, tài liệu, thư viện ảnh, form lead (tạo lead gắn dự án).
 
 ### F3. Cho thuê: FR-PUB-04, FR-PUB-05, FR-PUB-16, FR-ADM-02
-Danh sách có bộ lọc (danh mục, tỉnh, phường, giá/tháng, diện tích, phòng ngủ, nội thất, từ khoá không dấu, sắp xếp), bộ lọc nằm trên URL. Bộ lọc p95 ≤ 500ms. Chi tiết gồm thư viện ảnh (tối thiểu 3 ảnh khi xuất bản), video, mã tin, giá/tháng, diện tích, phòng ngủ/WC, tầng, hướng, nội thất, mô tả, vị trí, điều khoản thuê (thời hạn tối thiểu, cọc, kỳ thanh toán, dịch vụ bao gồm, ngày trống), sale phụ trách, form lead, tin tương tự. Mã tin `CT-xxxxxx`. Trạng thái `draft/published/hidden/rented`; tin đã thuê vẫn giữ trang, có nhãn "Đã thuê" và gợi ý tin tương tự. Nút tìm kiếm trên header dẫn tới `/cho-thue?q=` (giai đoạn 1 không có tìm kiếm toàn site).
+Danh sách có bộ lọc (danh mục, tỉnh, phường, giá/tháng, diện tích, phòng ngủ, nội thất, từ khoá không dấu, sắp xếp), bộ lọc nằm trên URL. Bộ lọc p95 ≤ 500ms. Chi tiết gồm thư viện ảnh (tối thiểu 3 ảnh khi xuất bản), video, mã tin, giá/tháng, diện tích, phòng ngủ/WC, tầng, hướng, nội thất, mô tả, vị trí, điều khoản thuê (thời hạn tối thiểu, cọc, kỳ thanh toán, dịch vụ bao gồm, ngày trống), sale phụ trách, form lead, tin tương tự. Mã tin `CT-xxxxxx`. Trạng thái `draft/published/hidden/rented`; tin đã thuê vẫn giữ trang, có nhãn "Đã thuê" và gợi ý tin tương tự, gắn `noindex, follow` và không vào sitemap. Nút tìm kiếm trên header dẫn tới `/cho-thue?q=` (giai đoạn 1 không có tìm kiếm toàn site).
 
 ### F4. Đăng tin BĐS: FR-PUB-06, FR-PUB-07, FR-ADM-03
 Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ chọn giá, khu vực, dự án / tin cho thuê liên quan, hạn ưu đãi + mã voucher. Có form lead. Quá hạn ưu đãi thì gắn "Đã kết thúc" và rời khối "Ưu đãi nổi bật" (BR-06).
@@ -61,7 +61,7 @@ Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ 
 Tin tức chung theo danh mục, có tags, bài liên quan. Không thu lead.
 
 ### F6. Tuyển dụng: FR-PUB-09, FR-ADM-05
-Danh sách việc (tự ẩn khi quá hạn nộp), chi tiết, form nộp CV (PDF/DOC/DOCX ≤ 5MB). Admin quản lý hồ sơ (`new/reviewing/interview/hired/rejected`). JSON-LD `JobPosting`.
+Danh sách việc (tự ẩn khi quá hạn nộp; mở URL trực tiếp thì hiện băng "đã hết hạn", ẩn form, `noindex`, bỏ JSON-LD), chi tiết, form nộp CV (PDF/DOC/DOCX ≤ 5MB). Admin quản lý hồ sơ (`new/reviewing/interview/hired/rejected`). JSON-LD `JobPosting`.
 
 ### F7. Dịch vụ, Liên hệ, trang pháp lý: FR-PUB-10, 11, 14
 Trang dịch vụ (Phân phối, Môi giới, Khai thác CHDV), trang liên hệ (form, bản đồ, hotline), chính sách bảo mật, điều khoản.
@@ -177,9 +177,7 @@ Các quy tắc dưới đây là ⚠️ giả định mặc định để build,
 | Q4 | Nội dung ban đầu: dự án, tin cho thuê, dịch vụ, bài giới thiệu | Go-live (code dùng dữ liệu mẫu) |
 | Q5 | Bản EN trang pháp lý có cần luật sư duyệt (hiện: admin duyệt) | Mở `/en` trang pháp lý |
 | Q6 | Hạn mức chi phí Claude API / tháng | Production |
-| Q7 | Banner đồng ý cookie cho GA4 (LGL-03): đề xuất chỉ tải GA4 sau khi khách đồng ý | Bước `/design` |
 | — | Tên miền | Production |
-| — | Hero video, dải 4 lối tắt, banner CTA (DESIGN) chưa có trường trong global `homepage`; DESIGN chưa có màn trang đích khu vực (FR-PUB-16) và trang danh mục | Bước `/design` chốt |
 
 ## Scalability Profile
 

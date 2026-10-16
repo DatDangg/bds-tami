@@ -44,7 +44,7 @@
 | Primary Soft | `#EAD3AE` | Chip danh mục, tab lọc đang chọn, nền hover nhẹ | Đo từ tab "Tất cả", chip "Thị trường" (#E6C89B – #E9D0AA) |
 | Primary Subtle | `#F8F3EB` | Nền khối nổi bật (panel lợi ích, vùng nhấn kem) | Đo từ panel bên phải trang chi tiết |
 | Accent Text | `#8C6733` | Chữ vàng cỡ nhỏ: link "Xem tất cả", "Đọc thêm", nhãn eyebrow (DỰ ÁN, TIN TỨC), tab active | Mockup ~#B58C50 chỉ đạt 3.1:1 trên nền trắng → **đậm lên** để đạt 5.1:1 |
-| Accent Display | `#B58C50` | Giá tiền cỡ lớn (≥ 24px), icon viền vàng, gạch chân tab | Chỉ dùng cho chữ lớn / icon (đạt 3:1) |
+| Accent Display | `#A07A3F` | Giá tiền cỡ lớn (≥ 24px), icon viền vàng, gạch chân tab | Chỉ dùng cho chữ lớn / icon. Mockup `#B58C50` chỉ 2.83:1 → đổi `#A07A3F` (3.61:1), chốt 16/10/2026 |
 | Badge Foreground | `#3C2704` | Chữ trên badge vàng ("Đang mở bán") | Đo từ badge, 8.1:1 |
 
 **Nền & bề mặt**
@@ -55,7 +55,8 @@
 | Background Alt | `#FAF8F6` | Nền section xen kẽ |
 | Surface | `#FFFFFF` | Card, form, thanh tìm kiếm, dropdown |
 | Surface Muted | `#F1F0EE` | Chip/tag trung tính ("Biệt thự", "Căn hộ"), ô input disabled |
-| Border | `#E8E6E3` | Viền card, input, đường kẻ chia | 
+| Border | `#E8E6E3` | Viền card, đường kẻ chia (trang trí) |
+| Border Input | `#857F79` | Viền input / select / checkbox (≥ 3:1 theo WCAG 1.4.11), chốt 16/10/2026 | 
 
 **Tối (section tối, footer, banner CTA)**
 
@@ -74,14 +75,14 @@
 |-------|-------|-------|---------|
 | Text Primary | `#141414` | Tiêu đề, tên dự án/tin, giá trị thông số | Đo từ heading (#090909 – #141413) |
 | Text Secondary | `#555555` | Đoạn mô tả, nội dung bài viết | 7.5:1 |
-| Text Muted | `#767676` | Địa chỉ, ngày đăng, nhãn thông số ("Diện tích", "Bàn giao"), placeholder | Mockup ~#8A–#A0 chưa đạt AA → **đậm lên** để đạt 4.5:1 |
+| Text Muted | `#6B6B6B` | Địa chỉ, ngày đăng, nhãn thông số ("Diện tích", "Bàn giao"), placeholder | Mockup ~#8A–#A0 chưa đạt AA → **đậm lên** để đạt 4.5:1 |
 
 **Trạng thái** (mockup không có, đề xuất cho hợp tông ấm)
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | Success | `#2F7D5B` | Gửi form thành công, trạng thái "Đã chốt" |
-| Warning | `#B7791F` | Sắp hết hạn ưu đãi, cảnh báo |
+| Warning | `#8A5A0A` | Sắp hết hạn ưu đãi, cảnh báo |
 | Error | `#B42318` | Lỗi form, trạng thái lỗi |
 | Info | `#2B6CB0` | Thông báo trung tính |
 
@@ -94,7 +95,7 @@
   --color-primary-soft: #EAD3AE;
   --color-primary-subtle: #F8F3EB;
   --color-accent-text: #8C6733;
-  --color-accent-display: #B58C50;
+  --color-accent-display: #A07A3F;
   --color-badge-foreground: #3C2704;
 
   --color-bg: #F7F5F4;
@@ -102,6 +103,7 @@
   --color-surface: #FFFFFF;
   --color-surface-muted: #F1F0EE;
   --color-border: #E8E6E3;
+  --color-border-input: #857F79;
 
   --color-dark: #111111;
   --color-dark-deep: #0A0C10;
@@ -111,10 +113,10 @@
 
   --color-text: #141414;
   --color-text-secondary: #555555;
-  --color-text-muted: #767676;
+  --color-text-muted: #6B6B6B;
 
   --color-success: #2F7D5B;
-  --color-warning: #B7791F;
+  --color-warning: #8A5A0A;
   --color-error: #B42318;
   --color-info: #2B6CB0;
 }
@@ -208,7 +210,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Màn | Route VI · EN | Bố cục tham chiếu (vinhomes.vn) |
 |---|---|---|
-| Trang chủ | `/` · `/en` | Hero full màn hình (ảnh/video, câu chính serif in hoa ở giữa, chữ chạy nhẹ) → dải giới thiệu ngắn + số liệu (kiểu "Thương hiệu… / Top 10…") → dải 4 lối tắt (Dự án · Cho thuê · Ưu đãi · Liên hệ) → **Dự án nổi bật**: tiêu đề + chữ chìm phía sau, slider full-bleed mỗi slide 1 dự án (ảnh lớn + khung chữ: tagline, TÊN DỰ ÁN, mô tả, nút "KHÁM PHÁ DỰ ÁN"), chấm phân trang → **Dịch vụ**: tiêu đề giữa + 3 thẻ ảnh có eyebrow → Ưu đãi nổi bật (lưới thẻ) → Đối tác (dải logo) → banner CTA tối → footer tối |
+| Trang chủ | `/` · `/en` | Hero full màn hình (ảnh bắt buộc; video tuỳ chọn theo từng slide, chỉ phát ≥ 1024px, câu chính serif in hoa ở giữa, chữ chạy nhẹ) → dải giới thiệu ngắn + số liệu (kiểu "Thương hiệu… / Top 10…") → **Dự án nổi bật**: tiêu đề + chữ chìm phía sau, slider full-bleed mỗi slide 1 dự án (ảnh lớn + khung chữ: tagline, TÊN DỰ ÁN, mô tả, nút "KHÁM PHÁ DỰ ÁN"), chấm phân trang → **Dịch vụ**: tiêu đề giữa + 3 thẻ ảnh có eyebrow → Ưu đãi nổi bật (lưới thẻ) → Đối tác (dải logo) → banner CTA tối → footer tối |
 | Danh sách dự án | `/du-an` · `/en/projects` | Banner ảnh + tiêu đề serif → bộ lọc dạng tab/chip → lưới thẻ dự án ảnh lớn (ảnh, eyebrow loại hình, tên serif, địa điểm) |
 | Chi tiết dự án | `/du-an/[slug]` · `/en/projects/[slug]` | Hero ảnh full màn hình + tên dự án → thanh mục con dính khi cuộn (Tổng quan · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Thư viện) → các section xen nền sáng/kem/tối → form để lại thông tin |
 | Cho thuê (danh sách) | `/cho-thue` · `/en/for-rent` | Banner + thanh tìm kiếm/lọc → lưới thẻ tin (ảnh, giá, diện tích, phòng, khu vực) + phân trang |
@@ -292,3 +294,15 @@ Với TỪNG screen trong Screen Inventory, khai báo rõ responsive behavior:
 
 Không được bỏ trống mục này — Review sẽ FAIL nếu thiếu.
 
+---
+
+## Quyết định bước `/design` (16/10/2026)
+
+Nguồn chi tiết: tokens `skills/react-nodejs/design-tokens.md`, screen specs `.context/design-spec.md`.
+
+- **Tokens:** 4 giá trị đổi để đạt WCAG AA (Text Muted `#6B6B6B`, Accent Display `#A07A3F`, Warning `#8A5A0A`, thêm Border Input `#857F79`); bảng màu ở trên đã cập nhật.
+- **Trang chủ:** hero dùng ảnh (bắt buộc), video **tuỳ chọn** từng slide: admin có thể chỉ dùng ảnh. **Bỏ** dải 4 lối tắt. **Giữ** banner CTA tối (khối `ctaBanner`). Thẻ Dịch vụ dùng ảnh `services.coverImage`. Không làm `pageBanners` / `provinces.intro` (dùng banner chữ / câu mẫu).
+- **SEO:** tin "Đã thuê" và tin tuyển dụng quá hạn vẫn mở trang (có băng thông báo), gắn `noindex, follow`, bỏ khỏi sitemap; tuyển dụng quá hạn ẩn form và bỏ JSON-LD `JobPosting`.
+- **Cookie:** banner đồng ý không chặn trang, nút Từ chối ngang hàng Đồng ý; GA4 chỉ tải sau khi đồng ý.
+- **Eyebrow:** tối đa 1 trên 3 section.
+- **Icon:** Phosphor Icons (thay Lucide mặc định của shadcn).

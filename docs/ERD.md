@@ -309,6 +309,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `title` | text | R | Phân phối · Môi giới · Khai thác căn hộ dịch vụ |
 | `slug` | text | R, U | |
 | `icon` | upload `rel→media` | | |
+| `coverImage` | upload `rel→media` | R khi `published` | Ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ |
 | `summary` | textarea | R | Hiện trên trang chủ |
 | `content` | richText | | |
 | `sortOrder` | number | | |
@@ -435,7 +436,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |
 |---|---|---|---|
-| file | upload | R | Ảnh ≤ 10MB (JPG/PNG/WebP/AVIF), PDF ≤ 20MB |
+| file | upload | R | Ảnh ≤ 10MB (JPG/PNG/WebP/AVIF), PDF ≤ 20MB, video MP4/WebM ≤ 15MB (chỉ dùng cho `homepage.hero.slides[].video`) |
 | `alt` | text | R với ảnh | Accessibility + SEO |
 | `caption` | text | | |
 | `uploadedBy` | `rel→staff` | | |
@@ -488,13 +489,14 @@ Dùng plugin `@payloadcms/plugin-seo`.
 
 | Khối | Trường |
 |---|---|
-| `hero` | `slides` (array 1–8: `image`, `title`, `subtitle`, `ctaLabel`, `ctaLink`) |
+| `hero` | `slides` (array 1–8: `image` (R, poster + mobile), `video` (tuỳ chọn, `rel→media` MP4/WebM ≤ 15MB, chỉ phát ≥ 1024px), `title`, `subtitle`, `ctaLabel`, `ctaLink`) |
 | `about` | `enabled`, `title`, `content` (richText), `image`, `stats` (array `{value, label}`, vd "10+ năm") |
 | `featuredProjects` | `enabled`, `title`, `projects` (`rel→projects` hasMany, tối đa 6; trống thì lấy `isFeatured` mới nhất) |
 | `services` | `enabled`, `title`, `items` (`rel→services` hasMany) |
 | `featuredOffers` | `enabled`, `title`, `posts` (`rel→property-posts` hasMany; trống thì lấy `isFeatured` còn hạn) |
 | `partners` | `enabled`, `title` (lấy `developers.showAsPartner`) |
-| `blockOrder` | array thứ tự khối |
+| `ctaBanner` | `enabled`, `title` (R khi `enabled`), `description`, `ctaLabel` (trống thì dùng chuỗi "Nhận tư vấn"), `ctaLink` (khoá trang hoặc URL), `backgroundImage` (tuỳ chọn). Chưa có `title` EN thì ẩn khối ở `/en` |
+| `blockOrder` | array thứ tự khối (gồm `ctaBanner`) |
 | `seo` | group |
 
 **`header`**: `navItems` (array `{label, link, children?}`), `ctaButton`.
