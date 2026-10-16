@@ -1,9 +1,14 @@
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { routing } from "@/i18n/routing";
 
-const supportedLocales = ["vi", "en"];
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
-// Placeholder: định tuyến i18n (next-intl) và UI làm ở task layer-1 riêng.
+// Khung layout: UI thật (header/footer) làm ở các task giao diện sau.
 export default async function LocaleLayout({
   children,
   params,
@@ -12,10 +17,13 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!supportedLocales.includes(locale)) notFound();
+  if (!hasLocale(routing.locales, locale)) notFound();
+  setRequestLocale(locale);
   return (
     <html lang={locale}>
-      <body>{children}</body>
+      <body>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

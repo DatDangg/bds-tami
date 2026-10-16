@@ -1,0 +1,7 @@
+{
+  "common": {
+    "siteName": "TAMI",
+    "switchLanguage": "Chuyển ngôn ngữ",
+    "languageName": { "vi": "Tiếng Việt", "en": "English" }
+  }
+}

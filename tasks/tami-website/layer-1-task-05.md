@@ -91,3 +91,6 @@ Mở khoá cho: `layer-2-task-03`, `layer-2-task-07`, `layer-3-task-02`, `layer-
 ## Notes
 - Không gom logic nghiệp vụ lead vào đây (để task lead).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-03 (16/10/2026)
+- m3: matcher của `src/proxy.ts` bỏ qua mọi path có dấu chấm → slug sinh ra **không được chứa `.`** (bỏ/đổi thành `-`), kèm test.

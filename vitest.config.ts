@@ -23,6 +23,8 @@ export default defineConfig({
           environment: "node",
           setupFiles: ["tests/setup.ts"],
           testTimeout: 30_000,
+          // next-intl import `next/server` không đuôi .js: để Vite resolve thay vì Node ESM thuần.
+          server: { deps: { inline: ["next-intl"] } },
         },
       },
     ],

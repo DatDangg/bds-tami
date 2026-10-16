@@ -93,3 +93,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-03
+- `LanguageSwitcher` phải gọi `buildLocaleCookie(locale)` (`src/i18n/localeCookie.ts`) ghi `document.cookie` khi khách bấm chuyển ngôn ngữ; proxy không tự đặt cookie.
+- Cookie chỉ dùng để giữ lựa chọn cho UI (vd đánh dấu ngôn ngữ đang chọn). KHÔNG đọc nó để redirect `/` hay đổi ngôn ngữ của URL (trái SPEC F12: không tự chuyển theo ngôn ngữ trình duyệt; mỗi URL một ngôn ngữ). Nếu muốn thêm hành vi dựa trên cookie phải qua Change Request.
