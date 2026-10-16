@@ -1,6 +1,65 @@
 {
-  "mode": "maintenance",
+  "mode": "initial-build",
   "activeWorkItem": null,
   "features": [],
-  "bugs": []
+  "bugs": [],
+  "projectName": "tami-website",
+  "initialBuild": {
+    "slug": "tami-website",
+    "taskDir": "tasks/tami-website",
+    "layerPlan": "docs/diagrams/layer-plan.md",
+    "totalTasks": 74,
+    "status": "plan_approved",
+    "approvedAt": "2026-10-16",
+    "adjustments": [
+      "checkpoint gộp theo 5 mốc",
+      "staging sớm sau L5",
+      "production trước Could"
+    ]
+  },
+  "totalLayers": 17,
+  "currentLayer": 0,
+  "completedTasks": [],
+  "inProgressTask": null,
+  "blockedTasks": [],
+  "decisions": [
+    {
+      "date": "2026-10-16T18:00:00+07:00",
+      "decision": "Duyệt layer plan với 5 mốc duyệt (M1–M5), staging sớm sau L5, production trước Could; giữ Mermaid (không cài archify)",
+      "reason": "User duyệt plan"
+    }
+  ],
+  "lastUpdated": "2026-10-16T18:00:00+07:00",
+  "approvalMilestones": [
+    {
+      "id": "M1",
+      "afterLayer": 4,
+      "description": "Nền xong (scaffold, auth, i18n, UI, upload, bộ field, danh mục, cấu hình, CD/giám sát/backup dạng file)",
+      "status": "pending"
+    },
+    {
+      "id": "M2",
+      "afterLayer": 10,
+      "description": "Tính năng Must xong (website VI/EN, lead, tuyển dụng, tự dịch) — staging sớm đã chạy từ L6",
+      "status": "pending"
+    },
+    {
+      "id": "M3",
+      "afterLayer": 12,
+      "description": "Staging đầy đủ Must + giám sát/backup + E2E PASS trên staging",
+      "status": "pending"
+    },
+    {
+      "id": "M4",
+      "afterLayer": 13,
+      "description": "Should xong (dashboard, redirect UI, trang khu vực, đối tác)",
+      "status": "pending"
+    },
+    {
+      "id": "M5",
+      "afterLayer": 14,
+      "description": "Trước deploy production: hardening xong; user duyệt production",
+      "status": "pending"
+    }
+  ]
 }
