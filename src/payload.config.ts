@@ -14,19 +14,14 @@ import { Staff } from "./collections/Staff";
 import { migrations } from "../migrations";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
+import { getS3ClientConfig } from "./lib/s3-config";
 import { createEmailAdapter } from "./lib/email/transport";
 import { MAX_UPLOAD_BYTES } from "./lib/upload/validate-file";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const env = getEnv();
 
-// SeaweedFS (S3 API) cần path-style: bucket nằm trong đường dẫn, không phải subdomain.
-const s3ClientConfig = {
-  endpoint: env.S3_ENDPOINT,
-  region: "us-east-1",
-  forcePathStyle: true,
-  credentials: { accessKeyId: env.S3_ACCESS_KEY_ID, secretAccessKey: env.S3_SECRET_ACCESS_KEY },
-};
+const s3ClientConfig = getS3ClientConfig();
 
 export default buildConfig({
   admin: {

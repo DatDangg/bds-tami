@@ -46,20 +46,20 @@ Mở khoá cho: `layer-3-task-01`, `layer-3-task-03`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
-- Error memory entry: none
+- Attempt: 2
+- Last failure type: reviewer round 1 FAIL (M1: DB probe qua getPayload sinh unhandled rejection khi DB chết)
+- Error memory entry: none (fix: pg.Pool riêng max:1 + connect/query timeout + on("error"); m1 s3-config dùng chung + HEALTH_CHECK_TIMEOUT_MS; m3 check cả 2 bucket)
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: code đủ 3 tiêu chí (200/503, không lộ chi tiết, timeout 2s + no-store); chờ reviewer
+- Verify commands + result (attempt 2): lint PASS; typecheck PASS; build PASS; `vitest run src/lib/health tests/integration/health.test.ts`: unit 4/4 + test mới probes.test.ts (DB down -> 503/db down, không lộ thông tin, không unhandledRejection, không cần Docker) PASS, KHÔNG còn Unhandled Rejection; integration "Redis tắt -> 503" PASS, "all up -> 200" ENV-BLOCKED (Docker tắt). `pnpm test` full: 306 passed / 9 failed (toàn integration ECONNREFUSED, ENV-BLOCKED); 4 unhandled rejection còn lại đến từ các integration khác dùng getPayload khi DB chết, không phải từ health
+- Reviewer verdict: NORMAL PASS round 2 (.context/review-reports/build-tami-website-layer-2-task-06-round-2-review.md); round 1 FAIL (unhandled rejection getPayload khi DB chết). Residual: đường 200 trên hạ tầng thật chưa chạy (Docker off) — chạy tests/integration/health.test.ts khi Docker bật trước khi dùng làm CD gate; 4 unhandled rejection còn lại từ integration test khác (getPayload lúc DB chết, có trước task này). MINOR n1 tên test probes nói 503, n2 không có hàm đóng pool — không chặn.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: API_SPEC §3 nếu shape response khác)
-- Decision log: pending
+- Doc impact result: docs/API_SPEC.md §3.5 thêm shape GET /api/health (as-built)
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-2): task-06 health` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -67,12 +67,12 @@ Mở khoá cho: `layer-3-task-01`, `layer-3-task-03`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-06` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức NORMAL)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [ ] Committed
 
 ## Files to Create/Modify

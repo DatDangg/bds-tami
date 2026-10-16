@@ -114,6 +114,19 @@ Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
 Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? }`. Gửi bằng `navigator.sendBeacon`. Trả `204`.
 
+### 3.5. `GET /api/health`
+
+Không cần đăng nhập, không rate limit. Dùng cho CD health gate, Docker `HEALTHCHECK`, Uptime Kuma.
+Kiểm song song DB (`select 1`), Redis (`PING`), storage (`HeadBucket` cả bucket public và private); mỗi check tối đa 2 giây.
+
+| Mã | Body |
+|---|---|
+| `200` | `{ "status": "ok", "checks": { "db": "up", "redis": "up", "storage": "up" } }` |
+| `503` | `{ "status": "down", "checks": { ... } }`; thành phần lỗi hoặc quá 2 giây có giá trị `"down"` |
+
+Header `Cache-Control: no-store`. Không trả version, host, chuỗi kết nối, stack trace.
+Code: `src/app/(payload)/api/health/route.ts`, `src/lib/health/`.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

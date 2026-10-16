@@ -103,6 +103,13 @@
       "round": 3,
       "report": ".context/review-reports/build-tami-website-layer-2-task-05-round-3-review.md",
       "completedAt": "2026-10-16T15:43:45.000Z"
+    },
+    {
+      "task": "layer-2/task-06",
+      "review": "NORMAL PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-2-task-06-round-2-review.md",
+      "completedAt": "2026-10-16T15:55:22.000Z"
     }
   ],
   "inProgressTask": null,
@@ -125,7 +132,7 @@
       "reason": "User: data này t gửi sau"
     }
   ],
-  "lastUpdated": "2026-10-16T15:43:45.000Z",
+  "lastUpdated": "2026-10-16T15:55:22.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
