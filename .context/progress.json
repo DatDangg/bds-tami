@@ -1,6 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": null,
+  "activeWorkItem": "build/tami-website",
   "features": [],
   "bugs": [],
   "projectName": "tami-website",
@@ -19,7 +19,15 @@
   },
   "totalLayers": 17,
   "currentLayer": 0,
-  "completedTasks": [],
+  "completedTasks": [
+    {
+      "task": "layer-0/task-01",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-0-task-01-round-1-review.md",
+      "completedAt": "2026-10-16T09:12:53.770Z"
+    }
+  ],
   "inProgressTask": null,
   "blockedTasks": [],
   "decisions": [
@@ -29,7 +37,7 @@
       "reason": "User duyệt plan"
     }
   ],
-  "lastUpdated": "2026-10-16T18:00:00+07:00",
+  "lastUpdated": "2026-10-16T09:12:53.770Z",
   "approvalMilestones": [
     {
       "id": "M1",

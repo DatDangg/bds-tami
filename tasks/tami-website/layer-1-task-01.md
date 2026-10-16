@@ -87,3 +87,8 @@ Mở khoá cho: `layer-4-task-05`
 - CI chỉ chạy thật khi user push lên GitHub (push không tự động, `auto_push_after_pass: false`).
 - Semgrep/ocr là tuỳ chọn, không chặn ở giai đoạn này.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-0-task-01 (16/10/2026)
+- F2: `src/payload.config.ts` gọi `getEnv()` khi import → CI `pnpm build` cần đủ 17 biến: cấp giá trị giả (dummy, không phải secret) trong workflow; không đưa secret thật vào image.
+- F3: `pnpm audit` còn advisory high `braces@3.0.3` (GHSA-vfj7-8cjw-p6xm, transitive qua sass/chokidar, chỉ build-time, chưa có bản vá) → allowlist có lý do + ngày xem lại, không tắt audit toàn bộ.
+- Next 16 `pnpm dev` tự chèn block `nextjs-agent-rules` vào AGENTS.md: tìm cách tắt (config/env của Next) hoặc thêm bước CI/hook chặn commit block đó.

@@ -96,3 +96,6 @@ Mở khoá cho: `layer-2-task-01`, `layer-2-task-02`, `layer-2-task-03`, `layer-
 - Field `avatar` thêm ở task media (tránh phụ thuộc vòng); hoặc thêm sau bằng migration riêng.
 - Session 8 giờ không hoạt động làm ở task riêng (session-refresh).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-0-task-01 (16/10/2026)
+- F1: `src/payload.config.ts` admin `i18n.supportedLanguages` đang có `{ vi, en }` → spec: admin CHỈ tiếng Việt → để `{ vi }`. Collection `staff` tối thiểu đã có ở `src/collections/Staff.ts` (layer 0) — mở rộng, không tạo lại.

@@ -1,5 +1,23 @@
 # 🚀 AI-Powered Project Template (Web)
 
+## Chạy dev (TAMI)
+
+Yêu cầu: Node >= 22, pnpm 9, Docker. Mọi cổng Docker chỉ bind `127.0.0.1` (Postgres `5433`, Redis `6381`, SeaweedFS S3 `8333`).
+
+```bash
+pnpm install
+cp .env.example .env.local      # điền các biến còn trống (PAYLOAD_SECRET, TURNSTILE_*, SMTP_*, ANTHROPIC_API_KEY, TRANSLATION_MODEL)
+docker compose -f docker/docker-compose.dev.yml up -d   # Postgres+PostGIS, Redis, SeaweedFS (bucket public/private)
+pnpm payload migrate            # áp migration trong migrations/ lên DB dev
+pnpm dev                        # http://localhost:3000/admin
+```
+
+- Verify: `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm build` (cần `.env.local` vì `payload.config.ts` validate env bằng `src/lib/env.ts`).
+- Đổi schema: sửa collection rồi `pnpm payload migrate:create <tên>` và commit file trong `migrations/`. Adapter `push: false`, không dùng `db push`.
+- Dừng hạ tầng: `docker compose -f docker/docker-compose.dev.yml down` (thêm `-v` để xoá dữ liệu dev).
+
+---
+
 > A model-agnostic multi-agent template for **working on repos that already have code** (bug/feature/update).
 
 > 📌 **Workflow:** `/spec-init` (read code → build spec, run once) → **loop** executes tasks → **`/change`** for all subsequent changes (via the `change-request` agent).

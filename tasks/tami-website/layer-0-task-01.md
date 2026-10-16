@@ -32,13 +32,13 @@ Dựng app Next.js (App Router) nhúng Payload CMS 3, TypeScript strict, pnpm; c
 Mở khoá cho: `layer-1-task-01`, `layer-1-task-02`, `layer-1-task-03`, `layer-1-task-04`, `layer-1-task-05`, `layer-1-task-06`, `layer-1-task-07`
 
 ## Acceptance Criteria
-- [ ] `pnpm install` tạo lockfile; sau đó `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` đều PASS
-- [ ] Cấu trúc thư mục đúng ARCHITECTURE §4 (`collections/`, `globals/`, `access/`, `hooks/`, `endpoints/`, `jobs/`, `lib/`, `components/`, `i18n/`, `seed/`, `migrations/`, `docker/`)
-- [ ] `payload.config.ts`: Postgres adapter `idType: "uuid"`, `localization: { locales: ["vi","en"], defaultLocale: "vi", fallback: false }`, `graphQL.disable: true`, admin `i18n` tiếng Việt
-- [ ] `src/lib/env.ts` validate env bằng zod; thiếu biến bắt buộc thì app báo lỗi rõ tên biến (không in giá trị); `.env.example` liệt kê đủ biến ở `project-config.md` § Secrets, không có secret thật
-- [ ] `docker compose -f docker/docker-compose.dev.yml up -d` chạy Postgres có đủ 3 extension `postgis`, `unaccent`, `pg_trgm`, Redis, SeaweedFS (2 bucket `public`, `private`); mọi cổng bind `127.0.0.1`
-- [ ] Mở `http://localhost:3000/admin` thấy màn tạo tài khoản đầu tiên của Payload (giao diện tiếng Việt)
-- [ ] Migration khởi tạo sinh bằng `pnpm payload migrate:create`, nằm trong `migrations/`; không dùng `push: true` ở bất kỳ môi trường nào
+- [x] `pnpm install` tạo lockfile; sau đó `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` đều PASS
+- [x] Cấu trúc thư mục đúng ARCHITECTURE §4 (`collections/`, `globals/`, `access/`, `hooks/`, `endpoints/`, `jobs/`, `lib/`, `components/`, `i18n/`, `seed/`, `migrations/`, `docker/`)
+- [x] `payload.config.ts`: Postgres adapter `idType: "uuid"`, `localization: { locales: ["vi","en"], defaultLocale: "vi", fallback: false }`, `graphQL.disable: true`, admin `i18n` tiếng Việt
+- [x] `src/lib/env.ts` validate env bằng zod; thiếu biến bắt buộc thì app báo lỗi rõ tên biến (không in giá trị); `.env.example` liệt kê đủ biến ở `project-config.md` § Secrets, không có secret thật
+- [x] `docker compose -f docker/docker-compose.dev.yml up -d` chạy Postgres có đủ 3 extension `postgis`, `unaccent`, `pg_trgm`, Redis, SeaweedFS (2 bucket `public`, `private`); mọi cổng bind `127.0.0.1`
+- [x] Mở `http://localhost:3000/admin` thấy màn tạo tài khoản đầu tiên của Payload (giao diện tiếng Việt)
+- [x] Migration khởi tạo sinh bằng `pnpm payload migrate:create`, nằm trong `migrations/`; không dùng `push: true` ở bất kỳ môi trường nào
 
 ## Tests cần viết
 - Unit `src/lib/env.test.ts`: thiếu biến → throw có tên biến; đủ biến → parse đúng kiểu
@@ -60,14 +60,14 @@ Mở khoá cho: `layer-1-task-01`, `layer-1-task-02`, `layer-1-task-03`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (5)/build = PASS; pnpm audit còn 1 high braces (transitive, build-time) → follow-up layer-1-task-01
+- Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-0-task-01-round-1-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: README (cách chạy dev). ARCHITECTURE không đổi.)
-- Decision log: pending
+- Doc impact result: README (mục Chạy dev TAMI); decisions.md Decision 1
+- Decision log: `.context/decisions.md` Decision 1 (Next 16.4.2 + Payload 3.91.0)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-0): task-01 scaffold` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -75,13 +75,13 @@ Mở khoá cho: `layer-1-task-01`, `layer-1-task-02`, `layer-1-task-03`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-0/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - package.json, pnpm-lock.yaml, tsconfig.json, next.config.ts, eslint.config.mjs, vitest.config.ts

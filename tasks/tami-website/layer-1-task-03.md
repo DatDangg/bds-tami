@@ -91,3 +91,7 @@ Mở khoá cho: `layer-2-task-08`, `layer-2-task-09`, `layer-3-task-02`, `layer-
 ## Notes
 - Nội dung trang thật làm ở các task trang công khai; task này chỉ dựng khung.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-0-task-01 (16/10/2026)
+- F4: hiện chỉ có `/vi`, `/` trả 404. Theo SPEC F12: tiếng Việt **không tiền tố** (`/`, `/du-an`…), tiếng Anh `/en/...` → next-intl `localePrefix: 'as-needed'`; `/vi/*` redirect 301 về bản không tiền tố. KHÔNG redirect `/` → `/vi`.
+- Next 16 đổi `middleware.ts` → `proxy.ts`: dùng đúng quy ước Next 16 (ARCHITECTURE §4 ghi middleware.ts → cập nhật doc nếu đổi).

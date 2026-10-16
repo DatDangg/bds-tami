@@ -1,0 +1,72 @@
+# Hạ tầng dev local cho TAMI. Chạy: docker compose -f docker/docker-compose.dev.yml up -d
+# Mọi cổng bind 127.0.0.1; tên container/volume có tiền tố `tami-` để không đụng dự án khác.
+# Cổng host chọn 5433/6381/8333 để tránh trùng Postgres/Redis mặc định trên máy dev.
+name: tami-dev
+
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: tami-postgres
+    environment:
+      POSTGRES_USER: tami
+      POSTGRES_PASSWORD: tami_dev_password
+      POSTGRES_DB: tami
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - tami-postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tami -d tami"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: tami-redis
+    ports:
+      - "127.0.0.1:6381:6379"
+    volumes:
+      - tami-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48
+    container_name: tami-seaweedfs
+    # master + volume + filer + S3 gateway trong một tiến trình (chỉ dùng cho dev).
+    command: ["server", "-dir=/data", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-s3.port=8333", "-ip.bind=0.0.0.0"]
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - tami-seaweedfs-data:/data
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  seaweedfs-init:
+    image: chrislusf/seaweedfs:4.48
+    container_name: tami-seaweedfs-init
+    depends_on:
+      seaweedfs:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    # Tạo 2 bucket nếu chưa có (idempotent: bỏ qua lỗi "đã tồn tại").
+    command:
+      - |
+        for bucket in public private; do
+          echo "s3.bucket.create -name $$bucket" | weed shell -master=seaweedfs:9333 || true
+        done
+
+volumes:
+  tami-postgres-data:
+  tami-redis-data:
+  tami-seaweedfs-data:
