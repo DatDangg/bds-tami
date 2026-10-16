@@ -10,7 +10,7 @@ export default defineConfig({
         resolve: { alias },
         test: {
           name: "unit",
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "tests/unit/**/*.test.ts"],
           environment: "node",
           setupFiles: ["tests/setup.ts"],
         },

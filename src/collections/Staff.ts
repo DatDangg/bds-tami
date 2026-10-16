@@ -14,6 +14,7 @@ import { auditStaffChanges, auditStaffDelete } from "../hooks/staff/audit-staff-
 import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-reset";
 import { flagPasswordChange } from "../hooks/staff/flag-password-change";
 import { guardLastAdminOnDelete, guardLastAdminOnUpdate, rejectBulkChangeOfActiveAdmins } from "../hooks/staff/last-admin-guard";
+import { SESSION_TTL_SECONDS } from "../lib/session/keepalive";
 
 const MIN_PASSWORD_LENGTH = 10;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -106,6 +107,9 @@ export const Staff: CollectionConfig = {
   auth: {
     maxLoginAttempts: MAX_LOGIN_ATTEMPTS,
     lockTime: LOCK_TIME_MS,
+    tokenExpiration: SESSION_TTL_SECONDS, // Tuyệt đối; "8 giờ không hoạt động" nhờ SessionKeepAlive làm mới khi còn thao tác (PERMISSION §7).
+    // Cookie `payload-token` luôn HttpOnly (Payload cố định); Secure chỉ bật ở production vì dev chạy http.
+    cookies: { sameSite: "Lax", secure: process.env.NODE_ENV === "production" },
   },
   access: {
     admin: isStaff,

@@ -8,7 +8,8 @@ async function lint(code: string) {
   return result!.messages.filter((m) => m.ruleId === "no-restricted-imports");
 }
 
-describe("ESLint: chặn lucide-react", () => {
+// Timeout riêng: ESLint programmatic nạp config lần đầu khá chậm khi chạy song song với project khác.
+describe("ESLint: chặn lucide-react", { timeout: 30_000 }, () => {
   it("báo lỗi khi import lucide-react", async () => {
     const messages = await lint('import { X } from "lucide-react";\nexport const a = X;\n');
     expect(messages).toHaveLength(1);

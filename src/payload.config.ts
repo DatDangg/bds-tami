@@ -31,6 +31,7 @@ const s3ClientConfig = {
 export default buildConfig({
   admin: {
     user: Staff.slug,
+    components: { providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"] },
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.

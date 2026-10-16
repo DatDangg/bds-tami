@@ -115,7 +115,7 @@ Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / t�
 
 - Mật khẩu tối thiểu 10 ký tự; khoá tạm 10 phút sau 5 lần sai.
 - **Lớp xác thực thứ 2:** đặt `/admin` sau **Cloudflare Access** (gói free, xác thực bằng mã OTP gửi email công ty). Payload chưa có 2FA tích hợp sẵn, nên đây là cách gọn nhất để có 2 lớp.
-- Session hết hạn sau 8 giờ không hoạt động.
+- Session hết hạn sau 8 giờ không hoạt động. Cơ chế: token `payload-token` hạn 8 giờ (`tokenExpiration` 28800, hạn tuyệt đối); provider admin `SessionKeepAlive` gọi `refreshCookieAsync()` của Payload khi người dùng còn thao tác (tối đa 1 lần/15 phút, không gọi khi tab ẩn), token mới thêm 8 giờ và đồng bộ sang các tab admin khác. Refresh bị từ chối (401/403) → Payload chuyển màn `/admin/logout-inactivity` rồi về đăng nhập. Cookie HttpOnly, SameSite=Lax, Secure khi chạy production.
 
 ## Ghi chú sync
 

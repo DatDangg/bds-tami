@@ -89,18 +89,36 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-2-task-03-round-2-review.md",
       "completedAt": "2026-10-16T13:40:00.559Z"
+    },
+    {
+      "task": "layer-2/task-04",
+      "review": "STRICT PASS",
+      "round": 3,
+      "report": ".context/review-reports/build-tami-website-layer-2-task-04-round-3-review.md",
+      "completedAt": "2026-10-16T14:43:38.736Z"
     }
   ],
   "inProgressTask": null,
-  "blockedTasks": [],
+  "blockedTasks": [
+    {
+      "task": "layer-2/task-02",
+      "reason": "Chờ user gửi nguồn danh mục hành chính chính thức (34 tỉnh/thành + phường/xã sau 01/07/2025, kèm tên cũ) — task note cấm tự bịa",
+      "since": "2026-10-16T13:58:50.661Z"
+    }
+  ],
   "decisions": [
     {
       "date": "2026-10-16T18:00:00+07:00",
       "decision": "Duyệt layer plan với 5 mốc duyệt (M1–M5), staging sớm sau L5, production trước Could; giữ Mermaid (không cài archify)",
       "reason": "User duyệt plan"
+    },
+    {
+      "date": "2026-10-16T13:58:50.661Z",
+      "decision": "layer-2-task-02 blocked chờ user gửi data địa giới; làm tiếp layer-2-task-04",
+      "reason": "User: data này t gửi sau"
     }
   ],
-  "lastUpdated": "2026-10-16T13:40:00.559Z",
+  "lastUpdated": "2026-10-16T14:43:38.736Z",
   "approvalMilestones": [
     {
       "id": "M1",
