@@ -2,6 +2,9 @@
 // Sync reviewer/spec-validator bash allow-rules with the verify commands in .context/project-config.md.
 // Only edits the block between the `# verify-commands:start` / `# verify-commands:end` markers
 // inside .opencode/agent/reviewer.md and .opencode/agent/spec-validator.md. Idempotent.
+// Claude Code: also syncs exact `Bash(<cmd>)` entries into .claude/settings.json → permissions.allow
+// (Claude has no per-agent bash rules). Entries it added are tracked in .claude/verify-permissions.json
+// so a removed/changed command is also removed from settings.json; hand-written rules are never touched.
 //
 // Safety: only auto-allows commands that are safe to serialize in YAML and do NOT look destructive.
 // Generated patterns are EXACT (no trailing wildcard) so `cmd && destructive` cannot ride along.
@@ -20,6 +23,9 @@ const PROFILE = join(ROOT, ".context", "project-config.md");
 const DRY_RUN = !process.argv.includes("--write");
 const START = "# verify-commands:start";
 const END = "# verify-commands:end";
+
+const CLAUDE_SETTINGS = join(ROOT, ".claude", "settings.json");
+const CLAUDE_TRACKING = join(ROOT, ".claude", "verify-permissions.json");
 
 const AGENT_FILES = [
   join(ROOT, ".opencode", "agent", "reviewer.md"),
@@ -126,6 +132,27 @@ function patchAgent(file, patterns, eol) {
   return { file, status: DRY_RUN ? "would-update" : "updated" };
 }
 
+function patchClaudeSettings(patterns) {
+  if (!existsSync(CLAUDE_SETTINGS)) return { status: "missing" };
+  const original = readFileSync(CLAUDE_SETTINGS, "utf8");
+  const settings = JSON.parse(original);
+  const previous = existsSync(CLAUDE_TRACKING) ? JSON.parse(readFileSync(CLAUDE_TRACKING, "utf8")).generated ?? [] : [];
+  const generated = patterns.map((p) => `Bash(${p})`);
+  const permissions = (settings.permissions ??= {});
+  const kept = (permissions.allow ?? []).filter((rule) => !previous.includes(rule) && !generated.includes(rule));
+  const allow = [...kept, ...generated];
+  if (allow.length) permissions.allow = allow;
+  else delete permissions.allow;
+  const eol = original.includes("\r\n") ? "\r\n" : "\n";
+  const updated = JSON.stringify(settings, null, 2).replace(/\n/g, eol) + eol;
+  if (updated === original) return { status: "unchanged" };
+  if (!DRY_RUN) {
+    writeFileSync(CLAUDE_SETTINGS, updated, "utf8");
+    writeFileSync(CLAUDE_TRACKING, JSON.stringify({ generated }, null, 2) + "\n", "utf8");
+  }
+  return { status: DRY_RUN ? "would-update" : "updated" };
+}
+
 function main() {
   if (!existsSync(PROFILE)) {
     console.error(`Không tìm thấy ${PROFILE}`);
@@ -178,6 +205,9 @@ function main() {
       console.log(`- ${rel}: ${res.status} (${patterns.length} rule).`);
     }
   }
+
+  const claude = patchClaudeSettings(patterns);
+  if (claude.status !== "missing") console.log(`- .claude/settings.json: ${claude.status} (${patterns.length} rule).`);
 
   if (patterns.length) {
     console.log(`\nAllow patterns: ${patterns.map((p) => `\`${p}\``).join(", ")}`);

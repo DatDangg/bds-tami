@@ -3,6 +3,7 @@
     "enabled": true,
     "threshold": 0.35,
     "minStepsLeft": 2,
-    "hardThreshold": 0.75
+    "hardThreshold": 0.75,
+    "contextLimit": 200000
   }
 }

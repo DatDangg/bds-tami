@@ -3,7 +3,7 @@
  * template-sync.mjs — Kéo cập nhật mới nhất từ template canonical vào một project.
  *
  * Chỉ ghi đè các path thuộc quyền TEMPLATE (managedPaths):
- *   AGENTS.md · .agent/ · .opencode/ · scripts/ · skills/
+ *   AGENTS.md · CLAUDE.md · .agent/ · .opencode/ · .claude/{agents,commands,skills,hooks}/ · scripts/ · skills/
  * KHÔNG BAO GIỜ đụng: code, SPECIFICATIONS.md, BRIEF.md, docs/, spec/, tasks/,
  * .context/, .devops/, .env*, package.json, .gitignore, README.md.
  *
@@ -33,9 +33,9 @@ const BRANCH = 'main'
 
 const DEFAULTS = {
   // Path thuộc quyền template → tự đồng bộ (ghi đè bằng bản template mới nhất).
-  managedPaths: ['AGENTS.md', '.agent', '.opencode', 'scripts', 'skills'],
+  managedPaths: ['AGENTS.md', 'CLAUDE.md', '.agent', '.opencode', '.claude/agents', '.claude/commands', '.claude/skills', '.claude/hooks', 'scripts', 'skills'],
   // Path chỉ CẢNH BÁO drift, KHÔNG tự ghi đè (project thường tuỳ biến).
-  reportOnlyPaths: ['opencode.jsonc'],
+  reportOnlyPaths: ['opencode.jsonc', '.claude/settings.json'],
 }
 
 const argv = process.argv.slice(2)
@@ -120,7 +120,36 @@ if (isGit) {
   }
 }
 
-// ---- 3. rsync managedPaths ----
+// ---- 3. rsync managedPaths (fallback copy bằng Node khi máy không có rsync, vd Windows) ----
+const HAS_RSYNC = spawnSync('rsync', ['--version'], { encoding: 'utf8' }).status === 0
+if (!HAS_RSYNC) console.log('ℹ️  Không có rsync — dùng copy Node (so nội dung từng file).')
+
+// Trả về dòng log cùng format rsync -i: `>f+++++++++ file` (thêm), `>f.c....... file` (sửa), `*deleting file`.
+function syncFile(src, dst, label) {
+  const exists = fs.existsSync(dst)
+  if (exists && fs.readFileSync(src).equals(fs.readFileSync(dst))) return []
+  if (!dryRun) { fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.copyFileSync(src, dst) }
+  return [`${exists ? '>f.c.......' : '>f+++++++++'} ${label}`]
+}
+
+function listFiles(dir) {
+  if (!fs.existsSync(dir)) return []
+  return fs.readdirSync(dir, { recursive: true }).map(String)
+    .filter((rel) => fs.statSync(path.join(dir, rel)).isFile())
+}
+
+function syncDir(srcDir, dstDir) {
+  const srcFiles = listFiles(srcDir)
+  const lines = srcFiles.flatMap((rel) => syncFile(path.join(srcDir, rel), path.join(dstDir, rel), rel.replace(/\\/g, '/')))
+  if (!prune) return lines
+  const keep = new Set(srcFiles)
+  for (const rel of listFiles(dstDir).filter((r) => !keep.has(r))) {
+    if (!dryRun) fs.rmSync(path.join(dstDir, rel))
+    lines.push(`*deleting ${rel.replace(/\\/g, '/')}`)
+  }
+  return lines
+}
+
 let nAdd = 0, nUpd = 0, nDel = 0
 for (const p of managed) {
   const srcPath = path.join(cache, p)
@@ -128,12 +157,17 @@ for (const p of managed) {
   const isDir = fs.statSync(srcPath).isDirectory()
   const src = isDir ? srcPath + path.sep : srcPath
   const dst = isDir ? path.join(ROOT, p) + path.sep : path.join(ROOT, p)
-  const a = ['-a', '--checksum', '-i']
-  if (isDir && prune) a.push('--delete')
-  if (dryRun) a.push('-n')
-  const r = spawnSync('rsync', [...a, src, dst], { encoding: 'utf8' })
-  if (r.status !== 0) die(`rsync "${p}" lỗi: ${(r.stderr || '').trim()}`)
-  const lines = (r.stdout || '').split('\n').filter((l) => /^[>*]/.test(l))
+  let lines
+  if (HAS_RSYNC) {
+    const a = ['-a', '--checksum', '-i']
+    if (isDir && prune) a.push('--delete')
+    if (dryRun) a.push('-n')
+    const r = spawnSync('rsync', [...a, src, dst], { encoding: 'utf8' })
+    if (r.status !== 0) die(`rsync "${p}" lỗi: ${(r.stderr || '').trim()}`)
+    lines = (r.stdout || '').split('\n').filter((l) => /^[>*]/.test(l))
+  } else {
+    lines = isDir ? syncDir(srcPath, path.join(ROOT, p)) : syncFile(srcPath, dst, path.basename(p))
+  }
   if (!lines.length) continue
   console.log(`\n📦 ${p}${isDir ? '/' : ''}`)
   for (const l of lines) {
@@ -150,8 +184,7 @@ for (const p of managed) {
 for (const p of reportOnly) {
   const src = path.join(cache, p), dst = path.join(ROOT, p)
   if (!fs.existsSync(src) || !fs.existsSync(dst)) continue
-  const d = spawnSync('diff', ['-q', src, dst], { encoding: 'utf8' })
-  if (d.status === 1) console.log(`\n⚠️  "${p}" khác template — KHÔNG tự đổi. Review tay nếu cần (vd merge gate bảo mật mới).`)
+  if (!fs.readFileSync(src).equals(fs.readFileSync(dst))) console.log(`\n⚠️  "${p}" khác template — KHÔNG tự đổi. Review tay nếu cần (vd merge gate bảo mật mới).`)
 }
 
 // ---- 5. summary ----

@@ -6,6 +6,7 @@
 > ⭐ **Sau khi build xong, MỌI thay đổi đi qua MỘT agent: `change-request`** (feature mới + fix bug). Cửa vào: **`/change`** (đọc hết `spec/changes/*.md`), hoặc `/bug` / `/feature`. `/bug-check` chỉ soi read-only.
 > Workflow chi tiết: `.agent/FEATURE_WORKFLOW.md`. Giá trị project → `.context/project-config.md` (do brainstorm ghi, không điền tay).
 > Lệnh con `/brainstorm`, `/design`, `/graph` là **manual override** (chạy tay khi muốn chạy lại/update 1 bước); trong `/start` chúng không bắt user gọi.
+> 🔌 **Runtime:** dùng được cho **opencode** (`.opencode/`, `opencode.jsonc`) và **Claude Code** (`CLAUDE.md`, `.claude/`). Tên tool/agent/config trong file này viết theo opencode; Claude Code dịch theo `CLAUDE.md` § Runtime mapping.
 
 ## Precedence
 
@@ -29,9 +30,9 @@
 | "rollback", "revert", "checkpoint" | **Rollback** → `.agent/rollback.md` — tag `layer-N-done` + revert strategy |
 | "design", "thiết kế UI", "design tokens", "screen spec", "làm đẹp" | **Design** → `/design` — sinh design tokens + screen specs (`design-spec.md`) trước khi chia layer |
 | thực thi task đã có | **Loop** → `.agent/loop.md` (ReAct: Read → Plan → Act → Observe) |
-| "implement feature" (spec/task đã có sẵn) | **Builder theo task** → `.opencode/agent/builder` |
-| "review", "check", "soát" (một diff/task cụ thể) | **Reviewer** → `.opencode/agent/reviewer` — KHÔNG tự sửa code |
-| "thêm skill", "add skill", "tạo skill", "register skill" | **Customize opencode** — tạo/cập nhật runtime skill đúng format (§Local skills) |
+| "implement feature" (spec/task đã có sẵn) | **Builder theo task** → subagent `builder` (`.opencode/agent/builder.md` · `.claude/agents/builder.md`) |
+| "review", "check", "soát" (một diff/task cụ thể) | **Reviewer** → subagent `reviewer` (`.opencode/agent/reviewer.md` · `.claude/agents/reviewer.md`) — KHÔNG tự sửa code |
+| "thêm skill", "add skill", "tạo skill", "register skill" | **Customize runtime** — tạo/cập nhật skill đúng format (§Local skills) |
 | hỏi / điều tra / "tại sao", "how does X work" | **Research-only** — KHÔNG edit nếu user chưa yêu cầu fix |
 
 Không rõ intent → hỏi 1 câu ngắn để phân loại, đừng đoán.
@@ -59,7 +60,8 @@ Không rõ intent → hỏi 1 câu ngắn để phân loại, đừng đoán.
 ## Workflow từng bước (initial build — `/start`)
 
 > `/start` chạy **liên tục, tự chuyển bước**; chỉ **DỪNG ở ⏸ checkpoint**. User reply "ok" để đi tiếp.
-> **Subagent** = `.opencode/agent/*.md` (gọi qua `task` tool). **Prompt-level** = `.agent/*.md` (đọc + thực thi trong session chính).
+> **Subagent** = `.opencode/agent/*.md` (opencode: tool `task`) · `.claude/agents/*.md` (Claude Code: tool `Agent`). **Prompt-level** = `.agent/*.md` (đọc + thực thi trong session chính).
+> Claude Code: gate cứng (git/DB, builder không commit, reviewer chỉ ghi report) = hook `.claude/hooks/guard.mjs` (xem `CLAUDE.md`).
 
 | Bước | Việc | Ai xử lý (subagent) | Prompt-level | Skill | Output | Gate |
 |---|---|---|---|---|---|---|
@@ -161,7 +163,7 @@ Code ≠ intent → ghi gap vào gap register (nếu có, vd `docs/changes/TECHN
 - **Commit** sau PASS theo Commit-First Tracking. `auto_push_after_pass: true` chỉ cho phép auto-push
   `target_branch` sau PASS; **deploy / mở PR luôn cần user yêu cầu rõ**.
 - **Default staging-direct**: chỉ auto-push `target_branch` khi current branch = `target_branch`; nếu user yêu cầu feature branch thì push current branch và PR chỉ khi user yêu cầu rõ. **Cấm push `forbidden_branch`**,
-  cấm `--force` / `-f`. Gate cứng ở `opencode.jsonc` (`permission.bash`).
+  cấm `--force` / `-f`. Gate cứng ở `opencode.jsonc` (`permission.bash`) · `.claude/settings.json` (`permissions.deny`).
 - **KHÔNG commit/push khi Reviewer FAIL** hoặc khi progress chưa cập nhật.
 - **KHÔNG tự sửa source khi đang review** — reviewer/spec-validator chỉ được ghi report scoped.
 - **Check commands lấy từ `.context/project-config.md`** — không hardcode `npm`.
@@ -233,16 +235,17 @@ Dọn report dở trước khi rerun reviewer.
 
 **Usage gate (safe-point theo ngưỡng):** policy ở `.context/session-policy.json`
 (`usageGate: {enabled, threshold, minStepsLeft, hardThreshold}`). Ở mỗi checkpoint, gọi tool `usage()`
-(plugin `loop-guard`); nếu `percent ≥ threshold` **và** còn ≥ `minStepsLeft` bước (hoặc `percent ≥ hardThreshold`)
-→ hỏi user bằng `question` tool: `[End — mở session mới] / [Làm tiếp] / [Tiếp, đừng hỏi tới hardThreshold]`.
+(plugin `loop-guard`; Claude Code: hook `.claude/hooks/session-handoff.mjs` tự chèn dòng `usage:` sau mỗi subagent khi ≥ threshold); nếu `percent ≥ threshold` **và** còn ≥ `minStepsLeft` bước (hoặc `percent ≥ hardThreshold`)
+→ hỏi user bằng `question` tool (Claude Code: `AskUserQuestion`): `[End — mở session mới] / [Làm tiếp] / [Tiếp, đừng hỏi tới hardThreshold]`.
 Chọn End → in Resume Briefing + dòng `/resume <type>/<slug>` để copy sang session mới, rồi dừng turn.
 
 ## Local skills
 
-- Runtime skills của template nằm trong `skills/<skill-name>/SKILL.md` và được đăng ký qua `opencode.jsonc` → `skills.paths: ["./skills"]`.
+- Runtime skills của template nằm trong `skills/<skill-name>/SKILL.md` và được đăng ký qua `opencode.jsonc` → `skills.paths: ["./skills"]` (opencode) và wrapper `.claude/skills/<skill-name>/SKILL.md` (Claude Code, sinh bởi `node scripts/sync-claude.mjs`).
 - Khi user yêu cầu **thêm skill**, phải tạo folder `skills/<lowercase-hyphen-name>/SKILL.md` với frontmatter `name` + `description`; `description` phải nêu rõ khi nào auto-trigger bằng keyword cụ thể.
 - Nếu skill có nhiều tài liệu chi tiết, giữ chúng trong cùng folder và để `SKILL.md` làm wrapper trỏ tới các file đó.
-- Sau mọi thay đổi skill/config/agent/command, nhắc user **restart opencode** vì config không hot-reload.
+- Agent/command/skill: sửa ở **nguồn** (`.opencode/agent/`, `.opencode/command/`, `skills/`) rồi chạy `node scripts/sync-claude.mjs` để sinh lại `.claude/` — **không sửa tay** file sinh trong `.claude/`.
+- Sau mọi thay đổi skill/config/agent/command, nhắc user **restart opencode / mở session Claude Code mới** vì config không hot-reload.
 
 ## Reviewer rules (risk-based)
 
