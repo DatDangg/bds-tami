@@ -253,3 +253,12 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* design-spec §1.4: vùng chạm >= 44px trên thiết bị cảm ứng; control zoom của MapLibre mặc định 29px. */
+@media (pointer: coarse) {
+  .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in,
+  .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out {
+    width: 44px;
+    height: 44px;
+  }
+}

@@ -3,5 +3,49 @@
     "siteName": "TAMI",
     "switchLanguage": "Switch language",
     "languageName": { "vi": "Tiếng Việt", "en": "English" }
+  },
+  "media": {
+    "gallery": {
+      "region": "Photo gallery",
+      "open": "Enlarge photo {index} of {total}",
+      "counter": "{current}/{total}",
+      "slide": "{index} / {total}",
+      "more": "+{count} photos"
+    },
+    "lightbox": {
+      "title": "Photo viewer",
+      "description": "Use the left and right arrow keys to change photo; press Esc to close.",
+      "close": "Close",
+      "previous": "Previous photo",
+      "next": "Next photo",
+      "counter": "Photo {current} of {total}"
+    },
+    "map": {
+      "region": "Location map",
+      "viewMap": "View map",
+      "loading": "Loading map…",
+      "error": "The map could not be loaded.",
+      "retry": "Try again",
+      "openGoogleMaps": "Open in Google Maps",
+      "approximateNote": "The area shown is approximate (300 m radius).",
+      "gestures": {
+        "windows": "Hold Ctrl and scroll to zoom the map",
+        "mac": "Hold ⌘ and scroll to zoom the map",
+        "mobile": "Use two fingers to move the map"
+      },
+      "controls": {
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "resetBearing": "Reset bearing to north",
+        "toggleAttribution": "Map data attribution",
+        "marker": "Location",
+        "title": "Map"
+      }
+    },
+    "video": {
+      "play": "Play video: {title}",
+      "thumbnailAlt": "Video preview: {title}",
+      "frameTitle": "Video: {title}"
+    }
   }
 }

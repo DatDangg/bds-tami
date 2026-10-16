@@ -52,20 +52,27 @@ Mở khoá cho: `layer-6-task-05`, `layer-6-task-07`, `layer-7-task-03`, `layer-
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
-- Error memory entry: none
+- Attempt: 2 (builder sửa theo review round 1, chờ reviewer round 2)
+- Last failure type: reviewer FAIL round 1 (C1 LazyMap tự gỡ map khi ready; M1 lộ toạ độ tin ẩn địa chỉ; M2 srcset chứa ảnh gốc; M3 thiếu ngữ nghĩa carousel)
+- Error memory entry: none (lỗi logic của attempt 1, không phải pattern lặp)
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: builder tự kiểm đủ 5 mục (Gallery/lightbox, LazyMap, VideoFacade, aria-label + touch target 44px, không cuộn ngang) bằng RTL + class layout; chưa kiểm trực quan 375px (chưa có trang dùng component)
+- Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` 49 file / 481 test PASS trước khi sửa kiểu test (sau đó chạy lại riêng src/components/media: 5 file / 61 test PASS) · `pnpm build` OK · `pnpm audit`: không thêm lỗ hổng từ maplibre-gl@6.11.2 (còn 1 high đã ignore sẵn trong package.json + 1 moderate/2 low có từ trước ở drizzle-kit/dompurify)
+- Attempt 2 (fix review round 1):
+  - C1: effect dựng map phụ thuộc `loadAttempt` (đếm lần yêu cầu tải), không còn phụ thuộc `phase`; `setPhase("ready")` không đổi deps nên không gỡ map. `t` đọc qua ref. Test: sau ready `remove` chưa được gọi và map chỉ dựng 1 lần; unmount thì `remove` đúng 1 lần.
+  - M1: `approximateLocation()` (map-geometry.ts) làm tròn lưới 0,001° (~110 m, lệch tối đa ~80 m nên vòng 300 m vẫn chứa vị trí thật); áp cho tâm bản đồ, tâm vòng 300 m và link Google Maps. JSDoc ghi contract: nơi gọi phía server phải truyền toạ độ đã làm tròn khi ẩn địa chỉ (đã ghi vào acceptance `layer-7-task-03` tin cho thuê). Test: không toạ độ chính xác nào trong center/vòng/link.
+  - M2: `listCandidates` chỉ dùng ảnh gốc khi không có cỡ đã sinh nào; test width 1920 -> large, srcset không có ảnh gốc.
+  - M3: một DOM; `aria-roledescription="carousel"` trên vùng và `role="group"` + `aria-roledescription="slide"` + `aria-label="n / total"` trên ô bọc nút chỉ khi dưới md (matchMedia qua useSyncExternalStore, mặc định mobile-first khi SSR). Từ md là lưới bento nên không gắn "slide" (sai ngữ nghĩa). Không thêm nút Trước/Sau mobile (vuốt + Tab đủ thao tác). Chỉ đổi thuộc tính ARIA nên CLS không đổi.
+  - m1: bento 3 ảnh (2 ô rộng 2 cột) và 4 ảnh (ô 2 rộng 2 cột) phủ kín lưới 4x2. m3: Lightbox không có returnFocusRef thì trả focus về phần tử đang focus lúc mở. m4: CSS `pointer: coarse` đặt control zoom MapLibre 44px (globals.css). m2 giữ nguyên (2 ảnh coi là dữ liệu lỗi). m5: thumbnail i.ytimg.com là request bên thứ ba trước khi bấm, ghi nhận cho chính sách privacy (residual).
+  - Verify attempt 2: `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` 49 file / 491 test PASS (gồm integration Docker dev) · `pnpm build` OK
+- Reviewer verdict: STRICT PASS round 2 (.context/review-reports/build-tami-website-layer-2-task-08-round-2-review.md); round 1 FAIL (C1 map bị remove sau ready, M1 lộ toạ độ, M2 srcset ảnh gốc, M3 aria carousel). MINOR còn lại không chặn: n1 cân nhắc lưới 0,002° cho ẩn địa chỉ, n3 carousel attrs khi 1–2 ảnh, n4 không hiện loading khi đổi toạ độ, n5 setSlideIndex mỗi scroll. Residual: chưa route nào dùng nên chưa kiểm bundling MapLibre/CSS động + trực quan 375/768/1280 — kiểm khi layer 6/7 gắn component; tile OSM không hợp traffic lớn; thumbnail i.ytimg.com là request bên thứ ba trước khi bấm.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: no doc impact (API/ERD/DESIGN); thêm acceptance contract approximateLocation vào tasks/tami-website/layer-7-task-03.md
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-2): task-08 mediacomp` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -73,12 +80,12 @@ Mở khoá cho: `layer-6-task-05`, `layer-6-task-07`, `layer-7-task-03`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-08` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [ ] Committed
 
 ## Files to Create/Modify

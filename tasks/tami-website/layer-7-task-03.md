@@ -43,6 +43,7 @@ Mở khoá cho: `layer-10-task-01`
 - [ ] Tin `rented`: badge, `noindex, follow`, gợi ý tin tương tự nổi bật; không JSON-LD RealEstateListing
 - [ ] Tin tương tự: cùng danh mục + tỉnh, loại trừ tin hiện tại, tối đa 4
 - [ ] Vùng `LeadFormSlot` (biến thể "Nhận tư vấn căn tương tự" khi rented)
+- [ ] Khi `showExactAddress=false`: server component phải truyền `approximateLocation(location)` (src/components/media/map-geometry.ts) cho `LazyMap` (kèm `approximate`), KHÔNG truyền toạ độ thật — props client component bị serialize vào HTML (contract từ layer-2-task-08)
 
 ## Tests cần viết
 - Integration render: rented → meta robots noindex; sale khoá → hotline

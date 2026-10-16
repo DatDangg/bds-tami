@@ -3,5 +3,49 @@
     "siteName": "TAMI",
     "switchLanguage": "Chuyển ngôn ngữ",
     "languageName": { "vi": "Tiếng Việt", "en": "English" }
+  },
+  "media": {
+    "gallery": {
+      "region": "Thư viện ảnh",
+      "open": "Phóng to ảnh {index} / {total}",
+      "counter": "{current}/{total}",
+      "slide": "{index} / {total}",
+      "more": "+{count} ảnh"
+    },
+    "lightbox": {
+      "title": "Xem ảnh",
+      "description": "Dùng phím mũi tên trái, phải để chuyển ảnh; nhấn Esc để đóng.",
+      "close": "Đóng",
+      "previous": "Ảnh trước",
+      "next": "Ảnh sau",
+      "counter": "Ảnh {current} / {total}"
+    },
+    "map": {
+      "region": "Bản đồ vị trí",
+      "viewMap": "Xem bản đồ",
+      "loading": "Đang tải bản đồ…",
+      "error": "Không tải được bản đồ.",
+      "retry": "Thử lại",
+      "openGoogleMaps": "Mở Google Maps",
+      "approximateNote": "Vị trí hiển thị là khu vực gần đúng (bán kính 300 m).",
+      "gestures": {
+        "windows": "Giữ Ctrl và cuộn để phóng to bản đồ",
+        "mac": "Giữ ⌘ và cuộn để phóng to bản đồ",
+        "mobile": "Dùng hai ngón tay để di chuyển bản đồ"
+      },
+      "controls": {
+        "zoomIn": "Phóng to",
+        "zoomOut": "Thu nhỏ",
+        "resetBearing": "Đặt lại hướng bắc",
+        "toggleAttribution": "Nguồn dữ liệu bản đồ",
+        "marker": "Vị trí",
+        "title": "Bản đồ"
+      }
+    },
+    "video": {
+      "play": "Phát video: {title}",
+      "thumbnailAlt": "Ảnh xem trước video: {title}",
+      "frameTitle": "Video: {title}"
+    }
   }
 }
