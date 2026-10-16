@@ -247,6 +247,6 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | A5 | Chỉ tiếng Việt | ⚠️ Giả định |
 | A6 | Mục tiêu tải khi thiết kế: 100.000 tin, 1.000 người đồng thời (NFR-02) | ⚠️ Giả định |
 | Q1 | Mục tiêu KPI cụ thể (BO-1…BO-4) | ⏳ Chờ điền |
-| Q2 | Logo, màu thương hiệu, font, hình ảnh (cho `docs/DESIGN.md`) | ⏳ Chờ cung cấp |
-| Q3 | Cấu hình server (CPU / RAM / ổ cứng), tên miền | ⏳ Chờ cung cấp |
+| Q2 | Logo, font, hình ảnh (cho `docs/DESIGN.md`) | ✅ Màu + logo đã có 16/10/2026 (`assets/brand/`) · ⏳ font, hình ảnh chờ cung cấp |
+| Q3 | Cấu hình server, tên miền | ✅ Server đã kiểm tra 16/10/2026: VPS dùng chung 4 vCPU / 15GB RAM / SSD 200GB, đủ dùng (`docs/ARCHITECTURE.md` §6.1) · ⏳ tên miền chờ cung cấp |
 | Q4 | Nội dung ban đầu: danh sách dự án, tin cho thuê, dịch vụ, bài giới thiệu | ⏳ Chờ cung cấp |

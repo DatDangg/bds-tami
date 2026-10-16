@@ -26,7 +26,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 | Cache / rate limit | Redis (hoặc Valkey) |
 | File | SeaweedFS (S3 API) + `@payloadcms/storage-s3`; ảnh resize bằng `sharp` |
 | Tác vụ nền | Payload Jobs Queue |
-| Hạ tầng | Docker Compose trên server công ty, Caddy, Cloudflare (free) |
+| Hạ tầng | Docker Compose trên server công ty (dùng chung), Nginx có sẵn trên host, Cloudflare (free) |
 | Email | Brevo SMTP |
 | Giám sát | Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma |
 | CI/CD | GitHub Actions (staging → duyệt → production) |
@@ -133,7 +133,9 @@ Giả định đang áp dụng (⚠️, chỉnh qua `/change`): A1 sale chỉ s�
 
 ## Deployment
 
-- Docker Compose trên server công ty (tối thiểu 4 core / 8GB RAM / 100GB SSD): `caddy`, `app`, `jobs`, `postgres`, `redis`, `seaweedfs`, giám sát.
+- Server công ty, **dùng chung** với dự án khác: VPS 4 vCPU / 15GB RAM / SSD 200GB, Ubuntu 24.04, Docker có sẵn (SSH alias `server`). Đủ cho giai đoạn 1.
+- Docker Compose (`app`, `jobs`, `postgres`, `redis`, `seaweedfs`, giám sát), tiền tố `tami-`. Container chỉ bind `127.0.0.1` (prod `:3010`, staging `:3011`); DB/Redis/file không mở cổng ra host.
+- Reverse proxy: **Nginx có sẵn trên host**, thêm file `tami.conf` / `tami-staging.conf`, không đụng site khác.
 - Production và staging tách biệt (DB, Redis, bucket, tên miền riêng; `staging_db ≠ prod_db`). Staging chặn truy cập công khai + `noindex`.
 - Cloudflare phía trước; server chỉ nhận traffic từ IP Cloudflare.
 - CI/CD: lint/typecheck/test/build → image theo SHA → staging (`payload migrate`, health check) → **duyệt tay** → production đúng image đó.

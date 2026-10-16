@@ -12,6 +12,7 @@
 
 **Reference Images:**
 - 6 ảnh mockup TAMI HOMES (Trang chủ, Danh sách dự án, Chi tiết dự án, Chi tiết căn, Tin tức, Tuyển dụng), user gửi ngày 16/10/2026.
+- Bộ logo chính thức: `assets/brand/` (xem § Logo).
 - ⚠️ **Chỉ lấy BẢNG MÀU** từ các ảnh này. **Không** lấy bố cục, menu, component hay nội dung (mockup có mục "Mua bán", "Về chúng tôi"… không khớp phạm vi `docs/BRD.md` v1.3). Bố cục và component sẽ làm ở bước `/design`.
 
 ---
@@ -109,6 +110,33 @@
 ```
 
 > Website chỉ dùng **giao diện sáng** (light), có các section tối xen kẽ như mockup. Không làm dark mode toàn trang ở giai đoạn 1.
+
+### Logo
+
+Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + chữ "TAMI HOMES" bên dưới). Bản gốc lưu ở `assets/brand/`, **không sửa, không xoá**.
+
+| File | Biến thể | Dùng ở đâu |
+|---|---|---|
+| `assets/brand/source/tami-homes-logo.ai` | **Bản gốc vector** (Illustrator, tương thích PDF) | Nguồn để xuất SVG / mọi kích thước khác |
+| `assets/brand/tami-logo-gold.png` | Vàng gradient, nền trong suốt | **Logo chính**: header nền sáng, trang chủ, ảnh chia sẻ (OG), email |
+| `assets/brand/tami-logo-white.png` | Trắng, nền trong suốt | Header đè lên ảnh hero, section tối, footer (`--color-dark`) |
+| `assets/brand/tami-logo-dark.png` | Đen, nền trong suốt | Header nền sáng khi cuộn trang (sticky), bản in |
+| `assets/brand/tami-logo-gray.png` | Xám, nền trong suốt | Dự phòng (văn bản, in ấn), hạn chế dùng trên web |
+
+**Việc builder phải làm khi dựng giao diện** (sinh vào `public/brand/`, không sửa file trong `assets/brand/`):
+
+1. **Xuất SVG** từ file `.ai` (Inkscape / Illustrator), bản vàng / trắng / đen. SVG là định dạng chính cho web; PNG chỉ là dự phòng.
+2. **Cắt sát** (trim): các file PNG gốc có nhiều khoảng trắng thừa quanh logo (khổ ngang ~3000×2100px). Bản web phải sát viền, giữ khoảng thở tối thiểu bằng 1/4 chiều cao biểu tượng mái nhà.
+3. **Tạo bản icon** (chỉ biểu tượng mái nhà, không chữ) cho: `favicon.ico` (32×32), `icon.svg`, `apple-touch-icon.png` (180×180, nền `#111111` hoặc `#F7F5F4`), icon PWA 192/512, avatar mạng xã hội.
+4. **Ảnh OG mặc định** 1200×630: logo vàng trên nền `#111111` hoặc `#F7F5F4`.
+5. Logo chèn qua `next/image` hoặc SVG inline, có `alt="TAMI HOMES"`; header cao ~40–48px trên desktop, ~32px trên mobile.
+
+**Quy tắc dùng logo:**
+- Không kéo méo tỉ lệ, không đổi màu ngoài 4 biến thể trên, không thêm bóng đổ / viền.
+- Logo vàng chỉ đặt trên nền sáng (`#FFFFFF`, `#F7F5F4`, `#F8F3EB`) hoặc nền tối đặc (`#111111`). Trên ảnh chụp thì dùng bản trắng.
+- Màu vàng của logo khớp với `--color-primary` (`#E0BF89`); gradient trong logo giữ nguyên, **không** áp gradient cho các thành phần UI khác.
+
+> Logo cũng được upload vào `site-settings.logo` / `logoDark` trong admin (`docs/ERD.md` §4.15) để admin đổi được mà không sửa code. Bản trong `public/brand/` là bản mặc định khi chưa cấu hình.
 
 ### Typography
 

@@ -35,8 +35,9 @@ Chi tiết: `docs/BRD.md` (v1.3).
 - Chỉ dùng phần mềm mã nguồn mở, tự host trên server của công ty
 
 ## Notes
-- Stack: Next.js + Payload CMS 3 + PostgreSQL (PostGIS) + Redis + SeaweedFS, Docker Compose, Cloudflare. Chi tiết: `docs/ARCHITECTURE.md`
+- Stack: Next.js + Payload CMS 3 + PostgreSQL (PostGIS) + Redis + SeaweedFS, Docker Compose, Nginx có sẵn, Cloudflare. Chi tiết: `docs/ARCHITECTURE.md`
+- Server: VPS dùng chung 4 vCPU / 15GB RAM / SSD 200GB (SSH alias `server`), đã kiểm tra đủ dùng (ARCHITECTURE §6.1)
 - Dữ liệu: `docs/ERD.md` · Phân quyền: `docs/PERMISSION.md` · API: `docs/API_SPEC.md`
 - Tham khảo giao diện: https://vinhomes.vn/ (chỉ bố cục, không sao chép nội dung)
 - Chuẩn bị sẵn để sau này có thể mở cho bên ngoài đăng tin (ARCHITECTURE §9.2), nhưng không làm tính năng đó bây giờ
-- Còn chờ: logo/màu thương hiệu (`docs/DESIGN.md`), cấu hình server, tên miền, nội dung ban đầu
+- Màu thương hiệu và logo đã có (`docs/DESIGN.md`, `assets/brand/`). Còn chờ: font, tên miền, nội dung ban đầu

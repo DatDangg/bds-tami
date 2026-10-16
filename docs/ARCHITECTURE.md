@@ -20,10 +20,10 @@
 ```mermaid
 flowchart TB
   U[Người dùng / Nhân viên] --> CF[Cloudflare<br/>CDN · SSL · WAF · Turnstile]
-  CF -->|chỉ IP Cloudflare| CAD[Caddy<br/>reverse proxy]
+  CF -->|chỉ IP Cloudflare| NGX[Nginx có sẵn trên host<br/>reverse proxy · dùng chung]
 
-  subgraph SERVER[Server công ty — Docker Compose]
-    CAD --> APP[App: Next.js + Payload CMS<br/>website · /admin · /api]
+  subgraph SERVER[Server công ty, dùng chung — Docker Compose]
+    NGX -->|127.0.0.1| APP[App: Next.js + Payload CMS<br/>website · /admin · /api]
     APP --> PG[(PostgreSQL + PostGIS)]
     APP --> RD[(Redis<br/>rate limit · cache)]
     APP --> S3[(SeaweedFS<br/>S3 API · ảnh & file)]
@@ -53,7 +53,7 @@ Staging chạy **một bộ riêng** (app + PostgreSQL + Redis + bucket riêng) 
 | Lưu file | **SeaweedFS** (S3 API) + plugin `@payloadcms/storage-s3` | Ảnh công khai (bucket `public`), CV/file nội bộ (bucket `private`) | Free |
 | Xử lý ảnh | `sharp` (tích hợp trong Payload) | Sinh sẵn các cỡ ảnh + WebP khi upload | Free |
 | Tác vụ nền | **Payload Jobs Queue** (lưu trong PostgreSQL) | Gửi email, nhắc lead quá hạn, dọn dữ liệu hết hạn lưu | Free |
-| Reverse proxy | Caddy | SSL nội bộ, điều hướng prod/staging, nén | Free |
+| Reverse proxy | **Nginx có sẵn trên server** (đang phục vụ các site khác ở cổng 80/443) | Thêm file cấu hình riêng cho TAMI; điều hướng prod/staging, SSL origin, nén | Free |
 | CDN / bảo vệ | Cloudflare (gói free) | Cache, SSL, chống DDoS, WAF cơ bản, Turnstile | Free |
 | Email | Brevo SMTP (gói free ~300 mail/ngày) | Thông báo lead, hồ sơ ứng tuyển | Free trong hạn mức |
 | Bản đồ | OpenStreetMap tiles + MapLibre GL | Bản đồ vị trí dự án / tin | Free |
@@ -98,7 +98,8 @@ Một repo, một app Next.js có nhúng Payload:
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
 ├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
-├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml, Caddyfile
+├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
+│   └── nginx/                 # tami.conf, tami-staging.conf (copy vào /etc/nginx/sites-available trên server)
 └── .github/workflows/         # CI/CD
 ```
 
@@ -179,21 +180,41 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 
 ## 6. Triển khai
 
-### 6.1. Các service trên server
+### 6.1. Server thực tế (kiểm tra 16/10/2026)
+
+| Hạng mục | Giá trị | Đánh giá |
+|---|---|---|
+| Truy cập | SSH alias `server` (`root@187.52.119.50`, key `id_ed25519_trungpq`) | — |
+| Máy | VPS KVM, Ubuntu 24.04 LTS | ✅ |
+| CPU | 4 vCPU AMD EPYC 9354P, tải ~0.3 | ✅ Đủ |
+| RAM | 15GB, trống ~11GB, **chưa có swap** | ✅ Đủ; ⚠️ nên thêm swap 4GB |
+| Ổ cứng | SSD 200GB, trống 118GB (sau khi dọn build cache) | ✅ Đủ giai đoạn 1; theo dõi theo lượng ảnh |
+| Docker | Docker 29.7 + Compose v5.5 | ✅ Có sẵn |
+| Reverse proxy | Nginx trên host, giữ cổng 80/443 | Dùng luôn, không thêm Caddy |
+
+**Server dùng chung** với các dự án khác (ismartschool-lms prod/staging/sysupgrade, nta-web, crm-dhp, WordPress nhstar; ~19 container). Quy tắc khi đặt TAMI lên:
+
+- Mọi container TAMI có tiền tố `tami-` / `tami-staging-`, compose project riêng, network riêng.
+- **Chỉ bind cổng vào `127.0.0.1`** (không `0.0.0.0`); PostgreSQL / Redis / SeaweedFS **không mở cổng ra host**, app truy cập qua network nội bộ của compose.
+- Cổng app: production `127.0.0.1:3010`, staging `127.0.0.1:3011` (tránh các cổng đang dùng: 3001, 3002, 3004, 3005, 4000, 4001, 5432–5434, 6380, 6381, 8088, 9001).
+- Đặt giới hạn RAM cho từng container (`mem_limit`) để không ảnh hưởng dự án khác.
+- Thêm site bằng file riêng trong `/etc/nginx/sites-available/` + symlink `sites-enabled/`; chạy `nginx -t` trước khi `reload`, **không sửa file của site khác**.
+
+### 6.2. Các service của TAMI
 
 | Service | Production | Staging | RAM ước tính |
 |---|---|---|---|
-| `caddy` | dùng chung | dùng chung | 50MB |
+| nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | 1 bản (có thể chạy 2) | 1 bản | 512MB–1GB / bản |
 | `jobs` | cùng image app, chạy chế độ runner | cùng image | 256MB |
 | `postgres` | riêng | riêng | 1–2GB / 256–512MB |
 | `redis` | riêng | riêng | 128MB |
-| `seaweedfs` | dùng chung, bucket riêng | bucket riêng | 256MB |
+| `seaweedfs` | dùng chung giữa prod/staging, bucket riêng | bucket riêng | 256MB |
 | giám sát | dùng chung | dùng chung | ~1GB |
 
-**Cấu hình server tối thiểu**: 4 core / 8GB RAM / 100GB SSD. Thoải mái: 8 core / 16GB RAM. Ổ cứng tăng theo lượng ảnh.
+Tổng ước tính ~4–5GB RAM, nằm gọn trong ~11GB đang trống.
 
-### 6.2. Môi trường
+### 6.3. Môi trường
 
 | | Production | Staging |
 |---|---|---|
@@ -204,7 +225,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 
 Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu đặt ở `.env.example`.
 
-### 6.3. CI/CD
+### 6.4. CI/CD
 
 1. Push vào nhánh làm việc → GitHub Actions chạy lint, typecheck, test, build.
 2. Build Docker image, gắn tag theo commit SHA.
@@ -212,6 +233,9 @@ Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu 
 4. Kiểm tra trên staging.
 5. **Duyệt tay** → deploy **production** đúng image và migration đã test ở staging.
 6. Health check fail thì quay về image trước.
+7. **Dọn build cache sau mỗi lần deploy** (`docker builder prune --filter until=72h -f`) nếu build trên server. Server từng đầy ổ vì các dự án khác bỏ qua bước này (140GB cache, đã dọn 16/10/2026).
+
+Các dự án khác trên server deploy bằng GitHub Actions self-hosted runner (`/opt/actions-runner-*`). TAMI có thể dùng cùng cách (runner riêng `/opt/actions-runner-tami`), hoặc build image trên GitHub rồi SSH vào kéo về. Chốt ở bước DevOps.
 
 Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, không `db push`, không sửa migration đã chạy, thay đổi phá dữ liệu phải gắn `HIGH_RISK_MIGRATION`.
 
@@ -221,7 +245,7 @@ Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, kh�
 
 | Lớp | Biện pháp |
 |---|---|
-| Mạng | Firewall chỉ mở 80/443 cho dải IP Cloudflare; SSH bằng key, đổi cổng, fail2ban |
+| Mạng | Container TAMI chỉ bind `127.0.0.1`; DB/Redis/file không mở cổng ra host. Mục tiêu: firewall chỉ mở 22/80/443 (80/443 cho dải IP Cloudflare), SSH bằng key, fail2ban. ⚠️ Hiện firewall server **đang tắt** và DB/Redis/MinIO của dự án khác mở `0.0.0.0`: bật firewall phải phối hợp team các dự án đó |
 | Truyền tải | HTTPS toàn bộ (Cloudflare Full Strict + chứng chỉ origin) |
 | Đăng nhập admin | Mật khẩu mạnh, khoá tạm sau 5 lần sai; **lớp xác thực thứ 2** bằng Cloudflare Access (OTP qua email công ty) đặt trước `/admin`, vì Payload chưa có 2FA tích hợp sẵn (`docs/PERMISSION.md` §7) |
 | Phân quyền | Kiểm tra quyền ở tầng collection/field của Payload, theo `docs/PERMISSION.md`; không tin dữ liệu phía client |
@@ -260,8 +284,8 @@ Kho backup phải nằm **ngoài server** (server khác của công ty, hoặc d
 
 | Mức | Dấu hiệu | Việc làm | Sửa code? |
 |---|---|---|---|
-| 1 (hiện tại) | — | 1 server, mọi thứ trong Docker Compose | — |
-| 2 | CPU/RAM thường > 70%, DB chậm | Tách PostgreSQL sang server riêng; chạy 2+ bản app sau Caddy | Không |
+| 1 (hiện tại) | — | 1 server dùng chung, mọi thứ trong Docker Compose | — |
+| 2 | CPU/RAM thường > 70%, DB chậm, hoặc dự án khác trên server ảnh hưởng TAMI | Chuyển TAMI sang server riêng / tách PostgreSQL sang server riêng; chạy 2+ bản app sau nginx (upstream) | Không |
 | 3 | Tìm kiếm chậm (p95 > 500ms) dù đã tối ưu index | Thêm OpenSearch, đồng bộ qua Payload Jobs; đổi implementation của `SearchService` | Chỉ trong `lib/search` |
 | 4 | DB quá tải đọc | Thêm read replica PostgreSQL | Cấu hình adapter |
 | 5 | Nhiều server | Chuyển sang Kubernetes / Docker Swarm | Không (app đã stateless) |

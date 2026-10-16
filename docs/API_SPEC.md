@@ -55,7 +55,7 @@ Lỗi:       { "success": false, "error": "<message>", "details": [...] }
 | `POST` | `/api/public/job-applications` | Nộp hồ sơ ứng tuyển (multipart) | 3 lần / giờ / IP | FR-PUB-09; BR-20, 21 |
 | `GET` | `/api/public/rentals` | Tìm & lọc tin cho thuê | 60 lần / phút / IP | FR-PUB-04 |
 | `POST` | `/api/public/click-events` | Ghi lượt bấm Hotline/Zalo/Fanpage | 30 lần / phút / IP | FR-PUB-12 |
-| `GET` | `/api/health` | Health check cho deploy & giám sát | — | ARCHITECTURE §6.3 |
+| `GET` | `/api/health` | Health check cho deploy & giám sát | — | ARCHITECTURE §6.4 |
 
 ### 3.1. `POST /api/public/leads`
 
