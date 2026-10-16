@@ -7,37 +7,36 @@
 
 | File | Loại | Ghi chú |
 |------|------|---------|
-| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ |
-| `DESIGN.md` | design_spec | Design spec / Figma notes |
-| `API_SPEC.md` | api_spec | **Overview + pointer** → code + `src/shared/types/api.ts` |
-| `ERD.md` | database_schema | **Overview + pointer** → migration/schema file |
-| `PERMISSION.md` | business_rules | Role list + guard order, **sync từ seed + guards thật** |
+| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ **v1.3** (website thương hiệu TAMI) — intent doc, chỉ đổi qua Change Request |
+| `ARCHITECTURE.md` | architecture | Kiến trúc hệ thống, deploy, bảo mật, backup, lộ trình mở rộng |
+| `ERD.md` | database_schema | Thiết kế dữ liệu (collection, trường, index). Khi có code → **pointer** tới `src/collections/` + `migrations/`, code thắng |
+| `PERMISSION.md` | business_rules | Vai trò `admin`/`sale` + ma trận quyền + guard order, **sync với `src/access/` khi có code** |
+| `API_SPEC.md` | api_spec | Endpoint tuỳ biến + quy ước. Khi có code → pointer tới `src/endpoints/` + `src/shared/types/api.ts` |
+| `DESIGN.md` | design_spec | Design spec / brand — **chưa điền** (chờ logo, màu, font) |
 | `generated/` | generated | Sinh tự động bằng `check_commands.docs_inventory` — **không sửa tay** |
+
+Tóm tắt phạm vi cho agent: `../BRIEF.md`. Spec tổng hợp: `../SPECIFICATIONS.md`.
 
 ## Historical (tham khảo — không dùng để validate)
 
 | File | Ghi chú |
 |------|---------|
+| `archive/BRD-v1.2-san-bds.md` | BRD bản cũ theo hướng **sàn BĐS** (bdstanlong.vn). Đã thay bằng `BRD.md` v1.3 — **không dùng để validate** |
 | `diagrams/` | Diagram minh họa (archify) — verify với code trước khi tin |
 
 ## Optional: manual classification hint
 
-Nếu muốn bỏ auto-detect, điền:
-
 ```yaml
-# - filename.md: brd
-# - filename.md: design
-# - filename.md: api_spec
-# - filename.md: erd
-# - filename.md: architecture
-# - filename.md: other
+- BRD.md: brd
+- ARCHITECTURE.md: architecture
+- ERD.md: erd
+- PERMISSION.md: other
+- API_SPEC.md: api_spec
+- DESIGN.md: design
+- archive/BRD-v1.2-san-bds.md: other
 ```
-
-## Không có docs?
-
-Để trống/điền tối thiểu — `/spec-init` sẽ dựng spec từ code.
 
 ## Quy tắc
 
-- **Không nhúng code/schema tay** vào docs canonical → dùng pointer + `docs/generated/`.
+- **Không nhúng code/schema tay** vào docs canonical sau khi đã có code → dùng pointer + `docs/generated/`.
 - Mọi thay đổi code/config/docs/schema → commit-first tracking là source of truth.

@@ -7,11 +7,12 @@
 
 ## Design References
 
-**Figma Link:** [https://figma.com/file/...]
-**Design Tool:** Figma / Sketch / Adobe XD / Other
+**Figma Link:** (chưa có)
+**Design Tool:** —
 
 **Reference Images:**
-- [Attach screenshots or paste image URLs]
+- 6 ảnh mockup TAMI HOMES (Trang chủ, Danh sách dự án, Chi tiết dự án, Chi tiết căn, Tin tức, Tuyển dụng), user gửi ngày 16/10/2026.
+- ⚠️ **Chỉ lấy BẢNG MÀU** từ các ảnh này. **Không** lấy bố cục, menu, component hay nội dung (mockup có mục "Mua bán", "Về chúng tôi"… không khớp phạm vi `docs/BRD.md` v1.3). Bố cục và component sẽ làm ở bước `/design`.
 
 ---
 
@@ -19,18 +20,95 @@
 
 ### Color Palette
 
+> Đo trực tiếp từ pixel ảnh mockup (16/10/2026). Phong cách: **vàng champagne + đen + nền kem**, cảm giác cao cấp.
+> Một số màu chữ đã được **chỉnh đậm hơn mockup** để đạt chuẩn tương phản WCAG AA (cột "Ghi chú").
+
+**Bảng màu chính**
+
+| Token | Value | Usage | Ghi chú |
+|-------|-------|-------|---------|
+| Primary | `#E0BF89` | Nền nút chính (Liên hệ, Tìm kiếm, Nhận tư vấn), badge trạng thái, tab đang chọn | Đo từ nút chính (#E0BE87 – #E2C491) |
+| Primary Foreground | `#141414` | Chữ / icon trên nền Primary | Tương phản 10.5:1 |
+| Primary Soft | `#EAD3AE` | Chip danh mục, tab lọc đang chọn, nền hover nhẹ | Đo từ tab "Tất cả", chip "Thị trường" (#E6C89B – #E9D0AA) |
+| Primary Subtle | `#F8F3EB` | Nền khối nổi bật (panel lợi ích, vùng nhấn kem) | Đo từ panel bên phải trang chi tiết |
+| Accent Text | `#8C6733` | Chữ vàng cỡ nhỏ: link "Xem tất cả", "Đọc thêm", nhãn eyebrow (DỰ ÁN, TIN TỨC), tab active | Mockup ~#B58C50 chỉ đạt 3.1:1 trên nền trắng → **đậm lên** để đạt 5.1:1 |
+| Accent Display | `#B58C50` | Giá tiền cỡ lớn (≥ 24px), icon viền vàng, gạch chân tab | Chỉ dùng cho chữ lớn / icon (đạt 3:1) |
+| Badge Foreground | `#3C2704` | Chữ trên badge vàng ("Đang mở bán") | Đo từ badge, 8.1:1 |
+
+**Nền & bề mặt**
+
 | Token | Value | Usage |
 |-------|-------|-------|
-| Primary | #000000 | Buttons, links, CTAs |
-| Secondary | #000000 | Supporting elements |
-| Background | #ffffff | Page background |
-| Surface | #f5f5f5 | Cards, panels |
-| Text Primary | #111111 | Headings, body |
-| Text Secondary | #666666 | Labels, captions |
-| Border | #e0e0e0 | Dividers, inputs |
-| Error | #ef4444 | Error states |
-| Success | #10b981 | Success states |
-| Warning | #f59e0b | Warning states |
+| Background | `#F7F5F4` | Nền trang (xám ấm rất nhạt) |
+| Background Alt | `#FAF8F6` | Nền section xen kẽ |
+| Surface | `#FFFFFF` | Card, form, thanh tìm kiếm, dropdown |
+| Surface Muted | `#F1F0EE` | Chip/tag trung tính ("Biệt thự", "Căn hộ"), ô input disabled |
+| Border | `#E8E6E3` | Viền card, input, đường kẻ chia | 
+
+**Tối (section tối, footer, banner CTA)**
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Dark | `#111111` | Footer, section "Kiến tạo giá trị sống", nút tối ("Tải tài liệu PDF") |
+| Dark Deep | `#0A0C10` | Banner CTA cuối trang (đen ánh xanh rất nhẹ) |
+| Dark Border | `#2A2A2A` | Đường kẻ trong vùng tối |
+| On Dark | `#FFFFFF` | Tiêu đề / chữ chính trên nền tối |
+| On Dark Muted | `#B3B3B3` | Chữ phụ trên nền tối (9:1) |
+| On Dark Accent | `#E0BF89` | Nhãn vàng, icon trên nền tối (10.8:1) |
+
+**Chữ**
+
+| Token | Value | Usage | Ghi chú |
+|-------|-------|-------|---------|
+| Text Primary | `#141414` | Tiêu đề, tên dự án/tin, giá trị thông số | Đo từ heading (#090909 – #141413) |
+| Text Secondary | `#555555` | Đoạn mô tả, nội dung bài viết | 7.5:1 |
+| Text Muted | `#767676` | Địa chỉ, ngày đăng, nhãn thông số ("Diện tích", "Bàn giao"), placeholder | Mockup ~#8A–#A0 chưa đạt AA → **đậm lên** để đạt 4.5:1 |
+
+**Trạng thái** (mockup không có, đề xuất cho hợp tông ấm)
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Success | `#2F7D5B` | Gửi form thành công, trạng thái "Đã chốt" |
+| Warning | `#B7791F` | Sắp hết hạn ưu đãi, cảnh báo |
+| Error | `#B42318` | Lỗi form, trạng thái lỗi |
+| Info | `#2B6CB0` | Thông báo trung tính |
+
+**Gợi ý CSS variables** (để `/design` sinh tokens chính thức):
+
+```css
+:root {
+  --color-primary: #E0BF89;
+  --color-primary-foreground: #141414;
+  --color-primary-soft: #EAD3AE;
+  --color-primary-subtle: #F8F3EB;
+  --color-accent-text: #8C6733;
+  --color-accent-display: #B58C50;
+  --color-badge-foreground: #3C2704;
+
+  --color-bg: #F7F5F4;
+  --color-bg-alt: #FAF8F6;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F1F0EE;
+  --color-border: #E8E6E3;
+
+  --color-dark: #111111;
+  --color-dark-deep: #0A0C10;
+  --color-dark-border: #2A2A2A;
+  --color-on-dark: #FFFFFF;
+  --color-on-dark-muted: #B3B3B3;
+
+  --color-text: #141414;
+  --color-text-secondary: #555555;
+  --color-text-muted: #767676;
+
+  --color-success: #2F7D5B;
+  --color-warning: #B7791F;
+  --color-error: #B42318;
+  --color-info: #2B6CB0;
+}
+```
+
+> Website chỉ dùng **giao diện sáng** (light), có các section tối xen kẽ như mockup. Không làm dark mode toàn trang ở giai đoạn 1.
 
 ### Typography
 
