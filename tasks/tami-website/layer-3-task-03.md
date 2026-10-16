@@ -103,3 +103,5 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
 - [ ] Nginx chuyển nguyên header `CF-Connecting-IP` (không ghi đè/không nhận từ client ngoài Cloudflare).
 - [ ] Đề xuất bật Cloudflare Authenticated Origin Pulls (mTLS) vì dải IP Cloudflare dùng chung mọi khách hàng — hỏi user.
 - [ ] Smoke test: 2 IP khác nhau rơi vào 2 bucket khác nhau.
+- [ ] Từ review layer-1-task-07: đặt bắt buộc `APP_ENV=production` (prod) / `APP_ENV=staging` + `EMAIL_ALLOWLIST` (staging) cho cả service `app` và `jobs`; service `jobs` chạy `pnpm jobs` (image cần `payload` CLI + loader TS).
+- [ ] Từ review layer-1-task-07 round 2: service `jobs` đặt `stop_grace_period: 60s` (worker chờ vòng đang chạy, tối đa 10 job SMTP); cân nhắc timeout cho nodemailer; kiểm SIGTERM thật trên Linux và job kẹt `processing=true` sau SIGKILL.

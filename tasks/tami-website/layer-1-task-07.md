@@ -32,11 +32,11 @@ Bật Payload Jobs (chạy trong process `jobs` riêng, cùng image), adapter em
 Mở khoá cho: `layer-2-task-07`, `layer-3-task-03`, `layer-6-task-08`, `layer-6-task-09`, `layer-7-task-01`, `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-9-task-07`, `layer-16-task-01`
 
 ## Acceptance Criteria
-- [ ] Job lưu trong Postgres (`payload-jobs`), không mất khi restart; retry có backoff
-- [ ] Process `pnpm jobs` chạy được tách khỏi web app; web app không tự chạy job nặng
-- [ ] `send-notification-email` nhận `{ template, to[], data }`, render template tiếng Việt, gửi qua SMTP
-- [ ] Khi `APP_ENV=staging` chỉ gửi tới địa chỉ trong `EMAIL_ALLOWLIST`, địa chỉ khác bị bỏ và ghi log
-- [ ] Không log nội dung email chứa dữ liệu cá nhân (chỉ log id job, template, số người nhận)
+- [x] Job lưu trong Postgres (`payload-jobs`), không mất khi restart; retry có backoff
+- [x] Process `pnpm jobs` chạy được tách khỏi web app; web app không tự chạy job nặng
+- [x] `send-notification-email` nhận `{ template, to[], data }`, render template tiếng Việt, gửi qua SMTP
+- [x] Khi `APP_ENV=staging` chỉ gửi tới địa chỉ trong `EMAIL_ALLOWLIST`, địa chỉ khác bị bỏ và ghi log
+- [x] Không log nội dung email chứa dữ liệu cá nhân (chỉ log id job, template, số người nhận)
 
 ## Tests cần viết
 - Integration: enqueue job → runner chạy → transport mock nhận đúng 1 email
@@ -59,13 +59,13 @@ Mở khoá cho: `layer-2-task-07`, `layer-3-task-03`, `layer-6-task-08`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (300, jobs-email integration DB thật)/build = PASS; audit high exit 0; smoke runner sống > 27s và xử lý job; SIGTERM thật + Brevo thật chưa kiểm (Windows/placeholder)
+- Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-1-task-07-round-2-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ARCHITECTURE §5.4 nếu tên job/lịch khác)
+- Doc impact result: no doc impact (.env.example thêm SMTP_PORT, EMAIL_FROM_ADDRESS, APP_ENV, EMAIL_ALLOWLIST)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -74,13 +74,13 @@ Mở khoá cho: `layer-2-task-07`, `layer-3-task-03`, `layer-6-task-08`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-1/task-07` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/jobs/index.ts (đăng ký tasks/workflows, lịch cron)

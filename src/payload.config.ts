@@ -8,7 +8,9 @@ import sharp from "sharp";
 
 import { Staff } from "./collections/Staff";
 import { migrations } from "../migrations";
+import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
+import { createEmailAdapter } from "./lib/email/transport";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const env = getEnv();
@@ -21,6 +23,8 @@ export default buildConfig({
   // Chỉ tài khoản nội bộ ở task này; collection nghiệp vụ thêm ở các layer sau.
   collections: [Staff],
   editor: lexicalEditor(),
+  email: createEmailAdapter(env),
+  jobs: jobsConfig,
   secret: env.PAYLOAD_SECRET,
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
   // Giai đoạn 1 chỉ dùng REST + Local API (ARCHITECTURE §3).

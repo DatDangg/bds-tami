@@ -31,6 +31,14 @@ const envSchema = z.object({
   SMTP_HOST: nonEmpty,
   SMTP_USER: nonEmpty,
   SMTP_PASS: nonEmpty,
+  // Brevo: smtp-relay.brevo.com, cổng 587 (STARTTLS); 465 = TLS ngay từ đầu (xem lib/email/transport.ts).
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  // Địa chỉ người gửi (phải là sender đã xác minh ở Brevo). Thiếu thì dùng SMTP_USER.
+  EMAIL_FROM_ADDRESS: z.email().optional(),
+  // Chỉ `production` được gửi email ra ngoài danh sách nội bộ (ARCHITECTURE §6.3); môi trường khác bị lọc theo EMAIL_ALLOWLIST.
+  APP_ENV: z.enum(["development", "test", "staging", "production"]).default("development"),
+  // Email nội bộ, ngăn cách bằng dấu phẩy; chỉ có tác dụng khi APP_ENV khác production.
+  EMAIL_ALLOWLIST: z.string().optional(),
   ANTHROPIC_API_KEY: nonEmpty,
   TRANSLATION_MODEL: nonEmpty,
   TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),

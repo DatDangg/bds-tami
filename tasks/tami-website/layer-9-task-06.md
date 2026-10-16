@@ -89,3 +89,6 @@ Mở khoá cho: `layer-12-task-01`
 ## Notes
 - Thời hạn là giả định A4; đặt hằng số cấu hình để chỉnh qua `/change`.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-07 (16/10/2026)
+- Job hết retry (`payload_jobs` có `hasError`/`totalTried` max) giữ PII khách trong `input` và bảng `payload_jobs_log` → `data-retention` phải xoá/ẩn danh các job lỗi cũ (vd > 7 ngày) cùng log của chúng.

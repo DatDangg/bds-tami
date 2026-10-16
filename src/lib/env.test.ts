@@ -22,6 +22,15 @@ const validEnv = {
 };
 
 describe("parseEnv", () => {
+  it("cấu hình email: mặc định cổng 587, APP_ENV=development; giá trị lạ -> lỗi nêu tên biến", () => {
+    const env = parseEnv(validEnv);
+    expect(env.SMTP_PORT).toBe(587);
+    expect(env.APP_ENV).toBe("development");
+    expect(env.EMAIL_ALLOWLIST).toBeUndefined();
+    expect(parseEnv({ ...validEnv, APP_ENV: "staging", SMTP_PORT: "465" })).toMatchObject({ APP_ENV: "staging", SMTP_PORT: 465 });
+    expect(() => parseEnv({ ...validEnv, APP_ENV: "prod" })).toThrow(/APP_ENV/);
+  });
+
   it("TRUST_CF_CONNECTING_IP: mặc định false, nhận true/false, giá trị lạ -> lỗi nêu tên biến", () => {
     expect(parseEnv(validEnv).TRUST_CF_CONNECTING_IP).toBe(false);
     expect(parseEnv({ ...validEnv, TRUST_CF_CONNECTING_IP: "true" }).TRUST_CF_CONNECTING_IP).toBe(true);

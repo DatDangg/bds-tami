@@ -15,11 +15,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "payload": "payload",
+    "jobs": "payload run scripts/jobs-runner.ts",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.91.0",
+    "@payloadcms/email-nodemailer": "3.91.0",
     "@payloadcms/next": "3.91.0",
     "@payloadcms/richtext-lexical": "3.91.0",
     "@payloadcms/translations": "3.91.0",
