@@ -121,6 +121,11 @@ export interface StaffAuthOperations {
  */
 export interface Staff {
   id: string;
+  fullName: string;
+  phone?: string | null;
+  role: 'admin' | 'sale';
+  active: boolean;
+  lastLoginAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -215,6 +220,11 @@ export interface PayloadMigration {
  * via the `definition` "staff_select".
  */
 export interface StaffSelect<T extends boolean = true> {
+  fullName?: T;
+  phone?: T;
+  role?: T;
+  active?: T;
+  lastLoginAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

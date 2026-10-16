@@ -59,3 +59,9 @@ _Errors encountered during this project will be logged below._
 ## 2026-10-16 — Audit allowlist GHSA-vfj7-8cjw-p6xm (braces)
 - `package.json` `pnpm.auditConfig.ignoreGhsas` bỏ qua advisory high `braces@3.0.3` (transitive sass/chokidar, build-time, chưa có bản vá).
 - **Xem lại trước 2026-12-16**: có bản vá → gỡ khỏi allowlist.
+
+## 2026-10-16 — Override endpoint Payload: không tự parse body (layer-1-task-02)
+- Lỗi lặp 3 lần: override `POST /api/staff/reset-password` tự đọc JSON/formData → lệch parser của Payload (multipart `_payload`, file-first) → lách kiểm độ dài mật khẩu.
+- Cách đúng: parse `req.clone()` bằng `addDataAndFileToRequest` (export từ `payload`) — cùng hàm handler mặc định dùng qua `wrapInternalEndpoints`; gắn lại `payload`, `routeParams` cho clone.
+- `resetPassword` của Payload không chạy `beforeOperation` và `beforeValidate` nhận doc đã hash → kiểm plaintext phải ở endpoint.
+- Residual: Local API `payload.resetPassword()` / GraphQL (đang tắt) không kiểm độ dài.

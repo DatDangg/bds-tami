@@ -1,7 +1,6 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vi } from "@payloadcms/translations/languages/vi";
-import { en } from "@payloadcms/translations/languages/en";
 import { buildConfig } from "payload";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,7 +26,7 @@ export default buildConfig({
   // Giai đoạn 1 chỉ dùng REST + Local API (ARCHITECTURE §3).
   graphQL: { disable: true },
   i18n: {
-    supportedLanguages: { vi, en },
+    supportedLanguages: { vi },
     fallbackLanguage: "vi",
   },
   localization: {

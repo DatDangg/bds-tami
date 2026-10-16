@@ -24,6 +24,8 @@ Không hardcode chuỗi vai trò rải rác: dùng hằng chung `ROLES` trong `s
 | `isAssignedOrAdmin` | Admin, hoặc `doc.assignedTo === user.id` |
 | `publishedOnly` | Khách: chỉ bản ghi `status` công khai (§3 ERD) và chưa xoá mềm. Staff: thấy tất cả |
 
+Hàm tạo dùng chung: `ownedByUserOrAdmin(field)` (nền của hai hàm `isAuthorOrAdmin`/`isAssignedOrAdmin`; `staff` dùng với `id` để sale chỉ thấy hồ sơ mình), `makePublishedOnly(statuses)` / `buildPublicWhere` (điều kiện công khai tập trung một chỗ; `rentalsPublishedOnly` cho `rentals` gồm `published` + `rented`). Điều kiện xoá mềm là `deletedAt` không tồn tại, nên collection dùng `publishedOnly` phải bật `trash: true`.
+
 Tài khoản `active = false` bị chặn đăng nhập và mọi quyền.
 
 ## 3. Ma trận quyền theo collection
