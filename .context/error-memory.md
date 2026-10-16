@@ -55,3 +55,7 @@ These rules were learned from real bugs. Apply them to every task, not just when
 ## Entries
 
 _Errors encountered during this project will be logged below._
+
+## 2026-10-16 — Audit allowlist GHSA-vfj7-8cjw-p6xm (braces)
+- `package.json` `pnpm.auditConfig.ignoreGhsas` bỏ qua advisory high `braces@3.0.3` (transitive sass/chokidar, build-time, chưa có bản vá).
+- **Xem lại trước 2026-12-16**: có bản vá → gỡ khỏi allowlist.

@@ -92,3 +92,6 @@ Mở khoá cho: `layer-15-task-01`
 ## Notes
 - Làm sau Should để CSP bao phủ cả trang/khối mới.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-01 (16/10/2026)
+- Pin GitHub Actions theo commit SHA (`.github/workflows/ci.yml` đang dùng tag `@v4`).

@@ -31,11 +31,11 @@ Workflow CI chạy trên mọi push vào `staging` và pull request: cài đặt
 Mở khoá cho: `layer-4-task-05`
 
 ## Acceptance Criteria
-- [ ] Trigger: `push` vào `staging`, `pull_request`; `concurrency` huỷ run cũ cùng ref
-- [ ] Các bước: setup pnpm + Node LTS có cache → `pnpm install --frozen-lockfile` → `pnpm lint` → `pnpm typecheck` → `pnpm test` → `pnpm build` → `pnpm audit --audit-level high`
-- [ ] Service container `postgis/postgis` (có `unaccent`, `pg_trgm`) và `redis` cho test integration; env test không dùng secret thật
-- [ ] Không có bước push/deploy; không đụng nhánh `main`
-- [ ] Dependabot cho npm + github-actions, nhắm nhánh `staging`
+- [x] Trigger: `push` vào `staging`, `pull_request`; `concurrency` huỷ run cũ cùng ref
+- [x] Các bước: setup pnpm + Node LTS có cache → `pnpm install --frozen-lockfile` → `pnpm lint` → `pnpm typecheck` → `pnpm test` → `pnpm build` → `pnpm audit --audit-level high`
+- [x] Service container `postgis/postgis` (có `unaccent`, `pg_trgm`) và `redis` cho test integration; env test không dùng secret thật
+- [x] Không có bước push/deploy; không đụng nhánh `main`
+- [x] Dependabot cho npm + github-actions, nhắm nhánh `staging`
 
 ## Tests cần viết
 - Kiểm cú pháp workflow bằng `actionlint` (nếu có sẵn) hoặc ghi `skip` kèm lý do
@@ -55,13 +55,13 @@ Mở khoá cho: `layer-4-task-05`
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (5)/build = PASS; pnpm audit --audit-level high exit 0 (1 high ignored GHSA-vfj7-8cjw-p6xm, xem lại trước 2026-12-16); actionlint = skip (không có sẵn, YAML parse OK); workflow chưa chạy thật trên GitHub
+- Reviewer verdict: NORMAL PASS round 1 — `.context/review-reports/build-tami-website-layer-1-task-01-round-1-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: no doc impact
 - Decision log: pending
 
 ## Commit / Tracking
@@ -70,13 +70,13 @@ Mở khoá cho: `layer-4-task-05`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-1/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức NORMAL)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - .github/workflows/ci.yml

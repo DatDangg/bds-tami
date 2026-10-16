@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 0,
+  "currentLayer": 1,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -26,6 +26,13 @@
       "round": 1,
       "report": ".context/review-reports/build-tami-website-layer-0-task-01-round-1-review.md",
       "completedAt": "2026-10-16T09:12:53.770Z"
+    },
+    {
+      "task": "layer-1/task-01",
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-1-task-01-round-1-review.md",
+      "completedAt": "2026-10-16T09:17:35.144Z"
     }
   ],
   "inProgressTask": null,
@@ -37,7 +44,7 @@
       "reason": "User duyệt plan"
     }
   ],
-  "lastUpdated": "2026-10-16T09:12:53.770Z",
+  "lastUpdated": "2026-10-16T09:17:35.144Z",
   "approvalMilestones": [
     {
       "id": "M1",
