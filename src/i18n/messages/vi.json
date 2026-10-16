@@ -47,5 +47,37 @@
       "thumbnailAlt": "Ảnh xem trước video: {title}",
       "frameTitle": "Video: {title}"
     }
+  },
+  "form": {
+    "required": "bắt buộc",
+    "submitting": "Đang gửi…",
+    "hotline": "Hotline",
+    "consent": {
+      "label": "Tôi đồng ý để TAMI xử lý dữ liệu cá nhân theo <policy>Chính sách bảo mật</policy>.",
+      "newTab": "(mở tab mới)",
+      "required": "Vui lòng đồng ý để gửi thông tin."
+    },
+    "captcha": {
+      "pending": "Đang xác minh chống spam, vui lòng thử lại sau giây lát.",
+      "unavailable": "Không tải được bước xác minh chống spam. Vui lòng tải lại trang rồi thử lại.",
+      "failed": "Xác minh chống spam không thành công, vui lòng thử lại."
+    },
+    "errors": {
+      "summary": "Vui lòng kiểm tra lại các trường được đánh dấu.",
+      "invalid": "Giá trị chưa hợp lệ.",
+      "rateLimit": "Anh/chị đã gửi nhiều lần, vui lòng thử lại sau {minutes, plural, one {# phút} other {# phút}} hoặc gọi hotline.",
+      "unavailable": "Hệ thống tạm thời không khả dụng, vui lòng thử lại sau ít phút.",
+      "generic": "Chưa gửi được, vui lòng thử lại.",
+      "network": "Chưa gửi được, vui lòng kiểm tra kết nối mạng và thử lại.",
+      "fileTooLarge": "Tệp quá lớn, vui lòng chọn tệp nhỏ hơn.",
+      "fileType": "Định dạng tệp không được hỗ trợ."
+    },
+    "actions": {
+      "retry": "Thử lại"
+    },
+    "success": {
+      "title": "Cảm ơn anh/chị!",
+      "description": "Chuyên viên TAMI sẽ liên hệ trong giờ làm việc."
+    }
   }
 }

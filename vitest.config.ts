@@ -23,6 +23,8 @@ export default defineConfig({
           include: ["src/**/*.test.tsx"],
           environment: "jsdom",
           setupFiles: ["tests/setup.ts", "tests/setup-dom.ts"],
+          // next-intl/navigation import `next/navigation` không đuôi .js: để Vite resolve (như project integration).
+          server: { deps: { inline: ["next-intl"] } },
         },
       },
       {

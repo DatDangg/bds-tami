@@ -47,5 +47,37 @@
       "thumbnailAlt": "Video preview: {title}",
       "frameTitle": "Video: {title}"
     }
+  },
+  "form": {
+    "required": "required",
+    "submitting": "Sending…",
+    "hotline": "Hotline",
+    "consent": {
+      "label": "I agree to TAMI processing my personal data under the <policy>Privacy Policy</policy>.",
+      "newTab": "(opens in a new tab)",
+      "required": "Please agree to send your information."
+    },
+    "captcha": {
+      "pending": "Anti-spam check in progress, please try again in a moment.",
+      "unavailable": "The anti-spam check could not load. Please reload the page and try again.",
+      "failed": "The anti-spam check failed, please try again."
+    },
+    "errors": {
+      "summary": "Please review the highlighted fields.",
+      "invalid": "This value is not valid.",
+      "rateLimit": "You have submitted several times. Please try again in {minutes, plural, one {# minute} other {# minutes}} or call the hotline.",
+      "unavailable": "The system is temporarily unavailable, please try again in a few minutes.",
+      "generic": "We could not send this, please try again.",
+      "network": "We could not send this, please check your connection and try again.",
+      "fileTooLarge": "The file is too large, please choose a smaller one.",
+      "fileType": "This file type is not supported."
+    },
+    "actions": {
+      "retry": "Try again"
+    },
+    "success": {
+      "title": "Thank you!",
+      "description": "A TAMI advisor will contact you during business hours."
+    }
   }
 }

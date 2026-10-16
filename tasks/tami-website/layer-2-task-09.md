@@ -52,20 +52,21 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2 (builder fix sau Reviewer round 1 FAIL; chưa review lại)
+- Last failure type: review FAIL — MAJOR-1 parseDetails nuốt detail không có path -> báo nhầm captcha; 7 MINOR (retry dữ liệu cũ, PII sau success, extra multipart, double-submit, loadTurnstile cache, reset trùng, key/test)
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria (builder tự kiểm, chờ Reviewer): consent không tick -> không gọi fetch + lỗi theo ngôn ngữ (test); Turnstile chỉ tải khi intersect/focus, tải 1 lần dùng chung (test); `details` -> field + aria-invalid/aria-describedby + focus ô lỗi đầu, lỗi chung/429/503/413/415/mạng -> `role="alert"`, thành công -> `role="status"` + focus tiêu đề (test); label thật, không placeholder (test)
+- Verify commands + result (attempt 2): `pnpm lint` PASS · `pnpm typecheck` PASS · `pnpm test` PASS (52 file / 524 test, gồm integration trên Docker dev) · `pnpm build` PASS
+- Fix attempt 2: parseDetails giữ item chỉ có message (field rỗng) vào tóm tắt; 400 không detail hiện `error` của server, chỉ gán captcha khi message nhắc captcha (pipeline không có mã máy đọc được); Thử lại dùng requestSubmit; xoá lastSubmit khi thành công; extra multipart number/boolean -> String, object -> JSON; cờ in-flight bằng useRef; loadTurnstile không cache thất bại; bỏ reset trùng ở expired-callback; khử trùng key FormStatus; thêm test tương ứng + unmount remove
+- Reviewer verdict: STRICT PASS round 2 (.context/review-reports/build-tami-website-layer-2-task-09-round-2-review.md); round 1 FAIL (400 validate hiện nhầm captcha). MINOR còn lại không chặn: tên test retry cũ, nhận diện captcha theo message (đề xuất code "captcha_failed" ở API_SPEC §2 khi làm endpoint), pipeline hard-code message tiếng Việt cho 400 ở /en (ngoài scope), usePublicForm dài. Residual: chưa kiểm trên browser thật (widget Cloudflare thật, 375px); nhánh file trống collectFields chưa test được trong jsdom.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: no doc impact
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-2): task-09 formkit` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -73,12 +74,12 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-09` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [ ] Committed
 
 ## Files to Create/Modify
