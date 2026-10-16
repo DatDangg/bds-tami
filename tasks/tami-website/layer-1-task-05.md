@@ -33,11 +33,11 @@ Các hàm thuần, có unit test đầy đủ, dùng lại ở hook/endpoint/job
 Mở khoá cho: `layer-2-task-03`, `layer-2-task-07`, `layer-3-task-02`, `layer-7-task-02`, `layer-8-task-02`, `layer-9-task-02`
 
 ## Acceptance Criteria
-- [ ] `slugify("Căn hộ dịch vụ Quận 1")` → `can-ho-dich-vu-quan-1`; xử lý `đ`, ký tự đặc biệt, gạch nối liên tiếp, độ dài tối đa
-- [ ] `normalizePhone` chấp nhận `09…`, `+849…`, `849…`, có dấu cách/chấm; từ chối số không hợp lệ
-- [ ] `normalizeSearchText` cho cùng kết quả với `unaccent(lower())` của Postgres trên bộ mẫu tiếng Việt
-- [ ] `ok(data)` → `{ success: true, data }`; `fail(status, error, details?)` → `{ success: false, error, details }`
-- [ ] `ipHash` không đảo ngược được, cùng IP cùng hash trong một môi trường
+- [x] `slugify("Căn hộ dịch vụ Quận 1")` → `can-ho-dich-vu-quan-1`; xử lý `đ`, ký tự đặc biệt, gạch nối liên tiếp, độ dài tối đa
+- [x] `normalizePhone` chấp nhận `09…`, `+849…`, `849…`, có dấu cách/chấm; từ chối số không hợp lệ
+- [x] `normalizeSearchText` cho cùng kết quả với `unaccent(lower())` của Postgres trên bộ mẫu tiếng Việt
+- [x] `ok(data)` → `{ success: true, data }`; `fail(status, error, details?)` → `{ success: false, error, details }`
+- [x] `ipHash` không đảo ngược được, cùng IP cùng hash trong một môi trường
 
 ## Tests cần viết
 - Unit cho từng hàm với bảng case (≥ 10 case slug tiếng Việt, ≥ 8 case SĐT)
@@ -57,13 +57,13 @@ Mở khoá cho: `layer-2-task-03`, `layer-2-task-07`, `layer-3-task-02`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (235, integration search-normalize chạy thật không skip)/build = PASS
+- Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-1-task-05-round-2-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: no doc impact
 - Decision log: pending
 
 ## Commit / Tracking
@@ -72,13 +72,13 @@ Mở khoá cho: `layer-2-task-03`, `layer-2-task-07`, `layer-3-task-02`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-1/task-05` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/lib/slug.ts (vi bỏ dấu, đ→d; en)

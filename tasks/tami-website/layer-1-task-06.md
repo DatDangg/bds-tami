@@ -91,3 +91,6 @@ Mở khoá cho: `layer-2-task-06`, `layer-2-task-07`, `layer-6-task-09`, `layer-
 ## Notes
 - Header `CF-Connecting-IP` có thể bị giả nếu truy cập thẳng origin; chỉ tin khi Nginx đã giới hạn IP Cloudflare (task docker/nginx).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-05 (16/10/2026)
+- n1: `src/lib/security/ip-hash.ts:9-14` chưa gộp IPv4-mapped dạng hex (`::ffff:cb00:7107`) về IPv4 vì kiểm IPv4-mapped chạy trước bước rút gọn IPv6 → đảo thứ tự + test, vì rate limit của task này dựa trên ipHash.
