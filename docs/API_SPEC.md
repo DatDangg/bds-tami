@@ -114,6 +114,15 @@ Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
 Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? }`. Gửi bằng `navigator.sendBeacon`. Trả `204`.
 
+| Trường | Ràng buộc |
+|---|---|
+| `type` | `hotline` \| `zalo` \| `fanpage` |
+| `pagePath` | bắt đầu bằng `/`, 1–500 ký tự |
+| `refCollection` | tuỳ chọn (null được), slug `[a-z0-9-]`, ≤ 64 ký tự |
+| `refId` | tuỳ chọn (null được), `[A-Za-z0-9_-]`, ≤ 64 ký tự |
+
+Body là JSON, nhận cả `Content-Type: text/plain` (sendBeacon), tối đa 2000 ký tự. Không cần Turnstile. Mã lỗi: `400` body sai, `429` vượt 30 lần/phút/IP (kèm `Retry-After`), `503` Redis không dùng được (theo §2). Code: `src/endpoints/public/click-events.ts`.
+
 ### 3.5. `GET /api/health`
 
 Không cần đăng nhập, không rate limit. Dùng cho CD health gate, Docker `HEALTHCHECK`, Uptime Kuma.

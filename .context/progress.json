@@ -110,6 +110,13 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-2-task-06-round-2-review.md",
       "completedAt": "2026-10-16T15:55:22.000Z"
+    },
+    {
+      "task": "layer-2/task-07",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-2-task-07-round-1-review.md",
+      "completedAt": "2026-10-16T16:16:54.000Z"
     }
   ],
   "inProgressTask": null,
@@ -130,9 +137,14 @@
       "date": "2026-10-16T13:58:50.661Z",
       "decision": "layer-2-task-02 blocked chờ user gửi data địa giới; làm tiếp layer-2-task-04",
       "reason": "User: data này t gửi sau"
+    },
+    {
+      "date": "2026-10-16T16:16:54.000Z",
+      "decision": "layer-2-task-07 làm tiếp dù Docker off; integration + migration apply env-blocked, chạy lại khi bật Docker trước promote staging",
+      "reason": "User: làm tiếp đi"
     }
   ],
-  "lastUpdated": "2026-10-16T15:55:22.000Z",
+  "lastUpdated": "2026-10-16T16:16:54.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

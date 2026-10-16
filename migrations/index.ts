@@ -3,6 +3,7 @@ import * as migration_20261016_092103_staff_auth from './20261016_092103_staff_a
 import * as migration_20261016_102520_jobs_queue from './20261016_102520_jobs_queue';
 import * as migration_20261016_104218_media_uploads from './20261016_104218_media_uploads';
 import * as migration_20261016_105811_audit_logs from './20261016_105811_audit_logs';
+import * as migration_20261016_160726_click_events from './20261016_160726_click_events';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261016_105811_audit_logs.up,
     down: migration_20261016_105811_audit_logs.down,
-    name: '20261016_105811_audit_logs'
+    name: '20261016_105811_audit_logs',
+  },
+  {
+    up: migration_20261016_160726_click_events.up,
+    down: migration_20261016_160726_click_events.down,
+    name: '20261016_160726_click_events'
   },
 ];

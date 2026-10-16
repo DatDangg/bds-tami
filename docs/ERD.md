@@ -459,7 +459,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | `meta` | json | Dữ liệu trước/sau (không chứa mật khẩu) |
 | `ipHash` | text | |
 
-**`click-events`**: `type` (`hotline` · `zalo` · `fanpage`), `pagePath`, `refCollection`, `refId`. Giữ 90 ngày. Mỗi giờ gộp vào **`click-stats-daily`** (`date`, `type`, `refCollection`, `refId`, `count`, unique theo 5 cột) cho dashboard.
+**`click-events`**: `type` (`hotline` · `zalo` · `fanpage`), `pagePath`, `refCollection`, `refId` (null khi không gắn bản ghi), `aggregatedAt` (job đánh dấu đã gộp; null = chưa gộp). Giữ 90 ngày. Job `aggregate-click-stats` chạy mỗi giờ, gộp các bản chưa có `aggregatedAt` vào **`click-stats-daily`** (`date`, `type`, `refCollection`, `refId`, `count`; unique theo 4 cột `date`, `type`, `refCollection`, `refId`) cho dashboard. Cộng dồn và đánh dấu trong cùng transaction theo lô nên chạy lại không cộng trùng. Ở `click-stats-daily`, `refCollection`/`refId` là chuỗi rỗng `""` (không phải null) khi không gắn bản ghi, để unique index không coi các dòng null là khác nhau. `date` là ngày theo giờ Việt Nam (UTC+7), lưu bằng 00:00 UTC của ngày đó. Code: `src/collections/ClickEvents.ts`, `ClickStatsDaily.ts`, `src/jobs/aggregate-click-stats.ts`.
 
 **`redirects`**: plugin `@payloadcms/plugin-redirects` (`from`, `to`, `type=301`). Đổi slug của nội dung đã xuất bản thì hook tự tạo redirect cho đúng ngôn ngữ (BR-05): `from` / `to` là đường dẫn đầy đủ, vd `/en/for-rent/old-slug` → `/en/for-rent/new-slug`.
 
@@ -550,7 +550,7 @@ Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (p
 |---|---|---|
 | `leads` | 24 tháng từ `lastActivityAt` ⚠️ | Ẩn danh: xoá họ tên, SĐT, email, lời nhắn; giữ số liệu thống kê |
 | `job-applications` | 12 tháng từ `createdAt` ⚠️ | Xoá file CV, ẩn danh thông tin cá nhân |
-| `click-events` | 90 ngày | Xoá (đã gộp vào `click-stats-daily`) |
+| `click-events` | 90 ngày | Xoá bản quá 90 ngày đã có `aggregatedAt` (đã gộp vào `click-stats-daily`); bản chưa gộp được gộp trước rồi mới xoá |
 | `audit-logs` | 24 tháng | Xoá bản cũ hơn |
 | Nội dung đã xoá mềm | Giữ đến khi admin xoá hẳn | — |
 | Bản phiên bản (`versions`) | Giữ 20 bản gần nhất mỗi bản ghi | Payload `maxPerDoc: 20` |

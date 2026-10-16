@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     'private-files': PrivateFile;
     'audit-logs': AuditLog;
+    'click-events': ClickEvent;
+    'click-stats-daily': ClickStatsDaily;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,6 +85,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
+    'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
+    'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -93,8 +97,12 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('vi' | 'en') | ('vi' | 'en')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'payload-jobs-stats': PayloadJobsStat;
+  };
+  globalsSelect: {
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
+  };
   locale: 'vi' | 'en';
   widgets: {
     collections: CollectionsWidget;
@@ -103,6 +111,7 @@ export interface Config {
   jobs: {
     tasks: {
       'send-notification-email': TaskSendNotificationEmail;
+      'aggregate-click-stats': TaskAggregateClickStats;
       inline: {
         input: unknown;
         output: unknown;
@@ -277,6 +286,34 @@ export interface AuditLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-events".
+ */
+export interface ClickEvent {
+  id: string;
+  type: 'hotline' | 'zalo' | 'fanpage';
+  pagePath: string;
+  refCollection?: string | null;
+  refId?: string | null;
+  aggregatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-stats-daily".
+ */
+export interface ClickStatsDaily {
+  id: string;
+  date: string;
+  type: 'hotline' | 'zalo' | 'fanpage';
+  refCollection?: string | null;
+  refId?: string | null;
+  count: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -344,7 +381,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'send-notification-email';
+        taskSlug: 'inline' | 'send-notification-email' | 'aggregate-click-stats';
         taskID: string;
         input?:
           | {
@@ -377,10 +414,19 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'send-notification-email') | null;
+  taskSlug?: ('inline' | 'send-notification-email' | 'aggregate-click-stats') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -406,6 +452,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'audit-logs';
         value: string | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'click-events';
+        value: string | ClickEvent;
+      } | null)
+    | ({
+        relationTo: 'click-stats-daily';
+        value: string | ClickStatsDaily;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -578,6 +632,32 @@ export interface AuditLogsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-events_select".
+ */
+export interface ClickEventsSelect<T extends boolean = true> {
+  type?: T;
+  pagePath?: T;
+  refCollection?: T;
+  refId?: T;
+  aggregatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-stats-daily_select".
+ */
+export interface ClickStatsDailySelect<T extends boolean = true> {
+  date?: T;
+  type?: T;
+  refCollection?: T;
+  refId?: T;
+  count?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -612,6 +692,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  meta?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -649,6 +730,34 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: string;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -678,6 +787,17 @@ export interface TaskSendNotificationEmail {
   output: {
     sent: number;
     dropped: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskAggregate-click-stats".
+ */
+export interface TaskAggregateClickStats {
+  input?: unknown;
+  output: {
+    aggregated: number;
+    deleted: number;
   };
 }
 /**

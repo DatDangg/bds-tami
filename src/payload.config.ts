@@ -8,10 +8,13 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 import { AuditLogs } from "./collections/AuditLogs";
+import { ClickEvents } from "./collections/ClickEvents";
+import { ClickStatsDaily } from "./collections/ClickStatsDaily";
 import { Media } from "./collections/Media";
 import { PrivateFiles } from "./collections/PrivateFiles";
 import { Staff } from "./collections/Staff";
 import { migrations } from "../migrations";
+import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
 import { getS3ClientConfig } from "./lib/s3-config";
@@ -37,9 +40,10 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs],
+  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
+  endpoints: [clickEventsEndpoint],
   jobs: jobsConfig,
   secret: env.PAYLOAD_SECRET,
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },

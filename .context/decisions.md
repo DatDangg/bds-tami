@@ -31,3 +31,11 @@ _No decisions recorded yet. Decisions logged here khi dựng spec và trong impl
 - **Alternatives Considered:** (1) fetch `/refresh-token` tự viết + `setUser` — review FAIL: không broadcast sang tab khác, tab để yên sẽ logout cả session (`_sid` chung) sau 8 giờ. (2) Rút ngắn tokenExpiration + refresh khi focus — không cần vì cơ chế provider khả dụng ở Payload 3.91.
 - **Rationale:** `refreshCookieAsync` dùng đúng đường refresh của Payload: cập nhật timer phiên client, broadcast REFRESHED đa tab, có guard đang-logout; refresh lỗi 401/403 thì Payload tự chuyển màn `/admin/logout-inactivity` rồi về login.
 - **Consequences:** Phiên sống tối đa 8 giờ kể từ lần refresh cuối (trễ ≤ 15 phút so với thao tác cuối). 401 đi qua màn inactivity thay vì về thẳng login. Cờ Secure phụ thuộc staging/prod chạy `next start` (`NODE_ENV=production`) — bước DevOps phải đảm bảo. Đa tab kiểm chứng bằng đọc source Payload, chưa có E2E.
+
+### Decision 3: Gộp lượt bấm click-events idempotent (layer-2-task-07)
+- **Date:** 2026-10-16
+- **Context:** Job `aggregate-click-stats` chạy hằng giờ phải gộp `click-events` vào `click-stats-daily` mà chạy lại không cộng trùng; dữ liệu thô xoá sau 90 ngày. ERD ghi "unique 5 cột" (gồm cả `count`).
+- **Decision:** Thêm cột `click-events.aggregatedAt`; job lấy lô ≤1000 bản chưa gộp (`createdAt <= now`), cộng dồn + đánh dấu trong cùng transaction. Unique `click-stats-daily` 4 cột `(date, type, refCollection, refId)`; ở bảng thống kê dùng `""` thay null cho ref để unique không coi null là khác nhau. `date` = ngày giờ VN (UTC+7), lưu 00:00 UTC. Xoá raw > 90 ngày chỉ khi đã có `aggregatedAt`.
+- **Alternatives Considered:** Tính lại theo cửa sổ thời gian — mất số liệu khi raw đã xoá. Unique có `count` — vô nghĩa với khoá.
+- **Rationale:** Đánh dấu + transaction cho exactly-once khi một runner; hàng đợi Payload không xếp trùng job cùng loại.
+- **Consequences:** Cộng dồn đọc-rồi-ghi không nguyên tử — chỉ an toàn với 1 process `jobs`; nhiều worker phải đổi sang `ON CONFLICT DO UPDATE`. Chưa kiểm trên Postgres thật (Docker off lúc build).
