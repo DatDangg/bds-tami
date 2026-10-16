@@ -3,10 +3,11 @@
 <!--
   Dự án làm mới từ đầu (chưa có code): file này được viết tay ngày 16/10/2026 từ thiết kế đã duyệt,
   thay vì reverse-engineer bằng /spec-init. Sau khi build, mọi thay đổi đi qua `/change` (agent change-request).
-  Nguồn: docs/BRD.md v1.3 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md
+  Nguồn: docs/BRD.md v1.4 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.0.0
+- **spec_version:** 1.1.0
+- **updated_at:** 2026-10-16
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
 ## Overview
@@ -15,13 +16,16 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 
 **Menu:** Trang chủ (= giới thiệu) · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ. **Không có Mua bán.**
 
+**Ngôn ngữ:** website công khai song ngữ **tiếng Việt (mặc định, URL không tiền tố)** và **tiếng Anh (`/en/...`)**; trang quản trị chỉ tiếng Việt. **Giao diện:** bố cục và phong cách theo vinhomes.vn, màu/logo/nội dung của TAMI (`docs/DESIGN.md`).
+
 ## Tech Stack
 
 | Lớp | Công nghệ |
 |---|---|
 | Ngôn ngữ / runtime | TypeScript, Node.js LTS |
 | Web + CMS + API | Next.js (App Router, SSR/ISR) + Payload CMS 3 |
-| UI | Tailwind CSS + shadcn/ui |
+| UI | Tailwind CSS + shadcn/ui; font EB Garamond + Montserrat (`next/font`, subset `vietnamese`) |
+| Song ngữ | Payload `localization` (`vi` mặc định, `en`) cho nội dung; `next-intl` cho định tuyến `/en` + chuỗi giao diện |
 | Database | PostgreSQL + PostGIS + `unaccent` + `pg_trgm`; Payload Postgres adapter (Drizzle) |
 | Cache / rate limit | Redis (hoặc Valkey) |
 | File | SeaweedFS (S3 API) + `@payloadcms/storage-s3`; ảnh resize bằng `sharp` |
@@ -69,10 +73,20 @@ Form lead ở tin cho thuê, bài Đăng tin BĐS, dự án, trang liên hệ; c
 Danh mục cha–con theo từng loại nội dung, chủ đầu tư, dịch vụ, menu/footer/cấu hình chung, tài khoản sale, thư viện ảnh (tự resize WebP), audit log, dashboard, redirect 301, hẹn giờ xuất bản, lịch sử phiên bản, xoá mềm.
 
 ### F11. SEO: FR-PUB-15, NFR-03
-SSR/ISR, URL tiếng Việt không dấu, meta + OG, `sitemap.xml`, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`), redirect 301 khi đổi slug.
+SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG theo từng ngôn ngữ, `hreflang` (`vi`, `en`, `x-default`), `<html lang>`, `sitemap.xml` gồm cả hai bản, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`, có `inLanguage`), redirect 301 khi đổi slug (theo từng ngôn ngữ).
+
+### F12. Song ngữ Việt – Anh: FR-PUB-18, FR-PUB-19, FR-ADM-17; BR-05, BR-07, BR-17
+- URL: tiếng Việt không tiền tố, tiếng Anh `/en` + đường dẫn tiếng Anh (bảng `docs/BRD.md` §2.1). Không tự chuyển theo ngôn ngữ trình duyệt; nhớ lựa chọn bằng cookie `NEXT_LOCALE`.
+- Nội dung: các trường chữ (tiêu đề, slug, mô tả, nội dung, SEO, tên danh mục, menu/footer, khối trang chủ, alt ảnh) có bản `vi` và `en` (Payload `localized: true`); số, giá, quan hệ, trạng thái, địa danh dùng chung. Danh sách trường: `docs/ERD.md` §1.1.
+- Trường `hasEnglish` ("Đã có bản tiếng Anh") trên mỗi nội dung: chỉ bật được khi đã điền đủ trường bắt buộc tiếng Anh; `/en` chỉ hiện nội dung có `hasEnglish = true`, **không** fallback sang tiếng Việt (chưa có thì 404 + không vào sitemap EN).
+- Chuỗi giao diện (menu cố định, nút, nhãn, lỗi form, thông báo, nhãn enum như nội thất / hướng nhà) ở `src/i18n/messages/{vi,en}.json`.
+- Định dạng số/ngày theo ngôn ngữ (`Intl`); tiền luôn VNĐ.
+- Nút chuyển ngôn ngữ đưa tới trang tương ứng; không có bản dịch thì về trang danh sách / trang chủ.
+- Lead và hồ sơ ứng tuyển lưu `locale` khách đã dùng; email nội bộ luôn tiếng Việt.
+- Admin (Payload) giao diện tiếng Việt; chuyển VI / EN khi soạn bài bằng bộ chọn locale có sẵn của Payload.
 
 ### Ngoài phạm vi
-Mua bán, tài khoản người ngoài / tự đăng tin, kiểm duyệt, báo cáo vi phạm, VIP / thanh toán, hoa hồng, CRM, app mobile, đa ngôn ngữ, tìm theo bản đồ, autocomplete.
+Mua bán, tài khoản người ngoài / tự đăng tin, kiểm duyệt, báo cáo vi phạm, VIP / thanh toán, hoa hồng, CRM, app mobile, ngôn ngữ thứ 3 trở lên, dịch máy tự động, giao diện admin tiếng Anh, tìm theo bản đồ, autocomplete.
 
 ## API Endpoints
 
@@ -113,9 +127,11 @@ Chi tiết trường, index, quy tắc: `docs/ERD.md`.
 
 ## Business Rules
 
-Theo `docs/BRD.md` §4: BR-01…06 (nội dung), BR-10…16 (lead), BR-20…21 (tuyển dụng), BR-30…32 (dữ liệu cá nhân).
+Theo `docs/BRD.md` §4: BR-01…07 (nội dung, gồm BR-07 hiển thị bản tiếng Anh), BR-10…17 (lead, gồm BR-17 ngôn ngữ của lead), BR-20…21 (tuyển dụng), BR-30…32 (dữ liệu cá nhân).
 
-Giả định đang áp dụng (⚠️, chỉnh qua `/change`): A1 sale chỉ sửa bài của mình · A2 gộp lead trùng 7 ngày · A3 nhắc lead chưa giao sau 30 phút · A4 lưu lead 24 tháng, CV 12 tháng · A5 chỉ tiếng Việt · A6 thiết kế cho 100.000 tin / 1.000 người đồng thời.
+Đã chốt: A5 song ngữ Việt – Anh (tiếng Việt mặc định, admin chỉ tiếng Việt, bản tiếng Anh do nhân viên nhập).
+
+Giả định đang áp dụng (⚠️, chỉnh qua `/change`): A1 sale chỉ sửa bài của mình · A2 gộp lead trùng 7 ngày · A3 nhắc lead chưa giao sau 30 phút · A4 lưu lead 24 tháng, CV 12 tháng · A6 thiết kế cho 100.000 tin / 1.000 người đồng thời.
 
 ## Scalability Profile
 

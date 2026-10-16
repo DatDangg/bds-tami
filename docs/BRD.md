@@ -3,13 +3,13 @@
 | Thông tin | Nội dung |
 |---|---|
 | Tên dự án | Website thương hiệu TAMI |
-| Phiên bản | 1.3 |
+| Phiên bản | 1.4 |
 | Ngày | 16/10/2026 |
 | Trạng thái | Đã duyệt phạm vi giai đoạn 1 |
 | Người soạn | (điền) |
 | Người phê duyệt | (điền) |
 | Mốc go-live mong muốn | (điền) |
-| Tham khảo giao diện | https://vinhomes.vn/ (chỉ tham khảo bố cục, không sao chép nội dung/hình ảnh) |
+| Tham khảo giao diện | https://vinhomes.vn/ — bố cục và phong cách theo vinhomes.vn, dùng màu/logo/ảnh/nội dung của TAMI, không sao chép nội dung/hình ảnh (chi tiết `docs/DESIGN.md`) |
 | Tài liệu liên quan | `docs/ARCHITECTURE.md`, `docs/ERD.md`, `docs/PERMISSION.md`, `docs/API_SPEC.md` |
 
 ### Lịch sử phiên bản
@@ -18,6 +18,7 @@
 |---|---|---|
 | 1.0–1.2 | 15/10/2026 | Bản nháp theo hướng **sàn BĐS** (tham chiếu bdstanlong.vn). Lưu tại `docs/archive/BRD-v1.2-san-bds.md`, chỉ để tham khảo |
 | 1.3 | 16/10/2026 | **Đổi định vị**: website thương hiệu của TAMI, công ty tự đăng nội dung, khách để lại liên hệ. Bỏ toàn bộ tính năng sàn (tài khoản người ngoài, kiểm duyệt, báo cáo vi phạm, VIP/thanh toán, xác minh môi giới). Bỏ mục Mua bán. Thêm Dịch vụ, Đăng tin BĐS (tin BĐS/voucher), Tuyển dụng vào giai đoạn 1. Chỉ 2 vai trò: Admin, Sale |
+| 1.4 | 16/10/2026 | **Song ngữ Việt – Anh**: website công khai có bản tiếng Anh (URL `/en/...`), tiếng Việt là mặc định. Thêm §2.1, FR-PUB-18, 19, FR-ADM-17, BR-07, BR-17; sửa FR-PUB-15, BR-05, A5. Chốt giao diện theo phong cách vinhomes.vn. Trang quản trị vẫn chỉ tiếng Việt |
 
 ---
 
@@ -52,14 +53,17 @@ Website cần **định hướng khách hàng, tạo sự tin tưởng và xây 
 - Trang quản trị (CMS) cho Admin và Sale.
 - Thu lead từ form, phân công lead cho sale, theo dõi trạng thái chăm sóc.
 - Nhận hồ sơ ứng tuyển (CV).
-- SEO, responsive mobile-first, tiếng Việt.
+- SEO, responsive mobile-first.
+- **Song ngữ**: tiếng Việt (mặc định) và tiếng Anh cho toàn bộ website công khai (giao diện + mọi loại nội dung). Trang quản trị chỉ tiếng Việt.
 
 **Ngoài phạm vi:**
 - Mục **Mua bán** (không làm).
 - Tài khoản cho khách hoặc môi giới bên ngoài, tự đăng tin, kiểm duyệt tin, báo cáo vi phạm.
 - Gói đăng tin, VIP, thanh toán online.
 - Tính hoa hồng, CRM chuyên sâu.
-- App mobile native, đa ngôn ngữ, tìm kiếm theo bản đồ, autocomplete.
+- Ngôn ngữ thứ 3 trở lên; dịch máy tự động (bản tiếng Anh do nhân viên tự nhập).
+- Giao diện trang quản trị bằng tiếng Anh.
+- App mobile native, tìm kiếm theo bản đồ, autocomplete.
 
 > Hệ thống được thiết kế để **có thể mở rộng** cho bên ngoài đăng tin sau này (xem `docs/ARCHITECTURE.md` §9), nhưng không xây dựng tính năng đó trong giai đoạn 1.
 
@@ -92,6 +96,26 @@ Website cần **định hướng khách hàng, tạo sự tin tưởng và xây 
 
 **Nút nổi góc dưới bên phải** (mọi trang): Hotline (click-to-call) · Zalo · Fanpage.
 
+### 2.1. URL theo ngôn ngữ
+
+Tiếng Việt **không có tiền tố**; tiếng Anh có tiền tố `/en` và đường dẫn tiếng Anh. Slug của từng bài cũng theo ngôn ngữ (bản tiếng Anh có slug tiếng Anh riêng).
+
+| Trang | Tiếng Việt | Tiếng Anh |
+|---|---|---|
+| Trang chủ | `/` | `/en` |
+| Dự án | `/du-an`, `/du-an/[slug]` | `/en/projects`, `/en/projects/[slug]` |
+| Cho thuê | `/cho-thue`, `/cho-thue/danh-muc/[category]`, `/cho-thue/khu-vuc/[province]`, `/cho-thue/[slug]` | `/en/for-rent`, `/en/for-rent/category/[category]`, `/en/for-rent/area/[province]`, `/en/for-rent/[slug]` |
+| Đăng tin BĐS | `/tin-bds`, `/tin-bds/danh-muc/[category]`, `/tin-bds/[slug]` | `/en/property-news`, `/en/property-news/category/[category]`, `/en/property-news/[slug]` |
+| Tin tức | `/tin-tuc`, `/tin-tuc/danh-muc/[category]`, `/tin-tuc/[slug]` | `/en/news`, `/en/news/category/[category]`, `/en/news/[slug]` |
+| Tuyển dụng | `/tuyen-dung`, `/tuyen-dung/[slug]` | `/en/careers`, `/en/careers/[slug]` |
+| Liên hệ | `/lien-he` | `/en/contact` |
+| Dịch vụ | `/dich-vu/[slug]` | `/en/services/[slug]` |
+| Pháp lý | `/chinh-sach-bao-mat`, `/dieu-khoan-su-dung` | `/en/privacy-policy`, `/en/terms-of-use` |
+| Quản trị | `/admin` | — (chỉ tiếng Việt) |
+
+- Khách vào lần đầu luôn thấy tiếng Việt; **không** tự chuyển theo ngôn ngữ trình duyệt (để Google index đủ cả hai bản). Lựa chọn của khách được nhớ bằng cookie.
+- Tên tỉnh/thành, phường/xã giữ nguyên tiếng Việt ở cả hai bản (tên riêng); slug địa danh dùng chung.
+
 > **Đăng tin BĐS ≠ Tin tức.** *Đăng tin BĐS* là tin thương mại của TAMI (tin BĐS, voucher, ưu đãi) và có form thu lead. *Tin tức* là tin tức chung (thị trường, đời sống, sự kiện), không thu lead.
 >
 > **Cho thuê ≠ Đăng tin BĐS.** *Cho thuê* là danh sách BĐS cho thuê **có cấu trúc** (giá, diện tích, phòng…) để lọc. *Đăng tin BĐS* là **bài đăng dạng tin**.
@@ -120,9 +144,11 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | FR-PUB-12 | Nút nổi góc dưới phải: Hotline, Zalo, Fanpage | Must | Link lấy từ cấu hình; ghi nhận số lượt bấm |
 | FR-PUB-13 | Mọi form thu thông tin có ô **đồng ý xử lý dữ liệu cá nhân** (link chính sách) và chống spam | Must | Không tick thì không gửi được |
 | FR-PUB-14 | Trang pháp lý: Chính sách bảo mật, Điều khoản sử dụng | Must | |
-| FR-PUB-15 | SEO: URL thân thiện, meta, Open Graph, `sitemap.xml`, `robots.txt`, breadcrumb, schema.org (`RealEstateListing`, `Article`, `JobPosting`, `Organization`) | Must | |
+| FR-PUB-15 | SEO: URL thân thiện, meta, Open Graph, `sitemap.xml`, `robots.txt`, breadcrumb, schema.org (`RealEstateListing`, `Article`, `JobPosting`, `Organization`) | Must | Mỗi bản ngôn ngữ có meta riêng, `<html lang>` đúng, thẻ `hreflang` (`vi`, `en`, `x-default` → bản tiếng Việt) trỏ chéo khi có cả hai bản; sitemap liệt kê cả hai bản |
 | FR-PUB-16 | Trang đích theo khu vực cho Cho thuê, ví dụ `/cho-thue/khu-vuc/ha-noi` | Should | |
 | FR-PUB-17 | Khối giới thiệu đối tác / chủ đầu tư (logo) trên trang chủ | Should | |
+| FR-PUB-18 | Website công khai song ngữ Việt – Anh: giao diện (menu, nút, nhãn, form, thông báo lỗi, thông báo cảm ơn) và nội dung (trang chủ, dự án, cho thuê, Đăng tin BĐS, tin tức, dịch vụ, tuyển dụng, trang pháp lý, menu/footer, danh mục) | Must | URL theo §2.1; bản EN chỉ hiện nội dung đã có bản dịch (BR-07); số, ngày hiển thị theo định dạng của ngôn ngữ đang xem; tiền luôn là VNĐ |
+| FR-PUB-19 | Nút chuyển ngôn ngữ VI / EN trên header, menu và footer | Must | Chuyển sang đúng trang tương ứng ở ngôn ngữ kia; trang chưa có bản dịch thì về trang danh sách (hoặc trang chủ) của ngôn ngữ kia |
 
 ### 3.2. Quản trị (CMS)
 
@@ -144,6 +170,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | FR-ADM-14 | Dashboard: số lead theo trạng thái/nguồn/sale, số nội dung đang hiển thị, lượt bấm hotline/Zalo/fanpage | Should | |
 | FR-ADM-15 | Quản lý chuyển hướng 301 | Should | |
 | FR-ADM-16 | Hẹn giờ xuất bản bài | Could | |
+| FR-ADM-17 | Nhập bản tiếng Anh cho mọi nội dung và cấu hình hiển thị (chuyển VI / EN ngay trong form soạn bài); đánh dấu "Đã có bản tiếng Anh" | Must | Chưa điền đủ trường bắt buộc tiếng Anh (tiêu đề, slug, mô tả ngắn, nội dung chính) thì không đánh dấu được; danh sách nội dung lọc được "chưa có bản tiếng Anh" |
 
 ---
 
@@ -155,8 +182,9 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 - **BR-02** Bài viết (dự án, Đăng tin BĐS, tin tức, tuyển dụng): `Nháp → Đã xuất bản → Ẩn`.
 - **BR-03** Xóa nội dung là **xóa mềm**; chỉ admin khôi phục hoặc xóa hẳn.
 - **BR-04** Mỗi nội dung có người đăng (`author`). Sale chỉ sửa/xóa nội dung **của mình**; admin sửa/xóa tất cả. ⚠️ Giả định, chỉnh được.
-- **BR-05** Slug tự sinh từ tiêu đề (tiếng Việt không dấu), không trùng trong cùng loại. Đổi slug của nội dung đã xuất bản thì tự tạo redirect 301.
+- **BR-05** Slug tự sinh từ tiêu đề **theo từng ngôn ngữ** (tiếng Việt bỏ dấu; tiếng Anh lấy từ tiêu đề tiếng Anh), không trùng trong cùng loại và cùng ngôn ngữ. Đổi slug của nội dung đã xuất bản thì tự tạo redirect 301 cho đúng ngôn ngữ đó.
 - **BR-06** Bài Đăng tin BĐS có hạn ưu đãi: quá hạn thì gắn nhãn "Đã kết thúc" và rời khối "Ưu đãi nổi bật".
+- **BR-07** Trạng thái xuất bản (`status`) dùng chung cho cả hai ngôn ngữ. Bản tiếng Việt là bắt buộc. Nội dung chỉ hiện ở bản tiếng Anh khi đã đánh dấu "Đã có bản tiếng Anh"; chưa đánh dấu thì **không** hiện ở `/en` (không lấy chữ tiếng Việt thay vào), không có trong sitemap tiếng Anh, URL tiếng Anh trả 404.
 
 ### 4.2. Lead
 
@@ -169,11 +197,12 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 - **BR-14** Lead `Mới` chưa có người phụ trách sau **30 phút** (giờ hành chính) thì nhắc admin. ⚠️ Giả định.
 - **BR-15** Chống trùng: cùng SĐT + cùng nội dung nguồn trong **7 ngày** thì gộp vào lead cũ (ghi thêm hoạt động), không tạo lead mới. ⚠️ Giả định.
 - **BR-16** Chống spam: captcha ẩn (Cloudflare Turnstile) + giới hạn 5 lần gửi / 10 phút / IP.
+- **BR-17** Lead lưu **ngôn ngữ khách đã dùng** khi gửi form (`vi` / `en`), hiện trong admin và email thông báo để sale chọn ngôn ngữ khi liên hệ. Email gửi nội bộ luôn bằng tiếng Việt. Chống trùng (BR-15) không phân biệt ngôn ngữ.
 
 ### 4.3. Tuyển dụng
 
 - **BR-20** Trạng thái hồ sơ: `Mới → Đang xem → Phỏng vấn → Nhận | Loại`.
-- **BR-21** Có hồ sơ mới thì email báo admin.
+- **BR-21** Có hồ sơ mới thì email báo admin. Hồ sơ cũng lưu ngôn ngữ khách đã dùng như BR-17.
 
 ### 4.4. Dữ liệu cá nhân
 
@@ -244,9 +273,10 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | A2 | Gộp lead trùng trong 7 ngày (BR-15) | ⚠️ Giả định |
 | A3 | Nhắc lead chưa giao sau 30 phút (BR-14) | ⚠️ Giả định |
 | A4 | Lưu lead 24 tháng, CV 12 tháng (BR-31) | ⚠️ Giả định |
-| A5 | Chỉ tiếng Việt | ⚠️ Giả định |
+| A5 | Song ngữ Việt – Anh, tiếng Việt mặc định; admin chỉ tiếng Việt; bản tiếng Anh do nhân viên tự nhập | ✅ Chốt 16/10/2026 |
+| Q5 | Ai dịch nội dung sang tiếng Anh, chính sách bảo mật / điều khoản bản tiếng Anh có cần luật sư duyệt không | ⏳ Chờ trả lời |
 | A6 | Mục tiêu tải khi thiết kế: 100.000 tin, 1.000 người đồng thời (NFR-02) | ⚠️ Giả định |
 | Q1 | Mục tiêu KPI cụ thể (BO-1…BO-4) | ⏳ Chờ điền |
-| Q2 | Logo, font, hình ảnh (cho `docs/DESIGN.md`) | ✅ Màu + logo đã có 16/10/2026 (`assets/brand/`) · ⏳ font, hình ảnh chờ cung cấp |
+| Q2 | Logo, font, hình ảnh (cho `docs/DESIGN.md`) | ✅ Màu + logo đã có 16/10/2026 (`assets/brand/`) · ✅ font tạm chốt EB Garamond + Montserrat theo phong cách vinhomes.vn (đổi được nếu TAMI có font riêng) · ⏳ hình ảnh chờ cung cấp |
 | Q3 | Cấu hình server, tên miền | ✅ Server đã kiểm tra 16/10/2026: VPS dùng chung 4 vCPU / 15GB RAM / SSD 200GB, đủ dùng (`docs/ARCHITECTURE.md` §6.1) · ⏳ tên miền chờ cung cấp |
 | Q4 | Nội dung ban đầu: danh sách dự án, tin cho thuê, dịch vụ, bài giới thiệu | ⏳ Chờ cung cấp |

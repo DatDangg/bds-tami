@@ -25,6 +25,8 @@ Staging:     https://staging.<domain>/api
 Production:  https://<domain>/api
 ```
 
+**Ngôn ngữ** (song ngữ, BRD FR-PUB-18): endpoint công khai nhận `locale` = `vi` (mặc định) | `en`. Giá trị khác trả 400. Với `locale=en`, chỉ trả nội dung có `hasEnglish = true` và trả trường chữ bản tiếng Anh (không fallback sang tiếng Việt, ERD §1.1). Thông báo lỗi trong `error` / `details` trả theo `locale` để hiện thẳng lên form. Payload Local API / REST dùng tham số `locale` có sẵn của Payload (`fallbackLocale: false` ở phía công khai).
+
 **Xác thực**: session cookie của Payload (`payload-token`, HttpOnly, Secure, SameSite=Lax). Không có API key công khai.
 
 **Response contract** (chỉ áp dụng cho endpoint tuỳ biến, qua helper `ok()` / `fail()`; REST tự sinh của Payload giữ format riêng của Payload):
@@ -73,6 +75,7 @@ Body (JSON):
 | `turnstileToken` | string | ✔ | |
 | `utm` | object | | `source`, `medium`, `campaign`, `term`, `content` |
 | `pageUrl` | string | | |
+| `locale` | `vi` \| `en` | | Mặc định `vi`. Lưu vào `leads.locale` (BR-17); dùng cho thông báo lỗi |
 
 Kết quả `200`: `{ success: true, data: { received: true } }`. Luôn giống nhau dù lead được tạo mới hay gộp vào lead cũ (không lộ dữ liệu đã có).
 
@@ -80,7 +83,7 @@ Xử lý: rate limit → Turnstile → validate → chống trùng (BR-15) → t
 
 ### 3.2. `POST /api/public/job-applications`
 
-`multipart/form-data`: `jobPostingId`, `fullName`, `phone`, `email`, `message?`, `consent=true`, `turnstileToken`, `cv` (file PDF/DOC/DOCX ≤ 5MB, kiểm tra MIME thật).
+`multipart/form-data`: `jobPostingId`, `fullName`, `phone`, `email`, `message?`, `consent=true`, `turnstileToken`, `locale?` (`vi` | `en`, lưu vào `job-applications.locale`), `cv` (file PDF/DOC/DOCX ≤ 5MB, kiểm tra MIME thật).
 
 Vị trí phải đang `published` và chưa quá `deadline`, nếu không trả 400. File lưu vào `private-files`. Kết quả `200`: `{ success: true, data: { received: true } }`.
 
@@ -90,8 +93,9 @@ Query params (đồng bộ với URL trang `/cho-thue` để chia sẻ được)
 
 | Param | Ví dụ | Ghi chú |
 |---|---|---|
+| `locale` | `en` | Mặc định `vi`; quyết định slug danh mục, trường chữ trả về và `searchText` dùng để tìm |
 | `q` | `studio quan 1` | Từ khoá, gõ không dấu vẫn ra (ERD §6) |
-| `category` | `can-ho-dich-vu` | slug danh mục (gồm danh mục con) |
+| `category` | `can-ho-dich-vu` · `serviced-apartments` | slug danh mục theo `locale` (gồm danh mục con) |
 | `province` | `ho-chi-minh` | slug |
 | `ward` | `ben-thanh` | slug |
 | `priceMin`, `priceMax` | `5000000`, `15000000` | VNĐ/tháng |
@@ -101,9 +105,9 @@ Query params (đồng bộ với URL trang `/cho-thue` để chia sẻ được)
 | `sort` | `newest` \| `price_asc` \| `price_desc` | Mặc định `newest` |
 | `page`, `limit` | `1`, `12` | `limit` tối đa 48 |
 
-Kết quả: `{ success: true, data: { items: RentalCard[], total, page, totalPages } }`. `RentalCard` chỉ gồm trường công khai (mã tin, tiêu đề, slug, ảnh đại diện, giá, diện tích, phòng ngủ, khu vực, trạng thái). **Không** trả `address` khi `showExactAddress = false`. Không bao giờ trả trường nội bộ.
+Kết quả: `{ success: true, data: { items: RentalCard[], total, page, totalPages } }`. `RentalCard` chỉ gồm trường công khai (mã tin, tiêu đề, slug, ảnh đại diện, giá, diện tích, phòng ngủ, khu vực, trạng thái), chữ và slug theo `locale`. **Không** trả `address` khi `showExactAddress = false`. Không bao giờ trả trường nội bộ.
 
-Gọi qua `SearchService`. Cache: `s-maxage=60`.
+Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
 ### 3.4. `POST /api/public/click-events`
 
@@ -128,8 +132,8 @@ Không có webhook ra ngoài ở giai đoạn 1.
 
 | Sự kiện | Nơi phát | Việc |
 |---|---|---|
-| Nội dung đổi / xuất bản / ẩn | hook `afterChange`, `afterDelete` | `revalidateTag` các trang liên quan |
+| Nội dung đổi / xuất bản / ẩn | hook `afterChange`, `afterDelete` | `revalidateTag` các trang liên quan ở **cả hai ngôn ngữ** |
 | Lead mới / gộp | endpoint 3.1 | Job `send-notification-email` |
 | Lead được giao | hook `leads.afterChange` | Activity `assignment` + job email |
 | Hồ sơ ứng tuyển mới | endpoint 3.2 | Job email cho `notificationEmails` |
-| Đổi slug nội dung đã xuất bản | hook `beforeChange` | Tạo redirect 301 |
+| Đổi slug nội dung đã xuất bản | hook `beforeChange` | Tạo redirect 301 cho ngôn ngữ có slug đổi |

@@ -1,6 +1,6 @@
 # ARCHITECTURE — Website TAMI
 
-> Kiến trúc mục tiêu cho giai đoạn 1, duyệt ngày 16/10/2026. Nguồn yêu cầu: `docs/BRD.md` v1.3.
+> Kiến trúc mục tiêu cho giai đoạn 1, duyệt ngày 16/10/2026. Nguồn yêu cầu: `docs/BRD.md` v1.4 (song ngữ Việt – Anh).
 > Khi đã có code: cấu hình thật (`docker-compose*.yml`, `payload.config.ts`, `next.config.ts`) là nguồn chuẩn. File này mô tả **ý đồ và lý do**, cần cập nhật khi kiến trúc đổi.
 
 ---
@@ -46,7 +46,8 @@ Staging chạy **một bộ riêng** (app + PostgreSQL + Redis + bucket riêng) 
 | Thành phần | Công nghệ | Vai trò | Phí |
 |---|---|---|---|
 | Web + CMS + API | **Next.js** (App Router) + **Payload CMS 3**, TypeScript, Node.js LTS | Website công khai (SSR/ISR), trang `/admin`, REST API, Local API cho server component | Free |
-| Giao diện | Tailwind CSS + shadcn/ui | UI website | Free |
+| Giao diện | Tailwind CSS + shadcn/ui; font EB Garamond + Montserrat qua `next/font` (tự host) | UI website theo phong cách vinhomes.vn (`docs/DESIGN.md`) | Free |
+| Song ngữ | **Payload `localization`** (nội dung `vi` / `en`) + **`next-intl`** (định tuyến `/en`, đường dẫn tiếng Anh, chuỗi giao diện, định dạng số/ngày) | Website công khai Việt – Anh | Free |
 | Database | **PostgreSQL** + **PostGIS** + `unaccent` + `pg_trgm` | Dữ liệu chính, tọa độ, tìm kiếm tiếng Việt không dấu | Free |
 | ORM / migration | Payload Postgres adapter (Drizzle bên dưới), `payload migrate` | Schema sinh từ cấu hình collection, migration versioned | Free |
 | Cache / rate limit | Redis (hoặc Valkey) | Giới hạn gửi form, cache dùng chung khi chạy nhiều bản app | Free |
@@ -71,6 +72,7 @@ Staging chạy **một bộ riêng** (app + PostgreSQL + Redis + bucket riêng) 
 | D3 | Payload Jobs thay vì BullMQ | Không cần thêm worker riêng; job lưu trong DB, không mất khi restart | BullMQ: thêm một tiến trình phải vận hành |
 | D4 | `sharp` của Payload thay vì imgproxy | Ảnh được resize lúc upload, phục vụ thẳng qua CDN; bớt một service | imgproxy: linh hoạt hơn nhưng thêm thành phần |
 | D5 | SeaweedFS cho file | Có S3 API, nhẹ, giấy phép Apache 2.0 | MinIO: bản community đã bị giới hạn tính năng; S3 thuê ngoài: tốn phí |
+| D6 | Song ngữ trong **cùng một bản ghi** (Payload localization) + `next-intl` với `localePrefix: 'as-needed'` và `pathnames` | Một bài có cả bản VI và EN, chung giá/ảnh/trạng thái, không phải đồng bộ hai bản ghi; tiếng Việt giữ URL gọn không tiền tố; đường dẫn tiếng Anh tự map (`/du-an` ↔ `/en/projects`) | Tách bản ghi riêng cho mỗi ngôn ngữ: dễ lệch giá/trạng thái giữa hai bản. Subdomain `en.`: thêm cấu hình DNS/SSL/cache, SEO chia đôi tên miền |
 
 ---
 
@@ -82,7 +84,7 @@ Một repo, một app Next.js có nhúng Payload:
 .
 ├── src/
 │   ├── app/
-│   │   ├── (frontend)/        # Website công khai (Trang chủ, Dự án, Cho thuê, ...)
+│   │   ├── (frontend)/[locale]/  # Website công khai (Trang chủ, Dự án, Cho thuê, ...), dùng chung cho vi / en
 │   │   └── (payload)/         # /admin và /api do Payload sinh
 │   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
@@ -95,6 +97,8 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
 │   │   └── seo/               # Sinh metadata, JSON-LD, sitemap
 │   ├── components/            # UI dùng chung
+│   ├── i18n/                  # routing.ts (locales, pathnames vi ↔ en), request.ts, messages/vi.json, messages/en.json
+│   ├── middleware.ts          # next-intl: nhận /en, nhớ cookie NEXT_LOCALE, bỏ qua /admin và /api
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
 ├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
@@ -131,6 +135,7 @@ sequenceDiagram
 
 - Trang công khai: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`, nên nội dung mới lên web trong ≤ 1 phút (BRD §7.2).
 - Khi lưu nội dung, hook `afterChange` gọi `revalidateTag` / `revalidatePath` để Next.js render lại trang liên quan (chi tiết, danh sách, trang chủ nếu là nội dung nổi bật).
+- **Song ngữ:** middleware `next-intl` xác định ngôn ngữ từ URL (`/en/...` → `en`, còn lại → `vi`), không đọc `Accept-Language` để chuyển hướng (mỗi URL luôn trả cùng một ngôn ngữ, nên CDN cache an toàn). Server component gọi Payload Local API với `locale` và `fallbackLocale: false`; bản `en` lọc thêm `hasEnglish = true`, không có thì `notFound()`. Hook xoá cache gọi `revalidatePath` cho cả hai đường dẫn VI và EN. `sitemap.xml` sinh cả hai bản kèm `alternates` (`hreflang`).
 - Ảnh, JS, CSS: `Cache-Control: public, max-age=31536000, immutable` (tên file có hash).
 - `/admin`, `/api/*`, form: **không cache** (Cloudflare bypass).
 

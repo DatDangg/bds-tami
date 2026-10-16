@@ -7,7 +7,7 @@
 
 | File | Loại | Ghi chú |
 |------|------|---------|
-| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ **v1.3** (website thương hiệu TAMI) — intent doc, chỉ đổi qua Change Request |
+| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ **v1.4** (website thương hiệu TAMI, song ngữ Việt – Anh) — intent doc, chỉ đổi qua Change Request |
 | `ARCHITECTURE.md` | architecture | Kiến trúc hệ thống, deploy, bảo mật, backup, lộ trình mở rộng |
 | `ERD.md` | database_schema | Thiết kế dữ liệu (collection, trường, index). Khi có code → **pointer** tới `src/collections/` + `migrations/`, code thắng |
 | `PERMISSION.md` | business_rules | Vai trò `admin`/`sale` + ma trận quyền + guard order, **sync với `src/access/` khi có code** |
@@ -21,7 +21,7 @@ Tóm tắt phạm vi cho agent: `../BRIEF.md`. Spec tổng hợp: `../SPECIFICAT
 
 | File | Ghi chú |
 |------|---------|
-| `archive/BRD-v1.2-san-bds.md` | BRD bản cũ theo hướng **sàn BĐS** (bdstanlong.vn). Đã thay bằng `BRD.md` v1.3 — **không dùng để validate** |
+| `archive/BRD-v1.2-san-bds.md` | BRD bản cũ theo hướng **sàn BĐS** (bdstanlong.vn). Đã thay bằng `BRD.md` từ v1.3 — **không dùng để validate** |
 | `diagrams/` | Diagram minh họa (archify) — verify với code trước khi tin |
 
 ## Optional: manual classification hint

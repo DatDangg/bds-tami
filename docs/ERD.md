@@ -1,6 +1,6 @@
 # ERD — Thiết kế dữ liệu Website TAMI
 
-> **Trạng thái:** thiết kế ban đầu (16/10/2026), dựng từ `docs/BRD.md` v1.3, **chưa có code**.
+> **Trạng thái:** thiết kế ban đầu (16/10/2026), dựng từ `docs/BRD.md` v1.4 (song ngữ Việt – Anh, §1.1), **chưa có code**.
 > Khi đã có code, **nguồn chuẩn** là cấu hình collection trong `src/collections/*`, `src/globals/*` và migration trong `migrations/`. Nếu file này lệch với code thì **code thắng**, và phải cập nhật file này trong cùng task (xem `AGENTS.md` § Doc Impact).
 
 ---
@@ -26,7 +26,18 @@
 | `rentals` | `draft` · `published` · `hidden` · `rented` |
 | `projects`, `property-posts`, `news`, `services`, `job-postings`, `pages` | `draft` · `published` · `hidden` |
 
-Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm.
+Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm. Bản tiếng Anh (`/en`) còn phải có `hasEnglish = true` (§1.1).
+
+### 1.1. Song ngữ (Payload localization)
+
+Cấu hình: `localization: { locales: ['vi', 'en'], defaultLocale: 'vi', fallback: false }` (BRD FR-PUB-18, BR-07).
+
+- Trường `localized: true` lưu riêng bản `vi` và `en`. Payload đặt các cột này ở bảng `<collection>_locales` (cột `_locale`, `_parent_id`), không nằm ở bảng chính.
+- **Localized** (áp cho mọi collection/global ở §4, không ghi lại từng bảng): `title`, `name`, `slug`, `summary`, `excerpt`, `description`, `overview`, `content`, các trường richText/textarea hiển thị cho khách, nhãn trong array (vd `amenities.name`, `floorPlans.title`), nhóm `seo`, chữ trong globals `homepage` / `header` / `footer`, `media.alt` / `caption`.
+- **Không localized** (dùng chung hai bản): số, giá, diện tích, ngày, quan hệ, `status`, `code`, `author`, select/enum (nhãn hiển thị dịch ở file chuỗi giao diện), ảnh/file, toạ độ, `provinces` / `wards` (tên riêng tiếng Việt).
+- **`hasEnglish`** (checkbox, I, mặc định `false`) có trên mọi collection nội dung: `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`, `categories`, `developers`. Hook `beforeValidate` chặn bật khi thiếu trường bắt buộc tiếng Anh: `title`/`name`, `slug`, mô tả ngắn (`summary` / `excerpt` / `description`), nội dung chính (`overview` / `content` / `description` tuỳ collection).
+- Trường bắt buộc (**R**) chỉ bắt buộc ở bản `vi`; bản `en` chỉ bắt buộc khi `hasEnglish = true`.
+- **Slug**: unique theo cặp (`_locale`, `slug`) trong cùng collection (với `categories`: theo (`_locale`, `scope`, `slug`)). Bản `en` sinh từ `title` tiếng Anh.
 
 ---
 
@@ -138,7 +149,7 @@ Dữ liệu seed từ danh mục hành chính chính thức, đặt ở `seed/`.
 | Trường | Kiểu | Ràng buộc | Ghi chú |
 |---|---|---|---|
 | `name` | text | R | |
-| `slug` | text | R | Unique theo cặp (`scope`, `slug`) |
+| `slug` | text | R | Unique theo (`_locale`, `scope`, `slug`) |
 | `scope` | select | R, I | `rental` · `property_post` · `news` · `project` · `job` |
 | `parent` | `rel→categories` | | Cùng `scope` với con (hook kiểm tra); tối đa 2 cấp |
 | `description` | textarea | | Dùng cho trang danh mục + SEO |
@@ -329,6 +340,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `note` | textarea | | Ghi chú nội bộ |
 | `consentAt` | date | R | |
 | `consentVersion` | text | R | Phiên bản chính sách tại thời điểm đồng ý |
+| `locale` | select | R | `vi` · `en`: ngôn ngữ khách dùng khi nộp (BR-21) |
 | `ipHash` | text | | Hash IP (không lưu IP thô) |
 | `anonymizedAt` | date | | Đặt khi job `data-retention` xử lý |
 
@@ -357,6 +369,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `mergedCount` | number | | Số lần khách gửi lại và được gộp |
 | `consentAt` | date | R | |
 | `consentVersion` | text | R | |
+| `locale` | select | R, I | `vi` · `en`: ngôn ngữ khách dùng khi gửi form (BR-17). Không dùng để chống trùng |
 | `utm` | group | | `source`, `medium`, `campaign`, `term`, `content` |
 | `pageUrl` | text | | Trang khách gửi form |
 | `referrer` | text | | |
@@ -412,7 +425,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 **`click-events`**: `type` (`hotline` · `zalo` · `fanpage`), `pagePath`, `refCollection`, `refId`. Giữ 90 ngày. Mỗi giờ gộp vào **`click-stats-daily`** (`date`, `type`, `refCollection`, `refId`, `count`, unique theo 5 cột) cho dashboard.
 
-**`redirects`**: plugin `@payloadcms/plugin-redirects` (`from`, `to`, `type=301`). Đổi slug của nội dung đã xuất bản thì hook tự tạo redirect (BR-05).
+**`redirects`**: plugin `@payloadcms/plugin-redirects` (`from`, `to`, `type=301`). Đổi slug của nội dung đã xuất bản thì hook tự tạo redirect cho đúng ngôn ngữ (BR-05): `from` / `to` là đường dẫn đầy đủ, vd `/en/for-rent/old-slug` → `/en/for-rent/new-slug`.
 
 **`payload-jobs`**: bảng hàng đợi do Payload Jobs quản lý.
 
@@ -429,6 +442,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 Dùng plugin `@payloadcms/plugin-seo`.
 
 ### 4.15. Globals
+
+> Globals: các trường chữ (tiêu đề khối, slide, nhãn menu, cột footer, `siteName`, `address`, `copyright`) là localized; link, ảnh, số điện thoại, email dùng chung. `header.navItems[].link` lưu **khoá trang** (vd `projects`, `rentals`) hoặc URL tuyệt đối, để mỗi ngôn ngữ tự ra đúng đường dẫn.
 
 **`site-settings`**: `siteName`, `logo`, `logoDark`, `favicon`, `hotline`, `zaloUrl`, `fanpageUrl`, `email`, `address`, `mapLocation` (point), `socialLinks` (array `{platform, url}`), `notificationEmails` (array email nhận thông báo lead/ứng tuyển), `privacyPolicyVersion` (dùng làm `consentVersion`), `gaMeasurementId`.
 
@@ -471,11 +486,19 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 
 Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (partial index `WHERE deleted_at IS NULL`, nếu dùng trường `deletedAt`).
 
+**Song ngữ:** cột localized nằm ở bảng `<collection>_locales`, nên index tìm kiếm và slug đặt ở đó:
+
+| Bảng | Index | Phục vụ |
+|---|---|---|
+| `<collection>_locales` (mọi collection nội dung) | UNIQUE `(_locale, slug)` | Tra trang theo slug từng ngôn ngữ |
+| `rentals_locales` | GIN `search_text gin_trgm_ops` (thay cho index trên bảng `rentals`) | Tìm từ khoá theo ngôn ngữ đang xem |
+| `rentals`, `projects`, `property_posts`, `news`, `job_postings` | thêm cột `has_english` ngay sau `status` trong các index danh sách ở trên, vd `(status, has_english, category_id, …)` | Lọc danh sách bản tiếng Anh |
+
 ---
 
 ## 6. Tìm kiếm (giai đoạn 1)
 
-- Cột `searchText` của `rentals` được hook `beforeChange` sinh từ: `code` + `title` + `address` + tên phường + tên tỉnh + `legacyNames` của phường + tên dự án. Chuyển chữ thường và bỏ dấu (`unaccent`).
+- Cột `searchText` của `rentals` (localized) được hook `beforeChange` sinh **cho từng ngôn ngữ** từ: `code` + `title` của ngôn ngữ đó + `address` + tên phường + tên tỉnh + `legacyNames` của phường + tên dự án. Chuyển chữ thường và bỏ dấu (`unaccent`). Tìm ở `/en` dùng `searchText` bản `en` (vẫn gõ được tên địa danh tiếng Việt không dấu).
 - Từ khoá người dùng nhập cũng được chuẩn hoá như vậy, rồi tìm bằng `ILIKE` / similarity của `pg_trgm` trên index GIN.
 - Toàn bộ nằm sau `SearchService` (`src/lib/search`). Khi cần OpenSearch thì chỉ đổi implementation (ARCHITECTURE §9.1).
 - `property-posts` và `news`: tìm đơn giản theo tiêu đề (đủ cho giai đoạn 1).

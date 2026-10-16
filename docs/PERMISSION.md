@@ -1,6 +1,6 @@
 # PERMISSION.md — Vai trò & phân quyền
 
-> **Trạng thái:** thiết kế ban đầu (16/10/2026), theo `docs/BRD.md` v1.3, chưa có code.
+> **Trạng thái:** thiết kế ban đầu (16/10/2026), theo `docs/BRD.md` v1.4, chưa có code.
 > Khi có code, nguồn chuẩn là: field `role` của collection `staff`, các hàm trong `src/access/`, và cấu hình `access` của từng collection/global. Lệch thì **code thắng**, và phải cập nhật file này trong cùng task.
 
 ## 1. Vai trò
@@ -82,7 +82,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | Mọi nội dung | `isFeatured` | **Chỉ admin** (khối nổi bật trên trang chủ do admin quyết) |
 | `rentals`, `leads` | `code` | Chỉ đọc với tất cả (hệ thống sinh) |
 | `leads` | `assignedTo`, `assignedAt` | **Chỉ admin** sửa; hệ thống tự gán theo BR-12 |
-| `leads` | `phone`, `email`, `fullName`, `message` | Chỉ đọc với sale (không sửa dữ liệu khách gửi) |
+| `leads` | `phone`, `email`, `fullName`, `message`, `locale` | Chỉ đọc với sale (không sửa dữ liệu khách gửi) |
 | `staff` | `role`, `active` | **Chỉ admin** |
 
 ## 5. Thứ tự kiểm tra trên endpoint tuỳ biến
