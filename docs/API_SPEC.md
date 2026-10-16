@@ -120,7 +120,8 @@ Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? 
 | `GET` | `/api/admin/leads/export` | admin | Xuất lead ra `.xlsx` theo bộ lọc hiện tại (trạng thái, nguồn, sale, khoảng ngày). Ghi audit log `lead.export` | FR-ADM-10 |
 | `POST` | `/api/admin/leads/:id/assign` | admin | Giao lead cho sale `{ staffId }`. Sinh activity `assignment`, email cho sale, ghi audit log | FR-ADM-09; BR-12, 13 |
 | `GET` | `/api/admin/private-files/:id/download` | admin | Tải CV. Ghi audit log `application.view_cv` | FR-ADM-05 |
-| `GET` | `/api/admin/dashboard` | admin (toàn bộ), sale (số liệu lead của mình) | Số liệu dashboard | FR-ADM-14 |
+| `GET` | `/api/admin/dashboard` | admin (toàn bộ), sale (số liệu lead của mình) | Số liệu dashboard (admin thấy thêm: số bài dịch lỗi / chờ duyệt, chi phí dịch tháng này) | FR-ADM-14 |
+| `POST` | `/api/admin/translations/:collection/:id` | admin; sale với bài của mình | "Dịch lại bằng AI" (§5.1) | FR-ADM-18 |
 
 Thứ tự kiểm tra: `docs/PERMISSION.md` §5. Giới hạn: xuất Excel 10 lần / giờ / user.
 
@@ -137,3 +138,11 @@ Không có webhook ra ngoài ở giai đoạn 1.
 | Lead được giao | hook `leads.afterChange` | Activity `assignment` + job email |
 | Hồ sơ ứng tuyển mới | endpoint 3.2 | Job email cho `notificationEmails` |
 | Đổi slug nội dung đã xuất bản | hook `beforeChange` | Tạo redirect 301 cho ngôn ngữ có slug đổi |
+| Lưu bản `vi` đang xuất bản / lưu global | hook `afterChange` | Job `translate-content` (dịch trường đã đổi sang `en`, BRD BR-08) |
+| Nhân viên sửa trường `en` | hook `beforeChange` | `translation.enSource = manual` |
+
+Gọi ra ngoài duy nhất: **Claude API** từ job `translate-content` (chỉ nội dung công khai, ARCHITECTURE §7).
+
+### 5.1. `POST /api/admin/translations/:collection/:id`
+
+"Dịch lại bằng AI" cho một bản ghi (hoặc `:collection = globals`, `:id = <slug global>`). Quyền: admin, hoặc sale là `author` của bản ghi (`docs/PERMISSION.md` §4). Đưa job `translate-content` vào hàng đợi với `force: true` (dịch đè cả bản `manual`, đặt lại `enSource = ai`). Kết quả `202`: `{ success: true, data: { queued: true } }`. Giới hạn 30 lần / giờ / user. Ghi audit log `content.retranslate`.

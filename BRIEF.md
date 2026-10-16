@@ -26,7 +26,7 @@ Chi tiết: `docs/BRD.md` (v1.4).
 - Tuyển dụng: danh sách việc, nộp CV
 - Liên hệ, trang Dịch vụ, trang pháp lý; nút nổi Hotline / Zalo / Fanpage
 - Admin (Payload CMS): đăng mọi loại bài, danh mục cha–con cho từng loại, quản lý lead (phân công, trạng thái, ghi chú, xuất Excel), tài khoản sale, cấu hình trang chủ
-- Song ngữ Việt – Anh cho toàn bộ website công khai; nút chuyển ngôn ngữ VI / EN; bản tiếng Anh do nhân viên nhập trong admin
+- Song ngữ Việt – Anh cho toàn bộ website công khai; nút chuyển ngôn ngữ VI / EN; bản tiếng Anh do AI (Claude API) tự dịch khi xuất bản, nhân viên sửa tay được trong admin
 - **Không có** mục Mua bán; **không** cho người ngoài đăng tin ở giai đoạn này
 
 ## Non-functional Requirements
@@ -35,7 +35,7 @@ Chi tiết: `docs/BRD.md` (v1.4).
 - Thiết kế cho 100.000 tin / 1.000 người đồng thời; app stateless, scale ngang được
 - Bảo mật: HTTPS, Cloudflare, Turnstile + rate limit cho form, lớp xác thực thứ 2 cho `/admin`, CV không có link công khai
 - Backup ra ngoài server (RPO ≤ 15 phút, RTO ≤ 4 giờ); có staging riêng
-- Chỉ dùng phần mềm mã nguồn mở, tự host trên server của công ty
+- Chỉ dùng phần mềm mã nguồn mở, tự host trên server của công ty (ngoại lệ: Claude API để dịch tiếng Anh, có hạn mức chi phí tháng)
 
 ## Notes
 - Stack: Next.js + Payload CMS 3 + PostgreSQL (PostGIS) + Redis + SeaweedFS, Docker Compose, Nginx có sẵn, Cloudflare. Chi tiết: `docs/ARCHITECTURE.md`
@@ -43,4 +43,4 @@ Chi tiết: `docs/BRD.md` (v1.4).
 - Dữ liệu: `docs/ERD.md` · Phân quyền: `docs/PERMISSION.md` · API: `docs/API_SPEC.md`
 - Giao diện: bố cục và phong cách theo https://vinhomes.vn/ (hero full màn hình, tiêu đề serif in hoa, slider dự án), dùng màu/logo/ảnh/nội dung của TAMI, không sao chép nội dung (`docs/DESIGN.md`)
 - Chuẩn bị sẵn để sau này có thể mở cho bên ngoài đăng tin (ARCHITECTURE §9.2), nhưng không làm tính năng đó bây giờ
-- Màu thương hiệu và logo đã có (`docs/DESIGN.md`, `assets/brand/`). Font tạm chốt EB Garamond + Montserrat. Còn chờ: tên miền, nội dung ban đầu (cả bản tiếng Anh)
+- Màu thương hiệu và logo đã có (`docs/DESIGN.md`, `assets/brand/`). Font tạm chốt EB Garamond + Montserrat. Còn chờ: tên miền, nội dung ban đầu (tiếng Việt; bản tiếng Anh AI tự dịch), hạn mức chi phí Claude API

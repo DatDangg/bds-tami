@@ -1,6 +1,6 @@
 # PERMISSION.md — Vai trò & phân quyền
 
-> **Trạng thái:** thiết kế ban đầu (16/10/2026), theo `docs/BRD.md` v1.4, chưa có code.
+> **Trạng thái:** thiết kế ban đầu (16/10/2026), theo `docs/BRD.md` v1.5, chưa có code.
 > Khi có code, nguồn chuẩn là: field `role` của collection `staff`, các hàm trong `src/access/`, và cấu hình `access` của từng collection/global. Lệch thì **code thắng**, và phải cập nhật file này trong cùng task.
 
 ## 1. Vai trò
@@ -73,6 +73,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `staff` | Đọc + sửa **hồ sơ của chính mình** (tên, SĐT, ảnh, mật khẩu) | ✔ (tạo, khoá, đặt lại mật khẩu, đổi vai trò) |
 | `audit-logs` | — | Chỉ đọc (không ai sửa/xoá) |
 | `click-events`, `click-stats-daily` | — | Chỉ đọc |
+| `translation-usage` | — | Chỉ đọc |
 
 ## 4. Quyền theo trường (field-level)
 
@@ -84,6 +85,8 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `leads` | `assignedTo`, `assignedAt` | **Chỉ admin** sửa; hệ thống tự gán theo BR-12 |
 | `leads` | `phone`, `email`, `fullName`, `message`, `locale` | Chỉ đọc với sale (không sửa dữ liệu khách gửi) |
 | `staff` | `role`, `active` | **Chỉ admin** |
+| Mọi nội dung + globals | `translation.*` | Chỉ đọc với tất cả (hệ thống ghi). Sửa tay trường `en` thì được theo quyền sửa bài; nút "Dịch lại bằng AI" theo quyền sửa bài (`POST /api/admin/translations/...`) |
+| `pages` (pháp lý) | `hasEnglish` | **Chỉ admin** bật sau khi duyệt bản dịch (BRD BR-08) |
 
 ## 5. Thứ tự kiểm tra trên endpoint tuỳ biến
 
@@ -104,7 +107,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 ## 6. Thao tác bắt buộc ghi audit log
 
-Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá tài khoản, đổi vai trò · Đăng nhập thất bại.
+Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá tài khoản, đổi vai trò · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.
 
 ## 7. Bảo vệ trang `/admin`
 

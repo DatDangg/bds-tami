@@ -1,6 +1,6 @@
 # ARCHITECTURE — Website TAMI
 
-> Kiến trúc mục tiêu cho giai đoạn 1, duyệt ngày 16/10/2026. Nguồn yêu cầu: `docs/BRD.md` v1.4 (song ngữ Việt – Anh).
+> Kiến trúc mục tiêu cho giai đoạn 1, duyệt ngày 16/10/2026. Nguồn yêu cầu: `docs/BRD.md` v1.5 (song ngữ Việt – Anh, AI tự dịch).
 > Khi đã có code: cấu hình thật (`docker-compose*.yml`, `payload.config.ts`, `next.config.ts`) là nguồn chuẩn. File này mô tả **ý đồ và lý do**, cần cập nhật khi kiến trúc đổi.
 
 ---
@@ -10,7 +10,7 @@
 1. **Một ứng dụng duy nhất**: Next.js + Payload CMS chạy chung (website + admin + API). Ít thành phần thì ít thứ hỏng, dễ vận hành.
 2. **Đọc nhiều, ghi ít**: trang công khai render sẵn và cache ở CDN; phần lớn request không chạm tới DB.
 3. **Stateless**: app không lưu trạng thái trên đĩa hay bộ nhớ (file nằm ở object storage, session/rate limit nằm ở DB/Redis), nên chạy thêm bản app được mà không sửa code.
-4. **Mã nguồn mở, tự host**: không phụ thuộc dịch vụ trả phí (NFR-09).
+4. **Mã nguồn mở, tự host**: không phụ thuộc dịch vụ trả phí (NFR-09). Ngoại lệ duy nhất: Claude API để dịch tiếng Anh (D7), có hạn mức chi phí; API lỗi/hết hạn mức thì website vẫn chạy, chỉ bản tiếng Anh mới chưa có.
 5. **Chừa chỗ mở rộng, không làm trước**: thiết kế sẵn điểm nối (§9), nhưng không xây tính năng chưa cần.
 
 ---
@@ -27,12 +27,13 @@ flowchart TB
     APP --> PG[(PostgreSQL + PostGIS)]
     APP --> RD[(Redis<br/>rate limit · cache)]
     APP --> S3[(SeaweedFS<br/>S3 API · ảnh & file)]
-    JOB[Payload Jobs runner<br/>email · nhắc lead · dọn dữ liệu] --> PG
+    JOB[Payload Jobs runner<br/>email · nhắc lead · dọn dữ liệu · dịch EN] --> PG
     MON[Grafana · Loki · Prometheus · GlitchTip]
   end
 
   APP -. SMTP .-> MAIL[Brevo SMTP]
   JOB -. SMTP .-> MAIL
+  JOB -. HTTPS, chỉ nội dung công khai .-> AI[Claude API<br/>dịch VI → EN]
   PG -. backup liên tục .-> BK[(Kho backup ngoài server)]
   S3 -. backup hằng ngày .-> BK
 ```
@@ -57,6 +58,7 @@ Staging chạy **một bộ riêng** (app + PostgreSQL + Redis + bucket riêng) 
 | Reverse proxy | **Nginx có sẵn trên server** (đang phục vụ các site khác ở cổng 80/443) | Thêm file cấu hình riêng cho TAMI; điều hướng prod/staging, SSL origin, nén | Free |
 | CDN / bảo vệ | Cloudflare (gói free) | Cache, SSL, chống DDoS, WAF cơ bản, Turnstile | Free |
 | Email | Brevo SMTP (gói free ~300 mail/ngày) | Thông báo lead, hồ sơ ứng tuyển | Free trong hạn mức |
+| Dịch tự động | **Claude API** (`@anthropic-ai/sdk`), model qua env `TRANSLATION_MODEL` | Dịch nội dung VI → EN trong job `translate-content` (BRD BR-08) | **Trả phí** theo lượng chữ, có hạn mức tháng |
 | Bản đồ | OpenStreetMap tiles + MapLibre GL | Bản đồ vị trí dự án / tin | Free |
 | Giám sát | Prometheus + Grafana + Loki, GlitchTip (lỗi), Uptime Kuma (uptime) | Metrics, log, lỗi, cảnh báo | Free |
 | Backup | pgBackRest (PostgreSQL), restic (file) | Sao lưu ra ngoài server | Free (chỉ tốn chỗ lưu) |
@@ -73,6 +75,7 @@ Staging chạy **một bộ riêng** (app + PostgreSQL + Redis + bucket riêng) 
 | D4 | `sharp` của Payload thay vì imgproxy | Ảnh được resize lúc upload, phục vụ thẳng qua CDN; bớt một service | imgproxy: linh hoạt hơn nhưng thêm thành phần |
 | D5 | SeaweedFS cho file | Có S3 API, nhẹ, giấy phép Apache 2.0 | MinIO: bản community đã bị giới hạn tính năng; S3 thuê ngoài: tốn phí |
 | D6 | Song ngữ trong **cùng một bản ghi** (Payload localization) + `next-intl` với `localePrefix: 'as-needed'` và `pathnames` | Một bài có cả bản VI và EN, chung giá/ảnh/trạng thái, không phải đồng bộ hai bản ghi; tiếng Việt giữ URL gọn không tiền tố; đường dẫn tiếng Anh tự map (`/du-an` ↔ `/en/projects`) | Tách bản ghi riêng cho mỗi ngôn ngữ: dễ lệch giá/trạng thái giữa hai bản. Subdomain `en.`: thêm cấu hình DNS/SSL/cache, SEO chia đôi tên miền |
+| D7 | Dịch tiếng Anh bằng **Claude API**, chạy nền trong Payload Jobs, tự lên web | Chất lượng dịch tốt cho văn bản marketing BĐS, hiểu bảng thuật ngữ, giữ cấu trúc richText; chạy nền nên không làm chậm lúc lưu bài; chỉ dịch trường đã đổi nên ít tốn | LibreTranslate tự host: miễn phí nhưng dịch kém, tốn RAM server dùng chung. Model tự host (Ollama): server 4 vCPU không đủ. Nhân viên tự dịch: tốn công, dễ bỏ sót |
 
 ---
 
@@ -94,6 +97,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu
 │   ├── lib/
 │   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1)
+│   │   ├── translation/       # TranslationService: gọi Claude API, dịch richText theo node, thuật ngữ, hạn mức chi phí
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
 │   │   └── seo/               # Sinh metadata, JSON-LD, sitemap
 │   ├── components/            # UI dùng chung
@@ -180,6 +184,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 | `close-job-postings` | Hằng ngày 00:10 | Ẩn tin tuyển dụng quá hạn nộp |
 | `data-retention` | Hằng tuần | Ẩn danh lead quá 24 tháng, xoá CV quá 12 tháng (BR-31) |
 | `aggregate-click-stats` | Hằng giờ | Gộp số lượt bấm hotline/Zalo/fanpage cho dashboard |
+| `translate-content` | Ngay khi lưu bản `vi` đang xuất bản / global, hoặc bấm "Dịch lại bằng AI" | Dịch các trường đã đổi sang `en` (bỏ qua bản `enSource = manual`), sinh slug `en`, bật `hasEnglish`, xoá cache `/en`. Gộp nhiều lần lưu liên tiếp của cùng bài (chờ ~1 phút). Thử lại 3 lần (backoff); lỗi thì `translation.status = failed`. Kiểm hạn mức tháng trước khi gọi (BR-08) |
 
 ---
 
@@ -228,7 +233,7 @@ Tổng ước tính ~4–5GB RAM, nằm gọn trong ~11GB đang trống.
 | Truy cập | Công khai | Cloudflare Access hoặc mật khẩu, `noindex` |
 | Email | Gửi thật | Chỉ gửi tới danh sách email nội bộ |
 
-Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu đặt ở `.env.example`.
+Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu đặt ở `.env.example`, gồm cả `ANTHROPIC_API_KEY`, `TRANSLATION_MODEL`, `TRANSLATION_MONTHLY_BUDGET_USD` (prod/staging giá trị riêng).
 
 ### 6.4. CI/CD
 
@@ -258,6 +263,7 @@ Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, kh�
 | Upload | Kiểm tra MIME thật + giới hạn dung lượng; CV ở bucket private; tên file ngẫu nhiên |
 | Nội dung | Rich text lưu dạng JSON (Lexical), render an toàn; không cho chèn HTML/script tuỳ ý |
 | Dữ liệu cá nhân | SĐT/email khách chỉ hiện cho người có quyền; audit log khi xem danh sách và khi xuất Excel |
+| Dịch AI | `ANTHROPIC_API_KEY` chỉ ở `.env` server (prod/staging key riêng), chỉ job phía server dùng, không bao giờ ra trình duyệt. Chỉ gửi trường nội dung công khai; lead, CV, dữ liệu nhân viên **không** đi qua `TranslationService` (chặn bằng danh sách collection cho phép). Kết quả dịch là văn bản / JSON Lexical, validate lại cấu trúc trước khi lưu, không nhận HTML. Staging dùng hạn mức thấp |
 | Phụ thuộc | Dependabot / `pnpm audit` trong CI |
 | Header | CSP, HSTS, X-Frame-Options, Referrer-Policy |
 

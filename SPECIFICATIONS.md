@@ -3,10 +3,10 @@
 <!--
   Dự án làm mới từ đầu (chưa có code): file này được viết tay ngày 16/10/2026 từ thiết kế đã duyệt,
   thay vì reverse-engineer bằng /spec-init. Sau khi build, mọi thay đổi đi qua `/change` (agent change-request).
-  Nguồn: docs/BRD.md v1.4 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
+  Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.1.0
+- **spec_version:** 1.2.0
 - **updated_at:** 2026-10-16
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -26,6 +26,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 | Web + CMS + API | Next.js (App Router, SSR/ISR) + Payload CMS 3 |
 | UI | Tailwind CSS + shadcn/ui; font EB Garamond + Montserrat (`next/font`, subset `vietnamese`) |
 | Song ngữ | Payload `localization` (`vi` mặc định, `en`) cho nội dung; `next-intl` cho định tuyến `/en` + chuỗi giao diện |
+| Dịch tự động | Claude API (`@anthropic-ai/sdk`), chạy trong Payload Jobs; model cấu hình qua env `TRANSLATION_MODEL` |
 | Database | PostgreSQL + PostGIS + `unaccent` + `pg_trgm`; Payload Postgres adapter (Drizzle) |
 | Cache / rate limit | Redis (hoặc Valkey) |
 | File | SeaweedFS (S3 API) + `@payloadcms/storage-s3`; ảnh resize bằng `sharp` |
@@ -75,10 +76,12 @@ Danh mục cha–con theo từng loại nội dung, chủ đầu tư, dịch v�
 ### F11. SEO: FR-PUB-15, NFR-03
 SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG theo từng ngôn ngữ, `hreflang` (`vi`, `en`, `x-default`), `<html lang>`, `sitemap.xml` gồm cả hai bản, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`, có `inLanguage`), redirect 301 khi đổi slug (theo từng ngôn ngữ).
 
-### F12. Song ngữ Việt – Anh: FR-PUB-18, FR-PUB-19, FR-ADM-17; BR-05, BR-07, BR-17
+### F12. Song ngữ Việt – Anh: FR-PUB-18, FR-PUB-19, FR-ADM-17, FR-ADM-18; BR-05, BR-07, BR-08, BR-17
 - URL: tiếng Việt không tiền tố, tiếng Anh `/en` + đường dẫn tiếng Anh (bảng `docs/BRD.md` §2.1). Không tự chuyển theo ngôn ngữ trình duyệt; nhớ lựa chọn bằng cookie `NEXT_LOCALE`.
 - Nội dung: các trường chữ (tiêu đề, slug, mô tả, nội dung, SEO, tên danh mục, menu/footer, khối trang chủ, alt ảnh) có bản `vi` và `en` (Payload `localized: true`); số, giá, quan hệ, trạng thái, địa danh dùng chung. Danh sách trường: `docs/ERD.md` §1.1.
-- Trường `hasEnglish` ("Đã có bản tiếng Anh") trên mỗi nội dung: chỉ bật được khi đã điền đủ trường bắt buộc tiếng Anh; `/en` chỉ hiện nội dung có `hasEnglish = true`, **không** fallback sang tiếng Việt (chưa có thì 404 + không vào sitemap EN).
+- Trường `hasEnglish` ("Đã có bản tiếng Anh") trên mỗi nội dung: hệ thống tự bật khi đủ trường bắt buộc tiếng Anh; `/en` chỉ hiện nội dung có `hasEnglish = true`, **không** fallback sang tiếng Việt (chưa có thì 404 + không vào sitemap EN).
+- **AI tự dịch** (BR-08): lưu bản `vi` đang `published` (hoặc global) → job `translate-content` gọi Claude API dịch các trường localized đã đổi (richText dịch từng đoạn chữ, giữ cấu trúc), sinh slug `en`, bật `hasEnglish`, xoá cache trang `/en`. Bản `en` đã sửa tay (`translation.enSource = manual`) không bị dịch đè; bản `vi` đổi sau đó thì gắn `translation.viChangedAfterManual`. Nút "Dịch lại bằng AI" trong admin. Trang pháp lý: AI dịch nháp, admin duyệt mới bật `hasEnglish`. Bảng thuật ngữ ở `site-settings.translationGlossary`. Lỗi: thử lại 3 lần, vẫn lỗi → `translation.status = failed` + cảnh báo dashboard. Hạn mức chi phí tháng qua env; vượt thì dừng dịch và báo admin. **Chỉ gửi nội dung công khai**, không gửi lead/CV.
+- Chuỗi giao diện tiếng Anh (`en.json`) do AI dịch một lần lúc làm code, review trong PR.
 - Chuỗi giao diện (menu cố định, nút, nhãn, lỗi form, thông báo, nhãn enum như nội thất / hướng nhà) ở `src/i18n/messages/{vi,en}.json`.
 - Định dạng số/ngày theo ngôn ngữ (`Intl`); tiền luôn VNĐ.
 - Nút chuyển ngôn ngữ đưa tới trang tương ứng; không có bản dịch thì về trang danh sách / trang chủ.
@@ -86,7 +89,7 @@ SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG 
 - Admin (Payload) giao diện tiếng Việt; chuyển VI / EN khi soạn bài bằng bộ chọn locale có sẵn của Payload.
 
 ### Ngoài phạm vi
-Mua bán, tài khoản người ngoài / tự đăng tin, kiểm duyệt, báo cáo vi phạm, VIP / thanh toán, hoa hồng, CRM, app mobile, ngôn ngữ thứ 3 trở lên, dịch máy tự động, giao diện admin tiếng Anh, tìm theo bản đồ, autocomplete.
+Mua bán, tài khoản người ngoài / tự đăng tin, kiểm duyệt, báo cáo vi phạm, VIP / thanh toán, hoa hồng, CRM, app mobile, ngôn ngữ thứ 3 trở lên, dịch chiều Anh → Việt, dịch dữ liệu khách gửi, giao diện admin tiếng Anh, tìm theo bản đồ, autocomplete.
 
 ## API Endpoints
 
@@ -103,6 +106,7 @@ Chi tiết: `docs/API_SPEC.md`.
 | `POST` | `/api/admin/leads/:id/assign` | admin |
 | `GET` | `/api/admin/private-files/:id/download` | admin |
 | `GET` | `/api/admin/dashboard` | admin, sale (phạm vi của mình) |
+| `POST` | `/api/admin/translations/:collection/:id` | admin, sale (bài của mình) — "Dịch lại bằng AI" |
 | * | `/api/<collection>` | REST tự sinh của Payload, bảo vệ bằng `access` |
 
 ## Database Schema
@@ -114,7 +118,7 @@ Chi tiết trường, index, quy tắc: `docs/ERD.md`.
 - **Nội dung:** `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`
 - **Khách hàng:** `leads`, `lead-activities`, `job-applications`
 - **File:** `media` (public), `private-files` (CV)
-- **Hệ thống:** `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs`
+- **Hệ thống:** `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs`, `translation-usage`
 - **Globals:** `site-settings`, `homepage`, `header`, `footer`
 - Khoá UUID; mã hiển thị riêng (`CT-`, `LD-`); tiền là số VNĐ; xoá mềm; versions; tìm kiếm `unaccent` + `pg_trgm`.
 
@@ -127,9 +131,9 @@ Chi tiết trường, index, quy tắc: `docs/ERD.md`.
 
 ## Business Rules
 
-Theo `docs/BRD.md` §4: BR-01…07 (nội dung, gồm BR-07 hiển thị bản tiếng Anh), BR-10…17 (lead, gồm BR-17 ngôn ngữ của lead), BR-20…21 (tuyển dụng), BR-30…32 (dữ liệu cá nhân).
+Theo `docs/BRD.md` §4: BR-01…08 (nội dung; BR-07 hiển thị bản tiếng Anh, BR-08 AI tự dịch), BR-10…17 (lead, gồm BR-17 ngôn ngữ của lead), BR-20…21 (tuyển dụng), BR-30…32 (dữ liệu cá nhân).
 
-Đã chốt: A5 song ngữ Việt – Anh (tiếng Việt mặc định, admin chỉ tiếng Việt, bản tiếng Anh do nhân viên nhập).
+Đã chốt: A5 song ngữ Việt – Anh (tiếng Việt mặc định, admin chỉ tiếng Việt, bản tiếng Anh do AI tự dịch và tự lên web, nhân viên sửa tay được; trang pháp lý admin duyệt).
 
 Giả định đang áp dụng (⚠️, chỉnh qua `/change`): A1 sale chỉ sửa bài của mình · A2 gộp lead trùng 7 ngày · A3 nhắc lead chưa giao sau 30 phút · A4 lưu lead 24 tháng, CV 12 tháng · A6 thiết kế cho 100.000 tin / 1.000 người đồng thời.
 

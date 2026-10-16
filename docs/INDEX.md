@@ -7,7 +7,7 @@
 
 | File | Loại | Ghi chú |
 |------|------|---------|
-| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ **v1.4** (website thương hiệu TAMI, song ngữ Việt – Anh) — intent doc, chỉ đổi qua Change Request |
+| `BRD.md` | business_requirements | Yêu cầu nghiệp vụ **v1.5** (website thương hiệu TAMI, song ngữ Việt – Anh, AI tự dịch) — intent doc, chỉ đổi qua Change Request |
 | `ARCHITECTURE.md` | architecture | Kiến trúc hệ thống, deploy, bảo mật, backup, lộ trình mở rộng |
 | `ERD.md` | database_schema | Thiết kế dữ liệu (collection, trường, index). Khi có code → **pointer** tới `src/collections/` + `migrations/`, code thắng |
 | `PERMISSION.md` | business_rules | Vai trò `admin`/`sale` + ma trận quyền + guard order, **sync với `src/access/` khi có code** |

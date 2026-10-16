@@ -3,7 +3,7 @@
 | Thông tin | Nội dung |
 |---|---|
 | Tên dự án | Website thương hiệu TAMI |
-| Phiên bản | 1.4 |
+| Phiên bản | 1.5 |
 | Ngày | 16/10/2026 |
 | Trạng thái | Đã duyệt phạm vi giai đoạn 1 |
 | Người soạn | (điền) |
@@ -19,6 +19,7 @@
 | 1.0–1.2 | 15/10/2026 | Bản nháp theo hướng **sàn BĐS** (tham chiếu bdstanlong.vn). Lưu tại `docs/archive/BRD-v1.2-san-bds.md`, chỉ để tham khảo |
 | 1.3 | 16/10/2026 | **Đổi định vị**: website thương hiệu của TAMI, công ty tự đăng nội dung, khách để lại liên hệ. Bỏ toàn bộ tính năng sàn (tài khoản người ngoài, kiểm duyệt, báo cáo vi phạm, VIP/thanh toán, xác minh môi giới). Bỏ mục Mua bán. Thêm Dịch vụ, Đăng tin BĐS (tin BĐS/voucher), Tuyển dụng vào giai đoạn 1. Chỉ 2 vai trò: Admin, Sale |
 | 1.4 | 16/10/2026 | **Song ngữ Việt – Anh**: website công khai có bản tiếng Anh (URL `/en/...`), tiếng Việt là mặc định. Thêm §2.1, FR-PUB-18, 19, FR-ADM-17, BR-07, BR-17; sửa FR-PUB-15, BR-05, A5. Chốt giao diện theo phong cách vinhomes.vn. Trang quản trị vẫn chỉ tiếng Việt |
+| 1.5 | 16/10/2026 | **AI tự dịch sang tiếng Anh** (Claude API): xuất bản bản tiếng Việt là tự dịch và hiện bản tiếng Anh, nhân viên sửa tay được; trang pháp lý phải duyệt tay. Thêm FR-ADM-18, BR-08; sửa FR-ADM-17, BR-07, NFR-09, A5, Q5, ngoài phạm vi |
 
 ---
 
@@ -54,14 +55,14 @@ Website cần **định hướng khách hàng, tạo sự tin tưởng và xây 
 - Thu lead từ form, phân công lead cho sale, theo dõi trạng thái chăm sóc.
 - Nhận hồ sơ ứng tuyển (CV).
 - SEO, responsive mobile-first.
-- **Song ngữ**: tiếng Việt (mặc định) và tiếng Anh cho toàn bộ website công khai (giao diện + mọi loại nội dung). Trang quản trị chỉ tiếng Việt.
+- **Song ngữ**: tiếng Việt (mặc định) và tiếng Anh cho toàn bộ website công khai (giao diện + mọi loại nội dung). Bản tiếng Anh do **AI tự dịch** từ bản tiếng Việt, nhân viên sửa tay khi cần. Trang quản trị chỉ tiếng Việt.
 
 **Ngoài phạm vi:**
 - Mục **Mua bán** (không làm).
 - Tài khoản cho khách hoặc môi giới bên ngoài, tự đăng tin, kiểm duyệt tin, báo cáo vi phạm.
 - Gói đăng tin, VIP, thanh toán online.
 - Tính hoa hồng, CRM chuyên sâu.
-- Ngôn ngữ thứ 3 trở lên; dịch máy tự động (bản tiếng Anh do nhân viên tự nhập).
+- Ngôn ngữ thứ 3 trở lên; dịch chiều Anh → Việt; dịch dữ liệu khách gửi (lead, CV).
 - Giao diện trang quản trị bằng tiếng Anh.
 - App mobile native, tìm kiếm theo bản đồ, autocomplete.
 
@@ -170,7 +171,8 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | FR-ADM-14 | Dashboard: số lead theo trạng thái/nguồn/sale, số nội dung đang hiển thị, lượt bấm hotline/Zalo/fanpage | Should | |
 | FR-ADM-15 | Quản lý chuyển hướng 301 | Should | |
 | FR-ADM-16 | Hẹn giờ xuất bản bài | Could | |
-| FR-ADM-17 | Nhập bản tiếng Anh cho mọi nội dung và cấu hình hiển thị (chuyển VI / EN ngay trong form soạn bài); đánh dấu "Đã có bản tiếng Anh" | Must | Chưa điền đủ trường bắt buộc tiếng Anh (tiêu đề, slug, mô tả ngắn, nội dung chính) thì không đánh dấu được; danh sách nội dung lọc được "chưa có bản tiếng Anh" |
+| FR-ADM-17 | **AI tự dịch** bản tiếng Anh cho mọi nội dung và cấu hình hiển thị (trang chủ, menu, footer, danh mục) khi bản tiếng Việt được xuất bản hoặc sửa (BR-08) | Must | Bản tiếng Anh lên web trong ≤ 10 phút sau khi xuất bản; dịch lỗi thì thử lại, vẫn lỗi thì bản EN không hiện và admin thấy cảnh báo; giữ nguyên định dạng bài (tiêu đề, danh sách, đậm, link, ảnh) |
+| FR-ADM-18 | Xem và sửa tay bản tiếng Anh (chuyển VI / EN ngay trong form soạn bài); nút **"Dịch lại bằng AI"**; lọc nội dung theo trạng thái dịch (chưa dịch / AI dịch / đã sửa tay / dịch lỗi / bản Việt đã đổi sau khi sửa tay) | Must | Bản đã sửa tay **không** bị AI dịch đè, trừ khi bấm "Dịch lại bằng AI" |
 
 ---
 
@@ -184,7 +186,13 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 - **BR-04** Mỗi nội dung có người đăng (`author`). Sale chỉ sửa/xóa nội dung **của mình**; admin sửa/xóa tất cả. ⚠️ Giả định, chỉnh được.
 - **BR-05** Slug tự sinh từ tiêu đề **theo từng ngôn ngữ** (tiếng Việt bỏ dấu; tiếng Anh lấy từ tiêu đề tiếng Anh), không trùng trong cùng loại và cùng ngôn ngữ. Đổi slug của nội dung đã xuất bản thì tự tạo redirect 301 cho đúng ngôn ngữ đó.
 - **BR-06** Bài Đăng tin BĐS có hạn ưu đãi: quá hạn thì gắn nhãn "Đã kết thúc" và rời khối "Ưu đãi nổi bật".
-- **BR-07** Trạng thái xuất bản (`status`) dùng chung cho cả hai ngôn ngữ. Bản tiếng Việt là bắt buộc. Nội dung chỉ hiện ở bản tiếng Anh khi đã đánh dấu "Đã có bản tiếng Anh"; chưa đánh dấu thì **không** hiện ở `/en` (không lấy chữ tiếng Việt thay vào), không có trong sitemap tiếng Anh, URL tiếng Anh trả 404.
+- **BR-07** Trạng thái xuất bản (`status`) dùng chung cho cả hai ngôn ngữ. Bản tiếng Việt là bắt buộc. Nội dung chỉ hiện ở bản tiếng Anh khi đã có bản dịch hoàn chỉnh (cờ "Đã có bản tiếng Anh", hệ thống tự bật khi AI dịch xong hoặc nhân viên sửa tay đủ trường bắt buộc); chưa có thì **không** hiện ở `/en` (không lấy chữ tiếng Việt thay vào), không có trong sitemap tiếng Anh, URL tiếng Anh trả 404.
+- **BR-08** Dịch tự động:
+  - Xuất bản / sửa bản tiếng Việt thì AI dịch **các trường đã đổi** sang tiếng Anh và tự hiện bản tiếng Anh (không chờ duyệt).
+  - Nhân viên sửa tay bản tiếng Anh thì bản đó thành "đã sửa tay": AI không dịch đè nữa; khi bản tiếng Việt đổi tiếp, admin/người đăng thấy nhắc "bản Việt đã đổi" để tự sửa hoặc bấm "Dịch lại bằng AI".
+  - **Trang pháp lý** (Chính sách bảo mật, Điều khoản) AI chỉ dịch nháp; **admin duyệt** rồi mới hiện ở `/en`.
+  - Tên riêng giữ nguyên: TAMI HOMES, tên dự án, tên chủ đầu tư, tên đường, địa danh. Dùng bảng thuật ngữ do admin cấu hình (vd "căn hộ dịch vụ" → "serviced apartment").
+  - Chỉ gửi **nội dung công khai** cho dịch vụ AI; **không bao giờ** gửi lead, CV, dữ liệu khách hàng hay dữ liệu nội bộ.
 
 ### 4.2. Lead
 
@@ -224,7 +232,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | NFR-06 | Khả dụng | Uptime ≥ 99.5%/tháng |
 | NFR-07 | Truy cập | Responsive mobile-first, WCAG 2.1 mức A (mục tiêu AA cho trang chính) |
 | NFR-08 | Tương thích | Chrome, Safari, Edge, Firefox (2 bản gần nhất); trình duyệt trong Zalo/Facebook |
-| NFR-09 | Chi phí | Chỉ dùng phần mềm mã nguồn mở, tự host trên server của công ty. Dịch vụ trả phí chỉ gồm tên miền (và email/SMS nếu vượt gói free) |
+| NFR-09 | Chi phí | Chỉ dùng phần mềm mã nguồn mở, tự host trên server của công ty. Dịch vụ trả phí chỉ gồm tên miền (và email/SMS nếu vượt gói free) và **Claude API** để dịch tiếng Anh (tính theo lượng chữ dịch; đặt hạn mức chi tiêu hằng tháng, vượt hạn mức thì dừng dịch và báo admin) |
 | NFR-10 | Bảo trì | Có staging tách biệt production; CI/CD; có tài liệu kiến trúc và dữ liệu |
 
 ---
@@ -273,8 +281,9 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | A2 | Gộp lead trùng trong 7 ngày (BR-15) | ⚠️ Giả định |
 | A3 | Nhắc lead chưa giao sau 30 phút (BR-14) | ⚠️ Giả định |
 | A4 | Lưu lead 24 tháng, CV 12 tháng (BR-31) | ⚠️ Giả định |
-| A5 | Song ngữ Việt – Anh, tiếng Việt mặc định; admin chỉ tiếng Việt; bản tiếng Anh do nhân viên tự nhập | ✅ Chốt 16/10/2026 |
-| Q5 | Ai dịch nội dung sang tiếng Anh, chính sách bảo mật / điều khoản bản tiếng Anh có cần luật sư duyệt không | ⏳ Chờ trả lời |
+| A5 | Song ngữ Việt – Anh, tiếng Việt mặc định; admin chỉ tiếng Việt; bản tiếng Anh do AI (Claude API) tự dịch, tự lên web, nhân viên sửa tay được | ✅ Chốt 16/10/2026 |
+| Q5 | Ai dịch tiếng Anh: ✅ AI tự dịch (BR-08). Bản tiếng Anh của Chính sách bảo mật / Điều khoản có cần luật sư duyệt không | ⏳ Chờ trả lời (hiện: admin duyệt) |
+| Q6 | Hạn mức chi phí Claude API mỗi tháng | ⏳ Chờ điền |
 | A6 | Mục tiêu tải khi thiết kế: 100.000 tin, 1.000 người đồng thời (NFR-02) | ⚠️ Giả định |
 | Q1 | Mục tiêu KPI cụ thể (BO-1…BO-4) | ⏳ Chờ điền |
 | Q2 | Logo, font, hình ảnh (cho `docs/DESIGN.md`) | ✅ Màu + logo đã có 16/10/2026 (`assets/brand/`) · ✅ font tạm chốt EB Garamond + Montserrat theo phong cách vinhomes.vn (đổi được nếu TAMI có font riêng) · ⏳ hình ảnh chờ cung cấp |

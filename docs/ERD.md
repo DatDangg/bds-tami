@@ -1,6 +1,6 @@
 # ERD — Thiết kế dữ liệu Website TAMI
 
-> **Trạng thái:** thiết kế ban đầu (16/10/2026), dựng từ `docs/BRD.md` v1.4 (song ngữ Việt – Anh, §1.1), **chưa có code**.
+> **Trạng thái:** thiết kế ban đầu (16/10/2026), dựng từ `docs/BRD.md` v1.5 (song ngữ Việt – Anh, AI tự dịch, §1.1), **chưa có code**.
 > Khi đã có code, **nguồn chuẩn** là cấu hình collection trong `src/collections/*`, `src/globals/*` và migration trong `migrations/`. Nếu file này lệch với code thì **code thắng**, và phải cập nhật file này trong cùng task (xem `AGENTS.md` § Doc Impact).
 
 ---
@@ -35,7 +35,18 @@ Cấu hình: `localization: { locales: ['vi', 'en'], defaultLocale: 'vi', fallba
 - Trường `localized: true` lưu riêng bản `vi` và `en`. Payload đặt các cột này ở bảng `<collection>_locales` (cột `_locale`, `_parent_id`), không nằm ở bảng chính.
 - **Localized** (áp cho mọi collection/global ở §4, không ghi lại từng bảng): `title`, `name`, `slug`, `summary`, `excerpt`, `description`, `overview`, `content`, các trường richText/textarea hiển thị cho khách, nhãn trong array (vd `amenities.name`, `floorPlans.title`), nhóm `seo`, chữ trong globals `homepage` / `header` / `footer`, `media.alt` / `caption`.
 - **Không localized** (dùng chung hai bản): số, giá, diện tích, ngày, quan hệ, `status`, `code`, `author`, select/enum (nhãn hiển thị dịch ở file chuỗi giao diện), ảnh/file, toạ độ, `provinces` / `wards` (tên riêng tiếng Việt).
-- **`hasEnglish`** (checkbox, I, mặc định `false`) có trên mọi collection nội dung: `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`, `categories`, `developers`. Hook `beforeValidate` chặn bật khi thiếu trường bắt buộc tiếng Anh: `title`/`name`, `slug`, mô tả ngắn (`summary` / `excerpt` / `description`), nội dung chính (`overview` / `content` / `description` tuỳ collection).
+- **`hasEnglish`** (checkbox, I, mặc định `false`) có trên mọi collection nội dung: `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`, `categories`, `developers`. Hệ thống tự bật khi đủ trường bắt buộc tiếng Anh: `title`/`name`, `slug`, mô tả ngắn (`summary` / `excerpt` / `description`), nội dung chính (`overview` / `content` / `description` tuỳ collection); hook `beforeValidate` chặn bật khi còn thiếu. Với `pages` loại pháp lý, chỉ **admin** bật (BR-08).
+- **`translation`** (group, không localized, chỉ đọc trong admin trừ nút "Dịch lại bằng AI") đi kèm `hasEnglish` trên các collection trên và các global `homepage`, `header`, `footer`, `site-settings` (BR-08):
+
+| Trường | Kiểu | Ghi chú |
+|---|---|---|
+| `status` | select, I | `none` (chưa dịch) · `queued` · `done` · `failed` · `pending_review` (trang pháp lý chờ admin duyệt) |
+| `enSource` | select | `ai` · `manual`. Nhân viên sửa bất kỳ trường `en` nào → `manual`, AI không dịch đè |
+| `viChangedAfterManual` | checkbox, I | Bản `vi` đổi sau khi bản `en` đã sửa tay → nhắc trong admin |
+| `sourceHash` | text | Hash từng trường `vi` lần dịch gần nhất (json `{field: hash}`), để chỉ dịch trường đã đổi |
+| `translatedAt` | date | |
+| `model` | text | Model đã dùng |
+| `lastError` | text | Lỗi lần dịch gần nhất (không chứa nội dung bài) |
 - Trường bắt buộc (**R**) chỉ bắt buộc ở bản `vi`; bản `en` chỉ bắt buộc khi `hasEnglish = true`.
 - **Slug**: unique theo cặp (`_locale`, `slug`) trong cùng collection (với `categories`: theo (`_locale`, `scope`, `slug`)). Bản `en` sinh từ `title` tiếng Anh.
 
@@ -94,7 +105,7 @@ erDiagram
 | Nội dung | `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages` | Nội dung hiển thị trên web |
 | Khách hàng | `leads`, `lead-activities`, `job-applications` | Dữ liệu khách để lại, hồ sơ ứng tuyển |
 | File | `media`, `private-files` | Ảnh/file công khai; CV và file nội bộ |
-| Hệ thống | `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs` | Nhật ký, thống kê, chuyển hướng, hàng đợi job |
+| Hệ thống | `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs`, `translation-usage` | Nhật ký, thống kê, chuyển hướng, hàng đợi job, chi phí dịch AI |
 | Globals | `site-settings`, `homepage`, `header`, `footer` | Cấu hình dùng chung |
 | *(để dành)* | `members` | Tài khoản người đăng bên ngoài, **chưa tạo** (ARCHITECTURE §9.2) |
 
@@ -416,7 +427,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `actor` | `rel→staff` | |
-| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `staff.create` · `staff.update_role` · `staff.deactivate` · `auth.login_failed` · `application.view_cv` |
+| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `staff.create` · `staff.update_role` · `staff.deactivate` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
 | `collection` | text | |
 | `docId` | text | |
 | `summary` | text | Mô tả ngắn |
@@ -428,6 +439,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 **`redirects`**: plugin `@payloadcms/plugin-redirects` (`from`, `to`, `type=301`). Đổi slug của nội dung đã xuất bản thì hook tự tạo redirect cho đúng ngôn ngữ (BR-05): `from` / `to` là đường dẫn đầy đủ, vd `/en/for-rent/old-slug` → `/en/for-rent/new-slug`.
 
 **`payload-jobs`**: bảng hàng đợi do Payload Jobs quản lý.
+
+**`translation-usage`** (chỉ admin đọc; hệ thống ghi): `month` (`YYYY-MM`, U), `inputTokens`, `outputTokens`, `requests`, `estimatedCostUsd`. Job dịch cộng dồn sau mỗi lần gọi; vượt hạn mức tháng (env `TRANSLATION_MONTHLY_BUDGET_USD`) thì dừng dịch và báo admin.
 
 ### 4.14. Nhóm `seo` (dùng chung)
 
@@ -445,7 +458,7 @@ Dùng plugin `@payloadcms/plugin-seo`.
 
 > Globals: các trường chữ (tiêu đề khối, slide, nhãn menu, cột footer, `siteName`, `address`, `copyright`) là localized; link, ảnh, số điện thoại, email dùng chung. `header.navItems[].link` lưu **khoá trang** (vd `projects`, `rentals`) hoặc URL tuyệt đối, để mỗi ngôn ngữ tự ra đúng đường dẫn.
 
-**`site-settings`**: `siteName`, `logo`, `logoDark`, `favicon`, `hotline`, `zaloUrl`, `fanpageUrl`, `email`, `address`, `mapLocation` (point), `socialLinks` (array `{platform, url}`), `notificationEmails` (array email nhận thông báo lead/ứng tuyển), `privacyPolicyVersion` (dùng làm `consentVersion`), `gaMeasurementId`.
+**`site-settings`**: `siteName`, `logo`, `logoDark`, `favicon`, `hotline`, `zaloUrl`, `fanpageUrl`, `email`, `address`, `mapLocation` (point), `socialLinks` (array `{platform, url}`), `notificationEmails` (array email nhận thông báo lead/ứng tuyển), `privacyPolicyVersion` (dùng làm `consentVersion`), `gaMeasurementId`, `translationGlossary` (array `{vi, en, note?}`: thuật ngữ cố định cho AI dịch, vd `căn hộ dịch vụ` → `serviced apartment`; tên riêng như TAMI HOMES, tên dự án giữ nguyên), `translationEnabled` (checkbox, tắt nhanh dịch tự động). Hạn mức chi phí và API key nằm ở biến môi trường, **không** lưu DB.
 
 **`homepage`**:
 
