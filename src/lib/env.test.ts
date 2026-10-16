@@ -22,6 +22,12 @@ const validEnv = {
 };
 
 describe("parseEnv", () => {
+  it("TRUST_CF_CONNECTING_IP: mặc định false, nhận true/false, giá trị lạ -> lỗi nêu tên biến", () => {
+    expect(parseEnv(validEnv).TRUST_CF_CONNECTING_IP).toBe(false);
+    expect(parseEnv({ ...validEnv, TRUST_CF_CONNECTING_IP: "true" }).TRUST_CF_CONNECTING_IP).toBe(true);
+    expect(() => parseEnv({ ...validEnv, TRUST_CF_CONNECTING_IP: "1" })).toThrow(/TRUST_CF_CONNECTING_IP/);
+  });
+
   it("parse đúng kiểu khi đủ biến", () => {
     const env = parseEnv(validEnv);
     expect(env.TRANSLATION_MONTHLY_BUDGET_USD).toBe(25.5);

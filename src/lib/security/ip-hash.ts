@@ -1,22 +1,31 @@
 import { createHmac } from "node:crypto";
 import { isIPv6 } from "node:net";
 
-const IPV4_MAPPED = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/;
+const IPV4_MAPPED_DOTTED = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/;
+const IPV4_MAPPED_HEX = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/;
+
+/** `cb00`,`7107` -> `203.0.113.7`. */
+function hexPairToIpv4(high: string, low: string): string {
+  const value = (Number.parseInt(high, 16) << 16) | Number.parseInt(low, 16);
+  return [value >>> 24, (value >>> 16) & 255, (value >>> 8) & 255, value & 255].join(".");
+}
 
 /** Cùng một IP viết nhiều dạng (hoa/thường, rút gọn, IPv4-mapped) phải ra cùng hash. */
 function canonicalizeIp(ip: string): string {
   const trimmed = ip.trim().toLowerCase();
-  const mapped = IPV4_MAPPED.exec(trimmed);
-  if (mapped) return mapped[1]!;
-  if (isIPv6(trimmed)) {
-    try {
-      // URL ghi lại IPv6 ở dạng rút gọn chuẩn; zone id (`%eth0`) làm URL ném lỗi nên giữ nguyên chuỗi.
-      return new URL(`http://[${trimmed}]`).hostname.slice(1, -1);
-    } catch {
-      return trimmed;
-    }
+  if (!isIPv6(trimmed)) return trimmed;
+  let compact: string;
+  try {
+    // URL ghi lại IPv6 ở dạng rút gọn chuẩn (và đổi `::ffff:1.2.3.4` thành dạng hex); phải rút gọn
+    // TRƯỚC khi kiểm IPv4-mapped. Zone id (`%eth0`) làm URL ném lỗi nên giữ nguyên chuỗi.
+    compact = new URL(`http://[${trimmed}]`).hostname.slice(1, -1);
+  } catch {
+    compact = trimmed;
   }
-  return trimmed;
+  const hex = IPV4_MAPPED_HEX.exec(compact);
+  if (hex) return hexPairToIpv4(hex[1]!, hex[2]!);
+  const dotted = IPV4_MAPPED_DOTTED.exec(compact);
+  return dotted ? dotted[1]! : compact;
 }
 
 /**

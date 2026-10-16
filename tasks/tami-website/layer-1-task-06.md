@@ -32,12 +32,12 @@ Hạ tầng bảo vệ endpoint công khai: rate limit theo IP trên Redis (an t
 Mở khoá cho: `layer-2-task-06`, `layer-2-task-07`, `layer-6-task-09`, `layer-7-task-02`, `layer-9-task-02`, `layer-9-task-05`
 
 ## Acceptance Criteria
-- [ ] Rate limit atomic (Lua/MULTI) theo khoá `endpoint:ipHash`, trả 429 kèm `Retry-After`
-- [ ] Cấu hình sẵn: leads 5/10 phút, job-applications 3/giờ, rentals 60/phút, click-events 30/phút (API_SPEC §3)
-- [ ] Turnstile verify gọi `siteverify` với secret từ env; token sai/thiếu → 400; lỗi mạng tới Cloudflare → 400 (fail closed), có log
-- [ ] Môi trường test dùng test key chính thức của Turnstile (luôn pass / luôn fail)
-- [ ] IP lấy từ `CF-Connecting-IP` chỉ khi có cấu hình proxy tin cậy, ngược lại dùng remote address; không lưu IP thô
-- [ ] Redis mất kết nối: endpoint công khai trả 503 thay vì bỏ qua rate limit (fail closed), ghi log
+- [x] Rate limit atomic (Lua/MULTI) theo khoá `endpoint:ipHash`, trả 429 kèm `Retry-After`
+- [x] Cấu hình sẵn: leads 5/10 phút, job-applications 3/giờ, rentals 60/phút, click-events 30/phút (API_SPEC §3)
+- [x] Turnstile verify gọi `siteverify` với secret từ env; token sai/thiếu → 400; lỗi mạng tới Cloudflare → 400 (fail closed), có log
+- [x] Môi trường test dùng test key chính thức của Turnstile (luôn pass / luôn fail)
+- [x] IP lấy từ `CF-Connecting-IP` chỉ khi có cấu hình proxy tin cậy, ngược lại dùng remote address; không lưu IP thô
+- [x] Redis mất kết nối: endpoint công khai trả 503 thay vì bỏ qua rate limit (fail closed), ghi log
 
 ## Tests cần viết
 - Integration với Redis dev: vượt ngưỡng → 429; hết cửa sổ → cho qua
@@ -58,13 +58,13 @@ Mở khoá cho: `layer-2-task-06`, `layer-2-task-07`, `layer-6-task-09`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (273, rate-limit integration Redis thật)/build = PASS; audit high exit 0 (round 1)
+- Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-1-task-06-round-2-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: no doc impact (.env.example thêm TRUST_CF_CONNECTING_IP; follow-up deploy ở layer-3-task-03)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -73,13 +73,13 @@ Mở khoá cho: `layer-2-task-06`, `layer-2-task-07`, `layer-6-task-09`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-1/task-06` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/lib/redis.ts

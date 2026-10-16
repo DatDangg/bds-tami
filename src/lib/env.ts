@@ -6,6 +6,16 @@ import { z } from "zod";
  */
 const nonEmpty = z.string().min(1, "bắt buộc");
 
+/** Chỉ `true`/`false`; thiếu = false. Giá trị lạ là lỗi cấu hình (không đoán), tránh vô tình tin/không tin header proxy. */
+const trustCloudflareSchema = z.enum(["true", "false"]).default("false").transform((value) => value === "true");
+
+/** Đọc cờ `TRUST_CF_CONNECTING_IP` (xem `client-ip.ts`); ném lỗi nêu tên biến nếu giá trị không hợp lệ. */
+export function parseTrustCloudflareFlag(value: string | undefined): boolean {
+  const result = trustCloudflareSchema.safeParse(value === "" ? undefined : value);
+  if (!result.success) throw new EnvValidationError(["TRUST_CF_CONNECTING_IP"]);
+  return result.data;
+}
+
 const envSchema = z.object({
   DATABASE_URL: nonEmpty,
   DATABASE_URL_TEST: z.string().min(1).optional(),
@@ -25,6 +35,7 @@ const envSchema = z.object({
   TRANSLATION_MODEL: nonEmpty,
   TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),
   NEXT_PUBLIC_SITE_URL: z.url(),
+  TRUST_CF_CONNECTING_IP: trustCloudflareSchema,
 });
 
 export type Env = z.infer<typeof envSchema>;

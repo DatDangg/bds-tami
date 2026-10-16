@@ -65,3 +65,7 @@ _Errors encountered during this project will be logged below._
 - Cách đúng: parse `req.clone()` bằng `addDataAndFileToRequest` (export từ `payload`) — cùng hàm handler mặc định dùng qua `wrapInternalEndpoints`; gắn lại `payload`, `routeParams` cho clone.
 - `resetPassword` của Payload không chạy `beforeOperation` và `beforeValidate` nhận doc đã hash → kiểm plaintext phải ở endpoint.
 - Residual: Local API `payload.resetPassword()` / GraphQL (đang tắt) không kiểm độ dài.
+
+## 2026-10-16 — Public pipeline (layer-1-task-06), lưu ý cho task endpoint công khai
+- `src/endpoints/_middleware/public-pipeline.ts` bọc `validate()` trong try/catch → MỌI lỗi thành 400 (log warn tên lỗi). Giữ `validate` chỉ parse + zod; KHÔNG đặt truy vấn DB/logic nghiệp vụ trong `validate` (bug thật sẽ thành "dữ liệu không hợp lệ"). Nếu cần, sửa pipeline: chỉ 400 cho SyntaxError/ZodError, còn lại ném tiếp.
+- Nối endpoint vào pipeline phải truyền `remoteAddress` nếu có; prod bắt buộc `TRUST_CF_CONNECTING_IP=true` (xem layer-3-task-03).

@@ -96,3 +96,10 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
 
 ## Follow-up từ review layer-1-task-04
 - `src/lib/fonts.ts` dùng `next/font/google`: `next build` tải font từ Google Fonts nên bước build trong Dockerfile/CI cần mạng ra ngoài tới Google Fonts. Nếu build bị cô lập mạng thì chuyển sang `next/font/local` (tải sẵn file woff2 vào repo).
+
+## Follow-up từ review layer-1-task-06 (16/10/2026) — BẮT BUỘC
+- [ ] Đặt `TRUST_CF_CONNECTING_IP=true` cho staging và production (thiếu cờ → mọi khách chung bucket rate limit `unknown` → 1 kẻ spam chặn form lead toàn site).
+- [ ] Nginx: chỉ allow dải IP Cloudflare + `deny all`; cổng app chỉ bind 127.0.0.1, không lộ trực tiếp.
+- [ ] Nginx chuyển nguyên header `CF-Connecting-IP` (không ghi đè/không nhận từ client ngoài Cloudflare).
+- [ ] Đề xuất bật Cloudflare Authenticated Origin Pulls (mTLS) vì dải IP Cloudflare dùng chung mọi khách hàng — hỏi user.
+- [ ] Smoke test: 2 IP khác nhau rơi vào 2 bucket khác nhau.

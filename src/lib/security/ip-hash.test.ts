@@ -29,6 +29,15 @@ describe("ipHash", () => {
     expect(ipHash("2001:0db8:0000:0000:0000:0000:0000:0001", secret)).toBe(ipHash("2001:db8::1", secret));
   });
 
+  it("IPv4-mapped dạng hex (::ffff:cb00:7107) trùng IPv4 tương ứng", () => {
+    expect(ipHash("::ffff:cb00:7107", secret)).toBe(ipHash("203.0.113.7", secret));
+    expect(ipHash("::FFFF:CB00:7107", secret)).toBe(ipHash("203.0.113.7", secret));
+    expect(ipHash("0:0:0:0:0:ffff:cb00:7107", secret)).toBe(ipHash("203.0.113.7", secret));
+    expect(ipHash("::ffff:0:1", secret)).toBe(ipHash("0.0.0.1", secret));
+    // ::ffff:0:0:1 là địa chỉ IPv6 khác, không được gộp về IPv4.
+    expect(ipHash("::ffff:0:0:1", secret)).not.toBe(ipHash("0.0.0.1", secret));
+  });
+
   it("giá trị không phải IP vẫn băm được (không làm sập endpoint)", () => {
     expect(ipHash("unknown", secret)).toMatch(/^[0-9a-f]{64}$/);
     expect(ipHash("fe80::1%eth0", secret)).toMatch(/^[0-9a-f]{64}$/);
