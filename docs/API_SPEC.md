@@ -46,8 +46,9 @@ Lỗi:       { "success": false, "error": "<message>", "details": [...] }
 | 404 | Không tìm thấy (kể cả khi bản ghi tồn tại nhưng ngoài phạm vi quyền) |
 | 413 | File quá lớn |
 | 415 | Loại file không hỗ trợ |
-| 429 | Vượt giới hạn gửi |
+| 429 | Vượt giới hạn gửi (kèm header `Retry-After` tính bằng giây) |
 | 500 | Lỗi hệ thống |
+| 503 | Hệ thống chống spam (Redis) tạm không dùng được: endpoint công khai từ chối thay vì bỏ qua rate limit |
 
 ## 3. Endpoint công khai
 

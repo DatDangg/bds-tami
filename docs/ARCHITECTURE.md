@@ -94,9 +94,13 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
 │   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log
 │   ├── endpoints/             # Endpoint tuỳ biến: gửi lead, ứng tuyển, tìm kiếm, đếm click
+│   │   └── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
 │   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu
 │   ├── lib/
-│   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1)
+│   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
+│   │   ├── security/          # rate-limit (Redis Lua), turnstile, client-ip, ip-hash
+│   │   ├── email/             # adapter SMTP Brevo, allowlist ngoài production, template email nội bộ (tiếng Việt)
+│   │   ├── http/              # ok() / fail() theo response contract (API_SPEC §2)
 │   │   ├── translation/       # TranslationService: gọi Claude API, dịch richText theo node, thuật ngữ, hạn mức chi phí
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
 │   │   └── seo/               # Sinh metadata, JSON-LD, sitemap
@@ -105,6 +109,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
+├── scripts/                   # jobs-runner.ts (`pnpm jobs`)
 ├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
 ├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
 │   └── nginx/                 # tami.conf, tami-staging.conf (copy vào /etc/nginx/sites-available trên server)
@@ -178,7 +183,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 
 | Job | Lịch | Việc |
 |---|---|---|
-| `send-notification-email` | Ngay khi có sự kiện | Email lead mới / giao lead / hồ sơ ứng tuyển |
+| `send-notification-email` | Ngay khi có sự kiện | Email lead mới / giao lead / hồ sơ ứng tuyển. Retry 5 lần (backoff từ 30s); input sai → huỷ không retry; xong thì xoá job (không giữ PII) |
 | `remind-unassigned-leads` | 10 phút/lần, giờ hành chính | Lead `new` chưa có sale sau 30 phút thì nhắc admin (BR-14) |
 | `expire-offers` | Hằng ngày 00:05 | Bài Đăng tin BĐS quá hạn ưu đãi thì gắn "Đã kết thúc", xoá cache trang (BR-06) |
 | `close-job-postings` | Hằng ngày 00:10 | Ẩn tin tuyển dụng quá hạn nộp |
@@ -216,7 +221,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 |---|---|---|---|
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | 1 bản (có thể chạy 2) | 1 bản | 512MB–1GB / bản |
-| `jobs` | cùng image app, chạy chế độ runner | cùng image | 256MB |
+| `jobs` | cùng image app, lệnh `pnpm jobs` (`payload run scripts/jobs-runner.ts`, poll 5s, dừng an toàn bằng SIGTERM/SIGINT; đặt `stop_grace_period` ~60s) | cùng image | 256MB |
 | `postgres` | riêng | riêng | 1–2GB / 256–512MB |
 | `redis` | riêng | riêng | 128MB |
 | `seaweedfs` | dùng chung giữa prod/staging, bucket riêng | bucket riêng | 256MB |
@@ -232,6 +237,15 @@ Tổng ước tính ~4–5GB RAM, nằm gọn trong ~11GB đang trống.
 | DB | `DATABASE_URL_PROD` | `DATABASE_URL_STAGING` |
 | Truy cập | Công khai | Cloudflare Access hoặc mật khẩu, `noindex` |
 | Email | Gửi thật | Chỉ gửi tới danh sách email nội bộ |
+
+Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
+
+| Biến | Production | Staging | Ghi chú |
+|---|---|---|---|
+| `APP_ENV` | `production` (**bắt buộc**) | `staging` | Khác `production` thì email chỉ gửi tới `EMAIL_ALLOWLIST` |
+| `EMAIL_ALLOWLIST` | — | danh sách email nội bộ | Rỗng ở môi trường không phải production → runner log lỗi |
+| `TRUST_CF_CONNECTING_IP` | `true` | `true` | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu → mọi khách chung 1 bucket rate limit |
+| `SMTP_PORT`, `EMAIL_FROM_ADDRESS` | Brevo (587) | Brevo | Mặc định 587 |
 
 Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu đặt ở `.env.example`, gồm cả `ANTHROPIC_API_KEY`, `TRANSLATION_MODEL`, `TRANSLATION_MONTHLY_BUDGET_USD` (prod/staging giá trị riêng).
 
