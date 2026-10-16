@@ -92,7 +92,7 @@ const blockInactiveLogin: CollectionBeforeLoginHook = ({ user, req }) => {
   return user;
 };
 
-/** Tài khoản nội bộ đăng nhập /admin (PERMISSION §1, §3.4, §7; ERD §4.1). `avatar` thêm ở task media. */
+/** Tài khoản nội bộ đăng nhập /admin (PERMISSION §1, §3.4, §7; ERD §4.1). */
 export const Staff: CollectionConfig = {
   slug: "staff",
   admin: { useAsTitle: "email", defaultColumns: ["fullName", "email", "role", "active"] },
@@ -135,6 +135,13 @@ export const Staff: CollectionConfig = {
       required: true,
       defaultValue: true,
       access: { create: isAdmin, update: isAdmin },
+    },
+    // Chỉ nhận ảnh, chọn từ thư viện `media` (sale tự đổi ảnh hồ sơ của mình nhờ access `update` ở trên).
+    {
+      name: "avatar",
+      type: "upload",
+      relationTo: "media",
+      filterOptions: { mimeType: { contains: "image/" } },
     },
     {
       name: "lastLoginAt",

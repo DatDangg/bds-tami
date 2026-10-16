@@ -95,3 +95,4 @@ Mở khoá cho: `layer-15-task-01`
 
 ## Follow-up từ review layer-1-task-01 (16/10/2026)
 - Pin GitHub Actions theo commit SHA (`.github/workflows/ci.yml` đang dùng tag `@v4`).
+- Từ review layer-2-task-01: `X-Content-Type-Options: nosniff` cho `/api/media/file/*`; PDF trong `media` public ép `Content-Disposition: attachment` (hoặc phục vụ media từ domain riêng) để giảm rủi ro file polyglot.

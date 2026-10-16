@@ -33,12 +33,12 @@ Hai collection upload dùng `@payloadcms/storage-s3`: `media` (bucket public, �
 Mở khoá cho: `layer-4-task-01`, `layer-4-task-02`, `layer-5-task-01`, `layer-5-task-02`, `layer-5-task-03`, `layer-5-task-04`, `layer-6-task-09`, `layer-6-task-10`, `layer-8-task-01`
 
 ## Acceptance Criteria
-- [ ] `media`: ảnh JPG/PNG/WebP/AVIF ≤ 10MB sinh `thumb` 400w, `card` 800w, `large` 1600w, `og` 1200×630 dạng WebP; PDF ≤ 20MB; video MP4/WebM ≤ 15MB
-- [ ] Kiểm MIME thật bằng nội dung file (không tin đuôi/Content-Type); sai → 415, quá cỡ → 413
-- [ ] Tên file lưu ngẫu nhiên; `alt` (localized) bắt buộc với ảnh; `caption` localized; `uploadedBy` tự gán
-- [ ] Quyền `media`: khách đọc; staff upload; sale chỉ sửa file mình upload; admin toàn quyền
-- [ ] `private-files`: không có URL công khai, không đọc qua REST với khách/sale; chỉ admin (tải qua endpoint riêng ở task CV)
-- [ ] Không cho upload SVG/HTML (chống XSS)
+- [x] `media`: ảnh JPG/PNG/WebP/AVIF ≤ 10MB sinh `thumb` 400w, `card` 800w, `large` 1600w, `og` 1200×630 dạng WebP; PDF ≤ 20MB; video MP4/WebM ≤ 15MB
+- [x] Kiểm MIME thật bằng nội dung file (không tin đuôi/Content-Type); sai → 415, quá cỡ → 413
+- [x] Tên file lưu ngẫu nhiên; `alt` (localized) bắt buộc với ảnh; `caption` localized; `uploadedBy` tự gán
+- [x] Quyền `media`: khách đọc; staff upload; sale chỉ sửa file mình upload; admin toàn quyền
+- [x] `private-files`: không có URL công khai, không đọc qua REST với khách/sale; chỉ admin (tải qua endpoint riêng ở task CV)
+- [x] Không cho upload SVG/HTML (chống XSS)
 
 ## Tests cần viết
 - Integration: upload ảnh JPG thật → có 4 cỡ WebP
@@ -62,13 +62,13 @@ Mở khoá cho: `layer-4-task-01`, `layer-4-task-02`, `layer-5-task-01`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (325; media-upload 18 test, S3 + DB thật)/build = PASS; audit high exit 0; migrate:down + migrate trên dev OK (builder)
+- Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-2-task-01-round-2-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.12 nếu giới hạn/cỡ ảnh khác)
+- Doc impact result: docs/ERD.md §4.1 staff.avatar đã có — đúng thiết kế, no doc change
 - Decision log: pending
 
 ## Commit / Tracking
@@ -77,13 +77,13 @@ Mở khoá cho: `layer-4-task-01`, `layer-4-task-02`, `layer-5-task-01`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Media.ts
