@@ -10,9 +10,19 @@ export default defineConfig({
         resolve: { alias },
         test: {
           name: "unit",
-          include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          include: ["src/**/*.test.ts"],
           environment: "node",
           setupFiles: ["tests/setup.ts"],
+        },
+      },
+      {
+        // Component React (RTL) cần DOM.
+        resolve: { alias },
+        test: {
+          name: "ui",
+          include: ["src/**/*.test.tsx"],
+          environment: "jsdom",
+          setupFiles: ["tests/setup.ts", "tests/setup-dom.ts"],
         },
       },
       {

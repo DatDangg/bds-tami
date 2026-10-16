@@ -146,7 +146,8 @@ Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) n�
 | `--text-small` | sans | `0.875rem` (14px) | 1.5 | 400 | Thường | Nhãn, chú thích, helper, lỗi form |
 | `--text-xsmall` | sans | `0.75rem` (12px) | 1.5 | 500 | Thường | Meta (ngày đăng, mã tin). Không dùng cho đoạn văn |
 | `--text-eyebrow` | sans | `0.75rem` → `0.8125rem` | 1.4 | 600 | IN HOA, `0.12em`, `--color-accent-text` | Nhãn trên tiêu đề (theo hạn mức §0) |
-| `--text-button` | sans | `0.875rem` (14px); sm `0.8125rem` | 1 | 600 | IN HOA, `0.08em` | Nút |
+| `--text-button` | sans | `0.875rem` (14px) | 1 | 600 | IN HOA, `0.08em` | Nút (md, lg) |
+| `--text-button-sm` | sans | `0.8125rem` (13px) | 1 | 600 | IN HOA, `0.08em` | Nút size sm |
 | `--text-price` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` | 1.2 | 500 | `tabular-nums`, `--color-accent-display` hoặc `--color-text` | Giá ở trang chi tiết |
 
 **Quy tắc chữ:**
@@ -300,7 +301,7 @@ Chiều rộng kiểm tra bắt buộc ở review: **375 / 768 / 1280** (gate `s
 
 | Component | Quy định |
 |---|---|
-| Button | Cao: sm 36px (chỉ desktop), md 44px, lg 52px. Padding ngang 20/24/32px. Chữ `--text-button`. Primary: nền `--color-primary`, chữ `--color-primary-foreground`. Outline: viền 1px `--color-text`, nền trong suốt, hover nền `--color-text` chữ `--color-surface`. Dark: nền `--color-dark`, chữ `--color-on-dark`. Ghost: chỉ chữ + gạch chân khi hover. `:active` `translateY(1px)`. Disabled: opacity 0.5 + `cursor: not-allowed`. Nhãn 1 dòng ở desktop, không đặt `max-width` |
+| Button | Cao: sm 36px (chỉ desktop), md 44px, lg 52px. Padding ngang 20/24/32px. Chữ `--text-button` (sm: `--text-button-sm`). Primary: nền `--color-primary`, chữ `--color-primary-foreground`. Outline: viền 1px `--color-text`, nền trong suốt, hover nền `--color-text` chữ `--color-surface`. Dark: nền `--color-dark`, chữ `--color-on-dark`. Ghost: chỉ chữ + gạch chân khi hover. `:active` `translateY(1px)`. Disabled: opacity 0.5 + `cursor: not-allowed`. Nhãn 1 dòng ở desktop, không đặt `max-width` |
 | Input/Select/Textarea | Cao 48px (textarea ≥ 120px). Viền 1px `--color-input-border`, nền `--color-surface`, focus: viền `--color-focus-ring` + ring. Lỗi: viền `--color-error` + icon + chữ lỗi dưới ô. Label luôn hiện phía trên (không dùng placeholder làm label) |
 | Checkbox | Ô 20px, vùng chạm 44px (label bấm được) |
 | Chip/Tab lọc | Cao 40px (mobile 44px). Mặc định viền `--color-border` chữ `--color-text-secondary`; đang chọn nền `--color-primary-soft` chữ `--color-text`, `aria-pressed`/`aria-selected` |

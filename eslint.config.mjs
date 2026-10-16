@@ -25,6 +25,22 @@ const eslintConfig = [
   },
   ...nextCoreWebVitals,
   ...nextTypescript,
+  {
+    // Icon chỉ từ Phosphor (qua src/components/icons.ts); shadcn CLI mặc định sinh lucide-react nên phải chặn.
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["lucide-react", "lucide-react/*"],
+              message: "Dùng Phosphor Icons qua @/components/icons, không dùng lucide-react.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

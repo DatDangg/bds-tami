@@ -32,13 +32,13 @@ Chuyển design tokens thành CSS variables + theme Tailwind v4, cấu hình sha
 Mở khoá cho: `layer-2-task-05`, `layer-2-task-08`, `layer-2-task-09`, `layer-5-task-05`, `layer-5-task-06`, `layer-5-task-07`
 
 ## Acceptance Criteria
-- [ ] Mọi màu/khoảng cách/radius/shadow/z-index/motion lấy từ token (tokens §1–§7), không có mã màu rời trong component
-- [ ] Cặp màu chữ/nền dùng cho Button/Input đạt AA theo bảng tokens §9 (gồm 4 giá trị đã sửa: Text Muted `#6B6B6B`, Accent Display `#A07A3F`, Warning `#8A5A0A`, Input Border `#857F79`)
-- [ ] Focus `:focus-visible` dùng `--focus-ring`; không có `outline: none` không thay thế
-- [ ] `prefers-reduced-motion` tắt chuyển động theo tokens §6
-- [ ] Font tự host qua `next/font`, subset `vietnamese`, `display: swap`
-- [ ] Icon chỉ từ Phosphor; ESLint chặn `lucide-react`
-- [ ] Không làm dark mode (tokens §0)
+- [x] Mọi màu/khoảng cách/radius/shadow/z-index/motion lấy từ token (tokens §1–§7), không có mã màu rời trong component
+- [x] Cặp màu chữ/nền dùng cho Button/Input đạt AA theo bảng tokens §9 (gồm 4 giá trị đã sửa: Text Muted `#6B6B6B`, Accent Display `#A07A3F`, Warning `#8A5A0A`, Input Border `#857F79`)
+- [x] Focus `:focus-visible` dùng `--focus-ring`; không có `outline: none` không thay thế
+- [x] `prefers-reduced-motion` tắt chuyển động theo tokens §6
+- [x] Font tự host qua `next/font`, subset `vietnamese`, `display: swap`
+- [x] Icon chỉ từ Phosphor; ESLint chặn `lucide-react`
+- [x] Không làm dark mode (tokens §0)
 
 ## Tests cần viết
 - Unit/RTL: Button các variant render đúng class; Dialog bẫy focus, Esc đóng, trả focus
@@ -58,13 +58,13 @@ Mở khoá cho: `layer-2-task-05`, `layer-2-task-08`, `layer-2-task-09`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS (reviewer xác minh)
+- Verify commands + result: install --frozen-lockfile/lint/typecheck/test (144)/build = PASS; audit high exit 0; chưa kiểm dialog/sheet animation và responsive trên browser thật
+- Reviewer verdict: STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-1-task-04-round-2-review.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: docs/DESIGN.md đã khớp (bước /design); nếu lệch tokens thì cập nhật tokens file, không sửa DESIGN intent)
+- Doc impact result: skills/react-nodejs/design-tokens.md (thêm token --text-button-sm)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -73,13 +73,13 @@ Mở khoá cho: `layer-2-task-05`, `layer-2-task-08`, `layer-2-task-09`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-1/task-04` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/app/(frontend)/globals.css (tokens §11)

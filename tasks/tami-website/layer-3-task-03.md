@@ -93,3 +93,6 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
 ## Notes
 - KHÔNG SSH vào server ở task này. Mọi thao tác trên server làm ở task deploy-staging/production có user duyệt.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-1-task-04
+- `src/lib/fonts.ts` dùng `next/font/google`: `next build` tải font từ Google Fonts nên bước build trong Dockerfile/CI cần mạng ra ngoài tới Google Fonts. Nếu build bị cô lập mạng thì chuyển sang `next/font/local` (tải sẵn file woff2 vào repo).
