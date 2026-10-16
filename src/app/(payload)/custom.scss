@@ -1,0 +1,131 @@
+// Giao diện admin TAMI: màu nhấn #8C6733, font Montserrat, logo hai bản sáng/tối.
+// Payload dùng palette "success" làm màu nhấn (link, focus, trạng thái chọn) nên ghi đè thang này.
+// CSS ngoài @layer thắng lớp payload-default của Payload.
+//
+// Tỉ lệ tương phản (WCAG 2.2, đã tính):
+//  - Nền sáng: chữ trắng / nút #8C6733 = 5.12:1 (AA 4.5), hover #7A5A2C = 6.31:1;
+//    link #8C6733 / nền trắng 5.12:1, / #F5F5F5 4.69:1.
+//  - Nền tối:  chữ #141414 / nút #E0BF89 = 10.51:1, hover #EBD2A8 = 12.56:1; link #E0BF89 / nền #141414 10.51:1.
+//  - Palette success (ramp giữ cùng chiều với Payload): sáng — banner #6A4E26/#F1E6D3 6.23, pill #342612/#E9D9BB 10.55,
+//    diff "added" (--diff-create-pill-color = theme-success-650 #5B4320 / nền theme-success-200 #E0BF89) 5.28
+//    (cặp mặc định 600/200 #6A4E26/#E0BF89 chỉ 4.39 nên bị ghi đè), nhãn thẻ chọn #342612/#F8F3EB 13.28;
+//    icon UI #A07A43/#F8F3EB 3.55 (>=3); query-inspector chuỗi #8C6733 / #FFF 5.12, / #F5F5F5 4.69.
+//    tối — banner #EBD2A8/#1D150A 12.30, pill #F6EDDF/#281D0E 14.22, diff "added" #EFDBB7/#342612 10.81,
+//    diff link 14.92, nhãn thẻ chọn 16.66; icon UI #8C6733/#120D07 3.78 (>=3); query-inspector #E0BF89/#141414 10.51.
+
+:root {
+  --tami-accent: #8c6733;
+  --tami-accent-hover: #7a5a2c;
+  --tami-on-accent: #fff;
+
+  // Font: next/font gắn --font-montserrat lên <html> (htmlProps ở layout.tsx) nên modal, drawer, toast
+  // (portal ngoài children) cũng nhận Montserrat.
+  --font-body: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  // Chữ "thêm mới" ở màn so sánh phiên bản: mặc định 600 chỉ đạt 4.39:1 ở giao diện sáng.
+  --diff-create-pill-color: var(--theme-success-650);
+
+  --color-success-50: #f8f3eb;
+  --color-success-100: #f1e6d3;
+  --color-success-150: #e9d9bb;
+  --color-success-200: #e0bf89;
+  --color-success-250: #d2ad73;
+  --color-success-300: #c19b60;
+  --color-success-350: #b0894f;
+  --color-success-400: #a07a43;
+  --color-success-450: #946e39;
+  --color-success-500: #8c6733;
+  --color-success-550: #7a5a2c;
+  --color-success-600: #6a4e26;
+  --color-success-650: #5b4320;
+  --color-success-700: #4d391b;
+  --color-success-750: #402f16;
+  --color-success-800: #342612;
+  --color-success-850: #281d0e;
+  --color-success-900: #1d150a;
+  --color-success-950: #120d07;
+}
+
+html[data-theme="dark"] {
+  --tami-accent: #e0bf89;
+  --tami-accent-hover: #ebd2a8;
+  --tami-on-accent: #141414;
+
+  // Payload đã tự đảo --theme-success-* ở giao diện tối (50 = tối nhất, 950 = sáng nhất)
+  // nên KHÔNG đảo --color-success-* nữa; ghi đè thẳng --theme-success-* theo chiều đó, 500 = màu nhấn.
+  --theme-success-50: #120d07;
+  --theme-success-100: #1d150a;
+  --theme-success-150: #281d0e;
+  --theme-success-200: #342612;
+  --theme-success-250: #402f16;
+  --theme-success-300: #4d391b;
+  --theme-success-350: #5b4320;
+  --theme-success-400: #8c6733;
+  --theme-success-450: #a07a43;
+  --theme-success-500: #e0bf89;
+  --theme-success-550: #e6c999;
+  --theme-success-600: #ebd2a8;
+  --theme-success-650: #efdbb7;
+  --theme-success-700: #f2e3cb;
+  --theme-success-750: #f4e8d6;
+  --theme-success-800: #f6eddf;
+  --theme-success-850: #f8f1e7;
+  --theme-success-900: #faf5ee;
+  --theme-success-950: #fdfaf6;
+}
+
+// Query-inspector dùng thẳng --color-success-450 (không qua theme): chữ chuỗi chỉ đạt 3.99 ở giao diện tối.
+.query-inspector {
+  --string-color: var(--theme-success-500);
+}
+
+// Nút chính: nền màu nhấn, chữ đạt AA (số liệu ở đầu file).
+.btn--style-primary:not(.btn--disabled) {
+  --bg-color: var(--tami-accent);
+  --color: var(--tami-on-accent);
+  --hover-bg: var(--tami-accent-hover);
+  --hover-color: var(--tami-on-accent);
+}
+
+// Logo/icon: bản vàng cho giao diện sáng, bản trắng cho giao diện tối.
+.tami-admin-logo {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.tami-admin-icon {
+  display: block;
+  width: 100%;
+  max-width: 48px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.tami-admin-logo__dark,
+.tami-admin-icon__dark {
+  display: none !important;
+}
+
+html[data-theme="dark"] {
+  .tami-admin-logo__light,
+  .tami-admin-icon__light {
+    display: none !important;
+  }
+
+  .tami-admin-logo__dark,
+  .tami-admin-icon__dark {
+    display: block !important;
+  }
+}

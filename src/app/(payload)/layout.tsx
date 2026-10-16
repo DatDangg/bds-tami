@@ -4,7 +4,9 @@ import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import type { ServerFunctionClient } from "payload";
 import type { ReactNode } from "react";
 
+import { montserrat } from "@/lib/fonts";
 import { importMap } from "./admin/importMap.js";
+import "./custom.scss";
 
 const serverFunction: ServerFunctionClient = async function (args) {
   "use server";
@@ -13,7 +15,12 @@ const serverFunction: ServerFunctionClient = async function (args) {
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <RootLayout config={config} importMap={importMap} serverFunction={serverFunction}>
+    <RootLayout
+      config={config}
+      importMap={importMap}
+      serverFunction={serverFunction}
+      htmlProps={{ className: montserrat.variable }}
+    >
       {children}
     </RootLayout>
   );

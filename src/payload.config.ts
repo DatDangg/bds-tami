@@ -31,7 +31,14 @@ const s3ClientConfig = {
 export default buildConfig({
   admin: {
     user: Staff.slug,
-    components: { providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"] },
+    components: {
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"],
+      graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
+    },
+    meta: {
+      titleSuffix: " - TAMI Admin",
+      icons: [{ rel: "icon", type: "image/png", url: "/brand/tami-icon-gold.png" }],
+    },
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
