@@ -33,3 +33,4 @@ batchQueue: []
 - 2026-10-16T15:40:36.000Z ✅ DONE builder attempt 3 — custom.scss: --diff-create-pill-color → success-650 (sáng 5.28, tối 10.81); .query-inspector --string-color → success-500 (tối 10.51, sáng 4.69/5.12); gộp :root; sửa số contrast comment + task file. lint/typecheck/build PASS; test 300 pass/8 fail integration do Docker (Postgres 5433/Redis) không chạy — ECONNREFUSED, ngoài diff. ▶ START reviewer round 3 FAST (cancel sẽ redo bước này).
 - 2026-10-16T15:43:25.000Z ✅ DONE reviewer round 3 FAST — PASS: MAJOR-1 sáng 5.28/tối 10.82, query-inspector tối 10.51, 1 khối :root; lint/typecheck/build PASS; integration test env-blocked (Docker off). Residual: chưa kiểm trực quan, cần rerun pnpm test khi Docker bật.
 - 2026-10-16T15:43:45.000Z closeout — no doc impact; progress.json completedTasks += layer-2/task-05 (FAST PASS r3); commit.
+- 2026-10-16T16:19:21.000Z verify sau commit: Docker dev bật; pnpm test 420/420 PASS.

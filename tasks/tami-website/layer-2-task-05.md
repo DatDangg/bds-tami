@@ -57,6 +57,7 @@ Mở khoá cho: `layer-12-task-01`
 - Verify commands + result (attempt 2): lint PASS · typecheck PASS · test PASS x2 · build PASS
 - Verify commands + result (attempt 1): pnpm lint PASS · typecheck PASS · test PASS (38 files / 388 tests) · build PASS · generate:importmap đã chạy
 - Reviewer verdict: FAST PASS round 3 (.context/review-reports/build-tami-website-layer-2-task-05-round-3-review.md); round 1-2 FAIL (contrast dark, font portal, diff-create 4.39). Residual: chưa kiểm trực quan /admin; integration test round 3 env-blocked (Docker off), round 2 PASS 388 với hạ tầng — rerun pnpm test khi Docker bật.
+- Verify sau commit (2026-10-16T16:19:21.000Z, Docker dev tami-* bật): pnpm test 44 files / 420 tests PASS, 0 unhandled rejection — residual env-blocked đã đóng.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
