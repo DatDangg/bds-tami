@@ -13,7 +13,7 @@
 **Reference Images:**
 - 6 ảnh mockup TAMI HOMES (Trang chủ, Danh sách dự án, Chi tiết dự án, Chi tiết căn, Tin tức, Tuyển dụng), user gửi ngày 16/10/2026.
 - Bộ logo chính thức: `assets/brand/` (xem § Logo).
-- ⚠️ **Chỉ lấy BẢNG MÀU** từ các ảnh này. **Không** lấy bố cục, menu, component hay nội dung (mockup có mục "Mua bán", "Về chúng tôi"… không khớp phạm vi `docs/BRD.md` v1.3).
+- ⚠️ **Chỉ lấy BẢNG MÀU** từ các ảnh này. **Không** lấy bố cục, menu, component hay nội dung (mockup có mục "Mua bán", "Về chúng tôi"… không khớp phạm vi `docs/BRD.md` v1.5).
 
 **Website tham chiếu bố cục & phong cách: https://vinhomes.vn** (chốt 16/10/2026)
 
@@ -230,7 +230,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo đen) | Theo vinhomes.vn: **logo ở giữa**, trái là nút tìm kiếm, phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. Desktop ≥ 1280px có thể hiện menu ngang dưới logo |
+| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo đen) | Theo vinhomes.vn: **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. Desktop ≥ 1280px có thể hiện menu ngang dưới logo |
 | Menu toàn màn hình | — | Mở từ nút menu: phủ toàn màn hình nền tối, mục menu chữ lớn, mục con xổ ra; cuối có hotline + mạng xã hội |
 | Language Switcher | Chữ `VI | EN` · trong menu toàn màn hình | Chuyển sang **đúng trang tương ứng** ở ngôn ngữ kia; nếu trang đó chưa có bản dịch thì về trang danh sách / trang chủ của ngôn ngữ kia. Có `hreflang`, `aria-label`, ghi nhớ lựa chọn bằng cookie `NEXT_LOCALE` |
 | Section Heading | Có/không chữ chìm · căn giữa/căn trái | Eyebrow + tiêu đề serif in hoa + mô tả ngắn; chữ chìm to mờ phía sau |

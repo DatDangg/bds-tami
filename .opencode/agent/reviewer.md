@@ -13,6 +13,11 @@ permission:
   bash:
     "*": deny
     # verify-commands:start — auto-generated từ .context/project-config.md (scripts/apply-verify-permissions.mjs)
+    "pnpm test": allow
+    "pnpm install --frozen-lockfile": allow
+    "pnpm lint": allow
+    "pnpm typecheck": allow
+    "pnpm build": allow
     # verify-commands:end
     "aislop *": allow
     "npx aislop*": allow

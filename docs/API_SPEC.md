@@ -118,7 +118,7 @@ Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? 
 | Method | Path | Quyền | Mục đích | BRD |
 |---|---|---|---|---|
 | `GET` | `/api/admin/leads/export` | admin | Xuất lead ra `.xlsx` theo bộ lọc hiện tại (trạng thái, nguồn, sale, khoảng ngày). Ghi audit log `lead.export` | FR-ADM-10 |
-| `POST` | `/api/admin/leads/:id/assign` | admin | Giao lead cho sale `{ staffId }`. Sinh activity `assignment`, email cho sale, ghi audit log | FR-ADM-09; BR-12, 13 |
+| `POST` | `/api/admin/leads/:id/assign` | admin | Giao lead cho sale `{ staffId }`: chỉ cập nhật `assignedTo` qua Payload Local API; activity `assignment`, email cho sale và audit log `lead.assign` do **một** nơi duy nhất là hook `leads.afterChange` sinh (§5), để không sinh trùng khi admin đổi `assignedTo` trong form | FR-ADM-09; BR-12, 13 |
 | `GET` | `/api/admin/private-files/:id/download` | admin | Tải CV. Ghi audit log `application.view_cv` | FR-ADM-05 |
 | `GET` | `/api/admin/dashboard` | admin (toàn bộ), sale (số liệu lead của mình) | Số liệu dashboard (admin thấy thêm: số bài dịch lỗi / chờ duyệt, chi phí dịch tháng này) | FR-ADM-14 |
 | `POST` | `/api/admin/translations/:collection/:id` | admin; sale với bài của mình | "Dịch lại bằng AI" (§5.1) | FR-ADM-18 |
@@ -135,7 +135,7 @@ Không có webhook ra ngoài ở giai đoạn 1.
 |---|---|---|
 | Nội dung đổi / xuất bản / ẩn | hook `afterChange`, `afterDelete` | `revalidateTag` các trang liên quan ở **cả hai ngôn ngữ** |
 | Lead mới / gộp | endpoint 3.1 | Job `send-notification-email` |
-| Lead được giao | hook `leads.afterChange` | Activity `assignment` + job email |
+| Lead được giao / giao lại (`assignedTo` đổi, từ endpoint `/assign`, form admin hoặc tự giao BR-12) | hook `leads.afterChange` (nơi **duy nhất**) | Activity `assignment` + job email + audit log `lead.assign` (trừ tự giao) |
 | Hồ sơ ứng tuyển mới | endpoint 3.2 | Job email cho `notificationEmails` |
 | Đổi slug nội dung đã xuất bản | hook `beforeChange` | Tạo redirect 301 cho ngôn ngữ có slug đổi |
 | Lưu bản `vi` đang xuất bản / lưu global | hook `afterChange` | Job `translate-content` (dịch trường đã đổi sang `en`, BRD BR-08) |

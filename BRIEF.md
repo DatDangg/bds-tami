@@ -10,7 +10,7 @@ Mục tiêu chính: tạo niềm tin, xây dựng nhận diện thương hiệu 
 
 Website song ngữ: tiếng Việt (mặc định) và tiếng Anh (`/en`). Trang quản trị chỉ tiếng Việt.
 
-Chi tiết: `docs/BRD.md` (v1.4).
+Chi tiết: `docs/BRD.md` (v1.5).
 
 ## Target Users
 - Khách tìm thuê BĐS, tìm hiểu dự án, quan tâm ưu đãi của TAMI (không cần đăng nhập)
@@ -25,7 +25,7 @@ Chi tiết: `docs/BRD.md` (v1.4).
 - Tin tức: tin tức chung (khác Đăng tin BĐS, không thu lead)
 - Tuyển dụng: danh sách việc, nộp CV
 - Liên hệ, trang Dịch vụ, trang pháp lý; nút nổi Hotline / Zalo / Fanpage
-- Admin (Payload CMS): đăng mọi loại bài, danh mục cha–con cho từng loại, quản lý lead (phân công, trạng thái, ghi chú, xuất Excel), tài khoản sale, cấu hình trang chủ
+- Admin (Payload CMS): admin đăng mọi loại bài; sale đăng dự án, cho thuê, Đăng tin BĐS, tin tức, tuyển dụng (Dịch vụ và trang pháp lý chỉ admin); danh mục cha–con cho từng loại, quản lý lead (phân công, trạng thái, ghi chú, xuất Excel), tài khoản sale, cấu hình trang chủ
 - Song ngữ Việt – Anh cho toàn bộ website công khai; nút chuyển ngôn ngữ VI / EN; bản tiếng Anh do AI (Claude API) tự dịch khi xuất bản, nhân viên sửa tay được trong admin
 - **Không có** mục Mua bán; **không** cho người ngoài đăng tin ở giai đoạn này
 

@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.2.0
+- **spec_version:** 1.2.1
 - **updated_at:** 2026-10-16
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -33,6 +33,8 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 | Tác vụ nền | Payload Jobs Queue |
 | Hạ tầng | Docker Compose trên server công ty (dùng chung), Nginx có sẵn trên host, Cloudflare (free) |
 | Email | Brevo SMTP |
+| Bản đồ | OpenStreetMap + MapLibre GL (không cần API key trả phí) |
+| Analytics | Google Analytics 4 + Google Search Console (chỉ tải GA4 khi khách đồng ý cookie, xem Q7) |
 | Giám sát | Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma |
 | CI/CD | GitHub Actions (staging → duyệt → production) |
 | Package manager | pnpm |
@@ -41,19 +43,19 @@ Lý do lựa chọn: `docs/ARCHITECTURE.md` §3.
 
 ## Features
 
-Mã yêu cầu theo `docs/BRD.md`.
+Mã yêu cầu theo `docs/BRD.md`. Mức ưu tiên: mọi FR là **Must**, trừ **Should**: FR-PUB-16 (trang đích khu vực), FR-PUB-17 (khối đối tác), FR-ADM-14 (dashboard), FR-ADM-15 (redirect 301) · **Could**: FR-ADM-16 (hẹn giờ xuất bản). Graph xếp Should/Could vào layer sau Must.
 
 ### F1. Trang chủ (giới thiệu TAMI): FR-PUB-01, FR-PUB-17
 Các khối Hero slide (1–8), Về TAMI (kèm số liệu), Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Đối tác, Footer liên hệ. Admin bật/tắt và sắp xếp khối qua global `homepage`.
 
 ### F2. Dự án: FR-PUB-02, FR-PUB-03, FR-ADM-01
-Danh sách lọc theo loại hình / tỉnh / trạng thái mở bán. Chi tiết: tổng quan, chủ đầu tư, bản đồ, tiện ích, mặt bằng, pháp lý, chính sách bán hàng, tài liệu, form lead.
+Danh sách lọc theo loại hình / tỉnh / trạng thái mở bán, có phân trang, chỉ dự án đã xuất bản. Chi tiết: tổng quan, chủ đầu tư, bản đồ, tiện ích, mặt bằng, pháp lý, chính sách bán hàng, tài liệu, thư viện ảnh, form lead (tạo lead gắn dự án).
 
 ### F3. Cho thuê: FR-PUB-04, FR-PUB-05, FR-PUB-16, FR-ADM-02
-Danh sách có bộ lọc (danh mục, tỉnh, phường, giá/tháng, diện tích, phòng ngủ, nội thất, từ khoá không dấu, sắp xếp), bộ lọc nằm trên URL. Chi tiết gồm điều khoản thuê (thời hạn tối thiểu, cọc, kỳ thanh toán, dịch vụ bao gồm, ngày trống), sale phụ trách, form lead, tin tương tự. Mã tin `CT-xxxxxx`. Trạng thái `draft/published/hidden/rented`; tin đã thuê vẫn giữ trang.
+Danh sách có bộ lọc (danh mục, tỉnh, phường, giá/tháng, diện tích, phòng ngủ, nội thất, từ khoá không dấu, sắp xếp), bộ lọc nằm trên URL. Bộ lọc p95 ≤ 500ms. Chi tiết gồm thư viện ảnh (tối thiểu 3 ảnh khi xuất bản), video, mã tin, giá/tháng, diện tích, phòng ngủ/WC, tầng, hướng, nội thất, mô tả, vị trí, điều khoản thuê (thời hạn tối thiểu, cọc, kỳ thanh toán, dịch vụ bao gồm, ngày trống), sale phụ trách, form lead, tin tương tự. Mã tin `CT-xxxxxx`. Trạng thái `draft/published/hidden/rented`; tin đã thuê vẫn giữ trang, có nhãn "Đã thuê" và gợi ý tin tương tự. Nút tìm kiếm trên header dẫn tới `/cho-thue?q=` (giai đoạn 1 không có tìm kiếm toàn site).
 
 ### F4. Đăng tin BĐS: FR-PUB-06, FR-PUB-07, FR-ADM-03
-Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ chọn giá, khu vực, dự án / tin cho thuê liên quan, hạn ưu đãi + mã voucher. Có form lead. Quá hạn ưu đãi thì gắn "Đã kết thúc".
+Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ chọn giá, khu vực, dự án / tin cho thuê liên quan, hạn ưu đãi + mã voucher. Có form lead. Quá hạn ưu đãi thì gắn "Đã kết thúc" và rời khối "Ưu đãi nổi bật" (BR-06).
 
 ### F5. Tin tức: FR-PUB-08, FR-ADM-04
 Tin tức chung theo danh mục, có tags, bài liên quan. Không thu lead.
@@ -68,10 +70,10 @@ Trang dịch vụ (Phân phối, Môi giới, Khai thác CHDV), trang liên hệ
 Hotline / Zalo / Fanpage ở góc dưới phải mọi trang; ghi nhận lượt bấm.
 
 ### F9. Lead: FR-PUB-13, FR-ADM-09, FR-ADM-10; BR-10…16
-Form lead ở tin cho thuê, bài Đăng tin BĐS, dự án, trang liên hệ; consent bắt buộc; Turnstile + rate limit; chống trùng 7 ngày; tự giao cho sale đăng bài (tin cho thuê / bài Đăng tin BĐS), còn lại admin giao; email thông báo; nhắc lead chưa giao sau 30 phút; trạng thái `new/contacted/consulting/won/lost/spam`; lịch sử chăm sóc; xuất Excel (admin).
+Form lead ở tin cho thuê, bài Đăng tin BĐS, dự án, trang liên hệ; consent bắt buộc; Turnstile + rate limit; chống trùng 7 ngày; tự giao cho sale đăng bài (tin cho thuê / bài Đăng tin BĐS), còn lại admin giao; email thông báo; nhắc lead chưa giao sau 30 phút; trạng thái `new/contacted/consulting/won/lost/spam`, chuyển `lost` bắt buộc nhập lý do (BR-11); admin giao lại thì email cho sale mới (BR-13); nhắc admin khi lead `new` chưa có người phụ trách sau 30 phút **giờ hành chính** (BR-14, định nghĩa ở § Quy tắc biên); lịch sử chăm sóc; xuất Excel (admin, ghi audit log). Phân công chỉ sinh activity/email/audit ở **một** nơi (hook `leads.afterChange`, `docs/API_SPEC.md` §5).
 
 ### F10. Quản trị: FR-ADM-06, 07, 08, 11, 12, 13, 14, 15, 16
-Danh mục cha–con theo từng loại nội dung, chủ đầu tư, dịch vụ, menu/footer/cấu hình chung, tài khoản sale, thư viện ảnh (tự resize WebP), audit log, dashboard, redirect 301, hẹn giờ xuất bản, lịch sử phiên bản, xoá mềm.
+Danh mục cha–con theo từng loại nội dung (danh mục đang có nội dung thì không xoá được), chủ đầu tư, dịch vụ (chỉ admin), trang pháp lý (chỉ admin, `docs/ERD.md` §4.9b), menu/footer/cấu hình chung, tài khoản sale, thư viện ảnh (ảnh ≤ 10MB, tự resize WebP), audit log, dashboard, redirect 301, hẹn giờ xuất bản, lịch sử phiên bản, xoá mềm. Nội dung xuất bản/sửa lên trang công khai trong ≤ 1 phút (BRD §7.2).
 
 ### F11. SEO: FR-PUB-15, NFR-03
 SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG theo từng ngôn ngữ, `hreflang` (`vi`, `en`, `x-default`), `<html lang>`, `sitemap.xml` gồm cả hai bản, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`, có `inLanguage`), redirect 301 khi đổi slug (theo từng ngôn ngữ).
@@ -80,7 +82,7 @@ SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG 
 - URL: tiếng Việt không tiền tố, tiếng Anh `/en` + đường dẫn tiếng Anh (bảng `docs/BRD.md` §2.1). Không tự chuyển theo ngôn ngữ trình duyệt; nhớ lựa chọn bằng cookie `NEXT_LOCALE`.
 - Nội dung: các trường chữ (tiêu đề, slug, mô tả, nội dung, SEO, tên danh mục, menu/footer, khối trang chủ, alt ảnh) có bản `vi` và `en` (Payload `localized: true`); số, giá, quan hệ, trạng thái, địa danh dùng chung. Danh sách trường: `docs/ERD.md` §1.1.
 - Trường `hasEnglish` ("Đã có bản tiếng Anh") trên mỗi nội dung: hệ thống tự bật khi đủ trường bắt buộc tiếng Anh; `/en` chỉ hiện nội dung có `hasEnglish = true`, **không** fallback sang tiếng Việt (chưa có thì 404 + không vào sitemap EN).
-- **AI tự dịch** (BR-08): lưu bản `vi` đang `published` (hoặc global) → job `translate-content` gọi Claude API dịch các trường localized đã đổi (richText dịch từng đoạn chữ, giữ cấu trúc), sinh slug `en`, bật `hasEnglish`, xoá cache trang `/en`. Bản `en` đã sửa tay (`translation.enSource = manual`) không bị dịch đè; bản `vi` đổi sau đó thì gắn `translation.viChangedAfterManual`. Nút "Dịch lại bằng AI" trong admin. Trang pháp lý: AI dịch nháp, admin duyệt mới bật `hasEnglish`. Bảng thuật ngữ ở `site-settings.translationGlossary`. Lỗi: thử lại 3 lần, vẫn lỗi → `translation.status = failed` + cảnh báo dashboard. Hạn mức chi phí tháng qua env; vượt thì dừng dịch và báo admin. **Chỉ gửi nội dung công khai**, không gửi lead/CV.
+- **AI tự dịch** (BR-08): lưu bản `vi` đang `published` (hoặc global) → job `translate-content` gọi Claude API dịch các trường localized đã đổi (richText dịch từng đoạn chữ, giữ cấu trúc), sinh slug `en`, bật `hasEnglish`, xoá cache trang `/en`. Bản `en` đã sửa tay (`translation.enSource = manual`) không bị dịch đè; bản `vi` đổi sau đó thì gắn `translation.viChangedAfterManual`. Nút "Dịch lại bằng AI" trong admin. Trang pháp lý: AI dịch nháp, admin duyệt mới bật `hasEnglish`. Bảng thuật ngữ ở `site-settings.translationGlossary`. Bản tiếng Anh lên web trong ≤ 10 phút sau khi xuất bản. Lỗi: thử lại 3 lần, vẫn lỗi → `translation.status = failed` + cảnh báo dashboard. Admin lọc danh sách nội dung theo trạng thái dịch (chưa dịch / AI dịch / đã sửa tay / dịch lỗi / bản Việt đã đổi sau khi sửa tay, FR-ADM-18). Hạn mức chi phí tháng qua env; vượt thì dừng dịch và báo admin. **Chỉ gửi nội dung công khai**, không gửi lead/CV.
 - Chuỗi giao diện tiếng Anh (`en.json`) do AI dịch một lần lúc làm code, review trong PR.
 - Chuỗi giao diện (menu cố định, nút, nhãn, lỗi form, thông báo, nhãn enum như nội thất / hướng nhà) ở `src/i18n/messages/{vi,en}.json`.
 - Định dạng số/ngày theo ngôn ngữ (`Intl`); tiền luôn VNĐ.
@@ -125,8 +127,8 @@ Chi tiết trường, index, quy tắc: `docs/ERD.md`.
 ## Authentication
 
 - Payload auth trên collection `staff` (session cookie HttpOnly). Khách không có tài khoản.
-- 2 vai trò `admin` (1, luôn còn ít nhất 1) và `sale`. Sale đăng mọi loại bài, sửa/xoá bài của mình ⚠️, chỉ thấy lead được giao. Ma trận đầy đủ: `docs/PERMISSION.md`.
-- Khoá tạm sau 5 lần sai; lớp xác thực thứ 2 bằng Cloudflare Access trước `/admin`; session hết hạn sau 8 giờ không hoạt động.
+- 2 vai trò `admin` (BRD: 1 tài khoản; hệ thống cho phép thêm, luôn còn ít nhất 1) và `sale`. Sale tạo dự án, tin cho thuê, Đăng tin BĐS, tin tức, tuyển dụng; sửa/xoá bài của mình ⚠️; chỉ thấy lead được giao. **Dịch vụ và trang pháp lý chỉ admin** (chốt 16/10/2026). Ma trận đầy đủ: `docs/PERMISSION.md`.
+- Khoá tạm sau 5 lần sai; lớp xác thực thứ 2 bằng Cloudflare Access trước `/admin`; session hết hạn sau 8 giờ không hoạt động (Payload `tokenExpiration` tính theo thời gian tuyệt đối → admin UI làm mới token khi còn hoạt động; ghi residual risk nếu không làm được).
 - Để dành collection `members` cho người đăng bên ngoài (chưa tạo).
 
 ## Business Rules
@@ -136,6 +138,48 @@ Theo `docs/BRD.md` §4: BR-01…08 (nội dung; BR-07 hiển thị bản tiếng
 Đã chốt: A5 song ngữ Việt – Anh (tiếng Việt mặc định, admin chỉ tiếng Việt, bản tiếng Anh do AI tự dịch và tự lên web, nhân viên sửa tay được; trang pháp lý admin duyệt).
 
 Giả định đang áp dụng (⚠️, chỉnh qua `/change`): A1 sale chỉ sửa bài của mình · A2 gộp lead trùng 7 ngày · A3 nhắc lead chưa giao sau 30 phút · A4 lưu lead 24 tháng, CV 12 tháng · A6 thiết kế cho 100.000 tin / 1.000 người đồng thời.
+
+## Non-functional Requirements
+
+Nguồn: `docs/BRD.md` §5 (NFR) và §6 (LGL).
+
+| Mã | Yêu cầu |
+|---|---|
+| NFR-01 | Core Web Vitals "Good" ở p75 mobile: LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1. API lọc p95 ≤ 500ms |
+| NFR-02 | App stateless, scale ngang; mục tiêu 100.000 tin / 1.000 người đồng thời (§ Scalability Profile) |
+| NFR-03 | SEO: SSR/ISR (F11) |
+| NFR-04 | Bảo mật: HTTPS, OWASP Top 10, header CSP / HSTS / X-Frame-Options / Referrer-Policy, kiểm tra MIME thật khi upload, Turnstile + rate limit form, lớp xác thực thứ 2 cho `/admin`, CV không có link công khai (`docs/ARCHITECTURE.md` §7) |
+| NFR-05 | Backup ngoài server, RPO ≤ 15 phút, RTO ≤ 4 giờ, diễn tập khôi phục 6 tháng/lần |
+| NFR-06 | Uptime ≥ 99.5%/tháng |
+| NFR-07 | Responsive mobile-first; WCAG 2.1 mức A, mục tiêu AA cho trang chính (trang chủ, danh sách/chi tiết dự án và cho thuê, liên hệ) |
+| NFR-08 | Chrome, Safari, Edge, Firefox (2 bản gần nhất) + trình duyệt trong Zalo / Facebook |
+| NFR-09 | Phần mềm tự host đều là mã nguồn mở. Dịch vụ ngoài chỉ dùng gói **miễn phí** (Cloudflare, Turnstile, Cloudflare Access, Brevo, GA4, Search Console); trả phí chỉ có tên miền (và email nếu vượt gói free) và Claude API (hạn mức tháng qua env) |
+| NFR-10 | Staging tách biệt production; CI/CD; tài liệu kiến trúc và dữ liệu |
+| LGL-01…04 | Địa giới 2 cấp (34 tỉnh, lưu tên cũ); trường pháp lý cho dự án / tin cho thuê; bảo vệ dữ liệu cá nhân (BR-30…32); không sao chép nội dung tham khảo |
+
+## Quy tắc biên (edge cases)
+
+Các quy tắc dưới đây là ⚠️ giả định mặc định để build, chỉnh qua `/change`:
+
+- **Giờ hành chính** (BR-14): 08:00–17:30, thứ 2 – thứ 7, giờ Việt Nam; chưa trừ ngày lễ. Lead tới ngoài giờ thì đếm 30 phút từ đầu giờ làm kế tiếp.
+- **Sale bị khoá** (`active = false`): lead đang giao giữ nguyên người phụ trách và hiện cảnh báo "sale đã khoá" cho admin để giao lại; lead mới từ tin của sale đó chờ admin giao (BR-12). Trang tin công khai thay "Sale phụ trách" bằng hotline chung.
+- **Tin "Đã thuê"**: form vẫn nhận lead với tiêu đề "Nhận tư vấn căn tương tự"; lead gắn nguồn là tin đó.
+- **Globals chưa có bản tiếng Anh**: `header` / `footer` thiếu bản EN thì `/en` dùng menu cố định trong `en.json`; khối trang chủ chưa có bản EN thì ẩn khối đó ở `/en` (không lấy chữ tiếng Việt, BR-07).
+- **Hẹn giờ xuất bản** (FR-ADM-16): bài `published` có `publishedAt` ở tương lai thì chưa hiện công khai; job Payload chạy mỗi phút revalidate các bài vừa tới giờ.
+- **Hai người sửa cùng bài**: dùng document locking có sẵn của Payload 3.
+- **Bộ lọc không có kết quả**: hiện trạng thái trống + nút xoá bộ lọc. **Lỗi máy chủ**: trang 500 đúng ngôn ngữ đang xem (screen spec ở bước `/design`).
+
+## Câu hỏi mở
+
+| # | Nội dung | Cần trước |
+|---|---|---|
+| Q1 | KPI cụ thể (BO-1…BO-4) | Go-live |
+| Q4 | Nội dung ban đầu: dự án, tin cho thuê, dịch vụ, bài giới thiệu | Go-live (code dùng dữ liệu mẫu) |
+| Q5 | Bản EN trang pháp lý có cần luật sư duyệt (hiện: admin duyệt) | Mở `/en` trang pháp lý |
+| Q6 | Hạn mức chi phí Claude API / tháng | Production |
+| Q7 | Banner đồng ý cookie cho GA4 (LGL-03): đề xuất chỉ tải GA4 sau khi khách đồng ý | Bước `/design` |
+| — | Tên miền | Production |
+| — | Hero video, dải 4 lối tắt, banner CTA (DESIGN) chưa có trường trong global `homepage`; DESIGN chưa có màn trang đích khu vực (FR-PUB-16) và trang danh mục | Bước `/design` chốt |
 
 ## Scalability Profile
 

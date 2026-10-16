@@ -74,7 +74,7 @@ Website cần **định hướng khách hàng, tạo sự tin tưởng và xây 
 |---|---|---|
 | Khách truy cập | Không đăng nhập | Tìm hiểu TAMI, xem dự án / BĐS cho thuê / ưu đãi / tin tức, để lại liên hệ, ứng tuyển |
 | **Admin** | 1 tài khoản, quản trị toàn quyền | Quản lý mọi nội dung, cấu hình web, tài khoản sale, phân công lead, xem CV |
-| **Sale** | Nhiều tài khoản | Đăng bài mọi loại, chăm sóc lead được giao |
+| **Sale** | Nhiều tài khoản | Đăng dự án, tin cho thuê, Đăng tin BĐS, tin tức, tuyển dụng (Dịch vụ và trang pháp lý chỉ admin); chăm sóc lead được giao |
 
 ---
 

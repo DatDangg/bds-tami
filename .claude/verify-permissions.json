@@ -1,0 +1,9 @@
+{
+  "generated": [
+    "Bash(pnpm test)",
+    "Bash(pnpm install --frozen-lockfile)",
+    "Bash(pnpm lint)",
+    "Bash(pnpm typecheck)",
+    "Bash(pnpm build)"
+  ]
+}

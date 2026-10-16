@@ -9,46 +9,46 @@
 ## Config
 
 ```yaml
-project: <tên dự án>
+project: tami-website
 output_language: vi            # vi | en — ngôn ngữ cho docs/summary
 
 # ── Git ──
-target_branch: <target_branch> # default staging-direct: current branch phải là branch này khi commit/push PASS; chưa điền = hỏi user
+target_branch: staging        # default staging-direct: current branch phải là branch này khi commit/push PASS; chưa điền = hỏi user
 forbidden_branch: main         # cấm push trực tiếp (opencode.jsonc hard-deny main/ref main)
-branch_pattern: "<target_branch>" # default staging-direct; feature/<slug>|bug/<slug> chỉ khi user yêu cầu feature branch
+branch_pattern: "staging" # default staging-direct; feature/<slug>|bug/<slug> chỉ khi user yêu cầu feature branch
 auto_push_after_pass: false    # ⚠️ KHÔNG phải "tự commit": commit sau PASS luôn BẮT BUỘC. Flag này chỉ = AUTO-PUSH: true = tự `git push origin <target_branch>` sau PASS; false = chỉ commit local, chờ user yêu cầu rõ.
 
 # ── Package / source ──
-package_manager: <none|pnpm|npm|yarn|bun>  # none/chưa điền = không hardcode lệnh
-source_roots: []               # ví dụ: [src] hoặc [apps, packages]; [] nếu chưa có app code
+package_manager: pnpm
+source_roots: [src]            # app Next.js + Payload một package (ARCHITECTURE §4); scaffold ở layer 0
 
 # ── Verify commands (null/placeholder = skip, no app configured) ──
-web_typecheck_command: null
+web_typecheck_command: null   # không tách web/api — dùng alias generic
 web_lint_command: null
 api_typecheck_command: null
 api_lint_command: null
-test_command: null
-install_command: null
-lint_command: null          # generic alias if web/api split does not apply
-typecheck_command: null     # generic alias if web/api split does not apply
-build_command: null
-migration_command: null     # only used when db_tool != none and migration_required: true
+test_command: pnpm test
+install_command: pnpm install --frozen-lockfile
+lint_command: pnpm lint          # generic alias if web/api split does not apply
+typecheck_command: pnpm typecheck     # generic alias if web/api split does not apply
+build_command: pnpm build
+migration_command: pnpm payload migrate     # only used when db_tool != none and migration_required: true
 
 # ── Database ──
-db_tool: none                  # none | prisma | drizzle | other
-migration_required: false      # true nếu cần migration versioned (chỉ khi db_tool != none)
-staging_db: <env var staging, vd DATABASE_URL_STAGING>   # TÊN ENV VAR, không phải connection string/secret
-prod_db: <env var production, vd DATABASE_URL_PROD>       # TÊN ENV VAR; phải khác staging_db
+db_tool: other                 # Payload CMS 3 Postgres adapter (Drizzle bên dưới); migration bằng `payload migrate:create` / `payload migrate`
+migration_required: true       # true nếu cần migration versioned (chỉ khi db_tool != none)
+staging_db: DATABASE_URL_STAGING   # TÊN ENV VAR, không phải connection string/secret
+prod_db: DATABASE_URL_PROD       # TÊN ENV VAR; phải khác staging_db
 destructive_migration_policy: HIGH_RISK_MIGRATION
 
 # ── Deploy / CI-CD (từ brainstorm; secret nằm ở .env.local) ──
-deploy_platform: <vercel|railway|docker-vps|skip>
-ci_cd: <github-actions|gitlab-ci|skip>
+deploy_platform: docker-vps    # Docker Compose trên server công ty (SSH alias `server`), Nginx host, Cloudflare — ARCHITECTURE §6
+ci_cd: github-actions          # staging → duyệt tay → production (ARCHITECTURE §6.4); runner chốt ở bước DevOps
 
 # ── Monitoring ──
-monitor_enabled: false         # true | false
-otel_service_name: <tên service trong telemetry>
-otel_env: <production|staging>
+monitor_enabled: true          # Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma
+otel_service_name: tami-web
+otel_env: staging              # production đặt qua env khi deploy prod
 ```
 
 ### DB / migration
@@ -72,14 +72,16 @@ otel_env: <production|staging>
 
 ```yaml
 check_commands:
-  install: null             # alias of install_command
+  install: pnpm install --frozen-lockfile
   web_typecheck: null       # hoặc = web_typecheck_command
   web_lint: null            # hoặc = web_lint_command
   api_typecheck: null       # hoặc = api_typecheck_command
   api_lint: null            # hoặc = api_lint_command
-  test: null                # hoặc = test_command
-  build: null               # hoặc = build_command
-  migration: null           # hoặc = migration_command khi migration_required=true
+  lint: pnpm lint           # không tách web/api
+  typecheck: pnpm typecheck
+  test: pnpm test
+  build: pnpm build
+  migration: pnpm payload migrate   # KHÔNG auto-allow; chỉ chạy trong deploy staging/prod
   docs_inventory: null
 ```
 
@@ -91,18 +93,18 @@ check_commands:
 
 ```yaml
 models:
-  builder:        <provider>/<model-code-chinh>
-  builder_strong: <provider>/<model-manh-hon>     # chỉ dùng khi user yêu cầu rõ (§7 gate)
-  reviewer:       <provider>/<model-khac-ho>
-  spec_validator: <provider>/<model-ho-thu-3>     # họ thứ 3 nếu có
-  change_request: <provider>/<model-plan>          # ⭐ agent hậu-build (classify/spec/task) — cửa vào /change
+  builder:        sonnet
+  builder_strong: opus     # chỉ dùng khi user yêu cầu rõ (§7 gate)
+  reviewer:       opus
+  spec_validator: opus     # họ thứ 3 nếu có
+  change_request: opus          # ⭐ agent hậu-build (classify/spec/task) — cửa vào /change
 ```
 
 ## UI rules (nếu project có UI)
 
 ```yaml
 ui:
-  responsive_breakpoints: [375, 768, 1280]
+  responsive_breakpoints: [375, 640, 768, 1024, 1280, 1536]   # 375 = mobile test; còn lại = Tailwind sm/md/lg/xl/2xl (DESIGN.md)
   max_file_lines: 300
   max_function_lines: 50
 ```
@@ -112,5 +114,5 @@ ui:
 ```yaml
 secrets:
   source: env                    # chỉ đọc từ env; KHÔNG hardcode/commit
-  required: [DATABASE_URL, JWT_SECRET]
+  required: [DATABASE_URL, PAYLOAD_SECRET, REDIS_URL, S3_ENDPOINT, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_PUBLIC, S3_BUCKET_PRIVATE, TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, SMTP_HOST, SMTP_USER, SMTP_PASS, ANTHROPIC_API_KEY, TRANSLATION_MODEL, TRANSLATION_MONTHLY_BUDGET_USD, NEXT_PUBLIC_SITE_URL]   # deploy: DATABASE_URL lấy từ DATABASE_URL_STAGING / DATABASE_URL_PROD
 ```

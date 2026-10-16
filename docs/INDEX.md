@@ -12,7 +12,7 @@
 | `ERD.md` | database_schema | Thiết kế dữ liệu (collection, trường, index). Khi có code → **pointer** tới `src/collections/` + `migrations/`, code thắng |
 | `PERMISSION.md` | business_rules | Vai trò `admin`/`sale` + ma trận quyền + guard order, **sync với `src/access/` khi có code** |
 | `API_SPEC.md` | api_spec | Endpoint tuỳ biến + quy ước. Khi có code → pointer tới `src/endpoints/` + `src/shared/types/api.ts` |
-| `DESIGN.md` | design_spec | Design spec / brand — **chưa điền** (chờ logo, màu, font) |
+| `DESIGN.md` | design_spec | Design spec / brand — đã điền màu, logo, font, bố cục theo vinhomes.vn; screen spec chi tiết ở `.context/design-spec.md` (bước `/design`) |
 | `generated/` | generated | Sinh tự động bằng `check_commands.docs_inventory` — **không sửa tay** |
 
 Tóm tắt phạm vi cho agent: `../BRIEF.md`. Spec tổng hợp: `../SPECIFICATIONS.md`.

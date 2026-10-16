@@ -7,8 +7,8 @@
 
 | Vai trò | Số lượng | Mô tả | Nguồn (code) |
 |---|---|---|---|
-| `admin` | 1 (tối thiểu 1 tài khoản luôn hoạt động) | Quản trị toàn quyền | `staff.role` |
-| `sale` | Nhiều | Đăng bài mọi loại, chăm sóc lead được giao | `staff.role` |
+| `admin` | 1 theo BRD; hệ thống cho phép thêm, luôn còn tối thiểu 1 tài khoản hoạt động | Quản trị toàn quyền | `staff.role` |
+| `sale` | Nhiều | Đăng dự án, tin cho thuê, Đăng tin BĐS, tin tức, tuyển dụng (Dịch vụ và trang pháp lý chỉ admin); chăm sóc lead được giao | `staff.role` |
 | *(khách)* | — | Không đăng nhập; chỉ xem nội dung đã xuất bản và gửi form | — |
 | *(`members`)* | — | Để dành cho người đăng bên ngoài, **chưa tạo** | — |
 
@@ -107,7 +107,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 ## 6. Thao tác bắt buộc ghi audit log
 
-Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá tài khoản, đổi vai trò · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.
+Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá tài khoản, đổi vai trò, đặt lại mật khẩu · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.
 
 ## 7. Bảo vệ trang `/admin`
 

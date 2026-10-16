@@ -26,7 +26,7 @@
 | `rentals` | `draft` · `published` · `hidden` · `rented` |
 | `projects`, `property-posts`, `news`, `services`, `job-postings`, `pages` | `draft` · `published` · `hidden` |
 
-Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm. Bản tiếng Anh (`/en`) còn phải có `hasEnglish = true` (§1.1).
+Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm; với bài có `publishedAt` thì còn phải `publishedAt ≤ now` (hẹn giờ, FR-ADM-16). Bản tiếng Anh (`/en`) còn phải có `hasEnglish = true` (§1.1).
 
 ### 1.1. Song ngữ (Payload localization)
 
@@ -35,7 +35,7 @@ Cấu hình: `localization: { locales: ['vi', 'en'], defaultLocale: 'vi', fallba
 - Trường `localized: true` lưu riêng bản `vi` và `en`. Payload đặt các cột này ở bảng `<collection>_locales` (cột `_locale`, `_parent_id`), không nằm ở bảng chính.
 - **Localized** (áp cho mọi collection/global ở §4, không ghi lại từng bảng): `title`, `name`, `slug`, `summary`, `excerpt`, `description`, `overview`, `content`, các trường richText/textarea hiển thị cho khách, nhãn trong array (vd `amenities.name`, `floorPlans.title`), nhóm `seo`, chữ trong globals `homepage` / `header` / `footer`, `media.alt` / `caption`.
 - **Không localized** (dùng chung hai bản): số, giá, diện tích, ngày, quan hệ, `status`, `code`, `author`, select/enum (nhãn hiển thị dịch ở file chuỗi giao diện), ảnh/file, toạ độ, `provinces` / `wards` (tên riêng tiếng Việt).
-- **`hasEnglish`** (checkbox, I, mặc định `false`) có trên mọi collection nội dung: `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`, `categories`, `developers`. Hệ thống tự bật khi đủ trường bắt buộc tiếng Anh: `title`/`name`, `slug`, mô tả ngắn (`summary` / `excerpt` / `description`), nội dung chính (`overview` / `content` / `description` tuỳ collection); hook `beforeValidate` chặn bật khi còn thiếu. Với `pages` loại pháp lý, chỉ **admin** bật (BR-08).
+- **`hasEnglish`** (checkbox, I, mặc định `false`) có trên mọi collection nội dung: `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`, `categories`, `developers`. Hệ thống tự bật khi đủ trường bắt buộc tiếng Anh: `title`/`name`, `slug` (trừ `pages`, route cố định theo `kind`, §4.9b), mô tả ngắn (`summary` / `excerpt` / `description`), nội dung chính (`overview` / `content` / `description` tuỳ collection); hook `beforeValidate` chặn bật khi còn thiếu. Với `pages` loại pháp lý, chỉ **admin** bật (BR-08).
 - **`translation`** (group, không localized, chỉ đọc trong admin trừ nút "Dịch lại bằng AI") đi kèm `hasEnglish` trên các collection trên và các global `homepage`, `header`, `footer`, `site-settings` (BR-08):
 
 | Trường | Kiểu | Ghi chú |
@@ -113,7 +113,7 @@ erDiagram
 
 ## 4. Chi tiết collection
 
-Ký hiệu: **R** = bắt buộc · **U** = unique · **I** = có index · `rel→X` = quan hệ tới collection X.
+Ký hiệu: **R** = bắt buộc · **U** = unique · **I** = có index · `rel→X` = quan hệ tới collection X. Với `slug` (localized), **U** nghĩa là unique theo (`_locale`, `slug`) trong collection (§1.1), không phải unique toàn cột.
 
 ### 4.1. `staff` (auth)
 
@@ -249,7 +249,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `rentedAt` | date | | Tự gán khi chuyển `rented` |
 | `publishedAt` | date | I | |
 | `author` | `rel→staff` | R, I | Sale phụ trách; lead từ tin này tự giao cho người này (BR-12) |
-| `searchText` | text (ẩn) | I (trigram) | Tự sinh, xem §6 |
+| `searchText` | text (ẩn), **localized** | I (trigram, ở `rentals_locales`) | Tự sinh theo từng ngôn ngữ, xem §6 |
 | `seo` | group | | |
 
 **`rentalTerms`** (group)
@@ -314,6 +314,30 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `sortOrder` | number | | |
 | `status` | select | R | |
 | `seo` | group | | |
+
+Không có `author`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §3.1), nên nút "Dịch lại bằng AI" cũng chỉ admin dùng.
+
+### 4.9b. `pages` (trang pháp lý)
+
+Giai đoạn 1 chỉ có 2 trang pháp lý, route **cố định theo `kind`** (không dùng slug):
+
+| `kind` | Route VI | Route EN |
+|---|---|---|
+| `privacy` | `/chinh-sach-bao-mat` | `/en/privacy-policy` |
+| `terms` | `/dieu-khoan-su-dung` | `/en/terms-of-use` |
+
+| Trường | Kiểu | Ràng buộc | Ghi chú |
+|---|---|---|---|
+| `kind` | select | R, U | `privacy` · `terms`. Mỗi loại đúng 1 bản ghi (seed sẵn); không đổi sau khi tạo |
+| `title` | text | R | Localized |
+| `content` | richText | R | Localized |
+| `version` | text | R | Phiên bản văn bản (vd `1.0`). Bản `privacy` đang `published` là nguồn của `site-settings.privacyPolicyVersion` / `consentVersion` (BR-30): hook `pages.afterChange` ghi đè `privacyPolicyVersion` khi bản `privacy` được xuất bản; trường đó chỉ đọc trong admin |
+| `effectiveDate` | date | R | Ngày hiệu lực, hiện trên trang |
+| `status` | select | R, I | `draft` · `published` · `hidden` |
+| `hasEnglish`, `translation` | | | Theo §1.1. Mọi bản ghi `pages` đều là trang pháp lý: AI chỉ dịch nháp (`translation.status = pending_review`), **chỉ admin** bật `hasEnglish` sau khi duyệt (BR-08). Trường bắt buộc tiếng Anh: `title`, `content` |
+| `seo` | group | | |
+
+Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §3.1, §4). Thêm loại trang mới (vd "Giới thiệu") phải qua Change Request vì cần route mới.
 
 ### 4.10. `job-postings`, `job-applications`
 
@@ -427,7 +451,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `actor` | `rel→staff` | |
-| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `staff.create` · `staff.update_role` · `staff.deactivate` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
+| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
 | `collection` | text | |
 | `docId` | text | |
 | `summary` | text | Mô tả ngắn |
@@ -514,7 +538,7 @@ Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (p
 - Cột `searchText` của `rentals` (localized) được hook `beforeChange` sinh **cho từng ngôn ngữ** từ: `code` + `title` của ngôn ngữ đó + `address` + tên phường + tên tỉnh + `legacyNames` của phường + tên dự án. Chuyển chữ thường và bỏ dấu (`unaccent`). Tìm ở `/en` dùng `searchText` bản `en` (vẫn gõ được tên địa danh tiếng Việt không dấu).
 - Từ khoá người dùng nhập cũng được chuẩn hoá như vậy, rồi tìm bằng `ILIKE` / similarity của `pg_trgm` trên index GIN.
 - Toàn bộ nằm sau `SearchService` (`src/lib/search`). Khi cần OpenSearch thì chỉ đổi implementation (ARCHITECTURE §9.1).
-- `property-posts` và `news`: tìm đơn giản theo tiêu đề (đủ cho giai đoạn 1).
+- `property-posts` và `news`: giai đoạn 1 **không** có ô tìm kiếm (chỉ lọc theo danh mục). Nút tìm kiếm trên header dẫn tới `/cho-thue?q=` (dùng `searchText` ở trên).
 
 ---
 
