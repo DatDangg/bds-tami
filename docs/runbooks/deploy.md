@@ -102,6 +102,7 @@ Theo `docker/nginx/` và ARCHITECTURE §6 (không thuộc pipeline này).
 - **Migration đã chạy KHÔNG rollback được.** Health fail → `deploy.sh` chỉ quay *image* về bản trước; DB giữ schema mới.
   Vì vậy mọi migration phải **backward-compatible với image trước** (expand/contract): lần deploy N chỉ thêm (cột/bảng nullable,
   default), lần N+1 mới bỏ phần cũ sau khi chắc chắn không image nào còn dùng.
+- **BL-003:** hàm `down` của các migration Payload đã được làm idempotent (`DROP CONSTRAINT IF EXISTS` vì `DROP TABLE ... CASCADE` đã gỡ sẵn FK `payload_locked_documents_rels_*_fk`; `DROP INDEX IF EXISTS` chỉ để phòng thủ), nên `payload migrate:down` chạy được trọn vòng up/down/up. Chiến lược rollback production vẫn là **fix-forward**; `migrate:down` chỉ dùng cho DB dev/test, không bao giờ chạy trên staging/prod.
 - Cấm `db push`, `migrate reset`, seed/reset, clone data staging→prod. `staging_db` ≠ `prod_db`.
 
 ### HIGH_RISK_MIGRATION

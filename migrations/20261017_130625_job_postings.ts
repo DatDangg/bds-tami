@@ -196,12 +196,12 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "_job_postings_v" CASCADE;
   DROP TABLE "_job_postings_v_locales" CASCADE;
   DROP TABLE "job_applications" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_job_postings_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_job_postings_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_job_applications_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_job_applications_fk";
   
-  DROP INDEX "payload_locked_documents_rels_job_postings_id_idx";
-  DROP INDEX "payload_locked_documents_rels_job_applications_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_job_postings_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_job_applications_id_idx";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "job_postings_id";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "job_applications_id";
   DROP TYPE "public"."enum_job_postings_employment_type";

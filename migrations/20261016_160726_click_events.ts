@@ -60,9 +60,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "click_events" CASCADE;
   DROP TABLE "click_stats_daily" CASCADE;
   DROP TABLE "payload_jobs_stats" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_click_events_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_click_events_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_click_stats_daily_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_click_stats_daily_fk";
   
   ALTER TABLE "payload_jobs_log" ALTER COLUMN "task_slug" SET DATA TYPE text;
   DROP TYPE "public"."enum_payload_jobs_log_task_slug";
@@ -72,8 +72,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_payload_jobs_task_slug";
   CREATE TYPE "public"."enum_payload_jobs_task_slug" AS ENUM('inline', 'send-notification-email');
   ALTER TABLE "payload_jobs" ALTER COLUMN "task_slug" SET DATA TYPE "public"."enum_payload_jobs_task_slug" USING "task_slug"::"public"."enum_payload_jobs_task_slug";
-  DROP INDEX "payload_locked_documents_rels_click_events_id_idx";
-  DROP INDEX "payload_locked_documents_rels_click_stats_daily_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_click_events_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_click_stats_daily_id_idx";
   ALTER TABLE "payload_jobs" DROP COLUMN "meta";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "click_events_id";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "click_stats_daily_id";
