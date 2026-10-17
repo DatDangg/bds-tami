@@ -1,0 +1,218 @@
+# STAGING — Docker Compose cho TAMI trên server dùng chung (ARCHITECTURE §6). Project `tami-staging`, container `tami-staging-*`, network riêng.
+# KHÔNG chứa secret: mọi giá trị nhạy cảm đọc từ env file trên server (không commit), truyền bằng --env-file.
+# Chỉ `app` publish cổng và chỉ bind 127.0.0.1:3011; postgres/redis/seaweedfs không publish cổng nào ra host.
+#
+# Dùng (trên server; TAMI_IMAGE = tag theo commit SHA, promote prod dùng đúng image đã chạy ở staging):
+#   export TAMI_IMAGE=tami-web:<git-sha>
+#   C="docker compose --env-file /opt/tami/staging.env -f docker/docker-compose.staging.yml"
+#   $C config -q                                  # kiểm tra cấu hình + biến bắt buộc
+#   $C up -d postgres redis seaweedfs seaweedfs-init
+#   $C --profile tools run --rm migrate           # BƯỚC RIÊNG trước khi bật app/jobs (app/jobs KHÔNG tự migrate lúc khởi động)
+#   $C up -d app jobs
+# Danh sách biến của env file: khối "Docker Compose staging/prod" trong .env.example (mục này dùng giá trị riêng của môi trường).
+#
+# jobs: CHỈ 1 bản (job aggregate-click-stats cộng dồn đọc-rồi-ghi, không nguyên tử; ARCHITECTURE §6.2).
+# Không dùng `--scale jobs=N`; container_name cố định cũng chặn việc này.
+name: tami-staging
+
+x-logging: &default-logging
+  # json-file có xoay vòng: Promtail/Alloy của hạ tầng Loki đọc log container qua docker (docker_sd); app log JSON (pino) ra stdout.
+  # Không dùng driver loki trực tiếp vì cần plugin cài trên host dùng chung; thiếu plugin thì container không khởi động.
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    labels: "com.docker.compose.project,com.docker.compose.service"
+
+x-app-environment: &app-environment
+  APP_ENV: staging
+  # Nginx chỉ nhận IP Cloudflare nên tin header CF-Connecting-IP (thiếu cờ này mọi khách chung 1 bucket rate limit).
+  TRUST_CF_CONNECTING_IP: "true"
+  NODE_OPTIONS: "--max-old-space-size=576"
+  DATABASE_URL: ${DATABASE_URL_STAGING:?DATABASE_URL_STAGING bắt buộc}
+  PAYLOAD_SECRET: ${PAYLOAD_SECRET:?}
+  REDIS_URL: redis://:${REDIS_PASSWORD:?}@redis:6379
+  S3_ENDPOINT: http://seaweedfs:8333
+  S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?}
+  S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?}
+  S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:?}
+  S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:?}
+  TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:?}
+  TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:?}
+  SMTP_HOST: ${SMTP_HOST:?}
+  SMTP_USER: ${SMTP_USER:?}
+  SMTP_PASS: ${SMTP_PASS:?}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  # Tuỳ chọn: chuỗi rỗng làm validate email lỗi nên không đặt giá trị mặc định; thiếu trong env file thì không truyền.
+  EMAIL_FROM_ADDRESS:
+  EMAIL_ALLOWLIST: ${EMAIL_ALLOWLIST:?EMAIL_ALLOWLIST bắt buộc ở staging (email nội bộ, ngăn cách bằng dấu phẩy)}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+  TRANSLATION_MODEL: ${TRANSLATION_MODEL:?}
+  TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:?}
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://staging.<domain>)}
+  GLITCHTIP_DSN: ${GLITCHTIP_DSN:-}
+  GLITCHTIP_PUBLIC_DSN: ${GLITCHTIP_PUBLIC_DSN:-}
+  METRICS_TOKEN: ${METRICS_TOKEN:-}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+
+x-hardening: &hardening
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  # Không đặt read_only: SWC của Next (nạp TS cho `jobs`/`migrate`) giải nén native addon vào ~/.cache cần ghi + exec; tmpfs mặc định noexec và
+  # tính vào mem_limit. Rootfs ghi được là cache disk của container, mất khi tạo lại container (stateless).
+
+services:
+  app:
+    image: ${TAMI_IMAGE:?TAMI_IMAGE bắt buộc (vd tami-web:<git-sha>)}
+    container_name: tami-staging-app
+    <<: *hardening
+    environment: *app-environment
+    ports:
+      - "127.0.0.1:3011:3000"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      seaweedfs: { condition: service_healthy }
+    mem_limit: 768m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+    # HEALTHCHECK /api/health nằm trong image.
+
+  jobs:
+    image: ${TAMI_IMAGE:?TAMI_IMAGE bắt buộc (vd tami-web:<git-sha>)}
+    container_name: tami-staging-jobs
+    <<: *hardening
+    # = `pnpm jobs` (payload run scripts/jobs-runner.ts) nhưng node chạy trực tiếp làm PID 1: qua pnpm, SIGTERM làm pnpm thoát ngay (exit 1)
+    # trước khi runner kịp dừng êm; chạy trực tiếp thì runner log "đã dừng", exit 0.
+    command: ["node", "node_modules/payload/bin.js", "run", "scripts/jobs-runner.ts"]
+    environment:
+      <<: *app-environment
+      # Đo thực tế: ~190MB ổn định khi rảnh (payload + loader TS), nên heap 256MB trong mem_limit 384m.
+      NODE_OPTIONS: "--max-old-space-size=256"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      seaweedfs: { condition: service_healthy }
+    # Worker chờ vòng đang chạy (tối đa 10 job SMTP) khi nhận SIGTERM.
+    stop_grace_period: 60s
+    # Không có HTTP: tắt HEALTHCHECK /api/health thừa kế từ image.
+    healthcheck:
+      disable: true
+    mem_limit: 384m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+
+  # Bước migrate riêng của pipeline deploy (profile `tools`: không chạy khi `up`).
+  migrate:
+    image: ${TAMI_IMAGE:?TAMI_IMAGE bắt buộc (vd tami-web:<git-sha>)}
+    container_name: tami-staging-migrate
+    profiles: ["tools"]
+    <<: *hardening
+    command: ["node", "node_modules/payload/bin.js", "migrate"]
+    environment: *app-environment
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      disable: true
+    mem_limit: 512m
+    restart: "no"
+    logging: *default-logging
+    networks: [internal]
+
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: tami-staging-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tami}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:-tami}
+    # `DATABASE_URL_STAGING` phải trỏ tới host `postgres`, cùng user/mật khẩu/db ở trên.
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "effective_cache_size=384MB", "-c", "max_connections=50"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 512m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    container_name: tami-staging-redis
+    # Mật khẩu qua env (không nằm trong process list của host). volatile-lru: chỉ đẩy key có TTL khi đầy bộ nhớ.
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --maxmemory 100mb --maxmemory-policy volatile-lru --save 300 10"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    mem_limit: 128m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48
+    container_name: tami-staging-seaweedfs
+    # master + volume + filer + S3 gateway trong một tiến trình. Khoá S3 lấy từ AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (không có file cấu hình chứa secret).
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-ip.bind=0.0.0.0", "-volume.max=30", "-master.volumeSizeLimitMB=1024"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?}
+    volumes:
+      - seaweedfs-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+    mem_limit: 256m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+
+  # Tạo 2 bucket nếu chưa có (idempotent): chỉ bỏ qua lỗi "already exists"; lỗi khác (sai tên/khoá) làm init exit 1.
+  seaweedfs-init:
+    image: chrislusf/seaweedfs:4.48
+    container_name: tami-staging-seaweedfs-init
+    depends_on:
+      seaweedfs: { condition: service_healthy }
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        for bucket in "$$S3_BUCKET_PUBLIC" "$$S3_BUCKET_PRIVATE"; do
+          if ! out=$$(echo "s3.bucket.create -name $$bucket" | weed shell -master=seaweedfs:9333 2>&1); then
+            case "$$out" in
+              *"already exists"*) echo "bucket $$bucket đã tồn tại" ;;
+              *) echo "$$out" >&2; exit 1 ;;
+            esac
+          fi
+        done
+    environment:
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:?}
+      S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:?}
+    mem_limit: 128m
+    logging: *default-logging
+    networks: [internal]
+
+networks:
+  internal:
+    name: tami-staging-net
+
+volumes:
+  postgres-data:
+  redis-data:
+  seaweedfs-data:

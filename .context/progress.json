@@ -145,6 +145,13 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-3-task-02-round-2-review.md",
       "completedAt": "2026-10-17T02:30:00.000Z"
+    },
+    {
+      "task": "layer-3/task-03",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-3-task-03-round-2-review.md",
+      "completedAt": "2026-10-17T03:45:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -175,9 +182,14 @@
       "date": "2026-10-16T17:30:44.000Z",
       "decision": "Đóng layer 2 (trừ task-02 blocked) và sang layer 3, chỉ làm task không phụ thuộc layer-2-task-02 (19 task chạy được: L3 01-03, L4 01-07, L5 02,03,05-08, L6 03,06,07)",
       "reason": "User: PASS thì sang layer 3 với task không phụ thuộc task-02"
+    },
+    {
+      "date": "2026-10-17T02:40:00.000Z",
+      "decision": "G1: ảnh media giữ URL /api/media/file/*, thêm ngoại lệ cache immutable (public, max-age=31536000) ở Nginx (L3-T03), next.config (L4-T03), Cloudflare rule (L6-T01); ARCHITECTURE §5.1/§5.3 cập nhật trong L3-T03",
+      "reason": "User chọn phương án (a) Ngoại lệ cache"
     }
   ],
-  "lastUpdated": "2026-10-17T02:30:00.000Z",
+  "lastUpdated": "2026-10-17T03:45:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

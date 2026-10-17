@@ -1,6 +1,9 @@
-import * as Sentry from "@sentry/nextjs";
+import * as SentryNamespace from "@sentry/nextjs";
 
-import { initSentryIfConfigured } from "./src/lib/monitoring/sentry-options";
+import { initSentryIfConfigured, pickSentryExports } from "./src/lib/monitoring/sentry-options";
+
+// Chọn bản export đủ bộ theo cách process nạp SDK (ESM của jobs vs Next): xem pickSentryExports.
+const Sentry = pickSentryExports(SentryNamespace);
 
 // Đọc process.env trực tiếp (không qua getEnv): cấu hình giám sát không được làm app hỏng khi thiếu biến khác,
 // và file này cũng chạy trong process `jobs`. Không DSN → không init, không network.

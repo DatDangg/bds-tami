@@ -1,7 +1,7 @@
 import type { ErrorEvent } from "@sentry/nextjs";
 import { describe, expect, it, vi } from "vitest";
 
-import { initSentryIfConfigured, scrubSentryEvent } from "./sentry-options";
+import { initSentryIfConfigured, pickSentryExports, scrubSentryEvent } from "./sentry-options";
 
 describe("initSentryIfConfigured", () => {
   it("DSN rỗng/thiếu → không gọi init (tắt êm, không network)", () => {
@@ -63,5 +63,18 @@ describe("scrubSentryEvent (beforeSend)", () => {
 
   it("event không có request/exception vẫn chạy được", () => {
     expect(scrubSentryEvent({} as ErrorEvent)).toEqual({});
+  });
+});
+
+describe("pickSentryExports", () => {
+  it("namespace có `default` (CJS nạp qua ESM) → dùng default, nơi có đủ named export", () => {
+    const full = { init: () => "init", onUnhandledRejectionIntegration: () => "integration" };
+    const namespace = { init: full.init, default: full };
+    expect(pickSentryExports(namespace)).toBe(full);
+  });
+
+  it("namespace không có `default` (Next/Turbopack) → giữ nguyên namespace", () => {
+    const namespace = { init: () => "init", onUnhandledRejectionIntegration: () => "integration" };
+    expect(pickSentryExports(namespace)).toBe(namespace);
   });
 });

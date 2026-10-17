@@ -1,0 +1,34 @@
+# Context build Docker: chỉ đưa vào những gì build/chạy app cần. KHÔNG bao giờ đưa secret vào image.
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+node_modules
+.next
+out
+coverage
+*.tsbuildinfo
+.pnpm-store
+.DS_Store
+npm-debug.log*
+
+# Tài liệu, workflow AI, task: không cần trong image
+docs
+tasks
+spec
+skills
+assets
+seed
+.agent
+.claude
+.context
+.opencode
+.devops
+AGENTS.md
+CLAUDE.md
+BRIEF.md
+README.md
+SPECIFICATIONS.md
+opencode.jsonc
+docker

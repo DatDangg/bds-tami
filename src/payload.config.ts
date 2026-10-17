@@ -18,6 +18,7 @@ import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
 import { logger } from "./lib/logger";
+import { resolveProdMigrations } from "./lib/payload/prod-migrations";
 import { registerDbPool, type PoolStats } from "./lib/monitoring/metrics";
 import { getS3ClientConfig } from "./lib/s3-config";
 import { createEmailAdapter } from "./lib/email/transport";
@@ -71,7 +72,10 @@ export default buildConfig({
     // Schema chỉ đổi qua migration versioned; cấm push ở mọi môi trường.
     push: false,
     migrationDir: path.resolve(dirname, "../migrations"),
-    prodMigrations: migrations,
+    // Mặc định KHÔNG tự migrate khi app/jobs khởi động ở production: adapter chạy prodMigrations lúc connect nên
+    // app và jobs sẽ đua nhau. Migrate là bước riêng của pipeline deploy (`payload migrate`, ARCHITECTURE §6.4).
+    // Chỉ đặt AUTO_MIGRATE_ON_START=true cho môi trường chạy 1 container.
+    prodMigrations: resolveProdMigrations(process.env.AUTO_MIGRATE_ON_START, migrations),
   }),
   sharp,
   // Trần 20MB (PDF lớn nhất); busboy cắt và trả 413. Giới hạn theo loại file do `createUploadGuard` kiểm.

@@ -37,7 +37,7 @@ Mở khoá cho: `layer-5-task-08`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - [ ] `publicWhere` là **nơi duy nhất** dựng điều kiện công khai (status, chưa xoá mềm, EN → `hasEnglish = true`); task hẹn giờ chỉ thêm `publishedAt ≤ now` ở đây
 - [ ] Bản EN không bao giờ trả chữ tiếng Việt (fallback tắt) và bản ghi chưa có EN → `null` để trang gọi `notFound()`
 - [ ] Trang công khai: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`; HTML không phụ thuộc cookie
-- [ ] `/admin`, `/api/*` không cache
+- [ ] `/admin`, `/api/*` không cache — **trừ `/api/media/file/*`**: `Cache-Control: public, max-age=31536000, immutable` (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`; kiểm header thật của route file Payload/storage-s3, không để bị ghi đè thành no-store)
 
 ## Tests cần viết
 - Integration (collection test): draft/hidden/xoá mềm không ra; EN thiếu `hasEnglish` không ra; khách không đọc được trường nội bộ

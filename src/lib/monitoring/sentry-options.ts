@@ -62,3 +62,12 @@ export function initSentryIfConfigured<Options extends object>(
   init({ ...base, ...extraOptions } as unknown as Options);
   return true;
 }
+
+/**
+ * Process `jobs` (tsx, Node ESM) nạp bản CJS của SDK qua cjs-module-lexer nên namespace thiếu vài named export
+ * (vd onUnhandledRejectionIntegration): đủ bộ export nằm ở `default` (module.exports). Next/Turbopack nạp bản ESM
+ * (không có `default`) → giữ nguyên namespace.
+ */
+export function pickSentryExports<Namespace extends object>(namespace: Namespace): Namespace {
+  return "default" in namespace ? (namespace as Namespace & { default: Namespace }).default : namespace;
+}

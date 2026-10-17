@@ -44,6 +44,7 @@ build (initial)
 Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Acceptance Criteria
+- [ ] Cloudflare cache rule: `/api/*` bypass **trừ `/api/media/file/*`** → cache (Edge TTL theo header origin immutable) — **chỉ áp host prod**; host staging bypass cache toàn bộ (hoặc Cloudflare Access) để ảnh/static staging không lọt qua basic auth (review L3-T03 round 2 MINOR-R2-1/R2-2) (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`)
 - [ ] ⏸ Mỗi bước chạm server (tạo thư mục, `.env`, Nginx, Cloudflare, chạy pipeline) chỉ làm sau khi user xác nhận trong chat
 - [ ] Compose staging chạy `tami-staging-*` (app, jobs, postgres, redis; SeaweedFS bucket riêng); chỉ app bind `127.0.0.1:3011`
 - [ ] Nginx `tami-staging.conf`: `nginx -t` PASS rồi mới reload; chỉ nhận IP Cloudflare; không sửa file site khác
