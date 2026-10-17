@@ -160,7 +160,7 @@ Dữ liệu seed từ danh mục hành chính chính thức, đặt ở `seed/`.
 - **Nguồn dữ liệu:** `seed/data/danh-muc-phuong-xa-moi.xlsx` là nguồn chính (mã, tên tỉnh, tên phường/xã sau 01/07/2025); `seed/data/vietnam-sap-nhap-phuong-xa.csv` chỉ dùng lấy tên cũ (`legacyNames`). Seed lúc chạy chỉ đọc `seed/data/administrative-units.json` (34 tỉnh/thành, 3.321 đơn vị: 687 phường, 2.621 xã, 13 đặc khu). File JSON do script sinh: `node scripts/build-admin-units.mjs` (Node >= 22.18); script thất bại nếu sai số lượng, trùng khoá so khớp, csv không khớp xlsx hoặc alias thừa. Khoá so khớp xlsx/csv giữ nguyên chữ cái và dấu thanh, chỉ bỏ qua vị trí dấu thanh (hoà/hòa), hoa/thường, khoảng trắng, nháy cong/thẳng, gạch ngang dài/ngắn, "Tp"/"Thành phố". Phần còn lại chỉ nối bằng bảng alias cùng-một-phường trong script. Lỗi chính tả trong xlsx được sửa bằng bảng override tên theo mã (`WARD_NAME_OVERRIDES`, áp trước khi so khớp; hiện có 1 mục: 40153016 "Phường Đào Duy Tư" -> "Phường Đào Duy Từ", quyết định user 2026-10-17, csv ghi đúng); script thất bại nếu override thừa/không khớp tên xlsx, hoặc một dòng csv bị hai phường xlsx cùng khớp.
 - **`legacyNames`:** mảng `{ name }` (bảng `wards_legacy_names`), mỗi phần tử có dạng "<phường/xã cũ>, <quận/huyện cũ>" ("Phường Bến Nghé, Quận 1"); đơn vị cũ cấp huyện (đặc khu) chỉ có tên huyện cũ. Hook `searchText` của rentals sau này phải làm phẳng `.name`.
 - **Dẫn xuất:** `provinces.slug` = `slugify` tên bỏ tiền tố "Tỉnh"/"Thành phố"; `shortName` = tên bỏ tiền tố (riêng TP.HCM = "TP.HCM"); `sortOrder` = mã BNV dạng số. `wards.slug` = `slugify(name)` (cùng hàm `src/lib/slug.ts` của app), thêm hậu tố `-2`, `-3`... khi trùng trong cùng tỉnh (UNIQUE `province` + `slug`; trùng giữa các tỉnh được phép).
-- **Xoá:** xoá tỉnh còn phường/xã bị hook `beforeDelete` chặn (409, thông báo rõ); xoá phường/xã xoá luôn `legacyNames` (cascade).
+- **Xoá:** xoá tỉnh còn phường/xã, tin cho thuê hoặc dự án (kể cả đã xoá mềm) tham chiếu bị hook `beforeDelete` chặn (409, thông báo rõ; FK `province_id` của `rentals`/`projects` là NOT NULL nhưng `ON DELETE SET NULL` nên nếu không chặn sẽ là lỗi 500). Xoá phường/xã còn tin cho thuê (kể cả xoá mềm) tham chiếu cũng bị chặn 409 (`src/hooks/wards/guard-delete.ts`); xoá phường/xã xoá luôn `legacyNames` (cascade).
 - **Seed lại ghi đè chỉnh sửa tay:** `pnpm seed` upsert theo `code`; mọi chỉnh sửa của admin ở `name`/`type`/`slug`/`legacyNames`/`shortName`/`sortOrder` bị ghi đè bằng dữ liệu chính thức ở lần seed kế tiếp (bản ghi không đổi thì không ghi).
 
 ### 4.3. `categories`
@@ -269,6 +269,19 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `author` | `rel→staff` | R, I | Sale phụ trách; lead từ tin này tự giao cho người này (BR-12) |
 | `searchText` | text (ẩn), **localized** | I (trigram, ở `rentals_locales`) | Tự sinh theo từng ngôn ngữ, xem §6 |
 | `seo` | group | | |
+
+**As-built (layer 6 task 02):**
+- **Trường localized:** `title`, `slug`, `description`, `legalNote`, `searchText` (cột ở `rentals_locales`); còn lại dùng chung các ngôn ngữ.
+- **`code`:** hook `beforeValidate` lấy `nextval('rentals_code_seq')` trong cùng transaction, bỏ qua giá trị client gửi (kể cả `overrideAccess`); duplicate được mã mới. Rollback hoặc lưu lỗi validate để lại khoảng trống số (chỉ cần duy nhất, không cần liên tục). Sequence tạo trong migration `20261017_143212_rentals`.
+- **`rentedAt`:** hệ thống ghi khi chuyển sang `rented`, giữ nguyên khi lưu lại, xoá khi rời `rented`; giá trị client gửi bị bỏ qua.
+- **Giá / diện tích:** `priceMonthlyVnd` bắt buộc trừ khi `priceNegotiable`; `areaM2` > 0.
+- **`gallery`:** tối thiểu 3 ảnh với mọi trạng thái hiển thị công khai (`published` và `rented`); `draft`/`hidden` được thiếu. Chỉ nhận ảnh (`image/*`).
+- **`videoUrl`:** chỉ https của `youtube.com`, `youtu.be`, `tiktok.com` (kể cả tên miền con).
+- **`ward` ∈ `province` (G22):** `filterOptions` trong admin và validator ở server (chặn cả API/seed, kể cả sửa riêng `province`).
+- **Quyền đọc `address` / `location`:** nhân viên (`req.user` đang hoạt động) luôn đọc; khách chỉ đọc khi `showExactAddress = true`. Chặn ở cấp trường nên REST/GraphQL mặc định và phiên bản (`/api/rentals/versions`) không lộ; `where`/`sort` theo hai trường này của khách bị từ chối (400). Trang công khai cần vị trí gần đúng thì L7-T03 tự tính từ dữ liệu đọc bằng `overrideAccess` ở server, không trả toạ độ chính xác.
+- **`searchText`:** `hidden` + chỉ nhân viên đọc/lọc được (khách `where[searchText]` bị 400, không dò được số nhà); dịch vụ tìm kiếm công khai (L7-T02) truy vấn ở server với `overrideAccess`. Gồm mã, tiêu đề, địa chỉ, phường + `legacyNames[].name`, tỉnh, tên dự án, không dấu, chữ thường.
+- **Làm mới `searchText` ngôn ngữ còn lại:** khi đổi địa chỉ/tỉnh/phường/dự án, hook `afterChange` cập nhật `rentals_locales` của ngôn ngữ kia (nếu đã có tiêu đề) và dòng phiên bản mới nhất `_rentals_v_locales.version_search_text` (cùng transaction, UPDATE tham số hoá). Các phiên bản cũ hơn giữ chuỗi cũ.
+- **Giới hạn đã biết (chuyển L7-T02):** `searchText` không tự dựng lại khi đổi tên dự án hoặc tên/`legacyNames` của phường (chỉ cập nhật ở lần lưu tin kế tiếp); cần lệnh reindex/backfill idempotent. Index trigram chưa tạo (xem §5).
 
 **`rentalTerms`** (group)
 
@@ -534,7 +547,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 ## 5. Index
 
-Payload tạo index cho trường `index: true` và `unique: true`. Các index dưới đây **tạo thêm bằng migration SQL** cho truy vấn công khai:
+Payload tạo index cho trường `index: true` và `unique: true`. Các index dưới đây **tạo thêm bằng migration SQL** cho truy vấn công khai. As-built `rentals` (migration `20261017_143212_rentals`): `rentals_list_idx`, `rentals_status_ward_idx`, `rentals_status_published_at_idx`, `rentals_status_area_m2_idx`, `rentals_status_bedrooms_idx`, `rentals_location_gist_idx`, cộng `rentals_code_idx` (UNIQUE) và `rentals_slug_idx` UNIQUE `(slug, _locale)` trên `rentals_locales` do Payload sinh; sequence `rentals_code_seq` tạo trong cùng migration. Index trigram `search_text` **chưa tạo**, làm ở L7-T02 (SearchService):
 
 | Bảng | Index | Phục vụ |
 |---|---|---|

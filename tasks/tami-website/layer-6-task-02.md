@@ -35,13 +35,13 @@ CRUD tin cho thuê đủ trường, mã tự sinh, trạng thái `rented`, chu�
 Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-8-task-02`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
-- [ ] Đủ trường ERD §4.6 + group `rentalTerms`
-- [ ] `code` sinh từ sequence, chỉ đọc với mọi người, không trùng khi tạo song song
-- [ ] Publish cần ≥ 3 ảnh; `priceMonthlyVnd` bắt buộc trừ khi `priceNegotiable`
-- [ ] Chuyển `rented` → tự gán `rentedAt`
-- [ ] `searchText` (localized) = code + title của locale + address + phường + tỉnh + legacyNames + tên dự án, đã chuẩn hoá bằng `normalizeSearchText`
-- [ ] Index: `(status, has_english, category_id, province_id, price_monthly_vnd)`, `(status, ward_id)`, `(status, published_at DESC)`, `(status, area_m2)`, `(status, bedrooms)`, GIST `location`, UNIQUE `(_locale, slug)`
+- [x] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
+- [x] Đủ trường ERD §4.6 + group `rentalTerms`
+- [x] `code` sinh từ sequence, chỉ đọc với mọi người, không trùng khi tạo song song
+- [x] Publish cần ≥ 3 ảnh; `priceMonthlyVnd` bắt buộc trừ khi `priceNegotiable`
+- [x] Chuyển `rented` → tự gán `rentedAt`
+- [x] `searchText` (localized) = code + title của locale + address + phường + tỉnh + legacyNames + tên dự án, đã chuẩn hoá bằng `normalizeSearchText`
+- [x] Index: `(status, has_english, category_id, province_id, price_monthly_vnd)`, `(status, ward_id)`, `(status, published_at DESC)`, `(status, area_m2)`, `(status, bedrooms)`, GIST `location`, UNIQUE `(_locale, slug)`
 
 ## Tests cần viết
 - Integration: tạo 20 tin song song → 20 mã khác nhau, tăng dần
@@ -59,20 +59,21 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type: review FAIL round 1 (MAJOR-1 lộ address/location/searchText cho khách) — sửa attempt 2
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS toàn bộ + follow-up L2-T02 (legacyNames[].name) + G22 (ward∈province, validator mặc định)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 110 file 1.218 PASS (33 integration rentals, DB thật); pnpm build PASS. Migration `20261017_143212_rentals` (sequence `rentals_code_seq` + 5 index + GIST) applied dev 18/18; DB tạm up/down/up OK
+- Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-6-task-02-round-2-review.md`
+- Residual risk: searchText cũ khi đổi tên dự án / legacyNames phường → reindex ở L7-T02 (đã gắn). Trigram GIN → L7-T02. `payload-types` ghi address luôn có nhưng khách có thể không nhận → L7-T03 coi address/location optional. MINOR B (UPDATE version row giả định versions bật), C (test guard tỉnh nhánh rentals chưa tách) → L15-T01
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.6, §5, §6 nếu lệch)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.2, §4.6, §5; `docs/PERMISSION.md` §4
+- Decision log: guard 409 xoá ward/province (ngoài file liệt kê, reviewer chấp nhận); videoUrl chỉ https YouTube/TikTok (đúng ERD); trigram để L7-T02 (Notes task)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-6): task-02 rentals` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -80,13 +81,13 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-6/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Rentals.ts
@@ -103,4 +104,4 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 - `wards.legacyNames` lưu dạng mảng `{ name }` ("<phường cũ>, <quận/huyện cũ>"): hook `searchText` phải lấy `legacyNames[].name` (ERD §4.2, §5).
 
 ## Follow-up từ spec-validation layer 5 addendum
-- [ ] G22: `rentals.ward` lọc `filterOptions` theo `province` đã chọn + validate server; field upload có `validate` tuỳ biến phải gọi validator `upload` mặc định trước (bài học L5-T01).
+- [x] G22: `rentals.ward` lọc `filterOptions` theo `province` đã chọn + validate server; field upload có `validate` tuỳ biến phải gọi validator `upload` mặc định trước (bài học L5-T01).

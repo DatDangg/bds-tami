@@ -97,3 +97,6 @@ Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-6-task-02
+- [ ] `rentals.searchText` cũ khi đổi tên dự án hoặc sửa `wards.legacyNames`: thêm lệnh reindex/backfill searchText + hook trên `projects`/`wards` (hoặc job định kỳ) để làm mới các tin liên quan.

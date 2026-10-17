@@ -83,7 +83,10 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 |---|---|---|
 | Mọi nội dung | `author` | Tự gán người tạo; **chỉ admin đổi** |
 | Mọi nội dung | `isFeatured` | **Chỉ admin** (khối nổi bật trên trang chủ do admin quyết) |
-| `rentals`, `leads` | `code` | Chỉ đọc với tất cả (hệ thống sinh) |
+| `rentals`, `leads` | `code` | Chỉ đọc với tất cả (hệ thống sinh; `rentals`: đã làm, hook từ sequence) |
+| `rentals` | `rentedAt` | Chỉ đọc với tất cả (hệ thống ghi khi chuyển `rented`) |
+| `rentals` | `address`, `location` | Nhân viên luôn đọc; **khách chỉ đọc khi `showExactAddress = true`** (chặn ở cấp trường nên áp cho cả REST/GraphQL và phiên bản; khách không lọc/sắp xếp theo hai trường này) |
+| `rentals` | `searchText` | Chỉ nhân viên đọc/lọc được (ẩn khỏi API); hệ thống ghi |
 | `leads` | `assignedTo`, `assignedAt` | **Chỉ admin** sửa; hệ thống tự gán theo BR-12 |
 | `leads` | `phone`, `email`, `fullName`, `message`, `locale` | Chỉ đọc với sale (không sửa dữ liệu khách gửi) |
 | `staff` | `role`, `active` | **Chỉ admin** |

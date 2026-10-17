@@ -82,6 +82,7 @@ export interface Config {
     pages: Page;
     news: News;
     projects: Project;
+    rentals: Rental;
     'job-postings': JobPosting;
     'job-applications': JobApplication;
     redirects: Redirect;
@@ -108,6 +109,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    rentals: RentalsSelect<false> | RentalsSelect<true>;
     'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
     'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -804,6 +806,100 @@ export interface Project {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rentals".
+ */
+export interface Rental {
+  id: string;
+  code: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  project?: (string | null) | Project;
+  province: string | Province;
+  ward: string | Ward;
+  address: string;
+  showExactAddress?: boolean | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
+  priceMonthlyVnd?: number | null;
+  priceNegotiable?: boolean | null;
+  areaM2: number;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  floor?: string | null;
+  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  furnishing?: ('none' | 'basic' | 'full') | null;
+  rentalTerms?: {
+    minLeaseMonths?: number | null;
+    depositMonths?: number | null;
+    paymentCycle?: ('monthly' | 'quarterly' | 'semiannual' | 'annual') | null;
+    includedServices?:
+      | ('electricity' | 'water' | 'internet' | 'cleaning' | 'laundry' | 'parking' | 'management_fee' | 'security')[]
+      | null;
+    availableFrom?: string | null;
+  };
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  gallery?: (string | Media)[] | null;
+  videoUrl?: string | null;
+  legalNote?: string | null;
+  rentedAt?: string | null;
+  searchText?: string | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden' | 'rented';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings".
  */
 export interface JobPosting {
@@ -1120,6 +1216,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'rentals';
+        value: string | Rental;
       } | null)
     | ({
         relationTo: 'job-postings';
@@ -1599,6 +1699,74 @@ export interface ProjectsSelect<T extends boolean = true> {
   documents?: T;
   legalInfo?: T;
   salesPolicy?: T;
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rentals_select".
+ */
+export interface RentalsSelect<T extends boolean = true> {
+  code?: T;
+  title?: T;
+  category?: T;
+  project?: T;
+  province?: T;
+  ward?: T;
+  address?: T;
+  showExactAddress?: T;
+  location?: T;
+  priceMonthlyVnd?: T;
+  priceNegotiable?: T;
+  areaM2?: T;
+  bedrooms?: T;
+  bathrooms?: T;
+  floor?: T;
+  houseDirection?: T;
+  balconyDirection?: T;
+  furnishing?: T;
+  rentalTerms?:
+    | T
+    | {
+        minLeaseMonths?: T;
+        depositMonths?: T;
+        paymentCycle?: T;
+        includedServices?: T;
+        availableFrom?: T;
+      };
+  description?: T;
+  gallery?: T;
+  videoUrl?: T;
+  legalNote?: T;
+  rentedAt?: T;
+  searchText?: T;
   slug?: T;
   status?: T;
   publishedAt?: T;

@@ -100,3 +100,6 @@ Mở khoá cho: `layer-10-task-01`
 
 ## Follow-up từ review layer-6-task-03
 - [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+
+## Follow-up từ review layer-6-task-02
+- [ ] `rentals.address`/`location` không trả cho khách khi `showExactAddress=false` (field read access): trang chi tiết coi 2 trường là optional (không in "undefined"); bản đồ khu vực gần đúng tự tính ở server bằng `overrideAccess` + làm tròn, không gửi toạ độ chính xác.

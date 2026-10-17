@@ -112,3 +112,7 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Test ghi redirect song song cùng một tài liệu sang 2 slug (khoá advisory thật sự được kiểm, r2-m1).
 - [ ] `resolve-redirect.ts`: đưa bước khởi động Payload vào cùng cuộc đua timeout 400 ms (r2-m2).
 - [ ] `proxy.ts:18`: giữ query của đích redirect nếu có (r2-m4).
+
+## Follow-up từ review layer-6-task-02
+- [ ] `build-search-text.ts:141-144`: UPDATE bản version mới nhất giả định versions luôn bật — thêm kiểm tra/comment (MINOR B).
+- [ ] Test riêng nhánh rentals của guard xoá tỉnh (MINOR C).
