@@ -67,7 +67,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: builder tự đánh dấu [x] (chờ Reviewer STRICT). Chi tiết:
+- Acceptance criteria: PASS — Reviewer STRICT PASS round 2 (`.context/review-reports/build-tami-website-layer-5-task-05-round-2-review.md`). Chi tiết:
   - G14: `tests/e2e/revalidate-globals.ts` (`pnpm e2e:revalidate`, cần `pnpm build` + `next start -p 3217`): lưu header/footer qua REST admin tạm → trang `/` và `/en` đổi ở LẦN TẢI ĐẦU (vi, en, footer, cột footer), EN chưa có bản EN thì không lộ nhãn VI; khôi phục dữ liệu qua REST rồi xoá admin tạm. 9/9 PASS, chạy 2 lần (DB global rỗng và đã seed).
   - L3-T01 MINOR-1: `scrub-text.ts` bỏ lookbehind, thay nhóm bắt `(^|D)`; test đối chiếu hành vi cũ (differential 22 mẫu: chỉ khác ở ca MINOR-3) + test cấm `(?<` trong code.
   - MINOR-2: `logger.ts` lọc tham số sau chuỗi format khi có `%s/%d/%i/%f/%o/%O/%j` (Error → `name: message` đã lọc, số chứa SĐT → `[phone]` và đổi `%d`→`%s`). MINOR-3: SĐT có ngoặc `(028) 3823 4567` bị che; dãy >= 12 chữ số liền (timestamp ms, đuôi UUID, số tài khoản) giữ nguyên, trừ khi dính liền một SĐT. Hạn chế còn lại: số tài khoản/mã đơn 9-11 chữ số vẫn bị che (chấp nhận, che dư an toàn PII).
@@ -83,7 +83,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
   - MINOR-3: ngôn ngữ hiện tại là `<a href={pathname} aria-current hreflang lang>` (đúng spec §2.3). MINOR-5: `useCloseOnDesktop(close)` với `useCallback` (listener không đăng ký lại mỗi render). MINOR-6: e2e chỉ chạy khi `E2E_BASE_URL` là localhost/127.0.0.1/[::1].
   - Verify cuối: install OK · lint 0 lỗi · typecheck OK · `pnpm test` 86 file / 924 test PASS · build OK. Chạy lại đo: `pnpm build && pnpm start -p 3218`, mở `/` và `/en` ở 375 và 1280. Menu con (hover/Esc/touch) chưa đo trên trình duyệt thật vì menu seed không có mục con: cần thêm 1 mục con trong admin global `header`; hiện chỉ có RTL.
 - Reviewer verdict: round 1 FAIL (MAJOR-1 scrubText lọt SĐT 12 số, MAJOR-2 touch target <44, MAJOR-3 DesktopNav submenu a11y) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-5-task-05-round-2-review.md`). Primary đo trình duyệt 375/768/1280 (round 1) + 375 touch target (round 2). Residual MINOR-1/4 → AC `layer-14-task-02`; MINOR-2/3 → AC `layer-15-task-01`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
 - Doc impact result: có. `docs/ARCHITECTURE.md` §5 thêm As-built khung trang (load-shell, view model, menu đầy đủ-hoặc-cố-định, ISR 60s, sự kiện cookie) và §8 sửa dòng source map; `docs/runbooks/deploy.md` §8 (source map GlitchTip); `.env.example` (4 biến GLITCHTIP_*). Không đổi API/schema/ERD.

@@ -68,10 +68,10 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
   2. Cookie banner chưa có: banner phải đặt `--floating-bottom-offset` trên `<html>` khi hiện (đã ghi vào L5-T07).
   3. EN 404 không có dòng "có bản tiếng Việt" — đúng design-spec S17 (không xác định được trang VI).
   - MINOR (reviewer): FloatingContact chưa gửi `refCollection`/`refId` (§2.5, ghi vào L6-T05, L7-T03); beacon nên `text/plain`; `json-ld.ts:19` `new URL` ném lỗi nếu `NEXT_PUBLIC_SITE_URL` sai; `EmptyState.tsx:28` biểu thức khó đọc; `CategoryListTemplate` chưa có test riêng (kèm test trang danh mục L6-T04); `Pagination.tsx:43` `aria-live` thừa; 11 tên collection trong `click-types.ts` cần đối chiếu ERD ở spec-validation layer 5.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
-- Doc impact result: no doc impact (không đổi API contract công khai ngoài siết validate click-events; không đổi schema)
+- Doc impact result: `docs/API_SPEC.md` §3.4 (ràng buộc `pagePath` chặn `//`, `/\`, có `trim`; `refCollection` là enum `CLICK_REF_COLLECTIONS`) + `docs/ERD.md` §4.13 (`click-events.refCollection` giới hạn theo ERD §3) — reconciled as-built lúc đóng layer 5 (G16 spec-validation layer 5). Không đổi schema.
 - Decision log: none
 
 ## Commit / Tracking
@@ -96,6 +96,6 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - src/app/global-error.tsx
 
 ## Notes
-- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G2 — click-events chưa giới hạn refCollection/refId (src/endpoints/public/click-events.ts:13): giới hạn refCollection theo danh sách collection ERD §2 để không sinh dòng rác trong click-stats-daily; chặn pagePath bắt đầu "//".
+- Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G2 — click-events chưa giới hạn refCollection/refId (src/endpoints/public/click-events.ts:13): giới hạn refCollection theo danh sách collection ERD §3 để không sinh dòng rác trong click-stats-daily; chặn pagePath bắt đầu "//".
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.

@@ -115,3 +115,9 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - Firewall server đang tắt: KHÔNG tự bật (ảnh hưởng dự án khác), chỉ báo cáo.
 - Giám sát + backup chưa bật ở đây; bật ở task redeploy staging đầy đủ.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ spec-validation layer 5
+- Nguồn: G17, G18 trong `.context/review-reports/spec-validation-build-tami-website-layer-5.md`.
+- [ ] G17: truyền `NEXT_PUBLIC_HOTLINE` làm build-arg (`ARG` + `ENV` trước `pnpm build`) trong `docker/Dockerfile` và `build-args` của `.github/workflows/deploy.yml` (lấy từ GitHub `vars`), để `src/app/global-error.tsx` hiện số hotline khi DB lỗi (design-spec S18); ghi vào `docs/runbooks/deploy.md`; kiểm trong image staging trang lỗi gốc có số hotline. Bổ sung biến vào danh sách R4 (`/brainstorm secrets`).
+- [ ] G18: CI kiểm `importMap.js` không lệch (lỗi thật đã xảy ra, commit a614b3d): bước `pnpm payload generate:importmap` + `git diff --exit-code` trong `.github/workflows/ci.yml`.
+- [ ] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*` cho staging, build image, gây lỗi thử và kiểm stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, `docs/runbooks/deploy.md` §8).

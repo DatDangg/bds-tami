@@ -62,7 +62,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-14-task-01`
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 95 file 991 PASS (gồm test hydrate renderToString + hydrateRoot giữ `_ga`); pnpm build PASS. Trình duyệt (next start, site-settings test `G-TEST1234`): 375/768/1280 không cuộn ngang, nút ≥44, nút nổi không bị che (offset 238px ở 375); đồng ý → reload giữ `_ga` + 1 request gtag; từ chối → không gtag/`_ga`; rút đồng ý từ footer xoá `_ga*` + `ga-disable`
 - Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-5-task-07-round-2-review.md`
 - Residual risk: chưa có dữ liệu GA4 thật (ID giả, `_ga` đặt tay). MINOR-A: bấm Từ chối/Đồng ý trên banner thì focus rơi về body (đề xuất focus `main#main`) → L15-T01 a11y sweep. CSP cho GA → AC L14-T01. CI kiểm importMap không lệch → đề xuất cho L6-T01/CI.
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `.context/design-spec.md` §3.10 thêm as-built note (cookie `pv`, footer mở dialog, ẩn khi không có GA ID)

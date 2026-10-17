@@ -65,10 +65,10 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-07`, `layer-8-task-01`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: 8/8 builder PASS (chờ Reviewer STRICT)
+- Acceptance criteria: 8/8 PASS — Reviewer STRICT PASS round 1 (`.context/review-reports/build-tami-website-layer-5-task-02-round-1-review.md`)
 - Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` 79 files / 857 tests PASS (full, sau lần sửa cuối) · `pnpm build` OK · migration `20261017_092524_services_pages` applied (migrate:status Yes, batch 11), drift check: `migrate:create` lần 2 không sinh file (không có thay đổi schema) · `pnpm seed:pages` chạy 2 lần trên DB dev: tạo 2 rồi bỏ qua 2
 - Reviewer verdict: **STRICT PASS round 1** (`.context/review-reports/build-tami-website-layer-5-task-02-round-1-review.md`). Residual MINOR-1/4 → AC `layer-6-task-01`; MINOR-2 → `layer-10-task-02`; MINOR-3 → `layer-5-task-03`; MINOR-5 → `layer-8-task-01`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ERD.md` §4.9b: thêm hành vi as-built "gỡ xuất bản/ẩn/xoá `privacy` giữ nguyên `privacyPolicyVersion`". ERD §4.9/§4.9b còn lại khớp code (services/pages không `publishedAt`/`isFeatured`/`author`). API_SPEC/DESIGN: no doc impact.

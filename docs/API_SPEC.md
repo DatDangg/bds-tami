@@ -1,6 +1,6 @@
 # API Specification — Website TAMI
 
-> **Trạng thái:** thiết kế ban đầu (16/10/2026), chưa có code.
+> **Trạng thái:** thiết kế ban đầu (16/10/2026); đã có code cho các endpoint ghi dòng `Code:`. Doc được reconcile as-built theo từng task (và lúc đóng layer): mục ghi **As-built** đã đối chiếu với code, mục khác vẫn là thiết kế chờ task tương ứng.
 > Khi có code, nguồn chuẩn theo thứ tự: (1) code trong `src/endpoints/` và `src/collections/`; (2) schema dùng chung `src/shared/types/api.ts` (zod + type); (3) `docs/generated/` (sinh tự động, không sửa tay). Lệch thì **code thắng**.
 
 ## 1. Tổng quan
@@ -117,11 +117,13 @@ Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? 
 | Trường | Ràng buộc |
 |---|---|
 | `type` | `hotline` \| `zalo` \| `fanpage` |
-| `pagePath` | bắt đầu bằng `/`, 1–500 ký tự |
-| `refCollection` | tuỳ chọn (null được), slug `[a-z0-9-]`, ≤ 64 ký tự |
+| `pagePath` | cắt khoảng trắng hai đầu (`trim`), rồi 1–500 ký tự, bắt đầu bằng `/`; **không** được bắt đầu bằng `//` hoặc `/\` (URL cùng giao thức, không phải đường dẫn nội bộ) → `400` |
+| `refCollection` | tuỳ chọn (null được), một trong 11 giá trị `CLICK_REF_COLLECTIONS` (nhóm "Danh mục nền" + "Nội dung" ở ERD §3): `provinces`, `wards`, `categories`, `developers`, `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages`. Giá trị khác (vd `leads`) → `400` |
 | `refId` | tuỳ chọn (null được), `[A-Za-z0-9_-]`, ≤ 64 ký tự |
 
 Body là JSON, nhận cả `Content-Type: text/plain` (sendBeacon), tối đa 2000 ký tự. Không cần Turnstile. Mã lỗi: `400` body sai, `429` vượt 30 lần/phút/IP (kèm `Retry-After`), `503` Redis không dùng được (theo §2). Code: `src/endpoints/public/click-events.ts`.
+
+**As-built (layer-5-task-06, reconcile lúc đóng layer 5):** ràng buộc `pagePath`/`refCollection` ở bảng trên khớp `clickEventBodySchema` (`src/endpoints/public/click-events.ts`) và danh sách `CLICK_REF_COLLECTIONS` (`src/lib/click-stats/click-types.ts`). Siết theo G2 (spec-validation layer 2) để endpoint công khai không sinh dòng rác trong `click-stats-daily`.
 
 ### 3.5. `GET /api/health`
 

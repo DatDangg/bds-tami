@@ -52,7 +52,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 1 (builder; chờ reviewer STRICT)
+- Attempt: 1 (builder) — Reviewer STRICT PASS round 1 (`.context/review-reports/build-tami-website-layer-5-task-03-round-1-review.md`)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
@@ -61,11 +61,11 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-
 - Acceptance criteria: 5/5 PASS (builder, attempt 1): AC1 Duplicate lộ lỗi thật (hasEnglish giữ true) → sửa `hasEnglishField` (`beforeDuplicate` → false), test `news.test.ts` Duplicate; AC2 `news` thêm vào `PublicCollectionSlug`, allowlist dịch đã có sẵn (thêm `allowlist.test.ts`); ERD §4.8 đủ trường (`cover` R khi published, `tags` → `news_texts`); index `news_list_idx` (status, has_english, category_id, published_at DESC) SQL tuỳ biến trong migration `20261017_093650_news` + UNIQUE (slug, _locale) do Payload sinh; không có quan hệ leads (test)
 - Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` FULL 81 files / 874 tests PASS (sau lần sửa cuối) · `pnpm build` OK · `migrate` + `migrate:status` (batch 12 Yes) OK · drift check `migrate:create` → "No schema changes detected" (không sinh file) · `APP_ENV=production pnpm seed:sample-news` → thoát code 1
 - Reviewer verdict: **STRICT PASS round 1** (`.context/review-reports/build-tami-website-layer-5-task-03-round-1-review.md`). Residual MINOR-1 → AC `layer-9-task-07`; MINOR-2/3 → `layer-6-task-06`; MINOR-4 → `layer-7-task-01`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ERD §4.8 (`cover` R khi `published`, `tags` ở `news_texts`) + ERD §5 index `news_list_idx` reconciled as-built; không đổi API_SPEC/DESIGN
-- Decision log: pending
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-03 news` + trailer theo `.agent/workflows/state-commit.md` §2.8

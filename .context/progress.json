@@ -314,7 +314,7 @@
       "reason": "Review L5-T08 MAJOR-3; quyết định kỹ thuật của primary, reviewer chấp nhận"
     }
   ],
-  "lastUpdated": "2026-10-17T19:50:00.000Z",
+  "lastUpdated": "2026-10-17T20:15:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -377,6 +377,12 @@
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-4.md",
       "note": "T06 deferred (G10: M1 chỉ có giám sát phía app); G11–G14 gắn AC; ARCH §4/§6.2 reconcile; chờ user duyệt M1"
+    },
+    {
+      "layer": 5,
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-5.md",
+      "note": "40/40 AC (T02,T03,T05–T08); T01/T04 blocked bởi layer-2-task-02. G15→L6-T03, G16/R15 reconcile API_SPEC+ERD, G17→L6-T01, G18 gắn task + BACKLOG BL-001/002 (blocked chờ user), R14/R17 xong. G19 (L6 bị chặn, staging sớm) + R4 secrets chờ user"
     }
   ]
 }

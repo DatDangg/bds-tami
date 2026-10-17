@@ -99,7 +99,7 @@ Mở khoá cho: `layer-16-task-01`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-5-task-07
-- Bấm Từ chối/Đồng ý trên CookieBanner xong focus rơi về `<body>` (`src/components/consent/CookieBanner.tsx:114,150-155`) → chuyển focus `main#main` nếu focus đang trong banner.
+- [ ] Bấm Từ chối/Đồng ý trên CookieBanner xong focus rơi về `<body>` (`src/components/consent/CookieBanner.tsx:114,150-155`) → chuyển focus `main#main` nếu focus đang trong banner.
 
 ## Follow-up từ review layer-5-task-08
-- Thêm test khoá `src/app/(frontend)/[locale]/layout.tsx`: `generateStaticParams()` trả `[]` (không prerender trang công khai lúc build) và `generateMetadata` noindex khi `APP_ENV` ≠ production — tránh hồi quy MAJOR-3.
+- [ ] Thêm test khoá `src/app/(frontend)/[locale]/layout.tsx`: `generateStaticParams()` trả `[]` (không prerender trang công khai lúc build) và `generateMetadata` noindex khi `APP_ENV` ≠ production — tránh hồi quy MAJOR-3.

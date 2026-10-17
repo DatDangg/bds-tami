@@ -93,3 +93,6 @@ Mở khoá cho: `layer-10-task-03`
 ## Notes
 - `RichText` là component dùng chung cho các trang chi tiết sau.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ spec-validation layer 5
+- [ ] G18 (L5-T06 MINOR-5): test riêng cho `src/components/templates/CategoryListTemplate.tsx` (consumer chạy được đầu tiên; L6-T04 đang bị chặn): chips danh mục có `aria-current` đúng mục đang chọn; danh sách trống → `EmptyState` với link `parentListHref`; ẩn phân trang khi trống.

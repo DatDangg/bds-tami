@@ -95,3 +95,6 @@ Mở khoá cho: `layer-10-task-01`
 ## Follow-up từ review layer-5-task-06
 - FloatingContact chưa nhận `refCollection`/`refId` (design-spec §2.5): trang chi tiết cần truyền để click-stats tính theo tin/dự án (`src/components/layout/FloatingContact.tsx`, endpoint đã nhận enum `CLICK_REF_COLLECTIONS`).
 - Nếu trang có thanh cố định đáy (giá/CTA trên mobile): đặt `--floating-bottom-offset` để nút nổi không bị đè.
+
+## Follow-up từ spec-validation layer 5
+- [ ] G18 (L5-T06 MINOR-2): Blob gửi bằng `navigator.sendBeacon` trong `src/components/layout/FloatingContact.tsx` đặt type `text/plain;charset=UTF-8` (làm cùng lúc truyền `refCollection`/`refId` ở mục trên); test giải mã Blob kiểm type.

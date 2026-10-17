@@ -107,3 +107,6 @@ Mở khoá cho: `layer-13-task-01`, `layer-13-task-02`, `layer-13-task-03`, `lay
 - HỎI USER TRƯỚC KHI LÀM: kho backup ngoài server (server khác của công ty hay Backblaze B2), kênh cảnh báo (email/Telegram). Không tự chọn; chưa có câu trả lời thì dừng ở trạng thái `blocked`.
 - Firewall server đang tắt: KHÔNG tự bật, chỉ báo cáo.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ spec-validation layer 5
+- [ ] G18 (L5-T05): đưa `pnpm e2e:revalidate` (`tests/e2e/revalidate-globals.ts`, cần `next start`) vào CI / E2E smoke staging thay vì chỉ chạy tay; ghi kết quả vào evidence.

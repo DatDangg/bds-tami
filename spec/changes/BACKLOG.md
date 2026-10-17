@@ -8,7 +8,8 @@
 
 | ID | Tiêu đề | Loại | Trạng thái | Change file | Tạo | Xong |
 |----|---------|------|-----------|-------------|-----|------|
-| _(chưa có — auto-intake sẽ thêm dòng đầu tiên)_ |
+| BL-001 | Design debt header/footer: header 2 hàng ở xl, website bỏ qua `header.ctaButton`/logo nhập trong CMS, footer chưa accordion < md, menu toàn màn hình thiếu accordion menu con (L5-T05 decision log; G18 spec-validation layer 5) | MODIFY | blocked (chờ user quyết làm trong build hay sau build; chưa tạo change doc) | — | 2026-10-17 | |
+| BL-002 | Base image Debian 11 (EOL) của postgres/backup (`docker/backup/`): nâng lên base còn hỗ trợ (L4 G14; G18 spec-validation layer 5) | MODIFY | blocked (chờ user duyệt thời điểm nâng; chưa tạo change doc) | — | 2026-10-17 | |
 
 ## Quy tắc tracking
 

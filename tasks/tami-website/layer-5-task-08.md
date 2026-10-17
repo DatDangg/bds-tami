@@ -64,7 +64,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 99 file 1029 PASS; pnpm build PASS (`.next/server/app` chỉ còn _not-found/_global-error HTML). curl `next start` (.next sạch, `NEXT_PUBLIC_SITE_URL` lúc chạy): request đầu `APP_ENV=staging` → `noindex, nofollow`, robots `Disallow: /`; `APP_ENV=production` → không robots meta, robots Allow `/api/media/file/`; HTML `public, s-maxage=60, stale-while-revalidate=300`; `RSC: 1` → `no-store` (trang + robots/sitemap/llms/png); không chuỗi localhost
 - Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-5-task-08-round-2-review.md`
 - Residual risk: chưa trang nào gọi `buildPageMetadata`/JSON-LD builders (nối ở L6+), nên canonical chưa xuất hiện. Request đầu sau deploy render runtime (chậm hơn, CDN hấp thụ). ISR cache trên đĩa theo container (chỉ ảnh hưởng khi chạy 2+ bản app — xem ARCHITECTURE §9.1). MINOR: chưa có test khoá `generateStaticParams() → []` + noindex non-prod ở layout → L15-T01. Không có field ảnh OG mặc định trong site-settings: caller truyền `defaultImage`, cuối cùng logo tĩnh
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-5.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5 as-built layer-5-task-08 (site URL lúc chạy, noindex theo env, không prerender trang công khai lúc build, robots)
