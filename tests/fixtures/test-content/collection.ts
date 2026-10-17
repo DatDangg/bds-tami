@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { isAdmin } from "../../../src/access";
 import { withContentDefaults } from "../../../src/collections/_shared/content-defaults";
 import type { RevalidatePaths } from "../../../src/hooks/revalidate-content";
 
@@ -23,6 +24,10 @@ export const TestContent: CollectionConfig = withContentDefaults(
     fields: [
       { name: "title", type: "text", localized: true },
       { name: "summary", type: "textarea", localized: true },
+      // Trường localized không bắt buộc ở en: test kiểm fallback VI đã tắt.
+      { name: "details", type: "text", localized: true },
+      // Trường nội bộ: chỉ admin đọc (test truy vấn công khai kiểm khách không thấy).
+      { name: "internalNote", type: "text", access: { read: isAdmin } },
     ],
   },
   {

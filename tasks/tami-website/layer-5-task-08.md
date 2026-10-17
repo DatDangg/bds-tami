@@ -34,6 +34,7 @@ Helper sinh `generateMetadata` và JSON-LD cho mọi trang.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-6-task-06`, `layer-6-task-07`, `layer-6-task-08`, `layer-7-task-03`, `layer-8-task-03`, `layer-8-task-04`, `layer-8-task-05`, `layer-9-task-01`, `layer-13-task-03`
 
 ## Acceptance Criteria
+- [ ] Khi thêm `robots.ts`/`sitemap.ts`/`llms.txt`: sinh rule `has` RSC (`rsc`, `next-router-*`, `_rsc`) → `no-store` cho cả `DOTTED_PATH_SOURCE` (đặt sau rule của nó) trong `src/lib/http/cache-policy.ts`; đo `next start` các route này với và không `RSC: 1`; sửa comment `cache-policy.ts:43` + tiêu đề test `cache-policy.test.ts:79` đang ghi `private, no-store` thành `no-store` (review L4-T03 round 3 MINOR-1/2)
 - [ ] `NEXT_PUBLIC_SITE_URL` đang là localhost lúc `docker build` (L3-T03 MINOR-8): URL tuyệt đối (canonical, OG, JSON-LD, sitemap) phải lấy lúc chạy hoặc build-arg đúng môi trường (spec-validation layer 3)
 - [ ] Meta lấy `seo.metaTitle` → `title`; `metaDescription` → `summary`/`excerpt`; OG image → `seo.ogImage` → ảnh đại diện → ảnh OG mặc định
 - [ ] `hreflang` vi, en, x-default (→ vi) **chỉ** khi bản ghi có `hasEnglish`

@@ -1,6 +1,7 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { isAdmin, isStaff, ownedByUserOrAdmin } from "../access";
+import { MEDIA_FILE_CACHE_CONTROL } from "../lib/http/cache-policy";
 import { createUploadGuard, MEDIA_POLICY } from "../lib/upload/validate-file";
 
 /** Hook trả `data` đã gắn `uploadedBy`; `originalDoc` chỉ có khi sửa. */
@@ -41,6 +42,11 @@ export const Media: CollectionConfig = {
   upload: {
     mimeTypes: Object.keys(MEDIA_POLICY),
     adminThumbnail: "thumb",
+    // Ngoại lệ cache G1: tên file bất biến nên CDN/trình duyệt giữ 1 năm. Chỉ áp cho 200/206/304 (lỗi không qua đây).
+    modifyResponseHeaders: ({ headers }) => {
+      headers.set("Cache-Control", MEDIA_FILE_CACHE_CONTROL);
+      return headers;
+    },
     // Chặn "bom giải nén": ảnh ≤ 10MB nhưng hàng trăm megapixel làm sharp hết RAM.
     constructorOptions: { limitInputPixels: 80_000_000 },
     // Ảnh nhỏ hơn cỡ đích không bị phóng to nên thiếu cỡ đó: nơi hiển thị phải rơi về ảnh gốc.

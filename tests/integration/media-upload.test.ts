@@ -50,9 +50,10 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
   }
 
   /** Gọi REST như trình duyệt: multipart `file` + `_payload`. Không tự parse gì, đi qua handler của Payload. */
-  function rest(path: string, init: { method: string; token?: string; file?: TestFile; data?: object }) {
+  function rest(path: string, init: { method: string; token?: string; file?: TestFile; data?: object; ifNoneMatch?: string }) {
     const headers: Record<string, string> = {};
     if (init.token) headers.Authorization = `JWT ${init.token}`;
+    if (init.ifNoneMatch) headers["If-None-Match"] = init.ifNoneMatch;
     let body: FormData | undefined;
     if (init.file || init.data) {
       body = new FormData();
@@ -143,6 +144,13 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
       const file = await rest(`/media/file/${latest.docs[0]?.filename}`, { method: "GET" });
       expect(file.status).toBe(200);
       expect(file.headers.get("content-type")).toContain("image/jpeg");
+      // Ngoại lệ cache G1: storage-s3 không tự đặt Cache-Control, header do `Media.upload.modifyResponseHeaders` đặt.
+      expect(file.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+      const etag = file.headers.get("etag");
+      await file.arrayBuffer();
+      const revalidated = await rest(`/media/file/${latest.docs[0]?.filename}`, { method: "GET", ifNoneMatch: etag ?? "" });
+      expect(revalidated.status).toBe(304);
+      expect(revalidated.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
       const list = await rest("/media", { method: "GET" });
       expect(list.status).toBe(200);
       const body = (await list.json()) as { docs: object[] };
