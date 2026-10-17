@@ -1,0 +1,112 @@
+name: ssh-deploy
+description: >-
+  Upload mã triển khai (docker/, scripts/deploy/) vào release BẤT BIẾN theo môi trường + commit SHA trên server qua SSH, rồi chạy
+  deploy.sh của đúng release đó với image theo digest. Không ghi đè release khác. Host key kiểm tra cứng từ known_hosts
+  (không StrictHostKeyChecking=no). Secret chỉ đi qua env/stdin, không vào argv hay log.
+inputs:
+  environment:
+    description: staging | production
+    required: true
+  image:
+    description: 'ghcr.io/<repo>@sha256:<digest>'
+    required: true
+  release-sha:
+    description: Commit SHA đầy đủ (40 hex) của mã triển khai; tên thư mục release
+    required: true
+  host:
+    description: Host/IP server (secret DEPLOY_HOST)
+    required: true
+  user:
+    description: User SSH deploy (secret DEPLOY_USER)
+    required: true
+  port:
+    description: Cổng SSH
+    default: "22"
+  ssh-key:
+    description: Private key (secret DEPLOY_SSH_KEY)
+    required: true
+  known-hosts:
+    description: Nội dung known_hosts đã ghim host key server (secret DEPLOY_SSH_KNOWN_HOSTS)
+    required: true
+  registry-user:
+    description: User đăng nhập GHCR trên server
+    required: true
+  registry-token:
+    description: Token pull GHCR (GITHUB_TOKEN của job, hết hạn khi job kết thúc)
+    required: true
+  deploy-root:
+    description: Thư mục gốc trên server; release nằm ở <deploy-root>/releases/<environment>/<sha>
+    default: /opt/tami
+
+runs:
+  using: composite
+  steps:
+    - name: Chuẩn bị SSH
+      shell: bash
+      env:
+        SSH_KEY: ${{ inputs.ssh-key }}
+        KNOWN_HOSTS: ${{ inputs.known-hosts }}
+        TARGET_ENV: ${{ inputs.environment }}
+        RELEASE_SHA: ${{ inputs.release-sha }}
+      run: |
+        set -euo pipefail
+        [[ $TARGET_ENV == staging || $TARGET_ENV == production ]] || { echo "environment không hợp lệ"; exit 1; }
+        [[ $RELEASE_SHA =~ ^[a-f0-9]{40}$ ]] || { echo "release-sha phải là commit SHA 40 hex"; exit 1; }
+        install -d -m 700 "$RUNNER_TEMP/ssh"
+        install -m 600 /dev/null "$RUNNER_TEMP/ssh/id_deploy"
+        printf '%s\n' "$SSH_KEY" > "$RUNNER_TEMP/ssh/id_deploy"
+        printf '%s\n' "$KNOWN_HOSTS" > "$RUNNER_TEMP/ssh/known_hosts"
+
+    # Release bất biến: giải nén vào thư mục tạm cùng cha rồi `mv -T` nguyên tử sang <sha>. Nếu <sha> đã có (chạy lại cùng commit,
+    # hoặc release đang được dùng) thì GIỮ NGUYÊN, không ghi đè: nội dung theo SHA là cố định. Không đụng release của SHA/môi trường khác.
+    - name: Gửi mã triển khai vào release theo SHA
+      shell: bash
+      env:
+        HOST: ${{ inputs.host }}
+        SSH_USER: ${{ inputs.user }}
+        PORT: ${{ inputs.port }}
+        DEPLOY_ROOT: ${{ inputs.deploy-root }}
+        TARGET_ENV: ${{ inputs.environment }}
+        RELEASE_SHA: ${{ inputs.release-sha }}
+      run: |
+        set -euo pipefail
+        ssh_cmd=(ssh -p "$PORT" -i "$RUNNER_TEMP/ssh/id_deploy" -o IdentitiesOnly=yes -o BatchMode=yes
+          -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" "$SSH_USER@$HOST")
+        # shellcheck disable=SC2016 # biến được shell trên SERVER mở rộng (bash -c ... _ root env sha)
+        remote_script='set -euo pipefail
+        d="$1/releases/$2"; sha="$3"
+        mkdir -p "$d"
+        t="$(mktemp -d "$d/.incoming.XXXXXX")"
+        trap "rm -rf \"\$t\"" EXIT
+        tar -xzf - -C "$t"
+        if [ ! -d "$d/$sha" ]; then mv -T "$t" "$d/$sha" || [ -d "$d/$sha" ]; fi
+        touch "$d/$sha"'
+        printf -v remote 'bash -c %q _ %q %q %q' "$remote_script" "$DEPLOY_ROOT" "$TARGET_ENV" "$RELEASE_SHA"
+        tar -czf - docker scripts/deploy | "${ssh_cmd[@]}" "$remote"
+
+    - name: Chạy deploy.sh của release trên server
+      shell: bash
+      env:
+        HOST: ${{ inputs.host }}
+        SSH_USER: ${{ inputs.user }}
+        PORT: ${{ inputs.port }}
+        DEPLOY_ROOT: ${{ inputs.deploy-root }}
+        TARGET_ENV: ${{ inputs.environment }}
+        RELEASE_SHA: ${{ inputs.release-sha }}
+        IMAGE: ${{ inputs.image }}
+        REGISTRY_USER: ${{ inputs.registry-user }}
+        REGISTRY_TOKEN: ${{ inputs.registry-token }}
+      run: |
+        set -euo pipefail
+        ssh_cmd=(ssh -p "$PORT" -i "$RUNNER_TEMP/ssh/id_deploy" -o IdentitiesOnly=yes -o BatchMode=yes
+          -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" "$SSH_USER@$HOST")
+        # Chạy script nằm TRONG release của đúng SHA: compose/config dùng là của commit đã build/duyệt, không phải của lần upload khác.
+        printf -v remote 'bash %q %q --release-sha %q --image %q --registry-user %q --registry-token-stdin' \
+          "$DEPLOY_ROOT/releases/$TARGET_ENV/$RELEASE_SHA/scripts/deploy/deploy.sh" "$TARGET_ENV" "$RELEASE_SHA" "$IMAGE" "$REGISTRY_USER"
+        # Token đi qua stdin của ssh: không nằm trong argv (ps) hay log của runner/server.
+        printf '%s\n' "$REGISTRY_TOKEN" | "${ssh_cmd[@]}" "$remote"
+
+    - name: Xoá khoá SSH
+      if: always()
+      shell: bash
+      run: rm -rf "$RUNNER_TEMP/ssh"

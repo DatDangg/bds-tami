@@ -284,7 +284,15 @@ Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu 
 6. Health check fail thì quay về image trước.
 7. **Dọn build cache sau mỗi lần deploy** (`docker builder prune --filter until=72h -f`) nếu build trên server. Server từng đầy ổ vì các dự án khác bỏ qua bước này (140GB cache, đã dọn 16/10/2026).
 
-Các dự án khác trên server deploy bằng GitHub Actions self-hosted runner (`/opt/actions-runner-*`). TAMI có thể dùng cùng cách (runner riêng `/opt/actions-runner-tami`), hoặc build image trên GitHub rồi SSH vào kéo về. Chốt ở bước DevOps.
+Các dự án khác trên server deploy bằng GitHub Actions self-hosted runner (`/opt/actions-runner-*`); TAMI **không** dùng cách đó.
+
+**As-built (`.github/workflows/deploy.yml`, `.github/actions/ssh-deploy/`, `scripts/deploy/deploy.sh` + `lib/*.sh`, `docs/runbooks/deploy.md`; quyết định: `.context/decisions.md` Decision 4):**
+- Runner GitHub build image (tag = commit SHA, label OCI) → push GHCR → job SSH vào server (host key ghim bằng secret `DEPLOY_SSH_KNOWN_HOSTS`, `StrictHostKeyChecking=yes`) chạy `deploy.sh`. Deploy **theo digest** (`ghcr.io/<repo>@sha256:…`), không dùng `latest`.
+- Kích hoạt bằng `workflow_run` của CI: chỉ khi CI PASS cho push vào `staging` của chính repo (không `main`, không PR/fork). Nhánh mặc định repo phải là `staging`.
+- Staging tự động; production là job trên GitHub Environment `production` (required reviewers, cấu hình trên GitHub) và nhận đúng digest staging đã chạy; server còn kiểm cặp digest + commit SHA có trong `/opt/tami/state/staging.history` (dòng `<digest> <thời điểm> <sha>`) và từ chối digest cũ hơn `production.current` (trừ `--allow-older`, chỉ chạy tay).
+- Mã triển khai (`docker/`, `scripts/deploy/`) upload vào **release bất biến theo môi trường + SHA** `/opt/tami/releases/<env>/<sha>/` (không ghi đè release khác); `deploy.sh` chạy từ chính release đó và đổi symlink `releases/<env>/current` nguyên tử trong khoá. Production vì thế luôn dùng compose/config của đúng commit đã duyệt. Giữ 5 release mới nhất mỗi môi trường.
+- `deploy.sh`: khoá `flock` chung → kiểm release (+ production: digest/SHA đã qua staging) → đổi `current` → pull → cổng `HIGH_RISK_MIGRATION` (production bị chặn khi có migration chưa apply mang dấu) → `payload migrate` → up `app`/`jobs` → health `/api/health` (retry/timeout) + `jobs` ổn định → mọi lỗi sau khi bắt đầu đổi container (kể cả `compose up` lỗi) quay về image + release trước (exit 1; rollback cũng lỗi → exit 3) (state ở `/opt/tami/state`). Migration đã chạy không rollback được nên phải backward-compatible.
+- Không build trên server nên không có `docker builder prune`; script chỉ xoá image `tami` cũ (giữ current/previous của cả hai môi trường), không prune toàn cục.
 
 Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, không `db push`, không sửa migration đã chạy, thay đổi phá dữ liệu phải gắn `HIGH_RISK_MIGRATION`.
 

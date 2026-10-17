@@ -44,6 +44,8 @@ build (initial)
 Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Acceptance Criteria
+- [ ] Trước lần deploy thật: rollback dùng `COMPOSE_FILE` qua symlink `current` như lúc deploy (`scripts/deploy/lib/release.sh:48`, review L4-T05 r2 MINOR-1) + assert trong `deploy.test.sh`; xác minh Compose có resolve symlink cho bind `./postgres/init.sql` không — nếu có thì chuyển init.sql sang đường dẫn cố định hoặc `configs:` để postgres không bị recreate mỗi lần đổi release (MINOR-2); cấu hình required reviewers Environment `production`, nhánh mặc định `staging`, secret DEPLOY_* theo `docs/runbooks/deploy.md`
+- [ ] Pin action trong `.github/workflows/ci.yml` theo commit SHA (đang `@v4`; review L4-T05 r2 MINOR-4)
 - [ ] Dockerfile COPY `seed/` (và chạy `seed:categories` được trong container) trước deploy staging (review L4-T01)
 - [ ] Từ layer-1-task-06/L3-T03: kiểm `nginx -v` (≥ 1.18 cho `listen 443 ssl http2`) và `docker version` trên server; hỏi user bật Authenticated Origin Pulls (khối conf đã có, đang comment); smoke test 2 IP thật qua Cloudflare rơi vào 2 bucket rate limit (spec-validation layer 3)
 - [ ] Cloudflare cache rule: `/api/*` bypass **trừ `/api/media/file/*`** → cache (Edge TTL theo header origin immutable) — **chỉ áp host prod**; host staging bypass cache toàn bộ (hoặc Cloudflare Access) để ảnh/static staging không lọt qua basic auth (review L3-T03 round 2 MINOR-R2-1/R2-2) (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`)
