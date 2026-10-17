@@ -27,7 +27,7 @@ export function Header({ items, contact }: { items: NavItemView[]; contact: Foot
   const locale = useLocale() as Locale;
   const homeHref = resolveNavLink("home", locale)?.href ?? "/";
   return (
-    <header className="sticky top-0 z-(--z-header) bg-surface shadow-sm">
+    <header className="sticky top-0 z-(--z-header) bg-surface shadow-sm print:hidden">
       <div className="mx-auto flex h-16 w-full max-w-container items-center gap-4 px-gutter lg:h-18">
         <Link href={homeHref} aria-label={t("home")} className="order-2 inline-flex min-h-11 min-w-11 shrink-0 items-center xl:order-1">
           <BrandLogo />

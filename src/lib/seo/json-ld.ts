@@ -130,6 +130,33 @@ export function buildArticleJsonLd(input: ArticleInput) {
   };
 }
 
+export interface ServiceInput extends Localized {
+  name: string;
+  url: string;
+  description?: string | null;
+  imageUrls?: readonly string[];
+  provider: { name: string; siteUrl: string; logoUrl?: string };
+}
+
+export function buildServiceJsonLd(input: ServiceInput) {
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@type": "Service",
+    name: input.name,
+    description: input.description || undefined,
+    url: input.url,
+    image: input.imageUrls?.length ? [...input.imageUrls] : undefined,
+    provider: {
+      "@type": "Organization",
+      name: input.provider.name,
+      url: input.provider.siteUrl,
+      logo: input.provider.logoUrl,
+    },
+    areaServed: { "@type": "Country", name: DEFAULT_COUNTRY },
+    inLanguage: input.locale,
+  };
+}
+
 /** Giá trị `employmentType` của schema.org/Google. */
 export type JobEmploymentType = "FULL_TIME" | "PART_TIME" | "CONTRACTOR" | "TEMPORARY" | "INTERN" | "OTHER";
 

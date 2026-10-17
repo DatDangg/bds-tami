@@ -5,6 +5,7 @@ const eslintConfig = [
   {
     ignores: [
       ".next/",
+      "public/vendor/", // bản chép của thư viện bên thứ ba (scripts/copy-maplibre-worker.mjs)
       "node_modules/",
       "migrations/",
       "coverage/",

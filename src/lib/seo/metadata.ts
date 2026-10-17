@@ -99,6 +99,12 @@ export function shouldNoindex(input: Pick<PageMetadataInput, "seo" | "forceNoind
   return Boolean(input.seo?.noindex) || Boolean(input.forceNoindex) || !isIndexingAllowed();
 }
 
+/** Ảnh OG 1200×630 đã sinh khi upload (nhẹ hơn ảnh gốc cho crawler mạng xã hội); thiếu thì dùng ảnh gốc. */
+export function toOgImage(cover: Media | null): Media | null {
+  const og = cover?.sizes?.og;
+  return cover && og?.url ? { ...cover, url: og.url, width: og.width ?? cover.width, height: og.height ?? cover.height } : cover;
+}
+
 /** `generateMetadata` cho mọi trang công khai. */
 export function buildPageMetadata(input: PageMetadataInput): Metadata {
   const siteUrl = getSiteUrl();

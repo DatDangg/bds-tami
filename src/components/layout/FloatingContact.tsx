@@ -43,7 +43,7 @@ export function FloatingContact({ contact }: { contact: FloatingContactView }) {
     <div
       role="group"
       aria-label={t("group")}
-      className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(max(1rem,env(safe-area-inset-bottom))+var(--floating-bottom-offset,0px))] z-(--z-floating) flex flex-col items-end gap-3"
+      className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(max(1rem,env(safe-area-inset-bottom))+var(--floating-bottom-offset,0px))] z-(--z-floating) flex flex-col items-end gap-3 print:hidden"
     >
       <ul id="floating-contact-actions" className={cn("flex-col items-end gap-3", open ? "flex" : "hidden md:flex")}>
         {hotline && (

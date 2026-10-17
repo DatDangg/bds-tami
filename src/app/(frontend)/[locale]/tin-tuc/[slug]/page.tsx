@@ -20,10 +20,9 @@ import { findLocalizedSlugs, findPublicNewsBySlug, findRelatedNews } from "@/lib
 import { categoryHref, populatedMedia, toNewsCards, visibleCategory } from "@/lib/news/news-view";
 import { estimateReadMinutes } from "@/lib/news/read-time";
 import { buildArticleJsonLd } from "@/lib/seo/json-ld";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildPageMetadata, toOgImage } from "@/lib/seo/metadata";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
 import { routing, type Locale } from "@/i18n/routing";
-import type { Media } from "@/payload-types";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -43,12 +42,6 @@ const loadArticle = cache(async (locale: Locale, slug: string) => {
   const slugs = await findLocalizedSlugs(payload, "news", doc.id);
   return { payload, doc, slugs };
 });
-
-/** Ảnh OG 1200×630 đã sinh khi upload (nhẹ hơn ảnh gốc cho crawler mạng xã hội); thiếu thì dùng ảnh gốc. */
-function toOgImage(cover: Media | null): Media | null {
-  const og = cover?.sizes?.og;
-  return cover && og?.url ? { ...cover, url: og.url, width: og.width ?? cover.width, height: og.height ?? cover.height } : cover;
-}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -84,8 +77,9 @@ export default async function NewsDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [t, tNav, identity, relatedDocs] = await Promise.all([
+  const [t, tRich, tNav, identity, relatedDocs] = await Promise.all([
     getTranslations({ locale, namespace: "page.news" }),
+    getTranslations({ locale, namespace: "page.richText" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     loadSiteIdentity(locale),
     findRelatedNews(payload, locale, doc),
@@ -131,7 +125,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
         </div>
       )}
       <div className="mx-auto w-full max-w-text px-gutter py-10">
-        <RichText data={doc.content} className="max-w-[68ch]" />
+        <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
       </div>
       <footer className="mx-auto flex w-full max-w-text flex-col gap-6 px-gutter pb-section-tight">
         {tags.length > 0 && (

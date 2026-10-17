@@ -174,3 +174,59 @@ describe("RichText: cấu trúc", () => {
     expect(screen.getByRole("img", { name: "Ảnh A" })).toBeInTheDocument();
   });
 });
+
+describe("RichText: tiếp nối review L6-T06", () => {
+  const table = { type: "table", children: [{ type: "tablerow", children: [{ type: "tablecell", headerState: 0, children: [text("A")] }] }] };
+
+  it("gốc có break-words + overflow-wrap:anywhere (URL dài không gây cuộn ngang)", () => {
+    const { container } = render(<RichText data={doc(paragraph(text("x")))} className="max-w-[68ch]" />);
+    expect(container.firstElementChild).toHaveClass("break-words", "[overflow-wrap:anywhere]", "max-w-[68ch]");
+  });
+
+  it("bảng: vùng cuộn có role=region + aria-label khi nơi dùng truyền tableLabel", () => {
+    render(<RichText data={doc(table)} tableLabel="Bảng nội dung" />);
+    const region = screen.getByRole("region", { name: "Bảng nội dung" });
+    expect(region).toHaveAttribute("tabindex", "0");
+    expect(region.querySelector("table")).not.toBeNull();
+  });
+
+  it("bảng không có tableLabel: không gắn role=region không tên", () => {
+    const { container } = render(<RichText data={doc(table)} />);
+    expect(container.querySelector("[role=region]")).toBeNull();
+  });
+
+  const internal = (value: unknown, relationTo = "news") => ({
+    type: "link",
+    fields: { linkType: "internal", doc: { relationTo, value } },
+    children: [text("Bài khác")],
+  });
+
+  it("link nội bộ `doc` đã populate + có locale → link thật tới URL công khai đúng ngôn ngữ", () => {
+    render(<RichText data={doc(paragraph(internal({ slug: "bai-moi" })))} locale="vi" />);
+    const anchor = screen.getByRole("link", { name: "Bài khác" });
+    expect(anchor).toHaveAttribute("href", "/tin-tuc/bai-moi");
+    expect(anchor).not.toHaveAttribute("rel");
+  });
+
+  it("link nội bộ ở /en: bản có EN → /en/...; chưa có EN hoặc chưa populate → chỉ giữ chữ", () => {
+    const { unmount } = render(<RichText data={doc(paragraph(internal({ slug: "new-post", hasEnglish: true })))} locale="en" />);
+    expect(screen.getByRole("link", { name: "Bài khác" })).toHaveAttribute("href", "/en/news/new-post");
+    unmount();
+    for (const value of [{ slug: "x", hasEnglish: false }, "id-1"]) {
+      const view = render(<RichText data={doc(paragraph(internal(value)))} locale="en" />);
+      expect(view.container.querySelector("a")).toBeNull();
+      expect(view.container.textContent).toBe("Bài khác");
+      view.unmount();
+    }
+  });
+
+  it("anchorSections: h2 cấp gốc có id muc-N theo thứ tự (khớp mục lục); h3 và không bật thì không có id", () => {
+    const data = doc({ type: "heading", tag: "h2", children: [text("Một")] }, { type: "heading", tag: "h3", children: [text("con")] }, { type: "heading", tag: "h1", children: [text("Hai")] });
+    const on = render(<RichText data={data} anchorSections />);
+    expect([...on.container.querySelectorAll("h2")].map((node) => node.id)).toEqual(["muc-1", "muc-2"]);
+    expect(on.container.querySelector("h3")?.id).toBe("");
+    on.unmount();
+    const off = render(<RichText data={data} />);
+    expect(off.container.querySelector("h2")?.id).toBe("");
+  });
+});

@@ -17,7 +17,8 @@ export default defineConfig({
       },
       {
         // Component React (RTL) cần DOM.
-        resolve: { alias },
+        // Test page (Server Component đọc Payload) dùng vi.mock("@payload-config"): alias để Vite phân giải được import; file thật không được nạp vì đã bị mock.
+        resolve: { alias: { ...alias, "@payload-config": fileURLToPath(new URL("./src/payload.config.ts", import.meta.url)) } },
         test: {
           name: "ui",
           include: ["src/**/*.test.tsx"],

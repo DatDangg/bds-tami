@@ -37,9 +37,9 @@ Ba nhóm trang tĩnh-động; trang liên hệ chừa vùng form lead.
 Mở khoá cho: `layer-10-task-01`
 
 ## Acceptance Criteria
-- [ ] Trang pháp lý route cố định theo `kind`, hiện `version` + `effectiveDate`; EN chỉ khi admin đã bật `hasEnglish`
-- [ ] Liên hệ: hotline, email, địa chỉ, bản đồ lười từ `site-settings.mapLocation`; vùng `LeadFormSlot`
-- [ ] Dịch vụ: hero dùng `coverImage`, banner CTA cuối trang (dùng lại khối CTA)
+- [x] Trang pháp lý route cố định theo `kind`, hiện `version` + `effectiveDate`; EN chỉ khi admin đã bật `hasEnglish`
+- [x] Liên hệ: hotline, email, địa chỉ, bản đồ lười từ `site-settings.mapLocation`; vùng `LeadFormSlot`
+- [x] Dịch vụ: hero dùng `coverImage`, banner CTA cuối trang (dùng lại khối CTA)
 
 ## Tests cần viết
 - Integration render: pháp lý EN chưa duyệt → 404 EN
@@ -53,20 +53,22 @@ Mở khoá cho: `layer-10-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS toàn bộ + follow-up L6-T03 (404 có nội dung) + L6-T06 (RichText)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 128 file 1.383 PASS (builder lần 1 có 3 file integration lỗi beforeAll, chạy lại PASS; reviewer chạy PASS ngay lần 1); pnpm build PASS. curl next start :3225: `/en/privacy-policy` (chưa EN), `/dich-vu/khong-co`, dịch vụ chưa EN → 404 HTML có h1/header/footer, no-store; trang 200 ISR MISS→HIT, `public, s-maxage=60, stale-while-revalidate=300`; canonical/hreflang/robots đúng; JSON-LD Organization/Service/BreadcrumbList. Trình duyệt 375/768/1280 không cuộn ngang (kể cả URL 200 ký tự), touch ≥44, 1 h1
+- Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-07-round-1-review.md`
+- Phạm vi thêm (primary giữ trong task vì chặn AC bản đồ): sửa worker MapLibre hỏng ở mọi bản build (L2-T08) — `scripts/copy-maplibre-worker.mjs` chép worker vào `public/vendor/maplibre/` (gitignore) trước dev/build, `LazyMap` gọi `setWorkerUrl`
+- Residual risk: **bản đồ chưa xác nhận hiển thị bằng mắt** (M1) → kiểm trên staging L6-T01. Worker không đánh version URL (m2), CSP cho bản đồ (m3) → L14-T01. Tile OSM tải khi cuộn tới, không qua đồng ý (có từ trước, SPEC không yêu cầu). m4–m7 → L15-T01. `?service=` chưa có nơi đọc (LeadForm sau)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-07)
+- Decision log: giữ sửa worker MapLibre trong task này (primary)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-6): task-07 pubsvc` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -74,13 +76,13 @@ Mở khoá cho: `layer-10-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-6/task-07` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức NORMAL)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/app/(frontend)/[locale]/dich-vu/[slug]/page.tsx
@@ -92,7 +94,7 @@ Mở khoá cho: `layer-10-task-01`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-6-task-03
-- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+- [x] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
 
 ## Follow-up từ review layer-6-task-06
-- [ ] `RichText` (dùng chung): thêm `break-words`/`overflow-wrap:anywhere` ở gốc để URL dài không gây cuộn ngang ở 375; wrapper bảng cuộn có `role="region"` + `aria-label`; link nội bộ dạng `doc` render thành link thật (MINOR 6, 8, 9).
+- [x] `RichText` (dùng chung): thêm `break-words`/`overflow-wrap:anywhere` ở gốc để URL dài không gây cuộn ngang ở 375; wrapper bảng cuộn có `role="region"` + `aria-label`; link nội bộ dạng `doc` render thành link thật (MINOR 6, 8, 9).

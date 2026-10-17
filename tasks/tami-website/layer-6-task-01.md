@@ -129,3 +129,6 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Follow-up từ review layer-6-task-09
 - [ ] Bật `TRUST_CF_CONNECTING_IP=true` ở staging/prod (sau Cloudflare); nếu không mọi khách chung một bucket rate limit (vd ứng tuyển 3/giờ toàn site). Kiểm bằng 2 IP khác nhau.
+
+## Follow-up từ review layer-6-task-07
+- [ ] Trên staging: mở `/lien-he` (site-settings có `mapLocation`) → bản đồ MapLibre vẽ được tile, console không lỗi "Worker failed to load"; ảnh chụp làm bằng chứng.

@@ -136,3 +136,9 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Trang danh mục và `?page≥2`: ảnh đầu tiên có priority (LCP).
 - [ ] hreflang ở `?page=n` không trỏ tới trang EN không tồn tại.
 - [ ] `?page` vượt quá → 301 về trang cuối hoặc 404 có nội dung (xử lý ở proxy).
+
+## Follow-up từ review layer-6-task-07
+- [ ] `legal-page.ts:17` dùng `depth: 1` để link nội bộ trong trang pháp lý thành link thật.
+- [ ] Hero dịch vụ: thêm fallback `vh` cho `svh`.
+- [ ] Trang pháp lý: thêm meta description.
+- [ ] `RichText.tsx:348`: tách options render cho dễ đọc.

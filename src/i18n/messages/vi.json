@@ -207,6 +207,35 @@
         "copied": "Đã sao chép liên kết",
         "copyFailed": "Không sao chép được"
       }
+    },
+    "richText": {
+      "table": "Bảng nội dung, cuộn ngang để xem đủ"
+    },
+    "cta": {
+      "getAdvice": "Nhận tư vấn"
+    },
+    "services": {
+      "otherTitle": "Dịch vụ khác",
+      "learnMore": "Xem dịch vụ",
+      "ctaTitle": "Bạn quan tâm {name}?",
+      "ctaDescription": "Để lại thông tin, chuyên viên TAMI sẽ liên hệ tư vấn trong thời gian sớm nhất."
+    },
+    "contact": {
+      "title": "Liên hệ",
+      "description": "Đội ngũ TAMI sẵn sàng tư vấn. Gọi hotline hoặc để lại thông tin, chúng tôi sẽ phản hồi sớm nhất.",
+      "infoTitle": "Thông tin liên hệ",
+      "hotline": "Hotline",
+      "email": "Email",
+      "address": "Địa chỉ",
+      "hours": "Giờ làm việc",
+      "hoursValue": "08:00 - 17:30, thứ 2 - thứ 7",
+      "mapLabel": "Văn phòng TAMI trên bản đồ",
+      "formTitle": "Gửi yêu cầu tư vấn",
+      "formFallback": "Vui lòng liên hệ qua hotline hoặc email để được tư vấn."
+    },
+    "legal": {
+      "version": "Phiên bản {version} · Hiệu lực từ {date}",
+      "tocTitle": "Mục lục"
     }
   }
 }

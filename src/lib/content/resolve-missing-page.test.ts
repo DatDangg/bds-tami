@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const findPublicBySlug = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
+const findPublicOne = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: vi.fn().mockResolvedValue({}) }));
-vi.mock("./public-queries", () => ({ findPublicBySlug }));
+vi.mock("./public-queries", () => ({ findPublicBySlug, findPublicOne }));
 vi.mock("../logger", () => ({ logger: { warn: vi.fn(), error: vi.fn() } }));
 
 import {
@@ -19,6 +20,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   clearMissingPageCache();
   findPublicBySlug.mockReset();
+  findPublicOne.mockReset();
 });
 afterEach(() => vi.useRealTimers());
 
@@ -42,6 +44,16 @@ describe("matchDynamicPage", () => {
     }
   });
 
+  it("khớp dịch vụ vi/en và URL cố định của trang pháp lý (không slug)", () => {
+    expect(matchDynamicPage("/dich-vu/moi-gioi")).toMatchObject({ locale: "vi", slug: "moi-gioi", rule: { collection: "services" } });
+    expect(matchDynamicPage("/en/services/brokerage")).toMatchObject({ locale: "en", slug: "brokerage", rule: { collection: "services" } });
+    expect(matchDynamicPage("/chinh-sach-bao-mat")).toMatchObject({ locale: "vi", slug: "", rule: { collection: "pages", where: { kind: { equals: "privacy" } } } });
+    expect(matchDynamicPage("/en/terms-of-use/")).toMatchObject({ locale: "en", slug: "", rule: { collection: "pages", where: { kind: { equals: "terms" } } } });
+    for (const path of ["/dich-vu", "/dich-vu/a/b", "/en/chinh-sach-bao-mat", "/privacy-policy", "/chinh-sach-bao-mat/x", "/lien-he", "/en/contact"]) {
+      expect(matchDynamicPage(path), path).toBeNull();
+    }
+  });
+
   it("`/tin-tuc/danh-muc` (không có trang) được coi là slug tin tức không tồn tại → 404 đầy đủ", () => {
     expect(matchDynamicPage("/tin-tuc/danh-muc")).toMatchObject({ slug: "danh-muc", rule: { collection: "news" } });
   });
@@ -58,6 +70,20 @@ describe("resolveMissingPage", () => {
     findPublicBySlug.mockResolvedValue(null);
     await resolveMissingPage("/en/news/category/market");
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "categories", "en", "market", { depth: 0, where: { scope: { equals: "news" } } });
+  });
+
+  it("trang pháp lý: tra theo `kind` bằng findPublicOne; EN chưa duyệt (không có bản công khai) → 404 EN", async () => {
+    findPublicOne.mockResolvedValueOnce({ id: "1" }).mockResolvedValueOnce(null);
+    expect(await resolveMissingPage("/chinh-sach-bao-mat")).toBeNull();
+    expect(await resolveMissingPage("/en/privacy-policy")).toBe("en");
+    expect(findPublicOne).toHaveBeenNthCalledWith(2, {}, "pages", "en", { kind: { equals: "privacy" } }, { depth: 0 });
+    expect(findPublicBySlug).not.toHaveBeenCalled();
+  });
+
+  it("dịch vụ: tra theo slug của ngôn ngữ URL", async () => {
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/services/khong-co")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "services", "en", "khong-co", { depth: 0 });
   });
 
   it("URL không phải trang động: không đụng DB", async () => {

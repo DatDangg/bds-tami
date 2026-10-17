@@ -5,6 +5,7 @@ import {
   buildJobPostingJsonLd,
   buildOrganizationJsonLd,
   buildRealEstateListingJsonLd,
+  buildServiceJsonLd,
   serializeJsonLd,
 } from "./json-ld";
 
@@ -21,6 +22,20 @@ describe("json-ld", () => {
       [1, "https://x.test/a"],
       [2, "https://x.test/a/b"],
     ]);
+  });
+
+  it("Service: provider là Organization, có inLanguage, bỏ trường trống", () => {
+    const data = buildServiceJsonLd({
+      locale: "en",
+      name: "Brokerage",
+      url: "https://x.test/en/services/brokerage",
+      description: "",
+      provider: { name: "TAMI", siteUrl: "https://x.test" },
+    });
+    expect(data).toMatchObject({ "@type": "Service", name: "Brokerage", inLanguage: "en", provider: { "@type": "Organization", name: "TAMI" } });
+    const parsed = JSON.parse(serializeJsonLd(data)) as Record<string, unknown>;
+    expect(parsed).not.toHaveProperty("description");
+    expect(parsed).not.toHaveProperty("image");
   });
 
   it("serialize thay < để không đóng thẻ script sớm", () => {

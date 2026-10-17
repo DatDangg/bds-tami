@@ -1,0 +1,27 @@
+import type { ReactNode } from "react";
+import { useId } from "react";
+
+interface LeadFormSlotProps {
+  /** Tiêu đề `h2` của khối (vd "Gửi yêu cầu tư vấn"). */
+  title: string;
+  /** Form lead thật (task lead-form-integration thay slot này); chưa có thì hiện `fallback`. */
+  children?: ReactNode;
+  /** Nội dung tạm khi chưa có form: hướng khách sang kênh liên hệ khác. */
+  fallback?: ReactNode;
+}
+
+/**
+ * Vùng chừa sẵn cho form lead (layer-10-task-01 ráp `LeadForm` vào đây). Có `id="lead-form"` để nút "Ứng tuyển"/"Nhận tư vấn"
+ * cuộn tới; nền `--color-primary-subtle` theo design-spec §3.4. Server Component, không có logic form.
+ */
+export function LeadFormSlot({ title, children, fallback }: LeadFormSlotProps) {
+  const headingId = useId();
+  return (
+    <section id="lead-form" aria-labelledby={headingId} className="scroll-mt-24 rounded-sm bg-primary-subtle p-6 lg:p-8">
+      <h2 id={headingId} className="mb-4 font-display text-h2">
+        {title}
+      </h2>
+      {children ?? fallback}
+    </section>
+  );
+}

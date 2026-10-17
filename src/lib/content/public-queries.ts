@@ -120,3 +120,23 @@ export async function findPublicBySlug<T = unknown>(
   });
   return (result.docs[0] as T | undefined) ?? null;
 }
+
+/**
+ * Một bản ghi công khai theo điều kiện (không theo slug): dùng cho trang có route cố định như trang pháp lý (`{ kind: { equals } }`).
+ * Cùng quy tắc `publicWhere` như mọi truy vấn công khai: không có, chưa công khai, đã xoá mềm, hoặc `en` mà chưa có bản dịch → `null`.
+ */
+export async function findPublicOne<T = unknown>(
+  payload: Payload,
+  collection: PublicCollectionSlug,
+  locale: Locale,
+  where: Where,
+  options: Pick<PublicBySlugOptions, "depth"> = {},
+): Promise<T | null> {
+  const result = await payload.find({
+    ...guestReadOptions(collection, locale, options.depth ?? DEFAULT_DEPTH),
+    where: { and: [publicWhere(collection, locale), where] },
+    limit: 1,
+    pagination: false,
+  });
+  return (result.docs[0] as T | undefined) ?? null;
+}

@@ -41,7 +41,7 @@ const SOCIAL_PLATFORMS: Record<string, { name: string; icon: ReactElement }> = {
 export function Footer({ columns, tagline, copyright, contact, socials, showCookieSettings }: FooterProps) {
   const hasContact = Boolean(contact.hotline ?? contact.email ?? contact.address);
   return (
-    <footer className="theme-dark-block py-section-tight">
+    <footer className="theme-dark-block py-section-tight print:hidden">
       <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter">
         <div className="flex flex-col gap-4">
           <BrandLogo tone="on-dark" className="self-start" />
@@ -106,7 +106,7 @@ function FooterContact({ contact }: { contact: FooterContactView }) {
   );
 }
 
-function SocialLinks({ socials }: { socials: SocialLinkView[] }) {
+export function SocialLinks({ socials }: { socials: SocialLinkView[] }) {
   const t = useTranslations("layout.footer");
   if (socials.length === 0) return null;
   return (

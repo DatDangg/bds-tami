@@ -1,6 +1,9 @@
 import { Fragment, type ReactNode } from "react";
 import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { resolveInternalDocHref } from "@/lib/content/doc-link";
+import { isSectionHeading, sectionHeadingId } from "@/lib/content/section-headings";
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/i18n/routing";
 
 /**
  * Render nội dung Lexical (trường `richText` của Payload) bằng danh sách node ĐƯỢC PHÉP, không dùng HTML thô:
@@ -79,10 +82,10 @@ function renderText(node: LexicalNode, key: number): ReactNode {
   return <Fragment key={key}>{content}</Fragment>;
 }
 
-function renderLink(node: LexicalNode, key: number, depth: number): ReactNode {
+function renderLink(node: LexicalNode, key: number, depth: number, ctx: RenderContext): ReactNode {
   const fields = (typeof node.fields === "object" && node.fields !== null ? node.fields : {}) as { url?: unknown; newTab?: unknown; linkType?: unknown };
-  const target = fields.linkType === "internal" ? null : safeHref(fields.url);
-  const inner = renderChildren(node.children, depth + 1);
+  const target = fields.linkType === "internal" ? resolveInternalTarget(node, ctx) : safeHref(fields.url);
+  const inner = renderChildren(node.children, depth + 1, ctx);
   if (!target) return <Fragment key={key}>{inner}</Fragment>;
   const opensNewTab = fields.newTab === true;
   return (
@@ -96,6 +99,13 @@ function renderLink(node: LexicalNode, key: number, depth: number): ReactNode {
       {inner}
     </a>
   );
+}
+
+/** Link nội bộ (`doc`): chỉ thành link khi biết ngôn ngữ và doc đã populate có trang công khai (xem `resolveInternalDocHref`); không thì giữ chữ. */
+function resolveInternalTarget(node: LexicalNode, ctx: RenderContext): { href: string; external: false } | null {
+  const fields = (typeof node.fields === "object" && node.fields !== null ? node.fields : {}) as { doc?: unknown };
+  const href = ctx.locale ? resolveInternalDocHref(fields.doc, ctx.locale) : null;
+  return href ? { href, external: false } : null;
 }
 
 /** Ảnh upload từ `media` đã populate (depth ≥ 1); id chưa populate hoặc không phải ảnh thì bỏ qua. */
@@ -112,8 +122,8 @@ function renderUpload(node: LexicalNode, key: number): ReactNode {
   );
 }
 
-function renderList(node: LexicalNode, key: number, depth: number): ReactNode {
-  const items = renderChildren(node.children, depth + 1);
+function renderList(node: LexicalNode, key: number, depth: number, ctx: RenderContext): ReactNode {
+  const items = renderChildren(node.children, depth + 1, ctx);
   return node.listType === "number" ? (
     <ol key={key} className={cn(TEXT_CLASS.list, "list-decimal")}>
       {items}
@@ -125,21 +135,27 @@ function renderList(node: LexicalNode, key: number, depth: number): ReactNode {
   );
 }
 
-function renderTable(node: LexicalNode, key: number, depth: number): ReactNode {
+function renderTable(node: LexicalNode, key: number, depth: number, ctx: RenderContext): ReactNode {
   return (
-    <div key={key} className={TEXT_CLASS.tableWrap} tabIndex={0}>
+    // Vùng cuộn ngang tới được bằng bàn phím: cần role + tên để trình đọc màn hình biết đó là gì (nhãn do nơi dùng dịch).
+    <div
+      key={key}
+      className={TEXT_CLASS.tableWrap}
+      tabIndex={0}
+      {...(ctx.tableLabel ? { role: "region", "aria-label": ctx.tableLabel } : {})}
+    >
       <table className={TEXT_CLASS.table}>
-        <tbody>{renderChildren(node.children, depth + 1)}</tbody>
+        <tbody>{renderChildren(node.children, depth + 1, ctx)}</tbody>
       </table>
     </div>
   );
 }
 
-function renderCell(node: LexicalNode, key: number, depth: number): ReactNode {
+function renderCell(node: LexicalNode, key: number, depth: number, ctx: RenderContext): ReactNode {
   const Tag = typeof node.headerState === "number" && node.headerState > 0 ? "th" : "td";
   return (
     <Tag key={key} className={cn(TEXT_CLASS.cell, Tag === "th" && "bg-surface-muted font-semibold")}>
-      {renderChildren(node.children, depth + 1)}
+      {renderChildren(node.children, depth + 1, ctx)}
     </Tag>
   );
 }
@@ -149,7 +165,7 @@ function headingTag(tag: unknown): "h2" | "h3" {
   return tag === "h1" || tag === "h2" ? "h2" : "h3";
 }
 
-function renderNode(node: LexicalNode, key: number, depth: number): ReactNode {
+function renderNode(node: LexicalNode, key: number, depth: number, ctx: RenderContext): ReactNode {
   if (depth > MAX_DEPTH) return null;
   switch (node.type) {
     case "text":
@@ -158,9 +174,9 @@ function renderNode(node: LexicalNode, key: number, depth: number): ReactNode {
       return <br key={key} />;
     case "link":
     case "autolink":
-      return renderLink(node, key, depth);
+      return renderLink(node, key, depth, ctx);
     case "paragraph": {
-      const children = renderChildren(node.children, depth + 1);
+      const children = renderChildren(node.children, depth + 1, ctx);
       // Đoạn rỗng (Enter thừa trong editor) không render khoảng cách trống.
       const empty = asNodes(node.children).every((child) => child.type === "text" && !child.text);
       return empty ? null : (
@@ -171,50 +187,66 @@ function renderNode(node: LexicalNode, key: number, depth: number): ReactNode {
     }
     case "heading": {
       const Tag = headingTag(node.tag);
+      const id = ctx.sections && depth === 0 && isSectionHeading(node) ? sectionHeadingId(ctx.sections.count++) : undefined;
       return (
-        <Tag key={key} className={TEXT_CLASS[Tag]}>
-          {renderChildren(node.children, depth + 1)}
+        <Tag key={key} id={id} className={cn(TEXT_CLASS[Tag], id && "scroll-mt-24")}>
+          {renderChildren(node.children, depth + 1, ctx)}
         </Tag>
       );
     }
     case "quote":
       return (
         <blockquote key={key} className={TEXT_CLASS.quote}>
-          {renderChildren(node.children, depth + 1)}
+          {renderChildren(node.children, depth + 1, ctx)}
         </blockquote>
       );
     case "list":
-      return renderList(node, key, depth);
+      return renderList(node, key, depth, ctx);
     case "listitem":
-      return <li key={key}>{renderChildren(node.children, depth + 1)}</li>;
+      return <li key={key}>{renderChildren(node.children, depth + 1, ctx)}</li>;
     case "horizontalrule":
       return <hr key={key} className="my-8 border-border" />;
     case "upload":
       return renderUpload(node, key);
     case "table":
-      return renderTable(node, key, depth);
+      return renderTable(node, key, depth, ctx);
     case "tablerow":
-      return <tr key={key}>{renderChildren(node.children, depth + 1)}</tr>;
+      return <tr key={key}>{renderChildren(node.children, depth + 1, ctx)}</tr>;
     case "tablecell":
-      return renderCell(node, key, depth);
+      return renderCell(node, key, depth, ctx);
     default:
       // Node không có trong danh sách (html, block, relationship...) bị bỏ cả nhánh: không bao giờ render nội dung tuỳ ý.
       return null;
   }
 }
 
-function renderChildren(children: unknown, depth: number): ReactNode {
-  return asNodes(children).map((child, index) => renderNode(child, index, depth));
+function renderChildren(children: unknown, depth: number, ctx: RenderContext): ReactNode {
+  return asNodes(children).map((child, index) => renderNode(child, index, depth, ctx));
+}
+
+/** Thông tin ngoài cây Lexical mà node cần khi render (đi xuyên mọi cấp). */
+interface RenderContext {
+  locale: Locale | undefined;
+  tableLabel: string | undefined;
+  /** Có giá trị khi bật `anchorSections`: đếm `h2` cấp gốc đã gắn `id` (khớp `collectSectionHeadings`). */
+  sections: { count: number } | undefined;
 }
 
 interface RichTextProps {
   /** Giá trị trường richText: `{ root: { children: [...] } }`. Thiếu/sai dạng thì không render gì. */
   data: unknown;
   className?: string;
+  /** Ngôn ngữ trang: cần để link nội bộ (`doc`) thành link thật; thiếu thì link nội bộ giữ chữ. */
+  locale?: Locale;
+  /** Tên (đã dịch) của vùng cuộn bảng cho trình đọc màn hình; thiếu thì vùng cuộn không có role. */
+  tableLabel?: string;
+  /** Gắn `id` (`muc-1`, `muc-2`...) lên các `h2` cấp gốc để mục lục (`collectSectionHeadings`) trỏ tới. */
+  anchorSections?: boolean;
 }
 
-export function RichText({ data, className }: RichTextProps) {
+export function RichText({ data, className, locale, tableLabel, anchorSections = false }: RichTextProps) {
   const root = typeof data === "object" && data !== null ? (data as { root?: LexicalNode }).root : undefined;
   if (!root || typeof root !== "object") return null;
-  return <div className={className}>{renderChildren(root.children, 0)}</div>;
+  // `break-words` + `overflow-wrap:anywhere`: URL/chuỗi dài không đẩy trang cuộn ngang ở 375px.
+  return <div className={cn("break-words [overflow-wrap:anywhere]", className)}>{renderChildren(root.children, 0, { locale, tableLabel, sections: anchorSections ? { count: 0 } : undefined })}</div>;
 }

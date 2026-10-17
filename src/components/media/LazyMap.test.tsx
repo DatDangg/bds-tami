@@ -12,6 +12,7 @@ const maplibre = vi.hoisted(() => ({
   addSource: vi.fn(),
   addControl: vi.fn(),
   markerAdded: vi.fn(),
+  setWorkerUrl: vi.fn(),
   loadHandlers: [] as Array<() => void>,
 }));
 
@@ -38,7 +39,7 @@ vi.mock("maplibre-gl", () => {
       return this;
     }
   }
-  return { Map: FakeMap, Marker: FakeMarker, NavigationControl: class {} };
+  return { Map: FakeMap, Marker: FakeMarker, NavigationControl: class {}, setWorkerUrl: maplibre.setWorkerUrl };
 });
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
 
@@ -94,6 +95,7 @@ describe("LazyMap", () => {
     await act(async () => observer().intersect());
     await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(1));
     expect(maplibre.moduleLoaded).toHaveBeenCalledTimes(1);
+    expect(maplibre.setWorkerUrl).toHaveBeenCalledWith("/vendor/maplibre/maplibre-gl-worker.mjs");
     const options = maplibre.constructed.mock.lastCall?.[0];
     expect(options.center).toEqual([location.lng, location.lat]);
     expect(options.cooperativeGestures).toBe(true);

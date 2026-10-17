@@ -5,8 +5,8 @@ import { getPayload } from "payload";
 import { type Locale, locales } from "../../i18n/routing";
 import type { pathnames } from "../../i18n/routing";
 import { logger } from "../logger";
-import { publicPath } from "./content-paths";
-import { findPublicBySlug, type PublicCollectionSlug } from "./public-queries";
+import { LEGAL_PAGE_ROUTES, publicPath } from "./content-paths";
+import { findPublicBySlug, findPublicOne, type PublicCollectionSlug } from "./public-queries";
 import { normalizeRedirectSource } from "./redirect-paths";
 
 type PathnameKey = keyof typeof pathnames;
@@ -20,8 +20,8 @@ type PathnameKey = keyof typeof pathnames;
  */
 interface MissingPageRule {
   key: PathnameKey;
-  /** Tên tham số động trong `key` (`[slug]`, `[category]`). */
-  param: string;
+  /** Tên tham số động trong `key` (`[slug]`, `[category]`). Bỏ trống = route cố định không slug (trang pháp lý): chỉ cần `where`. */
+  param?: string;
   collection: PublicCollectionSlug;
   /** Điều kiện thêm, cùng điều kiện page dùng (vd `scope` của danh mục). */
   where?: Where;
@@ -30,23 +30,30 @@ interface MissingPageRule {
 export const MISSING_PAGE_RULES: readonly MissingPageRule[] = [
   { key: "/tin-tuc/[slug]", param: "slug", collection: "news" },
   { key: "/tin-tuc/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "news" } } },
+  { key: "/dich-vu/[slug]", param: "slug", collection: "services" },
+  { key: LEGAL_PAGE_ROUTES.privacy, collection: "pages", where: { kind: { equals: "privacy" } } },
+  { key: LEGAL_PAGE_ROUTES.terms, collection: "pages", where: { kind: { equals: "terms" } } },
 ];
 
 const PLACEHOLDER = "SLUGPLACEHOLDER";
 
 const escapeRegex = (value: string): string => value.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
 
-/** Mỗi (quy tắc, ngôn ngữ) → regex khớp URL công khai: `/tin-tuc/<slug>`, `/en/news/<slug>`... (một đoạn, không `/` trong slug). */
+/**
+ * Mỗi (quy tắc, ngôn ngữ) → regex khớp URL công khai: `/tin-tuc/<slug>`, `/en/news/<slug>`... (một đoạn, không `/` trong slug);
+ * quy tắc không có `param` khớp đúng URL cố định (`/chinh-sach-bao-mat`, `/en/privacy-policy`).
+ */
 const MATCHERS = MISSING_PAGE_RULES.flatMap((rule) =>
   locales.map((locale) => {
-    const pattern = escapeRegex(publicPath(rule.key, locale, { [rule.param]: PLACEHOLDER }));
-    return { rule, locale, regex: new RegExp(`^${pattern.replace(PLACEHOLDER, "([^/]+)")}$`) };
+    const pattern = escapeRegex(publicPath(rule.key, locale, rule.param ? { [rule.param]: PLACEHOLDER } : {}));
+    return { rule, locale, regex: new RegExp(`^${rule.param ? pattern.replace(PLACEHOLDER, "([^/]+)") : pattern}$`) };
   }),
 );
 
 export interface MatchedPage {
   rule: MissingPageRule;
   locale: Locale;
+  /** Rỗng với route cố định (không có slug). */
   slug: string;
 }
 
@@ -55,7 +62,9 @@ export function matchDynamicPage(pathname: string): MatchedPage | null {
   const path = normalizeRedirectSource(pathname);
   for (const { rule, locale, regex } of MATCHERS) {
     const found = regex.exec(path);
-    if (!found?.[1]) continue;
+    if (!found) continue;
+    if (!rule.param) return { rule, locale, slug: "" };
+    if (!found[1]) continue;
     try {
       return { rule, locale, slug: decodeURIComponent(found[1]) };
     } catch {
@@ -84,12 +93,12 @@ function remember(pathname: string, missing: boolean): void {
 }
 
 async function pageExists(match: MatchedPage): Promise<boolean> {
-  if (!match.slug) return false;
+  const { rule, locale, slug } = match;
+  if (rule.param && !slug) return false;
   const payload = await getPayload({ config });
-  const doc = await findPublicBySlug(payload, match.rule.collection, match.locale, match.slug, {
-    depth: 0,
-    ...(match.rule.where ? { where: match.rule.where } : {}),
-  });
+  const doc = rule.param
+    ? await findPublicBySlug(payload, rule.collection, locale, slug, { depth: 0, ...(rule.where ? { where: rule.where } : {}) })
+    : await findPublicOne(payload, rule.collection, locale, rule.where ?? {}, { depth: 0 });
   return doc !== null;
 }
 

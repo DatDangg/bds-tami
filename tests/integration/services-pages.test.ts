@@ -363,6 +363,21 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       expect(en.docs.map((doc) => doc.title)).toEqual(["Privacy"]);
     });
 
+    it("findPublicOne theo kind (route cố định của trang pháp lý): nháp → null; EN chưa duyệt → null (404 EN), duyệt rồi → có", async () => {
+      const byKind = (kind: string, locale: Locale) => publicQueries.findPublicOne<{ kind: string; title: string }>(payload, "pages", locale, { kind: { equals: kind } }, { depth: 0 });
+      const privacy = await createPage({ kind: "privacy", title: "Chính sách" });
+      expect(await byKind("privacy", "vi")).toBeNull();
+      await updatePage(privacy.id, { status: "published" });
+      expect(await byKind("privacy", "vi")).toMatchObject({ kind: "privacy", title: "Chính sách" });
+      expect(await byKind("terms", "vi")).toBeNull();
+      expect(await byKind("privacy", "en")).toBeNull();
+      await updatePage(privacy.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en" });
+      expect(await byKind("privacy", "en")).toMatchObject({ title: "Privacy" });
+      await updatePage(privacy.id, { deletedAt: NOW() });
+      expect(await byKind("privacy", "vi")).toBeNull();
+      expect(await byKind("privacy", "en")).toBeNull();
+    });
+
     it("services: draft/hidden/xoá mềm không lộ; en cần hasEnglish; tìm theo slug đúng locale", async () => {
       const live = await createService({ title: "Công khai Dịch vụ", status: "published", coverImage: mediaId });
       await createService({ title: "Nháp Dịch vụ" });

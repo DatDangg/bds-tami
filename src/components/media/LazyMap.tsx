@@ -8,6 +8,8 @@ import { approximateLocation, circlePolygon, isValidLocation, type LatLng } from
 import { ResponsiveImage, type MediaImage } from "./ResponsiveImage";
 
 const APPROXIMATE_RADIUS_M = 300;
+// Worker của MapLibre chép vào public/ bởi scripts/copy-maplibre-worker.mjs: URL tự suy ra của thư viện hỏng khi bundler gộp chunk.
+const MAPLIBRE_WORKER_URL = "/vendor/maplibre/maplibre-gl-worker.mjs";
 // Màu cho layer MapLibre (không đọc được CSS var): --color-accent-text trong skills/react-nodejs/design-tokens.md.
 const ACCENT = "#8c6733";
 // Chính sách OSM (https://operations.osmfoundation.org/policies/tiles/): bắt buộc attribution, không dùng cho traffic lớn.
@@ -56,6 +58,7 @@ function googleMapsUrl(location: LatLng, approximate: boolean) {
 /** Dựng bản đồ vào `container`, trả hàm dọn. MapLibre và CSS của nó chỉ được import ở đây (khi thật sự cần). */
 async function mountMap(container: HTMLElement, { location, approximate, locale, markerLabel }: MountOptions): Promise<() => void> {
   const [maplibre] = await Promise.all([import("maplibre-gl"), import("maplibre-gl/dist/maplibre-gl.css")]);
+  maplibre.setWorkerUrl(MAPLIBRE_WORKER_URL);
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
   const map = new maplibre.Map({
     container,

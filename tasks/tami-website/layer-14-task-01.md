@@ -100,3 +100,7 @@ Mở khoá cho: `layer-15-task-01`
 
 ## Follow-up từ review layer-5-task-07
 - [ ] CSP cho phép GA4 (chỉ tải sau đồng ý cookie, `src/components/analytics/GoogleAnalytics.tsx`): `script-src` thêm `https://www.googletagmanager.com`; `connect-src` + `img-src` thêm `https://*.google-analytics.com`, `https://*.analytics.google.com`, `https://*.googletagmanager.com`. Kiểm: đồng ý cookie → gtag tải + gửi collect không bị CSP chặn.
+
+## Follow-up từ review layer-6-task-07
+- [ ] CSP cho bản đồ: `worker-src 'self'`, `script-src 'self'`, `connect-src` + `img-src` thêm `https://tile.openstreetmap.org` (không cần `blob:`).
+- [ ] Worker MapLibre đặt URL có version (`/vendor/maplibre/<version>/` hoặc `?v=`) + cache immutable.
