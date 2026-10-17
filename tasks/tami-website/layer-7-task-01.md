@@ -97,3 +97,6 @@ Mở khoá cho: `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-04`, `layer-
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ spec-validation layer 5 addendum
+- [ ] G22: `property-posts.ward` lọc theo `province` + validate server; field upload có `validate` tuỳ biến phải gọi validator `upload` mặc định trước.

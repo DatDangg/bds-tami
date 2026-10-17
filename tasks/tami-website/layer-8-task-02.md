@@ -100,3 +100,6 @@ Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-
 ## Notes
 - Side effect phân công (activity assignment, email, audit) KHÔNG làm ở đây — task lead-assignment, một nơi duy nhất (design D6).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ spec-validation layer 5 addendum
+- [ ] G23: thống nhất cách ẩn danh PII với `job-applications` (giá trị thay thế, không NULL khi cột NOT NULL).

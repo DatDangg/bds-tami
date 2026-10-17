@@ -101,3 +101,6 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 
 ## Follow-up từ review layer-2-task-02
 - `wards.legacyNames` lưu dạng mảng `{ name }` ("<phường cũ>, <quận/huyện cũ>"): hook `searchText` phải lấy `legacyNames[].name` (ERD §4.2, §5).
+
+## Follow-up từ spec-validation layer 5 addendum
+- [ ] G22: `rentals.ward` lọc `filterOptions` theo `province` đã chọn + validate server; field upload có `validate` tuỳ biến phải gọi validator `upload` mặc định trước (bài học L5-T01).

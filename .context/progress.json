@@ -340,7 +340,7 @@
       "reason": "User chọn Đào Duy Từ"
     }
   ],
-  "lastUpdated": "2026-10-18T00:15:00.000Z",
+  "lastUpdated": "2026-10-18T00:35:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -409,6 +409,12 @@
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-5.md",
       "note": "40/40 AC (T02,T03,T05–T08); T01/T04 blocked bởi layer-2-task-02. G15→L6-T03, G16/R15 reconcile API_SPEC+ERD, G17→L6-T01, G18 gắn task + BACKLOG BL-001/002 (blocked chờ user), R14/R17 xong. G19 (L6 bị chặn, staging sớm) + R4 secrets chờ user"
+    },
+    {
+      "layer": "5-addendum",
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-5-addendum.md",
+      "note": "L2-T02, L5-T01, L5-T04: 15/15 AC. G19 đóng (L6 mở hết). G20/G21/G24→L6-T01, G22→L6-T02/L7-T01, G23→L9-T06/L8-T02, G25 chờ user. BL-003 không chặn staging."
     }
   ]
 }

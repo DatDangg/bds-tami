@@ -121,3 +121,8 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - [ ] G17: truyền `NEXT_PUBLIC_HOTLINE` làm build-arg (`ARG` + `ENV` trước `pnpm build`) trong `docker/Dockerfile` và `build-args` của `.github/workflows/deploy.yml` (lấy từ GitHub `vars`), để `src/app/global-error.tsx` hiện số hotline khi DB lỗi (design-spec S18); ghi vào `docs/runbooks/deploy.md`; kiểm trong image staging trang lỗi gốc có số hotline. Bổ sung biến vào danh sách R4 (`/brainstorm secrets`).
 - [ ] G18: CI kiểm `importMap.js` không lệch (lỗi thật đã xảy ra, commit a614b3d): bước `pnpm payload generate:importmap` + `git diff --exit-code` trong `.github/workflows/ci.yml`.
 - [ ] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*` cho staging, build image, gây lỗi thử và kiểm stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, `docs/runbooks/deploy.md` §8).
+
+## Follow-up từ spec-validation layer 5 addendum
+- [ ] G20: image runtime chưa có thư mục `seed/` (`docker/Dockerfile:61-68`) — đưa `seed/` + `scripts/seed*.{mjs,ts}` vào image (hoặc chạy seed bằng image builder); AC seed dùng `pnpm seed` (không còn `seed:categories`).
+- [ ] G21: trước khi đụng staging, chạy toàn bộ migration (17) trên DB PostGIS trống (CI hoặc tay) + thêm bước migrate vào CI.
+- [ ] G24: AC "các trang đã có mở được" chỉ kiểm các trang đã build tới lúc deploy; lần deploy đầu không có image trước nên không thử rollback image — ghi rõ trong evidence.

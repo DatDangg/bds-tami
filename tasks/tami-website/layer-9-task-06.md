@@ -96,3 +96,6 @@ Mở khoá cho: `layer-12-task-01`
 ## Follow-up từ review layer-5-task-04
 - [ ] Xoá CV hết hạn: đặt `job-applications.cv = null` + `anonymizedAt` TRƯỚC rồi mới xoá `private-files` (cv chỉ bắt buộc khi chưa ẩn danh; FK `ON DELETE SET NULL`).
 - [ ] Không dùng xoá hàng loạt theo `where` trên `job-applications` qua Local API (overrideAccess bỏ qua `disableBulkDelete`, mất rollback CV/audit) — lặp xoá theo id hoặc chỉ ẩn danh.
+
+## Follow-up từ spec-validation layer 5 addendum
+- [ ] G23: cột PII của `job-applications` (fullName, phone, email…) đang NOT NULL → ẩn danh bằng giá trị thay thế cố định (vd "Đã ẩn danh"), không đặt NULL; thống nhất với L8-T02 (lead).
