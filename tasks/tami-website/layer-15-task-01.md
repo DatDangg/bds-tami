@@ -103,3 +103,6 @@ Mở khoá cho: `layer-16-task-01`
 
 ## Follow-up từ review layer-5-task-08
 - [ ] Thêm test khoá `src/app/(frontend)/[locale]/layout.tsx`: `generateStaticParams()` trả `[]` (không prerender trang công khai lúc build) và `generateMetadata` noindex khi `APP_ENV` ≠ production — tránh hồi quy MAJOR-3.
+
+## Follow-up từ review layer-5-task-01
+- [ ] FK `NOT NULL` + `ON DELETE set null` (vd `projects.province_id`, `author_id`, `floor_plans.image_id`): xoá tỉnh/nhân viên/media đang được tham chiếu trả 500 → thêm `beforeDelete` trả 409 rõ ràng (mẫu `Provinces.beforeDelete`).

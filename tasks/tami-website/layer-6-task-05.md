@@ -98,3 +98,8 @@ Mở khoá cho: `layer-10-task-01`
 
 ## Follow-up từ spec-validation layer 5
 - [ ] G18 (L5-T06 MINOR-2): Blob gửi bằng `navigator.sendBeacon` trong `src/components/layout/FloatingContact.tsx` đặt type `text/plain;charset=UTF-8` (làm cùng lúc truyền `refCollection`/`refId` ở mục trên); test giải mã Blob kiểm type.
+
+## Follow-up từ review layer-5-task-01
+- [ ] `Projects.gallery` (và `News.cover`) dùng `validate` tuỳ biến nên bỏ qua kiểm upload mặc định của Payload: gọi validator `upload` mặc định (`payload/shared`) trước rồi mới kiểm publish — chặn PDF vào gallery, id media sai trả 400 thay vì 500 (`src/collections/Projects.ts:29-34`).
+- [ ] `Projects.ward` thêm `filterOptions` chỉ phường thuộc `province` đã chọn (`src/collections/Projects.ts:103`) + validate phía server.
+- [ ] Dự án published mà mọi ảnh gallery bị xoá (FK set null) → trang chi tiết/danh sách hiện ảnh placeholder, không vỡ.

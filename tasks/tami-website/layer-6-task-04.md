@@ -89,3 +89,6 @@ Mở khoá cho: `layer-10-task-03`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-5-task-01
+- [ ] Dữ liệu mẫu dự án đang là 2 bản draft không ảnh (`seed/sample/projects.ts`): trước khi dựng trang danh sách/staging, seed mẫu phải có ảnh và `published` — commit vài ảnh nhẹ trong `seed/sample/images/` (không cần mạng; upload qua Payload Local API vào S3/SeaweedFS) thay vì tải picsum lúc seed.

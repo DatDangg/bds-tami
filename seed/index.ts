@@ -4,6 +4,7 @@ import { seedDefaultCategories } from "./categories";
 import { seedGeo } from "./geo";
 import { seedLegalPages } from "./pages";
 import { seedSampleNews } from "./sample/news";
+import { seedSampleProjects } from "./sample/projects";
 import { seedSampleServices } from "./sample/services";
 import { seedShellGlobals } from "./shell-globals";
 
@@ -60,6 +61,13 @@ const SAMPLE_STEPS: readonly SeedStep[] = [
     name: "tin tức mẫu",
     async run(payload) {
       const { created, skipped } = await seedSampleNews(payload);
+      return `tạo ${created}, bỏ qua ${skipped}`;
+    },
+  },
+  {
+    name: "dự án mẫu",
+    async run(payload) {
+      const { created, skipped } = await seedSampleProjects(payload);
       return `tạo ${created}, bỏ qua ${skipped}`;
     },
   },

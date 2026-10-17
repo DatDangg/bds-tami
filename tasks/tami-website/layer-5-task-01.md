@@ -35,12 +35,12 @@ CRUD dự án trong admin đủ trường ERD §4.5, dùng bộ field chung.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-02`, `layer-6-task-04`, `layer-6-task-05`, `layer-7-task-01`, `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
+- [x] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
 - [→] Trước khi collection nội dung mở Duplicate: `slugField` chung có `beforeDuplicate` để slug các locale không phải dạng `xyz - Copy` (sinh lại/để trống cho admin đặt; áp cả `developers`), có test (review L4-T01 round 2 MINOR-1) → **chuyển sang `layer-5-task-02`** (L5-T01 chờ layer-2-task-02; services là collection nội dung đầu tiên)
-- [ ] Đủ trường ERD §4.5 (gồm `location` PostGIS point, `scale`, `amenities`, `floorPlans`, `documents`, `legalInfo`, `salesPolicy`)
-- [ ] `gallery` bắt buộc khi `published`; ảnh đầu là ảnh đại diện
-- [ ] Dùng factory kit: slug, seo, status, publishedAt, author, isFeatured, hasEnglish/translation, versions, xoá mềm, revalidate
-- [ ] Index `(status, has_english, sales_status, province_id)` + GIST `location` + UNIQUE `(_locale, slug)` trong `projects_locales`
+- [x] Đủ trường ERD §4.5 (gồm `location` PostGIS point, `scale`, `amenities`, `floorPlans`, `documents`, `legalInfo`, `salesPolicy`)
+- [x] `gallery` bắt buộc khi `published`; ảnh đầu là ảnh đại diện
+- [x] Dùng factory kit: slug, seo, status, publishedAt, author, isFeatured, hasEnglish/translation, versions, xoá mềm, revalidate
+- [x] Index `(status, has_english, sales_status, province_id)` + GIST `location` + UNIQUE `(_locale, slug)` trong `projects_locales`
 
 ## Tests cần viết
 - Integration: publish thiếu gallery → lỗi
@@ -57,20 +57,22 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-02`, `layer-6-task-04`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS toàn bộ (gồm G12 allowlist projects)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 103 file 1.076 PASS (16 integration projects); pnpm build PASS. Migration `20261017_125429_projects` applied dev (migrate:status Yes); index kiểm trong DB: `projects_list_idx` btree (status, has_english, sales_status, province_id), `projects_location_gist_idx` gist (location)
+- Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-5-task-01-round-1-review.md`
+- Lệch: Notes ghi "ảnh picsum" nhưng seed mẫu tạo 2 dự án draft không ảnh (upload cần mạng + S3) → follow-up L6-T04
+- Residual risk: MINOR-1 `gallery` validate tuỳ biến bỏ qua kiểm `filterOptions` qua API (PDF lọt vào gallery, id sai → 500; news `cover` cùng mẫu) và MINOR-2 `ward` chưa lọc theo `province` → follow-up L6-T05. MINOR-5 FK NOT NULL + set null (xoá tỉnh/staff/media đang dùng → 500; xoá media làm rỗng gallery) → L15-T01
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.5, §5 nếu lệch)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.5 as-built + §5 index projects
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-01 projects` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -78,13 +80,13 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-02`, `layer-6-task-04`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Projects.ts

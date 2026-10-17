@@ -11,6 +11,7 @@ import * as migration_20261017_043315_translation_usage from './20261017_043315_
 import * as migration_20261017_092524_services_pages from './20261017_092524_services_pages';
 import * as migration_20261017_093650_news from './20261017_093650_news';
 import * as migration_20261017_122831_provinces_wards from './20261017_122831_provinces_wards';
+import * as migration_20261017_125429_projects from './20261017_125429_projects';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20261017_122831_provinces_wards.up,
     down: migration_20261017_122831_provinces_wards.down,
-    name: '20261017_122831_provinces_wards'
+    name: '20261017_122831_provinces_wards',
+  },
+  {
+    up: migration_20261017_125429_projects.up,
+    down: migration_20261017_125429_projects.down,
+    name: '20261017_125429_projects'
   },
 ];

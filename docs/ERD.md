@@ -232,6 +232,8 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `author` | `rel→staff` | R, I | Tự gán người tạo |
 | `seo` | group | | §4.14 |
 
+> **As-built (layer-5-task-01):** `src/collections/Projects.ts`, migration `20261017_125429_projects`. Localized: `title`, `slug`, `summary`, `overview`, `legalInfo`, `salesPolicy`, `amenities[].name`, `floorPlans[].title`, `scale.handoverTime`. `location` = PostGIS `geometry(Point)` (migration có `CREATE EXTENSION IF NOT EXISTS postgis`; DB test phải bật PostGIS). `gallery` bắt buộc ≥ 1 ảnh khi `status=published` (draft được trống), ảnh đầu là ảnh đại diện; `floorPlans[].image` bắt buộc; `documents` chỉ PDF; giá/diện tích `min: 0`, không ràng buộc chéo (from ≤ to) vì spec không yêu cầu. `category` giới hạn scope `project`. Bộ field nội dung qua `withContentDefaults` (`englishRequiredFields`: title, slug, summary, overview). Dữ liệu mẫu (`pnpm seed --sample`): 2 dự án draft, chưa có ảnh.
+
 ### 4.6. `rentals` (Cho thuê)
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |
@@ -534,7 +536,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `rentals` | `(status, area_m2)`, `(status, bedrooms)` | Lọc diện tích, phòng ngủ |
 | `rentals` | GIN `search_text gin_trgm_ops` | Tìm từ khoá không dấu |
 | `rentals`, `projects` | GIST `location` | Sẵn cho tìm theo bản đồ sau này |
-| `projects` | `(status, sales_status, province_id)` | Lọc dự án |
+| `projects` | `(status, has_english, sales_status, province_id)` (`projects_list_idx`, SQL tuỳ biến trong migration `20261017_125429_projects`, không partial — giống `news_list_idx`) | Lọc dự án |
 | `property_posts` | `(status, category_id, published_at DESC)`, `(status, is_featured, offer_end_at)` | Danh sách, khối ưu đãi |
 | `news` | `(status, has_english, category_id, published_at DESC)` (`news_list_idx`, SQL tuỳ biến trong migration `20261017_093650_news`) | Danh sách tin tức |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |

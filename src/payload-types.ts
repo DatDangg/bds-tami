@@ -81,6 +81,7 @@ export interface Config {
     services: Service;
     pages: Page;
     news: News;
+    projects: Project;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -103,6 +104,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -668,6 +670,134 @@ export interface News {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  developer?: (string | null) | Developer;
+  salesStatus: 'upcoming' | 'selling' | 'handed_over';
+  province: string | Province;
+  ward?: (string | null) | Ward;
+  address?: string | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
+  priceFromVnd?: number | null;
+  priceToVnd?: number | null;
+  areaFromM2?: number | null;
+  areaToM2?: number | null;
+  scale?: {
+    totalUnits?: number | null;
+    blocks?: number | null;
+    floors?: number | null;
+    landAreaM2?: number | null;
+    handoverTime?: string | null;
+  };
+  summary?: string | null;
+  overview?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  amenities?:
+    | {
+        name: string;
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  gallery?: (string | Media)[] | null;
+  floorPlans?:
+    | {
+        title: string;
+        image: string | Media;
+        id?: string | null;
+      }[]
+    | null;
+  documents?: (string | Media)[] | null;
+  legalInfo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  salesPolicy?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -846,6 +976,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'news';
         value: string | News;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: string | Project;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1237,6 +1371,82 @@ export interface NewsSelect<T extends boolean = true> {
   excerpt?: T;
   content?: T;
   tags?: T;
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  developer?: T;
+  salesStatus?: T;
+  province?: T;
+  ward?: T;
+  address?: T;
+  location?: T;
+  priceFromVnd?: T;
+  priceToVnd?: T;
+  areaFromM2?: T;
+  areaToM2?: T;
+  scale?:
+    | T
+    | {
+        totalUnits?: T;
+        blocks?: T;
+        floors?: T;
+        landAreaM2?: T;
+        handoverTime?: T;
+      };
+  summary?: T;
+  overview?: T;
+  amenities?:
+    | T
+    | {
+        name?: T;
+        icon?: T;
+        id?: T;
+      };
+  gallery?: T;
+  floorPlans?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        id?: T;
+      };
+  documents?: T;
+  legalInfo?: T;
+  salesPolicy?: T;
   slug?: T;
   status?: T;
   publishedAt?: T;
