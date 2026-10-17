@@ -11,6 +11,7 @@ import { AuditLogs } from "./collections/AuditLogs";
 import { Categories } from "./collections/Categories";
 import { ClickEvents } from "./collections/ClickEvents";
 import { ClickStatsDaily } from "./collections/ClickStatsDaily";
+import { TranslationUsage } from "./collections/TranslationUsage";
 import { Developers } from "./collections/Developers";
 import { Media } from "./collections/Media";
 import { PrivateFiles } from "./collections/PrivateFiles";
@@ -48,7 +49,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, Categories, Developers],
+  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),

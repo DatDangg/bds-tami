@@ -473,7 +473,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 **`payload-jobs`**: bảng hàng đợi do Payload Jobs quản lý.
 
-**`translation-usage`** (chỉ admin đọc; hệ thống ghi): `month` (`YYYY-MM`, U), `inputTokens`, `outputTokens`, `requests`, `estimatedCostUsd`. Job dịch cộng dồn sau mỗi lần gọi; vượt hạn mức tháng (env `TRANSLATION_MONTHLY_BUDGET_USD`) thì dừng dịch và báo admin.
+**`translation-usage`** (chỉ admin đọc; hệ thống ghi): `month` (`YYYY-MM`, U), `inputTokens`, `outputTokens`, `requests`, `estimatedCostUsd`. Job dịch cộng dồn sau mỗi lần gọi; vượt hạn mức tháng (env `TRANSLATION_MONTHLY_BUDGET_USD`) thì dừng dịch và báo admin. As-built: `month` tính theo UTC (cùng chu kỳ tính phí của provider), unique index do DB giữ; `TranslationService` cộng dồn bằng một câu `INSERT ... ON CONFLICT (month) DO UPDATE SET x = x + EXCLUDED.x` nên nhiều lần dịch song song không mất lần cộng nào; `estimatedCostUsd` là ước tính từ `usage` của API theo bảng giá trong `src/lib/translation/budget.ts` (model ngoài bảng tính theo giá cao nhất); chạm hạn mức (`>=`) thì dừng, hạn mức 0 = tắt dịch. Không ai ghi qua API (create/update/delete `denyAll`). Code: `src/collections/TranslationUsage.ts`, `src/lib/translation/`.
 
 ### 4.14. Nhóm `seo` (dùng chung)
 

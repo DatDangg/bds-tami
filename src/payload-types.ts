@@ -73,6 +73,7 @@ export interface Config {
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
+    'translation-usage': TranslationUsage;
     categories: Category;
     developers: Developer;
     'payload-kv': PayloadKv;
@@ -89,6 +90,7 @@ export interface Config {
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
+    'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -319,6 +321,20 @@ export interface ClickStatsDaily {
   refCollection?: string | null;
   refId?: string | null;
   count: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translation-usage".
+ */
+export interface TranslationUsage {
+  id: string;
+  month: string;
+  inputTokens: number;
+  outputTokens: number;
+  requests: number;
+  estimatedCostUsd: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -572,6 +588,10 @@ export interface PayloadLockedDocument {
         value: string | ClickStatsDaily;
       } | null)
     | ({
+        relationTo: 'translation-usage';
+        value: string | TranslationUsage;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: string | Category;
       } | null)
@@ -771,6 +791,19 @@ export interface ClickStatsDailySelect<T extends boolean = true> {
   refCollection?: T;
   refId?: T;
   count?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translation-usage_select".
+ */
+export interface TranslationUsageSelect<T extends boolean = true> {
+  month?: T;
+  inputTokens?: T;
+  outputTokens?: T;
+  requests?: T;
+  estimatedCostUsd?: T;
   updatedAt?: T;
   createdAt?: T;
 }

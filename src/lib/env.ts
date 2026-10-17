@@ -19,6 +19,26 @@ export function parseTrustCloudflareFlag(value: string | undefined): boolean {
 /** Biến tuỳ chọn: chuỗi rỗng (dòng `KEY=` trong .env) coi như chưa đặt. */
 const emptyToUndefined = (value: unknown) => (value === "" ? undefined : value);
 
+/**
+ * Dịch AI (BR-08). `ANTHROPIC_API_KEY` tuỳ chọn: thiếu key thì app vẫn chạy, chỉ việc dịch báo lỗi `not_configured`
+ * (D7: Claude API lỗi không làm sập website). Hạn mức 0 = tắt dịch (mọi lần dịch bị `budget_exceeded`).
+ */
+const translationEnvShape = {
+  ANTHROPIC_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  TRANSLATION_MODEL: nonEmpty,
+  TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),
+};
+const translationEnvSchema = z.object(translationEnvShape);
+
+export type TranslationEnv = z.infer<typeof translationEnvSchema>;
+
+/** Chỉ đọc 3 biến dịch AI (service không cần cả bộ env của app). Lỗi chỉ nêu tên biến, không in giá trị. */
+export function parseTranslationEnv(source: Record<string, string | undefined>): TranslationEnv {
+  const result = translationEnvSchema.safeParse(source);
+  if (result.success) return result.data;
+  throw new EnvValidationError([...new Set(result.error.issues.map((issue) => String(issue.path[0])))]);
+}
+
 const envSchema = z.object({
   DATABASE_URL: nonEmpty,
   DATABASE_URL_TEST: z.string().min(1).optional(),
@@ -42,9 +62,7 @@ const envSchema = z.object({
   APP_ENV: z.enum(["development", "test", "staging", "production"]).default("development"),
   // Email nội bộ, ngăn cách bằng dấu phẩy; chỉ có tác dụng khi APP_ENV khác production.
   EMAIL_ALLOWLIST: z.string().optional(),
-  ANTHROPIC_API_KEY: nonEmpty,
-  TRANSLATION_MODEL: nonEmpty,
-  TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),
+  ...translationEnvShape,
   NEXT_PUBLIC_SITE_URL: z.url(),
   TRUST_CF_CONNECTING_IP: trustCloudflareSchema,
   // Giám sát (ARCHITECTURE §8). Không có DSN thì tắt hẳn GlitchTip. `GLITCHTIP_PUBLIC_DSN` (DSN cho trình duyệt) được đọc lúc chạy qua `/api/monitoring-config`, không nhúng lúc build.

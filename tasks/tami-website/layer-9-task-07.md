@@ -44,6 +44,8 @@ Tự dịch các trường localized đã đổi sang `en`, sinh slug EN, bật 
 Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 
 ## Acceptance Criteria
+- [ ] Job chỉ retry lỗi tạm thời (`rate_limited`, `provider_unavailable`); KHÔNG retry `invalid_input`, `invalid_output`, `refused`, `truncated`, `budget_exceeded`, `not_configured`, `not_allowed` (tránh trả tiền lặp) — có test (review L4-T04 round 2 MINOR-A)
+- [ ] Giảm chặn nhầm trong `validateModelOutput` (`src/lib/translation/segments.ts`): chỉ chặn `<` khi mở thẻ HTML; bỏ dấu câu cuối URL trước khi so URL nguồn; test với `≥/≤/→`, "trên 100m2" → "over 100m2", URL kèm dấu câu; test chia lô với nội dung khác nhau mỗi item + assert dừng khi chạm hạn mức giữa lô + khoá shape `output_config` (review L4-T04 round 2 MINOR-B/C)
 - [ ] Lưu bản `vi` `published` (hoặc global) → enqueue 1 job/bản ghi (gộp nhiều lần lưu trong ~1 phút)
 - [ ] Chỉ dịch trường có `sourceHash` đổi; `enSource=manual` → không dịch đè, đặt `viChangedAfterManual=true` khi bản vi đổi
 - [ ] Sửa tay bất kỳ trường `en` → `enSource=manual`
@@ -52,6 +54,7 @@ Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 - [ ] Lỗi: thử 3 lần backoff; vẫn lỗi → `status=failed`, `lastError` (không chứa nội dung); vượt hạn mức → dừng + email admin
 - [ ] `site-settings.translationEnabled=false` → không enqueue
 - [ ] Mục tiêu bản EN lên web ≤ 10 phút sau xuất bản (đo trên dev với SDK mock + độ trễ)
+- [ ] Job translate-content chỉ gửi field localized công khai của collection (allowlist theo field), có test — review L4-T04 round 1 MINOR-1
 
 ## Tests cần viết
 - Integration (SDK mock): publish vi → job → en đủ trường, hasEnglish=true

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EnvValidationError, parseEnv } from "./env";
+import { EnvValidationError, parseEnv, parseTranslationEnv } from "./env";
 
 const validEnv = {
   DATABASE_URL: "postgres://u:p@localhost:5433/db",
@@ -90,5 +90,31 @@ describe("parseEnv: giám sát", () => {
     expect(() => parseEnv({ ...validEnv, GLITCHTIP_DSN: "khong-phai-url" })).toThrow(/GLITCHTIP_DSN/);
     expect(() => parseEnv({ ...validEnv, METRICS_TOKEN: "token-ngan" })).toThrow(/METRICS_TOKEN/);
     expect(() => parseEnv({ ...validEnv, METRICS_TOKEN: "token-ngan" })).not.toThrow(/token-ngan/);
+  });
+});
+
+describe("parseEnv: dịch AI", () => {
+  it("ANTHROPIC_API_KEY tuỳ chọn (thiếu hoặc rỗng -> undefined, app vẫn chạy); model và hạn mức vẫn bắt buộc", () => {
+    const withoutKey: Record<string, string> = { ...validEnv };
+    delete withoutKey.ANTHROPIC_API_KEY;
+    expect(parseEnv(withoutKey).ANTHROPIC_API_KEY).toBeUndefined();
+    expect(parseEnv({ ...validEnv, ANTHROPIC_API_KEY: "" }).ANTHROPIC_API_KEY).toBeUndefined();
+    expect(() => parseEnv({ ...validEnv, TRANSLATION_MODEL: "" })).toThrow(/TRANSLATION_MODEL/);
+  });
+
+  it("TRANSLATION_MONTHLY_BUDGET_USD: số >= 0 (0 = tắt dịch); âm hoặc không phải số -> lỗi nêu tên biến", () => {
+    expect(parseEnv({ ...validEnv, TRANSLATION_MONTHLY_BUDGET_USD: "0" }).TRANSLATION_MONTHLY_BUDGET_USD).toBe(0);
+    expect(() => parseEnv({ ...validEnv, TRANSLATION_MONTHLY_BUDGET_USD: "-1" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
+    expect(() => parseEnv({ ...validEnv, TRANSLATION_MONTHLY_BUDGET_USD: "abc" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
+  });
+
+  it("parseTranslationEnv chỉ đọc 3 biến dịch, lỗi không in giá trị", () => {
+    expect(parseTranslationEnv({ TRANSLATION_MODEL: "claude-opus-5-5", TRANSLATION_MONTHLY_BUDGET_USD: "5" })).toEqual({
+      ANTHROPIC_API_KEY: undefined,
+      TRANSLATION_MODEL: "claude-opus-5-5",
+      TRANSLATION_MONTHLY_BUDGET_USD: 5,
+    });
+    expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
+    expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).not.toThrow(/sk-secret-oops/);
   });
 });

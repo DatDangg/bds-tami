@@ -21,6 +21,7 @@
     "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
     "@payloadcms/db-postgres": "3.91.0",
     "@payloadcms/email-nodemailer": "3.91.0",
     "@payloadcms/next": "3.91.0",

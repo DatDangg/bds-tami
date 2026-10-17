@@ -7,6 +7,7 @@ import * as migration_20261016_160726_click_events from './20261016_160726_click
 import * as migration_20261017_031052_categories_developers from './20261017_031052_categories_developers';
 import * as migration_20261017_033508_globals_site_header_footer from './20261017_033508_globals_site_header_footer';
 import * as migration_20261017_034248_globals_translation_group from './20261017_034248_globals_translation_group';
+import * as migration_20261017_043315_translation_usage from './20261017_043315_translation_usage';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261017_034248_globals_translation_group.up,
     down: migration_20261017_034248_globals_translation_group.down,
-    name: '20261017_034248_globals_translation_group'
+    name: '20261017_034248_globals_translation_group',
+  },
+  {
+    up: migration_20261017_043315_translation_usage.up,
+    down: migration_20261017_043315_translation_usage.down,
+    name: '20261017_043315_translation_usage'
   },
 ];
