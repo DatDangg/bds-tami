@@ -19,6 +19,7 @@
     "seed:categories": "payload run scripts/seed-categories.ts",
     "seed:pages": "payload run scripts/seed-pages.ts",
     "seed:sample-services": "payload run scripts/seed-sample-services.ts",
+    "seed:sample-news": "payload run scripts/seed-sample-news.ts",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap"
   },

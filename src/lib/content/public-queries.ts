@@ -8,7 +8,7 @@ import { type Pagination, parsePagination } from "./pagination";
  * Allowlist collection mà truy vấn công khai được phép nhận. Collection mới (tin tức, dự án...) phải được THÊM VÀO ĐÂY khi
  * có trang công khai; collection nội bộ thêm sau không tự lọt vào. Slug ngoài danh sách là lỗi typecheck.
  */
-export type PublicCollectionSlug = Extract<CollectionSlug, "categories" | "developers" | "services" | "pages">;
+export type PublicCollectionSlug = Extract<CollectionSlug, "categories" | "developers" | "services" | "pages" | "news">;
 
 /** Collection không có trường `status` (danh mục nền, chủ đầu tư): chỉ cần chưa xoá mềm. */
 const COLLECTIONS_WITHOUT_STATUS: ReadonlySet<string> = new Set(["categories", "developers"]);

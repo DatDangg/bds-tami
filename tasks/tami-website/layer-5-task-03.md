@@ -33,11 +33,11 @@ CRUD tin tức (danh mục, tags, bìa, nội dung) dùng bộ field chung.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] Test duplicate qua Local API `overrideAccess: true`: bản sao có `slugs.en` sinh lại hoặc rỗng VÀ `hasEnglish === false` (`src/fields/slug.ts:112`) (MINOR-3) (review L5-T02 round 1)
-- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
-- [ ] Đủ trường ERD §4.8
-- [ ] Index `(status, has_english, category_id, published_at DESC)`, UNIQUE `(_locale, slug)`
-- [ ] Không thu lead (không có quan hệ leads)
+- [x] Test duplicate qua Local API `overrideAccess: true`: bản sao có `slugs.en` sinh lại hoặc rỗng VÀ `hasEnglish === false` (`src/fields/slug.ts:112`) (MINOR-3) (review L5-T02 round 1)
+- [x] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
+- [x] Đủ trường ERD §4.8
+- [x] Index `(status, has_english, category_id, published_at DESC)`, UNIQUE `(_locale, slug)`
+- [x] Không thu lead (không có quan hệ leads)
 
 ## Tests cần viết
 - Integration: sale sửa/xoá tin tức của sale khác → 403; xoá mềm + admin khôi phục; không xoá được danh mục đang có tin tức
@@ -52,19 +52,19 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1 (builder; chờ reviewer STRICT)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 PASS (builder, attempt 1): AC1 Duplicate lộ lỗi thật (hasEnglish giữ true) → sửa `hasEnglishField` (`beforeDuplicate` → false), test `news.test.ts` Duplicate; AC2 `news` thêm vào `PublicCollectionSlug`, allowlist dịch đã có sẵn (thêm `allowlist.test.ts`); ERD §4.8 đủ trường (`cover` R khi published, `tags` → `news_texts`); index `news_list_idx` (status, has_english, category_id, published_at DESC) SQL tuỳ biến trong migration `20261017_093650_news` + UNIQUE (slug, _locale) do Payload sinh; không có quan hệ leads (test)
+- Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` FULL 81 files / 874 tests PASS (sau lần sửa cuối) · `pnpm build` OK · `migrate` + `migrate:status` (batch 12 Yes) OK · drift check `migrate:create` → "No schema changes detected" (không sinh file) · `APP_ENV=production pnpm seed:sample-news` → thoát code 1
+- Reviewer verdict: **STRICT PASS round 1** (`.context/review-reports/build-tami-website-layer-5-task-03-round-1-review.md`). Residual MINOR-1 → AC `layer-9-task-07`; MINOR-2/3 → `layer-6-task-06`; MINOR-4 → `layer-7-task-01`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.8 nếu lệch)
+- Doc impact result: ERD §4.8 (`cover` R khi `published`, `tags` ở `news_texts`) + ERD §5 index `news_list_idx` reconciled as-built; không đổi API_SPEC/DESIGN
 - Decision log: pending
 
 ## Commit / Tracking
@@ -73,13 +73,13 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-03` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/News.ts

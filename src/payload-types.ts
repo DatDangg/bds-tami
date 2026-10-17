@@ -78,6 +78,7 @@ export interface Config {
     developers: Developer;
     services: Service;
     pages: Page;
+    news: News;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -97,6 +98,7 @@ export interface Config {
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -562,6 +564,69 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  cover?: (string | null) | Media;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tags?: string[] | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -728,6 +793,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: string | News;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1051,6 +1120,47 @@ export interface PagesSelect<T extends boolean = true> {
   version?: T;
   effectiveDate?: T;
   status?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  cover?: T;
+  excerpt?: T;
+  content?: T;
+  tags?: T;
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
   hasEnglish?: T;
   translation?:
     | T

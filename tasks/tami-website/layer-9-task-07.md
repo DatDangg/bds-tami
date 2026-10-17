@@ -44,6 +44,7 @@ Tự dịch các trường localized đã đổi sang `en`, sinh slug EN, bật 
 Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 
 ## Acceptance Criteria
+- [ ] Bản sao (Duplicate) giữ nguyên nhóm `translation` (status/sourceHash/enSource) → reset nhóm trong `beforeDuplicate` hoặc job coi bản sao là chưa dịch; có test (`src/fields/translation.ts:24-46`, MINOR-1) (review L5-T03 round 1)
 - [ ] Job chỉ retry lỗi tạm thời (`rate_limited`, `provider_unavailable`); KHÔNG retry `invalid_input`, `invalid_output`, `refused`, `truncated`, `budget_exceeded`, `not_configured`, `not_allowed` (tránh trả tiền lặp) — có test (review L4-T04 round 2 MINOR-A)
 - [ ] Giảm chặn nhầm trong `validateModelOutput` (`src/lib/translation/segments.ts`): chỉ chặn `<` khi mở thẻ HTML; bỏ dấu câu cuối URL trước khi so URL nguồn; test với `≥/≤/→`, "trên 100m2" → "over 100m2", URL kèm dấu câu; test chia lô với nội dung khác nhau mỗi item + assert dừng khi chạm hạn mức giữa lô + khoá shape `output_config` (review L4-T04 round 2 MINOR-B/C)
 - [ ] Lưu bản `vi` `published` (hoặc global) → enqueue 1 job/bản ghi (gộp nhiều lần lưu trong ~1 phút)

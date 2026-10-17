@@ -301,10 +301,10 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `title` | text | R | |
 | `slug` | text | R, U | |
 | `category` | `rel→categories` (scope=`news`) | R, I | |
-| `cover` | upload `rel→media` | R | |
+| `cover` | upload `rel→media` | R khi `published` | Ảnh thẻ danh sách và hero bài viết; bản nháp được thiếu (as-built L5-T03) |
 | `excerpt` | textarea | R | |
 | `content` | richText | R | |
-| `tags` | text hasMany | | |
+| `tags` | text hasMany | | Không localized; lưu ở bảng `news_texts` (as-built L5-T03) |
 | `status` | select | R, I | |
 | `publishedAt` | date | I | Cho phép hẹn giờ (FR-ADM-16) |
 | `author` | `rel→staff` | R, I | |
@@ -528,7 +528,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `rentals`, `projects` | GIST `location` | Sẵn cho tìm theo bản đồ sau này |
 | `projects` | `(status, sales_status, province_id)` | Lọc dự án |
 | `property_posts` | `(status, category_id, published_at DESC)`, `(status, is_featured, offer_end_at)` | Danh sách, khối ưu đãi |
-| `news` | `(status, category_id, published_at DESC)` | Danh sách tin tức |
+| `news` | `(status, has_english, category_id, published_at DESC)` (`news_list_idx`, SQL tuỳ biến trong migration `20261017_093650_news`) | Danh sách tin tức |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |
 | `leads` | `(status, assigned_to_id, created_at DESC)` | Danh sách lead trong admin |
 | `audit_logs` | `(created_at)` (btree, Postgres quét ngược cho mới-nhất-trước), `(collection, doc_id)`, `actor`, `action` | Tra cứu nhật ký |

@@ -14,6 +14,8 @@ function hasEnglishField(): CheckboxField {
     defaultValue: false,
     index: true,
     access: readOnlyForEveryone,
+    // Nhân bản bỏ slug `en` (xem `slugField`) nên bản sao chưa đủ điều kiện bật; kể cả khi Local API `overrideAccess: true` giữ nguyên giá trị.
+    hooks: { beforeDuplicate: [() => false] },
     admin: { position: "sidebar", readOnly: true },
   };
 }

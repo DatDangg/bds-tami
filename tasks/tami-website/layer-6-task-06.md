@@ -35,6 +35,8 @@ Danh sách tin tức có lọc danh mục + phân trang; chi tiết render richT
 Mở khoá cho: `layer-10-task-03`
 
 ## Acceptance Criteria
+- [ ] Test `news_list_idx` tồn tại sau khi chạy migration thật (`pg_indexes`, mẫu `audit-staff.test.ts:95-96`) (MINOR-2) (review L5-T03 round 1)
+- [ ] Test nhánh category trong thùng rác (`src/fields/scoped-category.ts:36`) + quyết định UX khi khôi phục bài có category đã xoá (MINOR-3) (review L5-T03 round 1)
 - [ ] G14: quan sát `revalidatePath` trúng cache Next thật khi lưu bài (đo `next start`: trước/sau lưu) (spec-validation layer 4)
 - [ ] G13: sửa `categories` (route: null) phải làm mới cache trang danh sách theo danh mục (revalidate path/tag tương ứng); test hook (spec-validation layer 4)
 - [ ] RichText không render HTML tuỳ ý; link ngoài `rel="noopener"`
