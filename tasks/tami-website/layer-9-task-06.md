@@ -99,3 +99,6 @@ Mở khoá cho: `layer-12-task-01`
 
 ## Follow-up từ spec-validation layer 5 addendum
 - [ ] G23: cột PII của `job-applications` (fullName, phone, email…) đang NOT NULL → ẩn danh bằng giá trị thay thế cố định (vd "Đã ẩn danh"), không đặt NULL; thống nhất với L8-T02 (lead).
+
+## Follow-up từ review layer-6-task-09
+- [ ] Dọn CV mồ côi: `private-files` loại CV không có `job-applications` nào trỏ tới và cũ hơn N giờ (tiến trình chết giữa lưu CV và tạo hồ sơ) → xoá row + object S3.

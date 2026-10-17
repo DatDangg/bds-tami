@@ -101,3 +101,6 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 
 ## Follow-up từ review layer-6-task-03
 - [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+
+## Follow-up từ review layer-6-task-09
+- [ ] Chuyển `isPastDeadline` (`src/endpoints/public/job-applications.ts:42`, mở hết ngày deadline theo giờ VN, giả định date picker lưu 12:00) sang `src/lib/` và dùng chung cho bộ lọc danh sách + nhãn "Hết hạn"; kiểm giá trị thật date picker lưu.

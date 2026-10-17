@@ -116,3 +116,9 @@ Mở khoá cho: `layer-16-task-01`
 ## Follow-up từ review layer-6-task-02
 - [ ] `build-search-text.ts:141-144`: UPDATE bản version mới nhất giả định versions luôn bật — thêm kiểm tra/comment (MINOR B).
 - [ ] Test riêng nhánh rentals của guard xoá tỉnh (MINOR C).
+
+## Follow-up từ review layer-6-task-09
+- [ ] `jobApplicationFieldsSchema`: chặn NUL/ký tự điều khiển trong `fullName`/`message` (đang 500 do Postgres) → 400.
+- [ ] Giới hạn số part/field multipart trong `job-application-body.ts`; giảm sao chép buffer.
+- [ ] Thu hẹp map `ValidationError` → 400 `cvInvalid` chỉ khi lỗi ở field `file` (`job-applications.ts:110`).
+- [ ] Test bù trừ CV kiểm cả object S3 bị xoá (`tests/integration/job-applications.test.ts:302`).

@@ -126,3 +126,6 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - [ ] G20: image runtime chưa có thư mục `seed/` (`docker/Dockerfile:61-68`) — đưa `seed/` + `scripts/seed*.{mjs,ts}` vào image (hoặc chạy seed bằng image builder); AC seed dùng `pnpm seed` (không còn `seed:categories`).
 - [ ] G21: trước khi đụng staging, chạy toàn bộ migration (17) trên DB PostGIS trống (CI hoặc tay) + thêm bước migrate vào CI.
 - [ ] G24: AC "các trang đã có mở được" chỉ kiểm các trang đã build tới lúc deploy; lần deploy đầu không có image trước nên không thử rollback image — ghi rõ trong evidence.
+
+## Follow-up từ review layer-6-task-09
+- [ ] Bật `TRUST_CF_CONNECTING_IP=true` ở staging/prod (sau Cloudflare); nếu không mọi khách chung một bucket rate limit (vd ứng tuyển 3/giờ toàn site). Kiểm bằng 2 IP khác nhau.
