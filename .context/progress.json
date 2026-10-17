@@ -236,15 +236,17 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-5-task-08-round-2-review.md",
       "completedAt": "2026-10-17T19:50:00.000Z"
+    },
+    {
+      "task": "layer-2/task-02",
+      "review": "STRICT PASS",
+      "round": 3,
+      "report": ".context/review-reports/build-tami-website-layer-2-task-02-round-3-review.md",
+      "completedAt": "2026-10-17T22:10:00.000Z"
     }
   ],
   "inProgressTask": null,
   "blockedTasks": [
-    {
-      "task": "layer-2/task-02",
-      "reason": "Chờ user gửi nguồn danh mục hành chính chính thức (34 tỉnh/thành + phường/xã sau 01/07/2025, kèm tên cũ) — task note cấm tự bịa",
-      "since": "2026-10-16T13:58:50.661Z"
-    },
     {
       "task": "layer-4/task-06",
       "status": "deferred",
@@ -312,9 +314,19 @@
       "date": "2026-10-17T19:50:00.000Z",
       "decision": "Trang công khai không prerender lúc next build (generateStaticParams [] + ISR theo request) để robots/canonical lấy env lúc chạy",
       "reason": "Review L5-T08 MAJOR-3; quyết định kỹ thuật của primary, reviewer chấp nhận"
+    },
+    {
+      "date": "2026-10-17T20:40:00.000Z",
+      "decision": "Nguồn địa giới L2-T02: xlsx (seed/data/danh-muc-phuong-xa-moi.xlsx) là nguồn chính cho tỉnh (mã BNV 01–34), tên + mã phường/xã; CSV (seed/data/vietnam-sap-nhap-phuong-xa.csv) chỉ bổ sung legacyNames, ghép theo tỉnh+tên phường/xã. Sau đó làm L5-T01, L5-T04, layer 6",
+      "reason": "User duyệt"
+    },
+    {
+      "date": "2026-10-17T21:40:00.000Z",
+      "decision": "Ghi đè tên xlsx \"Phường Đào Duy Tư\" (Thanh Hóa, mã 40153016) thành \"Phường Đào Duy Từ\" (lỗi gõ của xlsx; CSV + danh nhân)",
+      "reason": "User chọn Đào Duy Từ"
     }
   ],
-  "lastUpdated": "2026-10-17T20:15:00.000Z",
+  "lastUpdated": "2026-10-17T22:10:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

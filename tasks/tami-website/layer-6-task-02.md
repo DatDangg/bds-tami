@@ -98,3 +98,6 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 ## Notes
 - Index trigram `search_text` làm ở task search-service (cùng truy vấn).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-2-task-02
+- `wards.legacyNames` lưu dạng mảng `{ name }` ("<phường cũ>, <quận/huyện cũ>"): hook `searchText` phải lấy `legacyNames[].name` (ERD §4.2, §5).

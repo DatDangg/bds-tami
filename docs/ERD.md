@@ -155,6 +155,14 @@ Quy tắc: luôn còn ít nhất 1 `admin` đang hoạt động (hook chặn kho
 
 Dữ liệu seed từ danh mục hành chính chính thức, đặt ở `seed/`. Chỉ admin sửa.
 
+**As-built (layer 2 task 02):**
+- **Mã:** `provinces.code` = mã BNV 2 chữ số ("29"); `wards.code` = mã TMS 8 chữ số ("70101063"). Cả hai là khoá upsert của seed (kiểu text).
+- **Nguồn dữ liệu:** `seed/data/danh-muc-phuong-xa-moi.xlsx` là nguồn chính (mã, tên tỉnh, tên phường/xã sau 01/07/2025); `seed/data/vietnam-sap-nhap-phuong-xa.csv` chỉ dùng lấy tên cũ (`legacyNames`). Seed lúc chạy chỉ đọc `seed/data/administrative-units.json` (34 tỉnh/thành, 3.321 đơn vị: 687 phường, 2.621 xã, 13 đặc khu). File JSON do script sinh: `node scripts/build-admin-units.mjs` (Node >= 22.18); script thất bại nếu sai số lượng, trùng khoá so khớp, csv không khớp xlsx hoặc alias thừa. Khoá so khớp xlsx/csv giữ nguyên chữ cái và dấu thanh, chỉ bỏ qua vị trí dấu thanh (hoà/hòa), hoa/thường, khoảng trắng, nháy cong/thẳng, gạch ngang dài/ngắn, "Tp"/"Thành phố". Phần còn lại chỉ nối bằng bảng alias cùng-một-phường trong script. Lỗi chính tả trong xlsx được sửa bằng bảng override tên theo mã (`WARD_NAME_OVERRIDES`, áp trước khi so khớp; hiện có 1 mục: 40153016 "Phường Đào Duy Tư" -> "Phường Đào Duy Từ", quyết định user 2026-10-17, csv ghi đúng); script thất bại nếu override thừa/không khớp tên xlsx, hoặc một dòng csv bị hai phường xlsx cùng khớp.
+- **`legacyNames`:** mảng `{ name }` (bảng `wards_legacy_names`), mỗi phần tử có dạng "<phường/xã cũ>, <quận/huyện cũ>" ("Phường Bến Nghé, Quận 1"); đơn vị cũ cấp huyện (đặc khu) chỉ có tên huyện cũ. Hook `searchText` của rentals sau này phải làm phẳng `.name`.
+- **Dẫn xuất:** `provinces.slug` = `slugify` tên bỏ tiền tố "Tỉnh"/"Thành phố"; `shortName` = tên bỏ tiền tố (riêng TP.HCM = "TP.HCM"); `sortOrder` = mã BNV dạng số. `wards.slug` = `slugify(name)` (cùng hàm `src/lib/slug.ts` của app), thêm hậu tố `-2`, `-3`... khi trùng trong cùng tỉnh (UNIQUE `province` + `slug`; trùng giữa các tỉnh được phép).
+- **Xoá:** xoá tỉnh còn phường/xã bị hook `beforeDelete` chặn (409, thông báo rõ); xoá phường/xã xoá luôn `legacyNames` (cascade).
+- **Seed lại ghi đè chỉnh sửa tay:** `pnpm seed` upsert theo `code`; mọi chỉnh sửa của admin ở `name`/`type`/`slug`/`legacyNames`/`shortName`/`sortOrder` bị ghi đè bằng dữ liệu chính thức ở lần seed kế tiếp (bản ghi không đổi thì không ghi).
+
 ### 4.3. `categories`
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |

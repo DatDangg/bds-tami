@@ -31,11 +31,11 @@ Collection địa giới 2 cấp (34 tỉnh, phường/xã kèm tên cũ) và kh
 Mở khoá cho: `layer-5-task-01`, `layer-5-task-04`, `layer-6-task-01`, `layer-6-task-02`
 
 ## Acceptance Criteria
-- [ ] `provinces` (code U, name, shortName, slug U, sortOrder) và `wards` (province, code U, name, type, slug unique trong tỉnh, legacyNames)
-- [ ] Seed 34 tỉnh/thành và phường/xã theo danh mục hành chính chính thức sau 01/07/2025, có `legacyNames`
-- [ ] Seed idempotent (chạy lại không nhân bản, upsert theo `code`)
-- [ ] `--sample` (dữ liệu mẫu) bị chặn khi `APP_ENV=production`
-- [ ] Khách/sale chỉ đọc; admin sửa
+- [x] `provinces` (code U, name, shortName, slug U, sortOrder) và `wards` (province, code U, name, type, slug unique trong tỉnh, legacyNames)
+- [x] Seed 34 tỉnh/thành và phường/xã theo danh mục hành chính chính thức sau 01/07/2025, có `legacyNames`
+- [x] Seed idempotent (chạy lại không nhân bản, upsert theo `code`)
+- [x] `--sample` (dữ liệu mẫu) bị chặn khi `APP_ENV=production`
+- [x] Khách/sale chỉ đọc; admin sửa
 
 ## Tests cần viết
 - Integration: seed 2 lần → số bản ghi không đổi
@@ -52,20 +52,23 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-04`, `layer-6-task-01`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 3
+- Last failure type: review FAIL round 1 (M1 khoá so khớp bỏ hết dấu → 16 phường gộp legacyNames) — sửa attempt 2; attempt 3 = ghi đè tên Đào Duy Từ (user) + MINOR n1–n3
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 PASS
+- Nguồn dữ liệu (user duyệt 2026-10-17): `seed/data/danh-muc-phuong-xa-moi.xlsx` (chính: mã tỉnh BNV 01–34, mã phường/xã TMS 8 số, tên) + `seed/data/vietnam-sap-nhap-phuong-xa.csv` (chỉ legacyNames). Converter `scripts/build-admin-units.mjs` → `seed/data/administrative-units.json`: 34 tỉnh, 3.321 phường/xã (687/2.621/13), 10.643 legacyNames, 9 alias chính tả + 1 ghi đè tên (40153016 Phường Đào Duy Từ)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 102 file 1.060 PASS (gồm integration DB); pnpm build PASS. Seed dev: lần đầu tạo 34/3.321, chạy lại unchanged; sau fix 16 → 1 updated rồi unchanged
+- Reviewer verdict: STRICT FAIL round 1 → PASS round 2 → PASS round 3 (delta) — `.context/review-reports/build-tami-website-layer-2-task-02-round-3-review.md`
+- Migration: `migrations/20261017_122831_provinces_wards.ts` additive (enum + provinces/wards/wards_legacy_names + cột locked_documents_rels), không HIGH_RISK
+- Residual risk: index chung tên `province_slug_idx` (Payload không đặt tên được; trùng sẽ fail rõ khi migrate). Reseed ghi đè sửa tay của admin (upsert theo code — ghi ERD §4.2). Converter cần Node ≥22.18 (engines đã đặt). Hook searchText của rentals (L6-T02) phải lấy `legacyNames[].name`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.2 nếu nguồn dữ liệu/trường khác)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.2 as-built (định dạng mã, nguồn + lệnh sinh lại, chuẩn hoá khoá/alias/ghi đè, slug/shortName/sortOrder, xoá tỉnh 409, reseed ghi đè)
+- Decision log: nguồn xlsx chính + CSV tên cũ; ghi đè Đào Duy Tư → Đào Duy Từ (user, progress.json decisions)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-2): task-02 geo` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -73,13 +76,13 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-04`, `layer-6-task-01`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-2/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Provinces.ts, Wards.ts

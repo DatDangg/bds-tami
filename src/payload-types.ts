@@ -76,6 +76,8 @@ export interface Config {
     'translation-usage': TranslationUsage;
     categories: Category;
     developers: Developer;
+    provinces: Province;
+    wards: Ward;
     services: Service;
     pages: Page;
     news: News;
@@ -96,6 +98,8 @@ export interface Config {
     'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
+    provinces: ProvincesSelect<false> | ProvincesSelect<true>;
+    wards: WardsSelect<false> | WardsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
@@ -446,6 +450,43 @@ export interface Developer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces".
+ */
+export interface Province {
+  id: string;
+  code: string;
+  name: string;
+  shortName?: string | null;
+  slug: string;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards".
+ */
+export interface Ward {
+  id: string;
+  province: string | Province;
+  code: string;
+  name: string;
+  type: 'phuong' | 'xa' | 'dac_khu';
+  slug: string;
+  /**
+   * Tên đơn vị cũ trước 01/07/2025, dùng cho tìm kiếm.
+   */
+  legacyNames?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
  */
 export interface Service {
@@ -787,6 +828,14 @@ export interface PayloadLockedDocument {
         value: string | Developer;
       } | null)
     | ({
+        relationTo: 'provinces';
+        value: string | Province;
+      } | null)
+    | ({
+        relationTo: 'wards';
+        value: string | Ward;
+      } | null)
+    | ({
         relationTo: 'services';
         value: string | Service;
       } | null)
@@ -1070,6 +1119,38 @@ export interface DevelopersSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces_select".
+ */
+export interface ProvincesSelect<T extends boolean = true> {
+  code?: T;
+  name?: T;
+  shortName?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards_select".
+ */
+export interface WardsSelect<T extends boolean = true> {
+  province?: T;
+  code?: T;
+  name?: T;
+  type?: T;
+  slug?: T;
+  legacyNames?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
