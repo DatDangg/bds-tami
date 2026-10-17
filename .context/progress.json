@@ -189,12 +189,18 @@
       "completedAt": "2026-10-17T10:15:00.000Z"
     }
   ],
-  "inProgressTask": null,
+  "inProgressTask": "layer-4/task-07",
   "blockedTasks": [
     {
       "task": "layer-2/task-02",
       "reason": "Chờ user gửi nguồn danh mục hành chính chính thức (34 tỉnh/thành + phường/xã sau 01/07/2025, kèm tên cũ) — task note cấm tự bịa",
       "since": "2026-10-16T13:58:50.661Z"
+    },
+    {
+      "task": "layer-4/task-06",
+      "status": "deferred",
+      "reason": "User chọn skip stack giám sát lúc này; bắt buộc làm trước M3/production. 4 AC code chuyển sang layer-5-task-05",
+      "since": "2026-10-17T10:30:00.000Z"
     }
   ],
   "decisions": [
@@ -232,9 +238,14 @@
       "date": "2026-10-17T09:00:00.000Z",
       "decision": "CD: GitHub-hosted runner build image tag SHA → GHCR → SSH vào server chạy scripts/deploy/deploy.sh (staging tự động sau CI PASS trên nhánh staging; production qua GitHub Environment required reviewers, cùng digest)",
       "reason": "User đồng ý phương án GitHub-hosted + GHCR + SSH (L4-T05)"
+    },
+    {
+      "date": "2026-10-17T10:30:00.000Z",
+      "decision": "Defer layer-4-task-06 (stack giám sát) tới trước M3/production; chuyển 4 AC code sang layer-5-task-05; tiếp layer-4-task-07",
+      "reason": "User đồng ý đề xuất skip task-06"
     }
   ],
-  "lastUpdated": "2026-10-17T10:15:00.000Z",
+  "lastUpdated": "2026-10-17T10:30:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

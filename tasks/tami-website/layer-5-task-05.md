@@ -35,6 +35,10 @@ Layout công khai dùng chung VI/EN theo screen spec.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-6-task-06`, `layer-6-task-07`, `layer-6-task-08`, `layer-7-task-03`, `layer-8-task-03`, `layer-8-task-04`, `layer-9-task-01`, `layer-10-task-03`
 
 ## Acceptance Criteria
+- [ ] L3-T01 MINOR-1: bỏ regex lookbehind `(?<!d)` trong `src/lib/monitoring/scrub-text.ts:7` (chunk client → SyntaxError, không hydrate trên Safari/iOS < 16.4, in-app Zalo/Facebook); có test — PHẢI xong trước deploy prod (spec-validation layer 3; chuyển từ layer-4-task-06 deferred)
+- [ ] L3-T01 MINOR-2/3: logger lọc tham số `%s` là Error / `%d`; giảm che nhầm số dài (timestamp ms, UUID, số tài khoản) và che SĐT dạng `(028) 3823 4567` (spec-validation layer 3; chuyển từ layer-4-task-06 deferred)
+- [ ] Upload source map GlitchTip (stack trình duyệt đang minify) (spec-validation layer 3; chuyển từ layer-4-task-06 deferred)
+- [ ] Prometheus chạy trong container scrape được app (L3-T03 MINOR-1: `127.0.0.1:3010/3011` của host không tới được từ container — dùng network chung/host-gateway) (spec-validation layer 3; chuyển từ layer-4-task-06 deferred)
 - [ ] Menu: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ (không có Mua bán)
 - [ ] Menu ngang chỉ ≥ xl; < xl dùng menu toàn màn hình (bẫy focus, Esc đóng, khoá cuộn nền)
 - [ ] Nút tìm kiếm header dẫn tới `/cho-thue?q=` (EN `/en/for-rent?q=`)

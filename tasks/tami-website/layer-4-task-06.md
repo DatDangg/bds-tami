@@ -1,5 +1,7 @@
 # Task 06: Stack giám sát: Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma + cảnh báo
 
+> ⏸ **DEFERRED (2026-10-17, user duyệt):** skip stack giám sát lúc này; PHẢI làm trước mốc M3 / deploy production (ít nhất Uptime Kuma báo web chết). 4 AC phía code (scrub-text lookbehind iOS<16.4, logger MINOR-2/3, source map, Prometheus scrape) đã chuyển sang `layer-5-task-05`. Khi làm lại: hỏi user dùng chung stack có sẵn trên server hay dựng riêng (đã giải thích cho user).
+
 ## Layer
 4 — Danh mục, cấu hình chung, truy vấn công khai, TranslationService, CD/giám sát/backup
 
@@ -32,10 +34,10 @@ Compose giám sát dùng chung prod/staging, bind `127.0.0.1`, có dashboard và
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] L3-T01 MINOR-1: bỏ regex lookbehind `(?<!d)` trong `src/lib/monitoring/scrub-text.ts:7` (chunk client → SyntaxError, không hydrate trên Safari/iOS < 16.4, in-app Zalo/Facebook); có test — PHẢI xong trước deploy prod (spec-validation layer 3)
-- [ ] L3-T01 MINOR-2/3: logger lọc tham số `%s` là Error / `%d`; giảm che nhầm số dài (timestamp ms, UUID, số tài khoản) và che SĐT dạng `(028) 3823 4567` (spec-validation layer 3)
-- [ ] Upload source map GlitchTip (stack trình duyệt đang minify) (spec-validation layer 3)
-- [ ] Prometheus chạy trong container scrape được app (L3-T03 MINOR-1: `127.0.0.1:3010/3011` của host không tới được từ container — dùng network chung/host-gateway) (spec-validation layer 3)
+- [→] L3-T01 MINOR-1: bỏ regex lookbehind `(?<!d)` trong `src/lib/monitoring/scrub-text.ts:7` (chunk client → SyntaxError, không hydrate trên Safari/iOS < 16.4, in-app Zalo/Facebook); có test — PHẢI xong trước deploy prod (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)
+- [→] L3-T01 MINOR-2/3: logger lọc tham số `%s` là Error / `%d`; giảm che nhầm số dài (timestamp ms, UUID, số tài khoản) và che SĐT dạng `(028) 3823 4567` (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)
+- [→] Upload source map GlitchTip (stack trình duyệt đang minify) (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)
+- [→] Prometheus chạy trong container scrape được app (L3-T03 MINOR-1: `127.0.0.1:3010/3011` của host không tới được từ container — dùng network chung/host-gateway) (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)
 - [ ] Mọi UI giám sát chỉ bind `127.0.0.1`, truy cập qua Nginx + Cloudflare Access
 - [ ] Cảnh báo: ổ cứng > 80%, 5xx tăng đột biến, `/api/health` fail, backup không chạy (metric từ task backup)
 - [ ] Uptime Kuma: trang chủ, `/api/health`, staging mỗi phút; kênh email/Telegram cấu hình bằng env
