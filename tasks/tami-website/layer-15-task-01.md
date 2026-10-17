@@ -97,3 +97,6 @@ Mở khoá cho: `layer-16-task-01`
 - Hẹn giờ xuất bản (Could) KHÔNG nằm trong lần deploy này; làm ở layer cuối và lên production qua lần deploy kế tiếp (CD: staging → duyệt tay → production).
 - Sau task này: spec-publisher sinh `spec/test-scope/current.json` (`trigger: initial-build`) theo `.agent/loop.md`; chạy lại sau khi Could lên production.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-5-task-07
+- Bấm Từ chối/Đồng ý trên CookieBanner xong focus rơi về `<body>` (`src/components/consent/CookieBanner.tsx:114,150-155`) → chuyển focus `main#main` nếu focus đang trong banner.

@@ -203,6 +203,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Mở lại từ footer "Cài đặt cookie / Cookie settings". Rút lại đồng ý → xoá cookie `_ga*` + không tải GA4 ở lần tải sau.
 - A11y: `role="region"` `aria-label="Cookie"`, không bẫy focus (không phải modal), xuất hiện sau nội dung chính trong thứ tự focus; dialog Tuỳ chọn là modal chuẩn.
 - Không ảnh hưởng HTML cache (§1.5): banner render client sau hydrate, đặt chỗ sẵn không gây CLS (dạng overlay cố định, không đẩy nội dung).
+- **As-built (layer-5-task-07):** cookie thêm `pv` = `privacyPolicyVersion` đã đồng ý (`{v:1, analytics, ts, pv}`) để so khi đổi version. Link footer "Cài đặt cookie" mở thẳng dialog Tuỳ chọn (hiện lựa chọn hiện tại, bật/tắt Phân tích) thay vì banner; ẩn link khi chưa cấu hình GA ID. < md banner đặt `--floating-bottom-offset` để nút nổi không bị che.
 
 ---
 

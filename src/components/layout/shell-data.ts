@@ -52,10 +52,17 @@ export interface FloatingContactView {
   fanpageUrl?: string;
 }
 
+/** Đầu vào cho banner đồng ý cookie: lấy từ `site-settings` (trường công khai). Không phụ thuộc cookie của khách. */
+export interface ConsentView {
+  gaMeasurementId: string | null;
+  privacyPolicyVersion: string;
+}
+
 export interface ShellView {
   navItems: NavItemView[];
   contact: FooterContactView;
   floatingContact: FloatingContactView;
+  consent: ConsentView;
   footer: {
     columns: FooterColumnView[];
     tagline: string;
@@ -165,5 +172,14 @@ export function buildFloatingContact(
     ...(hotline && telHref ? { hotline: { label: hotline, telHref } } : {}),
     ...(zaloUrl && isHttpUrl(zaloUrl) ? { zaloUrl } : {}),
     ...(fanpageUrl && isHttpUrl(fanpageUrl) ? { fanpageUrl } : {}),
+  };
+}
+
+export function buildConsent(
+  settings: { gaMeasurementId?: string | null; privacyPolicyVersion?: string | null } | null,
+): ConsentView {
+  return {
+    gaMeasurementId: settings?.gaMeasurementId?.trim() || null,
+    privacyPolicyVersion: settings?.privacyPolicyVersion?.trim() ?? "",
   };
 }

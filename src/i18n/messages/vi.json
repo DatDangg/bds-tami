@@ -52,6 +52,22 @@
         "privacy-policy": "Chính sách bảo mật",
         "terms-of-use": "Điều khoản sử dụng"
       }
+    },
+    "consent": {
+      "region": "Cookie",
+      "message": "TAMI dùng cookie phân tích (Google Analytics) để cải thiện website. Cookie cần thiết luôn bật.",
+      "privacyLink": "Chính sách bảo mật",
+      "decline": "Từ chối",
+      "accept": "Đồng ý",
+      "preferences": "Tuỳ chọn",
+      "close": "Đóng",
+      "preferencesTitle": "Tuỳ chọn cookie",
+      "preferencesDescription": "Chọn loại cookie anh/chị cho phép. Có thể thay đổi bất cứ lúc nào ở mục Cài đặt cookie cuối trang.",
+      "necessaryTitle": "Cần thiết",
+      "necessaryDescription": "Giúp website hoạt động (ghi nhớ ngôn ngữ, bảo mật). Luôn bật.",
+      "analyticsTitle": "Phân tích",
+      "analyticsDescription": "Google Analytics giúp TAMI hiểu cách khách dùng website để cải thiện. Chỉ bật khi anh/chị đồng ý.",
+      "save": "Lưu lựa chọn"
     }
   },
   "media": {

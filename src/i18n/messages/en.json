@@ -52,6 +52,22 @@
         "privacy-policy": "Privacy Policy",
         "terms-of-use": "Terms of Use"
       }
+    },
+    "consent": {
+      "region": "Cookie",
+      "message": "TAMI uses analytics cookies (Google Analytics) to improve this website. Essential cookies are always on.",
+      "privacyLink": "Privacy Policy",
+      "decline": "Decline",
+      "accept": "Accept",
+      "preferences": "Preferences",
+      "close": "Close",
+      "preferencesTitle": "Cookie preferences",
+      "preferencesDescription": "Choose which cookies you allow. You can change this at any time via Cookie settings in the footer.",
+      "necessaryTitle": "Essential",
+      "necessaryDescription": "Keeps the website working (language choice, security). Always on.",
+      "analyticsTitle": "Analytics",
+      "analyticsDescription": "Google Analytics helps TAMI understand how the website is used so we can improve it. Only on if you accept.",
+      "save": "Save choices"
     }
   },
   "media": {

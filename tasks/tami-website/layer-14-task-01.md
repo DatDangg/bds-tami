@@ -97,3 +97,6 @@ Mở khoá cho: `layer-15-task-01`
 ## Follow-up từ review layer-1-task-01 (16/10/2026)
 - Pin GitHub Actions theo commit SHA (`.github/workflows/ci.yml` đang dùng tag `@v4`).
 - Từ review layer-2-task-01: `X-Content-Type-Options: nosniff` cho `/api/media/file/*`; PDF trong `media` public ép `Content-Disposition: attachment` (hoặc phục vụ media từ domain riêng) để giảm rủi ro file polyglot.
+
+## Follow-up từ review layer-5-task-07
+- [ ] CSP cho phép GA4 (chỉ tải sau đồng ý cookie, `src/components/analytics/GoogleAnalytics.tsx`): `script-src` thêm `https://www.googletagmanager.com`; `connect-src` + `img-src` thêm `https://*.google-analytics.com`, `https://*.analytics.google.com`, `https://*.googletagmanager.com`. Kiểm: đồng ý cookie → gtag tải + gửi collect không bị CSP chặn.

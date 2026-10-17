@@ -6,6 +6,7 @@ import { type PageLinkKey, resolveNavLink } from "@/lib/content/nav-link";
 import { logger } from "@/lib/logger";
 import type { Locale } from "@/i18n/routing";
 import {
+  buildConsent,
   buildContact,
   buildFloatingContact,
   buildFooterColumns,
@@ -58,6 +59,7 @@ export async function loadShell(locale: Locale): Promise<ShellView> {
     navItems: header ? buildNavItems(header.navItems, locale, menuLabels) : fixedMenuItems(locale, menuLabels),
     contact: buildContact(settings),
     floatingContact: buildFloatingContact(settings),
+    consent: buildConsent(settings),
     footer: {
       columns: buildFooterColumns(footer?.columns, locale, fixedColumns),
       tagline: footer?.contactBlock?.trim() || t("footer.tagline"),

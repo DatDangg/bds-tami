@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import en from "@/i18n/messages/en.json";
 import vi_ from "@/i18n/messages/vi.json";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -9,12 +9,13 @@ import { OPEN_COOKIE_SETTINGS_EVENT } from "./cookie-settings-event";
 import { PublicShell } from "./PublicShell";
 import { buildFooterColumns, buildNavItems, type ShellView } from "./shell-data";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), usePathname: () => "/" }));
 
 const shell: ShellView = {
   navItems: buildNavItems(null, "vi", vi_.layout.nav.items),
   contact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, email: "info@tami.vn", address: "Quận 1" },
   floatingContact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" } },
+  consent: { gaMeasurementId: "G-TEST1234", privacyPolicyVersion: "1" },
   footer: {
     columns: buildFooterColumns(null, "vi", [
       { title: "Khám phá", links: [{ label: "Dự án", href: "/du-an", external: false }] },
@@ -28,16 +29,23 @@ const shell: ShellView = {
   },
 };
 
-function renderShell(locale: "vi" | "en" = "vi") {
+function renderShell(locale: "vi" | "en" = "vi", view: ShellView = shell) {
   const messages = locale === "vi" ? vi_ : en;
   return render(
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <PublicShell shell={shell}>
+      <PublicShell shell={view}>
         <h1>Nội dung</h1>
       </PublicShell>
     </NextIntlClientProvider>,
   );
 }
+
+beforeEach(() => {
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
+  });
+});
 
 afterEach(() => {
   document.cookie = "NEXT_LOCALE=; Path=/; Max-Age=0";
@@ -76,6 +84,11 @@ describe("PublicShell", () => {
     await user.click(within(footer).getByRole("button", { name: "Cài đặt cookie" }));
     window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, listener);
     expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it("footer: không có mã GA hợp lệ thì ẩn nút Cài đặt cookie (không có gì để quản lý)", () => {
+    renderShell("vi", { ...shell, consent: { gaMeasurementId: null, privacyPolicyVersion: "" } });
+    expect(within(screen.getByRole("contentinfo")).queryByRole("button", { name: "Cài đặt cookie" })).toBeNull();
   });
 
   it("footer EN: nhãn tiếng Anh, liên hệ và mạng xã hội an toàn", () => {

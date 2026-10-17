@@ -33,12 +33,12 @@ Không tải GA4 khi chưa đồng ý; banner không chặn trang, nút Từ ch�
 Mở khoá cho: `layer-6-task-01`, `layer-14-task-01`
 
 ## Acceptance Criteria
-- [ ] Chưa chọn/từ chối → không có script gtag, không cookie `_ga`
-- [ ] Đồng ý → chèn gtag với `site-settings.gaMeasurementId`; không có ID → không hiện banner
-- [ ] Đổi `privacyPolicyVersion` → hỏi lại
-- [ ] Rút lại đồng ý (footer "Cài đặt cookie") → xoá `_ga*`, lần tải sau không có GA4
-- [ ] Banner render client sau hydrate, overlay cố định (không CLS), không bẫy focus; dialog Tuỳ chọn là modal chuẩn
-- [ ] HTML trang không đổi theo cookie (an toàn cache CDN)
+- [x] Chưa chọn/từ chối → không có script gtag, không cookie `_ga`
+- [x] Đồng ý → chèn gtag với `site-settings.gaMeasurementId`; không có ID → không hiện banner
+- [x] Đổi `privacyPolicyVersion` → hỏi lại
+- [x] Rút lại đồng ý (footer "Cài đặt cookie") → xoá `_ga*`, lần tải sau không có GA4
+- [x] Banner render client sau hydrate, overlay cố định (không CLS), không bẫy focus; dialog Tuỳ chọn là modal chuẩn
+- [x] HTML trang không đổi theo cookie (an toàn cache CDN)
 
 ## Tests cần viết
 - RTL: từ chối → không chèn script; đồng ý → chèn đúng ID
@@ -52,20 +52,21 @@ Mở khoá cho: `layer-6-task-01`, `layer-14-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type: review FAIL round 1 (MAJOR-1: hydrate render enabled=false xoá `_ga` mỗi lần tải trang) — đã sửa attempt 2
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 6/6 PASS + follow-up L5-T06 (`--floating-bottom-offset`)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 95 file 991 PASS (gồm test hydrate renderToString + hydrateRoot giữ `_ga`); pnpm build PASS. Trình duyệt (next start, site-settings test `G-TEST1234`): 375/768/1280 không cuộn ngang, nút ≥44, nút nổi không bị che (offset 238px ở 375); đồng ý → reload giữ `_ga` + 1 request gtag; từ chối → không gtag/`_ga`; rút đồng ý từ footer xoá `_ga*` + `ga-disable`
+- Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-5-task-07-round-2-review.md`
+- Residual risk: chưa có dữ liệu GA4 thật (ID giả, `_ga` đặt tay). MINOR-A: bấm Từ chối/Đồng ý trên banner thì focus rơi về body (đề xuất focus `main#main`) → L15-T01 a11y sweep. CSP cho GA → AC L14-T01. CI kiểm importMap không lệch → đề xuất cho L6-T01/CI.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: `.context/design-spec.md` §3.10 thêm as-built note (cookie `pv`, footer mở dialog, ẩn khi không có GA ID)
+- Decision log: reviewer chấp nhận 2 lệch (thêm `pv`; footer mở dialog thay banner) — không cần spec delta
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-07 cookie` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -73,17 +74,17 @@ Mở khoá cho: `layer-6-task-01`, `layer-14-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-07` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/consent/CookieBanner.tsx, ConsentPreferences.tsx
-- src/lib/consent/consent-cookie.ts (`tami_consent` `{v:1, analytics, ts}`, 12 tháng)
+- src/lib/consent/consent-cookie.ts (`tami_consent` `{v:1, analytics, ts, pv}`, 12 tháng)
 - src/components/analytics/GoogleAnalytics.tsx
 
 ## Notes

@@ -22,6 +22,8 @@ interface FooterProps {
   copyright: string;
   contact: FooterContactView;
   socials: SocialLinkView[];
+  /** Có cookie tuỳ chọn (GA4) để quản lý; không có thì ẩn nút, tránh control không làm gì. */
+  showCookieSettings: boolean;
 }
 
 /** Tên thương hiệu không dịch. `other` dùng nhãn i18n chung. */
@@ -36,7 +38,7 @@ const SOCIAL_PLATFORMS: Record<string, { name: string; icon: ReactElement }> = {
 };
 
 /** Chân trang tối (design-spec §2.4): logo + giới thiệu, các cột liên kết + liên hệ, dòng cuối (bản quyền, mạng xã hội, ngôn ngữ, cookie). */
-export function Footer({ columns, tagline, copyright, contact, socials }: FooterProps) {
+export function Footer({ columns, tagline, copyright, contact, socials, showCookieSettings }: FooterProps) {
   const hasContact = Boolean(contact.hotline ?? contact.email ?? contact.address);
   return (
     <footer className="theme-dark-block py-section-tight">
@@ -68,7 +70,9 @@ export function Footer({ columns, tagline, copyright, contact, socials }: Footer
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <SocialLinks socials={socials} />
             <LanguageSwitcher />
-            <CookieSettingsButton className="inline-flex min-h-11 cursor-pointer items-center text-small text-text-secondary underline-offset-4 hover:text-text hover:underline" />
+            {showCookieSettings && (
+              <CookieSettingsButton className="inline-flex min-h-11 cursor-pointer items-center text-small text-text-secondary underline-offset-4 hover:text-text hover:underline" />
+            )}
           </div>
         </div>
       </div>
