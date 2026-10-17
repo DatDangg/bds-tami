@@ -10,6 +10,7 @@
 |----|---------|------|-----------|-------------|-----|------|
 | BL-001 | Design debt header/footer: header 2 hàng ở xl, website bỏ qua `header.ctaButton`/logo nhập trong CMS, footer chưa accordion < md, menu toàn màn hình thiếu accordion menu con (L5-T05 decision log; G18 spec-validation layer 5) | MODIFY | blocked (chờ user quyết làm trong build hay sau build; chưa tạo change doc) | — | 2026-10-17 | |
 | BL-002 | Base image Debian 11 (EOL) của postgres/backup (`docker/backup/`): nâng lên base còn hỗ trợ (L4 G14; G18 spec-validation layer 5) | MODIFY | blocked (chờ user duyệt thời điểm nâng; chưa tạo change doc) | — | 2026-10-17 | |
+| BL-003 | `down` của 8 migration do Payload sinh lỗi khi rollback (DROP CONSTRAINT `payload_locked_documents_rels_*_fk` sau `DROP TABLE … CASCADE`): click_events, categories_developers, translation_usage, services_pages, news, provinces_wards, projects, job_postings. Đề xuất: sửa riêng `down` (`IF EXISTS`), giữ nguyên `up` + snapshot — là ngoại lệ luật "không sửa migration đã apply", hoặc ghi runbook rollback = fix-forward (review L5-T04 round 2) | BUG | blocked (chờ user duyệt ngoại lệ; chưa tạo change doc) | — | 2026-10-18 | |
 
 ## Quy tắc tracking
 

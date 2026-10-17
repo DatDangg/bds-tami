@@ -92,3 +92,6 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 ## Notes
 - Lệch nhỏ giữa ARCHITECTURE ("ẩn tin") và SPEC F6 ("mở URL trực tiếp thì hiện băng") — theo SPEC: ẩn khỏi danh sách bằng truy vấn, không đổi status.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-5-task-04
+- [ ] Danh sách tuyển dụng lọc `deadline >= hôm nay` (access chưa lọc); trang chi tiết tin hết hạn vẫn mở, hiện trạng thái "Hết hạn" + noindex, follow (DESIGN.md:305).

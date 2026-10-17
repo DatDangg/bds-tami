@@ -35,11 +35,11 @@ Tin tuyển dụng (dùng bộ field chung) và hồ sơ ứng tuyển chỉ adm
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-08`, `layer-6-task-09`, `layer-6-task-10`, `layer-8-task-05`, `layer-9-task-06`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
-- [ ] `job-postings` đủ trường ERD §4.10, `deadline` bắt buộc + index
-- [ ] `job-applications`: chỉ admin đọc/sửa (`status`, `note`); khách/sale không đọc; không tạo qua REST công khai (chỉ qua endpoint ở task sau)
-- [ ] Trường khách gửi (`fullName`, `phone`, `email`, `message`, `cv`, `consent*`, `locale`) chỉ đọc trong admin
-- [ ] Trạng thái `new → reviewing → interview → hired | rejected`
+- [x] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
+- [x] `job-postings` đủ trường ERD §4.10, `deadline` bắt buộc + index
+- [x] `job-applications`: chỉ admin đọc/sửa (`status`, `note`); khách/sale không đọc; không tạo qua REST công khai (chỉ qua endpoint ở task sau)
+- [x] Trường khách gửi (`fullName`, `phone`, `email`, `message`, `cv`, `consent*`, `locale`) chỉ đọc trong admin
+- [x] Trạng thái `new → reviewing → interview → hired | rejected`
 
 ## Tests cần viết
 - Integration: sale sửa/xoá tin tuyển dụng của sale khác → 403; xoá mềm + admin khôi phục; không xoá được danh mục đang có tin tuyển dụng
@@ -55,20 +55,21 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-08`, `layer-6-task-09`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 3
+- Last failure type: review FAIL round 1 (M1 xoá hồ sơ ứng tuyển để lại CV) — sửa attempt 2; attempt 3 = MINOR m5–m8
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS toàn bộ (gồm G12)
+- Verify commands + result: pnpm lint / typecheck = PASS; pnpm test 104 file 1.102 PASS (25 integration job-postings, DB thật); pnpm build PASS. Migration dev: `20261017_130625_job_postings` (batch 15) + `20261017_132020_job_applications_cv_nullable` (batch 16), migrate:status 16/16, `cv_id` nullable. "Khách POST → 403" kiểm qua Local API `overrideAccess:false` (cùng access check với REST)
+- Reviewer verdict: STRICT FAIL round 1 → PASS round 2 → PASS round 3 (delta) — `.context/review-reports/build-tami-website-layer-5-task-04-round-3-review.md`
+- Residual risk: S3 chỉ giả lập trong test. Local API bulk delete (overrideAccess) vẫn bỏ qua `disableBulkDelete` → ghi vào L9-T06. Ẩn tin hết hạn làm ở truy vấn danh sách L6-T08 (chi tiết vẫn mở cho link chia sẻ). `down` của migration job_postings (và 7 migration đã commit) lỗi khi rollback — pattern Payload sinh, chờ user (BACKLOG BL-003)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.10 nếu lệch)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.10 + §5 (`job_postings_list_idx`), `docs/PERMISSION.md` §3.3
+- Decision log: thêm migration riêng cho `cv_id` nullable thay vì sửa migration đã apply (primary); guard 409 xoá cứng tin còn hồ sơ (reviewer chấp nhận)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-04 jobsposts` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -76,13 +77,13 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-08`, `layer-6-task-09`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-04` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/JobPostings.ts, JobApplications.ts

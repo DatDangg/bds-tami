@@ -12,6 +12,8 @@ import * as migration_20261017_092524_services_pages from './20261017_092524_ser
 import * as migration_20261017_093650_news from './20261017_093650_news';
 import * as migration_20261017_122831_provinces_wards from './20261017_122831_provinces_wards';
 import * as migration_20261017_125429_projects from './20261017_125429_projects';
+import * as migration_20261017_130625_job_postings from './20261017_130625_job_postings';
+import * as migration_20261017_132020_job_applications_cv_nullable from './20261017_132020_job_applications_cv_nullable';
 
 export const migrations = [
   {
@@ -82,6 +84,16 @@ export const migrations = [
   {
     up: migration_20261017_125429_projects.up,
     down: migration_20261017_125429_projects.down,
-    name: '20261017_125429_projects'
+    name: '20261017_125429_projects',
+  },
+  {
+    up: migration_20261017_130625_job_postings.up,
+    down: migration_20261017_130625_job_postings.down,
+    name: '20261017_130625_job_postings',
+  },
+  {
+    up: migration_20261017_132020_job_applications_cv_nullable.up,
+    down: migration_20261017_132020_job_applications_cv_nullable.down,
+    name: '20261017_132020_job_applications_cv_nullable'
   },
 ];

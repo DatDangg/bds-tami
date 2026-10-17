@@ -3,6 +3,7 @@ import type { Payload } from "payload";
 import { seedDefaultCategories } from "./categories";
 import { seedGeo } from "./geo";
 import { seedLegalPages } from "./pages";
+import { seedSampleJobPostings } from "./sample/job-postings";
 import { seedSampleNews } from "./sample/news";
 import { seedSampleProjects } from "./sample/projects";
 import { seedSampleServices } from "./sample/services";
@@ -68,6 +69,13 @@ const SAMPLE_STEPS: readonly SeedStep[] = [
     name: "dự án mẫu",
     async run(payload) {
       const { created, skipped } = await seedSampleProjects(payload);
+      return `tạo ${created}, bỏ qua ${skipped}`;
+    },
+  },
+  {
+    name: "tin tuyển dụng mẫu",
+    async run(payload) {
+      const { created, skipped } = await seedSampleJobPostings(payload);
       return `tạo ${created}, bỏ qua ${skipped}`;
     },
   },

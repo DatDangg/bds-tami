@@ -92,3 +92,7 @@ Mở khoá cho: `layer-12-task-01`
 
 ## Follow-up từ review layer-1-task-07 (16/10/2026)
 - Job hết retry (`payload_jobs` có `hasError`/`totalTried` max) giữ PII khách trong `input` và bảng `payload_jobs_log` → `data-retention` phải xoá/ẩn danh các job lỗi cũ (vd > 7 ngày) cùng log của chúng.
+
+## Follow-up từ review layer-5-task-04
+- [ ] Xoá CV hết hạn: đặt `job-applications.cv = null` + `anonymizedAt` TRƯỚC rồi mới xoá `private-files` (cv chỉ bắt buộc khi chưa ẩn danh; FK `ON DELETE SET NULL`).
+- [ ] Không dùng xoá hàng loạt theo `where` trên `job-applications` qua Local API (overrideAccess bỏ qua `disableBulkDelete`, mất rollback CV/audit) — lặp xoá theo id hoặc chỉ ẩn danh.

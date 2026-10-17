@@ -82,6 +82,8 @@ export interface Config {
     pages: Page;
     news: News;
     projects: Project;
+    'job-postings': JobPosting;
+    'job-applications': JobApplication;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -105,6 +107,8 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
+    'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -798,6 +802,128 @@ export interface Project {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-postings".
+ */
+export interface JobPosting {
+  id: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  province?: (string | null) | Province;
+  workplace?: string | null;
+  employmentType: 'full_time' | 'part_time' | 'internship' | 'contract';
+  salaryMinVnd?: number | null;
+  salaryMaxVnd?: number | null;
+  salaryText?: string | null;
+  quantity?: number | null;
+  deadline: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  requirements?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  benefits?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-applications".
+ */
+export interface JobApplication {
+  id: string;
+  jobPosting: string | JobPosting;
+  fullName: string;
+  phone: string;
+  email: string;
+  message?: string | null;
+  cv?: (string | null) | PrivateFile;
+  consentAt: string;
+  consentVersion: string;
+  locale: 'vi' | 'en';
+  status: 'new' | 'reviewing' | 'interview' | 'hired' | 'rejected';
+  /**
+   * Ghi chú nội bộ, ứng viên không thấy.
+   */
+  note?: string | null;
+  ipHash?: string | null;
+  anonymizedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -980,6 +1106,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'job-postings';
+        value: string | JobPosting;
+      } | null)
+    | ({
+        relationTo: 'job-applications';
+        value: string | JobApplication;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1476,6 +1610,74 @@ export interface ProjectsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-postings_select".
+ */
+export interface JobPostingsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  province?: T;
+  workplace?: T;
+  employmentType?: T;
+  salaryMinVnd?: T;
+  salaryMaxVnd?: T;
+  salaryText?: T;
+  quantity?: T;
+  deadline?: T;
+  description?: T;
+  requirements?: T;
+  benefits?: T;
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-applications_select".
+ */
+export interface JobApplicationsSelect<T extends boolean = true> {
+  jobPosting?: T;
+  fullName?: T;
+  phone?: T;
+  email?: T;
+  message?: T;
+  cv?: T;
+  consentAt?: T;
+  consentVersion?: T;
+  locale?: T;
+  status?: T;
+  note?: T;
+  ipHash?: T;
+  anonymizedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,0 +1,37 @@
+import type { CollectionAfterDeleteHook } from "payload";
+
+import { writeAuditLog } from "../../lib/audit/write-audit-log";
+
+/**
+ * Xoá hồ sơ ứng tuyển thì xoá luôn CV (`private-files`): nếu không, dòng metadata (tên file thường chứa tên ứng viên) và
+ * object S3 mồ côi vĩnh viễn, job `data-retention` duyệt theo `job-applications` sẽ không bao giờ tìm thấy (ERD §7, BR-31).
+ * Xoá qua Local API cùng `req` (cùng transaction) để hook `afterDelete` của plugin S3 xoá object; lỗi thì rollback cả hai.
+ * Dùng `where` thay vì `id` để CV đã mất trước đó (hồ sơ đã ẩn danh, `cv` = null) không làm hỏng việc xoá hồ sơ.
+ */
+export const deleteApplicationCv: CollectionAfterDeleteHook = async ({ doc, req }) => {
+  const cvId = typeof doc.cv === "object" && doc.cv !== null ? doc.cv.id : doc.cv;
+  if (!cvId) return doc;
+  const result = await req.payload.delete({
+    collection: "private-files",
+    where: { id: { equals: cvId } },
+    overrideAccess: true,
+    req,
+  });
+  if (result.errors.length > 0) {
+    throw new Error(`Không xoá được CV của hồ sơ ứng tuyển ${doc.id}`);
+  }
+  return doc;
+};
+
+/** Xoá hồ sơ chứa dữ liệu cá nhân thì phải có dấu vết; summary chỉ có id, không có tên/email/SĐT của ứng viên. */
+export const auditApplicationPurge: CollectionAfterDeleteHook = async ({ doc, req }) => {
+  await writeAuditLog({
+    actor: req.user,
+    action: "content.purge",
+    collection: "job-applications",
+    docId: doc.id,
+    summary: `Xoá hẳn job-applications ${doc.id}`,
+    req,
+  });
+  return doc;
+};

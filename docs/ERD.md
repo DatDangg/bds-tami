@@ -370,15 +370,17 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `province` | `rel→provinces` | | Nơi làm việc |
 | `workplace` | text | | Địa chỉ cụ thể |
 | `employmentType` | select | R | `full_time` · `part_time` · `internship` · `contract` |
-| `salaryMinVnd`, `salaryMaxVnd` | number | | Dùng cho JSON-LD `JobPosting` |
+| `salaryMinVnd`, `salaryMaxVnd` | number | | Dùng cho JSON-LD `JobPosting`. `salaryMaxVnd` ≥ `salaryMinVnd` khi cả hai có giá trị |
 | `salaryText` | text | | "Thỏa thuận", "15–30 triệu + hoa hồng" |
-| `quantity` | number | | |
+| `quantity` | number | | Tối thiểu 1 |
 | `deadline` | date | R, I | Quá hạn thì tự ẩn khỏi danh sách |
 | `description`, `requirements`, `benefits` | richText | R / R / | |
 | `status` | select | R, I | |
 | `publishedAt` | date | | |
 | `author` | `rel→staff` | R | |
 | `seo` | group | | |
+
+Đã xây (as-built): không có `isFeatured`. Xoá **hẳn** (chỉ admin) tin còn hồ sơ ứng tuyển bị chặn **409** (`job_applications.job_posting_id` NOT NULL nhưng FK `ON DELETE SET NULL`); xoá mềm vẫn được và hồ sơ giữ nguyên. Tin quá hạn chỉ bị loại khỏi danh sách ở query công khai (trang chi tiết vẫn truy cập được, xem DESIGN).
 
 **`job-applications`** (chỉ admin đọc)
 
@@ -388,7 +390,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `fullName` | text | R | |
 | `phone` | text | R | |
 | `email` | email | R | |
-| `cv` | upload `rel→private-files` | R | PDF/DOC/DOCX ≤ 5MB |
+| `cv` | upload `rel→private-files` | R (đến khi ẩn danh) | PDF/DOC/DOCX ≤ 5MB. Bắt buộc cho tới khi `anonymizedAt` được đặt; cột `cv_id` cho phép NULL để job `data-retention` xoá CV |
 | `message` | textarea | | |
 | `status` | select | R, I | `new` · `reviewing` · `interview` · `hired` · `rejected` |
 | `note` | textarea | | Ghi chú nội bộ |
@@ -397,6 +399,12 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `locale` | select | R | `vi` · `en`: ngôn ngữ khách dùng khi nộp (BR-21) |
 | `ipHash` | text | | Hash IP (không lưu IP thô) |
 | `anonymizedAt` | date | | Đặt khi job `data-retention` xử lý |
+
+Đã xây (as-built):
+- Trường do ứng viên gửi (`jobPosting`, `fullName`, `phone`, `email`, `message`, `cv`, `consentAt`, `consentVersion`, `locale`) và `anonymizedAt` chỉ đọc: không ai sửa qua API kể cả admin; admin chỉ đổi `status` và `note`. Không ai tạo qua API (`create` bị từ chối); bản ghi chỉ do endpoint công khai tạo bằng Local API `overrideAccess`.
+- `ipHash` không bao giờ trả ra qua API/admin (`read` bị từ chối), chỉ lưu trong DB.
+- Không bật `trash`, `versions`, nhân bản: không sinh thêm bản sao dữ liệu cá nhân. `status` không ép thứ tự chuyển trạng thái.
+- Admin xoá hồ sơ: hook `afterDelete` xoá luôn CV trong `private-files` (cùng transaction; plugin S3 xoá object) và ghi audit `content.purge` chỉ có id, không có PII. Hồ sơ đã ẩn danh (`cv` null) vẫn xoá được. Thứ tự hook: audit trước, xoá CV (không hoàn tác được trên S3) sau cùng; xoá CV lỗi thì rollback cả hồ sơ + audit. `disableBulkDelete: true`: chỉ xoá từng hồ sơ, vì bulk delete không đảm bảo rollback này.
 
 ### 4.11. `leads`, `lead-activities`
 
@@ -539,6 +547,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `projects` | `(status, has_english, sales_status, province_id)` (`projects_list_idx`, SQL tuỳ biến trong migration `20261017_125429_projects`, không partial — giống `news_list_idx`) | Lọc dự án |
 | `property_posts` | `(status, category_id, published_at DESC)`, `(status, is_featured, offer_end_at)` | Danh sách, khối ưu đãi |
 | `news` | `(status, has_english, category_id, published_at DESC)` (`news_list_idx`, SQL tuỳ biến trong migration `20261017_093650_news`) | Danh sách tin tức |
+| `job_postings` | `(status, has_english, deadline)` (`job_postings_list_idx`, SQL tuỳ biến trong migration `20261017_130625_job_postings`, không partial) | Danh sách tin tuyển dụng còn hạn |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |
 | `leads` | `(status, assigned_to_id, created_at DESC)` | Danh sách lead trong admin |
 | `audit_logs` | `(created_at)` (btree, Postgres quét ngược cho mới-nhất-trước), `(collection, doc_id)`, `actor`, `action` | Tra cứu nhật ký |

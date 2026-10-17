@@ -65,7 +65,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 |---|---|---|---|
 | `leads` | **Chỉ tạo** qua endpoint `POST /api/public/leads` | Đọc + sửa **Được giao**; không xoá, không xuất | ✔ (đọc, sửa, phân công, xoá mềm, xuất Excel) |
 | `lead-activities` | — | Đọc + thêm trên lead **Được giao** | Đọc + thêm |
-| `job-applications` | **Chỉ tạo** qua `POST /api/public/job-applications` | — | ✔ |
+| `job-applications` | **Chỉ tạo** qua `POST /api/public/job-applications` (endpoint dùng Local API `overrideAccess`; không ai, kể cả admin, tạo được qua REST/admin) | — (403 đọc/sửa/xoá) | Đọc; sửa **chỉ `status` và `note`** (trường khách gửi là chỉ đọc, `ipHash` không bao giờ trả ra); xoá (kèm xoá CV, ghi audit không PII) |
 | `private-files` | — | — | ✔ (tải qua endpoint kiểm quyền) |
 
 ### 3.4. Hệ thống
