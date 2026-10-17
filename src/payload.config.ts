@@ -8,8 +8,10 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 import { AuditLogs } from "./collections/AuditLogs";
+import { Categories } from "./collections/Categories";
 import { ClickEvents } from "./collections/ClickEvents";
 import { ClickStatsDaily } from "./collections/ClickStatsDaily";
+import { Developers } from "./collections/Developers";
 import { Media } from "./collections/Media";
 import { PrivateFiles } from "./collections/PrivateFiles";
 import { Staff } from "./collections/Staff";
@@ -43,7 +45,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily],
+  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, Categories, Developers],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint],

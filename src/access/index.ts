@@ -4,6 +4,7 @@ export { isAssignedOrAdmin } from "./isAssignedOrAdmin";
 export { isAuthorOrAdmin } from "./isAuthorOrAdmin";
 export { isStaff } from "./isStaff";
 export { ownedByUserOrAdmin } from "./ownedByUserOrAdmin";
+export { readUnlessTrashed } from "./readUnlessTrashed";
 export {
   buildPublicWhere,
   makePublishedOnly,

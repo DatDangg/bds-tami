@@ -34,15 +34,15 @@ Danh mục riêng từng loại nội dung (tối đa 2 cấp) và chủ đầu 
 Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-6-task-01`, `layer-6-task-02`, `layer-7-task-01`, `layer-8-task-01`, `layer-9-task-07`, `layer-13-task-04`
 
 ## Acceptance Criteria
-- [ ] G7: `withContentDefaults` thêm option bỏ bớt field dùng chung (vd `omit: ["slug","author"]`) và slug unique theo scope (`scopeField` → unique (`_locale`, `scope`, `slug`) cho `categories`, ERD §4.3); có test (spec-validation layer 3)
-- [ ] L3-T02 n2: `fieldAccess` bỏ qua giá trị `undefined` (không được ghi đè deny-all thành mở quyền) và throw khi tên field lạ (`content-defaults.ts:49-55`); có test (spec-validation layer 3)
-- [ ] L3-T02 n1: kiểm trùng slug không dùng `like` (ILIKE %prefix%, pagination:false) — dùng `equals base` OR tiền tố `head-` (`fields/slug.ts:41`) (spec-validation layer 3)
-- [ ] `categories`: name/slug/description/seo localized; `scope` ∈ {rental, property_post, news, project, job}; slug unique theo (`_locale`, `scope`, `slug`)
-- [ ] `parent` cùng scope, tối đa 2 cấp (hook kiểm tra)
-- [ ] Không xoá được danh mục có danh mục con; hook kiểm tra nội dung đang dùng theo bảng scope → collection (mỗi task nội dung thêm test cho collection của mình)
-- [ ] `developers` có `hasEnglish`/`translation`, `showAsPartner`, logo
-- [ ] Khách/sale đọc; admin ghi
-- [ ] Seed danh mục mặc định theo ERD §4.3, idempotent
+- [x] G7: `withContentDefaults` thêm option bỏ bớt field dùng chung (vd `omit: ["slug","author"]`) và slug unique theo scope (`scopeField` → unique (`_locale`, `scope`, `slug`) cho `categories`, ERD §4.3); có test (spec-validation layer 3)
+- [x] L3-T02 n2: `fieldAccess` bỏ qua giá trị `undefined` (không được ghi đè deny-all thành mở quyền) và throw khi tên field lạ (`content-defaults.ts:49-55`); có test (spec-validation layer 3)
+- [x] L3-T02 n1: kiểm trùng slug không dùng `like` (ILIKE %prefix%, pagination:false) — dùng `equals base` OR tiền tố `head-` (`fields/slug.ts:41`) (spec-validation layer 3)
+- [x] `categories`: name/slug/description/seo localized; `scope` ∈ {rental, property_post, news, project, job}; slug unique theo (`_locale`, `scope`, `slug`)
+- [x] `parent` cùng scope, tối đa 2 cấp (hook kiểm tra)
+- [x] Không xoá được danh mục có danh mục con; hook kiểm tra nội dung đang dùng theo bảng scope → collection (mỗi task nội dung thêm test cho collection của mình)
+- [x] `developers` có `hasEnglish`/`translation`, `showAsPartner`, logo
+- [x] Khách/sale đọc; admin ghi
+- [x] Seed danh mục mặc định theo ERD §4.3, idempotent
 
 ## Tests cần viết
 - Integration: con khác scope cha → lỗi; cấp 3 → lỗi
@@ -59,20 +59,33 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2 (sau Reviewer round 1 FAIL: MAJOR-1 duplicate phá UNIQUE). Attempt 1: không có lỗi phải retry.
+- Last failure type: review MAJOR-1 (Duplicate: Payload `beforeDuplicate` thêm " - Copy" vào `scopeSlug` mọi locale + copy slug locale khác → trùng (en, scope, slug) mà UNIQUE DB không bắt). Fix: `disableDuplicate: true` cho Categories (Payload chặn cả Local API/REST, 400); danh mục nền hiếm khi cần nhân bản, và sửa tại `slugField` chung là phạm vi rộng hơn task.
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria (builder, chờ Reviewer STRICT):
+  - G7: `withContentDefaults` thêm `omit` (tên trường dùng chung), `scopeField` (slug lọc theo scope + trường ẩn `scopeSlug` unique localized → UNIQUE `(scope_slug, _locale)`), `route: null` (không có trang riêng); bỏ `status` mà không tự đặt `access.read` thì ném lỗi. Test: `src/collections/_shared/content-defaults.test.ts`, `src/fields/slug.test.ts`, `tests/integration/categories.test.ts`.
+  - n2: `fieldAccess` bỏ khoá `undefined`, ném lỗi khi tên không phải trường dùng chung / đã omit. Test: `content-defaults.test.ts` "fieldAccess (n2)".
+  - n1: kiểm trùng slug dùng `in` trên ≤ 20 ứng viên `base, base-2...` mỗi lượt (Payload không có toán tử "bắt đầu bằng"; `like`/`contains` đều là `ILIKE %x%`), lặp lượt kế nếu bị chiếm hết. Test: `src/fields/slug.test.ts` (không có `like`/`contains`, 1 truy vấn thường, 2 lượt khi 25 ứng viên bị chiếm).
+  - categories/developers/hook cây/chặn xoá/quyền/seed: `tests/integration/categories.test.ts` (24 test, DB tạm).
+- Verify commands + result (Builder attempt 1): `pnpm install --frozen-lockfile` OK; `pnpm lint` OK; `pnpm typecheck` OK; `pnpm test` FULL 66 file / 667 test PASS; `pnpm build` OK. `pnpm payload migrate` áp `20261017_031052_categories_developers` lên DB dev, `migrate:status` batch 7 = Yes; `pnpm seed:categories` chạy 2 lần trên DB dev: tạo 11 rồi bỏ qua 11.
+- Attempt 2 (sau Reviewer round 1) - cách sửa:
+  - MAJOR-1: `Categories` `disableDuplicate: true`. Test `tests/integration/categories.test.ts` "MAJOR-1" (vi+en, `payload.duplicate` → 400, chỉ 1 bản (en, scope, slug)): FAIL trước sửa (duplicate thành công), PASS sau.
+  - MINOR-1: hook `src/hooks/categories/lock-scope.ts` ép `scope` = bản đã lưu khi update (kể cả `overrideAccess: true`). Test "MINOR-1": FAIL trước (scope đổi sang rental), PASS sau.
+  - MINOR-2: `validate-tree.ts` chặn `parent` có `deletedAt`. Test "MINOR-2": đã PASS cả trước sửa (Payload từ chối cha trong thùng rác ở bước khác); check tường minh giữ làm lớp phòng thủ.
+  - MINOR-3: `fields/slug.ts` `isAllowedScope` (đọc options select từ `collection.flattenedFields`) - scope ngoài enum không đi vào truy vấn → validate select trả 400. Test integration "MINOR-3" FAIL trước (không phải 400), PASS sau; unit test thêm trong `src/fields/slug.test.ts`.
+  - MINOR-4: không làm; residual: lỗi unique do race báo trên field ẩn `scopeSlug` (map sang `slug` cần `afterError` tuỳ biến, không gọn).
+  - Drift check: `pnpm payload migrate:create drift_check_tmp` trên DB dev → "No schema changes detected", không sinh file (từ chối tạo file rỗng) → no drift; không có migration mới.
+- Verify attempt 2 (sau lần sửa cuối): install --frozen-lockfile OK; lint OK; typecheck OK; `pnpm test` FULL 66 file / 672 test PASS; build OK; `migrate:status` 7/7 Yes.
+- Follow-up: (1) Dockerfile chưa COPY `seed/` → thêm ở layer-6-task-01 trước deploy staging (cần danh mục mặc định). (2) `slugField` chung: duplicate ở collection khác (`developers`, collection nội dung layer 5+) gán slug `xyz - Copy` sai định dạng `[a-z0-9-]` → đề xuất task riêng thêm `beforeDuplicate` chung cho `slugField`.
+- Reviewer verdict: round 1 FAIL (MAJOR-1 duplicate phá UNIQUE scopeSlug) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-4-task-01-round-2-review.md`). Residual: MINOR-1 duplicate `developers` → slug locale khác dạng `xyz - Copy` (do slugField chung) → đã gắn AC `layer-5-task-01`; MINOR-4 lỗi race UNIQUE báo trên field ẩn `scopeSlug`; Dockerfile chưa COPY `seed/` → đã gắn AC `layer-6-task-01`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.3/§4.4 nếu lệch)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.3 (as-built: UNIQUE qua `scopeSlug`, scope khoá sau khi tạo, chặn xoá cả xoá mềm, seed), §4.4 (as-built), §5 (ghi chú UNIQUE của categories). Không đổi PERMISSION/API_SPEC.
+- Decision log: UNIQUE (`_locale`, `scope`, `slug`) qua field ẩn localized `scopeSlug` (Postgres không UNIQUE xuyên 2 bảng); scope khoá sau khi tạo; Categories `disableDuplicate`; categories/developers `versions: false`
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-4): task-01 cats` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -80,13 +93,13 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-4/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Categories.ts
@@ -94,6 +107,7 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-
 - src/hooks/categories/guard-delete.ts (map scope → collection)
 - seed/categories.ts
 - migrations/*
+- (thêm, ngoài danh sách gốc) src/collections/_shared/content-defaults.ts, src/fields/{slug,scope-slug,name}.ts, src/lib/slug.ts, src/access/readUnlessTrashed.ts, src/hooks/categories/{scope-collections,validate-tree,lock-scope}.ts, scripts/seed-categories.ts, package.json (`seed:categories`), src/payload.config.ts, tests/fixtures/categories/*, tests/integration/categories.test.ts
 
 ## Notes
 - ⚠️ PERMISSION: sale chỉ đọc `developers`; nếu vướng thì mở quyền qua `/change`.

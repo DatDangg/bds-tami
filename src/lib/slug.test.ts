@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appendUniqueSuffix, SLUG_MAX_LENGTH, slugify } from "./slug";
+import { appendUniqueSuffix, SLUG_MAX_LENGTH, slugify, suffixedSlug } from "./slug";
 
 describe("slugify", () => {
   it.each([
@@ -81,5 +81,14 @@ describe("appendUniqueSuffix", () => {
     const result = appendUniqueSuffix(base, new Set([base]));
     expect(result).toHaveLength(SLUG_MAX_LENGTH);
     expect(result.endsWith("-2")).toBe(true);
+  });
+});
+
+describe("suffixedSlug", () => {
+  it("ghép -n và cắt phần gốc cho vừa maxLength", () => {
+    expect(suffixedSlug("can-ho", 2)).toBe("can-ho-2");
+    const long = "a".repeat(SLUG_MAX_LENGTH);
+    expect(suffixedSlug(long, 12)).toBe(`${"a".repeat(SLUG_MAX_LENGTH - 3)}-12`);
+    expect(suffixedSlug("ab-cd", 2, 5)).toBe("ab-2");
   });
 });

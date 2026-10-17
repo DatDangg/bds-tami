@@ -4,6 +4,7 @@ import { isAdmin, isAuthorOrAdmin, isStaff, makePublishedOnly, PUBLIC_STATUSES }
 import { authorField } from "../../fields/author";
 import { isFeaturedField } from "../../fields/is-featured";
 import { publishedAtField } from "../../fields/published-at";
+import { scopeSlugField } from "../../fields/scope-slug";
 import { seoField } from "../../fields/seo";
 import { slugField } from "../../fields/slug";
 import { CONTENT_STATUSES, type ContentStatus, statusField } from "../../fields/status";
@@ -17,6 +18,21 @@ import { CONTENT_ROUTES, type ContentRoute } from "../../lib/content/content-pat
 /** Số bản phiên bản giữ lại mỗi bản ghi (ERD §7). */
 export const MAX_VERSIONS_PER_DOC = 20;
 
+/** Tên các trường dùng chung mà `omit` / `fieldAccess` nhắm tới (`slug` gồm cả `scopeSlug` khi có `scopeField`). */
+export const SHARED_FIELD_NAMES = [
+  "slug",
+  "status",
+  "publishedAt",
+  "author",
+  "isFeatured",
+  "hasEnglish",
+  "translation",
+  "seo",
+] as const;
+export type SharedFieldName = (typeof SHARED_FIELD_NAMES)[number];
+
+type FieldAccessOverrides = Partial<Record<"create" | "read" | "update", FieldAccess | undefined>>;
+
 export interface ContentOptions {
   /** Các giá trị `status` hợp lệ; `rentals` truyền thêm `rented`. */
   statuses?: readonly ContentStatus[];
@@ -24,15 +40,29 @@ export interface ContentOptions {
   publicStatuses?: readonly string[];
   /** Trường nguồn sinh slug (mặc định `title`; `categories` dùng `name`). */
   slugSource?: string;
+  /**
+   * Slug chỉ duy nhất trong cùng giá trị của trường này (vd `scope` của `categories`, ERD §4.3): kiểm trùng lọc theo
+   * trường đó và DB giữ UNIQUE (`_locale`, trường, `slug`) qua trường phụ `scopeSlug`. Không dùng chung với `omit: ["slug"]`.
+   */
+  scopeField?: string;
   /** Trường EN bắt buộc để bật `hasEnglish` (mặc định `title`, `slug`; thêm mô tả ngắn + nội dung chính theo collection). */
   englishRequiredFields?: readonly string[];
-  /** Trang công khai để làm mới cache; mặc định tra `CONTENT_ROUTES` theo slug collection. */
-  route?: ContentRoute;
+  /**
+   * Trang công khai để làm mới cache; mặc định tra `CONTENT_ROUTES` theo slug collection. `null` = collection không
+   * có trang riêng (danh mục nền, chủ đầu tư): bỏ hook làm mới cache.
+   */
+  route?: ContentRoute | null;
+  /**
+   * Bỏ bớt trường dùng chung mà ERD không định nghĩa cho collection (vd `pages` không có `slug`/`author`).
+   * Bỏ `status` thì collection PHẢI tự đặt `access.read` (mặc định lọc theo `status`).
+   */
+  omit?: readonly SharedFieldName[];
   /**
    * Ghi đè access của trường dùng chung theo tên (gộp nông vào access mặc định). Vd `pages` cho admin bật EN:
-   * `{ hasEnglish: { update: isAdmin } }`. Access cấp collection (`create`...) ghi đè qua `collection.access`.
+   * `{ hasEnglish: { update: isAdmin } }`. Khoá có giá trị `undefined` bị bỏ qua (không bao giờ biến deny-all thành
+   * mở quyền); tên không phải trường dùng chung (hoặc đã `omit`) thì ném lỗi. Access cấp collection ghi đè qua `collection.access`.
    */
-  fieldAccess?: Readonly<Record<string, Partial<Record<"create" | "read" | "update", FieldAccess>>>>;
+  fieldAccess?: Readonly<Record<string, FieldAccessOverrides>>;
   /** Chỉ test ghi đè để không phụ thuộc Next. */
   revalidate?: RevalidatePaths;
 }
@@ -46,12 +76,45 @@ const deleteAccess: Access = (args) => {
   return isSoftDelete ? isAuthorOrAdmin(args) : isAdmin(args);
 };
 
-function applyFieldAccess(fields: Field[], overrides: ContentOptions["fieldAccess"]): Field[] {
-  if (!overrides) return fields;
-  return fields.map((field) => {
-    const override = "name" in field ? overrides[field.name] : undefined;
-    return override ? ({ ...field, access: { ...("access" in field ? field.access : {}), ...override } } as Field) : field;
-  });
+/** Mỗi phần tử: tên trường dùng chung → các trường thật sinh ra (`slug` kèm `scopeSlug`, `hasEnglish`/`translation` tách riêng). */
+function buildSharedFields(options: ContentOptions): Array<[SharedFieldName, Field[]]> {
+  const translation = translationFields();
+  const part = (name: string) => translation.filter((field) => "name" in field && field.name === name);
+  return [
+    ["slug", [slugField({ sourceField: options.slugSource, scopeField: options.scopeField }), ...(options.scopeField ? [scopeSlugField(options.scopeField)] : [])]],
+    ["status", [statusField(options.statuses ?? CONTENT_STATUSES)]],
+    ["publishedAt", [publishedAtField()]],
+    ["author", [authorField()]],
+    ["isFeatured", [isFeaturedField()]],
+    ["hasEnglish", part("hasEnglish")],
+    ["translation", part("translation")],
+    ["seo", [seoField()]],
+  ];
+}
+
+function withFieldAccess(fields: Field[], override: FieldAccessOverrides): Field[] {
+  const defined = Object.fromEntries(Object.entries(override).filter(([, access]) => access !== undefined));
+  return fields.map((field) =>
+    "name" in field && field.name !== "scopeSlug"
+      ? ({ ...field, access: { ...("access" in field ? field.access : {}), ...defined } } as Field)
+      : field,
+  );
+}
+
+function resolveSharedFields(options: ContentOptions, collectionSlug: string): Field[] {
+  const omitted = new Set<string>(options.omit ?? []);
+  if (options.scopeField && omitted.has("slug")) {
+    throw new Error(`Collection "${collectionSlug}": scopeField cần trường slug, không thể omit "slug".`);
+  }
+  const overrides = options.fieldAccess ?? {};
+  const available = buildSharedFields(options).filter(([name]) => !omitted.has(name));
+  const unknown = Object.keys(overrides).filter((name) => !available.some(([shared]) => shared === name));
+  if (unknown.length > 0) {
+    throw new Error(
+      `Collection "${collectionSlug}": fieldAccess nhắm trường không phải trường dùng chung (hoặc đã omit): ${unknown.join(", ")}.`,
+    );
+  }
+  return available.flatMap(([name, fields]) => (overrides[name] ? withFieldAccess(fields, overrides[name]) : fields));
 }
 
 /**
@@ -61,10 +124,14 @@ function applyFieldAccess(fields: Field[], overrides: ContentOptions["fieldAcces
  */
 export function withContentDefaults(collection: CollectionConfig, options: ContentOptions = {}): CollectionConfig {
   const slug = collection.slug as CollectionSlug;
-  const route = options.route ?? (CONTENT_ROUTES as Record<string, ContentRoute | undefined>)[slug];
-  if (!route) throw new Error(`Thiếu trang công khai (route) cho collection nội dung "${slug}".`);
+  const omitsStatus = options.omit?.includes("status") ?? false;
+  if (omitsStatus && !collection.access?.read) {
+    throw new Error(`Collection "${slug}" bỏ trường status nên phải tự đặt access.read (mặc định lọc theo status).`);
+  }
+  const route = options.route === undefined ? (CONTENT_ROUTES as Record<string, ContentRoute | undefined>)[slug] : options.route;
+  if (route === undefined) throw new Error(`Thiếu trang công khai (route) cho collection nội dung "${slug}".`);
   const publicStatuses = options.publicStatuses ?? PUBLIC_STATUSES.default;
-  const revalidate = createRevalidateContent({ route, publicStatuses, revalidate: options.revalidate });
+  const revalidate = route ? createRevalidateContent({ route, publicStatuses, revalidate: options.revalidate }) : undefined;
 
   return {
     ...collection,
@@ -84,23 +151,9 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
         requireEnglishFields(options.englishRequiredFields ?? ["title", "slug"]),
         ...(collection.hooks?.beforeValidate ?? []),
       ],
-      afterChange: [auditContentTrash, revalidate.afterChange, ...(collection.hooks?.afterChange ?? [])],
-      afterDelete: [auditContentPurge, revalidate.afterDelete, ...(collection.hooks?.afterDelete ?? [])],
+      afterChange: [auditContentTrash, ...(revalidate ? [revalidate.afterChange] : []), ...(collection.hooks?.afterChange ?? [])],
+      afterDelete: [auditContentPurge, ...(revalidate ? [revalidate.afterDelete] : []), ...(collection.hooks?.afterDelete ?? [])],
     },
-    fields: [
-      ...collection.fields,
-      ...applyFieldAccess(
-        [
-          slugField({ sourceField: options.slugSource }),
-          statusField(options.statuses ?? CONTENT_STATUSES),
-          publishedAtField(),
-          authorField(),
-          isFeaturedField(),
-          ...translationFields(),
-          seoField(),
-        ],
-        options.fieldAccess,
-      ),
-    ],
+    fields: [...collection.fields, ...resolveSharedFields(options, collection.slug)],
   };
 }

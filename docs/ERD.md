@@ -174,6 +174,12 @@ Dữ liệu mặc định (seed, admin sửa được):
 - `property_post`: Tin BĐS · Voucher / Ưu đãi
 - `news`: Thị trường · Tin TAMI · Đời sống
 
+**As-built (layer-4-task-01):** `src/collections/Categories.ts` dùng `withContentDefaults` với `omit` `status`/`publishedAt`/`author`/`isFeatured`, `route: null`, `versions: false`, nên có thêm `hasEnglish` + `translation`, xoá mềm (`deletedAt`) và audit, nhưng không có `status`/`author`. Khách/sale đọc, chỉ admin ghi. `scope` chỉ chọn lúc tạo (sửa sau bị bỏ qua, kể cả Local API `overrideAccess: true`, nhờ hook `lock-scope`) để không làm lệch cha–con và nội dung đang dùng. `disableDuplicate: true` (Payload thêm " - Copy" vào mọi locale của trường `unique` và copy nguyên slug locale khác, phá UNIQUE `(_locale, scope, slug)`). Cha không được ở thùng rác.
+- **UNIQUE (`_locale`, `scope`, `slug`)**: Postgres không tạo được UNIQUE xuyên hai bảng (`scope` ở `categories`, `slug` ở `categories_locales`), nên có trường ẩn `scopeSlug` (localized, `unique`, giá trị `<scope>/<slug>`, do hook ghi, không lộ ra API) và Payload sinh `UNIQUE (scope_slug, _locale)` trên `categories_locales`; cùng ngữ nghĩa, không cần SQL tuỳ biến hay trigger. Cột `slug` chỉ có index thường. Kiểm trùng lúc ghi lọc theo `scope` rồi thêm `-2`, `-3`.
+- **Chặn xoá** (`src/hooks/categories/guard-delete.ts`): cả xoá hẳn (`beforeDelete`) lẫn xoá mềm (đặt `deletedAt`, `beforeValidate`) đều trả 409 khi còn danh mục con hoặc còn nội dung dùng, tính cả bản đã xoá mềm. Bảng scope → collection nằm ở `src/hooks/categories/scope-collections.ts` (`rentals`, `property-posts`, `news`, `projects`, `job-postings`, trường `category`); collection chưa có trong config thì bỏ qua.
+- **Cây** (`validate-tree.ts`): `parent` phải cùng `scope`, là danh mục gốc (tối đa 2 cấp), không phải chính nó; danh mục đang có con không gắn được vào cha khác.
+- Seed: `seed/categories.ts` (`pnpm seed:categories`), idempotent theo (`scope`, slug sinh từ tên).
+
 ### 4.4. `developers` (chủ đầu tư)
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |
@@ -185,6 +191,8 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `website` | text (URL) | | |
 | `showAsPartner` | checkbox | | Hiện trong khối đối tác trên trang chủ (FR-PUB-17) |
 | `sortOrder` | number | | |
+
+**As-built (layer-4-task-01):** `src/collections/Developers.ts`, `withContentDefaults` với `omit` `status`/`publishedAt`/`author`/`isFeatured`/`seo`, `versions: false`; có `hasEnglish` + `translation`, xoá mềm. `slug` (localized) tự sinh từ `name`, unique theo (`_locale`, `slug`). `website` chỉ nhận http(s). Khách/sale đọc, chỉ admin ghi (PERMISSION §3.2).
 
 ### 4.5. `projects`
 
@@ -529,7 +537,7 @@ Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (p
 
 | Bảng | Index | Phục vụ |
 |---|---|---|
-| `<collection>_locales` (mọi collection nội dung) | UNIQUE `(_locale, slug)` | Tra trang theo slug từng ngôn ngữ |
+| `<collection>_locales` (mọi collection nội dung) | UNIQUE `(_locale, slug)` (`categories`: UNIQUE `(scope_slug, _locale)`, xem §4.3) | Tra trang theo slug từng ngôn ngữ |
 | `rentals_locales` | GIN `search_text gin_trgm_ops` (thay cho index trên bảng `rentals`) | Tìm từ khoá theo ngôn ngữ đang xem |
 | `rentals`, `projects`, `property_posts`, `news`, `job_postings` | thêm cột `has_english` ngay sau `status` trong các index danh sách ở trên, vd `(status, has_english, category_id, …)` | Lọc danh sách bản tiếng Anh |
 

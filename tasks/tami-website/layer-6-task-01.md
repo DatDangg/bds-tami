@@ -44,6 +44,7 @@ build (initial)
 Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Acceptance Criteria
+- [ ] Dockerfile COPY `seed/` (và chạy `seed:categories` được trong container) trước deploy staging (review L4-T01)
 - [ ] Từ layer-1-task-06/L3-T03: kiểm `nginx -v` (≥ 1.18 cho `listen 443 ssl http2`) và `docker version` trên server; hỏi user bật Authenticated Origin Pulls (khối conf đã có, đang comment); smoke test 2 IP thật qua Cloudflare rơi vào 2 bucket rate limit (spec-validation layer 3)
 - [ ] Cloudflare cache rule: `/api/*` bypass **trừ `/api/media/file/*`** → cache (Edge TTL theo header origin immutable) — **chỉ áp host prod**; host staging bypass cache toàn bộ (hoặc Cloudflare Access) để ảnh/static staging không lọt qua basic auth (review L3-T03 round 2 MINOR-R2-1/R2-2) (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`)
 - [ ] ⏸ Mỗi bước chạm server (tạo thư mục, `.env`, Nginx, Cloudflare, chạy pipeline) chỉ làm sau khi user xác nhận trong chat

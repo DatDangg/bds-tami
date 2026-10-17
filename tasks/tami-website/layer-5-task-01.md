@@ -35,6 +35,7 @@ CRUD dự án trong admin đủ trường ERD §4.5, dùng bộ field chung.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-02`, `layer-6-task-04`, `layer-6-task-05`, `layer-7-task-01`, `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] Trước khi collection nội dung mở Duplicate: `slugField` chung có `beforeDuplicate` để slug các locale không phải dạng `xyz - Copy` (sinh lại/để trống cho admin đặt; áp cả `developers`), có test (review L4-T01 round 2 MINOR-1)
 - [ ] Đủ trường ERD §4.5 (gồm `location` PostGIS point, `scale`, `amenities`, `floorPlans`, `documents`, `legalInfo`, `salesPolicy`)
 - [ ] `gallery` bắt buộc khi `published`; ảnh đầu là ảnh đại diện
 - [ ] Dùng factory kit: slug, seo, status, publishedAt, author, isFeatured, hasEnglish/translation, versions, xoá mềm, revalidate

@@ -32,6 +32,13 @@ function truncateAtWordBoundary(slug: string, maxLength: number): string {
   return (lastHyphen > 0 ? head.slice(0, lastHyphen) : head).replace(/-+$/, "");
 }
 
+/** Ứng viên thứ `n` (n ≥ 2) của `base`: `base-n`, phần gốc cắt bớt để cả chuỗi ≤ `maxLength`. */
+export function suffixedSlug(base: string, n: number, maxLength: number = SLUG_MAX_LENGTH): string {
+  const suffix = `-${n}`;
+  const head = base.slice(0, maxLength - suffix.length).replace(/-+$/, "");
+  return `${head}${suffix}`;
+}
+
 /**
  * Trả `base` nếu chưa nằm trong `taken`, ngược lại `base-2`, `base-3`... (số nhỏ nhất còn trống).
  * Phần gốc bị cắt khi cần để slug có hậu tố vẫn ≤ `maxLength`.
@@ -43,9 +50,7 @@ export function appendUniqueSuffix(
 ): string {
   if (!taken.has(base)) return base;
   for (let n = 2; ; n++) {
-    const suffix = `-${n}`;
-    const head = base.slice(0, maxLength - suffix.length).replace(/-+$/, "");
-    const candidate = `${head}${suffix}`;
+    const candidate = suffixedSlug(base, n, maxLength);
     if (!taken.has(candidate)) return candidate;
   }
 }

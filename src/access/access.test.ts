@@ -7,6 +7,7 @@ import {
   isAuthorOrAdmin,
   isStaff,
   publishedOnly,
+  readUnlessTrashed,
   rentalsPublishedOnly,
 } from "./index";
 import { ROLES } from "./roles";
@@ -96,5 +97,17 @@ describe("publishedOnly", () => {
 
   it("tài khoản khoá: false, không rơi về quyền khách", () => {
     expect(publishedOnly(argsFor(lockedSale))).toBe(false);
+  });
+});
+
+describe("readUnlessTrashed", () => {
+  it("khách: mọi bản chưa xoá mềm (không đọc được thùng rác)", () => {
+    expect(readUnlessTrashed(argsFor(null))).toEqual({ deletedAt: { exists: false } });
+  });
+
+  it("staff đang hoạt động: thấy tất cả; tài khoản khoá: false", () => {
+    expect(readUnlessTrashed(argsFor(sale))).toBe(true);
+    expect(readUnlessTrashed(argsFor(admin))).toBe(true);
+    expect(readUnlessTrashed(argsFor(lockedSale))).toBe(false);
   });
 });

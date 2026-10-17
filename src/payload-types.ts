@@ -73,6 +73,8 @@ export interface Config {
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
+    categories: Category;
+    developers: Developer;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +89,8 @@ export interface Config {
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    developers: DevelopersSelect<false> | DevelopersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -314,6 +318,106 @@ export interface ClickStatsDaily {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name?: string | null;
+  scope: 'rental' | 'property_post' | 'news' | 'project' | 'job';
+  parent?: (string | null) | Category;
+  description?: string | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  scopeSlug?: string | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "developers".
+ */
+export interface Developer {
+  id: string;
+  name?: string | null;
+  logo?: (string | null) | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Địa chỉ trang web, bắt đầu bằng https://
+   */
+  website?: string | null;
+  showAsPartner?: boolean | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -460,6 +564,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'click-stats-daily';
         value: string | ClickStatsDaily;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'developers';
+        value: string | Developer;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -655,6 +767,71 @@ export interface ClickStatsDailySelect<T extends boolean = true> {
   count?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  scope?: T;
+  parent?: T;
+  description?: T;
+  sortOrder?: T;
+  slug?: T;
+  scopeSlug?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "developers_select".
+ */
+export interface DevelopersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  description?: T;
+  website?: T;
+  showAsPartner?: T;
+  sortOrder?: T;
+  slug?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -16,6 +16,7 @@
     "test": "vitest run",
     "payload": "payload",
     "jobs": "payload run scripts/jobs-runner.ts",
+    "seed:categories": "payload run scripts/seed-categories.ts",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap"
   },
