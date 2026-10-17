@@ -7,6 +7,7 @@ import { logger } from "@/lib/logger";
 import type { Locale } from "@/i18n/routing";
 import {
   buildContact,
+  buildFloatingContact,
   buildFooterColumns,
   buildNavItems,
   buildSocialLinks,
@@ -56,6 +57,7 @@ export async function loadShell(locale: Locale): Promise<ShellView> {
   return {
     navItems: header ? buildNavItems(header.navItems, locale, menuLabels) : fixedMenuItems(locale, menuLabels),
     contact: buildContact(settings),
+    floatingContact: buildFloatingContact(settings),
     footer: {
       columns: buildFooterColumns(footer?.columns, locale, fixedColumns),
       tagline: footer?.contactBlock?.trim() || t("footer.tagline"),

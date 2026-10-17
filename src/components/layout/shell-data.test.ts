@@ -3,6 +3,7 @@ import en from "@/i18n/messages/en.json";
 import vi from "@/i18n/messages/vi.json";
 import {
   buildContact,
+  buildFloatingContact,
   buildFooterColumns,
   buildNavItems,
   buildSocialLinks,
@@ -121,5 +122,15 @@ describe("footer", () => {
         { platform: "other", url: "javascript:alert(1)" },
       ]),
     ).toEqual([{ platform: "facebook", url: "https://facebook.com/tami" }]);
+  });
+});
+
+describe("buildFloatingContact", () => {
+  it("hotline thành tel:, Zalo/Fanpage giữ http(s), bỏ link nguy hiểm hoặc trống", () => {
+    expect(
+      buildFloatingContact({ hotline: " 0901 234 567 ", zaloUrl: "https://zalo.me/tami", fanpageUrl: "javascript:alert(1)" }),
+    ).toEqual({ hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, zaloUrl: "https://zalo.me/tami" });
+    expect(buildFloatingContact({ hotline: "", zaloUrl: "  " })).toEqual({});
+    expect(buildFloatingContact(null)).toEqual({});
   });
 });

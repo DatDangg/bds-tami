@@ -129,5 +129,49 @@
       "title": "Thank you!",
       "description": "A TAMI advisor will contact you during business hours."
     }
+  },
+  "page": {
+    "floating": {
+      "group": "Quick contact",
+      "open": "Quick contact",
+      "close": "Close quick contact",
+      "hotline": "Call hotline",
+      "zalo": "Chat on Zalo",
+      "fanpage": "Facebook fanpage"
+    },
+    "breadcrumb": {
+      "nav": "Breadcrumb",
+      "backTo": "Back to {label}"
+    },
+    "pagination": {
+      "nav": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "goToPage": "Page {page}",
+      "status": "Page {page}/{total}"
+    },
+    "empty": {
+      "filteredTitle": "No matching listings",
+      "filteredDescription": "Try removing some filters or changing the area.",
+      "clearFilters": "Clear filters",
+      "getAdvice": "Get advice",
+      "emptyTitle": "There are no articles in this section yet.",
+      "backToList": "Back to the list"
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "This page may have moved or no longer exists.",
+      "backHome": "Back to home",
+      "browseRentals": "Browse rentals",
+      "quickLinks": "Quick links"
+    },
+    "serverError": {
+      "title": "Something went wrong",
+      "description": "Please try again in a few minutes.",
+      "descriptionWithHotline": "Please try again in a few minutes. For urgent help, call {hotline}.",
+      "retry": "Try again",
+      "backHome": "Back to home",
+      "errorCode": "Error code: {digest}"
+    }
   }
 }

@@ -2,15 +2,22 @@ import type { Endpoint, PayloadRequest } from "payload";
 import { z } from "zod";
 
 import { runPublicPipeline, type PublicPipelineDeps, type ValidationOutcome } from "../_middleware/public-pipeline";
-import { CLICK_TYPES } from "../../lib/click-stats/click-types";
+import { CLICK_REF_COLLECTIONS, CLICK_TYPES } from "../../lib/click-stats/click-types";
 
 /** Body hợp lệ chỉ vài chục byte; chặn sớm body lớn bất thường trước khi parse. */
 const MAX_BODY_CHARS = 2_000;
 
 export const clickEventBodySchema = z.object({
   type: z.enum(CLICK_TYPES),
-  pagePath: z.string().trim().min(1).max(500).startsWith("/"),
-  refCollection: z.string().max(64).regex(/^[a-z0-9-]+$/).nullish(),
+  // Đường dẫn nội bộ: "//host" và "/\host" là URL cùng giao thức (protocol-relative) chứ không phải đường dẫn trên site.
+  pagePath: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .startsWith("/")
+    .refine((path) => !path.startsWith("//") && !path.startsWith("/\\"), "Phải là đường dẫn nội bộ"),
+  refCollection: z.enum(CLICK_REF_COLLECTIONS).nullish(),
   refId: z.string().max(64).regex(/^[A-Za-z0-9_-]+$/).nullish(),
 });
 

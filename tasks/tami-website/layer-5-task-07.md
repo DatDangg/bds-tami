@@ -89,3 +89,6 @@ Mở khoá cho: `layer-6-task-01`, `layer-14-task-01`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-5-task-06
+- Khi CookieBanner đang hiện: đặt CSS var `--floating-bottom-offset` trên `<html>` = chiều cao banner (gỡ khi đóng) để FloatingContact (`src/components/layout/FloatingContact.tsx`) không bị đè. Từ `md` banner ở góc trái dưới thì không cần.

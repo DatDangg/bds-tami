@@ -35,11 +35,11 @@ Các khối dùng lại cho mọi trang danh sách/chi tiết.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-6-task-06`, `layer-6-task-07`, `layer-6-task-08`, `layer-7-task-03`, `layer-8-task-03`, `layer-8-task-04`, `layer-9-task-01`
 
 ## Acceptance Criteria
-- [ ] Nút nổi góc dưới phải: Hotline/Zalo/Fanpage từ `site-settings`; bấm gửi `sendBeacon` đúng `type`/`pagePath`; không đè cookie banner
-- [ ] Breadcrumb có JSON-LD `BreadcrumbList` (dùng helper ở task SEO nếu đã có, hoặc tự sinh tối thiểu)
-- [ ] Phân trang có `aria-current`, link thật (crawl được)
-- [ ] Trạng thái trống có nút xoá bộ lọc
-- [ ] 404 và 500 hiện đúng ngôn ngữ đang xem, có link về trang chủ ngôn ngữ đó
+- [x] Nút nổi góc dưới phải: Hotline/Zalo/Fanpage từ `site-settings`; bấm gửi `sendBeacon` đúng `type`/`pagePath`; không đè cookie banner
+- [x] Breadcrumb có JSON-LD `BreadcrumbList` (dùng helper ở task SEO nếu đã có, hoặc tự sinh tối thiểu)
+- [x] Phân trang có `aria-current`, link thật (crawl được)
+- [x] Trạng thái trống có nút xoá bộ lọc
+- [x] 404 và 500 hiện đúng ngôn ngữ đang xem, có link về trang chủ ngôn ngữ đó (sau hydrate — xem Residual risk 1)
 
 ## Tests cần viết
 - RTL: bấm Zalo gọi sendBeacon với body đúng
@@ -54,20 +54,25 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 PASS + follow-up G2 (click-events: `refCollection` enum `CLICK_REF_COLLECTIONS`, chặn `pagePath` bắt đầu `//` hoặc `/\`)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 93 file 954 test PASS; pnpm build PASS (`/[locale]/[...rest]` dynamic). Builder kiểm `/en/khong-ton-tai` trên trình duyệt ở 375: không cuộn ngang, touch target ≥44
+- Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-5-task-06-round-1-review.md`
+- Residual risk:
+  1. HTML server của 404/500 là shell `__next_error__` rỗng (root layout nằm dưới `[locale]` động); nội dung đúng ngôn ngữ chỉ có sau hydrate. Status 404 + noindex đúng. Hướng sửa: `app/layout.tsx` trả children + `app/not-found.tsx` theo next-intl, hoặc `experimental.globalNotFound`; 404 locale sai ở `[locale]/layout.tsx:28` cùng gốc. Nêu ở checkpoint layer / spec-validator.
+  2. Cookie banner chưa có: banner phải đặt `--floating-bottom-offset` trên `<html>` khi hiện (đã ghi vào L5-T07).
+  3. EN 404 không có dòng "có bản tiếng Việt" — đúng design-spec S17 (không xác định được trang VI).
+  - MINOR (reviewer): FloatingContact chưa gửi `refCollection`/`refId` (§2.5, ghi vào L6-T05, L7-T03); beacon nên `text/plain`; `json-ld.ts:19` `new URL` ném lỗi nếu `NEXT_PUBLIC_SITE_URL` sai; `EmptyState.tsx:28` biểu thức khó đọc; `CategoryListTemplate` chưa có test riêng (kèm test trang danh mục L6-T04); `Pagination.tsx:43` `aria-live` thừa; 11 tên collection trong `click-types.ts` cần đối chiếu ERD ở spec-validation layer 5.
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: no doc impact (không đổi API contract công khai ngoài siết validate click-events; không đổi schema)
+- Decision log: none
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-06 layoututil` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -75,13 +80,13 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-06` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/layout/FloatingContact.tsx (sendBeacon `/api/public/click-events`)

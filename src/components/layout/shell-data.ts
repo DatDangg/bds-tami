@@ -45,9 +45,17 @@ export interface SocialLinkView {
   url: string;
 }
 
+/** Ba đích của nút liên hệ nổi (FR-PUB-12). Thiếu đích nào thì ẩn nút đó. */
+export interface FloatingContactView {
+  hotline?: { label: string; telHref: string };
+  zaloUrl?: string;
+  fanpageUrl?: string;
+}
+
 export interface ShellView {
   navItems: NavItemView[];
   contact: FooterContactView;
+  floatingContact: FloatingContactView;
   footer: {
     columns: FooterColumnView[];
     tagline: string;
@@ -143,4 +151,19 @@ export function buildContact(settings: { hotline?: string | null; email?: string
 /** Chỉ nhận http(s): URL này thành `href`, chặn `javascript:`... */
 export function buildSocialLinks(links: readonly { platform: string; url: string }[] | null | undefined): SocialLinkView[] {
   return (links ?? []).flatMap((link) => (isHttpUrl(link.url) ? [{ platform: link.platform, url: link.url }] : []));
+}
+
+/** Nút nổi: hotline → `tel:`; Zalo/Fanpage chỉ nhận http(s) (URL này thành `href`, chặn `javascript:`...). */
+export function buildFloatingContact(
+  settings: { hotline?: string | null; zaloUrl?: string | null; fanpageUrl?: string | null } | null,
+): FloatingContactView {
+  const hotline = settings?.hotline?.trim();
+  const telHref = hotline ? toTelHref(hotline) : "";
+  const zaloUrl = settings?.zaloUrl?.trim();
+  const fanpageUrl = settings?.fanpageUrl?.trim();
+  return {
+    ...(hotline && telHref ? { hotline: { label: hotline, telHref } } : {}),
+    ...(zaloUrl && isHttpUrl(zaloUrl) ? { zaloUrl } : {}),
+    ...(fanpageUrl && isHttpUrl(fanpageUrl) ? { fanpageUrl } : {}),
+  };
 }

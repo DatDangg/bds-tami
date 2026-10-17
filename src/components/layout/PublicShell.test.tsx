@@ -14,6 +14,7 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 const shell: ShellView = {
   navItems: buildNavItems(null, "vi", vi_.layout.nav.items),
   contact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, email: "info@tami.vn", address: "Quận 1" },
+  floatingContact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" } },
   footer: {
     columns: buildFooterColumns(null, "vi", [
       { title: "Khám phá", links: [{ label: "Dự án", href: "/du-an", external: false }] },

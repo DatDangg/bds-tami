@@ -129,5 +129,49 @@
       "title": "Cảm ơn anh/chị!",
       "description": "Chuyên viên TAMI sẽ liên hệ trong giờ làm việc."
     }
+  },
+  "page": {
+    "floating": {
+      "group": "Liên hệ nhanh",
+      "open": "Liên hệ nhanh",
+      "close": "Đóng liên hệ nhanh",
+      "hotline": "Gọi hotline",
+      "zalo": "Chat Zalo",
+      "fanpage": "Fanpage Facebook"
+    },
+    "breadcrumb": {
+      "nav": "Đường dẫn trang (Breadcrumb)",
+      "backTo": "Quay lại {label}"
+    },
+    "pagination": {
+      "nav": "Phân trang",
+      "previous": "Trước",
+      "next": "Sau",
+      "goToPage": "Trang {page}",
+      "status": "Trang {page}/{total}"
+    },
+    "empty": {
+      "filteredTitle": "Không tìm thấy tin phù hợp",
+      "filteredDescription": "Thử bớt điều kiện lọc hoặc đổi khu vực.",
+      "clearFilters": "Xoá bộ lọc",
+      "getAdvice": "Nhận tư vấn",
+      "emptyTitle": "Chưa có bài viết trong mục này.",
+      "backToList": "Về danh sách"
+    },
+    "notFound": {
+      "title": "Không tìm thấy trang",
+      "description": "Trang có thể đã đổi địa chỉ hoặc không còn.",
+      "backHome": "Về trang chủ",
+      "browseRentals": "Xem tin cho thuê",
+      "quickLinks": "Liên kết nhanh"
+    },
+    "serverError": {
+      "title": "Đã có lỗi xảy ra",
+      "description": "Vui lòng thử lại sau ít phút.",
+      "descriptionWithHotline": "Vui lòng thử lại sau ít phút. Nếu cần gấp, gọi hotline {hotline}.",
+      "retry": "Thử lại",
+      "backHome": "Về trang chủ",
+      "errorCode": "Mã lỗi: {digest}"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { FloatingContact } from "./FloatingContact";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import type { ShellView } from "./shell-data";
@@ -17,6 +18,7 @@ export function PublicShell({ shell, children }: { shell: ShellView; children: R
         {children}
       </main>
       <Footer {...shell.footer} contact={shell.contact} />
+      <FloatingContact contact={shell.floatingContact} />
     </>
   );
 }
