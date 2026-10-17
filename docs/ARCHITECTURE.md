@@ -237,12 +237,13 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | 1 bản (có thể chạy 2) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
-| `postgres` | riêng (`postgis/postgis:17-3.5`) | riêng | `mem_limit` 2g / 512m |
+| `postgres` | riêng (`tami-postgres:17-3.5-pgbackrest2.59` = `postgis/postgis:17-3.5` + pgbackrest, build từ `docker/backup/Dockerfile`; bật `archive_mode`, `archive_timeout=300`) | riêng | `mem_limit` 2g / 512m |
+| `backup` (sidecar) | 1 bản: lịch + pgBackRest (diff/full/check) + restic, kho đích ngoài server cấu hình bằng env | 1 bản, kho riêng | `mem_limit` 384m / 256m |
 | `redis` | riêng (có mật khẩu, `maxmemory 100mb`, `volatile-lru`) | riêng | 128m |
 | `seaweedfs` | **As-built:** mỗi môi trường 1 instance riêng trong compose của mình (không publish cổng, khoá S3 lấy từ env), bucket riêng (`tami-prod-*`) — thay cho phương án dùng chung ban đầu, để prod/staging không chia sẻ dữ liệu hay khoá | instance riêng, bucket `tami-staging-*` | 256m |
 | giám sát | dùng chung | dùng chung | ~1GB |
 
-Tổng trần `mem_limit` as-built: prod ≈ 3,8GB (app 1g + jobs 384m + postgres 2g + redis 128m + seaweedfs 256m) + staging ≈ 2,0GB (768m + 384m + 512m + 128m + 256m) + giám sát dùng chung ~1GB ≈ 6,8GB; chưa tính các container chạy một lần (`migrate` 512m, `seaweedfs-init` 128m). Mức dùng thực thường thấp hơn trần, nằm gọn trong ~11GB đang trống.
+Tổng trần `mem_limit` as-built: prod ≈ 4,2GB (app 1g + jobs 384m + postgres 2g + redis 128m + seaweedfs 256m + backup 384m) + staging ≈ 2,3GB (768m + 384m + 512m + 128m + 256m + backup 256m) + giám sát dùng chung ~1GB ≈ 7,5GB; chưa tính các container chạy một lần (`migrate` 512m, `seaweedfs-init` 128m). Mức dùng thực thường thấp hơn trần, nằm gọn trong ~11GB đang trống.
 
 **As-built (`docker/Dockerfile`, `docker/docker-compose.{prod,staging}.yml`, `docker/nginx/`):**
 - Một image (`docker/Dockerfile`, Node 22, user `node`, `HEALTHCHECK /api/health`) chạy cả `app` (`next start`) và `jobs`; không dùng `output: standalone` vì `jobs` và `payload migrate` cần `payload` CLI + loader TS + toàn bộ dependency production. Không chứa `.env`, source map hay devDependencies.
@@ -327,7 +328,7 @@ Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, kh�
 - Prometheus + Grafana: CPU, RAM, ổ cứng, kết nối DB, thời gian phản hồi. Loki gom log.
 - Cảnh báo: ổ cứng > 80%, lỗi 5xx tăng đột biến, backup không chạy.
 
-**Sao lưu** (NFR-05)
+**Sao lưu** (NFR-05; runbook `docs/runbooks/restore.md`, quyết định `.context/decisions.md` Decision 5)
 
 | Dữ liệu | Cách | Tần suất | Giữ |
 |---|---|---|---|
@@ -336,6 +337,13 @@ Quy tắc migration theo `AGENTS.md` (Non-negotiables): migration versioned, kh�
 | Cấu hình server | Lưu trong repo (trừ secret) + secret cất riêng | Mỗi lần đổi | — |
 
 Kho backup phải nằm **ngoài server** (server khác của công ty, hoặc dịch vụ lưu trữ giá rẻ như Backblaze B2). Diễn tập khôi phục lên staging 6 tháng/lần, mục tiêu RTO ≤ 4 giờ.
+
+**As-built (`docker/backup/*`, service `postgres` + `backup` trong `docker/docker-compose.{staging,prod}.yml`, `docs/runbooks/restore.md`, test `docker/backup/test/e2e.sh`):**
+- **Đích cấu hình bằng env, chưa chốt nhà cung cấp:** S3-compatible (B2, MinIO/SeaweedFS công ty…) hoặc SFTP sang server khác, qua hai env file trên server (`$BACKUP_ENV_DIR/pgbackrest.env`, `restic.env`, thư mục `ssh/`; mẫu `docker/backup/*-env.example`, không commit credential). Kho mã hoá (pgBackRest `aes-256-cbc`, restic). SFTP cho pgBackRest bị giới hạn bởi libssh2 1.9 của image (runbook §9); khuyến nghị kho S3.
+- **PostgreSQL:** image tuỳ biến (cùng base `17-3.5`, giữ volume) có pgbackrest; `archive_mode=on`, `archive_command=pgbackrest --stanza=tami archive-push %p`, `archive_timeout=300` (RPO đo được 297 s); sidecar `backup` chạy full Chủ nhật 02:00 + diff ngày khác 02:00 (giờ Việt Nam) + `check` mỗi 10 phút; giữ 6 bản full + WAL (≥ 35 ngày) ⇒ PITR 30 ngày. Sidecar dùng pgdata read-only + socket chung với postgres. **Trần WAL chưa lên kho** `archive-push-queue-max` (staging 4GiB / prod 8GiB, env `BACKUP_ARCHIVE_PUSH_QUEUE_MAX`): kho chết quá trần thì BỎ WAL (gãy PITR, cần full mới) thay vì đầy ổ server dùng chung; base postgis ghim digest + build assert Debian 11/glibc 2.31.
+- **File:** restic hằng ngày 03:00 qua S3 API (`rclone sync` bucket → volume `backup-mirror` → `restic backup`, không chụp volume SeaweedFS đang ghi), `forget --keep-daily 30 --keep-monthly 12 --prune`, `restic check` (đọc thử 10%) Chủ nhật.
+- **Heartbeat:** `/var/lib/tami-backup/<kind>.success` chỉ ghi khi job exit 0 + textfile metric `tami_backup_last_success_timestamp_seconds{kind,env}` (node_exporter textfile collector khi có Prometheus) + URL push tuỳ chọn (Uptime Kuma). `stanza-create`/`restic init` chạy tay.
+- **Test thật (Docker, S3 TLS + SFTP):** PITR về mốc T và restore mới nhất khớp số bản ghi, restic restore khớp sha256, heartbeat/scheduler/`archive_timeout` đúng, chuyển image từ volume gốc giữ dữ liệu/collation/index, kho không với tới không làm phình `pg_wal` (trần WAL) và full mới chạy được khi kho hồi phục. **Chưa chạy trên server thật** (kiểm ở layer-6-task-01 + diễn tập đầu tiên).
 
 ---
 

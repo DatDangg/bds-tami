@@ -248,7 +248,7 @@ deploy() {
   run compose config -q
   pull_image
   gate_high_risk_migrations
-  run compose up -d postgres redis seaweedfs
+  run compose up -d postgres redis seaweedfs backup
   run compose up -d seaweedfs-init
   run_migrations
   if switch_app_and_jobs; then

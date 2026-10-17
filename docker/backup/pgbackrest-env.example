@@ -1,0 +1,48 @@
+# Mẫu env file của pgBackRest cho TAMI. Sao thành $BACKUP_ENV_DIR/pgbackrest.env trên server (vd /opt/tami/backup/staging/pgbackrest.env),
+# quyền 600, KHÔNG commit. Dùng cho cả container postgres (archive_command) và sidecar backup. Chọn MỘT trong hai khối: S3 hoặc SFTP.
+# Quy ước file: mỗi dòng KEY=VALUE, không dấu nháy, không comment cuối dòng (docker --env-file không bỏ comment cuối dòng).
+# staging và production dùng kho/đường dẫn/mật khẩu RIÊNG (không chia sẻ). Kho phải nằm NGOÀI server TAMI.
+
+# Mã hoá toàn bộ kho (bắt buộc; mất mật khẩu = mất backup, cất bản sao riêng ở chỗ khác server): `openssl rand -base64 48`
+PGBACKREST_REPO1_CIPHER_TYPE=aes-256-cbc
+PGBACKREST_REPO1_CIPHER_PASS=
+
+# ---- Khối A: kho S3-compatible (Backblaze B2, MinIO/SeaweedFS của công ty, AWS S3, ...) ----
+# pgBackRest chỉ nói HTTPS tới S3 (endpoint không có "https://").
+PGBACKREST_REPO1_TYPE=s3
+# Thư mục gốc trong bucket, vd /tami-staging hoặc /tami-prod
+PGBACKREST_REPO1_PATH=/tami-staging
+PGBACKREST_REPO1_S3_BUCKET=
+# Backblaze B2: s3.<region>.backblazeb2.com ; MinIO/SeaweedFS: host:port của gateway
+PGBACKREST_REPO1_S3_ENDPOINT=s3.us-west-004.backblazeb2.com
+PGBACKREST_REPO1_S3_REGION=us-west-004
+PGBACKREST_REPO1_S3_KEY=
+PGBACKREST_REPO1_S3_KEY_SECRET=
+# B2/AWS: host ; MinIO/SeaweedFS: path
+PGBACKREST_REPO1_S3_URI_STYLE=host
+# Chứng chỉ tự ký của kho nội bộ: đặt file CA vào $BACKUP_ENV_DIR/ssh/ rồi trỏ tới (KHÔNG tắt verify-tls trên môi trường thật)
+# PGBACKREST_REPO1_STORAGE_CA_FILE=/etc/backup/ssh/ca.pem
+
+# ---- Khối B: kho trên server khác qua SFTP (thay cho khối A: xoá/comment khối A) ----
+# pgBackRest trong image dùng libssh2 1.9 (Debian 11): CHỈ chạy với khoá RSA định dạng PEM + file khoá công khai, host key ssh-rsa, kex diffie-hellman-*.
+# Server đích phải bật lại ssh-rsa (OpenSSH >= 8.8 tắt mặc định) và, nếu hardened, DH gex:
+#   HostKeyAlgorithms +ssh-rsa / PubkeyAcceptedAlgorithms +ssh-rsa / KexAlgorithms +diffie-hellman-group-exchange-sha256
+# Không chấp nhận được thì dùng khối A (S3). Chi tiết: docs/runbooks/restore.md §9.
+# Tạo khoá (không passphrase, dành riêng cho backup, chỉ quyền ghi vào thư mục kho): ssh-keygen -m PEM -t rsa -b 3072 -N "" -f $BACKUP_ENV_DIR/ssh/id_rsa
+# PGBACKREST_REPO1_TYPE=sftp
+# PGBACKREST_REPO1_PATH=/srv/backup/tami-staging/pgbackrest
+# PGBACKREST_REPO1_SFTP_HOST=backup.example.internal
+# PGBACKREST_REPO1_SFTP_HOST_PORT=22
+# PGBACKREST_REPO1_SFTP_HOST_USER=tami-backup
+# Khoá + known_hosts nằm trong $BACKUP_ENV_DIR/ssh/ (mount read-only vào /etc/backup/ssh); chown 999:999, khoá riêng chmod 600.
+# PGBACKREST_REPO1_SFTP_PRIVATE_KEY_FILE=/etc/backup/ssh/id_rsa
+# PGBACKREST_REPO1_SFTP_PUBLIC_KEY_FILE=/etc/backup/ssh/id_rsa.pub
+# PGBACKREST_REPO1_SFTP_KNOWN_HOST=/etc/backup/ssh/known_hosts
+# PGBACKREST_REPO1_SFTP_HOST_KEY_CHECK_TYPE=strict
+# PGBACKREST_REPO1_SFTP_HOST_KEY_HASH_TYPE=sha256
+
+# ---- Heartbeat tuỳ chọn (Uptime Kuma "Push" monitor: dán URL push; được GET khi job thành công) ----
+# Đặt khoảng "heartbeat interval" của monitor lớn hơn chu kỳ job (wal: 10 phút -> 20 phút; pg_diff/pg_full/files: 1 ngày -> 26 giờ).
+# HEARTBEAT_URL_WAL=https://kuma.example.internal/api/push/<token>?status=up&msg=OK
+# HEARTBEAT_URL_PG_DIFF=
+# HEARTBEAT_URL_PG_FULL=

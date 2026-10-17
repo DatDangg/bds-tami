@@ -6,10 +6,12 @@
 #   export TAMI_IMAGE=tami-web:<git-sha>
 #   C="docker compose --env-file /opt/tami/staging.env -f docker/docker-compose.staging.yml"
 #   $C config -q                                  # kiểm tra cấu hình + biến bắt buộc
-#   $C up -d postgres redis seaweedfs seaweedfs-init
+#   $C build postgres backup                      # image postgres (+pgbackrest) và sidecar backup: một lần, hoặc khi đổi phiên bản trong docker/backup/Dockerfile
+#   $C up -d postgres redis seaweedfs backup seaweedfs-init
 #   $C --profile tools run --rm migrate           # BƯỚC RIÊNG trước khi bật app/jobs (app/jobs KHÔNG tự migrate lúc khởi động)
 #   $C up -d app jobs
 # Danh sách biến của env file: khối "Docker Compose staging/prod" trong .env.example (mục này dùng giá trị riêng của môi trường).
+# Backup (pgBackRest + restic, kho ngoài server): BACKUP_ENV_DIR trỏ thư mục chứa pgbackrest.env, restic.env, ssh/ — xem docs/runbooks/restore.md.
 #
 # jobs: CHỈ 1 bản (job aggregate-click-stats cộng dồn đọc-rồi-ghi, không nguyên tử; ARCHITECTURE §6.2).
 # Không dùng `--scale jobs=N`; container_name cố định cũng chặn việc này.
@@ -122,23 +124,93 @@ services:
     networks: [internal]
 
   postgres:
-    image: postgis/postgis:17-3.5
+    # Image tuỳ biến = postgis/postgis:17-3.5 + pgbackrest (archive_command cần binary trong container). Dựng 1 lần: `$C build postgres backup`
+    # (deploy.sh không pull image này; chưa có tag thì `compose up` tự build). Giữ nguyên base 17-3.5 và volume `postgres-data`.
+    image: tami-postgres:17-3.5-pgbackrest2.59
+    build:
+      context: ./backup
+      target: postgres
     container_name: tami-staging-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tami}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
       POSTGRES_DB: ${POSTGRES_DB:-tami}
+      PGBACKREST_PG1_USER: ${POSTGRES_USER:-tami}
+      # Trần WAL chưa lên kho (pgbackrest.conf giải thích): vượt thì BỎ WAL thay vì làm đầy ổ server dùng chung. Staging 4GiB / prod 8GiB (ước tính runbook ~4,6 GB WAL/ngày ở tải cao: kho chết quá cỡ 1-2 ngày thì mới bỏ WAL).
+      PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX: ${BACKUP_ARCHIVE_PUSH_QUEUE_MAX:-4GiB}
+    # Kho đích + khoá + mật khẩu mã hoá của pgBackRest (PGBACKREST_REPO1_*): file trên server, KHÔNG commit (mẫu docker/backup/pgbackrest-env.example).
+    env_file:
+      - ${BACKUP_ENV_DIR:?BACKUP_ENV_DIR bắt buộc (thư mục chứa pgbackrest.env, restic.env, ssh/; xem docs/runbooks/restore.md)}/pgbackrest.env
     # `DATABASE_URL_STAGING` phải trỏ tới host `postgres`, cùng user/mật khẩu/db ở trên.
-    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "effective_cache_size=384MB", "-c", "max_connections=50"]
+    # archive_timeout 300s: WAL đang ghi dở được đẩy lên kho tối đa mỗi 5 phút => RPO <= 15 phút kể cả khi một lần đẩy lỗi/chậm.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - effective_cache_size=384MB
+      - -c
+      - max_connections=50
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=pgbackrest --stanza=tami archive-push %p
+      - -c
+      - archive_timeout=300
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+      - ./backup/pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
+      # Thư mục socket dùng chung với sidecar `backup` (pgBackRest backup nối vào postgres qua unix socket).
+      - postgres-socket:/var/run/postgresql
+      - ${BACKUP_ENV_DIR}/ssh:/etc/backup/ssh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 10
     mem_limit: 512m
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+
+  # Sidecar backup (ARCHITECTURE §8): lịch + chạy pgBackRest (diff/full/check) và restic. Chạy user postgres (uid 999) để đọc pgdata (read-only).
+  # Kho đích nằm NGOÀI server (cấu hình bằng env file). Chỉ một bản; không publish cổng. Runbook: docs/runbooks/restore.md.
+  backup:
+    image: tami-backup:pgbackrest2.59-restic0.17.3
+    build:
+      context: ./backup
+      target: backup
+    container_name: tami-staging-backup
+    <<: *hardening
+    user: "999:999"
+    entrypoint: ["bash", "/opt/backup/scheduler.sh"]
+    env_file:
+      - ${BACKUP_ENV_DIR:?BACKUP_ENV_DIR bắt buộc}/pgbackrest.env
+      - ${BACKUP_ENV_DIR}/restic.env
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      BACKUP_ENV_NAME: staging
+      PGBACKREST_PG1_USER: ${POSTGRES_USER:-tami}
+      SRC_S3_ENDPOINT: http://seaweedfs:8333
+      SRC_S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?}
+      SRC_S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?}
+      SRC_S3_BUCKETS: ${S3_BUCKET_PUBLIC:?} ${S3_BUCKET_PRIVATE:?}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data:ro
+      - postgres-socket:/var/run/postgresql
+      - ./backup:/opt/backup:ro
+      - ./backup/pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
+      - backup-state:/var/lib/tami-backup
+      - backup-mirror:/mirror
+      - ${BACKUP_ENV_DIR}/ssh:/etc/backup/ssh:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      seaweedfs: { condition: service_healthy }
+    stop_grace_period: 30s
+    mem_limit: 256m
     restart: unless-stopped
     logging: *default-logging
     networks: [internal]
@@ -214,5 +286,8 @@ networks:
 
 volumes:
   postgres-data:
+  postgres-socket:
+  backup-state:
+  backup-mirror:
   redis-data:
   seaweedfs-data:

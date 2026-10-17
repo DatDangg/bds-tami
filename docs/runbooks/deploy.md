@@ -80,6 +80,8 @@ Giữ 5 release mới nhất mỗi môi trường + release `current` (`RELEASES
 **Chuyển từ bố cục cũ** (`/opt/tami/repo`, nếu từng dựng tay): không cần giữ; lần deploy đầu theo bố cục mới có thể làm container
 `postgres` bị tạo lại một lần vì đường dẫn bind mount `./postgres/init.sql` đổi sang `releases/<env>/current/docker/...`
 (dữ liệu nằm trong volume nên không mất; chọn giờ ít người dùng). Sau đó đường dẫn ổn định giữa các lần deploy.
+**Backup (bắt buộc trước deploy đầu tiên):** compose staging/prod có service `backup` và image postgres tuỳ biến; `BACKUP_ENV_DIR` (trong env file) phải trỏ thư mục
+chứa `pgbackrest.env`, `restic.env`, `ssh/` — thiếu thì `compose config` lỗi và `deploy.sh` dừng trước khi đổi gì. Thiết lập và khôi phục: `docs/runbooks/restore.md`.
 Env file phải `chmod 600` (script từ chối nếu `others` đọc được). `DATABASE_URL_STAGING` ≠ `DATABASE_URL_PROD`, mật khẩu/khoá riêng từng môi trường (xem `.env.example`).
 
 ### 3.2 User deploy

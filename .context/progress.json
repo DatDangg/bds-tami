@@ -187,9 +187,16 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-4-task-05-round-2-review.md",
       "completedAt": "2026-10-17T10:15:00.000Z"
+    },
+    {
+      "task": "layer-4/task-07",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-4-task-07-round-2-review.md",
+      "completedAt": "2026-10-17T13:00:00.000Z"
     }
   ],
-  "inProgressTask": "layer-4/task-07",
+  "inProgressTask": null,
   "blockedTasks": [
     {
       "task": "layer-2/task-02",
@@ -243,9 +250,14 @@
       "date": "2026-10-17T10:30:00.000Z",
       "decision": "Defer layer-4-task-06 (stack giám sát) tới trước M3/production; chuyển 4 AC code sang layer-5-task-05; tiếp layer-4-task-07",
       "reason": "User đồng ý đề xuất skip task-06"
+    },
+    {
+      "date": "2026-10-17T10:40:00.000Z",
+      "decision": "Backup L4-T07: đích kho ngoài server chưa chốt → cấu hình chung (repo S3-compatible hoặc SFTP), endpoint/khoá qua env; chọn đích thật khi deploy",
+      "reason": "User chọn Chưa chốt, làm chung"
     }
   ],
-  "lastUpdated": "2026-10-17T10:30:00.000Z",
+  "lastUpdated": "2026-10-17T13:00:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

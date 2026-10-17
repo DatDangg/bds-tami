@@ -1,0 +1,36 @@
+# CHỈ DÙNG CHO TEST (docker/backup/test/e2e.sh): thêm hai đích backup tạm vào project compose staging
+# (`-f docker/docker-compose.staging.yml -f docker/backup/test/docker-compose.e2e.yml -p tami-bk-e2e`).
+#   target-s3   : SeaweedFS S3 qua HTTPS (chứng chỉ tự ký) — mô phỏng B2/MinIO/SeaweedFS của công ty
+#   target-sftp : OpenSSH SFTP — mô phỏng server khác của công ty
+services:
+  target-s3:
+    image: chrislusf/seaweedfs:4.48
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.port.https=8334", "-s3.cert.file=/certs/cert.pem", "-s3.key.file=/certs/key.pem", "-ip.bind=0.0.0.0", "-volume.max=60", "-master.volumeSizeLimitMB=256"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${E2E_TARGET_KEY:?}
+      AWS_SECRET_ACCESS_KEY: ${E2E_TARGET_SECRET:?}
+    volumes:
+      - ${E2E_DIR:?}/certs:/certs:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [internal]
+
+  target-sftp:
+    image: atmoz/sftp:alpine
+    # libssh2 1.9 (trong pgbackrest 2.59 trên Debian 11) chỉ có kex diffie-hellman*: server hardened chỉ cho curve25519 sẽ bị từ chối
+    # ("Unable to exchange encryption keys"), và chỉ dùng host key + khoá người dùng ssh-rsa (SHA1): OpenSSH >= 8.8 tắt mặc định nên phải bật lại (xem runbook §9).
+    entrypoint: ["sh", "-c", "printf 'KexAlgorithms +diffie-hellman-group-exchange-sha256\nHostKeyAlgorithms +ssh-rsa\nPubkeyAcceptedAlgorithms +ssh-rsa\n' >> /etc/ssh/sshd_config && exec /entrypoint tami::1001:1001:upload"]
+    volumes:
+      - ${E2E_DIR:?}/ssh/id_rsa.pub:/home/tami/.ssh/keys/id_rsa.pub:ro
+    networks: [internal]
+
+  # Lịch của sidecar để rảnh trong lúc test (test tự gọi script; scheduler được thử riêng với state tạm).
+  backup:
+    environment:
+      BACKUP_WAL_CHECK_SECONDS: "86400"
+      BACKUP_PG_SLOT: "2359"
+      BACKUP_FILES_SLOT: "2359"
+      BACKUP_CHECK_SLOT: "2359"

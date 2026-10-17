@@ -1,0 +1,27 @@
+# Mẫu env file của restic cho TAMI (file SeaweedFS). Sao thành $BACKUP_ENV_DIR/restic.env trên server
+# (vd /opt/tami/backup/staging/restic.env), quyền 600, KHÔNG commit. Chỉ sidecar backup đọc. Chọn MỘT trong hai khối: S3 hoặc SFTP.
+# Quy ước file: mỗi dòng KEY=VALUE, không dấu nháy, không comment cuối dòng.
+# staging và production dùng kho/mật khẩu RIÊNG. Kho phải nằm NGOÀI server TAMI. Nguồn (SeaweedFS + bucket) compose tự truyền.
+
+# Mật khẩu mã hoá kho restic (mất = mất backup, cất bản sao riêng ở chỗ khác server): `openssl rand -base64 48`
+RESTIC_PASSWORD=
+
+# ---- Khối A: kho S3-compatible ----
+# Định dạng: s3:https://<endpoint>/<bucket>/<thư-mục>
+RESTIC_REPOSITORY=s3:https://s3.us-west-004.backblazeb2.com/<bucket>/tami-staging-files
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+# Kho nội bộ dùng chứng chỉ tự ký: đặt CA vào $BACKUP_ENV_DIR/ssh/ rồi trỏ tới.
+# RESTIC_CACERT=/etc/backup/ssh/ca.pem
+
+# ---- Khối B: kho trên server khác qua SFTP (thay cho khối A) ----
+# RESTIC_REPOSITORY=sftp:tami-backup@backup.example.internal:/srv/backup/tami-staging/restic
+# Tham số ssh (khoá + known_hosts trong $BACKUP_ENV_DIR/ssh/, chown 999:999, khoá chmod 600). Một dòng, không dấu nháy.
+# RESTIC_SFTP_ARGS=-i /etc/backup/ssh/id_ed25519 -o UserKnownHostsFile=/etc/backup/ssh/known_hosts -o StrictHostKeyChecking=yes -o CheckHostIP=no -o BatchMode=yes
+
+# ---- Giới hạn an toàn khi đồng bộ bucket -> /mirror (mặc định 500 object bị xoá/lần) ----
+# BACKUP_MAX_DELETE=500
+
+# ---- Heartbeat tuỳ chọn (Uptime Kuma Push monitor; interval nên ~26 giờ cho files, ~8 ngày cho files_check) ----
+# HEARTBEAT_URL_FILES=
+# HEARTBEAT_URL_FILES_CHECK=
