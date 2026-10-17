@@ -32,7 +32,15 @@ ENV DATABASE_URL=postgres://build:build@127.0.0.1:5432/build \
     SMTP_HOST=build SMTP_USER=build SMTP_PASS=build \
     ANTHROPIC_API_KEY=build TRANSLATION_MODEL=build TRANSLATION_MONTHLY_BUDGET_USD=0 \
     NEXT_PUBLIC_SITE_URL=http://localhost:3000
-RUN pnpm build \
+# Source map trình duyệt: chỉ sinh + upload lên GlitchTip khi có secret `glitchtip_auth_token` (+ build-arg url/org/project);
+# không có secret thì `pnpm build` không sinh `.map`. Token đi qua secret mount (không vào layer/history), `.map` luôn bị xoá khỏi image.
+ARG GLITCHTIP_URL=""
+ARG GLITCHTIP_ORG=""
+ARG GLITCHTIP_PROJECT=""
+RUN --mount=type=secret,id=glitchtip_auth_token \
+    if [ -s /run/secrets/glitchtip_auth_token ]; then export GLITCHTIP_AUTH_TOKEN="$(cat /run/secrets/glitchtip_auth_token)"; fi \
+ && pnpm build \
+ && node scripts/upload-sourcemaps.mjs \
  && find .next -name '*.map' -type f -delete \
  && rm -rf .next/cache
 

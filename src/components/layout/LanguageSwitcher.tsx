@@ -1,0 +1,54 @@
+"use client";
+
+import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { resolveNavLink } from "@/lib/content/nav-link";
+import { buildLocaleCookie } from "@/i18n/localeCookie";
+import { type Locale, locales } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
+
+/**
+ * `VI | EN` (design-spec §2.3: mỗi mục là `<a hreflang lang>`). Ngôn ngữ đang xem: link về chính trang này, chữ đậm + `aria-current`
+ * (tên truy cập "Tiếng Việt" đọc được vì là `<a>`, không phải `aria-label` trên phần tử generic). Mỗi mục ≥ 44×44, hai mục cách nhau ≥ 8px.
+ * Ngôn ngữ kia: link về TRANG CHỦ của ngôn ngữ đó (tạm thời; map trang tương ứng làm ở task EN) và ghi cookie `NEXT_LOCALE`
+ * để UI nhớ lựa chọn. Cookie KHÔNG được đọc để redirect: mỗi URL một ngôn ngữ (SPEC F12), nên link vẫn hoạt động khi chặn cookie.
+ */
+export function LanguageSwitcher({ className }: { className?: string }) {
+  const current = useLocale() as Locale;
+  const t = useTranslations("common");
+  const pathname = usePathname();
+  return (
+    <div className={cn("flex items-center text-small font-semibold uppercase", className)} role="group" aria-label={t("switchLanguage")}>
+      {locales.map((locale, index) => (
+        <span key={locale} className="flex items-center">
+          {index > 0 && <span aria-hidden="true" className="px-2 text-text-muted">|</span>}
+          {locale === current ? (
+            <a
+              href={pathname}
+              hrefLang={locale}
+              lang={locale}
+              aria-current="true"
+              aria-label={t(`languageName.${locale}`)}
+              className="inline-flex min-h-11 min-w-11 items-center justify-center font-bold text-text"
+            >
+              {locale}
+            </a>
+          ) : (
+            <a
+              href={resolveNavLink("home", locale)?.href ?? "/"}
+              hrefLang={locale}
+              lang={locale}
+              aria-label={t(`languageName.${locale}`)}
+              onClick={() => {
+                document.cookie = buildLocaleCookie(locale);
+              }}
+              className="inline-flex min-h-11 min-w-11 items-center justify-center text-text-secondary underline-offset-4 hover:text-text hover:underline"
+            >
+              {locale}
+            </a>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+}

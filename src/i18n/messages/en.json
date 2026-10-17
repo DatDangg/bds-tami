@@ -2,7 +2,57 @@
   "common": {
     "siteName": "TAMI",
     "switchLanguage": "Switch language",
-    "languageName": { "vi": "Tiếng Việt", "en": "English" }
+    "languageName": {
+      "vi": "Tiếng Việt",
+      "en": "English"
+    }
+  },
+  "layout": {
+    "skipToContent": "Skip to content",
+    "header": {
+      "home": "TAMI, go to home page",
+      "search": "Search rentals",
+      "menu": "Menu",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "nav": {
+      "main": "Main menu",
+      "mobile": "Full-screen main menu",
+      "mobileDescription": "Choose a page to visit. Press Esc to close the menu.",
+      "openSubmenu": "Open submenu of {label}",
+      "items": {
+        "home": "Home",
+        "projects": "Projects",
+        "rentals": "For rent",
+        "property-posts": "Post your property",
+        "news": "News",
+        "careers": "Careers",
+        "contact": "Contact"
+      }
+    },
+    "language": {
+      "nav": "Switch language"
+    },
+    "footer": {
+      "tagline": "TAMI HOMES: real estate advisory and brokerage, with you from search to handover.",
+      "copyright": "© TAMI HOMES. All rights reserved.",
+      "cookieSettings": "Cookie settings",
+      "contact": "Contact",
+      "hotline": "Hotline",
+      "email": "Email",
+      "address": "Address",
+      "social": "Social media",
+      "socialOther": "Social media link",
+      "columns": {
+        "explore": "Explore",
+        "about": "About TAMI"
+      },
+      "links": {
+        "privacy-policy": "Privacy Policy",
+        "terms-of-use": "Terms of Use"
+      }
+    }
   },
   "media": {
     "gallery": {

@@ -39,6 +39,7 @@ build (initial)
 Mở khoá cho: `layer-15-task-01`
 
 ## Acceptance Criteria
+- [ ] Esc đóng được menu con DesktopNav mở bằng hover khi focus ở chỗ khác (listener Esc cấp document, `DesktopNav.tsx:26-33`, WCAG 1.4.13); dùng index của map thay `items.indexOf` (`:42`); thử disclosure với screen reader thật + đo 768/1024 trên trình duyệt (MINOR-1/4) (review L5-T05 round 2)
 - [ ] Lighthouse mobile: LCP ≤ 2.5s, CLS ≤ 0.1, TBT thấp (proxy INP) trên 5 trang chính; ghi số đo
 - [ ] axe: 0 lỗi mức A/AA trên 5 trang chính
 - [ ] Responsive 375/768/1280: không cuộn ngang, touch target ≥ 44px

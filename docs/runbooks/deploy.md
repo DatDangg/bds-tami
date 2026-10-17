@@ -177,3 +177,17 @@ Khoá: 1 `flock` chung (`/opt/tami/state/deploy.lock`) cho cả hai môi trườ
 - Compose đọc qua symlink `releases/<env>/current`; nếu Docker Compose resolve symlink thành đường dẫn thật khi tính bind mount thì
   postgres bị tạo lại ở mỗi lần đổi release (vài giây, dữ liệu nằm trong volume). Kiểm ở lần chạy thật đầu tiên (layer-6-task-01).
 - Chưa chạy trên server thật: lần chạy đầu ở layer-6-task-01.
+
+## 8. Source map trình duyệt → GlitchTip (tuỳ chọn)
+Mục đích: stack lỗi trình duyệt trên GlitchTip hiện đúng file/dòng nguồn thay vì mã minify.
+- Bật bằng cấu hình CI, không đổi code: GitHub **secret** `GLITCHTIP_AUTH_TOKEN` (token quyền `project:write`, tạo ở GlitchTip > Profile > Auth Tokens)
+  và GitHub **vars** `GLITCHTIP_URL` (gốc GlitchTip, vd `https://glitchtip.example.com`), `GLITCHTIP_ORG`, `GLITCHTIP_PROJECT` (cùng project với `GLITCHTIP_PUBLIC_DSN`).
+  `deploy.yml` truyền secret vào build qua Docker secret mount (`glitchtip_auth_token`, không vào layer/history) và vars qua build-arg.
+- Không đặt secret: `pnpm build` KHÔNG sinh source map (`next.config.ts` → `shouldEmitBrowserSourceMaps`), script upload chỉ in "bỏ qua". Build bình thường.
+- Có secret: `next build` sinh source map trình duyệt → `scripts/upload-sourcemaps.mjs` chạy `sentry-cli sourcemaps inject` (gắn debug ID vào `.js` + `.map`)
+  rồi `sourcemaps upload` (url-prefix `~/_next/static`) → **luôn xoá `.map`** khỏi `.next/static` (kể cả khi upload lỗi), và `Dockerfile` xoá thêm lần nữa.
+  Image cuối không chứa `.map`, `/_next/static/**/*.map` trả 404.
+- Có token mà thiếu `GLITCHTIP_URL/ORG/PROJECT` → script ném lỗi, build dừng (không âm thầm bỏ qua).
+- Lần đầu sau khi bật, kiểm: gây một lỗi JS thử trên staging, mở event trong GlitchTip, stack phải hiện đường dẫn nguồn (`src/...`). Nếu GlitchTip phiên bản cũ
+  không hỗ trợ debug ID (artifact bundle) thì stack vẫn minify: nâng GlitchTip hoặc chuyển sang upload theo release (`--release`). Chưa kiểm được với server thật.
+- Chạy tay (sau `GLITCHTIP_AUTH_TOKEN=... GLITCHTIP_URL=... GLITCHTIP_ORG=... GLITCHTIP_PROJECT=... pnpm build`): `node scripts/upload-sourcemaps.mjs`.

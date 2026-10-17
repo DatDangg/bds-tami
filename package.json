@@ -20,6 +20,8 @@
     "seed:pages": "payload run scripts/seed-pages.ts",
     "seed:sample-services": "payload run scripts/seed-sample-services.ts",
     "seed:sample-news": "payload run scripts/seed-sample-news.ts",
+    "seed:shell": "payload run scripts/seed-shell-globals.ts",
+    "e2e:revalidate": "payload run tests/e2e/revalidate-globals.ts",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap"
   },
@@ -58,6 +60,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "3.1152.0",
+    "@sentry/cli": "2.58.6",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

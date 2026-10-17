@@ -2,7 +2,57 @@
   "common": {
     "siteName": "TAMI",
     "switchLanguage": "Chuyển ngôn ngữ",
-    "languageName": { "vi": "Tiếng Việt", "en": "English" }
+    "languageName": {
+      "vi": "Tiếng Việt",
+      "en": "English"
+    }
+  },
+  "layout": {
+    "skipToContent": "Bỏ qua tới nội dung",
+    "header": {
+      "home": "TAMI, về trang chủ",
+      "search": "Tìm tin cho thuê",
+      "menu": "Menu",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu"
+    },
+    "nav": {
+      "main": "Menu chính",
+      "mobile": "Menu chính toàn màn hình",
+      "mobileDescription": "Chọn trang để xem. Nhấn Esc để đóng menu.",
+      "openSubmenu": "Mở mục con của {label}",
+      "items": {
+        "home": "Trang chủ",
+        "projects": "Dự án",
+        "rentals": "Cho thuê",
+        "property-posts": "Đăng tin BĐS",
+        "news": "Tin tức",
+        "careers": "Tuyển dụng",
+        "contact": "Liên hệ"
+      }
+    },
+    "language": {
+      "nav": "Chuyển ngôn ngữ"
+    },
+    "footer": {
+      "tagline": "TAMI HOMES: tư vấn và môi giới bất động sản, đồng hành cùng khách hàng từ tìm kiếm đến bàn giao.",
+      "copyright": "© TAMI HOMES. Bảo lưu mọi quyền.",
+      "cookieSettings": "Cài đặt cookie",
+      "contact": "Liên hệ",
+      "hotline": "Hotline",
+      "email": "Email",
+      "address": "Địa chỉ",
+      "social": "Mạng xã hội",
+      "socialOther": "Liên kết mạng xã hội",
+      "columns": {
+        "explore": "Khám phá",
+        "about": "Về TAMI"
+      },
+      "links": {
+        "privacy-policy": "Chính sách bảo mật",
+        "terms-of-use": "Điều khoản sử dụng"
+      }
+    }
   },
   "media": {
     "gallery": {

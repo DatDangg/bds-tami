@@ -68,6 +68,13 @@ jobs:
           file: docker/Dockerfile
           push: true
           provenance: false
+          # Source map trình duyệt -> GlitchTip (tuỳ chọn): thiếu secret/vars thì build bình thường, không sinh source map.
+          secrets: |
+            glitchtip_auth_token=${{ secrets.GLITCHTIP_AUTH_TOKEN }}
+          build-args: |
+            GLITCHTIP_URL=${{ vars.GLITCHTIP_URL }}
+            GLITCHTIP_ORG=${{ vars.GLITCHTIP_ORG }}
+            GLITCHTIP_PROJECT=${{ vars.GLITCHTIP_PROJECT }}
           tags: ${{ steps.name.outputs.image }}:${{ github.event.workflow_run.head_sha }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}

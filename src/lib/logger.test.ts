@@ -132,6 +132,26 @@ describe("logger: redact PII", () => {
     expect(output()).toContain("2026-10-17");
   });
 
+  it("%s với Error và %d với số không để message/SĐT thô lọt vào msg", () => {
+    const { logger, output } = capture();
+    logger.error("lỗi %s", new Error("gửi khach@example.com 0901234567 thất bại"));
+    logger.info("gọi %d lúc %d", 901234567, 42);
+    logger.info({ endpoint: "leads" }, "lỗi %s", new Error("a@b.vn 0912345678"));
+    const text = output();
+    for (const secret of ["khach@example.com", "0901234567", "901234567", "a@b.vn", "0912345678"]) {
+      expect(text).not.toContain(secret);
+    }
+    const lines = text.trim().split("\n").map((line) => JSON.parse(line) as { msg: string });
+    expect(lines[0]?.msg).toContain("lỗi Error: gửi");
+    expect(lines[1]?.msg).toBe("gọi [phone] lúc 42");
+  });
+
+  it("giữ nguyên số bình thường và ID dài khi nội suy", () => {
+    const { logger, output } = capture();
+    logger.info("mất %d ms, ts %d", 250, 1760000000000);
+    expect((JSON.parse(output()) as { msg: string }).msg).toBe("mất 250 ms, ts 1760000000000");
+  });
+
   it("logger.child() kế thừa hook và vẫn lọc", () => {
     const { logger, output } = capture();
     const child = logger.child({ component: "leads" });

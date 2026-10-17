@@ -3,12 +3,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
 import { cacheControlHeaders } from "./src/lib/http/cache-policy";
+import { shouldEmitBrowserSourceMaps } from "./src/lib/monitoring/browser-sourcemaps";
 
 // Không bật `output: "standalone"`: image Docker (docker/Dockerfile) chạy `app` (next start) và `jobs`/`migrate` (payload CLI + loader TS) từ cùng cây node_modules production, nên trace standalone không đủ cho jobs.
 // agentRules: false — `next dev` không tự chèn block `nextjs-agent-rules` vào AGENTS.md (AGENTS.md do template quản lý).
 // Không đưa APP_ENV/DSN vào bundle qua `env`/NEXT_PUBLIC_*: một image build 1 lần rồi promote staging -> prod (ARCHITECTURE §6.4).
+// productionBrowserSourceMaps: chỉ khi có GLITCHTIP_AUTH_TOKEN (build release): `scripts/upload-sourcemaps.mjs` upload lên GlitchTip rồi xoá `.map`.
 const nextConfig: NextConfig = {
   agentRules: false,
+  productionBrowserSourceMaps: shouldEmitBrowserSourceMaps(process.env),
   headers: async () => cacheControlHeaders(),
 };
 

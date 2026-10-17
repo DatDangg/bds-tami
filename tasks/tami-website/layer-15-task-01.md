@@ -37,6 +37,7 @@ Promote đúng image + migration đã chạy ở staging lên production sau khi
 Mở khoá cho: `layer-16-task-01`
 
 ## Acceptance Criteria
+- [ ] Trước production: `scrubText` NFKC normalize + mở rộng lớp ký tự (`/`, `–`, `_`, `%20`, chữ số full-width) và không cắt 4096 giữa dãy số (lùi điểm cắt trước dãy số cuối) — hoặc ghi rõ giới hạn đã biết (`src/lib/monitoring/scrub-text.ts:6,41`) (MINOR-2/3) (review L5-T05 round 2)
 - [ ] ⏸ Mốc M5: user duyệt production deploy; đã có tên miền, Q4 nội dung thật, Q6 hạn mức Claude API, Q5 (pháp lý EN) xử lý
 - [ ] Không có migration `HIGH_RISK_MIGRATION` chưa xử lý; migration đã chạy staging
 - [ ] Deploy qua GitHub Environment `production` (required reviewers) đúng digest image staging

@@ -48,6 +48,7 @@ function serializeError(value: unknown): unknown {
 }
 
 const OBJECT_FORMAT_PATTERN = /%[oOj]/;
+const NUMBER_FORMAT_PATTERN = /%[dif]/g;
 
 function stringifyForScrub(value: object): string {
   try {
@@ -62,6 +63,21 @@ function scrubRecordMessage(record: unknown): unknown {
   if (typeof record !== "object" || record === null || Array.isArray(record)) return record;
   const { msg } = record as { msg?: unknown };
   return typeof msg === "string" ? { ...record, msg: scrubText(msg) } : record;
+}
+
+/**
+ * Tham số nội suy (đứng sau chuỗi format) trước khi pino ghép vào msg. `%s` với Error ghi `String(err)` (message thô),
+ * `%d` với số ghi nguyên số (SĐT dạng number): đều không qua redact nên lọc ở đây. Số không chứa SĐT giữ nguyên kiểu number.
+ */
+function scrubInterpolatedArg(arg: unknown, interpolatesObjects: boolean): unknown {
+  if (typeof arg === "string") return scrubText(arg);
+  if (arg instanceof Error) return scrubText(`${arg.name}: ${arg.message}`);
+  if (typeof arg === "number" || typeof arg === "bigint") {
+    const cleaned = scrubText(String(arg));
+    return cleaned === String(arg) ? arg : cleaned;
+  }
+  if (interpolatesObjects && typeof arg === "object" && arg !== null) return scrubText(stringifyForScrub(arg));
+  return arg;
 }
 
 function hasStringMessage(value: unknown): value is { message: string } {
@@ -89,11 +105,16 @@ export function scrubLogArguments(args: unknown[]): unknown[] {
   const formatIndex = typeof merge === "string" ? 0 : 1;
   const format = all[formatIndex];
   const interpolates = typeof format === "string" && OBJECT_FORMAT_PATTERN.test(format);
+  const hasPlaceholder = typeof format === "string" && /%[sdifoOj]/.test(format);
   const scrubbed = all.map((arg, index) => {
     if (typeof arg === "string") return scrubText(arg);
-    if (interpolates && index > formatIndex && typeof arg === "object" && arg !== null) return scrubText(stringifyForScrub(arg));
-    return arg;
+    if (!hasPlaceholder || index <= formatIndex) return arg;
+    return scrubInterpolatedArg(arg, interpolates);
   });
+  // Số bị che thành chuỗi thì `%d` ra NaN: đổi sang `%s` để log vẫn đọc được ("[phone]").
+  if (hasPlaceholder && scrubbed.some((arg, index) => typeof arg === "string" && typeof all[index] === "number")) {
+    scrubbed[formatIndex] = (scrubbed[formatIndex] as string).replace(NUMBER_FORMAT_PATTERN, "%s");
+  }
   // `logger.info("text")` / `logger.info({ ... })`: bỏ `message` undefined cuối để giữ dạng gọi ban đầu.
   while (scrubbed.length > 1 && scrubbed[scrubbed.length - 1] === undefined) scrubbed.pop();
   return scrubbed;
