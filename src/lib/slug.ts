@@ -31,3 +31,21 @@ function truncateAtWordBoundary(slug: string, maxLength: number): string {
   const lastHyphen = head.lastIndexOf("-");
   return (lastHyphen > 0 ? head.slice(0, lastHyphen) : head).replace(/-+$/, "");
 }
+
+/**
+ * Trả `base` nếu chưa nằm trong `taken`, ngược lại `base-2`, `base-3`... (số nhỏ nhất còn trống).
+ * Phần gốc bị cắt khi cần để slug có hậu tố vẫn ≤ `maxLength`.
+ */
+export function appendUniqueSuffix(
+  base: string,
+  taken: ReadonlySet<string>,
+  maxLength: number = SLUG_MAX_LENGTH,
+): string {
+  if (!taken.has(base)) return base;
+  for (let n = 2; ; n++) {
+    const suffix = `-${n}`;
+    const head = base.slice(0, maxLength - suffix.length).replace(/-+$/, "");
+    const candidate = `${head}${suffix}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+}

@@ -477,7 +477,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | `noindex` | checkbox | |
 | `canonical` | text | |
 
-Dùng plugin `@payloadcms/plugin-seo`.
+**As-built (layer-3-task-02):** nhóm `seo` tự khai báo trong `src/fields/seo.ts` (localized, đúng tên trường ở bảng trên), KHÔNG dùng `@payloadcms/plugin-seo` vì plugin đặt nhóm `meta` (title/description/image), không có `noindex`/`canonical`. Bộ field/hook dùng chung cho collection nội dung: `withContentDefaults` (`src/collections/_shared/content-defaults.ts`) gồm `slug` (localized, `unique`, tự thêm hậu tố `-2`, `-3` khi trùng trong cùng `_locale`), `status`, `publishedAt` (chỉ đọc, hệ thống gán lần đầu `published`), `author`, `isFeatured`, `hasEnglish` + `translation`, `seo`; xoá mềm dùng tính năng `trash: true` của Payload (cột `deletedAt`, không có trường tự đặt).
 
 ### 4.15. Globals
 

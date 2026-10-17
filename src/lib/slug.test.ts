@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SLUG_MAX_LENGTH, slugify } from "./slug";
+import { appendUniqueSuffix, SLUG_MAX_LENGTH, slugify } from "./slug";
 
 describe("slugify", () => {
   it.each([
@@ -61,5 +61,25 @@ describe("slugify", () => {
     for (const input of ["Căn hộ dịch vụ Quận 1", "v1.2.3", "Đ-Đ  Đ"]) {
       expect(slugify(slugify(input))).toBe(slugify(input));
     }
+  });
+});
+
+describe("appendUniqueSuffix", () => {
+  it("giữ nguyên khi chưa ai dùng", () => {
+    expect(appendUniqueSuffix("can-ho", new Set())).toBe("can-ho");
+    expect(appendUniqueSuffix("can-ho", new Set(["can-ho-2"]))).toBe("can-ho");
+  });
+
+  it("thêm hậu tố nhỏ nhất còn trống bắt đầu từ -2", () => {
+    expect(appendUniqueSuffix("can-ho", new Set(["can-ho"]))).toBe("can-ho-2");
+    expect(appendUniqueSuffix("can-ho", new Set(["can-ho", "can-ho-2", "can-ho-3"]))).toBe("can-ho-4");
+    expect(appendUniqueSuffix("can-ho", new Set(["can-ho", "can-ho-3"]))).toBe("can-ho-2");
+  });
+
+  it("cắt phần gốc để slug có hậu tố vẫn ≤ maxLength", () => {
+    const base = "a".repeat(SLUG_MAX_LENGTH);
+    const result = appendUniqueSuffix(base, new Set([base]));
+    expect(result).toHaveLength(SLUG_MAX_LENGTH);
+    expect(result.endsWith("-2")).toBe(true);
   });
 });
