@@ -2,6 +2,7 @@ import type { EventEmitter } from "node:events";
 import { rm } from "node:fs/promises";
 import pg from "pg";
 import type { Payload } from "payload";
+import type { Project } from "../../src/payload-types";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { seedSampleProjects } from "../../seed/sample/projects";
@@ -230,6 +231,69 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect(await statusOf(updateProject(draft.id, { status: "published" }))).toBe(400);
       const published = await updateProject(draft.id, { status: "published", gallery: [mediaIds[1], mediaIds[0]] });
       expect(published.gallery).toEqual([mediaIds[1], mediaIds[0]]);
+    });
+  });
+
+  describe("gallery chỉ nhận ảnh + phường thuộc tỉnh + ảnh bị xoá (follow-up layer-5-task-01)", () => {
+    const wardData = (province: string, code: string) => ({ province, code, name: `Phường ${code}`, type: "phuong", slug: `phuong-${code}` });
+    let otherProvinceId = "";
+    let wardInProvince = "";
+    let wardInOtherProvince = "";
+
+    beforeAll(async () => {
+      otherProvinceId = (await payload.create({ collection: "provinces", data: { code: "X7", name: "Tỉnh thử phường", slug: "tinh-thu-phuong" }, overrideAccess: true })).id;
+      wardInProvince = (await payload.create({ collection: "wards", data: wardData(provinceId, "00010001") as never, overrideAccess: true })).id;
+      wardInOtherProvince = (await payload.create({ collection: "wards", data: wardData(otherProvinceId, "00020002") as never, overrideAccess: true })).id;
+    });
+
+    it("gallery có PDF → 400 (kể cả nháp); id media sai định dạng hoặc không tồn tại → 400 thay vì 500", async () => {
+      const pdfId = mediaIds[2];
+      expect(await statusOf(createProject({ title: "Gallery PDF", status: "published", gallery: [mediaIds[0], pdfId] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Nháp gallery PDF", gallery: [pdfId] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Gallery id sai", status: "published", gallery: ["khong-phai-uuid"] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Gallery id không tồn tại", status: "published", gallery: ["00000000-0000-4000-8000-000000000000"] }))).toBe(400);
+      const ok = await createProject({ title: "Gallery ảnh", status: "published", gallery: [mediaIds[0]] });
+      expect(await statusOf(updateProject(ok.id, { gallery: [mediaIds[0], pdfId] }))).toBe(400);
+    });
+
+    it("documents vẫn chỉ nhận PDF (không bị ảnh hưởng)", async () => {
+      expect(await statusOf(createProject({ title: "Tài liệu ảnh", documents: [mediaIds[0]] }))).toBe(400);
+      expect((await createProject({ title: "Tài liệu PDF", documents: [mediaIds[2]] })).documents).toEqual([mediaIds[2]]);
+    });
+
+    it("ward không thuộc province → 400; cùng tỉnh hoặc không chọn phường → được; sửa riêng province làm lệch → 400", async () => {
+      expect(await statusOf(createProject({ title: "Phường lệch tỉnh", ward: wardInOtherProvince }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Phường không tồn tại", ward: "00000000-0000-4000-8000-000000000000" }))).toBe(400);
+      const ok = await createProject({ title: "Phường đúng tỉnh", ward: wardInProvince });
+      expect(ok.ward).toBe(wardInProvince);
+      expect((await createProject({ title: "Không chọn phường" })).ward ?? null).toBeNull();
+      expect(await statusOf(updateProject(ok.id, { province: otherProvinceId }))).toBe(400);
+      expect(await statusOf(updateProject(ok.id, { ward: wardInOtherProvince }))).toBe(400);
+      expect((await updateProject(ok.id, { province: otherProvinceId, ward: wardInOtherProvince })).province).toBe(otherProvinceId);
+    });
+
+    it("ward.filterOptions lọc theo tỉnh đã chọn trong form (admin); chưa chọn tỉnh thì không lọc", async () => {
+      const field = payload.collections.projects!.config.flattenedFields.find((item) => item.name === "ward") as {
+        filterOptions?: (args: { siblingData?: unknown }) => unknown;
+      };
+      expect(field.filterOptions?.({ siblingData: { province: provinceId } })).toEqual({ province: { equals: provinceId } });
+      expect(field.filterOptions?.({ siblingData: {} })).toBe(true);
+    });
+
+    it("dự án published mà mọi ảnh gallery bị xoá (media bị xoá cứng): đọc công khai không lỗi, view trang chi tiết không có hero, thẻ không có cover", async () => {
+      const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" (mime_type, filename, width) VALUES ('image/jpeg', 'tam.jpg', 800) RETURNING id`));
+      const tempId = inserted.rows[0].id as string;
+      const doc = await createProject({ title: "Mất hết ảnh", status: "published", gallery: [tempId] });
+      const detailView = await import("../../src/lib/projects/project-detail-view");
+      const cardView = await import("../../src/lib/projects/project-view");
+      const before = await publicQueries.findPublicBySlug<Project>(payload, "projects", "vi", doc.slug as string, { depth: 1 });
+      expect(detailView.toProjectDetailView(before!, "vi").hero?.url).toBe("/api/media/file/tam.jpg");
+
+      await withDatabase((client) => client.query(`DELETE FROM "media" WHERE id = $1`, [tempId]));
+      const after = await publicQueries.findPublicBySlug<Project>(payload, "projects", "vi", doc.slug as string, { depth: 1 });
+      expect(after).not.toBeNull();
+      expect(detailView.toProjectDetailView(after!, "vi")).toMatchObject({ hero: null, gallery: [] });
+      expect(cardView.toProjectCardData(after!, "vi")?.cover).toBeNull();
     });
   });
 

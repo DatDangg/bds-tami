@@ -3,6 +3,7 @@ import type { Payload, Where } from "payload";
 import type { SalesStatus } from "../../collections/Projects";
 import type { Locale } from "../../i18n/routing";
 import type { Category, Project, Province } from "../../payload-types";
+import { relationId } from "../payload/relation-id";
 import { findPublicBySlug, findPublicList, type PublicListResult } from "../content/public-queries";
 
 /** 12 dự án/trang (design-spec S02). */
@@ -87,4 +88,34 @@ export function listPublicProjects(payload: Payload, locale: Locale, query: Proj
     depth: 1,
     select: PROJECT_CARD_FIELDS,
   });
+}
+
+/** Dự án công khai theo slug của ngôn ngữ đang xem; `depth: 1` populate ảnh (gallery, mặt bằng, tài liệu), tỉnh, phường, chủ đầu tư, danh mục. */
+export function findPublicProjectBySlug(payload: Payload, locale: Locale, slug: string): Promise<Project | null> {
+  return findPublicBySlug<Project>(payload, "projects", locale, slug, { depth: 1 });
+}
+
+/** Số thẻ "Dự án khác" cuối trang chi tiết (design-spec S03 khối 12). */
+export const OTHER_PROJECTS_COUNT = 3;
+
+/**
+ * Tối đa 3 dự án CÙNG tỉnh hoặc CÙNG loại hình, mới nhất trước, loại dự án hiện tại. Đi qua `findPublicList` nên chỉ dự án công khai
+ * (và `/en` chỉ dự án có bản EN). Thiếu cả tỉnh lẫn danh mục thì không có dự án liên quan.
+ */
+export async function findOtherProjects(payload: Payload, locale: Locale, current: Pick<Project, "id" | "province" | "category">): Promise<Project[]> {
+  const provinceId = relationId(current.province);
+  const categoryId = relationId(current.category);
+  const related: Where[] = [
+    ...(provinceId ? [{ province: { equals: provinceId } }] : []),
+    ...(categoryId ? [{ category: { equals: categoryId } }] : []),
+  ];
+  if (related.length === 0) return [];
+  const { docs } = await findPublicList<Project>(payload, "projects", locale, {
+    where: { and: [{ or: related }, { id: { not_equals: current.id } }] },
+    sort: PROJECT_SORT,
+    limit: OTHER_PROJECTS_COUNT,
+    depth: 1,
+    select: PROJECT_CARD_FIELDS,
+  });
+  return docs;
 }

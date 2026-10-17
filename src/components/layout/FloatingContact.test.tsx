@@ -2,6 +2,7 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
+import { ClickRefMarker } from "./ClickRefMarker";
 import { FloatingContact } from "./FloatingContact";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/en/for-rent" }));
@@ -37,6 +38,38 @@ describe("FloatingContact", () => {
       url: "/api/public/click-events",
       body: { type: "zalo", pagePath: "/en/for-rent" },
     });
+  });
+
+  it("Blob gửi bằng sendBeacon có type text/plain;charset=UTF-8 và nội dung vẫn là JSON hợp lệ (G18)", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<FloatingContact contact={contact} />, "vi");
+    await user.click(screen.getByRole("link", { name: "Chat Zalo" }));
+    const [, blob] = sendBeacon.mock.calls.at(-1)!;
+    // Blob chuẩn hoá `type` về chữ thường nên `charset=UTF-8` đọc lại là `charset=utf-8`.
+    expect(blob.type).toBe("text/plain;charset=utf-8");
+    expect(JSON.parse(await blob.text())).toMatchObject({ type: "zalo" });
+  });
+
+  it("trang chi tiết khai ClickRefMarker → beacon kèm refCollection/refId; rời trang thì gỡ ref", async () => {
+    const user = userEvent.setup();
+    const detail = renderWithIntl(
+      <>
+        <ClickRefMarker collection="projects" id="9f1c2d3e-aaaa-bbbb-cccc-000000000001" />
+        <FloatingContact contact={contact} />
+      </>,
+      "vi",
+    );
+    await user.click(screen.getByRole("link", { name: "Chat Zalo" }));
+    expect((await lastBeacon()).body).toEqual({
+      type: "zalo",
+      pagePath: "/en/for-rent",
+      refCollection: "projects",
+      refId: "9f1c2d3e-aaaa-bbbb-cccc-000000000001",
+    });
+    detail.unmount();
+    renderWithIntl(<FloatingContact contact={contact} />, "vi");
+    await user.click(screen.getByRole("link", { name: "Chat Zalo" }));
+    expect((await lastBeacon()).body).toEqual({ type: "zalo", pagePath: "/en/for-rent" });
   });
 
   it("hotline và fanpage gửi đúng type", async () => {

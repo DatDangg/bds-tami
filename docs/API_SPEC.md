@@ -114,6 +114,8 @@ Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
 ### 3.4. `POST /api/public/click-events`
 
+> As-built (layer-6-task-05): trang chi tiết dự án gửi `refCollection=projects` + `refId` (id dự án) qua `ClickRefMarker`; body beacon `text/plain;charset=UTF-8`.
+
 Body: `{ type: "hotline" | "zalo" | "fanpage", pagePath, refCollection?, refId? }`. Gửi bằng `navigator.sendBeacon`. Trả `204`.
 
 | Trường | Ràng buộc |

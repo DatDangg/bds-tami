@@ -93,3 +93,6 @@ Mở khoá cho: `layer-15-task-01`
 ## Notes
 - Đo sau Should để số liệu phản ánh bản sẽ lên production.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-6-task-05
+- [ ] Link breadcrumb rộng 42px (< 44) — tăng vùng chạm trong `Breadcrumb`.

@@ -231,6 +231,66 @@
         "handed_over": "Handed over"
       }
     },
+    "projectDetail": {
+      "heroConsult": "Get advice",
+      "heroDocuments": "Download documents",
+      "subNavLabel": "Project contents",
+      "sections": {
+        "overview": "Overview",
+        "location": "Location",
+        "amenities": "Amenities",
+        "floorPlans": "Floor plans",
+        "legal": "Legal information",
+        "policy": "Sales policy",
+        "gallery": "Photo gallery"
+      },
+      "subNav": {
+        "overview": "Overview",
+        "location": "Location",
+        "amenities": "Amenities",
+        "floorPlans": "Floor plans",
+        "legal": "Legal",
+        "policy": "Policy",
+        "gallery": "Gallery"
+      },
+      "specs": {
+        "label": "Project facts",
+        "developer": "Developer",
+        "category": "Type",
+        "scale": "Scale",
+        "area": "Area",
+        "price": "Price from",
+        "handover": "Handover",
+        "units": "{count} units",
+        "blocks": "{count} blocks",
+        "floors": "{count} floors",
+        "landArea": "Land {area}",
+        "newTab": "(opens in a new tab)"
+      },
+      "location": {
+        "mapLabel": "{name} location on the map",
+        "address": "Address"
+      },
+      "amenitiesLabel": "Amenities list",
+      "floorPlans": {
+        "tabs": "Choose a floor plan",
+        "select": "Choose a floor plan",
+        "open": "Enlarge floor plan {title}"
+      },
+      "documents": {
+        "title": "Documents",
+        "download": "Download documents",
+        "downloadNamed": "Download: {name} (PDF, opens in a new tab)",
+        "pdf": "PDF"
+      },
+      "leadForm": {
+        "title": "Get project information",
+        "fallback": "Call the hotline or contact us for the price list, policies and detailed advice about this project.",
+        "hotline": "Hotline"
+      },
+      "relatedTitle": "Other projects",
+      "stickyConsult": "Get advice"
+    },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
     },

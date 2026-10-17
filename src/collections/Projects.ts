@@ -5,10 +5,12 @@ import type {
   UploadField,
   UploadFieldManyValidation,
 } from "payload";
+import { upload } from "payload/shared";
 
 import { requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
+import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { withContentDefaults } from "./_shared/content-defaults";
 
@@ -24,9 +26,13 @@ const SALES_STATUS_LABELS: Record<SalesStatus, string> = {
 /**
  * Thư viện ảnh là nguồn ảnh đại diện (ảnh đầu tiên) của thẻ dự án và hero trang chi tiết, nên bắt buộc có ít nhất một ảnh khi
  * xuất bản (ERD §4.5); bản nháp được thiếu để sale lưu dở. `data` của lần sửa một phần có thể thiếu `gallery` dù bản đã lưu có,
- * nên giá trị đã lưu (`previousValue`) cũng được tính.
+ * nên giá trị đã lưu (`previousValue`) cũng được tính. Chạy validator `upload` mặc định của Payload trước: validator tuỳ biến thay hẳn bản
+ * mặc định nên nếu không gọi thì `filterOptions` (chỉ ảnh, không nhận PDF) và kiểm id hợp lệ không còn áp ở server (id sai → 500 thay vì 400).
  */
-const validateGallery: UploadFieldManyValidation = (value, { data, previousValue }) => {
+const validateGallery: UploadFieldManyValidation = async (value, options) => {
+  const base = await upload(value, options);
+  if (base !== true) return base;
+  const { data, previousValue } = options;
   const publishing = (data as { status?: string } | undefined)?.status === "published";
   const current = value === undefined ? previousValue : value;
   const hasImage = Array.isArray(current) && current.length > 0;
@@ -100,7 +106,8 @@ export function createProjects(revalidate?: RevalidatePaths): CollectionConfig {
           options: SALES_STATUSES.map((value) => ({ label: SALES_STATUS_LABELS[value], value })),
         },
         { name: "province", type: "relationship", relationTo: "provinces", required: true, index: true },
-        { name: "ward", type: "relationship", relationTo: "wards", index: true },
+        // Phường phải thuộc `province` đã chọn: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn).
+        { name: "ward", type: "relationship", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
         { name: "address", type: "text" },
         { name: "location", type: "point" },
         nonNegativeNumber("priceFromVnd"),

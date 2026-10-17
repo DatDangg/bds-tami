@@ -39,3 +39,9 @@ export function formatVndCompact(amount: number, locale: Locale): string {
   const unit = units.find(([size]) => amount >= size);
   return unit ? `${formatNumber(amount / unit[0], locale)}${unit[1]}` : formatVnd(amount, locale);
 }
+
+/** Dung lượng tệp cho danh sách tài liệu: `850 KB` · `2,4 MB` (en: `2.4 MB`). Hệ 1024; dưới 1 KB hiện `1 KB` (không có tệp 0 byte đáng hiện). */
+export function formatFileSize(bytes: number, locale: Locale): string {
+  const kilobytes = Math.max(1, Math.round(bytes / 1024));
+  return kilobytes >= 1024 ? `${formatNumber(Math.round((bytes / 1024 / 1024) * 10) / 10, locale)} MB` : `${kilobytes} KB`;
+}

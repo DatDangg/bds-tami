@@ -31,6 +31,7 @@ export const MISSING_PAGE_RULES: readonly MissingPageRule[] = [
   { key: "/tin-tuc/[slug]", param: "slug", collection: "news" },
   { key: "/tin-tuc/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "news" } } },
   { key: "/dich-vu/[slug]", param: "slug", collection: "services" },
+  { key: "/du-an/[slug]", param: "slug", collection: "projects" },
   { key: LEGAL_PAGE_ROUTES.privacy, collection: "pages", where: { kind: { equals: "privacy" } } },
   { key: LEGAL_PAGE_ROUTES.terms, collection: "pages", where: { kind: { equals: "terms" } } },
 ];

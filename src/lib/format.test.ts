@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatArea, formatDate, formatNumber, formatVnd, formatVndCompact } from "./format";
+import { formatArea, formatDate, formatFileSize, formatNumber, formatVnd, formatVndCompact } from "./format";
 
 describe("formatVnd", () => {
   it("vi: dấu chấm phân cách nghìn, hậu tố ₫", () => {
@@ -48,5 +48,15 @@ describe("formatVndCompact", () => {
   });
   it("dưới 1 triệu hiện số đầy đủ", () => {
     expect(formatVndCompact(900_000, "vi")).toBe("900.000 ₫");
+  });
+});
+
+describe("formatFileSize", () => {
+  it("KB cho tệp nhỏ (tối thiểu 1 KB), MB một chữ số thập phân từ 1 MB; dấu thập phân theo ngôn ngữ", () => {
+    expect(formatFileSize(10, "vi")).toBe("1 KB");
+    expect(formatFileSize(850 * 1024, "vi")).toBe("850 KB");
+    expect(formatFileSize(2.4 * 1024 * 1024, "vi")).toBe("2,4 MB");
+    expect(formatFileSize(2.4 * 1024 * 1024, "en")).toBe("2.4 MB");
+    expect(formatFileSize(1024 * 1024, "en")).toBe("1 MB");
   });
 });

@@ -92,7 +92,8 @@ describe.skipIf(!baseUrl)("integration: redirect khi đổi slug (BR-05, DB tạ
     categoryId = (
       await payload.create({ collection: "categories", data: { name: "Thị trường", scope: "news" } as never, locale: "vi", overrideAccess: true, depth: 0 })
     ).id;
-    const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" DEFAULT VALUES RETURNING id`));
+    // `cover` chỉ nhận ảnh (filterOptions), nên dòng media phải có mime_type ảnh.
+    const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" (mime_type) VALUES ($1) RETURNING id`, ["image/jpeg"]));
     mediaId = inserted.rows[0].id as string;
   }, 120_000);
 

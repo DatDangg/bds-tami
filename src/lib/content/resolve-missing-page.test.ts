@@ -39,7 +39,7 @@ describe("matchDynamicPage", () => {
   });
 
   it("không khớp: trang chủ, danh sách, đường dẫn tiếng Anh ở nhánh vi, nhiều đoạn, trang khác", () => {
-    for (const path of ["/", "/tin-tuc", "/en/news", "/news/x", "/en/tin-tuc/x", "/tin-tuc/a/b", "/du-an/x", "/vi/tin-tuc/x"]) {
+    for (const path of ["/", "/tin-tuc", "/en/news", "/news/x", "/en/tin-tuc/x", "/tin-tuc/a/b", "/du-an", "/en/projects", "/du-an/a/b", "/vi/tin-tuc/x"]) {
       expect(matchDynamicPage(path), path).toBeNull();
     }
   });
@@ -72,6 +72,14 @@ describe("resolveMissingPage", () => {
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "categories", "en", "market", { depth: 0, where: { scope: { equals: "news" } } });
   });
 
+  it("dự án: khớp vi/en và tra theo slug của ngôn ngữ URL (EN chưa có bản dịch → 404 EN)", async () => {
+    expect(matchDynamicPage("/du-an/can-ho-a")).toMatchObject({ locale: "vi", slug: "can-ho-a", rule: { collection: "projects" } });
+    expect(matchDynamicPage("/en/projects/apartment-a")).toMatchObject({ locale: "en", slug: "apartment-a", rule: { collection: "projects" } });
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/projects/chua-dich")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "projects", "en", "chua-dich", { depth: 0 });
+  });
+
   it("trang pháp lý: tra theo `kind` bằng findPublicOne; EN chưa duyệt (không có bản công khai) → 404 EN", async () => {
     findPublicOne.mockResolvedValueOnce({ id: "1" }).mockResolvedValueOnce(null);
     expect(await resolveMissingPage("/chinh-sach-bao-mat")).toBeNull();
@@ -88,7 +96,7 @@ describe("resolveMissingPage", () => {
 
   it("URL không phải trang động: không đụng DB", async () => {
     expect(await resolveMissingPage("/tin-tuc")).toBeNull();
-    expect(await resolveMissingPage("/du-an/abc")).toBeNull();
+    expect(await resolveMissingPage("/du-an")).toBeNull();
     expect(findPublicBySlug).not.toHaveBeenCalled();
   });
 

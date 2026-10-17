@@ -12,9 +12,8 @@ import {
   validateGallery,
   validatePriceMonthly,
   validateVideoUrl,
-  validateWardInProvince,
-  wardFilterOptions,
 } from "../hooks/rentals/field-validators";
+import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { withContentDefaults } from "./_shared/content-defaults";

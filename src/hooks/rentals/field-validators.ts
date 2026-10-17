@@ -1,51 +1,16 @@
 import type {
   NumberFieldSingleValidation,
-  RelationshipFieldSingleValidation,
   TextFieldSingleValidation,
   UploadFieldManyValidation,
-  Where,
 } from "payload";
-import { number, relationship, upload } from "payload/shared";
+import { number, upload } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../../access";
-import { relationId } from "../../lib/payload/relation-id";
 
 /** Số ảnh tối thiểu để xuất bản tin cho thuê (ERD §4.6). */
 export const MIN_PUBLISHED_GALLERY_IMAGES = 3;
 
-type SiblingValues = { status?: unknown; priceNegotiable?: unknown; priceMonthlyVnd?: unknown; province?: unknown } | undefined;
-
-/**
- * Lọc phường theo tỉnh đã chọn (G22) cho ô chọn trong admin. `siblingData` ở đây là dữ liệu form, nên chưa chọn tỉnh thì chưa lọc.
- */
-export function wardFilterOptions({ siblingData }: { siblingData?: unknown }): Where | true {
-  const provinceId = relationId((siblingData as SiblingValues)?.province);
-  return provinceId ? { province: { equals: provinceId } } : true;
-}
-
-/**
- * Phường phải thuộc tỉnh đã chọn (G22), kiểm ở server (API/seed cũng bị chặn, không chỉ `filterOptions` của admin). Chạy validator
- * `relationship` mặc định của Payload trước (nó áp `required` và `filterOptions`). `siblingData` trong `validate` đã gộp giá trị
- * đã lưu vào dữ liệu gửi lên, nên sửa riêng `province` (không gửi `ward`) cũng bị so với phường đang lưu.
- */
-export const validateWardInProvince: RelationshipFieldSingleValidation = async (value, options) => {
-  const base = await relationship(value, options);
-  if (base !== true) return base;
-  const wardId = relationId(value ?? (options.siblingData as { ward?: unknown } | undefined)?.ward);
-  const provinceId = relationId((options.siblingData as SiblingValues)?.province);
-  if (!wardId || !provinceId) return true;
-  const ward = await options.req.payload.findByID({
-    collection: "wards",
-    id: wardId,
-    depth: 0,
-    select: { province: true },
-    overrideAccess: true,
-    disableErrors: true,
-    req: options.req,
-  });
-  if (!ward) return "Phường/xã không tồn tại.";
-  return relationId(ward.province) === provinceId ? true : "Phường/xã không thuộc tỉnh/thành đã chọn.";
-};
+type SiblingValues = { status?: unknown; priceNegotiable?: unknown; priceMonthlyVnd?: unknown } | undefined;
 
 /**
  * Giá thuê/tháng: bắt buộc trừ khi `priceNegotiable` (ERD §4.6). Chạy validator `number` mặc định trước (giữ `min: 0`);

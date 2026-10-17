@@ -231,6 +231,66 @@
         "handed_over": "Đã bàn giao"
       }
     },
+    "projectDetail": {
+      "heroConsult": "Nhận tư vấn",
+      "heroDocuments": "Tải tài liệu",
+      "subNavLabel": "Mục lục dự án",
+      "sections": {
+        "overview": "Tổng quan",
+        "location": "Vị trí",
+        "amenities": "Tiện ích",
+        "floorPlans": "Mặt bằng",
+        "legal": "Pháp lý",
+        "policy": "Chính sách bán hàng",
+        "gallery": "Thư viện ảnh"
+      },
+      "subNav": {
+        "overview": "Tổng quan",
+        "location": "Vị trí",
+        "amenities": "Tiện ích",
+        "floorPlans": "Mặt bằng",
+        "legal": "Pháp lý",
+        "policy": "Chính sách",
+        "gallery": "Thư viện"
+      },
+      "specs": {
+        "label": "Thông số dự án",
+        "developer": "Chủ đầu tư",
+        "category": "Loại hình",
+        "scale": "Quy mô",
+        "area": "Diện tích",
+        "price": "Giá từ",
+        "handover": "Bàn giao",
+        "units": "{count} căn",
+        "blocks": "{count} tòa",
+        "floors": "{count} tầng",
+        "landArea": "Đất {area}",
+        "newTab": "(mở tab mới)"
+      },
+      "location": {
+        "mapLabel": "Vị trí {name} trên bản đồ",
+        "address": "Địa chỉ"
+      },
+      "amenitiesLabel": "Danh sách tiện ích",
+      "floorPlans": {
+        "tabs": "Chọn mặt bằng",
+        "select": "Chọn mặt bằng",
+        "open": "Phóng to mặt bằng {title}"
+      },
+      "documents": {
+        "title": "Tài liệu",
+        "download": "Tải tài liệu",
+        "downloadNamed": "Tải tài liệu: {name} (PDF, mở tab mới)",
+        "pdf": "PDF"
+      },
+      "leadForm": {
+        "title": "Nhận thông tin dự án",
+        "fallback": "Gọi hotline hoặc liên hệ để nhận bảng giá, chính sách và tư vấn chi tiết về dự án.",
+        "hotline": "Hotline"
+      },
+      "relatedTitle": "Dự án khác",
+      "stickyConsult": "Nhận tư vấn"
+    },
     "richText": {
       "table": "Bảng nội dung, cuộn ngang để xem đủ"
     },

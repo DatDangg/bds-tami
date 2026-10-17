@@ -20,3 +20,5 @@ export const CLICK_REF_COLLECTIONS = [
   "job-postings",
   "pages",
 ] as const;
+
+export type ClickRefCollection = (typeof CLICK_REF_COLLECTIONS)[number];

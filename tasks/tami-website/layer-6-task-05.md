@@ -37,11 +37,11 @@ Chi tiết dự án: tổng quan, chủ đầu tư, bản đồ, tiện ích, m�
 Mở khoá cho: `layer-10-task-01`
 
 ## Acceptance Criteria
-- [ ] Không có bản EN → 404 EN; slug cũ → 301 (resolve-redirect)
-- [ ] Ảnh LCP `priority`; bản đồ lười; tài liệu PDF mở tab mới
-- [ ] Có vùng `LeadFormSlot` (form ráp ở task lead-form-integration)
-- [ ] JSON-LD Organization/breadcrumb; meta + OG
-- [ ] Mỗi trang đúng một `h1`
+- [x] Không có bản EN → 404 EN; slug cũ → 301 (resolve-redirect)
+- [x] Ảnh LCP `priority`; bản đồ lười; tài liệu PDF mở tab mới
+- [x] Có vùng `LeadFormSlot` (form ráp ở task lead-form-integration)
+- [x] JSON-LD Organization/breadcrumb; meta + OG
+- [x] Mỗi trang đúng một `h1`
 
 ## Tests cần viết
 - Integration render: dự án đủ khối; dự án thiếu `floorPlans` → ẩn khối, không lỗi
@@ -55,20 +55,21 @@ Mở khoá cho: `layer-10-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 2 (attempt 2 = sửa MINOR sau PASS round 1)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 PASS + follow-up L5-T06 (refCollection/refId, offset), L5-T01 (validator upload mặc định gallery/cover, ward∈province, placeholder mất ảnh), G18 (beacon text/plain), L6-T03 (404 có nội dung)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 135 file 1.477 PASS; pnpm build PASS (`/[locale]/du-an/[slug]` ISR). Trình duyệt next start :3227: 375/768/1280 không cuộn ngang; sub-nav dính, cuộn + focus + hash; lightbox bẫy focus, Esc, trả focus; accordion 375 / 2 cột 1280 (kể cả tắt JS); `/en` tiếng Anh. curl: ISR MISS→HIT `public, s-maxage=60, stale-while-revalidate=300`; slug lạ + EN chưa dịch → 404 có h1/header/footer; slug cũ → 301; JSON-LD RealEstateListing + BreadcrumbList escape; og:image 1200×630; 1 h1
+- Reviewer verdict: STRICT PASS round 1 → PASS round 2 (delta MINOR 1–4) — `.context/review-reports/build-tami-website-layer-6-task-05-round-2-review.md`. Primary sửa 2 MINOR round 2 (try/catch `decodeURIComponent` hash trong LegalPolicy; regex test `/shidden(=|s|>)/`) — test file 19/19, lint, typecheck PASS
+- Residual risk: dev DB 3 ảnh mẫu cũ có alt EN tiếng Việt (seed chỉ đặt khi tạo mới). Bản đồ chưa kiểm hiển thị (→ staging L6-T01). Link breadcrumb 42px rộng (component có sẵn) → L14-T02. Không JS < lg: panel thứ 2 accordion không mở được (nội dung vẫn trong HTML)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
-- Decision log: pending
+- Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-05), `docs/API_SPEC.md` §3.4 (refCollection/refId)
+- Decision log: biến riêng `--sticky-cta-height`; RealEstateListing không giá; 1 icon tiện ích; validator phường dùng chung `src/fields/` (reviewer chấp nhận)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-6): task-05 pubprojdetail` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -76,13 +77,13 @@ Mở khoá cho: `layer-10-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-6/task-05` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức NORMAL)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/app/(frontend)/[locale]/du-an/[slug]/page.tsx
@@ -97,12 +98,12 @@ Mở khoá cho: `layer-10-task-01`
 - Nếu trang có thanh cố định đáy (giá/CTA trên mobile): đặt `--floating-bottom-offset` để nút nổi không bị đè.
 
 ## Follow-up từ spec-validation layer 5
-- [ ] G18 (L5-T06 MINOR-2): Blob gửi bằng `navigator.sendBeacon` trong `src/components/layout/FloatingContact.tsx` đặt type `text/plain;charset=UTF-8` (làm cùng lúc truyền `refCollection`/`refId` ở mục trên); test giải mã Blob kiểm type.
+- [x] G18 (L5-T06 MINOR-2): Blob gửi bằng `navigator.sendBeacon` trong `src/components/layout/FloatingContact.tsx` đặt type `text/plain;charset=UTF-8` (làm cùng lúc truyền `refCollection`/`refId` ở mục trên); test giải mã Blob kiểm type.
 
 ## Follow-up từ review layer-5-task-01
-- [ ] `Projects.gallery` (và `News.cover`) dùng `validate` tuỳ biến nên bỏ qua kiểm upload mặc định của Payload: gọi validator `upload` mặc định (`payload/shared`) trước rồi mới kiểm publish — chặn PDF vào gallery, id media sai trả 400 thay vì 500 (`src/collections/Projects.ts:29-34`).
-- [ ] `Projects.ward` thêm `filterOptions` chỉ phường thuộc `province` đã chọn (`src/collections/Projects.ts:103`) + validate phía server.
-- [ ] Dự án published mà mọi ảnh gallery bị xoá (FK set null) → trang chi tiết/danh sách hiện ảnh placeholder, không vỡ.
+- [x] `Projects.gallery` (và `News.cover`) dùng `validate` tuỳ biến nên bỏ qua kiểm upload mặc định của Payload: gọi validator `upload` mặc định (`payload/shared`) trước rồi mới kiểm publish — chặn PDF vào gallery, id media sai trả 400 thay vì 500 (`src/collections/Projects.ts:29-34`).
+- [x] `Projects.ward` thêm `filterOptions` chỉ phường thuộc `province` đã chọn (`src/collections/Projects.ts:103`) + validate phía server.
+- [x] Dự án published mà mọi ảnh gallery bị xoá (FK set null) → trang chi tiết/danh sách hiện ảnh placeholder, không vỡ.
 
 ## Follow-up từ review layer-6-task-03
-- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+- [x] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.

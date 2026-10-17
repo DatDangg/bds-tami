@@ -46,6 +46,7 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
   let otherSale: Awaited<ReturnType<typeof createStaff>>;
   let categoryId = "";
   let mediaId = "";
+  let pdfMediaId = "";
   let publicQueries: typeof import("../../src/lib/content/public-queries");
 
   const asUser = <T extends object>(doc: T) => ({ ...doc, collection: "staff" as const });
@@ -114,9 +115,11 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
     sale = await createStaff("sale", ROLES.sale);
     otherSale = await createStaff("othersale", ROLES.sale);
     categoryId = (await createCategory("Thị trường", "news")).id;
-    // Trường upload chỉ cần một `media` tồn tại: chèn thẳng một dòng để khỏi ghi file ra đĩa.
-    const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" DEFAULT VALUES RETURNING id`));
-    mediaId = inserted.rows[0].id as string;
+    // Trường upload chỉ cần `media` tồn tại: chèn thẳng dòng để khỏi ghi file ra đĩa. Có `mime_type` vì `cover` chỉ nhận ảnh (filterOptions).
+    const insertMedia = async (mimeType: string) =>
+      (await withDatabase((client) => client.query(`INSERT INTO "media" (mime_type) VALUES ($1) RETURNING id`, [mimeType]))).rows[0].id as string;
+    mediaId = await insertMedia("image/jpeg");
+    pdfMediaId = await insertMedia("application/pdf");
   }, 120_000);
 
   afterAll(async () => {
@@ -420,6 +423,14 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(published.status).toBe("published");
       expect((await updateNews(published.id, { excerpt: "Sửa một phần" })).excerpt).toBe("Sửa một phần");
       expect(await statusOf(updateNews(published.id, { cover: null }))).toBe(400);
+    });
+
+    it("cover chỉ nhận ảnh: PDF hoặc id media sai → 400 (validator upload mặc định vẫn chạy cùng kiểm publish)", async () => {
+      expect(await statusOf(createNews({ title: "Bìa PDF", status: "published", cover: pdfMediaId, content: lexical("x") }))).toBe(400);
+      expect(await statusOf(createNews({ title: "Nháp bìa PDF", cover: pdfMediaId, content: lexical("x") }))).toBe(400);
+      expect(await statusOf(createNews({ title: "Bìa id sai", status: "published", cover: "khong-phai-uuid", content: lexical("x") }))).toBe(400);
+      expect(await statusOf(createNews({ title: "Bìa không tồn tại", status: "published", cover: "00000000-0000-4000-8000-000000000000", content: lexical("x") }))).toBe(400);
+      expect((await createNews({ title: "Bìa ảnh", status: "published", cover: mediaId, content: lexical("x") })).status).toBe("published");
     });
 
     it("tags là mảng chữ", async () => {
