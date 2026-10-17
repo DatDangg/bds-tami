@@ -41,7 +41,7 @@ const validateSalaryMax: NumberFieldSingleValidation = (value, options) => {
 
 /**
  * Tin tuyển dụng (ERD §4.10, FR-ADM-05): sale tạo và sửa/xoá mềm tin của mình, admin sửa mọi tin và là người duy nhất xoá hẳn/khôi
- * phục (PERMISSION §3.1; access mặc định của `withContentDefaults`). `category` thuộc scope `job`. Không có `isFeatured` (ERD
+ * phục (PERMISSION §3.1; access mặc định của `withContentDefaults`). `category` thuộc scope `job` và TUỲ CHỌN (ERD §4.10, G25: cột DB vốn nullable, chỉ bỏ kiểm bắt buộc ở validator; có giá trị thì vẫn phải đúng scope). Không có `isFeatured` (ERD
  * không định nghĩa khối tuyển dụng nổi bật). `deadline` bắt buộc: "quá hạn thì tự ẩn khỏi danh sách" do truy vấn danh sách công
  * khai áp (layer 6), không phải access đọc, vì trang chi tiết vẫn cần tồn tại cho đường dẫn đã chia sẻ. Index tổng hợp
  * `(status, has_english, deadline)` là SQL tuỳ biến trong migration `job_postings`. `revalidate` chỉ để test ghi đè.
@@ -58,7 +58,7 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
       hooks: { beforeDelete: [guardJobPostingHardDelete] },
       fields: [
         titleField(),
-        scopedCategoryField("job"),
+        scopedCategoryField("job", { required: false }),
         { name: "province", type: "relationship", relationTo: "provinces", index: true },
         { name: "workplace", type: "text" },
         employmentTypeField,

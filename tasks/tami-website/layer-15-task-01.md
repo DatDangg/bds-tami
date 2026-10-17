@@ -149,3 +149,9 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Test chứng minh `findPublicList` với `select` không tải trường dài (`overview`…).
 - [ ] Seed mẫu: không ghi đè tên EN của danh mục admin tạo trùng tên VI.
 - [ ] Skeleton 6 thẻ cho `/du-an` (`loading.tsx`) nếu đo thấy cần.
+
+## Follow-up từ review layer-6-task-08
+- [ ] Migration `20261017_175237_close_job_postings_task` `down`: xoá job `close-job-postings` trong `payload_jobs` trước khi bỏ giá trị enum (hoặc ghi runbook).
+- [ ] `JobDetail.tsx:56`: tin hết hạn trên mobile bỏ padding 64px của thanh dính không hiển thị.
+- [ ] Seed mẫu tuyển dụng: không publish bản nháp thật trùng tiêu đề VI (`completeLegacyDraft`).
+- [ ] `tuyen-dung/[slug]/page.tsx:78/106`: dùng chung một `now` cho metadata và trang.

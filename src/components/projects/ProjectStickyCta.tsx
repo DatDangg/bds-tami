@@ -12,11 +12,11 @@ const OFFSET_VAR = "--sticky-cta-height";
 const LG_QUERY = "(min-width: 1024px)";
 
 /**
- * Thanh "Nhận tư vấn" dính đáy chỉ trên mobile (< lg; `lg:hidden` để HTML server không hiện ở desktop), hiện khi vùng form lead CHƯA trong viewport (design-spec S03). Đặt
+ * Thanh "Nhận tư vấn" dính đáy (tuỳ biến `label` + `targetId` cho nút "Ứng tuyển" ở trang tuyển dụng) chỉ trên mobile (< lg; `lg:hidden` để HTML server không hiện ở desktop), hiện khi vùng form lead CHƯA trong viewport (design-spec S03). Đặt
  * `--sticky-cta-height` trên `<html>` khi đang hiện để nút liên hệ nổi nằm trên thanh (biến khác `--floating-bottom-offset` của banner cookie, để hai bên không ghi đè nhau);
  * thanh tự nằm trên banner cookie bằng chính `--floating-bottom-offset`. Không có IntersectionObserver thì thanh luôn hiện.
  */
-export function ProjectStickyCta() {
+export function ProjectStickyCta({ targetId = LEAD_FORM_DOM_ID, label }: { targetId?: string; label?: string } = {}) {
   const t = useTranslations("page.projectDetail");
   const [formInView, setFormInView] = useState(false);
   const [isLg, setIsLg] = useState(false);
@@ -31,12 +31,12 @@ export function ProjectStickyCta() {
   }, []);
 
   useEffect(() => {
-    const form = document.getElementById(LEAD_FORM_DOM_ID);
+    const form = document.getElementById(targetId);
     if (!form || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver((entries) => setFormInView(entries.some((entry) => entry.isIntersecting)));
     observer.observe(form);
     return () => observer.disconnect();
-  }, []);
+  }, [targetId]);
 
   const visible = !isLg && !formInView;
   useEffect(() => {
@@ -52,7 +52,7 @@ export function ProjectStickyCta() {
   return (
     <div className="fixed inset-x-0 bottom-[var(--floating-bottom-offset,0px)] z-(--z-sticky) box-content flex h-16 items-center bg-surface px-gutter pb-[env(safe-area-inset-bottom,0px)] shadow-md lg:hidden print:hidden">
       <Button asChild size="lg" className="w-full">
-        <a href={`#${LEAD_FORM_DOM_ID}`}>{t("stickyConsult")}</a>
+        <a href={`#${targetId}`}>{label ?? t("stickyConsult")}</a>
       </Button>
     </div>
   );

@@ -160,6 +160,19 @@ export function buildServiceJsonLd(input: ServiceInput) {
 /** Giá trị `employmentType` của schema.org/Google. */
 export type JobEmploymentType = "FULL_TIME" | "PART_TIME" | "CONTRACTOR" | "TEMPORARY" | "INTERN" | "OTHER";
 
+export interface JobLocationInput {
+  streetAddress?: string | null;
+  /** Thành phố/tỉnh; dữ liệu Tami chỉ tới cấp tỉnh nên dùng chung cho `addressLocality` và `addressRegion`. */
+  province?: string | null;
+}
+
+export interface JobSalaryInput {
+  /** Đơn vị tiền ISO 4217. */
+  currency: string;
+  minValue?: number | null;
+  maxValue?: number | null;
+}
+
 export interface JobPostingInput extends Localized {
   title: string;
   url: string;
@@ -170,8 +183,21 @@ export interface JobPostingInput extends Localized {
   validThrough?: string | null;
   employmentType?: JobEmploymentType | null;
   hiringOrganization: { name: string; siteUrl: string; logoUrl?: string };
-  /** Địa điểm làm việc dạng chữ (vd "Hà Nội"). */
-  location?: string | null;
+  /** Nơi làm việc; thiếu cả hai thì `jobLocation` chỉ còn quốc gia (Google bắt buộc `jobLocation` kèm `addressCountry`). */
+  location?: JobLocationInput | null;
+  /** Lương theo tháng (`unitText: MONTH`); thiếu cả min và max thì bỏ `baseSalary` (không khai lương khi chỉ có chữ "Thỏa thuận"). */
+  baseSalary?: JobSalaryInput | null;
+}
+
+function buildBaseSalary(salary: JobSalaryInput | null | undefined) {
+  const min = typeof salary?.minValue === "number" ? salary.minValue : undefined;
+  const max = typeof salary?.maxValue === "number" ? salary.maxValue : undefined;
+  if (!salary || (min === undefined && max === undefined)) return undefined;
+  return {
+    "@type": "MonetaryAmount",
+    currency: salary.currency,
+    value: { "@type": "QuantitativeValue", minValue: min, maxValue: max, unitText: "MONTH" },
+  };
 }
 
 export function buildJobPostingJsonLd(input: JobPostingInput) {
@@ -190,9 +216,17 @@ export function buildJobPostingJsonLd(input: JobPostingInput) {
       sameAs: input.hiringOrganization.siteUrl,
       logo: input.hiringOrganization.logoUrl,
     },
-    jobLocation: input.location
-      ? { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: input.location, addressCountry: DEFAULT_COUNTRY } }
-      : undefined,
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: input.location?.streetAddress || undefined,
+        addressLocality: input.location?.province || undefined,
+        addressRegion: input.location?.province || undefined,
+        addressCountry: DEFAULT_COUNTRY,
+      },
+    },
+    baseSalary: buildBaseSalary(input.baseSalary),
     inLanguage: input.locale,
   };
 }

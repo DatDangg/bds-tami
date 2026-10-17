@@ -80,6 +80,16 @@ describe("resolveMissingPage", () => {
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "projects", "en", "chua-dich", { depth: 0 });
   });
 
+  it("tuyển dụng: khớp vi/en, tra job-postings theo slug của ngôn ngữ URL; danh sách /tuyen-dung không bị khớp", async () => {
+    expect(matchDynamicPage("/tuyen-dung/sales")).toMatchObject({ locale: "vi", slug: "sales", rule: { collection: "job-postings" } });
+    expect(matchDynamicPage("/en/careers/sales-manager")).toMatchObject({ locale: "en", slug: "sales-manager", rule: { collection: "job-postings" } });
+    expect(matchDynamicPage("/tuyen-dung")).toBeNull();
+    expect(matchDynamicPage("/en/careers")).toBeNull();
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/careers/khong-co")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "job-postings", "en", "khong-co", { depth: 0 });
+  });
+
   it("trang pháp lý: tra theo `kind` bằng findPublicOne; EN chưa duyệt (không có bản công khai) → 404 EN", async () => {
     findPublicOne.mockResolvedValueOnce({ id: "1" }).mockResolvedValueOnce(null);
     expect(await resolveMissingPage("/chinh-sach-bao-mat")).toBeNull();

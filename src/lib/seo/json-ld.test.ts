@@ -188,13 +188,24 @@ describe("json-ld builders (schema.org)", () => {
           validThrough: "2026-11-01",
           employmentType: "FULL_TIME",
           hiringOrganization: { name: "TAMI", siteUrl: "https://x.test" },
-          location: "Hà Nội",
+          location: { province: "Hà Nội", streetAddress: "1 Phố A" },
+          baseSalary: { currency: "VND", minValue: 15_000_000, maxValue: 30_000_000 },
         }),
       ),
     ).toMatchInlineSnapshot(`
       {
         "@context": "https://schema.org",
         "@type": "JobPosting",
+        "baseSalary": {
+          "@type": "MonetaryAmount",
+          "currency": "VND",
+          "value": {
+            "@type": "QuantitativeValue",
+            "maxValue": 30000000,
+            "minValue": 15000000,
+            "unitText": "MONTH",
+          },
+        },
         "datePosted": "2026-10-01",
         "description": "<p>Mô tả</p>",
         "employmentType": "FULL_TIME",
@@ -210,6 +221,8 @@ describe("json-ld builders (schema.org)", () => {
             "@type": "PostalAddress",
             "addressCountry": "VN",
             "addressLocality": "Hà Nội",
+            "addressRegion": "Hà Nội",
+            "streetAddress": "1 Phố A",
           },
         },
         "title": "Sales",
@@ -217,6 +230,24 @@ describe("json-ld builders (schema.org)", () => {
         "validThrough": "2026-11-01",
       }
     `);
+  });
+
+  it("JobPosting: thiếu nơi làm và lương → jobLocation chỉ có quốc gia, không có baseSalary; chỉ một đầu lương vẫn khai", () => {
+    const base = {
+      locale: "en" as const,
+      title: "Intern",
+      url: "https://x.test/en/careers/intern",
+      description: "<p>x</p>",
+      datePosted: "2026-10-01",
+      hiringOrganization: { name: "TAMI", siteUrl: "https://x.test" },
+    };
+    const bare = asEmitted(buildJobPostingJsonLd(base)) as Record<string, unknown>;
+    expect(bare.baseSalary).toBeUndefined();
+    expect(bare.jobLocation).toEqual({ "@type": "Place", address: { "@type": "PostalAddress", addressCountry: "VN" } });
+    expect(bare.inLanguage).toBe("en");
+    const onlyMin = asEmitted(buildJobPostingJsonLd({ ...base, baseSalary: { currency: "VND", minValue: 10_000_000 } })) as { baseSalary: { value: Record<string, unknown> } };
+    expect(onlyMin.baseSalary.value).toEqual({ "@type": "QuantitativeValue", minValue: 10_000_000, unitText: "MONTH" });
+    expect((asEmitted(buildJobPostingJsonLd({ ...base, baseSalary: { currency: "VND" } })) as Record<string, unknown>).baseSalary).toBeUndefined();
   });
 
   it("escape </script> trong mọi builder", () => {

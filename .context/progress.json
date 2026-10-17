@@ -313,6 +313,13 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-6-task-05-round-2-review.md",
       "completedAt": "2026-10-18T09:30:00.000Z"
+    },
+    {
+      "task": "layer-6/task-08",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-6-task-08-round-1-review.md",
+      "completedAt": "2026-10-18T10:20:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -421,7 +428,7 @@
       "reason": "User chọn Bỏ, theo spec"
     }
   ],
-  "lastUpdated": "2026-10-18T09:30:00.000Z",
+  "lastUpdated": "2026-10-18T10:20:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

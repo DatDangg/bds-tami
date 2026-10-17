@@ -100,3 +100,6 @@ Mở khoá cho: `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-04`, `layer-
 
 ## Follow-up từ spec-validation layer 5 addendum
 - [ ] G22: `property-posts.ward` lọc theo `province` + validate server; field upload có `validate` tuỳ biến phải gọi validator `upload` mặc định trước.
+
+## Follow-up từ review layer-6-task-08
+- [ ] `expire-offers` và `close-job-postings` chạy ở tiến trình `jobs` (ngoài Next) nên `revalidatePath` không có tác dụng: chọn một cơ chế revalidate liên tiến trình (vd endpoint nội bộ có xác thực gọi từ job, hoặc dựa ISR/thời gian render) và áp cho cả hai job.

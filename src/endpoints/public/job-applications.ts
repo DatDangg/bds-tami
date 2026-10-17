@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { APIError, ValidationError, type Endpoint, type Payload } from "payload";
 
+import { isPastDeadline } from "@/lib/careers/deadline";
 import { getEnv } from "@/lib/env";
 import { fail, ok } from "@/lib/http/response";
 import { logger } from "@/lib/logger";
@@ -31,17 +32,6 @@ export interface JobApplicationDeps {
 interface OpenPosting {
   id: string;
   title: string;
-}
-
-const VIETNAM_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
-
-/**
- * `deadline` là ngày (trường `dayOnly`), nên tính theo NGÀY giờ Việt Nam: còn nhận hồ sơ hết ngày hạn chót.
- * So chuỗi `YYYY-MM-DD` (ISO sắp xếp được theo thứ tự thời gian); phần ngày của `deadline` lấy theo UTC như Payload lưu.
- */
-export function isPastDeadline(deadlineIso: string, now: Date): boolean {
-  const todayInVietnam = new Date(now.getTime() + VIETNAM_UTC_OFFSET_MS).toISOString().slice(0, 10);
-  return deadlineIso.slice(0, 10) < todayInVietnam;
 }
 
 /** Chỉ tin `published`, chưa xoá mềm (find mặc định bỏ bản trong thùng rác), chưa quá hạn. Mọi trường hợp khác -> null. */

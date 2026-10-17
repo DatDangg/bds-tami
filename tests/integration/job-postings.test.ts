@@ -276,11 +276,20 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
   });
 
   describe("job-postings: category thuộc scope job", () => {
-    it("danh mục sai scope hoặc thiếu → 400; đúng scope → được", async () => {
+    it("danh mục sai scope → 400; đúng scope → được", async () => {
       const wrong = await createCategory("Tin X", "news");
       expect(await statusOf(createJob({ title: "Sai scope", category: wrong.id }))).toBe(400);
-      expect(await statusOf(createJob({ title: "Thiếu danh mục", category: null }))).toBe(400);
       expect((await createJob({ title: "Đúng scope" })).category).toBe(categoryId);
+    });
+
+    it("G25: danh mục tuỳ chọn (ERD §4.10): tạo không có danh mục được, gỡ danh mục khi sửa được, sai scope vẫn bị chặn", async () => {
+      const without = await createJob({ title: "Không danh mục", category: null });
+      expect(without.category ?? null).toBeNull();
+      const created = await createJob({ title: "Có rồi gỡ danh mục" });
+      expect(created.category).toBe(categoryId);
+      expect((await updateJob(created.id, { category: null })).category ?? null).toBeNull();
+      const wrong = await createCategory("Tin Y", "news");
+      expect(await statusOf(updateJob(created.id, { category: wrong.id }))).toBe(400);
     });
 
     it("không xoá được danh mục đang có tin tuyển dụng (xoá hẳn và xoá mềm → 409); hết tin thì xoá được", async () => {
@@ -542,21 +551,123 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
     });
   });
 
+  describe("tuyển dụng công khai: danh sách chỉ tin còn hạn, chi tiết vẫn mở (SPECIFICATIONS F6)", () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    /** Giá trị ô chọn ngày của admin: 12:00 UTC của ngày (hôm nay giờ VN + số ngày). */
+    const pickerDeadline = (daysFromToday: number, now: Date) => {
+      const today = new Date(now.getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      return new Date(Date.parse(`${today}T12:00:00.000Z`) + daysFromToday * DAY).toISOString();
+    };
+    let careers: typeof import("../../src/lib/careers/job-queries");
+
+    beforeAll(async () => {
+      careers = await import("../../src/lib/careers/job-queries");
+    });
+
+    const titlesOf = async (locale: Locale, now: Date, extra: Record<string, unknown> = {}) =>
+      (await careers.listOpenJobs(payload, locale, { page: 1, now, ...extra })).docs.map((doc) => doc.title);
+
+    it("tin hết hạn không ở danh sách nhưng chi tiết vẫn tìm được; tin còn hạn (kể cả hạn là hôm nay) ở danh sách", async () => {
+      const now = new Date();
+      await createJob({ title: "CL còn hạn dài", status: "published", deadline: pickerDeadline(30, now) });
+      await createJob({ title: "CL hạn hôm nay", status: "published", deadline: pickerDeadline(0, now) });
+      await createJob({ title: "CL đã hết hạn", status: "published", deadline: pickerDeadline(-2, now) });
+      await createJob({ title: "CL nháp còn hạn", deadline: pickerDeadline(30, now) });
+
+      const titles = await titlesOf("vi", now);
+      expect(titles).toEqual(expect.arrayContaining(["CL còn hạn dài", "CL hạn hôm nay"]));
+      expect(titles).not.toContain("CL đã hết hạn");
+      expect(titles).not.toContain("CL nháp còn hạn");
+
+      const expired = await careers.findPublicJobBySlug(payload, "vi", "cl-da-het-han");
+      expect(expired?.title).toBe("CL đã hết hạn");
+      expect(await careers.findPublicJobBySlug(payload, "vi", "cl-nhap-con-han")).toBeNull();
+    });
+
+    it("biên nửa đêm giờ VN: 16:59 UTC còn hạn chót hôm nay, 17:00 UTC (00:00 ICT) đã hết", async () => {
+      const deadline = new Date(Date.UTC(2031, 0, 10, 12)).toISOString();
+      await createJob({ title: "CL biên nửa đêm", status: "published", deadline });
+      expect(await titlesOf("vi", new Date("2031-01-10T16:59:59.000Z"))).toContain("CL biên nửa đêm");
+      expect(await titlesOf("vi", new Date("2031-01-10T17:00:00.000Z"))).not.toContain("CL biên nửa đêm");
+    });
+
+    it("lọc theo danh mục và tỉnh; /en cần hasEnglish; tin chưa có danh mục (G25) vẫn vào danh sách không lọc", async () => {
+      const now = new Date();
+      const other = await createCategory("Nhóm khác", "job");
+      const inCategory = await createJob({
+        title: "CL trong nhóm khác",
+        status: "published",
+        category: other.id,
+        province: provinceId,
+        deadline: pickerDeadline(10, now),
+      });
+      await createJob({ title: "CL không danh mục", status: "published", category: null, deadline: pickerDeadline(10, now) });
+      expect(await titlesOf("vi", now, { categoryIds: [other.id] })).toEqual(["CL trong nhóm khác"]);
+      expect(await titlesOf("vi", now, { provinceId })).toContain("CL trong nhóm khác");
+      expect(await titlesOf("vi", now)).toContain("CL không danh mục");
+      expect(await titlesOf("en", now)).not.toContain("CL trong nhóm khác");
+      await payload.update({
+        collection: "job-postings",
+        id: inCategory.id,
+        data: { title: "Job in other group", description: lexical("en"), requirements: lexical("en"), hasEnglish: true } as never,
+        locale: "en",
+        overrideAccess: true,
+      });
+      expect(await titlesOf("en", now)).toContain("Job in other group");
+    });
+
+    it("tin hết hạn không ra ở gợi ý findOtherOpenJobs và không tự đổi status", async () => {
+      const now = new Date();
+      const gone = await createJob({ title: "CL gợi ý hết hạn", status: "published", deadline: pickerDeadline(-3, now) });
+      const live = await createJob({ title: "CL gợi ý còn hạn", status: "published", deadline: pickerDeadline(5, now) });
+      const others = await careers.findOtherOpenJobs(payload, "vi", gone.id, now);
+      expect(others.map((doc) => doc.id)).toContain(live.id);
+      expect(others.map((doc) => doc.id)).not.toContain(gone.id);
+      const reread = await payload.findByID({ collection: "job-postings", id: gone.id, depth: 0, overrideAccess: true });
+      expect(reread.status).toBe("published");
+    });
+
+    it("job close-job-postings: chỉ làm mới cache tin vừa hết hạn (hôm qua), không đổi status/deadline và không đụng tin khác", async () => {
+      const { closeJobPostings } = await import("../../src/jobs/close-job-postings");
+      const now = new Date();
+      const yesterday = await createJob({ title: "CL vừa hết hạn", status: "published", deadline: pickerDeadline(-1, now) });
+      await createJob({ title: "CL hết hạn từ lâu", status: "published", deadline: pickerDeadline(-9, now) });
+      await createJob({ title: "CL vẫn còn hạn", status: "published", deadline: pickerDeadline(4, now) });
+      await updateJob(yesterday.id, { title: "Just expired", description: lexical("en"), requirements: lexical("en"), hasEnglish: true }, { locale: "en" });
+      const recorded: string[][] = [];
+      const outcome = await closeJobPostings({ req: { payload } as never, now, revalidate: (paths) => void recorded.push(paths) });
+      expect(outcome).toEqual({ expired: 1 });
+      expect(recorded.flat().sort()).toEqual(
+        ["/en/tuyen-dung", "/en/tuyen-dung/just-expired", "/vi/tuyen-dung", "/vi/tuyen-dung/cl-vua-het-han"].sort(),
+      );
+      const reread = await payload.findByID({ collection: "job-postings", id: yesterday.id, depth: 0, overrideAccess: true });
+      expect(reread.status).toBe("published");
+      expect(reread.deadline).toBe(pickerDeadline(-1, now));
+    });
+  });
+
   describe("seed", () => {
-    it("seedSampleJobPostings: thiếu tỉnh báo lỗi rõ; chạy 2 lần không nhân đôi; tin là bản nháp còn hạn", async () => {
+    it("seedSampleJobPostings: thiếu tỉnh báo lỗi rõ; chạy 2 lần không nhân đôi; tin published, có tin hết hạn, tin không danh mục và tin có bản EN", async () => {
       await expect(seedSampleJobPostings(payload)).rejects.toThrow(/pnpm seed/);
       await payload.create({ collection: "provinces", data: { code: "79", name: "Thành phố Hồ Chí Minh", slug: "ho-chi-minh" }, overrideAccess: true });
-      expect(await seedSampleJobPostings(payload)).toEqual({ created: 2, skipped: 0 });
-      expect(await seedSampleJobPostings(payload)).toEqual({ created: 0, skipped: 2 });
+      expect(await seedSampleJobPostings(payload)).toEqual({ created: 4, skipped: 0 });
+      expect(await seedSampleJobPostings(payload)).toEqual({ created: 0, skipped: 4 });
       const seeded = await payload.find({
         collection: "job-postings",
-        where: { title: { equals: "Chuyên viên tư vấn bất động sản" } },
+        where: {
+          title: { in: ["Chuyên viên tư vấn bất động sản", "Trưởng nhóm kinh doanh (đã đóng)", "Nhân viên chăm sóc khách hàng bán thời gian"] },
+        },
         locale: "vi",
         depth: 0,
         overrideAccess: true,
       });
-      expect(seeded.docs[0]?.status).toBe("draft");
-      expect(Date.parse(seeded.docs[0]!.deadline)).toBeGreaterThan(Date.now());
+      const byTitle = new Map(seeded.docs.map((doc) => [doc.title, doc]));
+      const open = byTitle.get("Chuyên viên tư vấn bất động sản")!;
+      expect(open.status).toBe("published");
+      expect(open.hasEnglish).toBe(true);
+      expect(Date.parse(open.deadline)).toBeGreaterThan(Date.now());
+      expect(Date.parse(byTitle.get("Trưởng nhóm kinh doanh (đã đóng)")!.deadline)).toBeLessThan(Date.now());
+      expect(byTitle.get("Nhân viên chăm sóc khách hàng bán thời gian")!.category ?? null).toBeNull();
     });
   });
 });

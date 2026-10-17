@@ -7,7 +7,7 @@ import type { PublicPipelineDeps } from "../_middleware/public-pipeline";
 const log = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn() }));
 vi.mock("@/lib/logger", () => ({ logger: { child: () => log, ...log } }));
 
-import { handleJobApplication, isPastDeadline } from "./job-applications";
+import { handleJobApplication } from "./job-applications";
 
 const MB = 1024 * 1024;
 const POSTING_ID = "7f1c0f0e-2b0a-4c53-9d0e-2d6e1f0a9b11";
@@ -117,21 +117,6 @@ async function submit(submission: Submission = {}, options: FakeOptions = {}, pi
   });
   return { response, body: (await response.json()) as Record<string, unknown>, ...fake, pipelineDeps };
 }
-
-describe("isPastDeadline (ngày giờ Việt Nam)", () => {
-  it("còn nhận hết ngày hạn chót; quá hạn từ ngày kế tiếp", () => {
-    // 2026-10-17 10:00 UTC = 17:00 ICT ngày 17/10.
-    expect(isPastDeadline("2026-10-17T12:00:00.000Z", NOW)).toBe(false);
-    expect(isPastDeadline("2026-10-17T00:00:00.000Z", NOW)).toBe(false);
-    expect(isPastDeadline("2026-10-16T12:00:00.000Z", NOW)).toBe(true);
-  });
-
-  it("23:30 UTC đã là ngày hôm sau ở Việt Nam", () => {
-    const lateUtc = new Date("2026-10-17T23:30:00.000Z");
-    expect(isPastDeadline("2026-10-17T12:00:00.000Z", lateUtc)).toBe(true);
-    expect(isPastDeadline("2026-10-18T12:00:00.000Z", lateUtc)).toBe(false);
-  });
-});
 
 describe("POST /api/public/job-applications (handler)", () => {
   beforeEach(() => {

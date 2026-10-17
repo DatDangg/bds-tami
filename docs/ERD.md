@@ -386,14 +386,14 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `salaryMinVnd`, `salaryMaxVnd` | number | | Dùng cho JSON-LD `JobPosting`. `salaryMaxVnd` ≥ `salaryMinVnd` khi cả hai có giá trị |
 | `salaryText` | text | | "Thỏa thuận", "15–30 triệu + hoa hồng" |
 | `quantity` | number | | Tối thiểu 1 |
-| `deadline` | date | R, I | Quá hạn thì tự ẩn khỏi danh sách |
+| `deadline` | date | R, I | Quá hạn thì tự ẩn khỏi danh sách (truy vấn lọc `deadline >= 00:00 hôm nay giờ VN`). Ô chọn ngày admin lưu 12:00 UTC của ngày chọn |
 | `description`, `requirements`, `benefits` | richText | R / R / | |
 | `status` | select | R, I | |
 | `publishedAt` | date | | |
 | `author` | `rel→staff` | R | |
 | `seo` | group | | |
 
-Đã xây (as-built): không có `isFeatured`. Xoá **hẳn** (chỉ admin) tin còn hồ sơ ứng tuyển bị chặn **409** (`job_applications.job_posting_id` NOT NULL nhưng FK `ON DELETE SET NULL`); xoá mềm vẫn được và hồ sơ giữ nguyên. Tin quá hạn chỉ bị loại khỏi danh sách ở query công khai (trang chi tiết vẫn truy cập được, xem DESIGN).
+Đã xây (as-built): không có `isFeatured`; `category` tuỳ chọn (G25; cột nullable, validator chỉ kiểm scope `job` khi có giá trị). Xoá **hẳn** (chỉ admin) tin còn hồ sơ ứng tuyển bị chặn **409** (`job_applications.job_posting_id` NOT NULL nhưng FK `ON DELETE SET NULL`); xoá mềm vẫn được và hồ sơ giữ nguyên. Tin quá hạn chỉ bị loại khỏi danh sách ở query công khai (trang chi tiết vẫn truy cập được, xem DESIGN).
 
 **`job-applications`** (chỉ admin đọc)
 

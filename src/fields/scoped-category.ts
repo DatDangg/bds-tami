@@ -11,14 +11,14 @@ function toId(value: unknown): string | number | null {
 }
 
 /**
- * Trường `category` của collection nội dung (ERD §2): bắt buộc, trỏ tới danh mục ĐÚNG `scope` và chưa xoá mềm. Quan hệ thô của
+ * Trường `category` của collection nội dung (ERD §2): mặc định bắt buộc (`required: false` cho tin tuyển dụng, ERD §4.10, G25), trỏ tới danh mục ĐÚNG `scope` và chưa xoá mềm. Quan hệ thô của
  * Payload không giới hạn theo scope nên `validate` đọc lại danh mục (API/seed cũng bị chặn, không chỉ `filterOptions` của admin).
  * `data` của lần sửa một phần có thể thiếu `category` dù bản đã lưu có, nên giá trị đã lưu (`previousValue`) cũng được tính.
  */
-export function scopedCategoryField(scope: CategoryScope): RelationshipField {
+export function scopedCategoryField(scope: CategoryScope, { required = true }: { required?: boolean } = {}): RelationshipField {
   const validate: RelationshipFieldSingleValidation = async (value, { req, previousValue }) => {
     const id = toId(value === undefined ? previousValue : value);
-    if (id === null) return "Danh mục không được để trống.";
+    if (id === null) return required ? "Danh mục không được để trống." : true;
     const category = await preserveRequestLocale(req, () =>
       req.payload.findByID({
         collection: "categories",

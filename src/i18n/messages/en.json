@@ -291,6 +291,58 @@
       "relatedTitle": "Other projects",
       "stickyConsult": "Get advice"
     },
+    "careers": {
+      "title": "Careers",
+      "description": "Join the TAMI team: browse our open positions and apply online.",
+      "filtersLabel": "Job filters",
+      "categoriesLabel": "Job categories",
+      "all": "All",
+      "provinceLabel": "Location",
+      "allProvinces": "All",
+      "apply": "Filter",
+      "clear": "Clear filters",
+      "resultCount": "{count, plural, one {# open position} other {# open positions}}",
+      "listLabel": "Open positions",
+      "emptyTitle": "No matching positions.",
+      "noJobs": "TAMI has no open positions right now.",
+      "noJobsDescription": "You can still send us your CV and we will get in touch when a suitable role opens.",
+      "sendCv": "Send your CV to {email}",
+      "deadline": "Apply by: {date}",
+      "deadlineToday": "Closes today",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "salaryFrom": "From {amount}",
+      "salaryUpTo": "Up to {amount}",
+      "employmentType": {
+        "full_time": "Full-time",
+        "part_time": "Part-time",
+        "internship": "Internship",
+        "contract": "Contract"
+      }
+    },
+    "careerDetail": {
+      "summaryTitle": "Job summary",
+      "location": "Location",
+      "employmentType": "Employment type",
+      "quantity": "Openings",
+      "quantityValue": "{count}",
+      "salary": "Salary",
+      "deadline": "Application deadline",
+      "applyCta": "Apply now",
+      "stickyApply": "Apply now",
+      "sections": {
+        "description": "Job description",
+        "requirements": "Requirements",
+        "benefits": "Benefits"
+      },
+      "expiredTitle": "This position is closed",
+      "expiredBody": "Sorry, this position is no longer accepting applications. You can browse our other open positions.",
+      "otherTitle": "Other open positions",
+      "viewAll": "View all positions",
+      "applyForm": {
+        "title": "Apply for this position",
+        "fallback": "The online application form is coming soon. In the meantime you can email us your CV."
+      }
+    },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
     },

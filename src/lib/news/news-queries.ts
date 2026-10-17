@@ -86,7 +86,7 @@ export async function findRelatedNews(payload: Payload, locale: Locale, current:
  * Slug của CẢ HAI ngôn ngữ (để dựng hreflang): `doc` chỉ mang slug của locale đang đọc. Đọc bằng `overrideAccess` nhưng CHỈ
  * trường `slug`, và chỉ gọi cho bản ghi đã qua truy vấn công khai, nên không lộ gì thêm.
  */
-export async function findLocalizedSlugs(payload: Payload, collection: "news" | "categories" | "services" | "projects", id: string): Promise<{ vi?: string; en?: string }> {
+export async function findLocalizedSlugs(payload: Payload, collection: "news" | "categories" | "services" | "projects" | "job-postings", id: string): Promise<{ vi?: string; en?: string }> {
   const doc = (await payload.findByID({ collection, id, locale: "all", depth: 0, overrideAccess: true, select: { slug: true } })) as {
     slug?: { vi?: string | null; en?: string | null } | string | null;
   };

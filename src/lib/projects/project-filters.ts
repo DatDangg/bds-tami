@@ -22,7 +22,7 @@ export interface ProjectFilters {
   status?: SalesStatus;
 }
 
-function firstValue(value: string | string[] | undefined): string | undefined {
+export function firstValue(value: string | string[] | undefined): string | undefined {
   const first = Array.isArray(value) ? value[0] : value;
   const trimmed = first?.trim();
   return trimmed && trimmed.length <= MAX_SLUG_LENGTH ? trimmed : undefined;

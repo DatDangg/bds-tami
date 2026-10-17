@@ -38,10 +38,10 @@ Danh sách chỉ vị trí còn hạn; chi tiết vị trí hết hạn vẫn m�
 Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 
 ## Acceptance Criteria
-- [ ] Danh sách lọc `deadline ≥ hôm nay (giờ VN)`
-- [ ] Chi tiết hết hạn: băng thông báo, ẩn vùng form, `noindex`, không JSON-LD
-- [ ] Còn hạn: JSON-LD `JobPosting` (lương min/max nếu có, `validThrough`, `inLanguage`); vùng `ApplyFormSlot`
-- [ ] Job `close-job-postings` chỉ revalidate, **không** đổi `status` (để URL vẫn mở theo spec)
+- [x] Danh sách lọc `deadline ≥ hôm nay (giờ VN)`
+- [x] Chi tiết hết hạn: băng thông báo, ẩn vùng form, `noindex`, không JSON-LD
+- [x] Còn hạn: JSON-LD `JobPosting` (lương min/max nếu có, `validThrough`, `inLanguage`); vùng `ApplyFormSlot`
+- [x] Job `close-job-postings` chỉ revalidate, **không** đổi `status` (để URL vẫn mở theo spec)
 
 ## Tests cần viết
 - Integration render: tin hết hạn không ở danh sách; chi tiết có noindex
@@ -52,23 +52,24 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 - Reviewer report path: `.context/review-reports/build-tami-website-layer-6-task-08-round-<R>-review.md`
 
 ## Migration
-- Không đụng schema (không tạo migration).
+- As-built: `migrations/20261017_175237_close_job_postings_task.ts` — chỉ `ALTER TYPE … ADD VALUE 'close-job-postings'` trên enum `task_slug` của `payload_jobs` (additive, không HIGH_RISK). `down` cần xoá job `close-job-postings` đang xếp hàng trước (MINOR M1 → L15-T01). `category` vốn nullable nên G25 không cần migration.
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 4/4 PASS + follow-up L5-T04 (lọc deadline, chi tiết hết hạn), G25 (category tuỳ chọn), L6-T09 (helper deadline chung `src/lib/careers/deadline.ts`; date picker dayOnly lưu `YYYY-MM-DDT12:00:00.000Z`), L6-T03 (404 có nội dung)
+- Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 141 file 1.530 PASS; pnpm build PASS. next start :3228 (APP_ENV=production): `/tuyen-dung` 200 `public, s-maxage=60, stale-while-revalidate=300`, 3 tin mở (bỏ tin hết hạn); lọc → `noindex, follow` + canonical; tin hết hạn 200 + banner, `noindex, follow`, 0 JSON-LD, không form ứng tuyển; tin mở có JobPosting (`validThrough …T23:59:59+07:00`, baseSalary, jobLocation, inLanguage); slug lạ / EN thiếu → 404 có h1/header/footer, no-store; ISR HIT; 375/768/1280 không cuộn ngang, touch ≥44
+- Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-08-round-1-review.md`
+- Residual risk: job `close-job-postings` revalidate không có tác dụng ngoài tiến trình Next (giữ theo task; trang vẫn đúng nhờ ISR 60 s + list dynamic) → chọn cơ chế revalidate liên tiến trình khi làm `expire-offers` (L7-T01). Cron viết UTC (00:10 VN). Ngay sau nửa đêm VN trang chi tiết cache có thể còn "mở" ~1 phút (endpoint vẫn chặn). MINOR M1, M4–M6 → L15-T01
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ARCHITECTURE §5.4: ghi rõ `close-job-postings` chỉ revalidate (khớp spec F6) nếu cần)
-- Decision log: pending
+- Doc impact result: `docs/ARCHITECTURE.md` §5.4 + as-built layer-6-task-08, `docs/ERD.md` §4.10, `docs/API_SPEC.md` §3.2
+- Decision log: G25 category tuỳ chọn (user); tin hết hạn bỏ toàn bộ JSON-LD (SPEC F6); cron UTC (reviewer chấp nhận)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-6): task-08 pubcareers` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -76,13 +77,13 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-6/task-08` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức NORMAL)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/app/(frontend)/[locale]/tuyen-dung/page.tsx, [slug]/page.tsx
@@ -94,13 +95,13 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-5-task-04
-- [ ] Danh sách tuyển dụng lọc `deadline >= hôm nay` (access chưa lọc); trang chi tiết tin hết hạn vẫn mở, hiện trạng thái "Hết hạn" + noindex, follow (DESIGN.md:305).
+- [x] Danh sách tuyển dụng lọc `deadline >= hôm nay` (access chưa lọc); trang chi tiết tin hết hạn vẫn mở, hiện trạng thái "Hết hạn" + noindex, follow (DESIGN.md:305).
 
 ## Quyết định user 2026-10-18
-- [ ] G25: `job-postings.category` chuyển thành tuỳ chọn (đúng ERD §4.10); cập nhật test + migration nếu đổi NOT NULL.
+- [x] G25: `job-postings.category` chuyển thành tuỳ chọn (đúng ERD §4.10); cập nhật test + migration nếu đổi NOT NULL.
 
 ## Follow-up từ review layer-6-task-03
-- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+- [x] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
 
 ## Follow-up từ review layer-6-task-09
-- [ ] Chuyển `isPastDeadline` (`src/endpoints/public/job-applications.ts:42`, mở hết ngày deadline theo giờ VN, giả định date picker lưu 12:00) sang `src/lib/` và dùng chung cho bộ lọc danh sách + nhãn "Hết hạn"; kiểm giá trị thật date picker lưu.
+- [x] Chuyển `isPastDeadline` (`src/endpoints/public/job-applications.ts:42`, mở hết ngày deadline theo giờ VN, giả định date picker lưu 12:00) sang `src/lib/` và dùng chung cho bộ lọc danh sách + nhãn "Hết hạn"; kiểm giá trị thật date picker lưu.

@@ -18,9 +18,9 @@ const LINK_CLASS = "inline-flex min-h-11 items-center hover:text-text hover:unde
 
 /**
  * Breadcrumb mọi trang trừ trang chủ (design-spec §2.6). `items` là các mục SAU "Trang chủ" (component tự thêm mục đầu
- * theo ngôn ngữ), mục cuối = trang hiện tại. Quá 3 mục thì < md chỉ hiện "← mục cha". Kèm JSON-LD `BreadcrumbList`.
+ * theo ngôn ngữ), mục cuối = trang hiện tại. Quá 3 mục thì < md chỉ hiện "← mục cha". Kèm JSON-LD `BreadcrumbList` (`jsonLd={false}` cho trang không được có dữ liệu có cấu trúc, vd tin tuyển dụng hết hạn).
  */
-export function Breadcrumb({ items, className }: { items: BreadcrumbItem[]; className?: string }) {
+export function Breadcrumb({ items, className, jsonLd = true }: { items: BreadcrumbItem[]; className?: string; jsonLd?: boolean }) {
   const t = useTranslations("page.breadcrumb");
   const tNav = useTranslations("layout.nav.items");
   const locale = useLocale() as Locale;
@@ -59,7 +59,7 @@ export function Breadcrumb({ items, className }: { items: BreadcrumbItem[]; clas
           );
         })}
       </ol>
-      {siteUrl && <JsonLd data={buildBreadcrumbJsonLd(trail, siteUrl)} />}
+      {jsonLd && siteUrl && <JsonLd data={buildBreadcrumbJsonLd(trail, siteUrl)} />}
     </nav>
   );
 }

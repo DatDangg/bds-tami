@@ -144,6 +144,7 @@ export interface Config {
     tasks: {
       'send-notification-email': TaskSendNotificationEmail;
       'aggregate-click-stats': TaskAggregateClickStats;
+      'close-job-postings': TaskCloseJobPostings;
       inline: {
         input: unknown;
         output: unknown;
@@ -1101,7 +1102,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'send-notification-email' | 'aggregate-click-stats';
+        taskSlug: 'inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings';
         taskID: string;
         input?:
           | {
@@ -1134,7 +1135,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'send-notification-email' | 'aggregate-click-stats') | null;
+  taskSlug?: ('inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -2323,6 +2324,16 @@ export interface TaskAggregateClickStats {
   output: {
     aggregated: number;
     deleted: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskClose-job-postings".
+ */
+export interface TaskCloseJobPostings {
+  input?: unknown;
+  output: {
+    expired: number;
   };
 }
 /**

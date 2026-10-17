@@ -16,6 +16,7 @@ import * as migration_20261017_130625_job_postings from './20261017_130625_job_p
 import * as migration_20261017_132020_job_applications_cv_nullable from './20261017_132020_job_applications_cv_nullable';
 import * as migration_20261017_135306_redirects from './20261017_135306_redirects';
 import * as migration_20261017_143212_rentals from './20261017_143212_rentals';
+import * as migration_20261017_175237_close_job_postings_task from './20261017_175237_close_job_postings_task';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20261017_143212_rentals.up,
     down: migration_20261017_143212_rentals.down,
-    name: '20261017_143212_rentals'
+    name: '20261017_143212_rentals',
+  },
+  {
+    up: migration_20261017_175237_close_job_postings_task.up,
+    down: migration_20261017_175237_close_job_postings_task.down,
+    name: '20261017_175237_close_job_postings_task'
   },
 ];
