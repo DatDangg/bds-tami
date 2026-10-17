@@ -40,16 +40,19 @@ export const DOTTED_PATH_CACHE_CONTROL = "public, max-age=0, s-maxage=60";
 /**
  * Biến thể RSC của trang công khai (điều hướng client/prefetch): Next phân biệt chúng với HTML chỉ bằng header request
  * (`RSC`, `Next-Router-*`) hoặc query `_rsc`, còn Cloudflare bỏ qua `Vary` và cache theo URL. Nếu để `public`, một request
- * có `RSC: 1` lúc cache miss sẽ làm CDN lưu 307/flight payload rồi phát cho mọi khách. Nên các biến thể này `private, no-store`.
+ * có `RSC: 1` lúc cache miss sẽ làm CDN lưu 307/flight payload rồi phát cho mọi khách. Nên các biến thể này `no-store`.
  */
 const RSC_REQUEST_HEADERS = ["rsc", "next-router-prefetch", "next-router-state-tree", "next-router-segment-prefetch"] as const;
 
-/** Phải đặt SAU rule trang công khai: cùng key `Cache-Control` thì rule khai sau ghi đè. */
-function rscVariantNoStoreRules() {
+/**
+ * Phải đặt SAU rule gốc của `source`: cùng key `Cache-Control` thì rule khai sau ghi đè. Áp cho cả path có đuôi
+ * (robots.txt, sitemap.xml, llms.txt do route handler sinh): request kèm `RSC: 1` tới đó cũng không được vào CDN.
+ */
+function rscVariantNoStoreRules(source: string) {
   const noStore = [{ key: "Cache-Control", value: NO_STORE_CACHE_CONTROL }];
   return [
-    ...RSC_REQUEST_HEADERS.map((key) => ({ source: PUBLIC_PAGE_SOURCE, has: [{ type: "header" as const, key }], headers: noStore })),
-    { source: PUBLIC_PAGE_SOURCE, has: [{ type: "query" as const, key: "_rsc" }], headers: noStore },
+    ...RSC_REQUEST_HEADERS.map((key) => ({ source, has: [{ type: "header" as const, key }], headers: noStore })),
+    { source, has: [{ type: "query" as const, key: "_rsc" }], headers: noStore },
   ];
 }
 
@@ -61,8 +64,9 @@ function rscVariantNoStoreRules() {
 export function cacheControlHeaders() {
   return [
     { source: PUBLIC_PAGE_SOURCE, headers: [{ key: "Cache-Control", value: PUBLIC_PAGE_CACHE_CONTROL }] },
-    ...rscVariantNoStoreRules(),
+    ...rscVariantNoStoreRules(PUBLIC_PAGE_SOURCE),
     { source: DOTTED_PATH_SOURCE, headers: [{ key: "Cache-Control", value: DOTTED_PATH_CACHE_CONTROL }] },
+    ...rscVariantNoStoreRules(DOTTED_PATH_SOURCE),
     { source: "/admin/:path*", headers: [{ key: "Cache-Control", value: NO_STORE_CACHE_CONTROL }] },
   ];
 }

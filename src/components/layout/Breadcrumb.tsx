@@ -2,7 +2,9 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { CaretLeft, CaretRight } from "@/components/icons";
 import { resolveNavLink } from "@/lib/content/nav-link";
-import { buildBreadcrumbJsonLd, serializeJsonLd } from "@/lib/seo/json-ld";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { getSiteUrl } from "@/lib/seo/site-url";
 import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +27,8 @@ export function Breadcrumb({ items, className }: { items: BreadcrumbItem[]; clas
   const home: BreadcrumbItem = { label: tNav("home"), href: resolveNavLink("home", locale)?.href ?? "/" };
   const trail = [home, ...items];
   const parent = trail.length > 3 ? trail.at(-2) : undefined;
-  // Không có URL gốc thì bỏ JSON-LD thay vì sinh URL tương đối sai.
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  // Không có URL gốc (lúc build, hoặc chưa cấu hình) thì bỏ JSON-LD thay vì sinh URL sai. Đọc lúc chạy, không nhúng lúc build.
+  const siteUrl = getSiteUrl();
 
   return (
     <nav aria-label={t("nav")} className={cn("mx-auto w-full max-w-container px-gutter text-small text-text-muted", className)}>
@@ -57,12 +59,7 @@ export function Breadcrumb({ items, className }: { items: BreadcrumbItem[]; clas
           );
         })}
       </ol>
-      {siteUrl && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildBreadcrumbJsonLd(trail, siteUrl)) }}
-        />
-      )}
+      {siteUrl && <JsonLd data={buildBreadcrumbJsonLd(trail, siteUrl)} />}
     </nav>
   );
 }

@@ -229,6 +229,13 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-5-task-07-round-2-review.md",
       "completedAt": "2026-10-17T18:50:00.000Z"
+    },
+    {
+      "task": "layer-5/task-08",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-5-task-08-round-2-review.md",
+      "completedAt": "2026-10-17T19:50:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -300,9 +307,14 @@
       "date": "2026-10-17T17:50:00.000Z",
       "decision": "Chạy tuần tự các task không bị chặn, không hỏi trước mỗi task; chỉ dừng ở mốc duyệt (M2–M5) hoặc khi cần user quyết",
       "reason": "User: cứ làm lần lượt đi, chỉ dừng khi có gì cần hỏi"
+    },
+    {
+      "date": "2026-10-17T19:50:00.000Z",
+      "decision": "Trang công khai không prerender lúc next build (generateStaticParams [] + ISR theo request) để robots/canonical lấy env lúc chạy",
+      "reason": "Review L5-T08 MAJOR-3; quyết định kỹ thuật của primary, reviewer chấp nhận"
     }
   ],
-  "lastUpdated": "2026-10-17T18:50:00.000Z",
+  "lastUpdated": "2026-10-17T19:50:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

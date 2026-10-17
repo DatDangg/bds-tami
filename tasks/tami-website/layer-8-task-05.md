@@ -93,3 +93,6 @@ Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 ## Notes
 - Task hẹn giờ (Could) bổ sung điều kiện `publishedAt ≤ now` qua `publicWhere` — không sửa ở đây.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-5-task-08
+- `src/lib/seo/robots.ts` (L5-T08) cho production `allow: ["/", "/api/media/file/"]` + `disallow: ["/admin", "/api/"]` vì ảnh/OG phục vụ ở `/api/media/file/` (ARCHITECTURE §5). Khi thêm dòng `Sitemap:` phải GIỮ ngoại lệ `/api/media/file/` này (AC44 chỉ nói chặn `/admin`, `/api`).

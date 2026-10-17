@@ -76,10 +76,13 @@ describe("cacheControlHeaders (next.config)", () => {
     expect(rules[2]?.headers).toEqual([{ key: "Cache-Control", value: NO_STORE_CACHE_CONTROL }]);
   });
 
-  it("biến thể RSC (header rsc/next-router-*, query _rsc) là private, no-store và đứng SAU rule trang công khai", () => {
+  it.each([
+    ["trang công khai", PUBLIC_PAGE_SOURCE, "/"],
+    ["path có đuôi (robots/sitemap/llms)", DOTTED_PATH_SOURCE, "/robots.txt"],
+  ])("biến thể RSC của %s (header rsc/next-router-*, query _rsc) là no-store và đứng SAU rule gốc của nó", (_name, source) => {
     const all = cacheControlHeaders();
-    const publicIndex = all.findIndex((rule) => rule.source === PUBLIC_PAGE_SOURCE && !("has" in rule));
-    const rsc = all.filter((rule) => "has" in rule);
+    const baseIndex = all.findIndex((rule) => rule.source === source && !("has" in rule));
+    const rsc = all.filter((rule) => "has" in rule && rule.source === source);
     const conditions = rsc.map((rule) => JSON.stringify((rule as { has: unknown }).has));
     expect(conditions).toEqual([
       '[{"type":"header","key":"rsc"}]',
@@ -89,9 +92,8 @@ describe("cacheControlHeaders (next.config)", () => {
       '[{"type":"query","key":"_rsc"}]',
     ]);
     for (const rule of rsc) {
-      expect(rule.source).toBe(PUBLIC_PAGE_SOURCE);
       expect(rule.headers).toEqual([{ key: "Cache-Control", value: NO_STORE_CACHE_CONTROL }]);
-      expect(all.indexOf(rule)).toBeGreaterThan(publicIndex);
+      expect(all.indexOf(rule)).toBeGreaterThan(baseIndex);
     }
   });
 });

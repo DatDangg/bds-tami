@@ -32,6 +32,8 @@ ENV DATABASE_URL=postgres://build:build@127.0.0.1:5432/build \
     SMTP_HOST=build SMTP_USER=build SMTP_PASS=build \
     ANTHROPIC_API_KEY=build TRANSLATION_MODEL=build TRANSLATION_MONTHLY_BUDGET_USD=0 \
     NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# NEXT_PUBLIC_SITE_URL ở trên chỉ là placeholder để qua validate lúc build. Code đọc URL gốc LÚC CHẠY (src/lib/seo/site-url.ts, khoá động
+# nên Next không nhúng giá trị này vào bundle) và bỏ URL tuyệt đối trong HTML prerender lúc build; giá trị thật do compose cấp mỗi môi trường.
 # Source map trình duyệt: chỉ sinh + upload lên GlitchTip khi có secret `glitchtip_auth_token` (+ build-arg url/org/project);
 # không có secret thì `pnpm build` không sinh `.map`. Token đi qua secret mount (không vào layer/history), `.map` luôn bị xoá khỏi image.
 ARG GLITCHTIP_URL=""
