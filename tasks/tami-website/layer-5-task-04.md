@@ -35,6 +35,7 @@ Tin tuyển dụng (dùng bộ field chung) và hồ sơ ứng tuyển chỉ adm
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-08`, `layer-6-task-09`, `layer-6-task-10`, `layer-8-task-05`, `layer-9-task-06`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
 - [ ] `job-postings` đủ trường ERD §4.10, `deadline` bắt buộc + index
 - [ ] `job-applications`: chỉ admin đọc/sửa (`status`, `note`); khách/sale không đọc; không tạo qua REST công khai (chỉ qua endpoint ở task sau)
 - [ ] Trường khách gửi (`fullName`, `phone`, `email`, `message`, `cv`, `consent*`, `locale`) chỉ đọc trong admin

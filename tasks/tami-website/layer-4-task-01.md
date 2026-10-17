@@ -65,7 +65,7 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria (builder, chờ Reviewer STRICT):
+- Acceptance criteria (reviewer STRICT PASS):
   - G7: `withContentDefaults` thêm `omit` (tên trường dùng chung), `scopeField` (slug lọc theo scope + trường ẩn `scopeSlug` unique localized → UNIQUE `(scope_slug, _locale)`), `route: null` (không có trang riêng); bỏ `status` mà không tự đặt `access.read` thì ném lỗi. Test: `src/collections/_shared/content-defaults.test.ts`, `src/fields/slug.test.ts`, `tests/integration/categories.test.ts`.
   - n2: `fieldAccess` bỏ khoá `undefined`, ném lỗi khi tên không phải trường dùng chung / đã omit. Test: `content-defaults.test.ts` "fieldAccess (n2)".
   - n1: kiểm trùng slug dùng `in` trên ≤ 20 ứng viên `base, base-2...` mỗi lượt (Payload không có toán tử "bắt đầu bằng"; `like`/`contains` đều là `ILIKE %x%`), lặp lượt kế nếu bị chiếm hết. Test: `src/fields/slug.test.ts` (không có `like`/`contains`, 1 truy vấn thường, 2 lượt khi 25 ứng viên bị chiếm).
@@ -81,7 +81,7 @@ Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-
 - Verify attempt 2 (sau lần sửa cuối): install --frozen-lockfile OK; lint OK; typecheck OK; `pnpm test` FULL 66 file / 672 test PASS; build OK; `migrate:status` 7/7 Yes.
 - Follow-up: (1) Dockerfile chưa COPY `seed/` → thêm ở layer-6-task-01 trước deploy staging (cần danh mục mặc định). (2) `slugField` chung: duplicate ở collection khác (`developers`, collection nội dung layer 5+) gán slug `xyz - Copy` sai định dạng `[a-z0-9-]` → đề xuất task riêng thêm `beforeDuplicate` chung cho `slugField`.
 - Reviewer verdict: round 1 FAIL (MAJOR-1 duplicate phá UNIQUE scopeSlug) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-4-task-01-round-2-review.md`). Residual: MINOR-1 duplicate `developers` → slug locale khác dạng `xyz - Copy` (do slugField chung) → đã gắn AC `layer-5-task-01`; MINOR-4 lỗi race UNIQUE báo trên field ẩn `scopeSlug`; Dockerfile chưa COPY `seed/` → đã gắn AC `layer-6-task-01`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-4.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ERD.md` §4.3 (as-built: UNIQUE qua `scopeSlug`, scope khoá sau khi tạo, chặn xoá cả xoá mềm, seed), §4.4 (as-built), §5 (ghi chú UNIQUE của categories). Không đổi PERMISSION/API_SPEC.

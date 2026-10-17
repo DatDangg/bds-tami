@@ -36,6 +36,7 @@ CRUD bài Đăng tin BĐS (tin, voucher, ưu đãi) + job hằng ngày xử lý 
 Mở khoá cho: `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-04`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
 - [ ] Đủ trường ERD §4.7 (`offer` group, quan hệ dự án/tin cho thuê tuỳ chọn)
 - [ ] `isOfferEnded` là nguồn duy nhất cho nhãn "Đã kết thúc" và loại khỏi khối "Ưu đãi nổi bật"
 - [ ] Job 00:05 revalidate trang bài vừa hết hạn + trang chủ (cả vi/en); chạy lại idempotent

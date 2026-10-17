@@ -54,7 +54,7 @@ Mở khoá cho: `layer-12-task-01`
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria (builder; reviewer chưa chạy):
+- Acceptance criteria (reviewer STRICT PASS round 2):
   - [x] pgBackRest: archive WAL liên tục (`archive_timeout=300` ≤ 900; đo thật: dòng ghi lên kho sau 297 s không can thiệp), full hằng tuần (Chủ nhật), diff hằng ngày, giữ ≥ 35 ngày (6 bản full + WAL) => PITR 30 ngày. Test: PITR về mốc T và restore mới nhất khớp số bản ghi (1800 / 2500), PostGIS đọc được.
   - [x] restic: SeaweedFS hằng ngày qua S3 API, `forget --keep-daily 30 --keep-monthly 12 --prune`, check định kỳ. Test: backup -> xoá bucket + bản sao -> restore -> sha256 khớp -> đưa lại lên bucket khớp nội dung.
   - [x] Kho ngoài server, đích cấu hình bằng env (S3-compatible hoặc SFTP, cả hai chạy thật trong e2e); mẫu `*.example`, không commit credential.
@@ -62,7 +62,7 @@ Mở khoá cho: `layer-12-task-01`
   - [x] Runbook khôi phục từng bước (`docs/runbooks/restore.md`) + số liệu thời gian đo local; RTO thật chỉ đo được khi diễn tập trên server (ghi ở runbook §5/§8/§9).
 - Verify commands + result: xem "Builder verify" bên dưới (e2e, shellcheck, compose config, deploy.test.sh, pnpm install/lint/typecheck/test/build).
 - Reviewer verdict: round 1 FAIL (MAJOR-1 thiếu archive-push-queue-max → WAL đầy ổ) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-4-task-07-round-2-review.md`). Residual: MINOR-A e2e dùng tag → AC `layer-6-task-01`; MINOR-B cảnh báo dropped WAL → AC `layer-4-task-06` (deferred); chưa chạy trên server thật; Debian 11 EOL (nâng base là task riêng)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-4.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/runbooks/restore.md` (mới), `docs/ARCHITECTURE.md` §6.2 + §8 (as-built), `docs/runbooks/deploy.md` §3.1 (BACKUP_ENV_DIR bắt buộc), `.env.example` (BACKUP_ENV_DIR). Không đổi API/ERD/schema.

@@ -94,7 +94,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
-│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/)
+│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/), categories/ (cây, khoá scope, chặn xoá), revalidate-global, trim-text
 │   ├── endpoints/             # Endpoint tuỳ biến: gửi lead, ứng tuyển, tìm kiếm, đếm click
 │   │   ├── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
 │   │   └── public/            # Endpoint công khai: click-events (đã có), leads, job-applications
@@ -103,14 +103,14 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
 │   │   ├── security/          # rate-limit (Redis Lua), turnstile, client-ip, ip-hash
 │   │   ├── email/             # adapter SMTP Brevo, allowlist ngoài production, template email nội bộ (tiếng Việt)
-│   │   ├── http/              # ok() / fail() theo response contract (API_SPEC §2)
+│   │   ├── http/              # ok() / fail() theo response contract (API_SPEC §2); cache-policy.ts (Cache-Control trang/api/RSC, withDefaultNoStore)
 │   │   ├── audit/             # Ghi audit-logs
 │   │   ├── upload/            # Kiểm loại/cỡ file upload (media, private-files)
 │   │   ├── session/           # Phiên admin 8 giờ không hoạt động (keepalive)
 │   │   ├── health/            # runHealthChecks + probe DB/Redis/S3 cho /api/health
 │   │   ├── click-stats/       # Gộp lượt bấm (hàm thuần cho job aggregate-click-stats)
 │   │   ├── monitoring/        # GlitchTip options + scrubText, metrics Prometheus, process-errors, service-name
-│   │   ├── content/           # content-paths: map collection → path nội bộ /{locale}{pathnames key} cho revalidate
+│   │   ├── content/           # content-paths (path nội bộ /{locale}{key} cho revalidate), public-queries (publicWhere/findPublicList/BySlug), pagination, nav-link, get-globals/read-global/global-cache
 │   │   ├── payload/           # preserve-request-locale, prod-migrations (AUTO_MIGRATE_ON_START)
 │   │   ├── logger.ts          # pino JSON + redact/scrub PII, dùng chung app/jobs/Payload
 │   │   ├── s3-config.ts       # Cấu hình S3 client (SeaweedFS) dùng chung
@@ -123,11 +123,13 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
-├── scripts/                   # jobs-runner.ts (`pnpm jobs` ở dev; container chạy thẳng `node node_modules/payload/bin.js run scripts/jobs-runner.ts`)
+├── scripts/                   # deploy/ (deploy.sh + lib/ + deploy.test.sh, chạy trên server qua SSH); seed-categories.ts; jobs-runner.ts (`pnpm jobs` ở dev; container chạy thẳng `node node_modules/payload/bin.js run scripts/jobs-runner.ts`)
 ├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
 ├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
+│   ├── backup/                # image postgres + pgBackRest, sidecar backup (pgBackRest + restic), e2e test
 │   └── nginx/                 # tami.conf, tami-staging.conf (copy vào /etc/nginx/sites-available trên server)
-└── .github/workflows/         # CI/CD
+├── docs/runbooks/             # deploy.md, restore.md
+└── .github/                   # workflows/ (ci.yml, deploy.yml), actions/ssh-deploy
 ```
 
 Quy ước: logic nghiệp vụ nằm trong `lib/` (gọi được từ hook, endpoint, job), không nằm rải trong component.
@@ -235,7 +237,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 | Service | Production | Staging | RAM ước tính |
 |---|---|---|---|
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
-| `app` | 1 bản (có thể chạy 2) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
+| `app` | **đúng 1 bản** (chạy 2+ bản cần cache handler dùng chung trước — §9.1, G9) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
 | `postgres` | riêng (`tami-postgres:17-3.5-pgbackrest2.59` = `postgis/postgis:17-3.5` + pgbackrest, build từ `docker/backup/Dockerfile`; bật `archive_mode`, `archive_timeout=300`) | riêng | `mem_limit` 2g / 512m |
 | `backup` (sidecar) | 1 bản: lịch + pgBackRest (diff/full/check) + restic, kho đích ngoài server cấu hình bằng env | 1 bản, kho riêng | `mem_limit` 384m / 256m |

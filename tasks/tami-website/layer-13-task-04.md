@@ -32,6 +32,7 @@ Logo wall các `developers.showAsPartner`, ngay dưới hero theo screen spec.
 Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 
 ## Acceptance Criteria
+- [ ] G13: sửa `developers` (`showAsPartner`, logo) phải làm mới cache khối đối tác trang chủ vi/en; test hook (spec-validation layer 4)
 - [ ] Chỉ logo (alt = tên chủ đầu tư), sắp theo `sortOrder`
 - [ ] Bật/tắt + vị trí theo `homepage.partners` / `blockOrder`
 - [ ] EN: thiếu title EN → ẩn khối

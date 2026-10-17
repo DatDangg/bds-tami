@@ -67,7 +67,7 @@ Mở khoá cho: `layer-9-task-07`
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: builder tự kiểm 9/9 AC đạt (chờ reviewer STRICT). Test dùng SDK giả/fetch giả, không gọi API thật.
+- Acceptance criteria: builder tự kiểm 9/9 AC đạt (reviewer STRICT PASS). Test dùng SDK giả/fetch giả, không gọi API thật.
   - lastError lọc: `errors.ts` (`toLastError` chỉ trả mã cố định), `claude-client.ts#mapProviderError`; test `translation-service.test.ts` (lỗi SDK chứa khoá/stack/endpoint giả) + `claude-client.test.ts` (SDK thật + fetch giả: 429/401/403/400/404/500/529/lỗi mạng/JSON sai schema)
   - Allowlist: `allowlist.ts`, kiểm đầu tiên trong `translate` (trước DB/glossary/client)
   - richText: `lexical.ts` + `segments.ts` (chỉ text node; so khung cây trước/sau; kết quả sai -> invalid_output)
@@ -76,7 +76,7 @@ Mở khoá cho: `layer-9-task-07`
 - Verify commands + result (builder, attempt 1): `pnpm install --frozen-lockfile` OK · `pnpm lint` 0 lỗi 0 cảnh báo · `pnpm typecheck` OK · `pnpm test` 77 file / 818 test PASS (sau lần sửa cuối) · `pnpm build` OK. Migration `20261017_043315_translation_usage` (additive, không DROP) đã apply trên DB dev, `migrate:status` Yes (batch 10), `migrate:create` lần 2 không sinh file (không drift).
 - Verify attempt 2: `pnpm install --frozen-lockfile` OK · `pnpm lint` 0 lỗi · `pnpm typecheck` OK · `pnpm test` 77 file / 827 test PASS (sau lần sửa cuối) · `pnpm build` OK. Test mới: claude-client (a) max_tokens+JSON cụt, (b) refusal, (c) end_turn sai schema/không JSON — qua SDK thật + fetch giả, service ghi chi phí; service: output null vẫn ghi chi phí, lỗi HTTP không ghi, URL/markdown/`<>` chèn, lỗi DB che mã, chia lô (+kiểm budget/ghi chi phí từng lô), lô 2 cụt, đoạn quá lớn.
 - Reviewer verdict: round 1 FAIL (MAJOR-1 messages.parse làm mất usage khi JSON hỏng) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-4-task-04-round-2-review.md`). Residual: MINOR-A retry policy, MINOR-B chặn nhầm `<`/URL dấu câu, MINOR-C test chia lô → AC `layer-9-task-07`; bảng giá `budget.ts` phải đối chiếu trước khi đặt budget production; chưa thử API thật (user chốt mock)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-4.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: đã reconcile as-built: `docs/ERD.md` §4.13 (translation-usage: tháng UTC, upsert nguyên tử, bảng giá, hạn mức 0) và `docs/ARCHITECTURE.md` hàng "Dịch AI" (allowlist as-built, lastError chỉ mã, thiếu key vẫn chạy). Không đổi API_SPEC/DESIGN.

@@ -78,7 +78,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-12-task-01`
   - `pnpm install --frozen-lockfile` PASS · `pnpm lint` PASS · `pnpm typecheck` PASS · `pnpm test` PASS (77 file, 827 test) · `pnpm build` PASS.
   - Image Docker tạm giữ lại trên máy dev: rhysd/actionlint:1.7.7, koalaman/shellcheck:stable (không có container tồn đọng).
 - Reviewer verdict: round 1 FAIL (MAJOR-1 compose upload chung ngoài flock, MAJOR-2 up lỗi không rollback) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-4-task-05-round-2-review.md`). SHA 4 action primary đã đối chiếu `git ls-remote` khớp tag. Residual: MINOR-1/2 symlink compose + init.sql, MINOR-4 ci.yml pin SHA → AC `layer-6-task-01`; MINOR-3 release chờ khoá có thể bị prune (fail an toàn); toàn bộ luồng thật (SSH, GHCR login, psql, rollback) kiểm ở L6-T01
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-4.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: docs/runbooks/deploy.md (mới); docs/ARCHITECTURE.md §6.4 (as-built + chốt cách runner). Không đổi API/schema → `docs/API_SPEC.md`/`docs/ERD.md` no doc impact.

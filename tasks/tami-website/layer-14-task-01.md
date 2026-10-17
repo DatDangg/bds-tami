@@ -38,6 +38,7 @@ Bật header bảo mật cho website và admin sau khi biết đủ bên thứ b
 Mở khoá cho: `layer-15-task-01`
 
 ## Acceptance Criteria
+- [ ] G14: gom 5 header bảo mật lặp ở `docker/nginx/tami-staging.conf` (location media) vào snippet `include` dùng chung (spec-validation layer 4)
 - [ ] CSP chỉ cho phép nguồn cần thiết; không `unsafe-eval` ở trang công khai; admin Payload hoạt động bình thường
 - [ ] `X-Frame-Options: DENY` (hoặc `frame-ancestors none`), `Referrer-Policy: strict-origin-when-cross-origin`, HSTS (production)
 - [ ] Không vỡ: Turnstile, GA4 sau đồng ý, bản đồ, video facade, GlitchTip

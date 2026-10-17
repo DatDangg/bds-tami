@@ -257,13 +257,13 @@
       "reason": "User chọn Chưa chốt, làm chung"
     }
   ],
-  "lastUpdated": "2026-10-17T13:00:00.000Z",
+  "lastUpdated": "2026-10-17T13:30:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
       "afterLayer": 4,
       "description": "Nền xong (scaffold, auth, i18n, UI, upload, bộ field, danh mục, cấu hình, CD/giám sát/backup dạng file)",
-      "status": "pending"
+      "status": "awaiting_approval"
     },
     {
       "id": "M2",
@@ -312,6 +312,12 @@
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-3.md",
       "note": "G7/G8 đã gắn AC L4-T01, L4-T06, L5-T02, L5-T08, L6-T01; R6/R7/R9 reconcile; G9 (ISR in-process vs ARCHITECTURE §9.1) chờ user; R4 secrets chờ /brainstorm secrets"
+    },
+    {
+      "layer": 4,
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-4.md",
+      "note": "T06 deferred (G10: M1 chỉ có giám sát phía app); G11–G14 gắn AC; ARCH §4/§6.2 reconcile; chờ user duyệt M1"
     }
   ]
 }

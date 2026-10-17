@@ -44,6 +44,7 @@ build (initial)
 Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Acceptance Criteria
+- [ ] G10: chốt với user cách báo động backup/web chết trên staging khi stack giám sát (L4-T06) còn hoãn — bật riêng Uptime Kuma hoặc chấp nhận tới trước M3; đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (spec-validation layer 4)
 - [ ] Backup lần đầu trên server: tạo `BACKUP_ENV_DIR` + env pgBackRest/restic (đích S3/SFTP user chốt), `stanza-create`, `restic init`, kiểm digest base `postgis/postgis:17-3.5` trên server khớp digest ghim + `ldd --version` trước khi đổi image (restore.md §2.3), đặt `HEARTBEAT_URL_WAL`; e2e test chuyển image đọc `ARG POSTGIS_IMAGE` thay vì tag (review L4-T07 round 2 MINOR-A)
 - [ ] Trước lần deploy thật: rollback dùng `COMPOSE_FILE` qua symlink `current` như lúc deploy (`scripts/deploy/lib/release.sh:48`, review L4-T05 r2 MINOR-1) + assert trong `deploy.test.sh`; xác minh Compose có resolve symlink cho bind `./postgres/init.sql` không — nếu có thì chuyển init.sql sang đường dẫn cố định hoặc `configs:` để postgres không bị recreate mỗi lần đổi release (MINOR-2); cấu hình required reviewers Environment `production`, nhánh mặc định `staging`, secret DEPLOY_* theo `docs/runbooks/deploy.md`
 - [ ] Pin action trong `.github/workflows/ci.yml` theo commit SHA (đang `@v4`; review L4-T05 r2 MINOR-4)

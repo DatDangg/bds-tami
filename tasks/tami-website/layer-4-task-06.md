@@ -34,6 +34,7 @@ Compose giám sát dùng chung prod/staging, bind `127.0.0.1`, có dashboard và
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
+- [ ] G11: Prometheus chạy trong container scrape được app (`127.0.0.1:3010/3011` của host không tới được từ container — dùng network chung/host-gateway); nhận heartbeat backup `docker/backup/lib.sh` (G10) (spec-validation layer 4)
 - [ ] Cảnh báo khi log postgres có "dropped WAL file" (pgBackRest vượt `archive-push-queue-max` → PITR gãy) hoặc tự chạy full khi archive hồi phục sau lỗi dài; cảnh báo heartbeat backup (`tami_backup_last_success_timestamp_seconds`) + ổ > 80% (review L4-T07 round 2 MINOR-B)
 - [→] L3-T01 MINOR-1: bỏ regex lookbehind `(?<!d)` trong `src/lib/monitoring/scrub-text.ts:7` (chunk client → SyntaxError, không hydrate trên Safari/iOS < 16.4, in-app Zalo/Facebook); có test — PHẢI xong trước deploy prod (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)
 - [→] L3-T01 MINOR-2/3: logger lọc tham số `%s` là Error / `%d`; giảm che nhầm số dài (timestamp ms, UUID, số tài khoản) và che SĐT dạng `(028) 3823 4567` (spec-validation layer 3) → **chuyển sang `layer-5-task-05`** (2026-10-17, task-06 deferred)

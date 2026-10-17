@@ -35,6 +35,8 @@ Danh sách tin tức có lọc danh mục + phân trang; chi tiết render richT
 Mở khoá cho: `layer-10-task-03`
 
 ## Acceptance Criteria
+- [ ] G14: quan sát `revalidatePath` trúng cache Next thật khi lưu bài (đo `next start`: trước/sau lưu) (spec-validation layer 4)
+- [ ] G13: sửa `categories` (route: null) phải làm mới cache trang danh sách theo danh mục (revalidate path/tag tương ứng); test hook (spec-validation layer 4)
 - [ ] RichText không render HTML tuỳ ý; link ngoài `rel="noopener"`
 - [ ] Bài liên quan cùng danh mục, loại trừ bài hiện tại, tối đa 3
 - [ ] JSON-LD `Article` có `inLanguage`
