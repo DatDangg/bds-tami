@@ -35,13 +35,14 @@ Dịch vụ (có `coverImage`) và 2 trang pháp lý route cố định theo `ki
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-07`, `layer-8-task-01`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
-- [ ] G7: `pages` (không slug/author, ERD §4.9b) và `services` (không author, ERD §4.9) dùng `withContentDefaults` qua option `omit`/`fieldAccess` của layer-4-task-01 — không chép lại logic factory (spec-validation layer 3)
-- [ ] `services`: đủ trường ERD §4.9, `coverImage` bắt buộc khi `published`, không có `author`; chỉ admin tạo/sửa/xoá
-- [ ] `pages`: `kind` ∈ {privacy, terms} unique, không đổi sau khi tạo; không có slug; `version`, `effectiveDate`
-- [ ] Bản `privacy` đang `published` → hook ghi `site-settings.privacyPolicyVersion = version`
-- [ ] `pages.hasEnglish` chỉ admin bật (field access); AI dịch xong đặt `pending_review` (logic ở task dịch)
-- [ ] Seed 2 bản ghi `pages` idempotent
+- [x] Trước khi collection nội dung mở Duplicate: `slugField` chung có `beforeDuplicate` để slug các locale không phải dạng `xyz - Copy` (sinh lại/để trống cho admin đặt; áp cả `developers`), có test (review L4-T01 round 2 MINOR-1) (chuyển từ layer-5-task-01)
+- [x] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
+- [x] G7: `pages` (không slug/author, ERD §4.9b) và `services` (không author, ERD §4.9) dùng `withContentDefaults` qua option `omit`/`fieldAccess` của layer-4-task-01 — không chép lại logic factory (spec-validation layer 3)
+- [x] `services`: đủ trường ERD §4.9, `coverImage` bắt buộc khi `published`, không có `author`; chỉ admin tạo/sửa/xoá
+- [x] `pages`: `kind` ∈ {privacy, terms} unique, không đổi sau khi tạo; không có slug; `version`, `effectiveDate`
+- [x] Bản `privacy` đang `published` → hook ghi `site-settings.privacyPolicyVersion = version`
+- [x] `pages.hasEnglish` chỉ admin bật (field access); AI dịch xong đặt `pending_review` (logic ở task dịch)
+- [x] Seed 2 bản ghi `pages` idempotent
 
 ## Tests cần viết
 - Integration: sale tạo services/pages → 403
@@ -58,20 +59,20 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-07`, `layer-8-task-01`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1 (builder, hoàn thành)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 8/8 builder PASS (chờ Reviewer STRICT)
+- Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` OK · `pnpm typecheck` OK · `pnpm test` 79 files / 857 tests PASS (full, sau lần sửa cuối) · `pnpm build` OK · migration `20261017_092524_services_pages` applied (migrate:status Yes, batch 11), drift check: `migrate:create` lần 2 không sinh file (không có thay đổi schema) · `pnpm seed:pages` chạy 2 lần trên DB dev: tạo 2 rồi bỏ qua 2
+- Reviewer verdict: **STRICT PASS round 1** (`.context/review-reports/build-tami-website-layer-5-task-02-round-1-review.md`). Residual MINOR-1/4 → AC `layer-6-task-01`; MINOR-2 → `layer-10-task-02`; MINOR-3 → `layer-5-task-03`; MINOR-5 → `layer-8-task-01`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.9/§4.9b nếu lệch)
-- Decision log: pending
+- Doc impact result: `docs/ERD.md` §4.9b: thêm hành vi as-built "gỡ xuất bản/ẩn/xoá `privacy` giữ nguyên `privacyPolicyVersion`". ERD §4.9/§4.9b còn lại khớp code (services/pages không `publishedAt`/`isFeatured`/`author`). API_SPEC/DESIGN: no doc impact.
+- Decision log: unpublish/xoá privacy KHÔNG xoá `privacyPolicyVersion` (BR-30: consent đã lưu trỏ về phiên bản cuối đã công khai; form không được ghi `consentVersion` rỗng). `pages` bỏ `publishedAt` (ERD không có): FR-ADM-16 khi thêm `publishedAt ≤ now` vào `buildPublicWhere` phải loại trừ services/pages như đã làm với categories/developers.
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-5): task-02 svcpages` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -79,13 +80,13 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-07`, `layer-8-task-01`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-5/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Services.ts, Pages.ts

@@ -37,6 +37,7 @@ Global trang chủ cho admin bật/tắt, sắp xếp khối và chỉnh nội d
 Mở khoá cho: `layer-9-task-01`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] Lưu `services` phải làm mới thẻ dịch vụ trên trang chủ (revalidate trang chủ vi/en hoặc tag); FR-ADM-16 (`publishedAt ≤ now`) phải loại trừ services/pages (không có publishedAt) (MINOR-5) (review L5-T02 round 1)
 - [ ] G12: thêm `homepage` vào `TRANSLATABLE_GLOBALS` (`src/lib/translation/allowlist.ts`) + revalidate tag global; test (spec-validation layer 4)
 - [ ] Khối: `hero` (1–8 slide; `image` bắt buộc, `video` tuỳ chọn chỉ MP4/WebM ≤ 15MB), `about` (+ `stats`), `featuredProjects` (≤ 6), `services`, `featuredOffers`, `partners`, `ctaBanner` (`title` bắt buộc khi `enabled`), `blockOrder` gồm `ctaBanner`, `seo`
 - [ ] Chữ localized; quan hệ/ảnh dùng chung; có `translation` group

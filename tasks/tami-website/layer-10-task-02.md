@@ -34,6 +34,7 @@ Công cụ trong `/admin` để quản lý bản dịch.
 Mở khoá cho: `layer-12-task-01`, `layer-13-task-01`
 
 ## Acceptance Criteria
+- [ ] Admin bật được `pages.hasEnglish` trong UI: field `hasEnglish` dùng chung đang `admin.readOnly: true` (`src/fields/translation.ts:17`) → `withFieldAccess`/nút duyệt phải bỏ readOnly khi override update cho admin (MINOR-2) (review L5-T02 round 1)
 - [ ] Retranslate: authenticate → quyền sửa bài (admin, hoặc sale là `author`; `services`/`pages`/globals chỉ admin) → 404 nếu ngoài phạm vi → enqueue `force: true` (đặt lại `enSource=ai`) → 202; rate limit 30/giờ/user; audit `content.retranslate`
 - [ ] `:collection` ngoài allowlist → 404
 - [ ] Danh sách nội dung lọc theo: chưa dịch / AI dịch / đã sửa tay / dịch lỗi / bản Việt đổi sau khi sửa tay

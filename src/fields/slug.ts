@@ -105,6 +105,12 @@ const validateSlug: TextFieldSingleValidation = (value, { req, data }) => {
   return required ? "Slug không được để trống (nhập tiêu đề hoặc nhập slug)." : true;
 };
 
+/**
+ * Nhân bản (Duplicate) bỏ slug của MỌI locale: mặc định Payload thêm " - Copy" vào trường `unique` của từng locale (slug `xyz - Copy`,
+ * sai định dạng URL) hoặc giữ nguyên slug (trùng). Trả `undefined` = để trống, hook `beforeValidate` sinh lại từ tiêu đề kèm hậu tố `-2` nếu trùng.
+ */
+const dropSlugOnDuplicate: FieldHook = () => undefined;
+
 /** Trường `slug` dùng chung cho mọi collection nội dung (ERD §1.1: unique theo cặp `_locale` + `slug`). */
 export function slugField({ sourceField = "title", scopeField }: SlugFieldOptions = {}): TextField {
   return {
@@ -114,7 +120,7 @@ export function slugField({ sourceField = "title", scopeField }: SlugFieldOption
     unique: !scopeField,
     index: true,
     validate: validateSlug,
-    hooks: { beforeValidate: [makeSlugHook(sourceField, scopeField)] },
+    hooks: { beforeValidate: [makeSlugHook(sourceField, scopeField)], beforeDuplicate: [dropSlugOnDuplicate] },
     admin: { position: "sidebar", description: "Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3..." },
   };
 }

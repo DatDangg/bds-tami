@@ -340,7 +340,7 @@ Giai đoạn 1 chỉ có 2 trang pháp lý, route **cố định theo `kind`** (
 | `kind` | select | R, U | `privacy` · `terms`. Mỗi loại đúng 1 bản ghi (seed sẵn); không đổi sau khi tạo |
 | `title` | text | R | Localized |
 | `content` | richText | R | Localized |
-| `version` | text | R | Phiên bản văn bản (vd `1.0`). Bản `privacy` đang `published` là nguồn của `site-settings.privacyPolicyVersion` / `consentVersion` (BR-30): hook `pages.afterChange` ghi đè `privacyPolicyVersion` khi bản `privacy` được xuất bản; trường đó chỉ đọc trong admin |
+| `version` | text | R | Phiên bản văn bản (vd `1.0`). Bản `privacy` đang `published` là nguồn của `site-settings.privacyPolicyVersion` / `consentVersion` (BR-30): hook `pages.afterChange` ghi đè `privacyPolicyVersion` khi bản `privacy` được xuất bản; trường đó chỉ đọc trong admin. Gỡ xuất bản / ẩn / xoá bản `privacy` **giữ nguyên** phiên bản đã công khai cuối (consent đã lưu vẫn trỏ về nó, form không ghi `consentVersion` rỗng) |
 | `effectiveDate` | date | R | Ngày hiệu lực, hiện trên trang |
 | `status` | select | R, I | `draft` · `published` · `hidden` |
 | `hasEnglish`, `translation` | | | Theo §1.1. Mọi bản ghi `pages` đều là trang pháp lý: AI chỉ dịch nháp (`translation.status = pending_review`), **chỉ admin** bật `hasEnglish` sau khi duyệt (BR-08). Trường bắt buộc tiếng Anh: `title`, `content` |

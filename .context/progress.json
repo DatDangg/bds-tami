@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 4,
+  "currentLayer": 5,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -194,6 +194,13 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-4-task-07-round-2-review.md",
       "completedAt": "2026-10-17T13:00:00.000Z"
+    },
+    {
+      "task": "layer-5/task-02",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-5-task-02-round-1-review.md",
+      "completedAt": "2026-10-17T14:20:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -255,15 +262,22 @@
       "date": "2026-10-17T10:40:00.000Z",
       "decision": "Backup L4-T07: đích kho ngoài server chưa chốt → cấu hình chung (repo S3-compatible hoặc SFTP), endpoint/khoá qua env; chọn đích thật khi deploy",
       "reason": "User chọn Chưa chốt, làm chung"
+    },
+    {
+      "date": "2026-10-17T13:45:00.000Z",
+      "decision": "Duyệt M1; sang layer 5 bỏ qua task phụ thuộc layer-2-task-02 (L5-T01 projects, L5-T04 job-postings bị chặn) → bắt đầu L5-T02; AC slugField beforeDuplicate chuyển L5-T01 → L5-T02",
+      "reason": "User duyệt M1, yêu cầu skip task phụ thuộc layer-2-task-02"
     }
   ],
-  "lastUpdated": "2026-10-17T13:30:00.000Z",
+  "lastUpdated": "2026-10-17T14:20:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
       "afterLayer": 4,
       "description": "Nền xong (scaffold, auth, i18n, UI, upload, bộ field, danh mục, cấu hình, CD/giám sát/backup dạng file)",
-      "status": "awaiting_approval"
+      "status": "approved",
+      "approvedAt": "2026-10-17T13:45:00.000Z",
+      "note": "User duyệt: giám sát phía app, stack giám sát hoãn tới trước M3"
     },
     {
       "id": "M2",

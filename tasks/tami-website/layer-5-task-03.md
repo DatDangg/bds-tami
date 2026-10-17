@@ -33,6 +33,7 @@ CRUD tin tức (danh mục, tags, bìa, nội dung) dùng bộ field chung.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-03`, `layer-6-task-06`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] Test duplicate qua Local API `overrideAccess: true`: bản sao có `slugs.en` sinh lại hoặc rỗng VÀ `hasEnglish === false` (`src/fields/slug.ts:112`) (MINOR-3) (review L5-T02 round 1)
 - [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
 - [ ] Đủ trường ERD §4.8
 - [ ] Index `(status, has_english, category_id, published_at DESC)`, UNIQUE `(_locale, slug)`

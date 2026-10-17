@@ -36,7 +36,7 @@ Mở khoá cho: `layer-6-task-01`, `layer-6-task-02`, `layer-6-task-04`, `layer-
 
 ## Acceptance Criteria
 - [ ] G12: thêm slug collection công khai của task vào allowlist `PublicCollectionSlug` (`src/lib/content/public-queries.ts`) và (nếu dịch) `src/lib/translation/allowlist.ts`; test (spec-validation layer 4)
-- [ ] Trước khi collection nội dung mở Duplicate: `slugField` chung có `beforeDuplicate` để slug các locale không phải dạng `xyz - Copy` (sinh lại/để trống cho admin đặt; áp cả `developers`), có test (review L4-T01 round 2 MINOR-1)
+- [→] Trước khi collection nội dung mở Duplicate: `slugField` chung có `beforeDuplicate` để slug các locale không phải dạng `xyz - Copy` (sinh lại/để trống cho admin đặt; áp cả `developers`), có test (review L4-T01 round 2 MINOR-1) → **chuyển sang `layer-5-task-02`** (L5-T01 chờ layer-2-task-02; services là collection nội dung đầu tiên)
 - [ ] Đủ trường ERD §4.5 (gồm `location` PostGIS point, `scale`, `amenities`, `floorPlans`, `documents`, `legalInfo`, `salesPolicy`)
 - [ ] `gallery` bắt buộc khi `published`; ảnh đầu là ảnh đại diện
 - [ ] Dùng factory kit: slug, seo, status, publishedAt, author, isFeatured, hasEnglish/translation, versions, xoá mềm, revalidate

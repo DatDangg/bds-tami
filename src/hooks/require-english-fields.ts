@@ -3,7 +3,7 @@ import { type CollectionBeforeValidateHook, type CollectionSlug, ValidationError
 import { preserveRequestLocale } from "../lib/payload/preserve-request-locale";
 
 /** Giá trị coi là "đã nhập": chuỗi không rỗng, mảng không rỗng, richText Lexical có ít nhất một node. */
-function isFilled(value: unknown): boolean {
+export function isFilled(value: unknown): boolean {
   if (typeof value === "string") return value.trim() !== "";
   if (Array.isArray(value)) return value.length > 0;
   if (typeof value === "object" && value !== null) {

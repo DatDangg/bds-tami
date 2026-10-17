@@ -28,7 +28,7 @@ export interface RevalidateContentOptions {
 }
 
 
-function isPubliclyVisible(doc: ContentDoc | undefined, publicStatuses: readonly string[]): boolean {
+export function isPubliclyVisible(doc: ContentDoc | undefined, publicStatuses: readonly string[]): boolean {
   return Boolean(doc) && !doc?.deletedAt && publicStatuses.includes(String(doc?.status));
 }
 

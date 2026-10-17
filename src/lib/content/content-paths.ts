@@ -21,6 +21,13 @@ export const CONTENT_ROUTES = {
   services: { detail: "/dich-vu/[slug]" },
 } as const satisfies Record<string, ContentRoute>;
 
+/** Trang pháp lý (`pages`): route CỐ ĐỊNH theo `kind` (ERD §4.9b), giá trị là khoá `pathnames`, không có slug. */
+export const LEGAL_PAGE_ROUTES = {
+  privacy: "/chinh-sach-bao-mat",
+  terms: "/dieu-khoan-su-dung",
+} as const satisfies Record<string, PathnameKey>;
+export type LegalPageKind = keyof typeof LEGAL_PAGE_ROUTES;
+
 /**
  * Đường dẫn NỘI BỘ của trang theo ngôn ngữ, đúng dạng khoá cache của Next: `/${locale}${khoá pathnames}`
  * (vd `/vi/du-an/x`, `/en/du-an/x`, trang chủ `/vi`, `/en`). Lý do: trang render dưới segment

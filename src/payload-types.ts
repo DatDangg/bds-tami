@@ -76,6 +76,8 @@ export interface Config {
     'translation-usage': TranslationUsage;
     categories: Category;
     developers: Developer;
+    services: Service;
+    pages: Page;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -93,6 +95,8 @@ export interface Config {
     'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -440,6 +444,124 @@ export interface Developer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: string;
+  title?: string | null;
+  icon?: (string | null) | Media;
+  coverImage?: (string | null) | Media;
+  summary?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  kind: 'privacy' | 'terms';
+  title?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30).
+   */
+  version: string;
+  effectiveDate: string;
+  status: 'draft' | 'published' | 'hidden';
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -598,6 +720,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'developers';
         value: string | Developer;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -867,6 +997,80 @@ export interface DevelopersSelect<T extends boolean = true> {
         translatedAt?: T;
         model?: T;
         lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  coverImage?: T;
+  summary?: T;
+  content?: T;
+  sortOrder?: T;
+  slug?: T;
+  status?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  kind?: T;
+  title?: T;
+  content?: T;
+  version?: T;
+  effectiveDate?: T;
+  status?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
       };
   updatedAt?: T;
   createdAt?: T;

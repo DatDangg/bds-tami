@@ -14,7 +14,9 @@ import { ClickStatsDaily } from "./collections/ClickStatsDaily";
 import { TranslationUsage } from "./collections/TranslationUsage";
 import { Developers } from "./collections/Developers";
 import { Media } from "./collections/Media";
+import { Pages } from "./collections/Pages";
 import { PrivateFiles } from "./collections/PrivateFiles";
+import { Services } from "./collections/Services";
 import { Staff } from "./collections/Staff";
 import { Footer } from "./globals/Footer";
 import { Header } from "./globals/Header";
@@ -49,7 +51,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers],
+  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Services, Pages],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),

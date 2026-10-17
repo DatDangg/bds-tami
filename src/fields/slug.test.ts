@@ -123,6 +123,14 @@ describe("slugField: scopeField", () => {
   });
 });
 
+describe("slugField: nhân bản (Duplicate)", () => {
+  it("bỏ slug (undefined) thay vì thêm ' - Copy' mặc định của Payload cho trường unique, để hook sinh lại + hậu tố", async () => {
+    const [hook] = slugField().hooks?.beforeDuplicate ?? [];
+    expect(hook).toBeDefined();
+    expect(await hook!({ value: "xyz" } as unknown as Parameters<FieldHook>[0])).toBeUndefined();
+  });
+});
+
 describe("scopeSlugField", () => {
   const hook = scopeSlugField("scope").hooks?.beforeChange?.[0] as FieldHook;
   const run = (siblingData: Record<string, unknown>, originalDoc?: Record<string, unknown>) =>
