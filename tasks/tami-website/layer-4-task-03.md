@@ -34,6 +34,7 @@ Một lớp truy vấn duy nhất cho website: luôn `overrideAccess: false`, `l
 Mở khoá cho: `layer-5-task-08`, `layer-6-task-04`, `layer-6-task-05`, `layer-6-task-06`, `layer-6-task-07`, `layer-6-task-08`, `layer-7-task-03`, `layer-8-task-04`, `layer-9-task-01`, `layer-16-task-01`
 
 ## Acceptance Criteria
+- [ ] `src/lib/content/get-globals.ts` có `import "server-only"` nhưng gói chưa trong dependencies: thêm `server-only` vào dependencies (hoặc ghi rõ chỉ code bundle bởi Next được import; jobs/scripts dùng `read-global.ts`) khi nối truy vấn công khai (review L4-T02 round 2 MINOR-B)
 - [ ] `publicWhere` là **nơi duy nhất** dựng điều kiện công khai (status, chưa xoá mềm, EN → `hasEnglish = true`); task hẹn giờ chỉ thêm `publishedAt ≤ now` ở đây
 - [ ] Bản EN không bao giờ trả chữ tiếng Việt (fallback tắt) và bản ghi chưa có EN → `null` để trang gọi `notFound()`
 - [ ] Trang công khai: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`; HTML không phụ thuộc cookie

@@ -18,8 +18,8 @@ function hasEnglishField(): CheckboxField {
   };
 }
 
-/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). */
-function translationGroup(): GroupField {
+/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). Globals chỉ dùng group này (không `hasEnglish`: header/footer/site-settings luôn render ở cả hai ngôn ngữ). */
+export function translationGroup(): GroupField {
   return {
     name: "translation",
     type: "group",

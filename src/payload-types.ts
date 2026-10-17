@@ -102,9 +102,15 @@ export interface Config {
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('vi' | 'en') | ('vi' | 'en')[];
   globals: {
+    'site-settings': SiteSetting;
+    header: Header;
+    footer: Footer;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: 'vi' | 'en';
@@ -907,6 +913,182 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  siteName: string;
+  logo?: (string | null) | Media;
+  logoDark?: (string | null) | Media;
+  favicon?: (string | null) | Media;
+  /**
+   * Số hiển thị và gọi từ nút nổi (FR-PUB-12)
+   */
+  hotline?: string | null;
+  zaloUrl?: string | null;
+  fanpageUrl?: string | null;
+  email?: string | null;
+  address?: string | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  mapLocation?: [number, number] | null;
+  socialLinks?:
+    | {
+        platform: 'facebook' | 'zalo' | 'youtube' | 'tiktok' | 'instagram' | 'linkedin' | 'x' | 'other';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Email nhận thông báo lead / hồ sơ ứng tuyển (chỉ admin thấy)
+   */
+  notificationEmails?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)
+   */
+  privacyPolicyVersion?: string | null;
+  gaMeasurementId?: string | null;
+  /**
+   * Thuật ngữ cố định cho AI dịch (BR-08)
+   */
+  translationGlossary?:
+    | {
+        vi: string;
+        en: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Tắt nhanh dịch tự động (BR-08)
+   */
+  translationEnabled?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: string;
+  navItems?:
+    | {
+        label: string;
+        /**
+         * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+         */
+        link: string;
+        children?:
+          | {
+              label: string;
+              /**
+               * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+               */
+              link: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  ctaButton?: {
+    label?: string | null;
+    /**
+     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     */
+    link?: string | null;
+  };
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: string;
+  columns?:
+    | {
+        title: string;
+        links?:
+          | {
+              label: string;
+              /**
+               * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+               */
+              link: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  contactBlock?: string | null;
+  copyright?: string | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -922,6 +1104,135 @@ export interface PayloadJobsStat {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logo?: T;
+  logoDark?: T;
+  favicon?: T;
+  hotline?: T;
+  zaloUrl?: T;
+  fanpageUrl?: T;
+  email?: T;
+  address?: T;
+  mapLocation?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  notificationEmails?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  privacyPolicyVersion?: T;
+  gaMeasurementId?: T;
+  translationGlossary?:
+    | T
+    | {
+        vi?: T;
+        en?: T;
+        note?: T;
+        id?: T;
+      };
+  translationEnabled?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        label?: T;
+        link?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  ctaButton?:
+    | T
+    | {
+        label?: T;
+        link?: T;
+      };
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  columns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  contactBlock?: T;
+  copyright?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

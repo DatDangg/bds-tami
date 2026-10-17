@@ -33,6 +33,7 @@ Service phía server dịch VI → EN: text/textarea và richText Lexical theo t
 Mở khoá cho: `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] `translation.lastError` (đọc công khai theo PERMISSION §4) chỉ lưu mã lỗi/thông điệp đã lọc — không stack, endpoint, header, API key, nội dung response của provider; có test (review L4-T02 round 2 MINOR-A)
 - [ ] Dùng `@anthropic-ai/sdk`, model từ env `TRANSLATION_MODEL`, key `ANTHROPIC_API_KEY` chỉ đọc phía server
 - [ ] Gọi với collection ngoài allowlist (leads, lead-activities, job-applications, staff, private-files, audit-logs) → throw, không gọi API
 - [ ] richText: chỉ gửi text node; kết quả ghép lại đúng cấu trúc (heading, list, bold, link, ảnh giữ nguyên); kết quả không hợp lệ → lỗi, không lưu

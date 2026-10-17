@@ -15,6 +15,9 @@ import { Developers } from "./collections/Developers";
 import { Media } from "./collections/Media";
 import { PrivateFiles } from "./collections/PrivateFiles";
 import { Staff } from "./collections/Staff";
+import { Footer } from "./globals/Footer";
+import { Header } from "./globals/Header";
+import { SiteSettings } from "./globals/SiteSettings";
 import { migrations } from "../migrations";
 import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { jobsConfig } from "./jobs";
@@ -46,6 +49,7 @@ export default buildConfig({
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
   collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, Categories, Developers],
+  globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint],

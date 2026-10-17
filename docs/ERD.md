@@ -510,6 +510,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 **`header`**: `navItems` (array `{label, link, children?}`), `ctaButton`.
 **`footer`**: `columns` (array `{title, links[]}`), `contactBlock`, `copyright`.
 
+> **As-built (L4-T02):** khoá trang hợp lệ (`src/lib/content/nav-link.ts`): `home`, `projects`, `rentals`, `property-posts`, `news`, `careers`, `contact`, `privacy-policy`, `terms-of-use`; giá trị khác phải là URL `http(s)://` (chặn `javascript:`...). `header.ctaButton` = group `{label (localized), link}`; `footer.contactBlock` = textarea localized; `footer.columns[].links[]` = `{label (localized), link}`; `socialLinks[].platform` = select (`facebook`, `zalo`, `youtube`, `tiktok`, `instagram`, `linkedin`, `x`, `other`). `notificationEmails`, `translationGlossary`, `translationEnabled` chỉ admin đọc (field access + hook `afterRead` xoá hẳn khoá vì Payload vẫn trả `[]` cho array bị chặn); `privacyPolicyVersion` ai cũng đọc, không ai sửa tay. Lưu global làm mới tag `global:<slug>` (cả vi và en). Cả ba global (`site-settings`, `header`, `footer`) có group `translation` (dùng chung `translationGroup()` ở `src/fields/translation.ts`, chỉ đọc với mọi người, hệ thống ghi; migration `20261017_034248_globals_translation_group`), KHÔNG có `hasEnglish` (layout luôn render cả vi và en, không cần cổng bật EN như collection). Global chỉ admin thấy trong menu admin (`admin.hidden`); URL/link lưu bản đã trim.
+
 ---
 
 ## 5. Index
