@@ -122,3 +122,9 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Giới hạn số part/field multipart trong `job-application-body.ts`; giảm sao chép buffer.
 - [ ] Thu hẹp map `ValidationError` → 400 `cvInvalid` chỉ khi lỗi ở field `file` (`job-applications.ts:110`).
 - [ ] Test bù trừ CV kiểm cả object S3 bị xoá (`tests/integration/job-applications.test.ts:302`).
+
+## Follow-up từ review layer-6-task-10
+- [ ] `private-file-download.ts:45-51` `resolveObjectKey` tôn trọng `prefix` của plugin storage.
+- [ ] Test admin bị khoá: chỉ chấp nhận 401 (PERMISSION §5).
+- [ ] `CvDownloadButton.tsx:21`: bỏ thuộc tính `download` (server đã gửi attachment) để lỗi 401/403/500 hiện ra thay vì lưu thành file.
+- [ ] Tài khoản bị khoá tạm (`lockUntil`) còn JWT cũ: cân nhắc chặn ở tầng xác thực chung (F1).

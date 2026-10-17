@@ -36,6 +36,11 @@ const submittedFields: Field[] = [
     access: submittedFieldAccess,
     admin: readOnlyInAdmin,
   },
+  {
+    name: "cvDownload",
+    type: "ui",
+    admin: { components: { Field: "/components/admin/CvDownloadButton#CvDownloadButton" } },
+  },
   { name: "consentAt", type: "date", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
   { name: "consentVersion", type: "text", required: true, maxLength: 40, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {

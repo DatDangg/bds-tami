@@ -174,6 +174,8 @@ Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/metrics/route.ts`
 
 Thứ tự kiểm tra: `docs/PERMISSION.md` §5. Giới hạn: xuất Excel 10 lần / giờ / user.
 
+> **As-built (layer-6-task-10) — tải CV:** `src/endpoints/admin/private-file-download.ts`. Thứ tự: chưa đăng nhập / tài khoản `active !== true` → 401; không phải admin → 403 (kể cả id không tồn tại, tránh dò); id không phải UUID → 400; không có bản ghi hoặc object S3 → 404. Stream thẳng từ bucket riêng (không presigned URL, không buffer). Audit `application.view_cv` (`collection: private-files`, `docId` = id file, IP hash, không PII) ghi sau khi mở object, trước byte đầu; ghi lỗi → huỷ stream, 500 (fail-closed). Header: `Content-Disposition: attachment` (tên ASCII đã làm sạch + `filename*` RFC 5987), `Content-Type` theo MIME đã lưu (lạ → `application/octet-stream`), `X-Content-Type-Options: nosniff`, `Content-Security-Policy: default-src 'none'; sandbox`, `Cache-Control: private, no-store`. `/api/private-files/file/:name` trả 404. Admin: nút "Tải CV" (ui field `cvDownload`) trong form hồ sơ.
+
 Các thao tác CRUD còn lại (nội dung, lead, tài khoản) dùng REST tự sinh của Payload qua trang `/admin`.
 
 ## 5. Sự kiện nội bộ (hook → job)
