@@ -74,3 +74,21 @@ describe("parseEnv", () => {
     expect(() => parseEnv({})).toThrow(/DATABASE_URL.*PAYLOAD_SECRET/);
   });
 });
+
+describe("parseEnv: giám sát", () => {
+  it("không đặt hoặc để trống → undefined (tắt GlitchTip, tắt /api/metrics)", () => {
+    for (const env of [parseEnv(validEnv), parseEnv({ ...validEnv, GLITCHTIP_DSN: "", GLITCHTIP_PUBLIC_DSN: "", METRICS_TOKEN: "" })]) {
+      expect(env.GLITCHTIP_DSN).toBeUndefined();
+      expect(env.GLITCHTIP_PUBLIC_DSN).toBeUndefined();
+      expect(env.METRICS_TOKEN).toBeUndefined();
+    }
+  });
+
+  it("DSN phải là URL, METRICS_TOKEN tối thiểu 32 ký tự; lỗi chỉ nêu tên biến, không in giá trị", () => {
+    const env = parseEnv({ ...validEnv, GLITCHTIP_DSN: "https://key@glitchtip.example/1", METRICS_TOKEN: "m".repeat(32) });
+    expect(env.GLITCHTIP_DSN).toBe("https://key@glitchtip.example/1");
+    expect(() => parseEnv({ ...validEnv, GLITCHTIP_DSN: "khong-phai-url" })).toThrow(/GLITCHTIP_DSN/);
+    expect(() => parseEnv({ ...validEnv, METRICS_TOKEN: "token-ngan" })).toThrow(/METRICS_TOKEN/);
+    expect(() => parseEnv({ ...validEnv, METRICS_TOKEN: "token-ngan" })).not.toThrow(/token-ngan/);
+  });
+});

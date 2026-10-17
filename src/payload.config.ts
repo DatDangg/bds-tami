@@ -17,6 +17,8 @@ import { migrations } from "../migrations";
 import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
+import { logger } from "./lib/logger";
+import { registerDbPool, type PoolStats } from "./lib/monitoring/metrics";
 import { getS3ClientConfig } from "./lib/s3-config";
 import { createEmailAdapter } from "./lib/email/transport";
 import { MAX_UPLOAD_BYTES } from "./lib/upload/validate-file";
@@ -45,6 +47,10 @@ export default buildConfig({
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint],
   jobs: jobsConfig,
+  // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
+  logger,
+  // Pool pg của adapter -> metrics kết nối DB (/api/metrics).
+  onInit: (payload) => registerDbPool((payload.db as { pool?: PoolStats }).pool),
   secret: env.PAYLOAD_SECRET,
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
   // Giai đoạn 1 chỉ dùng REST + Local API (ARCHITECTURE §3).

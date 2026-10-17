@@ -1,5 +1,7 @@
 import Redis from "ioredis";
 
+import { logger } from "@/lib/logger";
+
 // Cache trên globalThis: hot reload của dev server nạp lại module, biến module-level sẽ mở thêm kết nối.
 const globalForRedis = globalThis as typeof globalThis & { __tamiRedis?: Redis };
 
@@ -21,7 +23,7 @@ export function getRedis(): Redis {
   // ioredis phát 'error' liên tục khi Redis chết; không có listener thì process bị sập (unhandled 'error').
   // Lỗi thật được xử lý ở nơi gọi lệnh (rate limit trả 503); ở đây chỉ ghi tên lỗi, không ghi URL.
   client.on("error", (error: Error) => {
-    console.error("[redis] lỗi kết nối:", error.name);
+    logger.error({ component: "redis", errorName: error.name }, "lỗi kết nối");
   });
   globalForRedis.__tamiRedis = client;
   return client;

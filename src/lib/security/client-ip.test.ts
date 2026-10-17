@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getClientIp, UNKNOWN_CLIENT_IP } from "./client-ip";
 
+// Logger thật ghi ra stdout; test kiểm nội dung log qua mock.
+const log = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn() }));
+vi.mock("@/lib/logger", () => ({ logger: { child: () => log, ...log } }));
+
 const headers = (init: Record<string, string>) => new Headers(init);
 
 describe("getClientIp", () => {
@@ -60,7 +64,8 @@ describe("getClientIp cảnh báo bucket unknown ở production", () => {
   it("cảnh báo đúng một lần mỗi process, không log IP/header", async () => {
     vi.resetModules();
     vi.stubEnv("NODE_ENV", "production");
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warn = log.warn;
+    warn.mockClear();
     const mod = await import("./client-ip");
     const h = headers({ "cf-connecting-ip": "6.6.6.6" });
     mod.getClientIp(h, { trustCloudflare: false });
@@ -71,7 +76,8 @@ describe("getClientIp cảnh báo bucket unknown ở production", () => {
 
   it("không cảnh báo ngoài production hoặc khi xác định được IP", async () => {
     vi.resetModules();
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warn = log.warn;
+    warn.mockClear();
     const mod = await import("./client-ip");
     mod.getClientIp(headers({}));
     vi.stubEnv("NODE_ENV", "production");

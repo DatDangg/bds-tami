@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { verifyTurnstile } from "./turnstile";
 
+// Logger thật ghi ra stdout; test kiểm nội dung log qua mock.
+const log = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn() }));
+vi.mock("@/lib/logger", () => ({ logger: { child: () => log, ...log } }));
+
 // Test key chính thức của Cloudflare (luôn pass / luôn fail). Test không gọi mạng: fetch được mock.
 const ALWAYS_PASS_SECRET = "1x0000000000000000000000000000000AA";
 const ALWAYS_FAIL_SECRET = "2x0000000000000000000000000000000AA";
@@ -8,7 +12,7 @@ const ALWAYS_FAIL_SECRET = "2x0000000000000000000000000000000AA";
 const jsonResponse = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 
 describe("verifyTurnstile", () => {
-  beforeEach(() => vi.spyOn(console, "error").mockImplementation(() => {}));
+  beforeEach(() => log.error.mockClear());
   afterEach(() => vi.restoreAllMocks());
 
   it("token hợp lệ: gọi siteverify bằng POST form có secret + response + remoteip", async () => {
@@ -64,7 +68,7 @@ describe("verifyTurnstile", () => {
     const fetchImpl = vi.fn().mockRejectedValue(new TypeError("fetch failed: tok-secret-xyz"));
     const result = await verifyTurnstile("tok-secret-xyz", { secret: ALWAYS_PASS_SECRET, fetchImpl });
     expect(result).toEqual({ ok: false, reason: "unavailable" });
-    const logged = JSON.stringify(vi.mocked(console.error).mock.calls);
+    const logged = JSON.stringify(log.error.mock.calls);
     expect(logged).toContain("siteverify");
     expect(logged).not.toContain("tok-secret-xyz");
     expect(logged).not.toContain(ALWAYS_PASS_SECRET);

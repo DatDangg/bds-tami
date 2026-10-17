@@ -24,7 +24,7 @@ describe("GET /api/health", () => {
   it("DB, Redis, S3 đều ổn → 200, no-store, chỉ có trạng thái", async () => {
     redisState.down = false;
     const { GET } = await import("@/app/(payload)/api/health/route");
-    const res = await GET();
+    const res = await GET(new Request("http://localhost/api/health"));
     expect(res.status).toBe(200);
     expect(res.headers.get("cache-control")).toBe("no-store");
     expect(await res.json()).toEqual({
@@ -36,7 +36,7 @@ describe("GET /api/health", () => {
   it("Redis tắt → 503 với redis: down, không lộ thông điệp lỗi", async () => {
     redisState.down = true;
     const { GET } = await import("@/app/(payload)/api/health/route");
-    const res = await GET();
+    const res = await GET(new Request("http://localhost/api/health"));
     expect(res.status).toBe(503);
     expect(res.headers.get("cache-control")).toBe("no-store");
     const body = await res.json();

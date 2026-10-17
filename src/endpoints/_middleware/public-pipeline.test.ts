@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RateLimitUnavailableError } from "@/lib/security/rate-limit";
+// Logger thật ghi ra stdout; test kiểm nội dung log qua mock.
+const log = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn() }));
+vi.mock("@/lib/logger", () => ({ logger: { child: () => log, ...log } }));
+
 import { runPublicPipeline, type PublicPipelineDeps, type ValidationOutcome } from "./public-pipeline";
 
 const request = () => new Request("https://tami.test/api/public/leads", { method: "POST" });
@@ -33,7 +37,8 @@ function setup(overrides: Partial<PublicPipelineDeps> = {}, validation: Validati
 describe("runPublicPipeline (PERMISSION §5)", () => {
   beforeEach(() => {
     vi.stubEnv("PAYLOAD_SECRET", "test-secret-aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    log.error.mockClear();
+    log.warn.mockClear();
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -110,7 +115,6 @@ describe("runPublicPipeline (PERMISSION §5)", () => {
   });
 
   it("readToken ném lỗi (body hỏng) -> 400, không 500, dừng trước validate", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
     const { deps, validate } = setup();
     const result = await runPublicPipeline(
       {
@@ -126,7 +130,6 @@ describe("runPublicPipeline (PERMISSION §5)", () => {
   });
 
   it("validate ném lỗi -> 400", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
     const { deps } = setup();
     const result = await runPublicPipeline(
       { request: request(), endpoint: "leads", turnstile: false, validate: () => { throw new SyntaxError("bad json"); } },
@@ -143,7 +146,7 @@ describe("runPublicPipeline (PERMISSION §5)", () => {
       }),
     });
     await run();
-    const logged = JSON.stringify(vi.mocked(console.error).mock.calls);
+    const logged = JSON.stringify(log.error.mock.calls);
     expect(logged).toContain("ConnectionError");
     expect(logged).not.toContain("pw@host");
   });

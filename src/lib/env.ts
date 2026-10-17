@@ -16,6 +16,9 @@ export function parseTrustCloudflareFlag(value: string | undefined): boolean {
   return result.data;
 }
 
+/** Biến tuỳ chọn: chuỗi rỗng (dòng `KEY=` trong .env) coi như chưa đặt. */
+const emptyToUndefined = (value: unknown) => (value === "" ? undefined : value);
+
 const envSchema = z.object({
   DATABASE_URL: nonEmpty,
   DATABASE_URL_TEST: z.string().min(1).optional(),
@@ -44,6 +47,11 @@ const envSchema = z.object({
   TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),
   NEXT_PUBLIC_SITE_URL: z.url(),
   TRUST_CF_CONNECTING_IP: trustCloudflareSchema,
+  // Giám sát (ARCHITECTURE §8). Không có DSN thì tắt hẳn GlitchTip. `GLITCHTIP_PUBLIC_DSN` (DSN cho trình duyệt) được đọc lúc chạy qua `/api/monitoring-config`, không nhúng lúc build.
+  GLITCHTIP_DSN: z.preprocess(emptyToUndefined, z.url().optional()),
+  GLITCHTIP_PUBLIC_DSN: z.preprocess(emptyToUndefined, z.url().optional()),
+  // Bearer token cho `/api/metrics`; chưa đặt thì endpoint tắt (404). Tối thiểu 32 ký tự để chống đoán.
+  METRICS_TOKEN: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
 });
 
 export type Env = z.infer<typeof envSchema>;

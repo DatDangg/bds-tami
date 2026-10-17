@@ -13,8 +13,8 @@ describe.skipIf(!databaseUrl)("integration: phiên đăng nhập staff (DB thậ
   const runId = Date.now().toString(36);
   const email = `session-${runId}@example.test`;
   const password = "Mat-khau-hop-le-123";
-  let payload: Payload;
-  let staffId: string;
+  let payload: Payload; // gán trong beforeAll; undefined nếu beforeAll lỗi
+  let staffId: string | undefined;
 
   const refresh = (token?: string) =>
     handleEndpoints({
@@ -39,8 +39,9 @@ describe.skipIf(!databaseUrl)("integration: phiên đăng nhập staff (DB thậ
   });
 
   afterAll(async () => {
-    await payload.delete({ collection: "staff", id: staffId, overrideAccess: true });
-    await payload.destroy();
+    // beforeAll lỗi (DB chập chờn) thì chưa có payload/staffId: không xoá mù, tránh che lỗi gốc bằng lỗi afterAll.
+    if (payload && staffId) await payload.delete({ collection: "staff", id: staffId, overrideAccess: true });
+    await payload?.destroy();
   });
 
   it("tokenExpiration của staff là 8 giờ", () => {

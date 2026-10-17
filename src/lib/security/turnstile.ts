@@ -1,3 +1,6 @@
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ component: "turnstile" });
 const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TIMEOUT_MS = 5_000;
 /** Giới hạn token theo tài liệu Turnstile; dài hơn là rác, không gửi sang Cloudflare. */
@@ -26,7 +29,7 @@ export async function verifyTurnstile(
   if (typeof token !== "string" || token.length === 0) return { ok: false, reason: "missing-token" };
   if (token.length > MAX_TOKEN_LENGTH) return { ok: false, reason: "invalid-token" };
   if (!secret) {
-    console.error("[turnstile] thiếu TURNSTILE_SECRET_KEY, từ chối mọi token");
+    log.error("thiếu TURNSTILE_SECRET_KEY, từ chối mọi token");
     return { ok: false, reason: "unavailable" };
   }
 
@@ -40,14 +43,14 @@ export async function verifyTurnstile(
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!response.ok) {
-      console.error(`[turnstile] siteverify trả HTTP ${response.status}`);
+      log.error({ status: response.status }, "siteverify trả HTTP lỗi");
       return { ok: false, reason: "unavailable" };
     }
     const result: unknown = await response.json();
     const success = typeof result === "object" && result !== null && (result as { success?: unknown }).success === true;
     return success ? { ok: true } : { ok: false, reason: "invalid-token" };
   } catch (error) {
-    console.error("[turnstile] không gọi được siteverify:", error instanceof Error ? error.name : "unknown");
+    log.error({ errorName: error instanceof Error ? error.name : "unknown" }, "không gọi được siteverify");
     return { ok: false, reason: "unavailable" };
   }
 }

@@ -1,5 +1,6 @@
 import { isIP } from "node:net";
 import { parseTrustCloudflareFlag } from "@/lib/env";
+import { logger } from "@/lib/logger";
 
 let warnedUnknownInProduction = false;
 
@@ -41,5 +42,5 @@ export function getClientIp(headers: Headers, options: ClientIpOptions = {}): st
 function warnUnknownIpInProduction(): void {
   if (process.env.NODE_ENV !== "production" || warnedUnknownInProduction) return;
   warnedUnknownInProduction = true;
-  console.warn("[client-ip] không xác định được IP khách: mọi request dùng chung một bucket rate limit. Kiểm tra TRUST_CF_CONNECTING_IP và proxy.");
+  logger.warn({ component: "client-ip" }, "không xác định được IP khách: mọi request dùng chung một bucket rate limit. Kiểm tra TRUST_CF_CONNECTING_IP và proxy.");
 }

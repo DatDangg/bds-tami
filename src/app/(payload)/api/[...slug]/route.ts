@@ -8,9 +8,12 @@ import {
   REST_PUT,
 } from "@payloadcms/next/routes";
 
-export const GET = REST_GET(config);
-export const POST = REST_POST(config);
-export const DELETE = REST_DELETE(config);
-export const PATCH = REST_PATCH(config);
-export const PUT = REST_PUT(config);
-export const OPTIONS = REST_OPTIONS(config);
+import { withRequestMetrics } from "@/lib/monitoring/metrics";
+
+// Nhãn route cố định ("payload_rest"), không dùng URL thật để metrics không bùng nổ số series.
+export const GET = withRequestMetrics("payload_rest", REST_GET(config));
+export const POST = withRequestMetrics("payload_rest", REST_POST(config));
+export const DELETE = withRequestMetrics("payload_rest", REST_DELETE(config));
+export const PATCH = withRequestMetrics("payload_rest", REST_PATCH(config));
+export const PUT = withRequestMetrics("payload_rest", REST_PUT(config));
+export const OPTIONS = withRequestMetrics("payload_rest", REST_OPTIONS(config));

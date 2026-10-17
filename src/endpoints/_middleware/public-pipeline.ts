@@ -1,4 +1,5 @@
 import { fail } from "@/lib/http/response";
+import { logger } from "@/lib/logger";
 import { getClientIp, UNKNOWN_CLIENT_IP } from "@/lib/security/client-ip";
 import { ipHash } from "@/lib/security/ip-hash";
 import {
@@ -8,6 +9,8 @@ import {
   type RateLimitResult,
 } from "@/lib/security/rate-limit";
 import { verifyTurnstile, type TurnstileResult } from "@/lib/security/turnstile";
+
+const log = logger.child({ component: "public-pipeline" });
 
 export type ValidationOutcome<T> = { ok: true; value: T } | { ok: false; details: unknown[] };
 
@@ -38,7 +41,7 @@ const defaultDeps: PublicPipelineDeps = {
 
 /** Body hỏng (JSON sai, multipart lỗi…) là lỗi của client: 400, không để thành 500. Chỉ log tên lỗi. */
 function badInput(step: string, endpoint: string, error: unknown, message: string): Response {
-  console.warn(`[public-pipeline] ${endpoint}: ${step} ném lỗi (${error instanceof Error ? error.name : "unknown"}), trả 400`);
+  log.warn({ endpoint, step, errorName: error instanceof Error ? error.name : "unknown" }, "đầu vào hỏng, trả 400");
   return fail(400, message);
 }
 
@@ -60,7 +63,7 @@ export async function runPublicPipeline<T>(
   } catch (error) {
     if (!(error instanceof RateLimitUnavailableError)) throw error;
     const reason = error.cause instanceof Error ? error.cause.name : "unknown";
-    console.error(`[public-pipeline] ${input.endpoint}: Redis lỗi (${reason}), trả 503 (fail closed)`);
+    log.error({ endpoint: input.endpoint, reason }, "Redis lỗi, trả 503 (fail closed)");
     return { ok: false, response: fail(503, "Hệ thống tạm thời không khả dụng, vui lòng thử lại sau") };
   }
   if (!limit.allowed) {
