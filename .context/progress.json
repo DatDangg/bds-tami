@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 3,
+  "currentLayer": 4,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -189,7 +189,7 @@
       "reason": "User chọn phương án (a) Ngoại lệ cache"
     }
   ],
-  "lastUpdated": "2026-10-17T03:45:00.000Z",
+  "lastUpdated": "2026-10-17T04:10:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -238,6 +238,12 @@
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-2.md",
       "note": "trừ layer-2-task-02 (blocked chờ data địa giới); gap G1 cần user chốt trước layer-3-task-03"
+    },
+    {
+      "layer": 3,
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-3.md",
+      "note": "G7/G8 đã gắn AC L4-T01, L4-T06, L5-T02, L5-T08, L6-T01; R6/R7/R9 reconcile; G9 (ISR in-process vs ARCHITECTURE §9.1) chờ user; R4 secrets chờ /brainstorm secrets"
     }
   ]
 }

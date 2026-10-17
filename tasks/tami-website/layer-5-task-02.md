@@ -35,6 +35,7 @@ Dịch vụ (có `coverImage`) và 2 trang pháp lý route cố định theo `ki
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-07`, `layer-8-task-01`, `layer-8-task-05`, `layer-9-task-07`
 
 ## Acceptance Criteria
+- [ ] G7: `pages` (không slug/author, ERD §4.9b) và `services` (không author, ERD §4.9) dùng `withContentDefaults` qua option `omit`/`fieldAccess` của layer-4-task-01 — không chép lại logic factory (spec-validation layer 3)
 - [ ] `services`: đủ trường ERD §4.9, `coverImage` bắt buộc khi `published`, không có `author`; chỉ admin tạo/sửa/xoá
 - [ ] `pages`: `kind` ∈ {privacy, terms} unique, không đổi sau khi tạo; không có slug; `version`, `effectiveDate`
 - [ ] Bản `privacy` đang `published` → hook ghi `site-settings.privacyPolicyVersion = version`

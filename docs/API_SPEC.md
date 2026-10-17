@@ -136,6 +136,28 @@ Kiểm song song DB (`select 1`), Redis (`PING`), storage (`HeadBucket` cả buc
 Header `Cache-Control: no-store`. Không trả version, host, chuỗi kết nối, stack trace.
 Code: `src/app/(payload)/api/health/route.ts`, `src/lib/health/`.
 
+### 3.6. `GET /api/monitoring-config`
+
+Không cần đăng nhập. Trả cấu hình GlitchTip cho trình duyệt, đọc lúc chạy (cùng image promote staging → prod).
+
+| Mã | Body |
+|---|---|
+| `200` | `{ "dsn": string | null, "environment": "development" | "staging" | "production" }` (`dsn` = `GLITCHTIP_PUBLIC_DSN`, null khi chưa đặt) |
+
+Header `Cache-Control: private, max-age=300` (ngoại lệ của ARCHITECTURE §5.1). Code: `src/app/(payload)/api/monitoring-config/route.ts`.
+
+### 3.7. `GET /api/metrics` (nội bộ)
+
+Dành cho Prometheus, **không public**: Nginx trả 404 cho đường này; scrape qua `127.0.0.1`/network nội bộ. Xác thực `Authorization: Bearer <METRICS_TOKEN>` (so sánh thời gian hằng).
+
+| Mã | Body |
+|---|---|
+| `200` | Prometheus text format, metric `tami_*` (in-memory theo từng process) |
+| `401` | Thiếu/sai token, kèm `WWW-Authenticate: Bearer realm="metrics"` |
+| `404` | Chưa đặt `METRICS_TOKEN` (coi như không tồn tại) |
+
+Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/metrics/route.ts`, `src/lib/monitoring/metrics*.ts`.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

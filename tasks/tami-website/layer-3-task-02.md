@@ -64,10 +64,10 @@ Mở khoá cho: `layer-4-task-01`, `layer-4-task-02`, `layer-4-task-03`, `layer-
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: 7/7 đạt ở mức builder (chờ reviewer): slug (6 test), publishedAt (3), author/isFeatured (3), quyền theo bản ghi + xoá mềm/khôi phục/xoá hẳn + audit (5), hasEnglish chỉ đọc + chặn bật khi thiếu EN (3), revalidate vi/en (3), versions/trash/lock (3)
+- Acceptance criteria: 7/7 đạt (reviewer STRICT PASS round 2): slug (6 test), publishedAt (3), author/isFeatured (3), quyền theo bản ghi + xoá mềm/khôi phục/xoá hẳn + audit (5), hasEnglish chỉ đọc + chặn bật khi thiếu EN (3), revalidate vi/en (3), versions/trash/lock (3)
 - Verify commands + result: `pnpm install --frozen-lockfile` OK · `pnpm lint` 0 lỗi/0 cảnh báo · `pnpm typecheck` OK · `pnpm test` 63 file / 609 test PASS (gồm integration `tests/integration/content-defaults.test.ts` 29 test chạy DB thật Postgres 5433, DB tạm, và unit `content-paths.test.ts` + `slug.test.ts`) · `pnpm build` OK
 - Reviewer verdict: round 1 FAIL (M1 revalidate theo URL public) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-3-task-02-round-2-review.md`). Residual MINOR: n1 `slug.ts:41` `like` = ILIKE %prefix% (contains, pagination:false) → chậm với slug ngắn, nên đổi equals base OR like "head-"; n2 `content-defaults.ts:49-55` `fieldAccess` với giá trị `undefined` ghi đè deny-all thành mở quyền → lọc undefined + throw tên field lạ TRƯỚC khi `pages` dùng option (layer 4+); n3 test m6 purge xoá bản chưa trong thùng rác + rejects.toThrow không kiểm message. Chưa kiểm revalidate trên cache Next thật (route chi tiết ở layer 4)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-3.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ERD.md` §4.14 (as-built): nhóm `seo` tự khai báo thay vì plugin-seo; ghi bộ field dùng chung + xoá mềm bằng `trash`. Không đổi intent docs, không đổi API_SPEC/PERMISSION (không đổi hợp đồng). Không đổi schema production (không migration).

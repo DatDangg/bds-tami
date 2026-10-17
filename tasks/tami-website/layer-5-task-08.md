@@ -34,6 +34,7 @@ Helper sinh `generateMetadata` và JSON-LD cho mọi trang.
 Mở khoá cho: `layer-6-task-01`, `layer-6-task-04`, `layer-6-task-05`, `layer-6-task-06`, `layer-6-task-07`, `layer-6-task-08`, `layer-7-task-03`, `layer-8-task-03`, `layer-8-task-04`, `layer-8-task-05`, `layer-9-task-01`, `layer-13-task-03`
 
 ## Acceptance Criteria
+- [ ] `NEXT_PUBLIC_SITE_URL` đang là localhost lúc `docker build` (L3-T03 MINOR-8): URL tuyệt đối (canonical, OG, JSON-LD, sitemap) phải lấy lúc chạy hoặc build-arg đúng môi trường (spec-validation layer 3)
 - [ ] Meta lấy `seo.metaTitle` → `title`; `metaDescription` → `summary`/`excerpt`; OG image → `seo.ogImage` → ảnh đại diện → ảnh OG mặc định
 - [ ] `hreflang` vi, en, x-default (→ vi) **chỉ** khi bản ghi có `hasEnglish`
 - [ ] `noindex` khi `seo.noindex` hoặc khi trang yêu cầu (tin đã thuê, tuyển dụng hết hạn, staging)

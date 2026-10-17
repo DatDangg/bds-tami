@@ -88,8 +88,10 @@ Một repo, một app Next.js có nhúng Payload:
 ├── src/
 │   ├── app/
 │   │   ├── (frontend)/[locale]/  # Website công khai (Trang chủ, Dự án, Cho thuê, ...), dùng chung cho vi / en
-│   │   └── (payload)/         # /admin và /api do Payload sinh; api/health/route.ts (health check, route tĩnh thắng catch-all /api/[...slug])
+│   │   └── (payload)/         # /admin và /api do Payload sinh; route tĩnh thắng catch-all /api/[...slug]: api/health, api/metrics (Prometheus, Bearer), api/monitoring-config (DSN GlitchTip lúc chạy)
 │   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...
+│   │   └── _shared/           # content-defaults.ts: factory withContentDefaults (versions, trash, access, hook dùng chung)
+│   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
 │   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/)
@@ -107,16 +109,21 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── session/           # Phiên admin 8 giờ không hoạt động (keepalive)
 │   │   ├── health/            # runHealthChecks + probe DB/Redis/S3 cho /api/health
 │   │   ├── click-stats/       # Gộp lượt bấm (hàm thuần cho job aggregate-click-stats)
+│   │   ├── monitoring/        # GlitchTip options + scrubText, metrics Prometheus, process-errors, service-name
+│   │   ├── content/           # content-paths: map collection → path nội bộ /{locale}{pathnames key} cho revalidate
+│   │   ├── payload/           # preserve-request-locale, prod-migrations (AUTO_MIGRATE_ON_START)
+│   │   ├── logger.ts          # pino JSON + redact/scrub PII, dùng chung app/jobs/Payload
 │   │   ├── s3-config.ts       # Cấu hình S3 client (SeaweedFS) dùng chung
 │   │   ├── translation/       # TranslationService: gọi Claude API, dịch richText theo node, thuật ngữ, hạn mức chi phí
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
 │   │   └── seo/               # Sinh metadata, JSON-LD, sitemap
 │   ├── components/            # UI dùng chung: ui/ (shadcn), admin/ (logo, icon, keepalive), media/ (Gallery, Lightbox, LazyMap, VideoFacade, ResponsiveImage), forms/ (FormField, ConsentCheckbox, TurnstileWidget, FormStatus, use-public-form)
 │   ├── i18n/                  # routing.ts (locales, pathnames vi ↔ en), request.ts, messages/vi.json, messages/en.json
+│   ├── instrumentation.ts, instrumentation-client.ts  # Khởi tạo GlitchTip server/trình duyệt (chỉ khi có DSN)
 │   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
-├── scripts/                   # jobs-runner.ts (`pnpm jobs`)
+├── scripts/                   # jobs-runner.ts (`pnpm jobs` ở dev; container chạy thẳng `node node_modules/payload/bin.js run scripts/jobs-runner.ts`)
 ├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
 ├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
 │   └── nginx/                 # tami.conf, tami-staging.conf (copy vào /etc/nginx/sites-available trên server)
@@ -228,7 +235,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 |---|---|---|---|
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | 1 bản (có thể chạy 2) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
-| `jobs` | cùng image app, lệnh `pnpm jobs` (`payload run scripts/jobs-runner.ts`, poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
+| `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
 | `postgres` | riêng (`postgis/postgis:17-3.5`) | riêng | `mem_limit` 2g / 512m |
 | `redis` | riêng (có mật khẩu, `maxmemory 100mb`, `volatile-lru`) | riêng | 128m |
 | `seaweedfs` | **As-built:** mỗi môi trường 1 instance riêng trong compose của mình (không publish cổng, khoá S3 lấy từ env), bucket riêng (`tami-prod-*`) — thay cho phương án dùng chung ban đầu, để prod/staging không chia sẻ dữ liệu hay khoá | instance riêng, bucket `tami-staging-*` | 256m |

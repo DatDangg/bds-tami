@@ -34,6 +34,9 @@ Danh mục riêng từng loại nội dung (tối đa 2 cấp) và chủ đầu 
 Mở khoá cho: `layer-5-task-01`, `layer-5-task-03`, `layer-5-task-04`, `layer-6-task-01`, `layer-6-task-02`, `layer-7-task-01`, `layer-8-task-01`, `layer-9-task-07`, `layer-13-task-04`
 
 ## Acceptance Criteria
+- [ ] G7: `withContentDefaults` thêm option bỏ bớt field dùng chung (vd `omit: ["slug","author"]`) và slug unique theo scope (`scopeField` → unique (`_locale`, `scope`, `slug`) cho `categories`, ERD §4.3); có test (spec-validation layer 3)
+- [ ] L3-T02 n2: `fieldAccess` bỏ qua giá trị `undefined` (không được ghi đè deny-all thành mở quyền) và throw khi tên field lạ (`content-defaults.ts:49-55`); có test (spec-validation layer 3)
+- [ ] L3-T02 n1: kiểm trùng slug không dùng `like` (ILIKE %prefix%, pagination:false) — dùng `equals base` OR tiền tố `head-` (`fields/slug.ts:41`) (spec-validation layer 3)
 - [ ] `categories`: name/slug/description/seo localized; `scope` ∈ {rental, property_post, news, project, job}; slug unique theo (`_locale`, `scope`, `slug`)
 - [ ] `parent` cùng scope, tối đa 2 cấp (hook kiểm tra)
 - [ ] Không xoá được danh mục có danh mục con; hook kiểm tra nội dung đang dùng theo bảng scope → collection (mỗi task nội dung thêm test cho collection của mình)

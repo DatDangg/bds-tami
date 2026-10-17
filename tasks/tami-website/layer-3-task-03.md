@@ -83,7 +83,7 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
   - MINOR-8 (layer 4 SEO): image build với `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (placeholder build-time); trang prerender (SSG `/vi`, `/en`) dùng URL tuyệt đối (metadataBase/sitemap/canonical) sẽ chứa `localhost:3000` tới khi revalidate -> task SEO phải dùng dynamic/ISR hoặc đọc URL lúc chạy.
   - Task deploy: kiểm `nginx -v` và `docker version` (>= 28 để tránh lỗi publish loopback) trên server; chọn Authenticated Origin Pulls (hỏi user); rule Cache của Cloudflare cho `/api/media/file/*` chỉ áp host prod, không áp staging.
 - Reviewer verdict: round 1 FAIL (MAJOR-1 ảnh staging public → Cloudflare cache lọt basic auth) → attempt 2 → **STRICT PASS round 2** (`.context/review-reports/build-tami-website-layer-3-task-03-round-2-review.md`). Residual: MINOR-R2-1 đã ghi vào AC layer-6-task-01 (rule cache chỉ host prod); MINOR-R2-2 static staging (`/_next/static`, public/) có thể bị Cloudflare cache theo đuôi → bypass cache toàn host staging hoặc Cloudflare Access ở layer-6-task-01; seaweedfs-init exit code chỉ kiểm trên SeaweedFS 4.48; 5 header lặp ở tami-staging.conf phải sửa đồng bộ
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE (`.context/review-reports/spec-validation-build-tami-website-layer-3.md`)
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.1 (ngoại lệ cache `/api/media/file/*`, Nginx 404 `/api/metrics`), §5.3 (URL media thật), §6.2 (SeaweedFS riêng mỗi môi trường, jobs 1 bản + `mem_limit` 384m, khối as-built: image, migrate riêng, Nginx) cập nhật như as-built. `.env.example` thêm khối compose. `next.config.ts` cập nhật comment (không dùng standalone). `docs/API_SPEC.md`/`ERD.md`: no doc impact (không đổi API/schema)
@@ -119,10 +119,10 @@ Mở khoá cho: `layer-4-task-05`, `layer-4-task-06`, `layer-4-task-07`, `layer-
 - `src/lib/fonts.ts` dùng `next/font/google`: `next build` tải font từ Google Fonts nên bước build trong Dockerfile/CI cần mạng ra ngoài tới Google Fonts. Nếu build bị cô lập mạng thì chuyển sang `next/font/local` (tải sẵn file woff2 vào repo).
 
 ## Follow-up từ review layer-1-task-06 (16/10/2026) — BẮT BUỘC
-- [ ] Đặt `TRUST_CF_CONNECTING_IP=true` cho staging và production (thiếu cờ → mọi khách chung bucket rate limit `unknown` → 1 kẻ spam chặn form lead toàn site).
-- [ ] Nginx: chỉ allow dải IP Cloudflare + `deny all`; cổng app chỉ bind 127.0.0.1, không lộ trực tiếp.
-- [ ] Nginx chuyển nguyên header `CF-Connecting-IP` (không ghi đè/không nhận từ client ngoài Cloudflare).
-- [ ] Đề xuất bật Cloudflare Authenticated Origin Pulls (mTLS) vì dải IP Cloudflare dùng chung mọi khách hàng — hỏi user.
-- [ ] Smoke test: 2 IP khác nhau rơi vào 2 bucket khác nhau.
-- [ ] Từ review layer-1-task-07: đặt bắt buộc `APP_ENV=production` (prod) / `APP_ENV=staging` + `EMAIL_ALLOWLIST` (staging) cho cả service `app` và `jobs`; service `jobs` chạy `pnpm jobs` (image cần `payload` CLI + loader TS).
-- [ ] Từ review layer-1-task-07 round 2: service `jobs` đặt `stop_grace_period: 60s` (worker chờ vòng đang chạy, tối đa 10 job SMTP); cân nhắc timeout cho nodemailer; kiểm SIGTERM thật trên Linux và job kẹt `processing=true` sau SIGKILL.
+- [x] Đặt `TRUST_CF_CONNECTING_IP=true` cho staging và production (thiếu cờ → mọi khách chung bucket rate limit `unknown` → 1 kẻ spam chặn form lead toàn site).
+- [x] Nginx: chỉ allow dải IP Cloudflare + `deny all`; cổng app chỉ bind 127.0.0.1, không lộ trực tiếp.
+- [x] Nginx chuyển nguyên header `CF-Connecting-IP` (không ghi đè/không nhận từ client ngoài Cloudflare).
+- [ ] Đề xuất bật Cloudflare Authenticated Origin Pulls (mTLS) vì dải IP Cloudflare dùng chung mọi khách hàng — hỏi user. → chuyển AC `layer-6-task-01` (khối conf đã có, đang comment).
+- [ ] Smoke test: 2 IP khác nhau rơi vào 2 bucket khác nhau. → chuyển AC `layer-6-task-01` (cần Cloudflare thật).
+- [x] Từ review layer-1-task-07: đặt bắt buộc `APP_ENV=production` (prod) / `APP_ENV=staging` + `EMAIL_ALLOWLIST` (staging) cho cả service `app` và `jobs`; service `jobs` chạy `pnpm jobs` (image cần `payload` CLI + loader TS).
+- [x] Từ review layer-1-task-07 round 2: service `jobs` đặt `stop_grace_period: 60s` (worker chờ vòng đang chạy, tối đa 10 job SMTP); cân nhắc timeout cho nodemailer; kiểm SIGTERM thật trên Linux và job kẹt `processing=true` sau SIGKILL. — đã đặt `stop_grace_period: 60s`, SIGTERM êm đo trên Docker local; còn timeout nodemailer + job kẹt sau SIGKILL → kiểm ở `layer-6-task-01`.
