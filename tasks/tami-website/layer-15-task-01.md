@@ -128,3 +128,11 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Test admin bị khoá: chỉ chấp nhận 401 (PERMISSION §5).
 - [ ] `CvDownloadButton.tsx:21`: bỏ thuộc tính `download` (server đã gửi attachment) để lỗi 401/403/500 hiện ra thay vì lưu thành file.
 - [ ] Tài khoản bị khoá tạm (`lockUntil`) còn JWT cũ: cân nhắc chặn ở tầng xác thực chung (F1).
+
+## Follow-up từ review layer-6-task-06
+- [ ] `resolve-missing-page.ts:80-84`: cache đầy thì xoá cũ nhất thay vì xoá hết.
+- [ ] JSON-LD Article: không có ảnh bìa thì bỏ `image` (đang ra URL gốc site); thêm `author` = Organization publisher.
+- [ ] `ShareButtons.tsx:57`: kiểm link chia sẻ Zalo trên điện thoại thật; bỏ `title={title}`.
+- [ ] Trang danh mục và `?page≥2`: ảnh đầu tiên có priority (LCP).
+- [ ] hreflang ở `?page=n` không trỏ tới trang EN không tồn tại.
+- [ ] `?page` vượt quá → 301 về trang cuối hoặc 404 có nội dung (xử lý ở proxy).

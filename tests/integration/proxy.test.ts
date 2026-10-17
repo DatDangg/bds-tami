@@ -5,8 +5,14 @@ import proxy, { config } from "@/proxy";
 // Tra DB redirect có test riêng (content-redirects.test.ts); ở đây chỉ kiểm cách proxy dùng kết quả.
 const resolveRedirect = vi.hoisted(() => vi.fn<(pathname: string) => Promise<string | null>>());
 vi.mock("@/lib/content/resolve-redirect", () => ({ resolveRedirect }));
+// Kiểm tra trang tồn tại cũng có test riêng (resolve-missing-page.test.ts); ở đây chỉ kiểm cách proxy dùng kết quả.
+const resolveMissingPage = vi.hoisted(() => vi.fn<(pathname: string) => Promise<string | null>>());
+vi.mock("@/lib/content/resolve-missing-page", () => ({ resolveMissingPage }));
 
-beforeEach(() => resolveRedirect.mockReset().mockResolvedValue(null));
+beforeEach(() => {
+  resolveRedirect.mockReset().mockResolvedValue(null);
+  resolveMissingPage.mockReset().mockResolvedValue(null);
+});
 
 const call = (path: string, headers: Record<string, string> = {}) =>
   proxy(new NextRequest(`http://localhost:3000${path}`, { headers }));
@@ -113,5 +119,37 @@ describe("proxy redirect slug cũ (BR-05)", () => {
     const res = await call("/tin-tuc/bai-viet");
     expect(res.status).toBe(200);
     expect(rewriteTarget(res)).toContain("/vi/tin-tuc/bai-viet");
+  });
+});
+
+describe("proxy 404 SSR đầy đủ cho trang động không tồn tại (ARCHITECTURE §5.1)", () => {
+  it("trang không tồn tại → rewrite sang đường dẫn không route nào khớp, kèm ngôn ngữ cho global-not-found", async () => {
+    resolveMissingPage.mockResolvedValue("en");
+    const res = await call("/en/news/khong-co?utm=1");
+    expect(res.status).toBe(200);
+    const target = new URL(rewriteTarget(res)!);
+    expect(target.pathname).toBe("/__not-found__/missing");
+    expect(target.search).toBe("");
+    expect(res.headers.get("x-middleware-request-x-next-intl-locale")).toBe("en");
+    expect(resolveMissingPage).toHaveBeenCalledWith("/en/news/khong-co");
+  });
+
+  it("ngôn ngữ vi", async () => {
+    resolveMissingPage.mockResolvedValue("vi");
+    const res = await call("/tin-tuc/khong-co");
+    expect(rewriteTarget(res)).toContain("/__not-found__/missing");
+    expect(res.headers.get("x-middleware-request-x-next-intl-locale")).toBe("vi");
+  });
+
+  it("slug có redirect thì 301 trước, không kiểm tra tồn tại", async () => {
+    resolveRedirect.mockResolvedValue("/tin-tuc/moi");
+    resolveMissingPage.mockResolvedValue("vi");
+    expect((await call("/tin-tuc/cu")).status).toBe(301);
+    expect(resolveMissingPage).not.toHaveBeenCalled();
+  });
+
+  it("trang tồn tại / không kiểm tra được (null) → next-intl như thường", async () => {
+    const res = await call("/tin-tuc/co");
+    expect(rewriteTarget(res)).toContain("/vi/tin-tuc/co");
   });
 });

@@ -93,3 +93,6 @@ Mở khoá cho: `layer-10-task-01`
 
 ## Follow-up từ review layer-6-task-03
 - [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
+
+## Follow-up từ review layer-6-task-06
+- [ ] `RichText` (dùng chung): thêm `break-words`/`overflow-wrap:anywhere` ở gốc để URL dài không gây cuộn ngang ở 375; wrapper bảng cuộn có `role="region"` + `aria-label`; link nội bộ dạng `doc` render thành link thật (MINOR 6, 8, 9).

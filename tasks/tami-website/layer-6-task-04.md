@@ -95,3 +95,6 @@ Mở khoá cho: `layer-10-task-03`
 
 ## Quyết định user 2026-10-18
 - User cho phép commit ảnh mẫu nhẹ (giấy phép tự do hoặc placeholder tự tạo, tổng < 2 MB) vào `seed/sample/images/`; ghi nguồn/giấy phép ảnh trong `seed/sample/images/README.md`.
+
+## Ghi chú từ layer-6-task-06
+- Trang danh mục tin tức `/tin-tuc/danh-muc/[category]` (S05) đã làm ở L6-T06; task này chỉ làm danh mục dự án. Dùng lại `CategoryListTemplate`, `resolve-missing-page.ts` (404 có nội dung) và `RichText`.

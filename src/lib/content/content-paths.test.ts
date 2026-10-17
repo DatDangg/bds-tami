@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { CONTENT_ROUTES, type ContentRoute, contentPaths, internalPath } from "./content-paths";
+import { CONTENT_ROUTES, type ContentRoute, contentPaths, internalPath, publicPath } from "./content-paths";
 import { pathnames } from "../../i18n/routing";
 
 describe("internalPath", () => {
@@ -77,5 +77,21 @@ describe("contentPaths", () => {
   it("gộp slug cũ (đổi slug) và loại trùng", () => {
     const paths = contentPaths(route, { slugs: { vi: ["moi", "cu", "moi"], en: "b" }, featured: false });
     expect(paths).toEqual(["/vi/tin-tuc/moi", "/vi/tin-tuc/cu", "/en/tin-tuc/b", "/vi/tin-tuc", "/en/tin-tuc"]);
+  });
+});
+
+describe("publicPath", () => {
+  it("URL công khai: vi không tiền tố, en có /en và đường dẫn tiếng Anh", () => {
+    expect(publicPath("/tin-tuc", "vi")).toBe("/tin-tuc");
+    expect(publicPath("/tin-tuc", "en")).toBe("/en/news");
+    expect(publicPath("/", "vi")).toBe("/");
+    expect(publicPath("/", "en")).toBe("/en");
+    expect(publicPath("/tin-tuc/[slug]", "en", { slug: "new-post" })).toBe("/en/news/new-post");
+    expect(publicPath("/tin-tuc/danh-muc/[category]", "vi", { category: "thi-truong" })).toBe("/tin-tuc/danh-muc/thi-truong");
+    expect(publicPath("/tin-tuc/danh-muc/[category]", "en", { category: "market" })).toBe("/en/news/category/market");
+  });
+
+  it("mã hoá tham số để không thoát khỏi segment", () => {
+    expect(publicPath("/tin-tuc/[slug]", "vi", { slug: "a/b?c" })).toBe("/tin-tuc/a%2Fb%3Fc");
   });
 });

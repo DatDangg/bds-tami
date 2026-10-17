@@ -1,4 +1,4 @@
-import { type Locale, locales, pathnames } from "../../i18n/routing";
+import { defaultLocale, type Locale, locales, pathnames } from "../../i18n/routing";
 
 type PathnameKey = keyof typeof pathnames;
 
@@ -28,6 +28,9 @@ export const LEGAL_PAGE_ROUTES = {
 } as const satisfies Record<string, PathnameKey>;
 export type LegalPageKind = keyof typeof LEGAL_PAGE_ROUTES;
 
+/** Tham số động duy nhất của khoá (`[slug]`, `[category]`...); khoá nào cũng có tối đa một. */
+const DYNAMIC_SEGMENT = /\[[a-z]+\]/;
+
 /**
  * Đường dẫn NỘI BỘ của trang theo ngôn ngữ, đúng dạng khoá cache của Next: `/${locale}${khoá pathnames}`
  * (vd `/vi/du-an/x`, `/en/du-an/x`, trang chủ `/vi`, `/en`). Lý do: trang render dưới segment
@@ -36,7 +39,7 @@ export type LegalPageKind = keyof typeof LEGAL_PAGE_ROUTES;
  * truyền URL công khai thì không trúng mục cache nào. Khoá `pathnames` luôn là đường dẫn tiếng Việt, kể cả với `en`.
  */
 export function internalPath(key: PathnameKey, locale: Locale, slug?: string): string {
-  const path = slug === undefined ? key : key.replace("[slug]", encodeURIComponent(slug));
+  const path = slug === undefined ? key : key.replace(DYNAMIC_SEGMENT, encodeURIComponent(slug));
   return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }
 
@@ -64,4 +67,15 @@ export function contentPaths(route: ContentRoute, { slugs, featured }: ContentPa
     for (const locale of locales) paths.push(internalPath("/", locale));
   }
   return [...new Set(paths)];
+}
+
+/**
+ * URL CÔNG KHAI (thứ khách thấy: vi không tiền tố, en có `/en` và đường dẫn tiếng Anh) của một khoá `pathnames`, điền tham số
+ * động (`[slug]`, `[category]`...) đã encode. Khác `internalPath` (đường dẫn nội bộ dùng cho `revalidatePath`).
+ */
+export function publicPath(key: PathnameKey, locale: Locale, params: Record<string, string> = {}): string {
+  let path: string = pathnames[key][locale];
+  for (const [name, value] of Object.entries(params)) path = path.replace(`[${name}]`, encodeURIComponent(value));
+  if (locale === defaultLocale) return path;
+  return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }

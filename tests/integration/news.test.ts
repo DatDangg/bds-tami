@@ -215,6 +215,197 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
     });
   });
 
+  describe("danh mục ở thùng rác (review L5-T03 MINOR-3)", () => {
+    const messagesOf = async (promise: Promise<unknown>): Promise<string[]> => {
+      try {
+        await promise;
+      } catch (error) {
+        const data = (error as { data?: { errors?: { message: string }[] } }).data;
+        return data?.errors?.map((entry) => entry.message) ?? [(error as Error).message];
+      }
+      return [];
+    };
+    const trashCategory = (id: string) =>
+      payload.update({ collection: "categories", id, data: { deletedAt: NOW() }, user: asUser(admin), overrideAccess: false });
+
+    it("gán tin cho danh mục đã ở thùng rác bị chặn với thông báo rõ (scoped-category.ts nhánh deletedAt)", async () => {
+      const category = await createCategory("Sẽ vào thùng rác", "news");
+      await trashCategory(category.id);
+      const messages = await messagesOf(createNews({ title: "Vào danh mục rác", category: category.id }));
+      expect(messages.join(" ")).toMatch(/thùng rác/);
+      expect(await statusOf(createNews({ title: "Vào danh mục rác 2", category: category.id }))).toBe(400);
+    });
+
+    it("quyết định UX: danh mục còn tin (kể cả tin ở thùng rác) không xoá mềm được (409), nên khôi phục tin luôn thấy danh mục còn sống", async () => {
+      const category = await createCategory("Chỉ còn tin rác", "news");
+      const doc = await createNews({ title: "Tin sẽ vào thùng rác", category: category.id });
+      await updateNews(doc.id, { deletedAt: NOW() });
+      expect(await statusOf(trashCategory(category.id))).toBe(409);
+      const restored = await updateNews(doc.id, { deletedAt: null }, { as: admin, trash: true });
+      expect(restored.deletedAt ?? null).toBeNull();
+      expect(restored.category).toBe(category.id);
+    });
+  });
+
+  describe("làm mới cache khi sửa danh mục (spec-validation layer 4, G13)", () => {
+    it("đổi tên / đổi slug danh mục news làm mới /tin-tuc và trang danh mục (slug cũ + mới, vi + en)", async () => {
+      const category = await createCategory("Danh mục làm mới", "news");
+      revalidatedPaths.length = 0;
+      await payload.update({ collection: "categories", id: category.id, data: { name: "Danh mục đã đổi tên", slug: "slug-moi" } as never, locale: "vi", user: asUser(admin), overrideAccess: false });
+      const flat = revalidatedPaths.flat();
+      expect(flat).toEqual(expect.arrayContaining(["/vi/tin-tuc", "/en/tin-tuc", "/vi/tin-tuc/danh-muc/slug-moi", "/vi/tin-tuc/danh-muc/danh-muc-lam-moi"]));
+    });
+
+    it("danh mục scope khác (rental) làm mới danh sách cho thuê, không đụng /tin-tuc", async () => {
+      const category = await createCategory("Cho thuê làm mới", "rental");
+      expect(revalidatedPaths.flat()).toEqual(expect.arrayContaining(["/vi/cho-thue", "/en/cho-thue"]));
+      expect(revalidatedPaths.flat()).not.toContain("/vi/tin-tuc");
+      expect(category.id).toBeTruthy();
+    });
+
+    it("xoá mềm danh mục (không còn tin) cũng làm mới", async () => {
+      const category = await createCategory("Sắp xoá", "news");
+      revalidatedPaths.length = 0;
+      await payload.update({ collection: "categories", id: category.id, data: { deletedAt: NOW() }, user: asUser(admin), overrideAccess: false });
+      expect(revalidatedPaths.flat()).toEqual(expect.arrayContaining(["/vi/tin-tuc", "/vi/tin-tuc/danh-muc/sap-xoa"]));
+    });
+  });
+
+  describe("trang tin tức công khai (layer-6-task-06)", () => {
+    const publish = (title: string, data: Record<string, unknown> = {}) =>
+      createNews({ title, status: "published", cover: mediaId, content: lexical(`Nội dung ${title}`), ...data });
+    const setPublishedAt = (id: string, iso: string) =>
+      withDatabase((client) => client.query(`UPDATE "news" SET published_at = $1 WHERE id = $2`, [iso, id]));
+    const makeEnglish = (id: string, title: string) =>
+      payload.update({
+        collection: "news",
+        id,
+        data: { title, excerpt: "Summary", content: lexical(`Body ${title}`), hasEnglish: true } as never,
+        locale: "en",
+        overrideAccess: true,
+      });
+    let newsQueries: typeof import("../../src/lib/news/news-queries");
+    let listing: typeof import("../../src/lib/news/news-listing");
+
+    beforeAll(async () => {
+      newsQueries = await import("../../src/lib/news/news-queries");
+      listing = await import("../../src/lib/news/news-listing");
+    });
+
+    it("bài liên quan: cùng danh mục, loại bài hiện tại, tối đa 3, mới nhất trước, chỉ bài công khai", async () => {
+      const category = await createCategory("Liên quan A", "news");
+      const other = await createCategory("Liên quan B", "news");
+      const current = await publish("Bài đang xem", { category: category.id });
+      const ids: string[] = [];
+      for (const [index, title] of ["Liên quan 1", "Liên quan 2", "Liên quan 3", "Liên quan 4"].entries()) {
+        const doc = await publish(title, { category: category.id });
+        await setPublishedAt(doc.id, `2026-01-0${index + 1}T00:00:00.000Z`);
+        ids.push(doc.id);
+      }
+      await publish("Khác danh mục", { category: other.id });
+      await createNews({ title: "Nháp cùng danh mục", category: category.id });
+      const hidden = await publish("Ẩn cùng danh mục", { category: category.id });
+      await updateNews(hidden.id, { status: "hidden" });
+      const gone = await publish("Xoá cùng danh mục", { category: category.id });
+      await updateNews(gone.id, { deletedAt: NOW() });
+
+      const related = await newsQueries.findRelatedNews(payload, "vi", { id: current.id, category: category.id });
+      expect(related).toHaveLength(3);
+      expect(related.map((doc) => doc.title)).toEqual(["Liên quan 4", "Liên quan 3", "Liên quan 2"]);
+      expect(related.map((doc) => doc.id)).not.toContain(current.id);
+    });
+
+    it("bài liên quan nhận cả category đã populate; không có category → rỗng", async () => {
+      const category = await createCategory("Liên quan C", "news");
+      const current = await publish("Bài C1", { category: category.id });
+      await publish("Bài C2", { category: category.id });
+      const populated = (await payload.findByID({ collection: "news", id: current.id, depth: 1, overrideAccess: true })) as never as Parameters<typeof newsQueries.findRelatedNews>[2];
+      expect(await newsQueries.findRelatedNews(payload, "vi", populated)).toHaveLength(1);
+      expect(await newsQueries.findRelatedNews(payload, "vi", { id: current.id, category: null })).toEqual([]);
+    });
+
+    it("/en: bài liên quan chỉ gồm bài đã có bản EN", async () => {
+      const category = await createCategory("Liên quan D", "news");
+      const current = await publish("Bài D1", { category: category.id });
+      const withEnglish = await publish("Bài D2", { category: category.id });
+      await publish("Bài D3 chưa dịch", { category: category.id });
+      await makeEnglish(current.id, "Article D1");
+      await makeEnglish(withEnglish.id, "Article D2");
+      const related = await newsQueries.findRelatedNews(payload, "en", { id: current.id, category: category.id });
+      expect(related.map((doc) => doc.title)).toEqual(["Article D2"]);
+    });
+
+    it("trang danh mục: lọc theo danh mục + con, 12 bài/trang, phân trang không trùng", async () => {
+      const parent = await createCategory("Mục cha", "news");
+      const child = await payload.create({ collection: "categories", data: { name: "Mục con", scope: "news", parent: parent.id } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      for (let index = 1; index <= 13; index += 1) await publish(`Tin mục cha ${index}`, { category: parent.id });
+      await publish("Tin mục con", { category: child.id });
+      await publish("Tin ngoài mục", { category: categoryId });
+
+      const parentOnly = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id] });
+      expect(parentOnly.items).toHaveLength(12);
+      expect(parentOnly.featured).toEqual([]);
+      const withChildren = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
+      const page2 = await listing.loadNewsListing(payload, "vi", { page: 2, categoryIds: [parent.id, child.id] });
+      expect(withChildren.totalPages).toBe(2);
+      expect(page2.items).toHaveLength(2);
+      const titles = [...withChildren.items, ...page2.items].map((item) => item.title);
+      expect(new Set(titles).size).toBe(14);
+      expect(titles).toContain("Tin mục con");
+      expect(titles).not.toContain("Tin ngoài mục");
+      const beyond = await listing.loadNewsListing(payload, "vi", { page: 3, categoryIds: [parent.id, child.id] });
+      expect(beyond.outOfRange).toBe(true);
+      const emptyCategory = await createCategory("Mục trống", "news");
+      const empty = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [emptyCategory.id] });
+      expect(empty).toMatchObject({ isEmpty: true, outOfRange: false, items: [], featured: [] });
+    });
+
+    it("/tin-tuc trang 1: 4 bài nổi bật + lưới 12 bài; trang 2 không lặp bài nổi bật; đủ mọi bài, không trùng", async () => {
+      const loadAll = async () => {
+        const first = await listing.loadNewsListing(payload, "vi", { page: 1 });
+        const seen = [...first.featured, ...first.items];
+        for (let page = 2; page <= first.totalPages; page += 1) seen.push(...(await listing.loadNewsListing(payload, "vi", { page })).items);
+        return { first, seen };
+      };
+      const { first, seen } = await loadAll();
+      expect(first.featured).toHaveLength(4);
+      expect(first.items.length).toBeLessThanOrEqual(12);
+      expect(new Set(seen.map((card) => card.id)).size).toBe(seen.length);
+      const total = (await publicQueries.findPublicList(payload, "news", "vi", { limit: 50 })).totalDocs;
+      expect(seen).toHaveLength(total);
+      const page2 = await listing.loadNewsListing(payload, "vi", { page: 2 });
+      expect(page2.featured).toEqual([]);
+      expect(page2.items.map((card) => card.id)).not.toEqual(expect.arrayContaining(first.featured.map((card) => card.id)));
+    });
+
+    it("/en: lưới và danh mục chỉ gồm nội dung đã có bản EN", async () => {
+      const category = await createCategory("Chỉ vi", "news");
+      expect((await listing.buildNewsChips(payload, "en", "All", null)).map((chip) => chip.label)).not.toContain("Chỉ vi");
+      expect(await listing.loadNewsCategoryContext(payload, "en", "chi-vi")).toBeNull();
+      expect(await listing.loadNewsCategoryContext(payload, "vi", "chi-vi")).not.toBeNull();
+      expect(category.id).toBeTruthy();
+    });
+
+    it("chip: /tin-tuc = Tất cả (current) + danh mục cấp 1; trang danh mục cha có con = Tất cả + con", async () => {
+      const parent = await createCategory("Chip cha", "news");
+      await payload.create({ collection: "categories", data: { name: "Chip con", scope: "news", parent: parent.id } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      const all = await listing.buildNewsChips(payload, "vi", "Tất cả", null);
+      expect(all[0]).toMatchObject({ label: "Tất cả", href: "/tin-tuc", current: true });
+      expect(all.find((chip) => chip.label === "Chip cha")).toMatchObject({ href: "/tin-tuc/danh-muc/chip-cha" });
+      expect(all.filter((chip) => chip.current)).toHaveLength(1);
+      expect(all.map((chip) => chip.label)).not.toContain("Chip con");
+
+      const context = await listing.loadNewsCategoryContext(payload, "vi", "chip-cha");
+      const chips = await listing.buildNewsChips(payload, "vi", "Tất cả", context);
+      expect(chips.map((chip) => chip.label)).toEqual(["Tất cả", "Chip con"]);
+      expect(chips[0]).toMatchObject({ href: "/tin-tuc/danh-muc/chip-cha", current: true });
+      const childContext = await listing.loadNewsCategoryContext(payload, "vi", "chip-con");
+      expect(childContext?.parent?.name).toBe("Chip cha");
+      const childChips = await listing.buildNewsChips(payload, "vi", "Tất cả", childContext);
+      expect(childChips.filter((chip) => chip.current).map((chip) => chip.label)).toEqual(["Chip con"]);
+    });
+  });
+
   describe("trường bắt buộc", () => {
     it("title, excerpt, content bắt buộc ở bản vi khi tạo; slug sinh từ tiêu đề", async () => {
       expect(await statusOf(createNews({ title: "" }))).toBe(400);

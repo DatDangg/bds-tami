@@ -2,14 +2,27 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { logger } from "./lib/logger";
+import { resolveMissingPage } from "./lib/content/resolve-missing-page";
 import { resolveRedirect } from "./lib/content/resolve-redirect";
 
 const handleI18nRouting = createMiddleware(routing);
 
+/** Đường dẫn không route nào khớp: Next dựng 404 SSR đầy đủ (`app/global-not-found.tsx`) thay vì shell rỗng của `notFound()` trong page. */
+const NOT_FOUND_REWRITE_PATH = "/__not-found__/missing";
+/** Header next-intl đọc ngôn ngữ (`getLocale()` trong `global-not-found`); next-intl middleware tự đặt, ở đây ta bỏ qua nó nên đặt lại. */
+const LOCALE_HEADER = "x-next-intl-locale";
+
+function rewriteToNotFound(request: NextRequest, locale: string) {
+  const headers = new Headers(request.headers);
+  headers.set(LOCALE_HEADER, locale);
+  return NextResponse.rewrite(new URL(NOT_FOUND_REWRITE_PATH, request.nextUrl), { request: { headers } });
+}
+
 /**
  * 1) Slug cũ của nội dung đã đổi slug → 301 tới URL mới cùng ngôn ngữ (BR-05); tra TRƯỚC next-intl vì `from` là URL công khai
- *    (`/tin-tuc/cu`, `/en/news/old`). 2) next-intl trả 307 khi chuẩn hoá URL (vd `/vi/du-an` → `/du-an`); đây là chuyển hướng
- *    vĩnh viễn nên đổi sang 301.
+ *    (`/tin-tuc/cu`, `/en/news/old`). 2) Trang động (tin tức...) không tồn tại / chưa công khai / thiếu bản EN → rewrite sang 404 SSR
+ *    đầy đủ (`resolveMissingPage`: `notFound()` trong page chỉ cho shell rỗng ở HTML server). 3) next-intl trả 307 khi chuẩn hoá URL
+ *    (vd `/vi/du-an` → `/du-an`); đây là chuyển hướng vĩnh viễn nên đổi sang 301.
  */
 export default async function proxy(request: NextRequest) {
   const target = await resolveRedirect(request.nextUrl.pathname);
@@ -23,6 +36,8 @@ export default async function proxy(request: NextRequest) {
     }
     logger.warn({ target, pathname: request.nextUrl.pathname }, "Bỏ qua redirect trỏ ra ngoài origin");
   }
+  const missingLocale = await resolveMissingPage(request.nextUrl.pathname);
+  if (missingLocale) return rewriteToNotFound(request, missingLocale);
   const response = handleI18nRouting(request);
   if (response.status !== 307) return response;
   return new NextResponse(null, { status: 301, headers: response.headers });

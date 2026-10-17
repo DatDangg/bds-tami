@@ -188,6 +188,25 @@
       "retry": "Try again",
       "backHome": "Back to home",
       "errorCode": "Error code: {digest}"
+    },
+    "news": {
+      "title": "News",
+      "description": "Property market news, activities and announcements from TAMI.",
+      "tabsLabel": "News categories",
+      "all": "All",
+      "readTime": "{minutes} min read",
+      "moreNews": "More news",
+      "featuredLabel": "Featured news",
+      "relatedTitle": "Related articles",
+      "tagsLabel": "Tags",
+      "share": {
+        "label": "Share this article",
+        "facebook": "Share on Facebook",
+        "zalo": "Share via Zalo",
+        "copy": "Copy link",
+        "copied": "Link copied",
+        "copyFailed": "Could not copy"
+      }
     }
   }
 }

@@ -188,6 +188,25 @@
       "retry": "Thử lại",
       "backHome": "Về trang chủ",
       "errorCode": "Mã lỗi: {digest}"
+    },
+    "news": {
+      "title": "Tin tức",
+      "description": "Tin tức thị trường, hoạt động và thông báo từ TAMI.",
+      "tabsLabel": "Danh mục tin tức",
+      "all": "Tất cả",
+      "readTime": "{minutes} phút đọc",
+      "moreNews": "Tin khác",
+      "featuredLabel": "Tin nổi bật",
+      "relatedTitle": "Bài liên quan",
+      "tagsLabel": "Từ khoá",
+      "share": {
+        "label": "Chia sẻ bài viết",
+        "facebook": "Chia sẻ lên Facebook",
+        "zalo": "Chia sẻ qua Zalo",
+        "copy": "Sao chép liên kết",
+        "copied": "Đã sao chép liên kết",
+        "copyFailed": "Không sao chép được"
+      }
     }
   }
 }
