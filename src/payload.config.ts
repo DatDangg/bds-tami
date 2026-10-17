@@ -15,6 +15,7 @@ import { TranslationUsage } from "./collections/TranslationUsage";
 import { Developers } from "./collections/Developers";
 import { Provinces } from "./collections/Provinces";
 import { Wards } from "./collections/Wards";
+import { contentRedirectsPlugin } from "./collections/redirects-plugin";
 import { JobApplications } from "./collections/JobApplications";
 import { JobPostings } from "./collections/JobPostings";
 import { Media } from "./collections/Media";
@@ -82,7 +83,8 @@ export default buildConfig({
     fallback: false,
   },
   db: postgresAdapter({
-    pool: { connectionString: env.DATABASE_URL },
+    // connectionTimeoutMillis: pg mặc định 0 = chờ vô hạn; hết kết nối thì lỗi sau 5s thay vì treo (proxy tra redirect ở mọi trang chi tiết).
+    pool: { connectionString: env.DATABASE_URL, connectionTimeoutMillis: 5000 },
     idType: "uuid",
     // Schema chỉ đổi qua migration versioned; cấm push ở mọi môi trường.
     push: false,
@@ -96,6 +98,7 @@ export default buildConfig({
   // Trần 20MB (PDF lớn nhất); busboy cắt và trả 413. Giới hạn theo loại file do `createUploadGuard` kiểm.
   upload: { limits: { fileSize: MAX_UPLOAD_BYTES } },
   plugins: [
+    contentRedirectsPlugin(),
     s3Storage({
       bucket: env.S3_BUCKET_PUBLIC,
       config: s3ClientConfig,

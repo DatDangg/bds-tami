@@ -84,6 +84,7 @@ export interface Config {
     projects: Project;
     'job-postings': JobPosting;
     'job-applications': JobApplication;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -109,6 +110,7 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
     'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -924,6 +926,18 @@ export interface JobApplication {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: string;
+  from: string;
+  to: string;
+  type: '301';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1114,6 +1128,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'job-applications';
         value: string | JobApplication;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: string | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1676,6 +1694,17 @@ export interface JobApplicationsSelect<T extends boolean = true> {
   note?: T;
   ipHash?: T;
   anonymizedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
   updatedAt?: T;
   createdAt?: T;
 }

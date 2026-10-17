@@ -10,6 +10,7 @@ import { slugField } from "../../fields/slug";
 import { CONTENT_STATUSES, type ContentStatus, statusField } from "../../fields/status";
 import { translationFields } from "../../fields/translation";
 import { auditContentPurge, auditContentTrash } from "../../hooks/audit-content-delete";
+import { createSlugRedirect } from "../../hooks/create-slug-redirect";
 import { guardTrashedEdit } from "../../hooks/guard-trashed-edit";
 import { requireEnglishFields } from "../../hooks/require-english-fields";
 import { createRevalidateContent, type RevalidatePaths } from "../../hooks/revalidate-content";
@@ -131,6 +132,7 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
   const route = options.route === undefined ? (CONTENT_ROUTES as Record<string, ContentRoute | undefined>)[slug] : options.route;
   if (route === undefined) throw new Error(`Thiếu trang công khai (route) cho collection nội dung "${slug}".`);
   const publicStatuses = options.publicStatuses ?? PUBLIC_STATUSES.default;
+  const hasSlug = !(options.omit?.includes("slug") ?? false);
   const revalidate = route ? createRevalidateContent({ route, publicStatuses, revalidate: options.revalidate }) : undefined;
 
   return {
@@ -151,7 +153,12 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
         requireEnglishFields(options.englishRequiredFields ?? ["title", "slug"]),
         ...(collection.hooks?.beforeValidate ?? []),
       ],
-      afterChange: [auditContentTrash, ...(revalidate ? [revalidate.afterChange] : []), ...(collection.hooks?.afterChange ?? [])],
+      afterChange: [
+        auditContentTrash,
+        ...(revalidate ? [revalidate.afterChange] : []),
+        ...(route && hasSlug ? [createSlugRedirect({ route, publicStatuses })] : []),
+        ...(collection.hooks?.afterChange ?? []),
+      ],
       afterDelete: [auditContentPurge, ...(revalidate ? [revalidate.afterDelete] : []), ...(collection.hooks?.afterDelete ?? [])],
     },
     fields: [...collection.fields, ...resolveSharedFields(options, collection.slug)],

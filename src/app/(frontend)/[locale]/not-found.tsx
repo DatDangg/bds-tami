@@ -11,8 +11,10 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 const QUICK_LINKS = ["projects", "news", "contact"] as const;
 
 /**
- * 404 theo ngôn ngữ đang xem (design-spec S17): nằm trong nhánh `[locale]` nên giữ header/footer và đúng `/` hay `/en`.
- * Next tự trả status 404. Dòng "có bản tiếng Việt" ở EN chưa làm: chưa có cách xác định bản VI tương ứng từ đây.
+ * Nội dung 404 theo ngôn ngữ đang xem (design-spec S17), giữ header/footer và đúng `/` hay `/en`. Là default export của
+ * `[locale]/not-found` (client-render khi một trang con gọi `notFound()`) và được `app/global-not-found.tsx` dùng lại để HTML server có
+ * đủ nội dung cho URL không khớp route nào (không còn catch-all `[...rest]`: `notFound()` trong trang chỉ cho shell rỗng ở HTML server).
+ * Dòng "có bản tiếng Việt" ở EN chưa làm: chưa có cách xác định bản VI tương ứng từ đây.
  */
 export default function NotFoundPage() {
   const t = useTranslations("page.notFound");

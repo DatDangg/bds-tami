@@ -9,6 +9,7 @@ import { Media } from "../../../src/collections/Media";
 import { createPages } from "../../../src/collections/Pages";
 import { createServices } from "../../../src/collections/Services";
 import { Staff } from "../../../src/collections/Staff";
+import { contentRedirectsPlugin } from "../../../src/collections/redirects-plugin";
 import { createSiteSettings } from "../../../src/globals/SiteSettings";
 import type { RevalidatePaths } from "../../../src/hooks/revalidate-content";
 import type { RevalidateTags } from "../../../src/hooks/revalidate-global";
@@ -21,6 +22,7 @@ export function buildServicesPagesTestConfig(databaseUrl: string, revalidatePath
   return buildConfig({
     secret: "test-services-pages-secret-khong-dung-o-production",
     collections: [Staff, Media, AuditLogs, Developers, createServices(revalidatePaths), createPages(revalidatePaths)],
+    plugins: [contentRedirectsPlugin()],
     globals: [createSiteSettings(revalidateTags)],
     editor: lexicalEditor(),
     sharp,

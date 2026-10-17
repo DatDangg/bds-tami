@@ -76,10 +76,10 @@ describe("withContentDefaults: omit (G7)", () => {
     expect(fieldNames(config)).not.toContain("status");
   });
 
-  it("route: null bỏ hook làm mới cache, vẫn giữ hook audit", () => {
+  it("route: null bỏ hook làm mới cache + redirect slug, vẫn giữ hook audit", () => {
     const withRoute = withContentDefaults(base);
     const withoutRoute = withContentDefaults(base, { route: null });
-    expect(withRoute.hooks?.afterChange).toHaveLength(2);
+    expect(withRoute.hooks?.afterChange).toHaveLength(3);
     expect(withoutRoute.hooks?.afterChange).toHaveLength(1);
     expect(withoutRoute.hooks?.afterDelete).toHaveLength(1);
   });

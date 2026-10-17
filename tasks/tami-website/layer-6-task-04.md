@@ -92,3 +92,6 @@ Mở khoá cho: `layer-10-task-03`
 
 ## Follow-up từ review layer-5-task-01
 - [ ] Dữ liệu mẫu dự án đang là 2 bản draft không ảnh (`seed/sample/projects.ts`): trước khi dựng trang danh sách/staging, seed mẫu phải có ảnh và `published` — commit vài ảnh nhẹ trong `seed/sample/images/` (không cần mạng; upload qua Payload Local API vào S3/SeaweedFS) thay vì tải picsum lúc seed.
+
+## Quyết định user 2026-10-18
+- User cho phép commit ảnh mẫu nhẹ (giấy phép tự do hoặc placeholder tự tạo, tổng < 2 MB) vào `seed/sample/images/`; ghi nguồn/giấy phép ảnh trong `seed/sample/images/README.md`.

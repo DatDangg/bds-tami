@@ -97,3 +97,6 @@ Mở khoá cho: `layer-10-task-01`
 ## Follow-up từ review layer-5-task-06
 - FloatingContact chưa nhận `refCollection`/`refId` (design-spec §2.5): trang chi tiết cần truyền để click-stats tính theo tin/dự án (`src/components/layout/FloatingContact.tsx`, endpoint đã nhận enum `CLICK_REF_COLLECTIONS`).
 - Nếu trang có thanh cố định đáy (giá/CTA trên mobile): đặt `--floating-bottom-offset` để nút nổi không bị đè.
+
+## Follow-up từ review layer-6-task-03
+- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.

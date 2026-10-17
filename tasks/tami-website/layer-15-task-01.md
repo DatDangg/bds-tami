@@ -106,3 +106,9 @@ Mở khoá cho: `layer-16-task-01`
 
 ## Follow-up từ review layer-5-task-01
 - [ ] FK `NOT NULL` + `ON DELETE set null` (vd `projects.province_id`, `author_id`, `floor_plans.image_id`): xoá tỉnh/nhân viên/media đang được tham chiếu trả 500 → thêm `beforeDelete` trả 409 rõ ràng (mẫu `Provinces.beforeDelete`).
+
+## Follow-up từ review layer-6-task-03
+- [ ] Xoá cứng/vào thùng rác nội dung → dọn `redirects` trỏ tới đường dẫn của nó (m3).
+- [ ] Test ghi redirect song song cùng một tài liệu sang 2 slug (khoá advisory thật sự được kiểm, r2-m1).
+- [ ] `resolve-redirect.ts`: đưa bước khởi động Payload vào cùng cuộc đua timeout 400 ms (r2-m2).
+- [ ] `proxy.ts:18`: giữ query của đích redirect nếu có (r2-m4).

@@ -1,11 +1,9 @@
-import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { loadShell } from "@/components/layout/load-shell";
-import { PublicShell } from "@/components/layout/PublicShell";
-import { ebGaramond, montserrat } from "@/lib/fonts";
+import { PublicDocument } from "@/components/layout/PublicDocument";
 import { routing } from "@/i18n/routing";
 import { getSiteUrl, isIndexingAllowed } from "@/lib/seo/site-url";
 import "../globals.css";
@@ -43,14 +41,5 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const shell = await loadShell(locale);
-  return (
-    <html lang={locale} className={`${ebGaramond.variable} ${montserrat.variable}`}>
-      <body>
-        <NextIntlClientProvider>
-          <PublicShell shell={shell}>{children}</PublicShell>
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  );
+  return <PublicDocument locale={locale}>{children}</PublicDocument>;
 }

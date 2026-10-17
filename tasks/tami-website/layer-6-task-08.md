@@ -95,3 +95,9 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 
 ## Follow-up từ review layer-5-task-04
 - [ ] Danh sách tuyển dụng lọc `deadline >= hôm nay` (access chưa lọc); trang chi tiết tin hết hạn vẫn mở, hiện trạng thái "Hết hạn" + noindex, follow (DESIGN.md:305).
+
+## Quyết định user 2026-10-18
+- [ ] G25: `job-postings.category` chuyển thành tuỳ chọn (đúng ERD §4.10); cập nhật test + migration nếu đổi NOT NULL.
+
+## Follow-up từ review layer-6-task-03
+- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.

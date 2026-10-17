@@ -20,6 +20,9 @@ importers:
       '@payloadcms/next':
         specifier: 3.91.0
         version: 3.91.0(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.57.0)(next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      '@payloadcms/plugin-redirects':
+        specifier: 3.91.0
+        version: 3.91.0(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))
       '@payloadcms/richtext-lexical':
         specifier: 3.91.0
         version: 3.91.0(@faceless-ui/modal@3.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@payloadcms/next@3.91.0(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.57.0)(next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(@types/react@19.3.0)(monaco-editor@0.57.0)(next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)(yjs@13.6.33)
@@ -1700,6 +1703,11 @@ packages:
       payload: 3.91.0
       react: ^19.0.1 || ^19.1.2 || ^19.2.1
       react-dom: ^19.0.1 || ^19.1.2 || ^19.2.1
+
+  '@payloadcms/plugin-redirects@3.91.0':
+    resolution: {integrity: sha512-Wk3tNOrxb5Yr6DFAHDl2gd0DT828II6ZGhBubJWJpb/LZxn2jOCfAKf/2slT8BSsdwsDf9zUAStKy3QMGMlBIQ==}
+    peerDependencies:
+      payload: 3.91.0
 
   '@payloadcms/richtext-lexical@3.91.0':
     resolution: {integrity: sha512-Seu+NKAxU1bLI/QFMKqcaBAC0BZFc6/WVy11vRHqaofdbvac6Mo2oIoO8aYq5z4xVQ/KeUle8XnU42KxdCn8dA==}
@@ -7853,6 +7861,11 @@ snapshots:
       - next
       - supports-color
       - typescript
+
+  '@payloadcms/plugin-redirects@3.91.0(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))':
+    dependencies:
+      '@payloadcms/translations': 3.91.0
+      payload: 3.91.0(graphql@16.14.2)(typescript@5.9.3)
 
   '@payloadcms/richtext-lexical@3.91.0(@faceless-ui/modal@3.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@payloadcms/next@3.91.0(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.57.0)(next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(@types/react@19.3.0)(monaco-editor@0.57.0)(next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.91.0(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)(yjs@13.6.33)':
     dependencies:

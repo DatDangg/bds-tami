@@ -184,7 +184,7 @@ Không có webhook ra ngoài ở giai đoạn 1.
 | Lead mới / gộp | endpoint 3.1 | Job `send-notification-email` |
 | Lead được giao / giao lại (`assignedTo` đổi, từ endpoint `/assign`, form admin hoặc tự giao BR-12) | hook `leads.afterChange` (nơi **duy nhất**) | Activity `assignment` + job email + audit log `lead.assign` (trừ tự giao) |
 | Hồ sơ ứng tuyển mới | endpoint 3.2 | Job email cho `notificationEmails` |
-| Đổi slug nội dung đã xuất bản | hook `beforeChange` | Tạo redirect 301 cho ngôn ngữ có slug đổi |
+| Đổi slug nội dung đã xuất bản | hook `afterChange` (`create-slug-redirect`) | Tạo/cập nhật redirect 301 cho ngôn ngữ có slug đổi; `proxy.ts` trả 301 cho URL cũ |
 | Lưu bản `vi` đang xuất bản / lưu global | hook `afterChange` | Job `translate-content` (dịch trường đã đổi sang `en`, BRD BR-08) |
 | Nhân viên sửa trường `en` | hook `beforeChange` | `translation.enSource = manual` |
 

@@ -10,6 +10,7 @@ import { Media } from "../../../src/collections/Media";
 import { createProjects } from "../../../src/collections/Projects";
 import { Provinces } from "../../../src/collections/Provinces";
 import { Staff } from "../../../src/collections/Staff";
+import { contentRedirectsPlugin } from "../../../src/collections/redirects-plugin";
 import { Wards } from "../../../src/collections/Wards";
 import type { RevalidatePaths } from "../../../src/hooks/revalidate-content";
 
@@ -18,6 +19,7 @@ export function buildProjectsTestConfig(databaseUrl: string, revalidatePaths: Re
   return buildConfig({
     secret: "test-projects-secret-khong-dung-o-production",
     collections: [Staff, Media, AuditLogs, Categories, Developers, Provinces, Wards, createProjects(revalidatePaths)],
+    plugins: [contentRedirectsPlugin()],
     editor: lexicalEditor(),
     sharp,
     localization: { locales: ["vi", "en"], defaultLocale: "vi", fallback: false },

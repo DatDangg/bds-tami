@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 5,
+  "currentLayer": 6,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -257,6 +257,13 @@
       "round": 3,
       "report": ".context/review-reports/build-tami-website-layer-5-task-04-round-3-review.md",
       "completedAt": "2026-10-18T00:15:00.000Z"
+    },
+    {
+      "task": "layer-6/task-03",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-6-task-03-round-2-review.md",
+      "completedAt": "2026-10-18T02:00:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -338,9 +345,29 @@
       "date": "2026-10-17T21:40:00.000Z",
       "decision": "Ghi đè tên xlsx \"Phường Đào Duy Tư\" (Thanh Hóa, mã 40153016) thành \"Phường Đào Duy Từ\" (lỗi gõ của xlsx; CSV + danh nhân)",
       "reason": "User chọn Đào Duy Từ"
+    },
+    {
+      "date": "2026-10-18T00:45:00.000Z",
+      "decision": "BL-003: ngoại lệ được duyệt — sửa riêng phần down (IF EXISTS) của 8 migration Payload sinh, giữ nguyên up + snapshot, commit riêng, thử trên DB trống; làm sau L6-T03",
+      "reason": "User chọn Sửa down ngay"
+    },
+    {
+      "date": "2026-10-18T00:45:00.000Z",
+      "decision": "Cho commit ảnh mẫu nhẹ (giấy phép tự do/placeholder tự tạo, < 2 MB tổng) vào seed/sample/images/ để dữ liệu mẫu xuất bản được (L6-T04)",
+      "reason": "User đồng ý"
+    },
+    {
+      "date": "2026-10-18T00:45:00.000Z",
+      "decision": "G25: job-postings.category tuỳ chọn theo ERD — sửa code ở L6-T08",
+      "reason": "User chọn theo ERD"
+    },
+    {
+      "date": "2026-10-18T00:45:00.000Z",
+      "decision": "L6-T01 deploy staging làm cuối layer 6 (sau các trang); hỏi hạ tầng lúc đó",
+      "reason": "User chọn sau khi xong các trang"
     }
   ],
-  "lastUpdated": "2026-10-18T00:35:00.000Z",
+  "lastUpdated": "2026-10-18T02:00:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

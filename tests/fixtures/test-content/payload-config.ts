@@ -6,6 +6,7 @@ import sharp from "sharp";
 import { AuditLogs } from "../../../src/collections/AuditLogs";
 import { Media } from "../../../src/collections/Media";
 import { Staff } from "../../../src/collections/Staff";
+import { contentRedirectsPlugin } from "../../../src/collections/redirects-plugin";
 import { TestContent } from "./collection";
 
 /**
@@ -17,6 +18,7 @@ export function buildTestContentConfig(databaseUrl: string) {
   return buildConfig({
     secret: "test-content-secret-khong-dung-o-production",
     collections: [Staff, Media, AuditLogs, TestContent],
+    plugins: [contentRedirectsPlugin()],
     editor: lexicalEditor(),
     sharp,
     localization: { locales: ["vi", "en"], defaultLocale: "vi", fallback: false },

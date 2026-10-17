@@ -96,3 +96,6 @@ Mở khoá cho: `layer-10-task-03`
 
 ## Follow-up từ spec-validation layer 5
 - [ ] G18 (L5-T06 MINOR-5): test riêng cho `src/components/templates/CategoryListTemplate.tsx` (consumer chạy được đầu tiên; L6-T04 đang bị chặn): chips danh mục có `aria-current` đúng mục đang chọn; danh sách trống → `EmptyState` với link `parentListHref`; ẩn phân trang khi trống.
+
+## Follow-up từ review layer-6-task-03
+- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.

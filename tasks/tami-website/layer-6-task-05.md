@@ -103,3 +103,6 @@ Mở khoá cho: `layer-10-task-01`
 - [ ] `Projects.gallery` (và `News.cover`) dùng `validate` tuỳ biến nên bỏ qua kiểm upload mặc định của Payload: gọi validator `upload` mặc định (`payload/shared`) trước rồi mới kiểm publish — chặn PDF vào gallery, id media sai trả 400 thay vì 500 (`src/collections/Projects.ts:29-34`).
 - [ ] `Projects.ward` thêm `filterOptions` chỉ phường thuộc `province` đã chọn (`src/collections/Projects.ts:103`) + validate phía server.
 - [ ] Dự án published mà mọi ảnh gallery bị xoá (FK set null) → trang chi tiết/danh sách hiện ảnh placeholder, không vỡ.
+
+## Follow-up từ review layer-6-task-03
+- [ ] Slug không tồn tại / bản ghi chưa có EN (`notFound()` trong page) trả 404 **có nội dung trong HTML server** (h1 đúng ngôn ngữ, header/footer), không phải shell `__next_error__` (giới hạn Next 16 — ARCH §5.1): kiểm tra ở proxy trước khi vào page, hoặc cách khác đã ghi ở ARCH §5.1; curl bằng chứng.
