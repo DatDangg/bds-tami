@@ -1,0 +1,161 @@
+import config from "@payload-config";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { getPayload, type Payload } from "payload";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ProjectFilters } from "@/components/projects/ProjectFilters";
+import { CategoryListTemplate, type CategoryChip } from "@/components/templates/CategoryListTemplate";
+import { publicPath } from "@/lib/content/content-paths";
+import { parsePagination } from "@/lib/content/pagination";
+import { loadSiteIdentity } from "@/lib/content/site-identity";
+import { visibleCategory } from "@/lib/news/news-view";
+import { hasFilterParams, parseProjectFilters, projectQueryString, type RawProjectParams } from "@/lib/projects/project-filters";
+import {
+  findProjectCategoryBySlug,
+  listChildProjectCategories,
+  listProvinces,
+  listPublicProjects,
+  listRootProjectCategories,
+} from "@/lib/projects/project-queries";
+import { toProjectCards } from "@/lib/projects/project-view";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import type { Locale } from "@/i18n/routing";
+import type { Category } from "@/payload-types";
+
+interface ProjectListPageProps {
+  locale: Locale;
+  searchParams: RawProjectParams;
+}
+
+/** Danh mục đang lọc bằng `?category=`: slug, id chip cấp 1 cần đánh dấu và id dùng để lọc (danh mục + con của nó). */
+interface CategoryContext {
+  slug: string;
+  rootId: string;
+  filterIds: string[];
+}
+
+async function loadCategoryContext(payload: Payload, locale: Locale, slug: string): Promise<CategoryContext | null> {
+  const category = await findProjectCategoryBySlug(payload, locale, slug);
+  if (!category) return null;
+  const parent = visibleCategory(category.parent, locale);
+  // Danh mục cấp 1 gồm cả dự án của danh mục con; cấp 2 không có con và chip được đánh dấu là danh mục cha của nó.
+  const children = parent ? [] : (await listChildProjectCategories(payload, locale, category.id)).docs;
+  return { slug, rootId: parent?.id ?? category.id, filterIds: [category.id, ...children.map((child) => child.id)] };
+}
+
+/** Chip Loại hình (design-spec S02): "Tất cả" + danh mục cấp 1, link `?category=` giữ tỉnh/trạng thái đang lọc và về trang 1. */
+function buildChips(roots: Category[], listPath: string, allLabel: string, carry: { province?: string; status?: string }, currentRootId?: string): CategoryChip[] {
+  const named = roots.filter((root) => root.slug && root.name);
+  if (named.length === 0) return [];
+  return [
+    { label: allLabel, href: `${listPath}${projectQueryString(carry)}`, current: currentRootId === undefined },
+    ...named.map((root) => ({
+      label: root.name ?? "",
+      href: `${listPath}${projectQueryString({ category: root.slug ?? "", ...carry })}`,
+      current: root.id === currentRootId,
+    })),
+  ];
+}
+
+/**
+ * Dữ liệu + bố cục S02 (`/du-an`, lọc `?category=&province=&status=&page=`) trên `CategoryListTemplate`. Slug danh mục lạ bị bỏ
+ * qua (hiện danh sách không lọc, không 404); trang vượt số trang → `notFound()`. Đọc `searchParams` nên render theo request
+ * (không ISR); CDN giữ theo `Cache-Control` của `next.config.ts`.
+ */
+export async function ProjectListPage({ locale, searchParams }: ProjectListPageProps) {
+  const { page } = parsePagination(searchParams.page, undefined);
+  const filters = parseProjectFilters(searchParams);
+  const payload = await getPayload({ config });
+  const [context, provinces, t, tNav, roots] = await Promise.all([
+    filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
+    listProvinces(payload),
+    getTranslations({ locale, namespace: "page.projects" }),
+    getTranslations({ locale, namespace: "layout.nav.items" }),
+    listRootProjectCategories(payload, locale),
+  ]);
+  const province = provinces.find((item) => item.slug === filters.provinceSlug);
+  const listing = await listPublicProjects(payload, locale, {
+    page,
+    ...(context ? { categoryIds: context.filterIds } : {}),
+    ...(province ? { provinceId: province.id } : {}),
+    ...(filters.status ? { salesStatus: filters.status } : {}),
+  });
+  if (page > 1 && page > listing.totalPages) notFound();
+
+  const listPath = publicPath("/du-an", locale);
+  const carry = { ...(province ? { province: province.slug } : {}), ...(filters.status ? { status: filters.status } : {}) };
+  const filtersActive = Boolean(province || filters.status || context);
+  const buildHref = (target: number) => `${listPath}${projectQueryString({ ...(context ? { category: context.slug } : {}), ...carry, page: target })}`;
+
+  return (
+    <CategoryListTemplate
+      title={t("title")}
+      description={t("description")}
+      breadcrumb={[{ label: tNav("projects"), href: listPath }]}
+      chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
+      chipsLabel={t("categoriesLabel")}
+      scrollChips
+      toolbar={
+        <ProjectFilters
+          actionPath={listPath}
+          provinces={provinces.map((item) => ({ slug: item.slug, name: item.shortName || item.name }))}
+          {...(province ? { selectedProvince: province.slug } : {})}
+          {...(filters.status ? { selectedStatus: filters.status } : {})}
+          {...(context ? { hiddenCategory: context.slug } : {})}
+          // Hết kết quả thì nút xoá nằm ở EmptyState (tránh hai link trùng tên liền nhau).
+          active={filtersActive && listing.totalDocs > 0}
+        />
+      }
+      emptyState={
+        filtersActive ? (
+          <EmptyState variant="filtered" title={t("emptyTitle")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
+        ) : (
+          <EmptyState variant="empty" title={t("noProjects")} />
+        )
+      }
+      parentListHref={listPath}
+      isEmpty={listing.totalDocs === 0}
+      pagination={{ page, totalPages: listing.totalPages, buildHref }}
+    >
+      <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
+        <p role="status" aria-live="polite" className="text-small text-text-secondary">
+          {t("resultCount", { count: listing.totalDocs })}
+        </p>
+        <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {toProjectCards(listing.docs, locale).map((card, index) => (
+            <li key={card.id}>
+              <ProjectCard data={card} priority={index === 0} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </CategoryListTemplate>
+  );
+}
+
+/**
+ * `generateMetadata` của `/du-an`. Có tham số lọc (`?category=`, `province`, `status`) → `noindex, follow` và canonical về trang
+ * sạch `/du-an` (design-spec S04); không lọc: canonical là chính nó (kèm `?page=n` ở trang ≥ 2, như danh sách tin). Không tra
+ * danh mục nên không lặp truy vấn của trang.
+ */
+export async function buildProjectListMetadata({ locale, searchParams }: ProjectListPageProps): Promise<Metadata> {
+  const { page } = parsePagination(searchParams.page, undefined);
+  const filtered = hasFilterParams(searchParams);
+  const [t, identity] = await Promise.all([getTranslations({ locale, namespace: "page.projects" }), loadSiteIdentity(locale)]);
+  const pathFor = (target: Locale) => {
+    const path = publicPath("/du-an", target);
+    return !filtered && page > 1 ? `${path}?page=${page}` : path;
+  };
+  return buildPageMetadata({
+    locale,
+    siteName: identity.siteName,
+    defaultImage: identity.logo,
+    forceNoindex: filtered,
+    title: t("title"),
+    description: t("description"),
+    paths: { vi: pathFor("vi"), en: pathFor("en") },
+    hasEnglish: true,
+  });
+}

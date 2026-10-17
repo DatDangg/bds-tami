@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatArea, formatDate, formatNumber, formatVnd } from "./format";
+import { formatArea, formatDate, formatNumber, formatVnd, formatVndCompact } from "./format";
 
 describe("formatVnd", () => {
   it("vi: dấu chấm phân cách nghìn, hậu tố ₫", () => {
@@ -33,5 +33,20 @@ describe("formatDate", () => {
   });
   it("nhận Date và options tuỳ chỉnh", () => {
     expect(formatDate(new Date(instant), "en", { dateStyle: "long" })).toBe("October 16, 2026");
+  });
+});
+
+describe("formatVndCompact", () => {
+  it("vi: tỷ / triệu, dấu phẩy thập phân, tối đa 2 chữ số lẻ", () => {
+    expect(formatVndCompact(3_500_000_000, "vi")).toBe("3,5 tỷ");
+    expect(formatVndCompact(450_000_000, "vi")).toBe("450 triệu");
+    expect(formatVndCompact(1_234_000_000, "vi")).toBe("1,23 tỷ");
+  });
+  it("en: billion / million VND, dấu chấm thập phân", () => {
+    expect(formatVndCompact(3_500_000_000, "en")).toBe("3.5 billion VND");
+    expect(formatVndCompact(450_000_000, "en")).toBe("450 million VND");
+  });
+  it("dưới 1 triệu hiện số đầy đủ", () => {
+    expect(formatVndCompact(900_000, "vi")).toBe("900.000 ₫");
   });
 });

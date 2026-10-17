@@ -1,0 +1,50 @@
+import type { MediaImage } from "../../components/media/ResponsiveImage";
+import type { SalesStatus } from "../../collections/Projects";
+import type { Locale } from "../../i18n/routing";
+import type { Project, Province } from "../../payload-types";
+import { CONTENT_ROUTES } from "../content/content-paths";
+import { publicDetailPath } from "../content/redirect-paths";
+import { formatVndCompact } from "../format";
+import { populatedMedia, visibleCategory } from "../news/news-view";
+
+export interface ProjectCardData {
+  id: string;
+  title: string;
+  href: string;
+  salesStatus: SalesStatus;
+  /** Tên tỉnh/thành (ngắn nếu có), `null` khi tỉnh chưa populate. */
+  provinceName: string | null;
+  categoryName: string | null;
+  /** Giá thấp nhất đã rút gọn (`3,5 tỷ`), `null` khi chưa nhập giá. */
+  priceFrom: string | null;
+  /** Ảnh đầu tiên của thư viện ảnh = ảnh đại diện (ERD §4.5). */
+  cover: MediaImage | null;
+}
+
+function provinceLabel(province: Project["province"]): string | null {
+  if (!province || typeof province !== "object") return null;
+  return (province as Province).shortName || (province as Province).name || null;
+}
+
+export function toProjectCardData(doc: Project, locale: Locale): ProjectCardData | null {
+  // Dự án không có tiêu đề/slug không dựng được thẻ có link: bỏ qua thay vì render thẻ rỗng.
+  if (!doc.title || !doc.slug) return null;
+  const firstImage = doc.gallery?.find((item) => populatedMedia(item) !== null);
+  return {
+    id: doc.id,
+    title: doc.title,
+    href: publicDetailPath(CONTENT_ROUTES.projects, locale, doc.slug),
+    salesStatus: doc.salesStatus,
+    provinceName: provinceLabel(doc.province),
+    categoryName: visibleCategory(doc.category, locale)?.name ?? null,
+    priceFrom: typeof doc.priceFromVnd === "number" && doc.priceFromVnd > 0 ? formatVndCompact(doc.priceFromVnd, locale) : null,
+    cover: firstImage ? populatedMedia(firstImage) : null,
+  };
+}
+
+export function toProjectCards(docs: readonly Project[], locale: Locale): ProjectCardData[] {
+  return docs.flatMap((doc) => {
+    const card = toProjectCardData(doc, locale);
+    return card ? [card] : [];
+  });
+}

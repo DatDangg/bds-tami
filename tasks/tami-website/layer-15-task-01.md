@@ -142,3 +142,10 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Hero dịch vụ: thêm fallback `vh` cho `svh`.
 - [ ] Trang pháp lý: thêm meta description.
 - [ ] `RichText.tsx:348`: tách options render cho dễ đọc.
+
+## Follow-up từ review layer-6-task-04
+- [ ] 404 khi `?page` vượt phạm vi trên `/du-an`, `/tin-tuc` đang `public, s-maxage=60` → no-store hoặc 301 về trang cuối.
+- [ ] Tách `ProjectListPage` (~70 dòng) thành helper toolbar/empty-state.
+- [ ] Test chứng minh `findPublicList` với `select` không tải trường dài (`overview`…).
+- [ ] Seed mẫu: không ghi đè tên EN của danh mục admin tạo trùng tên VI.
+- [ ] Skeleton 6 thẻ cho `/du-an` (`loading.tsx`) nếu đo thấy cần.

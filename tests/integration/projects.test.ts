@@ -1,10 +1,12 @@
 import type { EventEmitter } from "node:events";
+import { rm } from "node:fs/promises";
 import pg from "pg";
 import type { Payload } from "payload";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { seedSampleProjects } from "../../seed/sample/projects";
 import { ROLES } from "../../src/access/roles";
+import { PROJECTS_TEST_MEDIA_DIR } from "../fixtures/projects/payload-config";
 
 const baseUrl = process.env.DATABASE_URL_TEST;
 
@@ -137,6 +139,7 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
     pool?.on("error", () => undefined);
     for (const client of pool?._clients ?? []) client.on("error", () => undefined);
     await payload?.destroy();
+    await rm(PROJECTS_TEST_MEDIA_DIR, { recursive: true, force: true });
     const connection = new pg.Client({ connectionString: baseUrl });
     await connection.connect();
     try {
@@ -350,22 +353,157 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
     });
   });
 
+  describe("danh sách dự án công khai (layer-6-task-04)", () => {
+    let queries: typeof import("../../src/lib/projects/project-queries");
+    let view: typeof import("../../src/lib/projects/project-view");
+    let otherProvinceId = "";
+    let catX = "";
+    let catY = "";
+    let catChild = "";
+    const publish = (title: string, data: Record<string, unknown> = {}) =>
+      createProject({ title, status: "published", gallery: [mediaIds[0]], ...data });
+    const setPublishedAt = (id: string, iso: string) =>
+      withDatabase((client) => client.query(`UPDATE "projects" SET published_at = $1 WHERE id = $2`, [iso, id]));
+    const titlesOf = (result: { docs: Array<{ title?: string | null }> }) => result.docs.map((doc) => doc.title);
+    const allCategories = () => [catX, catY, catChild];
+
+    beforeAll(async () => {
+      queries = await import("../../src/lib/projects/project-queries");
+      view = await import("../../src/lib/projects/project-view");
+      otherProvinceId = (
+        await payload.create({ collection: "provinces", data: { code: "98", name: "Thành phố Đà Nẵng", slug: "da-nang-list" }, overrideAccess: true })
+      ).id;
+      catX = (await createCategory("Loại X danh sách", "project")).id;
+      catY = (await createCategory("Loại Y danh sách", "project")).id;
+      catChild = (
+        await payload.create({ collection: "categories", data: { name: "Loại X con", scope: "project", parent: catX } as never, locale: "vi", overrideAccess: true, depth: 0 })
+      ).id;
+    });
+
+    it("lọc theo tỉnh, trạng thái mở bán, danh mục (+ con) và kết hợp; bản nháp / ẩn không lên danh sách", async () => {
+      await publish("Lọc 1", { province: provinceId, salesStatus: "selling", category: catX });
+      await publish("Lọc 2", { province: otherProvinceId, salesStatus: "upcoming", category: catX });
+      await publish("Lọc 3", { province: provinceId, salesStatus: "handed_over", category: catY });
+      await publish("Lọc 4", { province: provinceId, salesStatus: "selling", category: catChild });
+      await createProject({ title: "Lọc nháp", province: provinceId, salesStatus: "selling", category: catX });
+      const hidden = await publish("Lọc ẩn", { province: provinceId, salesStatus: "selling", category: catX });
+      await updateProject(hidden.id, { status: "hidden" });
+
+      const list = async (query: Partial<Parameters<typeof queries.listPublicProjects>[2]>) =>
+        titlesOf(await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: allCategories(), ...query })).sort();
+      expect(await list({})).toEqual(["Lọc 1", "Lọc 2", "Lọc 3", "Lọc 4"]);
+      expect(await list({ provinceId: otherProvinceId })).toEqual(["Lọc 2"]);
+      expect(await list({ salesStatus: "selling" })).toEqual(["Lọc 1", "Lọc 4"]);
+      expect(await list({ salesStatus: "handed_over" })).toEqual(["Lọc 3"]);
+      expect(await list({ provinceId, salesStatus: "upcoming" })).toEqual([]);
+      expect(await list({ categoryIds: [catY] })).toEqual(["Lọc 3"]);
+      expect(await list({ categoryIds: [catX] })).toEqual(["Lọc 1", "Lọc 2"]);
+      expect(await list({ categoryIds: [catX, catChild] })).toEqual(["Lọc 1", "Lọc 2", "Lọc 4"]);
+      expect(await list({ categoryIds: [catX, catChild], provinceId, salesStatus: "selling" })).toEqual(["Lọc 1", "Lọc 4"]);
+    });
+
+    it("/en chỉ gồm dự án đã có bản EN; mới xuất bản xếp trước", async () => {
+      const category = (await createCategory("Loại EN danh sách", "project")).id;
+      const first = await publish("EN một", { category });
+      const second = await publish("EN hai", { category });
+      await setPublishedAt(first.id, "2026-01-01T00:00:00.000Z");
+      await setPublishedAt(second.id, "2026-02-01T00:00:00.000Z");
+      expect(titlesOf(await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [category] }))).toEqual(["EN hai", "EN một"]);
+      expect(titlesOf(await queries.listPublicProjects(payload, "en", { page: 1, categoryIds: [category] }))).toEqual([]);
+      await payload.update({
+        collection: "projects",
+        id: first.id,
+        data: { title: "English one", summary: "S", overview: lexical("en"), hasEnglish: true } as never,
+        locale: "en",
+        overrideAccess: true,
+      });
+      expect(titlesOf(await queries.listPublicProjects(payload, "en", { page: 1, categoryIds: [category] }))).toEqual(["English one"]);
+    });
+
+    it("12 dự án/trang: trang 1 đủ 12, trang 2 phần còn lại, không trùng", async () => {
+      const category = (await createCategory("Loại phân trang", "project")).id;
+      for (let index = 1; index <= 13; index += 1) await publish(`Trang ${String(index).padStart(2, "0")}`, { category });
+      const first = await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [category] });
+      const second = await queries.listPublicProjects(payload, "vi", { page: 2, categoryIds: [category] });
+      expect(queries.PROJECT_PAGE_SIZE).toBe(12);
+      expect([first.docs.length, second.docs.length, first.totalPages, first.totalDocs]).toEqual([12, 1, 2, 13]);
+      expect(new Set([...titlesOf(first), ...titlesOf(second)]).size).toBe(13);
+    });
+
+    it("thẻ: ảnh đại diện = ảnh đầu thư viện, tỉnh/danh mục đã populate, link chi tiết theo ngôn ngữ; truy vấn danh mục + tỉnh", async () => {
+      await publish("Thẻ dự án", { province: otherProvinceId, category: catX, priceFromVnd: 3_500_000_000, gallery: [mediaIds[1], mediaIds[0]] });
+      const result = await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [catX], provinceId: otherProvinceId, salesStatus: "selling" });
+      const [card] = view.toProjectCards(result.docs, "vi");
+      expect(card).toMatchObject({ title: "Thẻ dự án", href: "/du-an/the-du-an", provinceName: "Thành phố Đà Nẵng", categoryName: "Loại X danh sách", priceFrom: "3,5 tỷ", salesStatus: "selling" });
+      expect(card?.cover).toMatchObject({ id: mediaIds[1] });
+      const categories = await queries.listRootProjectCategories(payload, "vi");
+      expect(categories.docs.map((doc) => doc.name)).toEqual(expect.arrayContaining(["Loại X danh sách", "Loại Y danh sách"]));
+      expect(categories.docs.map((doc) => doc.name)).not.toContain("Loại X con");
+      expect((await queries.listChildProjectCategories(payload, "vi", catX)).docs.map((doc) => doc.name)).toEqual(["Loại X con"]);
+      expect((await queries.findProjectCategoryBySlug(payload, "vi", "loai-x-danh-sach"))?.id).toBe(catX);
+      expect(await queries.findProjectCategoryBySlug(payload, "en", "loai-x-danh-sach")).toBeNull();
+      expect((await queries.listProvinces(payload)).map((province) => province.slug)).toEqual(expect.arrayContaining(["ha-noi", "da-nang-list"]));
+    });
+  });
+
   describe("seed", () => {
-    it("seedSampleProjects: thiếu tỉnh báo lỗi rõ; chạy 2 lần không nhân đôi; dự án là bản nháp", async () => {
+    const countMedia = async () =>
+      (await payload.find({ collection: "media", where: { alt: { contains: "Ảnh minh hoạ" } }, locale: "vi", limit: 0, pagination: false, overrideAccess: true })).totalDocs;
+    const seedProvinces = [
+      { code: "79", name: "Thành phố Hồ Chí Minh", slug: "ho-chi-minh" },
+      { code: "48", name: "Thành phố Đà Nẵng", slug: "da-nang" },
+      { code: "31", name: "Thành phố Hải Phòng", slug: "hai-phong" },
+    ];
+
+    it("seedSampleProjects: thiếu tỉnh báo lỗi rõ và không để lại ảnh/danh mục mồ côi", async () => {
       await expect(seedSampleProjects(payload)).rejects.toThrow(/pnpm seed/);
-      await payload.create({ collection: "provinces", data: { code: "79", name: "Thành phố Hồ Chí Minh", slug: "ho-chi-minh" }, overrideAccess: true });
-      expect(await seedSampleProjects(payload)).toEqual({ created: 2, skipped: 0 });
-      expect(await seedSampleProjects(payload)).toEqual({ created: 0, skipped: 2 });
+      expect(await countMedia()).toBe(0);
+    });
+
+    it("dự án mẫu: published + có ảnh; chạy 2 lần không nhân đôi dự án lẫn ảnh (media)", async () => {
+      for (const province of seedProvinces) await payload.create({ collection: "provinces", data: province, overrideAccess: true });
+      expect(await seedSampleProjects(payload)).toEqual({ created: 6, skipped: 0 });
+      expect(await countMedia()).toBe(6);
+      expect(await seedSampleProjects(payload)).toEqual({ created: 0, skipped: 6 });
+      expect(await countMedia()).toBe(6);
+
       const seeded = await payload.find({
         collection: "projects",
         where: { title: { equals: "Dự án mẫu Khu đô thị Tây Hồ" } },
         locale: "vi",
-        depth: 0,
+        depth: 1,
         overrideAccess: true,
       });
-      expect(seeded.docs[0]?.status).toBe("draft");
-      expect(seeded.docs[0]?.salesStatus).toBe("upcoming");
-      expect(seeded.docs[0]?.location).toEqual([105.8194, 21.0586]);
+      const doc = seeded.docs[0];
+      expect(doc?.status).toBe("published");
+      expect(doc?.salesStatus).toBe("upcoming");
+      expect(doc?.location).toEqual([105.8194, 21.0586]);
+      expect(doc?.gallery).toHaveLength(1);
+      expect(doc?.gallery?.[0]).toMatchObject({ mimeType: "image/webp" });
+      const published = await payload.find({ collection: "projects", where: { status: { equals: "published" } }, limit: 0, pagination: false, overrideAccess: true });
+      expect(published.docs.filter((project) => String(project.title).startsWith("Dự án mẫu"))).toHaveLength(6);
+    });
+
+    it("sample có đủ 3 loại hình, 3 trạng thái mở bán; có dự án có EN và dự án không có (để thử bộ lọc và /en)", async () => {
+      const { SAMPLE_PROJECTS } = await import("../../seed/sample/projects");
+      expect(new Set(SAMPLE_PROJECTS.map((project) => project.category.vi)).size).toBe(3);
+      expect(new Set(SAMPLE_PROJECTS.map((project) => project.salesStatus))).toEqual(new Set(["upcoming", "selling", "handed_over"]));
+      expect(SAMPLE_PROJECTS.filter((project) => project.english)).toHaveLength(3);
+      const english = await publicQueries.findPublicList<{ title: string }>(payload, "projects", "en", { where: { title: { like: "Sample" } } });
+      expect(english.docs).toHaveLength(3);
+    });
+
+    it("bản nháp không ảnh từ seed cũ được bổ sung ảnh + xuất bản, không tạo bản trùng", async () => {
+      const legacyTitle = "Dự án mẫu Căn hộ Sông Sài Gòn";
+      const found = await payload.find({ collection: "projects", where: { title: { equals: legacyTitle } }, locale: "vi", depth: 0, overrideAccess: true });
+      const legacy = found.docs[0]!;
+      // Đưa về dạng của seed cũ: nháp, không ảnh (Payload chỉ chặn bản xuất bản thiếu ảnh, nháp thì được).
+      await payload.update({ collection: "projects", id: legacy.id, data: { status: "draft", gallery: [] } as never, locale: "vi", overrideAccess: true });
+      expect(await seedSampleProjects(payload)).toEqual({ created: 0, skipped: 6 });
+      const healed = await payload.findByID({ collection: "projects", id: legacy.id, locale: "vi", depth: 0, overrideAccess: true });
+      expect(healed.status).toBe("published");
+      expect(healed.gallery).toHaveLength(1);
+      expect(await countMedia()).toBe(6);
     });
   });
 });

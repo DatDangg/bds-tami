@@ -1,3 +1,5 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { buildConfig } from "payload";
@@ -14,11 +16,16 @@ import { contentRedirectsPlugin } from "../../../src/collections/redirects-plugi
 import { Wards } from "../../../src/collections/Wards";
 import type { RevalidatePaths } from "../../../src/hooks/revalidate-content";
 
+/** Thư mục tạm chứa ảnh mẫu upload khi test seed (không có plugin S3 trong config test): test xoá nó ở `afterAll`, không ghi vào `./media` của repo. */
+export const PROJECTS_TEST_MEDIA_DIR = join(tmpdir(), "tami-projects-test-media");
+
+const MediaInTempDir = { ...Media, upload: { ...(Media.upload as object), staticDir: PROJECTS_TEST_MEDIA_DIR } };
+
 /** Config test cho dự án: collection THẬT `projects` + `categories`/`developers`/`provinces`/`wards`; `push: true` chỉ trên DB tạm (cần PostGIS, test tự bật). */
 export function buildProjectsTestConfig(databaseUrl: string, revalidatePaths: RevalidatePaths) {
   return buildConfig({
     secret: "test-projects-secret-khong-dung-o-production",
-    collections: [Staff, Media, AuditLogs, Categories, Developers, Provinces, Wards, createProjects(revalidatePaths)],
+    collections: [Staff, MediaInTempDir, AuditLogs, Categories, Developers, Provinces, Wards, createProjects(revalidatePaths)],
     plugins: [contentRedirectsPlugin()],
     editor: lexicalEditor(),
     sharp,

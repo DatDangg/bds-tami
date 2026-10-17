@@ -208,6 +208,29 @@
         "copyFailed": "Không sao chép được"
       }
     },
+    "projects": {
+      "title": "Dự án",
+      "description": "Các dự án bất động sản TAMI phân phối: lọc theo loại hình, tỉnh/thành và tình trạng mở bán.",
+      "filtersLabel": "Bộ lọc dự án",
+      "categoriesLabel": "Loại hình",
+      "all": "Tất cả",
+      "provinceLabel": "Tỉnh/thành",
+      "allProvinces": "Tất cả",
+      "statusLabel": "Trạng thái",
+      "allStatuses": "Tất cả",
+      "apply": "Lọc",
+      "clear": "Xoá bộ lọc",
+      "resultCount": "{count} dự án",
+      "gridLabel": "Danh sách dự án",
+      "priceFrom": "Từ {price}",
+      "emptyTitle": "Chưa có dự án phù hợp.",
+      "noProjects": "Chưa có dự án nào được xuất bản.",
+      "salesStatus": {
+        "upcoming": "Sắp mở bán",
+        "selling": "Đang mở bán",
+        "handed_over": "Đã bàn giao"
+      }
+    },
     "richText": {
       "table": "Bảng nội dung, cuộn ngang để xem đủ"
     },

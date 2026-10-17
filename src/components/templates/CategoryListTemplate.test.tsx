@@ -102,4 +102,50 @@ describe("CategoryListTemplate (spec-validation L5 G18)", () => {
     expect(screen.getByRole("link", { name: "Back to the list" })).toHaveAttribute("href", "/en/news");
     expect(document.body.textContent).not.toMatch(/[ạảãàáâậầấẩẫăắằặẳẵéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ]/i);
   });
+
+  it("toolbar luôn hiện (kể cả khi trống); chipsLabel bọc chip trong nav có nhãn; emptyState thay trạng thái trống mặc định", () => {
+    renderWithIntl(
+      <CategoryListTemplate
+        {...baseProps}
+        chips={chips}
+        chipsLabel="Loại hình"
+        toolbar={<form aria-label="Bộ lọc">lọc</form>}
+        emptyState={<p role="status">Trạng thái riêng</p>}
+        isEmpty
+      >
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(within(screen.getByRole("navigation", { name: "Loại hình" })).getAllByRole("link")).toHaveLength(chips.length);
+    expect(screen.getByRole("form", { name: "Bộ lọc" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Trạng thái riêng");
+    expect(screen.queryByRole("link", { name: "Về danh sách" })).toBeNull();
+  });
+
+  it("scrollChips: hàng chip cuộn ngang < sm (không xuống dòng); mặc định vẫn flex-wrap", () => {
+    const { unmount } = renderWithIntl(
+      <CategoryListTemplate {...baseProps} chips={chips} scrollChips isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.getByRole("link", { name: chips[0]!.label }).closest("ul")).toHaveClass("overflow-x-auto", "snap-x");
+    unmount();
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} chips={chips} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.getByRole("link", { name: chips[0]!.label }).closest("ul")).toHaveClass("flex-wrap");
+    expect(screen.getByRole("link", { name: chips[0]!.label }).closest("ul")).not.toHaveClass("overflow-x-auto");
+  });
+
+  it("không truyền toolbar/chipsLabel: giữ nguyên markup cũ (không có nav chip)", () => {
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} chips={chips} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.queryByRole("navigation", { name: "Loại hình" })).toBeNull();
+    expect(screen.queryByRole("form")).toBeNull();
+  });
 });

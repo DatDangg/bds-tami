@@ -299,6 +299,13 @@
       "round": 1,
       "report": ".context/review-reports/build-tami-website-layer-6-task-07-round-1-review.md",
       "completedAt": "2026-10-18T06:50:00.000Z"
+    },
+    {
+      "task": "layer-6/task-04",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-6-task-04-round-2-review.md",
+      "completedAt": "2026-10-18T08:10:00.000Z"
     }
   ],
   "inProgressTask": null,
@@ -400,9 +407,14 @@
       "date": "2026-10-18T00:45:00.000Z",
       "decision": "L6-T01 deploy staging làm cuối layer 6 (sau các trang); hỏi hạ tầng lúc đó",
       "reason": "User chọn sau khi xong các trang"
+    },
+    {
+      "date": "2026-10-18T07:35:00.000Z",
+      "decision": "Bỏ route /du-an/danh-muc/[category] (không có trong BRD/design-spec); chip danh mục dự án là link /du-an?category=<slug> đúng S02",
+      "reason": "User chọn Bỏ, theo spec"
     }
   ],
-  "lastUpdated": "2026-10-18T06:50:00.000Z",
+  "lastUpdated": "2026-10-18T08:10:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

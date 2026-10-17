@@ -208,6 +208,29 @@
         "copyFailed": "Could not copy"
       }
     },
+    "projects": {
+      "title": "Projects",
+      "description": "Property projects distributed by TAMI: filter by type, province and sales status.",
+      "filtersLabel": "Project filters",
+      "categoriesLabel": "Project type",
+      "all": "All",
+      "provinceLabel": "Province / city",
+      "allProvinces": "All",
+      "statusLabel": "Status",
+      "allStatuses": "All",
+      "apply": "Filter",
+      "clear": "Clear filters",
+      "resultCount": "{count, plural, one {# project} other {# projects}}",
+      "gridLabel": "Project list",
+      "priceFrom": "From {price}",
+      "emptyTitle": "No matching projects yet.",
+      "noProjects": "No projects have been published yet.",
+      "salesStatus": {
+        "upcoming": "Coming soon",
+        "selling": "Now selling",
+        "handed_over": "Handed over"
+      }
+    },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
     },
