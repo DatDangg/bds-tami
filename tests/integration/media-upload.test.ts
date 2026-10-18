@@ -293,23 +293,33 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
     let privateId: string;
     let privateName: string;
 
-    it("admin tạo CV PDF: tên ngẫu nhiên, nằm ở bucket private, KHÔNG có URL công khai", async () => {
-      const response = await rest("/private-files", {
-        method: "POST",
-        token: tokens.admin,
-        file: { bytes: pdfBytes(), name: "CV Nguyen Van A.pdf", type: "application/octet-stream" },
+    it("admin KHÔNG tạo/sửa được qua REST (403): private-files chỉ chứa CV do endpoint nộp CV tạo", async () => {
+      const file = { bytes: pdfBytes(), name: "file-noi-bo.pdf", type: "application/pdf" };
+      const before = (await payload.count({ collection: "private-files", overrideAccess: true })).totalDocs;
+      expect((await rest("/private-files", { method: "POST", token: tokens.admin, file, data: {} })).status).toBe(403);
+      expect((await payload.count({ collection: "private-files", overrideAccess: true })).totalDocs).toBe(before);
+    });
+
+    it("Local API (như endpoint nộp CV) tạo CV PDF: tên ngẫu nhiên, nằm ở bucket private, KHÔNG có URL công khai", async () => {
+      const bytes = pdfBytes();
+      const doc = await payload.create({
+        collection: "private-files",
+        overrideAccess: true,
+        file: { data: bytes, mimetype: "application/pdf", name: "CV Nguyen Van A.pdf", size: bytes.length },
         data: {},
       });
-      expect(response.status).toBe(201);
-      const { doc } = (await response.json()) as { doc: { id: string; filename: string; mimeType: string; url?: string | null } };
       privateId = doc.id;
-      privateName = doc.filename;
+      privateName = doc.filename as string;
       privateIds.push(doc.id);
-      expect(doc.filename).toMatch(/^[0-9a-f-]{36}\.pdf$/);
+      expect(doc.filename).toMatch(/^[0-9a-f-]{36}.pdf$/);
       expect(doc.mimeType).toBe("application/pdf");
       expect(doc.url ?? "").toBe("");
-      expect(await objectExists(privateBucket, doc.filename)).toBe(true);
-      expect(await objectExists(publicBucket, doc.filename)).toBe(false);
+      expect(await objectExists(privateBucket, privateName)).toBe(true);
+      expect(await objectExists(publicBucket, privateName)).toBe(false);
+    });
+
+    it("admin không sửa được CV qua REST (403) nhưng vẫn đọc được", async () => {
+      expect((await rest(`/private-files/${privateId}`, { method: "PATCH", token: tokens.admin, data: {} })).status).toBe(403);
     });
 
     it("không có route phục vụ file (kể cả admin): chỉ tải qua endpoint riêng ở task CV", async () => {

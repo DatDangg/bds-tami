@@ -20,6 +20,8 @@ export const AUDIT_ACTIONS = [
   "application.view_cv",
   "content.retranslate",
   "content.approve_translation",
+  // Job `data-retention` (hệ thống, không actor) vừa ẩn danh/xoá dữ liệu hết hạn; meta chỉ có số lượng, không PII.
+  "system.data_retention",
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];

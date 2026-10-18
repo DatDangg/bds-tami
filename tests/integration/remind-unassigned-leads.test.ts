@@ -165,6 +165,14 @@ describe.skipIf(!baseUrl)("integration: job remind-unassigned-leads", () => {
     expect(await runJob(vn(22, "09:10"))).toEqual({ reminded: 1 });
   });
 
+  it("hai lần chạy chồng nhau (khoá advisory + đọc lại trong transaction): mỗi lead chỉ nhắc MỘT lần, một email, một activity", async () => {
+    const lead = await createLead(vn(27, "09:00"));
+    const outcomes = await Promise.all([runJob(vn(27, "10:00")), runJob(vn(27, "10:00")), runJob(vn(27, "10:00"))]);
+    expect(outcomes.reduce((total, outcome) => total + outcome.reminded, 0)).toBe(1);
+    expect(await reminderJobsMentioning(lead)).toHaveLength(1);
+    expect(await emailSentActivities(lead.id)).toHaveLength(1);
+  });
+
   it("lỗi khi xếp email: rollback cả dấu remindedAt và activity", async () => {
     const lead = await createLead(vn(23, "08:00"));
     const original = payload.jobs.queue;

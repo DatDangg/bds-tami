@@ -104,7 +104,7 @@ erDiagram
 | Danh mục nền | `provinces`, `wards`, `categories`, `developers` | Địa giới, phân loại, chủ đầu tư |
 | Nội dung | `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages` | Nội dung hiển thị trên web |
 | Khách hàng | `leads`, `lead-activities`, `job-applications` | Dữ liệu khách để lại, hồ sơ ứng tuyển |
-| File | `media`, `private-files` | Ảnh/file công khai; CV và file nội bộ |
+| File | `media`, `private-files` | Ảnh/file công khai; CV ứng viên (chỉ CV) |
 | Hệ thống | `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs`, `translation-usage` | Nhật ký, thống kê, chuyển hướng, hàng đợi job, chi phí dịch AI |
 | Globals | `site-settings`, `homepage`, `header`, `footer` | Cấu hình dùng chung |
 | *(để dành)* | `members` | Tài khoản người đăng bên ngoài, **chưa tạo** (ARCHITECTURE §9.2) |
@@ -459,7 +459,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `referrer` | text | | |
 | `ipHash` | text | | |
 | `userAgent` | text | | |
-| `anonymizedAt` | date | | Sau khi ẩn danh: xoá `fullName`, `phone`, `email`, `message` |
+| `anonymizedAt` | date | | Sau khi ẩn danh: xoá `fullName`, `phone`, `email`, `message`, `ipHash`, `userAgent`, `pageUrl`; `referrer` chỉ giữ origin; nội dung activity `note`/`call` |
 
 **Chống trùng (BR-15):** tìm lead có cùng `phoneNormalized` + cùng `source` + cùng bản ghi nguồn, `createdAt` trong 7 ngày, chưa `won`/`lost`/`spam`. Có thì tăng `mergedCount`, cập nhật `lastActivityAt` và thêm `lead-activities` loại `merged`.
 
@@ -478,7 +478,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 
 Đổi `status` / `assignedTo` của lead tự sinh activity tương ứng (hook `afterChange`).
 
-Đã xây (as-built, layer-9-task-04): job `remind-unassigned-leads` (`src/jobs/remind-unassigned-leads.ts`) chọn lead `status = new`, chưa giao, chưa ẩn danh/xoá mềm, `remindedAt` trống, `createdAt` quá 30 phút, rồi lọc `businessMinutesBetween(createdAt, now) >= 30` (giờ hành chính BR-14); mỗi lead được đặt `remindedAt` + 1 activity `email_sent` (bọc `asSystemActivity`, `content` không PII) cùng transaction với job email gộp.
+Đã xây (as-built, layer-9-task-04): job `remind-unassigned-leads` (`src/jobs/remind-unassigned-leads.ts`) chọn lead `status = new`, chưa giao, chưa ẩn danh/xoá mềm, `remindedAt` trống, `createdAt` quá 30 phút, rồi lọc `businessMinutesBetween(createdAt, now) >= 30` (giờ hành chính BR-14); mỗi lead được đặt `remindedAt` + 1 activity `email_sent` (bọc `asSystemActivity`, `content` không PII) cùng transaction với job email gộp; transaction giữ khoá advisory `726004` (registry `src/lib/db/advisory-lock-keys.ts`) rồi mới chọn lead nên hai lần chạy chồng nhau không nhắc trùng.
 
 Đã xây (as-built, layer-9-task-03): hook `leads.afterChange` `recordAssignmentChange` (`src/hooks/leads/on-assignment-change.ts`) sinh activity `assignment` (`fromAssignee`/`toAssignee`, `actor` trống nếu hệ thống) khi `assignedTo` đổi (cả lúc tạo lead tự giao); `assignedAt` do `beforeChange` `stampAssignedAt` đặt, không nhận giá trị client. Ghi activity hệ thống bọc `asSystemActivity(req, fn)` (bộ đếm trong `req.context`, an toàn khi Payload chạy `Promise.all` trên cùng `req`).
 
@@ -507,7 +507,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 
 Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w · `og` 1200×630.
 
-**`private-files`** (bucket `private`, không có URL công khai): CV ứng viên và file nội bộ. Chỉ admin tải được qua endpoint có kiểm quyền.
+**`private-files`** (bucket `private`, không có URL công khai): **chỉ CV ứng viên** (quyết định 2026-10-18; không lưu file nội bộ). Không ai tạo/sửa được qua REST/admin, kể cả admin (`create`/`update` bị từ chối): chỉ endpoint nộp CV tạo bằng Local API `overrideAccess`. Admin đọc/xoá; chỉ admin tải được qua endpoint có kiểm quyền. Nhờ đó job `data-retention` dọn "CV mồ côi" không xoá nhầm file nào khác.
 
 ### 4.13. Hệ thống
 
@@ -516,7 +516,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `actor` | `rel→staff` | |
-| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `staff.activate` · `staff.delete` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` |
+| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `staff.activate` · `staff.delete` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` · `system.data_retention` |
 | `collection` | text | |
 | `docId` | text | |
 | `summary` | text | Mô tả ngắn |
@@ -620,12 +620,21 @@ Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (p
 
 | Dữ liệu | Thời hạn | Cách xử lý (job `data-retention`) |
 |---|---|---|
-| `leads` | 24 tháng từ `lastActivityAt` ⚠️ | Ẩn danh: xoá họ tên, SĐT, email, lời nhắn; giữ số liệu thống kê |
+| `leads` | 24 tháng từ `lastActivityAt` ⚠️ | Ẩn danh: xoá họ tên, SĐT, email, lời nhắn, `ipHash`, `userAgent`, `pageUrl`, query của `referrer`, nội dung ghi chú/cuộc gọi (`lead-activities`); giữ số liệu thống kê |
 | `job-applications` | 12 tháng từ `createdAt` ⚠️ | Xoá file CV, ẩn danh thông tin cá nhân |
 | `click-events` | 90 ngày | Xoá bản quá 90 ngày đã có `aggregatedAt` (đã gộp vào `click-stats-daily`); bản chưa gộp được gộp trước rồi mới xoá |
 | `audit-logs` | 24 tháng | Xoá bản cũ hơn |
 | Nội dung đã xoá mềm | Giữ đến khi admin xoá hẳn | — |
 | Bản phiên bản (`versions`) | Giữ 20 bản gần nhất mỗi bản ghi | Payload `maxPerDoc: 20` |
+| Job Payload lỗi (`payload-jobs` có `hasError`) | 7 ngày | Xoá job (và `payload_jobs_log` theo FK cascade): `input` của job lỗi có thể chứa dữ liệu khách |
+| `private-files` mồ côi (CV không hồ sơ nào trỏ tới) | 24 giờ | Xoá dòng + object S3 |
+
+Đã xây (as-built, layer-9-task-06; code `src/jobs/data-retention.ts`, `src/lib/retention/`, `src/lib/db/advisory-lock.ts`):
+- Job `data-retention` chạy Chủ nhật 03:00 giờ VN (cron `0 0 20 * * 6`, UTC), input tuỳ chọn `dryRun` (chỉ đếm, không đổi gì, không audit). Hằng số thời hạn ở `retention-config.ts` (giả định A4, đổi qua `/change`). Mốc: lead = `lastActivityAt` (thiếu thì `createdAt`), gồm cả lead đã xoá mềm; hồ sơ = `createdAt`.
+- Lead (quyết định 2026-10-18): chỉ ẩn danh, KHÔNG xoá cứng (`fullName`/`phone`/`phoneNormalized` = `ANONYMIZED_PLACEHOLDER`, `email`/`message`/`ipHash`/`userAgent`/`pageUrl` = NULL, `referrer` chỉ còn origin vì query/đường dẫn có thể chứa dữ liệu nhận diện, `anonymizedAt` = lúc chạy) kèm `lead-activities.content` của activity `note`/`call` = `ANONYMIZED_PLACEHOLDER` (giữ `type`, `actor`, thời gian; ghi bằng Local API `overrideAccess` trong cùng transaction vì `update` của collection bị từ chối cho mọi người); giữ số liệu (`status`, `source`, các mốc ngày, `mergedCount`, `utm`) và activity khác (`email_sent`…). Mỗi lead một transaction, chọn lại điều kiện hết hạn sau khi có khoá. Hồ sơ ứng tuyển: `fullName`/`phone`/`email` = cùng giá trị thay thế (G23; `email` bỏ qua kiểm định dạng khi `anonymizedAt` đã đặt), `message`/`note`/`ipHash`/`cv` = NULL, rồi xoá CV: object S3 TRƯỚC (`deletePrivateFile`), ném lỗi nếu S3 từ chối, sau đó mới xoá dòng `private-files`, trong một transaction mỗi hồ sơ. Phải xoá tường minh vì hook `afterDelete` của `@payloadcms/plugin-cloud-storage` (3.91.0) NUỐT lỗi xoá S3 (chỉ log): dựa vào hook thì DB xoá xong còn object (PII) mồ côi vĩnh viễn. Lỗi S3 → rollback cả ẩn danh (hồ sơ vẫn trỏ CV còn file, lần sau thử lại). Cùng cơ chế cho dọn CV mồ côi.
+- Xử lý theo lô (100 bản ghi/lô, tối đa 50 lô mỗi bước mỗi lần chạy), idempotent. Mỗi lô/bản ghi là một transaction giữ `pg_advisory_xact_lock(726003)` (mọi id khoá advisory nằm ở registry `src/lib/db/advisory-lock-keys.ts`: 726001 last-admin, 726002 redirect slug, 726003 data-retention, 726004 remind-unassigned-leads) và đọc lại bản ghi bên trong, nên các lần chạy chồng nhau không xử lý trùng. Các bước độc lập: một bước lỗi không chặn bước khác, rồi job ném lỗi tổng hợp để Payload Jobs thử lại. Bản ghi lỗi (dữ liệu cũ không qua validate hiện hành, S3 lỗi) bị bỏ qua và ghi log id (không PII), các bản ghi sau vẫn xử lý (dừng bước sau 20 bản ghi lỗi). Bộ đếm cộng dồn ngay khi commit nên audit/log đúng cả khi có bước lỗi giữa chừng.
+- Có thay đổi thật thì ghi MỘT audit `system.data_retention` (không actor, `meta` chỉ gồm số lượng). `click-events` không dọn ở đây (job `aggregate-click-stats` đã xoá sau khi gộp). Không đụng nội dung (dự án, tin…).
+- Migration `20261018_130000_data_retention` chỉ thêm giá trị enum (task `data-retention`, audit `system.data_retention`); `down` xoá job/log của task `data-retention` rồi dựng lại enum task slug; KHÔNG xoá dòng audit `system.data_retention` (vết của dữ liệu đã xoá không hoàn tác) và giữ nguyên giá trị enum `audit_logs.action` (Postgres không bỏ được giá trị enum); `up` chạy lại nhờ `ADD VALUE IF NOT EXISTS`. Migration này bắt buộc dù task ban đầu ghi "không đụng schema" (thêm giá trị enum).
 
 ---
 

@@ -3,6 +3,7 @@ import type { CollectionAfterChangeHook, PayloadRequest } from "payload";
 
 import { type Locale, locales } from "../i18n/routing";
 import { type ContentRoute } from "../lib/content/content-paths";
+import { ADVISORY_LOCK_KEYS } from "../lib/db/advisory-lock-keys";
 import { publicDetailPath } from "../lib/content/redirect-paths";
 import { preserveRequestLocale } from "../lib/payload/preserve-request-locale";
 import type { ContentDoc } from "./content-doc";
@@ -18,7 +19,7 @@ function slugAt(doc: LocalizedSlugDoc | undefined, locale: Locale, req: PayloadR
 }
 
 /** Khoá advisory theo transaction (tự nhả khi commit/rollback) tuần tự hoá việc ghi redirect: hai lần lưu đồng thời không đua nhau tạo cùng `from` (unique violation sẽ huỷ cả transaction lưu nội dung). */
-const REDIRECT_WRITE_LOCK_KEY = 726_002;
+const REDIRECT_WRITE_LOCK_KEY = ADVISORY_LOCK_KEYS.slugRedirectWrite;
 
 async function lockRedirectWrites(req: PayloadRequest): Promise<void> {
   const transactionId = await req.transactionID;

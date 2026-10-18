@@ -9,9 +9,10 @@ import type {
 import type { PostgresAdapter } from "@payloadcms/db-postgres";
 
 import { ROLES } from "../../access";
+import { ADVISORY_LOCK_KEYS } from "../../lib/db/advisory-lock-keys";
 
 /** Khoá advisory của Postgres dùng để tuần tự hoá mọi thay đổi làm giảm số admin (giá trị tuỳ ý, cố định). */
-const ADMIN_ROSTER_LOCK_KEY = 726_001;
+const ADMIN_ROSTER_LOCK_KEY = ADVISORY_LOCK_KEYS.adminRoster;
 
 const LAST_ADMIN_MESSAGE = "Hệ thống phải còn ít nhất một quản trị viên đang hoạt động.";
 

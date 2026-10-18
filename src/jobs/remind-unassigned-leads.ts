@@ -3,6 +3,8 @@ import { commitTransaction, initTransaction, killTransaction, type PayloadReques
 import { ROLES } from "../access/roles";
 import { asSystemActivity } from "../hooks/leads/lead-activity-hooks";
 import { businessMinutesBetween, isBusinessHour } from "../lib/leads/business-hours";
+import { lockForTransaction } from "../lib/db/advisory-lock";
+import { ADVISORY_LOCK_KEYS } from "../lib/db/advisory-lock-keys";
 import { getEnv } from "../lib/env";
 
 export const REMIND_UNASSIGNED_LEADS_SLUG = "remind-unassigned-leads";
@@ -19,18 +21,45 @@ export interface RemindUnassignedLeadsOutcome {
   reminded: number;
 }
 
+/** Khoá advisory của job này (id riêng trong registry `ADVISORY_LOCK_KEYS`): tuần tự hoá các lần chạy chồng nhau. */
+const REMIND_LOCK_KEY = ADVISORY_LOCK_KEYS.remindUnassignedLeads;
+
 /**
  * Nhắc admin các lead `new` chưa giao quá 30 phút làm việc (BR-14). Chỉ chạy trong giờ hành chính; ngoài giờ trả 0 và lead chờ tới giờ làm.
  * Mỗi lead nhắc ĐÚNG MỘT LẦN: `leads.remindedAt` được đặt cùng transaction với việc xếp email vào hàng đợi (commit cùng, rollback cùng),
- * nên chạy lại không gửi trùng và lỗi giữa chừng không làm mất lời nhắc. Một email gộp cho mọi lead trong lần chạy, chỉ có mã lead + link
- * admin (không SĐT/email khách). Mỗi lead ghi một activity `email_sent` (không PII) để lịch sử chăm sóc thấy đã nhắc.
+ * nên chạy lại không gửi trùng và lỗi giữa chừng không làm mất lời nhắc. Hai lần chạy chồng nhau (job treo/retry trùng lịch, hai process)
+ * cũng không nhắc trùng: transaction giữ khoá advisory rồi MỚI chọn ứng viên, nên bên chờ khoá thấy `remindedAt` bên kia vừa đặt.
+ * Một email gộp cho mọi lead trong lần chạy, chỉ có mã lead + link admin (không SĐT/email khách). Mỗi lead ghi một activity
+ * `email_sent` (không PII) để lịch sử chăm sóc thấy đã nhắc.
  */
 export async function remindUnassignedLeads(args: { req: PayloadRequest; now?: Date }): Promise<RemindUnassignedLeadsOutcome> {
   const { req, now = new Date() } = args;
-  const { payload } = req;
   if (!isBusinessHour(now)) return { reminded: 0 };
 
-  const candidates = await payload.find({
+  const ownsTransaction = await initTransaction(req);
+  try {
+    await lockForTransaction(req, REMIND_LOCK_KEY);
+    const outcome = await remindDueLeads(req, now);
+    if (ownsTransaction) await commitTransaction(req);
+    if (outcome.capped) {
+      req.payload.logger.warn({ limit: MAX_LEADS_PER_RUN }, "Nhắc lead: số lead chờ chạm trần mỗi lần chạy, phần còn lại được nhắc ở lần sau");
+    }
+    return { reminded: outcome.reminded };
+  } catch (error) {
+    if (ownsTransaction) await killTransaction(req);
+    throw error;
+  }
+}
+
+interface DueLead {
+  id: string;
+  code: string;
+  createdAt: string;
+}
+
+/** Lead `new` chưa giao, chưa nhắc, đã chờ đủ `REMIND_AFTER_BUSINESS_MINUTES` phút làm việc. Gọi SAU khi có khoá. `capped`: chạm trần `MAX_LEADS_PER_RUN`. */
+async function findDueLeads(req: PayloadRequest, now: Date): Promise<{ due: DueLead[]; capped: boolean }> {
+  const candidates = await req.payload.find({
     collection: "leads",
     where: {
       and: [
@@ -50,9 +79,11 @@ export async function remindUnassignedLeads(args: { req: PayloadRequest; now?: D
     req,
   });
   const due = candidates.docs.filter((lead) => businessMinutesBetween(new Date(lead.createdAt), now) >= REMIND_AFTER_BUSINESS_MINUTES);
-  if (due.length === 0) return { reminded: 0 };
+  return { due, capped: candidates.docs.length >= MAX_LEADS_PER_RUN };
+}
 
-  const admins = await payload.find({
+async function findActiveAdminEmails(req: PayloadRequest): Promise<string[]> {
+  const admins = await req.payload.find({
     collection: "staff",
     where: { and: [{ role: { equals: ROLES.admin } }, { active: { equals: true } }] },
     limit: 50,
@@ -62,51 +93,59 @@ export async function remindUnassignedLeads(args: { req: PayloadRequest; now?: D
     overrideAccess: true,
     req,
   });
-  const recipients = admins.docs.map((admin) => admin.email);
+  return admins.docs.map((admin) => admin.email);
+}
+
+/** Đặt `remindedAt` và ghi activity `email_sent` (không PII) cho từng lead, cùng transaction với việc xếp email. */
+async function markLeadsReminded(req: PayloadRequest, due: DueLead[], now: Date): Promise<void> {
+  const { payload } = req;
+  for (const lead of due) {
+    await payload.update({ collection: "leads", id: lead.id, data: { remindedAt: now.toISOString() }, depth: 0, overrideAccess: true, req });
+    await asSystemActivity(req, () =>
+      payload.create({
+        collection: "lead-activities",
+        data: { lead: lead.id, type: "email_sent", content: `Đã nhắc admin: chưa giao sau ${REMIND_AFTER_BUSINESS_MINUTES} phút làm việc` },
+        depth: 0,
+        overrideAccess: true,
+        req,
+      }),
+    );
+  }
+}
+
+/** Xếp MỘT email gộp cho mọi lead đến hạn: chỉ mã lead + link admin (không SĐT/email khách), liệt kê tối đa `MAX_LEADS_IN_EMAIL`. */
+async function queueReminderEmail(req: PayloadRequest, due: DueLead[], recipients: string[]): Promise<void> {
+  const siteUrl = getEnv().NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "");
+  const listed = due.slice(0, MAX_LEADS_IN_EMAIL);
+  await req.payload.jobs.queue({
+    task: "send-notification-email",
+    input: {
+      template: "unassigned-reminder",
+      to: recipients,
+      data: {
+        leads: listed.map((lead) => ({ code: lead.code, leadUrl: `${siteUrl}/admin/collections/leads/${lead.id}` })),
+        moreCount: due.length - listed.length,
+        waitMinutes: REMIND_AFTER_BUSINESS_MINUTES,
+      },
+    },
+    req,
+  });
+}
+
+/** Phần việc trong transaction đã giữ khoá: chọn lead đến hạn (đọc SAU khi có khoá), đánh dấu + activity, xếp email gộp. */
+async function remindDueLeads(req: PayloadRequest, now: Date): Promise<RemindUnassignedLeadsOutcome & { capped: boolean }> {
+  const { due, capped } = await findDueLeads(req, now);
+  if (due.length === 0) return { reminded: 0, capped: false };
+
+  const recipients = await findActiveAdminEmails(req);
   if (recipients.length === 0) {
     // Không đánh dấu: có admin thì lần chạy sau vẫn nhắc.
-    payload.logger.warn({ leads: due.length }, "Nhắc lead: không có admin hoạt động để nhận email");
-    return { reminded: 0 };
+    req.payload.logger.warn({ leads: due.length }, "Nhắc lead: không có admin hoạt động để nhận email");
+    return { reminded: 0, capped: false };
   }
-
-  const siteUrl = getEnv().NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "");
-  const ownsTransaction = await initTransaction(req);
-  try {
-    for (const lead of due) {
-      await payload.update({ collection: "leads", id: lead.id, data: { remindedAt: now.toISOString() }, depth: 0, overrideAccess: true, req });
-      await asSystemActivity(req, () =>
-        payload.create({
-          collection: "lead-activities",
-          data: { lead: lead.id, type: "email_sent", content: `Đã nhắc admin: chưa giao sau ${REMIND_AFTER_BUSINESS_MINUTES} phút làm việc` },
-          depth: 0,
-          overrideAccess: true,
-          req,
-        }),
-      );
-    }
-    const listed = due.slice(0, MAX_LEADS_IN_EMAIL);
-    await payload.jobs.queue({
-      task: "send-notification-email",
-      input: {
-        template: "unassigned-reminder",
-        to: recipients,
-        data: {
-          leads: listed.map((lead) => ({ code: lead.code, leadUrl: `${siteUrl}/admin/collections/leads/${lead.id}` })),
-          moreCount: due.length - listed.length,
-          waitMinutes: REMIND_AFTER_BUSINESS_MINUTES,
-        },
-      },
-      req,
-    });
-    if (ownsTransaction) await commitTransaction(req);
-  } catch (error) {
-    if (ownsTransaction) await killTransaction(req);
-    throw error;
-  }
-  if (candidates.docs.length >= MAX_LEADS_PER_RUN) {
-    payload.logger.warn({ limit: MAX_LEADS_PER_RUN }, "Nhắc lead: số lead chờ chạm trần mỗi lần chạy, phần còn lại được nhắc ở lần sau");
-  }
-  return { reminded: due.length };
+  await markLeadsReminded(req, due, now);
+  await queueReminderEmail(req, due, recipients);
+  return { reminded: due.length, capped };
 }
 
 /**

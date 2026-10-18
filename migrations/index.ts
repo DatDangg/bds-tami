@@ -22,6 +22,7 @@ import * as migration_20261018_082231_rentals_search_trgm from './20261018_08223
 import * as migration_20261018_091949_homepage_global from './20261018_091949_homepage_global';
 import * as migration_20261018_094454_leads from './20261018_094454_leads';
 import * as migration_20261018_113101_leads_reminded_at from './20261018_113101_leads_reminded_at';
+import * as migration_20261018_130000_data_retention from './20261018_130000_data_retention';
 
 export const migrations = [
   {
@@ -142,6 +143,11 @@ export const migrations = [
   {
     up: migration_20261018_113101_leads_reminded_at.up,
     down: migration_20261018_113101_leads_reminded_at.down,
-    name: '20261018_113101_leads_reminded_at'
+    name: '20261018_113101_leads_reminded_at',
+  },
+  {
+    up: migration_20261018_130000_data_retention.up,
+    down: migration_20261018_130000_data_retention.down,
+    name: '20261018_130000_data_retention'
   },
 ];

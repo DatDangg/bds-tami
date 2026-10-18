@@ -159,6 +159,7 @@ export interface Config {
       'close-job-postings': TaskCloseJobPostings;
       'expire-offers': TaskExpireOffers;
       'remind-unassigned-leads': TaskRemindUnassignedLeads;
+      'data-retention': TaskDataRetention;
       inline: {
         input: unknown;
         output: unknown;
@@ -314,7 +315,8 @@ export interface AuditLog {
     | 'auth.login_failed'
     | 'application.view_cv'
     | 'content.retranslate'
-    | 'content.approve_translation';
+    | 'content.approve_translation'
+    | 'system.data_retention';
   collection?: string | null;
   docId?: string | null;
   summary: string;
@@ -1263,7 +1265,8 @@ export interface PayloadJob {
           | 'aggregate-click-stats'
           | 'close-job-postings'
           | 'expire-offers'
-          | 'remind-unassigned-leads';
+          | 'remind-unassigned-leads'
+          | 'data-retention';
         taskID: string;
         input?:
           | {
@@ -1304,6 +1307,7 @@ export interface PayloadJob {
         | 'close-job-postings'
         | 'expire-offers'
         | 'remind-unassigned-leads'
+        | 'data-retention'
       )
     | null;
   queue?: string | null;
@@ -2865,6 +2869,24 @@ export interface TaskRemindUnassignedLeads {
   input?: unknown;
   output: {
     reminded: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskData-retention".
+ */
+export interface TaskDataRetention {
+  input: {
+    dryRun?: boolean | null;
+  };
+  output: {
+    dryRun: boolean;
+    leadsAnonymized: number;
+    applicationsAnonymized: number;
+    cvFilesDeleted: number;
+    orphanCvsDeleted: number;
+    auditLogsDeleted: number;
+    failedJobsDeleted: number;
   };
 }
 /**

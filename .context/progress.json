@@ -425,9 +425,16 @@
       "round": 1,
       "report": ".context/review-reports/build-tami-website-layer-9-task-04-round-1-review.md",
       "completedAt": "2026-10-18T20:15:00Z"
+    },
+    {
+      "task": "layer-9/task-06",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-9-task-06-round-2-review.md",
+      "completedAt": "2026-10-18T22:35:00Z"
     }
   ],
-  "inProgressTask": "layer-9/task-05 (review) → task-06 → task-07",
+  "inProgressTask": "layer-9/task-05 (squash) → task-07",
   "blockedTasks": [
     {
       "task": "layer-4/task-06",
@@ -566,9 +573,14 @@
       "date": "2026-10-18T16:25:00Z",
       "decision": "Layer 8: G31 trang danh mục cho thuê + D5 loading.tsx skeleton → task mới layer-9-task-08 (trước M2); D4 giữ ẩn mã voucher ưu đãi hết hạn (không hiện \"mã gạch ngang\" như design-spec S09 — không lộ mã còn dùng được), nút chia sẻ S09 → BACKLOG BL-007",
       "reason": "User duyệt checkpoint layer 8"
+    },
+    {
+      "date": "2026-10-18T21:25:00Z",
+      "decision": "Data-retention (L9-T06): Q1 private-files chỉ chứa CV — khoá upload trực tiếp của admin, sửa ERD; Q2 khi ẩn danh lead xoá thêm nội dung lead-activities note/call (thay \"Đã ẩn danh\") + ipHash/userAgent/pageUrl, giữ số liệu thống kê; Q3 hồ sơ ứng tuyển > 12 tháng ẩn danh + xoá CV bất kể trạng thái; Q4 lead còn mở 24 tháng không tương tác vẫn ẩn danh (BR-31); Q5 xoá audit > 24 tháng, nhưng down migration KHÔNG xoá audit system.data_retention",
+      "reason": "User trả lời Q1–Q5 review L9-T06 round 1"
     }
   ],
-  "lastUpdated": "2026-10-18T20:15:00Z",
+  "lastUpdated": "2026-10-18T22:35:00Z",
   "approvalMilestones": [
     {
       "id": "M1",

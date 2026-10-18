@@ -1,4 +1,5 @@
-import type { CollectionConfig, Field } from "payload";
+import type { CollectionConfig, EmailFieldValidation, Field } from "payload";
+import { email as validateEmail } from "payload/shared";
 
 import { denyAll, isAdmin, ROLES } from "../access";
 import { auditApplicationPurge, deleteApplicationCv } from "../hooks/job-applications/delete-cv-and-audit";
@@ -21,10 +22,16 @@ const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
 const submittedFieldAccess = { create: denyAll, update: denyAll };
 const readOnlyInAdmin = { readOnly: true } as const;
 
+/**
+ * `email` là NOT NULL (G23) nên hồ sơ đã ẩn danh mang giá trị thay thế (`ANONYMIZED_PLACEHOLDER`, không phải địa chỉ email): bỏ qua kiểm định dạng khi `anonymizedAt` đã đặt.
+ */
+const validateApplicantEmail: EmailFieldValidation = (value, options) =>
+  Boolean((options.data as { anonymizedAt?: unknown } | undefined)?.anonymizedAt) || validateEmail(value, options);
+
 const submittedFields: Field[] = [
   { name: "fullName", type: "text", required: true, maxLength: 120, access: submittedFieldAccess, admin: readOnlyInAdmin },
   { name: "phone", type: "text", required: true, maxLength: 20, access: submittedFieldAccess, admin: readOnlyInAdmin },
-  { name: "email", type: "email", required: true, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "email", type: "email", required: true, validate: validateApplicantEmail, access: submittedFieldAccess, admin: readOnlyInAdmin },
   { name: "message", type: "textarea", maxLength: 2000, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {
     name: "cv",
