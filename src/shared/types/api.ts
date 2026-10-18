@@ -44,3 +44,84 @@ export const jobApplicationFieldsSchema = z.object({
 });
 
 export type JobApplicationFields = z.infer<typeof jobApplicationFieldsSchema>;
+
+/** `?x=` (rỗng) coi như không truyền: form GET gửi cả ô bỏ trống. */
+const blankToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);
+const optional = <T extends z.ZodType>(schema: T) => z.preprocess(blankToUndefined, schema.optional());
+
+const MAX_SEARCH_QUERY_CHARS = 100;
+const MAX_SLUG_CHARS = 150;
+const MAX_PRICE_VND = 1_000_000_000_000;
+const MAX_AREA_M2 = 100_000;
+/** Trần số trang (cùng `MAX_PAGE` của `pagination.ts`): chặn OFFSET khổng lồ. */
+const MAX_SEARCH_PAGE = 500;
+export const MAX_RENTAL_SEARCH_LIMIT = 48;
+
+export const RENTAL_SORTS = ["newest", "price_asc", "price_desc"] as const;
+export const RENTAL_FURNISHINGS = ["none", "basic", "full"] as const;
+
+const slugParam = optional(z.string().trim().min(1).max(MAX_SLUG_CHARS));
+const wholeNumber = (max: number) => optional(z.coerce.number().int().min(0).max(max));
+
+/**
+ * Tham số `GET /api/public/rentals` (API_SPEC §3.3). Sai kiểu/ngoài khoảng → lỗi (endpoint trả 400). `bedrooms` 0..4, `4` = 4 phòng trở lên.
+ * Tên khoá trùng URL trang `/cho-thue` để chia sẻ được. Tham số lạ bị bỏ qua.
+ */
+export const rentalSearchParamsSchema = z
+  .object({
+    locale: z.preprocess(blankToUndefined, z.enum(["vi", "en"]).default("vi")),
+    q: optional(z.string().trim().max(MAX_SEARCH_QUERY_CHARS)),
+    category: slugParam,
+    province: slugParam,
+    ward: slugParam,
+    priceMin: wholeNumber(MAX_PRICE_VND),
+    priceMax: wholeNumber(MAX_PRICE_VND),
+    areaMin: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
+    areaMax: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
+    bedrooms: wholeNumber(4),
+    furnishing: optional(z.enum(RENTAL_FURNISHINGS)),
+    sort: z.preprocess(blankToUndefined, z.enum(RENTAL_SORTS).default("newest")),
+    page: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).max(MAX_SEARCH_PAGE).default(1)),
+    limit: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).max(MAX_RENTAL_SEARCH_LIMIT).default(12)),
+  })
+  .refine((value) => value.priceMin === undefined || value.priceMax === undefined || value.priceMin <= value.priceMax, {
+    path: ["priceMax"],
+    message: "priceMax phải lớn hơn hoặc bằng priceMin",
+  })
+  .refine((value) => value.areaMin === undefined || value.areaMax === undefined || value.areaMin <= value.areaMax, {
+    path: ["areaMax"],
+    message: "areaMax phải lớn hơn hoặc bằng areaMin",
+  });
+
+export type RentalSearchParams = z.infer<typeof rentalSearchParamsSchema>;
+export type RentalSort = (typeof RENTAL_SORTS)[number];
+
+/**
+ * Thẻ tin cho thuê trong danh sách (API_SPEC §3.3): chỉ trường công khai, chữ/slug theo `locale` của truy vấn.
+ * `address` chỉ có khi tin bật `showExactAddress` (khác thì KHÔNG có khoá này, không phải `null`).
+ */
+export interface RentalCard {
+  id: string;
+  code: string;
+  title: string;
+  slug: string;
+  status: "published" | "rented";
+  thumbnail: { url: string; alt: string | null } | null;
+  priceMonthlyVnd: number | null;
+  priceNegotiable: boolean;
+  areaM2: number;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  furnishing: (typeof RENTAL_FURNISHINGS)[number] | null;
+  province: { name: string; slug: string };
+  ward: { name: string; slug: string };
+  address?: string;
+  publishedAt: string | null;
+}
+
+export interface RentalSearchResult {
+  items: RentalCard[];
+  total: number;
+  page: number;
+  totalPages: number;
+}

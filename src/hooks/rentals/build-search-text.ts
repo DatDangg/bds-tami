@@ -61,7 +61,7 @@ async function readWardNames(req: PayloadRequest, id: string): Promise<string[]>
 }
 
 /** Dựng `searchText` của MỘT ngôn ngữ từ nguồn đã gộp (tiêu đề của ngôn ngữ đó, còn lại dùng chung). Tên dự án thiếu bản `locale` thì lấy bản `vi`. */
-async function buildForLocale(req: PayloadRequest, source: RentalSearchSource, locale: Locale): Promise<string> {
+export async function buildForLocale(req: PayloadRequest, source: RentalSearchSource, locale: Locale): Promise<string> {
   const provinceId = relationId(source.province);
   const wardId = relationId(source.ward);
   const projectId = relationId(source.project);
@@ -97,6 +97,26 @@ export const buildRentalSearchText: CollectionBeforeChangeHook = async ({ data, 
   return { ...data, searchText: await buildForLocale(req, source, req.locale as Locale) };
 };
 
+/**
+ * Ghi `searchText` đã dựng vào `rentals_locales` và dòng phiên bản mới nhất (`created_at` lớn nhất) của `_rentals_v_locales`, trong transaction của `req`
+ * (nếu có). UPDATE tham số hoá, không qua `payload.update` (tránh audit, revalidate, redirect, tạo phiên bản). Dùng chung với lệnh/hook reindex.
+ */
+export async function writeStoredSearchText(req: PayloadRequest, rentalId: string, locale: Locale, searchText: string): Promise<void> {
+  const adapter = req.payload.db as unknown as PostgresAdapter;
+  const transactionId = await req.transactionID;
+  const session = transactionId ? adapter.sessions[String(transactionId)] : undefined;
+  const db = session?.db ?? adapter.drizzle;
+  await adapter.execute({
+    db,
+    sql: sql`UPDATE "rentals_locales" SET "search_text" = ${searchText} WHERE "_parent_id" = ${rentalId} AND "_locale" = ${locale}`,
+  });
+  // Bản phiên bản mới nhất cũng cần khớp, để khôi phục phiên bản không đưa lại chuỗi cũ.
+  await adapter.execute({
+    db,
+    sql: sql`UPDATE "_rentals_v_locales" SET "version_search_text" = ${searchText} WHERE "_locale" = ${locale} AND "_parent_id" = (SELECT "id" FROM "_rentals_v" WHERE "parent_id" = ${rentalId} ORDER BY "created_at" DESC, "id" DESC LIMIT 1)`,
+  });
+}
+
 /** `true` nếu đổi một trong các trường không phụ thuộc ngôn ngữ mà `searchText` của MỌI ngôn ngữ đọc (địa chỉ, tỉnh, phường, dự án). */
 const sharedSourceChanged = (before: RentalSearchSource, after: RentalSearchSource): boolean =>
   asText(before.address) !== asText(after.address) ||
@@ -108,13 +128,10 @@ const sharedSourceChanged = (before: RentalSearchSource, after: RentalSearchSour
  * `afterChange`: lần lưu chỉ ghi ngôn ngữ của request, nên khi đổi phường/tỉnh/dự án/địa chỉ (dùng chung hai bản) `searchText`
  * của ngôn ngữ còn lại sẽ lệch. Dựng lại bản đó (chỉ khi nó đã có tiêu đề) bằng UPDATE trực tiếp trên `rentals_locales` và dòng phiên bản mới nhất (`created_at` lớn nhất) `_rentals_v_locales`,
  * cùng transaction, thay vì `payload.update` lồng nhau (kéo theo audit, revalidate, redirect, phiên bản).
- * Giới hạn: đổi tên dự án/tên cũ của phường không tự dựng lại tin đã có (chỉ cập nhật ở lần lưu tin kế tiếp).
+ * Đổi tên dự án/tên cũ của phường làm mới tin đã có ở hook của `projects`/`wards` và lệnh `reindex:rentals-search` (xem `reindex-rental-search-text.ts`).
  */
 export const refreshOtherLocaleSearchText: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   if (operation !== "update" || !previousDoc || !sharedSourceChanged(previousDoc as RentalSearchSource, doc as RentalSearchSource)) return doc;
-  const adapter = req.payload.db as unknown as PostgresAdapter;
-  const transactionId = await req.transactionID;
-  const session = transactionId ? adapter.sessions[String(transactionId)] : undefined;
   for (const locale of locales.filter((candidate) => candidate !== req.locale)) {
     const title = await preserveRequestLocale(req, async () => {
       const other = await req.payload.findByID({
@@ -132,16 +149,7 @@ export const refreshOtherLocaleSearchText: CollectionAfterChangeHook = async ({ 
     });
     if (!title) continue;
     const searchText = await buildForLocale(req, { ...(doc as RentalSearchSource), title }, locale);
-    const db = session?.db ?? adapter.drizzle;
-    await adapter.execute({
-      db,
-      sql: sql`UPDATE "rentals_locales" SET "search_text" = ${searchText} WHERE "_parent_id" = ${String(doc.id)} AND "_locale" = ${locale}`,
-    });
-    // Bản phiên bản mới nhất (vừa được lưu trước hook này) cũng cần khớp, để khôi phục phiên bản không đưa lại chuỗi cũ.
-    await adapter.execute({
-      db,
-      sql: sql`UPDATE "_rentals_v_locales" SET "version_search_text" = ${searchText} WHERE "_locale" = ${locale} AND "_parent_id" = (SELECT "id" FROM "_rentals_v" WHERE "parent_id" = ${String(doc.id)} ORDER BY "created_at" DESC, "id" DESC LIMIT 1)`,
-    });
+    await writeStoredSearchText(req, String(doc.id), locale, searchText);
   }
   return doc;
 };

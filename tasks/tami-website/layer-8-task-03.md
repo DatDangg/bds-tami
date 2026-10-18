@@ -94,3 +94,11 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 
 ## Follow-up từ spec-validation layer 6
 - [ ] G27 (LOW): route mới thêm rule vào `MISSING_PAGE_RULES` để slug lạ trả 404 có nội dung (G15), không quay lại 404 rỗng. Report: `.context/review-reports/spec-validation-build-tami-website-layer-6.md`.
+
+## Follow-up từ review layer-7-task-02 (round 1, MINOR)
+- [ ] `src/lib/search/rental-search-sql.ts:50`: lọc `ward` chỉ theo slug — slug phường chỉ unique trong tỉnh → giới hạn ward theo province (hoặc bắt buộc gửi kèm `province`, ghi API_SPEC §3.3).
+- [ ] `rental-search-sql.ts:27`: danh mục cha đã xoá mềm vẫn khớp → thêm `t."deleted_at" IS NULL`.
+- [ ] `rental-search-sql.ts:36-41`: điều kiện công khai chép tay từ `publicWhere` → snapshot test `buildPublicWhere` để khi thêm hẹn giờ `publishedAt` (FR-ADM-16) test đỏ.
+- [ ] `scripts/bench/rentals-search.ts`: chặn chạy khi `NODE_ENV=production` / `APP_ENV` staging|production hoặc host DB không phải dev (tránh chèn 100.000 tin giả published).
+- [ ] Hook reindex `src/hooks/{wards,projects}/reindex-rentals.ts` chạy đồng bộ trong transaction admin → đẩy sang job nền khi số tin vượt ngưỡng.
+- [ ] Đổi tên tỉnh chưa có hook reindex (đang dựa `pnpm reindex:rentals-search`).

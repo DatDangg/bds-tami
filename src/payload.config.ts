@@ -34,6 +34,7 @@ import { migrations } from "../migrations";
 import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { privateFileDownloadEndpoint } from "./endpoints/admin/private-file-download";
 import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
+import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
 import { logger } from "./lib/logger";
@@ -66,7 +67,7 @@ export default buildConfig({
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
-  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, privateFileDownloadEndpoint],
+  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint],
   jobs: jobsConfig,
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,

@@ -122,3 +122,4 @@ Mở khoá cho: `layer-13-task-01`, `layer-13-task-02`, `layer-13-task-03`, `lay
 - [ ] Admin publish 2 trang pháp lý (seed draft; `siteName` đã điền) → kiểm `/chinh-sach-bao-mat` + trang pháp lý còn lại mở được qua staging (AC L62 của L6-T01).
 - [ ] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*`, build image, gây lỗi thử, stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, runbook §8).
 - [ ] Smoke `jobs → app:3000/api/internal/revalidate` trong Docker thật (L7-T01): chạy tay `expire-offers`/`close-job-postings`, log app nhận revalidate, nginx public trả 404 cho `/api/internal/`.
+- [ ] Deploy L7-T02: migration `rentals_search_trgm` cần quyền `CREATE EXTENSION pg_trgm` (hoặc extension đã có từ init.sql) trên DB staging; đo lại p95 `GET /api/public/rentals` trên staging.

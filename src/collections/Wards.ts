@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isAdmin } from "../access";
 import { blockDeleteWhileHasRentals } from "../hooks/wards/guard-delete";
+import { reindexRentalsOnWardChange } from "../hooks/wards/reindex-rentals";
 
 export const WARD_TYPES = ["phuong", "xa", "dac_khu"] as const;
 export type WardType = (typeof WARD_TYPES)[number];
@@ -18,7 +19,7 @@ export const Wards: CollectionConfig = {
   admin: { useAsTitle: "name", defaultColumns: ["name", "province", "type", "code"] },
   defaultSort: "name",
   access: { read: () => true, create: isAdmin, update: isAdmin, delete: isAdmin },
-  hooks: { beforeDelete: [blockDeleteWhileHasRentals] },
+  hooks: { beforeDelete: [blockDeleteWhileHasRentals], afterChange: [reindexRentalsOnWardChange] },
   indexes: [{ fields: ["province", "slug"], unique: true }],
   fields: [
     { name: "province", type: "relationship", relationTo: "provinces", required: true, index: true },

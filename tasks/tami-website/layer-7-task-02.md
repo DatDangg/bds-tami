@@ -35,12 +35,12 @@ Tìm và lọc tin cho thuê trên Postgres sau interface `SearchService`, dùng
 Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 
 ## Acceptance Criteria
-- [ ] Tham số đúng API_SPEC §3.3 (locale, q, category gồm danh mục con, province, ward, giá, diện tích, bedrooms `4`=4+, furnishing, sort, page, limit ≤ 48); sai → 400
-- [ ] Trả `RentalCard` chỉ trường công khai; **không** trả `address` khi `showExactAddress=false`; không trường nội bộ
-- [ ] Chỉ `published`/`rented`... theo `publicWhere`; EN lọc `hasEnglish`
-- [ ] Từ khoá chuẩn hoá giống `searchText`, gõ không dấu vẫn ra; truy vấn tham số hoá (không nối chuỗi SQL)
-- [ ] Rate limit 60/phút; `Cache-Control: s-maxage=60`, cache key gồm locale
-- [ ] Bench với 100.000 tin giả lập: p95 ≤ 500ms trên máy dev (ghi số đo)
+- [x] Tham số đúng API_SPEC §3.3 (locale, q, category gồm danh mục con, province, ward, giá, diện tích, bedrooms `4`=4+, furnishing, sort, page, limit ≤ 48); sai → 400
+- [x] Trả `RentalCard` chỉ trường công khai; **không** trả `address` khi `showExactAddress=false`; không trường nội bộ
+- [x] Chỉ `published`/`rented`... theo `publicWhere`; EN lọc `hasEnglish`
+- [x] Từ khoá chuẩn hoá giống `searchText`, gõ không dấu vẫn ra; truy vấn tham số hoá (không nối chuỗi SQL)
+- [x] Rate limit 60/phút; `Cache-Control: s-maxage=60`, cache key gồm locale
+- [x] Bench với 100.000 tin giả lập: p95 ≤ 500ms trên máy dev (ghi số đo)
 
 ## Tests cần viết
 - Integration: từng bộ lọc + tổ hợp; `q` có/không dấu cùng kết quả
@@ -58,20 +58,21 @@ Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 1 (lần đầu bị user ngắt giữa chừng, redo trên đĩa — không tính attempt)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 6/6 AC + follow-up reindex searchText Done
+- Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (151 file, 1.637) · `pnpm build` PASS; test migration up→down→up; bench `pnpm bench:rentals-search` 100.000 tin p95 80.4ms (≤ 500ms)
+- Residual: p95 đo trên dev, đo lại trên staging; `CREATE EXTENSION pg_trgm` cần kiểm quyền user DB staging/prod khi deploy (L12-T01); `s-maxage` chỉ có tác dụng khi có Cloudflare Cache Rule (L15-T01)
+- Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-7-task-02-round-1-review.md`), 6 MINOR → `layer-8-task-03`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: API_SPEC §3.3, ERD §5/§6 nếu lệch)
-- Decision log: pending
+- Doc impact result: API_SPEC §3.3, ERD §6, ARCHITECTURE §4
+- Decision log: không có decision mới
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-7): task-02 search` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -79,13 +80,13 @@ Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-7/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/lib/search/search-service.ts (interface + PostgresRentalSearch)
@@ -98,5 +99,10 @@ Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
+
+## Bench (builder)
+- `pnpm bench:rentals-search` (`scripts/bench/rentals-search.ts`, không chạy trong `pnpm test`): chèn 100.000 tin `BENCH-*` vào DB dev, 12 kịch bản x 40 lần, xoá sạch ở `finally`. Có index trigram: **p95 tổng 80.4ms** (p50 26.4ms); kịch bản chậm nhất ~94.5ms (sort giá tăng, không `q`). Ngưỡng 500ms: ĐẠT. Kịch bản có `q` p95 5-61ms nhờ index GIN.
+- Migration `20261018_082231_rentals_search_trgm`: `CREATE EXTENSION IF NOT EXISTS pg_trgm` (contrib image `postgis/postgis`, trusted) + GIN `search_text gin_trgm_ops` trên `rentals_locales`; `down` chỉ `DROP INDEX IF EXISTS`; không backfill. Index composite bổ sung không cần (đã có index đơn cột, p95 đạt).
+
 ## Follow-up từ review layer-6-task-02
-- [ ] `rentals.searchText` cũ khi đổi tên dự án hoặc sửa `wards.legacyNames`: thêm lệnh reindex/backfill searchText + hook trên `projects`/`wards` (hoặc job định kỳ) để làm mới các tin liên quan.
+- [x] `rentals.searchText` cũ khi đổi tên dự án hoặc sửa `wards.legacyNames`: thêm lệnh reindex/backfill searchText + hook trên `projects`/`wards` (hoặc job định kỳ) để làm mới các tin liên quan.

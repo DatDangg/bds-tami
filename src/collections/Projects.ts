@@ -11,6 +11,7 @@ import { requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { withContentDefaults } from "./_shared/content-defaults";
 
@@ -94,6 +95,7 @@ export function createProjects(revalidate?: RevalidatePaths): CollectionConfig {
       slug: "projects",
       admin: { useAsTitle: "title", defaultColumns: ["title", "category", "salesStatus", "status", "publishedAt", "author"] },
       defaultSort: "-publishedAt",
+      hooks: { afterChange: [reindexRentalsOnProjectRename] },
       fields: [
         titleField(),
         scopedCategoryField("project"),

@@ -112,6 +112,8 @@ Kết quả: `{ success: true, data: { items: RentalCard[], total, page, totalPa
 
 Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
+> **As-built (layer-7-task-02):** `src/endpoints/public/rentals.ts` (`GET /api/public/rentals`), `src/lib/search/search-service.ts` (`SearchService` + `PostgresRentalSearch`), `rental-search-sql.ts` (WHERE/ORDER BY tham số hoá), schema `rentalSearchParamsSchema` + kiểu `RentalCard`/`RentalSearchResult` ở `src/shared/types/api.ts`. Thứ tự: rate limit `rentals` 60/phút/IP (không Turnstile; Redis lỗi → 503) → zod (sai kiểu/ngoài khoảng → 400; `priceMin ≤ priceMax`, `areaMin ≤ areaMax`; ô rỗng `?x=` coi như không truyền; khoá lạ bị bỏ qua; `q` ≤ 100 ký tự; `page` ≤ 500; `bedrooms` 0..4) → một truy vấn SQL lấy cả trang (khu vực + ảnh đại diện bằng `LATERAL`, không N+1). Tin hiển thị theo cùng điều kiện `publicWhere("rentals")` (`published`/`rented`, chưa xoá mềm, `en` cần `hasEnglish`; test đối chiếu hai bên). `q` chuẩn hoá như `searchText`, tách từ, mọi từ phải khớp (`LIKE %từ%` trên index trigram; tối đa 8 từ; `%`, `_` và dấu gạch chéo ngược được thoát). Tin chưa có giá (thương lượng) xếp cuối ở cả hai chiều sắp xếp giá; `id` chốt thứ tự phân trang. `RentalCard` KHÔNG có khoá `address` khi `showExactAddress=false` (SQL chỉ trả địa chỉ khi bật). Response thành công: `Cache-Control: public, s-maxage=60`; lỗi 400/429/503: `no-store`. Đo trên 100.000 tin giả lập (DB dev, `pnpm bench:rentals-search`): p95 tổng ≈ 80ms, kịch bản chậm nhất ≈ 95ms (ngưỡng 500ms).
+
 ### 3.4. `POST /api/public/click-events`
 
 > As-built (layer-6-task-05): trang chi tiết dự án gửi `refCollection=projects` + `refId` (id dự án) qua `ClickRefMarker`; body beacon `text/plain;charset=UTF-8`.

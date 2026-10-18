@@ -103,7 +103,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   └── admin/             # Endpoint cần đăng nhập admin: private-file-download (tải file private qua S3)
 │   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu, aggregate-click-stats, close-job-postings, expire-offers
 │   ├── lib/
-│   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
+│   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent), `rental-search-sql.ts` (WHERE/ORDER BY tham số hoá), `reindex-rental-search-text.ts` (làm mới `searchText`); endpoint `src/endpoints/public/rentals.ts`
 │   │   ├── security/          # rate-limit (Redis Lua), turnstile, client-ip, ip-hash
 │   │   ├── email/             # adapter SMTP Brevo, allowlist ngoài production, template email nội bộ (tiếng Việt)
 │   │   ├── http/              # ok() / fail() theo response contract (API_SPEC §2); cache-policy.ts (Cache-Control trang/api/RSC, withDefaultNoStore)

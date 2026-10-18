@@ -18,6 +18,8 @@
     "seed": "node scripts/seed.mjs",
     "jobs": "payload run scripts/jobs-runner.ts",
     "seed:categories": "payload run scripts/seed-categories.ts",
+    "reindex:rentals-search": "payload run scripts/reindex-rental-search-text.ts",
+    "bench:rentals-search": "payload run scripts/bench/rentals-search.ts",
     "seed:pages": "payload run scripts/seed-pages.ts",
     "seed:sample-services": "payload run scripts/seed-sample-services.ts",
     "seed:sample-news": "payload run scripts/seed-sample-news.ts",

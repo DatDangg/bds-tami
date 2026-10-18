@@ -21,4 +21,4 @@
   3. Báo user: "✅ Đã ghi vào backlog: <tiêu đề> — gõ `/change` (hoặc `/change <slug>`) để xử lý." **KHÔNG code ngay.**
 - **Agent xử lý change (`/change`):** khi change được xử lý xong (status `done` + chuyển `archive/`) → cập nhật hàng tương ứng: `in_progress` (khi bắt đầu) → `done` + ngày xong. `blocked` khi cần user quyết định.
 - **Duy nhất 1 nguồn:** mỗi dòng = 1 change doc ở `spec/changes/`. Không xoá dòng đã `done` (giữ lịch sử), chỉ cập nhật trạng thái.
-- **`/change --list`:** liệt kê các dòng chưa `done` từ bảng này (kèm slug để chạy `/change <slug>`).
+- **`/change --list`:** liệt kê các dòng chưa `done` từ bảng này (kèm slug để chạy `/change <slug>`).| BL-004 | `src/lib/contrast.test.ts:22` tìm marker `".theme-dark-block {\n  --color-bg"` → fail trên checkout Windows mới (core.autocrlf=true ra CRLF). Chuẩn hoá `\r\n` khi đọc CSS hoặc thêm `.gitattributes` `* text=auto eol=lf` (phát hiện khi chạy worktree L7) | BUG | pending (chưa tạo change doc) | — | 2026-10-18 | |

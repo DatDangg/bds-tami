@@ -7,6 +7,12 @@
 /** Trang công khai: CDN giữ 60s rồi phục vụ bản cũ tối đa 300s trong lúc làm mới (nội dung lên web ≤ 1 phút, BRD §7.2). */
 export const PUBLIC_PAGE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
 
+/**
+ * `GET /api/public/rentals` (API_SPEC §3.3): CDN giữ 60s, không stale-while-revalidate (kết quả theo bộ lọc, ít khi trùng URL).
+ * URL gồm `locale` nên cache key tách theo ngôn ngữ; response lỗi (400/429/503) không dùng giá trị này.
+ */
+export const PUBLIC_SEARCH_API_CACHE_CONTROL = "public, s-maxage=60";
+
 /** `/admin`, `/api/*` (trừ ngoại lệ bên dưới): không bao giờ vào CDN/proxy/trình duyệt. */
 export const NO_STORE_CACHE_CONTROL = "no-store";
 
