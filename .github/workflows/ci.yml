@@ -107,7 +107,9 @@ jobs:
           docker run -d --name tami-ci-seaweedfs -p 127.0.0.1:8333:8333 \
             -v "$RUNNER_TEMP/s3.json:/etc/seaweedfs/s3.json:ro" \
             chrislusf/seaweedfs:4.48 \
-            server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json -s3.port=8333 -ip.bind=0.0.0.0
+            server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json -s3.port=8333 -ip.bind=0.0.0.0 -master.volumeSizeLimitMB=256 -volume.max=32
+          # Runner đĩa nhỏ: mặc định volumeSizeLimit 30GB + volume.max tự tính theo đĩa trống => chỉ đủ volume cho 1 collection
+          # (bucket thứ hai ghi lỗi InternalError). Giới hạn nhỏ để mỗi bucket (collection) có volume riêng.
           for i in $(seq 1 60); do
             docker exec tami-ci-seaweedfs wget -q -O /dev/null http://127.0.0.1:9333/cluster/status \
               && curl -s -m 3 http://127.0.0.1:8333/ >/dev/null && break
@@ -118,6 +120,10 @@ jobs:
           for bucket in public private; do
             echo "s3.bucket.create -name $bucket" | docker exec -i tami-ci-seaweedfs weed shell -master=127.0.0.1:9333
           done
+          # weed shell thường exit 0 kể cả khi lệnh lỗi: kiểm danh sách bucket thật.
+          buckets="$(echo "s3.bucket.list" | docker exec -i tami-ci-seaweedfs weed shell -master=127.0.0.1:9333)"
+          echo "$buckets"
+          for bucket in public private; do echo "$buckets" | grep -qw "$bucket" || { echo "thiếu bucket $bucket"; exit 1; }; done
 
       # G18: importMap.js sinh tay bị lệch đã từng gây lỗi thật (a614b3d). Sinh lại rồi so với bản đã commit.
       - name: importMap không lệch
@@ -133,6 +139,12 @@ jobs:
 
       - name: Test (unit + integration)
         run: pnpm test
+
+      - name: Log SeaweedFS khi test lỗi
+        if: failure()
+        run: |
+          docker logs --tail 200 tami-ci-seaweedfs || true
+          echo "volume.list" | docker exec -i tami-ci-seaweedfs weed shell -master=127.0.0.1:9333 || true
 
       - name: Build
         run: pnpm build

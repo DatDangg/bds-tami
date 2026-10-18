@@ -8,7 +8,7 @@ agent: primary
 status: running
 attempt: 4
 interrupted: false
-updatedAt: 2026-10-18T17:15:00.000Z
+updatedAt: 2026-10-18T17:50:00.000Z
 filesTouched: []
 filesNew: [".context/runs/build-tami-website-layer-6-task-01.md"]
 evidence:
@@ -42,3 +42,4 @@ batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
 - 2026-10-18T16:30:00.000Z ▶ START builder sửa CI (cancel sẽ redo bước này).
 - 2026-10-18T17:00:00.000Z ✅ DONE builder sửa CI — ci.yml: migrate tami_test + bước SeaweedFS (docker run 4.48, s3.json dummy, chờ sẵn sàng, tạo bucket public/private); access.test.ts teardown xoá staff bằng SQL (last-admin-guard chặn trên DB trống). Giả lập CI local container riêng: migrate 2 DB, importMap, lint, typecheck, test 141 file 1.538 PASS, build PASS. ▶ START reviewer (cancel sẽ redo bước này).
 - 2026-10-18T17:15:00.000Z ✅ DONE reviewer sửa CI — NORMAL PASS (.context/review-reports/build-tami-website-layer-6-task-01-ci-round-1-review.md). Primary thêm guard if(!payload) trong afterAll (MINOR-2), access.test 25/25 + typecheck PASS. MINOR 1,3 → L15-T01. Commit + push.
+- 2026-10-18T17:50:00.000Z CI c0406c2: DB OK, còn 4 test ghi bucket private InternalError (SeaweedFS volume trên đĩa runner nhỏ). Sửa ci.yml: -master.volumeSizeLimitMB=256 -volume.max=32, kiểm s3.bucket.list, bước log khi fail. Local container mới: 3 bộ S3 38/38 PASS. Reviewer FAST PASS (ci-round-2). Commit + push.
