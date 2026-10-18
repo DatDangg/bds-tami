@@ -479,6 +479,8 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 
 ### 4.12. `media`, `private-files` (upload)
 
+> **As-built (L8-T01):** `media` đang được global `homepage` dùng (slide hero ảnh/video, ảnh about, nền ctaBanner) không xoá được — 409.
+
 **`media`** (bucket `public`, ai cũng đọc được)
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |
@@ -550,6 +552,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 **`footer`**: `columns` (array `{title, links[]}`), `contactBlock`, `copyright`.
 
 > **As-built (L4-T02):** khoá trang hợp lệ (`src/lib/content/nav-link.ts`): `home`, `projects`, `rentals`, `property-posts`, `news`, `careers`, `contact`, `privacy-policy`, `terms-of-use`; giá trị khác phải là URL `http(s)://` (chặn `javascript:`...). `header.ctaButton` = group `{label (localized), link}`; `footer.contactBlock` = textarea localized; `footer.columns[].links[]` = `{label (localized), link}`; `socialLinks[].platform` = select (`facebook`, `zalo`, `youtube`, `tiktok`, `instagram`, `linkedin`, `x`, `other`). `notificationEmails`, `translationGlossary`, `translationEnabled` chỉ admin đọc (field access + hook `afterRead` xoá hẳn khoá vì Payload vẫn trả `[]` cho array bị chặn); `privacyPolicyVersion` ai cũng đọc, không ai sửa tay. Lưu global làm mới tag `global:<slug>` (cả vi và en). Cả ba global (`site-settings`, `header`, `footer`) có group `translation` (dùng chung `translationGroup()` ở `src/fields/translation.ts`, chỉ đọc với mọi người, hệ thống ghi; migration `20261017_034248_globals_translation_group`), KHÔNG có `hasEnglish` (layout luôn render cả vi và en, không cần cổng bật EN như collection). Global chỉ admin thấy trong menu admin (`admin.hidden`); URL/link lưu bản đã trim.
+
+> **As-built (L8-T01) — `homepage`:** `src/globals/Homepage.ts` (migration `20261018_091949_homepage_global`, toàn bảng mới: `homepage`, `homepage_locales`, `homepage_rels`, `homepage_hero_slides(+_locales)`, `homepage_about_stats(+_locales)`, `homepage_block_order`). Chỉ admin ghi, khách đọc; có group `translation` (không `hasEnglish`) và nằm trong `TRANSLATABLE_GLOBALS` (G12). `hero.slides` `minRows 1`/`maxRows 8` (0 hoặc 9 slide → 400), `image` bắt buộc; `video` nhận MP4/WebM ≤ 15MB: `validate` đọc `mimeType`/`filesize` thật của media (ảnh/PDF/video > 15MB → 400; upload vào `media` vẫn bị `MEDIA_POLICY` chặn từ đầu). `featuredProjects.projects` `maxRows 6`. `ctaBanner.title` bắt buộc khi `enabled` chỉ ở bản `vi` (bản `en` thiếu title thì phía hiển thị ẩn khối, không chặn lưu). `blockOrder` = array `{block}` (`about`, `featuredProjects`, `services`, `featuredOffers`, `partners`, `ctaBanner`; hero luôn đứng đầu, không nằm trong mảng), mặc định đủ 6 khối, mỗi khối tối đa 1 lần. Không có dải lối tắt. Lưu `homepage` → làm mới tag `global:homepage` (đã thêm vào `PUBLIC_GLOBAL_SLUGS`) và `/vi`, `/en`; lưu/ẩn/xoá `services` đang hoặc vừa công khai cũng làm mới hai thứ đó (`src/hooks/homepage/`). Dữ liệu mẫu: `seed/sample/homepage.ts` (`pnpm seed --sample`, sau bước dự án mẫu vì dùng ảnh trong `media`). Ràng buộc bổ sung (review r1/r2): `ctaBanner.title` (vi) bắt buộc khi `enabled` — kể cả khi bật từ bản `en` (validator đọc title vi đã lưu; rỗng → 400). Xoá media đang là ảnh/video slide hero, ảnh khối about hoặc nền `ctaBanner` bị chặn 409 (`src/hooks/media/guard-delete.ts`, `beforeDelete` của `media`); ảnh OG của SEO không chặn (FK `ON DELETE SET NULL`).
 
 ---
 

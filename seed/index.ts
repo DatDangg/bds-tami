@@ -3,6 +3,7 @@ import type { Payload } from "payload";
 import { seedDefaultCategories } from "./categories";
 import { seedGeo } from "./geo";
 import { seedLegalPages } from "./pages";
+import { seedSampleHomepage } from "./sample/homepage";
 import { seedSampleJobPostings } from "./sample/job-postings";
 import { seedSampleNews } from "./sample/news";
 import { seedSampleProjects } from "./sample/projects";
@@ -93,6 +94,14 @@ const SAMPLE_STEPS: readonly SeedStep[] = [
     async run(payload) {
       const { created, skipped } = await seedSampleJobPostings(payload);
       return `tạo ${created}, bỏ qua ${skipped}`;
+    },
+  },
+  {
+    // Sau bước dự án mẫu: hero dùng ảnh do bước đó upload.
+    name: "trang chủ mẫu",
+    async run(payload) {
+      const { created } = await seedSampleHomepage(payload);
+      return created ? "tạo" : "đã có";
     },
   },
 ];

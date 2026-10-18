@@ -58,19 +58,19 @@ Mở khoá cho: `layer-9-task-01`, `layer-9-task-07`
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type (round 1): MAJOR-1 bật ctaBanner từ bản en khi title vi rỗng vẫn lưu được
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
 - Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (157 file, 1.715) · `pnpm build` PASS; migration up→down→up; migration đã áp DB dev
+- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-01-round-2-review.md`)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.15 nếu lệch)
+- Doc impact result: ERD §4.15 as-built (ràng buộc ctaBanner + chặn xoá media) + §4.12; ARCHITECTURE (allowlist homepage)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -79,13 +79,13 @@ Mở khoá cho: `layer-9-task-01`, `layer-9-task-07`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-8/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/globals/Homepage.ts

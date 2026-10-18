@@ -21,7 +21,7 @@ import type { RevalidateTags } from "../../../src/hooks/revalidate-global";
 export function buildServicesPagesTestConfig(databaseUrl: string, revalidatePaths: RevalidatePaths, revalidateTags: RevalidateTags) {
   return buildConfig({
     secret: "test-services-pages-secret-khong-dung-o-production",
-    collections: [Staff, Media, AuditLogs, Developers, createServices(revalidatePaths), createPages(revalidatePaths)],
+    collections: [Staff, Media, AuditLogs, Developers, createServices(revalidatePaths, revalidateTags), createPages(revalidatePaths)],
     plugins: [contentRedirectsPlugin()],
     globals: [createSiteSettings(revalidateTags)],
     editor: lexicalEditor(),

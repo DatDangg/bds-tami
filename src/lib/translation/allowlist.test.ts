@@ -8,6 +8,11 @@ describe("allowlist dịch", () => {
     expect(() => assertTranslatable({ kind: "collection", slug: "news" })).not.toThrow();
   });
 
+  it("cho dịch global trang chủ (G12) và vẫn chặn global không có trong danh sách", () => {
+    expect(() => assertTranslatable({ kind: "global", slug: "homepage" })).not.toThrow();
+    expect(() => assertTranslatable({ kind: "global", slug: "leads-settings" })).toThrow();
+  });
+
   it("từ chối collection nội bộ (leads)", () => {
     expect(() => assertTranslatable({ kind: "collection", slug: "leads" })).toThrow();
   });

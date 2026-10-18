@@ -1,6 +1,7 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { isAdmin, isStaff, ownedByUserOrAdmin } from "../access";
+import { blockDeleteWhileUsedByHomepage } from "../hooks/media/guard-delete";
 import { MEDIA_FILE_CACHE_CONTROL } from "../lib/http/cache-policy";
 import { createUploadGuard, MEDIA_POLICY } from "../lib/upload/validate-file";
 
@@ -38,6 +39,7 @@ export const Media: CollectionConfig = {
   hooks: {
     beforeOperation: [createUploadGuard(MEDIA_POLICY)],
     beforeChange: [stampUploader],
+    beforeDelete: [blockDeleteWhileUsedByHomepage],
   },
   upload: {
     mimeTypes: Object.keys(MEDIA_POLICY),

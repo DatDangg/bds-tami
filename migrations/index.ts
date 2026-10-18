@@ -19,6 +19,7 @@ import * as migration_20261017_143212_rentals from './20261017_143212_rentals';
 import * as migration_20261017_175237_close_job_postings_task from './20261017_175237_close_job_postings_task';
 import * as migration_20261018_075627_property_posts from './20261018_075627_property_posts';
 import * as migration_20261018_082231_rentals_search_trgm from './20261018_082231_rentals_search_trgm';
+import * as migration_20261018_091949_homepage_global from './20261018_091949_homepage_global';
 
 export const migrations = [
   {
@@ -125,5 +126,10 @@ export const migrations = [
     up: migration_20261018_082231_rentals_search_trgm.up,
     down: migration_20261018_082231_rentals_search_trgm.down,
     name: '20261018_082231_rentals_search_trgm',
+  },
+  {
+    up: migration_20261018_091949_homepage_global.up,
+    down: migration_20261018_091949_homepage_global.down,
+    name: '20261018_091949_homepage_global'
   },
 ];

@@ -355,9 +355,16 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-7-task-03-round-2-review.md",
       "completedAt": "2026-10-18T11:20:00Z"
+    },
+    {
+      "task": "layer-8/task-01",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/build-tami-website-layer-8-task-01-round-2-review.md",
+      "completedAt": "2026-10-18T13:10:00Z"
     }
   ],
-  "inProgressTask": null,
+  "inProgressTask": "layer-8/task-03 (đợt A) + task-04 (chờ squash)",
   "blockedTasks": [
     {
       "task": "layer-4/task-06",
@@ -493,7 +500,7 @@
       "reason": "User duyệt checkpoint layer 7"
     }
   ],
-  "lastUpdated": "2026-10-18T11:45:00Z",
+  "lastUpdated": "2026-10-18T13:10:00Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -20,8 +20,8 @@ export const TRANSLATABLE_COLLECTIONS = [
 /** `media` chỉ cho dịch đúng trường `alt` (tên tệp, URL, dữ liệu upload không đi ra ngoài). */
 export const TRANSLATABLE_MEDIA_FIELDS = ["alt"] as const;
 
-/** Globals công khai (header, footer, cấu hình chung). Trường nội bộ (`notificationEmails`, `translationGlossary`...) không nằm trong nội dung gửi đi, do bên gọi chọn trường. */
-export const TRANSLATABLE_GLOBALS = ["site-settings", "header", "footer"] as const;
+/** Globals công khai (trang chủ, header, footer, cấu hình chung). Trường nội bộ (`notificationEmails`, `translationGlossary`...) không nằm trong nội dung gửi đi, do bên gọi chọn trường. */
+export const TRANSLATABLE_GLOBALS = ["site-settings", "homepage", "header", "footer"] as const;
 
 export type TranslationTarget =
   | { kind: "collection"; slug: string }

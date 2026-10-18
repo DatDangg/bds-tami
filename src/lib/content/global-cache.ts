@@ -1,5 +1,5 @@
-/** Global đọc ở trang công khai (ARCHITECTURE §5.1). `homepage` thêm ở task riêng. */
-export const PUBLIC_GLOBAL_SLUGS = ["site-settings", "header", "footer"] as const;
+/** Global đọc ở trang công khai (ARCHITECTURE §5.1). */
+export const PUBLIC_GLOBAL_SLUGS = ["site-settings", "homepage", "header", "footer"] as const;
 export type PublicGlobalSlug = (typeof PUBLIC_GLOBAL_SLUGS)[number];
 
 /**

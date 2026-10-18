@@ -127,12 +127,14 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('vi' | 'en') | ('vi' | 'en')[];
   globals: {
     'site-settings': SiteSetting;
+    homepage: Homepage;
     header: Header;
     footer: Footer;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
@@ -2169,6 +2171,116 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: string;
+  hero: {
+    slides: {
+      image: string | Media;
+      video?: (string | null) | Media;
+      title?: string | null;
+      subtitle?: string | null;
+      ctaLabel?: string | null;
+      /**
+       * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+       */
+      ctaLink?: string | null;
+      id?: string | null;
+    }[];
+  };
+  about?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    content?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    image?: (string | null) | Media;
+    stats?:
+      | {
+          value: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  featuredProjects?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    projects?: (string | Project)[] | null;
+  };
+  services?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    items?: (string | Service)[] | null;
+  };
+  featuredOffers?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    posts?: (string | PropertyPost)[] | null;
+  };
+  partners?: {
+    enabled?: boolean | null;
+    title?: string | null;
+  };
+  ctaBanner?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    ctaLabel?: string | null;
+    /**
+     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     */
+    ctaLink?: string | null;
+    backgroundImage?: (string | null) | Media;
+  };
+  blockOrder?:
+    | {
+        block: 'about' | 'featuredProjects' | 'services' | 'featuredOffers' | 'partners' | 'ctaBanner';
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
@@ -2321,6 +2433,108 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         id?: T;
       };
   translationEnabled?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        slides?:
+          | T
+          | {
+              image?: T;
+              video?: T;
+              title?: T;
+              subtitle?: T;
+              ctaLabel?: T;
+              ctaLink?: T;
+              id?: T;
+            };
+      };
+  about?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        content?: T;
+        image?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  featuredProjects?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        projects?: T;
+      };
+  services?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        items?: T;
+      };
+  featuredOffers?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        posts?: T;
+      };
+  partners?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+      };
+  ctaBanner?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        description?: T;
+        ctaLabel?: T;
+        ctaLink?: T;
+        backgroundImage?: T;
+      };
+  blockOrder?:
+    | T
+    | {
+        block?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {

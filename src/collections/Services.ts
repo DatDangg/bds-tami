@@ -4,7 +4,9 @@ import { isAdmin } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
+import { createRevalidateHomepageOnService } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidateTags } from "../hooks/revalidate-global";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 const imageUpload = (name: string, validate?: UploadFieldSingleValidation): UploadField => ({
@@ -20,13 +22,15 @@ const imageUpload = (name: string, validate?: UploadFieldSingleValidation): Uplo
  * CHỈ admin tạo/sửa/xoá (PERMISSION §3.1), nên không có `author`. ERD không có `publishedAt`/`isFeatured` cho dịch vụ.
  * `revalidate` chỉ để test ghi đè.
  */
-export function createServices(revalidate?: RevalidatePaths): CollectionConfig {
+export function createServices(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
+  const revalidateHomepage = createRevalidateHomepageOnService({ paths: revalidate, tags: revalidateTags });
   return withContentDefaults(
     {
       slug: "services",
       admin: { useAsTitle: "title", defaultColumns: ["title", "status", "sortOrder", "updatedAt"] },
       defaultSort: "sortOrder",
       access: { create: isAdmin, update: isAdmin, delete: isAdmin },
+      hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         titleField(),
         imageUpload("icon"),
