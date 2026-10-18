@@ -8,14 +8,14 @@ agent: builder
 status: running
 attempt: 4
 interrupted: false
-updatedAt: 2026-10-18T19:40:00.000Z
+updatedAt: 2026-10-18T20:10:00.000Z
 filesTouched: []
 filesNew: [".context/runs/build-tami-website-layer-6-task-01.md"]
 evidence:
   reportPath: .context/review-reports/build-tami-website-layer-6-task-01-round-4-review.md
   round: 4
   verdict: PASS
-next: "Commit + push sửa dependency → theo dõi CD tới health 200 → seed + kiểm trang."
+next: "Chờ user tạo admin đầu tiên ở https://187-52-119-50.sslip.io/admin. Sau đó: (1) kiểm staff có admin; (2) ssh server docker exec tami-staging-app pnpm seed --sample; (3) admin điền site-settings.siteName (vi) trước khi publish privacy; (4) kiểm trang /, /du-an, /tin-tuc, /dich-vu, /tuyen-dung, /lien-he (bản đồ), /cho-thue? + 404 + robots noindex + log IP thật; (5) runbook bước 11 rate limit 2 IP, bước 12 rollback drill (deploy lần 2 đã có: release 0dfc8f9 + b936204), kiểm postgres không bị tạo lại (bind init.sql qua current); (6) evidence + reviewer + close-out L6-T01 + commit; (7) spec-validator layer 6 → mốc M2 sau L10 nên tiếp layer 7."
 loopSignal: none
 approvals: [{gate: attempt_4, at: 2026-10-18T14:00:00.000Z, ok: true, note: "User: cho attempt 4"}, {gate: staging_mode, at: 2026-10-18T10:40:00.000Z, ok: true, note: "sslip.io + Let's Encrypt + basic auth, không Cloudflare"}]
 batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
@@ -46,3 +46,4 @@ batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
 - 2026-10-18T18:30:00.000Z CI 0dfc8f9 xanh nhưng CD không chạy: default branch GitHub = main (workflow_run chỉ đọc nhánh mặc định). User đổi default branch → staging + re-run CI. Giữ luồng 1 nhánh (production duyệt Environment) — user có thể đổi sang 2 nhánh trước M5.
 - 2026-10-18T19:00:00.000Z CD lần đầu: image build + push OK, server pull, infra staging (postgres/redis/seaweedfs + init) chạy; bước migrate FAIL: ERR_MODULE_NOT_FOUND @aws-sdk/client-s3 (devDependency, image runtime cài --prod; dùng ở src/endpoints/admin/private-file-download.ts từ L6-T10). App chưa bật. ▶ START builder sửa (cancel sẽ redo bước này).
 - 2026-10-18T19:40:00.000Z ✅ DONE builder sửa dependency: @aws-sdk/client-s3 → dependencies (lockfile 3+/3-), test guard runtime-dependencies; docker build thật + migrate + seed + next start health 200 + jobs runner OK. Reviewer FAST PASS (deps-round-1). Full pnpm test local: lần 1 ngay sau khởi động container 5 fail (DB vừa lên), lần 2 không còn FAIL. Commit + push.
+- 2026-10-18T19:55:00.000Z CD b936204: staging deploy OK — tami-staging-app healthy, jobs up, /api/health 200, https 401 (basic auth). Release staging: 0dfc8f9 (lần lỗi), b936204 (current). Job production đỏ do chưa cấu hình env production (không có release/container prod) — user bật Required reviewers. Seed nền OK (34 tỉnh, 3.321 phường/xã, 11 danh mục, 2 trang pháp lý); seed --sample: menu/footer + 3 dịch vụ OK, dừng ở tin mẫu vì chưa có admin (staff = 0). Session dừng — user resume ở session mới.
