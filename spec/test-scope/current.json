@@ -1,82 +1,84 @@
 {
-  "specVersion": "1.6.0",
-  "scopeVersion": 6,
-  "generatedAt": "2026-10-19T18:00:00+07:00",
+  "specVersion": "1.7.0",
+  "scopeVersion": 7,
+  "generatedAt": "2026-10-19T19:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/rental-share-buttons-s09",
-  "backlog": "BL-007",
+  "workItem": "feature/apply-form-upload-progress",
+  "backlog": "BL-005",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-rental-share-buttons-s09.md",
+  "changeDoc": "spec/changes/2026-10-19-apply-form-upload-progress.md",
   "task": [
-    "tasks/feature-rental-share-buttons-s09/phase-1-task-01.md"
+    "tasks/feature-apply-form-upload-progress/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-rental-share-buttons-s09.md",
+  "specUpdate": "spec/updates/2026-10-19-apply-form-upload-progress.md",
   "specRefs": [
-    "F4",
-    "FR-PUB-07",
-    "design-spec S09"
+    "F6",
+    "FR-PUB-09",
+    "design-spec §3.4",
+    "API_SPEC §3.2"
   ],
   "specRefNotes": {
-    "F4": "SPECIFICATIONS.md F4: chi tiết bài Đăng tin BĐS có chia sẻ (Facebook, Zalo, sao chép link) ở đầu bài; điện thoại 1 nút 'Chia sẻ' Web Share API (fallback menu); ≥ xl cụm chia sẻ dính lề trái khi cuộn",
-    "FR-PUB-07": "Chi tiết bài Đăng tin BĐS /tin-bds/[slug] · /en/property-news/[slug]",
-    "design-spec S09": ".context/design-spec.md S09 bước 2 + bảng responsive: một cụm chia sẻ duy nhất; < 640 nút Share (navigator.share, fallback menu aria-expanded, Esc/bấm ngoài đóng); 640–1279 hàng ngang dưới ngày đăng; ≥ 1280 cụm dọc icon có aria-label, sticky lề trái cột chữ tới hết nội dung/thư viện ảnh, không đè form lead/bài liên quan"
+    "F6": "SPECIFICATIONS.md F6: form nộp CV (PDF/DOC/DOCX ≤ 5MB); màn ≥ md có thêm vùng kéo-thả tệp cạnh nút 'Chọn tệp', kiểm đuôi + dung lượng như khi chọn tệp; khi gửi nút hiện % tiến trình tải lên thật, trình đọc màn hình đọc được",
+    "FR-PUB-09": "Tuyển dụng: danh sách, chi tiết, form ứng tuyển (vị trí hết hạn ẩn form)",
+    "design-spec §3.4": ".context/design-spec.md §3.4: CV có vùng kéo-thả ở ≥ md, nút 'Chọn tệp / Choose file' ở mọi cỡ; khi gửi hiện tiến trình upload (XHR progress) trong nút dạng '%', không có track nền",
+    "API_SPEC §3.2": "POST /api/public/job-applications — contract không đổi (field, Turnstile, lỗi 400 field / code postingClosed / 413 / 415 / 429 / 5xx)"
   },
   "changed": {
     "files": [
-      "src/components/posts/PostDetail.tsx",
-      "src/components/posts/PostShare.tsx",
-      "src/components/posts/PostShare.test.tsx",
-      "src/components/news/use-copy-link.ts",
-      "src/components/news/ShareButtons.tsx",
-      "src/components/icons.ts",
+      "src/components/careers/ApplyForm.tsx",
+      "src/components/careers/ApplyForm.test.tsx",
+      "src/components/careers/CvPicker.tsx",
+      "src/components/forms/use-public-form.ts",
+      "src/components/forms/use-public-form.test.tsx",
+      "src/components/forms/submit-helpers.ts",
+      "src/components/forms/test-utils.ts",
       "src/i18n/messages/vi.json",
       "src/i18n/messages/en.json",
-      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.test.tsx",
-      "SPECIFICATIONS.md",
-      ".context/design-spec.md"
+      "SPECIFICATIONS.md"
     ],
-    "filesNote": "ShareButtons.tsx chỉ refactor nội bộ (logic sao chép tách ra hook use-copy-link.ts), props/markup/hành vi không đổi — tin tức/tuyển dụng cần regression. Không đổi API/schema.",
+    "filesNote": "Đã chốt theo code thật: CvPicker.tsx mới (nút Chọn tệp mọi cỡ + vùng kéo-thả ≥ md + input file sr-only); usePublicForm thêm option trackUploadProgress (XHR qua postWithUploadProgress trong submit-helpers, bọc thành Response, dùng chung luồng lỗi; không truyền option → fetch như cũ, LeadForm không đổi); test-utils.ts = FakeUploadXhr cho test. Không đổi API/schema; design-spec §3.4 không đổi chữ.",
     "modules": [
-      "PostDetail (chi tiết bài Đăng tin BĐS)",
-      "chia sẻ bài Đăng tin BĐS (Web Share API + fallback menu + cụm dính ≥ xl)",
+      "ApplyForm (form ứng tuyển trang chi tiết tuyển dụng)",
+      "usePublicForm (hook gửi form công khai dùng chung với LeadForm)",
       "i18n messages VI/EN"
     ]
   },
   "impact": {
     "direct": [
-      "/tin-bds/[slug] và /en/property-news/[slug]: cụm chia sẻ nằm ở đầu bài (sau tiêu đề/ngày đăng), không còn bản ở cuối bài",
-      "< 640px: chỉ 1 nút 'Chia sẻ' (VI) / 'Share' (EN); trình duyệt có navigator.share → gọi với tiêu đề + URL canonical",
-      "< 640px không có navigator.share (hoặc lỗi khác AbortError) → mở menu Facebook, Zalo, sao chép link; aria-expanded đổi đúng; Esc và bấm ra ngoài đóng menu",
-      "Người dùng huỷ share (AbortError) → không mở menu, không báo lỗi",
-      "640–1279px: hàng ngang Facebook, Zalo, sao chép link ngay dưới ngày đăng",
-      "≥ 1280px: cụm dọc chỉ icon (mỗi nút có aria-label) dính lề trái cột chữ khi cuộn, dừng ở hết nội dung/thư viện ảnh, không đè form lead và bài liên quan",
-      "Sao chép link → URL canonical vào clipboard + phản hồi đã sao chép; link Facebook/Zalo chứa URL canonical đúng locale"
+      "≥ 768px: vùng kéo-thả CV cạnh nút 'Chọn tệp / Choose file'; thả file .pdf/.doc/.docx ≤ 5MB → nhận như chọn tệp (hiện tên file)",
+      "Thả file sai đuôi hoặc > 5MB → báo lỗi tại ô CV giống hệt khi chọn tệp, không nhận file",
+      "< 768px: không có vùng kéo-thả, chỉ nút 'Chọn tệp / Choose file'",
+      "Khi gửi: nút gửi hiện % tiến trình tải lên thật (XHR upload.onprogress), không có track nền; xong hoặc lỗi → nút về trạng thái như cũ",
+      "A11y: vùng kéo-thả có label, thao tác bàn phím qua nút 'Chọn tệp'; tiến trình đọc được bởi trình đọc màn hình (aria-live hoặc progressbar)"
     ],
     "dependents": [
-      "PostDetail: khối ưu đãi, ảnh bìa, nội dung, thư viện ảnh, form lead, bài liên quan vẫn render đúng thứ tự S09",
+      "LeadForm (dùng chung usePublicForm): gửi lead dự án / cho thuê / Đăng tin BĐS / liên hệ không đổi hành vi",
       "i18n vi.json/en.json: nhãn mới có ở cả 2 locale"
     ],
     "regression": [
-      "Tin tức chi tiết /tin-tuc/[slug] (VI/EN) vẫn dùng ShareButtons như cũ (vị trí, nút, hành vi)",
-      "Tuyển dụng chi tiết (JobDetail) vẫn dùng ShareButtons như cũ",
-      "Gửi lead trong bài Đăng tin BĐS (validate, consent, Turnstile, UTM) như cũ",
-      "JSON-LD Article, metadata/canonical trang bài Đăng tin BĐS không đổi; trang vẫn static/ISR",
-      "Bàn phím: tab tới được mọi nút chia sẻ, focus ring hiển thị"
+      "Gửi hồ sơ thành công (200) → thông báo thành công như cũ, form reset",
+      "400 lỗi field → hiện lỗi tại đúng field",
+      "400 code postingClosed (vị trí hết hạn) → thông báo vị trí đã hết hạn như cũ",
+      "413 (file quá lớn) / 415 (sai loại file) → lỗi tại ô CV",
+      "429 / 5xx / mất mạng → thông báo lỗi chung, cho gửi lại",
+      "Turnstile reset sau mỗi lần gửi (thành công hoặc lỗi)",
+      "i18n VI/EN: nhãn, lỗi, thông báo đúng ngôn ngữ",
+      "Gửi lead dự án / cho thuê / liên hệ (validate, consent, Turnstile, UTM) không đổi",
+      "Chọn tệp bằng nút ở mọi cỡ màn vẫn hoạt động như cũ"
     ]
   },
   "acceptance": [
-    "Nút chia sẻ ở đầu bài (sau tiêu đề/meta), bỏ bản ở cuối bài",
-    "≤ sm: 1 nút 'Chia sẻ / Share' gọi navigator.share khi có; không có → menu (Facebook, Zalo, sao chép link)",
-    "≥ xl: cụm nút dính cột trái khi cuộn; sm–xl hàng ngang",
-    "Không vỡ trang tin tức đang dùng ShareButtons; i18n VI/EN; a11y label",
-    "Test component; pnpm test/lint/typecheck/build PASS"
+    "≥ md: vùng kéo-thả nhận file (.pdf/.doc/.docx ≤ 5MB), validate giống chọn tệp; < md chỉ nút chọn tệp",
+    "Khi gửi: nút hiện % tiến trình upload thật (XHR upload.onprogress); xong/lỗi về trạng thái như cũ",
+    "Giữ nguyên contract endpoint, Turnstile, thông báo lỗi/thành công, i18n VI/EN",
+    "A11y: vùng kéo-thả có label + fallback nút bàn phím; tiến trình đọc được (aria-live hoặc progressbar)",
+    "Test component kéo-thả + progress; pnpm test/lint/typecheck/build PASS"
   ],
   "viewports": [
     375,
-    640,
     768,
     1280
   ],
   "risk": "medium",
-  "riskNote": "low-medium: chỉ UI 1 màn, không đổi API/schema/auth; nâng lên medium cho enum low|medium|high vì có sticky + Web Share theo trình duyệt và component chia sẻ dùng chung tin tức/tuyển dụng cần regression"
+  "riskNote": "UI 1 form, không đổi API/schema/auth; medium vì có upload file + đổi đường gửi sang XHR trong hook usePublicForm dùng chung với LeadForm cần regression mọi form công khai"
 }

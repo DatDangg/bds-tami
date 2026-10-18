@@ -8,6 +8,7 @@ import {
   collectFields,
   isCaptchaFailureMessage,
   parseDetails,
+  postWithUploadProgress,
   readErrorCode,
   readErrorDetails,
   readErrorMessage,
@@ -29,6 +30,8 @@ type PublicFormOptions = {
   fileField?: string;
   /** Validate client (cùng luật API), trả `{tênField: thông báo đã dịch}`; rỗng = hợp lệ. */
   validate?: (fields: FormFields) => Record<string, string>;
+  /** Multipart: gửi bằng XMLHttpRequest để có `uploadPercent` (form CV). Không bật → fetch như cũ. */
+  trackUploadProgress?: boolean;
 };
 
 export type FormIssue = {
@@ -52,7 +55,7 @@ function failureFromStatus(statusCode: number, retryAfter: string | null, t: Tra
   return { kind: "server", message: t("errors.generic"), retryable: true };
 }
 
-export function usePublicForm({ endpoint, encoding, fieldNames, fileField, validate }: PublicFormOptions) {
+export function usePublicForm({ endpoint, encoding, fieldNames, fileField, validate, trackUploadProgress }: PublicFormOptions) {
   const t = useTranslations("form");
   const locale = useLocale();
   // Form được ghi nhớ lúc submit (từ event) để focus ô lỗi; không dùng ref vì react-hooks/refs coi cả kết quả hook là ref.
@@ -69,6 +72,8 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
   // Cờ đang gửi đọc đồng bộ trong handler: chặn chắc chắn kể cả khi `submit()` bị gọi 2 lần trước khi React render lại.
   const inFlightRef = useRef(false);
   const [lastSubmit, setLastSubmit] = useState<{ fields: FormFields; extra?: SubmitExtra } | null>(null);
+  // % upload đã làm tròn; `null` khi chưa có số (chưa gửi, chưa có sự kiện progress, hoặc đã xong/lỗi).
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
 
   // Sau khi lỗi được render (aria-invalid đã gắn) mới focus ô lỗi đầu tiên theo thứ tự DOM.
   useEffect(() => {
@@ -132,11 +137,14 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
   async function send(fields: FormFields, extra?: SubmitExtra) {
     const payload = { fields, extra, turnstileToken: token ?? undefined, locale };
     const isJson = encoding === "json";
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: isJson ? { "Content-Type": "application/json", Accept: "application/json" } : { Accept: "application/json" },
-      body: isJson ? buildJsonBody(payload) : buildMultipartBody(payload),
-    });
+    const response =
+      !isJson && trackUploadProgress
+        ? await postWithUploadProgress(endpoint, buildMultipartBody(payload), setUploadPercent)
+        : await fetch(endpoint, {
+            method: "POST",
+            headers: isJson ? { "Content-Type": "application/json", Accept: "application/json" } : { Accept: "application/json" },
+            body: isJson ? buildJsonBody(payload) : buildMultipartBody(payload),
+          });
     if (response.ok) {
       // Không giữ họ tên/SĐT/file CV trong state sau khi đã gửi xong.
       setLastSubmit(null);
@@ -172,6 +180,7 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
       failWith({ kind: "network", message: t("errors.network"), details: [], retryable: true });
     } finally {
       inFlightRef.current = false;
+      setUploadPercent(null);
       // Token Turnstile chỉ dùng được 1 lần, dù thành công hay lỗi: xin token mới.
       setToken(null);
       setResetSignal((count) => count + 1);
@@ -200,6 +209,7 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
     status,
     fieldErrors,
     issue,
+    uploadPercent,
     handleSubmit,
     submit,
     retry,

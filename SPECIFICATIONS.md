@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.6.0
+- **spec_version:** 1.7.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -63,7 +63,7 @@ Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ 
 Tin tức chung theo danh mục, có tags, bài liên quan. Không thu lead.
 
 ### F6. Tuyển dụng: FR-PUB-09, FR-ADM-05
-Danh sách việc (tự ẩn khi quá hạn nộp; mở URL trực tiếp thì hiện băng "đã hết hạn", ẩn form, `noindex`, bỏ JSON-LD), chi tiết, form nộp CV (PDF/DOC/DOCX ≤ 5MB). Admin quản lý hồ sơ (`new/reviewing/interview/hired/rejected`). JSON-LD `JobPosting`.
+Danh sách việc (tự ẩn khi quá hạn nộp; mở URL trực tiếp thì hiện băng "đã hết hạn", ẩn form, `noindex`, bỏ JSON-LD), chi tiết, form nộp CV (PDF/DOC/DOCX ≤ 5MB; màn ≥ md có thêm vùng kéo-thả tệp cạnh nút "Chọn tệp", kiểm đuôi + dung lượng như khi chọn tệp; khi gửi, nút hiện % tiến trình tải lên thật và trình đọc màn hình đọc được — design-spec §3.4). Admin quản lý hồ sơ (`new/reviewing/interview/hired/rejected`). JSON-LD `JobPosting`.
 
 ### F7. Dịch vụ, Liên hệ, trang pháp lý: FR-PUB-10, 11, 14
 Trang dịch vụ (Phân phối, Môi giới, Khai thác CHDV), trang liên hệ (form, bản đồ, hotline), chính sách bảo mật, điều khoản.

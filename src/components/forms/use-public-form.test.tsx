@@ -3,20 +3,22 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "../media/test-utils";
 import { ConsentCheckbox } from "./ConsentCheckbox";
+import { FakeUploadXhr } from "./test-utils";
 import { FormField } from "./FormField";
 import { FormErrorSummary, FormStatus } from "./FormStatus";
 import { buildMultipartBody } from "./submit-helpers";
 import { usePublicForm } from "./use-public-form";
 
-type HarnessProps = { encoding?: "json" | "multipart"; endpoint?: string };
+type HarnessProps = { encoding?: "json" | "multipart"; endpoint?: string; trackUploadProgress?: boolean };
 
 /** Form tối thiểu ráp các primitive như form lead/ứng tuyển sẽ làm; nút "token" thay cho widget Turnstile thật. */
-function Harness({ encoding = "json", endpoint = "/api/public/leads" }: HarnessProps) {
-  const form = usePublicForm({ endpoint, encoding, fieldNames: ["fullName", "phone", "cv"], fileField: encoding === "multipart" ? "cv" : undefined });
+function Harness({ encoding = "json", endpoint = "/api/public/leads", trackUploadProgress }: HarnessProps) {
+  const form = usePublicForm({ endpoint, encoding, fieldNames: ["fullName", "phone", "cv"], fileField: encoding === "multipart" ? "cv" : undefined, trackUploadProgress });
   if (form.status === "success") return <FormStatus />;
   const submitting = form.status === "submitting";
   return (
     <form noValidate onSubmit={(event) => form.handleSubmit(event, { source: "contact" })}>
+      {form.uploadPercent !== null && <span data-testid="percent">{form.uploadPercent}%</span>}
       <FormField name="fullName" label="Họ tên" required readOnly={submitting} error={form.fieldErrors.fullName} />
       <FormField name="phone" label="Số điện thoại" required readOnly={submitting} error={form.fieldErrors.phone} />
       {encoding === "multipart" && <FormField as="file" name="cv" label="CV" error={form.fieldErrors.cv} />}
@@ -362,6 +364,78 @@ describe("usePublicForm", () => {
     expect(submit).toBeDisabled();
     release(jsonResponse(200, { success: true, data: {} }));
     expect(await screen.findByRole("status")).toBeInTheDocument();
+  });
+});
+
+describe("usePublicForm: trackUploadProgress (XHR)", () => {
+  function renderUploadHarness() {
+    return renderWithIntl(<Harness encoding="multipart" endpoint="/api/public/job-applications" trackUploadProgress />);
+  }
+
+  it("không bật option thì vẫn dùng fetch, không tạo XMLHttpRequest (LeadForm/json không đổi)", async () => {
+    const Xhr = FakeUploadXhr.install();
+    const fetchMock = stubFetch(jsonResponse(200, { success: true, data: {} }));
+    const user = userEvent.setup();
+    renderWithIntl(<Harness />);
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "Gửi" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(Xhr.instances).toHaveLength(0);
+  });
+
+  it("bật option: gửi bằng XHR cùng body multipart + Accept json, % tăng theo upload.onprogress, 200 → success và % về null", async () => {
+    const Xhr = FakeUploadXhr.install();
+    const fetchMock = stubFetch(jsonResponse(500, { success: false }));
+    const user = userEvent.setup();
+    renderUploadHarness();
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "submit-with-cv" }));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(Xhr.sent).toHaveBeenCalledTimes(1);
+    const [url, body] = Xhr.sent.mock.calls[0]!;
+    expect(url).toBe("/api/public/job-applications");
+    expect(body).toBeInstanceOf(FormData);
+    expect(body.get("turnstileToken")).toBe("tok-1");
+    expect((body.get("cv") as File).name).toBe("cv.pdf");
+    expect(Xhr.last.requestHeaders).toEqual({ Accept: "application/json" });
+    expect(screen.queryByTestId("percent")).toBeNull();
+
+    Xhr.last.progress(500, 1000);
+    expect(screen.getByTestId("percent")).toHaveTextContent("50%");
+    Xhr.last.progress(1000, 1000);
+    expect(screen.getByTestId("percent")).toHaveTextContent("100%");
+    Xhr.last.respond(200, { success: true, data: {} });
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+  });
+
+  it("413 qua XHR gắn vào ô CV như fetch; % về null; 429 đọc Retry-After", async () => {
+    const Xhr = FakeUploadXhr.install();
+    const user = userEvent.setup();
+    renderUploadHarness();
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "submit-with-cv" }));
+    Xhr.last.progress(300, 1000);
+    Xhr.last.respond(413, { success: false, error: "File quá lớn", details: [] });
+    const cv = await screen.findByLabelText("CV");
+    await waitFor(() => expect(cv).toHaveAttribute("aria-invalid", "true"));
+    expect(screen.queryByTestId("percent")).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: "token" }));
+    await user.click(screen.getByRole("button", { name: "submit-with-cv" }));
+    Xhr.last.respond(429, { success: false, error: "x", details: [] }, { "Retry-After": "420" });
+    expect(await screen.findByRole("alert")).toHaveTextContent("7 phút");
+  });
+
+  it("lỗi mạng (onerror) qua XHR hiện thông báo mạng + nút Thử lại như fetch", async () => {
+    const Xhr = FakeUploadXhr.install();
+    const user = userEvent.setup();
+    renderUploadHarness();
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "submit-with-cv" }));
+    Xhr.last.fail();
+    expect(await screen.findByRole("alert")).toHaveTextContent("kiểm tra kết nối mạng");
+    expect(screen.getByRole("button", { name: "Thử lại" })).toBeInTheDocument();
+    expect(screen.queryByTestId("percent")).toBeNull();
   });
 });
 

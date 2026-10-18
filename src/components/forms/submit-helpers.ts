@@ -52,6 +52,35 @@ export function buildMultipartBody({ fields, extra, turnstileToken, locale }: Su
   return body;
 }
 
+/**
+ * POST multipart bằng XMLHttpRequest để đọc tiến trình upload (fetch không có `upload.onprogress`).
+ * Trả `Response` để phần xử lý kết quả (ok/400/413/429/503, `Retry-After`, body JSON) dùng chung với đường fetch;
+ * lỗi mạng/timeout/abort reject `TypeError` giống fetch nên luồng "network" phía trên không đổi.
+ */
+export function postWithUploadProgress(endpoint: string, body: FormData, onProgress: (percent: number) => void): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", endpoint);
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) onProgress(Math.round((event.loaded / event.total) * 100));
+    };
+    xhr.onload = () => {
+      // `Response` chỉ nhận status 200–599; status 0 (bị chặn/CORS) coi là lỗi mạng như fetch.
+      if (xhr.status < 200 || xhr.status > 599) {
+        reject(new TypeError("Network request failed"));
+        return;
+      }
+      const headers = new Headers();
+      const retryAfter = xhr.getResponseHeader("Retry-After");
+      if (retryAfter) headers.set("Retry-After", retryAfter);
+      resolve(new Response(xhr.responseText || null, { status: xhr.status, headers }));
+    };
+    xhr.onerror = xhr.ontimeout = xhr.onabort = () => reject(new TypeError("Network request failed"));
+    xhr.send(body);
+  });
+}
+
 export type DetailError = { field: string; message?: string };
 
 /**

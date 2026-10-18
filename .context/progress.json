@@ -144,6 +144,33 @@
       "review": "NORMAL PASS",
       "round": 2,
       "report": ".context/review-reports/feature-rental-share-buttons-s09-phase-1-task-01-round-2-review.md"
+    },
+    {
+      "slug": "apply-form-upload-progress",
+      "title": "Form ứng tuyển: % tiến trình tải CV thật (XHR upload.onprogress, dải tô trong nút + progressbar sr-only) + vùng kéo-thả CV ≥ md, nút Chọn tệp mọi cỡ (BL-005)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-005",
+      "changeDoc": "spec/changes/archive/2026-10-19-apply-form-upload-progress.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-apply-form-upload-progress/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-apply-form-upload-progress-phase-1-task-01-round-2-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.7.0",
+      "scopeVersion": 7,
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/feature-apply-form-upload-progress-phase-1-task-01-round-2-review.md"
     }
   ],
   "bugs": [
