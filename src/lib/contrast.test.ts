@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 // Đọc token thật từ globals.css để test không lệch khỏi CSS đang chạy (tokens §9).
-const css = readFileSync("src/app/(frontend)/globals.css", "utf8");
+// Checkout Windows (core.autocrlf) ra CRLF; marker bên dưới viết theo LF.
+const css = readFileSync("src/app/(frontend)/globals.css", "utf8").replace(/\r\n/g, "\n");
 
 function declarationsOf(block: string): Map<string, string> {
   const map = new Map<string, string>();
