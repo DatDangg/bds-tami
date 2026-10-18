@@ -56,6 +56,8 @@ x-app-environment: &app-environment
   GLITCHTIP_DSN: ${GLITCHTIP_DSN:-}
   GLITCHTIP_PUBLIC_DSN: ${GLITCHTIP_PUBLIC_DSN:-}
   METRICS_TOKEN: ${METRICS_TOKEN:-}
+  # Job (container jobs) gọi app qua mạng Docker để làm mới cache trang (lib/revalidate/internal-revalidate.ts); Nginx chặn /api/internal/ ra ngoài.
+  INTERNAL_APP_URL: http://app:3000
   LOG_LEVEL: ${LOG_LEVEL:-info}
 
 x-hardening: &hardening

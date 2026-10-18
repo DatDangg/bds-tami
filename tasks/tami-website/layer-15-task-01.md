@@ -179,3 +179,4 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (staging đang 0).
 - [ ] Xác nhận DB production khác DB staging (tên DB/host trong `prod.env` ≠ `/opt/tami/staging.env`), không sync data staging→prod (Tests của L6-T01).
 - [ ] G28 (LOW, spec-validation layer 6): bước migrate trên DB trống trong CI kiểm đủ số migration đã apply (19/19 tại L6) + các index chính, không chỉ "không lỗi".
+- [ ] Kiểm `down` của migration `close_job_postings_task` (và các migration thêm giá trị enum jobs) có xoá row task trước khi dựng lại enum như `20261018_075627_property_posts` (review L7-T01 r2 residual).

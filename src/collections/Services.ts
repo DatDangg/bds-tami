@@ -1,6 +1,7 @@
 import type { CollectionConfig, UploadField, UploadFieldSingleValidation } from "payload";
 
 import { isAdmin } from "../access";
+import { validateCoverWhenPublished } from "../fields/cover-image";
 import { requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
@@ -13,16 +14,6 @@ const imageUpload = (name: string, validate?: UploadFieldSingleValidation): Uplo
   filterOptions: { mimeType: { contains: "image/" } },
   validate,
 });
-
-/**
- * Ảnh bìa là ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ, nên bắt buộc khi xuất bản (ERD §4.9). `data` của
- * lần sửa một phần có thể thiếu `coverImage` dù bản đã lưu có, nên giá trị đã lưu (`previousValue`) cũng được tính.
- */
-const validateCoverImage: UploadFieldSingleValidation = (value, { data, previousValue }) => {
-  const publishing = (data as { status?: string } | undefined)?.status === "published";
-  const hasImage = value != null || (value === undefined && previousValue != null);
-  return publishing && !hasImage ? "Cần ảnh bìa trước khi xuất bản dịch vụ." : true;
-};
 
 /**
  * Dịch vụ (ERD §4.9, FR-PUB-10, FR-ADM-07): Phân phối · Môi giới · Khai thác căn hộ dịch vụ. Khách đọc bản đã xuất bản;
@@ -39,7 +30,8 @@ export function createServices(revalidate?: RevalidatePaths): CollectionConfig {
       fields: [
         titleField(),
         imageUpload("icon"),
-        imageUpload("coverImage", validateCoverImage),
+        // Ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ (ERD §4.9): bắt buộc khi xuất bản.
+        imageUpload("coverImage", validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản dịch vụ.")),
         { name: "summary", type: "textarea", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
         { name: "content", type: "richText", localized: true },
         { name: "sortOrder", type: "number", defaultValue: 0, index: true },

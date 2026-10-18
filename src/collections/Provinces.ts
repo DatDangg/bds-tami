@@ -7,6 +7,7 @@ const REFERENCING_COLLECTIONS = [
   { slug: "wards", label: "phường/xã" },
   { slug: "rentals", label: "tin cho thuê" },
   { slug: "projects", label: "dự án" },
+  { slug: "property-posts", label: "tin đăng BĐS" },
 ] as const;
 
 const blockDeleteWhileReferenced: CollectionBeforeDeleteHook = async ({ id, req }) => {

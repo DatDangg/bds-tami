@@ -131,7 +131,7 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
     sale = await createStaff("sale", ROLES.sale);
     await payload.updateGlobal({ slug: "site-settings", data: { siteName: "TAMI" }, locale: "vi", overrideAccess: true });
     // Trường upload chỉ cần một `media` tồn tại: chèn thẳng một dòng để khỏi ghi file ra đĩa.
-    const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" DEFAULT VALUES RETURNING id`));
+    const inserted = await withDatabase((client) => client.query(`INSERT INTO "media" (mime_type) VALUES ('image/jpeg') RETURNING id`));
     mediaId = inserted.rows[0].id as string;
   }, 120_000);
 
@@ -191,6 +191,11 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       expect(await statusOf(updateService(published.id, { coverImage: null }))).toBe(400);
       // Nháp được phép không có ảnh.
       expect((await updateService(draft.id, { sortOrder: 1 })).status).toBe("draft");
+    });
+
+    it("coverImage chỉ nhận ảnh: PDF bị validator upload mặc định chặn (helper ảnh bìa dùng chung gọi nó trước)", async () => {
+      const pdf = await withDatabase((client) => client.query(`INSERT INTO "media" (mime_type) VALUES ($1) RETURNING id`, ["application/pdf"]));
+      expect(await statusOf(createService({ title: "Bìa PDF", coverImage: pdf.rows[0].id as string }))).toBe(400);
     });
 
     it("bật hasEnglish cần đủ title, slug, summary, content bản en", async () => {

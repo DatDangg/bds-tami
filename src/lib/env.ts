@@ -81,6 +81,8 @@ const envSchema = z.object({
   GLITCHTIP_PUBLIC_DSN: z.preprocess(emptyToUndefined, z.url().optional()),
   // Bearer token cho `/api/metrics`; chưa đặt thì endpoint tắt (404). Tối thiểu 32 ký tự để chống đoán.
   METRICS_TOKEN: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
+  // Địa chỉ `app` trong mạng nội bộ để job (process `jobs`) gọi route làm mới cache; thiếu thì dev dùng http://localhost:3000.
+  INTERNAL_APP_URL: z.preprocess(emptyToUndefined, z.url().optional()),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -6,6 +6,7 @@ import { seedLegalPages } from "./pages";
 import { seedSampleJobPostings } from "./sample/job-postings";
 import { seedSampleNews } from "./sample/news";
 import { seedSampleProjects } from "./sample/projects";
+import { seedSamplePropertyPosts } from "./sample/property-posts";
 import { seedSampleRentals } from "./sample/rentals";
 import { seedSampleServices } from "./sample/services";
 import { seedShellGlobals } from "./shell-globals";
@@ -77,6 +78,13 @@ const SAMPLE_STEPS: readonly SeedStep[] = [
     name: "tin cho thuê mẫu",
     async run(payload) {
       const { created, skipped } = await seedSampleRentals(payload);
+      return `tạo ${created}, bỏ qua ${skipped}`;
+    },
+  },
+  {
+    name: "bài đăng tin BĐS mẫu",
+    async run(payload) {
+      const { created, skipped } = await seedSamplePropertyPosts(payload);
       return `tạo ${created}, bỏ qua ${skipped}`;
     },
   },

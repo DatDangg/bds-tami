@@ -22,6 +22,11 @@ describe("publicWhere", () => {
     expect(JSON.stringify(publicWhere("rentals", "vi"))).toContain('"in":["published","rented"]');
   });
 
+  it("property-posts: chỉ published (không có rented), en cần hasEnglish", () => {
+    expect(publicWhere("property-posts", "vi")).toEqual({ and: [{ status: { in: ["published"] } }, { deletedAt: { exists: false } }] });
+    expect(JSON.stringify(publicWhere("property-posts", "en"))).toContain("hasEnglish");
+  });
+
   it("collection không có status (categories, developers): chỉ lọc xoá mềm, en vẫn đòi hasEnglish", () => {
     for (const slug of ["categories", "developers"]) {
       expect(publicWhere(slug, "vi")).toEqual({ deletedAt: { exists: false } });

@@ -23,6 +23,7 @@ import { Pages } from "./collections/Pages";
 import { PrivateFiles } from "./collections/PrivateFiles";
 import { News } from "./collections/News";
 import { Projects } from "./collections/Projects";
+import { PropertyPosts } from "./collections/PropertyPosts";
 import { Rentals } from "./collections/Rentals";
 import { Services } from "./collections/Services";
 import { Staff } from "./collections/Staff";
@@ -61,7 +62,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, JobPostings, JobApplications],
+  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),

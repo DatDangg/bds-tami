@@ -83,6 +83,7 @@ export interface Config {
     news: News;
     projects: Project;
     rentals: Rental;
+    'property-posts': PropertyPost;
     'job-postings': JobPosting;
     'job-applications': JobApplication;
     redirects: Redirect;
@@ -110,6 +111,7 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     rentals: RentalsSelect<false> | RentalsSelect<true>;
+    'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
     'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
     'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -145,6 +147,7 @@ export interface Config {
       'send-notification-email': TaskSendNotificationEmail;
       'aggregate-click-stats': TaskAggregateClickStats;
       'close-job-postings': TaskCloseJobPostings;
+      'expire-offers': TaskExpireOffers;
       inline: {
         input: unknown;
         output: unknown;
@@ -901,6 +904,81 @@ export interface Rental {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "property-posts".
+ */
+export interface PropertyPost {
+  id: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  cover?: (string | null) | Media;
+  gallery?: (string | Media)[] | null;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  priceVnd?: number | null;
+  priceNote?: string | null;
+  province?: (string | null) | Province;
+  ward?: (string | null) | Ward;
+  relatedProject?: (string | null) | Project;
+  relatedRental?: (string | null) | Rental;
+  offer?: {
+    startAt?: string | null;
+    endAt?: string | null;
+    voucherCode?: string | null;
+    terms?: string | null;
+  };
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings".
  */
 export interface JobPosting {
@@ -1102,7 +1180,8 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings';
+        taskSlug:
+          'inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings' | 'expire-offers';
         taskID: string;
         input?:
           | {
@@ -1135,7 +1214,8 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings') | null;
+  taskSlug?:
+    ('inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings' | 'expire-offers') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1221,6 +1301,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'rentals';
         value: string | Rental;
+      } | null)
+    | ({
+        relationTo: 'property-posts';
+        value: string | PropertyPost;
       } | null)
     | ({
         relationTo: 'job-postings';
@@ -1800,6 +1884,61 @@ export interface RentalsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "property-posts_select".
+ */
+export interface PropertyPostsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  cover?: T;
+  gallery?: T;
+  excerpt?: T;
+  content?: T;
+  priceVnd?: T;
+  priceNote?: T;
+  province?: T;
+  ward?: T;
+  relatedProject?: T;
+  relatedRental?: T;
+  offer?:
+    | T
+    | {
+        startAt?: T;
+        endAt?: T;
+        voucherCode?: T;
+        terms?: T;
+      };
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings_select".
  */
 export interface JobPostingsSelect<T extends boolean = true> {
@@ -2331,6 +2470,16 @@ export interface TaskAggregateClickStats {
  * via the `definition` "TaskClose-job-postings".
  */
 export interface TaskCloseJobPostings {
+  input?: unknown;
+  output: {
+    expired: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskExpire-offers".
+ */
+export interface TaskExpireOffers {
   input?: unknown;
   output: {
     expired: number;

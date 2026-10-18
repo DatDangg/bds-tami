@@ -36,3 +36,15 @@ export const validateWardInProvince: RelationshipFieldSingleValidation = async (
   if (!ward) return "Phường/xã không tồn tại.";
   return relationId(ward.province) === provinceId ? true : "Phường/xã không thuộc tỉnh/thành đã chọn.";
 };
+
+/**
+ * Như `validateWardInProvince` cho collection mà `province` và `ward` đều TUỲ CHỌN (đăng tin BĐS): phường không có tỉnh thì không lọc/so
+ * được, nên chọn phường mà thiếu tỉnh là lỗi (`siblingData` đã gộp giá trị đã lưu: xoá riêng `province` khi còn `ward` cũng bị chặn).
+ */
+export const validateWardWithOptionalProvince: RelationshipFieldSingleValidation = async (value, options) => {
+  const base = await validateWardInProvince(value, options);
+  if (base !== true) return base;
+  const wardId = relationId(value ?? (options.siblingData as { ward?: unknown } | undefined)?.ward);
+  const provinceId = relationId((options.siblingData as ProvinceSibling)?.province);
+  return wardId && !provinceId ? "Chọn tỉnh/thành trước khi chọn phường/xã." : true;
+};

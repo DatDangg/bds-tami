@@ -164,6 +164,18 @@ Dành cho Prometheus, **không public**: Nginx trả 404 cho đường này; scr
 
 Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/metrics/route.ts`, `src/lib/monitoring/metrics*.ts`.
 
+### 3.8. `POST /api/internal/revalidate` (nội bộ)
+
+Dành cho process `jobs` (`expire-offers`, `close-job-postings`) làm mới cache trang công khai, **không public**: Nginx trả 404 cho `/api/internal/`; job gọi thẳng `INTERNAL_APP_URL` trong mạng Docker. Xác thực `Authorization: Bearer <token>` với token = HMAC-SHA256(`PAYLOAD_SECRET`, `tami:internal-revalidate:v1`) dạng hex (so sánh thời gian hằng). Body JSON `{ "paths": ["/vi/tin-bds/x", "/en", ...] }`, tối đa 200 đường dẫn, mỗi đường dẫn phải là đường dẫn nội bộ của trang công khai `/{vi|en}[/segment...]` (không `..`, không query).
+
+| Mã | Body |
+|---|---|
+| `200` | `{ "revalidated": <số đường dẫn> }` |
+| `400` | Body sai (không phải JSON, quá 200 đường dẫn, đường dẫn không hợp lệ) |
+| `401` | Thiếu/sai token |
+
+Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/internal/revalidate/route.ts`, `src/lib/revalidate/internal-revalidate.ts`.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

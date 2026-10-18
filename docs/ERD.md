@@ -317,6 +317,14 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `author` | `rel→staff` | R, I | Lead từ bài này tự giao cho người này |
 | `seo` | group | | |
 
+**As-built (layer-7-task-01):** `src/collections/PropertyPosts.ts`, migration `20261018_075627_property_posts` (bảng `property_posts`, `_locales`, `_rels` + bảng phiên bản; thêm giá trị `expire-offers` vào enum task của Payload Jobs; additive, không DROP/đổi kiểu).
+- **Trường localized:** `title`, `slug`, `excerpt`, `content`, `priceNote`, `offer.terms`; còn lại dùng chung các ngôn ngữ. `status` chỉ `draft`/`published`/`hidden`; khách thấy `published`.
+- **`cover`:** bắt buộc khi `published`, bản nháp được thiếu (như `news`); validator dùng chung `src/fields/cover-image.ts` (cũng dùng cho `news.cover`, `services.coverImage`), luôn chạy validator `upload` mặc định trước nên chỉ nhận ảnh. `gallery` chỉ nhận ảnh, tuỳ chọn.
+- **`province`/`ward` đều tuỳ chọn; `ward` phải thuộc `province` (G22)** — `filterOptions` trong admin + validator ở server; chọn `ward` mà thiếu `province` là lỗi 400. Không xoá được tỉnh/phường còn bài tham chiếu (409, tính cả bài xoá mềm).
+- **`offer`:** `startAt`, `endAt` là NGÀY (ô chọn `dayOnly`, ghim 12:00 UTC); `endAt` không được trước `startAt`; `voucherCode` ≤ 64 ký tự. "Đã kết thúc" **không lưu cờ trong DB**: `isOfferEnded(post, now)` (`src/lib/content/offer-status.ts`) là nguồn duy nhất — ưu đãi hết hiệu lực từ 00:00 ngày kế tiếp sau `endAt` theo giờ VN (cùng quy ước hạn nộp hồ sơ tuyển dụng); không có `endAt` = không hết hạn. Truy vấn khối "Ưu đãi nổi bật" dùng `offerNotEndedWhere(now)` (phủ định chính xác của `isOfferEnded`, có test đối chiếu ở các mốc biên); job dùng `offerJustEndedWhere(now)`.
+- `relatedProject`, `relatedRental` là quan hệ tuỳ chọn có index; xoá dự án/tin cho thuê tham chiếu sẽ đặt NULL (FK `ON DELETE SET NULL`).
+- Danh mục `category` giới hạn scope `property_post`; không xoá được danh mục đang có bài (409, kể cả xoá mềm). Slug collection nằm trong allowlist `PublicCollectionSlug` (G12) và `TRANSLATABLE_COLLECTIONS`. Dữ liệu mẫu (`pnpm seed --sample`): 2 bài draft (một bài tin, một voucher), chưa có ảnh bìa.
+
 ### 4.8. `news` (Tin tức)
 
 | Trường | Kiểu | Ràng buộc | Ghi chú |
@@ -558,7 +566,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `rentals` | GIN `search_text gin_trgm_ops` | Tìm từ khoá không dấu |
 | `rentals`, `projects` | GIST `location` | Sẵn cho tìm theo bản đồ sau này |
 | `projects` | `(status, has_english, sales_status, province_id)` (`projects_list_idx`, SQL tuỳ biến trong migration `20261017_125429_projects`, không partial — giống `news_list_idx`) | Lọc dự án |
-| `property_posts` | `(status, category_id, published_at DESC)`, `(status, is_featured, offer_end_at)` | Danh sách, khối ưu đãi |
+| `property_posts` | `(status, has_english, category_id, published_at DESC)` (`property_posts_list_idx`), `(status, is_featured, offer_end_at)` (`property_posts_featured_offer_idx`); SQL tuỳ biến trong migration `20261018_075627_property_posts`, không partial. Thêm index đơn `offer_end_at` (`property_posts_offer_offer_end_at_idx`, do `index: true` của field) cho truy vấn job `expire-offers` | Danh sách, khối ưu đãi |
 | `news` | `(status, has_english, category_id, published_at DESC)` (`news_list_idx`, SQL tuỳ biến trong migration `20261017_093650_news`) | Danh sách tin tức |
 | `job_postings` | `(status, has_english, deadline)` (`job_postings_list_idx`, SQL tuỳ biến trong migration `20261017_130625_job_postings`, không partial) | Danh sách tin tuyển dụng còn hạn |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |

@@ -2,7 +2,8 @@ import type { PayloadRequest, TaskConfig } from "payload";
 
 import { startOfVietnamDay } from "../lib/careers/deadline";
 import { CONTENT_ROUTES, contentPaths } from "../lib/content/content-paths";
-import { revalidateWithNext, type RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidatePaths } from "../hooks/revalidate-content";
+import { revalidateFromJob } from "../lib/revalidate/internal-revalidate";
 
 export const CLOSE_JOB_POSTINGS_SLUG = "close-job-postings";
 
@@ -23,11 +24,11 @@ interface LocalizedSlugDoc {
  * Làm mới cache trang của các tin tuyển dụng vừa hết hạn (hạn chót là ngày hôm qua giờ VN): trang chi tiết (vi + en) và danh sách. KHÔNG đổi
  * `status` và không sửa bản ghi nào: tin hết hạn vẫn mở bằng URL trực tiếp và hiện băng "hết hạn" (SPECIFICATIONS F6); việc ẩn khỏi danh sách do
  * truy vấn danh sách (`listOpenJobs`, `deadline >= hôm nay giờ VN`), không phụ thuộc job này. Job là lưới an toàn cho cache ISR của trang chi tiết:
- * ngoài ngữ cảnh Next (process `jobs`) `revalidatePath` không có tác dụng và `revalidateWithNext` chỉ ghi cảnh báo (xem ARCHITECTURE §5.4), khi đó
- * trang chi tiết tự đổi trạng thái nhờ `revalidate = 60`. Sitemap bỏ tin hết hạn ở layer-8-task-05 (cũng theo hạn lúc dựng, không cần job).
+ * ngoài ngữ cảnh Next (process `jobs`) `revalidatePath` không có tác dụng, nên `revalidate` mặc định gọi route nội bộ của app (`revalidateFromJob`,
+ * ARCHITECTURE §5.4); lỗi gọi ném ra để Payload Jobs thử lại. Sitemap bỏ tin hết hạn ở layer-8-task-05 (cũng theo hạn lúc dựng, không cần job).
  */
 export async function closeJobPostings(args: { req: PayloadRequest; now?: Date; revalidate?: RevalidatePaths }): Promise<CloseJobPostingsOutcome> {
-  const { req, now = new Date(), revalidate = revalidateWithNext } = args;
+  const { req, now = new Date(), revalidate = revalidateFromJob } = args;
   const { payload } = req;
   const todayStart = startOfVietnamDay(now);
   const justExpired = await payload.find({

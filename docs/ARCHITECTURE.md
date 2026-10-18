@@ -90,7 +90,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── (frontend)/[locale]/  # Website công khai (Trang chủ, Dự án, Cho thuê, ...), dùng chung cho vi / en; layout.tsx (generateStaticParams → [], dựng `<html>` qua `PublicDocument`), not-found.tsx (nội dung 404, dùng lại ở `app/global-not-found.tsx`), error.tsx; không có catch-all
 │   │   ├── global-error.tsx   # Trang lỗi gốc (khi layout lỗi), hotline lấy từ NEXT_PUBLIC_HOTLINE lúc build
 │   │   ├── robots.ts          # /robots.txt lúc chạy theo APP_ENV (dùng lib/seo/robots)
-│   │   └── (payload)/         # /admin và /api do Payload sinh; route tĩnh thắng catch-all /api/[...slug]: api/health, api/metrics (Prometheus, Bearer), api/monitoring-config (DSN GlitchTip lúc chạy)
+│   │   └── (payload)/         # /admin và /api do Payload sinh; route tĩnh thắng catch-all /api/[...slug]: api/health, api/metrics (Prometheus, Bearer), api/monitoring-config (DSN GlitchTip lúc chạy), api/internal/revalidate (job làm mới cache, Bearer dẫn xuất từ PAYLOAD_SECRET, Nginx chặn)
 │   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...; redirects-plugin.ts (cấu hình plugin redirects)
 │   │   └── _shared/           # content-defaults.ts: factory withContentDefaults (versions, trash, access, hook dùng chung)
 │   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo, ward-in-province (phường/xã thuộc tỉnh đã chọn)
@@ -101,7 +101,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
 │   │   ├── public/            # Endpoint công khai: click-events (đã có), leads, job-applications
 │   │   └── admin/             # Endpoint cần đăng nhập admin: private-file-download (tải file private qua S3)
-│   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu
+│   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu, aggregate-click-stats, close-job-postings, expire-offers
 │   ├── lib/
 │   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
 │   │   ├── security/          # rate-limit (Redis Lua), turnstile, client-ip, ip-hash
@@ -115,6 +115,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── consent/           # consent-cookie.ts: đọc/ghi cookie đồng ý (analytics, pv = privacyPolicyVersion)
 │   │   ├── monitoring/        # GlitchTip options + scrubText, metrics Prometheus, process-errors, service-name
 │   │   ├── content/           # content-paths (path nội bộ /{locale}{key} cho revalidate), public-queries (publicWhere/findPublicList/BySlug), pagination, nav-link, get-globals/read-global/global-cache, site-identity, resolve-redirect/find-redirect/redirect-paths, resolve-missing-page (404 có nội dung, `MISSING_PAGE_RULES`)
+│   │   ├── revalidate/        # internal-revalidate: token, validate body, handler route nội bộ + client cho job (`revalidateFromJob`)
 │   │   ├── payload/           # preserve-request-locale, prod-migrations (AUTO_MIGRATE_ON_START)
 │   │   ├── logger.ts          # pino JSON + redact/scrub PII, dùng chung app/jobs/Payload
 │   │   ├── s3-config.ts       # Cấu hình S3 client (SeaweedFS) dùng chung
@@ -218,11 +219,14 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 |---|---|---|
 | `send-notification-email` | Ngay khi có sự kiện | Email lead mới / giao lead / hồ sơ ứng tuyển. Retry 5 lần (backoff từ 30s); input sai → huỷ không retry; xong thì xoá job (không giữ PII) |
 | `remind-unassigned-leads` | 10 phút/lần, giờ hành chính | Lead `new` chưa có sale sau 30 phút thì nhắc admin (BR-14) |
-| `expire-offers` | Hằng ngày 00:05 | Bài Đăng tin BĐS quá hạn ưu đãi thì gắn "Đã kết thúc", xoá cache trang (BR-06) |
-| `close-job-postings` | Hằng ngày 00:10 giờ VN (cron `0 10 17 * * *` = 17:10 UTC: `schedule` không có múi giờ riêng, container `jobs` chạy UTC) | Làm mới cache trang (chi tiết vi/en + danh sách) của tin tuyển dụng vừa hết hạn (hạn chót là hôm qua giờ VN). **Không đổi `status`/bản ghi nào**: tin hết hạn vẫn mở bằng URL trực tiếp với băng "hết hạn" (SPEC F6); việc ẩn khỏi danh sách do truy vấn danh sách lọc `deadline`. Ngoài ngữ cảnh Next (process `jobs`) `revalidatePath` không có tác dụng (chỉ ghi cảnh báo, như hook lưu nội dung chạy từ script/seed): trạng thái đúng do ISR `revalidate = 60` của trang chi tiết + `force-dynamic` của danh sách |
+| `expire-offers` | Hằng ngày 00:05 giờ VN (cron `0 5 17 * * *` = 17:05 UTC, như `close-job-postings`) | Làm mới cache trang của bài Đăng tin BĐS có ưu đãi vừa kết thúc (`offer.endAt` là hôm qua giờ VN): chi tiết vi/en, `/tin-bds`, trang chủ (BR-06). **Không đổi bản ghi nào**: "Đã kết thúc" do `isOfferEnded` tính lúc render (nguồn duy nhất, cũng loại bài khỏi khối "Ưu đãi nổi bật"); job chỉ đẩy cache ISR ra ngay lúc 00:05. Idempotent. Làm mới cache qua route nội bộ của app (xem dưới) |
+| `close-job-postings` | Hằng ngày 00:10 giờ VN (cron `0 10 17 * * *` = 17:10 UTC: `schedule` không có múi giờ riêng, container `jobs` chạy UTC) | Làm mới cache trang (chi tiết vi/en + danh sách) của tin tuyển dụng vừa hết hạn (hạn chót là hôm qua giờ VN). **Không đổi `status`/bản ghi nào**: tin hết hạn vẫn mở bằng URL trực tiếp với băng "hết hạn" (SPEC F6); việc ẩn khỏi danh sách do truy vấn danh sách lọc `deadline`. Làm mới cache qua route nội bộ của app (xem dưới) thay vì `revalidatePath` trực tiếp (vô tác dụng ngoài Next); trang chi tiết vẫn có ISR `revalidate = 60` + danh sách `force-dynamic` làm lưới an toàn |
 | `data-retention` | Hằng tuần | Ẩn danh lead quá 24 tháng, xoá CV quá 12 tháng (BR-31) |
 | `aggregate-click-stats` | Hằng giờ (cron `0 0 * * * *`, 6 trường) | Gộp số lượt bấm hotline/Zalo/fanpage cho dashboard; xoá `click-events` > 90 ngày đã gộp. Cộng dồn đọc-rồi-ghi, chỉ đúng khi có **1 process `jobs`** (Decision 3) |
 | `translate-content` | Ngay khi lưu bản `vi` đang xuất bản / global, hoặc bấm "Dịch lại bằng AI" | Dịch các trường đã đổi sang `en` (bỏ qua bản `enSource = manual`), sinh slug `en`, bật `hasEnglish`, xoá cache `/en`. Gộp nhiều lần lưu liên tiếp của cùng bài (chờ ~1 phút). Thử lại 3 lần (backoff); lỗi thì `translation.status = failed`. Kiểm hạn mức tháng trước khi gọi (BR-08) |
+
+
+**Làm mới cache từ job (`expire-offers`, `close-job-postings`).** Job chạy ở process `jobs` (ngoài Next) nên `revalidatePath` không có tác dụng. Job gọi `POST {INTERNAL_APP_URL}/api/internal/revalidate` (body `{ paths: ["/vi/...", "/en/..."] }`, ≤ 200 đường dẫn/lần, client tự chia lô); route chạy trong Next và gọi `revalidatePath`. Quyết định thiết kế: (1) xác thực Bearer token = HMAC-SHA256 của `PAYLOAD_SECRET` với nhãn riêng (`tami:internal-revalidate:v1`) — `app` và `jobs` đều đã có `PAYLOAD_SECRET` nên KHÔNG thêm secret mới phải cấp phát/xoay vòng, và lộ token không lộ `PAYLOAD_SECRET`; (2) Nginx trả 404 cho `/api/internal/` ra Internet, job gọi thẳng `INTERNAL_APP_URL` (compose đặt `http://app:3000`, dev mặc định `http://localhost:3000`); (3) route chỉ nhận đường dẫn trang công khai `/{vi|en}...` (không `..`, không query) nên không dùng được để làm mới đường dẫn tuỳ ý; (4) lỗi gọi (mạng, 401, 5xx) được ném ra để Payload Jobs thử lại theo `retries` (3 lần, backoff mũ), không nuốt lỗi. Hook lưu nội dung chạy trong Next vẫn dùng `revalidateWithNext`. Code: `src/lib/revalidate/internal-revalidate.ts`, `src/app/(payload)/api/internal/revalidate/route.ts`.
 
 ---
 
