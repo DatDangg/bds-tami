@@ -69,6 +69,8 @@ export interface RealEstateListingInput extends Localized {
   address?: string | null;
   /** Giá thuê; bỏ trống khi "liên hệ". */
   price?: { amount: number; currency: string } | null;
+  /** Đơn vị đăng tin (Organization): TAMI. Bỏ trống thì không khai. */
+  publisher?: { name: string; siteUrl: string; logoUrl?: string } | null;
 }
 
 export function buildRealEstateListingJsonLd(input: RealEstateListingInput) {
@@ -81,6 +83,9 @@ export function buildRealEstateListingJsonLd(input: RealEstateListingInput) {
     image: input.imageUrls?.length ? [...input.imageUrls] : undefined,
     datePosted: input.datePosted || undefined,
     inLanguage: input.locale,
+    publisher: input.publisher
+      ? { "@type": "Organization", name: input.publisher.name, url: input.publisher.siteUrl, logo: input.publisher.logoUrl }
+      : undefined,
     contentLocation: input.address ? { "@type": "Place", address: input.address } : undefined,
     offers: input.price
       ? {

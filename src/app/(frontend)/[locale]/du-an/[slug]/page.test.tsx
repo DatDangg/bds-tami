@@ -117,6 +117,8 @@ describe("trang chi tiết dự án (S03)", () => {
       inLanguage: "vi",
       datePosted: "2026-02-03T00:00:00.000Z",
       contentLocation: { address: "Quận 1, Hà Nội" },
+      // G26: Organization (publisher) trong JSON-LD RealEstateListing.
+      publisher: { "@type": "Organization", name: "TAMI", url: "https://tami.example" },
     });
     expect(listing?.image).toEqual(["https://tami.example/api/media/file/g1-1600.webp", "https://tami.example/api/media/file/g2-1600.webp"]);
     expect(items.find((item) => item["@type"] === "BreadcrumbList")).toBeDefined();

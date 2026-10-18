@@ -12,6 +12,7 @@ export {
   FacebookLogo,
   Globe,
   Headset,
+  Info,
   InstagramLogo,
   LinkedinLogo,
   List,

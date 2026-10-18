@@ -291,6 +291,104 @@
       "relatedTitle": "Dự án khác",
       "stickyConsult": "Nhận tư vấn"
     },
+    "rentalDetail": {
+      "code": "Mã tin",
+      "postedAt": "Đăng ngày",
+      "rented": {
+        "badge": "Đã thuê",
+        "bannerTitle": "Căn này đã được cho thuê",
+        "banner": "Căn này đã được cho thuê. Xem các căn tương tự bên dưới hoặc để lại thông tin để TAMI tư vấn.",
+        "referencePrice": "Giá tham khảo"
+      },
+      "specs": {
+        "label": "Thông số chính",
+        "price": "Giá thuê",
+        "perMonth": "/tháng",
+        "negotiable": "Thoả thuận",
+        "area": "Diện tích",
+        "bedrooms": "Phòng ngủ",
+        "bathrooms": "WC"
+      },
+      "details": {
+        "title": "Chi tiết",
+        "floor": "Tầng",
+        "houseDirection": "Hướng nhà",
+        "balconyDirection": "Hướng ban công",
+        "furnishing": "Nội thất",
+        "category": "Danh mục",
+        "project": "Dự án"
+      },
+      "direction": {
+        "N": "Bắc",
+        "NE": "Đông Bắc",
+        "E": "Đông",
+        "SE": "Đông Nam",
+        "S": "Nam",
+        "SW": "Tây Nam",
+        "W": "Tây",
+        "NW": "Tây Bắc"
+      },
+      "furnishing": {
+        "none": "Không nội thất",
+        "basic": "Cơ bản",
+        "full": "Đầy đủ"
+      },
+      "terms": {
+        "title": "Điều khoản thuê",
+        "minLease": "Thời hạn tối thiểu",
+        "months": "{count} tháng",
+        "deposit": "Đặt cọc",
+        "paymentCycle": "Kỳ thanh toán",
+        "availableFrom": "Ngày trống",
+        "services": "Dịch vụ bao gồm",
+        "cycle": {
+          "monthly": "Hàng tháng",
+          "quarterly": "Hàng quý",
+          "semiannual": "6 tháng",
+          "annual": "Hàng năm"
+        },
+        "service": {
+          "electricity": "Điện",
+          "water": "Nước",
+          "internet": "Internet",
+          "cleaning": "Dọn phòng",
+          "laundry": "Giặt ủi",
+          "parking": "Giữ xe",
+          "management_fee": "Phí quản lý",
+          "security": "An ninh"
+        }
+      },
+      "sections": {
+        "description": "Mô tả",
+        "video": "Video",
+        "location": "Vị trí",
+        "legal": "Pháp lý"
+      },
+      "location": {
+        "mapLabel": "Vị trí {name} trên bản đồ"
+      },
+      "contact": {
+        "saleTitle": "Người phụ trách",
+        "hotlineTitle": "Liên hệ TAMI",
+        "callSale": "Gọi {phone}",
+        "callHotline": "Gọi hotline {phone}",
+        "avatarAlt": "Ảnh {name}"
+      },
+      "leadForm": {
+        "title": "Nhận tư vấn",
+        "titleRented": "Nhận tư vấn căn tương tự",
+        "fallback": "Gọi hotline hoặc liên hệ để được tư vấn chi tiết về căn này.",
+        "fallbackRented": "Căn này đã được cho thuê. Gọi hotline hoặc liên hệ để TAMI tư vấn các căn tương tự.",
+        "hotline": "Hotline"
+      },
+      "similar": {
+        "title": "Tin tương tự",
+        "titleRented": "Căn tương tự đang trống",
+        "bedroomsValue": "{count} PN"
+      },
+      "stickyConsult": "Nhận tư vấn",
+      "stickyConsultRented": "Nhận tư vấn căn tương tự"
+    },
     "careers": {
       "title": "Tuyển dụng",
       "description": "Gia nhập đội ngũ TAMI: xem các vị trí đang tuyển và gửi hồ sơ trực tuyến.",

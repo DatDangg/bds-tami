@@ -91,6 +91,13 @@ describe("json-ld builders (schema.org)", () => {
     });
   });
 
+  it("RealEstateListing: publisher là Organization (G26); không truyền thì không khai", () => {
+    const base = { locale: "vi", name: "A", url: "https://x.test/cho-thue/a" } as const;
+    const withPublisher = asEmitted(buildRealEstateListingJsonLd({ ...base, publisher: { name: "TAMI", siteUrl: "https://x.test", logoUrl: "https://x.test/logo.png" } }));
+    expect(withPublisher.publisher).toEqual({ "@type": "Organization", name: "TAMI", url: "https://x.test", logo: "https://x.test/logo.png" });
+    expect(asEmitted(buildRealEstateListingJsonLd(base))).not.toHaveProperty("publisher");
+  });
+
   it("RealEstateListing có inLanguage và Offer", () => {
     expect(
       asEmitted(

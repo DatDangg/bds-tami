@@ -73,7 +73,7 @@ function hasRenderableSize(media: Media): boolean {
 }
 
 /** Ảnh dùng được: đã populate, là ảnh (không phải PDF) và có URL/cỡ để dựng `<img>`. Ảnh bị xoá (FK set null) hoặc chỉ còn id thì bỏ. */
-function renderableImage(value: Media | string | null | undefined): Media | null {
+export function renderableImage(value: Media | string | null | undefined): Media | null {
   const media = populatedMedia(value);
   if (!media) return null;
   if (typeof media.mimeType === "string" && !media.mimeType.startsWith("image/")) return null;

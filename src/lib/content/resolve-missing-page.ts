@@ -32,6 +32,8 @@ export const MISSING_PAGE_RULES: readonly MissingPageRule[] = [
   { key: "/tin-tuc/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "news" } } },
   { key: "/dich-vu/[slug]", param: "slug", collection: "services" },
   { key: "/du-an/[slug]", param: "slug", collection: "projects" },
+  // Tin cho thuê ĐÃ THUÊ (`rented`) vẫn công khai (`publicWhere` của rentals): chỉ slug lạ / nháp / ẩn / thiếu bản EN mới 404.
+  { key: "/cho-thue/[slug]", param: "slug", collection: "rentals" },
   // Tin tuyển dụng HẾT HẠN vẫn tồn tại (`publicWhere` không lọc hạn): chỉ slug lạ / chưa công khai / thiếu bản EN mới 404.
   { key: "/tuyen-dung/[slug]", param: "slug", collection: "job-postings" },
   { key: LEGAL_PAGE_ROUTES.privacy, collection: "pages", where: { kind: { equals: "privacy" } } },

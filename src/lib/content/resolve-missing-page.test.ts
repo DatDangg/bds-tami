@@ -80,6 +80,18 @@ describe("resolveMissingPage", () => {
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "projects", "en", "chua-dich", { depth: 0 });
   });
 
+  it("cho thuê (G27): khớp vi/en, tra rentals theo slug của ngôn ngữ URL; danh sách và trang danh mục/khu vực không bị khớp", async () => {
+    expect(matchDynamicPage("/cho-thue/can-ho-a")).toMatchObject({ locale: "vi", slug: "can-ho-a", rule: { collection: "rentals" } });
+    expect(matchDynamicPage("/en/for-rent/apartment-a")).toMatchObject({ locale: "en", slug: "apartment-a", rule: { collection: "rentals" } });
+    expect(matchDynamicPage("/cho-thue")).toBeNull();
+    expect(matchDynamicPage("/en/for-rent")).toBeNull();
+    expect(matchDynamicPage("/cho-thue/danh-muc/can-ho")).toBeNull();
+    expect(matchDynamicPage("/en/for-rent/area/ha-noi")).toBeNull();
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/cho-thue/khong-co")).toBe("vi");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "rentals", "vi", "khong-co", { depth: 0 });
+  });
+
   it("tuyển dụng: khớp vi/en, tra job-postings theo slug của ngôn ngữ URL; danh sách /tuyen-dung không bị khớp", async () => {
     expect(matchDynamicPage("/tuyen-dung/sales")).toMatchObject({ locale: "vi", slug: "sales", rule: { collection: "job-postings" } });
     expect(matchDynamicPage("/en/careers/sales-manager")).toMatchObject({ locale: "en", slug: "sales-manager", rule: { collection: "job-postings" } });

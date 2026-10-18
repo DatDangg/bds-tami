@@ -102,3 +102,4 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 - [ ] `scripts/bench/rentals-search.ts`: chặn chạy khi `NODE_ENV=production` / `APP_ENV` staging|production hoặc host DB không phải dev (tránh chèn 100.000 tin giả published).
 - [ ] Hook reindex `src/hooks/{wards,projects}/reindex-rentals.ts` chạy đồng bộ trong transaction admin → đẩy sang job nền khi số tin vượt ngưỡng.
 - [ ] Đổi tên tỉnh chưa có hook reindex (đang dựa `pnpm reindex:rentals-search`).
+- [ ] Gộp `RentalCardData`/`RentalCard` cục bộ của trang chi tiết (L7-T03, `src/lib/rentals/rental-view.ts`, `SimilarRentals`) với DTO `RentalCard` của `GET /api/public/rentals` (`src/shared/types/api.ts`, L7-T02) — một component thẻ dùng chung.

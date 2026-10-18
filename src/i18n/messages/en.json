@@ -291,6 +291,104 @@
       "relatedTitle": "Other projects",
       "stickyConsult": "Get advice"
     },
+    "rentalDetail": {
+      "code": "Listing ID",
+      "postedAt": "Posted",
+      "rented": {
+        "badge": "Rented",
+        "bannerTitle": "This unit has been rented",
+        "banner": "This unit has been rented. See similar units below or leave your details for advice.",
+        "referencePrice": "Reference price"
+      },
+      "specs": {
+        "label": "Key facts",
+        "price": "Rent",
+        "perMonth": "/month",
+        "negotiable": "Negotiable",
+        "area": "Area",
+        "bedrooms": "Bedrooms",
+        "bathrooms": "Bathrooms"
+      },
+      "details": {
+        "title": "Details",
+        "floor": "Floor",
+        "houseDirection": "House direction",
+        "balconyDirection": "Balcony direction",
+        "furnishing": "Furnishing",
+        "category": "Category",
+        "project": "Project"
+      },
+      "direction": {
+        "N": "North",
+        "NE": "Northeast",
+        "E": "East",
+        "SE": "Southeast",
+        "S": "South",
+        "SW": "Southwest",
+        "W": "West",
+        "NW": "Northwest"
+      },
+      "furnishing": {
+        "none": "Unfurnished",
+        "basic": "Basic",
+        "full": "Fully furnished"
+      },
+      "terms": {
+        "title": "Lease terms",
+        "minLease": "Minimum lease",
+        "months": "{count} months",
+        "deposit": "Deposit",
+        "paymentCycle": "Payment cycle",
+        "availableFrom": "Available from",
+        "services": "Included services",
+        "cycle": {
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "semiannual": "Every 6 months",
+          "annual": "Annually"
+        },
+        "service": {
+          "electricity": "Electricity",
+          "water": "Water",
+          "internet": "Internet",
+          "cleaning": "Cleaning",
+          "laundry": "Laundry",
+          "parking": "Parking",
+          "management_fee": "Management fee",
+          "security": "Security"
+        }
+      },
+      "sections": {
+        "description": "Description",
+        "video": "Video",
+        "location": "Location",
+        "legal": "Legal information"
+      },
+      "location": {
+        "mapLabel": "{name} location on the map"
+      },
+      "contact": {
+        "saleTitle": "Agent in charge",
+        "hotlineTitle": "Contact TAMI",
+        "callSale": "Call {phone}",
+        "callHotline": "Call hotline {phone}",
+        "avatarAlt": "Photo of {name}"
+      },
+      "leadForm": {
+        "title": "Get advice",
+        "titleRented": "Find similar units",
+        "fallback": "Call the hotline or contact us for detailed advice about this unit.",
+        "fallbackRented": "This unit has been rented. Call the hotline or contact us and TAMI will advise on similar units.",
+        "hotline": "Hotline"
+      },
+      "similar": {
+        "title": "Similar listings",
+        "titleRented": "Similar available units",
+        "bedroomsValue": "{count} BR"
+      },
+      "stickyConsult": "Get advice",
+      "stickyConsultRented": "Find similar units"
+    },
     "careers": {
       "title": "Careers",
       "description": "Join the TAMI team: browse our open positions and apply online.",

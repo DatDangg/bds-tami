@@ -97,7 +97,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [relatedDocs, hotline] = await Promise.all([findOtherProjects(payload, locale, doc), loadHotline(locale)]);
+  const [relatedDocs, hotline, identity] = await Promise.all([findOtherProjects(payload, locale, doc), loadHotline(locale), loadSiteIdentity(locale)]);
   const view = toProjectDetailView(doc, locale);
   const ownPath = publicDetailPath(CONTENT_ROUTES.projects, locale, doc.slug ?? slug);
   const siteUrl = getSiteUrl();
@@ -106,11 +106,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     return url ? [url] : [];
   });
   const pageUrl = absoluteUrl(ownPath, siteUrl);
+  const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
 
   return (
     <>
       <ProjectDetail doc={doc} view={view} related={toProjectCards(relatedDocs, locale)} {...(hotline ? { hotline } : {})} ownPath={ownPath} />
-      {pageUrl && (
+      {pageUrl && siteUrl && (
         <JsonLd
           data={buildRealEstateListingJsonLd({
             locale,
@@ -120,6 +121,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             imageUrls,
             datePosted: doc.publishedAt,
             address: [view.address, view.areaLabel].filter(Boolean).join(", ") || null,
+            // G26: đơn vị đăng tin (Organization).
+            publisher: { name: identity.siteName, siteUrl, ...(logoUrl ? { logoUrl } : {}) },
           })}
         />
       )}
