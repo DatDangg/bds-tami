@@ -158,6 +158,7 @@ export interface Config {
       'aggregate-click-stats': TaskAggregateClickStats;
       'close-job-postings': TaskCloseJobPostings;
       'expire-offers': TaskExpireOffers;
+      'remind-unassigned-leads': TaskRemindUnassignedLeads;
       inline: {
         input: unknown;
         output: unknown;
@@ -1147,6 +1148,7 @@ export interface Lead {
   referrer?: string | null;
   ipHash?: string | null;
   userAgent?: string | null;
+  remindedAt?: string | null;
   anonymizedAt?: string | null;
   activities?: {
     docs?: (string | LeadActivity)[];
@@ -1256,7 +1258,12 @@ export interface PayloadJob {
         executedAt: string;
         completedAt: string;
         taskSlug:
-          'inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings' | 'expire-offers';
+          | 'inline'
+          | 'send-notification-email'
+          | 'aggregate-click-stats'
+          | 'close-job-postings'
+          | 'expire-offers'
+          | 'remind-unassigned-leads';
         taskID: string;
         input?:
           | {
@@ -1290,7 +1297,15 @@ export interface PayloadJob {
       }[]
     | null;
   taskSlug?:
-    ('inline' | 'send-notification-email' | 'aggregate-click-stats' | 'close-job-postings' | 'expire-offers') | null;
+    | (
+        | 'inline'
+        | 'send-notification-email'
+        | 'aggregate-click-stats'
+        | 'close-job-postings'
+        | 'expire-offers'
+        | 'remind-unassigned-leads'
+      )
+    | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -2127,6 +2142,7 @@ export interface LeadsSelect<T extends boolean = true> {
   referrer?: T;
   ipHash?: T;
   userAgent?: T;
+  remindedAt?: T;
   anonymizedAt?: T;
   activities?: T;
   updatedAt?: T;
@@ -2793,7 +2809,7 @@ export interface CollectionsWidget {
  */
 export interface TaskSendNotificationEmail {
   input: {
-    template: 'new-lead' | 'lead-assigned' | 'job-application';
+    template: 'new-lead' | 'lead-assigned' | 'job-application' | 'unassigned-reminder';
     to: string[];
     data?:
       | {
@@ -2839,6 +2855,16 @@ export interface TaskExpireOffers {
   input?: unknown;
   output: {
     expired: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRemind-unassigned-leads".
+ */
+export interface TaskRemindUnassignedLeads {
+  input?: unknown;
+  output: {
+    reminded: number;
   };
 }
 /**

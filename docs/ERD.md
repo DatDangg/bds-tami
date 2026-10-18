@@ -449,6 +449,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `assignedAt` | date | | |
 | `firstContactedAt` | date | | Lần đầu chuyển khỏi `new` |
 | `lastActivityAt` | date | I | Dùng cho hạn lưu 24 tháng |
+| `remindedAt` | date | | Dấu job `remind-unassigned-leads` đã nhắc admin lead chưa giao (BR-14): nhắc đúng một lần. Chỉ hệ thống ghi (migration `20261018_113101_leads_reminded_at`, cột nullable) |
 | `mergedCount` | number | | Số lần khách gửi lại và được gộp |
 | `consentAt` | date | R | |
 | `consentVersion` | text | R | |
@@ -476,6 +477,8 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `actor` | `rel→staff` | | Trống = hệ thống |
 
 Đổi `status` / `assignedTo` của lead tự sinh activity tương ứng (hook `afterChange`).
+
+Đã xây (as-built, layer-9-task-04): job `remind-unassigned-leads` (`src/jobs/remind-unassigned-leads.ts`) chọn lead `status = new`, chưa giao, chưa ẩn danh/xoá mềm, `remindedAt` trống, `createdAt` quá 30 phút, rồi lọc `businessMinutesBetween(createdAt, now) >= 30` (giờ hành chính BR-14); mỗi lead được đặt `remindedAt` + 1 activity `email_sent` (bọc `asSystemActivity`, `content` không PII) cùng transaction với job email gộp.
 
 Đã xây (as-built, layer-9-task-03): hook `leads.afterChange` `recordAssignmentChange` (`src/hooks/leads/on-assignment-change.ts`) sinh activity `assignment` (`fromAssignee`/`toAssignee`, `actor` trống nếu hệ thống) khi `assignedTo` đổi (cả lúc tạo lead tự giao); `assignedAt` do `beforeChange` `stampAssignedAt` đặt, không nhận giá trị client. Ghi activity hệ thống bọc `asSystemActivity(req, fn)` (bộ đếm trong `req.context`, an toàn khi Payload chạy `Promise.all` trên cùng `req`).
 

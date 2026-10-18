@@ -418,9 +418,16 @@
       "round": 2,
       "report": ".context/review-reports/build-tami-website-layer-9-task-01-round-2-review.md",
       "completedAt": "2026-10-18T19:50:00Z"
+    },
+    {
+      "task": "layer-9/task-04",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/build-tami-website-layer-9-task-04-round-1-review.md",
+      "completedAt": "2026-10-18T20:15:00Z"
     }
   ],
-  "inProgressTask": "layer-9/task-04 + task-05 (builder)",
+  "inProgressTask": "layer-9/task-05 (review) → task-06 → task-07",
   "blockedTasks": [
     {
       "task": "layer-4/task-06",
@@ -561,7 +568,7 @@
       "reason": "User duyệt checkpoint layer 8"
     }
   ],
-  "lastUpdated": "2026-10-18T19:50:00Z",
+  "lastUpdated": "2026-10-18T20:15:00Z",
   "approvalMilestones": [
     {
       "id": "M1",

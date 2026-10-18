@@ -154,6 +154,8 @@ const trackingFields: Field[] = [
   { name: "referrer", type: "text", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
   { name: "userAgent", type: "text", maxLength: 500, access: { read: adminOnlyRead, create: denyAll, update: denyAll }, admin: { ...readOnlyInAdmin, hidden: true } },
+  // Dấu "đã nhắc admin lead chưa giao" (job `remind-unassigned-leads`, BR-14): nhắc đúng một lần mỗi lead.
+  { name: "remindedAt", type: "date", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   { name: "anonymizedAt", type: "date", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   // Cột ảo (không có trong DB): lịch sử chăm sóc hiện ngay trong trang lead; quyền đọc theo `lead-activities`.
   { name: "activities", type: "join", collection: "lead-activities", on: "lead", defaultSort: "-createdAt", defaultLimit: 50 },

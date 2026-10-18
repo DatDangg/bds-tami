@@ -4,6 +4,7 @@ import { isAdmin } from "../access/isAdmin";
 import { aggregateClickStatsTask } from "./aggregate-click-stats";
 import { closeJobPostingsTask } from "./close-job-postings";
 import { expireOffersTask } from "./expire-offers";
+import { remindUnassignedLeadsTask } from "./remind-unassigned-leads";
 import { sendNotificationEmailTask } from "./send-notification-email";
 
 /**
@@ -14,7 +15,7 @@ import { sendNotificationEmailTask } from "./send-notification-email";
  * dọn dữ liệu, dịch) và lịch cron của chúng được thêm vào `tasks` ở task của từng nghiệp vụ.
  */
 export const jobsConfig: JobsConfig = {
-  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask],
+  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask, remindUnassignedLeadsTask],
   // Input chứa dữ liệu khách; job xong thì xoá để không giữ dữ liệu cá nhân trong bảng hàng đợi.
   deleteJobOnComplete: true,
   // Mặc định mọi user đăng nhập được chạy/xếp/huỷ job qua REST; chỉ admin mới được.

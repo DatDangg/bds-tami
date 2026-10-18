@@ -102,3 +102,7 @@ Mở khoá cho: `layer-12-task-01`
 
 ## Follow-up từ review layer-6-task-09
 - [ ] Dọn CV mồ côi: `private-files` loại CV không có `job-applications` nào trỏ tới và cũ hơn N giờ (tiến trình chết giữa lưu CV và tạo hồ sơ) → xoá row + object S3.
+
+## Follow-up từ review layer-9-task-04 round 1 (MINOR)
+- [ ] `src/jobs/remind-unassigned-leads.ts:33-51,76`: không chặn hai lần chạy chồng (đọc ứng viên ngoài transaction, update không kiểm lại `remindedAt IS NULL`) → `pg_advisory_xact_lock` + đọc lại ứng viên trong transaction (mẫu `last-admin-guard.ts:38`) hoặc update có điều kiện. Áp cùng cơ chế cho `data-retention`.
+- [ ] (tuỳ chọn) index cho truy vấn quét lead nhắc (`status, assigned_to_id, reminded_at, created_at`) khi dữ liệu lớn.

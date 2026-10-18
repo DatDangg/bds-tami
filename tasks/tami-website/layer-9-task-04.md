@@ -32,9 +32,9 @@ Mỗi 10 phút trong giờ hành chính nhắc admin các lead `new` chưa giao 
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] Đếm 30 phút theo giờ hành chính; lead tới ngoài giờ đếm từ đầu giờ làm kế tiếp
-- [ ] Mỗi lead chỉ nhắc 1 lần cho mỗi mốc (không spam mỗi 10 phút)
-- [ ] Một email gộp danh sách lead; không chứa SĐT/email khách (chỉ mã lead + link admin)
+- [x] Đếm 30 phút theo giờ hành chính; lead tới ngoài giờ đếm từ đầu giờ làm kế tiếp
+- [x] Mỗi lead chỉ nhắc 1 lần cho mỗi mốc (không spam mỗi 10 phút)
+- [x] Một email gộp danh sách lead; không chứa SĐT/email khách (chỉ mã lead + link admin)
 
 ## Tests cần viết
 - Unit `businessMinutesBetween`: tối thứ 7 → sáng thứ 2; trước 08:00; sau 17:30; Chủ nhật
@@ -56,13 +56,13 @@ Mở khoá cho: `layer-12-task-01`
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 3/3 đạt (builder)
+- Verify commands + result (builder, worktree wt9-t04): lint PASS · typecheck PASS · test 1938/1938 PASS (chỉ `src/lib/contrast.test.ts` fail do CRLF, đã biết, ngoài scope) · build PASS · integration `remind-unassigned-leads` 6/6 + migration up→down→up PASS
+- Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-9-task-04-round-1-review.md`); MINOR-1 job chạy chồng → `layer-9-task-06.md`; MINOR-2 index quét, MINOR-3 lastActivityAt lệch ~30' chấp nhận
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.11 nếu thêm `remindedAt`)
+- Doc impact result: ARCHITECTURE §5.4 (lịch cron + cách nhắc) và ERD §4.11 (`remindedAt` + as-built) đã cập nhật
 - Decision log: pending
 
 ## Commit / Tracking
@@ -71,19 +71,25 @@ Mở khoá cho: `layer-12-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-9/task-04` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
 - [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/lib/leads/business-hours.ts (`businessMinutesBetween`)
 - src/jobs/remind-unassigned-leads.ts
 - src/lib/email/templates/unassigned-reminder.ts
+- src/lib/email/templates/index.ts (đăng ký template), src/jobs/index.ts (đăng ký job), src/collections/Leads.ts (`remindedAt`), migrations/20261018_113101_leads_reminded_at.* (+ index.ts), src/payload-types.ts, docs/ARCHITECTURE.md §5.4, docs/ERD.md §4.11
 
 ## Notes
 - Chưa trừ ngày lễ (giả định spec).
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Builder notes (as-built)
+- Mốc đếm = `createdAt` của lead; nhắc đúng một lần (`remindedAt`), không có mốc thứ hai. Lead đã giao rồi bỏ giao vẫn tính từ `createdAt`.
+- Cron `0 */10 1-10 * * 1-6` (UTC) + `isBusinessHour` trong handler bỏ lần 17:30–17:50 VN.
+- Migration `20261018_113101_leads_reminded_at`: additive (`ADD VALUE IF NOT EXISTS` x2 cho enum task jobs, `ADD COLUMN IF NOT EXISTS reminded_at` nullable); `down` xoá row `payload_jobs_log`/`payload_jobs` của task rồi dựng lại enum, `IF EXISTS`.

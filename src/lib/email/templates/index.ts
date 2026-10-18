@@ -2,12 +2,14 @@ import { renderJobApplication } from "./job-application";
 import { type RenderedEmail } from "./layout";
 import { renderLeadAssigned } from "./lead-assigned";
 import { renderNewLead } from "./new-lead";
+import { renderUnassignedReminder } from "./unassigned-reminder";
 
 /** Nguồn duy nhất tên template; job `send-notification-email` lấy danh sách này làm options. */
 const renderers = {
   "new-lead": renderNewLead,
   "lead-assigned": renderLeadAssigned,
   "job-application": renderJobApplication,
+  "unassigned-reminder": renderUnassignedReminder,
 } as const satisfies Record<string, (data: unknown) => RenderedEmail>;
 
 export type EmailTemplateName = keyof typeof renderers;

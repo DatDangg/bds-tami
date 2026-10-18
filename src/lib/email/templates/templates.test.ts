@@ -61,7 +61,7 @@ describe("render template email nội bộ", () => {
   });
 
   it("danh sách tên template khớp bộ render", () => {
-    expect(EMAIL_TEMPLATE_NAMES).toEqual(["new-lead", "lead-assigned", "job-application"]);
+    expect(EMAIL_TEMPLATE_NAMES).toEqual(["new-lead", "lead-assigned", "job-application", "unassigned-reminder"]);
   });
 });
 
@@ -72,5 +72,37 @@ describe("helper layout", () => {
 
   it("toSingleLine gộp khoảng trắng và xuống dòng", () => {
     expect(toSingleLine("a\r\n b\t c ")).toBe("a b c");
+  });
+});
+
+describe("unassigned-reminder (BR-14)", () => {
+  const data = {
+    leads: [
+      { code: "LD-000001", leadUrl: "https://tami.vn/admin/collections/leads/1" },
+      { code: "LD-000002", leadUrl: "https://tami.vn/admin/collections/leads/2" },
+    ],
+    waitMinutes: 30,
+  };
+
+  it("một email gộp: mã lead + link, không có thông tin khách", () => {
+    const mail = renderEmailTemplate("unassigned-reminder", data);
+    expect(mail.subject).toBe("[TAMI] 2 khách hàng chưa được giao");
+    for (const piece of ["LD-000001", "LD-000002", data.leads[0]!.leadUrl, "30 phút làm việc"]) {
+      expect(mail.html).toContain(piece);
+      expect(mail.text).toContain(piece);
+    }
+  });
+
+  it("moreCount cộng vào tổng và có dòng 'khách hàng khác'", () => {
+    const mail = renderEmailTemplate("unassigned-reminder", { ...data, moreCount: 8 });
+    expect(mail.subject).toBe("[TAMI] 10 khách hàng chưa được giao");
+    expect(mail.text).toContain("Và 8 khách hàng khác");
+  });
+
+  it("danh sách rỗng hoặc link không http(s) -> lỗi; mã lead được escape", () => {
+    expect(() => renderEmailTemplate("unassigned-reminder", { ...data, leads: [] })).toThrow();
+    expect(() => renderEmailTemplate("unassigned-reminder", { ...data, leads: [{ code: "LD-1", leadUrl: "javascript:1" }] })).toThrow();
+    const mail = renderEmailTemplate("unassigned-reminder", { ...data, leads: [{ code: "<b>x</b>", leadUrl: data.leads[0]!.leadUrl }] });
+    expect(mail.html).not.toContain("<b>x</b>");
   });
 });
