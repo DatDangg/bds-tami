@@ -148,7 +148,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Biến thể **Đầy đủ** (dự án, liên hệ, Đăng tin BĐS): Họ tên* · Số điện thoại* · Email · Lời nhắn (textarea, đếm ký tự khi > 800/1000) · Checkbox đồng ý* · Turnstile · nút **Nhận tư vấn**.
 - Biến thể **Rút gọn** (khung dính tin cho thuê): Họ tên* · Số điện thoại* · Lời nhắn (1 dòng, mở rộng khi focus) · đồng ý* · Turnstile · nút.
 - Checkbox đồng ý: "Tôi đồng ý để TAMI xử lý dữ liệu cá nhân theo [Chính sách bảo mật]." / "I agree to TAMI processing my personal data under the [Privacy Policy]." Link mở tab mới, có `aria-describedby` tới chú thích "(mở tab mới)".
-- Gửi kèm ẩn: `source`, `sourceId`, `locale`, `pageUrl`, `utm` (đọc từ URL lần đầu vào phiên, lưu `sessionStorage`).
+- Gửi kèm ẩn: `source`, `sourceId`, `locale`, `pageUrl`, `utm` (ghi ở mọi trang công khai bởi island client trong khung trang: URL có `utm_*` thì lưu/ghi đè `sessionStorage`; lúc gửi ưu tiên UTM của URL hiện tại, không có thì bản đã lưu).
 - Validate client (cùng luật API): họ tên 2-100 ký tự; SĐT Việt Nam (chấp nhận `0xxxxxxxxx`, `+84…`, có dấu cách/chấm), `inputmode="tel"`, `autocomplete="tel"`; email hợp lệ nếu nhập; lời nhắn ≤ 1000. Validate khi blur + khi gửi, không validate khi đang gõ lần đầu.
 
 | Trạng thái | Hiển thị |

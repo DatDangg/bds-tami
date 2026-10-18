@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import type { LeadSource } from "@/lib/leads/lead-values";
 import { LeadForm } from "./LeadForm";
+import { UtmCapture } from "./UtmCapture";
 
 // Widget Turnstile có test riêng: ở đây giả lập đã xác minh xong ngay.
 vi.mock("@/components/forms/TurnstileWidget", async () => {
@@ -93,17 +94,36 @@ describe("LeadForm: payload theo source", () => {
     expect(sentBody(fetchMock)).not.toHaveProperty("sourceId");
   });
 
-  it("UTM trong URL được gửi kèm; vào trang khác vẫn còn nhờ sessionStorage", async () => {
+  it("UTM trên URL của chính trang có form được gửi kèm (ưu tiên URL hiện tại)", async () => {
     const fetchMock = stubFetch(jsonResponse(200, { success: true, data: { received: true } }));
-    window.history.replaceState(null, "", "/du-an/abc?utm_source=facebook&utm_campaign=t10");
-    const first = renderWithIntl(<LeadForm source="project" sourceId={SOURCE_ID} turnstileSiteKey="site" />, "vi");
-    first.unmount();
+    window.sessionStorage.setItem("tami.utm", JSON.stringify({ source: "zalo" }));
+    window.history.replaceState(null, "", "/lien-he?utm_source=facebook&utm_campaign=t10");
+    const user = userEvent.setup();
+    renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, "vi");
+    await fillAndSubmit(user, "Nhận tư vấn");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(sentBody(fetchMock).utm).toEqual({ source: "facebook", campaign: "t10" });
+  });
+
+  it("UTM lưu từ trang KHÔNG có form (island UtmCapture ở khung trang) → form ở trang khác gửi kèm", async () => {
+    const fetchMock = stubFetch(jsonResponse(200, { success: true, data: { received: true } }));
+    // Trang chủ có UTM, không có LeadForm: chỉ island của PublicShell chạy.
+    window.history.replaceState(null, "", "/?utm_source=facebook&utm_campaign=t10");
+    const landing = renderWithIntl(<UtmCapture />, "vi");
+    landing.unmount();
+    // Sang trang liên hệ không có UTM trên URL.
     window.history.replaceState(null, "", "/lien-he");
     const user = userEvent.setup();
     renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, "vi");
     await fillAndSubmit(user, "Nhận tư vấn");
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(sentBody(fetchMock).utm).toEqual({ source: "facebook", campaign: "t10" });
+  });
+
+  it("LeadForm không tự ghi UTM: mount ở URL có utm_* không đụng sessionStorage (island lo việc này)", () => {
+    window.history.replaceState(null, "", "/lien-he?utm_source=facebook");
+    renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, "vi");
+    expect(window.sessionStorage.getItem("tami.utm")).toBeNull();
   });
 
   it("bản EN: nút Get advice, locale=en", async () => {

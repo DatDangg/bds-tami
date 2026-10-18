@@ -33,7 +33,7 @@ function readStored(storage: Storage): LeadUtm | undefined {
   }
 }
 
-/** Gọi khi form hiện: URL có UTM thì ghi đè bản đã lưu (lượt vào mới nhất là nguồn quảng cáo thật). Storage bị chặn thì bỏ qua. */
+/** Gọi ở mọi trang công khai (island `UtmCapture`): URL có UTM thì ghi đè bản đã lưu (lượt vào mới nhất là nguồn quảng cáo thật). Storage bị chặn thì bỏ qua. */
 export function captureUtm(search: string = window.location.search): void {
   const fromUrl = parseUtmFromSearch(search);
   if (!fromUrl) return;

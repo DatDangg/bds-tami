@@ -109,6 +109,14 @@ describe("PublicShell", () => {
     const groups = screen.getAllByRole("group", { name: "Chuyển ngôn ngữ" });
     expect(groups).toHaveLength(2);
   });
+
+  it("có island ghi UTM: trang không có form vẫn lưu utm_* của URL vào sessionStorage (BR-10)", () => {
+    window.sessionStorage.clear();
+    window.history.replaceState(null, "", "/?utm_source=facebook&utm_campaign=t10");
+    renderShell();
+    expect(JSON.parse(window.sessionStorage.getItem("tami.utm") ?? "null")).toEqual({ source: "facebook", campaign: "t10" });
+    window.history.replaceState(null, "", "/");
+  });
 });
 
 describe("LanguageSwitcher", () => {

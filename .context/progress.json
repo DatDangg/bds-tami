@@ -90,6 +90,33 @@
       "review": "NORMAL PASS",
       "round": 1,
       "report": ".context/review-reports/feature-design-spec-s04-no-skeleton-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "slug": "utm-capture-public-layout",
+      "title": "Ghi UTM ở mọi trang công khai qua island client ở khung trang (sessionStorage), LeadForm đọc từ đó (BL-010)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-010",
+      "changeDoc": "spec/changes/archive/2026-10-19-utm-capture-public-layout.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-utm-capture-public-layout/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-utm-capture-public-layout-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.5.0",
+      "scopeVersion": 5,
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-utm-capture-public-layout-phase-1-task-01-round-1-review.md"
     }
   ],
   "bugs": [
@@ -765,7 +792,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T19:00:48.825Z",
+  "lastUpdated": "2026-10-18T19:15:29.310Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,76 +1,79 @@
 {
-  "specVersion": "1.4.1",
-  "scopeVersion": 4,
-  "generatedAt": "2026-10-19T16:00:00+07:00",
+  "specVersion": "1.5.0",
+  "scopeVersion": 5,
+  "generatedAt": "2026-10-19T17:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature-design-spec-s04-no-skeleton",
-  "backlog": "BL-011",
+  "workItem": "feature-utm-capture-public-layout",
+  "backlog": "BL-010",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-19-design-spec-s04-no-skeleton.md",
+  "changeDoc": "spec/changes/2026-10-19-utm-capture-public-layout.md",
   "task": [
-    "tasks/feature-design-spec-s04-no-skeleton/phase-1-task-01.md"
+    "tasks/feature-utm-capture-public-layout/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-design-spec-s04-no-skeleton.md",
+  "specUpdate": "spec/updates/2026-10-19-utm-capture-public-layout.md",
   "specRefs": [
-    "design-spec §3.2",
-    "design-spec S02",
-    "design-spec S04",
-    "design-spec S08",
-    "design-spec S10",
-    "FR-PUB-02",
-    "FR-PUB-04",
-    "FR-PUB-06",
-    "FR-PUB-08",
-    "FR-PUB-09"
+    "F9",
+    "BR-10",
+    "FR-PUB-13",
+    "design-spec §3.3"
   ],
   "specRefNotes": {
-    "design-spec §3.2": ".context/design-spec.md: không loading.tsx cấp route cho trang danh sách force-dynamic (kể cả thư mục cha) — gây soft-404; lưới danh sách dùng phản hồi chờ như S04; skeleton chỉ cho Suspense cục bộ",
-    "design-spec S04": "/cho-thue: đổi bộ lọc/trang/chip giữ kết quả cũ, mờ 50% + aria-busy, link đang chờ mờ nhẹ (useLinkStatus); không skeleton cấp route",
-    "design-spec S02": "/du-an: đổi chip/trang phản hồi chờ như S04",
-    "design-spec S08": "/tin-bds: đổi chip/trang phản hồi chờ như S04",
-    "design-spec S10": "/tin-tuc: đổi chip/trang phản hồi chờ như S04",
-    "FR-PUB-09": "/tuyen-dung: cùng nguyên tắc (thuộc LIST_PAGES của list-no-loading.test.ts)"
+    "F9": "SPECIFICATIONS.md F9: UTM (utm_source/medium/campaign/term/content) ghi ở mọi trang công khai VI/EN bởi island client ở khung trang vào sessionStorage; URL có UTM ghi đè, không có không ghi; form lead gửi UTM URL hiện tại, không có thì bản đã lưu",
+    "BR-10": "Nguồn lead (form tin cho thuê, bài Đăng tin BĐS, dự án, liên hệ) — UTM gửi kèm lead",
+    "FR-PUB-13": "Form lead công khai — trường ẩn utm",
+    "design-spec §3.3": ".context/design-spec.md Form lead 'Gửi kèm ẩn': utm ghi ở mọi trang công khai bởi island client trong khung trang; lúc gửi ưu tiên UTM URL hiện tại, không có thì bản đã lưu"
   },
   "changed": {
     "files": [
-      ".context/design-spec.md",
-      "SPECIFICATIONS.md"
+      "src/components/leads/UtmCapture.tsx",
+      "src/components/layout/PublicShell.tsx",
+      "src/components/leads/LeadForm.tsx",
+      "src/lib/leads/utm.ts",
+      "src/components/leads/UtmCapture.test.tsx",
+      "src/components/layout/PublicShell.test.tsx",
+      "src/components/leads/LeadForm.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
     ],
-    "filesNote": "doc-only — không đổi code/schema/API. Code đã khớp từ L10-T04: src/components/layout/PendingRegion.tsx, src/components/templates/CategoryListTemplate.tsx, src/components/rentals/RentalListPage.tsx; test chặn src/app/(frontend)/[locale]/list-no-loading.test.ts",
+    "filesNote": "Đã chốt theo code thật: UtmCapture.tsx + test mới; PublicShell gắn island; LeadForm bỏ captureUtm khi mount; utm.ts chỉ đổi doc comment (utm.test.ts không đổi). Không đổi API/schema.",
     "modules": [
-      "public list pages pending state (PendingRegion / PendingLink)"
+      "public layout shell (PublicShell / PublicDocument — mọi trang công khai VI/EN + 404)",
+      "lead UTM capture (src/lib/leads/utm.ts: captureUtm / readUtm, sessionStorage key tami.utm)",
+      "LeadForm (gửi lead)"
     ]
   },
   "impact": {
     "direct": [
-      "/cho-thue và /cho-thue/danh-muc/*: đổi bộ lọc/trang/chip → giữ kết quả cũ, vùng kết quả mờ 50% + aria-busy=\"true\" tới khi có kết quả, không nhảy layout; link (chip/phân trang/bỏ bộ lọc) đang chờ mờ nhẹ",
-      "/du-an: đổi chip loại hình/trang → giữ lưới cũ mờ 50% + aria-busy; link chờ mờ nhẹ",
-      "/tin-tuc (+ /tin-tuc/danh-muc/*): đổi chip danh mục/trang → phản hồi chờ như trên",
-      "/tin-bds (+ /tin-bds/danh-muc/*): đổi chip danh mục/trang → phản hồi chờ như trên",
-      "/tuyen-dung: đổi bộ lọc/trang → phản hồi chờ như trên",
-      "Không xuất hiện skeleton toàn trang (loading.tsx cấp route) khi điều hướng trong các trang danh sách trên; /en tương ứng như nhau"
+      "Vào bất kỳ trang công khai VI/EN (trang chủ, danh sách, chi tiết, /en/...) với ?utm_source=...&utm_medium=...&utm_campaign=... → sessionStorage['tami.utm'] chứa đúng các utm_* của URL",
+      "Vào trang có UTM rồi điều hướng (client-side) sang trang có LeadForm không có UTM trên URL → lead gửi kèm UTM đã lưu",
+      "URL mới có UTM khác (kể cả soft navigation đổi pathname) → ghi đè bản đã lưu",
+      "URL không có utm_* → không ghi, không xoá bản đã lưu",
+      "Trang có LeadForm mà URL hiện tại có UTM → gửi UTM của URL hiện tại (ưu tiên hơn bản lưu)",
+      "sessionStorage không khả dụng (chặn/throw, private mode) → trang không crash, form vẫn gửi được (không có utm)"
     ],
     "dependents": [
-      "Component dùng chung PendingRegion / PendingLink / CategoryListTemplate cho mọi trang danh sách"
+      "PublicShell / PublicDocument dùng cho [locale]/layout.tsx và app/not-found.tsx — mọi trang công khai VI/EN và trang 404 render bình thường, island không render DOM",
+      "LeadForm ở ProjectDetail (dự án), SaleContactBox (khung dính tin cho thuê), PostDetail (bài Đăng tin BĐS), /lien-he (liên hệ), LeadFormSlot"
     ],
     "regression": [
-      "?page vượt số trang ở các trang danh sách trên → HTTP 404 thật (không soft-404 HTTP 200)",
-      "Danh mục lạ (/cho-thue/danh-muc/<lạ>, /tin-tuc/danh-muc/<lạ>, /tin-bds/danh-muc/<lạ>) → HTTP 404",
-      "Trạng thái trống khi lọc (§3.9) và lỗi tải phần vẫn hiển thị đúng",
-      "prefers-reduced-motion: tắt transition mờ"
+      "Gửi lead ở dự án, tin cho thuê, bài Đăng tin BĐS, trang liên hệ (VI + EN): validate, consent, Turnstile, thông báo thành công/lỗi như cũ",
+      "Lead không có UTM (vào thẳng không UTM) vẫn tạo bình thường, trường utm trống",
+      "Layout công khai vẫn static/ISR: build không chuyển trang thành dynamic, không CSR bailout do useSearchParams",
+      "Header/footer/menu toàn màn hình (BL-001) không đổi",
+      "Form ứng tuyển (ApplyForm, /tuyen-dung) không gửi utm (không đổi)"
     ]
   },
   "acceptance": [
-    "Đổi bộ lọc/trang/chip ở /cho-thue, /cho-thue/danh-muc/*, /du-an, /tin-tuc(+danh mục), /tin-bds(+danh mục), /tuyen-dung: kết quả cũ giữ nguyên, mờ 50% + aria-busy=\"true\" khi chờ, hết chờ thì bỏ mờ và aria-busy",
-    "Link đang chờ (chip, phân trang, bỏ bộ lọc) mờ nhẹ + con trỏ progress",
-    "Không có skeleton cấp route; không có file loading.tsx dưới src/app cho các trang danh sách (list-no-loading.test.ts PASS)",
-    "?page vượt số trang → HTTP 404 (không soft-404)",
-    "design-spec §3.2/S02/S04/S08/S10 khớp hành vi đã build (user duyệt 2026-10-19)"
+    "Vào bất kỳ trang công khai (VI/EN) có utm_* → lưu vào sessionStorage (giữ quy tắc ghi đè hiện có của LeadForm)",
+    "Sang trang khác có LeadForm → lead gửi kèm UTM đã lưu",
+    "URL không có utm_* → không ghi; không phá static/caching của layout (island client nhỏ)",
+    "sessionStorage không khả dụng → không crash",
+    "Test; pnpm test/lint/typecheck/build PASS"
   ],
   "viewports": [
     375,
     768,
     1280
   ],
-  "risk": "low"
+  "risk": "medium"
 }

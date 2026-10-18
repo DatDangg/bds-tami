@@ -1,14 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, type FormEvent } from "react";
+import type { FormEvent } from "react";
 import { ConsentCheckbox } from "@/components/forms/ConsentCheckbox";
 import { FormField } from "@/components/forms/FormField";
 import { FormErrorSummary, FormStatus } from "@/components/forms/FormStatus";
 import { TurnstileWidget } from "@/components/forms/TurnstileWidget";
 import { usePublicForm, type FormFields } from "@/components/forms/use-public-form";
 import { Button } from "@/components/ui/button";
-import { captureUtm, readUtm } from "@/lib/leads/utm";
+import { readUtm } from "@/lib/leads/utm";
 import type { LeadSource } from "@/lib/leads/lead-values";
 import { normalizePhone } from "@/lib/phone";
 
@@ -46,8 +46,7 @@ export function LeadForm({ source, sourceId, turnstileSiteKey, hotline }: LeadFo
   const t = useTranslations("form.lead");
   const tForm = useTranslations("form");
 
-  useEffect(() => captureUtm(), []);
-
+  // UTM không ghi ở đây: island `UtmCapture` trong PublicShell đã lưu ở mọi trang; lúc gửi `readUtm()` vẫn ưu tiên URL hiện tại.
   const form = usePublicForm({
     endpoint: ENDPOINT,
     encoding: "json",
