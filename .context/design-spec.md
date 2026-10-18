@@ -80,15 +80,18 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | Trang không có hero | Luôn Đặc |
 | Cao | 64px (< lg) · 72px (≥ lg) |
 | Bố cục < xl | Trái: nút Tìm kiếm (icon kính lúp). Giữa: logo. Phải: `VI \| EN` (ẩn < sm, khi đó nằm trong menu) + nút Menu (icon 3 gạch, nhãn "Menu") |
-| Bố cục ≥ xl | Hàng 1 như trên; hàng 2 menu ngang căn giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ), chữ `--text-small` 600 in hoa `0.08em`. Tổng cao ≤ 80px khi cuộn (hàng 2 thu lại thành 1 hàng: logo trái, menu giữa, ngôn ngữ + menu phải). Mục có con: dropdown khi hover/focus/Enter, `aria-expanded` |
+| Bố cục ≥ xl | **Một hàng** (user quyết 2026-10-19, BL-001): logo trái · menu ngang giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ, chữ `--text-small` 600 in hoa `0.08em`) · phải: nút Tìm kiếm, `VI | EN`, nút CTA (nếu bật), nút Menu (mở menu toàn màn hình §2.2). Cao 72px như ≥ lg, không còn hàng 2. Mục có con: dropdown khi hover/focus/Enter, `aria-expanded`. Menu ngang không xuống dòng, không tràn ở 1280px |
 | Mục đang xem | Gạch chân 2px `--color-primary` (header trong suốt) / `--color-accent-text` (header đặc), `aria-current="page"` |
 | Sticky | Có, `position: sticky; top: 0; z: --z-header` |
+| Logo | Lấy từ `site-settings.logo` (bản cho nền sáng: header đặc) và `site-settings.logoDark` (bản cho nền tối: header trong suốt trên hero, menu toàn màn hình, footer). Thiếu bản nào → dùng logo tĩnh mặc định cho bản đó (`/brand/tami-logo-dark.png` / `/brand/tami-logo-white.png`) |
+| Nút CTA | Từ global `header.ctaButton`: "bật" = có cả `label` ở ngôn ngữ đang xem và `link` hợp lệ → hiện nút CTA (nút chính cỡ nhỏ) ở cụm phải header (≥ md) và trong menu toàn màn hình; thiếu nhãn ở ngôn ngữ đang xem (vd chưa có bản EN) hoặc thiếu link → ẩn, không mượn chữ ngôn ngữ kia (BR-07) |
 
 **Tìm kiếm (D7):** bấm icon mở thanh tìm (Sheet trên xuống, cao 160px desktop / toàn màn mobile): ô `q` (label ẩn trực quan "Tìm tin cho thuê / Search rentals"), gợi ý tĩnh 4 danh mục Cho thuê dạng chip. Enter → `/cho-thue?q=` · `/en/for-rent?q=`. Không autocomplete (ngoài phạm vi).
 
 ### 2.2. Menu toàn màn hình
 - Mở từ nút Menu, phủ toàn màn hình, lớp `.theme-dark-block` nền `--color-dark-deep`, `z: --z-overlay`.
 - Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h2` serif in hoa, mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
+- Accordion menu con: link cha giữ điều hướng, nút caret riêng cạnh link (≥ 44px, `aria-expanded`, `aria-controls`, nhãn "Mở menu con <mục>"), đóng mặc định, mở bằng Enter/Space/chạm; chuyển động mở/đóng `--duration-base`, tắt khi `prefers-reduced-motion`. Menu toàn màn hình dùng ở mọi breakpoint (≥ xl mở từ nút Menu trong header 1 hàng).
 - Mở: menu trượt mờ dần `--duration-slow`, các mục stagger 40ms (tắt khi reduced motion).
 - Nút đóng ở đúng vị trí nút Menu (cùng toạ độ), `aria-label="Đóng menu / Close menu"`.
 
@@ -102,7 +105,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Hàng 1: logo trắng + mô tả ngắn công ty (≤ 25 từ, `footer.contactBlock`).
 - Hàng 2: các cột `footer.columns` (lưới `auto-fit minmax(160px, 1fr)`): Dự án, Cho thuê, Dịch vụ (3 link dịch vụ), Về TAMI (Tuyển dụng, Liên hệ, Chính sách bảo mật, Điều khoản). Cột "Liên hệ": hotline (`tel:`), email (`mailto:`), địa chỉ.
 - Hàng 3 (đường kẻ `--color-dark-border` phía trên): copyright, mạng xã hội (icon 24px, vùng chạm 44px), `VI | EN`, link "Cài đặt cookie / Cookie settings" (mở lại banner §3.10).
-- Responsive: < md xếp dọc, cột link thành accordion (nút tiêu đề cột) để rút ngắn; ≥ md lưới; ≥ xl 5 cột.
+- Responsive: < md xếp dọc, mỗi cột link thành accordion (tiêu đề cột là heading chứa nút, đóng mặc định, `aria-expanded` + `aria-controls`); cột Liên hệ luôn mở; ≥ md lưới (không accordion, mọi link hiện); ≥ xl 5 cột.
 
 ### 2.5. Nút liên hệ nổi (FR-PUB-12)
 - Góc dưới phải, cách mép `max(16px, env(safe-area-inset-right))` và đáy `max(16px, env(safe-area-inset-bottom))`, `z: --z-floating`.

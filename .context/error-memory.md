@@ -69,3 +69,7 @@ _Errors encountered during this project will be logged below._
 ## 2026-10-16 — Public pipeline (layer-1-task-06), lưu ý cho task endpoint công khai
 - `src/endpoints/_middleware/public-pipeline.ts` bọc `validate()` trong try/catch → MỌI lỗi thành 400 (log warn tên lỗi). Giữ `validate` chỉ parse + zod; KHÔNG đặt truy vấn DB/logic nghiệp vụ trong `validate` (bug thật sẽ thành "dữ liệu không hợp lệ"). Nếu cần, sửa pipeline: chỉ 400 cho SyntaxError/ZodError, còn lại ném tiếp.
 - Nối endpoint vào pipeline phải truyền `remoteAddress` nếu có; prod bắt buộc `TRUST_CF_CONNECTING_IP=true` (xem layer-3-task-03).
+
+## 2026-10-19 — Header 1 hàng ≥ xl tràn ở 1280 (feature-header-footer-design-debt phase-1-task-01, attempt 1)
+- Review round 1 FAIL MAJOR-1: chỉ đo `scrollWidth` trong emulation không thanh cuộn (dư 17px) → bỏ sót chồng chéo; logo CMS + nhãn CTA không giới hạn rộng, menu `whitespace-nowrap` tràn đè logo/nút tìm mà không gây cuộn ngang.
+- Cách đúng: giới hạn rộng phần tử từ CMS (logo `max-w` + `object-contain`, CTA `max-w` + `span.truncate` + `title`), đo bằng `getBoundingClientRect` khoảng cách giữa các cụm ở `clientWidth` có thanh cuộn (1280 → ~1265) với dữ liệu thật + tổ hợp xấu nhất.

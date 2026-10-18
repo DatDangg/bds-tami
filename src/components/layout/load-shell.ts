@@ -8,8 +8,10 @@ import type { Locale } from "@/i18n/routing";
 import {
   buildConsent,
   buildContact,
+  buildCta,
   buildFloatingContact,
   buildFooterColumns,
+  buildLogo,
   buildNavItems,
   buildSocialLinks,
   type FooterColumnView,
@@ -57,6 +59,9 @@ export async function loadShell(locale: Locale): Promise<ShellView> {
 
   return {
     navItems: header ? buildNavItems(header.navItems, locale, menuLabels) : fixedMenuItems(locale, menuLabels),
+    cta: buildCta(header?.ctaButton, locale),
+    // `readPublicGlobal` đọc depth 1 nên `logo`/`logoDark` đã là doc media (url + kích thước); chưa populate thì logo tĩnh.
+    logo: buildLogo(settings),
     contact: buildContact(settings),
     floatingContact: buildFloatingContact(settings),
     consent: buildConsent(settings),

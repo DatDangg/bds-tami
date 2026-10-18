@@ -1,60 +1,74 @@
 {
-  "specVersion": "1.3.0",
-  "scopeVersion": 2,
-  "generatedAt": "2026-10-19T12:00:00+07:00",
+  "specVersion": "1.4.0",
+  "scopeVersion": 3,
+  "generatedAt": "2026-10-19T15:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature-legal-en-edit-requires-reapproval",
-  "backlog": "BL-013",
+  "workItem": "feature-header-footer-design-debt",
+  "backlog": "BL-001",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-legal-en-edit-requires-reapproval.md",
-  "task": "tasks/feature-legal-en-edit-requires-reapproval/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-10-19-legal-en-edit-requires-reapproval.md",
-  "specRefs": ["BR-08", "BR-07", "FR-ADM-17"],
+  "changeDoc": "spec/changes/2026-10-19-header-footer-design-debt.md",
+  "task": [
+    "tasks/feature-header-footer-design-debt/phase-1-task-01.md",
+    "tasks/feature-header-footer-design-debt/phase-1-task-02.md"
+  ],
+  "specUpdate": "spec/updates/2026-10-19-header-footer-design-debt.md",
+  "specRefs": ["design-spec §2.1", "design-spec §2.2", "design-spec §2.4", "FR-PUB-19", "BR-07"],
   "specRefNotes": {
-    "BR-08": "docs/BRD.md v1.6: bản EN trang pháp lý đã duyệt bị sửa tay nội dung EN (không qua lệnh duyệt) → mất duyệt, ẩn /en tới khi admin duyệt lại; lưu không đổi nội dung EN thì giữ duyệt (SPECIFICATIONS.md F12)",
-    "BR-07": "/en chỉ hiện nội dung có hasEnglish = true, không fallback tiếng Việt (404 + không vào sitemap EN)",
-    "FR-ADM-17": "job dịch translate-content + lệnh duyệt EN trang pháp lý POST /api/admin/translations/pages/:id/approve"
+    "design-spec §2.1": ".context/design-spec.md: header ≥ xl một hàng (logo trái · 7 mục menu giữa · tìm + VI|EN + CTA nếu bật + nút Menu phải); Logo từ site-settings.logo/logoDark, fallback logo tĩnh; Nút CTA từ global header.ctaButton (nhãn locale đang xem + link → hiện, thiếu → ẩn)",
+    "design-spec §2.2": ".context/design-spec.md: menu toàn màn hình (mọi breakpoint) — mục có con có nút caret xổ accordion menu con, aria-expanded/aria-controls, bàn phím, tắt chuyển động khi reduced motion",
+    "design-spec §2.4": ".context/design-spec.md: footer < md cột link accordion (heading chứa nút, đóng mặc định), cột Liên hệ luôn mở; ≥ md lưới",
+    "FR-PUB-19": "Nút chuyển ngôn ngữ VI / EN trên header, menu và footer — vị trí đổi trong header một hàng, phải giữ hoạt động",
+    "BR-07": "/en không fallback tiếng Việt — nút CTA thiếu nhãn EN thì ẩn ở /en"
   },
   "changed": {
     "files": [
-      "src/hooks/pages/approve-english.ts",
-      "src/collections/Pages.ts",
-      "tests/integration/retranslate.test.ts"
+      "src/components/layout/Header.*",
+      "src/components/layout/BrandLogo.*",
+      "src/components/layout/MobileMenu.*",
+      "src/components/layout/Footer.*",
+      "src/components/layout/DesktopNav.*",
+      "src/components/layout/load-shell.*",
+      "src/components/layout/shell-data.*",
+      "src/components/layout/PublicShell.*",
+      "tests/** (test khung trang header/footer/menu)"
     ],
-    "filesNote": "đã chốt ở close-out (khớp diff); kèm docs: docs/API_SPEC.md §5.2, docs/ARCHITECTURE.md, docs/BRD.md, SPECIFICATIONS.md",
+    "filesNote": "dự kiến, close-out cập nhật theo diff thật; kèm docs: .context/design-spec.md §2.1/§2.2/§2.4, SPECIFICATIONS.md",
     "modules": [
-      "legal page EN approval",
-      "pages beforeChange hook",
-      "i18n /en visibility"
+      "public layout header",
+      "full-screen menu",
+      "public layout footer",
+      "shell data loader (header/footer/site-settings globals)"
     ]
   },
   "impact": {
     "direct": [
-      "Hook beforeChange của pages: trang pháp lý đã duyệt EN (hasEnglish = true) bị sửa tay trường nội dung EN qua admin/API (không phải lệnh duyệt) → hasEnglish = false, /en của trang ẩn",
-      "Lưu trang pháp lý mà nội dung EN không đổi (chỉ đổi VI hoặc metadata không liên quan) → giữ hasEnglish = true",
-      "Lệnh duyệt POST /api/admin/translations/pages/:id/approve sau khi bị hạ duyệt → bật lại hasEnglish, /en hiện lại"
+      "Header ≥ xl (1280): một hàng — logo trái · 7 mục menu giữa (dropdown mục có con) · tìm + VI|EN + CTA (nếu bật) + nút Menu phải; < xl không đổi",
+      "Nút CTA header: header.ctaButton có nhãn ở locale đang xem + link → hiện đúng nhãn/link; thiếu nhãn hoặc link → ẩn (gồm /en thiếu nhãn EN)",
+      "Logo header: site-settings.logo / logoDark đã upload → dùng logo CMS; chưa có → logo tĩnh mặc định",
+      "Menu toàn màn hình: mục có con có nút caret xổ/thu accordion, aria-expanded/aria-controls đúng, thao tác bằng bàn phím (Tab/Enter/Space), không animation khi prefers-reduced-motion",
+      "Footer < md (375): mỗi cột link là accordion đóng mặc định, nút tiêu đề có aria-expanded/aria-controls; cột Liên hệ luôn mở; ≥ md (768) lưới như cũ"
     ],
     "dependents": [
-      "/en trang pháp lý (privacy, terms): 404 khi chưa duyệt lại, hiện lại sau duyệt",
-      "Sitemap EN: trang pháp lý bị hạ duyệt không vào sitemap EN",
-      "/api/locale-counterpart: không trả counterpart EN khi hasEnglish = false",
-      "Lệnh duyệt POST /api/admin/translations/pages/:id/approve",
-      "Job dịch translate-content (AI dịch lại trang pháp lý)"
+      "Khung trang mọi trang công khai `/` và `/en` (header + footer + menu dùng chung)",
+      "Loader dữ liệu khung trang (globals header, footer, site-settings) theo locale"
     ],
     "regression": [
-      "Duyệt EN trang pháp lý: 422 khi thiếu title/content EN (gồm richText rỗng, BL-012), 409 theo luồng hiện có",
-      "Form admin cũ gửi hasEnglish = true không tự duyệt được (giữ chặn hiện có)",
-      "AI dịch lại trang pháp lý vẫn hạ duyệt (ẩn /en)",
-      "Sửa bản VI trang pháp lý giữ trạng thái duyệt EN",
-      "Trang không phải pháp lý (pages khác, news, projects…) không bị ảnh hưởng bởi quy tắc hạ duyệt"
+      "Revalidate header/footer/site-settings: sửa global trong admin → khung trang `/` và `/en` cập nhật",
+      "Chuyển ngôn ngữ VI|EN trên header, menu, footer (FR-PUB-19): về đúng trang tương ứng / trang danh sách khi chưa có bản dịch",
+      "Dropdown menu con ở header ≥ xl (hover/focus, bàn phím)",
+      "Nút liên hệ nổi (FR-PUB-12) không bị header/menu che hoặc vỡ",
+      "Mở cài đặt cookie từ footer (banner đồng ý cookie / GA4)"
     ]
   },
   "acceptance": [
-    "Sửa trường nội dung EN của trang pháp lý đã duyệt (admin/API, không phải lệnh duyệt) → trạng thái duyệt EN về chưa duyệt, /en của trang đó ẩn như luồng AI dịch lại",
-    "Lưu không đổi nội dung EN (chỉ đổi VI/metadata không liên quan) → giữ duyệt",
-    "Lệnh duyệt EN rõ ràng hiện có duyệt lại được → /en hiện lại; form cũ không tự duyệt (giữ chặn hiện có)",
-    "Spec BR-08 cập nhật (intent user đã duyệt) + doc as-built (API_SPEC…)",
-    "Test hồi quy; pnpm test / lint / typecheck / build PASS"
+    "≥ xl header 1 hàng: logo trái · 7 mục menu giữa (dropdown mục có con giữ nguyên) · VI|EN + Menu (+ CTA nếu bật) phải; < xl không đổi",
+    "header.ctaButton bật trong CMS → nút CTA hiện trên header (nhãn/link từ CMS, đúng locale); tắt → ẩn",
+    "Logo upload trong CMS được dùng cho header; không có → logo mặc định",
+    "Footer < md: mỗi cột link là accordion đóng mặc định, nút tiêu đề có aria-expanded/aria-controls; ≥ md lưới như cũ",
+    "Menu toàn màn hình: mục có con có nút xổ accordion, aria-expanded, bàn phím OK, tắt animation khi reduced motion",
+    "Không vỡ revalidate header/footer ở / và /en; test cập nhật + pnpm test/lint/typecheck/build PASS",
+    "design-spec §2.1 (bố cục ≥ xl) cập nhật intent \"1 hàng\" (user đã quyết 2026-10-19)"
   ],
+  "viewports": [375, 768, 1280],
   "risk": "medium"
 }

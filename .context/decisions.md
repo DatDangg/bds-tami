@@ -63,3 +63,11 @@ _No decisions recorded yet. Decisions logged here khi dựng spec và trong impl
 - **Alternatives Considered:** Chờ có tên miền rồi mới dựng staging (trễ mốc staging sớm). Cloudflare Access/Tunnel (vẫn cần tên miền trong Cloudflare). Dùng IP trần + chứng chỉ tự ký (trình duyệt cảnh báo, không kiểm được HTTPS thật).
 - **Rationale:** Có staging HTTPS thật ngay để kiểm deploy/CD/seed/trang mà không đụng cấu hình chung của server; mọi phần phụ thuộc Cloudflare để lại cho production.
 - **Consequences:** Các AC Cloudflare (DNS, SSL Full Strict, cache rule, chỉ nhận IP Cloudflare, Origin Pulls, `TRUST_CF_CONNECTING_IP`) chuyển L15-T01; production cần tên miền thật trước M5. Ảnh/static staging không qua CDN nên không có nguy cơ lọt basic auth qua cache. Staging mất dữ liệu nếu hỏng ổ (chấp nhận, dữ liệu thử).
+
+### Decision 7: Logo header/footer lấy từ `site-settings.logo`/`logoDark`, CTA "bật" = có nhãn + link (feature-header-footer-design-debt, BL-001)
+- **Date:** 2026-10-19
+- **Context:** Change doc BL-001 yêu cầu dùng logo nhập trong CMS và `header.ctaButton`. Global `header` không có trường logo; `site-settings` đã có `logo`, `logoDark` (ERD §4.15); `ctaButton` không có cờ bật/tắt.
+- **Decision:** Dùng `site-settings.logo` cho nền sáng (header đặc), `logoDark` cho nền tối (header trong suốt, menu toàn màn hình, footer); thiếu bản nào → logo tĩnh tương ứng. CTA hiện khi có nhãn ở ngôn ngữ đang xem + link hợp lệ (không mượn nhãn VI cho EN). Nút Menu hiện cả ở ≥ xl (menu toàn màn hình dùng mọi breakpoint).
+- **Alternatives Considered:** Thêm trường `logo` + checkbox `enabled` vào global `header` (đổi schema + migration, trùng dữ liệu với `site-settings`).
+- **Rationale:** Không đổi schema/migration, một nguồn logo duy nhất.
+- **Consequences:** Admin cấu hình logo ở "Cấu hình chung"; tắt CTA = xoá nhãn hoặc link.

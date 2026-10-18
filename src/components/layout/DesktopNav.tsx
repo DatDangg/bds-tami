@@ -34,7 +34,8 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
 
   return (
     <nav aria-label={t("main")} className="hidden xl:block">
-      <ul ref={listRef} className="flex items-center gap-6 2xl:gap-8">
+      {/* gap-4 ở xl: hàng header 1280px còn chỗ cho logo + 7 mục + tìm/VI|EN/CTA/Menu không tràn (BL-001); rộng hơn mới nới gap. */}
+      <ul ref={listRef} className="flex items-center gap-4 2xl:gap-8">
         {items.map((item) => {
           const key = item.href + item.label;
           const hasChildren = item.children.length > 0;

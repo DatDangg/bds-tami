@@ -15,12 +15,13 @@ export function PublicShell({ shell, children }: { shell: ShellView; children: R
   return (
     <>
       <SkipLink />
-      <Header items={shell.navItems} contact={shell.contact} />
+      <Header items={shell.navItems} contact={shell.contact} logo={shell.logo} cta={shell.cta} />
       <main id="main" tabIndex={-1} className="min-h-[60dvh] focus:outline-none">
         {children}
       </main>
       <Footer
         {...shell.footer}
+        logo={shell.logo}
         contact={shell.contact}
         showCookieSettings={isValidGaMeasurementId(shell.consent.gaMeasurementId)}
       />

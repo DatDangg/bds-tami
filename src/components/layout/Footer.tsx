@@ -14,9 +14,10 @@ import { BrandLogo } from "./BrandLogo";
 import { CookieSettingsButton } from "./CookieSettingsButton";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NavAnchor } from "./NavAnchor";
-import type { FooterColumnView, FooterContactView, SocialLinkView } from "./shell-data";
+import type { FooterColumnView, FooterContactView, LogoView, SocialLinkView } from "./shell-data";
 
 interface FooterProps {
+  logo: LogoView;
   columns: FooterColumnView[];
   tagline: string;
   copyright: string;
@@ -38,13 +39,13 @@ const SOCIAL_PLATFORMS: Record<string, { name: string; icon: ReactElement }> = {
 };
 
 /** Chân trang tối (design-spec §2.4): logo + giới thiệu, các cột liên kết + liên hệ, dòng cuối (bản quyền, mạng xã hội, ngôn ngữ, cookie). */
-export function Footer({ columns, tagline, copyright, contact, socials, showCookieSettings }: FooterProps) {
+export function Footer({ logo, columns, tagline, copyright, contact, socials, showCookieSettings }: FooterProps) {
   const hasContact = Boolean(contact.hotline ?? contact.email ?? contact.address);
   return (
     <footer className="theme-dark-block py-section-tight print:hidden">
       <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter">
         <div className="flex flex-col gap-4">
-          <BrandLogo tone="on-dark" className="self-start" />
+          <BrandLogo tone="on-dark" image={logo.onDark} className="self-start" />
           <p className="max-w-text text-small whitespace-pre-line text-text-secondary">{tagline}</p>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">

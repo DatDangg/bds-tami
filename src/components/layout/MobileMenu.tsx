@@ -3,47 +3,42 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { List, X } from "@/components/icons";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { BrandLogo } from "./BrandLogo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NavAnchor, isActivePath } from "./NavAnchor";
-import type { FooterContactView, NavItemView } from "./shell-data";
+import type { FooterContactView, LinkView, LogoView, NavItemView } from "./shell-data";
 
-/** Từ breakpoint này menu ngang thay menu toàn màn hình (Tailwind `xl`, 80rem). */
-const DESKTOP_QUERY = "(min-width: 80rem)";
-
-/** Tự đóng khi cửa sổ rộng ra tới cỡ có menu ngang: nút Menu đã ẩn, lớp phủ không được kẹt lại. */
-function useCloseOnDesktop(close: () => void) {
-  useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
-    const query = window.matchMedia(DESKTOP_QUERY);
-    const onChange = (event: MediaQueryListEvent) => {
-      if (event.matches) close();
-    };
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, [close]);
+interface MobileMenuProps {
+  items: NavItemView[];
+  contact: FooterContactView;
+  logo: LogoView;
+  cta?: LinkView;
 }
 
 /**
- * Menu toàn màn hình cho < xl (design-spec §2.2). Radix Dialog lo bẫy focus, Esc đóng, khoá cuộn nền, trả focus về nút mở
+ * Menu toàn màn hình ở MỌI breakpoint, mở từ nút Menu trong header (design-spec §2.2; từ xl header một hàng vẫn có nút Menu, BL-001,
+ * nên không còn tự đóng khi cửa sổ rộng lên). Radix Dialog lo bẫy focus, Esc đóng, khoá cuộn nền, trả focus về nút mở
  * và `aria-expanded`/`aria-controls` trên nút. Đóng thì nội dung không còn trong DOM (không có link ẩn bị focus).
  * Bấm một link thì đóng: layout không dựng lại khi điều hướng nên dialog sẽ kẹt nếu không tự đóng.
+ * Nhãn "Menu" ẩn ở xl (chỉ icon + sr-only) để hàng header 1280px đủ chỗ cho 7 mục + CTA; hiện lại từ 2xl.
  */
-export function MobileMenu({ items, contact }: { items: NavItemView[]; contact: FooterContactView }) {
+export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
   const t = useTranslations("layout");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
-  useCloseOnDesktop(close);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-small font-semibold tracking-[0.08em] text-text uppercase xl:hidden">
+      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-small font-semibold tracking-[0.08em] text-text uppercase">
         <List size={24} aria-hidden="true" />
-        <span className="hidden sm:inline">{t("header.menu")}</span>
-        <span className="sr-only sm:hidden">{t("header.openMenu")}</span>
+        {/* Có CTA: ở md–lg cụm phải (VI|EN + CTA + Menu) phải ≤ nửa hàng để logo vẫn ở giữa → chỉ icon, nhãn sr-only. */}
+        <span className={cn("hidden sm:inline xl:hidden 2xl:inline", cta && "md:hidden lg:inline")}>{t("header.menu")}</span>
+        <span className={cn("sr-only sm:hidden xl:inline 2xl:hidden", cta && "md:inline lg:hidden")}>{t("header.openMenu")}</span>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         {/* Overlay là nơi Radix gắn khoá cuộn nền (react-remove-scroll): thiếu nó thì trang phía sau vẫn cuộn được. */}
@@ -57,7 +52,7 @@ export function MobileMenu({ items, contact }: { items: NavItemView[]; contact: 
           <DialogPrimitive.Title className="sr-only">{t("header.menu")}</DialogPrimitive.Title>
           <DialogPrimitive.Description className="sr-only">{t("nav.mobileDescription")}</DialogPrimitive.Description>
           <div className="mx-auto flex h-16 w-full max-w-container shrink-0 items-center justify-between px-gutter lg:h-18">
-            <BrandLogo tone="on-dark" />
+            <BrandLogo tone="on-dark" image={logo.onDark} />
             <DialogPrimitive.Close
               aria-label={t("header.closeMenu")}
               className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-sm text-text"
@@ -93,7 +88,8 @@ export function MobileMenu({ items, contact }: { items: NavItemView[]; contact: 
                 ))}
               </ul>
             </nav>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col items-start gap-6">
+              {cta && <NavAnchor link={cta} onClick={close} className={cn(buttonVariants(), "min-h-11")} />}
               <LanguageSwitcher />
               <MenuContact contact={contact} />
             </div>

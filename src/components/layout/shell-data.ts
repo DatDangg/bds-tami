@@ -58,8 +58,24 @@ export interface ConsentView {
   privacyPolicyVersion: string;
 }
 
+/** Một bản logo: chỉ URL + kích thước thật của file (để `next/image` giữ tỉ lệ), không đưa doc media nguyên ra client. */
+export interface LogoImageView {
+  url: string;
+  width: number;
+  height: number;
+}
+
+/** `onLight` = `site-settings.logo` (header đặc); `onDark` = `logoDark` (header trong suốt, menu toàn màn hình, footer). Thiếu bản nào → logo tĩnh. */
+export interface LogoView {
+  onLight?: LogoImageView;
+  onDark?: LogoImageView;
+}
+
 export interface ShellView {
   navItems: NavItemView[];
+  /** Nút CTA trong header (`header.ctaButton`); không có khi thiếu nhãn ở ngôn ngữ này hoặc link không hợp lệ. */
+  cta?: LinkView;
+  logo: LogoView;
   contact: FooterContactView;
   floatingContact: FloatingContactView;
   consent: ConsentView;
@@ -134,6 +150,36 @@ export function buildFooterColumns(
   });
   const complete = views.length > 0 && views.every((view) => view !== null);
   return complete ? views : fixedColumns;
+}
+
+/** Nút CTA: cùng quy tắc link menu (nhãn ở ngôn ngữ đang xem + khoá trang/URL http(s)); thiếu một trong hai → không có nút (BR-07). */
+export function buildCta(cta: RawLink | null | undefined, locale: Locale): LinkView | undefined {
+  return (cta && toLinkView(cta, locale)) || undefined;
+}
+
+interface RawMediaSize {
+  url?: string | null;
+  width?: number | null;
+  height?: number | null;
+}
+/** Tập con doc `media` đã populate (depth ≥ 1); chưa populate thì là id string và bị bỏ qua. */
+type RawLogoMedia = string | (RawMediaSize & { sizes?: { card?: RawMediaSize } | null }) | null | undefined;
+
+/**
+ * Ưu tiên cỡ `card` (800px, webp) đã sinh khi upload: ảnh gốc có thể nhiều MB. Ảnh nhỏ hơn 800px không có cỡ `card`
+ * (Media.ts) nên rơi về ảnh gốc. Thiếu URL hoặc kích thước → không dùng (để `next/image` không nhận ảnh không rõ tỉ lệ).
+ */
+function toLogoImage(media: RawLogoMedia): LogoImageView | undefined {
+  if (!media || typeof media === "string") return undefined;
+  const card = media.sizes?.card;
+  const { url, width, height } = card?.url ? card : media;
+  return url && width && height ? { url, width, height } : undefined;
+}
+
+export function buildLogo(settings: { logo?: RawLogoMedia; logoDark?: RawLogoMedia } | null): LogoView {
+  const onLight = toLogoImage(settings?.logo);
+  const onDark = toLogoImage(settings?.logoDark);
+  return { ...(onLight ? { onLight } : {}), ...(onDark ? { onDark } : {}) };
 }
 
 /** Số điện thoại → `tel:` (chỉ giữ chữ số và dấu + đầu). Rỗng nếu không có chữ số nào. */

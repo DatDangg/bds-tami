@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.3.0
+- **spec_version:** 1.4.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -15,6 +15,8 @@
 Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn hộ dịch vụ). Công ty tự đăng nội dung; khách xem và để lại liên hệ; lead được giao cho sale. Một app Next.js + Payload CMS gồm website công khai và trang quản trị `/admin`.
 
 **Menu:** Trang chủ (= giới thiệu) · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ. **Không có Mua bán.**
+
+**Khung trang:** header ≥ xl một hàng (logo trái · menu giữa · tìm, VI|EN, nút CTA, nút Menu phải). Logo lấy từ CMS `site-settings.logo` / `logoDark` (thiếu → logo mặc định); nút CTA lấy từ global `header.ctaButton` — chỉ hiện khi có nhãn ở ngôn ngữ đang xem + link (BR-07). Menu toàn màn hình (mọi breakpoint) xổ menu con dạng accordion; footer < md cột link dạng accordion (cột Liên hệ luôn mở), ≥ md dạng lưới. Chi tiết: `.context/design-spec.md` §2.1 / §2.2 / §2.4.
 
 **Ngôn ngữ:** website công khai song ngữ **tiếng Việt (mặc định, URL không tiền tố)** và **tiếng Anh (`/en/...`)**; trang quản trị chỉ tiếng Việt. **Giao diện:** bố cục và phong cách theo vinhomes.vn, màu/logo/nội dung của TAMI (`docs/DESIGN.md`).
 

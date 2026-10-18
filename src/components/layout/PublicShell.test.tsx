@@ -16,6 +16,7 @@ const shell: ShellView = {
   contact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, email: "info@tami.vn", address: "Quận 1" },
   floatingContact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" } },
   consent: { gaMeasurementId: "G-TEST1234", privacyPolicyVersion: "1" },
+  logo: {},
   footer: {
     columns: buildFooterColumns(null, "vi", [
       { title: "Khám phá", links: [{ label: "Dự án", href: "/du-an", external: false }] },

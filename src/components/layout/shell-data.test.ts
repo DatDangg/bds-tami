@@ -3,8 +3,10 @@ import en from "@/i18n/messages/en.json";
 import vi from "@/i18n/messages/vi.json";
 import {
   buildContact,
+  buildCta,
   buildFloatingContact,
   buildFooterColumns,
+  buildLogo,
   buildNavItems,
   buildSocialLinks,
   fixedMenuItems,
@@ -132,5 +134,48 @@ describe("buildFloatingContact", () => {
     ).toEqual({ hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, zaloUrl: "https://zalo.me/tami" });
     expect(buildFloatingContact({ hotline: "", zaloUrl: "  " })).toEqual({});
     expect(buildFloatingContact(null)).toEqual({});
+  });
+});
+
+describe("buildCta (header.ctaButton)", () => {
+  it("có nhãn + khoá trang: href theo ngôn ngữ, không external", () => {
+    expect(buildCta({ label: " Nhận tư vấn ", link: "contact" }, "vi")).toEqual({ label: "Nhận tư vấn", href: "/lien-he", external: false });
+    expect(buildCta({ label: "Get advice", link: "contact" }, "en")).toEqual({ label: "Get advice", href: "/en/contact", external: false });
+  });
+
+  it("URL ngoài được đánh dấu external; link nguy hiểm hoặc thiếu nhãn/link thì không có CTA (không mượn VI cho EN)", () => {
+    expect(buildCta({ label: "Zalo", link: "https://zalo.me/tami" }, "vi")).toEqual({ label: "Zalo", href: "https://zalo.me/tami", external: true });
+    expect(buildCta({ label: "X", link: "javascript:alert(1)" }, "vi")).toBeUndefined();
+    expect(buildCta({ label: undefined, link: "contact" }, "en")).toBeUndefined();
+    expect(buildCta({ label: "  ", link: "contact" }, "en")).toBeUndefined();
+    expect(buildCta({ label: "Nhận tư vấn", link: null }, "vi")).toBeUndefined();
+    expect(buildCta(null, "vi")).toBeUndefined();
+    expect(buildCta(undefined, "vi")).toBeUndefined();
+  });
+});
+
+describe("buildLogo (site-settings.logo / logoDark)", () => {
+  const media = {
+    id: "m1",
+    url: "/api/media/file/logo.png",
+    width: 3000,
+    height: 2100,
+    alt: "TAMI",
+    uploadedBy: "staff-1",
+    sizes: { card: { url: "/api/media/file/logo-800x560.webp", width: 800, height: 560 } },
+  };
+
+  it("ưu tiên cỡ card đã sinh; chỉ giữ url/width/height (không lộ doc media)", () => {
+    const logo = buildLogo({ logo: media, logoDark: null });
+    expect(logo).toEqual({ onLight: { url: "/api/media/file/logo-800x560.webp", width: 800, height: 560 } });
+    expect(JSON.stringify(logo)).not.toMatch(/uploadedBy|alt|"id"/);
+  });
+
+  it("chưa có cỡ card thì dùng ảnh gốc; thiếu kích thước, chưa populate (id) hoặc global null → không có bản đó", () => {
+    expect(buildLogo({ logo: null, logoDark: { ...media, sizes: {} } })).toEqual({
+      onDark: { url: "/api/media/file/logo.png", width: 3000, height: 2100 },
+    });
+    expect(buildLogo({ logo: { ...media, width: null, sizes: {} }, logoDark: "media-id" })).toEqual({});
+    expect(buildLogo(null)).toEqual({});
   });
 });
