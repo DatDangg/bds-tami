@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isOfferEnded, offerJustEndedWhere, offerNotEndedWhere } from "./offer-status";
+import { isOfferEnded, offerEndedWhere, offerJustEndedWhere, offerNotEndedWhere } from "./offer-status";
 
 const endAt = (iso: string | null | undefined) => ({ offer: { endAt: iso } });
 
@@ -59,6 +59,17 @@ describe("điều kiện truy vấn khớp isOfferEnded", () => {
   it("offerNotEndedWhere = phủ định chính xác của isOfferEnded với mọi tổ hợp mốc hạn x thời điểm", () => {
     for (const now of nows) {
       for (const value of endAts) expect(matchesNotEnded(value, now)).toBe(!isOfferEnded(endAt(value), now));
+    }
+  });
+
+  it("offerEndedWhere = có hạn và hạn < 00:00 hôm nay giờ VN, khớp isOfferEnded với mọi tổ hợp", () => {
+    for (const now of nows) {
+      const [exists, before] = (offerEndedWhere(now) as { and: Array<Record<string, Record<string, unknown>>> }).and;
+      expect(exists!["offer.endAt"]).toEqual({ exists: true });
+      for (const value of endAts) {
+        const matches = value !== null && Date.parse(value) < Date.parse(before!["offer.endAt"]!.less_than as string);
+        expect(matches).toBe(isOfferEnded(endAt(value), now));
+      }
     }
   });
 

@@ -92,6 +92,20 @@ describe("resolveMissingPage", () => {
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "rentals", "vi", "khong-co", { depth: 0 });
   });
 
+  it("Đăng tin BĐS (G27): khớp chi tiết + danh mục vi/en, tra property-posts / categories (scope property_post); danh sách /tin-bds không bị khớp", async () => {
+    expect(matchDynamicPage("/tin-bds/uu-dai-a")).toMatchObject({ locale: "vi", slug: "uu-dai-a", rule: { collection: "property-posts" } });
+    expect(matchDynamicPage("/en/property-news/offer-a")).toMatchObject({ locale: "en", slug: "offer-a", rule: { collection: "property-posts" } });
+    expect(matchDynamicPage("/tin-bds/danh-muc/voucher")).toMatchObject({ locale: "vi", slug: "voucher", rule: { collection: "categories" } });
+    expect(matchDynamicPage("/en/property-news/category/voucher")).toMatchObject({ locale: "en", slug: "voucher", rule: { collection: "categories" } });
+    expect(matchDynamicPage("/tin-bds")).toBeNull();
+    expect(matchDynamicPage("/en/property-news")).toBeNull();
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/property-news/khong-co")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "property-posts", "en", "khong-co", { depth: 0 });
+    expect(await resolveMissingPage("/tin-bds/danh-muc/khong-co")).toBe("vi");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "categories", "vi", "khong-co", { depth: 0, where: { scope: { equals: "property_post" } } });
+  });
+
   it("tuyển dụng: khớp vi/en, tra job-postings theo slug của ngôn ngữ URL; danh sách /tuyen-dung không bị khớp", async () => {
     expect(matchDynamicPage("/tuyen-dung/sales")).toMatchObject({ locale: "vi", slug: "sales", rule: { collection: "job-postings" } });
     expect(matchDynamicPage("/en/careers/sales-manager")).toMatchObject({ locale: "en", slug: "sales-manager", rule: { collection: "job-postings" } });

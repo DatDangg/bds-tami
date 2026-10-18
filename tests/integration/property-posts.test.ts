@@ -529,6 +529,69 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
     });
   });
 
+  describe("truy vấn trang công khai Đăng tin BĐS (S08/S09)", () => {
+    // Ngày riêng (tương lai xa) để tách khỏi bài của các test khác dùng chung DB; "bây giờ" cố định 10:00 VN 15/06/2031.
+    const now = new Date("2031-06-15T03:00:00.000Z");
+    let listCategoryId = "";
+    const ids: Record<string, string> = {};
+
+    it("listPublicPosts: bài còn hạn / không hạn trước, bài đã kết thúc sau; phân trang nối hai nhóm; lọc danh mục; loại id nổi bật", async () => {
+      const { listPublicPosts, findFeaturedPost } = await import("../../src/lib/posts/post-queries");
+      listCategoryId = (await createCategory("Danh mục truy vấn", "property_post")).id;
+      const make = async (key: string, offer?: Record<string, unknown>, extra: Record<string, unknown> = {}) => {
+        const doc = await createPost({ title: `Truy vấn ${key}`, status: "published", cover: imageIds[0], category: listCategoryId, ...(offer ? { offer } : {}), ...extra });
+        ids[key] = doc.id;
+      };
+      await make("ended-old", { endAt: pickerDate("2031-06-01") });
+      await make("ended-yesterday", { endAt: pickerDate("2031-06-14") });
+      await make("active-today", { endAt: pickerDate("2031-06-15") });
+      await make("active-none");
+      await make("active-future", { endAt: pickerDate("2031-07-01") });
+      await updatePost(ids["active-future"]!, { isFeatured: true });
+      await updatePost(ids["ended-old"]!, { isFeatured: true });
+
+      // Hai nhóm nối nhau theo trang: trang 1 = 3 bài còn hạn / không hạn, trang 2 = 2 bài đã kết thúc.
+      const first = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId] });
+      expect(first.docs.map((doc) => doc.id).sort()).toEqual(["active-today", "active-none", "active-future"].map((key) => ids[key]!).sort());
+      expect(first).toMatchObject({ totalPages: 2, isEmpty: false });
+      const second = await listPublicPosts(payload, "vi", { page: 2, now, categoryIds: [listCategoryId] });
+      expect(second.docs.map((doc) => doc.id).sort()).toEqual(["ended-old", "ended-yesterday"].map((key) => ids[key]!).sort());
+      expect((await listPublicPosts(payload, "vi", { page: 3, now, categoryIds: [listCategoryId] })).docs).toEqual([]);
+
+      // Hạn là NGÀY: ưu đãi hết hạn hôm nay (15/06) vẫn còn hiệu lực hết ngày; sang 00:00 ngày 16 giờ VN thì đã kết thúc.
+      const tomorrow = new Date("2031-06-15T17:00:00.000Z");
+      const after = await listPublicPosts(payload, "vi", { page: 1, now: tomorrow, categoryIds: [listCategoryId] });
+      expect(after.docs.map((doc) => doc.id)).not.toContain(ids["active-today"]);
+      expect(after.docs).toHaveLength(2);
+
+      const excluded = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId], excludeIds: [ids["active-none"]!] });
+      expect(excluded.docs.map((doc) => doc.id)).not.toContain(ids["active-none"]);
+      expect((await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [categoryId], excludeIds: [] })).docs.map((doc) => doc.id)).not.toContain(ids["active-none"]);
+
+      // Nổi bật = isFeatured còn hạn mới nhất: bài isFeatured đã kết thúc không được chọn.
+      const featured = await findFeaturedPost(payload, "vi", now);
+      expect(featured?.id).toBe(ids["active-future"]);
+    });
+
+    it("/en chỉ gồm bài có bản EN; bài nháp không bao giờ xuất hiện", async () => {
+      const { listPublicPosts } = await import("../../src/lib/posts/post-queries");
+      const draft = await createPost({ title: "Truy vấn nháp", status: "draft", category: listCategoryId });
+      const vi = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId] });
+      expect(vi.docs.map((doc) => doc.id)).not.toContain(draft.id);
+      const en = await listPublicPosts(payload, "en", { page: 1, now, categoryIds: [listCategoryId] });
+      expect(en.docs).toEqual([]);
+    });
+
+    it("findPublicPostBySlug + findRelatedTargets: chỉ trả dự án / tin cho thuê công khai (nháp thì không)", async () => {
+      const { findPublicPostBySlug, findRelatedTargets } = await import("../../src/lib/posts/post-queries");
+      const found = await findPublicPostBySlug(payload, "vi", "truy-van-active-none");
+      expect(found?.id).toBe(ids["active-none"]);
+      expect(await findPublicPostBySlug(payload, "vi", "truy-van-nhap")).toBeNull();
+      expect(await findPublicPostBySlug(payload, "en", "truy-van-active-none")).toBeNull();
+      expect(await findRelatedTargets(payload, "vi", {})).toEqual({ project: null, rental: null });
+    });
+  });
+
   describe("seed", () => {
     it("seedSamplePropertyPosts: thiếu danh mục mẫu báo lỗi rõ; chạy 2 lần không nhân đôi; bài là bản nháp đúng danh mục", async () => {
       await expect(seedSamplePropertyPosts(payload)).rejects.toThrow(/pnpm seed/);

@@ -208,6 +208,44 @@
         "copyFailed": "Could not copy"
       }
     },
+    "posts": {
+      "title": "Property listings",
+      "description": "The latest property news, vouchers and offers from TAMI.",
+      "tabsLabel": "Listing categories",
+      "all": "All",
+      "featuredLabel": "Featured listing",
+      "moreLabel": "More listings",
+      "relatedTitle": "Related listings",
+      "endedBadge": "Ended",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "endsToday": "Ends today",
+      "endsOn": "Until {date}",
+      "offer": {
+        "title": "Offer details",
+        "price": "Price",
+        "area": "Area",
+        "period": "Valid",
+        "periodRange": "From {start} to {end}",
+        "periodFrom": "From {start}",
+        "periodUntil": "Until {end}",
+        "status": "Status",
+        "ended": "This offer has ended",
+        "voucher": "Voucher code",
+        "copy": "Copy",
+        "copied": "Code copied",
+        "copyFailed": "Could not copy",
+        "terms": "Terms and conditions",
+        "related": "Related",
+        "relatedProject": "Project",
+        "relatedRental": "Rental listing"
+      },
+      "gallery": "Photos",
+      "leadForm": {
+        "title": "Get advice",
+        "fallback": "Call the hotline or contact us for detailed advice about this listing.",
+        "hotline": "Hotline"
+      }
+    },
     "projects": {
       "title": "Projects",
       "description": "Property projects distributed by TAMI: filter by type, province and sales status.",

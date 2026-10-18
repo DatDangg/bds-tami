@@ -208,6 +208,44 @@
         "copyFailed": "Không sao chép được"
       }
     },
+    "posts": {
+      "title": "Đăng tin BĐS",
+      "description": "Tin bất động sản, voucher và ưu đãi mới nhất từ TAMI.",
+      "tabsLabel": "Danh mục đăng tin",
+      "all": "Tất cả",
+      "featuredLabel": "Tin nổi bật",
+      "moreLabel": "Tin đăng khác",
+      "relatedTitle": "Tin liên quan",
+      "endedBadge": "Đã kết thúc",
+      "daysLeft": "Còn {count} ngày",
+      "endsToday": "Hết hạn hôm nay",
+      "endsOn": "Đến {date}",
+      "offer": {
+        "title": "Thông tin ưu đãi",
+        "price": "Giá",
+        "area": "Khu vực",
+        "period": "Thời hạn",
+        "periodRange": "Từ {start} đến {end}",
+        "periodFrom": "Từ {start}",
+        "periodUntil": "Đến {end}",
+        "status": "Trạng thái",
+        "ended": "Ưu đãi đã kết thúc",
+        "voucher": "Mã voucher",
+        "copy": "Sao chép",
+        "copied": "Đã sao chép mã",
+        "copyFailed": "Không sao chép được",
+        "terms": "Điều khoản áp dụng",
+        "related": "Liên quan",
+        "relatedProject": "Dự án",
+        "relatedRental": "Tin cho thuê"
+      },
+      "gallery": "Hình ảnh",
+      "leadForm": {
+        "title": "Nhận tư vấn",
+        "fallback": "Gọi hotline hoặc liên hệ để được tư vấn chi tiết về tin này.",
+        "hotline": "Hotline"
+      }
+    },
     "projects": {
       "title": "Dự án",
       "description": "Các dự án bất động sản TAMI phân phối: lọc theo loại hình, tỉnh/thành và tình trạng mở bán.",

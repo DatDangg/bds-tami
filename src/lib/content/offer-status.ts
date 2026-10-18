@@ -28,6 +28,11 @@ export function offerNotEndedWhere(now: Date): Where {
   };
 }
 
+/** Điều kiện truy vấn: ưu đãi ĐÃ kết thúc (có hạn và hạn trước hôm nay giờ VN) = `isOfferEnded`; danh sách xếp các bài này sau bài còn hạn. */
+export function offerEndedWhere(now: Date): Where {
+  return { and: [{ "offer.endAt": { exists: true } }, { "offer.endAt": { less_than: startOfVietnamDay(now).toISOString() } }] };
+}
+
 /** Điều kiện truy vấn: ưu đãi vừa kết thúc (hạn là NGÀY HÔM QUA giờ VN) = tập mà job 00:05 phải làm mới cache. */
 export function offerJustEndedWhere(now: Date): Where {
   const todayStart = startOfVietnamDay(now);
