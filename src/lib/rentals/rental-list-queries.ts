@@ -1,8 +1,9 @@
+import { cache } from "react";
 import type { Payload, Where } from "payload";
 
 import type { Locale } from "../../i18n/routing";
 import type { Category, Province, Ward } from "../../payload-types";
-import { findPublicList } from "../content/public-queries";
+import { findPublicBySlug, findPublicList } from "../content/public-queries";
 import { relationId } from "../payload/relation-id";
 import { PostgresRentalSearch, sqlExecutorOf } from "../search/search-service";
 import { type RentalFilters, toRentalSearchParams } from "../search/url-params";
@@ -42,6 +43,14 @@ export interface RentalFilterOptions {
 }
 
 const RENTAL_CATEGORY_SCOPE: Where = { scope: { equals: "rental" } };
+
+/**
+ * Danh mục `rental` theo slug của ngôn ngữ đang xem (S05); `parent` đã populate. Không có / xoá mềm / chưa có bản EN ở `/en` → `null`.
+ * `cache()` để trang và `generateMetadata` của cùng một request dùng chung một truy vấn.
+ */
+export const findRentalCategory = cache((payload: Payload, locale: Locale, slug: string): Promise<Category | null> => {
+  return findPublicBySlug<Category>(payload, "categories", locale, slug, { where: RENTAL_CATEGORY_SCOPE, depth: 1 });
+});
 
 /** Danh mục `rental` của ngôn ngữ đang xem, xếp cha rồi các con của nó; `/en` chỉ gồm danh mục đã có bản EN. Danh mục con mồ côi (cha ẩn ở ngôn ngữ này) bị bỏ. */
 export async function listRentalCategoryOptions(payload: Payload, locale: Locale): Promise<CategoryOption[]> {

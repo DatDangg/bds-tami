@@ -44,6 +44,12 @@ const COLLECTION_SECTIONS = {
     param: "category",
     extraWhere: () => ({ scope: { equals: "property_post" } }),
   },
+  "categories-rentals": {
+    collection: "categories",
+    route: "/cho-thue/danh-muc/[category]",
+    param: "category",
+    extraWhere: () => ({ scope: { equals: "rental" } }),
+  },
 } as const satisfies Record<string, CollectionSection>;
 
 export const STATIC_SECTION = "static";

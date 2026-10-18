@@ -1,5 +1,4 @@
 import config from "@payload-config";
-import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -13,12 +12,14 @@ import { ActiveFilters, useActiveFilterChips } from "@/components/rentals/Active
 import { RentalCard } from "@/components/rentals/RentalCard";
 import { RentalFilters } from "@/components/rentals/RentalFilters";
 import { PendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
+import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
 import { publicPath } from "@/lib/content/content-paths";
-import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
+import { visibleCategory } from "@/lib/news/news-view";
 import { listProvinces } from "@/lib/projects/project-queries";
 import {
   dropUnknownSlugs,
+  findRentalCategory,
   listRentalCategoryOptions,
   listWardOptions,
   type RentalFilterOptions,
@@ -26,9 +27,7 @@ import {
   toProvinceOptions,
 } from "@/lib/rentals/rental-list-queries";
 import { searchCardToRentalCardData } from "@/lib/rentals/rental-view";
-import { buildPageMetadata } from "@/lib/seo/metadata";
 import {
-  hasNarrowingParams,
   parseRentalFilters,
   type RawRentalParams,
   type RentalFilters as RentalFilterValues,
@@ -36,11 +35,6 @@ import {
 } from "@/lib/search/url-params";
 import type { RentalSearchResult } from "@/shared/types/api";
 import type { Locale } from "@/i18n/routing";
-
-interface RentalListPageProps {
-  locale: Locale;
-  searchParams: RawRentalParams;
-}
 
 /** Tải danh mục + tỉnh + phường (của tỉnh trên URL) và bỏ slug lạ khỏi bộ lọc. Phường chỉ tải khi URL có tỉnh hợp lệ. */
 async function loadFilterContext(locale: Locale, parsed: RentalFilterValues) {
@@ -69,52 +63,65 @@ function isSearchEntry(searchParams: RawRentalParams): boolean {
   return q !== undefined && q.trim() === "";
 }
 
-/** Chip loại hình: "Tất cả" + danh mục cấp 1, giữ các bộ lọc khác, về trang 1. Chip của danh mục cha sáng cả khi đang lọc một danh mục con của nó. */
-function categoryChips(filters: RentalFilterValues, options: RentalFilterOptions, listPath: string, allLabel: string) {
+/**
+ * Chip loại hình: "Tất cả" (`/cho-thue`) + danh mục cấp 1, mỗi chip là link tới TRANG DANH MỤC (S05) và giữ các bộ lọc khác, về trang 1.
+ * Chip của danh mục cha sáng cả khi đang ở một danh mục con của nó. `filters` không mang `category` (nó nằm trong đường dẫn).
+ */
+function categoryChips(filters: RentalFilterValues, options: RentalFilterOptions, currentSlug: string | undefined, locale: Locale, allLabel: string) {
   const roots = options.categories.filter((item) => item.depth === 0);
   // `categories` xếp cha rồi các con của nó: danh mục cấp 1 gần nhất ở trước mục đang chọn là cha (hoặc chính nó).
-  const currentIndex = options.categories.findIndex((item) => item.slug === filters.category);
+  const currentIndex = options.categories.findIndex((item) => item.slug === currentSlug);
   const currentRoot = options.categories.slice(0, currentIndex + 1).reverse().find((item) => item.depth === 0);
-  const hrefFor = (category: string | undefined) => {
-    const next: RentalFilterValues = { ...filters, page: 1 };
-    if (category) next.category = category;
-    else delete next.category;
-    return `${listPath}${rentalListQueryString(next)}`;
-  };
+  const query = rentalListQueryString({ ...filters, page: 1 });
   return [
-    { label: allLabel, href: hrefFor(undefined), current: filters.category === undefined },
-    ...roots.map((root) => ({ label: root.label, href: hrefFor(root.slug), current: currentRoot?.slug === root.slug })),
+    { label: allLabel, href: `${publicPath("/cho-thue", locale)}${query}`, current: currentSlug === undefined },
+    ...roots.map((root) => ({ label: root.label, href: `${categoryPath(locale, root.slug)}${query}`, current: currentRoot?.slug === root.slug })),
   ];
 }
 
 /**
- * S04 Danh sách Cho thuê (`/cho-thue`, `/en/for-rent`): server render qua `SearchService` (một truy vấn SQL cho cả trang), bộ lọc client đổi URL.
+ * S04 Danh sách Cho thuê (`/cho-thue`, `/en/for-rent`) và S05 trang danh mục (`categorySlug`): server render qua `SearchService` (một truy vấn SQL cho cả trang), bộ lọc client đổi URL.
  * Trang vượt số trang → `notFound()`. Slug danh mục/tỉnh/phường lạ bị bỏ qua. Đọc `searchParams` nên render theo request (không ISR);
  * CDN giữ HTML theo `Cache-Control` của `next.config.ts`.
+ * Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`; tin lọc theo danh mục + con của nó; banner, breadcrumb, đường dẫn
+ * bộ lọc/phân trang/"Xoá tất cả" đều là của trang danh mục.
  */
-export async function RentalListPage({ locale, searchParams }: RentalListPageProps) {
+export async function RentalListPage({ locale, searchParams, categorySlug }: RentalListPageProps) {
   const parsed = parseRentalFilters(searchParams);
   const [{ payload, options, filters }, t, tNav] = await Promise.all([
-    loadFilterContext(locale, parsed),
+    loadFilterContext(locale, categorySlug ? withoutCategory(parsed) : parsed),
     getTranslations({ locale, namespace: "page.rentals" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
   ]);
-  const result = await trySearch(payload, filters, locale);
+  const category = categorySlug ? await findRentalCategory(payload, locale, categorySlug) : null;
+  if (categorySlug && !category) notFound();
+  // `filters` = thứ hiện trên URL/bộ lọc (S05: không có `category`, nó nằm trong đường dẫn); `searchFilters` = thứ gửi SearchService.
+  const searchFilters: RentalFilterValues = categorySlug ? { ...filters, category: categorySlug } : filters;
+  const result = await trySearch(payload, searchFilters, locale);
   if (result && filters.page > 1 && filters.page > result.totalPages) notFound();
 
-  const listPath = publicPath("/cho-thue", locale);
+  const rentalsPath = publicPath("/cho-thue", locale);
+  const listPath = categorySlug ? categoryPath(locale, categorySlug) : rentalsPath;
   const buildHref = (page: number) => `${listPath}${rentalListQueryString(filters, { page })}`;
   const cards = result?.items.map((item) => searchCardToRentalCardData(item, locale)) ?? [];
+  const parent = category ? visibleCategory(category.parent, locale) : null;
+  const breadcrumb = [
+    { label: tNav("rentals"), href: rentalsPath },
+    ...(parent ? [{ label: parent.name ?? "", href: categoryPath(locale, parent.slug ?? "") }] : []),
+    ...(category ? [{ label: category.name ?? "", href: listPath }] : []),
+  ];
+  // Danh mục khoá nên bỏ khỏi ô lọc (S05); ô lọc của S04 giữ nguyên.
+  const filterOptions: RentalFilterOptions = categorySlug ? { ...options, categories: [] } : options;
 
   return (
     <>
-      <PageBanner title={t("title")} description={t("description")} />
-      <Breadcrumb items={[{ label: tNav("rentals"), href: listPath }]} className="py-2" />
+      <PageBanner title={category?.name ?? t("title")} description={category ? (category.description ?? undefined) : t("description")} />
+      <Breadcrumb items={breadcrumb} className="py-2" />
       <RentalListNavigationProvider actionPath={listPath}>
         <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter pt-4 pb-section-tight">
           <nav aria-label={t("categoriesLabel")}>
             <ul className="-my-1 flex snap-x snap-mandatory gap-2 overflow-x-auto py-1 pr-8 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:pr-0">
-              {categoryChips(filters, options, listPath, t("all")).map((chip) => (
+              {categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all")).map((chip) => (
                 <li key={chip.href} className="shrink-0 snap-start sm:shrink">
                   <Link
                     href={chip.href}
@@ -127,18 +134,20 @@ export async function RentalListPage({ locale, searchParams }: RentalListPagePro
               ))}
             </ul>
           </nav>
-          <RentalFilters filters={filters} options={options} focusSearch={isSearchEntry(searchParams)} />
-          <ActiveFilters filters={filters} options={options} listPath={listPath} />
+          <RentalFilters filters={filters} options={filterOptions} fixedCategory={categorySlug} focusSearch={isSearchEntry(searchParams)} />
+          <ActiveFilters filters={filters} options={filterOptions} listPath={listPath} />
           <PendingRegion className="flex flex-col gap-6">
             {result ? (
               <ResultList
                 result={result}
                 cards={cards}
                 filters={filters}
-                options={options}
+                options={filterOptions}
                 listPath={listPath}
                 locale={locale}
                 query={filters.q}
+                inCategory={category !== null}
+                rentalsPath={rentalsPath}
                 buildHref={buildHref}
               />
             ) : (
@@ -160,10 +169,13 @@ interface ResultListProps {
   locale: Locale;
   query: string | undefined;
   buildHref: (page: number) => string;
+  /** Trang danh mục: trống thật thì nói "trong mục này" + link về `/cho-thue`. */
+  inCategory: boolean;
+  rentalsPath: string;
 }
 
 /** Số kết quả (aria-live) + lưới thẻ + phân trang, hoặc trạng thái trống kèm tối đa 3 gợi ý bỏ bớt điều kiện (design-spec §3.9). */
-function ResultList({ result, cards, filters, options, listPath, locale, query, buildHref }: ResultListProps) {
+function ResultList({ result, cards, filters, options, listPath, locale, query, buildHref, inCategory, rentalsPath }: ResultListProps) {
   const t = useTranslations("page.rentals");
   const filtering = rentalListQueryString({ ...filters, page: 1 }) !== "";
   return (
@@ -177,7 +189,7 @@ function ResultList({ result, cards, filters, options, listPath, locale, query, 
           filtering ? (
             <FilteredEmpty filters={filters} options={options} listPath={listPath} locale={locale} title={t("empty.title")} />
           ) : (
-            <EmptyState variant="empty" title={t("empty.noListings")} />
+            <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />
           )
         ) : (
           <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -240,27 +252,4 @@ function ListError({ retryHref, title, retry }: { retryHref: string; title: stri
   );
 }
 
-/**
- * `generateMetadata` của `/cho-thue` (design-spec S04). Trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh: index, canonical là chính nó
- * (kèm `?page=n`). Tổ hợp lọc sâu hơn hoặc đổi sắp xếp: `noindex, follow` và canonical về trang gốc sạch. Không tra danh mục/tỉnh nên không
- * lặp truy vấn của trang; slug lạ chỉ làm trang noindex-hoặc-index theo tham số thô.
- */
-export async function buildRentalListMetadata({ locale, searchParams }: RentalListPageProps): Promise<Metadata> {
-  const filters = parseRentalFilters(searchParams);
-  const noindex = hasNarrowingParams(filters);
-  const [t, identity] = await Promise.all([getTranslations({ locale, namespace: "page.rentals" }), loadSiteIdentity(locale)]);
-  const query = noindex ? "" : rentalListQueryString(filters);
-  // Slug danh mục/tỉnh khác nhau theo ngôn ngữ: trang lọc không khai hreflang (hasEnglish=false), chỉ canonical về chính nó.
-  const filtered = query.includes("category=") || query.includes("province=");
-  const pathFor = (target: Locale) => `${publicPath("/cho-thue", target)}${query}`;
-  return buildPageMetadata({
-    locale,
-    siteName: identity.siteName,
-    defaultImage: identity.logo,
-    forceNoindex: noindex,
-    title: t("title"),
-    description: t("description"),
-    paths: { vi: pathFor("vi"), en: pathFor("en") },
-    hasEnglish: !filtered,
-  });
-}
+export { buildRentalListMetadata } from "./rental-list-metadata";

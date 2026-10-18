@@ -135,16 +135,19 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
           onChange={(event) => onChange({ q: event.target.value }, "typing")}
         />
       </Field>
-      <Field label={t("fields.category")} htmlFor={id("category")} className={span("lg:col-span-2")}>
-        <select id={id("category")} value={draft.category} onChange={(event) => onChange({ category: event.target.value }, "now")} className={FIELD_CLASS}>
-          <option value="">{t("fields.allCategories")}</option>
-          {options.categories.map((category) => (
-            <option key={category.slug} value={category.slug}>
-              {category.depth === 1 ? `– ${category.label}` : category.label}
-            </option>
-          ))}
-        </select>
-      </Field>
+      {/* Trang danh mục (S05) truyền danh sách rỗng: danh mục đã khoá, đổi danh mục = sang trang khác bằng chip. */}
+      {options.categories.length > 0 && (
+        <Field label={t("fields.category")} htmlFor={id("category")} className={span("lg:col-span-2")}>
+          <select id={id("category")} value={draft.category} onChange={(event) => onChange({ category: event.target.value }, "now")} className={FIELD_CLASS}>
+            <option value="">{t("fields.allCategories")}</option>
+            {options.categories.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.depth === 1 ? `– ${category.label}` : category.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
       <Field label={t("fields.province")} htmlFor={id("province")} className={span("lg:col-span-2")}>
         <select id={id("province")} value={draft.province} onChange={(event) => onChange({ province: event.target.value, ward: "" }, "now")} className={FIELD_CLASS}>
           <option value="">{t("fields.allProvinces")}</option>

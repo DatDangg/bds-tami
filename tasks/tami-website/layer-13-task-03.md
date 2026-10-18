@@ -95,3 +95,7 @@ Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 - [ ] `src/lib/rentals/rental-queries.ts:429-430`: dải giá ±30% ra 1–3 tin thì giữ các tin đó và bù tin còn lại, không thay hẳn.
 - [ ] `RentalListPage.tsx:95-152` ~57 dòng: tách hàm.
 - [ ] `rental-search-sql.ts:553-554`: nhánh thiếu `province` không còn tới được qua API mà lọc ward toàn quốc — bỏ hoặc chặn.
+
+## Follow-up từ review layer-9-task-08 round 2 (MINOR)
+- [ ] `src/app/(frontend)/[locale]/list-no-loading.test.ts:12-20` chỉ kiểm thư mục `danh-muc` — trang thật ở `danh-muc/[category]/` và thư mục cha (`[locale]/`) chưa bị chặn: đi ngược từ mỗi `page.tsx` danh sách lên `app/` để chặn mọi `loading.tsx` (soft-404).
+- [ ] `RentalListPage` ~75 dòng: tách tiếp (giới hạn 50).

@@ -352,7 +352,8 @@
         "title": "No matching listings",
         "suggestionsLabel": "Try removing a filter",
         "suggestion": "Remove {name}",
-        "noListings": "No rental listings have been published yet."
+        "noListings": "No rental listings have been published yet.",
+        "noListingsInCategory": "No rental listings in this category yet."
       },
       "error": {
         "title": "Could not load the rental listings.",

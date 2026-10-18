@@ -23,6 +23,8 @@ interface RentalFilterSheetProps {
   /** Sắp xếp đang chọn ở thanh dính (Sheet không có ô sắp xếp nhưng khi áp dụng phải giữ nó). */
   sort: string;
   options: RentalFilterOptions;
+  /** Trang danh mục (S05): danh mục khoá, không nằm trong bản nháp nhưng phải có trong truy vấn đếm. */
+  fixedCategory?: string | undefined;
 }
 
 const CLEARED: Omit<FilterDraft, "sort"> = { q: "", category: "", province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "" };
@@ -31,14 +33,14 @@ const CLEARED: Omit<FilterDraft, "sort"> = { q: "", category: "", province: "", 
  * Nút "Bộ lọc (n)" + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg). Khác thanh desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
  * dính có "Xoá" và "Xem n tin" (n lấy sống từ `GET /api/public/rentals?limit=1` theo bản nháp). Áp dụng mới đổi URL.
  */
-export function RentalFilterSheet({ filters, sort, options }: RentalFilterSheetProps) {
+export function RentalFilterSheet({ filters, sort, options, fixedCategory }: RentalFilterSheetProps) {
   const t = useTranslations("page.rentals.mobile");
   const locale = useLocale() as "vi" | "en";
   const { navigate } = useRentalListNavigation();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(() => draftOf(filters));
   const { wards, loading: wardsLoading } = useWardOptions(draft.province, options);
-  const draftFilters = parseRentalFilters(draft);
+  const draftFilters = parseRentalFilters(fixedCategory ? { ...draft, category: fixedCategory } : draft);
   const count = useApiJson<CountResponse>(open ? rentalCountApiPath(draftFilters, locale) : null, 300);
   const total = count.data?.data?.total;
   const activeCount = activeFilterCount(filters);

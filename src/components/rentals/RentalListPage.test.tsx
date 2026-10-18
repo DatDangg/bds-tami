@@ -45,6 +45,8 @@ const cards = [card("1", "Studio Ba Đình"), card("2", "Căn hộ 2PN", { bedro
 const search = vi.hoisted(() => vi.fn<(params: RentalSearchParams) => Promise<RentalSearchResult>>());
 const wardsFind = vi.hoisted(() => vi.fn());
 const findPublicList = vi.hoisted(() => vi.fn());
+const findPublicBySlug = vi.hoisted(() => vi.fn());
+const findByID = vi.hoisted(() => vi.fn());
 const notFound = vi.hoisted(() =>
   vi.fn(() => {
     throw new Error("NEXT_NOT_FOUND");
@@ -52,10 +54,10 @@ const notFound = vi.hoisted(() =>
 );
 const replace = vi.hoisted(() => vi.fn());
 vi.mock("@payload-config", () => ({ default: {} }));
-vi.mock("payload", () => ({ getPayload: async () => ({ find: wardsFind }) }));
+vi.mock("payload", () => ({ getPayload: async () => ({ find: wardsFind, findByID }) }));
 vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ replace }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
-vi.mock("@/lib/content/public-queries", () => ({ findPublicList }));
+vi.mock("@/lib/content/public-queries", () => ({ findPublicList, findPublicBySlug }));
 vi.mock("@/lib/projects/project-queries", () => ({ listProvinces: async () => provinces }));
 vi.mock("@/lib/logger", () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock("@/lib/search/search-service", () => ({
@@ -88,14 +90,22 @@ beforeEach(() => {
   findPublicList.mockImplementation(async (_payload: unknown, _collection: string, locale: string) => ({
     docs: categories.filter((item) => locale === "vi" || item.hasEnglish),
   }));
+  // Như truy vấn thật: slug của ĐÚNG ngôn ngữ; ở /en chỉ danh mục hasEnglish. Cha được populate (depth 1).
+  findPublicBySlug.mockImplementation(async (_payload: unknown, _collection: string, locale: string, slug: string) => {
+    const found = categories.find((item) => item.slug === slug && (locale === "vi" || item.hasEnglish));
+    if (!found) return null;
+    const parent = categories.find((item) => item.id === (found as { parent?: string }).parent);
+    return parent ? { ...found, parent } : found;
+  });
+  findByID.mockResolvedValue({ slug: { vi: "can-ho", en: "apartment" } });
 });
 afterEach(() => {
   vi.unstubAllEnvs();
-  for (const mock of [search, wardsFind, findPublicList, notFound, replace]) mock.mockReset();
+  for (const mock of [search, wardsFind, findPublicList, findPublicBySlug, findByID, notFound, replace]) mock.mockReset();
 });
 
-async function render(locale: "vi" | "en", searchParams: Record<string, string | string[]> = {}) {
-  const ui = await RentalListPage({ locale, searchParams });
+async function render(locale: "vi" | "en", searchParams: Record<string, string | string[]> = {}, categorySlug?: string) {
+  const ui = await RentalListPage({ locale, searchParams, ...(categorySlug ? { categorySlug } : {}) });
   return renderWithIntl(ui, locale);
 }
 const cardTitles = () => screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
@@ -185,13 +195,13 @@ describe("S04 /cho-thue: render", () => {
     expect(options).toEqual(["Tất cả danh mục", "Căn hộ", "– Căn hộ dịch vụ", "Nhà phố"]);
   });
 
-  it("chip Loại hình là link ?category= giữ bộ lọc khác và bỏ trang; chip cha sáng khi đang lọc danh mục con", async () => {
+  it("chip Loại hình là link tới TRANG DANH MỤC giữ bộ lọc khác và bỏ trang; chip cha sáng khi đang lọc danh mục con", async () => {
     await render("vi", { province: "ha-noi", category: "can-ho-dich-vu", page: "1" });
     const links = within(chipNav()).getAllByRole("link");
     expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
       ["Tất cả", "/cho-thue?province=ha-noi"],
-      ["Căn hộ", "/cho-thue?category=can-ho&province=ha-noi"],
-      ["Nhà phố", "/cho-thue?category=nha-pho&province=ha-noi"],
+      ["Căn hộ", "/cho-thue/danh-muc/can-ho?province=ha-noi"],
+      ["Nhà phố", "/cho-thue/danh-muc/nha-pho?province=ha-noi"],
     ]);
     expect(links.filter((link) => link.getAttribute("aria-current") === "page").map((link) => link.textContent)).toEqual(["Căn hộ"]);
   });
@@ -233,7 +243,7 @@ describe("S04 /cho-thue: render", () => {
     expect(screen.getByRole("heading", { level: 1, name: "For rent" })).toBeInTheDocument();
     expect(screen.getByText("1 listing")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/en/for-rent/slug-1");
-    expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent?category=can-ho"]);
+    expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent/category/can-ho"]);
   });
 });
 
@@ -291,25 +301,141 @@ describe("generateMetadata", () => {
     expect((await meta({ page: "2" })).alternates?.canonical).toBe("https://tami.example/cho-thue?page=2");
   });
 
-  it("lọc đúng MỘT danh mục hoặc MỘT tỉnh vẫn index, canonical là chính nó, không khai hreflang (slug khác nhau theo ngôn ngữ)", async () => {
-    const single: Array<Record<string, string>> = [{ category: "can-ho" }, { province: "ha-noi" }];
-    for (const searchParams of single) {
-      const result = await meta(searchParams);
-      expect(result.robots).toEqual({ index: true, follow: true });
-      expect(result.alternates?.canonical).toBe(`https://tami.example/cho-thue?${new URLSearchParams(searchParams)}`);
-      expect(result.alternates?.languages).toBeUndefined();
-    }
-    expect((await meta({ category: "can-ho" }, "en")).alternates?.canonical).toBe("https://tami.example/en/for-rent?category=can-ho");
+  it("lọc đúng MỘT tỉnh vẫn index, canonical là chính nó, không khai hreflang (slug khác nhau theo ngôn ngữ)", async () => {
+    const result = await meta({ province: "ha-noi" });
+    expect(result.robots).toEqual({ index: true, follow: true });
+    expect(result.alternates?.canonical).toBe("https://tami.example/cho-thue?province=ha-noi");
+    expect(result.alternates?.languages).toBeUndefined();
+  });
+
+  it("?category=<slug có thật>: canonical về TRANG DANH MỤC (vi và en), index, không hreflang; slug lạ coi như không có danh mục", async () => {
+    const vi = await meta({ category: "can-ho" });
+    expect(vi.robots).toEqual({ index: true, follow: true });
+    expect(vi.alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho");
+    expect(vi.alternates?.languages).toBeUndefined();
+    expect((await meta({ category: "can-ho", page: "2" })).alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho?page=2");
+    expect((await meta({ category: "can-ho" }, "en")).alternates?.canonical).toBe("https://tami.example/en/for-rent/category/can-ho");
+    expect((await meta({ category: "khong-co" })).alternates?.canonical).toBe("https://tami.example/cho-thue");
   });
 
   it("tổ hợp lọc sâu hoặc đổi sắp xếp: noindex, follow và canonical về trang sạch; ô rỗng của form không tính", async () => {
-    const deep: Array<Record<string, string>> = [{ category: "can-ho", province: "ha-noi" }, { q: "studio" }, { priceMax: "5000000" }, { sort: "price_asc" }, { province: "ha-noi", ward: "ba-dinh" }, { bedrooms: "2", page: "3" }];
+    const deep: Array<Record<string, string>> = [{ q: "studio" }, { priceMax: "5000000" }, { sort: "price_asc" }, { province: "ha-noi", ward: "ba-dinh" }, { bedrooms: "2", page: "3" }];
     for (const searchParams of deep) {
       const result = await meta(searchParams);
       expect(result.robots, JSON.stringify(searchParams)).toEqual({ index: false, follow: true });
       expect(result.alternates?.canonical).toBe("https://tami.example/cho-thue");
     }
+    const withCategory = await meta({ category: "can-ho", province: "ha-noi" });
+    expect(withCategory.robots).toEqual({ index: false, follow: true });
+    expect(withCategory.alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho");
     expect((await meta({ q: "", province: "" })).robots).toEqual({ index: true, follow: true });
     expect((await meta({ utm_source: "fb" })).robots).toEqual({ index: true, follow: true });
+  });
+});
+
+describe("S05 /cho-thue/danh-muc/[category]", () => {
+  it("lọc tin theo danh mục khoá (SearchService nhận slug, gồm con ở tầng SQL); h1 là tên danh mục; đúng một h1", async () => {
+    await render("vi", {}, "can-ho");
+    expect(lastParams()).toMatchObject({ category: "can-ho", locale: "vi", limit: 12, page: 1, available: true });
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1, name: "Căn hộ" })).toBeInTheDocument();
+    expect(cardTitles()).toEqual(["Studio Ba Đình", "Căn hộ 2PN", "Nhà phố rộng"]);
+  });
+
+  it("danh mục con: tin lọc theo slug con, chip của cha sáng", async () => {
+    await render("vi", {}, "can-ho-dich-vu");
+    expect(lastParams()).toMatchObject({ category: "can-ho-dich-vu" });
+    expect(screen.getByRole("heading", { level: 1, name: "Căn hộ dịch vụ" })).toBeInTheDocument();
+    const current = within(chipNav()).getAllByRole("link").filter((link) => link.getAttribute("aria-current") === "page");
+    expect(current.map((link) => link.getAttribute("href"))).toEqual(["/cho-thue/danh-muc/can-ho"]);
+  });
+
+  it("danh mục khoá: không có ô lọc Danh mục, ?category= trên URL bị bỏ qua; bộ lọc khác giữ và trỏ về chính trang danh mục", async () => {
+    await render("vi", { category: "nha-pho", province: "ha-noi", page: "1" }, "can-ho");
+    expect(lastParams()).toMatchObject({ category: "can-ho", province: "ha-noi" });
+    expect(screen.queryByLabelText("Danh mục", { selector: "#rental-panel-category" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Bỏ lọc Hà Nội" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
+    expect(screen.getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
+    expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
+      "/cho-thue?province=ha-noi",
+      "/cho-thue/danh-muc/can-ho?province=ha-noi",
+      "/cho-thue/danh-muc/nha-pho?province=ha-noi",
+    ]);
+  });
+
+  it("phân trang theo đường dẫn danh mục; trang vượt số trang → notFound", async () => {
+    search.mockResolvedValue(result(cards, { total: 30, page: 2, totalPages: 3 }));
+    await render("vi", { page: "2", sort: "price_desc" }, "can-ho");
+    const pagination = screen.getAllByRole("navigation").find((nav) => nav.getAttribute("aria-label")?.includes("Phân trang"))!;
+    expect(within(pagination).getAllByRole("link").map((link) => link.getAttribute("href"))).toContain("/cho-thue/danh-muc/can-ho?sort=price_desc&page=3");
+    search.mockResolvedValue(result(cards, { total: 3, page: 9, totalPages: 1 }));
+    await expect(render("vi", { page: "9" }, "can-ho")).rejects.toThrow("NEXT_NOT_FOUND");
+  });
+
+  it("slug lạ / xoá mềm / chưa có bản EN → notFound, không truy vấn tin", async () => {
+    await expect(render("vi", {}, "khong-co")).rejects.toThrow("NEXT_NOT_FOUND");
+    await expect(render("en", {}, "nha-pho")).rejects.toThrow("NEXT_NOT_FOUND");
+    expect(search).not.toHaveBeenCalled();
+  });
+
+  it("/en: link chip theo /en/for-rent/category/...", async () => {
+    await render("en", {}, "can-ho");
+    expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent/category/can-ho"]);
+  });
+
+  it("trống thật: 'trong mục này' + link về /cho-thue; trống khi lọc: nút xoá bộ lọc về trang danh mục", async () => {
+    search.mockResolvedValue(result([]));
+    const { unmount } = await render("vi", {}, "can-ho");
+    expect(screen.getByRole("heading", { name: "Chưa có tin cho thuê trong mục này." })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Về danh sách" })).toHaveAttribute("href", "/cho-thue");
+    unmount();
+    await render("vi", { province: "ha-noi" }, "can-ho");
+    expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
+  });
+
+  it("lỗi truy vấn: khung lỗi + Thử lại về cùng trang danh mục", async () => {
+    search.mockRejectedValue(new Error("db down"));
+    await render("vi", { province: "ha-noi" }, "can-ho");
+    expect(within(screen.getByRole("alert")).getByRole("link", { name: "Thử lại" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho?province=ha-noi");
+  });
+});
+
+describe("generateMetadata của trang danh mục", () => {
+  beforeEach(() => vi.stubEnv("APP_ENV", "production"));
+  const meta = (searchParams: Record<string, string>, categorySlug: string, locale: "vi" | "en" = "vi") =>
+    buildRentalListMetadata({ locale, searchParams, categorySlug });
+
+  it("index, canonical chính nó (kèm ?page=n), hreflang vi/en khi danh mục có EN, title theo tên danh mục", async () => {
+    const root = await meta({}, "can-ho");
+    expect(root.robots).toEqual({ index: true, follow: true });
+    expect(root.title).toBe("Căn hộ | TAMI");
+    expect(root.alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho");
+    expect(root.alternates?.languages).toMatchObject({
+      vi: "https://tami.example/cho-thue/danh-muc/can-ho",
+      en: "https://tami.example/en/for-rent/category/apartment",
+    });
+    expect((await meta({ page: "2" }, "can-ho")).alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho?page=2");
+    expect((await meta({}, "can-ho", "en")).alternates?.canonical).toBe("https://tami.example/en/for-rent/category/apartment");
+  });
+
+  it("danh mục chưa có bản EN: không khai hreflang", async () => {
+    findByID.mockResolvedValue({ slug: { vi: "nha-pho" } });
+    expect((await meta({}, "nha-pho")).alternates?.languages).toBeUndefined();
+  });
+
+  it("thêm bộ lọc ngoài page hoặc đổi sắp xếp: noindex, follow, canonical về trang danh mục sạch, không hreflang", async () => {
+    const noisy: Array<Record<string, string>> = [{ province: "ha-noi" }, { q: "studio" }, { sort: "price_asc" }];
+    for (const searchParams of noisy) {
+      const result = await meta(searchParams, "can-ho");
+      expect(result.robots, JSON.stringify(searchParams)).toEqual({ index: false, follow: true });
+      expect(result.alternates?.canonical).toBe("https://tami.example/cho-thue/danh-muc/can-ho");
+      expect(result.alternates?.languages).toBeUndefined();
+    }
+  });
+
+  it("danh mục seo.noindex → noindex; danh mục không có → metadata rỗng (trang tự 404)", async () => {
+    findPublicBySlug.mockResolvedValueOnce({ ...categories[0], seo: { noindex: true } });
+    expect((await meta({}, "can-ho")).robots).toEqual({ index: false, follow: true });
+    expect(await meta({}, "khong-co")).toEqual({});
   });
 });

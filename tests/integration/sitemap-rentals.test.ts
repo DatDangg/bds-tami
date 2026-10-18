@@ -144,6 +144,24 @@ describe.skipIf(!baseUrl)("integration: sitemap — cho thuê + danh mục (DB t
     expect(urls.map((url) => url.loc)).toEqual([`${SITE}/tin-tuc/danh-muc/tin-thi-truong`]);
   });
 
+  it("danh mục Cho thuê (S05): nhóm categories-rentals chỉ scope rental; loại xoá mềm và seo.noindex; EN chỉ khi hasEnglish", async () => {
+    const make = async (name: string, data: Record<string, unknown> = {}) =>
+      payload.create({ collection: "categories", data: { name, scope: "rental", ...data } as never, locale: "vi", overrideAccess: true, depth: 0 });
+    const translated = await make("Văn phòng");
+    await payload.update({ collection: "categories", id: translated.id, data: { name: "Office", hasEnglish: true } as never, locale: "en", overrideAccess: true });
+    await make("Kho xưởng noindex", { seo: { noindex: true } });
+    const gone = await make("Mặt bằng đã xoá");
+    await payload.update({ collection: "categories", id: gone.id, data: { deletedAt: new Date().toISOString() } as never, locale: "vi", overrideAccess: true });
+
+    const locs = (await sitemap.loadSectionUrls(payload, "categories-rentals", 1, SITE, new Date())).map((url) => url.loc);
+    expect(locs).toContain(`${SITE}/cho-thue/danh-muc/can-ho`);
+    expect(locs).toContain(`${SITE}/cho-thue/danh-muc/van-phong`);
+    expect(locs).toContain(`${SITE}/en/for-rent/category/office`);
+    expect(locs.some((loc) => loc.includes("kho-xuong") || loc.includes("mat-bang"))).toBe(false);
+    expect(locs.some((loc) => loc.includes("tin-thi-truong") || loc.includes("danh-muc-bds"))).toBe(false);
+    expect(await sitemap.countSectionChunks(payload, "categories-rentals", new Date())).toBeGreaterThanOrEqual(1);
+  });
+
   it("danh mục: seo.noindex xét theo từng ngôn ngữ (cả hai / chỉ vi / chỉ en)", async () => {
     const make = async (name: string, enName: string, noindex: { vi: boolean; en: boolean }) => {
       const created = await payload.create({

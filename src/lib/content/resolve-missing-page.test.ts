@@ -88,11 +88,20 @@ describe("resolveMissingPage", () => {
     expect(matchDynamicPage("/en/for-rent/apartment-a")).toMatchObject({ locale: "en", slug: "apartment-a", rule: { collection: "rentals" } });
     expect(matchDynamicPage("/cho-thue")).toBeNull();
     expect(matchDynamicPage("/en/for-rent")).toBeNull();
-    expect(matchDynamicPage("/cho-thue/danh-muc/can-ho")).toBeNull();
     expect(matchDynamicPage("/en/for-rent/area/ha-noi")).toBeNull();
     findPublicBySlug.mockResolvedValue(null);
     expect(await resolveMissingPage("/cho-thue/khong-co")).toBe("vi");
     expect(findPublicBySlug).toHaveBeenCalledWith({}, "rentals", "vi", "khong-co", { depth: 0 });
+  });
+
+  it("danh mục Cho thuê (S05): khớp vi/en, tra categories scope rental theo slug của ngôn ngữ URL → slug lạ / xoá mềm / chưa có EN là 404 đầy đủ", async () => {
+    expect(matchDynamicPage("/cho-thue/danh-muc/can-ho")).toMatchObject({ locale: "vi", slug: "can-ho", rule: { collection: "categories" } });
+    expect(matchDynamicPage("/en/for-rent/category/apartment")).toMatchObject({ locale: "en", slug: "apartment", rule: { collection: "categories" } });
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/for-rent/category/khong-co")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "categories", "en", "khong-co", { depth: 0, where: { scope: { equals: "rental" } } });
+    findPublicBySlug.mockResolvedValue({ id: "c1" });
+    expect(await resolveMissingPage("/cho-thue/danh-muc/can-ho")).toBeNull();
   });
 
   it("Đăng tin BĐS (G27): khớp chi tiết + danh mục vi/en, tra property-posts / categories (scope property_post); danh sách /tin-bds không bị khớp", async () => {

@@ -328,6 +328,41 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     });
   });
 
+  /** Trang danh mục Cho thuê (layer-9-task-08): `findRentalCategory` quyết định 404 (slug lạ / xoá mềm / chưa có EN) và cấp tin theo danh mục + con. */
+  describe("trang danh mục /cho-thue/danh-muc/[category]", () => {
+    it("tìm theo slug đúng ngôn ngữ, đúng scope rental; cha được populate ở danh mục con", async () => {
+      const { findRentalCategory } = await import("../../src/lib/rentals/rental-list-queries");
+      expect(await findRentalCategory(payload, "vi", "can-ho")).toMatchObject({ id: rootCategoryId, slug: "can-ho" });
+      const child = await findRentalCategory(payload, "vi", "can-ho-dich-vu");
+      expect(child).toMatchObject({ id: childCategoryId });
+      expect(child?.parent).toMatchObject({ id: rootCategoryId, slug: "can-ho" });
+      // Slug lạ, slug của scope khác (danh mục dự án) và slug chưa có bản EN đều là 404.
+      expect(await findRentalCategory(payload, "vi", "khong-co")).toBeNull();
+      expect(await findRentalCategory(payload, "vi", "du-an-can-ho")).toBeNull();
+      expect(await findRentalCategory(payload, "en", "can-ho")).toBeNull();
+    });
+
+    it("danh mục xoá mềm → null (và tin của nó không được liệt kê qua trang)", async () => {
+      const { findRentalCategory } = await import("../../src/lib/rentals/rental-list-queries");
+      await withDatabase((client) => client.query(`UPDATE "categories" SET "deleted_at" = now() WHERE "id" = $1`, [houseCategoryId]));
+      try {
+        expect(await findRentalCategory(payload, "vi", "nha-pho")).toBeNull();
+      } finally {
+        await withDatabase((client) => client.query(`UPDATE "categories" SET "deleted_at" = NULL WHERE "id" = $1`, [houseCategoryId]));
+      }
+      expect(await findRentalCategory(payload, "vi", "nha-pho")).toMatchObject({ id: houseCategoryId });
+    });
+
+    it("tin của trang: danh mục cha gồm tin của con, danh mục con chỉ tin của nó (đúng tập mà trang gọi SearchService)", async () => {
+      const filters = parseRentalFilters({ province: "ho-chi-minh" });
+      const forCategory = async (category: string) =>
+        (await service.search(toRentalSearchParams({ ...filters, category }, "vi"))).items.map((card) => card.title);
+      expect(await forCategory("can-ho-dich-vu")).toEqual(["Căn hộ dịch vụ Bến Nghé"]);
+      expect(await forCategory("can-ho")).toContain("Căn hộ dịch vụ Bến Nghé");
+      expect((await forCategory("can-ho")).length).toBeGreaterThan(1);
+    });
+  });
+
   /** Trang /cho-thue (layer-8-task-03): URL -> `parseRentalFilters` -> `toRentalSearchParams` -> SearchService, đúng đường trang đi. */
   describe("URL của trang /cho-thue -> đúng tập kết quả", () => {
     const viaUrl = async (query: string, locale: "vi" | "en" = "vi") => {

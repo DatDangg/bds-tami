@@ -35,11 +35,11 @@ const withHanoiWards: RentalFilterOptions = {
 };
 const none: RentalFilterValues = { sort: "newest", page: 1 };
 
-function ui(filters: RentalFilterValues, opts: RentalFilterOptions = options, locale: "vi" | "en" = "vi") {
+function ui(filters: RentalFilterValues, opts: RentalFilterOptions = options, locale: "vi" | "en" = "vi", fixedCategory?: string, actionPath?: string) {
   return (
     <NextIntlClientProvider locale={locale} messages={locale === "vi" ? vi_ : en}>
-      <RentalListNavigationProvider actionPath={locale === "vi" ? "/cho-thue" : "/en/for-rent"}>
-        <RentalFilters filters={filters} options={opts} />
+      <RentalListNavigationProvider actionPath={actionPath ?? (locale === "vi" ? "/cho-thue" : "/en/for-rent")}>
+        <RentalFilters filters={filters} options={opts} fixedCategory={fixedCategory} />
         <PendingRegion>
           <p>Kết quả</p>
         </PendingRegion>
@@ -190,6 +190,29 @@ describe("RentalFilters: đồng bộ với URL", () => {
   it("vùng kết quả không bận khi chưa đổi bộ lọc (aria-busy=false)", () => {
     render(ui(none));
     expect(screen.getByText("Kết quả").parentElement).toHaveAttribute("aria-busy", "false");
+  });
+});
+
+describe("RentalFilters: trang danh mục (danh mục khoá)", () => {
+  it("không có ô Danh mục (options.categories rỗng); đổi ô khác đổi URL của trang danh mục, không thêm category", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui(none, { ...options, categories: [] }, "vi", "can-ho", "/cho-thue/danh-muc/can-ho"));
+    expect(panel().queryByLabelText("Danh mục")).toBeNull();
+    await user.selectOptions(panel().getByLabelText("Tỉnh/thành"), "ha-noi");
+    expect(lastUrl()).toBe("/cho-thue/danh-muc/can-ho?province=ha-noi");
+  });
+
+  it("Sheet: số 'Xem n tin' đếm theo danh mục khoá dù bản nháp không có category", async () => {
+    const fetchSpy = vi.fn<(url: string) => Promise<Response>>(async () => Response.json({ success: true, data: { total: 4 } }));
+    vi.stubGlobal("fetch", fetchSpy);
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui(none, { ...options, categories: [] }, "vi", "can-ho", "/cho-thue/danh-muc/can-ho"));
+    await user.click(within(screen.getByRole("group", { name: "Bộ lọc tin cho thuê" })).getByRole("button", { name: "Bộ lọc" }));
+    const dialog = await screen.findByRole("dialog", { name: "Bộ lọc tin cho thuê" });
+    await within(dialog).findByRole("button", { name: "Xem 4 tin" });
+    const url = new URL(String(fetchSpy.mock.calls.map((call) => call[0] as string).find((u) => u.startsWith("/api/public/rentals"))), "http://x");
+    expect(url.searchParams.get("category")).toBe("can-ho");
+    expect(within(dialog).queryByLabelText("Danh mục")).toBeNull();
   });
 });
 

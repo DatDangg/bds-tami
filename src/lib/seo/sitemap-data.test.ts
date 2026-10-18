@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { docUrls, isSitemapSection, parseSitemapFile } from "./sitemap-data";
+import type { Payload } from "payload";
+
+import { countSectionChunks, docUrls, isSitemapSection, loadSectionUrls, parseSitemapFile } from "./sitemap-data";
 
 const SITE = "https://tami.example";
 const base = { slug: { vi: "du-an-a", en: "project-a" }, updatedAt: "2026-10-02T03:04:05.000Z" };
@@ -31,6 +33,38 @@ describe("docUrls", () => {
   it("slug có ký tự đặc biệt được encode; danh mục dùng tham số category", () => {
     const urls = docUrls({ slug: { vi: "nhà/đẹp" }, hasEnglish: false }, "/tin-tuc/danh-muc/[category]", "category", SITE);
     expect(urls[0]?.loc).toBe(`${SITE}/tin-tuc/danh-muc/nh%C3%A0%2F%C4%91%E1%BA%B9p`);
+  });
+});
+
+describe("nhóm categories-rentals (trang danh mục Cho thuê S05)", () => {
+  const now = new Date("2026-10-18T00:00:00.000Z");
+  const docs = [
+    { slug: { vi: "can-ho", en: "apartment" }, hasEnglish: true, updatedAt: "2026-10-01T00:00:00.000Z" },
+    { slug: { vi: "nha-pho", en: "townhouse" }, hasEnglish: false },
+    { slug: { vi: "an", en: "hidden" }, hasEnglish: true, seo: { vi: { noindex: true }, en: { noindex: true } } },
+  ];
+  const find = vi.fn<(args: unknown) => Promise<{ docs: typeof docs }>>(async () => ({ docs }));
+  const count = vi.fn<(args: unknown) => Promise<{ totalDocs: number }>>(async () => ({ totalDocs: 3 }));
+  const payload = { find, count } as unknown as Payload;
+
+  it("là nhóm hợp lệ; truy vấn scope rental, chỉ bản ghi công khai chưa xoá mềm, đọc như khách", async () => {
+    expect(isSitemapSection("categories-rentals")).toBe(true);
+    expect(parseSitemapFile("categories-rentals-1.xml")).toEqual({ section: "categories-rentals", chunk: 1 });
+    await loadSectionUrls(payload, "categories-rentals", 1, SITE, now);
+    const args = find.mock.calls[0]![0] as { collection: string; where: unknown; overrideAccess: boolean; trash: boolean };
+    expect(args).toMatchObject({ collection: "categories", overrideAccess: false, trash: false });
+    expect(JSON.stringify(args.where)).toContain('"scope":{"equals":"rental"}');
+    expect(JSON.stringify(args.where)).toContain("deletedAt");
+  });
+
+  it("URL: vi luôn có, en chỉ khi hasEnglish, loại danh mục seo.noindex", async () => {
+    const urls = await loadSectionUrls(payload, "categories-rentals", 1, SITE, now);
+    expect(urls.map((url) => url.loc)).toEqual([`${SITE}/cho-thue/danh-muc/can-ho`, `${SITE}/en/for-rent/category/apartment`, `${SITE}/cho-thue/danh-muc/nha-pho`]);
+  });
+
+  it("đếm số file theo cùng điều kiện", async () => {
+    expect(await countSectionChunks(payload, "categories-rentals", now)).toBe(1);
+    expect(JSON.stringify((count.mock.calls[0]![0] as { where: unknown }).where)).toContain('"scope":{"equals":"rental"}');
   });
 });
 

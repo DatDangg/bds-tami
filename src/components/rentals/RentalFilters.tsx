@@ -17,6 +17,8 @@ interface RentalFiltersProps {
   options: RentalFilterOptions;
   /** Vào từ nút tìm kiếm của header (`?q=` rỗng): đưa con trỏ vào ô từ khoá đang hiện để gõ ngay. */
   focusSearch?: boolean;
+  /** Trang danh mục (S05): slug danh mục bị khoá. `options.categories` rỗng nên không có ô danh mục; số đếm "Xem n tin" của Sheet vẫn phải tính theo danh mục này. */
+  fixedCategory?: string | undefined;
 }
 
 /** Hai ô từ khoá (thanh dính mobile, bảng desktop) cùng tồn tại trong DOM; chỉ một ô đang hiện theo breakpoint. */
@@ -27,7 +29,7 @@ const SEARCH_INPUT_IDS = ["rental-bar-q", "rental-panel-q"] as const;
  * ≥ lg: bảng lọc 2 hàng áp dụng ngay (gõ chữ/số chờ 300ms). < lg: thanh dính dưới header (từ khoá + "Bộ lọc (n)" + Sắp xếp), bấm "Bộ lọc" mở Sheet.
  * Hai bố cục dùng chung một bản nháp nên ô từ khoá/sắp xếp luôn khớp nhau; phần nào bị ẩn bằng CSS thì không vào cây truy cập.
  */
-export function RentalFilters({ filters, options, focusSearch = false }: RentalFiltersProps) {
+export function RentalFilters({ filters, options, focusSearch = false, fixedCategory }: RentalFiltersProps) {
   const t = useTranslations("page.rentals");
   const { navigate } = useRentalListNavigation();
   const { draft, update } = useLiveDraft(filters, navigate);
@@ -57,7 +59,7 @@ export function RentalFilters({ filters, options, focusSearch = false }: RentalF
             onChange={(event) => update({ q: event.target.value }, "typing")}
           />
         </div>
-        <RentalFilterSheet filters={filters} sort={draft.sort} options={options} />
+        <RentalFilterSheet filters={filters} sort={draft.sort} options={options} fixedCategory={fixedCategory} />
         <SortSelect id="rental-bar-sort" value={draft.sort} onChange={(sort) => update({ sort }, "now")} showLabel={false} className="w-32 shrink-0" />
       </div>
       <section aria-label={t("filtersLabel")} className="hidden lg:block">

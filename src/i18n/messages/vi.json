@@ -352,7 +352,8 @@
         "title": "Không tìm thấy tin phù hợp",
         "suggestionsLabel": "Thử bớt điều kiện lọc",
         "suggestion": "Bỏ {name}",
-        "noListings": "Chưa có tin cho thuê nào được đăng."
+        "noListings": "Chưa có tin cho thuê nào được đăng.",
+        "noListingsInCategory": "Chưa có tin cho thuê trong mục này."
       },
       "error": {
         "title": "Chưa tải được danh sách tin cho thuê.",
