@@ -8,7 +8,7 @@
     "slug": "tami-website",
     "taskDir": "tasks/tami-website",
     "layerPlan": "docs/diagrams/layer-plan.md",
-    "totalTasks": 75,
+    "totalTasks": 77,
     "status": "plan_approved",
     "approvedAt": "2026-10-16",
     "adjustments": [
@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 9,
+  "currentLayer": 10,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -592,9 +592,14 @@
       "date": "2026-10-18T21:25:00Z",
       "decision": "Data-retention (L9-T06): Q1 private-files chỉ chứa CV — khoá upload trực tiếp của admin, sửa ERD; Q2 khi ẩn danh lead xoá thêm nội dung lead-activities note/call (thay \"Đã ẩn danh\") + ipHash/userAgent/pageUrl, giữ số liệu thống kê; Q3 hồ sơ ứng tuyển > 12 tháng ẩn danh + xoá CV bất kể trạng thái; Q4 lead còn mở 24 tháng không tương tác vẫn ẩn danh (BR-31); Q5 xoá audit > 24 tháng, nhưng down migration KHÔNG xoá audit system.data_retention",
       "reason": "User trả lời Q1–Q5 review L9-T06 round 1"
+    },
+    {
+      "date": "2026-10-19T00:30:00Z",
+      "decision": "Layer 9: D5 phản hồi chờ phía client → task mới layer-10-task-04; BL-008 xoá CV an toàn khi S3 lỗi → task mới layer-10-task-05 (đều trước M2); CHƯA push staging — push + cập nhật nginx chặn /api/internal/ (G30) gộp một lần trước M2; dừng sau layer 9 chờ lệnh chạy layer 10",
+      "reason": "User duyệt checkpoint layer 9"
     }
   ],
-  "lastUpdated": "2026-10-19T00:20:00Z",
+  "lastUpdated": "2026-10-19T00:30:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -698,7 +703,9 @@
       "layer": 9,
       "verdict": "GAPS",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-9.md",
-      "note": "46/47 AC. D5 một phần (loading.tsx bỏ vì soft-404) chờ user; BL-008 (CV mồ côi khi S3 lỗi) chờ lịch; G33 primary dọn (task file, BACKLOG BL-009, MINOR L9-T07 → L10-T02). M2 còn L10-T01/T02/T03. G30 nginx trước push (26 commit chưa push). Staging budget dịch = 0 → không gọi API."
+      "note": "46/47 AC. D5 một phần (loading.tsx bỏ vì soft-404) chờ user; BL-008 (CV mồ côi khi S3 lỗi) chờ lịch; G33 primary dọn (task file, BACKLOG BL-009, MINOR L9-T07 → L10-T02). M2 còn L10-T01/T02/T03. G30 nginx trước push (26 commit chưa push). Staging budget dịch = 0 → không gọi API. User duyệt 2026-10-19: D5 → layer-10-task-04; BL-008 → layer-10-task-05 (trước M2); chưa push staging (push + nginx G30 gộp trước M2); dừng sau layer 9.",
+      "approvedAt": "2026-10-19T00:30:00Z",
+      "approvedBy": "user"
     }
   ]
 }
