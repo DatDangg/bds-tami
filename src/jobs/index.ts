@@ -5,6 +5,7 @@ import { aggregateClickStatsTask } from "./aggregate-click-stats";
 import { closeJobPostingsTask } from "./close-job-postings";
 import { dataRetentionTask } from "./data-retention";
 import { expireOffersTask } from "./expire-offers";
+import { reindexRentalsSearchTask } from "./reindex-rentals-search";
 import { remindUnassignedLeadsTask } from "./remind-unassigned-leads";
 import { sendNotificationEmailTask } from "./send-notification-email";
 import { translateContentTask } from "./translate-content";
@@ -14,10 +15,10 @@ import { translateContentTask } from "./translate-content";
  *
  * Cố ý KHÔNG có `autoRun`: web app chỉ xếp job vào hàng đợi; việc chạy job do process `jobs`
  * riêng (`pnpm jobs`, xem scripts/jobs-runner.ts) đảm nhiệm. Job nghiệp vụ khác (nhắc lead, hết hạn ưu đãi,
- * dọn dữ liệu, dịch) và lịch cron của chúng được thêm vào `tasks` ở task của từng nghiệp vụ.
+ * dọn dữ liệu, dịch, dựng lại chỉ mục tìm kiếm) và lịch cron của chúng được thêm vào `tasks` ở task của từng nghiệp vụ.
  */
 export const jobsConfig: JobsConfig = {
-  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask, remindUnassignedLeadsTask, dataRetentionTask, translateContentTask],
+  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask, remindUnassignedLeadsTask, dataRetentionTask, translateContentTask, reindexRentalsSearchTask],
   // Input chứa dữ liệu khách; job xong thì xoá để không giữ dữ liệu cá nhân trong bảng hàng đợi.
   deleteJobOnComplete: true,
   // Mặc định mọi user đăng nhập được chạy/xếp/huỷ job qua REST; chỉ admin mới được.

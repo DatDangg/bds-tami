@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.7.0
+- **spec_version:** 1.8.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -168,6 +168,7 @@ Các quy tắc dưới đây là ⚠️ giả định mặc định để build,
 - **Tin "Đã thuê"**: form vẫn nhận lead với tiêu đề "Nhận tư vấn căn tương tự"; lead gắn nguồn là tin đó.
 - **Globals chưa có bản tiếng Anh**: `header` / `footer` thiếu bản EN thì `/en` dùng menu cố định trong `en.json`; khối trang chủ chưa có bản EN thì ẩn khối đó ở `/en` (không lấy chữ tiếng Việt, BR-07).
 - **Hẹn giờ xuất bản** (FR-ADM-16): bài `published` có `publishedAt` ở tương lai thì chưa hiện công khai; job Payload chạy mỗi phút revalidate các bài vừa tới giờ.
+- **Đổi tên tỉnh / phường (tên, tên cũ) / dự án**: `searchText` của các tin cho thuê thuộc phạm vi đó được dựng lại để tìm kiếm không dấu khớp tên mới. ≤ 500 tin → làm ngay trong lần lưu; > 500 tin → xếp 1 job nền Payload Jobs (`reindex-rentals-search`, xử lý theo lô, idempotent, thử lại theo cấu hình Jobs) và form admin của bản ghi đó hiện cảnh báo "đang dựng lại chỉ mục tìm kiếm ở chế độ nền" tới khi job xong. Lệnh tay `pnpm reindex:rentals-search` vẫn giữ để chạy bù toàn bộ.
 - **Hai người sửa cùng bài**: dùng document locking có sẵn của Payload 3.
 - **Bộ lọc không có kết quả**: hiện trạng thái trống + nút xoá bộ lọc. **Lỗi máy chủ**: trang 500 đúng ngôn ngữ đang xem (screen spec ở bước `/design`).
 

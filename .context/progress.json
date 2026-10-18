@@ -171,6 +171,34 @@
       "review": "STRICT PASS",
       "round": 2,
       "report": ".context/review-reports/feature-apply-form-upload-progress-phase-1-task-01-round-2-review.md"
+    },
+    {
+      "slug": "rentals-reindex-background-job",
+      "title": "Reindex rentals.searchText > 500 tin chạy nền bằng Payload Jobs (task reindex-rentals-search, xếp trong transaction, idempotent) + cảnh báo form admin tỉnh/phường/dự án (field ảo searchReindexPending) + migration enum additive (BL-006)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-006",
+      "changeDoc": "spec/changes/archive/2026-10-19-rentals-reindex-background-job.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-rentals-reindex-background-job/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-rentals-reindex-background-job-phase-1-task-01-round-2-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.8.0",
+      "scopeVersion": 8,
+      "migration": "migrations/20261018_203017_rentals_reindex_job.ts (additive)",
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/feature-rentals-reindex-background-job-phase-1-task-01-round-2-review.md"
     }
   ],
   "bugs": [

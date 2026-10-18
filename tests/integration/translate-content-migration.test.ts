@@ -49,7 +49,6 @@ describe.skipIf(!baseUrl)("integration: migration translate_content up/down/up (
     const { createLocalReq } = await import("payload");
     const migration = migrations.find((item) => item.name === MIGRATION_NAME);
     expect(migration).toBeDefined();
-    expect(migrations.at(-1)?.name).toBe(MIGRATION_NAME);
     const db = payload.db.drizzle as unknown as { execute: (query: unknown) => Promise<{ rows: Record<string, unknown>[] }> };
     const req = await createLocalReq({}, payload);
     const args = { db: payload.db.drizzle, payload, req } as never;

@@ -9,6 +9,7 @@ import { upload } from "payload/shared";
 
 import { requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
+import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
@@ -90,6 +91,7 @@ const floorPlansField: ArrayField = {
  * phục (PERMISSION §3.1; access mặc định của `withContentDefaults`). `category` thuộc scope `project`. Index tổng hợp
  * `(status, has_english, sales_status, province_id)` và GIST `location` (ERD §5) là SQL tuỳ biến trong migration `projects`:
  * Payload chỉ sinh btree cho `point` và đặt tên index tổng hợp kém ổn định. `revalidate` chỉ để test ghi đè.
+ * Đổi `title` dựng lại `searchText` của tin thuộc dự án (hook `afterChange`); nhiều tin thì job nền + cảnh báo trên form (`searchReindexPendingField`, chỉ admin thấy).
  */
 export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
   const revalidateHomepage = createRevalidateHomepageOnUnpublish({ paths: revalidate, tags: revalidateTags });
@@ -100,6 +102,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       defaultSort: "-publishedAt",
       hooks: { afterChange: [reindexRentalsOnProjectRename, revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
+        searchReindexPendingField("project"),
         titleField(),
         scopedCategoryField("project"),
         { name: "developer", type: "relationship", relationTo: "developers", index: true },

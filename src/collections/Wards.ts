@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { isAdmin } from "../access";
+import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { blockDeleteWhileHasRentals } from "../hooks/wards/guard-delete";
 import { reindexRentalsOnWardChange } from "../hooks/wards/reindex-rentals";
 
@@ -13,6 +14,7 @@ const WARD_TYPE_LABELS: Record<WardType, string> = { phuong: "Phường", xa: "X
  * Phường/xã/đặc khu sau 01/07/2025 (ERD §4.2, LGL-01), `code` = mã TMS 8 số. `legacyNames` là tên đơn vị cũ
  * ("Phường Bến Nghé, Quận 1") để tìm kiếm. Slug duy nhất trong cùng tỉnh: DB giữ UNIQUE (`province`, `slug`).
  * Khách/sale chỉ đọc, chỉ admin ghi; hook `beforeDelete` chặn xoá phường còn tin cho thuê tham chiếu (409). Không localized, không status/soft delete (như `provinces`).
+ * Đổi tên/tên cũ dựng lại `searchText` của tin thuộc phường (hook `afterChange`); nhiều tin thì job nền + cảnh báo trên form (`searchReindexPendingField`).
  */
 export const Wards: CollectionConfig = {
   slug: "wards",
@@ -22,6 +24,7 @@ export const Wards: CollectionConfig = {
   hooks: { beforeDelete: [blockDeleteWhileHasRentals], afterChange: [reindexRentalsOnWardChange] },
   indexes: [{ fields: ["province", "slug"], unique: true }],
   fields: [
+    searchReindexPendingField("ward"),
     { name: "province", type: "relationship", relationTo: "provinces", required: true, index: true },
     { name: "code", type: "text", required: true, unique: true, index: true },
     { name: "name", type: "text", required: true },

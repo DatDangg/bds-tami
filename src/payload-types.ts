@@ -161,6 +161,7 @@ export interface Config {
       'remind-unassigned-leads': TaskRemindUnassignedLeads;
       'data-retention': TaskDataRetention;
       'translate-content': TaskTranslateContent;
+      'reindex-rentals-search': TaskReindexRentalsSearch;
       inline: {
         input: unknown;
         output: unknown;
@@ -482,6 +483,7 @@ export interface Developer {
  */
 export interface Province {
   id: string;
+  searchReindexPending?: boolean | null;
   code: string;
   name: string;
   shortName?: string | null;
@@ -496,6 +498,7 @@ export interface Province {
  */
 export interface Ward {
   id: string;
+  searchReindexPending?: boolean | null;
   province: string | Province;
   code: string;
   name: string;
@@ -700,6 +703,7 @@ export interface News {
  */
 export interface Project {
   id: string;
+  searchReindexPending?: boolean | null;
   title?: string | null;
   category?: (string | null) | Category;
   developer?: (string | null) | Developer;
@@ -1268,7 +1272,8 @@ export interface PayloadJob {
           | 'expire-offers'
           | 'remind-unassigned-leads'
           | 'data-retention'
-          | 'translate-content';
+          | 'translate-content'
+          | 'reindex-rentals-search';
         taskID: string;
         input?:
           | {
@@ -1311,6 +1316,7 @@ export interface PayloadJob {
         | 'remind-unassigned-leads'
         | 'data-retention'
         | 'translate-content'
+        | 'reindex-rentals-search'
       )
     | null;
   queue?: string | null;
@@ -1701,6 +1707,7 @@ export interface DevelopersSelect<T extends boolean = true> {
  * via the `definition` "provinces_select".
  */
 export interface ProvincesSelect<T extends boolean = true> {
+  searchReindexPending?: T;
   code?: T;
   name?: T;
   shortName?: T;
@@ -1714,6 +1721,7 @@ export interface ProvincesSelect<T extends boolean = true> {
  * via the `definition` "wards_select".
  */
 export interface WardsSelect<T extends boolean = true> {
+  searchReindexPending?: T;
   province?: T;
   code?: T;
   name?: T;
@@ -1848,6 +1856,7 @@ export interface NewsSelect<T extends boolean = true> {
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
+  searchReindexPending?: T;
   title?: T;
   category?: T;
   developer?: T;
@@ -2910,6 +2919,20 @@ export interface TaskTranslateContent {
     outcome: string;
     reason?: string | null;
     fields?: number | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskReindex-rentals-search".
+ */
+export interface TaskReindexRentalsSearch {
+  input: {
+    scope: 'province' | 'ward' | 'project';
+    id: string;
+  };
+  output: {
+    rentals: number;
+    rows: number;
   };
 }
 /**

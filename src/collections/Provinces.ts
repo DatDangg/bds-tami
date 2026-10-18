@@ -1,6 +1,7 @@
 import { APIError, type CollectionBeforeDeleteHook, type CollectionConfig } from "payload";
 
 import { isAdmin } from "../access";
+import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { reindexRentalsOnProvinceRename } from "../hooks/provinces/reindex-rentals";
 
 /** Bảng tham chiếu tỉnh bằng khoá ngoại NOT NULL: còn bản ghi (kể cả xoá mềm) thì chặn xoá bằng thông báo rõ ràng thay vì lỗi 500. */
@@ -31,7 +32,8 @@ const blockDeleteWhileReferenced: CollectionBeforeDeleteHook = async ({ id, req 
 /**
  * Tỉnh/thành sau 01/07/2025 (ERD §4.2, LGL-01): 34 bản ghi do `pnpm seed` nạp (`seed/geo.ts`), `code` = mã BNV 2 số.
  * Danh mục tĩnh công khai: khách/sale chỉ đọc, chỉ admin ghi (PERMISSION §3.2). Tên riêng tiếng Việt nên không
- * localized; không có status/soft delete (hook `beforeDelete` chặn xoá khi còn phường/tin cho thuê/dự án tham chiếu). Đổi `name` dựng lại `searchText` của tin thuộc tỉnh (hook `afterChange`, ERD §6).
+ * localized; không có status/soft delete (hook `beforeDelete` chặn xoá khi còn phường/tin cho thuê/dự án tham chiếu). Đổi `name` dựng lại `searchText` của tin thuộc tỉnh (hook `afterChange`, ERD §6);
+ * nhiều tin thì job nền + cảnh báo trên form (`searchReindexPendingField`).
  */
 export const Provinces: CollectionConfig = {
   slug: "provinces",
@@ -40,6 +42,7 @@ export const Provinces: CollectionConfig = {
   access: { read: () => true, create: isAdmin, update: isAdmin, delete: isAdmin },
   hooks: { beforeDelete: [blockDeleteWhileReferenced], afterChange: [reindexRentalsOnProvinceRename] },
   fields: [
+    searchReindexPendingField("province"),
     { name: "code", type: "text", required: true, unique: true, index: true },
     { name: "name", type: "text", required: true },
     { name: "shortName", type: "text" },

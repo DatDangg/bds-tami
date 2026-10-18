@@ -23,6 +23,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd } from '../../../components/admin/SearchReindexPendingWarning'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { LeadAssigneeWarning as LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef } from '../../../components/admin/LeadAssigneeWarning'
@@ -61,6 +62,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "/components/admin/SearchReindexPendingWarning#SearchReindexPendingWarning": SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning": LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef,
