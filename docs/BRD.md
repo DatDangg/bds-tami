@@ -3,8 +3,8 @@
 | Thông tin | Nội dung |
 |---|---|
 | Tên dự án | Website thương hiệu TAMI |
-| Phiên bản | 1.5 |
-| Ngày | 16/10/2026 |
+| Phiên bản | 1.6 |
+| Ngày | 19/10/2026 |
 | Trạng thái | Đã duyệt phạm vi giai đoạn 1 |
 | Người soạn | (điền) |
 | Người phê duyệt | (điền) |
@@ -20,6 +20,7 @@
 | 1.3 | 16/10/2026 | **Đổi định vị**: website thương hiệu của TAMI, công ty tự đăng nội dung, khách để lại liên hệ. Bỏ toàn bộ tính năng sàn (tài khoản người ngoài, kiểm duyệt, báo cáo vi phạm, VIP/thanh toán, xác minh môi giới). Bỏ mục Mua bán. Thêm Dịch vụ, Đăng tin BĐS (tin BĐS/voucher), Tuyển dụng vào giai đoạn 1. Chỉ 2 vai trò: Admin, Sale |
 | 1.4 | 16/10/2026 | **Song ngữ Việt – Anh**: website công khai có bản tiếng Anh (URL `/en/...`), tiếng Việt là mặc định. Thêm §2.1, FR-PUB-18, 19, FR-ADM-17, BR-07, BR-17; sửa FR-PUB-15, BR-05, A5. Chốt giao diện theo phong cách vinhomes.vn. Trang quản trị vẫn chỉ tiếng Việt |
 | 1.5 | 16/10/2026 | **AI tự dịch sang tiếng Anh** (Claude API): xuất bản bản tiếng Việt là tự dịch và hiện bản tiếng Anh, nhân viên sửa tay được; trang pháp lý phải duyệt tay. Thêm FR-ADM-18, BR-08; sửa FR-ADM-17, BR-07, NFR-09, A5, Q5, ngoài phạm vi |
+| 1.6 | 19/10/2026 | BR-08: sửa tay bản tiếng Anh của trang pháp lý đã duyệt → ẩn `/en` tới khi admin duyệt lại (user quyết 19/10/2026, BL-013) |
 
 ---
 
@@ -191,6 +192,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
   - Xuất bản / sửa bản tiếng Việt thì AI dịch **các trường đã đổi** sang tiếng Anh và tự hiện bản tiếng Anh (không chờ duyệt).
   - Nhân viên sửa tay bản tiếng Anh thì bản đó thành "đã sửa tay": AI không dịch đè nữa; khi bản tiếng Việt đổi tiếp, admin/người đăng thấy nhắc "bản Việt đã đổi" để tự sửa hoặc bấm "Dịch lại bằng AI".
   - **Trang pháp lý** (Chính sách bảo mật, Điều khoản) AI chỉ dịch nháp; **admin duyệt** rồi mới hiện ở `/en`.
+  - Bản tiếng Anh của trang pháp lý **đã duyệt** mà bị sửa tay tiếp (sửa nội dung tiếng Anh, không phải bấm duyệt) thì mất trạng thái duyệt và **ẩn khỏi `/en`** cho tới khi admin duyệt lại — giống khi AI dịch lại. Lưu mà không đổi nội dung tiếng Anh (chỉ sửa bản Việt hoặc thông tin khác) thì giữ duyệt.
   - Tên riêng giữ nguyên: TAMI HOMES, tên dự án, tên chủ đầu tư, tên đường, địa danh. Dùng bảng thuật ngữ do admin cấu hình (vd "căn hộ dịch vụ" → "serviced apartment").
   - Chỉ gửi **nội dung công khai** cho dịch vụ AI; **không bao giờ** gửi lead, CV, dữ liệu khách hàng hay dữ liệu nội bộ.
 

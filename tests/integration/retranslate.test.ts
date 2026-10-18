@@ -371,6 +371,83 @@ describe.skipIf(!baseUrl)("integration: dịch lại bằng AI + duyệt EN tran
       expect(await audits("content.approve_translation", id)).toHaveLength(2);
     });
 
+    /** Admin lưu form ở tab EN (sửa tay bản tiếng Anh): không phải lệnh duyệt, không phải job dịch. */
+    const saveEnglishForm = (id: string, data: Record<string, unknown>) =>
+      payload.update({ collection: "pages", id, data: data as never, locale: "en", user: asUser(admin), overrideAccess: false, depth: 0 });
+    const patchRest = (id: string, locale: string, body: Record<string, unknown>) =>
+      handleEndpoints({
+        config: payload.config,
+        request: new Request(`http://localhost/api/pages/${id}?locale=${locale}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `JWT ${tokens.admin}` },
+          body: JSON.stringify(body),
+        }),
+      });
+
+    it("trang đã duyệt, admin sửa tay nội dung EN (không phải lệnh duyệt) -> hasEnglish false + pending_review + enSource manual; form cũ không tự duyệt; duyệt lại bằng lệnh -> true + done", async () => {
+      const id = await createPendingPage("privacy");
+      expect((await approve(id, tokens.admin)).status).toBe(200);
+
+      // Form EN mở sẵn còn mang hasEnglish = true; admin sửa nội dung rồi Lưu.
+      await saveEnglishForm(id, { title: "Policy", content: lexical("Content edited by hand"), hasEnglish: true });
+      const lowered = await readPage(id);
+      expect(lowered.hasEnglish).toBe(false);
+      expect(lowered.translation).toMatchObject({ status: "pending_review", enSource: "manual" });
+      expect(await audits("content.approve_translation", id)).toHaveLength(1);
+
+      // Lưu lại form cũ (hasEnglish true, không đổi EN nữa) vẫn không tự duyệt.
+      await saveEnglishForm(id, { title: "Policy", content: lexical("Content edited by hand"), hasEnglish: true });
+      expect((await readPage(id)).hasEnglish).toBe(false);
+
+      expect((await approve(id, tokens.admin)).status).toBe(200);
+      const approved = await readPage(id);
+      expect(approved.hasEnglish).toBe(true);
+      expect(approved.translation).toMatchObject({ status: "done", enSource: "manual" });
+      expect(await audits("content.approve_translation", id)).toHaveLength(2);
+    });
+
+    it("trang đã duyệt, sửa tay tiêu đề EN qua REST PATCH ?locale=en -> hasEnglish false + pending_review", async () => {
+      const id = await createPendingPage("terms");
+      expect((await approve(id, tokens.admin)).status).toBe(200);
+      expect((await patchRest(id, "en", { title: "Terms of Use (edited)" })).status).toBe(200);
+      const page = await readPage(id);
+      expect(page.hasEnglish).toBe(false);
+      expect(page.translation).toMatchObject({ status: "pending_review", enSource: "manual" });
+    });
+
+    it("trang đã duyệt, ghi locale all (Local API) có nhánh en đổi -> hạ duyệt; nhánh en y nguyên -> giữ", async () => {
+      const id = await createPendingPage("privacy");
+      expect((await approve(id, tokens.admin)).status).toBe(200);
+      // Type Local API không liệt kê locale `all` cho update dù runtime chấp nhận (ghi object theo ngôn ngữ).
+      const saveAll = (title: Record<string, string>) => payload.update({ collection: "pages", id, data: { title }, locale: "all", overrideAccess: true, depth: 0 } as never);
+      await saveAll({ vi: "Chính sách", en: "Policy" });
+      expect((await readPage(id)).hasEnglish).toBe(true);
+      await saveAll({ vi: "Chính sách", en: "Policy (all)" });
+      const page = await readPage(id);
+      expect(page.hasEnglish).toBe(false);
+      expect(page.translation).toMatchObject({ status: "pending_review" });
+    });
+
+    it("trang đã duyệt, lưu KHÔNG đổi nội dung EN (gửi lại y nguyên / chỉ version ở tab EN / chỉ sửa VI) -> giữ hasEnglish true", async () => {
+      const id = await createPendingPage("privacy");
+      expect((await approve(id, tokens.admin)).status).toBe(200);
+
+      await saveEnglishForm(id, { title: "Policy", content: lexical("Content"), hasEnglish: true });
+      expect((await readPage(id)).hasEnglish).toBe(true);
+
+      await saveEnglishForm(id, { version: "2.0" });
+      expect((await readPage(id)).hasEnglish).toBe(true);
+
+      expect((await patchRest(id, "en", { effectiveDate: "2026-11-01T00:00:00.000Z" })).status).toBe(200);
+      expect((await readPage(id)).hasEnglish).toBe(true);
+
+      await saveForm(id, { title: "Chính sách (sửa VI)" });
+      const page = await readPage(id);
+      expect(page.hasEnglish).toBe(true);
+      expect(page.version).toBe("2.0");
+      expect(page.translation).toMatchObject({ status: "done" });
+    });
+
     it("trang đã duyệt, admin sửa bản Việt (tự dịch, job không force) -> hasEnglish false + pending_review", async () => {
       const id = await createPendingPage("terms");
       expect((await approve(id, tokens.admin)).status).toBe(200);

@@ -4,7 +4,7 @@ import { denyAll, isAdmin } from "../access";
 import { requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
 import { createRevalidatePage } from "../hooks/pages/revalidate-page";
-import { approveEnglish, guardEnglishApproval } from "../hooks/pages/approve-english";
+import { approveEnglish, guardEnglishApproval, revokeEnglishOnManualEdit } from "../hooks/pages/approve-english";
 import { lockPageKind } from "../hooks/pages/lock-kind";
 import { syncPrivacyPolicyVersion } from "../hooks/pages/sync-privacy-version";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
@@ -30,7 +30,8 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
       disableDuplicate: true,
       hooks: {
         beforeValidate: [lockPageKind],
-        beforeChange: [guardEnglishApproval],
+        // Sửa tay EN của trang đã duyệt hạ `hasEnglish` TRƯỚC, rồi guard chặn form cũ bật lại (BR-08).
+        beforeChange: [revokeEnglishOnManualEdit, guardEnglishApproval],
         afterChange: [revalidatePage.afterChange, syncPrivacyPolicyVersion, approveEnglish],
         afterDelete: [revalidatePage.afterDelete],
       },

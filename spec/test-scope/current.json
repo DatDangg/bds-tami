@@ -1,55 +1,60 @@
 {
-  "specVersion": "1.2.2",
-  "scopeVersion": 1,
-  "generatedAt": "2026-10-19T00:23:20+07:00",
-  "trigger": "bug-fix",
-  "workItem": "bug-isfilled-empty-richtext",
-  "backlog": "BL-012",
-  "changeDoc": "spec/changes/2026-10-19-isfilled-empty-richtext.md",
-  "task": "tasks/bug-isfilled-empty-richtext/phase-1-task-01.md",
-  "specRefs": ["BR-07", "BR-08", "FR-ADM-17"],
+  "specVersion": "1.3.0",
+  "scopeVersion": 2,
+  "generatedAt": "2026-10-19T12:00:00+07:00",
+  "trigger": "feature-update",
+  "workItem": "feature-legal-en-edit-requires-reapproval",
+  "backlog": "BL-013",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-19-legal-en-edit-requires-reapproval.md",
+  "task": "tasks/feature-legal-en-edit-requires-reapproval/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-10-19-legal-en-edit-requires-reapproval.md",
+  "specRefs": ["BR-08", "BR-07", "FR-ADM-17"],
   "specRefNotes": {
-    "BR-07": "hasEnglish chỉ bật khi đủ trường bắt buộc tiếng Anh (docs/ERD.md §1.1); thiếu thì không hiện ở /en",
-    "BR-08": "trang pháp lý: chỉ admin duyệt bản EN mới bật hasEnglish — POST /api/admin/translations/pages/:id/approve, 422 khi thiếu title/content (docs/API_SPEC.md §5.2)",
-    "FR-ADM-17": "job dịch tự động translate-content (dịch richText từng đoạn, tự bật hasEnglish)"
+    "BR-08": "docs/BRD.md v1.6: bản EN trang pháp lý đã duyệt bị sửa tay nội dung EN (không qua lệnh duyệt) → mất duyệt, ẩn /en tới khi admin duyệt lại; lưu không đổi nội dung EN thì giữ duyệt (SPECIFICATIONS.md F12)",
+    "BR-07": "/en chỉ hiện nội dung có hasEnglish = true, không fallback tiếng Việt (404 + không vào sitemap EN)",
+    "FR-ADM-17": "job dịch translate-content + lệnh duyệt EN trang pháp lý POST /api/admin/translations/pages/:id/approve"
   },
   "changed": {
     "files": [
-      "src/hooks/require-english-fields.ts",
-      "src/hooks/require-english-fields.test.ts"
+      "src/hooks/pages/approve-english.ts",
+      "src/collections/Pages.ts",
+      "tests/integration/retranslate.test.ts"
     ],
+    "filesNote": "đã chốt ở close-out (khớp diff); kèm docs: docs/API_SPEC.md §5.2, docs/ARCHITECTURE.md, docs/BRD.md, SPECIFICATIONS.md",
     "modules": [
-      "i18n/EN required fields",
       "legal page EN approval",
-      "translation job"
+      "pages beforeChange hook",
+      "i18n /en visibility"
     ]
   },
   "impact": {
     "direct": [
-      "isFilled: richText Lexical không có con, hoặc chỉ paragraph/heading rỗng (chỉ khoảng trắng/linebreak/tab) = chưa điền",
-      "Duyệt EN trang pháp lý POST /api/admin/translations/pages/:id/approve với content EN rỗng như trên → 422, details liệt kê path content; hasEnglish giữ false",
-      "Hook requireEnglishFields: không bật hasEnglish khi richText EN bắt buộc rỗng như trên",
-      "Job translate-content-save: không bật hasEnglish khi richText EN bắt buộc rỗng như trên",
-      "richText có text thật, hoặc node nội dung không phải text (upload, block…) → coi là đã điền"
+      "Hook beforeChange của pages: trang pháp lý đã duyệt EN (hasEnglish = true) bị sửa tay trường nội dung EN qua admin/API (không phải lệnh duyệt) → hasEnglish = false, /en của trang ẩn",
+      "Lưu trang pháp lý mà nội dung EN không đổi (chỉ đổi VI hoặc metadata không liên quan) → giữ hasEnglish = true",
+      "Lệnh duyệt POST /api/admin/translations/pages/:id/approve sau khi bị hạ duyệt → bật lại hasEnglish, /en hiện lại"
     ],
     "dependents": [
-      "requiredByLocale: trường R richText bản vi giờ chặn lưu khi chỉ có paragraph rỗng",
-      "translate-content selectChangedLeaves: nguồn vi rỗng → không dịch; en rỗng + vi có chữ → dịch",
-      "detect-manual-en: paragraph rỗng ↔ trống không tính là sửa tay",
-      "Homepage CTA title (dùng isFilled)"
+      "/en trang pháp lý (privacy, terms): 404 khi chưa duyệt lại, hiện lại sau duyệt",
+      "Sitemap EN: trang pháp lý bị hạ duyệt không vào sitemap EN",
+      "/api/locale-counterpart: không trả counterpart EN khi hasEnglish = false",
+      "Lệnh duyệt POST /api/admin/translations/pages/:id/approve",
+      "Job dịch translate-content (AI dịch lại trang pháp lý)"
     ],
     "regression": [
-      "Lưu/duyệt EN các collection có hasEnglish: pages pháp lý, news, projects, posts (property-posts), job-postings, categories, services, developers, rentals",
-      "Job dịch tự động (lưu bản vi published → dịch → bật hasEnglish), Dịch lại bằng AI",
-      "Admin sửa tay bản EN (enSource = manual, viChangedAfterManual)",
-      "Lưu bản vi có richText bắt buộc (nội dung hợp lệ vẫn lưu được)"
+      "Duyệt EN trang pháp lý: 422 khi thiếu title/content EN (gồm richText rỗng, BL-012), 409 theo luồng hiện có",
+      "Form admin cũ gửi hasEnglish = true không tự duyệt được (giữ chặn hiện có)",
+      "AI dịch lại trang pháp lý vẫn hạ duyệt (ẩn /en)",
+      "Sửa bản VI trang pháp lý giữ trạng thái duyệt EN",
+      "Trang không phải pháp lý (pages khác, news, projects…) không bị ảnh hưởng bởi quy tắc hạ duyệt"
     ]
   },
   "acceptance": [
-    "richText rỗng (không con, hoặc chỉ paragraph/heading không có text khác khoảng trắng/linebreak) → isFilled = false",
-    "richText có text thật, hoặc node nội dung không phải text (upload, block…) → isFilled = true",
-    "Test hồi quy cho các ca trên + duyệt pháp lý 422 + không bật hasEnglish",
-    "pnpm test / lint / typecheck / build PASS"
+    "Sửa trường nội dung EN của trang pháp lý đã duyệt (admin/API, không phải lệnh duyệt) → trạng thái duyệt EN về chưa duyệt, /en của trang đó ẩn như luồng AI dịch lại",
+    "Lưu không đổi nội dung EN (chỉ đổi VI/metadata không liên quan) → giữ duyệt",
+    "Lệnh duyệt EN rõ ràng hiện có duyệt lại được → /en hiện lại; form cũ không tự duyệt (giữ chặn hiện có)",
+    "Spec BR-08 cập nhật (intent user đã duyệt) + doc as-built (API_SPEC…)",
+    "Test hồi quy; pnpm test / lint / typecheck / build PASS"
   ],
   "risk": "medium"
 }
