@@ -68,7 +68,7 @@ describe("Header: khung và landmark", () => {
     const labels = within(nav)
       .getAllByRole("link", { hidden: true })
       .map((link) => link.textContent);
-    expect(labels).toEqual(["Home", "Projects", "For rent", "Post your property", "News", "Careers", "Contact"]);
+    expect(labels).toEqual(["Home", "Projects", "For rent", "Property news", "News", "Careers", "Contact"]);
     expect(nav).not.toHaveTextContent(/Trang chủ|Dự án|Cho thuê|Tin tức/);
     expect(within(nav).getByText("Projects", { selector: "a" })).toHaveAttribute("href", "/en/projects");
   });
@@ -151,6 +151,8 @@ describe("MobileMenu (< xl)", () => {
     renderIntl(<Header items={viItems} contact={contact} />);
     await user.click(menuTrigger());
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByRole("link", { name: "English" })).toHaveAttribute("href", "/en");
+    // /du-an/abc là trang có slug: bản ngôn ngữ kia do endpoint tra rồi chuyển hướng (xem LanguageSwitcher.test).
+    const href = within(dialog).getByRole("link", { name: "English" }).getAttribute("href") ?? "";
+    expect(href).toBe("/api/locale-counterpart?to=en&path=%2Fdu-an%2Fabc");
   });
 });

@@ -98,7 +98,7 @@ describe("ProjectFilters", () => {
   it("giữ ?category= bằng input ẩn; EN dùng nhãn tiếng Anh", () => {
     const { container } = renderWithIntl(<ProjectFilters actionPath="/en/projects" provinces={provinces} hiddenCategory="apartments" active={false} />, "en");
     expect(container.querySelector("input[type=hidden][name=category]")).toHaveAttribute("value", "apartments");
-    expect(screen.getByLabelText("Province / city")).toBeInTheDocument();
+    expect(screen.getByLabelText("Province/city")).toBeInTheDocument();
     expect(screen.getByLabelText("Status")).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Now selling" })).toBeInTheDocument();
   });

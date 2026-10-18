@@ -45,7 +45,7 @@ const blockHeadings = () => screen.getAllByRole("heading", { level: 2 }).map((he
 describe("HomeBlocks: thứ tự và bật/tắt khối", () => {
   it("render theo blockOrder mặc định: hero, Về TAMI, dự án, dịch vụ, ưu đãi, CTA (đối tác chưa có giao diện)", () => {
     renderHome(homepage());
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tiêu đề hero");
     expect(blockHeadings()).toEqual(["Về TAMI", "Dự án nổi bật", "Dịch vụ của TAMI", "Ưu đãi nổi bật", "Cần tư vấn?"]);
   });
 
@@ -103,13 +103,25 @@ describe("HomeBlocks: nội dung khối", () => {
     expect(screen.getByRole("link", { name: "Gọi ngay" })).toHaveAttribute("href", "https://zalo.me/tami");
   });
 
-  it("trang luôn có đúng một h1 ẩn bằng tên site, nằm ngoài carousel (slide có/không tiêu đề, hoặc không hero)", () => {
+  it("trang luôn có đúng một h1 ẩn: tiêu đề slide 1, không có thì tên site (kể cả không hero); nằm ngoài carousel", () => {
     const { unmount } = renderHome(homepage({ hero: { slides: [{ id: "s1", image: media("hero") }] } }));
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
     unmount();
+    const second = renderHome(homepage({ hero: { slides: [{ id: "s1", image: media("hero"), title: "Căn hộ cho thuê cao cấp" }] } }));
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Căn hộ cho thuê cao cấp");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("sr-only");
+    second.unmount();
     renderHome(homepage({ hero: { slides: [] } }));
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+  });
+
+  it("hero là mốc để header trong suốt đè lên (data-header-hero) và kéo lên dưới header", () => {
+    renderHome(homepage());
+    const hero = screen.getByRole("region", { name: "Nổi bật" });
+    expect(hero).toHaveAttribute("data-header-hero");
+    expect(hero).toHaveClass("-mt-16", "h-svh");
   });
 });
 
@@ -120,7 +132,7 @@ describe("HomeBlocks: truy cập", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Chuyển tới slide 2" }));
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Hero 1");
   });
 
   it("dịch vụ ≥ 4 mục: hàng cuộn focus được có tên truy cập là tiêu đề khối", () => {

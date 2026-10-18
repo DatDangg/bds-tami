@@ -2,16 +2,16 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { resolveNavLink } from "@/lib/content/nav-link";
 import { buildLocaleCookie } from "@/i18n/localeCookie";
 import { type Locale, locales } from "@/i18n/routing";
+import { localeSwitchHref } from "@/lib/i18n/counterpart-url";
 import { cn } from "@/lib/utils";
 
 /**
  * `VI | EN` (design-spec §2.3: mỗi mục là `<a hreflang lang>`). Ngôn ngữ đang xem: link về chính trang này, chữ đậm + `aria-current`
  * (tên truy cập "Tiếng Việt" đọc được vì là `<a>`, không phải `aria-label` trên phần tử generic). Mỗi mục ≥ 44×44, hai mục cách nhau ≥ 8px.
- * Ngôn ngữ kia: link về TRANG CHỦ của ngôn ngữ đó (tạm thời; map trang tương ứng làm ở task EN) và ghi cookie `NEXT_LOCALE`
- * để UI nhớ lựa chọn. Cookie KHÔNG được đọc để redirect: mỗi URL một ngôn ngữ (SPEC F12), nên link vẫn hoạt động khi chặn cookie.
+ * Ngôn ngữ kia: link tới TRANG TƯƠNG ỨNG (`localeSwitchHref`: trang luôn có hai bản link thẳng; trang có slug hoặc pháp lý qua `/api/locale-counterpart`,
+ * chưa có bản dịch thì về danh sách/trang chủ) và ghi cookie `NEXT_LOCALE` để UI nhớ lựa chọn. Cookie KHÔNG được đọc để redirect: mỗi URL một ngôn ngữ (SPEC F12), nên link vẫn hoạt động khi chặn cookie.
  */
 export function LanguageSwitcher({ className }: { className?: string }) {
   const current = useLocale() as Locale;
@@ -35,7 +35,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
             </a>
           ) : (
             <a
-              href={resolveNavLink("home", locale)?.href ?? "/"}
+              href={localeSwitchHref(pathname, locale)}
               hrefLang={locale}
               lang={locale}
               aria-label={t(`languageName.${locale}`)}

@@ -254,7 +254,6 @@
       "gallery": "Hình ảnh",
       "leadForm": {
         "title": "Nhận tư vấn",
-        "fallback": "Gọi hotline hoặc liên hệ để được tư vấn chi tiết về tin này.",
         "hotline": "Hotline"
       }
     },
@@ -431,7 +430,6 @@
       },
       "leadForm": {
         "title": "Nhận thông tin dự án",
-        "fallback": "Gọi hotline hoặc liên hệ để nhận bảng giá, chính sách và tư vấn chi tiết về dự án.",
         "hotline": "Hotline"
       },
       "relatedTitle": "Dự án khác",
@@ -522,10 +520,7 @@
       },
       "leadForm": {
         "title": "Nhận tư vấn",
-        "titleRented": "Nhận tư vấn căn tương tự",
-        "fallback": "Gọi hotline hoặc liên hệ để được tư vấn chi tiết về căn này.",
-        "fallbackRented": "Căn này đã được cho thuê. Gọi hotline hoặc liên hệ để TAMI tư vấn các căn tương tự.",
-        "hotline": "Hotline"
+        "titleRented": "Nhận tư vấn căn tương tự"
       },
       "similar": {
         "title": "Tin tương tự",
@@ -628,8 +623,7 @@
       "hours": "Giờ làm việc",
       "hoursValue": "08:00 - 17:30, thứ 2 - thứ 7",
       "mapLabel": "Văn phòng TAMI trên bản đồ",
-      "formTitle": "Gửi yêu cầu tư vấn",
-      "formFallback": "Vui lòng liên hệ qua hotline hoặc email để được tư vấn."
+      "formTitle": "Gửi yêu cầu tư vấn"
     },
     "legal": {
       "version": "Phiên bản {version} · Hiệu lực từ {date}",

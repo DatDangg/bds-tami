@@ -85,7 +85,7 @@ try {
   check((await fetchPage("vi")).includes(label("vi", "rentals")), "vi: nhãn header mới xuất hiện ở lần tải đầu sau khi lưu");
   const enBeforeSave = await fetchPage("en");
   check(!enBeforeSave.includes(`E2E${stamp}`), "en: chưa có bản EN thì KHÔNG hiện nhãn VI mới (dùng menu cố định en.json)");
-  check(enBeforeSave.includes("Post your property"), "en: menu cố định tiếng Anh vẫn hiển thị");
+  check(enBeforeSave.includes("Property news"), "en: menu cố định tiếng Anh vẫn hiển thị");
 
   const rows = viSaved.navItems ?? [];
   await saveGlobal("header", "en", {

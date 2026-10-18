@@ -5,6 +5,7 @@ import { resolveNavLink } from "@/lib/content/nav-link";
 import type { Locale } from "@/i18n/routing";
 import { BrandLogo } from "./BrandLogo";
 import { DesktopNav } from "./DesktopNav";
+import { HeaderFrame } from "./HeaderFrame";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileMenu } from "./MobileMenu";
 import type { FooterContactView, NavItemView } from "./shell-data";
@@ -18,19 +19,20 @@ export function searchHrefFor(locale: Locale): string {
 }
 
 /**
- * Header đặc, dính đầu trang (design-spec §2.1). Thuần hiển thị: nhận view model đã lọc từ layout. Chỉ DesktopNav,
+ * Header dính đầu trang (đặc; trong suốt đè hero khi trang có `[data-header-hero]`, xem `HeaderFrame`) (design-spec §2.1). Thuần hiển thị: nhận view model đã lọc từ layout. Chỉ DesktopNav,
  * MobileMenu, LanguageSwitcher là client. Thứ tự DOM = thứ tự Tab (logo, menu, tìm, ngôn ngữ, nút Menu); `order-*` chỉ đổi
- * vị trí hiển thị ở < xl (tìm bên trái, logo giữa). Biến thể trong suốt trên hero làm ở task trang có hero.
+ * vị trí hiển thị ở < xl (tìm bên trái, logo giữa). Hai bản logo (đen/trắng) cùng có trong DOM, CSS chọn bản theo biến thể.
  */
 export function Header({ items, contact }: { items: NavItemView[]; contact: FooterContactView }) {
   const t = useTranslations("layout.header");
   const locale = useLocale() as Locale;
   const homeHref = resolveNavLink("home", locale)?.href ?? "/";
   return (
-    <header className="sticky top-0 z-(--z-header) bg-surface shadow-sm print:hidden">
+    <HeaderFrame>
       <div className="mx-auto flex h-16 w-full max-w-container items-center gap-4 px-gutter lg:h-18">
         <Link href={homeHref} aria-label={t("home")} className="order-2 inline-flex min-h-11 min-w-11 shrink-0 items-center xl:order-1">
-          <BrandLogo />
+          <BrandLogo className="logo-on-light" />
+          <BrandLogo tone="on-dark" className="logo-on-dark" />
         </Link>
         <div className="order-2 hidden min-w-0 xl:flex xl:flex-1 xl:justify-center">
           <DesktopNav items={items} />
@@ -49,6 +51,6 @@ export function Header({ items, contact }: { items: NavItemView[]; contact: Foot
           <MobileMenu items={items} contact={contact} />
         </div>
       </div>
-    </header>
+    </HeaderFrame>
   );
 }

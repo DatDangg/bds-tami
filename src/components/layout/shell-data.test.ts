@@ -40,7 +40,7 @@ describe("menu chính", () => {
       "Home",
       "Projects",
       "For rent",
-      "Post your property",
+      "Property news",
       "News",
       "Careers",
       "Contact",

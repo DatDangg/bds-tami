@@ -99,3 +99,8 @@ Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 ## Follow-up từ review layer-9-task-08 round 2 (MINOR)
 - [x] (đã làm ở layer-10-task-04) `src/app/(frontend)/[locale]/list-no-loading.test.ts:12-20` chỉ kiểm thư mục `danh-muc` — trang thật ở `danh-muc/[category]/` và thư mục cha (`[locale]/`) chưa bị chặn: đi ngược từ mỗi `page.tsx` danh sách lên `app/` để chặn mọi `loading.tsx` (soft-404).
 - [ ] `RentalListPage` ~75 dòng: tách tiếp (giới hạn 50).
+
+## Follow-up từ review layer-10-task-03 round 2 (MINOR)
+- [ ] `/cho-thue/khu-vuc/[province]` khi làm trang khu vực: thêm rule counterpart (`src/lib/i18n/counterpart-url.ts:24`) — hiện luôn rơi về danh sách.
+- [ ] `tests/integration/locale-counterpart.test.ts` chỉ phủ rentals/categories/pages — thêm 1 ca cho collection slug khác (news hoặc projects) khi đụng tới.
+- [ ] `/api/locale-counterpart` chưa có rate limit (cache s-maxage 60) — cân nhắc khi bật giám sát.

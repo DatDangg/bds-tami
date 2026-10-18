@@ -107,7 +107,8 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
     <section
       aria-roledescription="carousel"
       aria-label={t("region")}
-      className="theme-dark-block relative isolate h-[calc(100svh-4rem)] max-h-[1080px] min-h-[560px] overflow-hidden lg:h-[calc(100svh-4.5rem)]"
+      data-header-hero=""
+      className="theme-dark-block relative isolate -mt-16 h-svh max-h-[1080px] min-h-[560px] overflow-hidden lg:-mt-18"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -139,7 +140,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
               <div aria-hidden="true" className="absolute inset-0 bg-overlay" />
               <div
                 className={cn(
-                  "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pb-24 text-center transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
+                  "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pt-16 pb-40 text-center sm:pb-24 lg:pt-18 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
                   active ? "translate-y-0 opacity-100 delay-200" : "translate-y-6 opacity-0",
                 )}
               >
@@ -165,7 +166,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
             </button>
           )}
           {multiple && (
-            <div role="group" aria-label={t("dots")} className="flex items-center">
+            <div role="group" aria-label={t("dots")} className="flex flex-wrap items-center justify-center px-2">
               {slides.map((slide, position) => (
                 <button
                   key={slide.id}

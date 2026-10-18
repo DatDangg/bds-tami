@@ -25,7 +25,7 @@
         "home": "Home",
         "projects": "Projects",
         "rentals": "For rent",
-        "property-posts": "Post your property",
+        "property-posts": "Property news",
         "news": "News",
         "careers": "Careers",
         "contact": "Contact"
@@ -221,7 +221,7 @@
       }
     },
     "posts": {
-      "title": "Property listings",
+      "title": "Property news",
       "description": "The latest property news, vouchers and offers from TAMI.",
       "tabsLabel": "Listing categories",
       "all": "All",
@@ -254,7 +254,6 @@
       "gallery": "Photos",
       "leadForm": {
         "title": "Get advice",
-        "fallback": "Call the hotline or contact us for detailed advice about this listing.",
         "hotline": "Hotline"
       }
     },
@@ -264,7 +263,7 @@
       "filtersLabel": "Project filters",
       "categoriesLabel": "Project type",
       "all": "All",
-      "provinceLabel": "Province / city",
+      "provinceLabel": "Province/city",
       "allProvinces": "All",
       "statusLabel": "Status",
       "allStatuses": "All",
@@ -328,7 +327,7 @@
         "4": "4+"
       },
       "furnishingOption": {
-        "none": "None",
+        "none": "Unfurnished",
         "basic": "Basic",
         "full": "Full"
       },
@@ -431,7 +430,6 @@
       },
       "leadForm": {
         "title": "Get project information",
-        "fallback": "Call the hotline or contact us for the price list, policies and detailed advice about this project.",
         "hotline": "Hotline"
       },
       "relatedTitle": "Other projects",
@@ -522,10 +520,7 @@
       },
       "leadForm": {
         "title": "Get advice",
-        "titleRented": "Find similar units",
-        "fallback": "Call the hotline or contact us for detailed advice about this unit.",
-        "fallbackRented": "This unit has been rented. Call the hotline or contact us and TAMI will advise on similar units.",
-        "hotline": "Hotline"
+        "titleRented": "Find similar units"
       },
       "similar": {
         "title": "Similar listings",
@@ -628,8 +623,7 @@
       "hours": "Working hours",
       "hoursValue": "8:00 AM - 5:30 PM, Mon - Sat",
       "mapLabel": "TAMI office on the map",
-      "formTitle": "Send an enquiry",
-      "formFallback": "Please contact us by hotline or email for advice."
+      "formTitle": "Send an enquiry"
     },
     "legal": {
       "version": "Version {version} · Effective {date}",

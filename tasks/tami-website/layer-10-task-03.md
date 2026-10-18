@@ -38,10 +38,10 @@ Bản tiếng Anh đầy đủ chuỗi giao diện; nút chuyển ngôn ngữ đ
 Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 
 ## Acceptance Criteria
-- [ ] `en.json` đủ mọi khoá của `vi.json` (script kiểm, chạy trong `pnpm test`); không em-dash/en-dash trong chuỗi UI
-- [ ] Chuyển ngôn ngữ trên trang chi tiết → trang tương ứng; chưa có bản dịch → trang danh sách ngôn ngữ kia (hoặc trang chủ)
-- [ ] Mọi trang có hreflang đúng (chỉ khi có cả hai bản)
-- [ ] Nhãn enum (nội thất, hướng nhà, loại việc…) dịch qua file chuỗi
+- [x] `en.json` đủ mọi khoá của `vi.json` (script kiểm, chạy trong `pnpm test`); không em-dash/en-dash trong chuỗi UI
+- [x] Chuyển ngôn ngữ trên trang chi tiết → trang tương ứng; chưa có bản dịch → trang danh sách ngôn ngữ kia (hoặc trang chủ)
+- [x] Mọi trang có hreflang đúng (chỉ khi có cả hai bản)
+- [x] Nhãn enum (nội thất, hướng nhà, loại việc…) dịch qua file chuỗi
 
 ## Tests cần viết
 - Unit i18n-check: thiếu khoá → fail
@@ -56,19 +56,19 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 2
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS
+- Verify commands + result: worktree: lint · typecheck · build PASS; test 2.331 PASS (contrast CRLF BL-004). Sau squash lên staging (sau T05 954f146): lint · typecheck PASS, src + locale-counterpart 1.636 PASS (contrast CRLF → sửa BL-004 commit kế)
+- Reviewer verdict: STRICT PASS round 2 (`.context/review-reports/build-tami-website-layer-10-task-03-round-2-review.md`); round 1 FAIL (MAJOR-1 pháp lý không EN → 404, MAJOR-2 thiếu integration); MINOR round 2 (phủ thêm collection, khu-vuc) → layer-13-task-03
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: no doc impact
 - Decision log: pending
 
 ## Commit / Tracking
@@ -77,13 +77,13 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-10/task-03` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/i18n/messages/en.json (đầy đủ, khớp khoá vi.json)
