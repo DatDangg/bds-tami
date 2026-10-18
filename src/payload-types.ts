@@ -86,6 +86,8 @@ export interface Config {
     'property-posts': PropertyPost;
     'job-postings': JobPosting;
     'job-applications': JobApplication;
+    leads: Lead;
+    'lead-activities': LeadActivity;
     redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -93,7 +95,11 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    leads: {
+      activities: 'lead-activities';
+    };
+  };
   collectionsSelect: {
     staff: StaffSelect<false> | StaffSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -114,6 +120,8 @@ export interface Config {
     'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
     'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
     'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    'lead-activities': LeadActivitiesSelect<false> | LeadActivitiesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -1103,6 +1111,71 @@ export interface JobApplication {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: string;
+  code: string;
+  source: 'rental' | 'property_post' | 'project' | 'contact';
+  rental?: (string | null) | Rental;
+  propertyPost?: (string | null) | PropertyPost;
+  project?: (string | null) | Project;
+  fullName: string;
+  phone: string;
+  phoneNormalized: string;
+  email?: string | null;
+  message?: string | null;
+  locale: 'vi' | 'en';
+  status: 'new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam';
+  lostReason?: string | null;
+  assignedTo?: (string | null) | Staff;
+  assignedAt?: string | null;
+  assigneeInactive?: boolean | null;
+  firstContactedAt?: string | null;
+  lastActivityAt?: string | null;
+  mergedCount?: number | null;
+  consentAt: string;
+  consentVersion: string;
+  utm?: {
+    source?: string | null;
+    medium?: string | null;
+    campaign?: string | null;
+    term?: string | null;
+    content?: string | null;
+  };
+  pageUrl?: string | null;
+  referrer?: string | null;
+  ipHash?: string | null;
+  userAgent?: string | null;
+  anonymizedAt?: string | null;
+  activities?: {
+    docs?: (string | LeadActivity)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-activities".
+ */
+export interface LeadActivity {
+  id: string;
+  lead: string | Lead;
+  type: 'note' | 'call' | 'status_change' | 'assignment' | 'merged' | 'email_sent';
+  content?: string | null;
+  fromStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
+  toStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
+  fromAssignee?: (string | null) | Staff;
+  toAssignee?: (string | null) | Staff;
+  actor?: (string | null) | Staff;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1315,6 +1388,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'job-applications';
         value: string | JobApplication;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: string | Lead;
+      } | null)
+    | ({
+        relationTo: 'lead-activities';
+        value: string | LeadActivity;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2004,6 +2085,67 @@ export interface JobApplicationsSelect<T extends boolean = true> {
   note?: T;
   ipHash?: T;
   anonymizedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  code?: T;
+  source?: T;
+  rental?: T;
+  propertyPost?: T;
+  project?: T;
+  fullName?: T;
+  phone?: T;
+  phoneNormalized?: T;
+  email?: T;
+  message?: T;
+  locale?: T;
+  status?: T;
+  lostReason?: T;
+  assignedTo?: T;
+  assignedAt?: T;
+  assigneeInactive?: T;
+  firstContactedAt?: T;
+  lastActivityAt?: T;
+  mergedCount?: T;
+  consentAt?: T;
+  consentVersion?: T;
+  utm?:
+    | T
+    | {
+        source?: T;
+        medium?: T;
+        campaign?: T;
+        term?: T;
+        content?: T;
+      };
+  pageUrl?: T;
+  referrer?: T;
+  ipHash?: T;
+  userAgent?: T;
+  anonymizedAt?: T;
+  activities?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-activities_select".
+ */
+export interface LeadActivitiesSelect<T extends boolean = true> {
+  lead?: T;
+  type?: T;
+  content?: T;
+  fromStatus?: T;
+  toStatus?: T;
+  fromAssignee?: T;
+  toAssignee?: T;
+  actor?: T;
   updatedAt?: T;
   createdAt?: T;
 }

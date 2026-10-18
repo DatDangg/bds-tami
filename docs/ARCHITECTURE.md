@@ -96,7 +96,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo, ward-in-province (phường/xã thuộc tỉnh đã chọn)
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
-│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/), categories/ (cây, khoá scope, chặn xoá), pages/ (lock-kind, sync-privacy-version, revalidate-page), rentals/ (generate-code CT-xxxxxx, build-search-text, field-validators), revalidate-global, trim-text
+│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/), categories/ (cây, khoá scope, chặn xoá), pages/ (lock-kind, sync-privacy-version, revalidate-page), rentals/ (generate-code CT-xxxxxx, build-search-text, field-validators), leads/ (generate-code LD-xxxxxx, sync-phone-normalized, status-activity, lead-activity-hooks), revalidate-global, trim-text
 │   ├── endpoints/             # Endpoint tuỳ biến: gửi lead, ứng tuyển, tìm kiếm, đếm click
 │   │   ├── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
 │   │   ├── public/            # Endpoint công khai: click-events (đã có), leads, job-applications

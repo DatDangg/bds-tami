@@ -68,6 +68,8 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `job-applications` | **Chỉ tạo** qua `POST /api/public/job-applications` (endpoint dùng Local API `overrideAccess`; không ai, kể cả admin, tạo được qua REST/admin) | — (403 đọc/sửa/xoá) | Đọc; sửa **chỉ `status` và `note`** (trường khách gửi là chỉ đọc, `ipHash` không bao giờ trả ra); xoá (kèm xoá CV, ghi audit không PII) |
 | `private-files` | — | — | ✔ (tải qua endpoint kiểm quyền) |
 
+> As-built (L8-T02): qua API/admin chỉ thêm loại `note`/`call` (cả admin; form admin chỉ liệt kê hai loại này, loại khác gửi qua API bị 403); `status_change`/`assignment`/`merged`/`email_sent` do hệ thống ghi. Sale chỉ thêm trên lead được giao (lead người khác → 403). Sale chỉ đổi `status` + `lostReason` của lead được giao; sửa dữ liệu khách chỉ admin, và lead đã ẩn danh không sửa được dữ liệu khách. Không ai sửa/xoá activity.
+
 ### 3.4. Hệ thống
 
 | Collection | Sale | Admin |

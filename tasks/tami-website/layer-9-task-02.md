@@ -97,3 +97,7 @@ Mở khoá cho: `layer-10-task-01`
 - Follow-up spec-validation layer 2 (.context/review-reports/spec-validation-build-tami-website-layer-2.md): G3 — form client nhận lỗi captcha bằng chữ "captcha" trong message (src/components/forms/submit-helpers.ts:90-92): khi làm lỗi theo locale phải giữ chữ "captcha" ở cả vi/en hoặc thêm mã lỗi `captcha_failed` vào API_SPEC §2 + client.
 - Activity/email/audit khi `assignedTo` đổi do hook ở task lead-assignment (kể cả tự giao); endpoint chỉ đặt `assignedTo`.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-8-task-02 round 2 (MINOR)
+- [ ] `src/hooks/leads/lead-activity-hooks.ts:13-21` cờ `asSystemActivity` lưu/khôi phục dạng boolean → không an toàn khi Payload chạy `Promise.all` trên cùng `req` (sửa status hàng loạt): đổi sang bộ đếm; test bulk update status ≥ 2 lead đều có activity. Mọi ghi activity hệ thống của task này (assignment, merged, email_sent) bọc `asSystemActivity`.
+- [ ] Sale gửi `lead` không phải UUID khi tạo activity có thể ra 500 thay vì 403/400 — kiểm + sửa.

@@ -36,14 +36,14 @@ Lưu lead và lịch sử chăm sóc; sale chỉ thấy lead được giao; admi
 Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-9-task-05`, `layer-9-task-06`
 
 ## Acceptance Criteria
-- [ ] Đủ trường ERD §4.11; `code` sequence chỉ đọc; `phoneNormalized` index
-- [ ] Không ai tạo lead qua REST công khai (chỉ endpoint ở task sau)
-- [ ] Sale: đọc/sửa lead được giao (status, ghi chú); không sửa `fullName/phone/email/message/locale`; không xoá; không xuất
-- [ ] Chuyển `lost` bắt buộc `lostReason`; trạng thái theo BR-11
-- [ ] Đổi `status` → activity `status_change` (hook); `firstContactedAt` lần đầu rời `new`
-- [ ] `lead-activities` chỉ thêm (không sửa/xoá); sale thêm được note/call trên lead được giao
-- [ ] Danh sách admin lọc theo trạng thái/nguồn/sale/thời gian; lead có sale `active=false` hiện cảnh báo
-- [ ] SĐT/email chỉ admin và sale phụ trách thấy (BR-32)
+- [x] Đủ trường ERD §4.11; `code` sequence chỉ đọc; `phoneNormalized` index
+- [x] Không ai tạo lead qua REST công khai (chỉ endpoint ở task sau)
+- [x] Sale: đọc/sửa lead được giao (status, ghi chú); không sửa `fullName/phone/email/message/locale`; không xoá; không xuất
+- [x] Chuyển `lost` bắt buộc `lostReason`; trạng thái theo BR-11
+- [x] Đổi `status` → activity `status_change` (hook); `firstContactedAt` lần đầu rời `new`
+- [x] `lead-activities` chỉ thêm (không sửa/xoá); sale thêm được note/call trên lead được giao
+- [x] Danh sách admin lọc theo trạng thái/nguồn/sale/thời gian; lead có sale `active=false` hiện cảnh báo
+- [x] SĐT/email chỉ admin và sale phụ trách thấy (BR-32)
 
 ## Tests cần viết
 - Integration: sale A đọc lead của sale B → 404/không thấy; sale sửa `phone` → bị chặn
@@ -61,19 +61,20 @@ Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-
 - Trước commit: đọc file migration sinh ra; nếu có DROP / đổi type / SET NOT NULL / UNIQUE/FK trên dữ liệu cũ / backfill → gắn `HIGH_RISK_MIGRATION` và dừng báo user (không dự kiến ở initial build vì toàn bảng mới).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type (round 1): M1 access create `lead-activities` trả false khi không có data → admin UI ẩn nút thêm note/call
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
 - Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (164 file, 1.788) · `pnpm build` PASS; migration up→down→up (đã áp DB dev, batch 23)
+- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-02-round-2-review.md`)
+- Ghi chú: Payload trả 403 (không phải 404) khi sale update by id lead không được giao — test assert 403; id là uuid
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §4.11, PERMISSION §3.3 nếu lệch)
+- Doc impact result: ERD §4.11 as-built (+ quy tắc `asSystemActivity`), PERMISSION §3.3, ARCHITECTURE §4
 - Decision log: pending
 
 ## Commit / Tracking
@@ -82,13 +83,13 @@ Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-8/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/Leads.ts, LeadActivities.ts
@@ -102,4 +103,4 @@ Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ spec-validation layer 5 addendum
-- [ ] G23: thống nhất cách ẩn danh PII với `job-applications` (giá trị thay thế, không NULL khi cột NOT NULL).
+- [x] G23: thống nhất cách ẩn danh PII với `job-applications` (giá trị thay thế, không NULL khi cột NOT NULL).
