@@ -38,9 +38,10 @@ export const guardManualActivity: CollectionBeforeValidateHook<LeadActivity> = a
   if (operation !== "create" || isSystemActivity(req)) return data;
   if (!isStaff({ req }) || !MANUAL_ACTIVITY_TYPES.includes(data?.type as LeadActivityType)) throw new Forbidden(req.t);
   const leadId: unknown = data?.lead;
-  // Id sai dạng (không phải UUID) làm Postgres ném lỗi cast (500). Admin: 400 báo đúng trường; sale không có quyền với lead không tồn tại nên 403 như id lạ.
+  // Id sai dạng (chuỗi không phải UUID, số, object) làm Postgres ném lỗi cast (500). Admin: 400 báo đúng trường; sale không có quyền với lead không tồn tại nên 403 như id lạ.
   if (isAdmin({ req })) {
-    if (typeof leadId === "string" && !isUuid(leadId)) {
+    // Thiếu hẳn (undefined/null) để Payload báo lỗi "bắt buộc" như thường.
+    if (leadId !== undefined && leadId !== null && !isUuid(leadId)) {
       throw new ValidationError({ collection: "lead-activities", errors: [{ path: "lead", message: "Mã lead không hợp lệ" }] });
     }
     return data;

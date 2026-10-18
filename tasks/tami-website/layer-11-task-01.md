@@ -84,3 +84,8 @@ Mở khoá cho: `layer-12-task-01`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-10-task-01 round 1 (MINOR)
+- [ ] `tests/integration/leads-public.test.ts:84-87`: gọi `handleLead` trực tiếp với Turnstile giả → E2E gửi lead đi qua route thật + Turnstile test key (phủ luôn đường đọc body stream).
+- [ ] `src/lib/leads/turnstile-site-key.ts:3`: thêm cảnh báo — trang có form mà bị prerender lúc build sẽ nhúng site key placeholder vào HTML.
+- [ ] `src/components/layout/Header.test.tsx` flaky khi máy tải nặng (timeout) → nới timeout/sửa chờ.

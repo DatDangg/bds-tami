@@ -141,6 +141,18 @@
     "actions": {
       "retry": "Thử lại"
     },
+    "lead": {
+      "fullName": "Họ và tên",
+      "phone": "Số điện thoại",
+      "email": "Email",
+      "message": "Nội dung cần tư vấn",
+      "submit": "Nhận tư vấn",
+      "errors": {
+        "fullName": "Vui lòng nhập họ tên (ít nhất 2 ký tự).",
+        "phone": "Số điện thoại chưa hợp lệ.",
+        "email": "Email chưa hợp lệ."
+      }
+    },
     "success": {
       "title": "Cảm ơn anh/chị!",
       "description": "Chuyên viên TAMI sẽ liên hệ trong giờ làm việc."

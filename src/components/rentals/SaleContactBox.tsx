@@ -1,14 +1,18 @@
 import { useLocale, useTranslations } from "next-intl";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { Phone } from "@/components/icons";
+import { LeadForm } from "@/components/leads/LeadForm";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 import { formatVndCompact } from "@/lib/format";
+import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import type { RentalDetailView, SaleContactView } from "@/lib/rentals/rental-view";
 import type { Locale } from "@/i18n/routing";
 
 interface SaleContactBoxProps {
   view: Pick<RentalDetailView, "rented" | "priceMonthlyVnd">;
+  /** Id tin cho thuê: nguồn của lead (tin đã thuê vẫn là nguồn). */
+  rentalId: string;
   /** Sale phụ trách đang hoạt động và có SĐT; `null` (sale bị khoá, đã xoá, thiếu SĐT) → hotline chung, KHÔNG hiện tên. */
   sale: SaleContactView | null;
   hotline?: { label: string; telHref: string };
@@ -16,12 +20,13 @@ interface SaleContactBoxProps {
 
 /**
  * Khung phải của S07 (`--color-primary-subtle`, dính ≥ lg): giá + "/tháng" (tin đã thuê: chữ mờ + "Giá tham khảo") → người phụ trách
- * (avatar, tên, nút gọi) hoặc hotline chung → vùng form lead (`LeadFormSlot`, layer-10-task-01 ráp form thật; tin đã thuê đổi tiêu đề
- * thành "Nhận tư vấn căn tương tự"). Server Component, không đọc DB.
+ * (avatar, tên, nút gọi) hoặc hotline chung → vùng form lead (`LeadFormSlot` + `LeadForm source=rental`; tin đã thuê đổi tiêu đề
+ * thành "Nhận tư vấn căn tương tự", nguồn vẫn là tin đó). Server Component, không đọc DB.
  */
-export function SaleContactBox({ view, sale, hotline }: SaleContactBoxProps) {
+export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBoxProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentalDetail");
+  const turnstileSiteKey = readTurnstileSiteKey();
   const contact = sale ? { href: sale.telHref, label: t("contact.callSale", { phone: sale.phoneLabel }) } : hotline ? { href: hotline.telHref, label: t("contact.callHotline", { phone: hotline.label }) } : null;
   return (
     <div className="flex flex-col gap-6 rounded-sm bg-primary-subtle p-6">
@@ -64,8 +69,9 @@ export function SaleContactBox({ view, sale, hotline }: SaleContactBoxProps) {
       <LeadFormSlot
         title={view.rented ? t("leadForm.titleRented") : t("leadForm.title")}
         className="scroll-mt-30 bg-transparent p-0 lg:scroll-mt-32 lg:p-0"
-        fallback={<p className="text-body text-text-secondary">{view.rented ? t("leadForm.fallbackRented") : t("leadForm.fallback")}</p>}
-      />
+      >
+        <LeadForm source="rental" sourceId={rentalId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+      </LeadFormSlot>
     </div>
   );
 }

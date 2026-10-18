@@ -99,3 +99,6 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 - [ ] `src/components/home/HomeBlocks.tsx:32`: nội dung `h1` sr-only = tiêu đề slide 1 (theo locale), không có thì tên site — khớp design-spec S01 `:284` mà không đưa h1 vào slide (tránh MAJOR-3 cũ).
 - [ ] `src/components/home/HeroSlider.tsx:142,161`: mobile cụm điều khiển xếp dọc cao 88px có thể chạm CTA khi hero thấp → `pb-32 sm:pb-24` (hoặc tương đương); kiểm 320px (8 dot bị cắt ~16px mỗi bên).
 - [ ] Header trong suốt đè hero (design-spec S01.1) chưa làm — cần biến thể Header + phát hiện cuộn.
+
+## Follow-up từ review layer-10-task-01 round 1 (MINOR)
+- [ ] Khoá i18n không còn dùng sau LeadForm (`leadForm.fallback*`, `contact.formFallback`…): xoá khỏi cả vi.json và en.json khi rà khoá (script i18n-check).

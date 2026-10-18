@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ContactDetails } from "@/components/contact/ContactDetails";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
+import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { LazyMap } from "@/components/media/LazyMap";
@@ -12,6 +13,7 @@ import { publicPath } from "@/lib/content/content-paths";
 import { buildContactPageView } from "@/lib/content/contact-view";
 import { getSiteSettings } from "@/lib/content/get-globals";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
+import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import { logger } from "@/lib/logger";
 import { buildOrganizationJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -65,6 +67,7 @@ export default async function ContactPage({ params }: PageProps) {
   ]);
   const { contact, socials, mapLocation } = buildContactPageView(settings);
   const siteUrl = getSiteUrl();
+  const turnstileSiteKey = readTurnstileSiteKey();
   const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
 
   return (
@@ -77,7 +80,9 @@ export default async function ContactPage({ params }: PageProps) {
           <ContactDetails contact={contact} socials={socials} />
         </div>
         <div className="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
-          <LeadFormSlot title={t("formTitle")} fallback={<p className="text-body text-text-secondary">{t("formFallback")}</p>} />
+          <LeadFormSlot title={t("formTitle")}>
+            <LeadForm source="contact" {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
+          </LeadFormSlot>
         </div>
         {mapLocation && (
           <div className="lg:col-span-5 lg:row-start-2">

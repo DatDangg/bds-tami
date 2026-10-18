@@ -2,11 +2,13 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { RichText } from "@/components/content/RichText";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
+import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { Gallery } from "@/components/media/Gallery";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { ShareButtons } from "@/components/news/ShareButtons";
 import { publicPath } from "@/lib/content/content-paths";
+import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import type { PostCardData, PostDetailView, PostOfferView } from "@/lib/posts/post-view";
 import type { Locale } from "@/i18n/routing";
 import type { PropertyPost } from "@/payload-types";
@@ -14,7 +16,7 @@ import { OfferBox } from "./OfferBox";
 import { PostCard } from "./PostCard";
 
 interface PostDetailProps {
-  doc: Pick<PropertyPost, "content">;
+  doc: Pick<PropertyPost, "id" | "content">;
   view: PostDetailView;
   offer: PostOfferView | null;
   related: PostCardData[];
@@ -27,7 +29,7 @@ interface PostDetailProps {
 
 /**
  * Bố cục S09: breadcrumb → đầu bài (danh mục, `h1`, ngày) → ảnh bìa 16:9 → [khối ưu đãi] → nội dung richText (68ch) → thư viện ảnh → vùng form lead
- * (`LeadFormSlot`, layer-10-task-01 ráp form `source=property_post`; tiêu đề giống nhau cho mọi trạng thái, kể cả ưu đãi đã kết thúc) → chia sẻ →
+ * (`LeadFormSlot` + `LeadForm source=property_post`; tiêu đề giống nhau cho mọi trạng thái, kể cả ưu đãi đã kết thúc) → chia sẻ →
  * bài liên quan. `h1` duy nhất là tiêu đề. Server Component; chỉ thư viện ảnh, nút chia sẻ, nút sao chép mã là client.
  */
 export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareUrl }: PostDetailProps) {
@@ -35,6 +37,7 @@ export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareU
   const t = useTranslations("page.posts");
   const tNav = useTranslations("layout.nav.items");
   const tRich = useTranslations("page.richText");
+  const turnstileSiteKey = readTurnstileSiteKey();
   return (
     <article>
       <Breadcrumb
@@ -74,19 +77,16 @@ export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareU
         )}
       </div>
       <div className="mx-auto w-full max-w-text px-gutter pb-10">
-        <LeadFormSlot
-          title={t("leadForm.title")}
-          fallback={
-            <div className="flex flex-col gap-3">
-              <p className="text-body text-text-secondary">{t("leadForm.fallback")}</p>
-              {hotline && (
-                <a href={hotline.telHref} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text hover:underline">
-                  {t("leadForm.hotline")}: {hotline.label}
-                </a>
-              )}
-            </div>
-          }
-        />
+        <LeadFormSlot title={t("leadForm.title")}>
+          <div className="flex flex-col gap-4">
+            <LeadForm source="property_post" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+            {hotline && (
+              <a href={hotline.telHref} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text hover:underline">
+                {t("leadForm.hotline")}: {hotline.label}
+              </a>
+            )}
+          </div>
+        </LeadFormSlot>
       </div>
       <footer className="mx-auto w-full max-w-text px-gutter pb-section-tight">
         <ShareButtons title={view.title} {...(shareUrl ? { url: shareUrl } : {})} />

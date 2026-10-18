@@ -1,0 +1,97 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { useEffect, type FormEvent } from "react";
+import { ConsentCheckbox } from "@/components/forms/ConsentCheckbox";
+import { FormField } from "@/components/forms/FormField";
+import { FormErrorSummary, FormStatus } from "@/components/forms/FormStatus";
+import { TurnstileWidget } from "@/components/forms/TurnstileWidget";
+import { usePublicForm, type FormFields } from "@/components/forms/use-public-form";
+import { Button } from "@/components/ui/button";
+import { captureUtm, readUtm } from "@/lib/leads/utm";
+import type { LeadSource } from "@/lib/leads/lead-values";
+import { normalizePhone } from "@/lib/phone";
+
+const ENDPOINT = "/api/public/leads";
+const FIELD_NAMES = ["fullName", "phone", "email", "message"] as const;
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+interface LeadFormProps {
+  source: LeadSource;
+  /** Id bản ghi nguồn (tin cho thuê/tin BĐS/dự án); bỏ qua khi `source = "contact"`. Tin đã thuê vẫn gửi id tin đó (FR-PUB-13). */
+  sourceId?: string;
+  /** Site key Turnstile (công khai); thiếu thì form báo không tải được bước xác minh khi gửi. */
+  turnstileSiteKey?: string;
+  hotline?: { label: string; telHref: string };
+}
+
+/** Phần body ngoài các ô người dùng nhập: nguồn, UTM (BR-10), URL trang (bỏ `#hash`) và referrer. Chỉ gọi phía client lúc gửi. */
+export function buildLeadExtra(source: LeadSource, sourceId: string | undefined): Record<string, unknown> {
+  const { origin, pathname, search } = window.location;
+  return {
+    source,
+    ...(source !== "contact" && sourceId ? { sourceId } : {}),
+    utm: readUtm(),
+    pageUrl: `${origin}${pathname}${search}`,
+    referrer: document.referrer || undefined,
+  };
+}
+
+/**
+ * Form lead dùng chung (FR-PUB-03/05/07/11, design-spec §3.3): họ tên + SĐT bắt buộc, email/lời nhắn tuỳ chọn, consent (BR-30), Turnstile lười.
+ * JSON tới `POST /api/public/leads`; cảm ơn `role="status"` thay form khi xong, lỗi field map vào ô. Là client island nên HTML trang không đổi
+ * theo trạng thái form. `locale` do `usePublicForm` gắn theo ngôn ngữ đang xem.
+ */
+export function LeadForm({ source, sourceId, turnstileSiteKey, hotline }: LeadFormProps) {
+  const t = useTranslations("form.lead");
+  const tForm = useTranslations("form");
+
+  useEffect(() => captureUtm(), []);
+
+  const form = usePublicForm({
+    endpoint: ENDPOINT,
+    encoding: "json",
+    fieldNames: FIELD_NAMES,
+    validate: (fields: FormFields) => {
+      const errors: Record<string, string> = {};
+      const { fullName, phone, email } = fields;
+      if (typeof fullName !== "string" || fullName.length < 2) errors.fullName = t("errors.fullName");
+      if (typeof phone !== "string" || normalizePhone(phone) === null) errors.phone = t("errors.phone");
+      if (typeof email === "string" && !EMAIL_SHAPE.test(email)) errors.email = t("errors.email");
+      return errors;
+    },
+  });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    return form.handleSubmit(event, buildLeadExtra(source, sourceId));
+  }
+
+  if (form.status === "success") return <FormStatus />;
+
+  const submitting = form.status === "submitting";
+  const { issue } = form;
+  const requiredLabel = tForm("required");
+
+  return (
+    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <FormField name="fullName" label={t("fullName")} required requiredLabel={requiredLabel} autoComplete="name" readOnly={submitting} error={form.fieldErrors.fullName} />
+      <FormField name="phone" type="tel" inputMode="tel" label={t("phone")} required requiredLabel={requiredLabel} autoComplete="tel" readOnly={submitting} error={form.fieldErrors.phone} />
+      <FormField name="email" type="email" label={t("email")} autoComplete="email" readOnly={submitting} error={form.fieldErrors.email} />
+      <FormField as="textarea" name="message" label={t("message")} maxLength={1000} readOnly={submitting} error={form.fieldErrors.message} />
+      <ConsentCheckbox {...form.consent} disabled={submitting} />
+      <TurnstileWidget siteKey={turnstileSiteKey} {...form.turnstile} />
+      {issue && (
+        <FormErrorSummary
+          message={issue.message}
+          details={issue.details}
+          tone={issue.kind === "rate-limit" ? "warning" : "error"}
+          onRetry={issue.retryable ? form.retry : undefined}
+          hotline={hotline && (issue.kind === "rate-limit" || issue.retryable) ? { label: hotline.label, href: hotline.telHref } : undefined}
+        />
+      )}
+      <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting} className="w-full sm:w-fit">
+        {submitting ? tForm("submitting") : t("submit")}
+      </Button>
+    </form>
+  );
+}

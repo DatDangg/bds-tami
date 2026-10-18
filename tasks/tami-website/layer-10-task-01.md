@@ -37,10 +37,10 @@ Component `LeadForm` dùng chung, thay các `LeadFormSlot`.
 Mở khoá cho: `layer-12-task-01`, `layer-14-task-01`, `layer-11-task-01`, `layer-14-task-02`
 
 ## Acceptance Criteria
-- [ ] Nút gửi "Nhận tư vấn / Get advice"; tin rented → tiêu đề "Nhận tư vấn căn tương tự / Find similar units", nguồn vẫn là tin đó
-- [ ] Gửi `source`, `sourceId`, `locale`, `utm`, `pageUrl`; consent link tới trang chính sách đúng ngôn ngữ
-- [ ] Thành công: thông báo cảm ơn `role="status"`; lỗi map vào field
-- [ ] Turnstile lười; HTML trang không đổi (form là client island)
+- [x] Nút gửi "Nhận tư vấn / Get advice"; tin rented → tiêu đề "Nhận tư vấn căn tương tự / Find similar units", nguồn vẫn là tin đó
+- [x] Gửi `source`, `sourceId`, `locale`, `utm`, `pageUrl`; consent link tới trang chính sách đúng ngôn ngữ
+- [x] Thành công: thông báo cảm ơn `role="status"`; lỗi map vào field
+- [x] Turnstile lười; HTML trang không đổi (form là client island)
 
 ## Tests cần viết
 - RTL: payload gửi đúng theo từng `source`
@@ -60,13 +60,13 @@ Mở khoá cho: `layer-12-task-01`, `layer-14-task-01`, `layer-11-task-01`, `lay
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS
+- Verify commands + result: worktree wt/l10-t01 (cây file trùng staging HEAD ef39df4 + diff): pnpm lint · typecheck · build PASS; test 2.272 PASS (contrast CRLF BL-004; integration lỗi do Postgres phục hồi → chạy riêng leads 47 PASS)
+- Reviewer verdict: STRICT PASS round 1 (`.context/review-reports/build-tami-website-layer-10-task-01-round-1-review.md`); MINOR-1/3/5 → layer-11-task-01; MINOR-2 UTM toàn site → BACKLOG BL-010; MINOR-4 khoá i18n thừa → L10-T03
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: no doc impact
 - Decision log: pending
 
 ## Commit / Tracking
@@ -75,13 +75,13 @@ Mở khoá cho: `layer-12-task-01`, `layer-14-task-01`, `layer-11-task-01`, `lay
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-10/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/leads/LeadForm.tsx

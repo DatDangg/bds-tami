@@ -16,6 +16,8 @@ const log = logger.child({ component: "leads" });
 /** Body hợp lệ chỉ vài trăm byte; chặn sớm body lớn bất thường (UTM/URL đã được cắt ở schema). */
 const MAX_BODY_CHARS = 16_000;
 const MAX_USER_AGENT_CHARS = 500;
+/** Trần theo byte khi đọc stream (UTF-8 tối đa 4 byte/ký tự); sau khi giải mã vẫn so lại theo ký tự. */
+const MAX_BODY_BYTES = MAX_BODY_CHARS * 4;
 
 /** Collection của bản ghi nguồn; khách chỉ gửi lead cho bản ghi đang công khai (tin `rented` vẫn nhận, FR-PUB-13). */
 const SOURCE_COLLECTION = { rental: "rentals", property_post: "property-posts", project: "projects" } as const satisfies Partial<
@@ -26,6 +28,8 @@ const SOURCE_COLLECTION = { rental: "rentals", property_post: "property-posts", 
 export interface LeadRequest {
   headers: Headers;
   text: () => Promise<string>;
+  /** Stream body gốc: có thì đọc có giới hạn (body chunked không có `Content-Length` không được đọc hết vào bộ nhớ). */
+  body?: ReadableStream<Uint8Array> | null;
 }
 
 export interface LeadEndpointDeps {
@@ -36,6 +40,24 @@ export interface LeadEndpointDeps {
   siteUrl?: string;
 }
 
+/** Đọc stream và dừng ngay khi vượt `MAX_BODY_BYTES` (huỷ stream, không giữ phần thừa). */
+async function readBoundedText(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return text + decoder.decode();
+    bytes += value.byteLength;
+    if (bytes > MAX_BODY_BYTES) {
+      await reader.cancel();
+      throw new Error("body quá lớn");
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+}
+
 /** Đọc body đúng một lần (Turnstile và validate dùng chung). Body hỏng/quá lớn ném lỗi: pipeline đổi thành 400. */
 function createJsonBodyReader(request: LeadRequest) {
   let pending: Promise<unknown> | undefined;
@@ -43,7 +65,7 @@ function createJsonBodyReader(request: LeadRequest) {
   const parse = async (): Promise<unknown> => {
     const declared = Number(request.headers.get("content-length"));
     if (Number.isFinite(declared) && declared > MAX_BODY_CHARS) throw new Error("body quá lớn");
-    const raw = await request.text();
+    const raw = request.body ? await readBoundedText(request.body) : await request.text();
     if (raw.length > MAX_BODY_CHARS) throw new Error("body quá lớn");
     return JSON.parse(raw);
   };
@@ -169,5 +191,5 @@ export async function handleLead(request: LeadRequest, deps: LeadEndpointDeps): 
 export const leadsEndpoint: Endpoint = {
   path: "/public/leads",
   method: "post",
-  handler: (req) => handleLead({ headers: req.headers, text: () => req.text!() }, { payload: req.payload }),
+  handler: (req) => handleLead({ headers: req.headers, text: () => req.text!(), body: req.body }, { payload: req.payload }),
 };

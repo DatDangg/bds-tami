@@ -1,6 +1,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { RichText } from "@/components/content/RichText";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
+import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
 import { Gallery } from "@/components/media/Gallery";
@@ -16,6 +17,7 @@ import { ProjectSection } from "@/components/projects/ProjectSection";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { ProjectSubNav } from "@/components/projects/ProjectSubNav";
 import { publicPath } from "@/lib/content/content-paths";
+import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import { SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { ProjectCardData } from "@/lib/projects/project-view";
 import type { Locale } from "@/i18n/routing";
@@ -41,6 +43,7 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
   const t = useTranslations("page.projectDetail");
   const tNav = useTranslations("layout.nav.items");
   const tRich = useTranslations("page.richText");
+  const turnstileSiteKey = readTurnstileSiteKey();
   const sections = visibleSections(view);
   const shown = new Set(sections);
 
@@ -88,23 +91,19 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
       <Documents documents={view.documents} />
       <div className="bg-bg py-section-tight">
         <div className="mx-auto w-full max-w-container px-gutter">
-          <LeadFormSlot
-            title={t("leadForm.title")}
-            className="scroll-mt-30 lg:scroll-mt-32"
-            fallback={
-              <div className="flex flex-col gap-3">
-                <p className="max-w-[60ch] text-body text-text-secondary">{t("leadForm.fallback")}</p>
-                {hotline && (
-                  <p>
-                    <span className="text-small text-text-muted">{t("leadForm.hotline")}: </span>
-                    <a href={hotline.telHref} className="inline-flex min-h-11 items-center font-display text-h3 text-accent-text underline underline-offset-4">
-                      {hotline.label}
-                    </a>
-                  </p>
-                )}
-              </div>
-            }
-          />
+          <LeadFormSlot title={t("leadForm.title")} className="scroll-mt-30 lg:scroll-mt-32">
+            <div className="flex flex-col gap-4">
+              <LeadForm source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+              {hotline && (
+                <p>
+                  <span className="text-small text-text-muted">{t("leadForm.hotline")}: </span>
+                  <a href={hotline.telHref} className="inline-flex min-h-11 items-center font-display text-h3 text-accent-text underline underline-offset-4">
+                    {hotline.label}
+                  </a>
+                </p>
+              )}
+            </div>
+          </LeadFormSlot>
         </div>
       </div>
       {related.length > 0 && (

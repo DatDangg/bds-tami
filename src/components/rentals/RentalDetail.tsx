@@ -146,7 +146,7 @@ export function RentalDetail({ doc, view, similar, sale, hotline, ownPath }: Ren
           <RentalSpecs view={view} />
         </div>
         <aside className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-28">
-          <SaleContactBox view={view} sale={sale} {...(hotline ? { hotline } : {})} />
+          <SaleContactBox view={view} rentalId={doc.id} sale={sale} {...(hotline ? { hotline } : {})} />
         </aside>
         <div className="flex min-w-0 flex-col gap-10 lg:col-span-8 lg:col-start-1 lg:row-start-2">
           <RentalDetails view={view} />

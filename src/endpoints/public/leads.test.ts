@@ -149,6 +149,41 @@ describe("POST /api/public/leads (handler)", () => {
     expect(createOrMerge).not.toHaveBeenCalled();
   });
 
+  it("body chunked không Content-Length: đọc stream có giới hạn, quá lớn -> 400 và huỷ stream (không đọc hết)", async () => {
+    let pulled = 0;
+    let cancelled = false;
+    const chunk = new TextEncoder().encode("x".repeat(10_000));
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled += 1;
+        controller.enqueue(chunk);
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    const text = vi.fn(async () => "không được gọi");
+    const request = { headers: new Headers({ "CF-Connecting-IP": "198.51.100.7" }), text, body: stream };
+    const response = await handleLead(request, { payload: fakePayload().payload, pipelineDeps: allowed(), now: () => NOW, siteUrl: "https://tami.test/" });
+    expect(response.status).toBe(400);
+    expect(cancelled).toBe(true);
+    expect(pulled).toBeLessThan(10);
+    expect(text).not.toHaveBeenCalled();
+    expect(createOrMerge).not.toHaveBeenCalled();
+  });
+
+  it("body chunked nhỏ hợp lệ được đọc từ stream", async () => {
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(JSON.stringify(baseBody)));
+        controller.close();
+      },
+    });
+    const request = { headers: new Headers({ "CF-Connecting-IP": "198.51.100.7" }), text: async () => "", body: stream };
+    const response = await handleLead(request, { payload: fakePayload().payload, pipelineDeps: allowed(), now: () => NOW, siteUrl: "https://tami.test/" });
+    expect(response.status).toBe(200);
+  });
+
   it("contact không cần sourceId (bỏ qua nếu có); ô email/message trống coi như không gửi; chuỗi phụ quá dài bị cắt", async () => {
     const { response, find } = await submit({
       ...baseBody,

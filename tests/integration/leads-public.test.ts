@@ -315,8 +315,12 @@ describe.skipIf(!baseUrl)("integration: POST /api/public/leads (tạo/gộp/tự
       });
     });
 
-    it("lỗi xếp email -> rollback cả lead (không mất lead âm thầm, khách nộp lại được), trả 500 chung", async () => {
-      const data = body();
+    // `ids` chỉ có sau beforeAll nên bảng chỉ giữ tên nguồn, dựng body trong test.
+    it.each([
+      ["rental (lỗi rơi ở job lead-assigned, trước email)", "rental"],
+      ["project (không tự giao, lỗi rơi đúng queueNewLeadEmail)", "project"],
+    ])("lỗi xếp email -> rollback cả lead (không mất lead âm thầm, khách nộp lại được), trả 500 chung: %s", async (_label, source) => {
+      const data = source === "project" ? body({ source: "project", sourceId: ids.project }) : body();
       const queue = vi.spyOn(payload.jobs, "queue").mockRejectedValueOnce(new Error("queue down"));
       try {
         const response = await submit(data);
@@ -328,6 +332,27 @@ describe.skipIf(!baseUrl)("integration: POST /api/public/leads (tạo/gộp/tự
       expect(await leadsOf(data.phone as string)).toHaveLength(0);
       expect((await submit(data)).status).toBe(200);
       expect(await leadsOf(data.phone as string)).toHaveLength(1);
+    });
+  });
+
+  describe("form liên hệ (LeadForm source=contact)", () => {
+    it("body đúng như client gửi (không sourceId, không email, UTM + pageUrl) tạo lead source=contact kèm UTM/pageUrl/ngôn ngữ", async () => {
+      const phone = freshPhone();
+      const clientBody = {
+        source: "contact",
+        fullName: "Khách Liên Hệ",
+        phone,
+        consent: true,
+        turnstileToken: "token",
+        locale: "en",
+        utm: { source: "facebook", campaign: "t10" },
+        pageUrl: "https://tami.test/en/contact",
+      };
+      expect((await submit(clientBody)).status).toBe(200);
+      const [lead, ...more] = await leadsOf(phone);
+      expect(more).toHaveLength(0);
+      expect(lead).toMatchObject({ source: "contact", locale: "en", pageUrl: "https://tami.test/en/contact", utm: { source: "facebook", campaign: "t10" } });
+      expect(lead!.consentAt).toBeTruthy();
     });
   });
 

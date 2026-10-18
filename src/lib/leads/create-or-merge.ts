@@ -144,6 +144,8 @@ export async function createOrMergeLead(payload: Payload, input: LeadInput, cont
     if (existing) {
       await mergeIntoLead(payload, req, existing, input);
     } else {
+      // Nhánh tạo chạy thêm vài truy vấn so với gộp nên chậm hơn chút; không đệm thời gian phản hồi vì endpoint có rate limit 5/10 phút/IP
+      // và cùng một response cho cả hai nhánh (rủi ro dò SĐT qua độ trễ được chấp nhận, residual L9-T02).
       const created = await createLead(payload, req, input, context);
       await queueNewLeadEmail(payload, req, created.id, input, context);
       outcome = "created";

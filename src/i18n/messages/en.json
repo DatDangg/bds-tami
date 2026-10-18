@@ -141,6 +141,18 @@
     "actions": {
       "retry": "Try again"
     },
+    "lead": {
+      "fullName": "Full name",
+      "phone": "Phone number",
+      "email": "Email",
+      "message": "What would you like advice on?",
+      "submit": "Get advice",
+      "errors": {
+        "fullName": "Please enter your name (at least 2 characters).",
+        "phone": "Please enter a valid phone number.",
+        "email": "Please enter a valid email address."
+      }
+    },
     "success": {
       "title": "Thank you!",
       "description": "A TAMI advisor will contact you during business hours."

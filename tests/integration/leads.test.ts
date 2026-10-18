@@ -354,15 +354,17 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
       expect(await activitiesOf(ofB.id)).toHaveLength(0);
     });
 
-    it("lead không phải UUID (hoặc object): sale bị 403, admin bị 400 — không phải 500", async () => {
+    it("lead không phải UUID (chuỗi, số hoặc object): sale bị 403, admin bị 400 — không phải 500", async () => {
       for (const leadId of ["khong-phai-uuid", "123", { id: "khong-phai-uuid" }]) {
         await expect(
           payload.create({ collection: "lead-activities", data: { lead: leadId, type: "note", content: "x" } as never, ...actingAs(saleA) }),
         ).rejects.toMatchObject({ status: 403 });
       }
-      await expect(
-        payload.create({ collection: "lead-activities", data: { lead: "khong-phai-uuid", type: "note", content: "x" } as never, ...actingAs(admin) }),
-      ).rejects.toMatchObject({ status: 400 });
+      for (const leadId of ["khong-phai-uuid", 123, { id: "khong-phai-uuid" }]) {
+        await expect(
+          payload.create({ collection: "lead-activities", data: { lead: leadId, type: "note", content: "x" } as never, ...actingAs(admin) }),
+        ).rejects.toMatchObject({ status: 400 });
+      }
     });
 
     it("loại hệ thống (status_change/assignment/merged/email_sent) không ai thêm tay được; note thiếu nội dung bị từ chối", async () => {
