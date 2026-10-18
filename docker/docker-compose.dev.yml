@@ -1,11 +1,20 @@
 # Hạ tầng dev local cho TAMI. Chạy: docker compose -f docker/docker-compose.dev.yml up -d
 # Mọi cổng bind 127.0.0.1; tên container/volume có tiền tố `tami-` để không đụng dự án khác.
 # Cổng host chọn 5433/6381/8333 để tránh trùng Postgres/Redis mặc định trên máy dev.
+#
+# ⚠️ Volume `tami-postgres-data` ĐÃ CÓ (khởi tạo bằng postgis/postgis:17-3.5 bullseye, glibc 2.31) thì KHÔNG chỉ `up -d` sau khi image đổi:
+# `up` sẽ tạo lại container bằng image bookworm (glibc 2.36) trên dữ liệu cũ mà không REINDEX => index text theo collation cũ sai thứ tự.
+# Chuyển image dev theo docs/runbooks/postgres-base-image.md (dừng app -> up image mới -> REINDEX + REFRESH COLLATION VERSION mọi DB -> amcheck).
+# Volume mới (máy mới / `down -v`) thì khởi tạo thẳng bằng image bookworm, không cần gì thêm.
 name: tami-dev
 
 services:
   postgres:
-    image: postgis/postgis:17-3.5
+    # Cùng image với staging (docker/backup/Dockerfile target postgis = postgres:17.11-bookworm + PostGIS 3.5.2); chưa có tag thì `up` tự build.
+    image: tami-postgis:17-3.5-bookworm
+    build:
+      context: ./backup
+      target: postgis
     container_name: tami-postgres
     environment:
       POSTGRES_USER: tami

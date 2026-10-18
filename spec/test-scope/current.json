@@ -1,88 +1,80 @@
 {
-  "specVersion": "1.9.0",
-  "scopeVersion": 9,
-  "generatedAt": "2026-10-19T21:00:00+07:00",
+  "specVersion": "1.10.0",
+  "scopeVersion": 10,
+  "generatedAt": "2026-10-19T22:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/layer9-minor-export-reminder",
-  "backlog": "BL-009",
+  "workItem": "feature/backup-base-image-debian12",
+  "backlog": "BL-002",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-layer9-minor-export-reminder.md",
+  "changeDoc": "spec/changes/archive/2026-10-19-backup-base-image-debian12.md",
   "task": [
-    "tasks/feature-layer9-minor-export-reminder/phase-1-task-01.md",
-    "tasks/feature-layer9-minor-export-reminder/phase-1-task-02.md"
+    "tasks/feature-backup-base-image-debian12/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-layer9-minor-export-reminder.md",
+  "specUpdate": "spec/updates/2026-10-19-backup-base-image-debian12.md",
   "specRefs": [
-    "F9",
-    "FR-ADM-09",
-    "FR-ADM-10",
-    "BR-14"
+    "NFR-05"
   ],
   "specRefNotes": {
-    "F9": "Lead — xuất Excel (admin, ghi audit log): xuất đúng bộ lọc danh sách lead (trạng thái / nguồn / sale phụ trách 'bằng'; ngày tạo 'lớn hơn hoặc bằng' / 'nhỏ hơn hoặc bằng'); bộ lọc khác → nút khoá + thông báo nêu toán tử hỗ trợ; nút không hiện ở thùng rác và list drawer",
-    "FR-ADM-09": "Quản lý lead trong /admin (danh sách, bộ lọc)",
-    "FR-ADM-10": "Xuất Excel lead (admin)",
-    "BR-14": "Nhắc admin khi lead 'new' chưa có người phụ trách sau 30 phút giờ hành chính — chỉ thêm index DB cho truy vấn job, hành vi không đổi"
+    "NFR-05": "Backup ngoài server (pgBackRest + restic), RPO <= 15 phút, RTO <= 4 giờ, diễn tập khôi phục — bổ sung ràng buộc §Hạ tầng: image PostgreSQL/backup chạy Debian 12 bookworm, giữ PG 17 + PostGIS 3.5; đổi base OS trên volume có dữ liệu chỉ theo runbook (REINDEX + REFRESH COLLATION VERSION), diễn tập staging trước prod; deploy không tự đổi image postgres"
   },
   "changed": {
     "files": [
-      "src/lib/leads/export-filters.ts",
-      "src/components/admin/LeadExportButton.tsx",
-      "src/components/admin/LeadExportSlot.tsx",
-      "src/collections/Leads.ts",
-      "src/app/(payload)/admin/importMap.js",
-      "migrations/20261018_212611_leads_remind_scan_index.ts",
-      "migrations/20261018_212611_leads_remind_scan_index.json",
-      "migrations/index.ts",
-      "SPECIFICATIONS.md",
-      "docs/API_SPEC.md",
-      "docs/ERD.md",
+      "docker/backup/Dockerfile",
+      "docker/backup/postgis/10_postgis.sh",
+      "docker/backup/postgis/update-postgis.sh",
+      "docker/backup/pgbackrest-env.example",
+      "docker/docker-compose.dev.yml",
+      "docker/docker-compose.staging.yml",
+      "docker/docker-compose.prod.yml",
+      "docker/backup/test/e2e.sh",
+      "docker/backup/test/docker-compose.e2e.yml",
+      "scripts/deploy/deploy.sh",
+      "scripts/deploy/deploy.test.sh",
+      "docs/runbooks/postgres-base-image.md",
+      "docs/runbooks/restore.md",
+      "docs/runbooks/deploy.md",
       "docs/ARCHITECTURE.md",
-      "tests/integration/leads-remind-scan-index-migration.test.ts"
+      "SPECIFICATIONS.md"
     ],
-    "filesNote": "Danh sách đã chốt theo code thật (T01 eeebe1b, T02). Migration additive (CREATE INDEX), không HIGH_RISK_MIGRATION.",
+    "filesNote": "Danh sách file thật (chốt sau reviewer round 1). Không đổi code app, không migration Payload.",
     "modules": [
-      "Admin leads — list view / trash view / list drawer (nút xuất Excel)",
-      "Bộ lọc xuất Excel (export-filters, fail-closed)",
-      "Endpoint GET /api/admin/leads/export (contract không đổi)",
-      "Job remind-unassigned-leads (index truy vấn)",
-      "DB migration (index bảng leads)"
+      "Image PostgreSQL (target postgis/postgres) — Debian 12 bookworm, PG 17.11, PostGIS 3.5.2",
+      "Sidecar backup (pgBackRest 2.59.1 + restic 0.17.3 + rclone)",
+      "Docker compose dev / staging / prod",
+      "Deploy script (guard đổi image postgres)",
+      "Runbook restore / deploy (quy trình đổi base image)"
     ]
   },
   "impact": {
     "direct": [
-      "Danh sách lead với bộ lọc trạng thái / nguồn / sale phụ trách 'bằng' và ngày tạo '>=' / '<=' → nút xuất bật, file Excel chỉ chứa đúng các lead khớp bộ lọc",
-      "Bộ lọc dùng toán tử khác (vd 'chứa', 'khác', 'trong', trường khác) → nút xuất khoá, thông báo liệt kê rõ các toán tử được hỗ trợ",
-      "Gọi thẳng GET /api/admin/leads/export với toán tử không hỗ trợ → bị từ chối (fail-closed), không xuất toàn bộ",
-      "Khoảng ngày createdFrom > createdTo so bằng Date.parse: ngày khác định dạng / khác múi giờ (vd '2026-10-19T00:00:00+07:00' vs '2026-10-18T18:00:00Z') so đúng thứ tự; năm > 9999 / chuỗi ngày không hợp lệ xử lý đúng",
-      "Trang thùng rác của leads (/admin/collections/leads/trash) → nút xuất không hiện (xác định phía server, không nhấp nháy khi tải)",
-      "Cửa sổ chọn lead (list drawer, vd từ field quan hệ trỏ tới leads) → nút xuất không hiện",
-      "Migration mới chạy được trên DB sạch và DB đã có dữ liệu; tạo index leads(status, assigned_to_id, reminded_at, created_at)"
+      "docker build --target postgis / postgres / backup PASS; trong image: VERSION_CODENAME=bookworm, glibc 2.36, postgres 17.x, pg_dump/pg_restore 17.x, pgbackrest 2.59.1, PostGIS 3.5.2, restic 0.17.3, rclone có mặt",
+      "Volume mới khởi tạo bằng image bookworm: extension postgis (+ postgis_topology, fuzzystrmatch, postgis_tiger_geocoder) như image gốc; app tạo được pg_trgm / unaccent",
+      "image_switch_test (e2e.sh): volume tạo bằng postgis/postgis:17-3.5 bullseye (ghim digest) có dữ liệu text tiếng Việt + index btree text + gist → bật image bookworm: số bản ghi + checksum dữ liệu giữ nguyên, có cảnh báo collation version mismatch; sau REINDEX + REFRESH COLLATION VERSION: datcollversion = 2.36, hết cảnh báo, amcheck bt_index_check mọi index btree sạch, postgis_full_version() 3.5.2, truy vấn gist đúng",
+      "deploy.sh: container postgres đang chạy image khác image khai trong compose → die trỏ runbook; không có container nhưng volume <project>_postgres-data đã có → die trừ PG_IMAGE_SWITCH_CONFIRMED=1; không container + không volume (lần đầu) → cho chạy; dry-run không gọi docker; deploy.test.sh PASS",
+      "Runbook có quy trình đổi image cho môi trường có dữ liệu (dừng app → backup → đổi image → REINDEX + REFRESH COLLATION VERSION → amcheck → bật app), thứ tự dev → staging (diễn tập backup/restore) → prod, có điểm rollback"
     ],
     "dependents": [
-      "Xuất Excel vẫn ghi audit log như cũ",
-      "List view leads bình thường (không thùng rác, không drawer) vẫn hiện nút xuất",
-      "Job remind-unassigned-leads dùng index, kết quả nhắc không đổi"
+      "docker compose -f docker/docker-compose.{dev,staging,prod}.yml config -q hợp lệ với tag image mới",
+      "Deploy staging/prod lần đầu sau change: base services redis / seaweedfs / backup vẫn khởi động bình thường"
     ],
     "regression": [
-      "Xuất Excel theo bộ lọc: cột / dữ liệu file như trước, không lộ lead ngoài bộ lọc (PII)",
-      "RBAC: chỉ admin thấy nút và gọi được endpoint export; sale bị từ chối (403) cả UI và API",
-      "Job nhắc lead: chỉ nhắc 1 lần mỗi lead (reminded_at), chỉ trong giờ hành chính 08:00–17:30 thứ 2 – thứ 7 giờ VN; lead đã giao / khác 'new' không bị nhắc",
-      "Danh sách / bộ lọc / phân trang / xoá mềm lead trong admin không đổi",
-      "Các migration trước vẫn chạy tuần tự đúng"
+      "Backup/restore pgBackRest + restic chạy end-to-end trên image mới cho cả đích s3 và sftp (bash docker/backup/test/e2e.sh)",
+      "deploy.sh khởi động base services (postgres, redis, seaweedfs, backup) và các bước deploy khác không đổi",
+      "Dev DB khởi tạo mới: app chạy migrate + seed được, tìm kiếm không dấu (pg_trgm / unaccent) và truy vấn địa lý (PostGIS) hoạt động",
+      "Staging DB sau khi đổi image theo runbook: app đọc/ghi bình thường, sắp xếp/tìm kiếm text tiếng Việt đúng"
     ]
   },
   "acceptance": [
-    "Nút xuất bị khoá → thông báo liệt kê toán tử hỗ trợ",
-    "Khoảng ngày khác định dạng so đúng thứ tự bằng Date.parse; có test ca biên",
-    "Trạng thái trash xác định phía server",
-    "Nút xuất không hiện trong list drawer",
-    "Migration thêm index (CREATE INDEX, không destructive) cho truy vấn job nhắc lead",
-    "pnpm test / lint / typecheck / build PASS"
+    "Mọi Dockerfile/compose trong docker/ không còn base Debian 11; tag/digest/phiên bản gói ghim cụ thể; build assert bookworm/glibc 2.36",
+    "PG server 17 + PostGIS 3.5.2; pg_dump/pg_restore/pgbackrest trong image cùng major 17",
+    "docker build target postgis/postgres/backup PASS",
+    "bash docker/backup/test/e2e.sh (s3 + sftp) PASS trên image mới, gồm image_switch_test bullseye→bookworm có REINDEX/refresh collation/amcheck",
+    "Guard deploy chặn đổi image postgres tự động; bash scripts/deploy/deploy.test.sh PASS",
+    "Runbook: quy trình chuyển image cho môi trường có dữ liệu + bắt buộc diễn tập backup/restore trên staging trước prod; không deploy",
+    "Không đụng volume dev tami-postgres-data/container dev; dọn container/volume/image tạm của e2e"
   ],
-  "viewports": [
-    1280
-  ],
-  "risk": "medium",
-  "riskNote": "Xuất Excel chứa PII lead (fail-closed + RBAC chỉ admin phải giữ) + migration additive (CREATE INDEX trên bảng leads). Không đổi API công khai/contract export/auth. Migration phải inspect trước commit, không chạy migrate trên staging/prod trong change này."
+  "viewports": [],
+  "uiTests": false,
+  "risk": "high",
+  "riskNote": "Đổi glibc 2.31 → 2.36 đổi collation en_US.utf8: index btree text cũ có thể sai thứ tự nếu không REINDEX + REFRESH COLLATION VERSION. Không migration Payload, không đổi volume/dữ liệu thật; deploy staging/prod và kiểm thử thật trên staging là bước người vận hành, chỉ khi user yêu cầu rõ. Không có test UI."
 }

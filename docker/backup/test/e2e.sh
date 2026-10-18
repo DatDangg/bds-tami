@@ -6,7 +6,10 @@
 #                -> restore PITR tới T (kỳ vọng số bản ghi tại T) -> restore mới nhất (kỳ vọng đủ) -> so số bản ghi, đo thời gian
 #   restic     : upload object vào SeaweedFS nguồn -> backup -> xoá bucket + bản sao -> restore -> so sha256 -> đưa lại lên bucket
 #   heartbeat  : success/failure/textfile metric/URL heartbeat, scheduler chạy 1 vòng
-#   chuyển image: volume khởi tạo bằng postgis/postgis:17-3.5 gốc -> bật bằng image tuỳ biến -> dữ liệu, extension, collation, amcheck/REINDEX
+#   chuyển image: volume khởi tạo bằng postgis/postgis:17-3.5 gốc (Debian 11, glibc 2.31) -> bật bằng image bookworm (glibc 2.36) -> dữ liệu giữ nguyên,
+#                cảnh báo collation version mismatch, amcheck trước REINDEX (ghi nhận) -> quy trình runbook REINDEX + REFRESH COLLATION VERSION mọi DB
+#                -> datcollversion mới, hết cảnh báo, amcheck mọi index btree sạch (mọi DB), PostGIS 3.5.2, gist đúng (docs/runbooks/postgres-base-image.md)
+#   volume mới   : postgres chính của stack (volume mới, image bookworm, init.sql) phải có đúng bộ DB (template_postgis) + extension như image gốc tạo
 #   kho không với tới (đích cuối): trần archive-push-queue-max giữ pg_wal không phình, DB vẫn ghi được, kho hồi phục -> full mới thành công
 # Chạy: bash docker/backup/test/e2e.sh [s3] [sftp]   (mặc định cả hai). KEEP=1: không dọn khi kết thúc. E2E_WAIT_ARCHIVE_TIMEOUT=0: bỏ bước chờ archive_timeout thật.
 # Dọn tay nếu script bị ngắt (CHỈ trên máy dev; lọc theo label/tên project tami-bk-e2e, không đụng stack prod thật):
@@ -21,7 +24,12 @@ hostpath() { if command -v cygpath > /dev/null; then cygpath -m "$1"; else print
 HERE="$(hostpath "$HERE")" REPO_ROOT="$(hostpath "$REPO_ROOT")"
 PROJECT=tami-bk-e2e
 WORK="$HERE/.work"
-PG_IMAGE=tami-postgres:17-3.5-pgbackrest2.59
+# Tag phải khớp `image:` trong docker/docker-compose.prod.yml (compose `up --build` build lại đúng tag này).
+PG_IMAGE=tami-postgres:17-3.5-bookworm-pgbackrest2.59
+BACKUP_IMAGE=tami-backup:bookworm-pgbackrest2.59-restic0.17.3
+# Image đã khởi tạo volume dev/staging/prod hiện có (Debian 11, glibc 2.31) — ghim digest để case "chuyển image" luôn đi từ đúng glibc cũ.
+ORIG_PG_IMAGE=postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
+OLD_GLIBC=2.31 NEW_GLIBC=2.36 # = datcollversion kỳ vọng trước/sau (Dockerfile assert glibc base 2.36)
 SCENARIOS=("$@")
 (( ${#SCENARIOS[@]} )) || SCENARIOS=(s3 sftp)
 
@@ -62,13 +70,13 @@ chmod 777 "$WORK/certs" "$WORK/ssh"
 
 step "chuẩn bị image, chứng chỉ TLS cho đích S3, khoá SSH cho đích SFTP"
 docker build -q --target postgres -t "$PG_IMAGE" "$REPO_ROOT/docker/backup" > /dev/null
-docker build -q --target backup -t tami-backup:pgbackrest2.59-restic0.17.3 "$REPO_ROOT/docker/backup" > /dev/null
+docker build -q --target backup -t "$BACKUP_IMAGE" "$REPO_ROOT/docker/backup" > /dev/null
 docker run --rm -u 0 --entrypoint sh -v "$(hostpath "$WORK"):/w" "$PG_IMAGE" -c '
   openssl req -x509 -newkey rsa:2048 -nodes -days 2 -subj "/CN=target-s3" -addext "subjectAltName=DNS:target-s3" \
     -keyout /w/certs/key.pem -out /w/certs/cert.pem 2> /dev/null
   cp /w/certs/cert.pem /w/ssh/ca.pem
   chmod 644 /w/certs/* /w/ssh/ca.pem' > /dev/null
-docker run --rm -u 0 --entrypoint sh -v "$(hostpath "$WORK"):/w" tami-backup:pgbackrest2.59-restic0.17.3 -c '
+docker run --rm -u 0 --entrypoint sh -v "$(hostpath "$WORK"):/w" "$BACKUP_IMAGE" -c '
   ssh-keygen -q -m PEM -t rsa -b 3072 -N "" -f /w/ssh/id_rsa && chmod 644 /w/ssh/id_rsa /w/ssh/id_rsa.pub' > /dev/null
 
 S3_KEY="$(rand 10)" S3_SECRET="$(rand 20)"
@@ -387,46 +395,170 @@ wait_tcp_ready() { # <container> ; chờ postgres cuối cùng (qua TCP: server 
   fail "$c không sẵn sàng sau 120 giây"
 }
 
-# Chuyển image: volume do image GỐC khởi tạo (như prod hiện tại) rồi bật bằng image tuỳ biến (glibc/collation/extension/index còn nguyên).
+# ---------- chuyển image (bullseye glibc 2.31 -> bookworm glibc 2.36) ----------
+# Volume do image GỐC khởi tạo (như volume dev/staging/prod hiện có) rồi bật bằng image bookworm. Đổi glibc = đổi collation en_US.utf8:
+# Postgres cảnh báo "collation version mismatch", index btree trên text có thể sai thứ tự => phải chạy ĐÚNG quy trình
+# docs/runbooks/postgres-base-image.md (REINDEX DATABASE + ALTER DATABASE … REFRESH COLLATION VERSION trên MỌI DB có datcollversion,
+# ALTER COLLATION … REFRESH VERSION cho collation lệch) rồi amcheck mọi index btree phải sạch. Test này KHÔNG có kho nên archive_mode=off.
+SW_C="${PROJECT}-switch"
+sw_psql() { docker exec -i "$SW_C" psql -U tami -d "$1" -qAt -v ON_ERROR_STOP=1 "${@:2}"; } # <db> [psql args]; -q: không in command tag (SET/REINDEX) lẫn vào kết quả
+sw_q() { sw_psql tami -c "$1"; }                                                          # 1 câu lệnh trên DB tami, in kết quả
+sw_warnings() { docker exec "$SW_C" psql -U tami -d "$1" -c 'select 1' 2>&1 | grep -c 'collation version mismatch' || true; } # cảnh báo khi MỞ kết nối mới tới <db>
+# Checksum thứ tự theo collation: ép seqscan+sort (thứ tự glibc hiện tại) hoặc ép đọc theo index (thứ tự lúc build index); hai cái phải bằng nhau khi index đúng.
+SW_ORDER_BY_SORT="set enable_indexscan=off; set enable_indexonlyscan=off; set enable_bitmapscan=off; select md5(string_agg(txt, ',' order by txt)) from sw"
+SW_ORDER_BY_INDEX="set enable_seqscan=off; set enable_sort=off; select md5(string_agg(txt, ',' order by txt)) from sw"
+SW_DATA_SUM="select md5(string_agg(id || ':' || txt || ':' || tag, ',' order by id)) from sw"
+SW_DBS_LIST="select string_agg(datname || ':' || datistemplate, ' ' order by datname) from pg_database"
+SW_EXT_LIST="select string_agg(extname || ' ' || extversion, ', ' order by extname) from pg_extension"
+SW_EXPECT_DBS="" SW_EXPECT_EXT_TAMI="" SW_EXPECT_EXT_TEMPLATE="" # ghi ở image_switch_test (image gốc), dùng ở fresh_volume_init_test
+# Số index của pg_catalog có cột khoá collatable với collation khác C (= câu (5) runbook §3.6): kỳ vọng 0.
+SW_CATALOG_INDEX_NON_C="select count(distinct i.indexrelid) from pg_index i join pg_class c on c.oid = i.indrelid join pg_namespace n on n.oid = c.relnamespace cross join lateral unnest(i.indkey) k(attnum) join pg_attribute a on a.attrelid = i.indrelid and a.attnum = k.attnum join pg_collation co on co.oid = a.attcollation where n.nspname = 'pg_catalog' and co.collname <> 'C'"
+
+# Dữ liệu text đa dạng (tiếng Việt có dấu, hoa/thường, dấu câu, khoảng trắng, gạch nối, số) + index btree đơn/unique/nhiều cột + gist.
+switch_seed_data() {
+  sw_psql tami -q << 'SQL' > /dev/null
+create extension if not exists amcheck;
+create table sw(id serial primary key, txt text not null, tag text not null, geom geometry(Point,4326));
+insert into sw(txt, tag, geom)
+select w || ' ' || (g % 97) || case g % 5 when 0 then ' - Q.1' when 1 then ', P. Bến Nghé' when 2 then '  (số ' || g || ')' when 3 then '_' || g else '' end || ' ' || substr(md5(g::text), 1, 6),
+       w, st_setsrid(st_makepoint(g % 180, g % 90), 4326)
+from generate_series(1, 30000) g,
+     lateral (select (array['Đà Nẵng','đà nẵng','Hà Nội','hà nội','Ánh','anh','ánh','Ăn','ăn-uống','ăn uống','Nhà đất','nhà-đất','123 Lê Lợi','Lê Lợi, 123',
+                            'Q.1','Q 1','q1','Hồ Chí Minh','Ho Chi Minh','TP.HCM','tp hcm','Ơ','ơ','Ưu đãi!','ưu-đãi',' khoảng trắng','khoảng  trắng',
+                            'Ê-đê','ê đê','10 tỷ','1.000.000','1,000,000'])[1 + g % 32]) w(w);
+create index sw_txt on sw(txt);
+create unique index sw_txt_id_uq on sw(txt, id);
+create index sw_tag_txt on sw(tag, txt);
+create index sw_geom on sw using gist(geom);
+SQL
+}
+
+# amcheck từng index btree của bảng sw, KHÔNG fail: in "<ok>/<tổng>" (trước REINDEX chỉ để ghi nhận glibc mới có làm index cũ "hỏng" theo amcheck không).
+switch_amcheck_sw_report() {
+  local idx ok=0 total=0
+  for idx in $(sw_q "select indexrelid::regclass from pg_index i join pg_class c on c.oid = i.indexrelid join pg_am a on a.oid = c.relam where indrelid = 'sw'::regclass and a.amname = 'btree'"); do
+    total=$((total + 1))
+    if sw_q "select bt_index_check('$idx'::regclass, true)" > /dev/null 2>&1; then ok=$((ok + 1)); else echo "    amcheck $idx: LỖI (trước REINDEX, ghi nhận)" >&2; fi
+  done
+  printf '%s/%s' "$ok" "$total"
+}
+
+# amcheck mọi index btree hợp lệ ngoài pg_catalog (= câu trong runbook §3.6): chỉ btree, indisvalid + indisready (index invalid/đang build thì bt_index_check lỗi),
+# bỏ temp relation; heapallindexed=true. Chạy trong MỌI DB cho phép kết nối (template cũng có index PostGIS; DB tạo sau copy index từ template).
+SW_AMCHECK_COUNT="select count(bt_index_check(i.indexrelid, true)) from pg_index i join pg_class c on c.oid = i.indexrelid join pg_namespace n on n.oid = c.relnamespace join pg_am a on a.oid = c.relam where a.amname = 'btree' and i.indisvalid and i.indisready and c.relpersistence <> 't' and n.nspname not in ('pg_catalog','information_schema') and n.nspname not like 'pg_toast%'"
+switch_amcheck_all_databases() { # in tổng số index đã kiểm; fail nếu bt_index_check báo lỗi ở DB nào
+  local db n total=0 detail=""
+  for db in $(sw_psql postgres -c "select datname from pg_database where datallowconn order by datname"); do
+    n="$(sw_psql "$db" -c "create extension if not exists amcheck" -c "$SW_AMCHECK_COUNT" -c "drop extension if exists amcheck" | tail -n1)" \
+      || fail "[switch] amcheck báo index btree hỏng SAU REINDEX trong DB $db"
+    total=$((total + n)); detail+=" $db=$n"
+  done
+  echo "    amcheck theo DB:$detail" >&2
+  printf '%s' "$total"
+}
+
+# Quy trình runbook: với MỌI DB có datcollversion (gồm template1, template_postgis — template nhưng datallowconn nên kết nối được; postgres; tami):
+# REINDEX DATABASE + ALTER DATABASE … REFRESH COLLATION VERSION; collation trong pg_collation lệch version -> ALTER COLLATION … REFRESH VERSION.
+# REINDEX DATABASE (PG17) không gồm system catalog: không index catalog nào có cột khoá collation khác C (assert SW_CATALOG_INDEX_NON_C) nên không phụ thuộc glibc.
+switch_reindex_all_databases() {
+  local db n_coll
+  for db in $(sw_psql postgres -c "select datname from pg_database where datcollversion is not null and datallowconn order by datname"); do
+    sw_psql "$db" -q -c "reindex database \"$db\"" -c "alter database \"$db\" refresh collation version" > /dev/null 2>&1 || fail "[switch] REINDEX/REFRESH COLLATION VERSION lỗi ở DB $db"
+    # Hàng trăm collation (libc + ICU, ICU lib cũng đổi theo Debian) nên refresh trong MỘT khối DO, không 1 lệnh/collation.
+    n_coll="$(sw_psql "$db" -c "$SW_REFRESH_COLLATIONS" 2>&1 | grep -c '^NOTICE:  refreshed' || true)"
+    sw_psql "$db" -c "select count(*) from pg_collation where collname <> 'default' and collversion is distinct from pg_collation_actual_version(oid)" | grep -qx 0 \
+      || fail "[switch] vẫn còn collation lệch version trong DB $db sau REFRESH"
+    echo "    $db: REINDEX DATABASE + REFRESH COLLATION VERSION xong, $n_coll collation pg_collation refresh"
+  done
+}
+SW_REFRESH_COLLATIONS="do \$\$ declare c record; begin
+  for c in select oid::regcollation as name from pg_collation where collname <> 'default' and collversion is distinct from pg_collation_actual_version(oid) loop
+    execute format('alter collation %s refresh version', c.name);
+    raise notice 'refreshed %', c.name;
+  end loop; end \$\$"
+
 image_switch_test() {
-  step "chuyển image: khởi tạo volume bằng postgis/postgis:17-3.5 gốc -> bật bằng image tuỳ biến -> dữ liệu + extension + index"
-  local vol="${PROJECT}_switch" c="${PROJECT}-switch" orig=postgis/postgis:17-3.5 n_before n_after sum_before sum_after cv_before cv_after
-  local q="select md5(string_agg(txt, ',' order by txt)) from sw"
+  step "chuyển image: volume khởi tạo bằng postgis/postgis:17-3.5 gốc (glibc $OLD_GLIBC) -> bật bằng image bookworm (glibc $NEW_GLIBC) -> REINDEX theo runbook"
+  local vol="${PROJECT}_switch" n_before n_after sum_before sum_after ord_before ord_after ord_idx cv_before cv_after dbs_before dbs_after
+  local warn_before warn_after am_before am_after coll_left t0 reindex_s pgver extv
   local cvq="select coalesce(datcollversion,'-') from pg_database where datname='tami'"
+  local dbsq="select string_agg(datname || '=' || coalesce(datcollversion,'-'), ' ' order by datname) from pg_database where datallowconn"
   docker volume rm -f "$vol" > /dev/null 2>&1 || true
   docker volume create "$vol" > /dev/null
-  docker run -d --name "$c" -e POSTGRES_USER=tami -e POSTGRES_PASSWORD=unused -e POSTGRES_DB=tami \
-    -v "$vol:/var/lib/postgresql/data" -v "$(hostpath "$REPO_ROOT/docker/postgres/init.sql"):/docker-entrypoint-initdb.d/01-extensions.sql:ro" "$orig" > /dev/null
-  wait_tcp_ready "$c"
-  docker exec "$c" psql -U tami -d tami -v ON_ERROR_STOP=1 -q -c "create extension if not exists amcheck" \
-    -c "create table sw(id serial primary key, txt text, geom geometry(Point,4326))" \
-    -c "insert into sw(txt, geom) select md5(g::text) || case g%3 when 0 then ' Đà Nẵng' when 1 then ' hà nội' else ' Ánh' end, st_setsrid(st_makepoint(g%180, g%90),4326) from generate_series(1,30000) g" \
-    -c "create index sw_txt on sw(txt)" -c "create index sw_geom on sw using gist(geom)" > /dev/null
-  n_before="$(docker exec "$c" psql -U tami -d tami -At -c "select count(*) from sw")"
-  sum_before="$(docker exec "$c" psql -U tami -d tami -At -c "$q")"
-  cv_before="$(docker exec "$c" psql -U tami -d tami -At -c "$cvq")"
-  docker rm -f "$c" > /dev/null # SIGKILL: giống container bị tạo lại, postgres tự recovery từ WAL
-  # image tuỳ biến, cùng user/biến môi trường như compose; archive_mode=off vì test này không có kho
-  docker run -d --name "$c" -e POSTGRES_USER=tami -e POSTGRES_PASSWORD=unused -e POSTGRES_DB=tami \
+  docker run -d --name "$SW_C" -e POSTGRES_USER=tami -e POSTGRES_PASSWORD=unused -e POSTGRES_DB=tami \
+    -v "$vol:/var/lib/postgresql/data" -v "$(hostpath "$REPO_ROOT/docker/postgres/init.sql"):/docker-entrypoint-initdb.d/01-extensions.sql:ro" "$ORIG_PG_IMAGE" > /dev/null
+  wait_tcp_ready "$SW_C"
+  # Kỳ vọng cho fresh_volume_init_test: bộ DB/extension mà image GỐC tạo trên volume mới (trước khi seed thêm amcheck).
+  SW_EXPECT_DBS="$(sw_q "$SW_DBS_LIST")" SW_EXPECT_EXT_TAMI="$(sw_q "$SW_EXT_LIST")" SW_EXPECT_EXT_TEMPLATE="$(sw_psql template_postgis -c "$SW_EXT_LIST")"
+  echo "    image gốc tạo: DB [$SW_EXPECT_DBS]; extension tami [$SW_EXPECT_EXT_TAMI]; template_postgis [$SW_EXPECT_EXT_TEMPLATE]"
+  switch_seed_data
+  n_before="$(sw_q "select count(*) from sw")" sum_before="$(sw_q "$SW_DATA_SUM")" ord_before="$(sw_q "$SW_ORDER_BY_SORT")"
+  cv_before="$(sw_q "$cvq")" dbs_before="$(sw_q "$dbsq")"
+  expect_eq "$cv_before" "$OLD_GLIBC" "[switch] datcollversion của volume do image gốc tạo"
+  expect_eq "$(sw_q "$SW_ORDER_BY_INDEX")" "$ord_before" "[switch] trước khi đổi image: thứ tự theo index = thứ tự sort"
+  docker rm -f "$SW_C" > /dev/null # SIGKILL: giống container bị tạo lại, postgres tự recovery từ WAL
+
+  step "[switch] bật bằng image bookworm $PG_IMAGE (chưa REINDEX): dữ liệu nguyên, cảnh báo mismatch, amcheck chỉ ghi nhận"
+  docker run -d --name "$SW_C" -e POSTGRES_USER=tami -e POSTGRES_PASSWORD=unused -e POSTGRES_DB=tami \
     -v "$vol:/var/lib/postgresql/data" "$PG_IMAGE" postgres -c archive_mode=off > /dev/null
-  wait_tcp_ready "$c"
-  n_after="$(docker exec "$c" psql -U tami -d tami -At -c "select count(*) from sw")"
-  sum_after="$(docker exec "$c" psql -U tami -d tami -At -c "$q")"
-  cv_after="$(docker exec "$c" psql -U tami -d tami -At -c "$cvq")"
-  expect_eq "$n_after" "$n_before" "[switch] số bản ghi sau khi đổi image"
-  expect_eq "$sum_after" "$sum_before" "[switch] checksum thứ tự theo collation"
-  expect_eq "$cv_after" "$cv_before" "[switch] datcollversion (collation)"
-  expect_eq "$(docker exec "$c" psql -U tami -d tami -At -c "select count(*) from pg_extension where extname in ('postgis','pg_trgm','unaccent')")" 3 "[switch] extension còn"
-  docker exec "$c" psql -U tami -d tami -v ON_ERROR_STOP=1 -q -c "select bt_index_check('sw_txt'::regclass, true)" -c "select bt_index_check('sw_pkey'::regclass, true)" > /dev/null \
-    || fail "[switch] amcheck báo index hỏng"
-  echo "ok  [switch] amcheck bt_index_check (heapallindexed) sạch"
-  docker exec "$c" psql -U tami -d tami -v ON_ERROR_STOP=1 -q -c "reindex index sw_txt" -c "reindex index sw_geom" > /dev/null || fail "[switch] REINDEX lỗi"
-  expect_eq "$(docker exec "$c" psql -U tami -d tami -At -c "select count(*) from sw where geom && st_makeenvelope(0,0,10,10,4326)")" \
-    "$(docker exec "$c" psql -U tami -d tami -At -c "select count(*) from sw where st_x(geom) between 0 and 10 and st_y(geom) between 0 and 10")" "[switch] truy vấn không gian qua index gist"
-  if docker logs "$c" 2>&1 | grep -qi 'collation version'; then fail "[switch] postgres cảnh báo collation version"; fi
-  result "[switch] volume gốc -> image tuỳ biến: $n_after bản ghi, extension + amcheck + REINDEX + gist OK, collation version '$cv_after' không đổi"
-  docker rm -f "$c" > /dev/null
+  wait_tcp_ready "$SW_C"
+  pgver="$(sw_q "show server_version")"
+  expect_eq "$(sw_q "select count(*) from sw")" "$n_before" "[switch] số bản ghi sau khi đổi image"
+  expect_eq "$(sw_q "$SW_DATA_SUM")" "$sum_before" "[switch] checksum dữ liệu (order by id) sau khi đổi image"
+  expect_eq "$(sw_q "$cvq")" "$OLD_GLIBC" "[switch] datcollversion vẫn là bản cũ trước khi refresh"
+  warn_before="$(sw_warnings tami)"
+  (( warn_before > 0 )) || fail "[switch] kỳ vọng Postgres cảnh báo 'collation version mismatch' khi mở kết nối tới DB tạo bằng glibc cũ"
+  echo "ok  [switch] kết nối mới tới tami: $warn_before dòng cảnh báo collation version mismatch (đúng kỳ vọng)"
+  am_before="$(switch_amcheck_sw_report)"
+  ord_after="$(sw_q "$SW_ORDER_BY_SORT")" ord_idx="$(sw_q "$SW_ORDER_BY_INDEX")"
+  echo "    thứ tự collation mẫu glibc $OLD_GLIBC -> $NEW_GLIBC: $([[ $ord_after == "$ord_before" ]] && echo 'không đổi' || echo 'ĐỔI'); index cũ $([[ $ord_idx == "$ord_after" ]] && echo 'khớp' || echo 'LỆCH') thứ tự sort mới; amcheck trước REINDEX: $am_before"
+
+  step "[switch] quy trình runbook: REINDEX DATABASE + REFRESH COLLATION VERSION mọi DB có datcollversion, collation lệch -> REFRESH VERSION"
+  t0=$(now)
+  switch_reindex_all_databases
+  reindex_s=$(($(now) - t0))
+
+  step "[switch] sau REINDEX: datcollversion mới, hết cảnh báo, amcheck mọi index btree sạch, PostGIS 3.5.2, gist đúng"
+  dbs_after="$(sw_q "$dbsq")"
+  expect_eq "$(sw_psql postgres -c "select count(*) from pg_database where datcollversion is not null and datcollversion <> '$NEW_GLIBC'")" 0 "[switch] mọi DB có datcollversion = $NEW_GLIBC ($dbs_after)"
+  warn_after="$(( $(sw_warnings tami) + $(sw_warnings postgres) + $(sw_warnings template_postgis) ))"
+  expect_eq "$warn_after" 0 "[switch] kết nối mới (tami, postgres, template_postgis) không còn cảnh báo collation"
+  coll_left="$(sw_q "select count(*) from pg_collation where collname <> 'default' and collversion is distinct from pg_collation_actual_version(oid)")"
+  expect_eq "$coll_left" 0 "[switch] không còn collation lệch version trong pg_collation (tami)"
+  # Chỉ xét cột KHOÁ của index catalog (view pg_stat_* có cột text collation default nhưng không có index): index catalog không phụ thuộc glibc.
+  expect_eq "$(sw_q "$SW_CATALOG_INDEX_NON_C")" 0 "[switch] không index nào của pg_catalog có cột khoá collation khác C (REINDEX DATABASE bỏ qua catalog là an toàn)"
+  am_after="$(switch_amcheck_all_databases)"
+  (( am_after >= 4 )) || fail "[switch] amcheck sau REINDEX chỉ kiểm $am_after index (kỳ vọng >= 4 index btree của sw)"
+  echo "ok  [switch] amcheck bt_index_check(heapallindexed) sạch trên $am_after index btree user trong mọi DB (sw + PostGIS/topology/tiger, kể cả template)"
+  expect_eq "$(sw_q "select count(*) from sw")" "$n_before" "[switch] số bản ghi sau REINDEX"
+  expect_eq "$(sw_q "$SW_DATA_SUM")" "$sum_before" "[switch] checksum dữ liệu sau REINDEX"
+  expect_eq "$(sw_q "$SW_ORDER_BY_INDEX")" "$(sw_q "$SW_ORDER_BY_SORT")" "[switch] sau REINDEX: thứ tự theo index = thứ tự sort (glibc mới)"
+  expect_eq "$(sw_q "select count(*) from pg_extension where extname in ('postgis','postgis_topology','fuzzystrmatch','postgis_tiger_geocoder','pg_trgm','unaccent')")" 6 "[switch] đủ extension"
+  extv="$(sw_q "select extversion from pg_extension where extname='postgis'")"
+  expect_eq "$extv" 3.5.2 "[switch] extversion postgis"
+  expect_eq "$(sw_q "select postgis_lib_version()")" 3.5.2 "[switch] postgis_lib_version (thư viện trong image)"
+  if sw_q "select postgis_full_version()" | grep -qi 'need upgrade'; then fail "[switch] postgis_full_version báo cần upgrade"; fi
+  expect_eq "$(sw_q "select count(*) from sw where geom && st_makeenvelope(0,0,10,10,4326)")" \
+    "$(sw_q "select count(*) from sw where st_x(geom) between 0 and 10 and st_y(geom) between 0 and 10")" "[switch] truy vấn không gian qua index gist"
+  result "[switch] bullseye glibc $OLD_GLIBC -> bookworm glibc $NEW_GLIBC (PG $pgver, PostGIS $extv): $n_before bản ghi + checksum giữ nguyên; datcollversion trước: $dbs_before; sau: $dbs_after; cảnh báo mismatch trước/sau: $warn_before/$warn_after; amcheck sw trước REINDEX $am_before, sau REINDEX $am_after index btree sạch; thứ tự collation mẫu $([[ $ord_after == "$ord_before" ]] && echo 'không đổi' || echo 'ĐỔI') (index cũ $([[ $ord_idx == "$ord_after" ]] && echo 'khớp' || echo 'lệch')); REINDEX mọi DB ${reindex_s}s"
+  docker rm -f "$SW_C" > /dev/null
   docker volume rm "$vol" > /dev/null
+}
+
+# Volume MỚI khởi tạo bằng image bookworm (postgres chính của stack: compose mount init.sql như prod) phải có đúng bộ DB + extension mà image gốc tạo
+# (template_postgis + postgis/topology/fuzzystrmatch/tiger + pg_trgm/unaccent). Bắt lỗi 10_postgis.sh không được entrypoint `source` (bit x):
+# initdb dừng giữa chừng, `restart: unless-stopped` khởi động lại trên PGDATA đã có => healthy nhưng thiếu template/extension.
+fresh_volume_init_test() {
+  step "volume mới bằng image bookworm: bộ DB + extension phải bằng image gốc tạo"
+  local c="${PROJECT}-postgres" restarts
+  restarts="$(docker inspect --format '{{.RestartCount}}' "$c")"
+  expect_eq "$restarts" 0 "[init] postgres chính không restart trong lúc khởi tạo volume mới"
+  expect_eq "$(dc exec -T postgres sh -c 'test ! -x /docker-entrypoint-initdb.d/10_postgis.sh && test -x /usr/local/bin/update-postgis.sh && echo mode-ok')" mode-ok "[init] 10_postgis.sh không có bit x (entrypoint source), update-postgis.sh có bit x"
+  expect_eq "$(psql_main "$SW_DBS_LIST")" "$SW_EXPECT_DBS" "[init] danh sách DB (datistemplate) bằng image gốc"
+  expect_eq "$(psql_main "$SW_EXT_LIST")" "$SW_EXPECT_EXT_TAMI" "[init] extension trong tami bằng image gốc"
+  expect_eq "$(dc exec -T postgres psql -U tami -d template_postgis -At -c "$SW_EXT_LIST")" "$SW_EXPECT_EXT_TEMPLATE" "[init] extension trong template_postgis bằng image gốc"
+  expect_eq "$(psql_main "select datcollversion from pg_database where datname = 'tami'")" "$NEW_GLIBC" "[init] volume mới có datcollversion = glibc image mới"
+  result "[init] volume mới (image bookworm + init.sql): DB [$SW_EXPECT_DBS], extension tami [$SW_EXPECT_EXT_TAMI] = image gốc; datcollversion $NEW_GLIBC"
 }
 
 wal_queue_len() { # số segment WAL đang chờ archive trong container postgres
@@ -501,6 +633,7 @@ unreachable_repo_test() {
   result "[$scn] kho hồi phục: full mới $(($(now) - t0)) giây thành công, check OK, WAL tiếp tục lên kho, last_run_ok{wal}=1"
 }
 image_switch_test
+fresh_volume_init_test
 for scn in "${SCENARIOS[@]}"; do run_scenario "$scn"; done
 heartbeat_and_scheduler_tests
 archive_timeout_real_wait

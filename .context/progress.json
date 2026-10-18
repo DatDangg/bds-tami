@@ -237,6 +237,34 @@
       "review": "STRICT PASS",
       "round": 1,
       "report": ".context/review-reports/feature-layer9-minor-export-reminder-phase-1-task-02-round-1-review.md"
+    },
+    {
+      "slug": "backup-base-image-debian12",
+      "title": "Base image Postgres/backup Debian 11 (EOL) → Debian 12 bookworm (FROM postgres:17.11-bookworm + PostGIS 3.5.2 + pgBackRest 2.59.1), tag mới, guard deploy.sh, e2e chuyển image REINDEX/refresh collation, runbook postgres-base-image (BL-002)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-002",
+      "changeDoc": "spec/changes/archive/2026-10-19-backup-base-image-debian12.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-backup-base-image-debian12/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 3,
+          "report": ".context/review-reports/feature-backup-base-image-debian12-phase-1-task-01-round-3-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.10.0",
+      "scopeVersion": 10,
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 3,
+      "report": ".context/review-reports/feature-backup-base-image-debian12-phase-1-task-01-round-3-review.md",
+      "residual": "Chưa chạy staging/prod (runbook docs/runbooks/postgres-base-image.md, staging trước prod); CI image → BL-014"
     }
   ],
   "bugs": [
@@ -912,7 +940,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T21:38:19.353Z",
+  "lastUpdated": "2026-10-18T23:05:46.952Z",
   "approvalMilestones": [
     {
       "id": "M1",

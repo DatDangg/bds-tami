@@ -7,6 +7,7 @@ Mục tiêu: **RPO ≤ 15 phút** (đo được: ghi xong, WAL lên kho ≤ 300 
 Quy ước dòng lệnh dưới đây (chạy trên server, user `deploy`):
 ```bash
 E=production                    # backup chỉ có ở production (staging không backup)
+export TAMI_IMAGE="$(cat /opt/tami/state/$E.current)"   # compose bắt buộc ${TAMI_IMAGE:?} (image app đang chạy)
 C="docker compose --env-file /opt/tami/prod.env -f /opt/tami/releases/$E/current/docker/docker-compose.prod.yml"
 BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgbackrest.env, restic.env, ssh/
 ```
@@ -21,9 +22,11 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
 - **Kho đích ngoài server, cấu hình hoàn toàn bằng env** (chưa chốt nhà cung cấp): S3-compatible (Backblaze B2, MinIO/SeaweedFS của công ty, AWS S3…)
   **hoặc** SFTP sang server khác. Endpoint, khoá, mật khẩu mã hoá nằm trong env file trên server (mẫu `docker/backup/pgbackrest-env.example`,
   `docker/backup/restic-env.example`), không commit. Không dịch vụ trả phí bắt buộc (NFR-09). Cả hai kho đều **mã hoá** (pgBackRest `aes-256-cbc`, restic mặc định).
-- **Image postgres tuỳ biến** (`docker/backup/Dockerfile`, target `postgres`) = `postgis/postgis:17-3.5` + `pgbackrest 2.59.1`: `archive_command` chạy trong
-  container postgres nên binary phải nằm trong đó. Giữ nguyên base `17-3.5` (Debian 11) và volume `postgres-data`: đổi sang base Debian khác đổi glibc/collation
-  và có thể làm hỏng index trên dữ liệu cũ. Base được **ghim digest** (`@sha256:01a6a70e…` trong Dockerfile) và build **fail** nếu OS không phải Debian 11 hoặc glibc khác 2.31. Có test tự động: volume khởi tạo bằng image gốc, bật bằng image mới, dữ liệu + extension + collation còn nguyên, `amcheck`/`REINDEX` sạch (`e2e.sh`, case "chuyển image").
+- **Image postgres tuỳ biến** (`docker/backup/Dockerfile`, target `postgres` = `tami-postgres:17-3.5-bookworm-pgbackrest2.59`) = `postgres:17.11-bookworm` (Debian 12, ghim digest
+  `@sha256:3645570c…`) + PostGIS 3.5.2 (kho `apt-archive.postgresql.org bookworm-pgdg-archive`, cùng bản đang chạy) + `pgbackrest 2.59.1`: `archive_command` chạy trong
+  container postgres nên binary phải nằm trong đó. Build **fail** nếu OS không phải bookworm hoặc glibc khác 2.36. Đổi base = đổi glibc/collation ⇒ index btree trên text của volume cũ phải
+  `REINDEX`: **không bao giờ chỉ đổi tag rồi `compose up`**; chuyển image cho môi trường đã có dữ liệu theo `docs/runbooks/postgres-base-image.md` (`deploy.sh` chặn đổi image postgres tự động).
+  Có test tự động: volume khởi tạo bằng image bullseye gốc, bật bằng image bookworm, dữ liệu nguyên, cảnh báo collation, quy trình REINDEX/refresh ⇒ `amcheck` sạch (`e2e.sh`, case "chuyển image").
 - **Lịch = vòng lặp trong sidecar `backup`** (không phải cron/systemd timer): nằm trong compose của từng môi trường (không cần quyền root, không sửa host dùng chung),
   log ra stdout (Loki), tự bắt kịp lịch khi container khởi động lại, job fail tự thử lại sau 30 phút cho tới khi thành công trong ngày. Sidecar chạy user `postgres`
   (uid 999), đọc pgdata **read-only** + dùng chung thư mục socket với postgres; `mem_limit` 384m; không publish cổng; không đụng container của dự án khác.
@@ -42,16 +45,17 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
    cp docker/backup/pgbackrest-env.example $BK/pgbackrest.env      # điền, chọn 1 khối S3 hoặc SFTP
    cp docker/backup/restic-env.example     $BK/restic.env          # điền
    chmod 600 $BK/pgbackrest.env $BK/restic.env
-   echo "BACKUP_ENV_DIR=$BK" >> /opt/tami/$E.env                   # biến compose bắt buộc (thiếu thì `compose config` báo lỗi)
+   echo "BACKUP_ENV_DIR=$BK" >> /opt/tami/prod.env                   # biến compose bắt buộc (thiếu thì `compose config` báo lỗi)
    ```
    Mật khẩu mã hoá: `openssl rand -base64 48` cho `PGBACKREST_REPO1_CIPHER_PASS` và `RESTIC_PASSWORD`. **Cất bản sao ở nơi KHÁC server** (mất mật khẩu = mất toàn bộ backup).
    SFTP / CA tự ký: đặt khoá, `known_hosts`, `ca.pem` vào `$BK/ssh/`, `sudo chown -R 999:999 $BK/ssh && chmod 600 $BK/ssh/id_*` (mount read-only vào `/etc/backup/ssh`).
 2. Dựng image (một lần; `deploy.sh` không pull image này, chưa có tag thì `compose up` tự build): `$C build postgres backup`.
 3. Chuyển container postgres sang image mới (**có một lần khởi động lại postgres, vài giây; dữ liệu nằm trong volume nên không mất**; chọn giờ ít người dùng).
-   **Trước đó** so glibc của image đang chạy với image mới (phải cùng bản, nếu khác thì DỪNG: collation đổi, index text có thể hỏng):
+   **Trước đó** so glibc của image đang chạy với image mới. Cùng bản (`2.36`) ⇒ làm tiếp bên dưới. Khác bản (volume còn từ `postgis/postgis:17-3.5` bullseye, glibc `2.31`)
+   ⇒ **DỪNG**, làm theo `docs/runbooks/postgres-base-image.md` (dừng app, tạo lại postgres, REINDEX + REFRESH COLLATION VERSION mọi DB, amcheck) rồi mới quay lại bước 4:
    ```bash
    docker exec tami-postgres ldd --version | head -1                       # image CŨ đang chạy
-   docker run --rm --entrypoint ldd tami-postgres:17-3.5-pgbackrest2.59 --version | head -1   # image MỚI: phải cùng "2.31-13+deb11uNN"
+   docker run --rm --entrypoint ldd tami-postgres:17-3.5-bookworm-pgbackrest2.59 --version | head -1   # image MỚI: "2.36-9+deb12uNN"
    ```
    ```bash
    $C up -d postgres seaweedfs backup      # compose tạo lại postgres với image mới, archive_mode=on; volume postgres-data giữ nguyên
@@ -86,7 +90,7 @@ Công cụ: `docker/backup/pg-restore.sh` (chạy `pgbackrest restore` trong con
 ### 3.1. Diễn tập / kiểm thử: restore vào volume MỚI rồi bật container tạm (không đụng stack đang chạy)
 ```bash
 cd /opt/tami/releases/$E/current/docker/backup
-IMG=tami-postgres:17-3.5-pgbackrest2.59
+IMG=tami-postgres:17-3.5-bookworm-pgbackrest2.59   # phải cùng glibc với image đã tạo bản backup; bản backup từ image bullseye (glibc 2.31) restore vào đây thì REINDEX theo postgres-base-image.md §3.5
 NET=tami-net                               # mạng của stack production
 VOL=drill_pg_$(date +%Y%m%d%H%M)
 docker volume create $VOL
@@ -229,17 +233,19 @@ Diễn tập đầu tiên: ngay sau khi bật backup trên production (mục 2.6
   ```
   Phát hiện sớm (đừng chờ tới trần): heartbeat `wal` (check mỗi 10 phút, `last_run_ok{kind="wal"}==0` hoặc `.success` cũ hơn 30 phút) + ổ cứng > 80%. **Khuyến nghị đặt `HEARTBEAT_URL_WAL` ngay khi bật backup**
   (mục 7) vì giám sát tập trung (layer-4-task-06) đang hoãn. Trần chỉ chặn *sự cố ổ đầy*, không thay cho cảnh báo: kho chết quá cỡ 1–2 ngày thì PITR đã gãy mà không ai biết nếu không có cảnh báo.
-- **SFTP cho pgBackRest bị giới hạn bởi libssh2 1.9.0 của Debian 11** (trong image): chỉ đàm phán kex `diffie-hellman-*`, host key `ssh-rsa`, khoá người dùng RSA PEM (kèm
-  `repo1-sftp-public-key-file`). sshd mặc định OpenSSH (Ubuntu 24.04) có kex DH nhưng **tắt `ssh-rsa` (SHA-1)**; server SFTP phải bật lại `HostKeyAlgorithms +ssh-rsa` và
-  `PubkeyAcceptedAlgorithms +ssh-rsa` (và nếu hardened: `KexAlgorithms +diffie-hellman-group-exchange-sha256`). Đã chứng minh chạy với cấu hình đó (`e2e.sh sftp`). Nếu không chấp nhận hạ thuật toán trên server đích,
-  dùng **kho S3-compatible** cho pgBackRest (khuyến nghị). restic qua SFTP dùng OpenSSH client hiện đại nên không bị giới hạn này.
+- **SFTP cho pgBackRest: khoá người dùng RSA vẫn ký `ssh-rsa` (SHA-1)** — libssh2 1.10.0 của Debian 12 (link OpenSSL) trong image đàm phán được kex `curve25519`/`ecdh` và host key
+  `ed25519`/`ecdsa` (đã thử: sshd chỉ cho `curve25519` vẫn chạy), nhưng chữ ký `rsa-sha2-*` cho khoá người dùng chỉ có từ libssh2 1.11 ⇒ cần khoá RSA PEM (kèm `repo1-sftp-public-key-file`)
+  và server SFTP (OpenSSH ≥ 8.8 tắt `ssh-rsa` mặc định) bật lại đúng một dòng `PubkeyAcceptedAlgorithms +ssh-rsa`. Đã chứng minh với cấu hình đó (`e2e.sh sftp`; không còn cần
+  `HostKeyAlgorithms +ssh-rsa` / `KexAlgorithms +diffie-hellman-*` như thời Debian 11). Nếu không chấp nhận `ssh-rsa` trên server đích, dùng **kho S3-compatible** cho pgBackRest (khuyến nghị).
+  restic qua SFTP dùng OpenSSH client hiện đại nên không bị giới hạn này.
 - pgBackRest nói **HTTPS** tới S3: endpoint phải có TLS hợp lệ (hoặc `PGBACKREST_REPO1_STORAGE_CA_FILE` trỏ CA nội bộ). Không tắt verify-tls trên môi trường thật.
-- **Image build trên OS hết hạn hỗ trợ**: base `postgis/postgis:17-3.5` là Debian 11 (kho đã chuyển sang `archive.debian.org`/`apt-archive.postgresql.org`, Dockerfile đã trỏ lại). Việc cần làm sau: lên
-  postgis base Debian 12 + `REINDEX` các index text sau khi kiểm tra collation (đổi base = thay đổi dữ liệu, làm riêng, có diễn tập). Tới lúc đó cài gói từ kho lưu trữ là chấp nhận được vì chỉ cài `pgbackrest` (ghim phiên bản), `openssh-client`, `curl`.
+- **Base image và glibc**: image là Debian 12 bookworm (hỗ trợ tới 06/2028), PostGIS 3.5.2 + pgbackrest 2.59.1 ghim từ `apt-archive.postgresql.org bookworm-pgdg-archive` (bản ghim không biến mất khi kho
+  hiện hành lên bản mới). Volume tạo bởi image bullseye cũ (glibc 2.31) **chuyển sang image này phải REINDEX** — `docs/runbooks/postgres-base-image.md`; bản backup pgBackRest tạo trên glibc 2.31 restore
+  vào image bookworm cũng phải REINDEX sau restore (ghi ở mục 8 ngày đổi image để biết bản nào là "cũ").
 - **Bản sao `/mirror`** tốn thêm ổ bằng dung lượng 2 bucket; theo dõi cùng ổ cứng (cảnh báo > 80%).
 - **Mất mật khẩu mã hoá = mất backup** (`PGBACKREST_REPO1_CIPHER_PASS`, `RESTIC_PASSWORD`). Cất bản sao ngoài server, ngoài repo.
 - **Env file và `$BK/ssh` không nằm trong backup này.** Cấu hình server lưu trong repo (trừ secret); secret cất riêng theo `ARCHITECTURE.md` §8.
-- **Chưa chạy trên server thật** (không SSH/deploy theo phạm vi task): build image trên server (cần mạng tới `apt-archive.postgresql.org`, `archive.debian.org`, Docker Hub), quyền chown `999:999` của `$BK/ssh`,
+- **Chưa chạy trên server thật** (không SSH/deploy theo phạm vi task): build image trên server (cần mạng tới `apt-archive.postgresql.org`, `deb.debian.org`, Docker Hub), quyền chown `999:999` của `$BK/ssh`,
   băng thông/độ trễ thật tới kho đích, số liệu RTO thật, tương tác với Promtail/Alloy. Các điểm đó kiểm ở lần bật backup đầu tiên trên production và diễn tập đầu tiên.
 - `restic forget --prune` chạy hằng ngày: kho nhỏ nên rẻ; nếu kho lớn thì chuyển prune sang hằng tuần (sửa `restic-backup.sh`). `files_check` đọc thử 10% dữ liệu mỗi tuần.
 - `restic backup` giữ `--host tami-<env>`: đổi `BACKUP_ENV_NAME` sẽ tách chuỗi snapshot (và `forget` không dọn chuỗi cũ). Đừng đổi.
@@ -251,6 +257,8 @@ Test thật (không đụng container dev; dựng project tạm `tami-bk-e2e` t�
 bash docker/backup/test/e2e.sh            # cả hai đích (s3, sftp), ~10 phút (chờ archive_timeout thật 5 phút)
 bash docker/backup/test/e2e.sh s3         # một đích;  E2E_WAIT_ARCHIVE_TIMEOUT=0 bỏ bước chờ 5 phút
 ```
+Case "chuyển image" (chạy đầu tiên) kéo `postgis/postgis:17-3.5@sha256:01a6a70e…` (bullseye) để khởi tạo volume như prod hiện có rồi bật bằng image bookworm và chạy quy trình
+`docs/runbooks/postgres-base-image.md` §3.5 — đây cũng là diễn tập bắt buộc trước khi chuyển image staging/prod.
 Nếu bị ngắt giữa chừng, dọn tay. **CHỈ chạy trên máy dev** (container prod cố định tên `tami-*`; overlay e2e đổi sang `tami-bk-e2e-*` nên không va chạm, nhưng đừng chạy trên server prod), và không chạy các lệnh dưới
 (chúng lọc theo project `tami-bk-e2e` nên không đụng container/mạng của stack thật, nhưng đừng thử trên server dùng chung):
 ```bash

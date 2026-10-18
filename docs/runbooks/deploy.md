@@ -23,6 +23,9 @@ push staging → CI (ci.yml) PASS → [workflow_run] Deploy:
   dùng compose/config của đúng commit đã duyệt, kể cả khi staging của commit mới hơn upload trong lúc production chờ khoá.
 - Thứ tự mỗi môi trường trong `deploy.sh`: khoá → kiểm release → (production: digest+SHA đã qua staging, không cũ hơn)
   → đổi symlink `releases/<env>/current` nguyên tử → `compose config -q` → pull → cổng `HIGH_RISK_MIGRATION`
+  → **guard image postgres** (container postgres đang chạy image khác image compose khai ⇒ dừng, chưa đổi gì: chuyển image postgres là việc làm tay có REINDEX,
+  `docs/runbooks/postgres-base-image.md` §6; không có container nhưng volume `<project>_postgres-data` đã có ⇒ cũng dừng, trừ khi chạy tay với
+  `PG_IMAGE_SWITCH_CONFIRMED=1` sau khi đã kiểm volume; chưa có container lẫn volume (server mới) thì qua)
   → up postgres/redis/seaweedfs → **`payload migrate`** (service `migrate`) → up `app` + `jobs`
   → health `/api/health` + `jobs` chạy ổn định → thành công: ghi state, dọn image + release cũ;
   thất bại (**kể cả `compose up` lỗi**): quay về image + release trước.
@@ -92,7 +95,8 @@ Env file phải `chmod 600` (script từ chối nếu `others` đọc được).
 
 ### 3.3 Env file
 Sao `.env.example` (khối Docker Compose staging/prod) → điền giá trị thật cho từng môi trường. `TAMI_IMAGE` trong file không cần đặt:
-`deploy.sh` đặt biến môi trường `TAMI_IMAGE` (thắng `--env-file`).
+`deploy.sh` đặt biến môi trường `TAMI_IMAGE` (thắng `--env-file`). Hệ quả: chạy `docker compose` **tay** trên server (runbook `postgres-base-image.md`, `restore.md`) phải
+`export TAMI_IMAGE="$(cat /opt/tami/state/<env>.current)"` trước, kể cả khi chỉ đụng `postgres` — compose interpolate `${TAMI_IMAGE:?}` cho cả file.
 
 `RETENTION_ORPHAN_OBJECT_SCAN` (`off` | `dry-run` | `delete`, mặc định `dry-run`): bước quét object CV mồ côi của job `data-retention` xoá object private không còn dòng `private-files`. Để `dry-run` (chỉ đếm, audit `system.data_retention` ghi `orphanObjectsFound`) cho tới khi xác nhận bucket private chỉ phục vụ đúng DB này (không dùng chung giữa môi trường) và số mồ côi báo cáo hợp lý; khi đó mới đặt `delete` bằng tay trong env file. Dù ở `delete`, quá 100 object hoặc quá 20% số object đã liệt kê thì job không xoá và báo lỗi (`failedSteps`). Không tự bật `delete` cho prod.
 
@@ -162,6 +166,12 @@ Với production, cặp digest + SHA phải có trong `staging.history`, và vì
 không tương thích ngược thì rollback image có thể lỗi → khôi phục từ backup (ARCHITECTURE §8).
 
 **Rollback không có image trước** (deploy đầu tiên fail): script báo `không có image trước`; app giữ ở image lỗi. Gỡ tay `docker compose ... stop app jobs`, sửa, deploy lại.
+
+**Guard postgres chặn vì volume có sẵn mà không có container** (`không có container … nhưng volume … đã có dữ liệu`): container postgres bị `down`/`rm` ngoài quy trình. Kiểm volume theo
+`postgres-base-image.md` §6 (dữ liệu đã REINDEX theo glibc của image compose khai, hoặc volume do chính image đó tạo) rồi chạy tay với biến xác nhận — chỉ tay, workflow không bao giờ đặt:
+```bash
+PG_IMAGE_SWITCH_CONFIRMED=1 bash /opt/tami/releases/<env>/<sha>/scripts/deploy/deploy.sh <env> --release-sha <sha> --image ghcr.io/<owner>/<repo>@sha256:<digest build từ <sha>>
+```
 
 Khoá: 1 `flock` chung (`/opt/tami/state/deploy.lock`) cho cả hai môi trường, chờ tối đa 300s (`LOCK_WAIT_SECONDS`), sau đó báo lỗi.
 `jobs` luôn 1 bản (container_name cố định).
@@ -281,6 +291,8 @@ staging sau Cloudflare `true`/`false` (đặt trong env file). Không bật cả
 Email Let's Encrypt, tên/mật khẩu basic auth, `EMAIL_ALLOWLIST`, `NEXT_PUBLIC_HOTLINE`. Đã chốt (user, 2026-10-18): staging không backup, không alert tới M3 (G10), dịch AI tắt (`TRANSLATION_MONTHLY_BUDGET_USD=0`, không cần `ANTHROPIC_API_KEY`).
 
 ### 9.5 Backup/giám sát/dịch AI trên staging (quyết định user 2026-10-18)
-- **Không backup:** `docker-compose.staging.yml` dùng image `postgis/postgis:17-3.5`, `archive_mode=off`, không có dịch vụ `backup`, không đọc `BACKUP_ENV_DIR`. `deploy.sh` chỉ `up` dịch vụ `backup` khi compose của môi trường có khai báo (prod có, staging không). Dữ liệu staging là dữ liệu mẫu: mất thì chạy lại migrate + seed. Prod giữ nguyên cấu hình backup. Muốn bật lại cho staging: chép khối `postgres`/`backup` và volume từ `docker-compose.prod.yml`.
+- **Không backup:** `docker-compose.staging.yml` dùng image `tami-postgis:17-3.5-bookworm` (Dockerfile `docker/backup` target `postgis` = `postgres:17.11-bookworm` + PostGIS 3.5.2, không pgbackrest; build trên server
+  `$C build postgres`, chưa có tag thì `compose up` tự build), `archive_mode=off`, không có dịch vụ `backup`, không đọc `BACKUP_ENV_DIR`. Volume staging hiện có do `postgis/postgis:17-3.5` (bullseye) tạo:
+  chuyển sang image bookworm theo `docs/runbooks/postgres-base-image.md` (deploy bị guard chặn cho tới khi làm xong). `deploy.sh` chỉ `up` dịch vụ `backup` khi compose của môi trường có khai báo (prod có, staging không). Dữ liệu staging là dữ liệu mẫu: mất thì chạy lại migrate + seed. Prod giữ nguyên cấu hình backup. Muốn bật lại cho staging: chép khối `postgres`/`backup` và volume từ `docker-compose.prod.yml`.
 - **Không alert tới M3:** không tạo rule/Uptime Kuma cho staging; xem log bằng `docker logs`.
 - **Dịch AI tắt:** `TRANSLATION_MONTHLY_BUDGET_USD=0`, không cần `ANTHROPIC_API_KEY` (`src/lib/env.ts` chấp nhận khoá rỗng; test `env.test.ts`).

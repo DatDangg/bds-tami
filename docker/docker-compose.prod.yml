@@ -129,9 +129,11 @@ services:
     networks: [internal]
 
   postgres:
-    # Image tuỳ biến = postgis/postgis:17-3.5 + pgbackrest (archive_command cần binary trong container). Dựng 1 lần: `$C build postgres backup`
-    # (deploy.sh không pull image này; chưa có tag thì `compose up` tự build). Giữ nguyên base 17-3.5 và volume `postgres-data`.
-    image: tami-postgres:17-3.5-pgbackrest2.59
+    # Image tuỳ biến (docker/backup/Dockerfile target postgres) = postgres:17.11-bookworm + PostGIS 3.5.2 + pgbackrest (archive_command cần binary
+    # trong container). Dựng 1 lần: `$C build postgres backup` (deploy.sh không pull image này; chưa có tag thì `compose up` tự build).
+    # Đổi tag = đổi image trên volume `postgres-data` đang có dữ liệu: deploy.sh TỪ CHỐI khi container postgres đang chạy image khác tag này;
+    # chuyển image (bullseye -> bookworm: đổi glibc/collation, phải REINDEX) theo docs/runbooks/postgres-base-image.md.
+    image: tami-postgres:17-3.5-bookworm-pgbackrest2.59
     build:
       context: ./backup
       target: postgres
@@ -184,7 +186,7 @@ services:
   # Sidecar backup (ARCHITECTURE §8): lịch + chạy pgBackRest (diff/full/check) và restic. Chạy user postgres (uid 999) để đọc pgdata (read-only).
   # Kho đích nằm NGOÀI server (cấu hình bằng env file). Chỉ một bản; không publish cổng. Runbook: docs/runbooks/restore.md.
   backup:
-    image: tami-backup:pgbackrest2.59-restic0.17.3
+    image: tami-backup:bookworm-pgbackrest2.59-restic0.17.3
     build:
       context: ./backup
       target: backup

@@ -24,9 +24,9 @@ PGBACKREST_REPO1_S3_URI_STYLE=host
 # PGBACKREST_REPO1_STORAGE_CA_FILE=/etc/backup/ssh/ca.pem
 
 # ---- Khối B: kho trên server khác qua SFTP (thay cho khối A: xoá/comment khối A) ----
-# pgBackRest trong image dùng libssh2 1.9 (Debian 11): CHỈ chạy với khoá RSA định dạng PEM + file khoá công khai, host key ssh-rsa, kex diffie-hellman-*.
-# Server đích phải bật lại ssh-rsa (OpenSSH >= 8.8 tắt mặc định) và, nếu hardened, DH gex:
-#   HostKeyAlgorithms +ssh-rsa / PubkeyAcceptedAlgorithms +ssh-rsa / KexAlgorithms +diffie-hellman-group-exchange-sha256
+# pgBackRest trong image dùng libssh2 1.10 (Debian 12, link OpenSSL): khoá NGƯỜI DÙNG RSA định dạng PEM + file khoá công khai, ký ssh-rsa (SHA-1);
+# kex curve25519/ecdh và host key ed25519/ecdsa đàm phán được bình thường. Server đích chỉ cần bật lại ssh-rsa cho khoá người dùng (OpenSSH >= 8.8 tắt mặc định):
+#   PubkeyAcceptedAlgorithms +ssh-rsa
 # Không chấp nhận được thì dùng khối A (S3). Chi tiết: docs/runbooks/restore.md §9.
 # Tạo khoá (không passphrase, dành riêng cho backup, chỉ quyền ghi vào thư mục kho): ssh-keygen -m PEM -t rsa -b 3072 -N "" -f $BACKUP_ENV_DIR/ssh/id_rsa
 # PGBACKREST_REPO1_TYPE=sftp

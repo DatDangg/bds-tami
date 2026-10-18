@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.9.0
+- **spec_version:** 1.10.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -205,6 +205,7 @@ Các quy tắc dưới đây là ⚠️ giả định mặc định để build,
 - Cloudflare phía trước; server chỉ nhận traffic từ IP Cloudflare.
 - CI/CD: lint/typecheck/test/build → image theo SHA → staging (`payload migrate`, health check) → **duyệt tay** → production đúng image đó.
 - Backup ngoài server: pgBackRest (liên tục) + restic (file hằng ngày), diễn tập khôi phục 6 tháng/lần.
+- Image PostgreSQL (dev/staging/prod) + sidecar backup chạy trên **OS còn hỗ trợ bảo mật** (Debian 12 bookworm, ghim digest/phiên bản), giữ PostgreSQL 17 + PostGIS 3.5; `pg_dump`/`pgbackrest` cùng major với server. Đổi base OS trên volume đã có dữ liệu = đổi glibc/collation ⇒ chỉ làm theo runbook (dừng app → backup → đổi image → `REINDEX` + `REFRESH COLLATION VERSION` → amcheck → bật app), **diễn tập backup/restore trên staging trước production**; deploy tự động không được tự đổi image postgres trên volume cũ (BL-002).
 
 Chi tiết: `docs/ARCHITECTURE.md` §6–8.
 

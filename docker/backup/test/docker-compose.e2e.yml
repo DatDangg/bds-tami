@@ -20,9 +20,10 @@ services:
 
   target-sftp:
     image: atmoz/sftp:alpine
-    # libssh2 1.9 (trong pgbackrest 2.59 trên Debian 11) chỉ có kex diffie-hellman*: server hardened chỉ cho curve25519 sẽ bị từ chối
-    # ("Unable to exchange encryption keys"), và chỉ dùng host key + khoá người dùng ssh-rsa (SHA1): OpenSSH >= 8.8 tắt mặc định nên phải bật lại (xem runbook §9).
-    entrypoint: ["sh", "-c", "printf 'KexAlgorithms +diffie-hellman-group-exchange-sha256\nHostKeyAlgorithms +ssh-rsa\nPubkeyAcceptedAlgorithms +ssh-rsa\n' >> /etc/ssh/sshd_config && exec /entrypoint tami::1001:1001:upload"]
+    # libssh2 1.10.0 của Debian 12 (link OpenSSL) trong pgbackrest 2.59: đàm phán được kex curve25519/ecdh và host key ed25519/ecdsa (đã thử: sshd
+    # chỉ cho curve25519 vẫn chạy), nhưng khoá NGƯỜI DÙNG RSA vẫn ký ssh-rsa (SHA-1; rsa-sha2-* chỉ có từ libssh2 1.11). OpenSSH >= 8.8 tắt
+    # ssh-rsa mặc định nên server SFTP phải bật lại đúng 1 dòng PubkeyAcceptedAlgorithms (xem runbook §9). Không còn cần +diffie-hellman / HostKeyAlgorithms +ssh-rsa.
+    entrypoint: ["sh", "-c", "printf 'PubkeyAcceptedAlgorithms +ssh-rsa\n' >> /etc/ssh/sshd_config && exec /entrypoint tami::1001:1001:upload"]
     volumes:
       - ${E2E_DIR:?}/ssh/id_rsa.pub:/home/tami/.ssh/keys/id_rsa.pub:ro
     networks: [internal]

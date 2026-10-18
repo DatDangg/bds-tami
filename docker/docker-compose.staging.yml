@@ -133,10 +133,16 @@ services:
     networks: [internal]
 
   postgres:
-    # STAGING KHÔNG BACKUP (quyết định user 2026-10-18): image postgis gốc, không pgbackrest, archive_mode=off, không dịch vụ `backup`,
-    # không cần BACKUP_ENV_DIR. Dữ liệu staging là dữ liệu mẫu, mất thì seed lại. Prod giữ nguyên cấu hình backup (docker-compose.prod.yml).
+    # STAGING KHÔNG BACKUP (quyết định user 2026-10-18): không pgbackrest, archive_mode=off, không dịch vụ `backup`, không cần BACKUP_ENV_DIR.
+    # Dữ liệu staging là dữ liệu mẫu, mất thì seed lại. Prod giữ nguyên cấu hình backup (docker-compose.prod.yml).
     # Muốn bật backup cho staging sau này: chép khối postgres/backup + volume tương ứng từ docker-compose.prod.yml (đổi tên container/mạng/BACKUP_ENV_NAME).
-    image: postgis/postgis:17-3.5
+    # Image = docker/backup/Dockerfile target postgis (postgres:17.11-bookworm + PostGIS 3.5.2; Docker Hub không có postgis/postgis 17-3.5 bookworm).
+    # Dựng 1 lần: `$C build postgres` (deploy.sh không pull; chưa có tag thì `compose up` tự build). Volume cũ khởi tạo bằng postgis/postgis:17-3.5
+    # (bullseye, glibc 2.31): đổi image = đổi collation, deploy.sh TỪ CHỐI tự tạo lại postgres; chuyển theo docs/runbooks/postgres-base-image.md (REINDEX).
+    image: tami-postgis:17-3.5-bookworm
+    build:
+      context: ./backup
+      target: postgis
     container_name: tami-staging-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tami}

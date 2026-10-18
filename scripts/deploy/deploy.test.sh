@@ -2,7 +2,8 @@
 # Test nhỏ cho deploy.sh + lib/*.sh, không cần Docker/server: `bash scripts/deploy/deploy.test.sh` (phần symlink chỉ chạy trên Linux).
 # Phủ: cổng HIGH_RISK_MIGRATION, kiểm tra tham số (cấm tag/latest, --release-sha), thứ tự --dry-run, chọn đúng release theo env+SHA
 # (từ chối SHA/env lệch), production chỉ nhận digest+SHA đã qua staging và không cũ hơn, rollback khi `compose up` lỗi (exit 1/3),
-# jobs ổn định, container tạm luôn bị xoá.
+# jobs ổn định, container tạm luôn bị xoá, guard image postgres (container chạy image khác compose => die, không tự đổi image trên volume cũ;
+# không container nhưng volume postgres-data đã có => die trừ PG_IMAGE_SWITCH_CONFIRMED=1).
 # shellcheck disable=SC2016,SC2034,SC2329 # bash -c nhận tham số vị trí; biến/hàm stub được dùng gián tiếp bởi deploy.sh đã source
 set -euo pipefail
 
@@ -195,6 +196,7 @@ run_deploy_scenario() {
     activate_release() { :; }
     pull_image() { :; }
     gate_high_risk_migrations() { :; }
+    guard_postgres_image() { :; }
     run_migrations() { :; }
     prune_old_tami_images() { :; }
     prune_old_releases() { :; }
@@ -293,6 +295,7 @@ run_base_services_deploy() {
     activate_release() { :; }
     pull_image() { :; }
     gate_high_risk_migrations() { :; }
+    guard_postgres_image() { echo guard-postgres >> "$WORK/calls"; }
     run_migrations() { echo migrate >> "$WORK/calls"; }
     prune_old_tami_images() { :; }
     prune_old_releases() { :; }
@@ -325,6 +328,64 @@ test_deploy_base_services_call_site() {
   expect "deploy: config ok => exit 0" test "$rc" == 0
   expect "deploy: up -d nhận đúng danh sách dịch vụ nền (có backup)" grep -qx 'compose up -d postgres redis seaweedfs backup' "$WORK/calls"
   expect "deploy: không có lệnh compose up -d trần (không danh sách)" bash -c '! grep -qx "compose up -d" "$1"' _ "$WORK/calls"
+  expect "deploy: kiểm image postgres chạy TRƯỚC compose up dịch vụ nền" test "$(line_of "$(< "$WORK/calls")" 'guard-postgres')" -lt "$(line_of "$(< "$WORK/calls")" 'compose up -d postgres')"
+}
+
+# --- Guard image postgres (BL-002): container đang chạy image khác image compose khai => die, không tự tạo lại postgres trên volume cũ ---
+guard_scenario() { # guard_scenario <image container đang chạy | "" = chưa có container> <image compose khai> [<volume đã có: yes|no>] [<PG_IMAGE_SWITCH_CONFIRMED>] ; ghi lệnh vào $WORK/calls
+  : > "$WORK/calls"
+  (
+    DRY_RUN=false POSTGRES_CONTAINER=tami-postgres RUNNING="$1" DECLARED="$2" VOLUME_EXISTS="${3:-no}"
+    export PG_IMAGE_SWITCH_CONFIRMED="${4:-0}"
+    docker() {
+      echo "docker $*" >> "$WORK/calls"
+      case "$1" in
+        inspect) [[ -n $RUNNING ]] || return 1; echo "$RUNNING" ;;
+        volume) [[ $VOLUME_EXISTS == yes ]] || return 1 ;;
+      esac
+    }
+    compose() {
+      echo "compose $*" >> "$WORK/calls"
+      # `compose config` (không tham số) in YAML đầy đủ, dòng đầu là name:; `config --images postgres` in image.
+      if [[ "$*" == "config" ]]; then printf 'name: tami-staging\nservices:\n  postgres:\n    image: %s\n' "$DECLARED"; else echo "$DECLARED"; fi
+    }
+    guard_postgres_image
+  ) > /dev/null 2>&1
+}
+
+test_guard_postgres_image() {
+  expect "guard postgres: container chạy đúng image compose => qua" guard_scenario tami-postgres:17-3.5-bookworm-pgbackrest2.59 tami-postgres:17-3.5-bookworm-pgbackrest2.59
+  expect "guard postgres: hỏi đúng container + image postgres của compose" bash -c 'grep -q "docker inspect .* tami-postgres$" "$1" && grep -qx "compose config --images postgres" "$1"' _ "$WORK/calls"
+  if guard_scenario tami-postgres:17-3.5-pgbackrest2.59 tami-postgres:17-3.5-bookworm-pgbackrest2.59; then
+    fail "guard postgres: image khác (bullseye -> bookworm) => die"
+  else
+    pass "guard postgres: image khác (bullseye -> bookworm) => die"
+  fi
+  if guard_scenario postgis/postgis:17-3.5 tami-postgis:17-3.5-bookworm; then
+    fail "guard postgres: staging image gốc -> image tuỳ biến => die"
+  else
+    pass "guard postgres: staging image gốc -> image tuỳ biến => die"
+  fi
+  expect "guard postgres: chưa có container lẫn volume (server mới) => qua" guard_scenario "" tami-postgis:17-3.5-bookworm no
+  expect "guard postgres: không container => kiểm volume <project>_postgres-data theo name: của compose config" grep -qx 'docker volume inspect tami-staging_postgres-data' "$WORK/calls"
+  if guard_scenario "" tami-postgis:17-3.5-bookworm yes; then
+    fail "guard postgres: không container nhưng volume đã có => die (không biết image nào tạo volume)"
+  else
+    pass "guard postgres: không container nhưng volume đã có => die (không biết image nào tạo volume)"
+  fi
+  expect "guard postgres: volume đã có + PG_IMAGE_SWITCH_CONFIRMED=1 (chạy tay) => qua" guard_scenario "" tami-postgis:17-3.5-bookworm yes 1
+  if guard_scenario "" tami-postgis:17-3.5-bookworm yes 0; then
+    fail "guard postgres: PG_IMAGE_SWITCH_CONFIRMED=0 không mở khoá"
+  else
+    pass "guard postgres: PG_IMAGE_SWITCH_CONFIRMED=0 không mở khoá"
+  fi
+  : > "$WORK/calls"
+  (
+    DRY_RUN=true POSTGRES_CONTAINER=tami-postgres
+    docker() { echo "docker được gọi trong dry-run" >> "$WORK/calls"; }
+    guard_postgres_image
+  ) > "$WORK/guard-dry-run.out"
+  expect "guard postgres: dry-run => chỉ in, không gọi docker" bash -c 'grep -q "^\[dry-run\]" "$1" && ! grep -q docker "$2"' _ "$WORK/guard-dry-run.out" "$WORK/calls"
 }
 
 test_jobs_running() {
@@ -371,6 +432,7 @@ test_require_staging_passed
 test_deploy_rollback
 test_base_services
 test_deploy_base_services_call_site
+test_guard_postgres_image
 test_jobs_running
 test_gate_removes_temp_container
 

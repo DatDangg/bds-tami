@@ -11,7 +11,7 @@
 #
 # Thứ tự (migration chạy TRƯỚC khi đổi app/jobs):
 #   khoá -> kiểm release -> (production: digest+SHA đã qua staging, không cũ hơn) -> đổi symlink current -> compose config -> pull
-#   -> kiểm HIGH_RISK_MIGRATION -> up postgres/redis/seaweedfs -> `payload migrate` -> up app + jobs -> health + jobs ổn định
+#   -> kiểm HIGH_RISK_MIGRATION -> kiểm image postgres không đổi -> up postgres/redis/seaweedfs -> `payload migrate` -> up app + jobs -> health + jobs ổn định
 #   -> fail (kể cả `up` lỗi): quay về image + release trước | ok: ghi trạng thái, dọn image/release cũ
 #
 # Migration đã chạy KHÔNG rollback được: quay về image trước chỉ an toàn khi migration backward-compatible
@@ -110,6 +110,7 @@ configure_env() {
     APP_CONTAINER=tami-staging-app
     JOBS_CONTAINER=tami-staging-jobs
     MIGRATE_CONTAINER=tami-staging-migrate
+    POSTGRES_CONTAINER=tami-staging-postgres
   else
     COMPOSE_NAME=docker-compose.prod.yml
     ENV_FILE="${ENV_FILE:-$TAMI_ROOT/prod.env}"
@@ -117,6 +118,7 @@ configure_env() {
     APP_CONTAINER=tami-app
     JOBS_CONTAINER=tami-jobs
     MIGRATE_CONTAINER=tami-migrate
+    POSTGRES_CONTAINER=tami-postgres
   fi
   COMPOSE_FILE="$REPO_DIR/docker/$COMPOSE_NAME"
 }
@@ -251,6 +253,44 @@ base_services() {
   echo "${services[*]}"
 }
 
+# Image postgres KHÔNG được đổi tự động: `compose up -d postgres` sẽ tạo lại container bằng image compose khai báo trên volume dữ liệu cũ;
+# đổi base (glibc/collation, vd bullseye -> bookworm) mà không REINDEX thì index text sai thứ tự. Chuyển image là việc làm tay theo
+# docs/runbooks/postgres-base-image.md; làm xong container đã chạy đúng image nên deploy sau đó qua.
+# Không có container nhưng volume dữ liệu đã có (container bị `down`/`rm`): không biết image nào tạo volume => cũng dừng, trừ khi operator
+# xác nhận bằng PG_IMAGE_SWITCH_CONFIRMED=1 (chạy tay, sau khi đã REINDEX theo runbook hoặc chắc volume do đúng image này tạo).
+# Chưa có container lẫn volume (server mới) thì cho qua.
+guard_postgres_image() {
+  if [[ $DRY_RUN == true ]]; then
+    printf '[dry-run] kiểm image container %s khớp image compose khai cho postgres (không container: volume <project>_postgres-data phải chưa có)\n' "$POSTGRES_CONTAINER"
+    return 0
+  fi
+  local running declared
+  running="$(docker inspect --format '{{.Config.Image}}' "$POSTGRES_CONTAINER" 2> /dev/null || true)"
+  if [[ -z $running ]]; then
+    guard_postgres_volume_without_container
+    return 0
+  fi
+  declared="$(compose config --images postgres)" || die "không đọc được image postgres từ compose"
+  [[ $running == "$declared" ]] || die "container $POSTGRES_CONTAINER đang chạy image '$running' nhưng compose khai '$declared': KHÔNG tự đổi image postgres trên volume cũ. Chuyển image theo docs/runbooks/postgres-base-image.md rồi deploy lại"
+}
+
+# Tên volume dữ liệu postgres theo cách compose đặt: <project>_<khoá volume>. project = dòng `name:` do `compose config` in (đọc từ chính compose
+# file đang deploy, không suy từ tên file); khoá volume `postgres-data` cố định trong cả hai compose staging/prod (service postgres mount nó).
+postgres_volume_name() {
+  local project
+  project="$(compose config 2> /dev/null | sed -n 's/^name: //p' | head -n1)"
+  [[ -n $project ]] || return 1
+  printf '%s_postgres-data' "$project"
+}
+
+guard_postgres_volume_without_container() {
+  local volume
+  volume="$(postgres_volume_name)" || die "không đọc được tên project từ compose config (để tìm volume postgres-data)"
+  docker volume inspect "$volume" > /dev/null 2>&1 || return 0
+  [[ ${PG_IMAGE_SWITCH_CONFIRMED:-0} == 1 ]] && { warn "không có container $POSTGRES_CONTAINER nhưng volume $volume đã có: PG_IMAGE_SWITCH_CONFIRMED=1 => tạo container trên volume này"; return 0; }
+  die "không có container $POSTGRES_CONTAINER nhưng volume $volume đã có dữ liệu: không biết image nào đã tạo volume, KHÔNG tự tạo postgres bằng image compose khai trên dữ liệu đó. Kiểm/REINDEX theo docs/runbooks/postgres-base-image.md §6 rồi chạy lại với PG_IMAGE_SWITCH_CONFIRMED=1"
+}
+
 # Mọi lỗi sau khi bắt đầu đổi container (kể cả `compose up` non-zero) đều đi vào rollback.
 switch_app_and_jobs() {
   run compose up -d app jobs && wait_for_health && jobs_running
@@ -269,6 +309,7 @@ deploy() {
   base_list="$(base_services)" || die "không xác định được danh sách dịch vụ nền"
   read -r -a base_array <<< "$base_list"
   if ((${#base_array[@]} == 0)); then die "danh sách dịch vụ nền rỗng"; fi
+  guard_postgres_image
   run compose up -d "${base_array[@]}"
   run compose up -d seaweedfs-init
   run_migrations
