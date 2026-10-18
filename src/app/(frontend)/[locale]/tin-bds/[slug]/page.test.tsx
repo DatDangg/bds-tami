@@ -69,9 +69,39 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     expect(screen.getByText("Nội dung chi tiết của ưu đãi.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Nhận tư vấn" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /0901 234 567/ })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Chia sẻ bài viết" })).toBeInTheDocument();
     // Bài không có giá/khu vực/ưu đãi/liên quan → không dựng khối ưu đãi rỗng.
     expect(screen.queryByRole("heading", { name: "Thông tin ưu đãi" })).toBeNull();
+  });
+
+  it("chia sẻ ở ĐẦU bài (trong header, sau ngày đăng) + rail dính ≥ xl; KHÔNG còn cụm chia sẻ cuối bài (S09)", async () => {
+    findPublicPostBySlug.mockResolvedValue(post());
+    const { container } = await renderPost();
+    const header = container.querySelector("header") as HTMLElement;
+    expect(header).toContainElement(screen.getByRole("heading", { level: 1 }));
+    expect(header.querySelector("time")).not.toBeNull();
+    // Nút gọn (< sm) + hàng ngang (sm–<xl) nằm trong header, sau <time>.
+    const compact = screen.getByRole("button", { name: "Chia sẻ" });
+    expect(header).toContainElement(compact);
+    const time = header.querySelector("time") as HTMLElement;
+    expect(time.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const groups = screen.getAllByRole("group", { name: "Chia sẻ bài viết" });
+    expect(groups.length).toBeGreaterThan(0);
+    for (const group of groups) {
+      // Mọi cụm chia sẻ đứng TRƯỚC vùng form lead; không có <footer> chia sẻ cuối bài.
+      const leadHeading = screen.getByRole("heading", { level: 2, name: "Nhận tư vấn" });
+      expect(group.compareDocumentPosition(leadHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+    expect(container.querySelector("article > footer")).toBeNull();
+    // Rail ≥ xl: ẩn dưới xl, con sticky, cùng wrapper với header + nội dung (không bao form lead).
+    const rail = container.querySelector("[data-share-variant='rail']") as HTMLElement;
+    expect(rail.className).toMatch(/\bhidden\b/);
+    expect(rail.className).toContain("xl:block");
+    expect(rail.querySelector(".sticky")).not.toBeNull();
+    // Thứ tự Tab: tiêu đề/ngày trước, rail sau header (rail `absolute` nên vị trí hiển thị không đổi).
+    expect(header.compareDocumentPosition(rail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(rail.parentElement).toContainElement(header);
+    expect(rail.parentElement).toContainElement(screen.getByText("Nội dung chi tiết của ưu đãi."));
+    expect(rail.parentElement).not.toContainElement(screen.getByRole("heading", { level: 2, name: "Nhận tư vấn" }));
   });
 
   it("ưu đãi còn hạn: khối ưu đãi TRƯỚC nội dung, có mã voucher và nút sao chép", async () => {

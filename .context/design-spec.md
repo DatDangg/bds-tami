@@ -445,7 +445,7 @@ Responsive: theo màn cha.
 ### S09. Chi tiết bài Đăng tin BĐS · `/tin-bds/[slug]` · `/en/property-news/[slug]` (FR-PUB-07)
 
 1. Breadcrumb.
-2. Đầu bài (container text 768px, căn trái): danh mục (link), tiêu đề cỡ `--text-h1`, chữ thường (§1.7), ngày đăng, nút chia sẻ (Facebook, Zalo, sao chép link).
+2. Đầu bài (container text 768px, căn trái): danh mục (link), tiêu đề cỡ `--text-h1`, chữ thường (§1.7), ngày đăng, nút chia sẻ (Facebook, Zalo, sao chép link). Chỉ một cụm chia sẻ trong bài (không lặp ở cuối bài); < sm: 1 nút "Chia sẻ / Share" gọi `navigator.share` (tiêu đề + URL canonical), trình duyệt không hỗ trợ hoặc lỗi khác huỷ → mở menu (Facebook, Zalo, sao chép link; `aria-expanded`, Esc/bấm ra ngoài đóng); sm–xl: hàng ngang ngay dưới ngày đăng; ≥ xl: cụm dọc chỉ icon (có `aria-label`) dính (`sticky`) ở lề trái cột chữ suốt phần đầu bài → hết nội dung/thư viện ảnh (không đè form lead, bài liên quan).
 3. Ảnh bìa `cover` 16:9, rộng 1024px (≥ lg tràn ra khỏi cột chữ), `priority`.
 4. **Khối ưu đãi** (nếu có `offer` / giá / khu vực / liên quan), đặt **trước** nội dung, nền `--color-primary-subtle`, viền 1px `--color-primary`:
    - Giá (`priceVnd` hoặc `priceNote`), khu vực, thời hạn "Từ <startAt> đến <endAt>", trạng thái (badge).
@@ -458,7 +458,8 @@ Responsive: theo màn cha.
 
 | Mốc | Thay đổi |
 |---|---|
-| 375 | Ảnh bìa tràn viền (bỏ gutter); khối ưu đãi full-width; nút chia sẻ thành 1 nút "Chia sẻ / Share" dùng Web Share API (fallback menu) |
+| 375 | Ảnh bìa tràn viền (bỏ gutter); khối ưu đãi full-width; nút chia sẻ thành 1 nút "Chia sẻ / Share" dùng Web Share API (fallback menu) — áp dụng < 640 (`sm`) |
+| 640 | Nút chia sẻ hàng ngang (Facebook, Zalo, sao chép link) ở đầu bài |
 | 1024 | Ảnh bìa rộng 1024 vượt cột chữ; nút chia sẻ dính cột trái (≥ xl) |
 
 **States:** form §3.3; ưu đãi sắp hết hạn → badge warning. **SEO:** JSON-LD `Article`. **Eyebrow:** 0.

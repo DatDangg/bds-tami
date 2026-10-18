@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.5.0
+- **spec_version:** 1.6.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -57,7 +57,7 @@ Danh sách lọc theo loại hình / tỉnh / trạng thái mở bán, có phân
 Danh sách có bộ lọc (danh mục, tỉnh, phường, giá/tháng, diện tích, phòng ngủ, nội thất, từ khoá không dấu, sắp xếp), bộ lọc nằm trên URL. Bộ lọc p95 ≤ 500ms. Chi tiết gồm thư viện ảnh (tối thiểu 3 ảnh khi xuất bản), video, mã tin, giá/tháng, diện tích, phòng ngủ/WC, tầng, hướng, nội thất, mô tả, vị trí, điều khoản thuê (thời hạn tối thiểu, cọc, kỳ thanh toán, dịch vụ bao gồm, ngày trống), sale phụ trách, form lead, tin tương tự. Mã tin `CT-xxxxxx`. Trạng thái `draft/published/hidden/rented`; tin đã thuê vẫn giữ trang, có nhãn "Đã thuê" và gợi ý tin tương tự, gắn `noindex, follow` và không vào sitemap. Nút tìm kiếm trên header dẫn tới `/cho-thue?q=` (giai đoạn 1 không có tìm kiếm toàn site).
 
 ### F4. Đăng tin BĐS: FR-PUB-06, FR-PUB-07, FR-ADM-03
-Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ chọn giá, khu vực, dự án / tin cho thuê liên quan, hạn ưu đãi + mã voucher. Có form lead. Quá hạn ưu đãi thì gắn "Đã kết thúc" và rời khối "Ưu đãi nổi bật" (BR-06).
+Bài dạng tin (tin BĐS, voucher, ưu đãi) theo danh mục; trường tuỳ chọn giá, khu vực, dự án / tin cho thuê liên quan, hạn ưu đãi + mã voucher. Có form lead. Quá hạn ưu đãi thì gắn "Đã kết thúc" và rời khối "Ưu đãi nổi bật" (BR-06). Chi tiết bài: chia sẻ (Facebook, Zalo, sao chép link) ở **đầu bài**, điện thoại dùng 1 nút "Chia sẻ" Web Share API (fallback menu), màn rộng (≥ xl) cụm chia sẻ dính lề trái khi cuộn (design-spec S09).
 
 ### F5. Tin tức: FR-PUB-08, FR-ADM-04
 Tin tức chung theo danh mục, có tags, bài liên quan. Không thu lead.

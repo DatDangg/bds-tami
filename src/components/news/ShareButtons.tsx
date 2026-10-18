@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
 import { FacebookLogo } from "@/components/icons";
+import { useCopyLink } from "./use-copy-link";
 
 interface ShareButtonsProps {
   /** URL tuyệt đối của bài (canonical). Thiếu (chưa cấu hình URL gốc) thì chỉ còn nút sao chép liên kết trang hiện tại. */
@@ -13,29 +13,14 @@ interface ShareButtonsProps {
 const ACTION_CLASS =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-sm border border-border px-4 text-small font-semibold text-text hover:border-input-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
 
-type CopyState = "idle" | "copied" | "failed";
-
 /**
  * Chia sẻ cuối bài (S11): Facebook, Zalo, sao chép liên kết. Facebook/Zalo là link mở tab mới (không cần JS, không tải SDK
  * của bên thứ ba nên không lộ dữ liệu khách trước khi họ bấm). Chỉ nút sao chép cần JS; kết quả báo qua vùng `aria-live`.
+ * Trang Đăng tin BĐS (S09) dùng `PostShare` riêng (chia sẻ đầu bài, Web Share < sm) nhưng tái dùng component này cho sm–<xl.
  */
 export function ShareButtons({ url, title }: ShareButtonsProps) {
   const t = useTranslations("page.news.share");
-  const [copyState, setCopyState] = useState<CopyState>("idle");
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => () => clearTimeout(resetTimer.current), []);
-
-  async function copyLink() {
-    const target = url ?? window.location.href;
-    try {
-      await navigator.clipboard.writeText(target);
-      setCopyState("copied");
-    } catch {
-      setCopyState("failed");
-    }
-    clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setCopyState("idle"), 3000);
-  }
+  const { copyState, copyLink } = useCopyLink(url);
 
   const encoded = url ? encodeURIComponent(url) : null;
   return (

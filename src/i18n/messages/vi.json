@@ -252,6 +252,10 @@
         "relatedRental": "Tin cho thuê"
       },
       "gallery": "Hình ảnh",
+      "share": {
+        "button": "Chia sẻ",
+        "menu": "Cách chia sẻ"
+      },
       "leadForm": {
         "title": "Nhận tư vấn",
         "hotline": "Hotline"

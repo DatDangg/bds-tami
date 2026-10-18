@@ -1,79 +1,82 @@
 {
-  "specVersion": "1.5.0",
-  "scopeVersion": 5,
-  "generatedAt": "2026-10-19T17:00:00+07:00",
+  "specVersion": "1.6.0",
+  "scopeVersion": 6,
+  "generatedAt": "2026-10-19T18:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature-utm-capture-public-layout",
-  "backlog": "BL-010",
+  "workItem": "feature/rental-share-buttons-s09",
+  "backlog": "BL-007",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-utm-capture-public-layout.md",
+  "changeDoc": "spec/changes/2026-10-19-rental-share-buttons-s09.md",
   "task": [
-    "tasks/feature-utm-capture-public-layout/phase-1-task-01.md"
+    "tasks/feature-rental-share-buttons-s09/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-utm-capture-public-layout.md",
+  "specUpdate": "spec/updates/2026-10-19-rental-share-buttons-s09.md",
   "specRefs": [
-    "F9",
-    "BR-10",
-    "FR-PUB-13",
-    "design-spec §3.3"
+    "F4",
+    "FR-PUB-07",
+    "design-spec S09"
   ],
   "specRefNotes": {
-    "F9": "SPECIFICATIONS.md F9: UTM (utm_source/medium/campaign/term/content) ghi ở mọi trang công khai VI/EN bởi island client ở khung trang vào sessionStorage; URL có UTM ghi đè, không có không ghi; form lead gửi UTM URL hiện tại, không có thì bản đã lưu",
-    "BR-10": "Nguồn lead (form tin cho thuê, bài Đăng tin BĐS, dự án, liên hệ) — UTM gửi kèm lead",
-    "FR-PUB-13": "Form lead công khai — trường ẩn utm",
-    "design-spec §3.3": ".context/design-spec.md Form lead 'Gửi kèm ẩn': utm ghi ở mọi trang công khai bởi island client trong khung trang; lúc gửi ưu tiên UTM URL hiện tại, không có thì bản đã lưu"
+    "F4": "SPECIFICATIONS.md F4: chi tiết bài Đăng tin BĐS có chia sẻ (Facebook, Zalo, sao chép link) ở đầu bài; điện thoại 1 nút 'Chia sẻ' Web Share API (fallback menu); ≥ xl cụm chia sẻ dính lề trái khi cuộn",
+    "FR-PUB-07": "Chi tiết bài Đăng tin BĐS /tin-bds/[slug] · /en/property-news/[slug]",
+    "design-spec S09": ".context/design-spec.md S09 bước 2 + bảng responsive: một cụm chia sẻ duy nhất; < 640 nút Share (navigator.share, fallback menu aria-expanded, Esc/bấm ngoài đóng); 640–1279 hàng ngang dưới ngày đăng; ≥ 1280 cụm dọc icon có aria-label, sticky lề trái cột chữ tới hết nội dung/thư viện ảnh, không đè form lead/bài liên quan"
   },
   "changed": {
     "files": [
-      "src/components/leads/UtmCapture.tsx",
-      "src/components/layout/PublicShell.tsx",
-      "src/components/leads/LeadForm.tsx",
-      "src/lib/leads/utm.ts",
-      "src/components/leads/UtmCapture.test.tsx",
-      "src/components/layout/PublicShell.test.tsx",
-      "src/components/leads/LeadForm.test.tsx",
+      "src/components/posts/PostDetail.tsx",
+      "src/components/posts/PostShare.tsx",
+      "src/components/posts/PostShare.test.tsx",
+      "src/components/news/use-copy-link.ts",
+      "src/components/news/ShareButtons.tsx",
+      "src/components/icons.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.test.tsx",
       "SPECIFICATIONS.md",
       ".context/design-spec.md"
     ],
-    "filesNote": "Đã chốt theo code thật: UtmCapture.tsx + test mới; PublicShell gắn island; LeadForm bỏ captureUtm khi mount; utm.ts chỉ đổi doc comment (utm.test.ts không đổi). Không đổi API/schema.",
+    "filesNote": "ShareButtons.tsx chỉ refactor nội bộ (logic sao chép tách ra hook use-copy-link.ts), props/markup/hành vi không đổi — tin tức/tuyển dụng cần regression. Không đổi API/schema.",
     "modules": [
-      "public layout shell (PublicShell / PublicDocument — mọi trang công khai VI/EN + 404)",
-      "lead UTM capture (src/lib/leads/utm.ts: captureUtm / readUtm, sessionStorage key tami.utm)",
-      "LeadForm (gửi lead)"
+      "PostDetail (chi tiết bài Đăng tin BĐS)",
+      "chia sẻ bài Đăng tin BĐS (Web Share API + fallback menu + cụm dính ≥ xl)",
+      "i18n messages VI/EN"
     ]
   },
   "impact": {
     "direct": [
-      "Vào bất kỳ trang công khai VI/EN (trang chủ, danh sách, chi tiết, /en/...) với ?utm_source=...&utm_medium=...&utm_campaign=... → sessionStorage['tami.utm'] chứa đúng các utm_* của URL",
-      "Vào trang có UTM rồi điều hướng (client-side) sang trang có LeadForm không có UTM trên URL → lead gửi kèm UTM đã lưu",
-      "URL mới có UTM khác (kể cả soft navigation đổi pathname) → ghi đè bản đã lưu",
-      "URL không có utm_* → không ghi, không xoá bản đã lưu",
-      "Trang có LeadForm mà URL hiện tại có UTM → gửi UTM của URL hiện tại (ưu tiên hơn bản lưu)",
-      "sessionStorage không khả dụng (chặn/throw, private mode) → trang không crash, form vẫn gửi được (không có utm)"
+      "/tin-bds/[slug] và /en/property-news/[slug]: cụm chia sẻ nằm ở đầu bài (sau tiêu đề/ngày đăng), không còn bản ở cuối bài",
+      "< 640px: chỉ 1 nút 'Chia sẻ' (VI) / 'Share' (EN); trình duyệt có navigator.share → gọi với tiêu đề + URL canonical",
+      "< 640px không có navigator.share (hoặc lỗi khác AbortError) → mở menu Facebook, Zalo, sao chép link; aria-expanded đổi đúng; Esc và bấm ra ngoài đóng menu",
+      "Người dùng huỷ share (AbortError) → không mở menu, không báo lỗi",
+      "640–1279px: hàng ngang Facebook, Zalo, sao chép link ngay dưới ngày đăng",
+      "≥ 1280px: cụm dọc chỉ icon (mỗi nút có aria-label) dính lề trái cột chữ khi cuộn, dừng ở hết nội dung/thư viện ảnh, không đè form lead và bài liên quan",
+      "Sao chép link → URL canonical vào clipboard + phản hồi đã sao chép; link Facebook/Zalo chứa URL canonical đúng locale"
     ],
     "dependents": [
-      "PublicShell / PublicDocument dùng cho [locale]/layout.tsx và app/not-found.tsx — mọi trang công khai VI/EN và trang 404 render bình thường, island không render DOM",
-      "LeadForm ở ProjectDetail (dự án), SaleContactBox (khung dính tin cho thuê), PostDetail (bài Đăng tin BĐS), /lien-he (liên hệ), LeadFormSlot"
+      "PostDetail: khối ưu đãi, ảnh bìa, nội dung, thư viện ảnh, form lead, bài liên quan vẫn render đúng thứ tự S09",
+      "i18n vi.json/en.json: nhãn mới có ở cả 2 locale"
     ],
     "regression": [
-      "Gửi lead ở dự án, tin cho thuê, bài Đăng tin BĐS, trang liên hệ (VI + EN): validate, consent, Turnstile, thông báo thành công/lỗi như cũ",
-      "Lead không có UTM (vào thẳng không UTM) vẫn tạo bình thường, trường utm trống",
-      "Layout công khai vẫn static/ISR: build không chuyển trang thành dynamic, không CSR bailout do useSearchParams",
-      "Header/footer/menu toàn màn hình (BL-001) không đổi",
-      "Form ứng tuyển (ApplyForm, /tuyen-dung) không gửi utm (không đổi)"
+      "Tin tức chi tiết /tin-tuc/[slug] (VI/EN) vẫn dùng ShareButtons như cũ (vị trí, nút, hành vi)",
+      "Tuyển dụng chi tiết (JobDetail) vẫn dùng ShareButtons như cũ",
+      "Gửi lead trong bài Đăng tin BĐS (validate, consent, Turnstile, UTM) như cũ",
+      "JSON-LD Article, metadata/canonical trang bài Đăng tin BĐS không đổi; trang vẫn static/ISR",
+      "Bàn phím: tab tới được mọi nút chia sẻ, focus ring hiển thị"
     ]
   },
   "acceptance": [
-    "Vào bất kỳ trang công khai (VI/EN) có utm_* → lưu vào sessionStorage (giữ quy tắc ghi đè hiện có của LeadForm)",
-    "Sang trang khác có LeadForm → lead gửi kèm UTM đã lưu",
-    "URL không có utm_* → không ghi; không phá static/caching của layout (island client nhỏ)",
-    "sessionStorage không khả dụng → không crash",
-    "Test; pnpm test/lint/typecheck/build PASS"
+    "Nút chia sẻ ở đầu bài (sau tiêu đề/meta), bỏ bản ở cuối bài",
+    "≤ sm: 1 nút 'Chia sẻ / Share' gọi navigator.share khi có; không có → menu (Facebook, Zalo, sao chép link)",
+    "≥ xl: cụm nút dính cột trái khi cuộn; sm–xl hàng ngang",
+    "Không vỡ trang tin tức đang dùng ShareButtons; i18n VI/EN; a11y label",
+    "Test component; pnpm test/lint/typecheck/build PASS"
   ],
   "viewports": [
     375,
+    640,
     768,
     1280
   ],
-  "risk": "medium"
+  "risk": "medium",
+  "riskNote": "low-medium: chỉ UI 1 màn, không đổi API/schema/auth; nâng lên medium cho enum low|medium|high vì có sticky + Web Share theo trình duyệt và component chia sẻ dùng chung tin tức/tuyển dụng cần regression"
 }

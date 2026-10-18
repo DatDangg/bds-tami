@@ -117,6 +117,33 @@
       "review": "STRICT PASS",
       "round": 1,
       "report": ".context/review-reports/feature-utm-capture-public-layout-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "slug": "rental-share-buttons-s09",
+      "title": "Chi tiết Đăng tin BĐS (S09): chia sẻ đầu bài — < sm 1 nút Web Share (menu dự phòng), sm–xl hàng ngang, ≥ xl rail dính lề trái; bỏ chia sẻ cuối bài (BL-007)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-007",
+      "changeDoc": "spec/changes/archive/2026-10-19-rental-share-buttons-s09.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-rental-share-buttons-s09/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "NORMAL PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-rental-share-buttons-s09-phase-1-task-01-round-2-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.6.0",
+      "scopeVersion": 6,
+      "completedAt": "2026-10-19",
+      "review": "NORMAL PASS",
+      "round": 2,
+      "report": ".context/review-reports/feature-rental-share-buttons-s09-phase-1-task-01-round-2-review.md"
     }
   ],
   "bugs": [
@@ -792,7 +819,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T19:15:29.310Z",
+  "lastUpdated": "2026-10-19",
   "approvalMilestones": [
     {
       "id": "M1",

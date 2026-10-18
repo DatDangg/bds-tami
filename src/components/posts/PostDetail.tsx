@@ -6,7 +6,6 @@ import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { Gallery } from "@/components/media/Gallery";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
-import { ShareButtons } from "@/components/news/ShareButtons";
 import { publicPath } from "@/lib/content/content-paths";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import type { PostCardData, PostDetailView, PostOfferView } from "@/lib/posts/post-view";
@@ -14,6 +13,7 @@ import type { Locale } from "@/i18n/routing";
 import type { PropertyPost } from "@/payload-types";
 import { OfferBox } from "./OfferBox";
 import { PostCard } from "./PostCard";
+import { PostShare, PostShareRail } from "./PostShare";
 
 interface PostDetailProps {
   doc: Pick<PropertyPost, "id" | "content">;
@@ -28,9 +28,11 @@ interface PostDetailProps {
 }
 
 /**
- * Bố cục S09: breadcrumb → đầu bài (danh mục, `h1`, ngày) → ảnh bìa 16:9 → [khối ưu đãi] → nội dung richText (68ch) → thư viện ảnh → vùng form lead
- * (`LeadFormSlot` + `LeadForm source=property_post`; tiêu đề giống nhau cho mọi trạng thái, kể cả ưu đãi đã kết thúc) → chia sẻ →
- * bài liên quan. `h1` duy nhất là tiêu đề. Server Component; chỉ thư viện ảnh, nút chia sẻ, nút sao chép mã là client.
+ * Bố cục S09: breadcrumb → đầu bài (danh mục, `h1`, ngày, chia sẻ) → ảnh bìa 16:9 → [khối ưu đãi] → nội dung richText (68ch) → thư viện ảnh
+ * → vùng form lead (`LeadFormSlot` + `LeadForm source=property_post`; tiêu đề giống nhau cho mọi trạng thái, kể cả ưu đãi đã kết thúc) →
+ * bài liên quan. Chia sẻ chỉ một cụm, ở đầu bài (không lặp cuối bài): < sm nút Web Share, sm–<xl hàng ngang (`PostShare`); ≥ xl rail
+ * icon dính lề trái cột chữ (`PostShareRail`) trong wrapper `relative` bao đầu bài → hết thư viện ảnh nên không đè form lead/bài liên quan.
+ * `h1` duy nhất là tiêu đề. Server Component; chỉ thư viện ảnh, chia sẻ, nút sao chép mã là client.
  */
 export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareUrl }: PostDetailProps) {
   const locale = useLocale() as Locale;
@@ -49,32 +51,37 @@ export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareU
           { label: view.title, href: ownPath },
         ]}
       />
-      <header className="mx-auto flex w-full max-w-text flex-col gap-4 px-gutter pt-6 pb-8">
-        {view.category && (
-          <Link href={view.category.href} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text hover:underline">
-            {view.category.label}
-          </Link>
+      <div className="relative">
+        <header className="mx-auto flex w-full max-w-text flex-col gap-4 px-gutter pt-6 pb-8">
+          {view.category && (
+            <Link href={view.category.href} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text hover:underline">
+              {view.category.label}
+            </Link>
+          )}
+          <h1 className="font-display text-h1 text-balance">{view.title}</h1>
+          {view.publishedAtLabel && view.publishedAtIso && (
+            <p className="text-small text-text-muted">
+              <time dateTime={view.publishedAtIso}>{view.publishedAtLabel}</time>
+            </p>
+          )}
+          <PostShare title={view.title} {...(shareUrl ? { url: shareUrl } : {})} />
+        </header>
+        {/* Rail sau <header> trong DOM (Tab gặp tiêu đề trước); `absolute inset-y-0` nên vẫn dính từ đầu bài. */}
+        <PostShareRail {...(shareUrl ? { url: shareUrl } : {})} />
+        {view.cover && (
+          <div className="mx-auto w-full max-w-5xl sm:px-gutter">
+            <ResponsiveImage media={view.cover} sizes="(min-width: 1024px) 1024px, 100vw" aspectRatio="16/9" priority />
+          </div>
         )}
-        <h1 className="font-display text-h1 text-balance">{view.title}</h1>
-        {view.publishedAtLabel && view.publishedAtIso && (
-          <p className="text-small text-text-muted">
-            <time dateTime={view.publishedAtIso}>{view.publishedAtLabel}</time>
-          </p>
-        )}
-      </header>
-      {view.cover && (
-        <div className="mx-auto w-full max-w-5xl sm:px-gutter">
-          <ResponsiveImage media={view.cover} sizes="(min-width: 1024px) 1024px, 100vw" aspectRatio="16/9" priority />
+        <div className="mx-auto flex w-full max-w-text flex-col gap-10 px-gutter py-10">
+          {offer && <OfferBox offer={offer} />}
+          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
+          {view.gallery.length > 0 && (
+            <section aria-label={t("gallery")}>
+              <Gallery images={view.gallery} />
+            </section>
+          )}
         </div>
-      )}
-      <div className="mx-auto flex w-full max-w-text flex-col gap-10 px-gutter py-10">
-        {offer && <OfferBox offer={offer} />}
-        <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
-        {view.gallery.length > 0 && (
-          <section aria-label={t("gallery")}>
-            <Gallery images={view.gallery} />
-          </section>
-        )}
       </div>
       <div className="mx-auto w-full max-w-text px-gutter pb-10">
         <LeadFormSlot title={t("leadForm.title")}>
@@ -88,9 +95,6 @@ export function PostDetail({ doc, view, offer, related, hotline, ownPath, shareU
           </div>
         </LeadFormSlot>
       </div>
-      <footer className="mx-auto w-full max-w-text px-gutter pb-section-tight">
-        <ShareButtons title={view.title} {...(shareUrl ? { url: shareUrl } : {})} />
-      </footer>
       {related.length > 0 && (
         <section aria-labelledby="related-posts" className="bg-bg-alt py-section-tight">
           <div className="mx-auto w-full max-w-container px-gutter">
