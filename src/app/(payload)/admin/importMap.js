@@ -23,6 +23,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { LeadAssigneeWarning as LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef } from '../../../components/admin/LeadAssigneeWarning'
+import { LeadExportButton as LeadExportButton_18acbe9af70d755a770c60fb9a6234f1 } from '../../../components/admin/LeadExportButton'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 } from '../../../components/admin/SessionKeepAlive'
@@ -56,6 +57,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning": LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef,
+  "/components/admin/LeadExportButton#LeadExportButton": LeadExportButton_18acbe9af70d755a770c60fb9a6234f1,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/SessionKeepAlive#SessionKeepAlive": SessionKeepAlive_739be204eef6d8fda1df751cccf17193,

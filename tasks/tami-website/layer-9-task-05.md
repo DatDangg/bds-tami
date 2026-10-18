@@ -33,11 +33,11 @@ Admin xuất `.xlsx` theo bộ lọc hiện tại; nút trong danh sách lead.
 Mở khoá cho: `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] Chỉ admin (sale 403, khách 401); rate limit 10 lần/giờ/user
-- [ ] Lọc theo trạng thái, nguồn, sale, khoảng ngày; stream file, `Cache-Control: no-store`
-- [ ] Ô bắt đầu bằng `=`, `+`, `-`, `@` được escape (chống CSV/Excel injection)
-- [ ] Ghi audit `lead.export` kèm bộ lọc và số dòng (không kèm dữ liệu khách)
-- [ ] Không xuất lead đã ẩn danh dưới dạng có PII
+- [x] Chỉ admin (sale 403, khách 401); rate limit 10 lần/giờ/user
+- [x] Lọc theo trạng thái, nguồn, sale, khoảng ngày; stream file, `Cache-Control: no-store`
+- [x] Ô bắt đầu bằng `=`, `+`, `-`, `@` được escape (chống CSV/Excel injection)
+- [x] Ghi audit `lead.export` kèm bộ lọc và số dòng (không kèm dữ liệu khách)
+- [x] Không xuất lead đã ẩn danh dưới dạng có PII
 
 ## Tests cần viết
 - Integration: admin xuất → file đọc lại đúng số dòng + audit
@@ -52,19 +52,19 @@ Mở khoá cho: `layer-12-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 3
+- Last failure type (round 1/2): bộ lọc admin {or:[{and}]} bị bỏ → xuất toàn bộ; khoảng ngày picker T12:00Z bị nới cả ngày
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: 5/5 xong (builder)
+- Verify commands + result (builder, worktree wt9-t05): `pnpm lint` PASS; `pnpm typecheck` PASS; `pnpm test` 2046 test PASS, 1 suite FAIL đã biết (`src/lib/contrast.test.ts` CRLF); test mới: unit `xlsx-stream` (17), `export-filters` (11), `leads-export` handler (6), UI `LeadExportButton` (5), integration `leads-export` (9: 401/403, đọc lại file đúng số dòng + audit không PII, escape công thức, lọc, 400, ẩn danh/xoá mềm, audit lỗi 500, lần 11 → 429, tài khoản khoá); `pnpm build` FAIL do môi trường: Turbopack không resolve `next/font/google` (Montserrat), 15 lỗi đều ở font, không liên quan file task
+- Reviewer verdict: STRICT round 1 FAIL → round 2 FAIL → round 3 PASS (`.context/review-reports/build-tami-website-layer-9-task-05-round-3-review.md`)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: có — `docs/API_SPEC.md` §4 thêm khối As-built cho `GET /api/admin/leads/export` (tham số, thứ tự lỗi, trần 20.000 dòng → 422, header, quy tắc escape/ẩn danh)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -76,10 +76,10 @@ Mở khoá cho: `layer-12-task-01`
 - [ ] Code written (chỉ trong scope)
 - [ ] Tests added + pass
 - [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
 - [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - src/endpoints/admin/leads-export.ts
@@ -88,3 +88,8 @@ Mở khoá cho: `layer-12-task-01`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-9-task-05 round 3 (MINOR)
+- [ ] `src/lib/leads/export-filters.ts:94-95`: thông báo khoá nút ghi rõ chỉ hỗ trợ "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" cho Ngày tạo.
+- [ ] `export-filters.ts:72`: so `createdFrom > createdTo` bằng `Date.parse` thay vì chuỗi.
+- [ ] (tuỳ chọn) dò trash bằng server component `serverProps.params.segments[2] === "trash"` thay vì pathname; ẩn nút trong list drawer.

@@ -13,8 +13,8 @@ import { LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadSt
 import { isUuid } from "../lib/uuid";
 import type { Lead } from "../payload-types";
 
-const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Đăng tin BĐS", project: "Dự án", contact: "Liên hệ" };
-const STATUS_LABELS: Record<LeadStatus, string> = {
+export const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Đăng tin BĐS", project: "Dự án", contact: "Liên hệ" };
+export const STATUS_LABELS: Record<LeadStatus, string> = {
   new: "Mới",
   contacted: "Đã liên hệ",
   consulting: "Đang tư vấn",
@@ -176,6 +176,8 @@ export const Leads: CollectionConfig = {
     useAsTitle: "code",
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "assigneeInactive", "createdAt"],
     listSearchableFields: ["code", "fullName"],
+    // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Chỉ admin thấy, endpoint kiểm quyền lại.
+    components: { beforeList: ["/components/admin/LeadExportButton#LeadExportButton"] },
   },
   defaultSort: "-createdAt",
   trash: true,
