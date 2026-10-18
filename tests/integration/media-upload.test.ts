@@ -311,7 +311,7 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
       privateId = doc.id;
       privateName = doc.filename as string;
       privateIds.push(doc.id);
-      expect(doc.filename).toMatch(/^[0-9a-f-]{36}.pdf$/);
+      expect(doc.filename).toMatch(/^[0-9a-f-]{36}\.pdf$/);
       expect(doc.mimeType).toBe("application/pdf");
       expect(doc.url ?? "").toBe("");
       expect(await objectExists(privateBucket, privateName)).toBe(true);
