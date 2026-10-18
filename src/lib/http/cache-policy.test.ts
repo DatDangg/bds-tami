@@ -5,6 +5,7 @@ import {
   cacheControlHeaders,
   DOTTED_PATH_CACHE_CONTROL,
   DOTTED_PATH_SOURCE,
+  ROUTE_HANDLER_FILE_SOURCE,
   MEDIA_FILE_CACHE_CONTROL,
   NO_STORE_CACHE_CONTROL,
   PUBLIC_PAGE_CACHE_CONTROL,
@@ -44,7 +45,7 @@ describe("PUBLIC_PAGE_SOURCE (biên dịch bằng path-to-regexp của Next như
 describe("DOTTED_PATH_SOURCE (path có đuôi file, biên dịch bằng path-to-regexp của Next)", () => {
   const matcher = pathToRegexp(DOTTED_PATH_SOURCE);
 
-  it.each(["/robots.txt", "/sitemap.xml", "/llms.txt", "/favicon.ico", "/brand/tami-logo-gold.png", "/en/robots.txt"])(
+  it.each(["/robots.txt", "/favicon.ico", "/brand/tami-logo-gold.png", "/en/robots.txt"])(
     "%s nhận TTL ngắn",
     (path) => {
       expect(matcher.test(path)).toBe(true);
@@ -58,10 +59,33 @@ describe("DOTTED_PATH_SOURCE (path có đuôi file, biên dịch bằng path-to-
     },
   );
 
+  it("route handler tự đặt Cache-Control (sitemap, llms) bị loại khỏi rule này để 503 no-store có hiệu lực", () => {
+    for (const path of ["/sitemap.xml", "/llms.txt", "/sitemaps/projects-1.xml", "/sitemaps/static-1.xml"]) expect(matcher.test(path)).toBe(false);
+  });
+
   it("hai nhóm PUBLIC_PAGE_SOURCE và DOTTED_PATH_SOURCE không chồng nhau", () => {
     const page = pathToRegexp(PUBLIC_PAGE_SOURCE);
     for (const path of ["/", "/en", "/robots.txt", "/brand/a.png", "/api/x", "/admin", "/_next/static/a.js"]) {
       expect(page.test(path) && matcher.test(path)).toBe(false);
+    }
+  });
+});
+
+describe("ROUTE_HANDLER_FILE_SOURCE", () => {
+  const matcher = pathToRegexp(ROUTE_HANDLER_FILE_SOURCE);
+
+  it.each(["/sitemap.xml", "/llms.txt", "/sitemaps/projects-1.xml"])("%s khớp", (path) => {
+    expect(matcher.test(path)).toBe(true);
+  });
+
+  it.each(["/", "/robots.txt", "/sitemap.xml.bak", "/du-an/a", "/api/health", "/brand/a.png"])("%s không khớp", (path) => {
+    expect(matcher.test(path)).toBe(false);
+  });
+
+  it("không chồng DOTTED_PATH_SOURCE và PUBLIC_PAGE_SOURCE", () => {
+    const others = [pathToRegexp(DOTTED_PATH_SOURCE), pathToRegexp(PUBLIC_PAGE_SOURCE)];
+    for (const path of ["/sitemap.xml", "/llms.txt", "/sitemaps/projects-1.xml"]) {
+      expect(others.some((other) => other.test(path))).toBe(false);
     }
   });
 });
@@ -78,7 +102,8 @@ describe("cacheControlHeaders (next.config)", () => {
 
   it.each([
     ["trang công khai", PUBLIC_PAGE_SOURCE, "/"],
-    ["path có đuôi (robots/sitemap/llms)", DOTTED_PATH_SOURCE, "/robots.txt"],
+    ["path có đuôi (robots, favicon...)", DOTTED_PATH_SOURCE, "/robots.txt"],
+    ["route handler file (sitemap/llms)", ROUTE_HANDLER_FILE_SOURCE, "/sitemap.xml"],
   ])("biến thể RSC của %s (header rsc/next-router-*, query _rsc) là no-store và đứng SAU rule gốc của nó", (_name, source) => {
     const all = cacheControlHeaders();
     const baseIndex = all.findIndex((rule) => rule.source === source && !("has" in rule));

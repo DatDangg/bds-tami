@@ -33,7 +33,14 @@ export const PUBLIC_PAGE_SOURCE = "/((?!api(?:/|$)|admin(?:/|$)|_next(?:/|$)|_ve
  * Đường dẫn có đuôi file (robots.txt, sitemap.xml, llms.txt, favicon.ico, ảnh trong `public/`...) TRỪ `/_next`, `/api`,
  * `/admin`, `/_vercel`. Khớp phần bù của `PUBLIC_PAGE_SOURCE` (cùng cách dùng `[.]`).
  */
-export const DOTTED_PATH_SOURCE = "/((?!api(?:/|$)|admin(?:/|$)|_next(?:/|$)|_vercel(?:/|$)).*[.].*)";
+export const DOTTED_PATH_SOURCE = "/((?!api(?:/|$)|admin(?:/|$)|_next(?:/|$)|_vercel(?:/|$)|sitemap[.]xml(?:/|$)|llms[.]txt(?:/|$)|sitemaps(?:/|$)).*[.].*)";
+
+/**
+ * Route handler tự đặt Cache-Control (200/404 ngắn, 503 `no-store`): `/sitemap.xml`, `/llms.txt`, `/sitemaps/*`. Header khai ở
+ * `next.config.ts` thắng header của route, nên các path này bị loại khỏi `DOTTED_PATH_SOURCE` (nếu không, `no-store` của 503
+ * bị đè thành `s-maxage=60` và CDN giữ lỗi tạm thời). Chỉ còn rule biến thể RSC (`no-store`) áp cho chúng.
+ */
+export const ROUTE_HANDLER_FILE_SOURCE = "/(sitemap[.]xml|llms[.]txt|sitemaps/.*)";
 
 /**
  * Path có đuôi: CDN giữ ngắn (60s), trình duyệt luôn hỏi lại. Lý do: file `public/` không có hash trong tên, và request
@@ -73,6 +80,7 @@ export function cacheControlHeaders() {
     ...rscVariantNoStoreRules(PUBLIC_PAGE_SOURCE),
     { source: DOTTED_PATH_SOURCE, headers: [{ key: "Cache-Control", value: DOTTED_PATH_CACHE_CONTROL }] },
     ...rscVariantNoStoreRules(DOTTED_PATH_SOURCE),
+    ...rscVariantNoStoreRules(ROUTE_HANDLER_FILE_SOURCE),
     { source: "/admin/:path*", headers: [{ key: "Cache-Control", value: NO_STORE_CACHE_CONTROL }] },
   ];
 }

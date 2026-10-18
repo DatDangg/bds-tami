@@ -38,11 +38,11 @@ Sitemap song ngữ có `hreflang` alternates, robots theo môi trường, llms.t
 Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 
 ## Acceptance Criteria
-- [ ] Chỉ nội dung công khai (`publicWhere`); loại tin `rented`, tuyển dụng hết hạn, `seo.noindex`
-- [ ] URL EN chỉ khi `hasEnglish`; mỗi URL có alternates vi/en/x-default khi có cả hai
-- [ ] `lastmod` = `updatedAt`
-- [ ] Production: robots cho phép (kể cả GPTBot/ClaudeBot/PerplexityBot), có `Sitemap:`; chặn `/admin`, `/api`. Staging: `Disallow: /`
-- [ ] Chia sitemap khi > 50.000 URL
+- [x] Chỉ nội dung công khai (`publicWhere`); loại tin `rented`, tuyển dụng hết hạn, `seo.noindex`
+- [x] URL EN chỉ khi `hasEnglish`; mỗi URL có alternates vi/en/x-default khi có cả hai
+- [x] `lastmod` = `updatedAt`
+- [x] Production: robots cho phép (kể cả GPTBot/ClaudeBot/PerplexityBot), có `Sitemap:`; chặn `/admin`, `/api`. Staging: `Disallow: /`
+- [x] Chia sitemap khi > 50.000 URL
 
 ## Tests cần viết
 - Integration: draft/rented/hết hạn không có trong sitemap; EN chưa dịch không có
@@ -56,19 +56,19 @@ Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type (round 1): M1 danh mục `seo.noindex` vẫn vào sitemap (không select `seo`)
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
+- Acceptance criteria: 5/5 (builder)
 - Verify commands + result: pending
-- Reviewer verdict: pending
+- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-05-round-2-review.md`)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: docs/ARCHITECTURE.md §5 as-built (sitemap index, robots Sitemap, llms.txt)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -77,13 +77,13 @@ Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-8/task-05` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/app/sitemap.ts (hoặc chia sitemap index theo collection)
@@ -96,3 +96,15 @@ Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 
 ## Follow-up từ review layer-5-task-08
 - `src/lib/seo/robots.ts` (L5-T08) cho production `allow: ["/", "/api/media/file/"]` + `disallow: ["/admin", "/api/"]` vì ảnh/OG phục vụ ở `/api/media/file/` (ARCHITECTURE §5). Khi thêm dòng `Sitemap:` phải GIỮ ngoại lệ `/api/media/file/` này (AC44 chỉ nói chặn `/admin`, `/api`).
+
+## Quyết định thiết kế / as-built (builder)
+- Sitemap = route handler (không dùng `sitemap.ts` của Next vì cần index): `/sitemap.xml` (index) + `/sitemaps/<nhóm>-<n>.xml`. Nhóm = allowlist trong `src/lib/seo/sitemap-data.ts` (collection nội bộ không thể lọt vào). Mỗi file ≤ 20.000 bản ghi (≤ 40.000 URL) nên < 50.000.
+- Loại: rentals chỉ `status = published` (rented bị noindex); job-postings `deadline >= startOfVietnamDay` (cùng quy ước `isPastDeadline`); `seo.noindex` xét theo từng ngôn ngữ (nhóm `seo` localized). Danh mục (news, property_post) có trang nên vào sitemap; danh mục `rental` chờ L8-T03. Trang tĩnh gồm `/cho-thue` danh sách theo `routing.ts` (trang do L8-T03).
+- Pháp lý (`pages`): theo `kind`, EN khi `hasEnglish`. x-default = bản vi. Một ngôn ngữ duy nhất → không alternates.
+- robots: giữ `/api/media/file/`; thêm `Sitemap:` chỉ ở production và khi biết `NEXT_PUBLIC_SITE_URL`; AI crawlers gộp chung nhóm `*` (nhóm riêng theo bot sẽ bỏ qua `Disallow` của `*`).
+- llms.txt: `src/app/llms.txt/route.ts` → `src/lib/seo/llms-route.ts` (+ `llms-txt.ts` thuần). Chỉ link thật, 5 mục mới nhất mỗi collection.
+- Cache: dùng rule `DOTTED_PATH_SOURCE` có sẵn (CDN 60s); route `force-dynamic` vì đọc DB/env lúc chạy. Không thêm unstable_cache.
+- Chưa làm (ngoài scope): `llms-full.txt`, `/.well-known/llms.txt`.
+
+## Follow-up từ review layer-8-task-05 round 2 (MINOR) → layer-16-task-01
+- Chuyển sang `layer-16-task-01.md` (task đổi `publicWhere` hẹn giờ, sitemap tự nhận).

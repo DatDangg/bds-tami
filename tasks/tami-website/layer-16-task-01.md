@@ -96,3 +96,9 @@ Mở khoá cho: không có
 - Cache CDN: trang chưa tới giờ trả 404 có thể bị cache 60s — chấp nhận (≤ 1 phút).
 - Phụ thuộc `deployprod` chỉ để giữ thứ tự (Could sau khi đã lên production); production không phụ thuộc task này.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-8-task-05 round 2 (MINOR)
+- [ ] `/sitemap.xml`, `/sitemaps/*`, `/llms.txt` có query string: 301 về URL sạch thay vì 404 (link có `utm_*` từ trợ lý AI); test riêng nhánh query/503 cho `/llms.txt`.
+- [ ] Sửa comment `src/lib/http/cache-policy.ts:26-27,33-34` và bullet layer-4-task-03 trong ARCHITECTURE (sitemap/llms không còn thuộc rule path có đuôi file).
+- [ ] Lookahead `sitemaps/[^/]+$` để path nhiều đoạn (`/sitemaps/a/b.xml`) vẫn có TTL ngắn.
+- [ ] Kiểm sitemap/llms loại tin hẹn giờ (`publishedAt > now`) khi `publicWhere` thêm điều kiện.
