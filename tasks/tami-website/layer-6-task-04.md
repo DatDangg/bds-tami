@@ -54,7 +54,6 @@ Mở khoá cho: `layer-10-task-03`
 ## Retry / Error Memory
 - Attempt: 2
 - Last failure type (round 1): MAJOR-1 route `/du-an/danh-muc/[category]` ngoài BRD/design-spec — gỡ theo quyết định user
-- Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
@@ -64,7 +63,7 @@ Mở khoá cho: `layer-10-task-03`
 - Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-6-task-04-round-2-review.md`
 - Lệch chấp nhận: chip là link + `aria-current` trong `nav` (S02 ghi `button[aria-pressed]` — link đúng ngữ nghĩa, chạy không cần JS); chưa có skeleton 6 thẻ (`loading.tsx`)
 - Residual risk: 404 `?page` vượt phạm vi vẫn `public, s-maxage=60` (giống /tin-tuc) → L15-T01. `ProjectListPage` ~70 dòng; chưa có test chứng minh `select` bỏ trường dài; seed có thể ghi đè tên EN danh mục trùng tên VI (staging) → L15-T01. Thẻ dự án trỏ `/du-an/[slug]` 404 tới khi xong L6-T05
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-04)

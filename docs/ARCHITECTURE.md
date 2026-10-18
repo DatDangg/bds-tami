@@ -91,15 +91,16 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── global-error.tsx   # Trang lỗi gốc (khi layout lỗi), hotline lấy từ NEXT_PUBLIC_HOTLINE lúc build
 │   │   ├── robots.ts          # /robots.txt lúc chạy theo APP_ENV (dùng lib/seo/robots)
 │   │   └── (payload)/         # /admin và /api do Payload sinh; route tĩnh thắng catch-all /api/[...slug]: api/health, api/metrics (Prometheus, Bearer), api/monitoring-config (DSN GlitchTip lúc chạy)
-│   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...
+│   ├── collections/           # Định nghĩa collection: Projects, Rentals, PropertyPosts, News, Leads, ...; redirects-plugin.ts (cấu hình plugin redirects)
 │   │   └── _shared/           # content-defaults.ts: factory withContentDefaults (versions, trash, access, hook dùng chung)
-│   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo
+│   ├── fields/                # Field nội dung dùng chung: slug, status, published-at, author, is-featured, translation, seo, ward-in-province (phường/xã thuộc tỉnh đã chọn)
 │   ├── globals/               # SiteSettings, Homepage, Header, Footer
 │   ├── access/                # Hàm phân quyền dùng chung: isAdmin, isAuthorOrAdmin, isAssignedOrAdmin
-│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/), categories/ (cây, khoá scope, chặn xoá), pages/ (lock-kind, sync-privacy-version, revalidate-page), revalidate-global, trim-text
+│   ├── hooks/                 # Hook collection: sinh mã tin, slug, gán lead, xoá cache, audit log (staff/), categories/ (cây, khoá scope, chặn xoá), pages/ (lock-kind, sync-privacy-version, revalidate-page), rentals/ (generate-code CT-xxxxxx, build-search-text, field-validators), revalidate-global, trim-text
 │   ├── endpoints/             # Endpoint tuỳ biến: gửi lead, ứng tuyển, tìm kiếm, đếm click
 │   │   ├── _middleware/       # public-pipeline: rateLimit → verifyTurnstile → validate (PERMISSION §5)
-│   │   └── public/            # Endpoint công khai: click-events (đã có), leads, job-applications
+│   │   ├── public/            # Endpoint công khai: click-events (đã có), leads, job-applications
+│   │   └── admin/             # Endpoint cần đăng nhập admin: private-file-download (tải file private qua S3)
 │   ├── jobs/                  # Payload Jobs: gửi email, nhắc lead, dọn dữ liệu
 │   ├── lib/
 │   │   ├── search/            # SearchService (PostgreSQL ở giai đoạn 1), normalize (không dấu, khớp unaccent)
@@ -113,25 +114,28 @@ Một repo, một app Next.js có nhúng Payload:
 │   │   ├── click-stats/       # Gộp lượt bấm (hàm thuần cho job aggregate-click-stats); click-types.ts (CLICK_TYPES, CLICK_REF_COLLECTIONS)
 │   │   ├── consent/           # consent-cookie.ts: đọc/ghi cookie đồng ý (analytics, pv = privacyPolicyVersion)
 │   │   ├── monitoring/        # GlitchTip options + scrubText, metrics Prometheus, process-errors, service-name
-│   │   ├── content/           # content-paths (path nội bộ /{locale}{key} cho revalidate), public-queries (publicWhere/findPublicList/BySlug), pagination, nav-link, get-globals/read-global/global-cache
+│   │   ├── content/           # content-paths (path nội bộ /{locale}{key} cho revalidate), public-queries (publicWhere/findPublicList/BySlug), pagination, nav-link, get-globals/read-global/global-cache, site-identity, resolve-redirect/find-redirect/redirect-paths, resolve-missing-page (404 có nội dung, `MISSING_PAGE_RULES`)
 │   │   ├── payload/           # preserve-request-locale, prod-migrations (AUTO_MIGRATE_ON_START)
 │   │   ├── logger.ts          # pino JSON + redact/scrub PII, dùng chung app/jobs/Payload
 │   │   ├── s3-config.ts       # Cấu hình S3 client (SeaweedFS) dùng chung
 │   │   ├── translation/       # TranslationService: gọi Claude API, dịch richText theo node, thuật ngữ, hạn mức chi phí
 │   │   ├── leads/             # Logic nghiệp vụ lead: chống trùng, phân công
+│   │   ├── projects/          # project-queries, project-filters, project-view, project-detail-view
+│   │   ├── careers/           # job-queries, job-filters, job-view, deadline, job-json-ld
 │   │   └── seo/               # site-url (URL gốc lúc chạy), metadata (meta/OG/canonical/hreflang/noindex), json-ld, robots; sitemap làm ở layer-8-task-05
-│   ├── components/            # UI dùng chung: ui/ (shadcn), admin/ (logo, icon, keepalive), media/ (Gallery, Lightbox, LazyMap, VideoFacade, ResponsiveImage), forms/ (FormField, ConsentCheckbox, TurnstileWidget, FormStatus, use-public-form), layout/ (PublicShell, load-shell, shell-data, Header, DesktopNav, MobileMenu, Footer, LanguageSwitcher, SkipLink, FloatingContact, Breadcrumb, Pagination, EmptyState, PageBanner), consent/ (CookieBanner, ConsentPreferences), analytics/ (GoogleAnalytics), seo/ (JsonLd), templates/ (CategoryListTemplate)
+│   ├── components/            # UI dùng chung: ui/ (shadcn), admin/ (logo, icon, keepalive), media/ (Gallery, Lightbox, LazyMap, VideoFacade, ResponsiveImage), forms/ (FormField, ConsentCheckbox, TurnstileWidget, FormStatus, use-public-form), layout/ (PublicShell, load-shell, shell-data, Header, DesktopNav, MobileMenu, Footer, LanguageSwitcher, SkipLink, FloatingContact, Breadcrumb, Pagination, EmptyState, PageBanner), consent/ (CookieBanner, ConsentPreferences), analytics/ (GoogleAnalytics), seo/ (JsonLd), templates/ (CategoryListTemplate), content/ (RichText), projects/ (ProjectListPage, ProjectDetail + các section), news/ (NewsListPage, NewsCard, ShareButtons), careers/ (JobListPage, JobDetail, ApplyFormSlot)
 │   ├── i18n/                  # routing.ts (locales, pathnames vi ↔ en), request.ts, messages/vi.json, messages/en.json
 │   ├── instrumentation.ts, instrumentation-client.ts  # Khởi tạo GlitchTip server/trình duyệt (chỉ khi có DSN)
-│   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
+│   ├── proxy.ts               # next-intl (Next 16 gọi là proxy, trước đây middleware): tra `redirects` (resolveRedirect, 301 cùng origin) → resolveMissingPage (404 có nội dung) → nhận /en, /vi/* → 301 về bản không tiền tố, bỏ qua /admin và /api
 │   └── payload.config.ts
 ├── migrations/                # Migration do `payload migrate:create` sinh, đã commit
-├── scripts/                   # deploy/ (deploy.sh + lib/ + deploy.test.sh, chạy trên server qua SSH); seed-categories.ts, seed-pages.ts, seed-shell-globals.ts, seed-sample-*.ts; upload-sourcemaps.mjs (upload source map lên GlitchTip lúc build image); jobs-runner.ts (`pnpm jobs` ở dev; container chạy thẳng `node node_modules/payload/bin.js run scripts/jobs-runner.ts`)
+├── scripts/                   # deploy/ (deploy.sh + lib/ + deploy.test.sh, chạy trên server qua SSH); seed.mjs + seed-run.ts (`pnpm seed [--sample]`, gọi seed/index.ts); seed-categories.ts, seed-pages.ts, seed-shell-globals.ts, seed-sample-*.ts; copy-maplibre-worker.mjs (chép worker MapLibre vào public/), generate-sample-images.mjs (sinh ảnh mẫu seed/sample/images); upload-sourcemaps.mjs (upload source map lên GlitchTip lúc build image); jobs-runner.ts (`pnpm jobs` ở dev; container chạy thẳng `node node_modules/payload/bin.js run scripts/jobs-runner.ts`)
 ├── tests/e2e/                 # revalidate-globals.ts (`pnpm e2e:revalidate`, chạy tay với `next start`, chưa vào CI)
-├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định
+├── seed/                      # Dữ liệu nền: 34 tỉnh/thành, phường/xã, danh mục mặc định, trang pháp lý, header/footer (index.ts điều phối)
+│   └── sample/                # Dữ liệu mẫu chỉ staging/dev (`--sample`): dự án, tin tức, dịch vụ, cho thuê, tuyển dụng + images/
 ├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
 │   ├── backup/                # image postgres + pgBackRest, sidecar backup (pgBackRest + restic), e2e test
-│   └── nginx/                 # tami.conf, tami-staging.conf (copy vào /etc/nginx/sites-available trên server)
+│   └── nginx/                 # tami.conf, tami-staging.conf (bản Cloudflare), tami-staging-sslip{,-http}.conf (staging tạm sslip.io + basic auth), tami-cloudflare-ips.conf (copy vào /etc/nginx/sites-available trên server)
 ├── docs/runbooks/             # deploy.md, restore.md
 └── .github/                   # workflows/ (ci.yml, deploy.yml), actions/ssh-deploy
 ```

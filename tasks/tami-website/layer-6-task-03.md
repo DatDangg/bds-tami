@@ -62,7 +62,7 @@ Mở khoá cho: `layer-12-task-01`, `layer-13-task-02`
 - Verify commands + result: pnpm lint / typecheck = PASS; pnpm test 108 file 1.174 PASS (gồm integration DB); pnpm build PASS. Migration `20261017_135306_redirects` (additive) applied dev. curl `next start` :3222 (dữ liệu test đã xoá): `/tin-tuc/cu-l6t3` → 301 `Location: /tin-tuc/moi-l6t3` (giữ query), `public, s-maxage=60, stale-while-revalidate=300`; `/en/news/cu-l6t3` → 301 `/en/news/moi-l6t3`; RSC: 1 → 301 `no-store`; đích độc `/evil.example`, `/%5Cevil.example`, `//evil.example` → 404 không theo; `/khong-ton-tai` 404 HTML server có `<h1>Không tìm thấy trang`, header, footer, `lang="vi"`; `/en/khong-ton-tai` 404 `<h1>Page not found` `lang="en"`; `/xx/khong-ton-tai`, `/wp-login.php` 404 nội dung vi; 404 `private, no-cache, no-store`
 - Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-6-task-03-round-2-review.md`
 - Residual risk: `experimental.globalNotFound` (kiểm lại khi nâng Next). Trang chi tiết gọi `notFound()` vẫn shell rỗng → AC đã gắn L6-T05/06/07/08, L7-T03. Cache tra redirect 60 s/instance. MINOR r2-m1 (test song song chưa ép tranh chấp cùng URL), r2-m2 (timeout chưa bọc khởi động Payload), r2-m4 (query của đích bị thay bằng query request), m3 (redirect treo sau xoá cứng) → L15-T01
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §4, §5.1 (as-built 404 + redirect), `docs/ERD.md` (redirects), `docs/API_SPEC.md` (hook)

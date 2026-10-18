@@ -67,7 +67,7 @@ Mở khoá cho: `layer-10-task-03`
 - Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-06-round-1-review.md`
 - Phạm vi thêm: trang S05 `/tin-tuc/danh-muc/[category]` (chip S10 trỏ tới); `RichText` dùng chung; `resolve-missing-page.ts` (proxy kiểm slug); `createCategories(revalidate?)` + hook revalidate danh mục
 - Residual risk: trang danh sách `force-dynamic` (do `?page=`) — cần curl `-I /tin-tuc?page=2` có `public, s-maxage=60` lúc đóng layer; `?page=99` → 404 shell rỗng (giới hạn đã ghi ARCH §5.1); link chia sẻ Zalo chưa kiểm trên điện thoại. MINOR 1–10 → L15-T01 / L6-T07
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-06: kiểm slug ở proxy → 404 SSR có nội dung)

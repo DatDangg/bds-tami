@@ -64,7 +64,7 @@ Mở khoá cho: `layer-10-task-01`
 - Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-07-round-1-review.md`
 - Phạm vi thêm (primary giữ trong task vì chặn AC bản đồ): sửa worker MapLibre hỏng ở mọi bản build (L2-T08) — `scripts/copy-maplibre-worker.mjs` chép worker vào `public/vendor/maplibre/` (gitignore) trước dev/build, `LazyMap` gọi `setWorkerUrl`
 - Residual risk: **bản đồ chưa xác nhận hiển thị bằng mắt** (M1) → kiểm trên staging L6-T01. Worker không đánh version URL (m2), CSP cho bản đồ (m3) → L14-T01. Tile OSM tải khi cuộn tới, không qua đồng ý (có từ trước, SPEC không yêu cầu). m4–m7 → L15-T01. `?service=` chưa có nơi đọc (LeadForm sau)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-07)

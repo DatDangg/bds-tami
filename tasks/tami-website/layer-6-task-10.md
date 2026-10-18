@@ -59,7 +59,7 @@ Mở khoá cho: `layer-12-task-01`
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 115 file 1.273 PASS (10 integration DB + S3 thật); pnpm build PASS (reviewer chạy — builder bị khoá .next bởi dev server khác)
 - Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-10-round-1-review.md`
 - Residual risk: MINOR 1 (resolveObjectKey bỏ qua `prefix` plugin storage), 2 (test admin bị khoá nhận cả 401/403 → siết 401), 3 (thuộc tính `download` làm lưu trang lỗi thành file) → L15-T01. F1 tài khoản bị khoá tạm (`lockUntil`) còn JWT cũ vẫn tải được — hành vi chung Payload. Nút admin chỉ kiểm jsdom, chưa kiểm trình duyệt
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/API_SPEC.md` §4 as-built

@@ -69,7 +69,7 @@ Mở khoá cho: `layer-7-task-01`, `layer-7-task-02`, `layer-7-task-03`, `layer-
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 110 file 1.218 PASS (33 integration rentals, DB thật); pnpm build PASS. Migration `20261017_143212_rentals` (sequence `rentals_code_seq` + 5 index + GIST) applied dev 18/18; DB tạm up/down/up OK
 - Reviewer verdict: STRICT FAIL round 1 → STRICT PASS round 2 — `.context/review-reports/build-tami-website-layer-6-task-02-round-2-review.md`
 - Residual risk: searchText cũ khi đổi tên dự án / legacyNames phường → reindex ở L7-T02 (đã gắn). Trigram GIN → L7-T02. `payload-types` ghi address luôn có nhưng khách có thể không nhận → L7-T03 coi address/location optional. MINOR B (UPDATE version row giả định versions bật), C (test guard tỉnh nhánh rentals chưa tách) → L15-T01
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ERD.md` §4.2, §4.6, §5; `docs/PERMISSION.md` §4

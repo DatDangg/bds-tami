@@ -65,7 +65,7 @@ Mở khoá cho: `layer-10-task-01`
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 135 file 1.477 PASS; pnpm build PASS (`/[locale]/du-an/[slug]` ISR). Trình duyệt next start :3227: 375/768/1280 không cuộn ngang; sub-nav dính, cuộn + focus + hash; lightbox bẫy focus, Esc, trả focus; accordion 375 / 2 cột 1280 (kể cả tắt JS); `/en` tiếng Anh. curl: ISR MISS→HIT `public, s-maxage=60, stale-while-revalidate=300`; slug lạ + EN chưa dịch → 404 có h1/header/footer; slug cũ → 301; JSON-LD RealEstateListing + BreadcrumbList escape; og:image 1200×630; 1 h1
 - Reviewer verdict: STRICT PASS round 1 → PASS round 2 (delta MINOR 1–4) — `.context/review-reports/build-tami-website-layer-6-task-05-round-2-review.md`. Primary sửa 2 MINOR round 2 (try/catch `decodeURIComponent` hash trong LegalPolicy; regex test `/shidden(=|s|>)/`) — test file 19/19, lint, typecheck PASS
 - Residual risk: dev DB 3 ảnh mẫu cũ có alt EN tiếng Việt (seed chỉ đặt khi tạo mới). Bản đồ chưa kiểm hiển thị (→ staging L6-T01). Link breadcrumb 42px rộng (component có sẵn) → L14-T02. Không JS < lg: panel thứ 2 accordion không mở được (nội dung vẫn trong HTML)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.1 (as-built layer-6-task-05), `docs/API_SPEC.md` §3.4 (refCollection/refId)

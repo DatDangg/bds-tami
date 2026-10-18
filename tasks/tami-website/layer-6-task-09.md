@@ -65,7 +65,7 @@ Mở khoá cho: `layer-7-task-04`
 - Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-09-round-1-review.md`
 - Lệch: không tạo `src/lib/email/templates/new-application.ts` — dùng lại template `job-application` (L1-T07) đủ dữ liệu BR-21. Sửa ngoài phạm vi: `PrivateFiles.ts` thêm MIME `application/msword` (trước đó .doc luôn bị từ chối)
 - Residual risk: `TRUST_CF_CONNECTING_IP` phải bật ở staging/prod (→ L6-T01). CV mồ côi khi tiến trình chết giữa 2 bước → job dọn (L9-T06). MINOR 1 (ký tự NUL/điều khiển trong fullName/message → 500), 4 (giới hạn số part), 5 (thu hẹp map ValidationError), 7 (test chưa kiểm object S3) → L15-T01. Helper deadline chuyển `src/lib/` dùng chung ở L6-T08
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/API_SPEC.md` §3.2 as-built

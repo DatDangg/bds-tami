@@ -151,7 +151,7 @@ Quy tắc: luôn còn ít nhất 1 `admin` đang hoạt động (hook chặn kho
 | `name` | text | R | |
 | `type` | select | R | `phuong` · `xa` · `dac_khu` |
 | `slug` | text | R | Unique trong cùng tỉnh |
-| `legacyNames` | array of text | | Tên cũ trước 01/07/2025 (vd "Phường Bến Nghé, Quận 1"), dùng cho tìm kiếm (LGL-01) |
+| `legacyNames` | array `{ name: text }` | | Tên cũ trước 01/07/2025 (vd "Phường Bến Nghé, Quận 1"), dùng cho tìm kiếm (LGL-01) |
 
 Dữ liệu seed từ danh mục hành chính chính thức, đặt ở `seed/`. Chỉ admin sửa.
 
@@ -565,7 +565,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `leads` | `(status, assigned_to_id, created_at DESC)` | Danh sách lead trong admin |
 | `audit_logs` | `(created_at)` (btree, Postgres quét ngược cho mới-nhất-trước), `(collection, doc_id)`, `actor`, `action` | Tra cứu nhật ký |
 
-Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (partial index `WHERE deleted_at IS NULL`, nếu dùng trường `deletedAt`).
+Với dữ liệu đang xoá mềm: index chỉ áp lên bản ghi chưa xoá (partial index `WHERE deleted_at IS NULL`, nếu dùng trường `deletedAt`). As-built (tới layer 6): các index danh sách hiện **không** partial — chỉ là đích thiết kế, chưa áp.
 
 **Song ngữ:** cột localized nằm ở bảng `<collection>_locales`, nên index tìm kiếm và slug đặt ở đó:
 

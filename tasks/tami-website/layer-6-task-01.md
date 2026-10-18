@@ -44,22 +44,22 @@ build (initial)
 Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Acceptance Criteria
-- [ ] Runbook go-live: điền `site-settings` (`siteName`…) TRƯỚC khi publish trang privacy — nếu thiếu, hook `sync-privacy-version` báo lỗi `siteName` khó hiểu; cân nhắc ValidationError rõ (MINOR-1); `scripts/seed-sample-services.ts` thoát sớm khi `APP_ENV=production` (MINOR-4) (review L5-T02 round 1)
-- [ ] G10: chốt với user cách báo động backup/web chết trên staging khi stack giám sát (L4-T06) còn hoãn — bật riêng Uptime Kuma hoặc chấp nhận tới trước M3; đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (spec-validation layer 4)
-- [ ] Backup lần đầu trên server: tạo `BACKUP_ENV_DIR` + env pgBackRest/restic (đích S3/SFTP user chốt), `stanza-create`, `restic init`, kiểm digest base `postgis/postgis:17-3.5` trên server khớp digest ghim + `ldd --version` trước khi đổi image (restore.md §2.3), đặt `HEARTBEAT_URL_WAL`; e2e test chuyển image đọc `ARG POSTGIS_IMAGE` thay vì tag (review L4-T07 round 2 MINOR-A)
-- [ ] Trước lần deploy thật: rollback dùng `COMPOSE_FILE` qua symlink `current` như lúc deploy (`scripts/deploy/lib/release.sh:48`, review L4-T05 r2 MINOR-1) + assert trong `deploy.test.sh`; xác minh Compose có resolve symlink cho bind `./postgres/init.sql` không — nếu có thì chuyển init.sql sang đường dẫn cố định hoặc `configs:` để postgres không bị recreate mỗi lần đổi release (MINOR-2); cấu hình required reviewers Environment `production`, nhánh mặc định `staging`, secret DEPLOY_* theo `docs/runbooks/deploy.md`
-- [ ] Pin action trong `.github/workflows/ci.yml` theo commit SHA (đang `@v4`; review L4-T05 r2 MINOR-4)
-- [ ] Dockerfile COPY `seed/` (và chạy `seed:categories` được trong container) trước deploy staging (review L4-T01)
-- [ ] Từ layer-1-task-06/L3-T03: kiểm `nginx -v` (≥ 1.18 cho `listen 443 ssl http2`) và `docker version` trên server; hỏi user bật Authenticated Origin Pulls (khối conf đã có, đang comment); smoke test 2 IP thật qua Cloudflare rơi vào 2 bucket rate limit (spec-validation layer 3)
-- [ ] Cloudflare cache rule: `/api/*` bypass **trừ `/api/media/file/*`** → cache (Edge TTL theo header origin immutable) — **chỉ áp host prod**; host staging bypass cache toàn bộ (hoặc Cloudflare Access) để ảnh/static staging không lọt qua basic auth (review L3-T03 round 2 MINOR-R2-1/R2-2) (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`)
-- [ ] Cloudflare Cache Rule: bypass cache khi request có header `rsc` / `next-router-prefetch` / `next-router-state-tree` / `next-router-segment-prefetch` hoặc query `_rsc` (Cloudflare bỏ qua `Vary`; origin đã trả `no-store` cho các biến thể này trên trang công khai; rule Cloudflare phải áp cho MỌI path, kể cả path có đuôi file); HTML và path có đuôi file tôn trọng TTL origin, không đặt Edge TTL ghi đè (review L4-T03 round 2)
-- [ ] ⏸ Mỗi bước chạm server (tạo thư mục, `.env`, Nginx, Cloudflare, chạy pipeline) chỉ làm sau khi user xác nhận trong chat
-- [ ] Compose staging chạy `tami-staging-*` (app, jobs, postgres, redis; SeaweedFS bucket riêng); chỉ app bind `127.0.0.1:3011`
-- [ ] Nginx `tami-staging.conf`: `nginx -t` PASS rồi mới reload; chỉ nhận IP Cloudflare; không sửa file site khác
-- [ ] Cloudflare: DNS staging, SSL Full Strict, Cloudflare Access (hoặc basic auth) chặn công khai; `X-Robots-Tag: noindex` + robots `Disallow: /`
-- [ ] Pipeline CD chạy thật từ nhánh `staging`: image theo SHA → `payload migrate` → app + jobs up → `/api/health` 200; thử rollback một lần (health fail giả lập) có ghi evidence
-- [ ] Seed nền (tỉnh/phường, danh mục, pages) + dữ liệu mẫu `--sample` chỉ ở staging; email chỉ tới `EMAIL_ALLOWLIST`
-- [ ] Các trang đã có (dự án, tin tức, dịch vụ, pháp lý, tuyển dụng) mở được qua tên miền staging
+- [x] Runbook go-live: điền `site-settings` (`siteName`…) TRƯỚC khi publish trang privacy — nếu thiếu, hook `sync-privacy-version` báo lỗi `siteName` khó hiểu; cân nhắc ValidationError rõ (MINOR-1); `scripts/seed-sample-services.ts` thoát sớm khi `APP_ENV=production` (MINOR-4) (review L5-T02 round 1)
+- [x] G10: chốt với user cách báo động backup/web chết trên staging khi stack giám sát (L4-T06) còn hoãn — bật riêng Uptime Kuma hoặc chấp nhận tới trước M3; đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (spec-validation layer 4)
+- [→ L15-T01] Backup lần đầu trên server: tạo `BACKUP_ENV_DIR` + env pgBackRest/restic (đích S3/SFTP user chốt), `stanza-create`, `restic init`, kiểm digest base `postgis/postgis:17-3.5` trên server khớp digest ghim + `ldd --version` trước khi đổi image (restore.md §2.3), đặt `HEARTBEAT_URL_WAL`; e2e test chuyển image đọc `ARG POSTGIS_IMAGE` thay vì tag (review L4-T07 round 2 MINOR-A)
+- [x] Trước lần deploy thật: rollback dùng `COMPOSE_FILE` qua symlink `current` như lúc deploy (`scripts/deploy/lib/release.sh:48`, review L4-T05 r2 MINOR-1) + assert trong `deploy.test.sh`; xác minh Compose có resolve symlink cho bind `./postgres/init.sql` không — nếu có thì chuyển init.sql sang đường dẫn cố định hoặc `configs:` để postgres không bị recreate mỗi lần đổi release (MINOR-2); cấu hình required reviewers Environment `production`, nhánh mặc định `staging`, secret DEPLOY_* theo `docs/runbooks/deploy.md`
+- [x] Pin action trong `.github/workflows/ci.yml` theo commit SHA (đang `@v4`; review L4-T05 r2 MINOR-4)
+- [x] Dockerfile COPY `seed/` (và chạy `seed:categories` được trong container) trước deploy staging (review L4-T01)
+- [x] Từ layer-1-task-06/L3-T03: kiểm `nginx -v` (≥ 1.18 cho `listen 443 ssl http2`) và `docker version` trên server; hỏi user bật Authenticated Origin Pulls (khối conf đã có, đang comment); smoke test 2 IP thật qua Cloudflare rơi vào 2 bucket rate limit (spec-validation layer 3)
+- [→ L15-T01] Cloudflare cache rule: `/api/*` bypass **trừ `/api/media/file/*`** → cache (Edge TTL theo header origin immutable) — **chỉ áp host prod**; host staging bypass cache toàn bộ (hoặc Cloudflare Access) để ảnh/static staging không lọt qua basic auth (review L3-T03 round 2 MINOR-R2-1/R2-2) (G1 (user chốt 2026-10-17, phương án a): ngoại lệ cache cho ảnh `/api/media/file/*`)
+- [→ L15-T01] Cloudflare Cache Rule: bypass cache khi request có header `rsc` / `next-router-prefetch` / `next-router-state-tree` / `next-router-segment-prefetch` hoặc query `_rsc` (Cloudflare bỏ qua `Vary`; origin đã trả `no-store` cho các biến thể này trên trang công khai; rule Cloudflare phải áp cho MỌI path, kể cả path có đuôi file); HTML và path có đuôi file tôn trọng TTL origin, không đặt Edge TTL ghi đè (review L4-T03 round 2)
+- [x] ⏸ Mỗi bước chạm server (tạo thư mục, `.env`, Nginx, Cloudflare, chạy pipeline) chỉ làm sau khi user xác nhận trong chat
+- [x] Compose staging chạy `tami-staging-*` (app, jobs, postgres, redis; SeaweedFS bucket riêng); chỉ app bind `127.0.0.1:3011`
+- [x] Nginx `tami-staging.conf`: `nginx -t` PASS rồi mới reload; chỉ nhận IP Cloudflare; không sửa file site khác *(một phần: phần "chỉ nhận IP Cloudflare" → L15-T01)*
+- [x] Cloudflare: DNS staging, SSL Full Strict, Cloudflare Access (hoặc basic auth) chặn công khai; `X-Robots-Tag: noindex` + robots `Disallow: /` *(một phần: basic auth + noindex + robots Done; DNS/SSL/Cloudflare → L15-T01)*
+- [x] Pipeline CD chạy thật từ nhánh `staging`: image theo SHA → `payload migrate` → app + jobs up → `/api/health` 200; thử rollback một lần (health fail giả lập) có ghi evidence *(một phần: CD Done; diễn tập rollback → L12-T01 (user hoãn))*
+- [x] Seed nền (tỉnh/phường, danh mục, pages) + dữ liệu mẫu `--sample` chỉ ở staging; email chỉ tới `EMAIL_ALLOWLIST`
+- [x] Các trang đã có (dự án, tin tức, dịch vụ, pháp lý, tuyển dụng) mở được qua tên miền staging *(một phần: pháp lý (draft, admin publish) → L12-T01)*
 
 ## Tests cần viết
 - Evidence: log pipeline, `curl -I` health + trang chủ qua Cloudflare, `nginx -t`, ảnh chụp trang
@@ -93,7 +93,7 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - Verify commands + result: phần A `pnpm test` 141 file 1.538 PASS, build PASS, `deploy.test.sh` PASS; CI c0406c2/0dfc8f9/b936204 xanh; phần B chỉ đổi runbook (no code).
 - Residual: `pnpm seed --sample` lần đầu trên staging exit 1 sau khi tạo 4 dự án (output bị cắt, không thấy lỗi); chạy lại PASS, DB không trùng (6 dự án / 6 media).
 - Reviewer verdict: phần A round 4 STRICT PASS; CI round 1-2 PASS; deps round 1 PASS; phần B round 5 NORMAL FAIL (thiếu chỗ nhận 6 mục) → round 6 NORMAL PASS (`.context/review-reports/build-tami-website-layer-6-task-01-round-6-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/runbooks/deploy.md` (§9 staging sslip + bước 12 rollback), `docs/ARCHITECTURE.md` §6.3 (phần A); task L12/L15 nhận mục hoãn
@@ -111,7 +111,7 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Committed
 
 ## Files to Create/Modify
 - (server) /opt/tami/staging.env (không commit)
@@ -127,17 +127,17 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 
 ## Follow-up từ spec-validation layer 5
 - Nguồn: G17, G18 trong `.context/review-reports/spec-validation-build-tami-website-layer-5.md`.
-- [ ] G17: truyền `NEXT_PUBLIC_HOTLINE` làm build-arg (`ARG` + `ENV` trước `pnpm build`) trong `docker/Dockerfile` và `build-args` của `.github/workflows/deploy.yml` (lấy từ GitHub `vars`), để `src/app/global-error.tsx` hiện số hotline khi DB lỗi (design-spec S18); ghi vào `docs/runbooks/deploy.md`; kiểm trong image staging trang lỗi gốc có số hotline. Bổ sung biến vào danh sách R4 (`/brainstorm secrets`).
-- [ ] G18: CI kiểm `importMap.js` không lệch (lỗi thật đã xảy ra, commit a614b3d): bước `pnpm payload generate:importmap` + `git diff --exit-code` trong `.github/workflows/ci.yml`.
-- [ ] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*` cho staging, build image, gây lỗi thử và kiểm stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, `docs/runbooks/deploy.md` §8).
+- [x] G17: truyền `NEXT_PUBLIC_HOTLINE` làm build-arg (`ARG` + `ENV` trước `pnpm build`) trong `docker/Dockerfile` và `build-args` của `.github/workflows/deploy.yml` (lấy từ GitHub `vars`), để `src/app/global-error.tsx` hiện số hotline khi DB lỗi (design-spec S18); ghi vào `docs/runbooks/deploy.md`; kiểm trong image staging trang lỗi gốc có số hotline. Bổ sung biến vào danh sách R4 (`/brainstorm secrets`). *(một phần: code Done; kiểm số hotline thật → L12-T01)*
+- [x] G18: CI kiểm `importMap.js` không lệch (lỗi thật đã xảy ra, commit a614b3d): bước `pnpm payload generate:importmap` + `git diff --exit-code` trong `.github/workflows/ci.yml`.
+- [→ L12-T01] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*` cho staging, build image, gây lỗi thử và kiểm stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, `docs/runbooks/deploy.md` §8).
 
 ## Follow-up từ spec-validation layer 5 addendum
-- [ ] G20: image runtime chưa có thư mục `seed/` (`docker/Dockerfile:61-68`) — đưa `seed/` + `scripts/seed*.{mjs,ts}` vào image (hoặc chạy seed bằng image builder); AC seed dùng `pnpm seed` (không còn `seed:categories`).
-- [ ] G21: trước khi đụng staging, chạy toàn bộ migration (17) trên DB PostGIS trống (CI hoặc tay) + thêm bước migrate vào CI.
-- [ ] G24: AC "các trang đã có mở được" chỉ kiểm các trang đã build tới lúc deploy; lần deploy đầu không có image trước nên không thử rollback image — ghi rõ trong evidence.
+- [x] G20: image runtime chưa có thư mục `seed/` (`docker/Dockerfile:61-68`) — đưa `seed/` + `scripts/seed*.{mjs,ts}` vào image (hoặc chạy seed bằng image builder); AC seed dùng `pnpm seed` (không còn `seed:categories`).
+- [x] G21: trước khi đụng staging, chạy toàn bộ migration (17) trên DB PostGIS trống (CI hoặc tay) + thêm bước migrate vào CI.
+- [x] G24: AC "các trang đã có mở được" chỉ kiểm các trang đã build tới lúc deploy; lần deploy đầu không có image trước nên không thử rollback image — ghi rõ trong evidence.
 
 ## Follow-up từ review layer-6-task-09
-- [ ] Bật `TRUST_CF_CONNECTING_IP=true` ở staging/prod (sau Cloudflare); nếu không mọi khách chung một bucket rate limit (vd ứng tuyển 3/giờ toàn site). Kiểm bằng 2 IP khác nhau.
+- [→ L15-T01] Bật `TRUST_CF_CONNECTING_IP=true` ở staging/prod (sau Cloudflare); nếu không mọi khách chung một bucket rate limit (vd ứng tuyển 3/giờ toàn site). Kiểm bằng 2 IP khác nhau.
 
 ## Follow-up từ review layer-6-task-07
-- [ ] Trên staging: mở `/lien-he` (site-settings có `mapLocation`) → bản đồ MapLibre vẽ được tile, console không lỗi "Worker failed to load"; ảnh chụp làm bằng chứng.
+- [→ L12-T01] Trên staging: mở `/lien-he` (site-settings có `mapLocation`) → bản đồ MapLibre vẽ được tile, console không lỗi "Worker failed to load"; ảnh chụp làm bằng chứng.

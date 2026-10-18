@@ -65,7 +65,7 @@ Mở khoá cho: `layer-7-task-04`, `layer-10-task-03`
 - Verify commands + result: pnpm install --frozen-lockfile / lint / typecheck = PASS; pnpm test 141 file 1.530 PASS; pnpm build PASS. next start :3228 (APP_ENV=production): `/tuyen-dung` 200 `public, s-maxage=60, stale-while-revalidate=300`, 3 tin mở (bỏ tin hết hạn); lọc → `noindex, follow` + canonical; tin hết hạn 200 + banner, `noindex, follow`, 0 JSON-LD, không form ứng tuyển; tin mở có JobPosting (`validThrough …T23:59:59+07:00`, baseSalary, jobLocation, inLanguage); slug lạ / EN thiếu → 404 có h1/header/footer, no-store; ISR HIT; 375/768/1280 không cuộn ngang, touch ≥44
 - Reviewer verdict: STRICT PASS round 1 — `.context/review-reports/build-tami-website-layer-6-task-08-round-1-review.md`
 - Residual risk: job `close-job-postings` revalidate không có tác dụng ngoài tiến trình Next (giữ theo task; trang vẫn đúng nhờ ISR 60 s + list dynamic) → chọn cơ chế revalidate liên tiến trình khi làm `expire-offers` (L7-T01). Cron viết UTC (00:10 VN). Ngay sau nửa đêm VN trang chi tiết cache có thể còn "mở" ~1 phút (endpoint vẫn chặn). MINOR M1, M4–M6 → L15-T01
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-6.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` §5.4 + as-built layer-6-task-08, `docs/ERD.md` §4.10, `docs/API_SPEC.md` §3.2
