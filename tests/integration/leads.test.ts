@@ -30,10 +30,15 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
   const actingAs = (user: object) => ({ user: asUser(user), overrideAccess: false as const });
 
   let phoneSeed = 0;
-  /** Lead như endpoint công khai tạo: Local API `overrideAccess` (create của collection là denyAll). */
+  /**
+   * Lead như endpoint công khai tạo: Local API `overrideAccess` (create của collection là denyAll). Người phụ trách ghi thẳng
+   * qua adapter DB (không qua hook) để các test dưới đếm activity của chính hành vi cần kiểm; hook phân công có test riêng
+   * ở `lead-assign.test.ts`.
+   */
   async function createLead(overrides: Partial<Omit<Lead, "id" | "createdAt" | "updatedAt">> = {}) {
     phoneSeed += 1;
-    return payload.create({
+    const { assignedTo = saleA.id, ...rest } = overrides;
+    const created = (await payload.create({
       collection: "leads",
       overrideAccess: true,
       data: {
@@ -43,10 +48,12 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
         locale: "vi",
         consentAt: new Date().toISOString(),
         consentVersion: "2026-10-test",
-        assignedTo: saleA.id,
-        ...overrides,
+        ...rest,
       } as never,
-    }) as Promise<Lead>;
+    })) as Lead;
+    if (assignedTo === null) return created;
+    await payload.db.updateOne({ collection: "leads", id: created.id, data: { assignedTo } });
+    return (await payload.findByID({ collection: "leads", id: created.id, overrideAccess: true })) as Lead;
   }
 
   const activitiesOf = async (leadId: string) =>
@@ -413,7 +420,7 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
       await payload.create({ collection: "lead-activities", data: { lead: lead.id, type: "note", content: "n" }, ...actingAs(saleA) });
       await payload.update({ collection: "leads", id: lead.id, data: { assignedTo: saleB.id }, ...actingAs(admin) });
       expect((await payload.find({ collection: "lead-activities", where: { lead: { equals: lead.id } }, ...actingAs(saleA) })).totalDocs).toBe(0);
-      expect((await payload.find({ collection: "lead-activities", where: { lead: { equals: lead.id } }, ...actingAs(saleB) })).totalDocs).toBe(1);
+      expect((await payload.find({ collection: "lead-activities", where: { lead: { equals: lead.id } }, ...actingAs(saleB) })).totalDocs).toBe(2); // ghi chú + activity phân công
     });
 
     it("tài khoản sale bị khoá mất mọi quyền", async () => {

@@ -4,19 +4,27 @@ import { isAdmin, isStaff } from "../../access";
 import { MANUAL_ACTIVITY_TYPES, type LeadActivityType } from "../../lib/leads/lead-values";
 import type { LeadActivity } from "../../payload-types";
 
-/** Cờ trong `req.context`: hệ thống đang tự ghi activity (đổi status, phân công, gộp lead…), không phải người dùng thêm tay. */
-const SYSTEM_ACTIVITY_FLAG = "systemActivity";
+/**
+ * Bộ đếm trong `req.context`: số lần `asSystemActivity` đang chạy chồng nhau trên cùng request (hệ thống đang tự ghi activity:
+ * đổi status, phân công, gộp lead…, không phải người dùng thêm tay). Dùng bộ đếm thay cờ boolean vì Payload có thể chạy
+ * `Promise.all` trên cùng `req` (sửa hàng loạt): lần kết thúc trước không được tắt cờ của lần còn đang chạy.
+ */
+const SYSTEM_ACTIVITY_COUNTER = "systemActivityDepth";
 
-export const isSystemActivity = (req: PayloadRequest): boolean => req.context[SYSTEM_ACTIVITY_FLAG] === true;
+const systemActivityDepth = (req: PayloadRequest): number => {
+  const depth = req.context[SYSTEM_ACTIVITY_COUNTER];
+  return typeof depth === "number" ? depth : 0;
+};
 
-/** Chạy `write` với cờ "hệ thống ghi"; luôn trả cờ về giá trị cũ sau đó để không rò sang lần ghi khác của cùng request. */
+export const isSystemActivity = (req: PayloadRequest): boolean => systemActivityDepth(req) > 0;
+
+/** Chạy `write` với cờ "hệ thống ghi"; luôn giảm bộ đếm sau đó (kể cả khi lỗi) để không rò sang lần ghi khác của cùng request. */
 export async function asSystemActivity<T>(req: PayloadRequest, write: () => Promise<T>): Promise<T> {
-  const previous = req.context[SYSTEM_ACTIVITY_FLAG];
-  req.context[SYSTEM_ACTIVITY_FLAG] = true;
+  req.context[SYSTEM_ACTIVITY_COUNTER] = systemActivityDepth(req) + 1;
   try {
     return await write();
   } finally {
-    req.context[SYSTEM_ACTIVITY_FLAG] = previous;
+    req.context[SYSTEM_ACTIVITY_COUNTER] = systemActivityDepth(req) - 1;
   }
 }
 

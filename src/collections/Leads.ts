@@ -1,13 +1,16 @@
-import type { CollectionConfig, Field, FieldAccess, TextField } from "payload";
+import type { CollectionConfig, Field, FieldAccess, RelationshipFieldSingleValidation, TextField } from "payload";
 
 import { denyAll, isAdmin, isAssignedOrAdmin, ROLES } from "../access";
 import { auditContentPurge, auditContentTrash } from "../hooks/audit-content-delete";
 import { guardTrashedEdit } from "../hooks/guard-trashed-edit";
 import { assignLeadCode } from "../hooks/leads/generate-code";
 import { purgeLeadActivities } from "../hooks/leads/lead-activity-hooks";
+import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/leads/on-assignment-change";
 import { computeAssigneeInactive, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
+import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
+import type { Lead } from "../payload-types";
 
 const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Đăng tin BĐS", project: "Dự án", contact: "Liên hệ" };
 const STATUS_LABELS: Record<LeadStatus, string> = {
@@ -96,9 +99,29 @@ const statusFields: Field[] = [
   },
 ];
 
+/**
+ * Chỉ chặn khi người phụ trách ĐỔI sang người không phải sale `active`; bỏ giao (null) và giữ nguyên giá trị cũ (sale đã khoá)
+ * vẫn lưu được, để lead cũ còn sửa status. `previousValue` = giá trị trước khi lưu (rỗng khi tạo). Cùng `req` để cùng transaction.
+ */
+const validateAssignee: RelationshipFieldSingleValidation = async (value, { previousValue, req }) => {
+  const nextId = assigneeId(value as Lead["assignedTo"]);
+  if (!nextId || nextId === assigneeId(previousValue as Lead["assignedTo"])) return true;
+  const staff = await req.payload.findByID({ collection: "staff", id: nextId, depth: 0, overrideAccess: true, req, disableErrors: true });
+  return isAssignableSale(staff) || ASSIGNEE_NOT_ASSIGNABLE_MESSAGE;
+};
+
 const assignmentFields: Field[] = [
-  // Chỉ admin đổi (PERMISSION §4); hoạt động/email/audit khi đổi người phụ trách do task phân công làm (design D6).
-  { name: "assignedTo", type: "relationship", relationTo: "staff", index: true, access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar" } },
+  // Chỉ admin đổi (PERMISSION §4); hoạt động/email/audit/`assignedAt` khi đổi người phụ trách do hook `recordAssignmentChange` làm (design D6).
+  {
+    name: "assignedTo",
+    type: "relationship",
+    relationTo: "staff",
+    index: true,
+    access: { create: isAdmin, update: isAdmin },
+    filterOptions: { role: { equals: ROLES.sale }, active: { equals: true } },
+    validate: validateAssignee,
+    admin: { position: "sidebar" },
+  },
   { name: "assignedAt", type: "date", access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar", date: dateTimeInAdmin } },
   {
     name: "assigneeInactive",
@@ -155,8 +178,8 @@ export const Leads: CollectionConfig = {
   disableDuplicate: true,
   hooks: {
     beforeValidate: [guardTrashedEdit, assignLeadCode, guardAnonymizedCustomerData, syncPhoneNormalized],
-    beforeChange: [stampLeadTimestamps],
-    afterChange: [auditContentTrash, recordStatusChange],
+    beforeChange: [stampLeadTimestamps, stampAssignedAt],
+    afterChange: [auditContentTrash, recordStatusChange, recordAssignmentChange],
     beforeDelete: [purgeLeadActivities],
     afterDelete: [auditContentPurge],
   },

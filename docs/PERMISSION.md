@@ -89,7 +89,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `rentals` | `rentedAt` | Chỉ đọc với tất cả (hệ thống ghi khi chuyển `rented`) |
 | `rentals` | `address`, `location` | Nhân viên luôn đọc; **khách chỉ đọc khi `showExactAddress = true`** (chặn ở cấp trường nên áp cho cả REST/GraphQL và phiên bản; khách không lọc/sắp xếp theo hai trường này) |
 | `rentals` | `searchText` | Chỉ nhân viên đọc/lọc được (ẩn khỏi API); hệ thống ghi |
-| `leads` | `assignedTo`, `assignedAt` | **Chỉ admin** sửa; hệ thống tự gán theo BR-12 |
+| `leads` | `assignedTo`, `assignedAt` | **Chỉ admin** sửa; hệ thống tự gán theo BR-12. As-built L9-T03: `assignedAt` thực tế chỉ hệ thống đặt, giá trị gửi lên bị bỏ; `POST /api/admin/leads/:id/assign` kiểm 401 → 403 → 400 → 404, sale gọi luôn 403; mọi đường (endpoint, form/REST) chỉ nhận sale `active` khi đổi người phụ trách, admin/sale bị khoá trả 400 |
 | `leads` | `phone`, `email`, `fullName`, `message`, `locale` | Chỉ đọc với sale (không sửa dữ liệu khách gửi) |
 | `staff` | `role`, `active` | **Chỉ admin** |
 | Mọi nội dung + globals | `translation.*` | Chỉ đọc với tất cả (hệ thống ghi). Sửa tay trường `en` thì được theo quyền sửa bài; nút "Dịch lại bằng AI" theo quyền sửa bài (`POST /api/admin/translations/...`) |

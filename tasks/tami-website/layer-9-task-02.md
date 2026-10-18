@@ -101,3 +101,8 @@ Mở khoá cho: `layer-10-task-01`
 ## Follow-up từ review layer-8-task-02 round 2 (MINOR)
 - [ ] `src/hooks/leads/lead-activity-hooks.ts:13-21` cờ `asSystemActivity` lưu/khôi phục dạng boolean → không an toàn khi Payload chạy `Promise.all` trên cùng `req` (sửa status hàng loạt): đổi sang bộ đếm; test bulk update status ≥ 2 lead đều có activity. Mọi ghi activity hệ thống của task này (assignment, merged, email_sent) bọc `asSystemActivity`.
 - [ ] Sale gửi `lead` không phải UUID khi tạo activity có thể ra 500 thay vì 403/400 — kiểm + sửa.
+
+## Follow-up từ review layer-9-task-03 round 2 (MINOR)
+- [ ] `tests/integration/lead-assign.test.ts:267`: thêm test form gửi lại `assignedTo` = sale đã khoá (giữ nguyên → OK) và gửi dạng object `{ id }`.
+- [ ] `src/collections/Leads.ts:106-111` validate tuỳ biến của `assignedTo` thay validator relationship mặc định → id sai định dạng ra 500: kiểm UUID trước `findByID` (400). Cùng chỗ với follow-up "lead không phải UUID" của L8-T02.
+- [ ] (đã xong ở L9-T03) cờ `asSystemActivity` đã là bộ đếm — KHÔNG làm lại. Tạo lead tự giao: `assignedTo = author` chỉ khi `isAssignableSale(author)` (`src/lib/leads/assignable-sale.ts`), không thì để trống (lead `new` chưa giao).
