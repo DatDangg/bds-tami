@@ -3,19 +3,19 @@
 ```yaml
 workItem: build/tami-website
 phaseTask: layer-6-task-01
-step: deploy
-agent: primary
+step: fix_cd
+agent: builder
 status: running
 attempt: 4
 interrupted: false
-updatedAt: 2026-10-18T17:50:00.000Z
+updatedAt: 2026-10-18T19:40:00.000Z
 filesTouched: []
 filesNew: [".context/runs/build-tami-website-layer-6-task-01.md"]
 evidence:
   reportPath: .context/review-reports/build-tami-website-layer-6-task-01-round-4-review.md
   round: 4
   verdict: PASS
-next: "Commit sửa CI + push staging → theo dõi deploy trên server."
+next: "Commit + push sửa dependency → theo dõi CD tới health 200 → seed + kiểm trang."
 loopSignal: none
 approvals: [{gate: attempt_4, at: 2026-10-18T14:00:00.000Z, ok: true, note: "User: cho attempt 4"}, {gate: staging_mode, at: 2026-10-18T10:40:00.000Z, ok: true, note: "sslip.io + Let's Encrypt + basic auth, không Cloudflare"}]
 batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
@@ -43,3 +43,6 @@ batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
 - 2026-10-18T17:00:00.000Z ✅ DONE builder sửa CI — ci.yml: migrate tami_test + bước SeaweedFS (docker run 4.48, s3.json dummy, chờ sẵn sàng, tạo bucket public/private); access.test.ts teardown xoá staff bằng SQL (last-admin-guard chặn trên DB trống). Giả lập CI local container riêng: migrate 2 DB, importMap, lint, typecheck, test 141 file 1.538 PASS, build PASS. ▶ START reviewer (cancel sẽ redo bước này).
 - 2026-10-18T17:15:00.000Z ✅ DONE reviewer sửa CI — NORMAL PASS (.context/review-reports/build-tami-website-layer-6-task-01-ci-round-1-review.md). Primary thêm guard if(!payload) trong afterAll (MINOR-2), access.test 25/25 + typecheck PASS. MINOR 1,3 → L15-T01. Commit + push.
 - 2026-10-18T17:50:00.000Z CI c0406c2: DB OK, còn 4 test ghi bucket private InternalError (SeaweedFS volume trên đĩa runner nhỏ). Sửa ci.yml: -master.volumeSizeLimitMB=256 -volume.max=32, kiểm s3.bucket.list, bước log khi fail. Local container mới: 3 bộ S3 38/38 PASS. Reviewer FAST PASS (ci-round-2). Commit + push.
+- 2026-10-18T18:30:00.000Z CI 0dfc8f9 xanh nhưng CD không chạy: default branch GitHub = main (workflow_run chỉ đọc nhánh mặc định). User đổi default branch → staging + re-run CI. Giữ luồng 1 nhánh (production duyệt Environment) — user có thể đổi sang 2 nhánh trước M5.
+- 2026-10-18T19:00:00.000Z CD lần đầu: image build + push OK, server pull, infra staging (postgres/redis/seaweedfs + init) chạy; bước migrate FAIL: ERR_MODULE_NOT_FOUND @aws-sdk/client-s3 (devDependency, image runtime cài --prod; dùng ở src/endpoints/admin/private-file-download.ts từ L6-T10). App chưa bật. ▶ START builder sửa (cancel sẽ redo bước này).
+- 2026-10-18T19:40:00.000Z ✅ DONE builder sửa dependency: @aws-sdk/client-s3 → dependencies (lockfile 3+/3-), test guard runtime-dependencies; docker build thật + migrate + seed + next start health 200 + jobs runner OK. Reviewer FAST PASS (deps-round-1). Full pnpm test local: lần 1 ngay sau khởi động container 5 fail (DB vừa lên), lần 2 không còn FAIL. Commit + push.

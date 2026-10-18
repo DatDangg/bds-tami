@@ -168,3 +168,6 @@ Mở khoá cho: `layer-16-task-01`
 ## Follow-up từ review sửa CI (layer-6-task-01)
 - [ ] `ci.yml`: kiểm kết quả tạo bucket SeaweedFS (`s3.bucket.list` hoặc grep output như `docker-compose.prod.yml:270`) thay vì tin exit code của `weed shell`.
 - [ ] Cân nhắc ghim image SeaweedFS trong CI theo digest.
+
+## Follow-up từ review sửa dependency runtime (layer-6-task-01)
+- [ ] `tests/unit/runtime-dependencies.test.ts`: thêm nhánh `require(` và bỏ qua `import type`/`export type` (MINOR).
