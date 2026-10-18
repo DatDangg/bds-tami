@@ -62,10 +62,10 @@ Mở khoá cho: `layer-12-task-01`
 - Acceptance criteria: pending
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (203 file, 2.143) · `pnpm build` PASS; migration up→down→down→up; đã áp DB dev
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-06-round-2-review.md`); user quyết Q1–Q5 (progress.json decisions 2026-10-18T21:25)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ERD §7 nếu lệch)
+- Doc impact result: ERD §2/§4.12/§7, ARCHITECTURE §5.4, PERMISSION §3.3 (private-files chỉ CV)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -94,21 +94,21 @@ Mở khoá cho: `layer-12-task-01`
 - Job hết retry (`payload_jobs` có `hasError`/`totalTried` max) giữ PII khách trong `input` và bảng `payload_jobs_log` → `data-retention` phải xoá/ẩn danh các job lỗi cũ (vd > 7 ngày) cùng log của chúng.
 
 ## Follow-up từ review layer-5-task-04
-- [ ] Xoá CV hết hạn: đặt `job-applications.cv = null` + `anonymizedAt` TRƯỚC rồi mới xoá `private-files` (cv chỉ bắt buộc khi chưa ẩn danh; FK `ON DELETE SET NULL`).
-- [ ] Không dùng xoá hàng loạt theo `where` trên `job-applications` qua Local API (overrideAccess bỏ qua `disableBulkDelete`, mất rollback CV/audit) — lặp xoá theo id hoặc chỉ ẩn danh.
+- [x] Xoá CV hết hạn: đặt `job-applications.cv = null` + `anonymizedAt` TRƯỚC rồi mới xoá `private-files` (cv chỉ bắt buộc khi chưa ẩn danh; FK `ON DELETE SET NULL`).
+- [x] Không dùng xoá hàng loạt theo `where` trên `job-applications` qua Local API (overrideAccess bỏ qua `disableBulkDelete`, mất rollback CV/audit) — lặp xoá theo id hoặc chỉ ẩn danh.
 
 ## Follow-up từ spec-validation layer 5 addendum
-- [ ] G23: cột PII của `job-applications` (fullName, phone, email…) đang NOT NULL → ẩn danh bằng giá trị thay thế cố định (vd "Đã ẩn danh"), không đặt NULL; thống nhất với L8-T02 (lead).
+- [x] G23: cột PII của `job-applications` (fullName, phone, email…) đang NOT NULL → ẩn danh bằng giá trị thay thế cố định (vd "Đã ẩn danh"), không đặt NULL; thống nhất với L8-T02 (lead).
 
 ## Follow-up từ review layer-6-task-09
-- [ ] Dọn CV mồ côi: `private-files` loại CV không có `job-applications` nào trỏ tới và cũ hơn N giờ (tiến trình chết giữa lưu CV và tạo hồ sơ) → xoá row + object S3.
+- [x] Dọn CV mồ côi: `private-files` loại CV không có `job-applications` nào trỏ tới và cũ hơn N giờ (tiến trình chết giữa lưu CV và tạo hồ sơ) → xoá row + object S3.
 
 ## Follow-up từ review layer-9-task-04 round 1 (MINOR)
-- [ ] `src/jobs/remind-unassigned-leads.ts:33-51,76`: không chặn hai lần chạy chồng (đọc ứng viên ngoài transaction, update không kiểm lại `remindedAt IS NULL`) → `pg_advisory_xact_lock` + đọc lại ứng viên trong transaction (mẫu `last-admin-guard.ts:38`) hoặc update có điều kiện. Áp cùng cơ chế cho `data-retention`.
-- [ ] (tuỳ chọn) index cho truy vấn quét lead nhắc (`status, assigned_to_id, reminded_at, created_at`) khi dữ liệu lớn.
+- [x] `src/jobs/remind-unassigned-leads.ts:33-51,76`: không chặn hai lần chạy chồng (đọc ứng viên ngoài transaction, update không kiểm lại `remindedAt IS NULL`) → `pg_advisory_xact_lock` + đọc lại ứng viên trong transaction (mẫu `last-admin-guard.ts:38`) hoặc update có điều kiện. Áp cùng cơ chế cho `data-retention`.
+- [→ BL-009] (tuỳ chọn) index cho truy vấn quét lead nhắc (`status, assigned_to_id, reminded_at, created_at`) khi dữ liệu lớn.
 
 ## Follow-up từ review layer-9-task-06 round 2 (MINOR)
-- [ ] Test "object S3 đã xoá rồi commit lỗi" (hồ sơ còn trỏ CV không file → lần sau xử lý).
-- [ ] `src/lib/retention/delete-private-file.ts:27-28` giả định bucket không có prefix → dựng key từ prefix lưu trữ hoặc kiểm `HeadObject`.
-- [ ] `run-data-retention.ts:59-66` audit meta ghi thêm số bước/bản ghi lỗi.
+- [→ BL-008] Test "object S3 đã xoá rồi commit lỗi" (hồ sơ còn trỏ CV không file → lần sau xử lý).
+- [→ BL-008] `src/lib/retention/delete-private-file.ts:27-28` giả định bucket không có prefix → dựng key từ prefix lưu trữ hoặc kiểm `HeadObject`.
+- [→ BL-008] `run-data-retention.ts:59-66` audit meta ghi thêm số bước/bản ghi lỗi.
 - (primary sửa) regex `.pdf` ở `tests/integration/media-upload.test.ts`.

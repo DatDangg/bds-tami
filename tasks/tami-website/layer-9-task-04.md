@@ -59,7 +59,7 @@ Mở khoá cho: `layer-12-task-01`
 - Acceptance criteria: 3/3 đạt (builder)
 - Verify commands + result (builder, worktree wt9-t04): lint PASS · typecheck PASS · test 1938/1938 PASS (chỉ `src/lib/contrast.test.ts` fail do CRLF, đã biết, ngoài scope) · build PASS · integration `remind-unassigned-leads` 6/6 + migration up→down→up PASS
 - Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-9-task-04-round-1-review.md`); MINOR-1 job chạy chồng → `layer-9-task-06.md`; MINOR-2 index quét, MINOR-3 lastActivityAt lệch ~30' chấp nhận
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ARCHITECTURE §5.4 (lịch cron + cách nhắc) và ERD §4.11 (`remindedAt` + as-built) đã cập nhật
@@ -76,7 +76,7 @@ Mở khoá cho: `layer-12-task-01`
 - [x] Check commands pass (theo `.context/project-config.md`)
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [x] Committed
 
 ## Files to Create/Modify

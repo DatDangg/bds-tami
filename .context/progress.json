@@ -594,7 +594,7 @@
       "reason": "User trả lời Q1–Q5 review L9-T06 round 1"
     }
   ],
-  "lastUpdated": "2026-10-19T00:00:00Z",
+  "lastUpdated": "2026-10-19T00:20:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -693,6 +693,12 @@
       "note": "28/28 AC đạt. G31 MEDIUM: trang danh mục cho thuê /cho-thue/danh-muc/[category] không có task (link từ trang chi tiết đang 404) — chờ user xếp task trước M2. D4 lệch S09 (voucher ẩn mã, nút chia sẻ), D5 thiếu skeleton/loading.tsx — chờ user. G32 → L9-T01/L16-T01, R23 dọn task file, PERMISSION ghi chú 403, BACKLOG BL-004..006 vào bảng: primary xong. G30 nginx trước push. User duyệt: G31 + D5 → task mới layer-9-task-08; D4 giữ ẩn mã voucher (lệch có chủ đích design-spec S09), nút chia sẻ → BL-007.",
       "approvedAt": "2026-10-18T16:25:00Z",
       "approvedBy": "user"
+    },
+    {
+      "layer": 9,
+      "verdict": "GAPS",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-9.md",
+      "note": "46/47 AC. D5 một phần (loading.tsx bỏ vì soft-404) chờ user; BL-008 (CV mồ côi khi S3 lỗi) chờ lịch; G33 primary dọn (task file, BACKLOG BL-009, MINOR L9-T07 → L10-T02). M2 còn L10-T01/T02/T03. G30 nginx trước push (26 commit chưa push). Staging budget dịch = 0 → không gọi API."
     }
   ]
 }

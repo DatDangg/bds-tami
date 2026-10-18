@@ -61,7 +61,7 @@ Mở khoá cho: `layer-12-task-01`
 - Acceptance criteria: 5/5 xong (builder)
 - Verify commands + result (builder, worktree wt9-t05): `pnpm lint` PASS; `pnpm typecheck` PASS; `pnpm test` 2046 test PASS, 1 suite FAIL đã biết (`src/lib/contrast.test.ts` CRLF); test mới: unit `xlsx-stream` (17), `export-filters` (11), `leads-export` handler (6), UI `LeadExportButton` (5), integration `leads-export` (9: 401/403, đọc lại file đúng số dòng + audit không PII, escape công thức, lọc, 400, ẩn danh/xoá mềm, audit lỗi 500, lần 11 → 429, tài khoản khoá); `pnpm build` FAIL do môi trường: Turbopack không resolve `next/font/google` (Montserrat), 15 lỗi đều ở font, không liên quan file task
 - Reviewer verdict: STRICT round 1 FAIL → round 2 FAIL → round 3 PASS (`.context/review-reports/build-tami-website-layer-9-task-05-round-3-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
 - Doc impact result: có — `docs/API_SPEC.md` §4 thêm khối As-built cho `GET /api/admin/leads/export` (tham số, thứ tự lỗi, trần 20.000 dòng → 422, header, quy tắc escape/ẩn danh)
@@ -73,12 +73,12 @@ Mở khoá cho: `layer-12-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-9/task-05` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [x] Committed
 
 ## Files to Create/Modify
@@ -90,6 +90,6 @@ Mở khoá cho: `layer-12-task-01`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-9-task-05 round 3 (MINOR)
-- [ ] `src/lib/leads/export-filters.ts:94-95`: thông báo khoá nút ghi rõ chỉ hỗ trợ "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" cho Ngày tạo.
-- [ ] `export-filters.ts:72`: so `createdFrom > createdTo` bằng `Date.parse` thay vì chuỗi.
-- [ ] (tuỳ chọn) dò trash bằng server component `serverProps.params.segments[2] === "trash"` thay vì pathname; ẩn nút trong list drawer.
+- [→ BL-009] `src/lib/leads/export-filters.ts:94-95`: thông báo khoá nút ghi rõ chỉ hỗ trợ "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" cho Ngày tạo.
+- [→ BL-009] `export-filters.ts:72`: so `createdFrom > createdTo` bằng `Date.parse` thay vì chuỗi.
+- [→ BL-009] (tuỳ chọn) dò trash bằng server component `serverProps.params.segments[2] === "trash"` thay vì pathname; ẩn nút trong list drawer.

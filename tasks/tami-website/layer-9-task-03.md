@@ -62,7 +62,7 @@ Mở khoá cho: `layer-12-task-01`, `layer-13-task-01`
 - Acceptance criteria: pending
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (179 file, 1.943) · `pnpm build` PASS
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-03-round-2-review.md`); MINOR-B/C → `layer-9-task-02.md`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
 - Doc impact result: API_SPEC §4 as-built (endpoint + luật sale active mọi đường ghi + khi không email), ERD §4.11, PERMISSION §3.3

@@ -99,8 +99,3 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 - [ ] `src/components/home/HomeBlocks.tsx:32`: nội dung `h1` sr-only = tiêu đề slide 1 (theo locale), không có thì tên site — khớp design-spec S01 `:284` mà không đưa h1 vào slide (tránh MAJOR-3 cũ).
 - [ ] `src/components/home/HeroSlider.tsx:142,161`: mobile cụm điều khiển xếp dọc cao 88px có thể chạm CTA khi hero thấp → `pb-32 sm:pb-24` (hoặc tương đương); kiểm 320px (8 dot bị cắt ~16px mỗi bên).
 - [ ] Header trong suốt đè hero (design-spec S01.1) chưa làm — cần biến thể Header + phát hiện cuộn.
-
-## Follow-up từ review layer-9-task-07 round 2 (MINOR)
-- [ ] `src/jobs/translate-content-save.ts:41-52`: khoá dòng `SELECT … FOR UPDATE` trên session `payload.db.sessions[req.transactionID]` trước khi đọc lại (đóng khe hở ms; tệ nhất mất bản dịch thay vì mất dữ liệu admin).
-- [ ] `translate-content-save.ts:11,21-27`: lần thử bật `hasEnglish` lỗi kiểm tra → Payload rollback + gỡ transaction của job; ghi dự phòng chạy transaction riêng → quyết định `hasEnglish` trước khi ghi bằng predicate `requireEnglishFields` thay vì bắt lỗi (hoặc sửa comment).
-- [ ] `tests/integration/translate-content.test.ts:533`: assertion `toBeGreaterThan(jobsBefore - 1)` lỏng → thêm case admin chỉ đổi link (hook không xếp job) và kiểm số job +1 từ `row_changed`.

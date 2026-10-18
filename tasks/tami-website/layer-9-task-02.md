@@ -67,7 +67,7 @@ Mở khoá cho: `layer-10-task-01`
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (184 file, 1.993, 0 skip) · `pnpm build` PASS
 - Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-9-task-02-round-1-review.md`); 4 MINOR → `layer-10-task-01.md`
 - Residual: thời gian phản hồi nhánh tạo dài hơn nhánh gộp (~4–6 truy vấn) — về lý thuyết đoán được qua độ trễ; Turnstile + rate limit giảm rủi ro
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
 - Doc impact result: API_SPEC §3.1 as-built, ARCHITECTURE §5.2 as-built

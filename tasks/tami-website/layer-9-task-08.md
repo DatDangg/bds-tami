@@ -64,7 +64,7 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 - Verify commands + result (worktree bds-wt9-t08): `pnpm lint` PASS (0 lỗi/0 cảnh báo) · `pnpm typecheck` PASS · `pnpm test` 178/180 file PASS (1916 test); lỗi còn lại: `src/lib/contrast.test.ts` (BL-004, CRLF worktree) và `tests/integration/media-upload.test.ts` (hook timeout 10s do DB/S3 chập chờn — chạy lại riêng PASS) · `pnpm build` PASS (lần đầu lỗi tải Google Font, chạy lại sau `rm -rf .next` PASS) · smoke `next start`: `/cho-thue` 200, `/cho-thue/danh-muc/khong-co` 404 có h1, `/en/for-rent/category/x` 404, `/cho-thue?category=abc` canonical về `/cho-thue`.
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-08-round-2-review.md`)
 - Gap chờ user (D5 giảm phạm vi): skeleton cấp route không giữ được HTTP 404 → chỉ `/cho-thue` có `PendingRegion`; đề xuất task riêng phản hồi chờ phía client (`useLinkStatus` trên Pagination/chip) cho các danh sách khác
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/ARCHITECTURE.md` thêm bullet as-built layer-9-task-08 (§5.1); `API_SPEC` không đổi (tham số API giữ nguyên); intent docs không đụng.

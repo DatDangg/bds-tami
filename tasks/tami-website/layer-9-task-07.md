@@ -80,11 +80,11 @@ Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 ## Feature Verification
 - Acceptance criteria: pending
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (214 file, 2.284) · `pnpm build` PASS; migration up→down→down→up; đã áp DB dev
-- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-07-round-2-review.md`); MINOR A/B/C → `layer-10-task-03.md`
-- Spec Validator verdict (layer close): pending
+- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-07-round-2-review.md`); MINOR A/B/C → `layer-10-task-02.md`
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: ARCHITECTURE §5.4 nếu luồng khác)
+- Doc impact result: ARCHITECTURE §5.4 (job, debounce, xếp job ngoài transaction, khe hở không khoá dòng), ERD (translation group)
 - Decision log: pending
 
 ## Commit / Tracking

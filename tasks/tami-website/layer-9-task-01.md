@@ -66,10 +66,10 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-04`, `layer-14-task-02`
 - Acceptance criteria: pending
 - Verify commands + result: worktree `pnpm lint` · `pnpm typecheck` · `pnpm build` PASS, `pnpm test` 1.967 PASS (`contrast.test.ts` CRLF BL-004); sau squash xem commit
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-01-round-2-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (D5 một phần, BL-008) — `.context/review-reports/spec-validation-build-tami-website-layer-9.md`
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: ERD §4.15 as-built (trang chủ đọc global + fallback isFeatured)
 - Decision log: pending
 
 ## Commit / Tracking
