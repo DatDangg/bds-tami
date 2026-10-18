@@ -14,6 +14,7 @@
 | BL-004 | src/lib/contrast.test.ts:22 tìm marker gồm xuống dòng LF sau `.theme-dark-block {` → fail trên checkout Windows mới (core.autocrlf=true ra CRLF; gặp ở worktree L7/L8). Chuẩn hoá CRLF→LF khi đọc CSS trong test, hoặc thêm `.gitattributes` với `* text=auto eol=lf` | BUG | pending (chưa tạo change doc) | — | 2026-10-18 | |
 | BL-005 | Form ứng tuyển (L7-T04): thanh % tiến trình khi tải CV + vùng kéo-thả riêng ở màn ≥ md theo design-spec §3.4 — nợ thiết kế (hook `usePublicForm` dùng fetch, không có upload progress; cần XHR riêng trong `ApplyForm`) | MODIFY | pending (user chọn backlog 2026-10-18, D3 spec-validation layer 7) | — | 2026-10-18 | |
 | BL-006 | Reindex `rentals.searchText` khi đổi tên tỉnh/phường/dự án có > 500 tin: hiện hook bỏ qua + log lệnh `pnpm reindex:rentals-search` (`src/lib/search/reindex-in-hook.ts`, L8-T03) → chuyển thành Payload Jobs task chạy nền (cần migration thêm giá trị enum task) + cảnh báo trên admin khi bị bỏ qua | MODIFY | pending (review L8-T03 MINOR-2) | — | 2026-10-18 | |
+| BL-007 | Trang Đăng tin BĐS (L8-T04): nút chia sẻ theo design-spec S09 — đặt đầu bài, Web Share API ở ≤ sm, nút dính cột trái ở ≥ xl (hiện ở cuối bài, dùng `ShareButtons` của tin tức) — nợ thiết kế, làm trước M3 | MODIFY | pending (user chọn backlog 2026-10-18, D4 spec-validation layer 8) | — | 2026-10-18 | |
 
 ## Quy tắc tracking
 

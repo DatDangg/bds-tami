@@ -8,7 +8,7 @@
     "slug": "tami-website",
     "taskDir": "tasks/tami-website",
     "layerPlan": "docs/diagrams/layer-plan.md",
-    "totalTasks": 74,
+    "totalTasks": 75,
     "status": "plan_approved",
     "approvedAt": "2026-10-16",
     "adjustments": [
@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 8,
+  "currentLayer": 9,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -526,9 +526,14 @@
       "date": "2026-10-18T11:45:00Z",
       "decision": "Layer 7: D1 tin \"Đã thuê\" giữ tối đa 8 tin tương tự (design-spec S07); D2 lọc giá ±30% làm ở L8-T03 (dưới 4 tin thì bỏ điều kiện giá); D3 % upload + kéo-thả form ứng tuyển → BACKLOG BL-005. Từ layer 7 chạy song song các task độc lập (worktree + DB riêng), merge/commit lần lượt",
       "reason": "User duyệt checkpoint layer 7"
+    },
+    {
+      "date": "2026-10-18T16:25:00Z",
+      "decision": "Layer 8: G31 trang danh mục cho thuê + D5 loading.tsx skeleton → task mới layer-9-task-08 (trước M2); D4 giữ ẩn mã voucher ưu đãi hết hạn (không hiện \"mã gạch ngang\" như design-spec S09 — không lộ mã còn dùng được), nút chia sẻ S09 → BACKLOG BL-007",
+      "reason": "User duyệt checkpoint layer 8"
     }
   ],
-  "lastUpdated": "2026-10-18T16:15:00Z",
+  "lastUpdated": "2026-10-18T16:25:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -624,7 +629,9 @@
       "layer": 8,
       "verdict": "GAPS",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-8.md",
-      "note": "28/28 AC đạt. G31 MEDIUM: trang danh mục cho thuê /cho-thue/danh-muc/[category] không có task (link từ trang chi tiết đang 404) — chờ user xếp task trước M2. D4 lệch S09 (voucher ẩn mã, nút chia sẻ), D5 thiếu skeleton/loading.tsx — chờ user. G32 → L9-T01/L16-T01, R23 dọn task file, PERMISSION ghi chú 403, BACKLOG BL-004..006 vào bảng: primary xong. G30 nginx trước push."
+      "note": "28/28 AC đạt. G31 MEDIUM: trang danh mục cho thuê /cho-thue/danh-muc/[category] không có task (link từ trang chi tiết đang 404) — chờ user xếp task trước M2. D4 lệch S09 (voucher ẩn mã, nút chia sẻ), D5 thiếu skeleton/loading.tsx — chờ user. G32 → L9-T01/L16-T01, R23 dọn task file, PERMISSION ghi chú 403, BACKLOG BL-004..006 vào bảng: primary xong. G30 nginx trước push. User duyệt: G31 + D5 → task mới layer-9-task-08; D4 giữ ẩn mã voucher (lệch có chủ đích design-spec S09), nút chia sẻ → BL-007.",
+      "approvedAt": "2026-10-18T16:25:00Z",
+      "approvedBy": "user"
     }
   ]
 }
