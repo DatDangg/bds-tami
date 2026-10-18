@@ -460,7 +460,7 @@
       "reason": "User chọn; runbook gợi ý env hỏng làm rollback cũng hỏng"
     }
   ],
-  "lastUpdated": "2026-10-18T20:10:00.000Z",
+  "lastUpdated": "2026-10-18T07:45:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -535,6 +535,12 @@
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-5-addendum.md",
       "note": "L2-T02, L5-T01, L5-T04: 15/15 AC. G19 đóng (L6 mở hết). G20/G21/G24→L6-T01, G22→L6-T02/L7-T01, G23→L9-T06/L8-T02, G25 chờ user. BL-003 không chặn staging."
+    },
+    {
+      "layer": 6,
+      "verdict": "COMPLETE",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-6.md",
+      "note": "59 AC: 50 đạt, 8 L6-T01 hoãn theo ngoại lệ user (→L12-T01/L15-T01), 1 lệch nhỏ G26. lint/typecheck/test 142 file 1.539 PASS. G26→L7-T03, G27→L7-T03/L8-T03/L8-T04/L13-T03, G28→L15-T01. Doc reconcile R18/R20/R21 chờ làm đầu layer 7. Chờ user duyệt sang layer 7."
     }
   ]
 }

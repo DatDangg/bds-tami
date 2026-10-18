@@ -103,3 +103,7 @@ Mở khoá cho: `layer-10-task-01`
 
 ## Follow-up từ review layer-6-task-02
 - [ ] `rentals.address`/`location` không trả cho khách khi `showExactAddress=false` (field read access): trang chi tiết coi 2 trường là optional (không in "undefined"); bản đồ khu vực gần đúng tự tính ở server bằng `overrideAccess` + làm tròn, không gửi toạ độ chính xác.
+
+## Follow-up từ spec-validation layer 6
+- [ ] G26 (LOW): AC L6-T05 "JSON-LD Organization" trên trang chi tiết dự án chưa có (`buildOrganizationJsonLd` chỉ dùng ở `/lien-he`). Thêm Organization (publisher/brand) vào JSON-LD `RealEstateListing` của trang này, hoặc ghi rõ không cần (design-spec S03 không đòi). Report: `.context/review-reports/spec-validation-build-tami-website-layer-6.md`.
+- [ ] G27 (LOW): slug lạ trả 404 có nội dung qua `MISSING_PAGE_RULES` (G15).

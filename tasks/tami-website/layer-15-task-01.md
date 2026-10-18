@@ -178,3 +178,4 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Backup production lần đầu (chi tiết từ AC L49 của L6-T01; staging không backup theo user): tạo `BACKUP_ENV_DIR` + env pgBackRest/restic (đích S3/SFTP user chốt), `stanza-create`, `restic init`, kiểm digest base `postgis/postgis:17-3.5` trên server khớp digest ghim + `ldd --version` trước khi đổi image (restore.md §2.3), đặt `HEARTBEAT_URL_WAL`; e2e test chuyển image đọc `ARG POSTGIS_IMAGE` thay vì tag (review L4-T07 round 2 MINOR-A).
 - [ ] Đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (staging đang 0).
 - [ ] Xác nhận DB production khác DB staging (tên DB/host trong `prod.env` ≠ `/opt/tami/staging.env`), không sync data staging→prod (Tests của L6-T01).
+- [ ] G28 (LOW, spec-validation layer 6): bước migrate trên DB trống trong CI kiểm đủ số migration đã apply (19/19 tại L6) + các index chính, không chỉ "không lỗi".
