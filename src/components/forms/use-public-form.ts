@@ -170,10 +170,11 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>, extra?: SubmitExtra) {
+  /** `additionalFields`: ô không đọc được từ DOM (vd file CV form giữ trong state để hiện tên/dung lượng). */
+  function handleSubmit(event: FormEvent<HTMLFormElement>, extra?: SubmitExtra, additionalFields?: FormFields) {
     event.preventDefault();
     setFormElement(event.currentTarget);
-    return submit(collectFields(event.currentTarget), extra);
+    return submit({ ...collectFields(event.currentTarget), ...additionalFields }, extra);
   }
 
   /** Gửi lại theo nội dung form hiện tại (người dùng có thể đã sửa); chỉ luồng `submit()` trực tiếp mới dùng bản đã lưu. */

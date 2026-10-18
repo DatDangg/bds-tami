@@ -55,6 +55,12 @@ function failWithKey(status: number, locale: ApplicantLocale, key: ApplicantMess
   return fail(status, applicantMessage(locale, key), details);
 }
 
+/** Lỗi do file CV: kèm `details` field `cv` để client gắn vào ô CV; `postingClosed` là lỗi 400 duy nhất của form không có `details` (client dựa vào đó để báo hết hạn). */
+function failCv(status: number, locale: ApplicantLocale, key: ApplicantMessageKey): Response {
+  const message = applicantMessage(locale, key);
+  return fail(status, message, [{ field: "cv", message }]);
+}
+
 /** Pipeline dùng thông điệp tiếng Việt cố định; dịch lại theo ngôn ngữ ứng viên, giữ chữ "captcha" (client nhận lỗi captcha qua chữ này). */
 async function localizePipelineFailure(
   response: Response,
@@ -83,7 +89,7 @@ async function inspectCv(bytes: Uint8Array, locale: ApplicantLocale): Promise<In
   } catch (error) {
     if (!(error instanceof APIError)) throw error;
     const key = error.status === 413 ? "cvTooLarge" : error.status === 415 ? "cvUnsupported" : "cvMissing";
-    return failWithKey(error.status, locale, key);
+    return failCv(error.status, locale, key);
   }
 }
 
@@ -97,7 +103,7 @@ async function storeCv(
   try {
     return await createCvFile(payload, bytes, inspected);
   } catch (error) {
-    if (error instanceof ValidationError) return failWithKey(400, locale, "cvInvalid");
+    if (error instanceof ValidationError) return failCv(400, locale, "cvInvalid");
     throw error;
   }
 }

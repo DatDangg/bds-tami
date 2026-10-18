@@ -340,7 +340,27 @@
       "viewAll": "Xem tất cả vị trí",
       "applyForm": {
         "title": "Ứng tuyển vị trí này",
-        "fallback": "Biểu mẫu ứng tuyển trực tuyến sẽ sớm có mặt. Trong lúc chờ, bạn có thể gửi CV qua email."
+        "fallback": "Biểu mẫu ứng tuyển trực tuyến sẽ sớm có mặt. Trong lúc chờ, bạn có thể gửi CV qua email.",
+        "fullName": "Họ và tên",
+        "phone": "Số điện thoại",
+        "email": "Email",
+        "cv": "CV",
+        "cvHelper": "PDF, DOC hoặc DOCX, tối đa 5MB.",
+        "message": "Lời nhắn",
+        "submit": "Ứng tuyển",
+        "removeFile": "Xoá tệp {name}",
+        "success": "TAMI đã nhận hồ sơ của anh/chị.",
+        "expired": "Vị trí này đã hết hạn nhận hồ sơ.",
+        "viewOpenJobs": "Xem các vị trí đang tuyển",
+        "errors": {
+          "fullName": "Vui lòng nhập họ tên (ít nhất 2 ký tự).",
+          "phone": "Số điện thoại chưa hợp lệ.",
+          "email": "Email chưa hợp lệ.",
+          "cvMissing": "Vui lòng đính kèm CV.",
+          "cvType": "CV chỉ nhận định dạng PDF, DOC hoặc DOCX.",
+          "cvTooLarge": "CV tối đa 5MB, vui lòng chọn tệp nhỏ hơn."
+        },
+        "orContact": "Hoặc liên hệ trực tiếp với chúng tôi:"
       }
     },
     "richText": {

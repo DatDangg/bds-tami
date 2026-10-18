@@ -340,7 +340,27 @@
       "viewAll": "View all positions",
       "applyForm": {
         "title": "Apply for this position",
-        "fallback": "The online application form is coming soon. In the meantime you can email us your CV."
+        "fallback": "The online application form is coming soon. In the meantime you can email us your CV.",
+        "fullName": "Full name",
+        "phone": "Phone number",
+        "email": "Email",
+        "cv": "CV",
+        "cvHelper": "PDF, DOC or DOCX, up to 5MB.",
+        "message": "Message",
+        "submit": "Apply",
+        "removeFile": "Remove file {name}",
+        "success": "We have received your application.",
+        "expired": "This position is no longer accepting applications.",
+        "viewOpenJobs": "View open positions",
+        "errors": {
+          "fullName": "Please enter your name (at least 2 characters).",
+          "phone": "This phone number is not valid.",
+          "email": "This email is not valid.",
+          "cvMissing": "Please attach your CV.",
+          "cvType": "The CV must be a PDF, DOC or DOCX file.",
+          "cvTooLarge": "The CV must be 5MB or less, please choose a smaller file."
+        },
+        "orContact": "Or contact us directly:"
       }
     },
     "richText": {

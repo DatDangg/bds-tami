@@ -240,6 +240,7 @@ describe("POST /api/public/job-applications (handler)", () => {
     const expired = await submit({}, { posting: { id: POSTING_ID, title: "x", deadline: YESTERDAY_MORNING() } });
     expect(expired.response.status).toBe(400);
     expect(expired.body.error).toBe("Vị trí tuyển dụng này không còn nhận hồ sơ");
+    expect(expired.body.details).toEqual([]);
     expect(expired.calls.create).not.toHaveBeenCalled();
 
     const missing = await submit({}, { posting: null });
@@ -338,7 +339,10 @@ describe("POST /api/public/job-applications (handler)", () => {
     fake.calls.create.mockRejectedValueOnce(new ValidationError({ errors: [{ message: "Invalid PDF file.", path: "file" }] }));
     const response = await handleJobApplication(await makeRequest({ fields: { locale: "en" } }), { payload: fake.payload, pipelineDeps: allowed(), now: () => NOW, siteUrl: "https://tami.test" });
     expect(response.status).toBe(400);
-    expect(((await response.json()) as { error: string }).error).toBe("The CV file is corrupted or unreadable, please choose another file");
+    const body = (await response.json()) as { error: string; details: unknown[] };
+    expect(body.error).toBe("The CV file is corrupted or unreadable, please choose another file");
+    // Client dựa vào đây để không nhầm CV hỏng với tin hết hạn (postingClosed là 400 duy nhất không có details).
+    expect(body.details).toEqual([{ field: "cv", message: body.error }]);
     expect(fake.calls.create).toHaveBeenCalledTimes(1);
   });
 

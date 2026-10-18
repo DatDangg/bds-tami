@@ -112,6 +112,8 @@ export default async function JobDetailPage({ params }: PageProps) {
     view.expired ? findOtherOpenJobs(payload, locale, doc.id, now) : [],
   ]);
   const ownPath = publicDetailPath(CONTENT_ROUTES["job-postings"], locale, doc.slug ?? slug);
+  // Site key là giá trị công khai nhưng đặt qua env lúc chạy (không NEXT_PUBLIC_ để không nhúng lúc build); trang ISR đọc nó khi render. Không dùng `getEnv()`: nó validate cả bộ env (kể cả secret) và ném lỗi làm sập trang công khai chỉ vì thiếu một biến không liên quan.
+  const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY?.trim() || undefined;
   const siteUrl = getSiteUrl();
   const pageUrl = absoluteUrl(ownPath, siteUrl);
   const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
@@ -134,6 +136,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         contact={{ ...(contact.email ? { email: contact.email } : {}), ...(contact.hotline ? { hotline: contact.hotline } : {}) }}
         ownPath={ownPath}
         {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        {...(turnstileSiteKey ? { turnstileSiteKey } : {})}
       />
       {jsonLdInput && <JsonLd data={buildJobPostingJsonLd(jsonLdInput)} />}
     </>

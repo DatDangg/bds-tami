@@ -84,12 +84,15 @@ const jsonLdItems = (container: HTMLElement) =>
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"], now: NOW });
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
+  // Radix Checkbox trong form ứng tuyển đo ô input ẩn bằng ResizeObserver (jsdom không có).
+  vi.stubGlobal("ResizeObserver", class { observe() {} unobserve() {} disconnect() {} });
   getSiteSettings.mockResolvedValue({ hotline: "0901 234 567", email: "tuyendung@tami.example" });
   findOtherOpenJobs.mockResolvedValue([]);
 });
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
   findPublicJobBySlug.mockReset();
   findOtherOpenJobs.mockReset();
   getSiteSettings.mockReset();
@@ -105,6 +108,10 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
     expect(h2s).toEqual(["Thông tin tuyển dụng", "Mô tả công việc", "Yêu cầu ứng viên", "Quyền lợi", "Ứng tuyển vị trí này"]);
     const form = container.querySelector("#apply-form") as HTMLElement;
     expect(form).not.toBeNull();
+    // Form ứng tuyển thật (S13) nằm trong vùng này; email + hotline là kênh dự phòng dưới form.
+    expect(within(form).getByLabelText(/Họ và tên/)).toBeInTheDocument();
+    expect(within(form).getByLabelText(/CV/)).toBeInTheDocument();
+    expect(within(form).getByRole("button", { name: "Ứng tuyển" })).toBeInTheDocument();
     expect(within(form).getByRole("link", { name: "Gửi CV tới tuyendung@tami.example" })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
     expect(within(form).getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     for (const link of screen.getAllByRole("link", { name: "Ứng tuyển" })) expect(link).toHaveAttribute("href", "#apply-form");

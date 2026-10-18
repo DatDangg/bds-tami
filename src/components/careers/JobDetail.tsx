@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { ApplyForm } from "@/components/careers/ApplyForm";
 import { ApplyFormSlot, APPLY_FORM_DOM_ID } from "@/components/careers/ApplyFormSlot";
 import { JobCard } from "@/components/careers/JobCard";
 import { RichText } from "@/components/content/RichText";
@@ -19,6 +20,8 @@ interface JobDetailProps {
   /** Vị trí đang tuyển khác: chỉ dùng khi tin đã hết hạn (gợi ý thay thế). */
   others: JobCardData[];
   contact: { email?: string; hotline?: { label: string; telHref: string } };
+  /** Site key Turnstile (công khai) cho form ứng tuyển; thiếu thì form báo không tải được bước xác minh. */
+  turnstileSiteKey?: string;
   /** Đường dẫn công khai của chính trang (mục cuối breadcrumb). */
   ownPath: string;
   /** URL tuyệt đối để chia sẻ; thiếu (chưa cấu hình URL gốc) thì nút sao chép dùng URL trang hiện tại. */
@@ -32,7 +35,7 @@ const SECTION_KEYS = ["description", "requirements", "benefits"] as const;
  * + nút Ứng tuyển + chia sẻ; < lg tóm tắt nằm ngay dưới tiêu đề, `dl` 2 cột) → vùng form ứng tuyển. Tin hết hạn: băng thông báo, KHÔNG có nút/vùng form/thanh
  * dính, KHÔNG có JSON-LD (kể cả breadcrumb), thay vào đó gợi ý vị trí khác. Server Component; chỉ thanh dính đáy và nút chia sẻ là client.
  */
-export function JobDetail({ doc, view, others, contact, ownPath, shareUrl }: JobDetailProps) {
+export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turnstileSiteKey }: JobDetailProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.careerDetail");
   const tCareers = useTranslations("page.careers");
@@ -140,7 +143,14 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl }: Job
       ) : (
         <div className="bg-bg py-section-tight">
           <div className="mx-auto w-full max-w-text px-gutter">
-            <ApplyFormSlot {...(contact.email ? { email: contact.email } : {})} {...(contact.hotline ? { hotline: contact.hotline } : {})} />
+            <ApplyFormSlot {...(contact.email ? { email: contact.email } : {})} {...(contact.hotline ? { hotline: contact.hotline } : {})}>
+              <ApplyForm
+                jobPostingId={doc.id}
+                listPath={listPath}
+                {...(turnstileSiteKey ? { turnstileSiteKey } : {})}
+                {...(contact.hotline ? { hotline: contact.hotline } : {})}
+              />
+            </ApplyFormSlot>
           </div>
         </div>
       )}
