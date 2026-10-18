@@ -53,9 +53,11 @@ describe.skipIf(!databaseUrl)("integration: staff auth + access (DB thật)", ()
   });
 
   afterAll(async () => {
-    for (const id of createdIds) {
-      await payload.delete({ collection: "staff", id, overrideAccess: true });
-    }
+    // Xoá thẳng bằng SQL: DB test sạch (CI) chỉ có các admin do test này tạo, nên admin cuối cùng sẽ bị
+    // last-admin-guard chặn nếu xoá qua Payload. FK của bảng phiên/khoá đăng nhập tự cascade theo hồ sơ.
+    if (!payload) return;
+    const { pool } = payload.db as unknown as { pool: { query: (sql: string, params: unknown[]) => Promise<unknown> } };
+    await pool.query("DELETE FROM staff WHERE id = ANY($1::uuid[])", [createdIds]);
     await payload.destroy();
   });
 

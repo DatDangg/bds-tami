@@ -92,6 +92,33 @@ jobs:
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f docker/postgres/init.sql
           pnpm payload migrate
 
+      # Test integration nạp `src/payload.config.ts` với DATABASE_URL (= tami_test) nên DB này phải có schema thật.
+      # Test tự tạo DB tạm (DATABASE_URL_TEST làm base) dùng tên DB khác nên không đụng tami_test.
+      - name: Migrate DB test (tami_test)
+        run: pnpm payload migrate
+
+      # Integration test cần S3 thật (media / private-file / job-applications / health). GitHub `services:` không truyền được command
+      # nên chạy bằng `docker run`, cùng image + lệnh `server -s3` như docker/docker-compose.dev.yml; identity là key dummy khớp env S3_*.
+      - name: Khởi động SeaweedFS S3 + tạo bucket
+        run: |
+          cat > "$RUNNER_TEMP/s3.json" <<'JSON'
+          {"identities":[{"name":"ci","credentials":[{"accessKey":"ci-dummy-access","secretKey":"ci-dummy-secret"}],"actions":["Admin","Read","Write","List","Tagging"]}]}
+          JSON
+          docker run -d --name tami-ci-seaweedfs -p 127.0.0.1:8333:8333 \
+            -v "$RUNNER_TEMP/s3.json:/etc/seaweedfs/s3.json:ro" \
+            chrislusf/seaweedfs:4.48 \
+            server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json -s3.port=8333 -ip.bind=0.0.0.0
+          for i in $(seq 1 60); do
+            docker exec tami-ci-seaweedfs wget -q -O /dev/null http://127.0.0.1:9333/cluster/status \
+              && curl -s -m 3 http://127.0.0.1:8333/ >/dev/null && break
+            sleep 2
+          done
+          docker exec tami-ci-seaweedfs wget -q -O /dev/null http://127.0.0.1:9333/cluster/status
+          curl -s -m 3 http://127.0.0.1:8333/ >/dev/null
+          for bucket in public private; do
+            echo "s3.bucket.create -name $bucket" | docker exec -i tami-ci-seaweedfs weed shell -master=127.0.0.1:9333
+          done
+
       # G18: importMap.js sinh tay bị lệch đã từng gây lỗi thật (a614b3d). Sinh lại rồi so với bản đã commit.
       - name: importMap không lệch
         run: |

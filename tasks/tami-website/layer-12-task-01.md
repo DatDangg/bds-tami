@@ -110,3 +110,6 @@ Mở khoá cho: `layer-13-task-01`, `layer-13-task-02`, `layer-13-task-03`, `lay
 
 ## Follow-up từ spec-validation layer 5
 - [ ] G18 (L5-T05): đưa `pnpm e2e:revalidate` (`tests/e2e/revalidate-globals.ts`, cần `next start`) vào CI / E2E smoke staging thay vì chỉ chạy tay; ghi kết quả vào evidence.
+
+## Follow-up từ layer-6-task-01 (staging tạm)
+- [ ] Staging đang dùng giá trị TẠM trong `/opt/tami/staging.env`: Turnstile = khoá TEST công khai Cloudflare (captcha luôn qua), SMTP giả `smtp.invalid` (email không gửi). Thay bằng Brevo + Turnstile thật trước khi kiểm E2E form/email trên staging.

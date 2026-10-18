@@ -164,3 +164,7 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Chạy kịch bản e2e backup `sftp` (`docker/backup/test/e2e.sh sftp`) trước khi bật backup production (chỉ `s3` đã PASS).
 - [ ] `scripts/deploy/deploy.test.sh:258-265`: dùng `printf '%s
 '` / `$'...'` thay xuống dòng thật trong chuỗi.
+
+## Follow-up từ review sửa CI (layer-6-task-01)
+- [ ] `ci.yml`: kiểm kết quả tạo bucket SeaweedFS (`s3.bucket.list` hoặc grep output như `docker-compose.prod.yml:270`) thay vì tin exit code của `weed shell`.
+- [ ] Cân nhắc ghim image SeaweedFS trong CI theo digest.
