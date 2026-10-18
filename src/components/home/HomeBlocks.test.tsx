@@ -1,0 +1,156 @@
+import { fireEvent, screen, within } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { renderWithIntl } from "@/components/media/test-utils";
+import { buildHomeView, type HomeDocs } from "@/lib/home/home-view";
+import type { Category, Homepage, Media, Project, PropertyPost, Service } from "@/payload-types";
+import { HomeBlocks } from "./HomeBlocks";
+
+const NOW = new Date("2026-10-18T03:00:00.000Z");
+const stamp = "2026-01-01T00:00:00.000Z";
+
+const media = (id: string): Media =>
+  ({ id, alt: `Ảnh ${id}`, url: `/api/media/file/${id}.jpg`, width: 1600, mimeType: "image/jpeg", sizes: { card: { url: `/api/media/file/${id}-800.webp`, width: 800 } }, updatedAt: stamp, createdAt: stamp }) as Media;
+const category: Category = { id: "c1", name: "Căn hộ", slug: "can-ho", scope: "project", hasEnglish: true, updatedAt: stamp, createdAt: stamp };
+
+const docs: HomeDocs = {
+  projects: [1, 2, 3].map((n) => ({ id: `p${n}`, title: `Dự án ${n}`, slug: `du-an-${n}`, summary: `Tóm tắt ${n}`, salesStatus: "selling", category, gallery: [media(`pg${n}`)] }) as Project),
+  services: [1, 2, 3].map((n) => ({ id: `s${n}`, title: `Dịch vụ ${n}`, slug: `dich-vu-${n}`, summary: "Mô tả", coverImage: media(`sv${n}`) }) as Service),
+  offers: [{ id: "o1", title: "Voucher 1", slug: "voucher-1", excerpt: "Ưu đãi", cover: media("oc1") } as PropertyPost],
+};
+
+const richText = {
+  root: { type: "root", version: 1, children: [{ type: "paragraph", version: 1, children: [{ type: "text", version: 1, text: "Giới thiệu TAMI." }] }] },
+} as unknown as NonNullable<Homepage["about"]>["content"];
+
+const homepage = (overrides: Partial<Homepage> = {}): Homepage =>
+  ({
+    id: "h",
+    hero: { slides: [{ id: "s1", image: media("hero"), title: "Tiêu đề hero", subtitle: "Phụ đề", ctaLabel: "Xem dự án", ctaLink: "projects" }] },
+    about: { enabled: true, title: "Về TAMI", content: richText, image: media("about"), stats: [{ value: "10+", label: "năm kinh nghiệm" }] },
+    featuredProjects: { enabled: true, title: "Dự án nổi bật" },
+    services: { enabled: true, title: "Dịch vụ của TAMI" },
+    featuredOffers: { enabled: true, title: "Ưu đãi nổi bật" },
+    partners: { enabled: true, title: "Đối tác" },
+    ctaBanner: { enabled: true, title: "Cần tư vấn?", description: "Để lại thông tin", ctaLabel: "", ctaLink: null },
+    blockOrder: ["about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"],
+    ...overrides,
+  }) as Homepage;
+
+const renderHome = (page: Homepage, locale: "vi" | "en" = "vi", content: HomeDocs = docs) =>
+  renderWithIntl(<HomeBlocks view={buildHomeView(page, content, locale, NOW)} siteName="TAMI HOMES" />, locale);
+
+/** Tiêu đề h2 của các khối theo thứ tự trong DOM. */
+const blockHeadings = () => screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
+
+describe("HomeBlocks: thứ tự và bật/tắt khối", () => {
+  it("render theo blockOrder mặc định: hero, Về TAMI, dự án, dịch vụ, ưu đãi, CTA (đối tác chưa có giao diện)", () => {
+    renderHome(homepage());
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+    expect(blockHeadings()).toEqual(["Về TAMI", "Dự án nổi bật", "Dịch vụ của TAMI", "Ưu đãi nổi bật", "Cần tư vấn?"]);
+  });
+
+  it("đổi blockOrder → đúng thứ tự mới; hero luôn đứng đầu", () => {
+    const { container } = renderHome(homepage({ blockOrder: [{ block: "ctaBanner" }, { block: "featuredOffers" }, { block: "about" }] as Homepage["blockOrder"] }));
+    expect(blockHeadings()).toEqual(["Cần tư vấn?", "Ưu đãi nổi bật", "Về TAMI"]);
+    expect(container.children[1]).toHaveAttribute("aria-roledescription", "carousel");
+  });
+
+  it("tắt khối (enabled=false) → không render khối đó", () => {
+    renderHome(homepage({ services: { enabled: false, title: "Dịch vụ của TAMI" }, featuredOffers: { enabled: false, title: "Ưu đãi nổi bật" } }));
+    expect(blockHeadings()).toEqual(["Về TAMI", "Dự án nổi bật", "Cần tư vấn?"]);
+    expect(screen.queryByText("Dịch vụ 1")).toBeNull();
+  });
+
+  it("ctaBanner tắt (mặc định) → không có banner", () => {
+    renderHome(homepage({ ctaBanner: { enabled: false, title: "Cần tư vấn?" } }));
+    expect(screen.queryByText("Cần tư vấn?")).toBeNull();
+  });
+});
+
+describe("HomeBlocks: nội dung khối", () => {
+  it("Về TAMI: nội dung richText và số liệu trong <dl>", () => {
+    renderHome(homepage());
+    expect(screen.getByText("Giới thiệu TAMI.")).toBeInTheDocument();
+    expect(screen.getByText("10+").tagName).toBe("DD");
+    expect(screen.getByText("năm kinh nghiệm").tagName).toBe("DT");
+  });
+
+  it("dự án: eyebrow là loại hình, nút 'Khám phá dự án' → trang dự án; có điều khiển khi ≥ 2 dự án", () => {
+    renderHome(homepage());
+    const region = screen.getByRole("region", { name: "Dự án nổi bật" });
+    expect(within(region).getAllByText("Căn hộ")).toHaveLength(3);
+    expect(within(region).getAllByRole("link", { name: "Khám phá dự án" })[0]).toHaveAttribute("href", "/du-an/du-an-1");
+    expect(within(region).getByRole("button", { name: "Chuyển tới dự án 3" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Xem tất cả" }).map((link) => link.getAttribute("href"))).toEqual(["/du-an", "/tin-bds"]);
+  });
+
+  it("1 dự án: không điều khiển", () => {
+    renderHome(homepage(), "vi", { ...docs, projects: docs.projects.slice(0, 1) });
+    expect(screen.queryByRole("button", { name: /Chuyển tới dự án/ })).toBeNull();
+  });
+
+  it("dịch vụ: mỗi thẻ là một link tới /dich-vu/[slug]; ưu đãi: thẻ link tới tin", () => {
+    renderHome(homepage());
+    expect(screen.getByRole("link", { name: /Dịch vụ 2/ })).toHaveAttribute("href", "/dich-vu/dich-vu-2");
+    expect(screen.getByRole("link", { name: /Voucher 1/ })).toHaveAttribute("href", "/tin-bds/voucher-1");
+  });
+
+  it("CTA 'Nhận tư vấn' mặc định → /lien-he; ctaLink đặt thì theo ctaLink", () => {
+    const first = renderHome(homepage());
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" })).toHaveAttribute("href", "/lien-he");
+    first.unmount();
+    renderHome(homepage({ ctaBanner: { enabled: true, title: "Cần tư vấn?", ctaLabel: "Gọi ngay", ctaLink: "https://zalo.me/tami" } }));
+    expect(screen.getByRole("link", { name: "Gọi ngay" })).toHaveAttribute("href", "https://zalo.me/tami");
+  });
+
+  it("trang luôn có đúng một h1 ẩn bằng tên site, nằm ngoài carousel (slide có/không tiêu đề, hoặc không hero)", () => {
+    const { unmount } = renderHome(homepage({ hero: { slides: [{ id: "s1", image: media("hero") }] } }));
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+    unmount();
+    renderHome(homepage({ hero: { slides: [] } }));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+  });
+});
+
+describe("HomeBlocks: truy cập", () => {
+  it("h1 vẫn nằm trong cây truy cập khi carousel chuyển sang slide khác (không nằm trong slide bị aria-hidden/inert)", () => {
+    renderHome(
+      homepage({ hero: { slides: [1, 2].map((n) => ({ id: `s${n}`, image: media(`h${n}`), title: `Hero ${n}`, ctaLabel: "Xem", ctaLink: "projects" })) } }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Chuyển tới slide 2" }));
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
+  });
+
+  it("dịch vụ ≥ 4 mục: hàng cuộn focus được có tên truy cập là tiêu đề khối", () => {
+    const services = [1, 2, 3, 4].map((n) => ({ id: `s${n}`, title: `Dịch vụ ${n}`, slug: `dich-vu-${n}`, summary: "Mô tả", coverImage: media(`sv${n}`) }) as Service);
+    renderHome(homepage(), "vi", { ...docs, services });
+    expect(screen.getByRole("list", { name: "Dịch vụ của TAMI" })).toHaveAttribute("tabindex", "0");
+  });
+});
+
+describe("HomeBlocks: /en không lấy chữ Việt", () => {
+  const enPage = (overrides: Partial<Homepage> = {}) =>
+    homepage({
+      hero: { slides: [{ id: "s1", image: media("hero"), title: "Curated real estate", ctaLabel: "View projects", ctaLink: "projects" }] },
+      about: { enabled: true, title: "About TAMI", content: richText, stats: [] },
+      featuredProjects: { enabled: true, title: "Featured projects" },
+      services: { enabled: true, title: null },
+      featuredOffers: { enabled: true, title: "Featured offers" },
+      ctaBanner: { enabled: true, title: null, description: null, ctaLabel: null, ctaLink: null },
+      ...overrides,
+    });
+
+  it("ctaBanner thiếu title EN → ẩn; khối thiếu tiêu đề EN → ẩn; link theo ngôn ngữ", () => {
+    renderHome(enPage(), "en");
+    expect(blockHeadings()).toEqual(["About TAMI", "Featured projects", "Featured offers"]);
+    expect(screen.queryByText("Get advice")).toBeNull();
+    expect(screen.getByRole("link", { name: "View projects" })).toHaveAttribute("href", "/en/projects");
+  });
+
+  it("có title EN thì ctaBanner hiện với nút mặc định 'Get advice' → /en/contact", () => {
+    renderHome(enPage({ ctaBanner: { enabled: true, title: "Need advice?" } }), "en");
+    expect(screen.getByRole("link", { name: "Get advice" })).toHaveAttribute("href", "/en/contact");
+  });
+});

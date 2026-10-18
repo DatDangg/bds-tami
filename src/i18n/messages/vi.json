@@ -622,6 +622,37 @@
     "legal": {
       "version": "Phiên bản {version} · Hiệu lực từ {date}",
       "tocTitle": "Mục lục"
+    },
+    "home": {
+      "title": "Bất động sản chọn lọc, căn hộ cho thuê",
+      "description": "TAMI HOMES phân phối, môi giới và khai thác căn hộ dịch vụ: dự án nổi bật, tin cho thuê và ưu đãi mới nhất.",
+      "hero": {
+        "region": "Nổi bật",
+        "slide": "Slide {index} / {total}",
+        "previous": "Slide trước",
+        "next": "Slide sau",
+        "pause": "Dừng trình chiếu",
+        "play": "Phát trình chiếu",
+        "dots": "Chọn slide",
+        "goTo": "Chuyển tới slide {index}"
+      },
+      "about": {
+        "watermark": "TAMI"
+      },
+      "projects": {
+        "watermark": "DỰ ÁN",
+        "viewAll": "Xem tất cả",
+        "explore": "Khám phá dự án",
+        "region": "Dự án nổi bật",
+        "slide": "Dự án {index} / {total}",
+        "previous": "Dự án trước",
+        "next": "Dự án sau",
+        "dots": "Chọn dự án",
+        "goTo": "Chuyển tới dự án {index}"
+      },
+      "offers": {
+        "viewAll": "Xem tất cả"
+      }
     }
   }
 }

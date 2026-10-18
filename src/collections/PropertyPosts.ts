@@ -6,7 +6,9 @@ import { requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidateTags } from "../hooks/revalidate-global";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -42,12 +44,14 @@ const offerGroup: GroupField = {
  * `cover` bắt buộc khi xuất bản (bản nháp được thiếu, như tin tức). Index tổng hợp `(status, has_english, category_id, published_at DESC)` và
  * `(status, is_featured, offer_end_at)` (ERD §5) là SQL tuỳ biến trong migration `property_posts`. `revalidate` chỉ để test ghi đè.
  */
-export function createPropertyPosts(revalidate?: RevalidatePaths): CollectionConfig {
+export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
+  const revalidateHomepage = createRevalidateHomepageOnUnpublish({ paths: revalidate, tags: revalidateTags });
   return withContentDefaults(
     {
       slug: "property-posts",
       admin: { useAsTitle: "title", defaultColumns: ["title", "category", "status", "publishedAt", "author"] },
       defaultSort: "-publishedAt",
+      hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         titleField(),
         scopedCategoryField("property_post"),

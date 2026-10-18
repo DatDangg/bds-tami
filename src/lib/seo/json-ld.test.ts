@@ -6,10 +6,21 @@ import {
   buildOrganizationJsonLd,
   buildRealEstateListingJsonLd,
   buildServiceJsonLd,
+  buildWebSiteJsonLd,
   serializeJsonLd,
 } from "./json-ld";
 
 describe("json-ld", () => {
+  it("WebSite: tên, URL gốc theo ngôn ngữ, inLanguage", () => {
+    expect(buildWebSiteJsonLd({ locale: "en", name: "TAMI", siteUrl: "https://x.test/en" })).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "TAMI",
+      url: "https://x.test/en",
+      inLanguage: "en",
+    });
+  });
+
   it("BreadcrumbList: position từ 1, URL tuyệt đối", () => {
     const data = buildBreadcrumbJsonLd(
       [

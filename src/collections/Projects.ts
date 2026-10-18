@@ -12,7 +12,9 @@ import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
+import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidateTags } from "../hooks/revalidate-global";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 export const SALES_STATUSES = ["upcoming", "selling", "handed_over"] as const;
@@ -89,13 +91,14 @@ const floorPlansField: ArrayField = {
  * `(status, has_english, sales_status, province_id)` và GIST `location` (ERD §5) là SQL tuỳ biến trong migration `projects`:
  * Payload chỉ sinh btree cho `point` và đặt tên index tổng hợp kém ổn định. `revalidate` chỉ để test ghi đè.
  */
-export function createProjects(revalidate?: RevalidatePaths): CollectionConfig {
+export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
+  const revalidateHomepage = createRevalidateHomepageOnUnpublish({ paths: revalidate, tags: revalidateTags });
   return withContentDefaults(
     {
       slug: "projects",
       admin: { useAsTitle: "title", defaultColumns: ["title", "category", "salesStatus", "status", "publishedAt", "author"] },
       defaultSort: "-publishedAt",
-      hooks: { afterChange: [reindexRentalsOnProjectRename] },
+      hooks: { afterChange: [reindexRentalsOnProjectRename, revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         titleField(),
         scopedCategoryField("project"),

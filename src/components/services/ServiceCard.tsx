@@ -2,16 +2,21 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import type { ServiceCardData } from "@/lib/services/service-view";
+import { cn } from "@/lib/utils";
 
 /**
  * Thẻ Dịch vụ (design-spec §3.2): ảnh bìa 4:5, tên + mô tả ngắn chữ trắng đè trên scrim đáy. Cả thẻ là MỘT link;
  * tên là heading `h3` (thẻ nằm dưới `h2` "Dịch vụ khác"). Không có ảnh bìa: nền tối đặc, chữ vẫn đọc được. Server Component.
+ * `className` đổi tỉ lệ/kích thước khung (bento trang chủ).
  */
-export function ServiceCard({ data }: { data: ServiceCardData }) {
+export function ServiceCard({ data, className }: { data: ServiceCardData; className?: string }) {
   return (
     <Link
       href={data.href}
-      className="group theme-dark-block relative isolate flex aspect-[4/5] min-h-11 flex-col justify-end overflow-hidden rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+      className={cn(
+        "group theme-dark-block relative isolate flex aspect-[4/5] min-h-11 flex-col justify-end overflow-hidden rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
+        className,
+      )}
     >
       {data.cover && (
         <ResponsiveImage

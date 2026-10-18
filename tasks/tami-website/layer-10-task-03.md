@@ -94,3 +94,8 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`, `layer-14-task-02`
 ## Notes
 - Bản dịch `en.json` do AI sinh một lần, reviewer kiểm câu chữ.
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-9-task-01 round 2 (MINOR)
+- [ ] `src/components/home/HomeBlocks.tsx:32`: nội dung `h1` sr-only = tiêu đề slide 1 (theo locale), không có thì tên site — khớp design-spec S01 `:284` mà không đưa h1 vào slide (tránh MAJOR-3 cũ).
+- [ ] `src/components/home/HeroSlider.tsx:142,161`: mobile cụm điều khiển xếp dọc cao 88px có thể chạm CTA khi hero thấp → `pb-32 sm:pb-24` (hoặc tương đương); kiểm 320px (8 dot bị cắt ~16px mỗi bên).
+- [ ] Header trong suốt đè hero (design-spec S01.1) chưa làm — cần biến thể Header + phát hiện cuộn.

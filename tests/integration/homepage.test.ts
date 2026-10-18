@@ -251,6 +251,45 @@ describe.skipIf(!baseUrl)("integration: global homepage (DB tạm)", () => {
     });
   });
 
+  describe("xoá media đang dùng: mọi nơi dùng + bulk + request en", () => {
+    const deleteMedia = (id: string, locale: "vi" | "en" = "vi") =>
+      payload.delete({ collection: "media", id, locale, user: asUser(admin), overrideAccess: false });
+
+    it("video slide, ảnh Về TAMI, nền CTA đều bị chặn 409; ảnh OG xoá được", async () => {
+      const video = await insertMedia("video/mp4", MB);
+      const about = await insertMedia("image/jpeg");
+      const cta = await insertMedia("image/jpeg");
+      const og = await insertMedia("image/jpeg");
+      await updateHomepage({
+        hero: { slides: [{ image: imageId, video }] },
+        about: { image: about },
+        ctaBanner: { enabled: false, backgroundImage: cta },
+        seo: { ogImage: og },
+      });
+      for (const id of [video, about, cta]) expect(await statusOf(deleteMedia(id))).toBe(409);
+      // Request en xoá media đang dùng: vẫn 409 (guard luôn đọc bản vi, không đổi locale của request).
+      expect(await statusOf(deleteMedia(about, "en"))).toBe(409);
+      expect(await statusOf(deleteMedia(og))).toBeUndefined();
+      await updateHomepage({ hero: { slides: slides(1) }, about: { image: null }, ctaBanner: { enabled: false, backgroundImage: null } });
+    });
+
+    it("xoá hàng loạt: media đang dùng nằm trong errors và còn nguyên, media không dùng bị xoá", async () => {
+      const used = await insertMedia("image/jpeg");
+      const unused = await insertMedia("image/jpeg");
+      await updateHomepage({ hero: { slides: [{ image: used }] } });
+      const result = await payload.delete({
+        collection: "media",
+        where: { id: { in: [used, unused] } },
+        user: asUser(admin),
+        overrideAccess: false,
+      });
+      expect(result.errors.map((error) => String(error.id))).toEqual([String(used)]);
+      expect(result.docs.map((doc) => String(doc.id))).toEqual([String(unused)]);
+      await updateHomepage({ hero: { slides: slides(1) } });
+      expect(await statusOf(deleteMedia(used))).toBeUndefined();
+    });
+  });
+
   describe("quyền", () => {
     it("sale ghi → 403; khách đọc được", async () => {
       expect(await statusOf(updateHomepage({ hero: { slides: slides(1) } }, sale))).toBe(403);

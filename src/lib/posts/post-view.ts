@@ -25,7 +25,7 @@ export function offerBadge(post: Pick<PropertyPost, "offer">, now: Date): OfferB
 const hasText = (value: string | null | undefined): value is string => typeof value === "string" && value.trim() !== "";
 
 /** Whitelist trường ảnh công khai trước khi vào props Client Component: không để lọt trường nội bộ của doc media (vd `uploadedBy`). */
-function toPublicImage(media: MediaImage | null): MediaImage | null {
+export function toPublicImage(media: MediaImage | null): MediaImage | null {
   if (!media) return null;
   return { url: media.url ?? null, alt: media.alt ?? null, width: media.width ?? null, ...(media.sizes ? { sizes: media.sizes } : {}) };
 }

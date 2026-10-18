@@ -18,6 +18,7 @@ export {
   List,
   MagnifyingGlass,
   MapPin,
+  Pause,
   Phone,
   Play,
   SlidersHorizontal,

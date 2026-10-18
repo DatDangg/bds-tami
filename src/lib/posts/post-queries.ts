@@ -17,7 +17,7 @@ const CATEGORY_LIMIT = 50;
 const PROPERTY_POST_SCOPE: Where = { scope: { equals: "property_post" } };
 
 /** Trường thẻ danh sách dùng: bỏ nội dung richText, thư viện ảnh, `offer.terms`... khỏi truy vấn danh sách. */
-const POST_CARD_FIELDS = {
+export const POST_CARD_FIELDS = {
   title: true,
   slug: true,
   excerpt: true,
@@ -123,12 +123,18 @@ export function findPublicPostBySlug(payload: Payload, locale: Locale, slug: str
   return findPublicBySlug<PropertyPost>(payload, "property-posts", locale, slug, { depth: 1 });
 }
 
-/** Tối đa 3 bài CÙNG danh mục, mới nhất trước, loại bài hiện tại (bài đã kết thúc vẫn có thể gợi ý nhưng xếp sau bài còn hạn). */
+/**
+ * Tối đa 3 bài CÙNG danh mục, mới nhất trước, loại bài hiện tại. Bài còn hạn trước; còn thiếu (danh mục chỉ có 1-2 bài còn hạn) thì lấy bù
+ * bài ưu đãi đã kết thúc cho đủ 3 thẻ (S09). `listPublicPosts` không dùng được ở đây: nó chỉ sang nhóm đã kết thúc ở các trang sau.
+ */
 export async function findRelatedPosts(payload: Payload, locale: Locale, current: Pick<PropertyPost, "id" | "category">, now: Date): Promise<PropertyPost[]> {
   const categoryId = relationId(current.category);
   if (!categoryId) return [];
-  const { docs } = await listPublicPosts(payload, locale, { page: 1, categoryIds: [categoryId], excludeIds: [current.id], now });
-  return docs.slice(0, RELATED_POSTS_COUNT);
+  const sameCategory: Where[] = [{ category: { in: [categoryId] } }, { id: { not_in: [current.id] } }];
+  const active = (await listPostsWhere([...sameCategory, offerNotEndedWhere(now)], locale, 1, payload)).docs.slice(0, RELATED_POSTS_COUNT);
+  if (active.length === RELATED_POSTS_COUNT) return active;
+  const ended = (await listPostsWhere([...sameCategory, offerEndedWhere(now)], locale, 1, payload)).docs;
+  return [...active, ...ended].slice(0, RELATED_POSTS_COUNT);
 }
 
 export interface RelatedTargets {

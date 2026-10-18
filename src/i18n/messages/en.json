@@ -622,6 +622,37 @@
     "legal": {
       "version": "Version {version} · Effective {date}",
       "tocTitle": "Contents"
+    },
+    "home": {
+      "title": "Curated real estate and apartments for rent",
+      "description": "TAMI HOMES distributes, brokers and operates serviced apartments: featured projects, rental listings and the latest offers.",
+      "hero": {
+        "region": "Highlights",
+        "slide": "Slide {index} of {total}",
+        "previous": "Previous slide",
+        "next": "Next slide",
+        "pause": "Pause slideshow",
+        "play": "Play slideshow",
+        "dots": "Choose a slide",
+        "goTo": "Go to slide {index}"
+      },
+      "about": {
+        "watermark": "TAMI"
+      },
+      "projects": {
+        "watermark": "PROJECTS",
+        "viewAll": "View all",
+        "explore": "Explore project",
+        "region": "Featured projects",
+        "slide": "Project {index} of {total}",
+        "previous": "Previous project",
+        "next": "Next project",
+        "dots": "Choose a project",
+        "goTo": "Go to project {index}"
+      },
+      "offers": {
+        "viewAll": "View all"
+      }
     }
   }
 }

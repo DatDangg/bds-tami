@@ -59,6 +59,16 @@ export function buildOrganizationJsonLd(input: OrganizationInput) {
   };
 }
 
+export interface WebSiteInput extends Localized {
+  name: string;
+  siteUrl: string;
+}
+
+/** `WebSite` của trang chủ (đi cùng `Organization`): tên site, URL gốc theo ngôn ngữ và `inLanguage`. */
+export function buildWebSiteJsonLd(input: WebSiteInput) {
+  return { "@context": SCHEMA_CONTEXT, "@type": "WebSite", name: input.name, url: input.siteUrl, inLanguage: input.locale };
+}
+
 export interface RealEstateListingInput extends Localized {
   name: string;
   url: string;

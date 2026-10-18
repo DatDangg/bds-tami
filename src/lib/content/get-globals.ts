@@ -5,7 +5,7 @@ import { unstable_cache } from "next/cache";
 import { getPayload } from "payload";
 
 import type { Locale } from "../../i18n/routing";
-import type { Footer, Header, SiteSetting } from "../../payload-types";
+import type { Footer, Header, Homepage, SiteSetting } from "../../payload-types";
 import { globalCacheTag, type PublicGlobalSlug } from "./global-cache";
 import { readPublicGlobal } from "./read-global";
 
@@ -25,3 +25,4 @@ function cachedGlobal<T extends PublicGlobalSlug>(slug: T) {
 export const getSiteSettings: (locale: Locale) => Promise<SiteSetting> = cachedGlobal("site-settings");
 export const getHeader: (locale: Locale) => Promise<Header> = cachedGlobal("header");
 export const getFooter: (locale: Locale) => Promise<Footer> = cachedGlobal("footer");
+export const getHomepage: (locale: Locale) => Promise<Homepage> = cachedGlobal("homepage");
