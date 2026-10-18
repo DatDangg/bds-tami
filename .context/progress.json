@@ -63,6 +63,33 @@
       "review": "STRICT PASS",
       "round": 1,
       "report": ".context/review-reports/feature-header-footer-design-debt-phase-1-task-02-round-1-review.md"
+    },
+    {
+      "slug": "design-spec-s04-no-skeleton",
+      "title": "design-spec: bỏ skeleton cấp route ở trang danh sách (§3.2/S02/S04/S08/S10), phản hồi chờ giữ kết quả cũ mờ 50% + aria-busy + useLinkStatus (BL-011)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-011",
+      "changeDoc": "spec/changes/archive/2026-10-19-design-spec-s04-no-skeleton.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-design-spec-s04-no-skeleton/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-design-spec-s04-no-skeleton-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.4.1",
+      "scopeVersion": 4,
+      "completedAt": "2026-10-19",
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-design-spec-s04-no-skeleton-phase-1-task-01-round-1-review.md"
     }
   ],
   "bugs": [
@@ -738,7 +765,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T18:54:18.654Z",
+  "lastUpdated": "2026-10-18T19:00:48.825Z",
   "approvalMilestones": [
     {
       "id": "M1",

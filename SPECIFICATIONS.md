@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.4.0
+- **spec_version:** 1.4.1
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 

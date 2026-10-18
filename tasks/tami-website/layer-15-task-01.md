@@ -148,7 +148,7 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] Tách `ProjectListPage` (~70 dòng) thành helper toolbar/empty-state.
 - [ ] Test chứng minh `findPublicList` với `select` không tải trường dài (`overview`…).
 - [ ] Seed mẫu: không ghi đè tên EN của danh mục admin tạo trùng tên VI.
-- [ ] Skeleton 6 thẻ cho `/du-an` (`loading.tsx`) nếu đo thấy cần.
+- [~] ~~Skeleton 6 thẻ cho `/du-an` (`loading.tsx`) nếu đo thấy cần.~~ Bỏ (BL-011, design-spec §3.2/S02 sửa 2026-10-19): cấm `loading.tsx` cấp route trước trang danh sách (soft-404, L9-T08); `/du-an` đã có phản hồi chờ `PendingRegion`/`PendingLink` (L10-T04).
 
 ## Follow-up từ review layer-6-task-08
 - [ ] Migration `20261017_175237_close_job_postings_task` `down`: xoá job `close-job-postings` trong `payload_jobs` trước khi bỏ giá trị enum (hoặc ghi runbook).

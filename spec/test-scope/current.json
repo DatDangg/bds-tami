@@ -1,89 +1,76 @@
 {
-  "specVersion": "1.4.0",
-  "scopeVersion": 3,
-  "generatedAt": "2026-10-19T15:00:00+07:00",
+  "specVersion": "1.4.1",
+  "scopeVersion": 4,
+  "generatedAt": "2026-10-19T16:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature-header-footer-design-debt",
-  "backlog": "BL-001",
+  "workItem": "feature-design-spec-s04-no-skeleton",
+  "backlog": "BL-011",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-header-footer-design-debt.md",
+  "changeDoc": "spec/changes/archive/2026-10-19-design-spec-s04-no-skeleton.md",
   "task": [
-    "tasks/feature-header-footer-design-debt/phase-1-task-01.md",
-    "tasks/feature-header-footer-design-debt/phase-1-task-02.md"
+    "tasks/feature-design-spec-s04-no-skeleton/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-header-footer-design-debt.md",
+  "specUpdate": "spec/updates/2026-10-19-design-spec-s04-no-skeleton.md",
   "specRefs": [
-    "design-spec §2.1",
-    "design-spec §2.2",
-    "design-spec §2.4",
-    "FR-PUB-19",
-    "BR-07"
+    "design-spec §3.2",
+    "design-spec S02",
+    "design-spec S04",
+    "design-spec S08",
+    "design-spec S10",
+    "FR-PUB-02",
+    "FR-PUB-04",
+    "FR-PUB-06",
+    "FR-PUB-08",
+    "FR-PUB-09"
   ],
   "specRefNotes": {
-    "design-spec §2.1": ".context/design-spec.md: header ≥ xl một hàng (logo trái · 7 mục menu giữa · tìm + VI|EN + CTA nếu bật + nút Menu phải); Logo từ site-settings.logo/logoDark, fallback logo tĩnh; Nút CTA từ global header.ctaButton (nhãn locale đang xem + link → hiện, thiếu → ẩn)",
-    "design-spec §2.2": ".context/design-spec.md: menu toàn màn hình (mọi breakpoint) — mục có con có nút caret xổ accordion menu con, aria-expanded/aria-controls, bàn phím, tắt chuyển động khi reduced motion",
-    "design-spec §2.4": ".context/design-spec.md: footer < md cột link accordion (heading chứa nút, đóng mặc định), cột Liên hệ luôn mở; ≥ md lưới",
-    "FR-PUB-19": "Nút chuyển ngôn ngữ VI / EN trên header, menu và footer — vị trí đổi trong header một hàng, phải giữ hoạt động",
-    "BR-07": "/en không fallback tiếng Việt — nút CTA thiếu nhãn EN thì ẩn ở /en"
+    "design-spec §3.2": ".context/design-spec.md: không loading.tsx cấp route cho trang danh sách force-dynamic (kể cả thư mục cha) — gây soft-404; lưới danh sách dùng phản hồi chờ như S04; skeleton chỉ cho Suspense cục bộ",
+    "design-spec S04": "/cho-thue: đổi bộ lọc/trang/chip giữ kết quả cũ, mờ 50% + aria-busy, link đang chờ mờ nhẹ (useLinkStatus); không skeleton cấp route",
+    "design-spec S02": "/du-an: đổi chip/trang phản hồi chờ như S04",
+    "design-spec S08": "/tin-bds: đổi chip/trang phản hồi chờ như S04",
+    "design-spec S10": "/tin-tuc: đổi chip/trang phản hồi chờ như S04",
+    "FR-PUB-09": "/tuyen-dung: cùng nguyên tắc (thuộc LIST_PAGES của list-no-loading.test.ts)"
   },
   "changed": {
     "files": [
-      "src/components/layout/Header.tsx",
-      "src/components/layout/Header.test.tsx",
-      "src/components/layout/BrandLogo.tsx",
-      "src/components/layout/DesktopNav.tsx",
-      "src/components/layout/MobileMenu.tsx",
-      "src/components/layout/MobileMenu.test.tsx",
-      "src/components/layout/Footer.tsx",
-      "src/components/layout/Footer.test.tsx",
-      "src/components/layout/FooterLinkColumn.tsx",
-      "src/components/layout/PublicShell.tsx",
-      "src/components/layout/PublicShell.test.tsx",
-      "src/components/layout/load-shell.ts",
-      "src/components/layout/shell-data.ts",
-      "src/components/layout/shell-data.test.ts"
+      ".context/design-spec.md",
+      "SPECIFICATIONS.md"
     ],
-    "filesNote": "theo diff thật (commit be33577 task-01 + commit task-02); kèm docs: .context/design-spec.md §2.1/§2.2/§2.4, SPECIFICATIONS.md, docs/ARCHITECTURE.md",
+    "filesNote": "doc-only — không đổi code/schema/API. Code đã khớp từ L10-T04: src/components/layout/PendingRegion.tsx, src/components/templates/CategoryListTemplate.tsx, src/components/rentals/RentalListPage.tsx; test chặn src/app/(frontend)/[locale]/list-no-loading.test.ts",
     "modules": [
-      "public layout header",
-      "full-screen menu",
-      "public layout footer",
-      "shell data loader (header/footer/site-settings globals)"
+      "public list pages pending state (PendingRegion / PendingLink)"
     ]
   },
   "impact": {
     "direct": [
-      "Header ≥ xl (1280): một hàng — logo trái · 7 mục menu giữa (dropdown mục có con) · tìm + VI|EN + CTA (nếu bật) + nút Menu phải; < xl không đổi",
-      "Nút CTA header: header.ctaButton có nhãn ở locale đang xem + link → hiện đúng nhãn/link; thiếu nhãn hoặc link → ẩn (gồm /en thiếu nhãn EN)",
-      "Logo header: site-settings.logo / logoDark đã upload → dùng logo CMS; chưa có → logo tĩnh mặc định",
-      "Menu toàn màn hình: mục có con có nút caret xổ/thu accordion, aria-expanded/aria-controls đúng, thao tác bằng bàn phím (Tab/Enter/Space), không animation khi prefers-reduced-motion",
-      "Footer < md (375): mỗi cột link là accordion đóng mặc định, nút tiêu đề có aria-expanded/aria-controls; cột Liên hệ luôn mở; ≥ md (768) lưới như cũ"
+      "/cho-thue và /cho-thue/danh-muc/*: đổi bộ lọc/trang/chip → giữ kết quả cũ, vùng kết quả mờ 50% + aria-busy=\"true\" tới khi có kết quả, không nhảy layout; link (chip/phân trang/bỏ bộ lọc) đang chờ mờ nhẹ",
+      "/du-an: đổi chip loại hình/trang → giữ lưới cũ mờ 50% + aria-busy; link chờ mờ nhẹ",
+      "/tin-tuc (+ /tin-tuc/danh-muc/*): đổi chip danh mục/trang → phản hồi chờ như trên",
+      "/tin-bds (+ /tin-bds/danh-muc/*): đổi chip danh mục/trang → phản hồi chờ như trên",
+      "/tuyen-dung: đổi bộ lọc/trang → phản hồi chờ như trên",
+      "Không xuất hiện skeleton toàn trang (loading.tsx cấp route) khi điều hướng trong các trang danh sách trên; /en tương ứng như nhau"
     ],
     "dependents": [
-      "Khung trang mọi trang công khai `/` và `/en` (header + footer + menu dùng chung)",
-      "Loader dữ liệu khung trang (globals header, footer, site-settings) theo locale"
+      "Component dùng chung PendingRegion / PendingLink / CategoryListTemplate cho mọi trang danh sách"
     ],
     "regression": [
-      "Revalidate header/footer/site-settings: sửa global trong admin → khung trang `/` và `/en` cập nhật",
-      "Chuyển ngôn ngữ VI|EN trên header, menu, footer (FR-PUB-19): về đúng trang tương ứng / trang danh sách khi chưa có bản dịch",
-      "Dropdown menu con ở header ≥ xl (hover/focus, bàn phím)",
-      "Nút liên hệ nổi (FR-PUB-12) không bị header/menu che hoặc vỡ",
-      "Mở cài đặt cookie từ footer (banner đồng ý cookie / GA4)"
+      "?page vượt số trang ở các trang danh sách trên → HTTP 404 thật (không soft-404 HTTP 200)",
+      "Danh mục lạ (/cho-thue/danh-muc/<lạ>, /tin-tuc/danh-muc/<lạ>, /tin-bds/danh-muc/<lạ>) → HTTP 404",
+      "Trạng thái trống khi lọc (§3.9) và lỗi tải phần vẫn hiển thị đúng",
+      "prefers-reduced-motion: tắt transition mờ"
     ]
   },
   "acceptance": [
-    "≥ xl header 1 hàng: logo trái · 7 mục menu giữa (dropdown mục có con giữ nguyên) · VI|EN + Menu (+ CTA nếu bật) phải; < xl không đổi",
-    "header.ctaButton bật trong CMS → nút CTA hiện trên header (nhãn/link từ CMS, đúng locale); tắt → ẩn",
-    "Logo upload trong CMS được dùng cho header; không có → logo mặc định",
-    "Footer < md: mỗi cột link là accordion đóng mặc định, nút tiêu đề có aria-expanded/aria-controls; ≥ md lưới như cũ",
-    "Menu toàn màn hình: mục có con có nút xổ accordion, aria-expanded, bàn phím OK, tắt animation khi reduced motion",
-    "Không vỡ revalidate header/footer ở / và /en; test cập nhật + pnpm test/lint/typecheck/build PASS",
-    "design-spec §2.1 (bố cục ≥ xl) cập nhật intent \"1 hàng\" (user đã quyết 2026-10-19)"
+    "Đổi bộ lọc/trang/chip ở /cho-thue, /cho-thue/danh-muc/*, /du-an, /tin-tuc(+danh mục), /tin-bds(+danh mục), /tuyen-dung: kết quả cũ giữ nguyên, mờ 50% + aria-busy=\"true\" khi chờ, hết chờ thì bỏ mờ và aria-busy",
+    "Link đang chờ (chip, phân trang, bỏ bộ lọc) mờ nhẹ + con trỏ progress",
+    "Không có skeleton cấp route; không có file loading.tsx dưới src/app cho các trang danh sách (list-no-loading.test.ts PASS)",
+    "?page vượt số trang → HTTP 404 (không soft-404)",
+    "design-spec §3.2/S02/S04/S08/S10 khớp hành vi đã build (user duyệt 2026-10-19)"
   ],
   "viewports": [
     375,
     768,
     1280
   ],
-  "risk": "medium"
+  "risk": "low"
 }

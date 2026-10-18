@@ -142,7 +142,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | **Dịch vụ** | 3:4 (nhỏ) / 4:5 (lớn), scrim dưới | Tên `--text-h2` trắng đè trên ảnh (đáy trái), `summary` 2 dòng `--color-on-dark-muted` ≥ md | Ảnh zoom; mũi tên `ArrowRight` trượt 4px |
 | **Việc làm** (hàng) | không ảnh | Tên vị trí `--text-h4`; nơi làm, hình thức, lương (`salaryText`), hạn nộp; nút mũi tên | Nền `--color-surface` → `--color-primary-subtle` |
 
-**Loading (skeleton):** cùng khung + tỉ lệ ảnh, khối `--color-surface-muted`, hiệu ứng nhấp nháy opacity 0.6 → 1 1.2s (tắt khi reduced motion). Dùng `loading.tsx` của route + `Suspense` cho lưới.
+**Loading (skeleton):** cùng khung + tỉ lệ ảnh, khối `--color-surface-muted`, hiệu ứng nhấp nháy opacity 0.6 → 1 1.2s (tắt khi reduced motion). **Không** dùng `loading.tsx` cấp route cho trang danh sách (`force-dynamic`, kể cả thư mục cha): khung chờ stream trước làm `notFound()` vượt số trang thành soft-404 HTTP 200 (L9-T08; test `list-no-loading.test.ts` chặn). Lưới danh sách dùng phản hồi chờ như S04 (giữ kết quả cũ, mờ 50% + `aria-busy`, link đang chờ mờ nhẹ qua `useLinkStatus`); skeleton chỉ dùng cho `Suspense` cục bộ của khối con.
 
 ### 3.3. Lead form (FR-PUB-13, API_SPEC §3.1)
 - Biến thể **Đầy đủ** (dự án, liên hệ, Đăng tin BĐS): Họ tên* · Số điện thoại* · Email · Lời nhắn (textarea, đếm ký tự khi > 800/1000) · Checkbox đồng ý* · Turnstile · nút **Nhận tư vấn**.
@@ -301,7 +301,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | 1024 | Chip + select cùng 1 hàng (select bên phải); lưới 3 cột |
 | 1536 | Giữ 3 cột, nới gap |
 
-**States:** loading skeleton 6 thẻ; trống khi lọc §3.9 (câu: "Chưa có dự án phù hợp."); EN: chỉ dự án `hasEnglish`.
+**States:** đổi chip/trang: giữ lưới cũ, mờ 50% + `aria-busy`, link đang chờ mờ nhẹ (`useLinkStatus`); không skeleton cấp route (§3.2); trống khi lọc §3.9 (câu: "Chưa có dự án phù hợp."); EN: chỉ dự án `hasEnglish`.
 **A11y:** chip là `button[aria-pressed]` trong `role="group" aria-label="Loại hình"`; kết quả `aria-live`.
 **Eyebrow:** 0. **Watermark:** banner chữ (nếu không có ảnh).
 
@@ -350,7 +350,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | 1536 | Lưới 4 cột (container vẫn 1280 → thẻ ~300px; dùng `@container` để thẻ tự chuyển hàng thông số xuống 2 dòng khi < 320px) |
 
 **States:**
-- Loading lần đầu: skeleton 6 thẻ. Đổi bộ lọc: giữ lưới cũ, mờ 50% + `aria-busy="true"` tới khi có kết quả (không nhảy layout).
+- Đổi bộ lọc/trang/chip: giữ kết quả cũ, mờ 50% + `aria-busy="true"` tới khi có kết quả (không nhảy layout), link đang chờ mờ nhẹ (`useLinkStatus`); không skeleton cấp route (`loading.tsx` gây soft-404, §3.2).
 - Trống khi lọc: §3.9 kèm danh sách 3 thao tác gợi ý theo bộ lọc đang có (vd bỏ "Phòng ngủ: 3", bỏ khoảng giá).
 - Lỗi API: §3.9 lỗi tải phần.
 - `q` có trong URL (từ tìm kiếm header): tiêu đề kết quả "Kết quả cho “studio quận 1” / Results for “studio quan 1”".
@@ -440,7 +440,7 @@ Responsive: theo màn cha.
 | 640 | Lưới 2 cột |
 | 1024 | Bài nổi bật split 7/5; lưới 3 cột |
 
-**States:** skeleton; trống §3.9; EN theo `hasEnglish`. **Eyebrow:** 0 (nhãn danh mục trên thẻ là metadata).
+**States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống §3.9; EN theo `hasEnglish`. **Eyebrow:** 0 (nhãn danh mục trên thẻ là metadata).
 
 ### S09. Chi tiết bài Đăng tin BĐS · `/tin-bds/[slug]` · `/en/property-news/[slug]` (FR-PUB-07)
 
@@ -476,7 +476,7 @@ Responsive: theo màn cha.
 | 640 | Lưới 2 cột |
 | 1024 | Khối nổi bật 7/5; lưới 3 cột |
 
-**States:** skeleton; trống; EN. **Eyebrow:** 0.
+**States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống; EN. **Eyebrow:** 0.
 
 ### S11. Chi tiết tin tức · `/tin-tuc/[slug]` · `/en/news/[slug]` (FR-PUB-08)
 
