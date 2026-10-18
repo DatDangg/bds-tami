@@ -155,3 +155,12 @@ Mở khoá cho: `layer-16-task-01`
 - [ ] `JobDetail.tsx:56`: tin hết hạn trên mobile bỏ padding 64px của thanh dính không hiển thị.
 - [ ] Seed mẫu tuyển dụng: không publish bản nháp thật trùng tiêu đề VI (`completeLegacyDraft`).
 - [ ] `tuyen-dung/[slug]/page.tsx:78/106`: dùng chung một `now` cho metadata và trang.
+
+## Follow-up từ review layer-6-task-01 (phần A round 2)
+- [ ] **Chặn trước production:** `docker/nginx/tami.conf` (và `tami-staging.conf` bản Cloudflare) đang `listen 443 ssl http2` — trên server dùng chung nginx 1.24, `http2` thuộc socket chung nên bật HTTP/2 cho mọi site khác. Bỏ `http2` (hoặc chỉ giữ khi mọi vhost trên 443 đã có), không đặt `ipv6only`/`default_server` trùng; `nginx -t` trên 1.24 kèm vhost giả trước khi bật.
+- [ ] Production chạy trên server dùng chung (187.52.119.50, nhiều site khác): mọi bước cô lập như staging (file site mới, compose project riêng, reload không restart, không cài/nâng nginx/certbot).
+
+## Follow-up từ review layer-6-task-01 (phần A round 4)
+- [ ] Chạy kịch bản e2e backup `sftp` (`docker/backup/test/e2e.sh sftp`) trước khi bật backup production (chỉ `s3` đã PASS).
+- [ ] `scripts/deploy/deploy.test.sh:258-265`: dùng `printf '%s
+'` / `$'...'` thay xuống dòng thật trong chuỗi.

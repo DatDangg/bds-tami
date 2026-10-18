@@ -72,6 +72,7 @@ jobs:
           secrets: |
             glitchtip_auth_token=${{ secrets.GLITCHTIP_AUTH_TOKEN }}
           build-args: |
+            NEXT_PUBLIC_HOTLINE=${{ vars.NEXT_PUBLIC_HOTLINE }}
             GLITCHTIP_URL=${{ vars.GLITCHTIP_URL }}
             GLITCHTIP_ORG=${{ vars.GLITCHTIP_ORG }}
             GLITCHTIP_PROJECT=${{ vars.GLITCHTIP_PROJECT }}

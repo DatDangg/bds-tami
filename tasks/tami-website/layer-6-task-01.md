@@ -13,7 +13,7 @@ build (initial)
 - Priority: DevOps
 - Scope: CROSS_CUTTING
 - Review level expected: **STRICT** — thao tác trên server thật dùng chung + migration lần đầu + secret
-- Blast radius: (server) /opt/tami-staging/.env (không commit); (server) /etc/nginx/sites-available/tami-staging.conf (copy từ `docker/nginx/`); docs/runbooks/deploy.md (cập nhật kết quả thật); …
+- Blast radius: (server) /opt/tami/staging.env (không commit); (server) /etc/nginx/sites-available/tami-staging-sslip*.conf (copy từ `docker/nginx/tami-staging-sslip*.conf`); docs/runbooks/deploy.md (cập nhật kết quả thật); …
 - Doc impact (dự kiến): docs/runbooks/deploy.md; ARCHITECTURE §6.4 (chốt cách runner/registry)
 - Decision impact: YES — ghi `.context/decisions.md`
 
@@ -105,8 +105,8 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - [ ] Committed
 
 ## Files to Create/Modify
-- (server) /opt/tami-staging/.env (không commit)
-- (server) /etc/nginx/sites-available/tami-staging.conf (copy từ `docker/nginx/`)
+- (server) /opt/tami/staging.env (không commit)
+- (server) /etc/nginx/sites-available/tami-staging-sslip*.conf (copy từ `docker/nginx/tami-staging-sslip*.conf`)
 - docs/runbooks/deploy.md (cập nhật kết quả thật)
 - .context/decisions.md (runner, registry, tên miền staging)
 

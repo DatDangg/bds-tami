@@ -1,14 +1,13 @@
 # Runbook: Backup và khôi phục TAMI (NFR-05)
 
-Phạm vi: `docker/backup/*` (image, lịch, script, mẫu env), `docker/docker-compose.{staging,prod}.yml` (service `postgres` tuỳ biến + `backup`),
+Phạm vi: `docker/backup/*` (image, lịch, script, mẫu env), `docker/docker-compose.prod.yml` (service `postgres` tuỳ biến + `backup`). **Staging KHÔNG có backup** (quyết định user 2026-10-18; deploy runbook §9.5); runbook này chỉ áp dụng cho production; diễn tập khôi phục chạy trong container `drill-pg` trên host production (§3.1), không dựng lên staging.
 `docker/backup/test/e2e.sh` (test thật). Kiến trúc: `docs/ARCHITECTURE.md` §8. Quyết định: `.context/decisions.md` Decision 5.
-Mục tiêu: **RPO ≤ 15 phút** (đo được: ghi xong, WAL lên kho ≤ 300 giây), **RTO ≤ 4 giờ**, diễn tập khôi phục lên staging **6 tháng/lần**.
+Mục tiêu: **RPO ≤ 15 phút** (đo được: ghi xong, WAL lên kho ≤ 300 giây), **RTO ≤ 4 giờ**, diễn tập khôi phục (vào container `drill-pg`, không đụng DB thật) **6 tháng/lần**.
 
 Quy ước dòng lệnh dưới đây (chạy trên server, user `deploy`):
 ```bash
-E=staging                       # hoặc production -> prod
-C="docker compose --env-file /opt/tami/$E.env -f /opt/tami/releases/$E/current/docker/docker-compose.$E.yml"
-# Với production: file là docker-compose.prod.yml và env là /opt/tami/prod.env
+E=production                    # backup chỉ có ở production (staging không backup)
+C="docker compose --env-file /opt/tami/prod.env -f /opt/tami/releases/$E/current/docker/docker-compose.prod.yml"
 BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgbackrest.env, restic.env, ssh/
 ```
 
@@ -27,7 +26,7 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
   và có thể làm hỏng index trên dữ liệu cũ. Base được **ghim digest** (`@sha256:01a6a70e…` trong Dockerfile) và build **fail** nếu OS không phải Debian 11 hoặc glibc khác 2.31. Có test tự động: volume khởi tạo bằng image gốc, bật bằng image mới, dữ liệu + extension + collation còn nguyên, `amcheck`/`REINDEX` sạch (`e2e.sh`, case "chuyển image").
 - **Lịch = vòng lặp trong sidecar `backup`** (không phải cron/systemd timer): nằm trong compose của từng môi trường (không cần quyền root, không sửa host dùng chung),
   log ra stdout (Loki), tự bắt kịp lịch khi container khởi động lại, job fail tự thử lại sau 30 phút cho tới khi thành công trong ngày. Sidecar chạy user `postgres`
-  (uid 999), đọc pgdata **read-only** + dùng chung thư mục socket với postgres; `mem_limit` 256m (staging) / 384m (prod); không publish cổng; không đụng container của dự án khác.
+  (uid 999), đọc pgdata **read-only** + dùng chung thư mục socket với postgres; `mem_limit` 384m; không publish cổng; không đụng container của dự án khác.
 - **File SeaweedFS đi qua S3 API + bản sao `/mirror` (volume `backup-mirror`)**, không đọc thẳng volume SeaweedFS: file `.dat/.idx` đang bị ghi dở khi server chạy
   nên chụp trực tiếp có thể không nhất quán. `rclone sync` chỉ chép phần thay đổi; restic lo lịch sử + chống trùng. Đổi lại cần thêm ổ bằng dung lượng bucket;
   `--max-delete 500` chặn việc bucket nguồn bị xoá sạch làm bản sao mất hàng loạt (snapshot cũ vẫn còn). Khi xoá hợp lệ > 500 object (dọn media hàng loạt) thì job `files` fail mỗi ngày: xem §4 "Vượt ngưỡng xoá".
@@ -37,7 +36,7 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
 
 ## 2. Thiết lập lần đầu trên server
 
-1. Thư mục + env file (một lần cho mỗi môi trường; staging và production dùng **kho, đường dẫn, mật khẩu riêng**):
+1. Thư mục + env file (một lần, chỉ production; kho/khoá/mật khẩu KHÔNG dùng chung với bất kỳ môi trường nào khác):
    ```bash
    sudo install -d -o deploy -g deploy -m 750 /opt/tami/backup /opt/tami/backup/$E /opt/tami/backup/$E/ssh
    cp docker/backup/pgbackrest-env.example $BK/pgbackrest.env      # điền, chọn 1 khối S3 hoặc SFTP
@@ -51,7 +50,7 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
 3. Chuyển container postgres sang image mới (**có một lần khởi động lại postgres, vài giây; dữ liệu nằm trong volume nên không mất**; chọn giờ ít người dùng).
    **Trước đó** so glibc của image đang chạy với image mới (phải cùng bản, nếu khác thì DỪNG: collation đổi, index text có thể hỏng):
    ```bash
-   docker exec tami-staging-postgres ldd --version | head -1                       # prod: tami-postgres; image CŨ đang chạy
+   docker exec tami-postgres ldd --version | head -1                       # image CŨ đang chạy
    docker run --rm --entrypoint ldd tami-postgres:17-3.5-pgbackrest2.59 --version | head -1   # image MỚI: phải cùng "2.31-13+deb11uNN"
    ```
    ```bash
@@ -60,7 +59,7 @@ BK=/opt/tami/backup/$E          # = BACKUP_ENV_DIR trong env file; chứa pgback
    $C exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "show archive_mode" -c "show archive_timeout" -c "select count(*) from pg_extension"'
    ```
    Từ lúc này postgres đẩy WAL bằng `archive_command`; **trước khi tạo stanza, archive sẽ báo lỗi và WAL tạm dồn ở `pg_wal`** — làm bước 4 ngay.
-   Có trần bảo vệ ổ đĩa (`archive-push-queue-max`, staging 4GiB / prod 8GiB): nếu bước 4 bị trì hoãn đủ lâu để vượt trần thì WAL bị bỏ và **phải chạy `full` mới** (bước 5) — mục 9.
+   Có trần bảo vệ ổ đĩa (`archive-push-queue-max`, prod 8GiB): nếu bước 4 bị trì hoãn đủ lâu để vượt trần thì WAL bị bỏ và **phải chạy `full` mới** (bước 5) — mục 9.
 4. Tạo kho (một lần; KHÔNG tự chạy để sai env không tạo ra kho rỗng ở sai chỗ mà không ai biết):
    ```bash
    $C exec backup bash /opt/backup/pg-backup.sh stanza-create
@@ -88,7 +87,7 @@ Công cụ: `docker/backup/pg-restore.sh` (chạy `pgbackrest restore` trong con
 ```bash
 cd /opt/tami/releases/$E/current/docker/backup
 IMG=tami-postgres:17-3.5-pgbackrest2.59
-NET=tami-staging-net                       # production: tami-net
+NET=tami-net                               # mạng của stack production
 VOL=drill_pg_$(date +%Y%m%d%H%M)
 docker volume create $VOL
 time ./pg-restore.sh --volume $VOL --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network $NET \
@@ -107,7 +106,7 @@ SFTP: tài khoản chỉ đọc) và luôn `archive_mode=off`. **Không bao gi�
 ### 3.2. Sự cố thật: khôi phục TẠI CHỖ (mất/hỏng volume `postgres-data`)
 1. Dừng ghi: `$C stop app jobs backup`; rồi `$C stop postgres`. (Container `backup` đã dừng nên bước 5 dùng `run --rm`, không `exec`.)
 2. (Nên) giữ bản cũ để đối chiếu nếu còn đọc được: `docker run --rm -v <project>_postgres-data:/from -v /opt/tami/old-pg:/to alpine tar czf /to/pg-$(date +%F).tgz -C /from .`
-   (`<project>` = `tami` hoặc `tami-staging`). Cần ổ trống ≈ kích thước DB.
+   (`<project>` = `tami`). Cần ổ trống ≈ kích thước DB.
 3. Khôi phục đè lên volume (delta: chỉ ghi lại file khác biệt, nhanh hơn):
    ```bash
    ./pg-restore.sh --volume <project>_postgres-data --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network <mạng compose> \
@@ -209,7 +208,7 @@ Cảnh báo bổ sung nên có: ổ cứng > 80%. **`HEARTBEAT_URL_WAL` nên đ�
 
 Người thực hiện: người phụ trách hạ tầng; ghi kết quả vào bảng dưới (commit vào file này hoặc ticket) mỗi lần.
 Quy trình: chọn một thời điểm trong 30 ngày qua → mục 3.1 (PITR về thời điểm đó, đo thời gian từng bước) → mục 4 (restic restore, so sha256) → mục 6 → ghi số liệu → dọn.
-Diễn tập đầu tiên: ngay sau khi bật backup trên staging (mục 2.6). Nhắc lịch: cuối tháng 4 và tháng 10 hằng năm.
+Diễn tập đầu tiên: ngay sau khi bật backup trên production (mục 2.6), khôi phục vào container `drill-pg` (mục 3.1; staging không có backup). Nhắc lịch: cuối tháng 4 và tháng 10 hằng năm.
 
 | Ngày | Môi trường | Người làm | Thời điểm đích | pgBackRest restore | Recovery | restic restore | Tổng | Kết quả kiểm tra (mục 6) |
 |---|---|---|---|---|---|---|---|---|
@@ -218,7 +217,7 @@ Diễn tập đầu tiên: ngay sau khi bật backup trên staging (mục 2.6). 
 ## 9. Giới hạn đã biết / việc chỉ kiểm được khi lên server
 
 - **Kho đích không với tới được (khoá hết hạn, B2 lỗi, sai env, chưa `stanza-create`) — WAL dồn ở `pg_wal`, có TRẦN tự động bảo vệ ổ đĩa.** Mỗi 5 phút có ghi sinh ~16MB (tối đa ~4,6GB/ngày).
-  `archive-push-queue-max` (env `PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX`, mặc định compose: **staging 4GiB, prod 8GiB**; đổi bằng `BACKUP_ARCHIVE_PUSH_QUEUE_MAX` trong env file của môi trường):
+  `archive-push-queue-max` (env `PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX`, mặc định compose prod: **8GiB**; đổi bằng `BACKUP_ARCHIVE_PUSH_QUEUE_MAX` trong env file của môi trường):
   quá trần thì pgBackRest báo PostgreSQL "đã lưu" rồi **bỏ WAL** và ghi cảnh báo `dropped WAL file ...` vào log postgres. Mục đích: ổ đĩa server dùng chung không đầy làm sập postgres TAMI **và cả các dự án khác**
   ("thà mất backup còn hơn mất DB"). Đã kiểm bằng test (`e2e.sh`, case "kho không với tới": ghi 14 segment ~224MB khi kho chết, trần 48MiB → pg_wal không phình, DB vẫn ghi, kho hồi phục → full mới OK).
   **Hệ quả bắt buộc xử lý:** từ lúc WAL đầu tiên bị bỏ, chuỗi WAL gãy ⇒ **PITR không đi qua khoảng đó**. Ngay khi kho hồi phục:
@@ -240,18 +239,18 @@ Diễn tập đầu tiên: ngay sau khi bật backup trên staging (mục 2.6). 
 - **Mất mật khẩu mã hoá = mất backup** (`PGBACKREST_REPO1_CIPHER_PASS`, `RESTIC_PASSWORD`). Cất bản sao ngoài server, ngoài repo.
 - **Env file và `$BK/ssh` không nằm trong backup này.** Cấu hình server lưu trong repo (trừ secret); secret cất riêng theo `ARCHITECTURE.md` §8.
 - **Chưa chạy trên server thật** (không SSH/deploy theo phạm vi task): build image trên server (cần mạng tới `apt-archive.postgresql.org`, `archive.debian.org`, Docker Hub), quyền chown `999:999` của `$BK/ssh`,
-  băng thông/độ trễ thật tới kho đích, số liệu RTO thật, tương tác với Promtail/Alloy. Các điểm đó kiểm ở layer-6-task-01 (deploy staging đầu tiên) và diễn tập đầu tiên.
+  băng thông/độ trễ thật tới kho đích, số liệu RTO thật, tương tác với Promtail/Alloy. Các điểm đó kiểm ở lần bật backup đầu tiên trên production và diễn tập đầu tiên.
 - `restic forget --prune` chạy hằng ngày: kho nhỏ nên rẻ; nếu kho lớn thì chuyển prune sang hằng tuần (sửa `restic-backup.sh`). `files_check` đọc thử 10% dữ liệu mỗi tuần.
 - `restic backup` giữ `--host tami-<env>`: đổi `BACKUP_ENV_NAME` sẽ tách chuỗi snapshot (và `forget` không dọn chuỗi cũ). Đừng đổi.
 
 ## 10. Test và dọn dẹp
 
-Test thật (không đụng container dev; dựng project tạm `tami-bk-e2e` từ compose staging + đích tạm, tự dọn khi xong):
+Test thật (không đụng container dev; dựng project tạm `tami-bk-e2e` từ compose prod (docker/docker-compose.prod.yml + overlay đổi tên container/network sang tami-bk-e2e-*, secret giả) + đích tạm, tự dọn khi xong):
 ```bash
 bash docker/backup/test/e2e.sh            # cả hai đích (s3, sftp), ~10 phút (chờ archive_timeout thật 5 phút)
 bash docker/backup/test/e2e.sh s3         # một đích;  E2E_WAIT_ARCHIVE_TIMEOUT=0 bỏ bước chờ 5 phút
 ```
-Nếu bị ngắt giữa chừng, dọn tay. **CHỈ chạy trên máy dev** (không có stack staging thật): server đã có `tami-staging-*` thì không chạy e2e, và không chạy các lệnh dưới
+Nếu bị ngắt giữa chừng, dọn tay. **CHỈ chạy trên máy dev** (container prod cố định tên `tami-*`; overlay e2e đổi sang `tami-bk-e2e-*` nên không va chạm, nhưng đừng chạy trên server prod), và không chạy các lệnh dưới
 (chúng lọc theo project `tami-bk-e2e` nên không đụng container/mạng của stack thật, nhưng đừng thử trên server dùng chung):
 ```bash
 docker compose -p tami-bk-e2e down -v --remove-orphans 2>/dev/null

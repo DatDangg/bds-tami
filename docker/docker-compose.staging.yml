@@ -6,12 +6,11 @@
 #   export TAMI_IMAGE=tami-web:<git-sha>
 #   C="docker compose --env-file /opt/tami/staging.env -f docker/docker-compose.staging.yml"
 #   $C config -q                                  # kiểm tra cấu hình + biến bắt buộc
-#   $C build postgres backup                      # image postgres (+pgbackrest) và sidecar backup: một lần, hoặc khi đổi phiên bản trong docker/backup/Dockerfile
-#   $C up -d postgres redis seaweedfs backup seaweedfs-init
+#   $C up -d postgres redis seaweedfs seaweedfs-init   # staging KHÔNG có dịch vụ backup (xem khối postgres)
 #   $C --profile tools run --rm migrate           # BƯỚC RIÊNG trước khi bật app/jobs (app/jobs KHÔNG tự migrate lúc khởi động)
 #   $C up -d app jobs
 # Danh sách biến của env file: khối "Docker Compose staging/prod" trong .env.example (mục này dùng giá trị riêng của môi trường).
-# Backup (pgBackRest + restic, kho ngoài server): BACKUP_ENV_DIR trỏ thư mục chứa pgbackrest.env, restic.env, ssh/ — xem docs/runbooks/restore.md.
+# Staging không backup + không alert tới M3 (quyết định user 2026-10-18); prod có backup (docker-compose.prod.yml, docs/runbooks/restore.md).
 #
 # jobs: CHỈ 1 bản (job aggregate-click-stats cộng dồn đọc-rồi-ghi, không nguyên tử; ARCHITECTURE §6.2).
 # Không dùng `--scale jobs=N`; container_name cố định cũng chặn việc này.
@@ -28,8 +27,12 @@ x-logging: &default-logging
 
 x-app-environment: &app-environment
   APP_ENV: staging
-  # Nginx chỉ nhận IP Cloudflare nên tin header CF-Connecting-IP (thiếu cờ này mọi khách chung 1 bucket rate limit).
-  TRUST_CF_CONNECTING_IP: "true"
+  # IP khách cho rate limit (thiếu cả hai cờ thì mọi khách chung 1 bucket). Mặc định = staging sslip.io KHÔNG Cloudflare: Nginx host
+  # (docker/nginx/tami-staging-sslip.conf) ghi đè X-Real-IP và app chỉ bind 127.0.0.1:3011 -> tin X-Real-IP, KHÔNG tin CF-Connecting-IP.
+  # Staging sau Cloudflare (docker/nginx/tami.conf kiểu staging.<domain>): đặt TRUST_CF_CONNECTING_IP=true + TRUST_X_REAL_IP=false trong env file.
+  # Không bật cả hai (khi đó chỉ CF-Connecting-IP được xét).
+  TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:-false}
+  TRUST_X_REAL_IP: ${TRUST_X_REAL_IP:-true}
   NODE_OPTIONS: "--max-old-space-size=576"
   DATABASE_URL: ${DATABASE_URL_STAGING:?DATABASE_URL_STAGING bắt buộc}
   PAYLOAD_SECRET: ${PAYLOAD_SECRET:?}
@@ -48,10 +51,12 @@ x-app-environment: &app-environment
   # Tuỳ chọn: chuỗi rỗng làm validate email lỗi nên không đặt giá trị mặc định; thiếu trong env file thì không truyền.
   EMAIL_FROM_ADDRESS:
   EMAIL_ALLOWLIST: ${EMAIL_ALLOWLIST:?EMAIL_ALLOWLIST bắt buộc ở staging (email nội bộ, ngăn cách bằng dấu phẩy)}
-  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+  # Tuỳ chọn: staging tắt dịch AI (TRANSLATION_MONTHLY_BUDGET_USD=0) nên không cần khoá; env.ts coi chuỗi rỗng = chưa đặt.
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   TRANSLATION_MODEL: ${TRANSLATION_MODEL:?}
-  TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:?}
-  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://staging.<domain>)}
+  # Staging: 0 = tắt dịch AI (quyết định user 2026-10-18). Đặt số > 0 + ANTHROPIC_API_KEY trong env file khi cần bật.
+  TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:-0}
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://187-52-119-50.sslip.io hoặc https://staging.<domain>)}
   GLITCHTIP_DSN: ${GLITCHTIP_DSN:-}
   GLITCHTIP_PUBLIC_DSN: ${GLITCHTIP_PUBLIC_DSN:-}
   METRICS_TOKEN: ${METRICS_TOKEN:-}
@@ -124,25 +129,16 @@ services:
     networks: [internal]
 
   postgres:
-    # Image tuỳ biến = postgis/postgis:17-3.5 + pgbackrest (archive_command cần binary trong container). Dựng 1 lần: `$C build postgres backup`
-    # (deploy.sh không pull image này; chưa có tag thì `compose up` tự build). Giữ nguyên base 17-3.5 và volume `postgres-data`.
-    image: tami-postgres:17-3.5-pgbackrest2.59
-    build:
-      context: ./backup
-      target: postgres
+    # STAGING KHÔNG BACKUP (quyết định user 2026-10-18): image postgis gốc, không pgbackrest, archive_mode=off, không dịch vụ `backup`,
+    # không cần BACKUP_ENV_DIR. Dữ liệu staging là dữ liệu mẫu, mất thì seed lại. Prod giữ nguyên cấu hình backup (docker-compose.prod.yml).
+    # Muốn bật backup cho staging sau này: chép khối postgres/backup + volume tương ứng từ docker-compose.prod.yml (đổi tên container/mạng/BACKUP_ENV_NAME).
+    image: postgis/postgis:17-3.5
     container_name: tami-staging-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tami}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
       POSTGRES_DB: ${POSTGRES_DB:-tami}
-      PGBACKREST_PG1_USER: ${POSTGRES_USER:-tami}
-      # Trần WAL chưa lên kho (pgbackrest.conf giải thích): vượt thì BỎ WAL thay vì làm đầy ổ server dùng chung. Staging 4GiB / prod 8GiB (ước tính runbook ~4,6 GB WAL/ngày ở tải cao: kho chết quá cỡ 1-2 ngày thì mới bỏ WAL).
-      PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX: ${BACKUP_ARCHIVE_PUSH_QUEUE_MAX:-4GiB}
-    # Kho đích + khoá + mật khẩu mã hoá của pgBackRest (PGBACKREST_REPO1_*): file trên server, KHÔNG commit (mẫu docker/backup/pgbackrest-env.example).
-    env_file:
-      - ${BACKUP_ENV_DIR:?BACKUP_ENV_DIR bắt buộc (thư mục chứa pgbackrest.env, restic.env, ssh/; xem docs/runbooks/restore.md)}/pgbackrest.env
     # `DATABASE_URL_STAGING` phải trỏ tới host `postgres`, cùng user/mật khẩu/db ở trên.
-    # archive_timeout 300s: WAL đang ghi dở được đẩy lên kho tối đa mỗi 5 phút => RPO <= 15 phút kể cả khi một lần đẩy lỗi/chậm.
     command:
       - postgres
       - -c
@@ -152,65 +148,16 @@ services:
       - -c
       - max_connections=50
       - -c
-      - wal_level=replica
-      - -c
-      - archive_mode=on
-      - -c
-      - archive_command=pgbackrest --stanza=tami archive-push %p
-      - -c
-      - archive_timeout=300
+      - archive_mode=off
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
-      - ./backup/pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
-      # Thư mục socket dùng chung với sidecar `backup` (pgBackRest backup nối vào postgres qua unix socket).
-      - postgres-socket:/var/run/postgresql
-      - ${BACKUP_ENV_DIR}/ssh:/etc/backup/ssh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 10
     mem_limit: 512m
-    restart: unless-stopped
-    logging: *default-logging
-    networks: [internal]
-
-  # Sidecar backup (ARCHITECTURE §8): lịch + chạy pgBackRest (diff/full/check) và restic. Chạy user postgres (uid 999) để đọc pgdata (read-only).
-  # Kho đích nằm NGOÀI server (cấu hình bằng env file). Chỉ một bản; không publish cổng. Runbook: docs/runbooks/restore.md.
-  backup:
-    image: tami-backup:pgbackrest2.59-restic0.17.3
-    build:
-      context: ./backup
-      target: backup
-    container_name: tami-staging-backup
-    <<: *hardening
-    user: "999:999"
-    entrypoint: ["bash", "/opt/backup/scheduler.sh"]
-    env_file:
-      - ${BACKUP_ENV_DIR:?BACKUP_ENV_DIR bắt buộc}/pgbackrest.env
-      - ${BACKUP_ENV_DIR}/restic.env
-    environment:
-      TZ: Asia/Ho_Chi_Minh
-      BACKUP_ENV_NAME: staging
-      PGBACKREST_PG1_USER: ${POSTGRES_USER:-tami}
-      SRC_S3_ENDPOINT: http://seaweedfs:8333
-      SRC_S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?}
-      SRC_S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?}
-      SRC_S3_BUCKETS: ${S3_BUCKET_PUBLIC:?} ${S3_BUCKET_PRIVATE:?}
-    volumes:
-      - postgres-data:/var/lib/postgresql/data:ro
-      - postgres-socket:/var/run/postgresql
-      - ./backup:/opt/backup:ro
-      - ./backup/pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
-      - backup-state:/var/lib/tami-backup
-      - backup-mirror:/mirror
-      - ${BACKUP_ENV_DIR}/ssh:/etc/backup/ssh:ro
-    depends_on:
-      postgres: { condition: service_healthy }
-      seaweedfs: { condition: service_healthy }
-    stop_grace_period: 30s
-    mem_limit: 256m
     restart: unless-stopped
     logging: *default-logging
     networks: [internal]
@@ -286,8 +233,5 @@ networks:
 
 volumes:
   postgres-data:
-  postgres-socket:
-  backup-state:
-  backup-mirror:
   redis-data:
   seaweedfs-data:

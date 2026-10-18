@@ -19,7 +19,6 @@ tasks
 spec
 skills
 assets
-seed
 .agent
 .claude
 .context

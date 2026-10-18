@@ -30,6 +30,7 @@ x-app-environment: &app-environment
   APP_ENV: production
   # Nginx chỉ nhận IP Cloudflare nên tin header CF-Connecting-IP (thiếu cờ này mọi khách chung 1 bucket rate limit).
   TRUST_CF_CONNECTING_IP: "true"
+  TRUST_X_REAL_IP: "false"
   NODE_OPTIONS: "--max-old-space-size=768"
   DATABASE_URL: ${DATABASE_URL_PROD:?DATABASE_URL_PROD bắt buộc}
   PAYLOAD_SECRET: ${PAYLOAD_SECRET:?}

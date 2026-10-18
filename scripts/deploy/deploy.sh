@@ -235,6 +235,22 @@ rollback_to_previous() {
   compose up -d app jobs && wait_for_health && jobs_running
 }
 
+# Dịch vụ nền cần chạy trước migrate. `backup` chỉ thêm khi compose của môi trường có định nghĩa nó: prod có;
+# staging KHÔNG có kho backup (quyết định user 2026-10-18) nên compose staging không khai báo dịch vụ này.
+base_services() {
+  local services=(postgres redis seaweedfs) declared
+  if [[ $DRY_RUN == true ]]; then
+    # dry-run không chạy docker: chỉ prod có backup
+    if [[ $TARGET_ENV == production ]]; then services+=(backup); fi
+    echo "${services[*]}"
+    return
+  fi
+  # Không đặt trong điều kiện `if`: lỗi đọc compose phải dừng deploy, không được lặng lẽ bỏ backup ở prod.
+  declared="$(compose config --services)" || die "không đọc được danh sách dịch vụ compose"
+  if grep -qx backup <<<"$declared"; then services+=(backup); fi
+  echo "${services[*]}"
+}
+
 # Mọi lỗi sau khi bắt đầu đổi container (kể cả `compose up` non-zero) đều đi vào rollback.
 switch_app_and_jobs() {
   run compose up -d app jobs && wait_for_health && jobs_running
@@ -248,7 +264,12 @@ deploy() {
   run compose config -q
   pull_image
   gate_high_risk_migrations
-  run compose up -d postgres redis seaweedfs backup
+  # Gán riêng: `die` trong $(...) làm đối số lệnh chỉ thoát subshell, `compose up -d` sẽ chạy KHÔNG danh sách (up toàn bộ).
+  local base_list base_array
+  base_list="$(base_services)" || die "không xác định được danh sách dịch vụ nền"
+  read -r -a base_array <<< "$base_list"
+  if ((${#base_array[@]} == 0)); then die "danh sách dịch vụ nền rỗng"; fi
+  run compose up -d "${base_array[@]}"
   run compose up -d seaweedfs-init
   run_migrations
   if switch_app_and_jobs; then

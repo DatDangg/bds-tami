@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Test thật backup/restore (NFR-05) trên Docker local, KHÔNG đụng container/volume dev (tami-postgres, tami-redis, tami-seaweedfs).
-# Dựng project compose tạm `tami-bk-e2e` từ CHÍNH docker/docker-compose.staging.yml (postgres tuỳ biến + sidecar backup + seaweedfs nguồn)
+# Dựng project compose tạm `tami-bk-e2e` từ CHÍNH docker/docker-compose.prod.yml (postgres tuỳ biến + sidecar backup + seaweedfs nguồn; overlay chỉ đổi tên container/network, secret giả ngẫu nhiên)
 # cộng đích backup tạm (docker-compose.e2e.yml): SeaweedFS S3 qua HTTPS và SFTP. Với từng đích (s3, sftp):
 #   pgBackRest : stanza-create -> full -> thêm dữ liệu -> diff -> thêm dữ liệu (mốc T) -> thêm dữ liệu -> check (ép + chờ archive WAL)
 #                -> restore PITR tới T (kỳ vọng số bản ghi tại T) -> restore mới nhất (kỳ vọng đủ) -> so số bản ghi, đo thời gian
@@ -9,7 +9,7 @@
 #   chuyển image: volume khởi tạo bằng postgis/postgis:17-3.5 gốc -> bật bằng image tuỳ biến -> dữ liệu, extension, collation, amcheck/REINDEX
 #   kho không với tới (đích cuối): trần archive-push-queue-max giữ pg_wal không phình, DB vẫn ghi được, kho hồi phục -> full mới thành công
 # Chạy: bash docker/backup/test/e2e.sh [s3] [sftp]   (mặc định cả hai). KEEP=1: không dọn khi kết thúc. E2E_WAIT_ARCHIVE_TIMEOUT=0: bỏ bước chờ archive_timeout thật.
-# Dọn tay nếu script bị ngắt (CHỈ trên máy dev; lọc theo label/tên project tami-bk-e2e, không đụng stack staging thật):
+# Dọn tay nếu script bị ngắt (CHỈ trên máy dev; lọc theo label/tên project tami-bk-e2e, không đụng stack prod thật):
 #   docker compose -p tami-bk-e2e down -v --remove-orphans; docker ps -aq --filter name=tami-bk-e2e- | xargs -r docker rm -f
 #   docker volume ls -q --filter name=tami-bk-e2e | xargs -r docker volume rm
 set -euo pipefail
@@ -33,7 +33,7 @@ expect_eq() { [[ "$1" == "$2" ]] || fail "$3: thực tế '$1', kỳ vọng '$2'
 
 dc() {
   docker compose -p "$PROJECT" --env-file "$(hostpath "$WORK/compose.env")" \
-    -f "$(hostpath "$REPO_ROOT/docker/docker-compose.staging.yml")" -f "$(hostpath "$HERE/docker-compose.e2e.yml")" "$@"
+    -f "$(hostpath "$REPO_ROOT/docker/docker-compose.prod.yml")" -f "$(hostpath "$HERE/docker-compose.e2e.yml")" "$@"
 }
 psql_main() { dc exec -T postgres psql -U tami -d tami -At -c "$1"; }
 bk() { dc exec -T backup "$@"; }
@@ -53,7 +53,8 @@ cleanup() {
 trap cleanup EXIT
 
 # ---------- chuẩn bị ----------
-[[ -z "$(docker ps -aq --filter name='^tami-staging-')" ]] || fail "đã có container tami-staging-*: dừng test để không đụng môi trường thật"
+# docker-compose.e2e.yml đổi tên container + network của stack prod sang tami-bk-e2e-*; còn sót từ lần chạy bị ngắt thì dọn tay (lệnh ở đầu file).
+[[ -z "$(docker ps -aq --filter name='^tami-bk-e2e-')" ]] || fail "còn container tami-bk-e2e-* từ lần chạy trước: dọn tay rồi chạy lại"
 rm -rf "$WORK"
 mkdir -p "$WORK/certs" "$WORK/ssh"
 chmod 777 "$WORK/certs" "$WORK/ssh"
@@ -75,7 +76,7 @@ TARGET_KEY="$(rand 10)" TARGET_SECRET="$(rand 20)"
 cat > "$WORK/compose.env" << EOF
 TAMI_IMAGE=tami-web:e2e-not-started
 POSTGRES_PASSWORD=$(rand 12)
-DATABASE_URL_STAGING=postgres://tami:x@postgres:5432/tami
+DATABASE_URL_PROD=postgres://tami:x@postgres:5432/tami
 PAYLOAD_SECRET=$(rand 16)
 REDIS_PASSWORD=$(rand 12)
 S3_ACCESS_KEY_ID=$S3_KEY
@@ -91,7 +92,7 @@ EMAIL_ALLOWLIST=a@example.com
 ANTHROPIC_API_KEY=x
 TRANSLATION_MODEL=x
 TRANSLATION_MONTHLY_BUDGET_USD=1
-NEXT_PUBLIC_SITE_URL=https://staging.example.com
+NEXT_PUBLIC_SITE_URL=https://prod.example.com
 BACKUP_ENV_DIR=$(hostpath "$WORK")
 E2E_DIR=$(hostpath "$WORK")
 E2E_TARGET_KEY=$TARGET_KEY
@@ -178,11 +179,11 @@ restore_and_count() { # <tên> <bảng> <target-time|""> -> in số bản ghi; g
   docker volume create "$vol" > /dev/null
   t0=$(now)
   bash "$REPO_ROOT/docker/backup/pg-restore.sh" --volume "$vol" --image "$PG_IMAGE" --env-file "$WORK/pgbackrest.env" \
-    --conf "$(hostpath "$REPO_ROOT/docker/backup/pgbackrest.conf")" --network tami-staging-net --ssh-dir "$WORK/ssh" "${args[@]}" > "$WORK/restore-$name.log" 2>&1 \
+    --conf "$(hostpath "$REPO_ROOT/docker/backup/pgbackrest.conf")" --network tami-bk-e2e-net --ssh-dir "$WORK/ssh" "${args[@]}" > "$WORK/restore-$name.log" 2>&1 \
     || { cat "$WORK/restore-$name.log" >&2; fail "pg-restore.sh $name lỗi"; }
   t1=$(now)
   # archive_mode=off: bản khôi phục KHÔNG được đẩy WAL vào kho đang dùng (xem runbook §3.3).
-  docker run -d --name "$cont" --network tami-staging-net --env-file "$WORK/pgbackrest.env" \
+  docker run -d --name "$cont" --network tami-bk-e2e-net --env-file "$WORK/pgbackrest.env" \
     -v "$vol:/var/lib/postgresql/data" -v "$(hostpath "$REPO_ROOT/docker/backup/pgbackrest.conf"):/etc/pgbackrest/pgbackrest.conf:ro" \
     -v "$(hostpath "$WORK/ssh"):/etc/backup/ssh:ro" -e POSTGRES_PASSWORD=unused \
     "$PG_IMAGE" postgres -c archive_mode=off > /dev/null
@@ -339,10 +340,10 @@ heartbeat_and_scheduler_tests() {
   after="$(bk cat /var/lib/tami-backup/pg_diff.success)"
   expect_eq "$after" "$before" "heartbeat pg_diff KHÔNG đổi khi job fail"
   bk bash -c '[[ -s /var/lib/tami-backup/pg_diff.failure ]]' || fail "thiếu .failure"
-  bk grep -q 'tami_backup_last_run_ok{kind="pg_diff",env="staging"} 0' /var/lib/tami-backup/textfile/tami_backup.prom || fail "textfile không báo last_run_ok=0"
+  bk grep -q 'tami_backup_last_run_ok{kind="pg_diff",env="production"} 0' /var/lib/tami-backup/textfile/tami_backup.prom || fail "textfile không báo last_run_ok=0"
   echo "ok  job fail: exit != 0, .success giữ nguyên, last_run_ok=0"
   bk bash /opt/backup/pg-backup.sh diff > /dev/null 2>&1 || fail "diff sau fail không chạy lại được"
-  bk grep -q 'tami_backup_last_run_ok{kind="pg_diff",env="staging"} 1' /var/lib/tami-backup/textfile/tami_backup.prom || fail "last_run_ok không trở lại 1"
+  bk grep -q 'tami_backup_last_run_ok{kind="pg_diff",env="production"} 1' /var/lib/tami-backup/textfile/tami_backup.prom || fail "last_run_ok không trở lại 1"
   echo "ok  chạy lại thành công: last_run_ok=1"
 
   # scheduler: state riêng, mọi slot = 0000 => mọi job tới hạn trong một vòng
@@ -386,7 +387,7 @@ wait_tcp_ready() { # <container> ; chờ postgres cuối cùng (qua TCP: server 
   fail "$c không sẵn sàng sau 120 giây"
 }
 
-# Chuyển image: volume do image GỐC khởi tạo (như prod/staging hiện tại) rồi bật bằng image tuỳ biến (glibc/collation/extension/index còn nguyên).
+# Chuyển image: volume do image GỐC khởi tạo (như prod hiện tại) rồi bật bằng image tuỳ biến (glibc/collation/extension/index còn nguyên).
 image_switch_test() {
   step "chuyển image: khởi tạo volume bằng postgis/postgis:17-3.5 gốc -> bật bằng image tuỳ biến -> dữ liệu + extension + index"
   local vol="${PROJECT}_switch" c="${PROJECT}-switch" orig=postgis/postgis:17-3.5 n_before n_after sum_before sum_after cv_before cv_after
@@ -444,7 +445,7 @@ pg_wal_old_segments() {
 unreachable_repo_test() {
   local scn="$1" target="target-$1" table="e2e_$1" old ready wal_mb0 wal_mb1 failed0 failed1 n0 n1 t0 waited=0 dropped
   step "[$scn] kho không với tới: trần hàng đợi WAL (archive-push-queue-max) bảo vệ ổ đĩa"
-  expect_eq "$(dc config | grep -c 'PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX: 4GiB')" 1 "[$scn] mặc định staging = 4GiB"
+  expect_eq "$(dc config | grep -c 'PGBACKREST_ARCHIVE_PUSH_QUEUE_MAX: 8GiB')" 1 "[$scn] mặc định prod = 8GiB"
   echo "BACKUP_ARCHIVE_PUSH_QUEUE_MAX=48MiB" >> "$WORK/compose.env" # trần nhỏ để thấy tác dụng trong vài giây (= 3 segment 16MB)
   dc up -d --force-recreate --wait postgres > /dev/null
   # shellcheck disable=SC2016 # $VAR phải được shell TRONG container mở rộng
@@ -485,7 +486,7 @@ unreachable_repo_test() {
   expect_eq "$n1" "$((n0 + 15))" "[$scn] DB vẫn nhận ghi khi kho chết"
   # heartbeat báo lỗi (cảnh báo / Kuma stale): check fail và last_run_ok{wal}=0
   if bk timeout 180 bash /opt/backup/pg-backup.sh check > "$WORK/check-down-$scn.log" 2>&1; then fail "[$scn] check thành công dù kho chết"; fi
-  bk grep -q 'tami_backup_last_run_ok{kind="wal",env="staging"} 0' /var/lib/tami-backup/textfile/tami_backup.prom || fail "[$scn] textfile không báo wal last_run_ok=0 khi kho chết"
+  bk grep -q 'tami_backup_last_run_ok{kind="wal",env="production"} 0' /var/lib/tami-backup/textfile/tami_backup.prom || fail "[$scn] textfile không báo wal last_run_ok=0 khi kho chết"
   echo "ok  [$scn] check fail khi kho chết, last_run_ok{wal}=0"
 
   # kho hồi phục -> PITR gãy ở khoảng bị bỏ => full MỚI phải thành công và check OK
@@ -496,7 +497,7 @@ unreachable_repo_test() {
   psql_main "insert into $table(payload) values ('sau-hoi-phuc')" > /dev/null
   psql_main "select pg_switch_wal()" > /dev/null
   wait_archived "$t0"
-  bk grep -q 'tami_backup_last_run_ok{kind="wal",env="staging"} 1' /var/lib/tami-backup/textfile/tami_backup.prom || fail "[$scn] last_run_ok{wal} không về 1 sau khi kho hồi phục"
+  bk grep -q 'tami_backup_last_run_ok{kind="wal",env="production"} 1' /var/lib/tami-backup/textfile/tami_backup.prom || fail "[$scn] last_run_ok{wal} không về 1 sau khi kho hồi phục"
   result "[$scn] kho hồi phục: full mới $(($(now) - t0)) giây thành công, check OK, WAL tiếp tục lên kho, last_run_ok{wal}=1"
 }
 image_switch_test

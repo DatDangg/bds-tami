@@ -36,6 +36,10 @@ ENV DATABASE_URL=postgres://build:build@127.0.0.1:5432/build \
 # nên Next không nhúng giá trị này vào bundle) và bỏ URL tuyệt đối trong HTML prerender lúc build; giá trị thật do compose cấp mỗi môi trường.
 # Source map trình duyệt: chỉ sinh + upload lên GlitchTip khi có secret `glitchtip_auth_token` (+ build-arg url/org/project);
 # không có secret thì `pnpm build` không sinh `.map`. Token đi qua secret mount (không vào layer/history), `.map` luôn bị xoá khỏi image.
+# Biến BUILD (Next nhúng vào bundle lúc build; đổi giá trị = build lại): số hotline cho src/app/global-error.tsx khi DB lỗi (design-spec S18).
+# CI lấy từ GitHub variable NEXT_PUBLIC_HOTLINE (deploy.yml build-args); rỗng = trang lỗi không hiện số.
+ARG NEXT_PUBLIC_HOTLINE=""
+ENV NEXT_PUBLIC_HOTLINE=$NEXT_PUBLIC_HOTLINE
 ARG GLITCHTIP_URL=""
 ARG GLITCHTIP_ORG=""
 ARG GLITCHTIP_PROJECT=""
@@ -66,6 +70,8 @@ COPY --chown=node:node --from=builder /app/package.json /app/tsconfig.json /app/
 COPY --chown=node:node --from=builder /app/src ./src
 COPY --chown=node:node --from=builder /app/scripts ./scripts
 COPY --chown=node:node --from=builder /app/migrations ./migrations
+# `pnpm seed` / `pnpm seed --sample` chạy được trong container (scripts/seed*.{mjs,ts} nằm trong ./scripts ở trên; seed/ chứa dữ liệu địa giới, ảnh mẫu).
+COPY --chown=node:node --from=builder /app/seed ./seed
 
 EXPOSE 3000
 # Probe sâu (DB, Redis, S3): 503 khi một phụ thuộc hỏng. Service `jobs` tắt healthcheck này trong compose (không có HTTP).

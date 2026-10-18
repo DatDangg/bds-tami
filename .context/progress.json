@@ -322,7 +322,7 @@
       "completedAt": "2026-10-18T10:20:00.000Z"
     }
   ],
-  "inProgressTask": null,
+  "inProgressTask": "layer-6/task-01",
   "blockedTasks": [
     {
       "task": "layer-4/task-06",
@@ -426,9 +426,29 @@
       "date": "2026-10-18T07:35:00.000Z",
       "decision": "Bỏ route /du-an/danh-muc/[category] (không có trong BRD/design-spec); chip danh mục dự án là link /du-an?category=<slug> đúng S02",
       "reason": "User chọn Bỏ, theo spec"
+    },
+    {
+      "date": "2026-10-18T10:40:00.000Z",
+      "decision": "Staging L6-T01: không có tên miền/Cloudflare → dùng 187-52-119-50.sslip.io (server 187.52.119.50), HTTPS Let's Encrypt qua Nginx, basic auth, không CDN; ngoại lệ so với AC Cloudflare (ghi task + ARCH). Production vẫn cần tên miền thật + Cloudflare trước M5",
+      "reason": "User: khó có domain; chọn sslip.io + HTTPS"
+    },
+    {
+      "date": "2026-10-18T11:25:00.000Z",
+      "decision": "Staging: tắt backup (không archive WAL, không container backup) vì chỉ dữ liệu mẫu trên server dùng chung; backup thật bật ở production",
+      "reason": "User chọn"
+    },
+    {
+      "date": "2026-10-18T11:25:00.000Z",
+      "decision": "G10: staging chưa có báo động; giám sát (L4-T06) trước M3",
+      "reason": "User chọn"
+    },
+    {
+      "date": "2026-10-18T11:25:00.000Z",
+      "decision": "Staging tắt AI dịch: TRANSLATION_MONTHLY_BUDGET_USD=0, không cần ANTHROPIC_API_KEY",
+      "reason": "User chọn"
     }
   ],
-  "lastUpdated": "2026-10-18T10:20:00.000Z",
+  "lastUpdated": "2026-10-18T14:40:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

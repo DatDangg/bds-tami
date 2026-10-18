@@ -45,7 +45,9 @@ restore_release_link() {
     rm -f "$link"
   fi
   RELEASE_ACTIVATED=false
-  COMPOSE_FILE="${PREVIOUS_RELEASE:-$REPO_DIR}/docker/$COMPOSE_NAME"
+  # Có release trước thì compose vẫn đọc QUA symlink `current` (vừa trả về release trước), giống lúc deploy: đường dẫn bind mount
+  # (./postgres/init.sql ...) không đổi nên postgres không bị tạo lại khi rollback. Không có release trước (`current` đã xoá) thì dùng release này.
+  if [[ -n $PREVIOUS_RELEASE ]]; then COMPOSE_FILE="$link/docker/$COMPOSE_NAME"; else COMPOSE_FILE="$REPO_DIR/docker/$COMPOSE_NAME"; fi
 }
 
 # Giữ RELEASES_KEEP release mới nhất + release `current`; xoá phần còn lại (không đụng thư mục lạ).

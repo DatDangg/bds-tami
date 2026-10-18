@@ -1,5 +1,5 @@
-# CHỈ DÙNG CHO TEST (docker/backup/test/e2e.sh): thêm hai đích backup tạm vào project compose staging
-# (`-f docker/docker-compose.staging.yml -f docker/backup/test/docker-compose.e2e.yml -p tami-bk-e2e`).
+# CHỈ DÙNG CHO TEST (docker/backup/test/e2e.sh): thêm hai đích backup tạm vào project compose PROD (stack có backup duy nhất; đổi tên container/network tami-* -> tami-bk-e2e-* vì trùng container dev)
+# (`-f docker/docker-compose.prod.yml -f docker/backup/test/docker-compose.e2e.yml -p tami-bk-e2e`).
 #   target-s3   : SeaweedFS S3 qua HTTPS (chứng chỉ tự ký) — mô phỏng B2/MinIO/SeaweedFS của công ty
 #   target-sftp : OpenSSH SFTP — mô phỏng server khác của công ty
 services:
@@ -27,10 +27,31 @@ services:
       - ${E2E_DIR:?}/ssh/id_rsa.pub:/home/tami/.ssh/keys/id_rsa.pub:ro
     networks: [internal]
 
+  # Tên container cố định của prod (tami-*) trùng container dev: đổi sang tami-bk-e2e-*.
+  app:
+    container_name: tami-bk-e2e-app
+  jobs:
+    container_name: tami-bk-e2e-jobs
+  migrate:
+    container_name: tami-bk-e2e-migrate
+  postgres:
+    container_name: tami-bk-e2e-postgres
+  redis:
+    container_name: tami-bk-e2e-redis
+  seaweedfs:
+    container_name: tami-bk-e2e-seaweedfs
+  seaweedfs-init:
+    container_name: tami-bk-e2e-seaweedfs-init
+
   # Lịch của sidecar để rảnh trong lúc test (test tự gọi script; scheduler được thử riêng với state tạm).
   backup:
+    container_name: tami-bk-e2e-backup
     environment:
       BACKUP_WAL_CHECK_SECONDS: "86400"
       BACKUP_PG_SLOT: "2359"
       BACKUP_FILES_SLOT: "2359"
       BACKUP_CHECK_SLOT: "2359"
+
+networks:
+  internal:
+    name: tami-bk-e2e-net

@@ -144,10 +144,12 @@ test_activate_restore_prune() {
     readlink "$link" > "$WORK/cur2"
     restore_release_link
     readlink "$link" > "$WORK/cur3"
+    printf "%s" "$COMPOSE_FILE" > "$WORK/compose3"
   )
   expect "activate: compose đọc qua symlink current (bind mount ổn định)" test "$(< "$WORK/compose1")" == "$link/docker/docker-compose.staging.yml"
   expect "activate: current trỏ release mới, ghi nhớ release trước" test "$(< "$WORK/cur2")" == "$ROOT/releases/staging/$SHA2" -a "$(< "$WORK/prev")" == "$ROOT/releases/staging/$SHA1"
   expect "restore: current quay về release trước" test "$(< "$WORK/cur3")" == "$ROOT/releases/staging/$SHA1"
+  expect "restore: rollback dùng COMPOSE_FILE qua symlink current như lúc deploy (L4-T05 MINOR-1)" test "$(< "$WORK/compose3")" == "$link/docker/docker-compose.staging.yml"
   (
     TAMI_ROOT="$ROOT" TARGET_ENV=staging DRY_RUN=false RELEASES_KEEP=2
     prune_old_releases > /dev/null
@@ -250,6 +252,81 @@ jobs_scenario() { # jobs_scenario <chế độ: stable|looping|stopped>
   ) > /dev/null 2>&1
 }
 
+# --- Dịch vụ nền: `backup` chỉ khi compose của môi trường khai báo (prod có, staging không backup) ---
+test_base_services() {
+  DRY_RUN=false
+  compose() { printf '%s
+' "$COMPOSE_SERVICES"; }
+  COMPOSE_SERVICES=$'app
+postgres
+backup
+redis'
+  expect "base_services: compose có dịch vụ backup (prod) -> up cả backup" test "$(base_services)" == "postgres redis seaweedfs backup"
+  COMPOSE_SERVICES=$'app
+postgres
+redis'
+  expect "base_services: compose không có backup (staging) -> không up backup" test "$(base_services)" == "postgres redis seaweedfs"
+  compose() { return 1; }
+  base_services_dies() { ! (base_services) > /dev/null 2>&1; }
+  expect "base_services: compose config lỗi -> die, không lặng lẽ bỏ backup" base_services_dies
+  unset -f compose
+  DRY_RUN=true TARGET_ENV=production
+  expect "base_services: dry-run production -> có backup, không gọi docker" test "$(base_services)" == "postgres redis seaweedfs backup"
+  TARGET_ENV=staging
+  expect "base_services: dry-run staging -> không backup" test "$(base_services)" == "postgres redis seaweedfs"
+  DRY_RUN=false
+}
+
+# deploy() ở mức cao nhất: `compose config --services` lỗi phải dừng deploy TRƯỚC mọi `compose up`
+# (die trong $(...) làm đối số chỉ thoát subshell => từng up toàn bộ dịch vụ trên image mới, ngoài rollback).
+# run_base_services_deploy <services-rc> <danh-sách-dịch-vụ>; ghi lệnh vào $WORK/calls; in mã thoát.
+run_base_services_deploy() {
+  : > "$WORK/calls"
+  local rc=0
+  set +e
+  (
+    set -e
+    local stub_rc="$1" stub_declared="$2"
+    DRY_RUN=false TARGET_ENV=production TARGET_IMAGE="$IMAGE" RELEASE_SHA="$SHA1"
+    read_previous_image() { PREVIOUS_IMAGE="$PREV_IMAGE"; }
+    require_staging_passed() { :; }
+    activate_release() { :; }
+    pull_image() { :; }
+    gate_high_risk_migrations() { :; }
+    run_migrations() { echo migrate >> "$WORK/calls"; }
+    prune_old_tami_images() { :; }
+    prune_old_releases() { :; }
+    wait_for_health() { return 0; }
+    record_success() { :; }
+    restore_release_link() { :; }
+    jobs_running() { return 0; }
+    compose() {
+      if [[ "$*" == "config --services" ]]; then
+        if ((stub_rc != 0)); then return "$stub_rc"; fi
+        printf '%s\n' "$stub_declared"
+        return 0
+      fi
+      echo "compose $*" >> "$WORK/calls"
+    }
+    deploy
+  ) > /dev/null 2>&1
+  rc=$?
+  set -e
+  printf '%s' "$rc"
+}
+
+test_deploy_base_services_call_site() {
+  local rc
+  rc="$(run_base_services_deploy 1 "")"
+  expect "deploy: compose config --services lỗi => exit khác 0" test "$rc" != 0
+  expect "deploy: compose config --services lỗi => KHÔNG có compose up nào" bash -c '! grep -q "compose up" "$1"' _ "$WORK/calls"
+  expect "deploy: compose config --services lỗi => không chạy migrate" bash -c '! grep -q "^migrate$" "$1"' _ "$WORK/calls"
+  rc="$(run_base_services_deploy 0 $'app\njobs\npostgres\nredis\nseaweedfs\nbackup')"
+  expect "deploy: config ok => exit 0" test "$rc" == 0
+  expect "deploy: up -d nhận đúng danh sách dịch vụ nền (có backup)" grep -qx 'compose up -d postgres redis seaweedfs backup' "$WORK/calls"
+  expect "deploy: không có lệnh compose up -d trần (không danh sách)" bash -c '! grep -qx "compose up -d" "$1"' _ "$WORK/calls"
+}
+
 test_jobs_running() {
   expect "jobs_running: running + không restart => ổn định" jobs_scenario stable
   if jobs_scenario looping; then fail "jobs_running: restart count tăng => không ổn định"; else pass "jobs_running: restart count tăng => không ổn định"; fi
@@ -292,6 +369,8 @@ test_release_layout
 test_activate_restore_prune
 test_require_staging_passed
 test_deploy_rollback
+test_base_services
+test_deploy_base_services_call_site
 test_jobs_running
 test_gate_removes_temp_container
 

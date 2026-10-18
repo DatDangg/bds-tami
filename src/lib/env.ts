@@ -7,13 +7,23 @@ import { z } from "zod";
 const nonEmpty = z.string().min(1, "bắt buộc");
 
 /** Chỉ `true`/`false`; thiếu = false. Giá trị lạ là lỗi cấu hình (không đoán), tránh vô tình tin/không tin header proxy. */
-const trustCloudflareSchema = z.enum(["true", "false"]).default("false").transform((value) => value === "true");
+const trustFlagSchema = z.enum(["true", "false"]).default("false").transform((value) => value === "true");
 
-/** Đọc cờ `TRUST_CF_CONNECTING_IP` (xem `client-ip.ts`); ném lỗi nêu tên biến nếu giá trị không hợp lệ. */
-export function parseTrustCloudflareFlag(value: string | undefined): boolean {
-  const result = trustCloudflareSchema.safeParse(value === "" ? undefined : value);
-  if (!result.success) throw new EnvValidationError(["TRUST_CF_CONNECTING_IP"]);
+/** Cờ tin header IP khách: chỉ `true`/`false`, thiếu = false; ném lỗi nêu TÊN biến (không in giá trị) nếu không hợp lệ. */
+function parseTrustFlag(name: string, value: string | undefined): boolean {
+  const result = trustFlagSchema.safeParse(value === "" ? undefined : value);
+  if (!result.success) throw new EnvValidationError([name]);
   return result.data;
+}
+
+/** Đọc cờ `TRUST_CF_CONNECTING_IP` (xem `client-ip.ts`). */
+export function parseTrustCloudflareFlag(value: string | undefined): boolean {
+  return parseTrustFlag("TRUST_CF_CONNECTING_IP", value);
+}
+
+/** Đọc cờ `TRUST_X_REAL_IP` (staging sslip.io: Nginx host ghi đè `X-Real-IP`, không có Cloudflare). */
+export function parseTrustRealIpFlag(value: string | undefined): boolean {
+  return parseTrustFlag("TRUST_X_REAL_IP", value);
 }
 
 /** Biến tuỳ chọn: chuỗi rỗng (dòng `KEY=` trong .env) coi như chưa đặt. */
@@ -64,7 +74,8 @@ const envSchema = z.object({
   EMAIL_ALLOWLIST: z.string().optional(),
   ...translationEnvShape,
   NEXT_PUBLIC_SITE_URL: z.url(),
-  TRUST_CF_CONNECTING_IP: trustCloudflareSchema,
+  TRUST_CF_CONNECTING_IP: trustFlagSchema,
+  TRUST_X_REAL_IP: trustFlagSchema,
   // Giám sát (ARCHITECTURE §8). Không có DSN thì tắt hẳn GlitchTip. `GLITCHTIP_PUBLIC_DSN` (DSN cho trình duyệt) được đọc lúc chạy qua `/api/monitoring-config`, không nhúng lúc build.
   GLITCHTIP_DSN: z.preprocess(emptyToUndefined, z.url().optional()),
   GLITCHTIP_PUBLIC_DSN: z.preprocess(emptyToUndefined, z.url().optional()),

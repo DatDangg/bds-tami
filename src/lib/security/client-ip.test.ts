@@ -8,6 +8,10 @@ vi.mock("@/lib/logger", () => ({ logger: { child: () => log, ...log } }));
 const headers = (init: Record<string, string>) => new Headers(init);
 
 describe("getClientIp", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("tin CF-Connecting-IP khi bật proxy tin cậy", () => {
     expect(getClientIp(headers({ "cf-connecting-ip": "203.0.113.7" }), { trustCloudflare: true })).toBe("203.0.113.7");
     expect(getClientIp(headers({ "cf-connecting-ip": "2001:db8::1" }), { trustCloudflare: true })).toBe("2001:db8::1");
@@ -22,6 +26,35 @@ describe("getClientIp", () => {
     const h = headers({ "x-forwarded-for": "6.6.6.6", "x-real-ip": "7.7.7.7" });
     expect(getClientIp(h, { trustCloudflare: true, remoteAddress: "198.51.100.9" })).toBe("198.51.100.9");
     expect(getClientIp(h, { trustCloudflare: true })).toBe(UNKNOWN_CLIENT_IP);
+  });
+
+  it("tin X-Real-IP chỉ khi bật trustRealIpHeader (staging sslip.io sau Nginx); mỗi khách một giá trị riêng", () => {
+    const opts = { trustCloudflare: false, trustRealIpHeader: true, remoteAddress: "172.18.0.1" };
+    expect(getClientIp(headers({ "x-real-ip": "203.0.113.7" }), opts)).toBe("203.0.113.7");
+    expect(getClientIp(headers({ "x-real-ip": "2001:db8::2" }), opts)).toBe("2001:db8::2");
+    expect(getClientIp(headers({ "x-real-ip": "203.0.113.7" }), { ...opts, trustRealIpHeader: false })).toBe("172.18.0.1");
+  });
+
+  it("trustRealIpHeader: X-Real-IP sai/thiếu -> remote address hoặc unknown; không bao giờ đọc X-Forwarded-For", () => {
+    const opts = { trustCloudflare: false, trustRealIpHeader: true };
+    expect(getClientIp(headers({ "x-real-ip": "1.1.1.1, 2.2.2.2", "x-forwarded-for": "6.6.6.6" }), opts)).toBe(UNKNOWN_CLIENT_IP);
+    expect(getClientIp(headers({ "x-forwarded-for": "6.6.6.6" }), { ...opts, remoteAddress: "198.51.100.9" })).toBe("198.51.100.9");
+  });
+
+  it("bật cả hai cờ: chỉ CF-Connecting-IP được xét, X-Real-IP không là đường lui giả mạo được", () => {
+    const h = headers({ "x-real-ip": "7.7.7.7" });
+    expect(getClientIp(h, { trustCloudflare: true, trustRealIpHeader: true })).toBe(UNKNOWN_CLIENT_IP);
+  });
+
+  it("mặc định đọc TRUST_X_REAL_IP từ env; giá trị lạ -> lỗi nêu tên biến", () => {
+    const h = headers({ "x-real-ip": "203.0.113.7" });
+    vi.stubEnv("TRUST_CF_CONNECTING_IP", "false");
+    vi.stubEnv("TRUST_X_REAL_IP", "true");
+    expect(getClientIp(h)).toBe("203.0.113.7");
+    vi.stubEnv("TRUST_X_REAL_IP", "false");
+    expect(getClientIp(h)).toBe(UNKNOWN_CLIENT_IP);
+    vi.stubEnv("TRUST_X_REAL_IP", "yes");
+    expect(() => getClientIp(h)).toThrow(/TRUST_X_REAL_IP/);
   });
 
   it("CF-Connecting-IP không phải IP hợp lệ -> bỏ qua", () => {

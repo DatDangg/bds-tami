@@ -63,14 +63,14 @@ jobs:
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
 
       # Phiên bản pnpm lấy từ field `packageManager` trong package.json.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: pnpm
@@ -81,6 +81,22 @@ jobs:
       # Cùng script khởi tạo với Docker dev: postgis, unaccent, pg_trgm (psql có sẵn trên ubuntu-latest).
       - name: Tạo extension Postgres
         run: psql "$DATABASE_URL_TEST" -v ON_ERROR_STOP=1 -f docker/postgres/init.sql
+
+      # G21: chạy TOÀN BỘ migration đã commit trên một DB PostGIS TRỐNG (DB riêng `tami_migrate`, không đụng `tami_test` của test)
+      # để lỗi migration lộ ở CI thay vì lần deploy staging/prod đầu. Thành công = migration tạo schema từ số 0 mà không lỗi.
+      - name: Migrate toàn bộ trên DB trống
+        env:
+          DATABASE_URL: postgres://tami:ci_only_password@127.0.0.1:5432/tami_migrate
+        run: |
+          psql "$DATABASE_URL_TEST" -v ON_ERROR_STOP=1 -c "CREATE DATABASE tami_migrate"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f docker/postgres/init.sql
+          pnpm payload migrate
+
+      # G18: importMap.js sinh tay bị lệch đã từng gây lỗi thật (a614b3d). Sinh lại rồi so với bản đã commit.
+      - name: importMap không lệch
+        run: |
+          pnpm payload generate:importmap
+          git diff --exit-code -- "src/app/(payload)/admin/importMap.js"
 
       - name: Lint
         run: pnpm lint

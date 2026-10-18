@@ -251,8 +251,8 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 | nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
 | `app` | **đúng 1 bản** (chạy 2+ bản cần cache handler dùng chung trước — §9.1, G9) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
-| `postgres` | riêng (`tami-postgres:17-3.5-pgbackrest2.59` = `postgis/postgis:17-3.5` + pgbackrest, build từ `docker/backup/Dockerfile`; bật `archive_mode`, `archive_timeout=300`) | riêng | `mem_limit` 2g / 512m |
-| `backup` (sidecar) | 1 bản: lịch + pgBackRest (diff/full/check) + restic, kho đích ngoài server cấu hình bằng env | 1 bản, kho riêng | `mem_limit` 384m / 256m |
+| `postgres` | riêng (prod: `tami-postgres:17-3.5-pgbackrest2.59` = `postgis/postgis:17-3.5` + pgbackrest, build từ `docker/backup/Dockerfile`; bật `archive_mode`, `archive_timeout=300`) | riêng | `mem_limit` 2g / 512m |
+| `backup` (sidecar, chỉ prod; staging không có) | 1 bản: lịch + pgBackRest (diff/full/check) + restic, kho đích ngoài server cấu hình bằng env | 1 bản, kho riêng | `mem_limit` 384m / 256m |
 | `redis` | riêng (có mật khẩu, `maxmemory 100mb`, `volatile-lru`) | riêng | 128m |
 | `seaweedfs` | **As-built:** mỗi môi trường 1 instance riêng trong compose của mình (không publish cổng, khoá S3 lấy từ env), bucket riêng (`tami-prod-*`) — thay cho phương án dùng chung ban đầu, để prod/staging không chia sẻ dữ liệu hay khoá | instance riêng, bucket `tami-staging-*` | 256m |
 | giám sát | dùng chung | dùng chung | ~1GB |
@@ -281,11 +281,16 @@ Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
 |---|---|---|---|
 | `APP_ENV` | `production` (**bắt buộc**) | `staging` | Khác `production` thì email chỉ gửi tới `EMAIL_ALLOWLIST` |
 | `EMAIL_ALLOWLIST` | — | danh sách email nội bộ | Rỗng ở môi trường không phải production → runner log lỗi |
-| `TRUST_CF_CONNECTING_IP` | `true` | `true` | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu → mọi khách chung 1 bucket rate limit |
+| `TRUST_CF_CONNECTING_IP` | `true` | `false` (sslip.io) / `true` (sau Cloudflare) | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu cả hai cờ IP → mọi khách chung 1 bucket rate limit |
+| `TRUST_X_REAL_IP` | `false` | `true` (sslip.io) / `false` (sau Cloudflare) | Chỉ bật khi Nginx cùng host ghi đè `X-Real-IP` và app bind `127.0.0.1`; không bật cùng `TRUST_CF_CONNECTING_IP` |
 | `SMTP_PORT`, `EMAIL_FROM_ADDRESS` | Brevo (587) | Brevo | Mặc định 587 |
 | `GLITCHTIP_DSN`, `GLITCHTIP_PUBLIC_DSN` | DSN dự án prod | DSN dự án staging | Server / trình duyệt; để trống thì không gửi lỗi. Trình duyệt lấy giá trị **lúc chạy** qua `/api/monitoring-config`, nên cùng một image promote staging → prod không cần build-arg riêng |
 | `METRICS_TOKEN` | ≥ 32 ký tự | ≥ 32 ký tự | Bearer cho `/api/metrics`; chưa đặt thì endpoint trả 404 |
 | `LOG_LEVEL` | `info` | `info` | Mặc định `info` (`silent` khi test) |
+
+**Ngoại lệ staging (as-built, 2026-10-18): chưa có tên miền/Cloudflare.** Staging chạy tại `https://187-52-119-50.sslip.io`, HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-staging-sslip*.conf`), basic auth + `noindex`, không CDN; IP khách lấy từ `X-Real-IP` do Nginx đặt (`TRUST_X_REAL_IP=true`). Production vẫn cần tên miền thật + Cloudflare (không đổi). Runbook: `docs/runbooks/deploy.md` §9.
+
+Staging cũng **không backup** (compose staging: image `postgis/postgis:17-3.5`, `archive_mode=off`, không dịch vụ `backup`, không cần `BACKUP_ENV_DIR`), **không alert** tới M3 và **tắt dịch AI** (`TRANSLATION_MONTHLY_BUDGET_USD=0`, `ANTHROPIC_API_KEY` để trống) theo quyết định user 2026-10-18; production giữ backup + WAL archive như §8. Dữ liệu staging là dữ liệu mẫu, mất thì migrate + seed lại.
 
 Secret nằm trong `.env` trên server (không commit). Danh sách biến mẫu đặt ở `.env.example`, gồm cả `ANTHROPIC_API_KEY`, `TRANSLATION_MODEL`, `TRANSLATION_MONTHLY_BUDGET_USD` (prod/staging giá trị riêng).
 

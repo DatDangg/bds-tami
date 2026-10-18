@@ -37,6 +37,12 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ ...validEnv, TRUST_CF_CONNECTING_IP: "1" })).toThrow(/TRUST_CF_CONNECTING_IP/);
   });
 
+  it("TRUST_X_REAL_IP: mặc định false, nhận true/false, giá trị lạ -> lỗi nêu tên biến", () => {
+    expect(parseEnv(validEnv).TRUST_X_REAL_IP).toBe(false);
+    expect(parseEnv({ ...validEnv, TRUST_X_REAL_IP: "true" }).TRUST_X_REAL_IP).toBe(true);
+    expect(() => parseEnv({ ...validEnv, TRUST_X_REAL_IP: "1" })).toThrow(/TRUST_X_REAL_IP/);
+  });
+
   it("parse đúng kiểu khi đủ biến", () => {
     const env = parseEnv(validEnv);
     expect(env.TRANSLATION_MONTHLY_BUDGET_USD).toBe(25.5);
@@ -100,6 +106,12 @@ describe("parseEnv: dịch AI", () => {
     expect(parseEnv(withoutKey).ANTHROPIC_API_KEY).toBeUndefined();
     expect(parseEnv({ ...validEnv, ANTHROPIC_API_KEY: "" }).ANTHROPIC_API_KEY).toBeUndefined();
     expect(() => parseEnv({ ...validEnv, TRANSLATION_MODEL: "" })).toThrow(/TRANSLATION_MODEL/);
+  });
+
+  it("staging tắt dịch AI: khoá rỗng + hạn mức 0 hợp lệ", () => {
+    const env = parseEnv({ ...validEnv, ANTHROPIC_API_KEY: "", TRANSLATION_MONTHLY_BUDGET_USD: "0" });
+    expect(env.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(env.TRANSLATION_MONTHLY_BUDGET_USD).toBe(0);
   });
 
   it("TRANSLATION_MONTHLY_BUDGET_USD: số >= 0 (0 = tắt dịch); âm hoặc không phải số -> lỗi nêu tên biến", () => {

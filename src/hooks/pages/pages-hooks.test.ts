@@ -1,9 +1,10 @@
 import type { CollectionAfterChangeHook, CollectionBeforeValidateHook } from "payload";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { TRANSLATABLE_COLLECTIONS } from "../../lib/translation/allowlist";
 import { lockPageKind } from "./lock-kind";
 import { createRevalidatePage } from "./revalidate-page";
+import { MISSING_SITE_NAME_MESSAGE, syncPrivacyPolicyVersion } from "./sync-privacy-version";
 
 type AfterChangeArgs = Parameters<CollectionAfterChangeHook>[0];
 
@@ -47,5 +48,26 @@ describe("createRevalidatePage", () => {
     expect(calls).toEqual([]);
     await run({ kind: "privacy", status: "hidden" }, { kind: "privacy", status: "published" });
     expect(calls).toHaveLength(1);
+  });
+});
+
+describe("syncPrivacyPolicyVersion: thiếu siteName", () => {
+  const publish = (global: object) => {
+    const updateGlobal = vi.fn();
+    const req = { payload: { findGlobal: async () => global, updateGlobal } };
+    const result = syncPrivacyPolicyVersion({ doc: { kind: "privacy", status: "published", version: "1.1" }, req } as unknown as AfterChangeArgs);
+    return { result, updateGlobal };
+  };
+
+  it("site-settings chưa có siteName -> lỗi 400 rõ ràng, không ghi global", async () => {
+    const { result, updateGlobal } = publish({ privacyPolicyVersion: "1.0" });
+    await expect(result).rejects.toMatchObject({ status: 400, message: MISSING_SITE_NAME_MESSAGE });
+    expect(updateGlobal).not.toHaveBeenCalled();
+  });
+
+  it("có siteName -> ghi phiên bản như cũ", async () => {
+    const { result, updateGlobal } = publish({ siteName: "TAMI", privacyPolicyVersion: "1.0" });
+    await result;
+    expect(updateGlobal).toHaveBeenCalledOnce();
   });
 });
