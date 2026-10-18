@@ -241,10 +241,13 @@ describe("POST /api/public/job-applications (handler)", () => {
     expect(expired.response.status).toBe(400);
     expect(expired.body.error).toBe("Vị trí tuyển dụng này không còn nhận hồ sơ");
     expect(expired.body.details).toEqual([]);
+    // Mã máy đọc được: client (ApplyForm) dựa vào đây thay cho quy ước "400 không có details".
+    expect(expired.body).toMatchObject({ code: "postingClosed" });
     expect(expired.calls.create).not.toHaveBeenCalled();
 
     const missing = await submit({}, { posting: null });
     expect(missing.response.status).toBe(400);
+    expect(missing.body).toMatchObject({ code: "postingClosed" });
     expect(missing.calls.create).not.toHaveBeenCalled();
   });
 
@@ -341,8 +344,9 @@ describe("POST /api/public/job-applications (handler)", () => {
     expect(response.status).toBe(400);
     const body = (await response.json()) as { error: string; details: unknown[] };
     expect(body.error).toBe("The CV file is corrupted or unreadable, please choose another file");
-    // Client dựa vào đây để không nhầm CV hỏng với tin hết hạn (postingClosed là 400 duy nhất không có details).
+    // Lỗi CV gắn vào ô CV và KHÔNG mang code postingClosed (client không nhầm CV hỏng với tin hết hạn).
     expect(body.details).toEqual([{ field: "cv", message: body.error }]);
+    expect(body).not.toHaveProperty("code");
     expect(fake.calls.create).toHaveBeenCalledTimes(1);
   });
 

@@ -1,12 +1,19 @@
 // Bench `PostgresRentalSearch` với 100.000 tin giả lập (NFR-01: p95 ≤ 500ms): `pnpm bench:rentals-search` (= `payload run`).
-// KHÔNG nằm trong `pnpm test`. Chỉ chạy trên DB dev: script chèn tin có mã `BENCH-*` rồi xoá hết ở `finally` (cascade xoá dòng ngôn ngữ).
+// KHÔNG nằm trong `pnpm test`. Chỉ chạy trên DB dev (có chặn cứng ở `bench-guard.ts`: production/staging hoặc host DB không phải localhost -> thoát): script chèn tin có mã `BENCH-*` rồi xoá hết ở `finally` (cascade xoá dòng ngôn ngữ).
 // Số tin đổi bằng `BENCH_ROWS`, số lần lặp mỗi kịch bản bằng `BENCH_RUNS`.
 import { sql } from "@payloadcms/db-postgres";
 import { getPayload } from "payload";
 
 import config from "../../src/payload.config";
+import { benchBlockedReason } from "./bench-guard";
 import { PostgresRentalSearch, sqlExecutorOf } from "../../src/lib/search/search-service";
 import { rentalSearchParamsSchema } from "../../src/shared/types/api";
+
+const blocked = benchBlockedReason(process.env);
+if (blocked) {
+  console.error(`Từ chối chạy bench: ${blocked}. Bench chèn ${process.env.BENCH_ROWS ?? 100_000} tin giả đã xuất bản, chỉ chạy trên DB dev ở máy này.`);
+  process.exit(1);
+}
 
 const ROWS = Number(process.env.BENCH_ROWS ?? 100_000);
 const RUNS = Number(process.env.BENCH_RUNS ?? 40);

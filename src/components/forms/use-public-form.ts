@@ -8,6 +8,7 @@ import {
   collectFields,
   isCaptchaFailureMessage,
   parseDetails,
+  readErrorCode,
   readErrorDetails,
   readErrorMessage,
   retryAfterMinutes,
@@ -37,6 +38,8 @@ export type FormIssue = {
   details: string[];
   /** Lỗi tạm thời: hiện nút Thử lại. */
   retryable: boolean;
+  /** `code` máy đọc được do API trả (vd `postingClosed`), nếu có. */
+  code?: string;
 };
 
 type Status = "idle" | "submitting" | "success";
@@ -98,6 +101,11 @@ export function usePublicForm({ endpoint, encoding, fieldNames, fileField, valid
   function failFromBody(statusCode: number, body: unknown, retryAfter: string | null) {
     const known = new Set([...fieldNames, "consent", ...(fileField ? [fileField] : [])]);
     if (statusCode === 400) {
+      const code = readErrorCode(body);
+      if (code) {
+        failWith({ kind: "validation", message: readErrorMessage(body) ?? t("errors.generic"), details: [], retryable: false, code });
+        return;
+      }
       const errors: Record<string, string> = {};
       const details: string[] = [];
       for (const { field, message } of parseDetails(readErrorDetails(body))) {

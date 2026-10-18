@@ -24,7 +24,7 @@ export function searchTerms(query: string | undefined): string[] {
 
 /** Danh mục theo slug của `locale` cùng danh mục con của nó (tối đa 2 cấp, ERD §4.3); chỉ tính danh mục scope `rental` chưa xoá mềm. */
 function categoryCondition(slug: string, locale: string): SqlFragment {
-  const matched = sql`SELECT cl."_parent_id" FROM "categories_locales" cl JOIN "categories" t ON t."id" = cl."_parent_id" AND t."scope" = 'rental' WHERE cl."_locale" = ${locale} AND cl."slug" = ${slug}`;
+  const matched = sql`SELECT cl."_parent_id" FROM "categories_locales" cl JOIN "categories" t ON t."id" = cl."_parent_id" AND t."scope" = 'rental' AND t."deleted_at" IS NULL WHERE cl."_locale" = ${locale} AND cl."slug" = ${slug}`;
   return sql`r."category_id" IN (SELECT c."id" FROM "categories" c WHERE c."deleted_at" IS NULL AND c."scope" = 'rental' AND (c."id" IN (${matched}) OR c."parent_id" IN (${matched})))`;
 }
 
@@ -40,14 +40,22 @@ function publicConditions(locale: string): SqlFragment[] {
   return conditions;
 }
 
+/** Phường theo slug TRONG tỉnh đã chọn: slug phường chỉ duy nhất trong tỉnh (ERD §4.2). Không có `province` thì `ward` bị schema API từ chối. */
+function wardCondition(ward: string, province: string | undefined): SqlFragment {
+  if (province === undefined) return sql`r."ward_id" IN (SELECT "id" FROM "wards" WHERE "slug" = ${ward})`;
+  return sql`r."ward_id" IN (SELECT w."id" FROM "wards" w JOIN "provinces" p ON p."id" = w."province_id" WHERE w."slug" = ${ward} AND p."slug" = ${province})`;
+}
+
 /** Mệnh đề WHERE đầy đủ. Mọi giá trị người dùng đi qua tham số (`${}`), không có chuỗi nào được nối vào SQL. */
 export function rentalWhere(params: RentalSearchParams): SqlFragment {
   const { locale } = params;
   const conditions = publicConditions(locale);
+  // Trang danh sách S04 không liệt kê tin đã thuê (chỉ truy cập bằng URL).
+  if (params.available) conditions.push(sql`r."status" = 'published'`);
   for (const term of searchTerms(params.q)) conditions.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`);
   if (params.category) conditions.push(categoryCondition(params.category, locale));
   if (params.province) conditions.push(sql`r."province_id" IN (SELECT "id" FROM "provinces" WHERE "slug" = ${params.province})`);
-  if (params.ward) conditions.push(sql`r."ward_id" IN (SELECT "id" FROM "wards" WHERE "slug" = ${params.ward})`);
+  if (params.ward) conditions.push(wardCondition(params.ward, params.province));
   if (params.priceMin !== undefined) conditions.push(sql`r."price_monthly_vnd" >= ${params.priceMin}`);
   if (params.priceMax !== undefined) conditions.push(sql`r."price_monthly_vnd" <= ${params.priceMax}`);
   if (params.areaMin !== undefined) conditions.push(sql`r."area_m2" >= ${params.areaMin}`);

@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ROLES } from "../../src/access/roles";
 import { reindexRentalSearchText } from "../../src/lib/search/reindex-rental-search-text";
+import { parseRentalFilters, toRentalSearchParams } from "../../src/lib/search/url-params";
 import { PostgresRentalSearch, sqlExecutorOf } from "../../src/lib/search/search-service";
 import { type RentalCard, rentalSearchParamsSchema } from "../../src/shared/types/api";
 
@@ -284,9 +285,28 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
 
     it("province + ward", async () => {
       expect(await titlesOf({ province: "ha-noi" })).toEqual(["Nhà phố Ba Đình rộng"]);
-      expect(await titlesOf({ ward: "ba-dinh" })).toEqual(["Nhà phố Ba Đình rộng"]);
+      expect(await titlesOf({ province: "ha-noi", ward: "ba-dinh" })).toEqual(["Nhà phố Ba Đình rộng"]);
+      // Slug phường chỉ duy nhất trong tỉnh: `ward` không kèm `province` là mơ hồ nên schema từ chối.
+      expect(rentalSearchParamsSchema.safeParse({ ward: "ba-dinh" }).success).toBe(false);
       expect((await search({ province: "ho-chi-minh", limit: 48 })).total).toBe(5);
       expect((await search({ province: "ha-noi", ward: "sai-gon" })).total).toBe(0);
+    });
+
+    it("danh mục cha đã xoá mềm không còn khớp (kể cả tin của danh mục con còn sống)", async () => {
+      await withDatabase((client) => client.query(`UPDATE "categories" SET "deleted_at" = now() WHERE "id" = $1`, [rootCategoryId]));
+      try {
+        expect((await search({ category: "can-ho" })).total).toBe(0);
+      } finally {
+        await withDatabase((client) => client.query(`UPDATE "categories" SET "deleted_at" = NULL WHERE "id" = $1`, [rootCategoryId]));
+      }
+      expect((await search({ category: "can-ho", limit: 48 })).total).toBe(4);
+    });
+
+    it("available=true (trang S04): bỏ tin đã thuê; mặc định API vẫn trả cả hai", async () => {
+      expect((await search({ limit: 48, available: true })).total).toBe(5);
+      expect((await search({ limit: 48 })).total).toBe(6);
+      expect((await search({ limit: 48, available: "false" })).total).toBe(6);
+      expect((await search({ limit: 48, province: "ho-chi-minh", available: "true" })).items.map((card) => card.status)).not.toContain("rented");
     });
 
     it("khoảng giá và diện tích gồm cả hai đầu; tin thương lượng (không giá) bị loại khi lọc giá", async () => {
@@ -305,6 +325,47 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect((await titlesOf({ furnishing: "full", sort: "price_asc" }))).toEqual(["Căn hộ dịch vụ Bến Nghé", "Biệt thự năm phòng ngủ"]);
       expect(await titlesOf({ furnishing: "full", category: "nha-pho", province: "ho-chi-minh", bedrooms: 4, priceMin: 50_000_000, q: "biet thu" })).toEqual(["Biệt thự năm phòng ngủ"]);
       expect(await titlesOf({ furnishing: "full", q: "studio" })).toEqual([]);
+    });
+  });
+
+  /** Trang /cho-thue (layer-8-task-03): URL -> `parseRentalFilters` -> `toRentalSearchParams` -> SearchService, đúng đường trang đi. */
+  describe("URL của trang /cho-thue -> đúng tập kết quả", () => {
+    const viaUrl = async (query: string, locale: "vi" | "en" = "vi") => {
+      const filters = parseRentalFilters(Object.fromEntries(new URLSearchParams(query)));
+      const result = await service.search(toRentalSearchParams(filters, locale));
+      return { total: result.total, titles: result.items.map((card) => card.title), statuses: result.items.map((card) => card.status) };
+    };
+
+    it("không lọc: chỉ tin còn trống (không có tin đã thuê), 12/trang, mới nhất trước", async () => {
+      const result = await viaUrl("");
+      expect(result.total).toBe(5);
+      expect(result.statuses).not.toContain("rented");
+      expect(result.titles).not.toContain("Căn hộ đã cho thuê");
+    });
+
+    it("từ khoá không dấu + bộ lọc; tham số lạ bị bỏ qua", async () => {
+      expect((await viaUrl("q=studio&bedrooms=0&utm_source=fb&limit=999")).titles).toEqual(["Studio gần chợ"]);
+      expect((await viaUrl("q=CAN HO DICH VU")).titles).toEqual(["Căn hộ dịch vụ Bến Nghé"]);
+    });
+
+    it("danh mục cha gồm danh mục con + tỉnh + khoảng giá + nội thất", async () => {
+      expect((await viaUrl("category=can-ho&province=ho-chi-minh")).total).toBe(3);
+      expect((await viaUrl("category=can-ho&province=ho-chi-minh&priceMin=10000000&furnishing=full")).titles).toEqual(["Căn hộ dịch vụ Bến Nghé"]);
+    });
+
+    it("phường theo tỉnh; phường không kèm tỉnh bị bỏ (URL không làm trang lỗi)", async () => {
+      expect((await viaUrl("province=ha-noi&ward=ba-dinh")).titles).toEqual(["Nhà phố Ba Đình rộng"]);
+      expect((await viaUrl("ward=ba-dinh")).total).toBe(5);
+    });
+
+    it("sắp xếp theo giá và phân trang qua URL; giá trị sai bị bỏ về mặc định", async () => {
+      expect((await viaUrl("sort=price_desc")).titles[0]).toBe("Biệt thự năm phòng ngủ");
+      expect((await viaUrl("sort=bogus&page=0&priceMin=abc")).total).toBe(5);
+    });
+
+    it("/en: chỉ tin có bản EN", async () => {
+      expect((await viaUrl("q=serviced", "en")).titles).toEqual(["Serviced apartment Ben Nghe"]);
+      expect((await viaUrl("", "en")).total).toBe(1);
     });
   });
 
@@ -375,7 +436,7 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     });
 
     it("tham số sai -> 400 (không cache); khoá lạ và giá trị rỗng được bỏ qua", async () => {
-      for (const query of ["limit=49", "limit=0", "page=0", "locale=fr", "sort=random", "bedrooms=5", "priceMin=abc", "priceMin=10&priceMax=5", "furnishing=x"]) {
+      for (const query of ["limit=49", "limit=0", "page=0", "locale=fr", "sort=random", "bedrooms=5", "priceMin=abc", "priceMin=10&priceMax=5", "furnishing=x", "ward=ba-dinh", "available=yes"]) {
         const response = await getHandler(query, newIp());
         expect(response.status, query).toBe(400);
         expect(response.headers.get("Cache-Control")).toBe("no-store");
@@ -409,6 +470,24 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(await searchTextOf("a", "vi")).not.toContain("phuong ben nghe");
       expect(await searchTextOf("a", "en")).toContain("ben thanh");
       expect((await search({ q: "ben thanh", limit: 48 })).total).toBe(5);
+    });
+
+    it("đổi tên tỉnh làm mới searchText của tin thuộc tỉnh, tìm được bằng tên mới (không dấu); đổi shortName thì không ghi lại", async () => {
+      expect(await searchTextOf("a", "vi")).toContain("ho chi minh");
+      await payload.update({ collection: "provinces", id: hcmId, data: { name: "Thành phố Sài Gòn" }, overrideAccess: true });
+      expect(await searchTextOf("a", "vi")).toContain("sai gon");
+      expect(await searchTextOf("a", "vi")).not.toContain("ho chi minh");
+      expect(await searchTextOf("a", "en")).toContain("sai gon");
+      expect((await search({ q: "thanh pho sai gon", limit: 48 })).total).toBe(5);
+      // Tin thuộc tỉnh khác không bị ghi lại.
+      expect(await searchTextOf("c", "vi")).toContain("ha noi");
+
+      await withDatabase((client) => client.query(`UPDATE "rentals_locales" SET "search_text" = 'cu' WHERE "_parent_id" = $1 AND "_locale" = 'vi'`, [ids.a]));
+      await payload.update({ collection: "provinces", id: hcmId, data: { shortName: "TP Sài Gòn" }, overrideAccess: true });
+      expect(await searchTextOf("a", "vi")).toBe("cu");
+      // Trả tên cũ cho các test sau (và dựng lại searchText đã đặt thành 'cu').
+      await payload.update({ collection: "provinces", id: hcmId, data: { name: "Thành phố Hồ Chí Minh" }, overrideAccess: true });
+      expect(await searchTextOf("a", "vi")).toContain("ho chi minh");
     });
 
     it("không đổi tên/tên cũ của phường thì không ghi lại", async () => {

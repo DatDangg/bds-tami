@@ -77,6 +77,12 @@ export function readErrorDetails(body: unknown): unknown {
   return typeof body === "object" && body !== null ? (body as { details?: unknown }).details : undefined;
 }
 
+/** `code` (mã máy đọc được, API_SPEC §2) của body lỗi; thiếu hoặc không phải chuỗi thì `undefined`. */
+export function readErrorCode(body: unknown): string | undefined {
+  const code = typeof body === "object" && body !== null ? (body as { code?: unknown }).code : undefined;
+  return typeof code === "string" && code ? code : undefined;
+}
+
 /** `error` của API là message đã theo locale (API_SPEC §2); hiện thẳng cho người dùng. */
 export function readErrorMessage(body: unknown): string | undefined {
   const error = typeof body === "object" && body !== null ? (body as { error?: unknown }).error : undefined;

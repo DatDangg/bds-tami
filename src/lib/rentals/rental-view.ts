@@ -10,6 +10,7 @@ import { formatDate } from "../format";
 import { visibleCategory } from "../news/news-view";
 import { lexicalPlainText } from "../news/read-time";
 import { renderableImage } from "../projects/project-detail-view";
+import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
 import type { SaleContact } from "./rental-queries";
 
 export type RentalDirection = NonNullable<Rental["houseDirection"]>;
@@ -204,6 +205,26 @@ export function toRentalCardData(doc: Rental, locale: Locale): RentalCardData | 
     cover,
   };
 }
+
+/**
+ * Thẻ từ kết quả `SearchService` (trang danh sách S04): cùng view model với thẻ tin tương tự nên cả hai dùng chung MỘT `RentalCard`.
+ * Ảnh đại diện của DTO là cỡ `card` (800w) đã chọn ở SQL (thiếu thì ảnh gốc): khai bề rộng 800 để `ResponsiveImage` dựng được.
+ */
+export function searchCardToRentalCardData(card: RentalSearchCard, locale: Locale): RentalCardData {
+  return {
+    id: card.id,
+    title: card.title,
+    href: publicDetailPath(CONTENT_ROUTES.rentals, locale, card.slug),
+    code: card.code,
+    priceMonthlyVnd: card.priceNegotiable ? null : positive(card.priceMonthlyVnd),
+    areaM2: card.areaM2,
+    bedrooms: nonNegative(card.bedrooms),
+    areaLabel: [card.ward.name, card.province.name].filter(hasText).join(", "),
+    cover: card.thumbnail ? { url: card.thumbnail.url, alt: card.thumbnail.alt, width: SEARCH_COVER_WIDTH } : null,
+  };
+}
+
+const SEARCH_COVER_WIDTH = 800;
 
 export function toRentalCards(docs: readonly Rental[], locale: Locale): RentalCardData[] {
   return docs.flatMap((doc) => {

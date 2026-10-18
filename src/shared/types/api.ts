@@ -7,7 +7,13 @@ export const apiErrorSchema = z.object({
   success: z.literal(false),
   error: z.string(),
   details: z.array(z.unknown()),
+  /** Mã máy đọc được (tuỳ chọn) cho lỗi mà client cần phân biệt mà không dựa vào chữ hay cấu trúc `details`; xem `API_ERROR_CODES`. */
+  code: z.string().optional(),
 });
+
+/** Mã lỗi máy đọc được của endpoint công khai (API_SPEC §2). `postingClosed`: tin tuyển dụng hết hạn / đóng / không tồn tại (`POST /api/public/job-applications`, 400). */
+export const API_ERROR_CODES = { postingClosed: "postingClosed" } as const;
+export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
 
 export const apiSuccessSchema = <T extends z.ZodType>(data: T) => z.object({ success: z.literal(true), data });
 
@@ -61,6 +67,8 @@ export const RENTAL_SORTS = ["newest", "price_asc", "price_desc"] as const;
 export const RENTAL_FURNISHINGS = ["none", "basic", "full"] as const;
 
 const slugParam = optional(z.string().trim().min(1).max(MAX_SLUG_CHARS));
+/** `?available=true` hoặc boolean từ code gọi thẳng; chuỗi khác (`yes`, `1`...) là sai (400). */
+const flag = optional(z.union([z.boolean(), z.enum(["true", "false"]).transform((value) => value === "true")]));
 const wholeNumber = (max: number) => optional(z.coerce.number().int().min(0).max(max));
 
 /**
@@ -80,6 +88,8 @@ export const rentalSearchParamsSchema = z
     areaMax: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
     bedrooms: wholeNumber(4),
     furnishing: optional(z.enum(RENTAL_FURNISHINGS)),
+    /** `true` = chỉ tin còn trống (`published`), bỏ tin đã thuê: trang danh sách S04 dùng; mặc định trả cả `published` lẫn `rented`. */
+    available: flag,
     sort: z.preprocess(blankToUndefined, z.enum(RENTAL_SORTS).default("newest")),
     page: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).max(MAX_SEARCH_PAGE).default(1)),
     limit: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).max(MAX_RENTAL_SEARCH_LIMIT).default(12)),
@@ -87,6 +97,11 @@ export const rentalSearchParamsSchema = z
   .refine((value) => value.priceMin === undefined || value.priceMax === undefined || value.priceMin <= value.priceMax, {
     path: ["priceMax"],
     message: "priceMax phải lớn hơn hoặc bằng priceMin",
+  })
+  // Slug phường chỉ duy nhất trong cùng tỉnh (ERD §4.2): gửi `ward` mà không có `province` là mơ hồ.
+  .refine((value) => value.ward === undefined || value.province !== undefined, {
+    path: ["ward"],
+    message: "ward cần đi kèm province (slug phường chỉ duy nhất trong tỉnh)",
   })
   .refine((value) => value.areaMin === undefined || value.areaMax === undefined || value.areaMin <= value.areaMax, {
     path: ["areaMax"],

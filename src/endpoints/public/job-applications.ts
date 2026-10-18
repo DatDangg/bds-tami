@@ -6,7 +6,7 @@ import { getEnv } from "@/lib/env";
 import { fail, ok } from "@/lib/http/response";
 import { logger } from "@/lib/logger";
 import { inspectUpload, PRIVATE_FILE_POLICY, type InspectedUpload } from "@/lib/upload/validate-file";
-import type { ApplicantLocale, JobApplicationFields } from "@/shared/types/api";
+import { API_ERROR_CODES, type ApiErrorCode, type ApplicantLocale, type JobApplicationFields } from "@/shared/types/api";
 
 import { runPublicPipeline, type PublicPipelineDeps } from "../_middleware/public-pipeline";
 import {
@@ -51,11 +51,11 @@ async function findOpenPosting(payload: Payload, id: string, now: Date): Promise
   return { id: posting.id, title: posting.title ?? "" };
 }
 
-function failWithKey(status: number, locale: ApplicantLocale, key: ApplicantMessageKey, details: unknown[] = []): Response {
-  return fail(status, applicantMessage(locale, key), details);
+function failWithKey(status: number, locale: ApplicantLocale, key: ApplicantMessageKey, details: unknown[] = [], code?: ApiErrorCode): Response {
+  return fail(status, applicantMessage(locale, key), details, code);
 }
 
-/** Lỗi do file CV: kèm `details` field `cv` để client gắn vào ô CV; `postingClosed` là lỗi 400 duy nhất của form không có `details` (client dựa vào đó để báo hết hạn). */
+/** Lỗi do file CV: kèm `details` field `cv` để client gắn vào ô CV (tin hết hạn là lỗi khác, có `code: "postingClosed"`). */
 function failCv(status: number, locale: ApplicantLocale, key: ApplicantMessageKey): Response {
   const message = applicantMessage(locale, key);
   return fail(status, message, [{ field: "cv", message }]);
@@ -210,7 +210,7 @@ async function processApplication(
   const { fields, cv } = submission;
   const now = (deps.now ?? (() => new Date()))();
   const posting = await findOpenPosting(deps.payload, fields.jobPostingId, now);
-  if (!posting) return failWithKey(400, fields.locale, "postingClosed");
+  if (!posting) return failWithKey(400, fields.locale, "postingClosed", [], API_ERROR_CODES.postingClosed);
 
   const bytes = new Uint8Array(await cv.arrayBuffer());
   const inspected = await inspectCv(bytes, fields.locale);

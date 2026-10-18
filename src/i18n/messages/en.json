@@ -269,6 +269,101 @@
         "handed_over": "Handed over"
       }
     },
+    "rentals": {
+      "title": "For rent",
+      "description": "Apartments, townhouses and offices for rent advised by TAMI: filter by area, price, floor area and furnishing.",
+      "filtersLabel": "Rental filters",
+      "categoriesLabel": "Property type",
+      "all": "All",
+      "gridLabel": "Rental listings",
+      "resultCount": "{count, plural, one {# listing} other {# listings}}",
+      "resultsFor": "Results for “{query}”",
+      "fields": {
+        "q": "Keyword",
+        "qPlaceholder": "Area, project, listing code",
+        "category": "Category",
+        "allCategories": "All categories",
+        "province": "Province/city",
+        "allProvinces": "All provinces/cities",
+        "ward": "Ward/commune",
+        "allWards": "All wards/communes",
+        "wardNeedsProvince": "Choose a province/city first",
+        "price": "Price/month (VND)",
+        "priceFrom": "Price from",
+        "priceTo": "Price to",
+        "fromPlaceholder": "From",
+        "toPlaceholder": "To",
+        "priceHintsLabel": "Suggested price ranges",
+        "area": "Floor area (m²)",
+        "areaFrom": "Floor area from",
+        "areaTo": "Floor area to",
+        "bedrooms": "Bedrooms",
+        "furnishing": "Furnishing",
+        "sort": "Sort by",
+        "anyOption": "Any"
+      },
+      "priceHints": {
+        "under5": "< 5 million",
+        "from5to10": "5-10 million",
+        "from10to20": "10-20 million",
+        "over20": "> 20 million"
+      },
+      "bedroomsOption": {
+        "0": "Studio",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4+"
+      },
+      "furnishingOption": {
+        "none": "None",
+        "basic": "Basic",
+        "full": "Full"
+      },
+      "sort": {
+        "newest": "Newest",
+        "price_asc": "Price: low to high",
+        "price_desc": "Price: high to low"
+      },
+      "active": {
+        "label": "Active filters",
+        "clearAll": "Clear all",
+        "remove": "Remove filter {name}",
+        "query": "Keyword: {value}",
+        "price": "Price: {value}",
+        "area": "Floor area: {value}",
+        "bedrooms": "Bedrooms: {value}",
+        "furnishing": "Furnishing: {value}",
+        "from": "from {value}",
+        "to": "to {value}",
+        "range": "{from} - {to}"
+      },
+      "mobile": {
+        "filters": "Filters",
+        "sheetTitle": "Rental filters",
+        "sheetDescription": "Choose your criteria, then show the results.",
+        "clear": "Clear",
+        "show": "{count, plural, one {Show # listing} other {Show # listings}}",
+        "showUnknown": "Show listings",
+        "close": "Close filters",
+        "counting": "Counting…"
+      },
+      "empty": {
+        "title": "No matching listings",
+        "suggestionsLabel": "Try removing a filter",
+        "suggestion": "Remove {name}",
+        "noListings": "No rental listings have been published yet."
+      },
+      "error": {
+        "title": "Could not load the rental listings.",
+        "retry": "Try again"
+      },
+      "card": {
+        "bedrooms": "{count} BR",
+        "negotiable": "Negotiable",
+        "perMonth": "/month"
+      }
+    },
     "projectDetail": {
       "heroConsult": "Get advice",
       "heroDocuments": "Download documents",
@@ -421,8 +516,7 @@
       },
       "similar": {
         "title": "Similar listings",
-        "titleRented": "Similar available units",
-        "bedroomsValue": "{count} BR"
+        "titleRented": "Similar available units"
       },
       "stickyConsult": "Get advice",
       "stickyConsultRented": "Find similar units"

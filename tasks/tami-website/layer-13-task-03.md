@@ -88,3 +88,10 @@ Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 
 ## Follow-up từ spec-validation layer 6
 - [ ] G27 (LOW): route mới thêm rule vào `MISSING_PAGE_RULES` để slug lạ trả 404 có nội dung (G15), không quay lại 404 rỗng. Report: `.context/review-reports/spec-validation-build-tami-website-layer-6.md`.
+
+## Follow-up từ review layer-8-task-03 round 1 (MINOR)
+- [ ] `src/components/rentals/RentalListPage.tsx:248-265`: metadata quyết noindex từ tham số URL thô → slug lạ (`?province=xyz`) cho trang indexable trùng nội dung trang gốc; chạy `dropUnknownSlugs` trong metadata.
+- [ ] `resolve-missing-page.test.ts`: regex `/[[a-z]+]/` không khớp `[...slug]` hay tên tham số có `-` — sửa regex.
+- [ ] `src/lib/rentals/rental-queries.ts:429-430`: dải giá ±30% ra 1–3 tin thì giữ các tin đó và bù tin còn lại, không thay hẳn.
+- [ ] `RentalListPage.tsx:95-152` ~57 dòng: tách hàm.
+- [ ] `rental-search-sql.ts:553-554`: nhánh thiếu `province` không còn tới được qua API mà lọc ward toàn quốc — bỏ hoặc chặn.

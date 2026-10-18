@@ -269,6 +269,101 @@
         "handed_over": "Đã bàn giao"
       }
     },
+    "rentals": {
+      "title": "Cho thuê",
+      "description": "Căn hộ, nhà phố, văn phòng cho thuê do TAMI tư vấn: lọc theo khu vực, mức giá, diện tích và nội thất.",
+      "filtersLabel": "Bộ lọc tin cho thuê",
+      "categoriesLabel": "Loại hình",
+      "all": "Tất cả",
+      "gridLabel": "Danh sách tin cho thuê",
+      "resultCount": "{count} tin phù hợp",
+      "resultsFor": "Kết quả cho “{query}”",
+      "fields": {
+        "q": "Từ khoá",
+        "qPlaceholder": "Khu vực, dự án, mã tin",
+        "category": "Danh mục",
+        "allCategories": "Tất cả danh mục",
+        "province": "Tỉnh/thành",
+        "allProvinces": "Tất cả tỉnh/thành",
+        "ward": "Phường/xã",
+        "allWards": "Tất cả phường/xã",
+        "wardNeedsProvince": "Chọn tỉnh/thành trước",
+        "price": "Giá/tháng (VNĐ)",
+        "priceFrom": "Giá từ",
+        "priceTo": "Giá đến",
+        "fromPlaceholder": "Từ",
+        "toPlaceholder": "Đến",
+        "priceHintsLabel": "Mốc giá gợi ý",
+        "area": "Diện tích (m²)",
+        "areaFrom": "Diện tích từ",
+        "areaTo": "Diện tích đến",
+        "bedrooms": "Phòng ngủ",
+        "furnishing": "Nội thất",
+        "sort": "Sắp xếp",
+        "anyOption": "Bất kỳ"
+      },
+      "priceHints": {
+        "under5": "< 5 triệu",
+        "from5to10": "5-10 triệu",
+        "from10to20": "10-20 triệu",
+        "over20": "> 20 triệu"
+      },
+      "bedroomsOption": {
+        "0": "Studio",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4+"
+      },
+      "furnishingOption": {
+        "none": "Không",
+        "basic": "Cơ bản",
+        "full": "Đầy đủ"
+      },
+      "sort": {
+        "newest": "Mới nhất",
+        "price_asc": "Giá tăng dần",
+        "price_desc": "Giá giảm dần"
+      },
+      "active": {
+        "label": "Đang lọc",
+        "clearAll": "Xoá tất cả",
+        "remove": "Bỏ lọc {name}",
+        "query": "Từ khoá: {value}",
+        "price": "Giá: {value}",
+        "area": "Diện tích: {value}",
+        "bedrooms": "Phòng ngủ: {value}",
+        "furnishing": "Nội thất: {value}",
+        "from": "từ {value}",
+        "to": "đến {value}",
+        "range": "{from} - {to}"
+      },
+      "mobile": {
+        "filters": "Bộ lọc",
+        "sheetTitle": "Bộ lọc tin cho thuê",
+        "sheetDescription": "Chọn điều kiện rồi nhấn xem kết quả.",
+        "clear": "Xoá",
+        "show": "Xem {count} tin",
+        "showUnknown": "Xem tin",
+        "close": "Đóng bộ lọc",
+        "counting": "Đang đếm…"
+      },
+      "empty": {
+        "title": "Không tìm thấy tin phù hợp",
+        "suggestionsLabel": "Thử bớt điều kiện lọc",
+        "suggestion": "Bỏ {name}",
+        "noListings": "Chưa có tin cho thuê nào được đăng."
+      },
+      "error": {
+        "title": "Chưa tải được danh sách tin cho thuê.",
+        "retry": "Thử lại"
+      },
+      "card": {
+        "bedrooms": "{count} PN",
+        "negotiable": "Thoả thuận",
+        "perMonth": "/tháng"
+      }
+    },
     "projectDetail": {
       "heroConsult": "Nhận tư vấn",
       "heroDocuments": "Tải tài liệu",
@@ -421,8 +516,7 @@
       },
       "similar": {
         "title": "Tin tương tự",
-        "titleRented": "Căn tương tự đang trống",
-        "bedroomsValue": "{count} PN"
+        "titleRented": "Căn tương tự đang trống"
       },
       "stickyConsult": "Nhận tư vấn",
       "stickyConsultRented": "Nhận tư vấn căn tương tự"

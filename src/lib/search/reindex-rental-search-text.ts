@@ -23,6 +23,13 @@ function scopeWhere(scope: ReindexScope): Where | undefined {
   return { province: { equals: scope.provinceId } };
 }
 
+/** Số tin (kể cả xoá mềm) thuộc `scope`: hook dùng để quyết định làm đồng bộ hay hoãn. */
+export async function rentalsInScope(payload: Payload, scope: ReindexScope, req?: PayloadRequest): Promise<number> {
+  const where = scopeWhere(scope);
+  const { totalDocs } = await payload.count({ collection: "rentals", ...(where ? { where } : {}), trash: true, overrideAccess: true, ...(req ? { req } : {}) });
+  return totalDocs;
+}
+
 interface RentalSource {
   id: string;
   code?: string | null;

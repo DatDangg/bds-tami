@@ -9,6 +9,12 @@ import { relationId } from "../payload/relation-id";
 export const SIMILAR_RENTALS_COUNT = 4;
 export const SIMILAR_RENTALS_COUNT_WHEN_RENTED = 8;
 
+/** Giá tin tương tự lệch tối đa ±30% so với tin đang xem (design-spec S07, D2 đã duyệt 2026-10-18). */
+export const SIMILAR_PRICE_TOLERANCE = 0.3;
+
+/** Ảnh ứng viên cho thẻ: lấy vài ảnh đầu để thẻ vẫn có ảnh khi ảnh đầu không dùng được (bị xoá, không phải ảnh, thiếu URL). */
+const COVER_CANDIDATES = 3;
+
 const RENTAL_SORT = ["-publishedAt", "-createdAt"];
 
 /** Trường thẻ tin cho thuê dùng: bỏ mô tả richText, điều khoản, `searchText`... khỏi truy vấn danh sách. */
@@ -31,12 +37,24 @@ export function findPublicRentalBySlug(payload: Payload, locale: Locale, slug: s
   return findPublicBySlug<Rental>(payload, "rentals", locale, slug, { depth: 1 });
 }
 
+type SimilarSource = Pick<Rental, "id" | "category" | "province" | "status"> & Partial<Pick<Rental, "priceMonthlyVnd" | "priceNegotiable">>;
+
+/** Khoảng giá ±30% quanh giá tin hiện tại; tin thương lượng / chưa có giá thì không có khoảng giá để so. */
+function priceBand(current: SimilarSource): Where | null {
+  const price = current.priceMonthlyVnd;
+  if (current.priceNegotiable === true || typeof price !== "number" || price <= 0) return null;
+  return {
+    priceMonthlyVnd: { greater_than_equal: Math.floor(price * (1 - SIMILAR_PRICE_TOLERANCE)), less_than_equal: Math.ceil(price * (1 + SIMILAR_PRICE_TOLERANCE)) },
+  };
+}
+
 /**
- * Tin tương tự: CÙNG danh mục và CÙNG tỉnh, loại tin hiện tại, mới nhất trước. Chỉ tin còn trống (`published`) kể cả khi trang đang xem là
- * tin đã thuê: không gợi ý một căn cũng đã cho thuê. Đi qua `findPublicList` nên `/en` chỉ gồm tin có bản EN. Thiếu cả danh mục lẫn tỉnh thì
- * không có gì để so khớp → rỗng.
+ * Tin tương tự: CÙNG danh mục và CÙNG tỉnh, giá ±30% (D2), loại tin hiện tại, mới nhất trước. Chỉ ra dưới `SIMILAR_RENTALS_COUNT` tin theo giá thì
+ * BỎ điều kiện giá (giữ danh mục + tỉnh) để khối không trống/quá thưa. Chỉ tin còn trống (`published`) kể cả khi trang đang xem là tin đã thuê:
+ * không gợi ý một căn cũng đã cho thuê. Đi qua `findPublicList` nên `/en` chỉ gồm tin có bản EN. Thiếu cả danh mục lẫn tỉnh thì không có gì
+ * để so khớp → rỗng.
  */
-export async function findSimilarRentals(payload: Payload, locale: Locale, current: Pick<Rental, "id" | "category" | "province" | "status">): Promise<Rental[]> {
+export async function findSimilarRentals(payload: Payload, locale: Locale, current: SimilarSource): Promise<Rental[]> {
   const categoryId = relationId(current.category);
   const provinceId = relationId(current.province);
   const sameArea: Where[] = [
@@ -44,21 +62,27 @@ export async function findSimilarRentals(payload: Payload, locale: Locale, curre
     ...(provinceId ? [{ province: { equals: provinceId } }] : []),
   ];
   if (sameArea.length === 0) return [];
-  const { docs } = await findPublicList<Rental>(payload, "rentals", locale, {
-    where: { and: [...sameArea, { id: { not_equals: current.id } }, { status: { equals: "published" } }] },
-    sort: RENTAL_SORT,
-    limit: current.status === "rented" ? SIMILAR_RENTALS_COUNT_WHEN_RENTED : SIMILAR_RENTALS_COUNT,
-    depth: 1,
-    select: RENTAL_CARD_FIELDS,
-  });
-  return withCoverImages(payload, docs);
+  const find = (extra: Where[]) =>
+    findPublicList<Rental>(payload, "rentals", locale, {
+      where: { and: [...sameArea, ...extra, { id: { not_equals: current.id } }, { status: { equals: "published" } }] },
+      sort: RENTAL_SORT,
+      limit: current.status === "rented" ? SIMILAR_RENTALS_COUNT_WHEN_RENTED : SIMILAR_RENTALS_COUNT,
+      depth: 1,
+      select: RENTAL_CARD_FIELDS,
+    });
+  const band = priceBand(current);
+  let { docs } = await find(band ? [band] : []);
+  if (band && docs.length < SIMILAR_RENTALS_COUNT) ({ docs } = await find([]));
+  return withCoverImages(payload, docs, locale);
 }
 
 /**
- * Thẻ chỉ cần ảnh ĐẦU: không populate cả thư viện (tối đa 8 tin × n ảnh mỗi lần dựng ISR). Đọc id thư viện ở `depth: 0` rồi lấy đúng các ảnh bìa
- * một lượt, với quyền khách (media công khai, `uploadedBy` bị chặn). Thẻ không có ảnh bìa dùng được thì `gallery` rỗng.
+ * Thẻ chỉ cần vài ảnh ĐẦU (`COVER_CANDIDATES`): không populate cả thư viện (tối đa 8 tin × n ảnh mỗi lần dựng ISR). Đọc id thư viện ở `depth: 0` rồi
+ * lấy các ảnh ứng viên một lượt, với quyền khách (media công khai, `uploadedBy` bị chặn) và `alt` đúng `locale` đang xem. `gallery` của thẻ giữ
+ * thứ tự thư viện và chỉ gồm ảnh đọc được: ảnh đầu không còn thì ảnh kế tiếp thế chỗ (`toRentalCardData` lấy ảnh dùng được đầu tiên); không ảnh nào
+ * dùng được thì `gallery` rỗng.
  */
-async function withCoverImages(payload: Payload, docs: Rental[]): Promise<Rental[]> {
+async function withCoverImages(payload: Payload, docs: Rental[], locale: Locale): Promise<Rental[]> {
   if (docs.length === 0) return docs;
   const { docs: galleries } = await payload.find({
     collection: "rentals",
@@ -68,15 +92,22 @@ async function withCoverImages(payload: Payload, docs: Rental[]): Promise<Rental
     overrideAccess: false,
     select: { gallery: true },
   });
-  const coverIdByRental = new Map(galleries.map((entry) => [entry.id, relationId(entry.gallery?.[0])] as const));
-  const coverIds = [...new Set([...coverIdByRental.values()].flatMap((id) => (id ? [id] : [])))];
-  if (coverIds.length === 0) return docs;
-  const { docs: covers } = await payload.find({ collection: "media", where: { id: { in: coverIds } }, depth: 0, pagination: false, overrideAccess: false });
-  const coverById = new Map(covers.map((cover) => [cover.id, cover] as const));
-  return docs.map((doc) => {
-    const cover = coverById.get(coverIdByRental.get(doc.id) ?? "");
-    return { ...doc, gallery: cover ? [cover] : [] };
+  const candidateIdsByRental = new Map(
+    galleries.map((entry) => [entry.id, (entry.gallery ?? []).flatMap((item) => relationId(item) ?? []).slice(0, COVER_CANDIDATES)] as const),
+  );
+  const candidateIds = [...new Set([...candidateIdsByRental.values()].flat())];
+  if (candidateIds.length === 0) return docs;
+  const { docs: covers } = await payload.find({
+    collection: "media",
+    where: { id: { in: candidateIds } },
+    locale,
+    fallbackLocale: false,
+    depth: 0,
+    pagination: false,
+    overrideAccess: false,
   });
+  const coverById = new Map(covers.map((cover) => [cover.id, cover] as const));
+  return docs.map((doc) => ({ ...doc, gallery: (candidateIdsByRental.get(doc.id) ?? []).flatMap((id) => coverById.get(id) ?? []) }));
 }
 
 /**

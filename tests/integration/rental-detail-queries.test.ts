@@ -207,10 +207,69 @@ describe.skipIf(!baseUrl)("integration: truy vấn trang chi tiết cho thuê (D
       expect(card).toHaveProperty("title");
       expect(card).not.toHaveProperty("description");
       expect(card).not.toHaveProperty("rentalTerms");
-      // Thẻ chỉ mang ảnh đầu (không populate cả thư viện).
-      expect(card?.gallery).toHaveLength(1);
+      // Thẻ chỉ mang vài ảnh đầu (không populate cả thư viện): ở đây thư viện 3 ảnh = đúng 3 ứng viên.
+      expect(card?.gallery).toHaveLength(3);
       expect(card?.gallery?.[0]).toEqual(expect.objectContaining({ id: imageIds[0] }));
       expect(await queries.findSimilarRentals(payload, "en", { id: current.id, category: categoryId, province: provinceId, status: "published" })).toEqual([]);
+    });
+
+    describe("giá ±30% (D2)", () => {
+      const priceOf = (docs: Array<{ priceMonthlyVnd?: number | null }>) => docs.map((doc) => doc.priceMonthlyVnd);
+      let isolatedCategoryId = "";
+      const similarTo = (id: string, extra: Record<string, unknown> = {}) =>
+        queries.findSimilarRentals(payload, "vi", { id, category: isolatedCategoryId, province: provinceId, status: "published", priceMonthlyVnd: 10_000_000, ...extra });
+
+      it("đủ 4 tin trong khoảng giá thì chỉ lấy tin trong khoảng (cả hai đầu 7tr/13tr tính); dưới 4 thì bỏ điều kiện giá", async () => {
+        isolatedCategoryId = (await payload.create({ collection: "categories", data: { name: "Văn phòng", scope: "rental" } as never, locale: "vi", overrideAccess: true, depth: 0 })).id;
+        const current = await createRental({ title: "Giá hiện tại", slug: "gia-hien-tai", category: isolatedCategoryId, priceMonthlyVnd: 10_000_000 });
+        for (const price of [7_000_000, 10_000_000, 13_000_000]) await createRental({ title: `Trong khoảng ${price}`, slug: `trong-khoang-${price}`, category: isolatedCategoryId, priceMonthlyVnd: price });
+        for (const price of [6_900_000, 13_100_000]) await createRental({ title: `Ngoài khoảng ${price}`, slug: `ngoai-khoang-${price}`, category: isolatedCategoryId, priceMonthlyVnd: price });
+
+        // Mới 3 tin trong khoảng (< 4) -> bỏ điều kiện giá, còn lại cùng danh mục + tỉnh (xếp mới nhất trước nên tin ngoài khoảng đứng đầu).
+        const fallback = await similarTo(current.id);
+        expect(fallback).toHaveLength(4);
+        expect(priceOf(fallback).some((price) => price === 6_900_000 || price === 13_100_000)).toBe(true);
+
+        await createRental({ title: "Trong khoảng 8tr", slug: "trong-khoang-8tr", category: isolatedCategoryId, priceMonthlyVnd: 8_000_000 });
+        const banded = await similarTo(current.id);
+        expect(banded).toHaveLength(4);
+        expect(priceOf(banded).every((price) => typeof price === "number" && price >= 7_000_000 && price <= 13_000_000)).toBe(true);
+      });
+
+      it("tin hiện tại thương lượng hoặc chưa có giá: không có khoảng giá để so, mọi tin cùng danh mục + tỉnh đều hợp lệ", async () => {
+        const current = await createRental({ title: "Thương lượng", slug: "thuong-luong", category: isolatedCategoryId, priceMonthlyVnd: null, priceNegotiable: true });
+        const negotiable = await similarTo(current.id, { priceMonthlyVnd: null, priceNegotiable: true });
+        expect(negotiable).toHaveLength(4);
+        expect(priceOf(negotiable).some((price) => price === 6_900_000 || price === 13_100_000 || price === 8_000_000)).toBe(true);
+      });
+    });
+
+    it("ảnh đầu không dùng được → thẻ dùng ảnh kế tiếp; alt đọc theo locale đang xem", async () => {
+      // Payload tự dựng `url` từ `filename`: ảnh dùng được cần filename + bề rộng; ảnh "không dùng được" thiếu cả hai.
+      const insertMedia = (filename: string | null, width: number | null) =>
+        withDatabase((client) => client.query(`INSERT INTO "media" (mime_type, filename, width) VALUES ($1, $2, $3) RETURNING id`, ["image/jpeg", filename, width]));
+      const unusableId = (await insertMedia(null, null)).rows[0].id as string;
+      const usableId = (await insertMedia("ban-trai.jpg", 1200)).rows[0].id as string;
+      await withDatabase((client) =>
+        client.query(`INSERT INTO "media_locales" ("_parent_id", "_locale", "alt") VALUES ($1, 'vi', 'Ảnh bìa'), ($1, 'en', 'Cover photo')`, [usableId]),
+      );
+      const cover = await payload.create({ collection: "categories", data: { name: "Cho bìa", scope: "rental" } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      const gallery = [unusableId, usableId, imageIds[0]];
+      const sibling = await createRental({ title: "Tin có ảnh bìa", slug: "tin-co-anh-bia", category: cover.id, gallery });
+      const current = await createRental({ title: "Tin đang xem", slug: "tin-dang-xem", category: cover.id });
+      await payload.update({
+        collection: "rentals",
+        id: sibling.id,
+        data: { title: "Listing with cover", description: lexical("en"), hasEnglish: true } as never,
+        locale: "en",
+        overrideAccess: true,
+      });
+
+      const { toRentalCards } = await import("../../src/lib/rentals/rental-view");
+      const [viCard] = toRentalCards(await queries.findSimilarRentals(payload, "vi", { id: current.id, category: cover.id, province: provinceId, status: "published" }), "vi");
+      expect(viCard?.cover).toMatchObject({ url: "/api/media/file/ban-trai.jpg", alt: "Ảnh bìa" });
+      const [enCard] = toRentalCards(await queries.findSimilarRentals(payload, "en", { id: current.id, category: cover.id, province: provinceId, status: "published" }), "en");
+      expect(enCard?.cover).toMatchObject({ url: "/api/media/file/ban-trai.jpg", alt: "Cover photo" });
     });
 
     it("thiếu cả danh mục lẫn tỉnh → rỗng (không so khớp được)", async () => {

@@ -1,3 +1,5 @@
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const findPublicBySlug = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
@@ -12,6 +14,7 @@ import {
   EXISTS_CACHE_TTL_MS,
   matchDynamicPage,
   MISSING_CACHE_TTL_MS,
+  MISSING_PAGE_RULES,
   MISSING_LOOKUP_TIMEOUT_MS,
   resolveMissingPage,
 } from "./resolve-missing-page";
@@ -165,5 +168,25 @@ describe("resolveMissingPage", () => {
     expect(await pending).toBeNull();
     expect(await resolveMissingPage("/tin-tuc/x")).toBeNull();
     expect(await resolveMissingPage("/tin-tuc/x")).toBe("vi");
+  });
+});
+
+/**
+ * Review spec-validation layer 6 (G27): trang động MỚI mà quên thêm quy tắc sẽ quay lại 404 rỗng (Next 16 không SSR `notFound()` của page).
+ * Duyệt mọi `page.tsx` dưới `app/(frontend)/[locale]` có đoạn động (`[slug]`, `[category]`...) và đòi khoá `pathnames` tương ứng có trong `MISSING_PAGE_RULES`.
+ */
+describe("MISSING_PAGE_RULES phủ mọi trang động", () => {
+  const root = join(process.cwd(), "src", "app", "(frontend)", "[locale]");
+  const dynamicPageKeys = (dir: string, prefix = ""): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      if (entry.isDirectory()) return dynamicPageKeys(join(dir, entry.name), `${prefix}/${entry.name}`);
+      return entry.name === "page.tsx" && /[[a-z]+]/.test(prefix) ? [prefix] : [];
+    });
+
+  it("mỗi route động có quy tắc (thêm vào MISSING_PAGE_RULES khi làm trang mới)", () => {
+    const keys = dynamicPageKeys(root);
+    expect(keys.length).toBeGreaterThan(0);
+    const covered = new Set<string>(MISSING_PAGE_RULES.map((rule) => rule.key));
+    expect(keys.filter((key) => !covered.has(key))).toEqual([]);
   });
 });

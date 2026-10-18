@@ -20,6 +20,7 @@ export {
   MapPin,
   Phone,
   Play,
+  SlidersHorizontal,
   TiktokLogo,
   WarningCircle,
   X,

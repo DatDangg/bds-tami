@@ -10,6 +10,7 @@ import { usePublicForm, type FormFields } from "@/components/forms/use-public-fo
 import { X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { normalizePhone } from "@/lib/phone";
+import { API_ERROR_CODES } from "@/shared/types/api";
 
 const ENDPOINT = "/api/public/job-applications";
 const FIELD_NAMES = ["fullName", "phone", "email", "cv", "message"] as const;
@@ -36,7 +37,7 @@ function formatFileSize(bytes: number): string {
 /**
  * Form ứng tuyển S13 (FR-PUB-09, design-spec §3.4): multipart tới `POST /api/public/job-applications`.
  * File CV được kiểm đuôi + dung lượng ngay khi chọn (không gửi file đã biết là sai); file hợp lệ giữ trong state để hiện tên/dung lượng/nút xoá.
- * Các trạng thái lỗi/captcha/429 dùng chung `usePublicForm`; 400 không kèm chi tiết = vị trí đã hết hạn (`postingClosed`); lỗi do file CV luôn kèm `details` field `cv` nên gắn vào ô CV, không bị nhầm thành hết hạn.
+ * Các trạng thái lỗi/captcha/429 dùng chung `usePublicForm`; vị trí đã hết hạn nhận biết bằng `code: "postingClosed"` của API (API_SPEC §3.2), không dựa vào cấu trúc `details`; lỗi do file CV kèm `details` field `cv` nên gắn vào ô CV.
  */
 export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }: ApplyFormProps) {
   const t = useTranslations("page.careerDetail.applyForm");
@@ -100,7 +101,7 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
 
   const submitting = form.status === "submitting";
   const { issue } = form;
-  const expired = issue?.kind === "validation" && issue.details.length === 0 && Object.keys(form.fieldErrors).length === 0;
+  const expired = issue?.code === API_ERROR_CODES.postingClosed;
   const requiredLabel = tForm("required");
 
   return (

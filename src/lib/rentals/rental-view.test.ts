@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { Category, Media, Project, Province, Rental, Ward } from "../../payload-types";
-import { toRentalCardData, toRentalCards, toRentalDetailView, toSaleContactView } from "./rental-view";
+import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
+import { searchCardToRentalCardData, toRentalCardData, toRentalCards, toRentalDetailView, toSaleContactView } from "./rental-view";
 
 const now = "2026-01-01T00:00:00.000Z";
 const image = (id: string, extra: Partial<Media> = {}): Media => ({
@@ -150,5 +151,53 @@ describe("toSaleContactView", () => {
     const avatar = toSaleContactView({ fullName: "A", phone: "0901111222", avatar: withInternal })?.avatar;
     expect(avatar).toEqual({ url: "/api/media/file/av.webp", alt: "Ảnh av", width: 1600 });
     expect(JSON.stringify(avatar)).not.toContain("staff-uuid-bi-mat");
+  });
+});
+
+describe("searchCardToRentalCardData (DTO của SearchService -> cùng view model với thẻ tin tương tự)", () => {
+  const dto: RentalSearchCard = {
+    id: "9",
+    code: "CT-000009",
+    title: "Studio Ba Đình",
+    slug: "studio-ba-dinh",
+    status: "published",
+    thumbnail: { url: "/api/media/file/studio-800.webp", alt: "Phòng khách" },
+    priceMonthlyVnd: 8_500_000,
+    priceNegotiable: false,
+    areaM2: 32,
+    bedrooms: 0,
+    bathrooms: 1,
+    furnishing: "full",
+    province: { name: "Hà Nội", slug: "ha-noi" },
+    ward: { name: "Phường Ba Đình", slug: "ba-dinh" },
+    publishedAt: now,
+  };
+
+  it("link theo ngôn ngữ, khu vực 'Phường, Tỉnh', ảnh bìa có bề rộng để ResponsiveImage dựng được", () => {
+    expect(searchCardToRentalCardData(dto, "vi")).toEqual({
+      id: "9",
+      title: "Studio Ba Đình",
+      href: "/cho-thue/studio-ba-dinh",
+      code: "CT-000009",
+      priceMonthlyVnd: 8_500_000,
+      areaM2: 32,
+      bedrooms: 0,
+      areaLabel: "Phường Ba Đình, Hà Nội",
+      cover: { url: "/api/media/file/studio-800.webp", alt: "Phòng khách", width: 800 },
+    });
+    expect(searchCardToRentalCardData(dto, "en").href).toBe("/en/for-rent/studio-ba-dinh");
+  });
+
+  it("thương lượng hoặc không giá -> giá null; không ảnh -> cover null; phòng ngủ null giữ null", () => {
+    expect(searchCardToRentalCardData({ ...dto, priceNegotiable: true }, "vi").priceMonthlyVnd).toBeNull();
+    expect(searchCardToRentalCardData({ ...dto, priceMonthlyVnd: null }, "vi").priceMonthlyVnd).toBeNull();
+    expect(searchCardToRentalCardData({ ...dto, thumbnail: null, bedrooms: null }, "vi")).toMatchObject({ cover: null, bedrooms: null });
+  });
+
+  it("cùng kết quả với thẻ dựng từ doc Payload cho cùng dữ liệu (một component dùng chung)", () => {
+    const fromDoc = toRentalCardData(rental({ gallery: [image("studio-800")], priceMonthlyVnd: 8_500_000, areaM2: 32, bedrooms: 0 }), "vi")!;
+    const fromDto = searchCardToRentalCardData({ ...dto, province: { name: "TP.HCM", slug: "ho-chi-minh" }, ward: { name: "Phường Sài Gòn", slug: "sai-gon" }, title: "Căn hộ 2PN Quận 1", slug: "can-ho-2pn-quan-1", code: "CT-000001", id: "r1" }, "vi");
+    expect(Object.keys(fromDto).sort()).toEqual(Object.keys(fromDoc).sort());
+    expect(fromDto.areaLabel).toBe(fromDoc.areaLabel);
   });
 });

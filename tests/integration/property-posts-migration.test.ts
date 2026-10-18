@@ -56,10 +56,16 @@ describe.skipIf(!baseUrl)("integration: migration property_posts up/down/up (DB 
     const args = { db: payload.db.drizzle, payload, req } as never;
 
     await db.execute(sql`INSERT INTO "payload_jobs" ("task_slug", "queue") VALUES ('expire-offers', 'default')`);
+    // Dòng log của 'expire-offers' nằm dưới một job KHÁC: xoá job 'expire-offers' không kéo nó đi theo (FK cascade), nên chỉ câu
+    // `DELETE FROM payload_jobs_log` của `down` mới gỡ được; thiếu câu đó thì dựng lại enum log sẽ lỗi (review L7-T01).
+    await db.execute(sql`INSERT INTO "payload_jobs" ("id", "task_slug", "queue") VALUES ('00000000-0000-4000-8000-000000000001', 'send-notification-email', 'default')`);
+    await db.execute(sql`INSERT INTO "payload_jobs_log" ("_order", "_parent_id", "id", "executed_at", "completed_at", "task_slug", "task_i_d", "state") VALUES (1, '00000000-0000-4000-8000-000000000001', 'log-expire-offers', now(), now(), 'expire-offers', '1', 'succeeded')`);
     await migration!.down(args);
 
     const afterDown = await db.execute(sql`SELECT to_regclass('public.property_posts')::text AS t, (SELECT count(*)::int FROM pg_enum e JOIN pg_type y ON y.oid = e.enumtypid WHERE y.typname = 'enum_payload_jobs_task_slug' AND e.enumlabel = 'expire-offers') AS n`);
     expect(afterDown.rows[0]).toEqual({ t: null, n: 0 });
+    const logAfterDown = await db.execute(sql`SELECT (SELECT count(*)::int FROM "payload_jobs_log" WHERE "id" = 'log-expire-offers') AS rows, (SELECT count(*)::int FROM pg_enum e JOIN pg_type y ON y.oid = e.enumtypid WHERE y.typname = 'enum_payload_jobs_log_task_slug' AND e.enumlabel = 'expire-offers') AS n`);
+    expect(logAfterDown.rows[0]).toEqual({ rows: 0, n: 0 });
 
     await migration!.up(args);
     const afterUp = await db.execute(sql`SELECT to_regclass('public.property_posts')::text AS t`);

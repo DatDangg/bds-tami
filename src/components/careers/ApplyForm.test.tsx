@@ -169,8 +169,8 @@ describe("ApplyForm: gửi hồ sơ", () => {
     expect(screen.getByLabelText(/Họ và tên/)).toHaveValue("Nguyễn Văn A");
   });
 
-  it("vị trí hết hạn (400 không có chi tiết) hiện thông báo kèm link danh sách tuyển dụng", async () => {
-    stubFetch(jsonResponse(400, { success: false, error: "Vị trí tuyển dụng này không còn nhận hồ sơ", details: [] }));
+  it("vị trí hết hạn (400 code postingClosed) hiện thông báo kèm link danh sách tuyển dụng", async () => {
+    stubFetch(jsonResponse(400, { success: false, error: "Vị trí tuyển dụng này không còn nhận hồ sơ", details: [], code: "postingClosed" }));
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
@@ -178,6 +178,16 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Vị trí này đã hết hạn nhận hồ sơ.");
     expect(screen.getByRole("link", { name: "Xem các vị trí đang tuyển" })).toHaveAttribute("href", "/tuyen-dung");
+  });
+
+  it("400 không có code (không phải hết hạn) hiện lỗi chung của form, KHÔNG báo hết hạn", async () => {
+    stubFetch(jsonResponse(400, { success: false, error: "Dữ liệu không hợp lệ", details: [] }));
+    const user = userEvent.setup();
+    renderForm();
+    await fillAll(user);
+    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Dữ liệu không hợp lệ");
+    expect(screen.queryByText("Vị trí này đã hết hạn nhận hồ sơ.")).toBeNull();
   });
 
   it("400 CV hỏng (kèm details field cv) gắn vào ô CV, không hiện thông báo hết hạn", async () => {

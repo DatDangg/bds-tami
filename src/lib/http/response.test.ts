@@ -35,6 +35,11 @@ describe("fail", () => {
     });
   });
 
+  it("code máy đọc được chỉ có khi truyền", async () => {
+    expect(await fail(400, "x", [], "postingClosed").json()).toEqual({ success: false, error: "x", details: [], code: "postingClosed" });
+    expect(await fail(400, "x").json()).not.toHaveProperty("code");
+  });
+
   it("details mặc định là mảng rỗng", async () => {
     const res = fail(404, "Không tìm thấy");
     expect(await res.json()).toEqual({ success: false, error: "Không tìm thấy", details: [] });

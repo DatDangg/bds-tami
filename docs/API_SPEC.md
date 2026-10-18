@@ -33,8 +33,10 @@ Production:  https://<domain>/api
 
 ```
 Thành công: { "success": true, "data": <payload> }
-Lỗi:       { "success": false, "error": "<message>", "details": [...] }
+Lỗi:       { "success": false, "error": "<message>", "details": [...], "code"?: "<mã máy đọc được>" }
 ```
+
+`code` (tuỳ chọn) chỉ có ở lỗi mà client cần nhận ra bằng máy thay vì dựa vào chữ hay cấu trúc `details`; hiện có một giá trị: `postingClosed` (§3.2). Định nghĩa ở `API_ERROR_CODES` (`src/shared/types/api.ts`), helper `fail(status, error, details, code?)`.
 
 **Mã lỗi**
 
@@ -86,9 +88,9 @@ Xử lý: rate limit → Turnstile → validate → chống trùng (BR-15) → t
 
 `multipart/form-data`: `jobPostingId`, `fullName`, `phone`, `email`, `message?`, `consent=true`, `turnstileToken`, `locale?` (`vi` | `en`, lưu vào `job-applications.locale`), `cv` (file PDF/DOC/DOCX ≤ 5MB, kiểm tra MIME thật).
 
-Vị trí phải đang `published` và chưa quá `deadline`, nếu không trả 400. File lưu vào `private-files`. Kết quả `200`: `{ success: true, data: { received: true } }`.
+Vị trí phải đang `published` và chưa quá `deadline`, nếu không trả 400 kèm `code: "postingClosed"`. File lưu vào `private-files`. Kết quả `200`: `{ success: true, data: { received: true } }`.
 
-> **As-built (layer-6-task-09):** `src/endpoints/public/job-applications.ts` (+ `job-application-body.ts`, schema `jobApplicationFieldsSchema` ở `src/shared/types/api.ts`). Thứ tự: rate limit 3/giờ/IP → Turnstile → đọc body giới hạn ~5,25 MB (Content-Length + đếm byte thật) → zod (`consent` = `"true"`, `jobPostingId` UUID, SĐT VN lưu E.164, `locale` mặc định `vi`) → tin phải `published`, chưa xoá mềm, chưa quá hết ngày `deadline` theo giờ Việt Nam (`isPastDeadline` ở `src/lib/careers/deadline.ts`, dùng chung với danh sách/nhãn "hết hạn" của trang tuyển dụng) (mọi trường hợp đóng/không tồn tại trả cùng một thông báo 400). CV kiểm bằng magic bytes (`inspectUpload`), lưu `private-files` tên UUID; tạo hồ sơ lỗi → xoá CV bù trừ (không dùng transaction vì S3). Lưu `consentAt`, `consentVersion` (= `privacyPolicyVersion`, thiếu thì `"unknown"` + cảnh báo), `ipHash` (HMAC-SHA256 IP). Email: job `send-notification-email` template `job-application` tới `notificationEmails` (không đính CV, chỉ link admin); lỗi hàng đợi vẫn trả 200. Mã lỗi: 400 (validate / tin đóng / CV hỏng; lỗi CV kèm `details` field `cv`, tin đóng là 400 duy nhất không có `details`), 413 (body hoặc CV quá cỡ), 415 (loại file sai), 429 (+`Retry-After`), 503 (Turnstile/hạ tầng); thông báo theo `locale` của form.
+> **As-built (layer-6-task-09):** `src/endpoints/public/job-applications.ts` (+ `job-application-body.ts`, schema `jobApplicationFieldsSchema` ở `src/shared/types/api.ts`). Thứ tự: rate limit 3/giờ/IP → Turnstile → đọc body giới hạn ~5,25 MB (Content-Length + đếm byte thật) → zod (`consent` = `"true"`, `jobPostingId` UUID, SĐT VN lưu E.164, `locale` mặc định `vi`) → tin phải `published`, chưa xoá mềm, chưa quá hết ngày `deadline` theo giờ Việt Nam (`isPastDeadline` ở `src/lib/careers/deadline.ts`, dùng chung với danh sách/nhãn "hết hạn" của trang tuyển dụng) (mọi trường hợp đóng/không tồn tại trả cùng một thông báo 400 kèm `code: "postingClosed"`; `ApplyForm` dựa vào `code` này để hiện "Vị trí này đã hết hạn nhận hồ sơ"). CV kiểm bằng magic bytes (`inspectUpload`), lưu `private-files` tên UUID; tạo hồ sơ lỗi → xoá CV bù trừ (không dùng transaction vì S3). Lưu `consentAt`, `consentVersion` (= `privacyPolicyVersion`, thiếu thì `"unknown"` + cảnh báo), `ipHash` (HMAC-SHA256 IP). Email: job `send-notification-email` template `job-application` tới `notificationEmails` (không đính CV, chỉ link admin); lỗi hàng đợi vẫn trả 200. Mã lỗi: 400 (validate / tin đóng / CV hỏng; lỗi CV kèm `details` field `cv` và không có `code`; tin đóng có `code: "postingClosed"`), 413 (body hoặc CV quá cỡ), 415 (loại file sai), 429 (+`Retry-After`), 503 (Turnstile/hạ tầng); thông báo theo `locale` của form.
 
 ### 3.3. `GET /api/public/rentals`
 
@@ -100,11 +102,12 @@ Query params (đồng bộ với URL trang `/cho-thue` để chia sẻ được)
 | `q` | `studio quan 1` | Từ khoá, gõ không dấu vẫn ra (ERD §6) |
 | `category` | `can-ho-dich-vu` · `serviced-apartments` | slug danh mục theo `locale` (gồm danh mục con) |
 | `province` | `ho-chi-minh` | slug |
-| `ward` | `ben-thanh` | slug |
+| `ward` | `ben-thanh` | slug phường; **bắt buộc kèm `province`** (slug phường chỉ duy nhất trong tỉnh), thiếu `province` → 400; chỉ khớp phường THUỘC tỉnh đó |
 | `priceMin`, `priceMax` | `5000000`, `15000000` | VNĐ/tháng |
 | `areaMin`, `areaMax` | `25`, `60` | m² |
 | `bedrooms` | `2` | `4` nghĩa là 4+ |
 | `furnishing` | `full` | |
+| `available` | `true` | Chỉ tin còn trống (`published`), bỏ tin `rented`. Mặc định (hoặc `false`) trả cả `published` lẫn `rented`. Trang `/cho-thue` dùng `true` (design-spec S04) |
 | `sort` | `newest` \| `price_asc` \| `price_desc` | Mặc định `newest` |
 | `page`, `limit` | `1`, `12` | `limit` tối đa 48 |
 
@@ -113,6 +116,8 @@ Kết quả: `{ success: true, data: { items: RentalCard[], total, page, totalPa
 Gọi qua `SearchService`. Cache: `s-maxage=60` (cache key gồm `locale`).
 
 > **As-built (layer-7-task-02):** `src/endpoints/public/rentals.ts` (`GET /api/public/rentals`), `src/lib/search/search-service.ts` (`SearchService` + `PostgresRentalSearch`), `rental-search-sql.ts` (WHERE/ORDER BY tham số hoá), schema `rentalSearchParamsSchema` + kiểu `RentalCard`/`RentalSearchResult` ở `src/shared/types/api.ts`. Thứ tự: rate limit `rentals` 60/phút/IP (không Turnstile; Redis lỗi → 503) → zod (sai kiểu/ngoài khoảng → 400; `priceMin ≤ priceMax`, `areaMin ≤ areaMax`; ô rỗng `?x=` coi như không truyền; khoá lạ bị bỏ qua; `q` ≤ 100 ký tự; `page` ≤ 500; `bedrooms` 0..4) → một truy vấn SQL lấy cả trang (khu vực + ảnh đại diện bằng `LATERAL`, không N+1). Tin hiển thị theo cùng điều kiện `publicWhere("rentals")` (`published`/`rented`, chưa xoá mềm, `en` cần `hasEnglish`; test đối chiếu hai bên). `q` chuẩn hoá như `searchText`, tách từ, mọi từ phải khớp (`LIKE %từ%` trên index trigram; tối đa 8 từ; `%`, `_` và dấu gạch chéo ngược được thoát). Tin chưa có giá (thương lượng) xếp cuối ở cả hai chiều sắp xếp giá; `id` chốt thứ tự phân trang. `RentalCard` KHÔNG có khoá `address` khi `showExactAddress=false` (SQL chỉ trả địa chỉ khi bật). Response thành công: `Cache-Control: public, s-maxage=60`; lỗi 400/429/503: `no-store`. Đo trên 100.000 tin giả lập (DB dev, `pnpm bench:rentals-search`): p95 tổng ≈ 80ms, kịch bản chậm nhất ≈ 95ms (ngưỡng 500ms).
+
+> **As-built (layer-8-task-03):** thêm `available` và luật `ward` cần `province` (400); `category` không còn khớp danh mục cha đã xoá mềm. Trang `/cho-thue` (`src/components/rentals/RentalListPage.tsx`) gọi thẳng `PostgresRentalSearch` (không qua HTTP) với `available=true`, 12 tin/trang; Sheet bộ lọc mobile gọi chính endpoint này (`limit=1`, `available=true`) để đếm "Xem n tin". URL trang dùng CÙNG tên khoá với API (`src/lib/search/url-params.ts`: `parseRentalFilters` / `rentalListQueryString` / `toRentalSearchParams`) nhưng khoan dung hơn API: tham số lạ hoặc giá trị sai bị bỏ qua (API trả 400), slug danh mục/tỉnh/phường không tồn tại bị bỏ, khoảng min > max được đảo lại, `ward` không kèm `province` bị bỏ.
 
 ### 3.4. `POST /api/public/click-events`
 
