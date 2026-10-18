@@ -34,12 +34,13 @@ Công cụ trong `/admin` để quản lý bản dịch.
 Mở khoá cho: `layer-12-task-01`, `layer-13-task-01`
 
 ## Acceptance Criteria
-- [ ] Admin bật được `pages.hasEnglish` trong UI: field `hasEnglish` dùng chung đang `admin.readOnly: true` (`src/fields/translation.ts:17`) → `withFieldAccess`/nút duyệt phải bỏ readOnly khi override update cho admin (MINOR-2) (review L5-T02 round 1)
-- [ ] Retranslate: authenticate → quyền sửa bài (admin, hoặc sale là `author`; `services`/`pages`/globals chỉ admin) → 404 nếu ngoài phạm vi → enqueue `force: true` (đặt lại `enSource=ai`) → 202; rate limit 30/giờ/user; audit `content.retranslate`
-- [ ] `:collection` ngoài allowlist → 404
-- [ ] Danh sách nội dung lọc theo: chưa dịch / AI dịch / đã sửa tay / dịch lỗi / bản Việt đổi sau khi sửa tay
-- [ ] Có bài `failed` hoặc vượt hạn mức → banner cảnh báo trong admin cho admin
-- [ ] Pháp lý `pending_review`: admin bấm duyệt → `hasEnglish=true` + audit `content.approve_translation`; sale không thấy nút
+- [x] Admin bật được `pages.hasEnglish` trong UI: field `hasEnglish` dùng chung đang `admin.readOnly: true` (`src/fields/translation.ts:17`) → (cập nhật round 2) KHÔNG bỏ readOnly: bật `hasEnglish` của `pages` chỉ qua nút "Duyệt bản EN" → `POST /api/admin/translations/pages/:id/approve` (ô tick chỉ đọc; hook `guardEnglishApproval` giữ nguyên giá trị với mọi request không mang cờ duyệt, tránh form cũ tự duyệt bản AI) (MINOR-2) (review L5-T02 round 1)
+- [x] Retranslate: authenticate → quyền sửa bài (admin, hoặc sale là `author`; `services`/`pages`/globals chỉ admin) → 404 nếu ngoài phạm vi → enqueue `force: true` (đặt lại `enSource=ai`) → 202; rate limit 30/giờ/user; audit `content.retranslate`
+- [x] `:collection` ngoài allowlist → 404
+- [x] Danh sách nội dung lọc theo: chưa dịch / AI dịch / đã sửa tay / dịch lỗi / bản Việt đổi sau khi sửa tay
+- [x] Có bài `failed` hoặc vượt hạn mức → banner cảnh báo trong admin cho admin
+- [x] Pháp lý: admin bấm duyệt (khi `hasEnglish` còn tắt: bản AI `pending_review`, bản EN sửa tay/dán, kể cả khi dịch tắt) → `hasEnglish=true` + audit `content.approve_translation` + status `done`; thiếu trường EN bắt buộc → 422 kèm danh sách trường; `hasEnglish` đã true → 409; sale không thấy nút (endpoint 403)
+- [x] Pháp lý bị AI dịch lại (nút Dịch lại hoặc tự dịch khi sửa bản Việt) → `hasEnglish=false` + `pending_review` + revalidate /vi và /en, ẩn /en tới khi admin duyệt (quyết định user 2026-10-18)
 
 ## Tests cần viết
 - Integration: sale retranslate bài người khác → 404; bài mình → 202 + audit
@@ -54,19 +55,19 @@ Mở khoá cho: `layer-12-task-01`, `layer-13-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 4 (user cho phép vượt 3 — 2026-10-18)
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS
+- Verify commands + result: worktree: lint · typecheck · build PASS, test 2.288 PASS. Sau squash lên staging (cả layer 10): lint · typecheck · build PASS; pnpm test 2.400 → 1 fail tương tác T03×T02 (locale-counterpart bật hasEnglish pages không cờ duyệt) → sửa test truyền context approveEnglish, chạy lại 8 PASS
+- Reviewer verdict: STRICT PASS round 4 (`.context/review-reports/build-tami-website-layer-10-task-02-round-4-review.md`); round 1 FAIL (MAJOR-1 pháp lý bản AI hiện ngay), round 2 FAIL (MAJOR-A form cũ tự duyệt), round 3 FAIL (MAJOR-H chỉ duyệt bản AI) — user quyết 2 lần; MINOR round 4 → layer-13-task-01; residual → BACKLOG BL-012, BL-013
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: API_SPEC §5.1 nếu lệch)
+- Doc impact result: docs/API_SPEC.md §5.1 + §5.2 (as-built), docs/ARCHITECTURE.md (job translate-content, duyệt pháp lý)
 - Decision log: pending
 
 ## Commit / Tracking
@@ -75,13 +76,13 @@ Mở khoá cho: `layer-12-task-01`, `layer-13-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-10/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/endpoints/admin/retranslate.ts (`POST /api/admin/translations/:collection/:id`)

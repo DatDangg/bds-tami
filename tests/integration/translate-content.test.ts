@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { EventEmitter } from "node:events";
 import pg from "pg";
-import { sql } from "@payloadcms/db-postgres";
-import { createLocalReq, JobCancelledError, type Payload } from "payload";
+import { type PostgresAdapter, sql } from "@payloadcms/db-postgres";
+import { createLocalReq, initTransaction, JobCancelledError, killTransaction, type Payload } from "payload";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { ROLES } from "../../src/access/roles";
@@ -436,7 +436,8 @@ describe.skipIf(!baseUrl)("integration: translate-content (DB tạm, SDK giả)"
       expect(en.title).toBe("EN:Chính sách bảo mật");
       expect(en.hasEnglish).toBe(false);
       expect(en.translation).toMatchObject({ status: "pending_review", enSource: "ai" });
-      expect(revalidated.flat().some((path) => path.startsWith("/en"))).toBe(false);
+      // Trang pháp lý: `/en` của chính trang phải được làm mới (hasEnglish về false, ẩn bản chưa duyệt).
+      expect(revalidated.flat().filter((path) => path.startsWith("/en"))).toEqual(["/en/chinh-sach-bao-mat"]);
     });
 
     it("collection không có trường status (developers): coi là đã xuất bản, enqueue + dịch được, bật hasEnglish", async () => {
@@ -538,6 +539,67 @@ describe.skipIf(!baseUrl)("integration: translate-content (DB tạm, SDK giả)"
       expect(final.columns.map((column) => column.title)).toEqual(["EN:Dự án mới", "EN:Cột mới"]);
       expect(final.columns[0]!.links[0]).toMatchObject({ label: "EN:Căn hộ", link: "https://tami.example/moi" });
       expect(final.columns[1]!.links[0]!.link).toBe("https://tami.example/lien-he");
+    });
+  });
+
+  describe("ghi kết quả: khoá dòng và job xếp lại (review L9-T07 round 2)", () => {
+    const readFooterVi = () =>
+      payload.findGlobal({ slug: "footer", locale: "vi", fallbackLocale: false, overrideAccess: true, depth: 0 }) as unknown as Promise<{ columns: { id: string; title: string; links: { id: string; label: string; link: string }[] }[] }>;
+    const footerJobIds = async () =>
+      (await payload.find({ collection: "payload-jobs", where: { and: [{ taskSlug: { equals: "translate-content" } }, { "input.slug": { equals: "footer" } }] }, depth: 0, pagination: false, overrideAccess: true })).docs.map((job) => job.id);
+
+    it("admin chỉ đổi link (hook KHÔNG xếp job) trong lúc job gọi API -> row_changed xếp đúng 1 job mới; lần sau dịch đủ", async () => {
+      const current = await readFooterVi();
+      const column = current.columns[0]!;
+      // Đổi chữ để job có việc; xoá job do hook xếp để đếm chính xác số job do `row_changed` tạo.
+      await payload.updateGlobal({ slug: "footer", data: { columns: [{ id: column.id, title: `${column.title} v2`, links: column.links }] } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      await payload.delete({ collection: "payload-jobs", where: { and: [{ taskSlug: { equals: "translate-content" } }, { "input.slug": { equals: "footer" } }] }, overrideAccess: true });
+      expect(await footerJobIds()).toHaveLength(0);
+
+      const llm = fakeClient(async (request) => {
+        const now = await readFooterVi();
+        const first = now.columns[0]!;
+        await payload.updateGlobal({
+          slug: "footer",
+          data: { columns: [{ id: first.id, title: first.title, links: first.links.map((link, index) => (index === 0 ? { id: link.id, label: link.label, link: "https://tami.example/chi-doi-link" } : link)) }] } as never,
+          locale: "vi",
+          overrideAccess: true,
+          depth: 0,
+        });
+        return echoResponse(request);
+      });
+      expect(await run({ kind: "global", slug: "footer" }, { client: llm.client })).toEqual({ outcome: "skipped", reason: "row_changed" });
+      // Lần lưu của admin chỉ đổi link nên hook không xếp job: job duy nhất đến từ `row_changed`.
+      expect(await footerJobIds()).toHaveLength(1);
+
+      expect(await run({ kind: "global", slug: "footer" }, { client: fakeClient().client })).toMatchObject({ outcome: "translated" });
+      const after = await readFooterVi();
+      expect(after.columns[0]!.links[0]!.link).toBe("https://tami.example/chi-doi-link");
+    });
+
+    it("job khoá dòng (FOR UPDATE) trước khi ghi: giao dịch khác đang giữ dòng thì job chờ, nhả khoá xong job mới ghi bản dịch", async () => {
+      const doc = await createNews({ title: "Khoá dòng" });
+      const id = String(doc.id);
+      await updateVi(id, { title: "Khoá dòng đổi" });
+      // Giao dịch của "admin" giữ khoá dòng bản ghi (như một lần lưu đang dở); `updatedAt` không đổi nên job vẫn hợp lệ khi lấy được khoá.
+      const holder = await createLocalReq({}, payload);
+      await initTransaction(holder);
+      const adapter = payload.db as unknown as PostgresAdapter;
+      await adapter.execute({ db: adapter.sessions[String(await holder.transactionID)]!.db, sql: sql`SELECT 1 FROM "news" WHERE "id" = ${id} FOR UPDATE` });
+      let finished = false;
+      try {
+        const job = run({ kind: "collection", slug: "news", docId: id }, { client: fakeClient().client }).then((outcome) => {
+          finished = true;
+          return outcome;
+        });
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        expect(finished).toBe(false);
+        await killTransaction(holder);
+        expect(await job).toMatchObject({ outcome: "translated" });
+      } finally {
+        await killTransaction(holder);
+      }
+      expect((await readNews(id, "en")).title).toBe("EN:Khoá dòng đổi");
     });
   });
 

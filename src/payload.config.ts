@@ -38,6 +38,8 @@ import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { leadAssignEndpoint } from "./endpoints/admin/lead-assign";
 import { leadsExportEndpoint } from "./endpoints/admin/leads-export";
 import { privateFileDownloadEndpoint } from "./endpoints/admin/private-file-download";
+import { approveEnglishEndpoint } from "./endpoints/admin/approve-english";
+import { retranslateEndpoint } from "./endpoints/admin/retranslate";
 import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
 import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
@@ -60,6 +62,7 @@ export default buildConfig({
     user: Staff.slug,
     components: {
       providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"],
+      beforeDashboard: ["/components/admin/TranslationFailedBanner#TranslationFailedBanner"],
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
     },
     meta: {
@@ -73,7 +76,7 @@ export default buildConfig({
   globals: [SiteSettings, Homepage, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
-  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint],
+  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint],
   jobs: jobsConfig,
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,

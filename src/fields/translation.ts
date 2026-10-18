@@ -49,6 +49,8 @@ export function translationGroup(): GroupField {
       { name: "translatedAt", type: "date", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       { name: "model", type: "text", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       { name: "lastError", type: "text", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      // Trường ảo (không có cột DB): nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.
+      { name: "retranslateAction", type: "ui", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
     ],
   };
 }

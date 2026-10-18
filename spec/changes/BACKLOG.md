@@ -19,6 +19,8 @@
 | BL-009 | MINOR còn lại layer 9: xuất Excel (L9-T05 r3) — thông báo khoá nút ghi rõ toán tử hỗ trợ (`export-filters.ts:94-95`), so `createdFrom > createdTo` bằng `Date.parse` (`:72`), dò trash bằng server component, ẩn nút trong list drawer; job nhắc lead (L9-T04) — index quét `status, assigned_to_id, reminded_at, created_at` khi dữ liệu lớn | MODIFY | pending (spec-validation layer 9 G33) | — | 2026-10-19 | |
 | BL-010 | UTM chỉ được ghi khi trang có `LeadForm` mount (`src/components/leads/LeadForm.tsx:49`) → khách vào từ quảng cáo ở trang chủ/danh sách rồi sang chi tiết mất UTM. Đề xuất island nhỏ ở layout công khai lưu `utm_*` vào sessionStorage (review L10-T01 round 1 MINOR-2) | MODIFY | pending (chưa tạo change doc) | — | 2026-10-18 | |
 | BL-011 | design-spec §3.5 (S04) còn câu "skeleton khi tải lần đầu" — thực tế cấm `loading.tsx` cấp route (soft-404, L9-T08). Đề xuất sửa intent: "Đổi bộ lọc/trang/chip: giữ kết quả cũ, mờ 50% + aria-busy, link đang chờ mờ nhẹ (useLinkStatus); không skeleton cấp route" (L10-T04) | MODIFY | pending (cần user duyệt sửa design-spec; chưa tạo change doc) | — | 2026-10-18 | |
+| BL-012 | `isFilled` (kiểm trường EN bắt buộc, dùng chung mọi collection) coi richText chỉ có 1 đoạn rỗng là "đủ" → bản EN trống vẫn qua 422 duyệt pháp lý / tự bật hasEnglish (review L10-T02 round 4) | BUG | pending (chưa tạo change doc) | — | 2026-10-18 | |
+| BL-013 | Trang pháp lý đã duyệt EN: admin sửa tay tiếp bản EN thì nội dung mới lên /en ngay, không qua duyệt lại. Cần user quyết BR-08 có đòi duyệt lại mọi thay đổi EN pháp lý không (review L10-T02 round 4) | MODIFY | blocked (chờ user quyết) | — | 2026-10-18 | |
 
 ## Quy tắc tracking
 

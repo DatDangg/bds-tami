@@ -15,6 +15,9 @@ export function isFilled(value: unknown): boolean {
 
 type Doc = Record<string, unknown>;
 
+/** Các trường bắt buộc còn thiếu trong bản `en`. Dùng chung với job dịch để quyết định có bật `hasEnglish` hay không, không phải thử rồi bắt lỗi. */
+export const missingEnglishFields = (requiredFields: readonly string[], english: Doc): string[] => requiredFields.filter((field) => !isFilled(english[field]));
+
 /** Bản `en` đã lưu của bản ghi (kể cả bản đã xoá mềm). */
 async function readStoredEnglish(
   { req, collection }: Parameters<CollectionBeforeValidateHook>[0],
@@ -68,7 +71,7 @@ export function requireEnglishFields(requiredFields: readonly string[]): Collect
     if (!newlyEnabled && req.locale !== "en") return data;
 
     const english = await resolveEnglishDoc(args);
-    const missing = requiredFields.filter((field) => !isFilled(english[field]));
+    const missing = missingEnglishFields(requiredFields, english);
     if (missing.length > 0) {
       throw new ValidationError({
         collection: collection.slug,

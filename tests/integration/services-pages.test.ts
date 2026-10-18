@@ -85,8 +85,8 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       depth: 0,
     });
 
-  const updatePage = (id: string, data: Record<string, unknown>, { as = admin, locale = "vi" }: Options = {}) =>
-    payload.update({ collection: "pages", id, data: data as never, locale, user: asUser(as), overrideAccess: false, depth: 0 });
+  const updatePage = (id: string, data: Record<string, unknown>, { as = admin, locale = "vi", approve = false }: Options & { approve?: boolean } = {}) =>
+    payload.update({ collection: "pages", id, data: data as never, locale, user: asUser(as), overrideAccess: false, depth: 0, context: approve ? { approveEnglish: true } : {} });
 
   const readSettings = () => payload.findGlobal({ slug: "site-settings", locale: "vi", overrideAccess: true });
 
@@ -294,7 +294,10 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       expect(await statusOf(updatePage(created.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { as: sale, locale: "en" }))).toBe(403);
       // Thiếu nội dung en → hook chặn.
       expect(await statusOf(updatePage(created.id, { hasEnglish: true, title: "Privacy" }, { locale: "en" }))).toBe(400);
-      const enabled = await updatePage(created.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en" });
+      const enabled = await updatePage(created.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en", approve: true });
+      // Không có lệnh duyệt (form/REST) thì `hasEnglish` không bật được (hook guardEnglishApproval).
+      const silent = await updatePage((await createPage({ kind: "terms" })).id, { hasEnglish: true, title: "Terms", content: lexical("en") }, { locale: "en" });
+      expect(silent.hasEnglish).toBe(false);
       expect(enabled.hasEnglish).toBe(true);
     });
 
@@ -363,7 +366,7 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       const vi = await publicQueries.findPublicList<{ kind: string }>(payload, "pages", "vi");
       expect(vi.docs.map((doc) => doc.kind)).toEqual(["privacy"]);
       expect((await publicQueries.findPublicList(payload, "pages", "en")).docs).toHaveLength(0);
-      await updatePage(privacy.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en" });
+      await updatePage(privacy.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en", approve: true });
       const en = await publicQueries.findPublicList<{ title: string }>(payload, "pages", "en");
       expect(en.docs.map((doc) => doc.title)).toEqual(["Privacy"]);
     });
@@ -376,7 +379,7 @@ describe.skipIf(!baseUrl)("integration: services + pages (DB tạm)", () => {
       expect(await byKind("privacy", "vi")).toMatchObject({ kind: "privacy", title: "Chính sách" });
       expect(await byKind("terms", "vi")).toBeNull();
       expect(await byKind("privacy", "en")).toBeNull();
-      await updatePage(privacy.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en" });
+      await updatePage(privacy.id, { hasEnglish: true, title: "Privacy", content: lexical("en") }, { locale: "en", approve: true });
       expect(await byKind("privacy", "en")).toMatchObject({ title: "Privacy" });
       await updatePage(privacy.id, { deletedAt: NOW() });
       expect(await byKind("privacy", "vi")).toBeNull();

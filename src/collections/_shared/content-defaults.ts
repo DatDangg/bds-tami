@@ -18,6 +18,8 @@ import { detectManualEnglish } from "../../hooks/translation/detect-manual-en";
 import { enqueueTranslation } from "../../hooks/translation/enqueue-translation";
 import { CONTENT_ROUTES, type ContentRoute } from "../../lib/content/content-paths";
 
+const TRANSLATION_FILTER_COMPONENT = "/components/admin/TranslationStatusFilter#TranslationStatusFilter";
+
 /** Số bản phiên bản giữ lại mỗi bản ghi (ERD §7). */
 export const MAX_VERSIONS_PER_DOC = 20;
 
@@ -128,6 +130,7 @@ function resolveSharedFields(options: ContentOptions, collectionSlug: string): F
 export function withContentDefaults(collection: CollectionConfig, options: ContentOptions = {}): CollectionConfig {
   const slug = collection.slug as CollectionSlug;
   const omitsStatus = options.omit?.includes("status") ?? false;
+  const omitsTranslation = options.omit?.includes("translation") ?? false;
   if (omitsStatus && !collection.access?.read) {
     throw new Error(`Collection "${slug}" bỏ trường status nên phải tự đặt access.read (mặc định lọc theo status).`);
   }
@@ -140,6 +143,10 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
   return {
     ...collection,
     trash: true,
+    // Lọc theo trạng thái dịch (FR-ADM-18) cho mọi collection có nhóm `translation`.
+    admin: { ...collection.admin, components: { ...collection.admin?.components, beforeList: [...(collection.admin?.components?.beforeList ?? []), ...(omitsTranslation ? [] : [TRANSLATION_FILTER_COMPONENT])] } },
+    // Job dịch đọc lại danh sách này để quyết định bật `hasEnglish` bằng đúng vị từ của hook `requireEnglishFields`.
+    custom: { ...collection.custom, englishRequiredFields: options.englishRequiredFields ?? ["title", "slug"] },
     versions: collection.versions ?? { maxPerDoc: MAX_VERSIONS_PER_DOC, drafts: false },
     access: {
       read: makePublishedOnly(publicStatuses),

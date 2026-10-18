@@ -85,3 +85,9 @@ Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 ## Notes
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
+
+## Follow-up từ review layer-10-task-02 round 4 (MINOR)
+- [ ] `src/collections/Pages.ts:55`: comment nút duyệt → "hiện khi `hasEnglish` còn tắt".
+- [ ] `src/endpoints/admin/approve-english.ts:31-39,65-67`: kiểm đủ trường EN chạy ngoài transaction → đưa vào cùng transaction (tránh 500 khi bản EN bị xoá giữa chừng).
+- [ ] Nút "Duyệt bản EN": nhắc "Lưu bản EN trước khi duyệt" (endpoint duyệt bản đã lưu, không phải form chưa lưu); kiểm trên trình duyệt form nạp lại sau `router.refresh()`.
+- [ ] Banner lỗi dịch gọi 13 request mỗi lần mở dashboard → gộp 1 endpoint tổng hợp (dùng chung với dashboard FR-ADM-14).

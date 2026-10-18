@@ -28,7 +28,7 @@ export async function isTranslationEnabled(req: PayloadRequest): Promise<boolean
 }
 
 /** Job dịch của CHÍNH bản ghi này đã xếp nhưng chưa chạy (chưa lấy, chưa lỗi cuối): lần lưu mới chỉ cần lùi giờ chạy của nó. */
-async function findPendingJob(req: PayloadRequest, input: TranslateContentInput): Promise<{ id: string | number } | undefined> {
+async function findPendingJob(req: PayloadRequest, input: TranslateContentInput): Promise<{ id: string | number; input?: unknown } | undefined> {
   const found = await preserveRequestLocale(req, () =>
     req.payload.find({
       collection: "payload-jobs",
@@ -63,7 +63,15 @@ export async function queueTranslation(req: PayloadRequest, input: TranslateCont
   const pending = await findPendingJob(req, input);
   if (pending) {
     await preserveRequestLocale(req, () =>
-      req.payload.update({ collection: "payload-jobs", id: pending.id, data: { waitUntil: waitUntil.toISOString() }, depth: 0, overrideAccess: true, req }),
+      req.payload.update({
+        collection: "payload-jobs",
+        id: pending.id,
+        // "Dịch lại bằng AI" gặp job đang chờ (không `force`) thì nâng nó lên `force`, không thì yêu cầu dịch đè bản sửa tay bị mất.
+        data: { waitUntil: waitUntil.toISOString(), ...(input.force ? { input: { ...(pending.input as object), force: true } } : {}) },
+        depth: 0,
+        overrideAccess: true,
+        req,
+      }),
     );
     return;
   }

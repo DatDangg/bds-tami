@@ -13,6 +13,7 @@ export const RATE_LIMITS = {
   rentals: { limit: 60, windowSeconds: 60 },
   "click-events": { limit: 30, windowSeconds: 60 },
   "admin-export-excel": { limit: 10, windowSeconds: 60 * 60 },
+  "admin-retranslate": { limit: 30, windowSeconds: 60 * 60 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitedEndpoint = keyof typeof RATE_LIMITS;

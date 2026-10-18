@@ -70,7 +70,16 @@ describe.skipIf(!baseUrl)("integration: chuyển ngôn ngữ sang trang tương 
     });
 
   const addEnglish = (collection: "rentals" | "categories" | "pages", id: string, data: Record<string, unknown>) =>
-    payload.update({ collection, id, data: data as never, locale: "en", overrideAccess: true, depth: 0 });
+    payload.update({
+      collection,
+      id,
+      data: data as never,
+      locale: "en",
+      overrideAccess: true,
+      depth: 0,
+      // Trang pháp lý chỉ bật hasEnglish qua lệnh duyệt (guardEnglishApproval, L10-T02).
+      context: collection === "pages" ? { approveEnglish: true } : {},
+    });
 
   const createRentalCategory = (name: string) =>
     payload.create({ collection: "categories", data: { name, scope: "rental" } as never, locale: "vi", overrideAccess: true, depth: 0 });

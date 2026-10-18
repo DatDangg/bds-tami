@@ -4,6 +4,7 @@ import { denyAll, isAdmin } from "../access";
 import { requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
 import { createRevalidatePage } from "../hooks/pages/revalidate-page";
+import { approveEnglish, guardEnglishApproval } from "../hooks/pages/approve-english";
 import { lockPageKind } from "../hooks/pages/lock-kind";
 import { syncPrivacyPolicyVersion } from "../hooks/pages/sync-privacy-version";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
@@ -29,7 +30,8 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
       disableDuplicate: true,
       hooks: {
         beforeValidate: [lockPageKind],
-        afterChange: [revalidatePage.afterChange, syncPrivacyPolicyVersion],
+        beforeChange: [guardEnglishApproval],
+        afterChange: [revalidatePage.afterChange, syncPrivacyPolicyVersion, approveEnglish],
         afterDelete: [revalidatePage.afterDelete],
       },
       fields: [
@@ -48,6 +50,8 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
           admin: { position: "sidebar" },
         },
         titleField(),
+        // Trường ảo: nút "Duyệt bản EN" (chỉ admin, chỉ khi bản dịch AI đang chờ duyệt).
+        { name: "approveEnglishAction", type: "ui", admin: { position: "sidebar", components: { Field: "/components/admin/ApproveEnglishButton#ApproveEnglishButton" } } },
         { name: "content", type: "richText", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
         { name: "version", type: "text", required: true, admin: { description: "Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30)." } },
         { name: "effectiveDate", type: "date", required: true, admin: { date: { pickerAppearance: "dayOnly" } } },

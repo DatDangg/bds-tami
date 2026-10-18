@@ -5,7 +5,7 @@ import { readStoredTranslation } from "../hooks/translation/compute-source-hash"
 import { isTranslationEnabled, queueTranslation } from "../hooks/translation/enqueue-translation";
 import { isFilled } from "../hooks/require-english-fields";
 import { parseTranslationEnv } from "../lib/env";
-import { CONTENT_ROUTES, type ContentRoute, contentPaths, internalPath } from "../lib/content/content-paths";
+import { CONTENT_ROUTES, type ContentRoute, contentPaths, internalPath, LEGAL_PAGE_ROUTES } from "../lib/content/content-paths";
 import { revalidateFromJob } from "../lib/revalidate/internal-revalidate";
 import { TRANSLATION_ERROR_MESSAGES, TranslationError, type TranslationErrorCode } from "../lib/translation/errors";
 import { TRANSLATE_CONTENT_SLUG, type TranslateContentInput } from "../lib/translation/job-input";
@@ -53,11 +53,18 @@ function selectChangedLeaves(leaves: TranslatableLeaf[], stored: SourceHashes, c
   });
 }
 
+/** Trang pháp lý: route cố định theo `kind`; `hasEnglish` vừa về false nên `/en` (ẩn bản chưa duyệt) và `/vi` (bỏ liên kết chuyển ngôn ngữ/hreflang tới /en) đều phải làm mới. */
+function legalEnglishPaths(saved: Doc): string[] {
+  const route = LEGAL_PAGE_ROUTES[saved.kind as keyof typeof LEGAL_PAGE_ROUTES];
+  return route ? [internalPath(route, "en"), internalPath(route, "vi")] : [];
+}
+
 /** Đường dẫn EN cần làm mới sau khi dịch: chi tiết (slug en vừa sinh), danh sách, trang chủ nếu nổi bật; global → trang chủ `/en` (cache theo thời gian lo phần còn lại). */
 function englishPaths(ctx: Context, saved: Doc): string[] {
   if (ctx.target.kind === "global") return [internalPath("/", "en")];
   const route = (CONTENT_ROUTES as Record<string, ContentRoute | undefined>)[ctx.target.slug];
-  if (!route || ctx.target.slug === "pages") return [];
+  if (ctx.target.slug === "pages") return legalEnglishPaths(saved);
+  if (!route) return [];
   const slug = typeof saved.slug === "string" && saved.slug !== "" ? saved.slug : undefined;
   // Chỉ bản EN vừa đổi: `contentPaths` luôn thêm cả danh sách/trang chủ vi, mà bản vi không đổi gì.
   return contentPaths(route, { slugs: { en: slug }, featured: Boolean(saved.isFeatured) }).filter((path) => path.startsWith("/en"));
