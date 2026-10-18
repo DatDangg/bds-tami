@@ -18,7 +18,7 @@
     ]
   },
   "totalLayers": 17,
-  "currentLayer": 7,
+  "currentLayer": 8,
   "completedTasks": [
     {
       "task": "layer-0/task-01",
@@ -486,9 +486,14 @@
       "date": "2026-10-18T07:20:00.000Z",
       "decision": "Hoãn diễn tập rollback image staging tới lần deploy staging thật kế tiếp (L12-T01, trước M5); tạm dựa deploy.test.sh PASS",
       "reason": "User chọn; runbook gợi ý env hỏng làm rollback cũng hỏng"
+    },
+    {
+      "date": "2026-10-18T11:45:00Z",
+      "decision": "Layer 7: D1 tin \"Đã thuê\" giữ tối đa 8 tin tương tự (design-spec S07); D2 lọc giá ±30% làm ở L8-T03 (dưới 4 tin thì bỏ điều kiện giá); D3 % upload + kéo-thả form ứng tuyển → BACKLOG BL-005. Từ layer 7 chạy song song các task độc lập (worktree + DB riêng), merge/commit lần lượt",
+      "reason": "User duyệt checkpoint layer 7"
     }
   ],
-  "lastUpdated": "2026-10-18T11:40:00Z",
+  "lastUpdated": "2026-10-18T11:45:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -576,7 +581,9 @@
       "layer": 7,
       "verdict": "COMPLETE",
       "report": ".context/review-reports/spec-validation-build-tami-website-layer-7.md",
-      "note": "27/27 AC. G26/G27 đóng. G29 (việc treo) → L8-T03; G30 nginx /api/internal/ trên server trước push kế tiếp → L12-T01 (+ checkpoint); R22 dọn task file xong. Chờ user quyết D1 (8 tin tương tự), D2 (lọc giá ±30%), D3 (% upload + kéo-thả) và duyệt sang layer 8."
+      "note": "27/27 AC. G26/G27 đóng. G29 (việc treo) → L8-T03; G30 nginx /api/internal/ trên server trước push kế tiếp → L12-T01 (+ checkpoint); R22 dọn task file xong. User duyệt: D1 giữ 8, D2 lọc ±30% ở L8-T03, D3 → BL-005.",
+      "approvedAt": "2026-10-18T11:45:00Z",
+      "approvedBy": "user"
     }
   ]
 }

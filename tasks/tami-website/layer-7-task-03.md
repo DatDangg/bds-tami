@@ -41,7 +41,7 @@ Mở khoá cho: `layer-10-task-01`
 - [x] Hiện mã tin, giá/tháng (hoặc "Thoả thuận"), diện tích, phòng ngủ/WC, tầng, hướng, nội thất, điều khoản thuê, mô tả, vị trí (ẩn số nhà khi `showExactAddress=false`), video facade
 - [x] Sale phụ trách hiện tên/SĐT; sale `active=false` → thay bằng hotline chung
 - [x] Tin `rented`: badge, `noindex, follow`, gợi ý tin tương tự nổi bật; không JSON-LD RealEstateListing
-- [x] Tin tương tự: cùng danh mục + tỉnh, loại trừ tin hiện tại, tối đa 4
+- [x] Tin tương tự: cùng danh mục + tỉnh, loại trừ tin hiện tại, tối đa 4 (tin `rented`: tối đa 8 theo design-spec S07 — user duyệt D1 2026-10-18)
 - [x] Vùng `LeadFormSlot` (biến thể "Nhận tư vấn căn tương tự" khi rented)
 - [x] Khi `showExactAddress=false`: server component phải truyền `approximateLocation(location)` (src/components/media/map-geometry.ts) cho `LazyMap` (kèm `approximate`), KHÔNG truyền toạ độ thật — props client component bị serialize vào HTML (contract từ layer-2-task-08)
 

@@ -108,3 +108,4 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 - [ ] (từ L7-T03) `src/lib/rentals/rental-queries.ts:71` thẻ tin tương tự: ảnh đầu gallery bị xoá → dùng ảnh kế tiếp; `:74` truyền `locale` khi đọc ảnh bìa.
 - [ ] (từ L7-T04) `POST /api/public/job-applications`: thêm `code: "postingClosed"` máy đọc được cho tin hết hạn, `ApplyForm` dựa vào code thay cho quy ước "400 không details"; sửa comment `job-applications.ts:58`, `ApplyForm.tsx:39`, API_SPEC §3.2.
 - [ ] (từ L7-T01) test migration `property_posts` chèn thêm dòng `payload_jobs_log` của `expire-offers` để bắt trường hợp bỏ `DELETE FROM payload_jobs_log` trong `down`.
+- [ ] D2 (user duyệt 2026-10-18): tin tương tự của trang chi tiết cho thuê lọc thêm giá ±30% (design-spec S07); nếu ra dưới 4 tin thì bỏ điều kiện giá, giữ cùng danh mục + tỉnh. Có test.
