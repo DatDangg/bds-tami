@@ -81,14 +81,23 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria (2026-10-18, staging tạm `https://187-52-119-50.sslip.io` — chưa có tên miền, không Cloudflare; user chốt):
+  - Done: compose `tami-staging-*` (app/jobs/postgres/redis/seaweedfs), chỉ app bind `127.0.0.1:3011`; nginx 2 site sslip (`nginx -t` PASS rồi reload, không sửa site khác); basic auth + `X-Robots-Tag: noindex, nofollow, noarchive` + robots `Disallow: /`; CD chạy thật từ nhánh `staging` (b936204: image digest → migrate → app + jobs → `/api/health` 200); seed nền + `--sample` chỉ staging (email chỉ tới `EMAIL_ALLOWLIST`); Dockerfile có `seed/` (G20); CI migrate DB trống + importMap drift (G18) + pin action SHA; `siteName` đã điền trước khi publish privacy; mỗi bước server có xác nhận của user.
+  - Rate limit 2 IP (runbook bước 11): cột đầu access log là IP thật; `click-events` qua `127.0.0.1:3011` với X-Real-IP giả lập: IP A 30×400 rồi 429, IP B 400 (bucket riêng); nginx luôn ghi đè `X-Real-IP $remote_addr` (`docker/nginx/tami-staging-sslip.conf:58`).
+  - Trang (qua tunnel tới app, bỏ basic auth): `/`, `/en`, `/du-an` (6 dự án, ảnh `/api/media/file/*` 200), `/du-an/<slug>`, `/en/projects`, `/tin-tuc`, `/tuyen-dung` (3 tin), `/lien-he` 200; 404 đúng; `/vi/*` → 301 bỏ tiền tố. `/dich-vu/<slug>` 404 và `/tin-tuc` rỗng là đúng (dịch vụ + tin mẫu seed ở trạng thái draft). Console chỉ có 404 prefetch `/cho-thue` (trang layer sau) và `/chinh-sach-bao-mat` (chưa publish).
+  - Server (AC L53): nginx 1.24 (không bật `http2`, tránh đổi giao thức site khác), Docker 29.7, Compose v5.5; DB staging (`tami-staging-postgres`, `/opt/tami/staging.env`) tách riêng — production chưa có env, kiểm khác DB production → `layer-15-task-01`.
+  - Postgres không bị tạo lại khi đổi release (AC L50): `tami-staging-postgres` Created 06:25:55Z (release 0dfc8f9), RestartCount 0, giữ nguyên qua lần đổi sang b936204 (app Created 06:53:48Z) → bind `init.sql` qua `current` không gây recreate.
+  - G17 phần code Done (`docker/Dockerfile:40-42`, `.github/workflows/deploy.yml:75`); repository variable `NEXT_PUBLIC_HOTLINE` chưa đặt → kiểm số hotline trên trang lỗi gốc chuyển `layer-12-task-01`.
+  - Trang pháp lý (AC L62): 2 trang seed ở trạng thái draft (`/chinh-sach-bao-mat` 404 đúng); publish là thao tác nội dung của admin (đã điền `siteName` nên publish được) → kiểm mở được chuyển `layer-12-task-01`.
+  - Hoãn: diễn tập rollback image (user 2026-10-18: tới lần deploy staging thật kế tiếp, trước M5 → `layer-12-task-01`; tạm dựa `scripts/deploy/deploy.test.sh` PASS); bản đồ `/lien-he` (site-settings chưa có `mapLocation`) → `layer-12-task-01`; upload source map GlitchTip thật (G18) → `layer-12-task-01` (bật giám sát ở đó); mọi mục Cloudflare (DNS, SSL Full Strict, nginx chỉ nhận IP Cloudflare, cache rule, Origin Pulls, `TRUST_CF_CONNECTING_IP`, smoke 2 IP qua Cloudflare) → `layer-15-task-01` (cần tên miền thật); backup (AC L49: user chốt staging không backup) → backup production ở `layer-15-task-01` kèm chi tiết L49; G10 báo động → trước M3 (`layer-12-task-01` bật giám sát); đối chiếu `budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production → `layer-15-task-01`.
+- Verify commands + result: phần A `pnpm test` 141 file 1.538 PASS, build PASS, `deploy.test.sh` PASS; CI c0406c2/0dfc8f9/b936204 xanh; phần B chỉ đổi runbook (no code).
+- Residual: `pnpm seed --sample` lần đầu trên staging exit 1 sau khi tạo 4 dự án (output bị cắt, không thấy lỗi); chạy lại PASS, DB không trùng (6 dự án / 6 media).
+- Reviewer verdict: phần A round 4 STRICT PASS; CI round 1-2 PASS; deps round 1 PASS; phần B round 5 NORMAL FAIL (thiếu chỗ nhận 6 mục) → round 6 NORMAL PASS (`.context/review-reports/build-tami-website-layer-6-task-01-round-6-review.md`)
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: docs/runbooks/deploy.md; ARCHITECTURE §6.4 (chốt cách runner/registry))
-- Decision log: pending
+- Doc impact result: `docs/runbooks/deploy.md` (§9 staging sslip + bước 12 rollback), `docs/ARCHITECTURE.md` §6.3 (phần A); task L12/L15 nhận mục hoãn
+- Decision log: `.context/progress.json` decisions (staging sslip.io + basic auth, không backup/báo động tới M3, dịch AI tắt, hoãn rollback drill tới lần deploy staging thật kế tiếp)
 
 ## Commit / Tracking
 - Commit gợi ý: `feat(layer-6): task-01 deploystg0` + trailer theo `.agent/workflows/state-commit.md` §2.8
@@ -96,12 +105,12 @@ Mở khoá cho: `layer-9-task-07`, `layer-12-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-6/task-01` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [ ] Committed
 
 ## Files to Create/Modify

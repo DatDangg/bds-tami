@@ -113,3 +113,11 @@ Mở khoá cho: `layer-13-task-01`, `layer-13-task-02`, `layer-13-task-03`, `lay
 
 ## Follow-up từ layer-6-task-01 (staging tạm)
 - [ ] Staging đang dùng giá trị TẠM trong `/opt/tami/staging.env`: Turnstile = khoá TEST công khai Cloudflare (captcha luôn qua), SMTP giả `smtp.invalid` (email không gửi). Thay bằng Brevo + Turnstile thật trước khi kiểm E2E form/email trên staging.
+
+## Follow-up hoãn từ layer-6-task-01 (đóng 2026-10-18)
+- [ ] Diễn tập rollback image trên staging ở lần deploy thật này (runbook `docs/runbooks/deploy.md` §9 bước 12): commit cố ý làm `/api/health` lỗi qua CI/CD → exit 1, `current` + image về release trước, health 200 → revert bằng commit mới. KHÔNG làm hỏng `staging.env` (rollback dùng chung env → exit 3).
+- [ ] Điền `mapLocation` ở site-settings staging rồi kiểm `/lien-he`: MapLibre vẽ tile, console không lỗi "Worker failed to load"; ảnh chụp làm evidence.
+- [ ] Điều tra `pnpm seed --sample` lần đầu exit 1 trên staging (L6-T01, sau 4 dự án; lần 2 PASS): chạy trên DB trống, giữ toàn bộ output.
+- [ ] Đặt repository variable `NEXT_PUBLIC_HOTLINE` (GitHub) rồi build lại; kiểm trên staging trang lỗi gốc (`global-error`, DB lỗi) hiện số hotline (G17, runbook §9 bước 13).
+- [ ] Admin publish 2 trang pháp lý (seed draft; `siteName` đã điền) → kiểm `/chinh-sach-bao-mat` + trang pháp lý còn lại mở được qua staging (AC L62 của L6-T01).
+- [ ] G18: kiểm upload source map GlitchTip thật: bật `GLITCHTIP_AUTH_TOKEN` (secret) + `vars.GLITCHTIP_*`, build image, gây lỗi thử, stack trace trên GlitchTip không minify (`scripts/upload-sourcemaps.mjs`, runbook §8).

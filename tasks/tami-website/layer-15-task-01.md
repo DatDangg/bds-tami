@@ -171,3 +171,10 @@ Mở khoá cho: `layer-16-task-01`
 
 ## Follow-up từ review sửa dependency runtime (layer-6-task-01)
 - [ ] `tests/unit/runtime-dependencies.test.ts`: thêm nhánh `require(` và bỏ qua `import type`/`export type` (MINOR).
+
+## Follow-up hoãn từ layer-6-task-01 (staging sslip.io, chưa có tên miền)
+- [ ] Cần tên miền thật trước M5. Các AC Cloudflare của L6-T01 chưa làm vì staging không qua Cloudflare: DNS + SSL Full Strict, cache rule `/api/*` bypass trừ `/api/media/file/*`, bypass biến thể RSC, Authenticated Origin Pulls (hỏi user), `TRUST_CF_CONNECTING_IP=true` + smoke 2 IP thật qua Cloudflare rơi vào 2 bucket.
+- [ ] Nginx production chỉ nhận IP Cloudflare (allow/deny theo dải Cloudflare, `tami.conf`) — AC L58 của L6-T01, staging sslip không qua Cloudflare nên chưa áp.
+- [ ] Backup production lần đầu (chi tiết từ AC L49 của L6-T01; staging không backup theo user): tạo `BACKUP_ENV_DIR` + env pgBackRest/restic (đích S3/SFTP user chốt), `stanza-create`, `restic init`, kiểm digest base `postgis/postgis:17-3.5` trên server khớp digest ghim + `ldd --version` trước khi đổi image (restore.md §2.3), đặt `HEARTBEAT_URL_WAL`; e2e test chuyển image đọc `ARG POSTGIS_IMAGE` thay vì tag (review L4-T07 round 2 MINOR-A).
+- [ ] Đối chiếu bảng giá `src/lib/translation/budget.ts` trước khi đặt `TRANSLATION_MONTHLY_BUDGET_USD` production (staging đang 0).
+- [ ] Xác nhận DB production khác DB staging (tên DB/host trong `prod.env` ≠ `/opt/tami/staging.env`), không sync data staging→prod (Tests của L6-T01).

@@ -262,8 +262,12 @@ Nginx host dùng chung (nginx 1.24, đã đọc `nginx -T`): chưa site nào dù
     `docker exec tami-staging-app pnpm seed --sample` (menu/footer, dịch vụ, tin, dự án, tuyển dụng, cho thuê mẫu; bị chặn khi `APP_ENV=production`).
     Trước khi **xuất bản** Chính sách bảo mật: vào admin điền `site-settings.siteName` (bản vi); thiếu thì xuất bản trả lỗi 400 nêu rõ. Email chỉ tới `EMAIL_ALLOWLIST`.
 11. `[XÁC NHẬN]` Smoke test rate limit theo IP: gửi form ứng tuyển/liên hệ từ 2 IP khác nhau → mỗi IP một bucket (không cùng 429). Cột đầu log `/var/log/nginx/tami-staging.access.log` là IP thật.
-12. `[XÁC NHẬN]` Diễn tập rollback (từ lần deploy thứ hai): deploy một commit có chủ đích làm `/api/health` lỗi (hoặc chạy tay `deploy.sh staging --image …` với `HEALTH_RETRIES=2` và env hỏng),
-    kỳ vọng exit 1, `current` quay về release trước, app về image trước, health 200; lưu log làm evidence. Không chạy trên production.
+12. `[XÁC NHẬN]` Diễn tập rollback (cần ít nhất một release staging đã deploy thành công trước đó): deploy một **image lỗi thật** — commit có chủ đích làm
+    `/api/health` lỗi đi qua CI/CD, sau đó revert bằng commit mới. Commit đó phải qua được CI (chỉ hỏng lúc chạy, không test nào bắt) và **không** kèm migration
+    (migration đã chạy không rollback được). **Không** làm hỏng `staging.env` hay đặt biến môi trường hỏng cho `deploy.sh`:
+    `rollback_to_previous` dùng chung `ENV_FILE` và môi trường tiến trình nên rollback cũng hỏng (exit 3, staging chết).
+    Kỳ vọng exit 1, `current` quay về release trước, app về image trước, health 200; lưu log làm evidence. Không chạy trên production.
+    Trạng thái 2026-10-18: hoãn tới lần deploy staging thật kế tiếp (trước M5); tạm dựa vào `scripts/deploy/deploy.test.sh` (kịch bản rollback) đã PASS.
 13. Evidence: ảnh chụp `/`, `/du-an`, `/tin-tuc`, `/dich-vu`, `/tuyen-dung`, `/lien-he` (bản đồ vẽ tile, console không lỗi "Worker failed to load"); trang lỗi gốc có số hotline.
 
 ### 9.3 Cờ tin IP khách theo môi trường

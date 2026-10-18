@@ -3,21 +3,21 @@
 ```yaml
 workItem: build/tami-website
 phaseTask: layer-6-task-01
-step: fix_cd
-agent: builder
-status: running
+step: closeout
+agent: primary
+status: done
 attempt: 4
 interrupted: false
-updatedAt: 2026-10-18T20:10:00.000Z
-filesTouched: []
+updatedAt: 2026-10-18T07:25:00.000Z
+filesTouched: ["docs/runbooks/deploy.md", "tasks/tami-website/layer-6-task-01.md", "tasks/tami-website/layer-12-task-01.md", "tasks/tami-website/layer-15-task-01.md", ".context/runs/build-tami-website-layer-6-task-01.md"]
 filesNew: [".context/runs/build-tami-website-layer-6-task-01.md"]
 evidence:
-  reportPath: .context/review-reports/build-tami-website-layer-6-task-01-round-4-review.md
-  round: 4
+  reportPath: .context/review-reports/build-tami-website-layer-6-task-01-round-6-review.md
+  round: 6
   verdict: PASS
-next: "Chờ user tạo admin đầu tiên ở https://187-52-119-50.sslip.io/admin. Sau đó: (1) kiểm staff có admin; (2) ssh server docker exec tami-staging-app pnpm seed --sample; (3) admin điền site-settings.siteName (vi) trước khi publish privacy; (4) kiểm trang /, /du-an, /tin-tuc, /dich-vu, /tuyen-dung, /lien-he (bản đồ), /cho-thue? + 404 + robots noindex + log IP thật; (5) runbook bước 11 rate limit 2 IP, bước 12 rollback drill (deploy lần 2 đã có: release 0dfc8f9 + b936204), kiểm postgres không bị tạo lại (bind init.sql qua current); (6) evidence + reviewer + close-out L6-T01 + commit; (7) spec-validator layer 6 → mốc M2 sau L10 nên tiếp layer 7."
+next: "L6-T01 done. Layer 6 hết task → spec-validator layer 6 (5g), checkpoint user duyệt trước layer 7."
 loopSignal: none
-approvals: [{gate: attempt_4, at: 2026-10-18T14:00:00.000Z, ok: true, note: "User: cho attempt 4"}, {gate: staging_mode, at: 2026-10-18T10:40:00.000Z, ok: true, note: "sslip.io + Let's Encrypt + basic auth, không Cloudflare"}]
+approvals: [{gate: rollback_drill_defer, at: 2026-10-18T21:35:00.000Z, ok: true, note: "User: hoãn rollback drill tới lần deploy staging thật kế tiếp (trước M5)"}, {gate: attempt_4, at: 2026-10-18T14:00:00.000Z, ok: true, note: "User: cho attempt 4"}, {gate: staging_mode, at: 2026-10-18T10:40:00.000Z, ok: true, note: "sslip.io + Let's Encrypt + basic auth, không Cloudflare"}]
 batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
 ```
 
@@ -47,3 +47,12 @@ batchQueue: ["phase-B server steps (mỗi bước cần user xác nhận)"]
 - 2026-10-18T19:00:00.000Z CD lần đầu: image build + push OK, server pull, infra staging (postgres/redis/seaweedfs + init) chạy; bước migrate FAIL: ERR_MODULE_NOT_FOUND @aws-sdk/client-s3 (devDependency, image runtime cài --prod; dùng ở src/endpoints/admin/private-file-download.ts từ L6-T10). App chưa bật. ▶ START builder sửa (cancel sẽ redo bước này).
 - 2026-10-18T19:40:00.000Z ✅ DONE builder sửa dependency: @aws-sdk/client-s3 → dependencies (lockfile 3+/3-), test guard runtime-dependencies; docker build thật + migrate + seed + next start health 200 + jobs runner OK. Reviewer FAST PASS (deps-round-1). Full pnpm test local: lần 1 ngay sau khởi động container 5 fail (DB vừa lên), lần 2 không còn FAIL. Commit + push.
 - 2026-10-18T19:55:00.000Z CD b936204: staging deploy OK — tami-staging-app healthy, jobs up, /api/health 200, https 401 (basic auth). Release staging: 0dfc8f9 (lần lỗi), b936204 (current). Job production đỏ do chưa cấu hình env production (không có release/container prod) — user bật Required reviewers. Seed nền OK (34 tỉnh, 3.321 phường/xã, 11 danh mục, 2 trang pháp lý); seed --sample: menu/footer + 3 dịch vụ OK, dừng ở tin mẫu vì chưa có admin (staff = 0). Session dừng — user resume ở session mới.
+- 2026-10-18T20:30:00.000Z User tạo admin đầu tiên; staff = 1 (role admin). Chạy seed --sample trên staging (bước tiếp đã duyệt, lần trước dừng ở tin mẫu).
+- 2026-10-18T20:45:00.000Z seed --sample lần 1: tạo 2 tin tức + 4 dự án rồi exit 1 (output bị cắt, không thấy dòng lỗi; warn revalidate ngoài Next là có chủ đích). Lần 2 (idempotent) PASS: +2 dự án, +2 tin cho thuê, +4 tuyển dụng. DB: 6 dự án / 6 media, không trùng. Residual: nguyên nhân exit 1 lần đầu chưa rõ.
+- 2026-10-18T20:50:00.000Z Kiểm trang qua 127.0.0.1:3011: / 200, /en 200, /du-an 200, /du-an/<slug> 200, /en/projects 200, /tin-tuc 200, /tuyen-dung 200, /lien-he 200 (có bản đồ), 404 đúng, /api/health 200, robots Disallow: /. /vi/* → 301 bỏ tiền tố (đúng). /dich-vu 404 (chưa có trang danh sách, dịch vụ mẫu là draft → /dich-vu/<slug> 404 đúng). /cho-thue 404 (trang thuộc layer sau). nginx: 401 + X-Robots-Tag noindex + HSTS. <title> trang chủ rỗng → chờ admin điền site-settings.siteName.
+- 2026-10-18T21:05:00.000Z User điền siteName. Bước 11 PASS: access log cột đầu = IP thật (171.224.x); click-events qua 127.0.0.1:3011 với X-Real-IP giả lập: IP A 30×400 rồi 429, IP B 400 (bucket riêng); nginx luôn ghi đè X-Real-IP=$remote_addr (tami-staging-sslip.conf:58). Chưa có domain: staging sslip.io, production cần domain trước M5.
+- 2026-10-18T21:15:00.000Z Bước 12 rollback drill: CHƯA chạy. Phát hiện runbook §9 bước 12 gợi ý "env hỏng" — rollback_to_previous (deploy.sh:227) dùng cùng ENV_FILE → rollback cũng hỏng (exit 3, staging chết). Muốn diễn tập đúng cần 1 image lỗi thật qua ghcr (commit cố ý qua CI hoặc push image tay). Hỏi user chọn cách.
+- 2026-10-18T21:40:00.000Z User: hoãn rollback drill tới lần deploy staging thật kế tiếp (trước M5). Sửa runbook bước 12; evidence trang qua tunnel; task file Feature Verification + hoãn sang L12-T01/L15-T01. ▶ START reviewer phần B round 5 (cancel sẽ redo bước này).
+- 2026-10-18T21:50:00.000Z ✅ DONE reviewer phần B round 5 NORMAL — FAIL MAJOR-1: 6 mục AC không Done cũng không có chỗ nhận (privacy 404, hotline trang lỗi, GlitchTip sourcemap, nginx chỉ IP Cloudflare, postgres không recreate, chi tiết backup L49). MINOR runbook CI/migration, budget.ts, approvals. Runbook bước 12 đúng code.
+- 2026-10-18T22:05:00.000Z Sửa round 5 (primary, chỉ doc): postgres không recreate (Created 06:25, giữ qua b936204) → AC L50 Done; hotline var GitHub chưa đặt, privacy publish, GlitchTip → L12; nginx IP Cloudflare, chi tiết backup L49, budget.ts → L15; runbook bước 12 thêm qua CI + không migration; approvals thêm rollback_drill_defer. ▶ START reviewer round 6 (cancel sẽ redo bước này).
+- 2026-10-18T07:25:00Z ✅ DONE reviewer round 6 NORMAL — PASS (MINOR-1 nginx/docker version + DB staging≠prod → đã ghi task/L15; MINOR-2: các mốc giờ trước trong journal là giờ địa phương gắn nhầm hậu tố Z — từ mốc này ghi UTC thật). Close-out: task file DoD, progress.json (completedTasks + inProgressTask=null + decision hoãn rollback drill). Commit.
