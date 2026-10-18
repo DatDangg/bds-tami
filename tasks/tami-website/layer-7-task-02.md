@@ -68,7 +68,7 @@ Mở khoá cho: `layer-8-task-03`, `layer-13-task-03`
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (151 file, 1.637) · `pnpm build` PASS; test migration up→down→up; bench `pnpm bench:rentals-search` 100.000 tin p95 80.4ms (≤ 500ms)
 - Residual: p95 đo trên dev, đo lại trên staging; `CREATE EXTENSION pg_trgm` cần kiểm quyền user DB staging/prod khi deploy (L12-T01); `s-maxage` chỉ có tác dụng khi có Cloudflare Cache Rule (L15-T01)
 - Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-7-task-02-round-1-review.md`), 6 MINOR → `layer-8-task-03`
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-7.md`
 
 ## Doc / Decision Impact
 - Doc impact result: API_SPEC §3.3, ERD §6, ARCHITECTURE §4

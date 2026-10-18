@@ -69,7 +69,7 @@ Mở khoá cho: `layer-8-task-01`, `layer-8-task-02`, `layer-8-task-04`, `layer-
 - Rollback note: `down` của `20261018_075627_property_posts` xoá row `payload_jobs`/`payload_jobs_log` của task `expire-offers` (mất lịch sử chạy + job đang chờ; task chỉ làm mới cache)
 - Residual: chưa thử end-to-end `jobs → app:3000/api/internal/revalidate` trong Docker → smoke ở lần deploy staging kế tiếp (L12-T01); job lỡ cả ngày thì bài hết hạn ngày đó chỉ làm mới khi cache hết hạn tự nhiên (chấp nhận)
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-7-task-01-round-2-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-7.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ERD §4.7 + §5, ARCHITECTURE §4/§5.4 (job + làm mới cache từ job), API_SPEC §3.8 (route nội bộ)

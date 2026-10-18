@@ -59,7 +59,7 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm build` PASS; `pnpm test` 147/148 file, 1.566 test PASS (chạy 2 lần ổn định); `src/lib/contrast.test.ts` fail chỉ trong worktree do checkout CRLF (BL-004, không thuộc task)
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-7-task-04-round-2-review.md`)
 - Residual: `invalidInput` multipart hỏng / 400 không JSON từ proxy vẫn hiện panel "hết hạn" (trình duyệt thật gần như không gặp); nên có `code: "postingClosed"` máy đọc được — follow-up dưới
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-7.md`
 
 ## Doc / Decision Impact
 - Doc impact result: `docs/API_SPEC.md` §3.2 — lỗi CV (`cvInvalid/cvMissing/cvTooLarge/cvUnsupported`) trả `details: [{ field: "cv" }]` (thêm phần tử, không đổi shape)
@@ -72,10 +72,10 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-7/task-04` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức NORMAL)
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
 - [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [x] Committed
@@ -93,4 +93,4 @@ Mở khoá cho: `layer-12-task-01`, `layer-11-task-01`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-7-task-04 round 2
-- [ ] Tín hiệu máy đọc được cho tin hết hạn (vd `code: "postingClosed"` trong body lỗi) thay cho quy ước "400 không details"; sửa comment `job-applications.ts:58`, `ApplyForm.tsx:39` (MINOR-A).
+- [→ L8-T03] Tín hiệu máy đọc được cho tin hết hạn (vd `code: "postingClosed"` trong body lỗi) thay cho quy ước "400 không details"; sửa comment `job-applications.ts:58`, `ApplyForm.tsx:39` (MINOR-A).

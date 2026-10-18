@@ -67,7 +67,7 @@ Mở khoá cho: `layer-10-task-01`
 - Acceptance criteria: 6/6 AC + 4 follow-up đã làm (builder)
 - Verify commands + result: worktree lint/typecheck/build PASS, test 1.599 PASS; sau squash merge cùng L7-T02/T04 trên staging: `pnpm lint` · `pnpm typecheck` · `pnpm test` (155 file, 1.694) · `pnpm build` PASS
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-7-task-03-round-2-review.md`); MINOR r2 (ảnh đầu gallery bị xoá → placeholder, locale ảnh thẻ, RentalDetail ~68 dòng) → follow-up dưới
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): COMPLETE — `.context/review-reports/spec-validation-build-tami-website-layer-7.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ARCHITECTURE.md §4 (lib/rentals, components/rentals) + §5.1 (`MISSING_PAGE_RULES` `/cho-thue/[slug]` → `rentals`, rented 200 noindex) — primary reconcile sau merge; không đổi API_SPEC/ERD
@@ -84,7 +84,7 @@ Mở khoá cho: `layer-10-task-01`
 - [x] Check commands pass (ngoại trừ `contrast.test.ts`: lỗi CRLF môi trường worktree, không do task) (theo `.context/project-config.md`)
 - [x] Reviewer độc lập PASS (mức STRICT)
 - [x] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
 - [x] Committed
 
 ## Files to Create/Modify
@@ -140,4 +140,4 @@ Mở khoá cho: `layer-10-task-01`
 - **MINOR-6:** `src/payload-types.ts` chỉ đổi EOL, primary không stage.
 
 ## Follow-up từ review layer-7-task-03 round 2 (MINOR)
-- [ ] `src/lib/rentals/rental-queries.ts:71`: thẻ tin tương tự lấy `gallery[0]`; ảnh đầu bị xoá → dùng ảnh kế tiếp thay vì placeholder. `:74` truyền `locale` khi đọc ảnh bìa. Gộp với `RentalCard` của L7-T02 ở L8-T03.
+- [→ L8-T03] `src/lib/rentals/rental-queries.ts:71`: thẻ tin tương tự lấy `gallery[0]`; ảnh đầu bị xoá → dùng ảnh kế tiếp thay vì placeholder. `:74` truyền `locale` khi đọc ảnh bìa. Gộp với `RentalCard` của L7-T02 ở L8-T03.

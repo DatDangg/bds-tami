@@ -103,3 +103,8 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 - [ ] Hook reindex `src/hooks/{wards,projects}/reindex-rentals.ts` chạy đồng bộ trong transaction admin → đẩy sang job nền khi số tin vượt ngưỡng.
 - [ ] Đổi tên tỉnh chưa có hook reindex (đang dựa `pnpm reindex:rentals-search`).
 - [ ] Gộp `RentalCardData`/`RentalCard` cục bộ của trang chi tiết (L7-T03, `src/lib/rentals/rental-view.ts`, `SimilarRentals`) với DTO `RentalCard` của `GET /api/public/rentals` (`src/shared/types/api.ts`, L7-T02) — một component thẻ dùng chung.
+
+## Follow-up từ spec-validation layer 7 (G29)
+- [ ] (từ L7-T03) `src/lib/rentals/rental-queries.ts:71` thẻ tin tương tự: ảnh đầu gallery bị xoá → dùng ảnh kế tiếp; `:74` truyền `locale` khi đọc ảnh bìa.
+- [ ] (từ L7-T04) `POST /api/public/job-applications`: thêm `code: "postingClosed"` máy đọc được cho tin hết hạn, `ApplyForm` dựa vào code thay cho quy ước "400 không details"; sửa comment `job-applications.ts:58`, `ApplyForm.tsx:39`, API_SPEC §3.2.
+- [ ] (từ L7-T01) test migration `property_posts` chèn thêm dòng `payload_jobs_log` của `expire-offers` để bắt trường hợp bỏ `DELETE FROM payload_jobs_log` trong `down`.
