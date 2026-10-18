@@ -93,7 +93,7 @@ Mở khoá cho: `layer-12-task-01`, `layer-14-task-01`, `layer-11-task-01`, `lay
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-9-task-02 round 1 (MINOR)
-- [ ] `src/lib/leads/create-or-merge.ts:144-150`: nhánh tạo chạy thêm ~4–6 truy vấn so với gộp → cân nhắc đệm thời gian phản hồi tối thiểu cho `POST /api/public/leads` (hoặc ghi residual chấp nhận).
-- [ ] `tests/integration/leads-public.test.ts:318-331`: test rollback thực ra lỗi ở job `lead-assigned` — thêm case `source: "project"` để lỗi rơi đúng `queueNewLeadEmail`.
-- [ ] `src/hooks/leads/lead-activity-hooks.ts:42-46`: admin gửi `lead` dạng object/số → kiểm UUID + test 400 (không 500).
-- [ ] `src/endpoints/public/leads.ts:44-47`: body chunked không `Content-Length` bị đọc hết vào bộ nhớ trước khi so giới hạn → đọc stream có giới hạn.
+- [x] `src/lib/leads/create-or-merge.ts:144-150`: nhánh tạo chạy thêm ~4–6 truy vấn so với gộp → cân nhắc đệm thời gian phản hồi tối thiểu cho `POST /api/public/leads` (hoặc ghi residual chấp nhận).
+- [x] `tests/integration/leads-public.test.ts:318-331`: test rollback thực ra lỗi ở job `lead-assigned` — thêm case `source: "project"` để lỗi rơi đúng `queueNewLeadEmail`.
+- [x] `src/hooks/leads/lead-activity-hooks.ts:42-46`: admin gửi `lead` dạng object/số → kiểm UUID + test 400 (không 500).
+- [x] `src/endpoints/public/leads.ts:44-47`: body chunked không `Content-Length` bị đọc hết vào bộ nhớ trước khi so giới hạn → đọc stream có giới hạn.

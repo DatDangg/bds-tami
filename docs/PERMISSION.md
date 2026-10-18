@@ -114,6 +114,8 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 4. `rateLimit`: cho thao tác nặng (xuất Excel).
 5. `validate` → handler → `auditLog` nếu là thao tác nhạy cảm (§6).
 
+> As-built (L10-T02): `POST /api/admin/translations/:collection/:id` kiểm theo thứ tự 401 → allowlist + định dạng id (404) → rate limit 30/giờ/user (429; Redis lỗi 503) → quyền sửa theo `access.update` của collection/global (404, cùng thông báo) → trạng thái dịch (409/503) → audit fail-closed → xếp job (202). `POST /api/admin/translations/pages/:id/approve`: 401 → 403 (không phải admin, trước khi đọc DB) → 400 → 404 → 409 → 422 → update + audit cùng transaction. Chi tiết: `docs/API_SPEC.md` §5.1, §5.2.
+
 ## 6. Thao tác bắt buộc ghi audit log
 
 Phân công / đổi người phụ trách lead · Xuất Excel lead · Xem / tải CV · Xoá mềm, khôi phục, xoá hẳn nội dung · Tạo / khoá / mở lại / xoá tài khoản, đổi vai trò, đặt lại mật khẩu · Đăng nhập thất bại · Bấm "Dịch lại bằng AI" · Duyệt bản tiếng Anh trang pháp lý.

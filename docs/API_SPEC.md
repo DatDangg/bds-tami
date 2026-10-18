@@ -195,6 +195,7 @@ Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/internal/revalida
 | `GET` | `/api/admin/private-files/:id/download` | admin | Tải CV. Ghi audit log `application.view_cv` | FR-ADM-05 |
 | `GET` | `/api/admin/dashboard` | admin (toàn bộ), sale (số liệu lead của mình) | Số liệu dashboard (admin thấy thêm: số bài dịch lỗi / chờ duyệt, chi phí dịch tháng này) | FR-ADM-14 |
 | `POST` | `/api/admin/translations/:collection/:id` | admin; sale với bài của mình | "Dịch lại bằng AI" (§5.1) | FR-ADM-18 |
+| `POST` | `/api/admin/translations/pages/:id/approve` | admin | Duyệt bản EN trang pháp lý, đường duy nhất bật `pages.hasEnglish` (§5.2). Audit `content.approve_translation` | BR-08 |
 
 Thứ tự kiểm tra: `docs/PERMISSION.md` §5. Giới hạn: xuất Excel 10 lần / giờ / user.
 

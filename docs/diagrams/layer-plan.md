@@ -42,7 +42,7 @@
 | 7 | Đăng tin BĐS, SearchService, chi tiết Cho thuê, form ứng tuyển | 4 | `01` Collection `property-posts` (Đăng tin BĐS) + job `expire-offers`<br>`02` `SearchService` + `GET /api/public/rentals` + index trigram<br>`03` Trang Chi tiết tin cho thuê (S07), gồm trạng thái "Đã thuê" và tin tương tự<br>`04` Form ứng tuyển trên trang chi tiết tuyển dụng | — |
 | 8 | Global trang chủ, dữ liệu lead, danh sách Cho thuê, trang Đăng tin BĐS, sitemap | 5 | `01` Global `homepage` (khối, thứ tự, hero video tuỳ chọn, CTA banner)<br>`02` Collection `leads` + `lead-activities` (trạng thái, ghi chú, quyền theo người được giao)<br>`03` Trang Danh sách Cho thuê (S04): bộ lọc trên URL, tìm không dấu, sắp xếp<br>`04` Trang Đăng tin BĐS: danh sách theo danh mục + chi tiết (S08, S09)<br>`05` `sitemap.xml` (vi + en, alternates), `robots.txt`, `llms.txt` | — |
 | 9 | Trang chủ, nghiệp vụ lead (endpoint, phân công, nhắc, xuất, lưu trữ), dịch tự động | 7 | `01` Trang chủ (S01): hero slide, Về TAMI, dự án nổi bật, dịch vụ, ưu đãi, CTA<br>`02` Endpoint `POST /api/public/leads`: chống spam, chống trùng 7 ngày, tự giao, email<br>`03` Phân công lead: hook `leads.afterChange` (nơi duy nhất) + `POST /api/admin/leads/:id/assign`<br>`04` Job `remind-unassigned-leads` theo giờ hành chính (BR-14)<br>`05` Xuất lead ra Excel `GET /api/admin/leads/export` + audit<br>`06` Job `data-retention`: ẩn danh lead 24 tháng, xoá CV 12 tháng, dọn log<br>`07` Job `translate-content` + hook tự dịch khi lưu bản `vi` đã xuất bản / global | — |
-| 10 | Tích hợp: form lead, admin dịch, hoàn thiện bản EN | 3 | `01` Ráp form lead vào chi tiết Cho thuê, Đăng tin BĐS, Dự án, Liên hệ<br>`02` Admin dịch: nút "Dịch lại bằng AI", lọc trạng thái dịch, duyệt bản EN trang pháp lý, cảnh báo lỗi dịch<br>`03` Hoàn thiện bản EN công khai: `en.json`, chuyển ngôn ngữ đúng trang tương ứng, hreflang toàn site | ⏸ M2 |
+| 10 | Tích hợp: form lead, admin dịch, hoàn thiện bản EN (+ 2 task bổ sung từ spec-validation layer 9) | 5 | `01` Ráp form lead vào chi tiết Cho thuê, Đăng tin BĐS, Dự án, Liên hệ<br>`02` Admin dịch: nút "Dịch lại bằng AI", lọc trạng thái dịch, duyệt bản EN trang pháp lý, cảnh báo lỗi dịch<br>`03` Hoàn thiện bản EN công khai: `en.json`, chuyển ngôn ngữ đúng trang tương ứng, hreflang toàn site<br>`04` Phản hồi chờ phía client cho các trang danh sách (D5)<br>`05` Xoá CV an toàn khi S3 lỗi + quét object mồ côi (BL-008) | ⏸ M2 |
 | 11 | E2E smoke (Playwright) | 1 | `01` E2E smoke (Playwright): trang chủ, lọc cho thuê, gửi lead, ứng tuyển, chuyển EN | — |
 | 12 | Redeploy staging đủ Must + giám sát/backup + chạy E2E trên staging | 1 | `01` Redeploy staging bản đủ Must + bật giám sát/backup + chạy E2E smoke trên staging | ⏸ M3 |
 | 13 | Should: dashboard, redirect UI, trang khu vực, đối tác | 4 | `01` Dashboard admin (FR-ADM-14): lead, nội dung, lượt bấm, cảnh báo dịch, chi phí dịch<br>`02` Quản lý chuyển hướng 301 trong admin (FR-ADM-15): kiểm tra hợp lệ, chống vòng/chuỗi<br>`03` Trang đích khu vực Cho thuê (FR-PUB-16, S06)<br>`04` Khối Đối tác / chủ đầu tư trên trang chủ (FR-PUB-17) | ⏸ M4 |
@@ -141,6 +141,8 @@ flowchart TB
     n_leadform["01 Ráp form lead vào chi tiết Cho thuê, Đăng tin BĐ"]
     n_tadmin["02 Admin dịch"]
     n_enpublic["03 Hoàn thiện bản EN công khai"]
+    n_pending["04 Phản hồi chờ danh sách (D5)"]
+    n_cvdelete["05 Xoá CV an toàn + quét mồ côi (BL-008)"]
   end
   subgraph L11["Layer 11: E2E smoke"]
     n_e2e["01 E2E smoke"]

@@ -483,7 +483,7 @@
       "completedAt": "2026-10-18T15:10:17.332Z"
     }
   ],
-  "inProgressTask": [],
+  "inProgressTask": null,
   "blockedTasks": [
     {
       "task": "layer-4/task-06",
@@ -632,9 +632,24 @@
       "date": "2026-10-19T00:30:00Z",
       "decision": "Layer 9: D5 phản hồi chờ phía client → task mới layer-10-task-04; BL-008 xoá CV an toàn khi S3 lỗi → task mới layer-10-task-05 (đều trước M2); CHƯA push staging — push + cập nhật nginx chặn /api/internal/ (G30) gộp một lần trước M2; dừng sau layer 9 chờ lệnh chạy layer 10",
       "reason": "User duyệt checkpoint layer 9"
+    },
+    {
+      "date": "2026-10-18",
+      "scope": "layer-10-task-02",
+      "decision": "Trang pháp lý bị AI dịch lại (nút Dịch lại hoặc tự dịch khi sửa bản Việt) → hasEnglish=false + pending_review, ẩn /en tới khi admin duyệt"
+    },
+    {
+      "date": "2026-10-18",
+      "scope": "layer-10-task-02",
+      "decision": "Admin duyệt được mọi bản EN pháp lý khi hasEnglish còn tắt (bản AI hoặc sửa tay, kể cả khi dịch tắt); thiếu trường EN → 422"
+    },
+    {
+      "date": "2026-10-18",
+      "scope": "layer-10-task-02",
+      "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T15:10:17.332Z",
+  "lastUpdated": "2026-10-18T19:50:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -741,6 +756,12 @@
       "note": "46/47 AC. D5 một phần (loading.tsx bỏ vì soft-404) chờ user; BL-008 (CV mồ côi khi S3 lỗi) chờ lịch; G33 primary dọn (task file, BACKLOG BL-009, MINOR L9-T07 → L10-T02). M2 còn L10-T01/T02/T03. G30 nginx trước push (26 commit chưa push). Staging budget dịch = 0 → không gọi API. User duyệt 2026-10-19: D5 → layer-10-task-04; BL-008 → layer-10-task-05 (trước M2); chưa push staging (push + nginx G30 gộp trước M2); dừng sau layer 9.",
       "approvedAt": "2026-10-19T00:30:00Z",
       "approvedBy": "user"
+    },
+    {
+      "layer": 10,
+      "verdict": "GAPS",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-10.md",
+      "note": "24/24 AC, không thiếu Must, chức năng sẵn sàng M2. Gap: G34 (MEDIUM) /lien-he?service= không điền sẵn dịch vụ — chờ user; G35 chi tiết lead form (nút rented, form rút gọn, đếm ký tự, hotline cảm ơn, GA4 generate_lead) — chờ user; G36 header trong suốt dự án/dịch vụ → L14-T02; G37/G38 primary đã reconcile (API_SPEC §3.6 + §4, ARCHITECTURE, PERMISSION §5, layer-plan, tick follow-up, decisions). Trước M2: push staging + nginx G30."
     }
   ]
 }
