@@ -74,6 +74,30 @@ describe("createAnthropicClient (SDK thật, fetch giả)", () => {
     expect(JSON.stringify((sent.body as { output_config: unknown }).output_config)).toContain("translations");
   });
 
+  it("khoá shape output_config: chỉ { format: { type: json_schema, schema } }, schema đòi translations[{id,text}] và không cho trường thừa (MINOR-C)", async () => {
+    const { impl, requests } = fakeFetch(() => messageResponse('{"translations":[]}'));
+    await createAnthropicClient({ apiKey: "k", fetch: impl, maxRetries: 0 }).translate(request);
+    const outputConfig = structuredClone((requests[0]!.body as { output_config: { format: { schema: Record<string, unknown> } } }).output_config);
+    // `description` ở gốc schema là ghi chú do SDK/zod tự sinh (không thuộc hợp đồng với API): bỏ ra khỏi phép so.
+    delete outputConfig.format.schema.description;
+    expect(outputConfig).toEqual({
+      format: {
+        type: "json_schema",
+        schema: {
+          type: "object",
+          properties: {
+            translations: {
+              type: "array",
+              items: { type: "object", properties: { id: { type: "string" }, text: { type: "string" } }, required: ["id", "text"], additionalProperties: false },
+            },
+          },
+          required: ["translations"],
+          additionalProperties: false,
+        },
+      },
+    });
+  });
+
   const usage = { inputTokens: 120, outputTokens: 34, cacheCreationTokens: 5, cacheReadTokens: 7 };
   const run = (text: string, stopReason: string) =>
     createAnthropicClient({ apiKey: "k", fetch: fakeFetch(() => messageResponse(text, stopReason)).impl, maxRetries: 0 }).translate(request);

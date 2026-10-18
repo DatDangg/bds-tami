@@ -160,6 +160,7 @@ export interface Config {
       'expire-offers': TaskExpireOffers;
       'remind-unassigned-leads': TaskRemindUnassignedLeads;
       'data-retention': TaskDataRetention;
+      'translate-content': TaskTranslateContent;
       inline: {
         input: unknown;
         output: unknown;
@@ -1266,7 +1267,8 @@ export interface PayloadJob {
           | 'close-job-postings'
           | 'expire-offers'
           | 'remind-unassigned-leads'
-          | 'data-retention';
+          | 'data-retention'
+          | 'translate-content';
         taskID: string;
         input?:
           | {
@@ -1308,6 +1310,7 @@ export interface PayloadJob {
         | 'expire-offers'
         | 'remind-unassigned-leads'
         | 'data-retention'
+        | 'translate-content'
       )
     | null;
   queue?: string | null;
@@ -2813,7 +2816,7 @@ export interface CollectionsWidget {
  */
 export interface TaskSendNotificationEmail {
   input: {
-    template: 'new-lead' | 'lead-assigned' | 'job-application' | 'unassigned-reminder';
+    template: 'new-lead' | 'lead-assigned' | 'job-application' | 'unassigned-reminder' | 'translation-budget-exceeded';
     to: string[];
     data?:
       | {
@@ -2887,6 +2890,23 @@ export interface TaskDataRetention {
     orphanCvsDeleted: number;
     auditLogsDeleted: number;
     failedJobsDeleted: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskTranslate-content".
+ */
+export interface TaskTranslateContent {
+  input: {
+    kind: 'collection' | 'global';
+    slug: string;
+    docId?: string | null;
+    force?: boolean | null;
+  };
+  output: {
+    outcome: string;
+    reason?: string | null;
+    fields?: number | null;
   };
 }
 /**

@@ -44,18 +44,18 @@ Tự dịch các trường localized đã đổi sang `en`, sinh slug EN, bật 
 Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 
 ## Acceptance Criteria
-- [ ] Bản sao (Duplicate) giữ nguyên nhóm `translation` (status/sourceHash/enSource) → reset nhóm trong `beforeDuplicate` hoặc job coi bản sao là chưa dịch; có test (`src/fields/translation.ts:24-46`, MINOR-1) (review L5-T03 round 1)
-- [ ] Job chỉ retry lỗi tạm thời (`rate_limited`, `provider_unavailable`); KHÔNG retry `invalid_input`, `invalid_output`, `refused`, `truncated`, `budget_exceeded`, `not_configured`, `not_allowed` (tránh trả tiền lặp) — có test (review L4-T04 round 2 MINOR-A)
-- [ ] Giảm chặn nhầm trong `validateModelOutput` (`src/lib/translation/segments.ts`): chỉ chặn `<` khi mở thẻ HTML; bỏ dấu câu cuối URL trước khi so URL nguồn; test với `≥/≤/→`, "trên 100m2" → "over 100m2", URL kèm dấu câu; test chia lô với nội dung khác nhau mỗi item + assert dừng khi chạm hạn mức giữa lô + khoá shape `output_config` (review L4-T04 round 2 MINOR-B/C)
-- [ ] Lưu bản `vi` `published` (hoặc global) → enqueue 1 job/bản ghi (gộp nhiều lần lưu trong ~1 phút)
-- [ ] Chỉ dịch trường có `sourceHash` đổi; `enSource=manual` → không dịch đè, đặt `viChangedAfterManual=true` khi bản vi đổi
-- [ ] Sửa tay bất kỳ trường `en` → `enSource=manual`
-- [ ] Dịch xong: điền trường en, sinh slug en (unique), bật `hasEnglish` khi đủ trường bắt buộc, `translation.status=done`, `model`, `translatedAt`, revalidate đường dẫn `/en`
-- [ ] `pages`: dịch xong đặt `pending_review`, **không** bật `hasEnglish`
-- [ ] Lỗi: thử 3 lần backoff; vẫn lỗi → `status=failed`, `lastError` (không chứa nội dung); vượt hạn mức → dừng + email admin
-- [ ] `site-settings.translationEnabled=false` → không enqueue
-- [ ] Mục tiêu bản EN lên web ≤ 10 phút sau xuất bản (đo trên dev với SDK mock + độ trễ)
-- [ ] Job translate-content chỉ gửi field localized công khai của collection (allowlist theo field), có test — review L4-T04 round 1 MINOR-1
+- [x] Bản sao (Duplicate) giữ nguyên nhóm `translation` (status/sourceHash/enSource) → reset nhóm trong `beforeDuplicate` hoặc job coi bản sao là chưa dịch; có test (`src/fields/translation.ts:24-46`, MINOR-1) (review L5-T03 round 1)
+- [x] Job chỉ retry lỗi tạm thời (`rate_limited`, `provider_unavailable`); KHÔNG retry `invalid_input`, `invalid_output`, `refused`, `truncated`, `budget_exceeded`, `not_configured`, `not_allowed` (tránh trả tiền lặp) — có test (review L4-T04 round 2 MINOR-A)
+- [x] Giảm chặn nhầm trong `validateModelOutput` (`src/lib/translation/segments.ts`): chỉ chặn `<` khi mở thẻ HTML; bỏ dấu câu cuối URL trước khi so URL nguồn; test với `≥/≤/→`, "trên 100m2" → "over 100m2", URL kèm dấu câu; test chia lô với nội dung khác nhau mỗi item + assert dừng khi chạm hạn mức giữa lô + khoá shape `output_config` (review L4-T04 round 2 MINOR-B/C)
+- [x] Lưu bản `vi` `published` (hoặc global) → enqueue 1 job/bản ghi (gộp nhiều lần lưu trong ~1 phút)
+- [x] Chỉ dịch trường có `sourceHash` đổi; `enSource=manual` → không dịch đè, đặt `viChangedAfterManual=true` khi bản vi đổi
+- [x] Sửa tay bất kỳ trường `en` → `enSource=manual`
+- [x] Dịch xong: điền trường en, sinh slug en (unique), bật `hasEnglish` khi đủ trường bắt buộc, `translation.status=done`, `model`, `translatedAt`, revalidate đường dẫn `/en`
+- [x] `pages`: dịch xong đặt `pending_review`, **không** bật `hasEnglish`
+- [x] Lỗi: thử 3 lần backoff; vẫn lỗi → `status=failed`, `lastError` (không chứa nội dung); vượt hạn mức → dừng + email admin
+- [x] `site-settings.translationEnabled=false` → không enqueue
+- [x] Mục tiêu bản EN lên web ≤ 10 phút sau xuất bản (đo trên dev với SDK mock + độ trễ)
+- [x] Job translate-content chỉ gửi field localized công khai của collection (allowlist theo field), có test — review L4-T04 round 1 MINOR-1
 
 ## Tests cần viết
 - Integration (SDK mock): publish vi → job → en đủ trường, hasEnglish=true
@@ -69,18 +69,18 @@ Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 - Reviewer report path: `.context/review-reports/build-tami-website-layer-9-task-07-round-<R>-review.md`
 
 ## Migration
-- Không đụng schema (không tạo migration).
+- Cần migration `20261018_140000_translate_content` (`migrations/20261018_140000_translate_content.ts`): chỉ `ADD VALUE IF NOT EXISTS 'translate-content'` vào hai enum `task_slug` của `payload_jobs` / `payload_jobs_log` (additive, không đổi bảng nội dung, không backfill; `down` xoá dòng job của task rồi dựng lại enum). Cờ gửi email hạn mức dùng bảng `payload_kv` sẵn có, không thêm bảng/cột.
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 2
+- Last failure type (round 1): MAJOR-1 lost update — job ghi lại field top-level từ bản đọc trước khi gọi API
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
 - Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (214 file, 2.284) · `pnpm build` PASS; migration up→down→down→up; đã áp DB dev
+- Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-9-task-07-round-2-review.md`); MINOR A/B/C → `layer-10-task-03.md`
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
@@ -93,13 +93,13 @@ Mở khoá cho: `layer-10-task-02`, `layer-16-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-9/task-07` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/jobs/translate-content.ts

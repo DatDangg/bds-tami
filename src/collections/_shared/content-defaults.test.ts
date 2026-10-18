@@ -79,8 +79,9 @@ describe("withContentDefaults: omit (G7)", () => {
   it("route: null bỏ hook làm mới cache + redirect slug, vẫn giữ hook audit", () => {
     const withRoute = withContentDefaults(base);
     const withoutRoute = withContentDefaults(base, { route: null });
-    expect(withRoute.hooks?.afterChange).toHaveLength(3);
-    expect(withoutRoute.hooks?.afterChange).toHaveLength(1);
+    expect(withRoute.hooks?.afterChange).toHaveLength(4);
+    // audit + xếp job dịch (hook dịch luôn có, không phụ thuộc route).
+    expect(withoutRoute.hooks?.afterChange).toHaveLength(2);
     expect(withoutRoute.hooks?.afterDelete).toHaveLength(1);
   });
 

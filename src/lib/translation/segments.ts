@@ -23,8 +23,11 @@ export interface TranslationPlan {
 }
 
 const MAX_TOTAL_CHARS = 60_000;
-const HTML_TAG_PATTERN = /<\/?[a-z!][^>]*>/i;
+/** Mở thẻ HTML (`<b`, `</p`, `<!--`, `<?`): chỉ `<` đứng trước chữ/`/`/`!`/`?` mới là dấu hiệu HTML. `<` so sánh ("< 100m2") và `>` ("->", ">= 50") không bị chặn. */
+const HTML_TAG_PATTERN = /<[a-z/!?]/i;
 const URL_PATTERN = /(?:https?:\/\/|www\.)[^\s)\]]+/gi;
+/** Dấu câu cuối câu dính vào URL (`...a.`, `...a,`): model hay dời/đổi dấu câu nên bỏ đi trước khi so với URL nguồn. */
+const TRAILING_URL_PUNCTUATION = /[.,;:!?'"’”»…]+$/u;
 
 function splitEdges(raw: string): { leading: string; core: string; trailing: string } {
   const core = raw.trim();
@@ -95,12 +98,13 @@ export function planItems(items: readonly TranslationItem[]): TranslationPlan {
   };
 }
 
-/** Model chèn URL, markdown link hoặc `<`/`>` mà đoạn nguồn không có (dấu hiệu prompt injection trong nội dung bài). */
+const urlsOf = (text: string): string[] => (text.match(URL_PATTERN) ?? []).map((url) => url.replace(TRAILING_URL_PUNCTUATION, ""));
+
+/** Model chèn URL hoặc markdown link mà đoạn nguồn không có (dấu hiệu prompt injection trong nội dung bài). HTML do `HTML_TAG_PATTERN` chặn riêng. */
 function hasInjectedLink(source: string, translated: string): boolean {
-  const sourceUrls = new Set(source.match(URL_PATTERN) ?? []);
-  if ((translated.match(URL_PATTERN) ?? []).some((url) => !sourceUrls.has(url))) return true;
-  if (translated.includes("](") && !source.includes("](")) return true;
-  return (translated.includes("<") && !source.includes("<")) || (translated.includes(">") && !source.includes(">"));
+  const sourceUrls = new Set(urlsOf(source));
+  if (urlsOf(translated).some((url) => !sourceUrls.has(url))) return true;
+  return translated.includes("](") && !source.includes("](");
 }
 
 /**

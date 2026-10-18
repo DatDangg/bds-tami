@@ -3,6 +3,8 @@ import type { GlobalAfterReadHook, GlobalConfig, TextFieldSingleValidation, Uplo
 import { denyAll, hideFromNonAdmin, isAdmin } from "../access";
 import { translationGroup } from "../fields/translation";
 import { createRevalidateGlobal, type RevalidateTags } from "../hooks/revalidate-global";
+import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
+import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { trimText } from "../hooks/trim-text";
 import { isHttpUrl } from "../lib/content/nav-link";
 
@@ -55,7 +57,8 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
     access: { read: () => true, update: isAdmin },
     hooks: {
       afterRead: [stripInternalFields],
-      afterChange: [createRevalidateGlobal("site-settings", revalidate)],
+      beforeChange: [detectManualEnglishGlobal],
+      afterChange: [createRevalidateGlobal("site-settings", revalidate), enqueueTranslation.globalAfterChange],
     },
     fields: [
       { name: "siteName", type: "text", localized: true, required: true },

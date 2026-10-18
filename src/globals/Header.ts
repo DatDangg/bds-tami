@@ -4,6 +4,8 @@ import { hideFromNonAdmin, isAdmin } from "../access";
 import { translationGroup } from "../fields/translation";
 import { navLinkField } from "../fields/nav-link";
 import { createRevalidateGlobal, type RevalidateTags } from "../hooks/revalidate-global";
+import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
+import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 
 const labelField: Field = { name: "label", type: "text", localized: true, required: true };
 
@@ -14,7 +16,7 @@ export function createHeader(revalidate?: RevalidateTags): GlobalConfig {
     label: "Menu đầu trang",
     admin: { hidden: hideFromNonAdmin },
     access: { read: () => true, update: isAdmin },
-    hooks: { afterChange: [createRevalidateGlobal("header", revalidate)] },
+    hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateGlobal("header", revalidate), enqueueTranslation.globalAfterChange] },
     fields: [
       {
         name: "navItems",

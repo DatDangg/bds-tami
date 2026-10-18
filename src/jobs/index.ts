@@ -7,6 +7,7 @@ import { dataRetentionTask } from "./data-retention";
 import { expireOffersTask } from "./expire-offers";
 import { remindUnassignedLeadsTask } from "./remind-unassigned-leads";
 import { sendNotificationEmailTask } from "./send-notification-email";
+import { translateContentTask } from "./translate-content";
 
 /**
  * Cấu hình Payload Jobs (ARCHITECTURE §5.4, D3). Hàng đợi lưu trong Postgres (`payload-jobs`).
@@ -16,7 +17,7 @@ import { sendNotificationEmailTask } from "./send-notification-email";
  * dọn dữ liệu, dịch) và lịch cron của chúng được thêm vào `tasks` ở task của từng nghiệp vụ.
  */
 export const jobsConfig: JobsConfig = {
-  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask, remindUnassignedLeadsTask, dataRetentionTask],
+  tasks: [sendNotificationEmailTask, aggregateClickStatsTask, closeJobPostingsTask, expireOffersTask, remindUnassignedLeadsTask, dataRetentionTask, translateContentTask],
   // Input chứa dữ liệu khách; job xong thì xoá để không giữ dữ liệu cá nhân trong bảng hàng đợi.
   deleteJobOnComplete: true,
   // Mặc định mọi user đăng nhập được chạy/xếp/huỷ job qua REST; chỉ admin mới được.

@@ -87,3 +87,25 @@ export async function recordUsage(payload: Payload, month: string, usage: UsageF
       updated_at = now()
   `);
 }
+
+const budgetAlertKey = (month: string) => `translation-budget-alert:${month}`;
+
+/**
+ * Giành quyền gửi email "vượt hạn mức" của tháng: `INSERT ... ON CONFLICT (key) DO NOTHING` trên `payload_kv` (unique `key`) nên đúng MỘT bên thắng dù
+ * nhiều job chạy song song. Trả `true` = bên gọi được gửi. Không cần bảng/cột mới; chạy trên pool như `recordUsage`.
+ */
+export async function claimBudgetAlert(payload: Payload, month: string): Promise<boolean> {
+  const adapter = payload.db as unknown as PostgresAdapter;
+  const result = await adapter.drizzle.execute(sql`
+    INSERT INTO payload_kv ("key", "data") VALUES (${budgetAlertKey(month)}, '{}'::jsonb)
+    ON CONFLICT ("key") DO NOTHING
+    RETURNING "id"
+  `);
+  return result.rows.length > 0;
+}
+
+/** Nhả quyền gửi khi việc xếp email thất bại, để lần chạm hạn mức sau còn thử lại được. */
+export async function releaseBudgetAlert(payload: Payload, month: string): Promise<void> {
+  const adapter = payload.db as unknown as PostgresAdapter;
+  await adapter.drizzle.execute(sql`DELETE FROM payload_kv WHERE "key" = ${budgetAlertKey(month)}`);
+}

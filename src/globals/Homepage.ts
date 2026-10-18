@@ -7,6 +7,8 @@ import { seoField } from "../fields/seo";
 import { translationGroup } from "../fields/translation";
 import { createRevalidateHomepageGlobal, type HomepageRevalidators } from "../hooks/homepage/revalidate-homepage";
 import { isFilled } from "../hooks/require-english-fields";
+import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
+import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { defaultLocale } from "../i18n/routing";
 
 const MB = 1024 * 1024;
@@ -190,7 +192,7 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
     label: "Trang chủ",
     admin: { hidden: hideFromNonAdmin },
     access: { read: () => true, update: isAdmin },
-    hooks: { afterChange: [createRevalidateHomepageGlobal(revalidators)] },
+    hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateHomepageGlobal(revalidators), enqueueTranslation.globalAfterChange] },
     fields: [
       heroBlock,
       aboutBlock,

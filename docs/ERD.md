@@ -43,7 +43,7 @@ Cấu hình: `localization: { locales: ['vi', 'en'], defaultLocale: 'vi', fallba
 | `status` | select, I | `none` (chưa dịch) · `queued` · `done` · `failed` · `pending_review` (trang pháp lý chờ admin duyệt) |
 | `enSource` | select | `ai` · `manual`. Nhân viên sửa bất kỳ trường `en` nào → `manual`, AI không dịch đè |
 | `viChangedAfterManual` | checkbox, I | Bản `vi` đổi sau khi bản `en` đã sửa tay → nhắc trong admin |
-| `sourceHash` | text | Hash từng trường `vi` lần dịch gần nhất (json `{field: hash}`), để chỉ dịch trường đã đổi |
+| `sourceHash` | text | Hash từng trường `vi` lần dịch gần nhất (json `{khoá-trường: sha256}`, khoá array theo `id` hàng, vd `navItems.<id>.label`), để chỉ dịch trường đã đổi. Khi người sửa tay `en` → đặt lại bằng hash `vi` hiện tại (mốc so cho `viChangedAfterManual`). Nhân bản (Duplicate) đặt lại cả nhóm `translation` về chưa dịch |
 | `translatedAt` | date | |
 | `model` | text | Model đã dùng |
 | `lastError` | text | Lỗi lần dịch gần nhất (không chứa nội dung bài) |

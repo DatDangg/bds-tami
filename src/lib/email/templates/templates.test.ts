@@ -61,7 +61,7 @@ describe("render template email nội bộ", () => {
   });
 
   it("danh sách tên template khớp bộ render", () => {
-    expect(EMAIL_TEMPLATE_NAMES).toEqual(["new-lead", "lead-assigned", "job-application", "unassigned-reminder"]);
+    expect(EMAIL_TEMPLATE_NAMES).toEqual(["new-lead", "lead-assigned", "job-application", "unassigned-reminder", "translation-budget-exceeded"]);
   });
 });
 
@@ -104,5 +104,21 @@ describe("unassigned-reminder (BR-14)", () => {
     expect(() => renderEmailTemplate("unassigned-reminder", { ...data, leads: [{ code: "LD-1", leadUrl: "javascript:1" }] })).toThrow();
     const mail = renderEmailTemplate("unassigned-reminder", { ...data, leads: [{ code: "<b>x</b>", leadUrl: data.leads[0]!.leadUrl }] });
     expect(mail.html).not.toContain("<b>x</b>");
+  });
+});
+
+describe("translation-budget-exceeded (BR-08)", () => {
+  const data = { month: "2026-10", adminUrl: "https://tami.example/admin" };
+
+  it("nêu tháng + link admin, không có nội dung khác", () => {
+    const mail = renderEmailTemplate("translation-budget-exceeded", data);
+    expect(mail.subject).toContain("2026-10");
+    expect(mail.html).toContain("https://tami.example/admin");
+    expect(mail.text).toContain("TRANSLATION_MONTHLY_BUDGET_USD");
+  });
+
+  it("tháng sai định dạng hoặc link không http(s) -> lỗi", () => {
+    expect(() => renderEmailTemplate("translation-budget-exceeded", { ...data, month: "2026-13" })).toThrow();
+    expect(() => renderEmailTemplate("translation-budget-exceeded", { ...data, adminUrl: "javascript:1" })).toThrow();
   });
 });

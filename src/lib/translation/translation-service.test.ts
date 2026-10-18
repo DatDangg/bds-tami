@@ -258,8 +258,8 @@ describe("TranslationService: kết quả sai và lỗi (lastError chỉ là mã
     expect(execute).not.toHaveBeenCalled();
   });
 
-  it("URL / markdown link / < > do model chèn mà nguồn không có -> invalid_output; nguồn có sẵn thì giữ", async () => {
-    for (const text of ["Xem https://evil.example", "[tại đây](x)", "a > b", "www.evil.example"]) {
+  it("URL / markdown link / thẻ HTML do model chèn mà nguồn không có -> invalid_output; nguồn có sẵn thì giữ", async () => {
+    for (const text of ["Xem https://evil.example", "[tại đây](x)", "a <b>đậm</b>", "www.evil.example", "https://evil.example."]) {
       const respond: Parameters<typeof fakeClient>[0] = (request) =>
         echoResponse(request, { output: { translations: [{ id: "s0", text }] } });
       await expect(setup({ respond }).service.translate({ target: news, items: [item("Xem thêm")] })).rejects.toMatchObject({ code: "invalid_output" });
@@ -268,6 +268,30 @@ describe("TranslationService: kết quả sai và lỗi (lastError chỉ là mã
     await expect(service.translate({ target: news, items: [item("Xem https://tami.example/a")] })).resolves.toMatchObject({
       values: { title: "EN:Xem https://tami.example/a" },
     });
+  });
+
+  it("không chặn nhầm ký hiệu so sánh: ≥ ≤ → có thể thành >= <= -> < >, \"trên 100m2\" -> \"over 100m2\" (review L4-T04 round 2 MINOR-B)", async () => {
+    const cases: [string, string][] = [
+      ["Diện tích ≥ 50m2", "Area >= 50m2"],
+      ["Giá ≤ 3 tỷ", "Price <= 3 billion"],
+      ["Từ sân bay → trung tâm", "From the airport -> city centre"],
+      ["Dưới 100m2", "Under < 100m2"],
+      ["trên 100m2", "over 100m2"],
+    ];
+    for (const [source, translated] of cases) {
+      const respond: Parameters<typeof fakeClient>[0] = (request) => echoResponse(request, { output: { translations: [{ id: "s0", text: translated }] } });
+      await expect(setup({ respond }).service.translate({ target: news, items: [item(source)] })).resolves.toMatchObject({ values: { title: translated } });
+    }
+  });
+
+  it("URL nguồn kèm dấu câu cuối: model dời/đổi dấu câu vẫn khớp; URL khác vẫn bị chặn (MINOR-B)", async () => {
+    const source = "Xem https://tami.example/a. Hoặc (https://tami.example/b), rồi https://tami.example/c!";
+    const translated = "See https://tami.example/a, or (https://tami.example/b). Then https://tami.example/c.";
+    const ok: Parameters<typeof fakeClient>[0] = (request) => echoResponse(request, { output: { translations: [{ id: "s0", text: translated }] } });
+    await expect(setup({ respond: ok }).service.translate({ target: news, items: [item(source)] })).resolves.toMatchObject({ values: { title: translated } });
+    const other: Parameters<typeof fakeClient>[0] = (request) =>
+      echoResponse(request, { output: { translations: [{ id: "s0", text: "See https://tami.example/a/evil." }] } });
+    await expect(setup({ respond: other }).service.translate({ target: news, items: [item("Xem https://tami.example/a.")] })).rejects.toMatchObject({ code: "invalid_output" });
   });
 
   it("lỗi DB ở bước kiểm hạn mức -> TranslationError mã cố định, không lộ message gốc", async () => {
@@ -279,7 +303,9 @@ describe("TranslationService: kết quả sai và lỗi (lastError chỉ là mã
   });
 
   it("nội dung dài -> chia nhiều lô, mỗi lô một request vừa trần đầu ra, kiểm hạn mức mỗi lô, ghi chi phí mỗi lô", async () => {
-    const items = Array.from({ length: 4 }, (_, index) => item("x".repeat(9_000), `f${index}`));
+    // Mỗi trường một chữ khác nhau: ghép kết quả sai lô/sai thứ tự sẽ lộ ngay (không thể trùng nhau như khi mọi trường cùng nội dung).
+    const letterOf = (index: number) => String.fromCharCode(97 + index);
+    const items = Array.from({ length: 4 }, (_, index) => item(letterOf(index).repeat(9_000), `f${index}`));
     const { service, calls, execute, find } = setup();
     const result = await service.translate({ target: news, items });
     expect(calls.length).toBeGreaterThan(1);
@@ -292,7 +318,16 @@ describe("TranslationService: kết quả sai và lỗi (lastError chỉ là mã
       expect(estimate).toBeLessThan(MAX_OUTPUT_TOKENS);
     }
     expect(Object.keys(result.values)).toEqual(["f0", "f1", "f2", "f3"]);
-    expect(result.values.f3).toBe(`EN:${"x".repeat(9_000)}`);
+    for (const index of [0, 1, 2, 3]) expect(result.values[`f${index}`]).toBe(`EN:${letterOf(index).repeat(9_000)}`);
+  });
+
+  it("chạm hạn mức GIỮA các lô -> dừng, không gọi lô sau, ném budget_exceeded, chi phí lô đã gọi vẫn ghi (MINOR-C)", async () => {
+    const items = Array.from({ length: 4 }, (_, index) => item(String.fromCharCode(97 + index).repeat(9_000), `f${index}`));
+    const { service, calls, execute, find } = setup();
+    find.mockResolvedValueOnce({ docs: [{ estimatedCostUsd: 0 }] }).mockResolvedValue({ docs: [{ estimatedCostUsd: config.monthlyBudgetUsd }] });
+    await expect(service.translate({ target: news, items })).rejects.toMatchObject({ code: "budget_exceeded" });
+    expect(calls).toHaveLength(1);
+    expect(execute).toHaveBeenCalledTimes(1);
   });
 
   it("lô thứ hai bị cắt cụt -> truncated, nhưng chi phí cả hai lô đã ghi; đủ hạn mức giữa chừng thì dừng lô sau", async () => {

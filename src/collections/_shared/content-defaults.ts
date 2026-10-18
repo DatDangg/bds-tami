@@ -14,6 +14,8 @@ import { createSlugRedirect } from "../../hooks/create-slug-redirect";
 import { guardTrashedEdit } from "../../hooks/guard-trashed-edit";
 import { requireEnglishFields } from "../../hooks/require-english-fields";
 import { createRevalidateContent, type RevalidatePaths } from "../../hooks/revalidate-content";
+import { detectManualEnglish } from "../../hooks/translation/detect-manual-en";
+import { enqueueTranslation } from "../../hooks/translation/enqueue-translation";
 import { CONTENT_ROUTES, type ContentRoute } from "../../lib/content/content-paths";
 
 /** Số bản phiên bản giữ lại mỗi bản ghi (ERD §7). */
@@ -120,7 +122,7 @@ function resolveSharedFields(options: ContentOptions, collectionSlug: string): F
 
 /**
  * Bọc cấu hình collection nội dung bằng quy tắc dùng chung: các trường chung, access (PERMISSION §3.1, §4),
- * phiên bản, thùng rác + audit, chặn bật `hasEnglish` khi thiếu EN, làm mới cache vi/en. Cấu hình riêng của
+ * phiên bản, thùng rác + audit, chặn bật `hasEnglish` khi thiếu EN, làm mới cache vi/en, tự dịch VI → EN (nhận diện sửa tay EN + xếp job `translate-content`). Cấu hình riêng của
  * collection thắng mặc định (`access`, `versions`...); hook của collection chạy SAU hook dùng chung.
  */
 export function withContentDefaults(collection: CollectionConfig, options: ContentOptions = {}): CollectionConfig {
@@ -153,10 +155,14 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
         requireEnglishFields(options.englishRequiredFields ?? ["title", "slug"]),
         ...(collection.hooks?.beforeValidate ?? []),
       ],
+      // Nhận diện sửa tay EN chạy TRƯỚC hook riêng của collection (nhìn thấy `data` nguyên vẹn do người dùng gửi).
+      beforeChange: [detectManualEnglish, ...(collection.hooks?.beforeChange ?? [])],
       afterChange: [
         auditContentTrash,
         ...(revalidate ? [revalidate.afterChange] : []),
         ...(route && hasSlug ? [createSlugRedirect({ route, publicStatuses })] : []),
+        // Chỉ collection trong allowlist dịch (`allowlist.ts`) mới được xếp job; hook tự bỏ qua collection khác.
+        enqueueTranslation.collectionAfterChange,
         ...(collection.hooks?.afterChange ?? []),
       ],
       afterDelete: [auditContentPurge, ...(revalidate ? [revalidate.afterDelete] : []), ...(collection.hooks?.afterDelete ?? [])],
