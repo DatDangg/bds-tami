@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { X } from "@/components/icons";
+import { PendingLink } from "@/components/layout/PendingRegion";
 import { formatNumber, formatVndCompact } from "@/lib/format";
 import { type ActiveFilterKind, activeFilterKinds, filtersWithout } from "@/lib/rentals/active-filters";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
@@ -64,7 +64,7 @@ export function ActiveFilters(props: ActiveFiltersProps) {
       <ul className="flex flex-wrap gap-2">
         {chips.map((chip) => (
           <li key={chip.kind}>
-            <Link
+            <PendingLink
               href={chip.href}
               scroll={false}
               aria-label={t("remove", { name: chip.name })}
@@ -72,13 +72,13 @@ export function ActiveFilters(props: ActiveFiltersProps) {
             >
               {chip.name}
               <X size={14} aria-hidden="true" />
-            </Link>
+            </PendingLink>
           </li>
         ))}
       </ul>
-      <Link href={props.listPath} scroll={false} className="inline-flex min-h-11 items-center px-2 text-small font-semibold underline underline-offset-4">
+      <PendingLink href={props.listPath} scroll={false} className="inline-flex min-h-11 items-center px-2 text-small font-semibold underline underline-offset-4">
         {t("clearAll")}
-      </Link>
+      </PendingLink>
     </div>
   );
 }

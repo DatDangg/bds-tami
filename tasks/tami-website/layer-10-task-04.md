@@ -29,10 +29,10 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - `layer-5-task-06` Thành phần trang dùng chung: phân trang, template danh mục (dùng kết quả của task này)
 
 ## Acceptance Criteria
-- [ ] Mọi trang danh sách công khai (`/du-an`, `/tin-tuc` + danh mục, `/tin-bds` + danh mục, `/tuyen-dung`, `/cho-thue` + danh mục) có trạng thái chờ khi bấm phân trang/chip/tab/bộ lọc: vùng kết quả mờ + `aria-busy=true`, link đang chờ có chỉ báo; không chặn thao tác
-- [ ] Không thêm `loading.tsx` (test chặn vẫn xanh); `?page=` vượt vẫn trả HTTP 404
-- [ ] Tôn trọng `prefers-reduced-motion`; không gây CLS; JS client tối thiểu
-- [ ] Ghi gap đề xuất Change Request sửa câu "skeleton khi tải lần đầu" trong design-spec §3.5 (không tự sửa intent doc)
+- [x] Mọi trang danh sách công khai (`/du-an`, `/tin-tuc` + danh mục, `/tin-bds` + danh mục, `/tuyen-dung`, `/cho-thue` + danh mục) có trạng thái chờ khi bấm phân trang/chip/tab/bộ lọc: vùng kết quả mờ + `aria-busy=true`, link đang chờ có chỉ báo; không chặn thao tác
+- [x] Không thêm `loading.tsx` (test chặn vẫn xanh); `?page=` vượt vẫn trả HTTP 404
+- [x] Tôn trọng `prefers-reduced-motion`; không gây CLS; JS client tối thiểu
+- [x] Ghi gap đề xuất Change Request sửa câu "skeleton khi tải lần đầu" trong design-spec §3.5 (không tự sửa intent doc)
 
 ## Tests cần viết
 - RTL: link đang chờ → vùng kết quả `aria-busy`
@@ -46,19 +46,19 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - Không dự kiến. Cần schema → dừng báo user.
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 2
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS
+- Verify commands + result: worktree: lint · typecheck · build PASS; src/components+app+lib 1.344 PASS, tests/integration 650 PASS (contrast CRLF BL-004). Sau squash lên staging (cùng T01): lint · typecheck PASS, src/components+app 544 PASS
+- Reviewer verdict: STRICT PASS round 2 (`.context/review-reports/build-tami-website-layer-10-task-04-round-2-review.md`); round 1 FAIL (MAJOR-1 ActiveFilters/EmptyState chưa PendingLink); MINOR round 2 (link Quay lại danh sách) không xử lý — ngoài yêu cầu
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending
+- Doc impact result: no doc impact; gap design-spec §3.5 → BACKLOG BL-011 (Change Request, không sửa intent doc)
 - Decision log: user duyệt 2026-10-19 (progress.json decisions)
 
 ## Commit / Tracking
@@ -66,13 +66,13 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - Progress: `.context/progress.json`
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/components/layout/Pagination.tsx
@@ -81,3 +81,5 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 
 ## Notes
 - Đọc: `.context/design-spec.md` §3.5, `src/components/rentals/RentalListPage.tsx` (PendingRegion), task file L9-T08 (bảng đo soft-404).
+- **Gap đề xuất Change Request (primary đưa vào BACKLOG):** design-spec §3.5 (S04) còn câu "skeleton khi tải lần đầu"; thực tế không dùng skeleton cấp route vì `loading.tsx` gây soft-404 (L9-T08: 9/9 route, test `list-no-loading.test.ts`). Đề xuất sửa: "Đổi bộ lọc/trang/chip: giữ kết quả cũ, mờ 50% + aria-busy, link đang chờ mờ nhẹ (useLinkStatus); không skeleton cấp route". Design-spec (intent) KHÔNG bị sửa ở task này.
+- Đã làm: `src/components/layout/PendingRegion.tsx` (ListPendingProvider, PendingRegion, PendingLink, FormPendingMarker); Pagination/chip (CategoryListTemplate, /cho-thue) dùng PendingLink; filter /du-an + /tuyen-dung đổi sang next/form + FormPendingMarker; test chặn loading.tsx đi ngược tới app/ (follow-up L13-T03 đã đánh dấu xong).

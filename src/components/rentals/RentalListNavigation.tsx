@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useTransition } from "react";
-import { cn } from "@/lib/utils";
+import { ListPendingProvider, PendingRegion as ListPendingRegion } from "@/components/layout/PendingRegion";
 
 interface RentalListNavigation {
   /** Có lần đổi URL đang chờ server dựng lại danh sách. */
@@ -14,7 +14,7 @@ interface RentalListNavigation {
 const NavigationContext = createContext<RentalListNavigation | null>(null);
 
 /**
- * Bao toàn bộ khu lọc + kết quả của `/cho-thue`: bộ lọc (client) đổi URL, server dựng lại danh sách, `PendingRegion` mờ đi tới khi xong.
+ * Bao toàn bộ khu lọc + kết quả của `/cho-thue`: bộ lọc (client) đổi URL, server dựng lại danh sách, `RentalPendingRegion` mờ đi tới khi xong.
  * `actionPath` là đường dẫn công khai của chính trang (đã có tiền tố ngôn ngữ).
  */
 export function RentalListNavigationProvider({ actionPath, children }: { actionPath: string; children: ReactNode }) {
@@ -25,7 +25,11 @@ export function RentalListNavigationProvider({ actionPath, children }: { actionP
     [actionPath, router],
   );
   const value = useMemo(() => ({ pending, navigate }), [pending, navigate]);
-  return <NavigationContext value={value}>{children}</NavigationContext>;
+  return (
+    <NavigationContext value={value}>
+      <ListPendingProvider>{children}</ListPendingProvider>
+    </NavigationContext>
+  );
 }
 
 export function useRentalListNavigation(): RentalListNavigation {
@@ -34,12 +38,12 @@ export function useRentalListNavigation(): RentalListNavigation {
   return context;
 }
 
-/** Vùng kết quả: đang đổi bộ lọc thì giữ lưới cũ, mờ 50% + `aria-busy` (không nhảy layout, design-spec S04). */
-export function PendingRegion({ children, className }: { children: ReactNode; className?: string }) {
+/** Vùng kết quả của `/cho-thue`: chờ khi đổi bộ lọc (transition) hoặc khi bấm link phân trang/chip (design-spec S04). */
+export function RentalPendingRegion({ children, className }: { children: ReactNode; className?: string }) {
   const { pending } = useRentalListNavigation();
   return (
-    <div aria-busy={pending} className={cn("transition-opacity duration-(--duration-fast)", pending && "opacity-50", className)}>
+    <ListPendingRegion forcePending={pending} {...(className ? { className } : {})}>
       {children}
-    </div>
+    </ListPendingRegion>
   );
 }

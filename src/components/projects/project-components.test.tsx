@@ -72,7 +72,8 @@ describe("ProjectFilters", () => {
       <ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" selectedStatus="upcoming" active />,
     );
     const form = screen.getByRole("form", { name: "Bộ lọc dự án" });
-    expect(form).toHaveAttribute("method", "get");
+    // next/form: GET là mặc định của <form> nên không ghi `method`; vẫn là form GET thường khi không có JS.
+    expect(form.getAttribute("method")).toBeNull();
     expect(form).toHaveAttribute("action", "/du-an");
     expect(screen.getByLabelText("Tỉnh/thành")).toHaveValue("da-nang");
     expect(screen.getByLabelText("Trạng thái")).toHaveValue("upcoming");

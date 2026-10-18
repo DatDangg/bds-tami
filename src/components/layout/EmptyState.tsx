@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { MagnifyingGlass } from "@/components/icons";
+import { PendingLink } from "@/components/layout/PendingRegion";
 import { Button } from "@/components/ui/button";
 
 interface EmptyStateProps {
@@ -29,7 +30,7 @@ export function EmptyState({ variant, title, description, clearFiltersHref, back
       <div className="flex flex-wrap items-center justify-center gap-3">
         {filtered && clearFiltersHref && (
           <Button asChild variant="outline">
-            <Link href={clearFiltersHref}>{t("clearFilters")}</Link>
+            <PendingLink href={clearFiltersHref}>{t("clearFilters")}</PendingLink>
           </Button>
         )}
         {filtered && adviceHref && (

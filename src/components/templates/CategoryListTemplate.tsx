@@ -1,9 +1,9 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { Breadcrumb, type BreadcrumbItem } from "@/components/layout/Breadcrumb";
 import { EmptyState } from "@/components/layout/EmptyState";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Pagination } from "@/components/layout/Pagination";
+import { ListPendingProvider, PendingLink, PendingRegion } from "@/components/layout/PendingRegion";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +39,7 @@ interface CategoryListTemplateProps {
 
 /**
  * Template trang danh mục dùng chung (design-spec S05): banner chữ/ảnh → breadcrumb → chip danh mục con → lưới → phân trang.
- * Server Component thuần bố cục: dữ liệu, metadata, 404 EN khi danh mục không `hasEnglish` do route gọi nó xử lý.
+ * Server Component bố cục (chip/phân trang báo chờ qua `PendingLink` cho `PendingRegion`): dữ liệu, metadata, 404 EN khi danh mục không `hasEnglish` do route gọi nó xử lý.
  */
 // `pr-8` chừa chỗ cho mép mờ để chip cuối cuộn ra khỏi vùng mờ; `py-1 -my-1` để vòng focus không bị `overflow` cắt.
 const CHIP_SCROLL_CLASS =
@@ -65,7 +65,7 @@ export function CategoryListTemplate({
       <ul className={cn("flex gap-2", scrollChips ? CHIP_SCROLL_CLASS : "flex-wrap")}>
         {chips.map((chip) => (
           <li key={chip.href} className={scrollChips ? "shrink-0 snap-start sm:shrink" : undefined}>
-            <Link
+            <PendingLink
               href={chip.href}
               aria-current={chip.current ? "page" : undefined}
               className={cn(
@@ -75,7 +75,7 @@ export function CategoryListTemplate({
               )}
             >
               {chip.label}
-            </Link>
+            </PendingLink>
           </li>
         ))}
       </ul>
@@ -94,17 +94,21 @@ export function CategoryListTemplate({
     <>
       <PageBanner title={title} description={description} image={bannerImage} />
       <Breadcrumb items={breadcrumb} className="py-2" />
-      <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter pt-4 pb-section-tight">
-        {chipsToolbar}
-        {isEmpty ? (
-          (emptyState ?? <EmptyState variant="empty" backHref={parentListHref} />)
-        ) : (
-          <>
-            {children}
-            <Pagination {...pagination} />
-          </>
-        )}
-      </div>
+      <ListPendingProvider>
+        <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter pt-4 pb-section-tight">
+          {chipsToolbar}
+          <PendingRegion className="flex flex-col gap-8">
+            {isEmpty ? (
+              (emptyState ?? <EmptyState variant="empty" backHref={parentListHref} />)
+            ) : (
+              <>
+                {children}
+                <Pagination {...pagination} />
+              </>
+            )}
+          </PendingRegion>
+        </div>
+      </ListPendingProvider>
     </>
   );
 }

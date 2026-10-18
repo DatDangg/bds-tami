@@ -1,17 +1,17 @@
 import config from "@payload-config";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { EmptyState } from "@/components/layout/EmptyState";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Pagination } from "@/components/layout/Pagination";
+import { PendingLink } from "@/components/layout/PendingRegion";
 import { ActiveFilters, useActiveFilterChips } from "@/components/rentals/ActiveFilters";
 import { RentalCard } from "@/components/rentals/RentalCard";
 import { RentalFilters } from "@/components/rentals/RentalFilters";
-import { PendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
+import { RentalPendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
 import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
 import { publicPath } from "@/lib/content/content-paths";
 import { logger } from "@/lib/logger";
@@ -123,20 +123,20 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
             <ul className="-my-1 flex snap-x snap-mandatory gap-2 overflow-x-auto py-1 pr-8 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:pr-0">
               {categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all")).map((chip) => (
                 <li key={chip.href} className="shrink-0 snap-start sm:shrink">
-                  <Link
+                  <PendingLink
                     href={chip.href}
                     aria-current={chip.current ? "page" : undefined}
                     className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full border px-4 text-small font-semibold ${chip.current ? "border-dark bg-dark text-on-dark" : "border-border text-text hover:border-input-border"}`}
                   >
                     {chip.label}
-                  </Link>
+                  </PendingLink>
                 </li>
               ))}
             </ul>
           </nav>
           <RentalFilters filters={filters} options={filterOptions} fixedCategory={categorySlug} focusSearch={isSearchEntry(searchParams)} />
           <ActiveFilters filters={filters} options={filterOptions} listPath={listPath} />
-          <PendingRegion className="flex flex-col gap-6">
+          <RentalPendingRegion className="flex flex-col gap-6">
             {result ? (
               <ResultList
                 result={result}
@@ -153,7 +153,7 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
             ) : (
               <ListError retryHref={`${listPath}${rentalListQueryString(filters)}`} title={t("error.title")} retry={t("error.retry")} />
             )}
-          </PendingRegion>
+          </RentalPendingRegion>
         </div>
       </RentalListNavigationProvider>
     </>
@@ -232,9 +232,9 @@ function Suggestions({ filters, options, listPath }: { filters: RentalFilterValu
     <ul className="flex flex-wrap justify-center gap-3" data-testid="empty-suggestions">
       {chips.map((chip) => (
         <li key={chip.kind}>
-          <Link href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+          <PendingLink href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
             {chip.name}
-          </Link>
+          </PendingLink>
         </li>
       ))}
     </ul>
@@ -245,9 +245,9 @@ function ListError({ retryHref, title, retry }: { retryHref: string; title: stri
   return (
     <div role="alert" className="flex flex-col items-start gap-3 rounded-sm bg-error-subtle p-6">
       <p className="font-semibold">{title}</p>
-      <Link href={retryHref} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+      <PendingLink href={retryHref} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
         {retry}
-      </Link>
+      </PendingLink>
     </div>
   );
 }

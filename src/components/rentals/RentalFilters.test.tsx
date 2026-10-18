@@ -11,7 +11,7 @@ const replace = vi.hoisted(() => vi.fn());
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace }) }));
 
 import { RentalFilters } from "./RentalFilters";
-import { PendingRegion, RentalListNavigationProvider } from "./RentalListNavigation";
+import { RentalPendingRegion, RentalListNavigationProvider } from "./RentalListNavigation";
 
 const options: RentalFilterOptions = {
   categories: [
@@ -40,9 +40,9 @@ function ui(filters: RentalFilterValues, opts: RentalFilterOptions = options, lo
     <NextIntlClientProvider locale={locale} messages={locale === "vi" ? vi_ : en}>
       <RentalListNavigationProvider actionPath={actionPath ?? (locale === "vi" ? "/cho-thue" : "/en/for-rent")}>
         <RentalFilters filters={filters} options={opts} fixedCategory={fixedCategory} />
-        <PendingRegion>
+        <RentalPendingRegion>
           <p>Kết quả</p>
-        </PendingRegion>
+        </RentalPendingRegion>
       </RentalListNavigationProvider>
     </NextIntlClientProvider>
   );

@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { CaretLeft, CaretRight } from "@/components/icons";
+import { PendingLink } from "@/components/layout/PendingRegion";
 import { cn } from "@/lib/utils";
 
 const CELL = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm px-3 text-small font-semibold";
@@ -31,7 +31,7 @@ interface PaginationProps {
 
 /**
  * Phân trang (design-spec §3.6): mọi số trang là `<a href>` thật; trang hiện tại `aria-current="page"`. Mobile chỉ
- * "Trước · Trang 2/12 · Sau". Server Component: không cần JS để đổi trang. Không render khi chỉ có 1 trang.
+ * "Trước · Trang 2/12 · Sau". Link là `PendingLink` (báo chờ cho `PendingRegion`); không cần JS để đổi trang. Không render khi chỉ có 1 trang.
  */
 export function Pagination({ page, totalPages, buildHref }: PaginationProps) {
   const t = useTranslations("page.pagination");
@@ -55,9 +55,9 @@ export function Pagination({ page, totalPages, buildHref }: PaginationProps) {
                 {item}
               </span>
             ) : (
-              <Link href={buildHref(item)} aria-label={t("goToPage", { page: item })} className={cn(CELL, "text-text hover:bg-surface-muted")}>
+              <PendingLink href={buildHref(item)} aria-label={t("goToPage", { page: item })} className={cn(CELL, "text-text hover:bg-surface-muted")}>
                 {item}
-              </Link>
+              </PendingLink>
             )}
           </li>
         ))}
@@ -96,8 +96,8 @@ function StepLink({
     );
   }
   return (
-    <Link href={buildHref(target)} rel={rel} className={cn(CELL, "gap-1 text-text hover:bg-surface-muted")}>
+    <PendingLink href={buildHref(target)} rel={rel} className={cn(CELL, "gap-1 text-text hover:bg-surface-muted")}>
       {content}
-    </Link>
+    </PendingLink>
   );
 }
