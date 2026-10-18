@@ -1,15 +1,12 @@
 "use client";
 
-import { useAuth, useListQuery } from "@payloadcms/ui";
-import { usePathname } from "next/navigation";
+import { useAuth, useListDrawerContext, useListQuery } from "@payloadcms/ui";
 import { useState } from "react";
 
 import { leadExportQueryFromWhere, UNSUPPORTED_FILTER_MESSAGE } from "@/lib/leads/export-filters";
 
 const DEFAULT_FILE_NAME = "tami-leads.xlsx";
 const REVOKE_DELAY_MS = 10_000;
-// Thùng rác dùng chung list view; Payload không truyền viewType xuống client nên nhận biết qua đường dẫn.
-const TRASH_VIEW_PATH = /\/collections\/leads\/trash\/?$/;
 
 /** Thông báo cho người dùng theo mã lỗi của `GET /api/admin/leads/export` (API_SPEC §4). */
 export function exportErrorMessage(status: number, retryAfter: string | null): string {
@@ -32,15 +29,17 @@ function fileNameFrom(contentDisposition: string | null): string {
  * Nút "Xuất Excel" trên danh sách lead, chỉ hiện cho admin (sale không được xuất: PERMISSION §3.3). Xuất đúng bộ lọc đang áp
  * trong danh sách (trạng thái, nguồn, sale, khoảng ngày). Bộ lọc không chuyển được (ô tìm kiếm, nhiều nhóm điều kiện, toán tử lạ)
  * thì nút bị khoá kèm thông báo, không xuất lặng lẽ toàn bộ lead. Dùng fetch thay vì liên kết tải thẳng để
- * lỗi 429/422 hiện thành thông báo thay vì tải về một file JSON lỗi. Ẩn ở thùng rác: endpoint chỉ xuất lead chưa xoá.
+ * lỗi 429/422 hiện thành thông báo thay vì tải về một file JSON lỗi. Thùng rác do `LeadExportSlot` (server) chặn; ở đây chỉ ẩn
+ * trong list drawer (chọn lead từ collection khác): `filterOptions` của drawer không nằm trong `where` nên xuất sẽ rộng hơn danh sách đang thấy.
  */
 export function LeadExportButton() {
   const { user } = useAuth();
   const { query } = useListQuery();
-  const pathname = usePathname();
+  // Ngoài drawer Payload trả context mặc định `{}` (không throw), `isInDrawer` undefined.
+  const { isInDrawer } = useListDrawerContext();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  if (user?.role !== "admin" || TRASH_VIEW_PATH.test(pathname ?? "")) return null;
+  if (user?.role !== "admin" || isInDrawer) return null;
   const converted = query?.search ? ({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE } as const) : leadExportQueryFromWhere(query?.where);
 
   async function exportLeads() {

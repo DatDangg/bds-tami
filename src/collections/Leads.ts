@@ -176,8 +176,8 @@ export const Leads: CollectionConfig = {
     useAsTitle: "code",
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "assigneeInactive", "createdAt"],
     listSearchableFields: ["code", "fullName"],
-    // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Chỉ admin thấy, endpoint kiểm quyền lại.
-    components: { beforeList: ["/components/admin/LeadExportButton#LeadExportButton"] },
+    // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
+    components: { beforeList: ["/components/admin/LeadExportSlot#LeadExportSlot"] },
   },
   defaultSort: "-createdAt",
   trash: true,

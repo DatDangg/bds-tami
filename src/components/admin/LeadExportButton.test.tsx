@@ -5,14 +5,14 @@ const state = vi.hoisted(() => ({
   user: { role: "admin" } as { role: string } | null,
   where: undefined as unknown,
   search: undefined as string | undefined,
-  pathname: "/admin/collections/leads",
+  // Ngoài drawer Payload trả context mặc định `{}` (không có `isInDrawer`).
+  drawer: {} as { isInDrawer?: boolean },
 }));
-
-vi.mock("next/navigation", () => ({ usePathname: () => state.pathname }));
 
 vi.mock("@payloadcms/ui", () => ({
   useAuth: () => ({ user: state.user }),
   useListQuery: () => ({ query: { where: state.where, search: state.search } }),
+  useListDrawerContext: () => state.drawer,
 }));
 
 import { exportErrorMessage, LeadExportButton } from "./LeadExportButton";
@@ -24,7 +24,7 @@ afterEach(() => {
   state.user = { role: "admin" };
   state.where = undefined;
   state.search = undefined;
-  state.pathname = "/admin/collections/leads";
+  state.drawer = {};
 });
 
 describe("exportErrorMessage", () => {
@@ -50,8 +50,8 @@ describe("LeadExportButton", () => {
     expect(container.innerHTML).toBe("");
   });
 
-  it("thùng rác (/trash) không hiện nút: endpoint chỉ xuất lead chưa xoá", () => {
-    state.pathname = "/admin/collections/leads/trash";
+  it("trong list drawer (chọn lead từ collection khác) không hiện nút: bộ lọc của drawer không nằm trong where", () => {
+    state.drawer = { isInDrawer: true };
     const { container } = render(<LeadExportButton />);
     expect(container.innerHTML).toBe("");
   });
@@ -99,7 +99,7 @@ describe("LeadExportButton", () => {
     render(<LeadExportButton />);
     const button = screen.getByRole("button", { name: "Xuất Excel" }) as HTMLButtonElement;
     expect(button.disabled).toBe(true);
-    expect(screen.getByRole("status").textContent).toContain("chưa hỗ trợ xuất");
+    expect(screen.getByRole("status").textContent).toContain('"lớn hơn hoặc bằng"');
     fireEvent.click(button);
     expect(fetchMock).not.toHaveBeenCalled();
   });

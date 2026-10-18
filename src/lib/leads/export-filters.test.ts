@@ -22,6 +22,23 @@ describe("parseLeadExportFilters", () => {
     expect(parse("createdFrom=2026-10-01T19:00:00%2B07:00")).toEqual({ ok: true, filters: { createdFrom: "2026-10-01T12:00:00.000Z" } });
   });
 
+  it("khoảng ngày so theo thời điểm thật (Date.parse), không so chuỗi", () => {
+    // Cùng thời điểm ở hai múi giờ khác nhau -> bằng nhau -> hợp lệ.
+    expect(parse("createdFrom=2026-10-01T19:00:00%2B07:00&createdTo=2026-10-01T12:00:00.000Z").ok).toBe(true);
+    // Chuỗi `+07:00` lớn hơn chuỗi `Z` theo thứ tự ký tự nhưng thời điểm lại nhỏ hơn -> hợp lệ.
+    expect(parse("createdFrom=2026-10-02T01:00:00%2B07:00&createdTo=2026-10-01T19:00:00.000Z").ok).toBe(true);
+    // Ngược lại: bắt đầu (19:00Z) sau kết thúc (18:00Z) -> lỗi.
+    const reversed = parse("createdFrom=2026-10-01T19:00:00.000Z&createdTo=2026-10-02T01:00:00%2B07:00");
+    expect(reversed.ok).toBe(false);
+    if (!reversed.ok) expect(reversed.issues[0]?.path).toEqual(["createdFrom"]);
+  });
+
+  it("năm 9999 cuộn sang +010000 khi đổi về UTC: so chuỗi sai thứ tự, so thời điểm vẫn bắt được khoảng ngược", () => {
+    const result = parse("createdFrom=9999-12-31T23:00:00-05:00&createdTo=9999-12-31T23:00:00.000Z");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues[0]?.path).toEqual(["createdFrom"]);
+  });
+
   it.each([
     ["status=hacked", "status"],
     ["source=%27%3B--", "source"],
@@ -101,5 +118,11 @@ describe("leadExportQueryFromWhere", () => {
     ["giá trị không phải chuỗi", { status: { equals: 5 } }],
   ])("%s -> chặn, không bỏ lặng lẽ", (_name, where) => {
     expect(leadExportQueryFromWhere(where)).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+  });
+
+  it("thông báo khoá nút nêu rõ field + toán tử hỗ trợ (đúng nhãn tiếng Việt của Payload) và thứ không hỗ trợ", () => {
+    for (const expected of ["Trạng thái", "Nguồn", "Sale phụ trách", "Ngày tạo", '"bằng"', '"lớn hơn hoặc bằng"', '"nhỏ hơn hoặc bằng"', "ô tìm kiếm", '"hoặc"']) {
+      expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
+    }
   });
 });

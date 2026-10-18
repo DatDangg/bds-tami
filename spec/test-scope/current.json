@@ -1,96 +1,84 @@
 {
-  "specVersion": "1.8.0",
-  "scopeVersion": 8,
-  "generatedAt": "2026-10-19T20:00:00+07:00",
+  "specVersion": "1.9.0",
+  "scopeVersion": 9,
+  "generatedAt": "2026-10-19T21:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/rentals-reindex-background-job",
-  "backlog": "BL-006",
+  "workItem": "feature/layer9-minor-export-reminder",
+  "backlog": "BL-009",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-rentals-reindex-background-job.md",
+  "changeDoc": "spec/changes/2026-10-19-layer9-minor-export-reminder.md",
   "task": [
-    "tasks/feature-rentals-reindex-background-job/phase-1-task-01.md"
+    "tasks/feature-layer9-minor-export-reminder/phase-1-task-01.md",
+    "tasks/feature-layer9-minor-export-reminder/phase-1-task-02.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-rentals-reindex-background-job.md",
+  "specUpdate": "spec/updates/2026-10-19-layer9-minor-export-reminder.md",
   "specRefs": [
-    "Quy tắc biên — Đổi tên tỉnh / phường / dự án",
-    "F3",
-    "FR-PUB-04",
-    "LGL-01",
-    "F10"
+    "F9",
+    "FR-ADM-09",
+    "FR-ADM-10",
+    "BR-14"
   ],
   "specRefNotes": {
-    "Quy tắc biên — Đổi tên tỉnh / phường / dự án": "SPECIFICATIONS.md § Quy tắc biên: đổi tên tỉnh / phường (tên, tên cũ) / dự án → dựng lại searchText các tin cho thuê thuộc phạm vi; ≤ 500 tin đồng bộ trong lần lưu; > 500 tin xếp 1 job nền Payload Jobs 'reindex-rentals-search' (theo lô, idempotent, retry theo cấu hình Jobs) + form admin hiện cảnh báo 'đang dựng lại chỉ mục tìm kiếm ở chế độ nền' tới khi job xong; lệnh tay pnpm reindex:rentals-search giữ",
-    "F3": "Cho thuê: tìm theo từ khoá không dấu; nút tìm kiếm header → /cho-thue?q=",
-    "FR-PUB-04": "Danh sách Cho thuê: tìm theo từ khóa (gõ không dấu vẫn ra); p95 ≤ 500ms",
-    "LGL-01": "docs/BRD.md: địa giới 2 cấp, lưu thêm tên cũ để tìm kiếm",
-    "F10": "Quản trị danh mục địa danh / dự án trong /admin"
+    "F9": "Lead — xuất Excel (admin, ghi audit log): xuất đúng bộ lọc danh sách lead (trạng thái / nguồn / sale phụ trách 'bằng'; ngày tạo 'lớn hơn hoặc bằng' / 'nhỏ hơn hoặc bằng'); bộ lọc khác → nút khoá + thông báo nêu toán tử hỗ trợ; nút không hiện ở thùng rác và list drawer",
+    "FR-ADM-09": "Quản lý lead trong /admin (danh sách, bộ lọc)",
+    "FR-ADM-10": "Xuất Excel lead (admin)",
+    "BR-14": "Nhắc admin khi lead 'new' chưa có người phụ trách sau 30 phút giờ hành chính — chỉ thêm index DB cho truy vấn job, hành vi không đổi"
   },
   "changed": {
     "files": [
-      "src/lib/search/reindex-in-hook.ts",
-      "src/lib/search/reindex-job-input.ts",
-      "src/jobs/reindex-rentals-search.ts",
-      "src/jobs/index.ts",
-      "src/fields/search-reindex-pending.ts",
-      "src/components/admin/SearchReindexPendingWarning.tsx",
-      "src/collections/Provinces.ts",
-      "src/collections/Wards.ts",
-      "src/collections/Projects.ts",
-      "src/hooks/provinces/reindex-rentals.ts",
-      "src/hooks/wards/reindex-rentals.ts",
-      "src/hooks/projects/reindex-rentals.ts",
-      "migrations/20261018_203017_rentals_reindex_job.ts",
-      "migrations/20261018_203017_rentals_reindex_job.json",
-      "migrations/index.ts",
-      "src/payload-types.ts",
+      "src/lib/leads/export-filters.ts",
+      "src/components/admin/LeadExportButton.tsx",
+      "src/components/admin/LeadExportSlot.tsx",
+      "src/collections/Leads.ts",
       "src/app/(payload)/admin/importMap.js",
-      "docs/ARCHITECTURE.md",
+      "migrations/<mới — CREATE INDEX leads(status, assigned_to_id, reminded_at, created_at)>.ts",
+      "migrations/<mới>.json",
+      "migrations/index.ts",
       "SPECIFICATIONS.md"
     ],
-    "filesNote": "Đã chốt theo code thật (close-out, reviewer round 2 STRICT PASS). Migration additive (ADD VALUE IF NOT EXISTS trên enum payload_jobs), không HIGH_RISK_MIGRATION.",
+    "filesNote": "Danh sách dự kiến theo change doc + task; change-request chốt lại theo code thật ở close-out. Migration additive (CREATE INDEX), không HIGH_RISK_MIGRATION.",
     "modules": [
-      "Tìm kiếm cho thuê (rentals.searchText, /cho-thue?q=)",
-      "Hook reindex khi đổi tên tỉnh / phường / dự án",
-      "Payload Jobs runner (task mới reindex-rentals-search)",
-      "Admin form tỉnh / phường / dự án (cảnh báo reindex nền)",
-      "DB migration (enum task jobs)"
+      "Admin leads — list view / trash view / list drawer (nút xuất Excel)",
+      "Bộ lọc xuất Excel (export-filters, fail-closed)",
+      "Endpoint GET /api/admin/leads/export (contract không đổi)",
+      "Job remind-unassigned-leads (index truy vấn)",
+      "DB migration (index bảng leads)"
     ]
   },
   "impact": {
     "direct": [
-      "Đổi tên tỉnh có ≤ 500 tin cho thuê → lưu xong tìm /cho-thue?q=<tên mới không dấu> ra ngay các tin đó (đồng bộ như cũ), không xếp job, không cảnh báo",
-      "Đổi tên tỉnh / phường / dự án có > 500 tin → lưu thành công, xếp đúng 1 job 'reindex-rentals-search'; không reindex đồng bộ trong request lưu",
-      "Form admin của bản ghi > 500 tin hiện cảnh báo 'đang dựng lại chỉ mục tìm kiếm ở chế độ nền' tới khi job xong; job xong → cảnh báo biến mất",
-      "Job chạy xong → tìm theo tên mới (không dấu) ra đủ tin thuộc phạm vi; tên cũ phường (oldName) vẫn tìm được",
-      "Job xử lý theo lô; chạy lại (cùng input) không nhân bản / không hỏng searchText (idempotent)",
-      "Job lỗi giữa chừng → log lỗi + retry theo cấu hình Jobs; chạy lại hoàn tất đúng",
-      "Đổi tên phường cả trường tên và tên cũ đều kích hoạt reindex; đổi trường không liên quan tên → không reindex, không xếp job"
+      "Danh sách lead với bộ lọc trạng thái / nguồn / sale phụ trách 'bằng' và ngày tạo '>=' / '<=' → nút xuất bật, file Excel chỉ chứa đúng các lead khớp bộ lọc",
+      "Bộ lọc dùng toán tử khác (vd 'chứa', 'khác', 'trong', trường khác) → nút xuất khoá, thông báo liệt kê rõ các toán tử được hỗ trợ",
+      "Gọi thẳng GET /api/admin/leads/export với toán tử không hỗ trợ → bị từ chối (fail-closed), không xuất toàn bộ",
+      "Khoảng ngày createdFrom > createdTo so bằng Date.parse: ngày khác định dạng / khác múi giờ (vd '2026-10-19T00:00:00+07:00' vs '2026-10-18T18:00:00Z') so đúng thứ tự; năm > 9999 / chuỗi ngày không hợp lệ xử lý đúng",
+      "Trang thùng rác của leads (/admin/collections/leads/trash) → nút xuất không hiện (xác định phía server, không nhấp nháy khi tải)",
+      "Cửa sổ chọn lead (list drawer, vd từ field quan hệ trỏ tới leads) → nút xuất không hiện",
+      "Migration mới chạy được trên DB sạch và DB đã có dữ liệu; tạo index leads(status, assigned_to_id, reminded_at, created_at)"
     ],
     "dependents": [
-      "Lệnh tay pnpm reindex:rentals-search vẫn chạy được, kết quả như job",
-      "Tạo / sửa tin cho thuê đơn lẻ: searchText tự dựng như cũ",
-      "Bộ lọc danh sách cho thuê (tỉnh, phường, dự án) không đổi",
-      "Trang đích khu vực /cho-thue/khu-vuc/<slug> (FR-PUB-16) hiển thị đúng sau đổi tên",
-      "Migration mới chạy được trên DB dev sạch và DB đã có dữ liệu (không destructive)"
+      "Xuất Excel vẫn ghi audit log như cũ",
+      "List view leads bình thường (không thùng rác, không drawer) vẫn hiện nút xuất",
+      "Job remind-unassigned-leads dùng index, kết quả nhắc không đổi"
     ],
     "regression": [
-      "Tìm /cho-thue?q= không dấu / có dấu với tên hiện tại vẫn ra kết quả; p95 ≤ 500ms",
-      "Lưu tỉnh / phường / dự án (không đổi tên) nhanh như cũ, không lỗi",
-      "Admin form tỉnh / phường / dự án: CRUD, quyền admin/sale không đổi",
-      "Các job Payload sẵn có (nếu có, vd hẹn giờ xuất bản / dịch EN) vẫn chạy",
-      "VI/EN: tên địa danh giữ tiếng Việt ở cả 2 bản, tìm kiếm EN không đổi"
+      "Xuất Excel theo bộ lọc: cột / dữ liệu file như trước, không lộ lead ngoài bộ lọc (PII)",
+      "RBAC: chỉ admin thấy nút và gọi được endpoint export; sale bị từ chối (403) cả UI và API",
+      "Job nhắc lead: chỉ nhắc 1 lần mỗi lead (reminded_at), chỉ trong giờ hành chính 08:00–17:30 thứ 2 – thứ 7 giờ VN; lead đã giao / khác 'new' không bị nhắc",
+      "Danh sách / bộ lọc / phân trang / xoá mềm lead trong admin không đổi",
+      "Các migration trước vẫn chạy tuần tự đúng"
     ]
   },
   "acceptance": [
-    "> 500 tin bị ảnh hưởng → xếp 1 job reindex (task 'reindex-rentals-search') thay vì bỏ qua; ≤ 500 giữ reindex đồng bộ như cũ",
-    "Job xử lý theo lô, idempotent, chạy lại an toàn; lỗi được log + retry theo cấu hình Jobs",
-    "Migration versioned thêm giá trị enum task (không destructive; rủi ro → HIGH_RISK_MIGRATION và dừng hỏi)",
-    "Admin thấy cảnh báo khi reindex được xếp chạy nền",
-    "Test hook + task; pnpm test/lint/typecheck/build PASS"
+    "Nút xuất bị khoá → thông báo liệt kê toán tử hỗ trợ",
+    "Khoảng ngày khác định dạng so đúng thứ tự bằng Date.parse; có test ca biên",
+    "Trạng thái trash xác định phía server",
+    "Nút xuất không hiện trong list drawer",
+    "Migration thêm index (CREATE INDEX, không destructive) cho truy vấn job nhắc lead",
+    "pnpm test / lint / typecheck / build PASS"
   ],
   "viewports": [
     1280
   ],
-  "risk": "medium-high",
-  "riskNote": "Có migration DB (thêm giá trị enum task Payload Jobs) + job nền chạy bulk update searchText trên nhiều tin cho thuê; ảnh hưởng tìm kiếm công khai. Không đổi API công khai/auth. Migration phải inspect trước commit, không chạy migrate trên staging/prod trong change này."
+  "risk": "medium",
+  "riskNote": "Xuất Excel chứa PII lead (fail-closed + RBAC chỉ admin phải giữ) + migration additive (CREATE INDEX trên bảng leads). Không đổi API công khai/contract export/auth. Migration phải inspect trước commit, không chạy migrate trên staging/prod trong change này."
 }

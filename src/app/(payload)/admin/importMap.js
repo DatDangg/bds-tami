@@ -27,7 +27,7 @@ import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { LeadAssigneeWarning as LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef } from '../../../components/admin/LeadAssigneeWarning'
-import { LeadExportButton as LeadExportButton_18acbe9af70d755a770c60fb9a6234f1 } from '../../../components/admin/LeadExportButton'
+import { LeadExportSlot as LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b } from '../../../components/admin/LeadExportSlot'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { TranslationFailedBanner as TranslationFailedBanner_050d0168f64ef9771ce7381aaf5804d0 } from '../../../components/admin/TranslationFailedBanner'
@@ -66,7 +66,7 @@ export const importMap = {
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning": LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef,
-  "/components/admin/LeadExportButton#LeadExportButton": LeadExportButton_18acbe9af70d755a770c60fb9a6234f1,
+  "/components/admin/LeadExportSlot#LeadExportSlot": LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/TranslationFailedBanner#TranslationFailedBanner": TranslationFailedBanner_050d0168f64ef9771ce7381aaf5804d0,

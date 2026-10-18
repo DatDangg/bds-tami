@@ -69,7 +69,8 @@ export function parseLeadExportFilters(params: URLSearchParams): ParsedLeadExpor
     if (timestamp) filters[name] = timestamp;
     else issues.push({ path: [name], message: "Thời điểm phải có dạng ISO 8601 kèm múi giờ, vd 2026-10-01T12:00:00.000Z" });
   }
-  if (filters.createdFrom && filters.createdTo && filters.createdFrom > filters.createdTo) {
+  // So theo thời điểm, không so chuỗi ISO: năm > 9999 chuẩn hoá thành `+010000-…` đứng trước `9999-…` theo ký tự.
+  if (filters.createdFrom && filters.createdTo && Date.parse(filters.createdFrom) > Date.parse(filters.createdTo)) {
     issues.push({ path: ["createdFrom"], message: "Thời điểm bắt đầu phải trước hoặc bằng thời điểm kết thúc" });
   }
   return issues.length > 0 ? { ok: false, issues } : { ok: true, filters };
@@ -91,8 +92,10 @@ const isRecord = (value: unknown): value is PlainRecord => typeof value === "obj
 /** Kết quả chuyển where của danh sách: `ok: false` = có điều kiện không ánh xạ được (xuất sẽ ra nhiều lead hơn danh sách đang thấy). */
 export type LeadExportQuery = { ok: true; query: string } | { ok: false; reason: string };
 
+// Tên toán tử lấy đúng nhãn tiếng Việt Payload hiển thị trong bộ lọc (`@payloadcms/translations` vi: equals / isGreaterThanOrEqualTo / isLessThanOrEqualTo).
 export const UNSUPPORTED_FILTER_MESSAGE =
-  "Bộ lọc hiện tại có điều kiện chưa hỗ trợ xuất (ô tìm kiếm, nhiều nhóm điều kiện hoặc toán tử khác \"bằng\"/khoảng ngày). Hãy bỏ điều kiện đó rồi xuất lại.";
+  'Chỉ xuất được khi bộ lọc dùng: Trạng thái, Nguồn hoặc Sale phụ trách với "bằng"; Ngày tạo với "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" (mỗi phía một lần). ' +
+  'Không hỗ trợ ô tìm kiếm, nhiều nhóm điều kiện "hoặc" và các toán tử khác. Hãy đổi bộ lọc rồi xuất lại.';
 
 /**
  * Payload WhereBuilder luôn ghi `{ or: [ { and: [...] } ] }`; chấp nhận đúng 1 nhánh `or`, `and` lồng nhau, điều kiện đơn.
