@@ -12,7 +12,7 @@
 
 **Code dự kiến (builder chốt):**
 - T01: `src/lib/leads/export-filters.ts` (thông báo `UNSUPPORTED_FILTER_MESSAGE` liệt kê toán tử; so `createdFrom > createdTo` bằng `Date.parse`), `src/components/admin/LeadExportButton.tsx` + server component bọc mới (dò thùng rác qua `params.segments`; ẩn trong list drawer), `src/collections/Leads.ts` (beforeList), `src/app/(payload)/admin/importMap.js`
-- T02: `migrations/<mới>` — `CREATE INDEX` trên `leads (status, assigned_to_id, reminded_at, created_at)` (additive, versioned) + `migrations/index.ts`
+- T02: `migrations/20261018_212611_leads_remind_scan_index` — `CREATE INDEX` trên `leads (status, assigned_to_id, reminded_at, created_at)` (additive, versioned) + `migrations/index.ts`
 
 **Schema/API:** endpoint `GET /api/admin/leads/export` contract không đổi. Schema: thêm 1 index trên bảng `leads` (không destructive).
 

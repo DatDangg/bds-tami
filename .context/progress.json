@@ -204,10 +204,10 @@
       "slug": "layer9-minor-export-reminder",
       "title": "MINOR layer 9: xuất Excel lead (thông báo khoá nút rõ toán tử, Date.parse khoảng ngày, dò trash phía server, ẩn nút trong list drawer) + index quét job nhắc lead (BL-009)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-009",
-      "changeDoc": "spec/changes/2026-10-19-layer9-minor-export-reminder.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-layer9-minor-export-reminder.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -216,18 +216,27 @@
           "attempt": 1,
           "review": "STRICT PASS",
           "round": 1,
-          "report": ".context/review-reports/feature-layer9-minor-export-reminder-phase-1-task-01-round-1-review.md"
+          "report": ".context/review-reports/feature-layer9-minor-export-reminder-phase-1-task-01-round-1-review.md",
+          "commit": "eeebe1b"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-layer9-minor-export-reminder/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-layer9-minor-export-reminder-phase-1-task-02-round-1-review.md"
         }
       ],
       "startedAt": "2026-10-19",
       "specVersion": "1.9.0",
-      "scopeVersion": 9
+      "scopeVersion": 9,
+      "migration": "migrations/20261018_212611_leads_remind_scan_index.ts (additive CREATE INDEX)",
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-layer9-minor-export-reminder-phase-1-task-02-round-1-review.md"
     }
   ],
   "bugs": [
@@ -903,7 +912,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T21:21:53.801Z",
+  "lastUpdated": "2026-10-18T21:38:19.353Z",
   "approvalMilestones": [
     {
       "id": "M1",

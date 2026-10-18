@@ -31,12 +31,16 @@
       "src/components/admin/LeadExportSlot.tsx",
       "src/collections/Leads.ts",
       "src/app/(payload)/admin/importMap.js",
-      "migrations/<mới — CREATE INDEX leads(status, assigned_to_id, reminded_at, created_at)>.ts",
-      "migrations/<mới>.json",
+      "migrations/20261018_212611_leads_remind_scan_index.ts",
+      "migrations/20261018_212611_leads_remind_scan_index.json",
       "migrations/index.ts",
-      "SPECIFICATIONS.md"
+      "SPECIFICATIONS.md",
+      "docs/API_SPEC.md",
+      "docs/ERD.md",
+      "docs/ARCHITECTURE.md",
+      "tests/integration/leads-remind-scan-index-migration.test.ts"
     ],
-    "filesNote": "Danh sách dự kiến theo change doc + task; change-request chốt lại theo code thật ở close-out. Migration additive (CREATE INDEX), không HIGH_RISK_MIGRATION.",
+    "filesNote": "Danh sách đã chốt theo code thật (T01 eeebe1b, T02). Migration additive (CREATE INDEX), không HIGH_RISK_MIGRATION.",
     "modules": [
       "Admin leads — list view / trash view / list drawer (nút xuất Excel)",
       "Bộ lọc xuất Excel (export-filters, fail-closed)",

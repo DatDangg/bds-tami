@@ -25,6 +25,7 @@ import * as migration_20261018_113101_leads_reminded_at from './20261018_113101_
 import * as migration_20261018_130000_data_retention from './20261018_130000_data_retention';
 import * as migration_20261018_140000_translate_content from './20261018_140000_translate_content';
 import * as migration_20261018_203017_rentals_reindex_job from './20261018_203017_rentals_reindex_job';
+import * as migration_20261018_212611_leads_remind_scan_index from './20261018_212611_leads_remind_scan_index';
 
 export const migrations = [
   {
@@ -160,6 +161,11 @@ export const migrations = [
   {
     up: migration_20261018_203017_rentals_reindex_job.up,
     down: migration_20261018_203017_rentals_reindex_job.down,
-    name: '20261018_203017_rentals_reindex_job'
+    name: '20261018_203017_rentals_reindex_job',
+  },
+  {
+    up: migration_20261018_212611_leads_remind_scan_index.up,
+    down: migration_20261018_212611_leads_remind_scan_index.down,
+    name: '20261018_212611_leads_remind_scan_index'
   },
 ];

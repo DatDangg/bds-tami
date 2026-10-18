@@ -181,6 +181,9 @@ export const Leads: CollectionConfig = {
   },
   defaultSort: "-createdAt",
   trash: true,
+  // Truy vấn quét của job `remind-unassigned-leads` (BR-14): `status = new` + `assigned_to_id IS NULL` + `reminded_at IS NULL`, lọc/sắp xếp `created_at`.
+  // Khai ở đây để snapshot migration đồng bộ; migration `leads_remind_scan_index`. Các index DESC khác vẫn là SQL tay trong migration `leads`.
+  indexes: [{ fields: ["status", "assignedTo", "remindedAt", "createdAt"] }],
   access: { read: isAssignedOrAdmin, create: denyAll, update: isAssignedOrAdmin, delete: isAdmin },
   disableDuplicate: true,
   hooks: {
