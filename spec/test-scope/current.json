@@ -12,7 +12,13 @@
     "tasks/feature-header-footer-design-debt/phase-1-task-02.md"
   ],
   "specUpdate": "spec/updates/2026-10-19-header-footer-design-debt.md",
-  "specRefs": ["design-spec §2.1", "design-spec §2.2", "design-spec §2.4", "FR-PUB-19", "BR-07"],
+  "specRefs": [
+    "design-spec §2.1",
+    "design-spec §2.2",
+    "design-spec §2.4",
+    "FR-PUB-19",
+    "BR-07"
+  ],
   "specRefNotes": {
     "design-spec §2.1": ".context/design-spec.md: header ≥ xl một hàng (logo trái · 7 mục menu giữa · tìm + VI|EN + CTA nếu bật + nút Menu phải); Logo từ site-settings.logo/logoDark, fallback logo tĩnh; Nút CTA từ global header.ctaButton (nhãn locale đang xem + link → hiện, thiếu → ẩn)",
     "design-spec §2.2": ".context/design-spec.md: menu toàn màn hình (mọi breakpoint) — mục có con có nút caret xổ accordion menu con, aria-expanded/aria-controls, bàn phím, tắt chuyển động khi reduced motion",
@@ -22,17 +28,22 @@
   },
   "changed": {
     "files": [
-      "src/components/layout/Header.*",
-      "src/components/layout/BrandLogo.*",
-      "src/components/layout/MobileMenu.*",
-      "src/components/layout/Footer.*",
-      "src/components/layout/DesktopNav.*",
-      "src/components/layout/load-shell.*",
-      "src/components/layout/shell-data.*",
-      "src/components/layout/PublicShell.*",
-      "tests/** (test khung trang header/footer/menu)"
+      "src/components/layout/Header.tsx",
+      "src/components/layout/Header.test.tsx",
+      "src/components/layout/BrandLogo.tsx",
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/MobileMenu.tsx",
+      "src/components/layout/MobileMenu.test.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/Footer.test.tsx",
+      "src/components/layout/FooterLinkColumn.tsx",
+      "src/components/layout/PublicShell.tsx",
+      "src/components/layout/PublicShell.test.tsx",
+      "src/components/layout/load-shell.ts",
+      "src/components/layout/shell-data.ts",
+      "src/components/layout/shell-data.test.ts"
     ],
-    "filesNote": "dự kiến, close-out cập nhật theo diff thật; kèm docs: .context/design-spec.md §2.1/§2.2/§2.4, SPECIFICATIONS.md",
+    "filesNote": "theo diff thật (commit be33577 task-01 + commit task-02); kèm docs: .context/design-spec.md §2.1/§2.2/§2.4, SPECIFICATIONS.md, docs/ARCHITECTURE.md",
     "modules": [
       "public layout header",
       "full-screen menu",
@@ -69,6 +80,10 @@
     "Không vỡ revalidate header/footer ở / và /en; test cập nhật + pnpm test/lint/typecheck/build PASS",
     "design-spec §2.1 (bố cục ≥ xl) cập nhật intent \"1 hàng\" (user đã quyết 2026-10-19)"
   ],
-  "viewports": [375, 768, 1280],
+  "viewports": [
+    375,
+    768,
+    1280
+  ],
   "risk": "medium"
 }

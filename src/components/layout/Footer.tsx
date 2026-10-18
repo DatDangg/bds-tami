@@ -12,8 +12,8 @@ import {
 } from "@/components/icons";
 import { BrandLogo } from "./BrandLogo";
 import { CookieSettingsButton } from "./CookieSettingsButton";
+import { FooterLinkColumn } from "./FooterLinkColumn";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { NavAnchor } from "./NavAnchor";
 import type { FooterColumnView, FooterContactView, LogoView, SocialLinkView } from "./shell-data";
 
 interface FooterProps {
@@ -48,21 +48,10 @@ export function Footer({ logo, columns, tagline, copyright, contact, socials, sh
           <BrandLogo tone="on-dark" image={logo.onDark} className="self-start" />
           <p className="max-w-text text-small whitespace-pre-line text-text-secondary">{tagline}</p>
         </div>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
+        {/* < md: cột link là accordion (FooterLinkColumn), cột Liên hệ luôn mở; ≥ md lưới auto-fit như spec §2.4. */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] md:gap-8">
           {columns.map((column) => (
-            <div key={column.title} className="flex flex-col gap-3">
-              <h2 className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{column.title}</h2>
-              <ul className="flex flex-col">
-                {column.links.map((link) => (
-                  <li key={link.href + link.label}>
-                    <NavAnchor
-                      link={link}
-                      className="inline-flex min-h-11 min-w-11 items-center text-small text-text-secondary hover:text-text hover:underline"
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <FooterLinkColumn key={column.title} column={column} />
           ))}
           {hasContact && <FooterContact contact={contact} />}
         </div>
@@ -85,7 +74,8 @@ function FooterContact({ contact }: { contact: FooterContactView }) {
   const t = useTranslations("layout.footer");
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{t("contact")}</h2>
+      {/* Cột Liên hệ luôn mở ở mọi breakpoint (spec §2.4); < md canh hàng với nút tiêu đề 44px của các cột accordion. */}
+      <h2 className="flex min-h-11 items-center text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase md:min-h-0">{t("contact")}</h2>
       <ul className="flex flex-col gap-1 text-small text-text-secondary">
         {contact.hotline && (
           <li>

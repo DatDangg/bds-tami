@@ -32,10 +32,10 @@
       "slug": "header-footer-design-debt",
       "title": "Design debt header/footer: header 1 hàng ở xl, CTA/logo từ CMS, footer accordion < md, accordion menu con (BL-001)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-001",
-      "changeDoc": "spec/changes/2026-10-19-header-footer-design-debt.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-header-footer-design-debt.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -49,13 +49,20 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-header-footer-design-debt/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-header-footer-design-debt-phase-1-task-02-round-1-review.md"
         }
       ],
       "startedAt": "2026-10-19",
       "specVersion": "1.4.0",
-      "scopeVersion": 3
+      "scopeVersion": 3,
+      "completedAt": "2026-10-19",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-header-footer-design-debt-phase-1-task-02-round-1-review.md"
     }
   ],
   "bugs": [
@@ -731,7 +738,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T18:30:25.394Z",
+  "lastUpdated": "2026-10-18T18:54:18.654Z",
   "approvalMilestones": [
     {
       "id": "M1",

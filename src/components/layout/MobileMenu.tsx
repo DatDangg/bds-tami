@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useCallback, useState } from "react";
-import { List, X } from "@/components/icons";
+import { useCallback, useId, useState } from "react";
+import { CaretDown, List, X } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./BrandLogo";
@@ -23,7 +23,7 @@ interface MobileMenuProps {
  * Menu toàn màn hình ở MỌI breakpoint, mở từ nút Menu trong header (design-spec §2.2; từ xl header một hàng vẫn có nút Menu, BL-001,
  * nên không còn tự đóng khi cửa sổ rộng lên). Radix Dialog lo bẫy focus, Esc đóng, khoá cuộn nền, trả focus về nút mở
  * và `aria-expanded`/`aria-controls` trên nút. Đóng thì nội dung không còn trong DOM (không có link ẩn bị focus).
- * Bấm một link thì đóng: layout không dựng lại khi điều hướng nên dialog sẽ kẹt nếu không tự đóng.
+ * Bấm một link thì đóng: layout không dựng lại khi điều hướng nên dialog sẽ kẹt nếu không tự đóng. Mục có con → accordion (`MenuItem`).
  * Nhãn "Menu" ẩn ở xl (chỉ icon + sr-only) để hàng header 1280px đủ chỗ cho 7 mục + CTA; hiện lại từ 2xl.
  */
 export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
@@ -64,27 +64,7 @@ export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
             <nav aria-label={t("nav.mobile")}>
               <ul className="flex flex-col">
                 {items.map((item) => (
-                  <li key={item.href + item.label} className="border-b border-border">
-                    <NavAnchor
-                      link={item}
-                      onClick={close}
-                      aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
-                      className="flex min-h-14 items-center font-display text-h2 uppercase hover:text-accent-text aria-[current=page]:text-accent-text"
-                    />
-                    {item.children.length > 0 && (
-                      <ul className="pb-3 pl-4">
-                        {item.children.map((child) => (
-                          <li key={child.href + child.label}>
-                            <NavAnchor
-                              link={child}
-                              onClick={close}
-                              className="flex min-h-11 items-center text-body text-text-secondary hover:text-accent-text"
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
+                  <MenuItem key={item.href + item.label} item={item} active={isActivePath(pathname, item.href)} onNavigate={close} />
                 ))}
               </ul>
             </nav>
@@ -97,6 +77,62 @@ export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
+  );
+}
+
+/**
+ * Một mục menu (spec §2.2). Mục có con: link cha vẫn điều hướng, nút caret riêng bên cạnh mở/đóng menu con (đóng mặc định).
+ * Menu con trượt bằng `grid-template-rows 0fr→1fr` theo `--duration-base`, tắt khi reduced motion. Khi đóng, khung mang `inert`
+ * nên link con không nhận focus/không có trong cây truy cập (nội dung vẫn trong DOM để chuyển động được).
+ */
+function MenuItem({ item, active, onNavigate }: { item: NavItemView; active: boolean; onNavigate: () => void }) {
+  const t = useTranslations("layout.nav");
+  const [open, setOpen] = useState(false);
+  const submenuId = useId();
+  const hasChildren = item.children.length > 0;
+  return (
+    <li className="border-b border-border">
+      <div className="flex items-center justify-between gap-2">
+        <NavAnchor
+          link={item}
+          onClick={onNavigate}
+          aria-current={active ? "page" : undefined}
+          className="flex min-h-14 min-w-0 flex-1 items-center font-display text-h2 uppercase hover:text-accent-text aria-[current=page]:text-accent-text"
+        />
+        {hasChildren && (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={submenuId}
+            aria-label={t("openSubmenu", { label: item.label })}
+            onClick={() => setOpen((value) => !value)}
+            className="inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text hover:text-accent-text"
+          >
+            <CaretDown size={20} aria-hidden="true" className={cn("transition-transform duration-(--duration-fast) motion-reduce:transition-none", open && "rotate-180")} />
+          </button>
+        )}
+      </div>
+      {hasChildren && (
+        <div
+          id={submenuId}
+          // `aria-hidden` kèm `inert` như HeroSlider: trình duyệt cũ không có `inert` vẫn ẩn khỏi AT.
+          aria-hidden={!open}
+          inert={!open}
+          className={cn(
+            "grid transition-[grid-template-rows] duration-(--duration-base) ease-out motion-reduce:transition-none",
+            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+          )}
+        >
+          <ul className="overflow-hidden pl-4">
+            {item.children.map((child) => (
+              <li key={child.href + child.label} className="last:pb-3">
+                <NavAnchor link={child} onClick={onNavigate} className="flex min-h-11 items-center text-body text-text-secondary hover:text-accent-text" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </li>
   );
 }
 
