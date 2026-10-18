@@ -2888,8 +2888,11 @@ export interface TaskDataRetention {
     applicationsAnonymized: number;
     cvFilesDeleted: number;
     orphanCvsDeleted: number;
+    orphanObjectsDeleted: number;
+    orphanObjectsFound: number;
     auditLogsDeleted: number;
     failedJobsDeleted: number;
+    failedRecords: number;
   };
 }
 /**

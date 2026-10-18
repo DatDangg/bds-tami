@@ -124,3 +124,8 @@ Mở khoá cho: `layer-13-task-01`, `layer-13-task-02`, `layer-13-task-03`, `lay
 - [ ] Smoke `jobs → app:3000/api/internal/revalidate` trong Docker thật (L7-T01): chạy tay `expire-offers`/`close-job-postings`, log app nhận revalidate, nginx public trả 404 cho `/api/internal/`.
 - [ ] Deploy L7-T02: migration `rentals_search_trgm` cần quyền `CREATE EXTENSION pg_trgm` (hoặc extension đã có từ init.sql) trên DB staging; đo lại p95 `GET /api/public/rentals` trên staging.
 - [ ] G30 (spec-validation layer 7): TRƯỚC lần push/deploy staging kế tiếp, cập nhật nginx trên server (`/etc/nginx/sites-available/tami-staging-sslip.conf` từ `docker/nginx/tami-staging-sslip.conf`: chặn `/api/internal/` → 404) → `nginx -t` → reload, có user xác nhận; kiểm `curl -I https://187-52-119-50.sslip.io/api/internal/revalidate` = 404.
+
+## Follow-up từ review layer-10-task-05 round 2 (MINOR)
+- [ ] `RETENTION_ORPHAN_OBJECT_SCAN` giá trị lạ → app/jobs không boot (kiểm ở `src/lib/env.ts:247` và `purge-orphan-objects.ts:89`): ghi rõ trong `docs/runbooks/deploy.md` hoặc giữ một chỗ kiểm; xác nhận service `jobs` trong compose nhận cùng env khi redeploy staging.
+- [ ] `tests/integration/data-retention.test.ts:489-500`: khôi phục env bằng `try/finally`.
+- [ ] `docs/ERD.md` §7 thiếu dòng bước quét object mồ côi.

@@ -49,6 +49,20 @@ export function parseTranslationEnv(source: Record<string, string | undefined>):
   throw new EnvValidationError([...new Set(result.error.issues.map((issue) => String(issue.path[0])))]);
 }
 
+/**
+ * Chế độ bước quét object mồ côi của job `data-retention` (xoá object private không còn dòng DB). `off`: không quét; `dry-run` (mặc định): chỉ đếm
+ * + ghi audit, KHÔNG xoá; `delete`: xoá thật. Chỉ bật `delete` sau khi xác nhận bucket private chỉ phục vụ đúng một DB (xem docs/runbooks/deploy.md, restore.md).
+ */
+const orphanObjectScanModeSchema = z.enum(["off", "dry-run", "delete"]);
+export type OrphanObjectScanMode = z.infer<typeof orphanObjectScanModeSchema>;
+
+/** Đọc `RETENTION_ORPHAN_OBJECT_SCAN` tại thời điểm gọi (không cache); thiếu/rỗng = `dry-run`, giá trị lạ là lỗi cấu hình (ném, chỉ nêu tên biến). */
+export function parseOrphanObjectScanMode(value: string | undefined): OrphanObjectScanMode {
+  const result = orphanObjectScanModeSchema.safeParse(value === undefined || value === "" ? "dry-run" : value);
+  if (!result.success) throw new EnvValidationError(["RETENTION_ORPHAN_OBJECT_SCAN"]);
+  return result.data;
+}
+
 const envSchema = z.object({
   DATABASE_URL: nonEmpty,
   DATABASE_URL_TEST: z.string().min(1).optional(),
@@ -59,6 +73,7 @@ const envSchema = z.object({
   S3_SECRET_ACCESS_KEY: nonEmpty,
   S3_BUCKET_PUBLIC: nonEmpty,
   S3_BUCKET_PRIVATE: nonEmpty,
+  RETENTION_ORPHAN_OBJECT_SCAN: z.preprocess(emptyToUndefined, orphanObjectScanModeSchema.default("dry-run")),
   TURNSTILE_SITE_KEY: nonEmpty,
   TURNSTILE_SECRET_KEY: nonEmpty,
   SMTP_HOST: nonEmpty,

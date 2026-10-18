@@ -31,8 +31,11 @@ describe("data-retention: lịch chạy", () => {
       "applicationsAnonymized",
       "cvFilesDeleted",
       "orphanCvsDeleted",
+      "orphanObjectsDeleted",
+      "orphanObjectsFound",
       "auditLogsDeleted",
       "failedJobsDeleted",
+      "failedRecords",
     ]);
   });
 });

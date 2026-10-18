@@ -22,6 +22,14 @@ export const DATA_RETENTION_LOCK_KEY = ADVISORY_LOCK_KEYS.dataRetention;
 /** Một bước gặp quá chừng này bản ghi lỗi (poison record / S3 sập) thì dừng bước thay vì thử hết 5000 bản ghi; lần chạy sau thử lại. */
 export const RETENTION_MAX_FAILED_RECORDS_PER_STEP = 20;
 
+/**
+ * Lớp chặn của bước quét object mồ côi (xoá theo SỰ VẮNG MẶT của dòng DB nên DB rỗng/nhầm DB/restore cũ sẽ đòi xoá cả bucket): quá `MAX_DELETE` object,
+ * hoặc (từ `RATIO_MIN_COUNT` object trở lên) quá `MAX_RATIO` số key đã liệt kê thì KHÔNG xoá gì, bước báo lỗi để admin xem (`failedSteps` trong audit).
+ */
+export const ORPHAN_OBJECT_MAX_DELETE = 100;
+export const ORPHAN_OBJECT_MAX_RATIO = 0.2;
+export const ORPHAN_OBJECT_RATIO_MIN_COUNT = 10;
+
 /** Lùi `months` tháng theo lịch UTC; ngày vượt quá độ dài tháng đích thì lấy ngày cuối tháng (31/3 lùi 1 tháng = 28/2, không tràn sang tháng sau). */
 export function monthsBefore(now: Date, months: number): Date {
   const result = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months, 1, now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()));

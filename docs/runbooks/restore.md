@@ -168,7 +168,8 @@ Với dữ liệu giai đoạn 1 (vài GB) tổng ≈ 1,5–2 giờ, trong ngư�
 3. Postgres không còn ở recovery: `select pg_is_in_recovery()` = `f`; `select * from pg_stat_archiver` không tăng `failed_count` (trừ drill dùng `archive_mode=off`).
 4. Sau khi bật app: `curl -fsS http://127.0.0.1:3011/api/health` (staging; production `:3010`) trả 200; mở vài trang công khai + một ảnh từ bucket public + một file private qua admin.
 5. File: `sha256sum` vài file mẫu so với snapshot (`restic-backup.sh restore` rồi so), danh sách object bucket khớp số file của snapshot.
-6. Backup tiếp tục chạy: `pg-backup.sh check` OK, đã chạy `full` mới (mục 3.2 bước 5), textfile `tami_backup.prom` cập nhật.
+6. Quét object mồ côi (job `data-retention`): TẮT trước khi bật app/jobs sau khôi phục DB (`RETENTION_ORPHAN_OBJECT_SCAN=off` hoặc `dry-run` trong env file). DB khôi phục về mốc cũ hơn bucket thì mọi CV upload sau mốc đó trông như mồ côi và sẽ bị xoá ở lần chạy Chủ nhật kế tiếp (ngưỡng 100 object/20% chỉ là lớp chặn cuối). Chỉ đặt lại `delete` khi DB và bucket đã đồng bộ (mục 5 khớp).
+7. Backup tiếp tục chạy: `pg-backup.sh check` OK, đã chạy `full` mới (mục 3.2 bước 5), textfile `tami_backup.prom` cập nhật.
 
 ## 7. Giám sát "backup thành công lần cuối" (dùng được khi chưa có Prometheus)
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EnvValidationError, parseEnv, parseTranslationEnv } from "./env";
+import { EnvValidationError, parseEnv, parseOrphanObjectScanMode, parseTranslationEnv } from "./env";
 
 const validEnv = {
   DATABASE_URL: "postgres://u:p@localhost:5433/db",
@@ -128,5 +128,15 @@ describe("parseEnv: dịch AI", () => {
     });
     expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
     expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).not.toThrow(/sk-secret-oops/);
+  });
+});
+
+describe("parseOrphanObjectScanMode", () => {
+  it("thiếu hoặc rỗng = dry-run (không xoá); nhận off/dry-run/delete; giá trị lạ là lỗi chỉ nêu tên biến", () => {
+    expect(parseOrphanObjectScanMode(undefined)).toBe("dry-run");
+    expect(parseOrphanObjectScanMode("")).toBe("dry-run");
+    expect(parseOrphanObjectScanMode("off")).toBe("off");
+    expect(parseOrphanObjectScanMode("delete")).toBe("delete");
+    expect(() => parseOrphanObjectScanMode("yes")).toThrow(/RETENTION_ORPHAN_OBJECT_SCAN/);
   });
 });

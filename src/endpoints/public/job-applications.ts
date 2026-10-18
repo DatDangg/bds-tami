@@ -124,7 +124,7 @@ async function createCvFile(payload: Payload, bytes: Uint8Array, inspected: Insp
   return stored.id;
 }
 
-/** S3 không rollback theo DB: tạo hồ sơ lỗi thì phải xoá CV vừa lưu (dòng `private-files` + object) để không mồ côi dữ liệu cá nhân. */
+/** S3 không rollback theo DB: tạo hồ sơ lỗi thì phải xoá CV vừa lưu (dòng `private-files` + object; hook `beforeDelete` xoá object và ném nếu S3 lỗi) để không mồ côi dữ liệu cá nhân; lỗi thì log, job `data-retention` dọn sau. */
 async function removeOrphanCv(payload: Payload, cvId: string): Promise<void> {
   try {
     await payload.delete({ collection: "private-files", id: cvId, overrideAccess: true });

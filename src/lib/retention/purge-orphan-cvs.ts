@@ -41,6 +41,7 @@ export async function purgeOrphanCvs({ payload, now, dryRun, tally }: RetentionS
   await processDueRecords({
     payload,
     step: "purge-orphan-cvs",
+    tally,
     findDueIds: (excludeIds) => findOrphanCvIds(payload, cutoff, RETENTION_BATCH_SIZE, excludeIds),
     processOne: async (id) => {
       const removed = await runInLockedTransaction(payload, DATA_RETENTION_LOCK_KEY, async (req) => {

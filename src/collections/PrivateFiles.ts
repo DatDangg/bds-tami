@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin, ROLES } from "../access";
+import { deleteObjectBeforeDelete } from "../hooks/private-files/delete-object-before-delete";
 import { createUploadGuard, PRIVATE_FILE_POLICY } from "../lib/upload/validate-file";
 
 /** Cả MIME nhận diện (vd `application/x-cfb`) lẫn MIME lưu (`application/msword`): guard ghi đè `mimetype` sang MIME lưu trước khi Payload kiểm `mimeType`. */
@@ -26,7 +27,7 @@ export const PrivateFiles: CollectionConfig = {
     delete: isAdmin,
   },
   disableDuplicate: true,
-  hooks: { beforeOperation: [createUploadGuard(PRIVATE_FILE_POLICY)] },
+  hooks: { beforeOperation: [createUploadGuard(PRIVATE_FILE_POLICY)], beforeDelete: [deleteObjectBeforeDelete] },
   upload: {
     mimeTypes: ALLOWED_MIME_TYPES,
     // Không phục vụ file qua route /api/private-files/file/*: nếu không, Payload rơi về đọc đĩa local.

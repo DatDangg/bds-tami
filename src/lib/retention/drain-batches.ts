@@ -1,5 +1,6 @@
 import type { Payload, Where } from "payload";
 
+import type { OrphanObjectScanMode } from "../env";
 import { RETENTION_BATCH_SIZE, RETENTION_MAX_BATCHES_PER_STEP, RETENTION_MAX_FAILED_RECORDS_PER_STEP } from "./retention-config";
 
 /** Bộ đếm cộng dồn của một lần chạy: mỗi bước cộng NGAY sau khi commit từng lô/bản ghi, nên bước lỗi giữa chừng vẫn để lại số đã xử lý thật (cho audit/log). */
@@ -8,8 +9,13 @@ export interface RetentionTally {
   applicationsAnonymized: number;
   cvFilesDeleted: number;
   orphanCvsDeleted: number;
+  orphanObjectsDeleted: number;
+  /** Số object mồ côi PHÁT HIỆN (cả khi chỉ đếm/bị chặn bởi ngưỡng): không phải số đã xoá, không tính vào tổng thay đổi. */
+  orphanObjectsFound: number;
   auditLogsDeleted: number;
   failedJobsDeleted: number;
+  /** Số bản ghi/object xử lý lỗi (bị bỏ qua, thử lại lần sau): KHÔNG phải số đã thay đổi, nên không tính vào tổng thay đổi. */
+  failedRecords: number;
 }
 
 export const emptyRetentionTally = (): RetentionTally => ({
@@ -17,8 +23,11 @@ export const emptyRetentionTally = (): RetentionTally => ({
   applicationsAnonymized: 0,
   cvFilesDeleted: 0,
   orphanCvsDeleted: 0,
+  orphanObjectsDeleted: 0,
+  orphanObjectsFound: 0,
   auditLogsDeleted: 0,
   failedJobsDeleted: 0,
+  failedRecords: 0,
 });
 
 export interface RetentionStepArgs {
@@ -27,6 +36,12 @@ export interface RetentionStepArgs {
   /** `true`: chỉ đếm bản ghi đến hạn (vào `tally`), không đổi gì. */
   dryRun: boolean;
   tally: RetentionTally;
+  /** Chỉ cho bước quét object mồ côi: giới hạn vùng quét theo prefix key (mặc định cả bucket private). */
+  orphanObjectScanPrefix?: string;
+  /** Ghi đè `RETENTION_ORPHAN_OBJECT_SCAN` (mặc định đọc từ env). */
+  orphanObjectScanMode?: OrphanObjectScanMode;
+  /** Ghi đè `ORPHAN_OBJECT_MAX_DELETE` (chỉ test). */
+  orphanObjectMaxDelete?: number;
 }
 
 const warnCeiling = (payload: Payload, step: string, processed: number): void =>
@@ -59,10 +74,11 @@ export const excludingIds = (where: Where, ids: string[]): Where => (ids.length 
 export async function processDueRecords(args: {
   payload: Payload;
   step: string;
+  tally: RetentionTally;
   findDueIds: (excludeIds: string[]) => Promise<string[]>;
   processOne: (id: string) => Promise<boolean>;
 }): Promise<void> {
-  const { payload, step, findDueIds, processOne } = args;
+  const { payload, step, tally, findDueIds, processOne } = args;
   const failedIds: string[] = [];
   let processedTotal = 0;
   let drained = false;
@@ -85,5 +101,6 @@ export async function processDueRecords(args: {
     drained = ids.length < RETENTION_BATCH_SIZE || (processedInBatch === 0 && failedInBatch === 0) || failedIds.length >= RETENTION_MAX_FAILED_RECORDS_PER_STEP;
     if (!drained && batch === RETENTION_MAX_BATCHES_PER_STEP - 1) warnCeiling(payload, step, processedTotal);
   }
+  tally.failedRecords += failedIds.length;
   if (failedIds.length > 0) throw new Error(`${step}: ${failedIds.length} bản ghi lỗi (đã xử lý ${processedTotal})`);
 }

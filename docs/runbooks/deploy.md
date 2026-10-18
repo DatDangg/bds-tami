@@ -94,6 +94,8 @@ Env file phải `chmod 600` (script từ chối nếu `others` đọc được).
 Sao `.env.example` (khối Docker Compose staging/prod) → điền giá trị thật cho từng môi trường. `TAMI_IMAGE` trong file không cần đặt:
 `deploy.sh` đặt biến môi trường `TAMI_IMAGE` (thắng `--env-file`).
 
+`RETENTION_ORPHAN_OBJECT_SCAN` (`off` | `dry-run` | `delete`, mặc định `dry-run`): bước quét object CV mồ côi của job `data-retention` xoá object private không còn dòng `private-files`. Để `dry-run` (chỉ đếm, audit `system.data_retention` ghi `orphanObjectsFound`) cho tới khi xác nhận bucket private chỉ phục vụ đúng DB này (không dùng chung giữa môi trường) và số mồ côi báo cáo hợp lý; khi đó mới đặt `delete` bằng tay trong env file. Dù ở `delete`, quá 100 object hoặc quá 20% số object đã liệt kê thì job không xoá và báo lỗi (`failedSteps`). Không tự bật `delete` cho prod.
+
 ### 3.4 Nginx / Cloudflare
 Theo `docker/nginx/` và ARCHITECTURE §6 (không thuộc pipeline này). Staging chưa có tên miền: dùng biến thể sslip.io không Cloudflare, xem mục 9.
 

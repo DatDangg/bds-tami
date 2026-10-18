@@ -63,6 +63,7 @@ export async function purgeExpiredApplications({ payload, now, dryRun, tally }: 
   await processDueRecords({
     payload,
     step: "purge-applications",
+    tally,
     findDueIds: async (excludeIds) => {
       const due = await payload.find({
         collection: "job-applications",

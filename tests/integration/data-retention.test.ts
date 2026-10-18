@@ -1,19 +1,40 @@
-import { DeleteObjectCommand, HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
 import type { EventEmitter } from "node:events";
 import pg from "pg";
 import { sql } from "@payloadcms/db-postgres";
 import { createLocalReq, type Payload } from "payload";
+import type { OrphanObjectScanMode } from "../../src/lib/env";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { asSystemActivity } from "../../src/hooks/leads/lead-activity-hooks";
 import { ANONYMIZED_PLACEHOLDER } from "../../src/lib/leads/lead-values";
 import type { Lead } from "../../src/payload-types";
 
+/**
+ * Bucket private dùng chung với checkout chính và các worktree khác: test này KHÔNG được liệt kê bucket ngoài vùng prefix của chính nó (bước quét mồ côi
+ * xoá theo sự vắng mặt của dòng DB). Mọi lời gọi liệt kê có prefix rỗng/ngoài vùng test (`retention-test-*` hoặc tên file CV do test tạo) làm test FAIL.
+ */
+const allowedExtraScanPrefixes = new Set<string>();
+vi.mock("../../src/lib/private-objects/private-objects", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../src/lib/private-objects/private-objects")>();
+  return {
+    ...original,
+    listPrivateObjectsPage: (prefix: string, continuationToken?: string) => {
+      if (!prefix.startsWith("retention-test-") && !allowedExtraScanPrefixes.has(prefix)) {
+        throw new Error("Test không được quét bucket private dùng chung ngoài prefix của test");
+      }
+      return original.listPrivateObjectsPage(prefix, continuationToken);
+    },
+  };
+});
+
 const baseUrl = process.env.DATABASE_URL_TEST;
 const hasS3 = Boolean(process.env.S3_ENDPOINT);
 const PDF = Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\nxref\n0 1\n0000000000 65535 f\ntrailer<<>>\nstartxref\n0\n%%EOF\n");
 const NOW = new Date("2026-10-18T12:00:00.000Z");
+/** Vùng quét object mồ côi không có object nào: các test khác không đụng bucket dùng chung. */
+const NO_SCAN_PREFIX = `retention-test-noscan-${randomUUID()}/`;
 const lexical = (text: string) => ({
   root: {
     type: "root",
@@ -41,9 +62,10 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
   let phoneSeed = 0;
 
   const exec = (query: unknown) => (payload.db.drizzle as unknown as { execute: (query: unknown) => Promise<{ rows: Record<string, unknown>[] }> }).execute(query);
-  const run = async (options: { dryRun?: boolean; now?: Date } = {}) => {
+  const run = async (options: { dryRun?: boolean; now?: Date; scanPrefix?: string; mode?: OrphanObjectScanMode; maxDelete?: number } = {}) => {
     const { runDataRetention } = await import("../../src/lib/retention/run-data-retention");
-    return runDataRetention({ payload, now: options.now ?? NOW, dryRun: options.dryRun });
+    // Mặc định quét vùng không có object nào: bucket private dùng chung với worktree/test khác, không được xoá object không do test này tạo.
+    return runDataRetention({ payload, now: options.now ?? NOW, dryRun: options.dryRun, orphanObjectScanPrefix: options.scanPrefix ?? NO_SCAN_PREFIX, orphanObjectScanMode: options.mode ?? "delete", orphanObjectMaxDelete: options.maxDelete });
   };
 
   async function createLead(lastActivityAt: Date, extra: Record<string, unknown> = {}) {
@@ -249,7 +271,7 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
     const auditsBefore = (await payload.count({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, overrideAccess: true })).totalDocs;
 
     const dry = await run({ dryRun: true });
-    expect(dry).toEqual({ dryRun: true, leadsAnonymized: 1, applicationsAnonymized: 1, cvFilesDeleted: 1, orphanCvsDeleted: 1, auditLogsDeleted: 1, failedJobsDeleted: 1 });
+    expect(dry).toEqual({ dryRun: true, leadsAnonymized: 1, applicationsAnonymized: 1, cvFilesDeleted: 1, orphanCvsDeleted: 1, orphanObjectsDeleted: 0, orphanObjectsFound: 0, failedRecords: 0, auditLogsDeleted: 1, failedJobsDeleted: 1 });
     expect((await reloadLead(lead.id)).anonymizedAt ?? null).toBeNull();
     expect((await reloadApplication(application.id)).anonymizedAt ?? null).toBeNull();
     expect(await fileRow(cv.id)).toBeDefined();
@@ -261,7 +283,7 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
 
     const real = await run();
     expect(real).toEqual({ ...dry, dryRun: false });
-    expect(await run()).toEqual({ dryRun: false, leadsAnonymized: 0, applicationsAnonymized: 0, cvFilesDeleted: 0, orphanCvsDeleted: 0, auditLogsDeleted: 0, failedJobsDeleted: 0 });
+    expect(await run()).toEqual({ dryRun: false, leadsAnonymized: 0, applicationsAnonymized: 0, cvFilesDeleted: 0, orphanCvsDeleted: 0, orphanObjectsDeleted: 0, orphanObjectsFound: 0, auditLogsDeleted: 0, failedJobsDeleted: 0, failedRecords: 0 });
     // Lần chạy không đổi gì không ghi thêm audit: chỉ đúng 1 audit cho lần chạy thật.
     expect((await payload.count({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, overrideAccess: true })).totalDocs).toBe(auditsBefore + 1);
   });
@@ -339,7 +361,7 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
     expect(await jobExists(oldHealthy)).toBe(true);
 
     const [entry] = (await payload.find({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, sort: "-createdAt", limit: 1, overrideAccess: true, depth: 0 })).docs;
-    expect(entry!.meta).toEqual({ leadsAnonymized: 1, applicationsAnonymized: 0, cvFilesDeleted: 0, orphanCvsDeleted: 0, auditLogsDeleted: 1, failedJobsDeleted: 1 });
+    expect(entry!.meta).toEqual({ leadsAnonymized: 1, applicationsAnonymized: 0, cvFilesDeleted: 0, orphanCvsDeleted: 0, orphanObjectsDeleted: 0, orphanObjectsFound: 0, auditLogsDeleted: 1, failedJobsDeleted: 1, failedRecords: 0, failedSteps: [] });
     expect(entry!.actor ?? null).toBeNull();
     expect(JSON.stringify(entry)).not.toMatch(/Nguyen|khach-pii|example\.test/);
   });
@@ -464,6 +486,9 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
     const { dataRetentionTask } = await import("../../src/jobs/data-retention");
     const lead = await createLead(new Date(Date.now() - 800 * 86_400_000));
     const req = await createLocalReq({}, payload);
+    // Handler chạy qua cấu hình thật (không prefix): tắt bước quét bucket để không đụng object dùng chung (mock ở đầu file là lớp chặn thứ hai).
+    const previousMode = process.env.RETENTION_ORPHAN_OBJECT_SCAN;
+    process.env.RETENTION_ORPHAN_OBJECT_SCAN = "off";
     const handler = dataRetentionTask.handler as unknown as (args: { input: { dryRun?: boolean }; req: typeof req }) => Promise<{ output: { dryRun: boolean; leadsAnonymized: number } }>;
     const dry = await handler({ input: { dryRun: true }, req });
     expect(dry.output).toMatchObject({ dryRun: true, leadsAnonymized: 1 });
@@ -471,5 +496,149 @@ describe.skipIf(!baseUrl || !hasS3)("integration: job data-retention", () => {
     const real = await handler({ input: {}, req });
     expect(real.output).toMatchObject({ dryRun: false, leadsAnonymized: 1 });
     expect((await reloadLead(lead.id)).anonymizedAt).toBeTruthy();
+    if (previousMode === undefined) delete process.env.RETENTION_ORPHAN_OBJECT_SCAN;
+    else process.env.RETENTION_ORPHAN_OBJECT_SCAN = previousMode;
+  });
+
+  describe("hook beforeDelete của private-files: mọi đường xoá dùng chung, S3 lỗi thì dòng DB còn", () => {
+    it("admin xoá hồ sơ ứng tuyển khi S3 lỗi: xoá hồ sơ bị rollback, CV + dòng private-files + object còn; lần sau xoá được cả hai", async () => {
+      const cv = await createCv();
+      const application = await createApplication(daysAgo(1), cv.id);
+      const s3Failure = failS3Deletes();
+      try {
+        await expect(payload.delete({ collection: "job-applications", id: application.id, overrideAccess: true })).rejects.toThrow();
+      } finally {
+        s3Failure.mockRestore();
+      }
+      expect(await reloadApplication(application.id)).toBeDefined();
+      expect(await fileRow(cv.id)).toBeDefined();
+      expect(await objectExists(cv.filename as string)).toBe(true);
+
+      await payload.delete({ collection: "job-applications", id: application.id, overrideAccess: true });
+      expect(await fileRow(cv.id)).toBeUndefined();
+      expect(await objectExists(cv.filename as string)).toBe(false);
+    });
+
+    it("xoá thẳng private-files theo id khi S3 lỗi (admin UI / removeOrphanCv): ném lỗi, dòng + object còn; lần sau xoá được", async () => {
+      const cv = await createCv();
+      const s3Failure = failS3Deletes();
+      try {
+        await expect(payload.delete({ collection: "private-files", id: cv.id, overrideAccess: true })).rejects.toThrow();
+      } finally {
+        s3Failure.mockRestore();
+      }
+      expect(await fileRow(cv.id)).toBeDefined();
+      expect(await objectExists(cv.filename as string)).toBe(true);
+
+      await payload.delete({ collection: "private-files", id: cv.id, overrideAccess: true });
+      expect(await fileRow(cv.id)).toBeUndefined();
+      expect(await objectExists(cv.filename as string)).toBe(false);
+    });
+
+    it("object đã xoá rồi commit lỗi (dòng private-files + con trỏ hồ sơ còn, object mất): lần chạy sau ẩn danh hồ sơ và xoá dòng, cvFilesDeleted = 1", async () => {
+      const cv = await createCv();
+      const application = await createApplication(daysAgo(500), cv.id);
+      await s3.send(new DeleteObjectCommand({ Bucket: privateBucket, Key: cv.filename as string }));
+      expect(await objectExists(cv.filename as string)).toBe(false);
+      expect(await fileRow(cv.id)).toBeDefined();
+
+      expect(await run()).toMatchObject({ applicationsAnonymized: 1, cvFilesDeleted: 1 });
+      expect((await reloadApplication(application.id)).anonymizedAt).toBe(NOW.toISOString());
+      expect(await fileRow(cv.id)).toBeUndefined();
+    });
+  });
+
+  describe("quét object mồ côi (bucket ↔ DB)", () => {
+    // LastModified là giờ thật của S3 nên "cũ hơn ngưỡng" mô phỏng bằng `now` lùi: now = hiện tại + 25h thì object vừa tạo đã quá ngưỡng 24h.
+    const FUTURE_NOW = () => new Date(Date.now() + 25 * 3_600_000);
+    const put = (key: string) => s3.send(new PutObjectCommand({ Bucket: privateBucket, Key: key, Body: PDF, ContentType: "application/pdf" }));
+
+    it("dry-run đếm đúng; chạy thật chỉ xoá object không có dòng DB; object chưa quá ngưỡng thì giữ", async () => {
+      const prefix = `retention-test-orphans-${randomUUID()}/`;
+      const keys = [`${prefix}a.pdf`, `${prefix}b.pdf`];
+      await Promise.all(keys.map(put));
+      const kept = await createCv(); // có dòng DB: quét đúng vùng của nó phải giữ lại
+      const keptApplication = await createApplication(daysAgo(1), kept.id); // có hồ sơ trỏ tới nên bước purge-orphan-cvs cũng không xoá
+      allowedExtraScanPrefixes.add(kept.filename as string);
+      try {
+        expect(await run({ dryRun: true, now: FUTURE_NOW(), scanPrefix: prefix })).toMatchObject({ orphanObjectsFound: 2, orphanObjectsDeleted: 0 });
+        for (const key of keys) expect(await objectExists(key)).toBe(true);
+
+        expect(await run({ now: new Date(), scanPrefix: prefix })).toMatchObject({ orphanObjectsFound: 0, orphanObjectsDeleted: 0 }); // chưa quá 24h
+        for (const key of keys) expect(await objectExists(key)).toBe(true);
+
+        expect(await run({ now: FUTURE_NOW(), scanPrefix: kept.filename as string })).toMatchObject({ orphanObjectsDeleted: 0 });
+        expect(await objectExists(kept.filename as string)).toBe(true);
+
+        expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix })).toMatchObject({ orphanObjectsFound: 2, orphanObjectsDeleted: 2 });
+        for (const key of keys) expect(await objectExists(key)).toBe(false);
+        expect(await objectExists(kept.filename as string)).toBe(true);
+      } finally {
+        await payload.delete({ collection: "job-applications", id: keptApplication.id, overrideAccess: true }).catch(() => {});
+      }
+    });
+
+    it("S3 từ chối xoá object mồ côi: job báo lỗi, object còn, audit ghi số bản ghi lỗi và bước lỗi; lần sau xoá được", async () => {
+      const prefix = `retention-test-orphans-${randomUUID()}/`;
+      const key = `${prefix}c.pdf`;
+      await put(key);
+      const s3Failure = failS3Deletes();
+      try {
+        await expect(run({ now: FUTURE_NOW(), scanPrefix: prefix })).rejects.toThrow(/purge-orphan-objects/);
+      } finally {
+        s3Failure.mockRestore();
+      }
+      expect(await objectExists(key)).toBe(true);
+      const [entry] = (await payload.find({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, sort: "-createdAt", limit: 1, overrideAccess: true, depth: 0 })).docs;
+      expect(entry!.meta).toMatchObject({ failedSteps: expect.arrayContaining(["purge-orphan-objects"]) });
+      expect((entry!.meta as { failedRecords: number }).failedRecords).toBeGreaterThanOrEqual(1);
+
+      expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix })).toMatchObject({ orphanObjectsDeleted: 1 });
+      expect(await objectExists(key)).toBe(false);
+    });
+
+    it("chế độ off bỏ qua bước (không liệt kê); dry-run chỉ đếm + ghi audit, không xoá; delete mới xoá", async () => {
+      const prefix = `retention-test-orphans-${randomUUID()}/`;
+      const key = `${prefix}d.pdf`;
+      await put(key);
+      const sendSpy = vi.spyOn(S3Client.prototype, "send");
+      expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix, mode: "off" })).toMatchObject({ orphanObjectsFound: 0, orphanObjectsDeleted: 0 });
+      expect(sendSpy.mock.calls.some(([command]) => (command as { constructor: { name: string } }).constructor.name === "ListObjectsV2Command")).toBe(false);
+      sendSpy.mockRestore();
+      expect(await objectExists(key)).toBe(true);
+
+      expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix, mode: "dry-run" })).toMatchObject({ orphanObjectsFound: 1, orphanObjectsDeleted: 0 });
+      expect(await objectExists(key)).toBe(true);
+      const [entry] = (await payload.find({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, sort: "-createdAt", limit: 1, overrideAccess: true, depth: 0 })).docs;
+      expect(entry!.meta).toMatchObject({ orphanObjectsFound: 1, orphanObjectsDeleted: 0 });
+
+      expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix, mode: "delete" })).toMatchObject({ orphanObjectsFound: 1, orphanObjectsDeleted: 1 });
+      expect(await objectExists(key)).toBe(false);
+    });
+
+    it("ngưỡng an toàn: quá số lượng tối đa thì KHÔNG xoá gì và job báo lỗi (failedSteps trong audit)", async () => {
+      const prefix = `retention-test-orphans-${randomUUID()}/`;
+      const keys = [`${prefix}e1.pdf`, `${prefix}e2.pdf`];
+      await Promise.all(keys.map(put));
+      await expect(run({ now: FUTURE_NOW(), scanPrefix: prefix, maxDelete: 1 })).rejects.toThrow(/purge-orphan-objects/);
+      for (const key of keys) expect(await objectExists(key)).toBe(true);
+      const [entry] = (await payload.find({ collection: "audit-logs", where: { action: { equals: "system.data_retention" } }, sort: "-createdAt", limit: 1, overrideAccess: true, depth: 0 })).docs;
+      expect(entry!.meta).toMatchObject({ failedSteps: expect.arrayContaining(["purge-orphan-objects"]), orphanObjectsFound: 2, orphanObjectsDeleted: 0 });
+
+      expect(await run({ now: FUTURE_NOW(), scanPrefix: prefix, maxDelete: 2 })).toMatchObject({ orphanObjectsDeleted: 2 });
+      for (const key of keys) expect(await objectExists(key)).toBe(false);
+    });
+
+    it("ngưỡng tỉ lệ: từ 10 mồ côi trở lên mà chiếm > 20% số object đã liệt kê thì không xoá (DB rỗng/nhầm DB/restore cũ)", async () => {
+      const prefix = `retention-test-orphans-${randomUUID()}/`;
+      const keys = Array.from({ length: 12 }, (_, index) => `${prefix}r${index}.pdf`);
+      await Promise.all(keys.map(put));
+      try {
+        await expect(run({ now: FUTURE_NOW(), scanPrefix: prefix })).rejects.toThrow(/purge-orphan-objects/);
+        expect(await Promise.all(keys.map(objectExists))).toEqual(keys.map(() => true));
+      } finally {
+        await Promise.all(keys.map((key) => s3.send(new DeleteObjectCommand({ Bucket: privateBucket, Key: key }))));
+      }
+    });
   });
 });

@@ -29,11 +29,11 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - `layer-6-task-09` Endpoint job-applications (dùng kết quả của task này)
 
 ## Acceptance Criteria
-- [ ] Hook `beforeDelete` trên `private-files`: xoá object S3 tường minh, lỗi → throw, dòng DB không bị xoá; dùng chung cho admin xoá hồ sơ (`delete-cv-and-audit.ts`), `removeOrphanCv`, admin xoá private-files trực tiếp, job data-retention (dùng lại hoặc thay `deletePrivateFile`, không xoá đôi gây lỗi)
-- [ ] Key S3 dựng từ prefix lưu trữ thật (không giả định bucket không prefix)
-- [ ] Quét đối chiếu bucket ↔ DB: object không có dòng `private-files` và cũ hơn ngưỡng → xoá (trong job data-retention hoặc lệnh tay có dry-run), log chỉ số lượng
-- [ ] Audit meta data-retention ghi số bước/bản ghi lỗi (MINOR L9-T06 r2)
-- [ ] Sửa comment sai ở `delete-cv-and-audit.ts:8`
+- [x] Hook `beforeDelete` trên `private-files`: xoá object S3 tường minh, lỗi → throw, dòng DB không bị xoá; dùng chung cho admin xoá hồ sơ (`delete-cv-and-audit.ts`), `removeOrphanCv`, admin xoá private-files trực tiếp, job data-retention (dùng lại hoặc thay `deletePrivateFile`, không xoá đôi gây lỗi)
+- [x] Key S3 dựng từ prefix lưu trữ thật (không giả định bucket không prefix)
+- [x] Quét đối chiếu bucket ↔ DB: object không có dòng `private-files` và cũ hơn ngưỡng → xoá (trong job data-retention hoặc lệnh tay có dry-run), log chỉ số lượng
+- [x] Audit meta data-retention ghi số bước/bản ghi lỗi (MINOR L9-T06 r2)
+- [x] Sửa comment sai ở `delete-cv-and-audit.ts:8`
 
 ## Tests cần viết
 - Integration S3 thật + mock lỗi tầng S3 client: mọi đường xoá → DB còn, object còn, lần sau xử lý được
@@ -48,19 +48,19 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - Không dự kiến. Cần schema → dừng báo user.
 
 ## Retry / Error Memory
-- Attempt: 0
+- Attempt: 2
 - Last failure type: n/a
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
-- Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Acceptance criteria: PASS
+- Verify commands + result: worktree: lint · typecheck · build PASS; test 2.220 PASS + chạy lại access/media-upload/data-retention 65 PASS (contrast CRLF BL-004). Sau squash lên staging: lint · typecheck PASS, data-retention + env + job-applications 46 PASS
+- Reviewer verdict: STRICT PASS round 2 (`.context/review-reports/build-tami-website-layer-10-task-05-round-2-review.md`); round 1 FAIL (CRITICAL-1 test quét bucket dùng chung, MAJOR-1 quét mồ côi không guard); MINOR round 2 → layer-12-task-01
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending
+- Doc impact result: docs/ARCHITECTURE.md, docs/ERD.md, docs/runbooks/deploy.md §3.3, docs/runbooks/restore.md §6, .env.example, compose staging/prod (RETENTION_ORPHAN_OBJECT_SCAN=dry-run)
 - Decision log: user duyệt 2026-10-19 (progress.json decisions)
 
 ## Commit / Tracking
@@ -68,13 +68,13 @@ build (initial) — task bổ sung (user duyệt 2026-10-19)
 - Progress: `.context/progress.json`
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/collections/PrivateFiles.ts

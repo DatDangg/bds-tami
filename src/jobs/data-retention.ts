@@ -21,8 +21,11 @@ export const dataRetentionTask: TaskConfig<"data-retention"> = {
     { name: "applicationsAnonymized", type: "number", required: true },
     { name: "cvFilesDeleted", type: "number", required: true },
     { name: "orphanCvsDeleted", type: "number", required: true },
+    { name: "orphanObjectsDeleted", type: "number", required: true },
+    { name: "orphanObjectsFound", type: "number", required: true },
     { name: "auditLogsDeleted", type: "number", required: true },
     { name: "failedJobsDeleted", type: "number", required: true },
+    { name: "failedRecords", type: "number", required: true },
   ],
   handler: async ({ input, req }) => {
     const output = await runDataRetention({ payload: req.payload, dryRun: input?.dryRun === true });

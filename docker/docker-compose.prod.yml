@@ -40,6 +40,8 @@ x-app-environment: &app-environment
   S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?}
   S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:?}
   S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:?}
+  # Bước quét object mồ côi của job data-retention: mặc định CHỈ ĐẾM (dry-run). Chỉ đặt `delete` trong env file sau khi xác nhận bucket private chỉ phục vụ đúng DB này (restore.md §6 mục 6).
+  RETENTION_ORPHAN_OBJECT_SCAN: ${RETENTION_ORPHAN_OBJECT_SCAN:-dry-run}
   TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:?}
   TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:?}
   SMTP_HOST: ${SMTP_HOST:?}

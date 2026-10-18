@@ -102,6 +102,7 @@ export async function anonymizeExpiredLeads({ payload, now, dryRun, tally }: Ret
   await processDueRecords({
     payload,
     step: "anonymize-leads",
+    tally,
     findDueIds: async (excludeIds) => {
       const due = await payload.find({
         collection: "leads",
