@@ -2,7 +2,33 @@
   "mode": "initial-build",
   "activeWorkItem": "build/tami-website",
   "features": [],
-  "bugs": [],
+  "bugs": [
+    {
+      "slug": "isfilled-empty-richtext",
+      "title": "isFilled coi richText chỉ có 1 đoạn rỗng là đủ (BL-012)",
+      "severity": "high",
+      "status": "done",
+      "backlog": "BL-012",
+      "changeDoc": "spec/changes/archive/2026-10-19-isfilled-empty-richtext.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-isfilled-empty-richtext/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": "2026-10-19",
+      "specVersion": "1.2.2",
+      "scopeVersion": 1,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-isfilled-empty-richtext-phase-1-task-01-round-1-review.md"
+    }
+  ],
   "projectName": "tami-website",
   "initialBuild": {
     "slug": "tami-website",

@@ -1,0 +1,55 @@
+{
+  "specVersion": "1.2.2",
+  "scopeVersion": 1,
+  "generatedAt": "2026-10-19T00:23:20+07:00",
+  "trigger": "bug-fix",
+  "workItem": "bug-isfilled-empty-richtext",
+  "backlog": "BL-012",
+  "changeDoc": "spec/changes/2026-10-19-isfilled-empty-richtext.md",
+  "task": "tasks/bug-isfilled-empty-richtext/phase-1-task-01.md",
+  "specRefs": ["BR-07", "BR-08", "FR-ADM-17"],
+  "specRefNotes": {
+    "BR-07": "hasEnglish chỉ bật khi đủ trường bắt buộc tiếng Anh (docs/ERD.md §1.1); thiếu thì không hiện ở /en",
+    "BR-08": "trang pháp lý: chỉ admin duyệt bản EN mới bật hasEnglish — POST /api/admin/translations/pages/:id/approve, 422 khi thiếu title/content (docs/API_SPEC.md §5.2)",
+    "FR-ADM-17": "job dịch tự động translate-content (dịch richText từng đoạn, tự bật hasEnglish)"
+  },
+  "changed": {
+    "files": [
+      "src/hooks/require-english-fields.ts",
+      "src/hooks/require-english-fields.test.ts"
+    ],
+    "modules": [
+      "i18n/EN required fields",
+      "legal page EN approval",
+      "translation job"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "isFilled: richText Lexical không có con, hoặc chỉ paragraph/heading rỗng (chỉ khoảng trắng/linebreak/tab) = chưa điền",
+      "Duyệt EN trang pháp lý POST /api/admin/translations/pages/:id/approve với content EN rỗng như trên → 422, details liệt kê path content; hasEnglish giữ false",
+      "Hook requireEnglishFields: không bật hasEnglish khi richText EN bắt buộc rỗng như trên",
+      "Job translate-content-save: không bật hasEnglish khi richText EN bắt buộc rỗng như trên",
+      "richText có text thật, hoặc node nội dung không phải text (upload, block…) → coi là đã điền"
+    ],
+    "dependents": [
+      "requiredByLocale: trường R richText bản vi giờ chặn lưu khi chỉ có paragraph rỗng",
+      "translate-content selectChangedLeaves: nguồn vi rỗng → không dịch; en rỗng + vi có chữ → dịch",
+      "detect-manual-en: paragraph rỗng ↔ trống không tính là sửa tay",
+      "Homepage CTA title (dùng isFilled)"
+    ],
+    "regression": [
+      "Lưu/duyệt EN các collection có hasEnglish: pages pháp lý, news, projects, posts (property-posts), job-postings, categories, services, developers, rentals",
+      "Job dịch tự động (lưu bản vi published → dịch → bật hasEnglish), Dịch lại bằng AI",
+      "Admin sửa tay bản EN (enSource = manual, viChangedAfterManual)",
+      "Lưu bản vi có richText bắt buộc (nội dung hợp lệ vẫn lưu được)"
+    ]
+  },
+  "acceptance": [
+    "richText rỗng (không con, hoặc chỉ paragraph/heading không có text khác khoảng trắng/linebreak) → isFilled = false",
+    "richText có text thật, hoặc node nội dung không phải text (upload, block…) → isFilled = true",
+    "Test hồi quy cho các ca trên + duyệt pháp lý 422 + không bật hasEnglish",
+    "pnpm test / lint / typecheck / build PASS"
+  ],
+  "risk": "medium"
+}

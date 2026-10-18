@@ -2,15 +2,40 @@ import { type CollectionBeforeValidateHook, type CollectionSlug, ValidationError
 
 import { preserveRequestLocale } from "../lib/payload/preserve-request-locale";
 
-/** Giá trị coi là "đã nhập": chuỗi không rỗng, mảng không rỗng, richText Lexical có ít nhất một node. */
+/**
+ * Giá trị coi là "đã nhập": chuỗi không rỗng, mảng không rỗng, richText Lexical có nội dung thật (xem `lexicalHasContent`).
+ * Object khác (upload, relationship…) coi là đã nhập.
+ */
 export function isFilled(value: unknown): boolean {
   if (typeof value === "string") return value.trim() !== "";
   if (Array.isArray(value)) return value.length > 0;
   if (typeof value === "object" && value !== null) {
     const children = (value as { root?: { children?: unknown } }).root?.children;
-    return Array.isArray(children) ? children.length > 0 : true;
+    return Array.isArray(children) ? lexicalHasContent(children) : true;
   }
   return false;
+}
+
+type LexicalNode = { type?: string; text?: string; children?: unknown };
+
+/** Node chỉ bọc chữ: rỗng khi con rỗng. */
+const TEXT_CONTAINER_TYPES = new Set(["paragraph", "heading", "quote", "list", "listitem", "link", "autolink"]);
+/** Node không mang nội dung. */
+const BLANK_NODE_TYPES = new Set(["linebreak", "tab"]);
+
+/**
+ * Lexical luôn để lại ít nhất một `paragraph` (không con, hoặc chỉ linebreak/khoảng trắng) khi admin xoá hết chữ,
+ * nên không thể đếm `children.length`. Có nội dung khi gặp text khác khoảng trắng, hoặc node nội dung không phải chữ
+ * (upload, block, relationship, horizontalrule…).
+ */
+function lexicalHasContent(nodes: unknown[]): boolean {
+  return nodes.some((raw) => {
+    const node = raw as LexicalNode;
+    if (node.type === "text") return typeof node.text === "string" && node.text.trim() !== "";
+    if (node.type !== undefined && BLANK_NODE_TYPES.has(node.type)) return false;
+    if (node.type !== undefined && TEXT_CONTAINER_TYPES.has(node.type)) return Array.isArray(node.children) && lexicalHasContent(node.children);
+    return true;
+  });
 }
 
 type Doc = Record<string, unknown>;
