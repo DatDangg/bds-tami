@@ -37,12 +37,12 @@ Global trang chủ cho admin bật/tắt, sắp xếp khối và chỉnh nội d
 Mở khoá cho: `layer-9-task-01`, `layer-9-task-07`
 
 ## Acceptance Criteria
-- [ ] Lưu `services` phải làm mới thẻ dịch vụ trên trang chủ (revalidate trang chủ vi/en hoặc tag); FR-ADM-16 (`publishedAt ≤ now`) phải loại trừ services/pages (không có publishedAt) (MINOR-5) (review L5-T02 round 1)
-- [ ] G12: thêm `homepage` vào `TRANSLATABLE_GLOBALS` (`src/lib/translation/allowlist.ts`) + revalidate tag global; test (spec-validation layer 4)
-- [ ] Khối: `hero` (1–8 slide; `image` bắt buộc, `video` tuỳ chọn chỉ MP4/WebM ≤ 15MB), `about` (+ `stats`), `featuredProjects` (≤ 6), `services`, `featuredOffers`, `partners`, `ctaBanner` (`title` bắt buộc khi `enabled`), `blockOrder` gồm `ctaBanner`, `seo`
-- [ ] Chữ localized; quan hệ/ảnh dùng chung; có `translation` group
-- [ ] Chỉ admin ghi; lưu → revalidate `/` và `/en`
-- [ ] Không có dải 4 lối tắt (đã bỏ)
+- [x] Lưu `services` phải làm mới thẻ dịch vụ trên trang chủ (revalidate trang chủ vi/en hoặc tag); FR-ADM-16 (`publishedAt ≤ now`) phải loại trừ services/pages (không có publishedAt) (MINOR-5) (review L5-T02 round 1)
+- [x] G12: thêm `homepage` vào `TRANSLATABLE_GLOBALS` (`src/lib/translation/allowlist.ts`) + revalidate tag global; test (spec-validation layer 4)
+- [x] Khối: `hero` (1–8 slide; `image` bắt buộc, `video` tuỳ chọn chỉ MP4/WebM ≤ 15MB), `about` (+ `stats`), `featuredProjects` (≤ 6), `services`, `featuredOffers`, `partners`, `ctaBanner` (`title` bắt buộc khi `enabled`), `blockOrder` gồm `ctaBanner`, `seo`
+- [x] Chữ localized; quan hệ/ảnh dùng chung; có `translation` group
+- [x] Chỉ admin ghi; lưu → revalidate `/` và `/en`
+- [x] Không có dải 4 lối tắt (đã bỏ)
 
 ## Tests cần viết
 - Integration: 0 slide hoặc 9 slide → lỗi; video 20MB → lỗi; video là ảnh → lỗi
@@ -67,7 +67,7 @@ Mở khoá cho: `layer-9-task-01`, `layer-9-task-07`
 - Acceptance criteria: pending
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (157 file, 1.715) · `pnpm build` PASS; migration up→down→up; migration đã áp DB dev
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-01-round-2-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (task đạt AC; gap G31 ngoài task) — `.context/review-reports/spec-validation-build-tami-website-layer-8.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ERD §4.15 as-built (ràng buộc ctaBanner + chặn xoá media) + §4.12; ARCHITECTURE (allowlist homepage)

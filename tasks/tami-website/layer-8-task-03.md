@@ -14,7 +14,7 @@ build (initial)
 - Scope: SINGLE_SURFACE
 - Review level expected: **STRICT** — trang chuyển đổi chính, bộ lọc/URL là contract chia sẻ, hiệu năng
 - Blast radius: src/app/(frontend)/[locale]/cho-thue/page.tsx; src/components/rentals/RentalFilters.tsx (client), RentalCard.tsx, SortSelect.tsx; src/lib/search/url-params.ts (parse/serialize, dùng chung với API)
-- Doc impact (dự kiến): no doc impact
+- Doc impact (dự kiến): API_SPEC §3.2/§3.3, ARCHITECTURE §4
 - Decision impact: NO
 
 ## Requirements
@@ -31,7 +31,7 @@ build (initial)
 - `layer-5-task-06` Thành phần trang dùng chung: nút liên hệ nổi, breadcrumb, page banner, phân trang, template danh mục, trạng thái trống/lỗi, 404/500 (dùng kết quả của task này)
 - `layer-5-task-08` Nền SEO: metadata, Open Graph, canonical, hreflang, JSON-LD builders (dùng kết quả của task này)
 
-Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
+Mở khoá cho: `layer-10-task-03`, `layer-13-task-03` (trang danh mục cho thuê `/cho-thue/danh-muc/[category]` KHÔNG thuộc L10-T03 — G31 spec-validation layer 8, chờ user xếp task)
 
 ## Acceptance Criteria
 - [x] Mọi bộ lọc phản ánh trên URL; mở URL chia sẻ ra đúng kết quả; tham số lạ bị bỏ qua
@@ -60,13 +60,13 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 
 ## Feature Verification
 - Acceptance criteria: pending
-- Verify commands + result: pending
+- Verify commands + result: worktree lint/typecheck/build PASS, test 162 file 1.788 PASS; sau squash staging (cùng T01/T02/T04): lint, typecheck, test 171 file 1.882, build PASS
 - Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-8-task-03-round-1-review.md`); 7 MINOR → follow-up dưới / L13-T03 / BL-006
 - Chưa làm (ghi gap): skeleton 6 thẻ S04 lần tải đầu (trang là server component đọc `searchParams`, không có trạng thái loading client); job reindex nền khi vượt ngưỡng 500 (cần migration enum task) → BL-006
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (task đạt AC; gap G31 ngoài task) — `.context/review-reports/spec-validation-build-tami-website-layer-8.md`
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: no doc impact)
+- Doc impact result: `docs/API_SPEC.md` §2/§3.2/§3.3 (`available`, `ward` cần `province` → 400, `code: "postingClosed"`), `docs/ARCHITECTURE.md` §4
 - Decision log: pending
 
 ## Commit / Tracking
@@ -116,7 +116,7 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-03`
 - **API thêm `available=true`** (chỉ tin `published`): S04 không liệt kê tin `rented` nhưng API L7-T02 trả cả hai; thay vì tham số "ngầm" chỉ trang dùng được, đưa thành tham số công khai để Sheet đếm "Xem n tin" qua chính endpoint này khớp số trên trang.
 - **URL trang khoan dung hơn API:** `parseRentalFilters` kiểm từng khoá bằng chính schema của API, giá trị sai/rỗng/khoá lạ bị bỏ (API vẫn 400); `ward` không `province` bị bỏ; min > max đảo lại; slug danh mục/tỉnh/phường không tồn tại bị bỏ ở `dropUnknownSlugs` (như `/du-an`), không 404.
 - **noindex:** `hasNarrowingParams` — trang gốc, một danh mục hoặc một tỉnh (kèm `page`) index, canonical là chính nó, không khai hreflang (slug khác nhau theo ngôn ngữ). Mọi tổ hợp sâu hơn (từ khoá, phường, giá, diện tích, phòng ngủ, nội thất, danh mục + tỉnh) hoặc đổi sắp xếp → `noindex, follow`, canonical về `/cho-thue` sạch.
-- **Chip loại hình = `?category=` (không phải trang S05)**: route `/cho-thue/danh-muc/[category]` + `/khu-vuc/[province]` chưa tồn tại (L10-T03), link tới đó hiện sẽ 404. L10-T03 đổi chip sang URL S05 (và thêm quy tắc `MISSING_PAGE_RULES`; test G27 bắt nếu quên).
+- **Chip loại hình = `?category=` (không phải trang S05)**: route (G31: chưa có task nhận) `/cho-thue/danh-muc/[category]` + `/khu-vuc/[province]` chưa tồn tại (L10-T03), link tới đó hiện sẽ 404. L10-T03 đổi chip sang URL S05 (và thêm quy tắc `MISSING_PAGE_RULES`; test G27 bắt nếu quên).
 - **Bộ lọc client:** một bản nháp (`useLiveDraft`) dùng chung thanh desktop + thanh dính mobile; URL là nguồn sự thật (đổi từ ngoài thì nạp lại, đổi do chính lần commit thì không nuốt chữ đang gõ — có test); gõ chờ 300ms, chọn/chip đổi ngay, luôn về trang 1, `router.replace(..., { scroll: false })`. Sheet mobile có bản nháp riêng, đếm sống bằng `limit=1`, phường tải qua REST `/api/wards` khi đổi tỉnh trong Sheet.
 - **Trạng thái:** đổi bộ lọc → `PendingRegion` mờ 50% + `aria-busy`; lỗi truy vấn → khung `role="alert"` + "Thử lại" (log lỗi, không sập trang); trống khi lọc → `EmptyState` + tối đa 3 link "Bỏ <điều kiện>".
 - **Chưa làm / ghi nhận:** (1) job nền reindex (cần migration, xem follow-up). (2) Skeleton "loading lần đầu 6 thẻ" của S04: trang là Server Component đọc `searchParams` nên không có trạng thái loading lần đầu phía client (bỏ). (3) Tên tỉnh trên thẻ từ `SearchService` là `provinces.name` (đầy đủ), trong khi thẻ tin tương tự dùng `shortName` — lệch nhãn nhỏ giữa hai nơi, sửa cần đổi DTO API (ngoài phạm vi).

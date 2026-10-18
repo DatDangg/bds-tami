@@ -98,3 +98,6 @@ Mở khoá cho: `layer-10-task-03`, `layer-13-task-04`, `layer-14-task-02`
 - [ ] `src/hooks/media/guard-delete.ts:11` truyền `req` vào `findGlobal({locale:"vi"})` → Local API đổi `req.locale` của request xoá sang vi (response/afterRead trả alt vi cho request en). Dùng `req.payload.db.findGlobal({ slug: "homepage", locale: "vi", req })` hoặc lưu/khôi phục `req.locale`/`fallbackLocale`.
 - [ ] Test guard xoá media: thêm case video slide, `about.image`, `ctaBanner.backgroundImage`, bulk delete, ảnh OG xoá được.
 - [ ] Race 2 admin (vi tắt + title rỗng / en bật cùng lúc) có thể để `enabled=true` + title vi rỗng → trang chủ ẩn CTA banner khi title rỗng (phòng thủ ở lớp hiển thị).
+
+## Follow-up từ spec-validation layer 8 (G32)
+- [ ] (từ L8-T04 MINOR-1) `src/lib/posts/post-queries.ts:127-132` `findRelatedPosts`: danh mục còn 1–2 bài còn hạn thì lấy bù từ nhóm đã kết thúc cho đủ 3 thẻ (design-spec S09); test.

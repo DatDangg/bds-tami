@@ -14,7 +14,7 @@ build (initial)
 - Scope: CROSS_CUTTING
 - Review level expected: **STRICT** — ảnh hưởng index toàn site + rò nội dung chưa công khai
 - Blast radius: src/app/sitemap.ts (hoặc chia sitemap index theo collection); src/app/robots.ts; src/app/llms.txt/route.ts
-- Doc impact (dự kiến): no doc impact
+- Doc impact (dự kiến): ARCHITECTURE §4/§5
 - Decision impact: NO
 
 ## Requirements
@@ -63,9 +63,9 @@ Mở khoá cho: `layer-12-task-01`, `layer-16-task-01`
 
 ## Feature Verification
 - Acceptance criteria: 5/5 (builder)
-- Verify commands + result: pending
+- Verify commands + result: worktree lint/typecheck/build PASS, test 1.768 PASS; sau squash staging (đủ L8): lint, typecheck, test 177 file 1.925, build PASS
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-05-round-2-review.md`)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (task đạt AC; gap G31 ngoài task) — `.context/review-reports/spec-validation-build-tami-website-layer-8.md`
 
 ## Doc / Decision Impact
 - Doc impact result: docs/ARCHITECTURE.md §5 as-built (sitemap index, robots Sitemap, llms.txt)

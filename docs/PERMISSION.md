@@ -97,6 +97,8 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 ## 5. Thứ tự kiểm tra trên endpoint tuỳ biến
 
+> Phạm vi: luật "trả 404 thay vì 403" của mục này áp cho endpoint tự viết `/api/admin/*`. REST mặc định của Payload (`/api/<collection>/:id`) trả 403 khi sale `update` bản ghi không được giao (vd `leads`, L8-T02) — chấp nhận (id là uuid, không đoán được); không đổi hành vi Payload.
+
 > Áp dụng cho các endpoint trong `src/endpoints/` (xem `docs/API_SPEC.md`). Collection mặc định của Payload dùng `access` như §3–4.
 
 **Endpoint công khai** (`/api/public/*`):

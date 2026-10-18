@@ -71,7 +71,7 @@ Mở khoá cho: `layer-9-task-02`, `layer-9-task-03`, `layer-9-task-04`, `layer-
 - Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (164 file, 1.788) · `pnpm build` PASS; migration up→down→up (đã áp DB dev, batch 23)
 - Reviewer verdict: STRICT round 1 FAIL → round 2 PASS (`.context/review-reports/build-tami-website-layer-8-task-02-round-2-review.md`)
 - Ghi chú: Payload trả 403 (không phải 404) khi sale update by id lead không được giao — test assert 403; id là uuid
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (task đạt AC; gap G31 ngoài task) — `.context/review-reports/spec-validation-build-tami-website-layer-8.md`
 
 ## Doc / Decision Impact
 - Doc impact result: ERD §4.11 as-built (+ quy tắc `asSystemActivity`), PERMISSION §3.3, ARCHITECTURE §4

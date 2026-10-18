@@ -528,7 +528,7 @@
       "reason": "User duyệt checkpoint layer 7"
     }
   ],
-  "lastUpdated": "2026-10-18T15:50:00Z",
+  "lastUpdated": "2026-10-18T16:15:00Z",
   "approvalMilestones": [
     {
       "id": "M1",
@@ -619,6 +619,12 @@
       "note": "27/27 AC. G26/G27 đóng. G29 (việc treo) → L8-T03; G30 nginx /api/internal/ trên server trước push kế tiếp → L12-T01 (+ checkpoint); R22 dọn task file xong. User duyệt: D1 giữ 8, D2 lọc ±30% ở L8-T03, D3 → BL-005.",
       "approvedAt": "2026-10-18T11:45:00Z",
       "approvedBy": "user"
+    },
+    {
+      "layer": 8,
+      "verdict": "GAPS",
+      "report": ".context/review-reports/spec-validation-build-tami-website-layer-8.md",
+      "note": "28/28 AC đạt. G31 MEDIUM: trang danh mục cho thuê /cho-thue/danh-muc/[category] không có task (link từ trang chi tiết đang 404) — chờ user xếp task trước M2. D4 lệch S09 (voucher ẩn mã, nút chia sẻ), D5 thiếu skeleton/loading.tsx — chờ user. G32 → L9-T01/L16-T01, R23 dọn task file, PERMISSION ghi chú 403, BACKLOG BL-004..006 vào bảng: primary xong. G30 nginx trước push."
     }
   ]
 }

@@ -102,3 +102,4 @@ Mở khoá cho: không có
 - [ ] Sửa comment `src/lib/http/cache-policy.ts:26-27,33-34` và bullet layer-4-task-03 trong ARCHITECTURE (sitemap/llms không còn thuộc rule path có đuôi file).
 - [ ] Lookahead `sitemaps/[^/]+$` để path nhiều đoạn (`/sitemaps/a/b.xml`) vẫn có TTL ngắn.
 - [ ] Kiểm sitemap/llms loại tin hẹn giờ (`publishedAt > now`) khi `publicWhere` thêm điều kiện.
+- [ ] (G32 spec-validation layer 8) Khi thêm `publishedAt ≤ now` vào `buildPublicWhere`/`publicWhere`: LOẠI TRỪ `services` và `pages` (không có `publishedAt`) — nếu không, dịch vụ và trang pháp lý biến mất; snapshot test `buildPublicWhere` (L8-T03) sẽ đỏ có chủ đích.

@@ -62,7 +62,7 @@ Mở khoá cho: `layer-10-task-01`, `layer-10-task-03`
 - Verify commands + result: pnpm lint OK · pnpm typecheck OK · pnpm test 159 files/1729 tests PASS (+ 25 integration property-posts) · pnpm build OK (builder, worktree wt8-t04)
 - Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-8-task-04-round-1-review.md`)
 - Lệch design-spec (ghi gap cho spec-validator, chờ user): (a) voucher hết hạn ẩn hẳn mã thay vì "mã gạch ngang" S09 `design-spec.md:449` — theo AC, không lộ mã; (b) nút chia sẻ ở footer sau form lead (S09 đặt đầu bài), chưa Web Share API ≤ sm và nút dính ≥ xl; (c) banner chữ thay banner ảnh `pageBanners.propertyPosts` (`:612`, spec cho phép fallback)
-- Spec Validator verdict (layer close): pending
+- Spec Validator verdict (layer close): GAPS (task đạt AC; gap G31 ngoài task) — `.context/review-reports/spec-validation-build-tami-website-layer-8.md`
 
 ## Doc / Decision Impact
 - Doc impact result: docs/ARCHITECTURE.md thêm as-built layer-8-task-04 (route S08/S09/S05, xếp bài hết hạn sau, voucher ẩn khi hết hạn)
@@ -101,4 +101,4 @@ Mở khoá cho: `layer-10-task-01`, `layer-10-task-03`
 - Chưa làm (ngoài scope/để task sau): nút "Chia sẻ" dùng Web Share API ở < sm (dùng lại `ShareButtons` của tin tức: Facebook/Zalo/sao chép); nút chia sẻ dính cột trái ≥ xl; form lead thật (layer-10-task-01 thay `LeadFormSlot`); banner ảnh `pageBanners.propertyPosts` (như tin tức, dùng banner chữ); nhãn "Đã kết thúc" trong JSON-LD không áp dụng.
 
 ## Follow-up từ review layer-8-task-04 round 1 (MINOR)
-- [ ] `src/lib/posts/post-queries.ts:127-132` `findRelatedPosts`: danh mục còn 1–2 bài còn hạn thì lấy bù từ nhóm đã kết thúc cho đủ 3 thẻ (design-spec S09); test.
+- [→ L9-T01] `src/lib/posts/post-queries.ts:127-132` `findRelatedPosts`: danh mục còn 1–2 bài còn hạn thì lấy bù từ nhóm đã kết thúc cho đủ 3 thẻ (design-spec S09); test.
