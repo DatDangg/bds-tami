@@ -36,12 +36,12 @@ Nhận lead từ mọi form công khai; phản hồi luôn giống nhau dù tạ
 Mở khoá cho: `layer-10-task-01`
 
 ## Acceptance Criteria
-- [ ] Thứ tự: rate limit 5/10 phút/IP → Turnstile → validate zod (consent `true`, độ dài, SĐT VN) → `sourceId` phải là bản ghi đang công khai (tin `rented` vẫn nhận)
-- [ ] Chống trùng: cùng `phoneNormalized` + `source` + bản ghi nguồn trong 7 ngày, chưa won/lost/spam → tăng `mergedCount`, activity `merged`, cập nhật `lastActivityAt`; không tạo lead mới
-- [ ] Tự giao (BR-12): `rental`/`property_post` và `author` đang `active` → `assignedTo = author`; còn lại để trống
-- [ ] Lưu `consentAt`, `consentVersion`, `locale`, `utm`, `pageUrl`, `referrer`, `ipHash`, `userAgent`
-- [ ] Enqueue email lead mới tới `notificationEmails` (tiếng Việt, ghi ngôn ngữ khách)
-- [ ] Response 200 `{received: true}` giống hệt nhau giữa tạo mới và gộp; lỗi theo `locale`
+- [x] Thứ tự: rate limit 5/10 phút/IP → Turnstile → validate zod (consent `true`, độ dài, SĐT VN) → `sourceId` phải là bản ghi đang công khai (tin `rented` vẫn nhận)
+- [x] Chống trùng: cùng `phoneNormalized` + `source` + bản ghi nguồn trong 7 ngày, chưa won/lost/spam → tăng `mergedCount`, activity `merged`, cập nhật `lastActivityAt`; không tạo lead mới
+- [x] Tự giao (BR-12): `rental`/`property_post` và `author` đang `active` → `assignedTo = author`; còn lại để trống
+- [x] Lưu `consentAt`, `consentVersion`, `locale`, `utm`, `pageUrl`, `referrer`, `ipHash`, `userAgent`
+- [x] Enqueue email lead mới tới `notificationEmails` (tiếng Việt, ghi ngôn ngữ khách)
+- [x] Response 200 `{received: true}` giống hệt nhau giữa tạo mới và gộp; lỗi theo `locale`
 
 ## Tests cần viết
 - Integration: gửi 2 lần cùng SĐT trong 7 ngày → 1 lead, `mergedCount=1`; ngày thứ 8 → 2 lead
@@ -58,19 +58,19 @@ Mở khoá cho: `layer-10-task-01`
 - Không đụng schema (không tạo migration).
 
 ## Retry / Error Memory
-- Attempt: 0
-- Last failure type: n/a
+- Attempt: 1
 - Error memory entry: none
 - Escalation: none (3 attempt fail → `architecture_review_needed`)
 
 ## Feature Verification
 - Acceptance criteria: pending
-- Verify commands + result: pending
-- Reviewer verdict: pending
+- Verify commands + result: `pnpm lint` · `pnpm typecheck` · `pnpm test` (184 file, 1.993, 0 skip) · `pnpm build` PASS
+- Reviewer verdict: STRICT round 1 PASS (`.context/review-reports/build-tami-website-layer-9-task-02-round-1-review.md`); 4 MINOR → `layer-10-task-01.md`
+- Residual: thời gian phản hồi nhánh tạo dài hơn nhánh gộp (~4–6 truy vấn) — về lý thuyết đoán được qua độ trễ; Turnstile + rate limit giảm rủi ro
 - Spec Validator verdict (layer close): pending
 
 ## Doc / Decision Impact
-- Doc impact result: pending (dự kiến: API_SPEC §3.1 nếu contract khác)
+- Doc impact result: API_SPEC §3.1 as-built, ARCHITECTURE §5.2 as-built
 - Decision log: pending
 
 ## Commit / Tracking
@@ -79,13 +79,13 @@ Mở khoá cho: `layer-10-task-01`
 - Progress: `.context/progress.json` → `inProgressTask` = `layer-9/task-02` khi bắt đầu, chuyển vào `completedTasks` khi PASS
 
 ## DoD (Definition of Done)
-- [ ] Code written (chỉ trong scope)
-- [ ] Tests added + pass
-- [ ] Check commands pass (theo `.context/project-config.md`)
-- [ ] Reviewer độc lập PASS (mức STRICT)
-- [ ] `.context/progress.json` updated
-- [ ] Doc Impact reconciled, hoặc ghi `no doc impact`
-- [ ] Committed
+- [x] Code written (chỉ trong scope)
+- [x] Tests added + pass
+- [x] Check commands pass (theo `.context/project-config.md`)
+- [x] Reviewer độc lập PASS (mức STRICT)
+- [x] `.context/progress.json` updated
+- [x] Doc Impact reconciled, hoặc ghi `no doc impact`
+- [x] Committed
 
 ## Files to Create/Modify
 - src/endpoints/public/leads.ts
@@ -99,10 +99,10 @@ Mở khoá cho: `layer-10-task-01`
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 
 ## Follow-up từ review layer-8-task-02 round 2 (MINOR)
-- [ ] `src/hooks/leads/lead-activity-hooks.ts:13-21` cờ `asSystemActivity` lưu/khôi phục dạng boolean → không an toàn khi Payload chạy `Promise.all` trên cùng `req` (sửa status hàng loạt): đổi sang bộ đếm; test bulk update status ≥ 2 lead đều có activity. Mọi ghi activity hệ thống của task này (assignment, merged, email_sent) bọc `asSystemActivity`.
-- [ ] Sale gửi `lead` không phải UUID khi tạo activity có thể ra 500 thay vì 403/400 — kiểm + sửa.
+- [x] (L9-T03) `src/hooks/leads/lead-activity-hooks.ts:13-21` cờ `asSystemActivity` lưu/khôi phục dạng boolean → không an toàn khi Payload chạy `Promise.all` trên cùng `req` (sửa status hàng loạt): đổi sang bộ đếm; test bulk update status ≥ 2 lead đều có activity. Mọi ghi activity hệ thống của task này (assignment, merged, email_sent) bọc `asSystemActivity`.
+- [x] Sale gửi `lead` không phải UUID khi tạo activity có thể ra 500 thay vì 403/400 — kiểm + sửa.
 
 ## Follow-up từ review layer-9-task-03 round 2 (MINOR)
-- [ ] `tests/integration/lead-assign.test.ts:267`: thêm test form gửi lại `assignedTo` = sale đã khoá (giữ nguyên → OK) và gửi dạng object `{ id }`.
-- [ ] `src/collections/Leads.ts:106-111` validate tuỳ biến của `assignedTo` thay validator relationship mặc định → id sai định dạng ra 500: kiểm UUID trước `findByID` (400). Cùng chỗ với follow-up "lead không phải UUID" của L8-T02.
-- [ ] (đã xong ở L9-T03) cờ `asSystemActivity` đã là bộ đếm — KHÔNG làm lại. Tạo lead tự giao: `assignedTo = author` chỉ khi `isAssignableSale(author)` (`src/lib/leads/assignable-sale.ts`), không thì để trống (lead `new` chưa giao).
+- [x] `tests/integration/lead-assign.test.ts:267`: thêm test form gửi lại `assignedTo` = sale đã khoá (giữ nguyên → OK) và gửi dạng object `{ id }`.
+- [x] `src/collections/Leads.ts:106-111` validate tuỳ biến của `assignedTo` thay validator relationship mặc định → id sai định dạng ra 500: kiểm UUID trước `findByID` (400). Cùng chỗ với follow-up "lead không phải UUID" của L8-T02.
+- [x] (đã xong ở L9-T03) cờ `asSystemActivity` đã là bộ đếm — KHÔNG làm lại. Tạo lead tự giao: `assignedTo = author` chỉ khi `isAssignableSale(author)` (`src/lib/leads/assignable-sale.ts`), không thì để trống (lead `new` chưa giao).

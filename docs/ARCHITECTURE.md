@@ -209,6 +209,8 @@ sequenceDiagram
 
 Phản hồi cho khách luôn giống nhau dù lead bị gộp hay tạo mới (không lộ dữ liệu đã có).
 
+**As-built (layer-9-task-02):** thứ tự thật là rate limit (Redis) → Turnstile → validate → kiểm bản ghi nguồn công khai → một transaction Payload (khoá advisory theo SĐT + nguồn + bản ghi để hai request đồng thời không tạo hai lead) gồm tìm trùng 7 ngày, gộp hoặc tạo lead, tự giao (hook `recordAssignmentChange` ghi activity + email cho sale) và xếp job email lead mới (cùng transaction nên lỗi xếp job thì lead rollback). Gộp không gửi email lead mới. Chi tiết: `docs/API_SPEC.md` §3.1.
+
 ### 5.3. Upload ảnh
 
 Nhân viên upload trong admin → Payload dùng `sharp` sinh các cỡ (`thumb` 400w, `card` 800w, `large` 1600w, `og` 1200×630) dạng WebP → lưu vào bucket `public` qua S3 API → website trả ảnh qua Cloudflare. **As-built:** bucket không có URL công khai; ảnh đi qua app tại `/api/media/file/<tên file>` (`payload.config.ts` không đặt `generateFileURL` cho `media`), nên đây là ngoại lệ cache của §5.1 (public, immutable, 1 năm).

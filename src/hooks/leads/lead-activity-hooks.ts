@@ -1,6 +1,7 @@
-import { Forbidden, type CollectionAfterChangeHook, type CollectionBeforeDeleteHook, type CollectionBeforeValidateHook, type PayloadRequest } from "payload";
+import { Forbidden, ValidationError, type CollectionAfterChangeHook, type CollectionBeforeDeleteHook, type CollectionBeforeValidateHook, type PayloadRequest } from "payload";
 
 import { isAdmin, isStaff } from "../../access";
+import { isUuid } from "../../lib/uuid";
 import { MANUAL_ACTIVITY_TYPES, type LeadActivityType } from "../../lib/leads/lead-values";
 import type { LeadActivity } from "../../payload-types";
 
@@ -36,9 +37,15 @@ export async function asSystemActivity<T>(req: PayloadRequest, write: () => Prom
 export const guardManualActivity: CollectionBeforeValidateHook<LeadActivity> = async ({ data, operation, req }) => {
   if (operation !== "create" || isSystemActivity(req)) return data;
   if (!isStaff({ req }) || !MANUAL_ACTIVITY_TYPES.includes(data?.type as LeadActivityType)) throw new Forbidden(req.t);
-  if (isAdmin({ req })) return data;
   const leadId: unknown = data?.lead;
-  if (typeof leadId !== "string") throw new Forbidden(req.t);
+  // Id sai dạng (không phải UUID) làm Postgres ném lỗi cast (500). Admin: 400 báo đúng trường; sale không có quyền với lead không tồn tại nên 403 như id lạ.
+  if (isAdmin({ req })) {
+    if (typeof leadId === "string" && !isUuid(leadId)) {
+      throw new ValidationError({ collection: "lead-activities", errors: [{ path: "lead", message: "Mã lead không hợp lệ" }] });
+    }
+    return data;
+  }
+  if (!isUuid(leadId)) throw new Forbidden(req.t);
   const lead = await req.payload.findByID({ collection: "leads", id: leadId, depth: 0, req, overrideAccess: false, disableErrors: true });
   if (!lead) throw new Forbidden(req.t);
   return data;

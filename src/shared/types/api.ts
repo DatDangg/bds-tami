@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { LEAD_SOURCES } from "@/lib/leads/lead-values";
 import { normalizePhone } from "@/lib/phone";
 
 /** Khung response API tuỳ biến (API_SPEC §2). Helper dựng response nằm ở `src/lib/http/response.ts`. */
@@ -50,6 +51,55 @@ export const jobApplicationFieldsSchema = z.object({
 });
 
 export type JobApplicationFields = z.infer<typeof jobApplicationFieldsSchema>;
+
+/** Ô trống của form gửi chuỗi rỗng: coi như không gửi. */
+const emptyToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);
+
+/** Chuỗi phụ (UTM, URL trang, referrer) chỉ để thống kê: quá dài thì cắt chứ không từ chối, để không mất lead vì một URL quảng cáo dài. */
+const clipped = (max: number) =>
+  z
+    .string()
+    .transform((value) => value.slice(0, max))
+    .optional();
+
+const leadUtmSchema = z.object({
+  source: clipped(200),
+  medium: clipped(200),
+  campaign: clipped(200),
+  term: clipped(200),
+  content: clipped(200),
+});
+
+/**
+ * Body JSON của `POST /api/public/leads` (API_SPEC §3.1). `turnstileToken` do pipeline kiểm trước nên không có trong kết quả.
+ * `sourceId` bắt buộc trừ khi `source = contact` (khi đó bỏ qua nếu có). `consent` phải là boolean `true` (BR-30).
+ */
+export const leadInputSchema = z
+  .object({
+    source: z.enum(LEAD_SOURCES),
+    sourceId: z.preprocess(emptyToUndefined, z.uuid().optional()),
+    fullName: z.string().trim().min(2).max(100),
+    phone: z
+      .string()
+      .trim()
+      .max(40)
+      .transform((value, context) => {
+        const normalized = normalizePhone(value);
+        if (normalized === null) context.addIssue({ code: "custom", message: "Số điện thoại không hợp lệ" });
+        return normalized ?? "";
+      }),
+    email: z.preprocess(emptyToUndefined, z.email().max(254).optional()),
+    message: z.preprocess(emptyToUndefined, z.string().trim().max(1000).optional()),
+    consent: z.literal(true),
+    utm: leadUtmSchema.optional(),
+    pageUrl: clipped(2000),
+    referrer: clipped(2000),
+    locale: applicantLocaleSchema.default("vi"),
+  })
+  .refine((value) => value.source === "contact" || value.sourceId !== undefined, { path: ["sourceId"], message: "Thiếu sourceId" })
+  .transform((value) => (value.source === "contact" ? { ...value, sourceId: undefined } : value));
+
+export type LeadInput = z.infer<typeof leadInputSchema>;
 
 /** `?x=` (rỗng) coi như không truyền: form GET gửi cả ô bỏ trống. */
 const blankToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);

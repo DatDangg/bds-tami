@@ -10,6 +10,7 @@ import { computeAssigneeInactive, recordStatusChange, stampLeadTimestamps } from
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
+import { isUuid } from "../lib/uuid";
 import type { Lead } from "../payload-types";
 
 const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Đăng tin BĐS", project: "Dự án", contact: "Liên hệ" };
@@ -106,6 +107,8 @@ const statusFields: Field[] = [
 const validateAssignee: RelationshipFieldSingleValidation = async (value, { previousValue, req }) => {
   const nextId = assigneeId(value as Lead["assignedTo"]);
   if (!nextId || nextId === assigneeId(previousValue as Lead["assignedTo"])) return true;
+  // Id sai dạng làm Postgres ném lỗi cast ở `findByID` (500): từ chối như người nhận không hợp lệ (400).
+  if (!isUuid(nextId)) return ASSIGNEE_NOT_ASSIGNABLE_MESSAGE;
   const staff = await req.payload.findByID({ collection: "staff", id: nextId, depth: 0, overrideAccess: true, req, disableErrors: true });
   return isAssignableSale(staff) || ASSIGNEE_NOT_ASSIGNABLE_MESSAGE;
 };
@@ -158,7 +161,7 @@ const trackingFields: Field[] = [
 
 /**
  * Lead khách để lại (ERD §4.11, FR-ADM-09, PERMISSION §3.3-§4, BR-11/BR-32):
- * - Không ai tạo qua REST/admin (`create: denyAll`); bản ghi do endpoint `POST /api/public/leads` (task sau) tạo bằng Local API
+ * - Không ai tạo qua REST/admin (`create: denyAll`); bản ghi do endpoint `POST /api/public/leads` tạo bằng Local API
  *   `overrideAccess`, sau Turnstile + rate limit.
  * - Sale chỉ đọc/sửa lead mình được giao (`isAssignedOrAdmin` trả điều kiện lọc ở tầng DB: lead người khác là 404, không lộ
  *   sự tồn tại), và chỉ đổi được `status` + `lostReason`; ghi chú đi qua `lead-activities`. Sale không xoá (kể cả xoá mềm).

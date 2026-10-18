@@ -239,6 +239,45 @@ describe.skipIf(!baseUrl)("integration: phân công lead (hook + POST /api/admin
       expect(saved.assignedAt).toBeTruthy();
     });
 
+    it("sale phụ trách bị khoá sau khi nhận lead: form gửi lại nguyên assignedTo (chuỗi hoặc object { id }) vẫn lưu được và không sinh gì", async () => {
+      const retiring = await createStaff("retiring", ROLES.sale);
+      const lead = await createLead(retiring.id);
+      await payload.update({ collection: "staff", id: retiring.id, data: { active: false }, overrideAccess: true });
+      const before = await snapshot(lead.id);
+      for (const assignedTo of [retiring.id, { id: retiring.id }]) {
+        const updated = await payload.update({
+          collection: "leads",
+          id: lead.id,
+          data: { assignedTo, status: "contacted" } as never,
+          depth: 0,
+          ...actingAs(admin),
+        });
+        expect(updated.assignedTo).toBe(retiring.id);
+      }
+      expect(await snapshot(lead.id)).toEqual(before);
+    });
+
+    it("assignedTo dạng object { id }: đổi sang sale hợp lệ được; sang sale bị khoá hoặc id sai định dạng -> 400 (không 500), giữ người cũ", async () => {
+      const lead = await createLead(saleA.id);
+      const patch = (assignedTo: unknown) =>
+        handleEndpoints({
+          config: payload.config,
+          request: new Request(`http://localhost/api/leads/${lead.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", Authorization: `JWT ${tokens.admin}` },
+            body: JSON.stringify({ assignedTo }),
+          }),
+        });
+      for (const bad of ["khong-phai-uuid", { id: "khong-phai-uuid" }, { id: lockedSale.id }, 12345]) {
+        expect((await patch(bad)).status, JSON.stringify(bad)).toBe(400);
+        await expect(payload.update({ collection: "leads", id: lead.id, data: { assignedTo: bad } as never, depth: 0, ...actingAs(admin) })).rejects.toMatchObject({ status: 400 });
+      }
+      expect((await payload.findByID({ collection: "leads", id: lead.id, overrideAccess: true, depth: 0 })).assignedTo).toBe(saleA.id);
+      const moved = await payload.update({ collection: "leads", id: lead.id, data: { assignedTo: { id: saleB.id } } as never, depth: 0, ...actingAs(admin) });
+      expect(moved.assignedTo).toBe(saleB.id);
+      expect((await assignments(lead.id)).at(-1)).toMatchObject({ fromAssignee: saleA.id, toAssignee: saleB.id });
+    });
+
     it("đổi assignedTo sang sale bị khoá hoặc admin (REST và Local API): 400, không sinh activity/email/audit, giữ người cũ", async () => {
       const lead = await createLead(saleA.id);
       const before = await snapshot(lead.id);

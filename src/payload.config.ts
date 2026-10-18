@@ -38,6 +38,7 @@ import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { leadAssignEndpoint } from "./endpoints/admin/lead-assign";
 import { privateFileDownloadEndpoint } from "./endpoints/admin/private-file-download";
 import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
+import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { jobsConfig } from "./jobs";
 import { getEnv } from "./lib/env";
@@ -71,7 +72,7 @@ export default buildConfig({
   globals: [SiteSettings, Homepage, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
-  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, privateFileDownloadEndpoint, rentalsEndpoint],
+  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint],
   jobs: jobsConfig,
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,

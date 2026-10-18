@@ -77,12 +77,15 @@ Body (JSON):
 | `consent` | `true` | ✔ | Phải là `true` |
 | `turnstileToken` | string | ✔ | |
 | `utm` | object | | `source`, `medium`, `campaign`, `term`, `content` |
-| `pageUrl` | string | | |
+| `pageUrl` | string | | Cắt còn 2000 ký tự |
+| `referrer` | string | | `document.referrer` của khách; cắt còn 2000 ký tự |
 | `locale` | `vi` \| `en` | | Mặc định `vi`. Lưu vào `leads.locale` (BR-17); dùng cho thông báo lỗi |
 
 Kết quả `200`: `{ success: true, data: { received: true } }`. Luôn giống nhau dù lead được tạo mới hay gộp vào lead cũ (không lộ dữ liệu đã có).
 
 Xử lý: rate limit → Turnstile → validate → chống trùng (BR-15) → tạo/gộp lead → phân công (BR-12) → đưa job email vào hàng đợi (BR-13). Chi tiết: `docs/ARCHITECTURE.md` §5.2.
+
+> **As-built (layer-9-task-02):** `src/endpoints/public/leads.ts` (+ `src/lib/leads/create-or-merge.ts`, `dedupe.ts`, `assign.ts`; schema `leadInputSchema` ở `src/shared/types/api.ts`). Thứ tự: rate limit `leads` 5/10 phút/IP (Redis lỗi → 503) → Turnstile (sai → 400, thông báo luôn có chữ "captcha" ở cả vi/en) → zod (`consent` phải là boolean `true`; SĐT VN lưu E.164 `+84…`; `email`/`message` rỗng coi như không gửi; `sourceId` bắt buộc trừ `contact` và bị bỏ qua nếu `contact`; `utm`/`pageUrl`/`referrer` quá dài bị cắt chứ không từ chối; body > 16.000 ký tự hoặc không phải JSON → 400) → bản ghi nguồn phải đang công khai (`published`; tin cho thuê nhận cả `rented`; nháp/xoá mềm/không tồn tại/sai loại đều cùng một lỗi 400, `details` field `sourceId`) → một transaction: khoá advisory theo (SĐT chuẩn hoá, nguồn, bản ghi nguồn) → tìm lead trùng (cùng SĐT chuẩn hoá + `source` + bản ghi nguồn, `createdAt` trong 7 ngày, `status` không phải `won/lost/spam`, chưa xoá mềm) → **gộp**: `mergedCount` +1, activity `merged` (`content` = lời nhắn lần gửi sau, không actor; hook của activity đẩy `lastActivityAt`), KHÔNG tạo lead, KHÔNG email → hoặc **tạo** lead `new` (`consentAt`, `consentVersion` = `privacyPolicyVersion` hoặc `"unknown"` + cảnh báo log, `locale`, `utm`, `pageUrl`, `referrer`, `ipHash` HMAC-SHA256, `userAgent` cắt 500) + tự giao BR-12 + job `send-notification-email` template `new-lead` tới `notificationEmails` (ghi ngôn ngữ khách; bỏ qua + cảnh báo nếu danh sách trống). Tự giao: chỉ `rental`/`property_post`, `assignedTo = author` của tin khi `isAssignableSale(author)` (sale `active`), còn lại để trống (admin giao sau); endpoint chỉ đặt `assignedTo`, hook `recordAssignmentChange` sinh activity `assignment` + email `lead-assigned` cho sale (không audit vì không có user). Lỗi xếp job làm rollback cả lead (khách nộp lại được, không mất lead âm thầm), trả 500. Thành công **luôn** `200 { success: true, data: { received: true } }`, giống hệt từng byte cho tạo mới và gộp. Lỗi (400/429/500/503) theo `locale` của body (thiếu thì `Accept-Language`); `details` chỉ có tên trường + thông điệp, không echo giá trị nhập. Log chỉ có tên lỗi, không PII.
 
 ### 3.2. `POST /api/public/job-applications`
 
