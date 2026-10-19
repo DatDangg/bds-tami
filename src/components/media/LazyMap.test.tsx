@@ -190,6 +190,16 @@ describe("LazyMap", () => {
     expect(maplibre.fitBounds).not.toHaveBeenCalled();
   });
 
+  it("approximate bỏ qua markers: không ghim nào, không fitBounds", async () => {
+    renderWithIntl(<LazyMap location={location} approximate markers={[{ lat: 10.78, lng: 106.71, label: "Trường A" }]} />);
+    await act(async () => observer().intersect());
+    await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalled());
+    act(() => maplibre.loadHandlers.forEach((handler) => handler()));
+    expect(maplibre.markerAdded).not.toHaveBeenCalled();
+    expect(maplibre.popupText).not.toHaveBeenCalled();
+    expect(maplibre.fitBounds).not.toHaveBeenCalled();
+  });
+
   it("tin hiện địa chỉ: tâm bản đồ là toạ độ thật", async () => {
     renderWithIntl(<LazyMap location={location} />);
     await act(async () => observer().intersect());

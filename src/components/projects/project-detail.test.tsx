@@ -414,6 +414,53 @@ describe("LegalPolicy (accordion < lg)", () => {
   });
 });
 
+describe("LegalPolicy neo phụ #documents", () => {
+  const blocks = [
+    { id: "legal", title: "Pháp lý", content: <p>Nội dung pháp lý</p> },
+    { id: "sales-policy", anchorIds: ["documents"], title: "Chính sách bán hàng", content: <p id="documents">Tài liệu</p> },
+  ];
+
+  it("link #documents mở khối đang thu gọn rồi cuộn tới (cả lần bấm lặp lại cùng hash)", async () => {
+    const user = userEvent.setup();
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderWithIntl(
+      <>
+        <a href="#documents">Tải tài liệu</a>
+        <LegalPolicy blocks={blocks} />
+      </>,
+    );
+    const toggle = screen.getByRole("button", { name: "Chính sách bán hàng" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await user.click(screen.getByRole("link", { name: "Tải tài liệu" }));
+    await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await user.click(screen.getByRole("link", { name: "Tải tài liệu" }));
+    await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(2));
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", "#");
+  });
+
+  it("giảm chuyển động: cuộn không mượt", async () => {
+    const user = userEvent.setup();
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduced-motion"), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    renderWithIntl(
+      <>
+        <a href="#documents">Tải tài liệu</a>
+        <LegalPolicy blocks={blocks} />
+      </>,
+    );
+    await user.click(screen.getByRole("link", { name: "Tải tài liệu" }));
+    await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "auto", block: "start" }));
+    window.history.replaceState(null, "", "#");
+  });
+});
+
 describe("FloorPlans", () => {
   const plans = (count: number) =>
     toProjectDetailView(baseProject({ floorPlans: Array.from({ length: count }, (_, index) => ({ title: `Căn ${index + 1}PN`, image: image(`f${index}`) })) }), "vi").floorPlans;

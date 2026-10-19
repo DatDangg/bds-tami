@@ -177,7 +177,8 @@ function toLocation(point: Project["location"]): LatLng | null {
   return isValidLocation(location) ? location : null;
 }
 
-const numberOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null);
+/** 0 và số âm coi như chưa nhập (hiện "Liên hệ" / "—"), không hiện "Từ 0 ₫". */
+const numberOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null);
 
 const trimmedOrNull = (value: string | null | undefined): string | null => (hasText(value) ? value.trim() : null);
 

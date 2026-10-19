@@ -1,7 +1,8 @@
 ---
 id: public-ui-market-vinhomes
 type: feature
-status: in_progress
+status: done
+completed: 2026-10-20
 created: 2026-10-19
 ---
 
@@ -64,7 +65,7 @@ Plan phase/task: `tasks/feature-public-ui-market-vinhomes/README.md`.
 | P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | **done** (T01 STRICT PASS r1, T02 PASS r3, T03/T04/T05 PASS r2, close-out NORMAL PASS, spec-validation PASS) | 4f48764, b2fe4e4, 4b7ab7e, 4058ae4, 1be4209, 2391bb6, fb360ab | 1.17.0 / v20 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md` |
 | P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, T03 STRICT PASS r3, close-out NORMAL PASS, spec-validation GAPS → xử lý ở close-out) | 16c5e81, 1511db5, 0b95083, close-out | 1.19.0 / v23 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md` |
 | P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | **done** (T01 NORMAL PASS r2, T02 STRICT PASS r1, spec-validation GAPS → xử lý ở close-out) | 80ba71e, 27f5ddb, close-out | 1.20.0 / v24 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md` |
-| P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | pending | — | — |
+| P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | **done** (T01 STRICT PASS r1, T02 STRICT PASS r1, close-out NORMAL PASS, spec-validation GAPS → xử lý ở close-out) | e7d0c81, 5b8ae10, close-out | 1.21.0 / v25 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-5.md` (+ BRD 1.8) |
 
 Ghi chú P1: header **luôn** kính mờ sáng (kể cả trên hero) theo quyết định user — thay biến thể trong suốt và "logo trắng trên hero" của BL-018.
 
@@ -87,6 +88,12 @@ Ghi chú P4 — **quyết định agent (user ủy quyền 2026-10-20)** (chi ti
 - "Tin liên quan": ≤ 4 tin cho thuê `published` + ≤ 4 Tin BĐS chưa kết thúc, ẩn khi trống, **không "Xem thêm"** (không có param lọc theo dự án); CTA "Đăng ký tham quan" = CtaBanner tối (không ảnh, không field CMS mới); hook làm mới chi tiết dự án cũ + mới khi tin công khai đổi.
 - BRD FR-PUB-03 **không bump** (thuần hiển thị, không nguồn lead mới).
 
+Ghi chú P5 — **quyết định agent (user ủy quyền 2026-10-20)** (4 nhóm schema do user duyệt 2026-10-19; chi tiết trong task file + `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-5.md`):
+- Giới hạn hàng ≤ 8 nổi bật / 40 tiện ích quanh / 30 dòng giá / 20 FAQ; trường chữ chính bắt buộc trong hàng; tab admin "Nội dung mở rộng"; `priceUpdatedAt` ẩn khỏi "Thêm bộ lọc".
+- Thứ tự menu neo 11 mục (Tổng quan · Nổi bật · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Giá · Thư viện · Tin liên quan · Hỏi đáp), trống tự ẩn; Tài liệu PDF vào trong Pháp lý (neo `#documents` mở khối kể cả khi thu gọn); tiện ích quanh = tab theo nhóm trong Vị trí + điểm trên bản đồ sẵn có; bảng giá rút gọn, 0/trống = "Liên hệ"; FAQ `<details>` + JSON-LD `FAQPage` theo ngôn ngữ trang.
+- Phân khu dự án và quỹ căn từng căn **ngoài phạm vi**. BRD 1.8 (FR-PUB-03, FR-PUB-15).
+- Migration additive `20261019_215847_project_detail_market_blocks` (deploy: staging migrate → kiểm → promote; gộp với migration P2 `20261019_144259_homepage_market_blocks` + bước admin P2 thêm Cho thuê/Tin tức vào Thứ tự khối).
+
 ## Acceptance (bắt buộc)
 - [x] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
 - [x] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
@@ -94,7 +101,7 @@ Ghi chú P4 — **quyết định agent (user ủy quyền 2026-10-20)** (chi ti
 - [x] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
 - [x] Tin tức: hàng theo danh mục + form tư vấn cuối trang. — P3; `/tin-bds` không có băng tìm kiếm (không có bộ lọc sẵn — quyết định agent).
 - [x] Chi tiết dự án: thẻ tư vấn dính bên phải ≥ lg + tin liên quan; phần cần schema mới tách phase riêng sau khi user duyệt.
-- [ ] Responsive mobile (thanh/khối tìm kiếm, slider vuốt được), VI/EN cùng bố cục, không CLS, giữ NFR hiệu năng (LCP).
+- [x] Responsive mobile (thanh/khối tìm kiếm, slider vuốt được), VI/EN cùng bố cục, không CLS, giữ NFR hiệu năng (LCP). — responsive gate mọi task (375/768/1024/1280) + kiểm trình duyệt dev/prod worktree ở 375/1024/1280 (không cuộn ngang), VI/EN cùng component, khung ảnh/banner cố định, ảnh hero/banner `priority`. **Residual:** LCP/CLS chưa đo bằng Lighthouse/PSI (đo trong pane không ra entry LCP) → chạy PSI mobile trên staging sau deploy cho `/`, `/cho-thue`, `/du-an`, `/du-an/<slug>`, `/tin-tuc` + `/en`.
 
 ## Ghi chú
 - Làm theo nhiều phase (vd: P1 tokens + header · P2 trang chủ · P3 trang danh sách + tin tức · P4 chi tiết dự án · P5 phần cần schema).

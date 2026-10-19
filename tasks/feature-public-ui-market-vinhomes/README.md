@@ -45,3 +45,8 @@ Verify: `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm build` (theo `.c
 - **Q1** "slider banner ưu đãi" (#3): ánh xạ vào slider Ưu đãi (khối 5), không dựng mới, không schema.
 - **Q2** homepage hiện có chưa có `rentals`/`news`: giữ bước triển khai — Admin → Trang chủ → Thứ tự khối thêm "Cho thuê", "Tin tức" (không auto-append, không data migration).
 - **Q3** `SPECIFICATIONS.md:174` cho Cho thuê/Tin tức: tiêu đề khối tuỳ chọn (trống → tiêu đề mặc định i18n, kể cả EN); khối chỉ ẩn ở `/en` khi không có tin/bài có bản EN.
+
+## User ủy quyền 2026-10-20 + kết quả P3–P5
+- User (2026-10-20): "còn lại 3 cái BL, làm lần lượt cho xong hết đi nhé, tự quyết định đừng hỏi lại anh, cuối cùng thì report lại là được" → duyệt bắt đầu P3 và qua mọi checkpoint P3–P5; câu hỏi thiết kế do agent tự quyết (ghi "quyết định agent (user ủy quyền 2026-10-20)" trong task file + change doc).
+- Làm trong worktree `.claude/worktrees/bl020-p3p5` (branch `claude/bl020-p3p5` từ staging b2f430e, DB `tami_wt_bl020`), fast-forward `staging` sau mỗi phase.
+- P3: 16c5e81, 1511db5, 0b95083, close-out 9588007 (spec 1.19.0 / v23, BRD 1.7) · P4: 80ba71e, 27f5ddb, close-out 2e2fe8f (1.20.0 / v24) · P5: e7d0c81 (migration additive `20261019_215847_project_detail_market_blocks`), 5b8ae10, close-out (1.21.0 / v25, BRD 1.8). BL-020 done.

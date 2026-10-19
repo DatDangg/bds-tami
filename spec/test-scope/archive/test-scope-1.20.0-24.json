@@ -1,0 +1,149 @@
+{
+  "specVersion": "1.20.0",
+  "scopeVersion": 24,
+  "generatedAt": "2026-10-20T21:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-020 Phase 4/5 — chi tiết dự án kiểu market (hero, thanh mục con viên thuốc dính, 2 cột ≥ lg + thẻ Tư vấn 1:1 sticky, Tin liên quan, CTA Đăng ký tham quan, làm mới chi tiết dự án khi tin cho thuê / Tin BĐS đổi). Spec 1.19.0 → 1.20.0 (MINOR), BRD không bump (thuần hiển thị, không nguồn lead mới). Đã build: T01 80ba71e, T02 27f5ddb; close-out (design-spec +4.5rem + spec delta) chưa commit.",
+  "workItem": "feature/public-ui-market-vinhomes",
+  "backlog": "BL-020",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-19-public-ui-market-vinhomes.md",
+  "task": [
+    "tasks/feature-public-ui-market-vinhomes/phase-4-task-01.md",
+    "tasks/feature-public-ui-market-vinhomes/phase-4-task-02.md"
+  ],
+  "commits": [
+    "80ba71e",
+    "27f5ddb",
+    "close-out phase 4 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "80ba71e": "P4-T01 — hero serif viết thường (priority), ProjectSubNav viên thuốc dính (scroll-margin +4.5rem, observer 176px, aria-current), ≥ lg 2 cột + thẻ Tư vấn 1:1 sticky (hotline + LeadForm duy nhất source=project), < lg thẻ sau Tài liệu + ProjectStickyCta, bỏ nền section xen kẽ, Thư viện thẻ tối 20px, LeadFormSlot headingId",
+    "27f5ddb": "P4-T02 — Tin liên quan (findProjectListings: ≤ 4 rentals published + ≤ 4 property-posts chưa kết thúc, findPublicList, song song, ảnh gom), CtaBanner Đăng ký tham quan → #lead-form + tel:, restyle FloorPlans/Documents, hook revalidate-project-on-listing trên Rentals/PropertyPosts (dự án cũ + mới, vi/en)",
+    "close-out phase 4 (commit chứa file này)": ".context/design-spec.md:86 +3.5rem → +4.5rem; spec 1.20.0 / scope v24"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.19.0-23.json",
+  "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md",
+  "specRefs": [
+    "F2",
+    "F1",
+    "F9",
+    "Giao diện"
+  ],
+  "specRefNotes": {
+    "F2": "Bố cục chi tiết (BL-020 P4): hero h1 serif viết thường; thanh mục con viên thuốc dính (Tổng quan · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Thư viện · Tin liên quan khi có), aria-current, neo không bị che; ≥ lg 2 cột + thẻ Tư vấn 1:1 sticky phải (hotline + 1 LeadForm #lead-form source=project, cao ≤ viewport, cuộn trong); < lg thẻ sau Tài liệu + CTA dính đáy; Tin liên quan ≤ 4 + ≤ 4, /en chỉ tin EN, ẩn khi trống, không Xem thêm; CTA Đăng ký tham quan → #lead-form + tel:. Làm mới chi tiết dự án cũ + mới (vi/en) khi tin cho thuê / Tin BĐS công khai đổi.",
+    "F1": "Lưu/ẩn/xoá tin cho thuê hoặc tin tức công khai vẫn làm mới trang chủ; bỏ chữ 'chỉ' — tin cho thuê / Tin BĐS gắn dự án còn làm mới chi tiết dự án (F2).",
+    "F9": "Không đổi — lead dự án vẫn source=project + sourceId; chỉ đổi vị trí form (một form duy nhất trong thẻ tư vấn).",
+    "Giao diện": "Chi tiết dự án ≥ lg 2 cột + thẻ tư vấn dính; không nền section xen kẽ tràn viền."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/app/(frontend)/[locale]/du-an/[slug]/page.tsx",
+      "src/app/(frontend)/[locale]/du-an/[slug]/page.test.tsx",
+      "src/collections/PropertyPosts.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/project-listing-revalidate.test.ts",
+      "src/components/forms/LeadFormSlot.tsx",
+      "src/components/projects/Documents.tsx",
+      "src/components/projects/FloorPlans.tsx",
+      "src/components/projects/LegalPolicy.tsx",
+      "src/components/projects/ProjectAmenities.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/components/projects/ProjectHero.tsx",
+      "src/components/projects/ProjectListings.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/ProjectSection.tsx",
+      "src/components/projects/ProjectSubNav.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/hooks/projects/revalidate-project-on-listing.ts",
+      "src/hooks/projects/revalidate-project-on-listing.test.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/lib/projects/project-detail-view.ts",
+      "src/lib/projects/project-detail-view.test.ts",
+      "src/lib/projects/project-listings.ts",
+      "src/lib/projects/project-listings.test.ts",
+      "src/lib/rentals/rental-queries.ts",
+      "docs/DESIGN.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Diff thật 9588007..27f5ddb (bỏ progress/task/review report) + close-out chưa commit (.context/design-spec.md:86). Không schema/migration/endpoint/access control. BRD không đổi.",
+    "modules": [
+      "Chi tiết dự án — ProjectDetail (lưới 1fr + 22rem/24rem ≥ lg, aside sticky thẻ Tư vấn 1:1, CtaBanner Đăng ký tham quan), ProjectHero, ProjectSection (scroll-margin +4.5rem)",
+      "Thanh mục con — ProjectSubNav (viên thuốc dính, observer -176px, aria-current), SECTION_IDS + visibleSections (project-detail-view.ts) gồm Tin liên quan",
+      "Tin liên quan — src/lib/projects/project-listings.ts (findPublicList, 2 truy vấn song song, withCoverImages gom ảnh) + ProjectListings.tsx",
+      "Form — LeadFormSlot prop headingId tuỳ chọn (form khác không đổi)",
+      "Cache — src/hooks/projects/revalidate-project-on-listing.ts gắn Rentals (field project, published/rented) + PropertyPosts (field relatedProject)",
+      "Restyle — FloorPlans (tab viên thuốc, ảnh 20px), Documents (thẻ trắng 20px), Location/Amenities/LegalPolicy, Thư viện thẻ tối 20px",
+      "Docs as-built — docs/DESIGN.md, .context/design-spec.md (S03, :86)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/du-an/<slug> + /en/projects/<slug>: hero ảnh (không nhảy bố cục) + h1 serif viết thường",
+      "Thanh mục con viên thuốc dính dưới header nổi: bấm từng mục → cuộn tới đúng khối, tiêu đề khối KHÔNG bị header/thanh mục che ở 375 / 1024 / 1280; cuộn tay → mục đang xem có aria-current đổi đúng",
+      "≥ lg (1024/1280/1536): bố cục 2 cột; thẻ 'Tư vấn 1:1' dính cột phải khi cuộn, không che nội dung cột trái, không tràn quá viewport (cuộn trong thẻ nếu cao), hotline hiện khi có",
+      "Trang chỉ có MỘT form lead (#lead-form) — không trùng form ở cuối trang hay ở mobile",
+      "Gửi form thẻ tư vấn hợp lệ → lead nguồn project gắn đúng dự án (sourceId), thấy trong admin Lead; thiếu consent không gửi được",
+      "< lg (375/768): thẻ tư vấn nằm ngay sau khối Tài liệu; CTA dính đáy (ProjectStickyCta) bấm → nhảy tới #lead-form, thẻ không bị thanh mục che",
+      "Tin liên quan: dự án có tin cho thuê published + Tin BĐS còn hạn → hiện ≤ 4 + ≤ 4, mới nhất trước; tin rented/hidden/draft/đã xoá và Tin BĐS 'Đã kết thúc' không hiện; không có nút Xem thêm",
+      "Tin liên quan /en: chỉ tin có bản EN; dự án không có tin (hoặc /en không có tin EN) → ẩn cả khối và mục 'Tin liên quan' trên thanh mục con; chỉ 1 nhóm trống → ẩn nhóm đó",
+      "CTA 'Đăng ký tham quan' cuối trang: nút chính → #lead-form; nút phụ tel: hotline chỉ khi có hotline; chữ đúng VI/EN",
+      "Làm mới: xuất bản tin cho thuê / Tin BĐS gắn dự án X → trong ≤ 1 phút chi tiết X (vi + en) hiện tin; ẩn/xoá/chuyển về nháp → tin biến mất; chuyển tin từ dự án X sang Y → biến mất ở X và hiện ở Y (cả /en nếu tin có EN)",
+      "Khối phân tách bằng đường kẻ (không nền xen kẽ tràn viền); Thư viện thẻ tối 20px; Mặt bằng tab viên thuốc; Tài liệu thẻ trắng 20px",
+      "Viewport 375/768/1024/1280/1536: không tràn ngang, không CLS khi tải ảnh hero / thẻ tin"
+    ],
+    "dependents": [
+      "LeadFormSlot dùng chung: form ở chi tiết tin cho thuê, Tin BĐS, Liên hệ, /tin-tuc vẫn hiển thị/gửi như cũ (headingId tuỳ chọn)",
+      "Rentals / PropertyPosts afterChange/afterDelete: trang chủ vẫn làm mới như F1 (khối Cho thuê, Ưu đãi); lưu tin không lỗi khi tin không gắn dự án hoặc dự án đã xoá mềm",
+      "RentalCard / PostCard dùng trong khối Tin liên quan (thẻ trắng 20px)",
+      "ProjectCard 'Dự án khác' trên chi tiết dự án",
+      "Header nổi (P1) + --header-offset với thanh mục con dính"
+    ],
+    "regression": [
+      "URL /du-an/<slug> và /en/projects/<slug>, metadata, canonical, JSON-LD, sitemap không đổi; dự án nháp/xoá mềm vẫn 404",
+      "Các khối cũ (Tổng quan, Vị trí/bản đồ, Tiện ích, Mặt bằng, Pháp lý, Chính sách, Tài liệu, Thư viện) còn đủ nội dung; khối trống vẫn ẩn",
+      "Lead dự án: rate limit, Turnstile, chống trùng 7 ngày, admin giao (source=project) như cũ",
+      "Trang chủ làm mới khi lưu/ẩn/xoá tin cho thuê / tin tức (F1) vẫn đúng",
+      "Danh sách /du-an (P3) + slider dự án trang chủ (P2) không đổi",
+      "Nút liên hệ nổi (F8) không chồng lên CTA dính đáy / thẻ tư vấn ở 375"
+    ]
+  },
+  "acceptance": [
+    "Thanh mục con dính, nhảy đúng mục, aria-current đúng, tiêu đề mục không bị che ở 375 / 1024 / 1280",
+    "≥ lg 2 cột + thẻ Tư vấn 1:1 sticky không che nội dung; < lg thẻ sau Tài liệu + CTA dính đáy tới #lead-form",
+    "Đúng một #lead-form trên trang; gửi tạo lead source=project gắn dự án",
+    "Tin liên quan đúng quy tắc công khai VI/EN, ẩn khi trống (khối + mục menu), không Xem thêm",
+    "CTA Đăng ký tham quan → #lead-form, tel: chỉ khi có hotline",
+    "Xuất bản / gỡ / chuyển dự án của tin cho thuê hoặc Tin BĐS → chi tiết dự án cũ + mới (vi/en) cập nhật ≤ 1 phút",
+    "VI/EN cùng bố cục; không tràn ngang; pnpm lint / typecheck / test PASS"
+  ],
+  "outOfScope": [
+    "Phase 5 (schema dự án: highlights, nearbyAmenities, priceTable, faqs; mục 'Khu', 'Giá & quỹ căn')",
+    "'Xem thêm' trong Tin liên quan / tham số URL lọc danh sách theo dự án",
+    "Ảnh CMS cho CTA Đăng ký tham quan",
+    "Thay đổi BRD FR-PUB-03",
+    "Đo Lighthouse LCP/CLS chính thức (residual)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280,
+    1536
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "POST /api/leads source=project + sourceId (dự án) từ thẻ Tư vấn 1:1 — 200 { received: true }; thiếu consent/Turnstile sai → 400; quá rate limit → 429 (contract không đổi)"
+  ],
+  "risk": "medium",
+  "riskNote": "UI 1 trang chi tiết × VI/EN × 5 viewport + hook cache mới trên 2 collection (Rentals, PropertyPosts) — STRICT PASS r1. Không schema/migration/quyền/endpoint/nguồn lead mới. Residual: DB dev không có tin gắn dự án nên khối Tin liên quan có dữ liệu mới kiểm bằng test mock — bên test cần seed tin cho thuê + Tin BĐS gắn dự án (có/không bản EN, có ưu đãi đã kết thúc) để kiểm hiển thị + làm mới. Ưu tiên: neo không bị che, 1 form duy nhất, revalidation khi chuyển dự án."
+}

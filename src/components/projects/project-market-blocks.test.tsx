@@ -157,6 +157,7 @@ describe("NearbyTabs", () => {
     expect(tabs.map((tab) => tab.tabIndex)).toEqual([0, -1, -1]);
     expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveTextContent("Trường A");
     expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveTextContent("500 m");
+    expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveAttribute("tabindex", "0");
     tabs[0]!.focus();
     await user.keyboard("{ArrowRight}");
     expect(tabs[1]).toHaveFocus();
@@ -237,6 +238,25 @@ describe("PriceTable", () => {
     expect(screen.getByText("Sắp hết").className).toContain("text-warning");
     expect(screen.getByText("Hết hàng").className).toContain("text-error");
     expect(screen.queryByText(/Cập nhật ngày/)).toBeNull();
+  });
+
+  it("giá từ == đến hiện một giá trị; chỉ \"đến\" → \"Đến X\"; giá trị 0 coi như chưa nhập (Liên hệ / —)", () => {
+    const edge = toProjectDetailView(
+      project({
+        priceTable: [
+          { unitType: "Bằng nhau", areaFrom: 70, areaTo: 70, priceFrom: 3_000_000_000, priceTo: 3_000_000_000 },
+          { unitType: "Chỉ đến", areaTo: 80, priceTo: 5_000_000_000 },
+          { unitType: "Số 0", areaFrom: 0, areaTo: 0, priceFrom: 0, priceTo: 0 },
+        ],
+      }),
+      "vi",
+    );
+    renderWithIntl(<PriceTable rows={edge.priceRows} updatedAt={null} />);
+    const rows = within(screen.getByRole("table")).getAllByRole("row").slice(1);
+    const cells = (row: HTMLElement) => within(row).getAllByRole("cell").map((cell) => cell.textContent);
+    expect(cells(rows[0]!).slice(0, 2)).toEqual(["70 m²", "3 tỷ"]);
+    expect(cells(rows[1]!).slice(0, 2)).toEqual(["Đến 80 m²", "Đến 5 tỷ"]);
+    expect(cells(rows[2]!).slice(0, 2)).toEqual(["—", "Liên hệ"]);
   });
 
   it("/en: 'Contact us', 'From', VND rút gọn tiếng Anh", () => {

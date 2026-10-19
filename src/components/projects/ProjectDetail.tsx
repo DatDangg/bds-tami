@@ -123,7 +123,7 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
           <ProjectListings {...listings} />
           {shown.has("faq") && <ProjectFaq faqs={view.faqs} />}
         </div>
-        {/* Cột phải ≥ lg; < lg nằm dưới nội dung (đúng chỗ form cũ). Form chỉ có MỘT bản trong DOM (không nhân đôi id). Chỉ thẻ bên trong dính (sticky trong chiều cao cột). */}
+        {/* Cột phải ≥ lg; < lg nằm cuối cột chính, sau Hỏi đáp. Form chỉ có MỘT bản trong DOM (không nhân đôi id). Chỉ thẻ bên trong dính (sticky trong chiều cao cột). */}
         <aside aria-labelledby={CONSULT_HEADING_ID} className="border-t border-border py-section-tight lg:border-t-0">
           <LeadFormSlot title={t("leadForm.title")} headingId={CONSULT_HEADING_ID} className={CONSULT_CARD_CLASS}>
             <div className="flex flex-col gap-4">

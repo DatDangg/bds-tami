@@ -77,6 +77,7 @@ export function NearbyTabs({ groups }: { groups: NearbyGroupView[] }) {
           role={hasTabs ? "tabpanel" : undefined}
           id={panelId(group.category)}
           aria-labelledby={hasTabs ? tabId(group.category) : undefined}
+          tabIndex={hasTabs ? 0 : undefined}
           hidden={hasTabs && activeCategory !== group.category}
         >
           <NearbyList group={group} label={t(`categories.${group.category}`)} />

@@ -1,11 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "public-ui-market-vinhomes",
-    "phaseTask": "phase-5-task-02",
-    "journal": ".context/runs/feature-public-ui-market-vinhomes-phase-5-task-02.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -502,7 +497,7 @@
       "slug": "public-ui-market-vinhomes",
       "title": "Website công khai theo market.vinhomes.vn: section + phong cách (bo góc, nút viên thuốc, header nổi kính mờ, serif viết thường), màu TAMI — 5 phase (BL-020)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 5,
       "totalPhases": 5,
       "phaseStatus": {
@@ -510,10 +505,10 @@
         "2": "done",
         "3": "done",
         "4": "done",
-        "5": "in_progress"
+        "5": "done"
       },
       "backlog": "BL-020",
-      "changeDoc": "spec/changes/2026-10-19-public-ui-market-vinhomes.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-public-ui-market-vinhomes.md",
       "plan": "tasks/feature-public-ui-market-vinhomes/README.md",
       "tasks": [
         {
@@ -704,20 +699,28 @@
           "result": "GAPS→resolved",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-4-spec-validation.md",
           "decisions": "quyết định agent (user ủy quyền 2026-10-20): không Xem thêm ở Tin liên quan; CTA tham quan không ảnh/không field CMS; BRD FR-PUB-03 không bump"
+        },
+        {
+          "phase": 5,
+          "result": "GAPS→resolved",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-5-spec-validation.md",
+          "closeoutReport": ".context/review-reports/feature-public-ui-market-vinhomes-phase-5-closeout-round-1-review.md",
+          "decisions": "quyết định agent (user ủy quyền 2026-10-20): giới hạn hàng 8/40/30/20; menu neo 11 mục; Tài liệu trong Pháp lý; tiện ích quanh tab + marker; 0 = Liên hệ; FAQPage theo locale; phân khu + quỹ căn ngoài phạm vi; BRD 1.8"
         }
       ],
       "startedAt": "2026-10-19",
-      "completedAt": null,
-      "specVersion": "1.20.0",
-      "scopeVersion": 24,
-      "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md",
-      "next": "spec-validator Phase 5 → close-out (MINOR P5-T02) → spec-publish → archive",
-      "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra P3: chưa Lighthouse LCP/CLS; 2 ảnh priority/trang (banner + thẻ đầu/bài lớn); h1 EN dài trong banner 240px; đổi Khoảng giá cần JS; NewsCard card trong khối tối phải truyền onDark; kiểm trình duyệt dev :3001 chỉ 375/1280. P4: khối Tin liên quan chưa thấy với dữ liệu thật (DB worktree không có tin gắn dự án); thẻ tư vấn cuộn trong trên màn thấp; tra cứu dự án trong hook lỗi → lần lưu tin lỗi (như hook revalidate sẵn có).",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.21.0",
+      "scopeVersion": 25,
+      "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-5.md",
+      "next": "Deploy: staging payload migrate (20261019_144259_homepage_market_blocks + 20261019_215847_project_detail_market_blocks) → verify → promote prod; admin thêm Cho thuê, Tin tức vào Thứ tự khối trang chủ; chạy PSI mobile LCP/CLS trên staging",
+      "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra P3: chưa Lighthouse LCP/CLS; 2 ảnh priority/trang (banner + thẻ đầu/bài lớn); h1 EN dài trong banner 240px; đổi Khoảng giá cần JS; NewsCard card trong khối tối phải truyền onDark; kiểm trình duyệt dev :3001 chỉ 375/1280. P4: khối Tin liên quan chưa thấy với dữ liệu thật (DB worktree không có tin gắn dự án); thẻ tư vấn cuộn trong trên màn thấp; tra cứu dự án trong hook lỗi → lần lưu tin lỗi (như hook revalidate sẵn có). P5: LCP/CLS chưa đo Lighthouse/PSI (PSI mobile trên staging sau deploy); sửa dự án ở locale EN khi hàng chưa có chữ EN bị chặn lưu (như amenities); marker bản đồ không focus bàn phím; icon Nổi bật chưa map (lưu text).",
       "specUpdates": [
         "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
         "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md",
         "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md",
-        "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md"
+        "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md",
+        "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-5.md"
       ],
       "migrations": [
         "migrations/20261019_144259_homepage_market_blocks",
@@ -1600,7 +1603,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-20T05:29:42+07:00",
+  "lastUpdated": "2026-10-20T05:47:48+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

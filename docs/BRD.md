@@ -3,7 +3,7 @@
 | Thông tin | Nội dung |
 |---|---|
 | Tên dự án | Website thương hiệu TAMI |
-| Phiên bản | 1.7 |
+| Phiên bản | 1.8 |
 | Ngày | 20/10/2026 |
 | Trạng thái | Đã duyệt phạm vi giai đoạn 1 |
 | Người soạn | (điền) |
@@ -22,6 +22,7 @@
 | 1.5 | 16/10/2026 | **AI tự dịch sang tiếng Anh** (Claude API): xuất bản bản tiếng Việt là tự dịch và hiện bản tiếng Anh, nhân viên sửa tay được; trang pháp lý phải duyệt tay. Thêm FR-ADM-18, BR-08; sửa FR-ADM-17, BR-07, NFR-09, A5, Q5, ngoài phạm vi |
 | 1.6 | 19/10/2026 | BR-08: sửa tay bản tiếng Anh của trang pháp lý đã duyệt → ẩn `/en` tới khi admin duyệt lại (user quyết 19/10/2026, BL-013) |
 | 1.7 | 20/10/2026 | Tin tức có form "Tư vấn nhu cầu" (nguồn lead `contact`) cuối trang danh sách `/tin-tuc`; trang danh mục + chi tiết tin tức vẫn không thu lead. Sửa ghi chú "Đăng tin BĐS ≠ Tin tức", BR-10 (change request BL-020 user duyệt 19/10/2026, giao agent quyết phần còn lại 20/10/2026) |
+| 1.8 | 20/10/2026 | Chi tiết dự án thêm điểm nổi bật, tiện ích xung quanh (khoảng cách), bảng giá theo loại căn, câu hỏi thường gặp (FR-PUB-03); schema.org thêm `FAQPage` (FR-PUB-15). Quỹ căn từng căn và phân khu dự án ngoài phạm vi (change request BL-020 P5 — user duyệt 4 nhóm nội dung 19/10/2026, giao agent quyết phần còn lại 20/10/2026) |
 
 ---
 
@@ -135,7 +136,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 |---|---|---|---|
 | FR-PUB-01 | Trang chủ gồm các khối: Hero slide, Về TAMI, Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Footer liên hệ | Must | Admin chỉnh được nội dung, thứ tự và bật/tắt từng khối; hero slide tối thiểu 1, tối đa 8 slide |
 | FR-PUB-02 | Danh sách dự án, lọc theo loại hình, tỉnh/thành, trạng thái mở bán; phân trang | Must | Chỉ hiển thị dự án đã xuất bản |
-| FR-PUB-03 | Chi tiết dự án: tổng quan, chủ đầu tư, vị trí (bản đồ), tiện ích, mặt bằng, pháp lý, chính sách bán hàng, tài liệu, thư viện ảnh, form để lại thông tin | Must | Gửi form tạo lead gắn với dự án |
+| FR-PUB-03 | Chi tiết dự án: tổng quan, chủ đầu tư, điểm nổi bật, vị trí (bản đồ), tiện ích xung quanh (khoảng cách), tiện ích, mặt bằng, pháp lý, chính sách bán hàng, bảng giá theo loại căn, tài liệu, thư viện ảnh, câu hỏi thường gặp, form để lại thông tin | Must | Gửi form tạo lead gắn với dự án |
 | FR-PUB-04 | Danh sách Cho thuê có bộ lọc: danh mục, tỉnh/thành, phường/xã, khoảng giá/tháng, diện tích, số phòng ngủ, nội thất; sắp xếp mới nhất / giá tăng / giá giảm; tìm theo từ khóa (gõ không dấu vẫn ra) | Must | Bộ lọc phản ánh trên URL (chia sẻ được); p95 ≤ 500ms |
 | FR-PUB-05 | Chi tiết tin cho thuê: thư viện ảnh, video, mã tin, giá/tháng, diện tích, phòng ngủ/WC, tầng, hướng, nội thất, thời hạn thuê, đặt cọc, dịch vụ bao gồm, ngày trống, mô tả, vị trí, sale phụ trách, form liên hệ, tin tương tự | Must | Tin "Đã thuê" vẫn mở được, có nhãn và gợi ý tin tương tự |
 | FR-PUB-06 | Danh sách Đăng tin BĐS theo danh mục (Tin BĐS, Voucher/Ưu đãi, …) | Must | Danh mục do admin cấu hình |
@@ -147,7 +148,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 | FR-PUB-12 | Nút nổi góc dưới phải: Hotline, Zalo, Fanpage | Must | Link lấy từ cấu hình; ghi nhận số lượt bấm |
 | FR-PUB-13 | Mọi form thu thông tin có ô **đồng ý xử lý dữ liệu cá nhân** (link chính sách) và chống spam | Must | Không tick thì không gửi được |
 | FR-PUB-14 | Trang pháp lý: Chính sách bảo mật, Điều khoản sử dụng | Must | |
-| FR-PUB-15 | SEO: URL thân thiện, meta, Open Graph, `sitemap.xml`, `robots.txt`, breadcrumb, schema.org (`RealEstateListing`, `Article`, `JobPosting`, `Organization`) | Must | Mỗi bản ngôn ngữ có meta riêng, `<html lang>` đúng, thẻ `hreflang` (`vi`, `en`, `x-default` → bản tiếng Việt) trỏ chéo khi có cả hai bản; sitemap liệt kê cả hai bản |
+| FR-PUB-15 | SEO: URL thân thiện, meta, Open Graph, `sitemap.xml`, `robots.txt`, breadcrumb, schema.org (`RealEstateListing`, `Article`, `JobPosting`, `Organization`, `FAQPage`) | Must | Mỗi bản ngôn ngữ có meta riêng, `<html lang>` đúng, thẻ `hreflang` (`vi`, `en`, `x-default` → bản tiếng Việt) trỏ chéo khi có cả hai bản; sitemap liệt kê cả hai bản |
 | FR-PUB-16 | Trang đích theo khu vực cho Cho thuê, ví dụ `/cho-thue/khu-vuc/ha-noi` | Should | |
 | FR-PUB-17 | Khối giới thiệu đối tác / chủ đầu tư (logo) trên trang chủ | Should | |
 | FR-PUB-18 | Website công khai song ngữ Việt – Anh: giao diện (menu, nút, nhãn, form, thông báo lỗi, thông báo cảm ơn) và nội dung (trang chủ, dự án, cho thuê, Đăng tin BĐS, tin tức, dịch vụ, tuyển dụng, trang pháp lý, menu/footer, danh mục) | Must | URL theo §2.1; bản EN chỉ hiện nội dung đã có bản dịch (BR-07); số, ngày hiển thị theo định dạng của ngôn ngữ đang xem; tiền luôn là VNĐ |

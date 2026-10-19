@@ -14,6 +14,10 @@ export interface PolicyBlock {
   content: ReactNode;
 }
 
+function prefersReducedMotion(): boolean {
+  return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 const LG_QUERY = "(min-width: 1024px)";
 
 function subscribeLg(onChange: () => void) {
@@ -82,10 +86,29 @@ export function LegalPolicy({ blocks }: { blocks: PolicyBlock[] }) {
       const target = blocks.find((block) => block.id === hashId || block.anchorIds?.includes(hashId));
       if (!target) return;
       setOpenIds((current) => (current.has(target.id) ? current : new Set(current).add(target.id)));
+      // Neo phụ (`#documents`) nằm trong khối có thể đang `display:none`: chỉ cuộn được sau khi khối mở và đã render lại.
+      if (target.anchorIds?.includes(hashId)) {
+        requestAnimationFrame(() => document.getElementById(hashId)?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" }));
+      }
+    }
+    // Bấm lại link cùng hash không phát `hashchange` và trình duyệt cuộn tới phần tử còn ẩn: tự mở + cuộn.
+    function onAnchorClick(event: MouseEvent) {
+      // Ctrl/Cmd/Shift/Alt hoặc nút chuột khác: để trình duyệt xử lý (mở tab mới…).
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest("a[href^='#']") : null;
+      const hashId = link?.getAttribute("href")?.slice(1);
+      if (!hashId || !blocks.some((block) => block.anchorIds?.includes(hashId))) return;
+      event.preventDefault();
+      window.history.replaceState(null, "", `#${hashId}`);
+      openBlockFromHash();
     }
     openBlockFromHash();
     window.addEventListener("hashchange", openBlockFromHash);
-    return () => window.removeEventListener("hashchange", openBlockFromHash);
+    document.addEventListener("click", onAnchorClick);
+    return () => {
+      window.removeEventListener("hashchange", openBlockFromHash);
+      document.removeEventListener("click", onAnchorClick);
+    };
   }, [blocks]);
 
   function toggle(id: string) {

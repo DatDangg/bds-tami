@@ -163,6 +163,11 @@ describe("toProjectDetailView", () => {
     expect(view.faqs).toEqual([{ id: "2", question: "Q3", answer: "A3" }]);
   });
 
+  it("bảng giá: 0 và số âm coi như thiếu (null)", () => {
+    const view = toProjectDetailView(project({ priceTable: [{ unitType: "2PN", areaFrom: 0, areaTo: -5, priceFrom: 0, priceTo: 2_000_000_000 }] } as Partial<Project>), "vi");
+    expect(view.priceRows[0]).toMatchObject({ areaFrom: null, areaTo: null, priceFrom: null, priceTo: 2_000_000_000 });
+  });
+
   it("richText chỉ có đoạn rỗng không tính là có nội dung", () => {
     expect(toProjectDetailView(project({ overview: lexical("  ") as never, legalInfo: lexical("") as never }), "vi")).toMatchObject({ hasOverview: false, hasLegal: false });
   });
