@@ -2,9 +2,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { LogoImageView } from "./shell-data";
 
-/** Logo tĩnh mặc định (`public/brand/`), dùng khi `site-settings.logo`/`logoDark` chưa cấu hình (docs/DESIGN.md § Logo). */
+/** Logo tĩnh mặc định (`public/brand/`), dùng khi `site-settings.logo`/`logoDark` chưa cấu hình (docs/DESIGN.md § Logo): vàng cho nền sáng (header đặc), trắng cho nền tối. */
 const STATIC_LOGO: Record<"on-light" | "on-dark", LogoImageView> = {
-  "on-light": { url: "/brand/tami-logo-dark.png", width: 800, height: 416 },
+  "on-light": { url: "/brand/tami-logo-gold.png", width: 800, height: 416 },
   "on-dark": { url: "/brand/tami-logo-white.png", width: 800, height: 416 },
 };
 

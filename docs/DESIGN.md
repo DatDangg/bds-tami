@@ -133,7 +133,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 | `assets/brand/source/tami-homes-logo.ai` | **Bản gốc vector** (Illustrator, tương thích PDF) | Nguồn để xuất SVG / mọi kích thước khác |
 | `assets/brand/tami-logo-gold.png` | Vàng gradient, nền trong suốt | **Logo chính**: header nền sáng, trang chủ, ảnh chia sẻ (OG), email |
 | `assets/brand/tami-logo-white.png` | Trắng, nền trong suốt | Header đè lên ảnh hero, section tối, footer (`--color-dark`) |
-| `assets/brand/tami-logo-dark.png` | Đen, nền trong suốt | Header nền sáng khi cuộn trang (sticky), bản in |
+| `assets/brand/tami-logo-dark.png` | Đen, nền trong suốt | Chỉ dùng cho in ấn / dự phòng (không dùng ở header web từ BL-018) |
 | `assets/brand/tami-logo-gray.png` | Xám, nền trong suốt | Dự phòng (văn bản, in ấn), hạn chế dùng trên web |
 
 **Việc builder phải làm khi dựng giao diện** (sinh vào `public/brand/`, không sửa file trong `assets/brand/`):
@@ -232,7 +232,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo đen) | Theo vinhomes.vn: **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. Desktop ≥ 1280px có thể hiện menu ngang dưới logo |
+| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo vàng) | Theo vinhomes.vn: **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. Desktop ≥ 1280px có thể hiện menu ngang dưới logo |
 | Menu toàn màn hình | — | Mở từ nút menu: phủ toàn màn hình nền tối, mục menu chữ lớn, mục con xổ ra; cuối có hotline + mạng xã hội |
 | Language Switcher | Chữ `VI | EN` · trong menu toàn màn hình | Chuyển sang **đúng trang tương ứng** ở ngôn ngữ kia; nếu trang đó chưa có bản dịch thì về trang danh sách / trang chủ của ngôn ngữ kia. Có `hreflang`, `aria-label`, ghi nhớ lựa chọn bằng cookie `NEXT_LOCALE` |
 | Section Heading | Có/không chữ chìm · căn giữa/căn trái | Eyebrow + tiêu đề serif in hoa + mô tả ngắn; chữ chìm to mờ phía sau |

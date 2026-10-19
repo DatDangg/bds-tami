@@ -397,6 +397,33 @@
       "migration": "migrations/20261019_082627_site_settings_page_banners.ts (additive: 6 cột uuid nullable + FK media ON DELETE SET NULL + index)",
       "specValidation": ".context/review-reports/feature-list-page-banner-image-spec-validation.md (PASS)",
       "residual": "pnpm build chưa chạy (dev server khác giữ .next); chưa xem trình duyệt 375/768/1280; MINOR r1: truyền nguyên doc media xuống client, thiếu test nhánh lỗi load-page-banner + test NewsListPage/PostListPage, cache 60s khi xoá media banner; chiều cao 42svh/header trong suốt/băng tìm kiếm để BL-020; media-upload.test.ts:145 chập chờn khi chạy song song"
+    },
+    {
+      "slug": "header-logo-gold",
+      "title": "Header nền sáng dùng logo vàng mặc định (/brand/tami-logo-gold.png); hero/footer/menu giữ trắng; logo CMS ưu tiên (BL-018)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-018",
+      "changeDoc": "spec/changes/archive/2026-10-19-header-logo-gold.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-header-logo-gold/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/feature-header-logo-gold-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": "2026-10-19",
+      "specVersion": "1.12.1",
+      "scopeVersion": 14,
+      "decision": "Tương phản logo vàng trên nền sáng ~1.5:1 (1.04–2.01:1 trên #FFFFFF) không đạt 3:1 — user chọn phương án B 2026-10-19 (\"dùng vàng thử đi\"), logo được WCAG miễn trừ",
+      "residual": "Chưa xem trình duyệt; pnpm build chưa chạy; MINOR: thiếu test footer/menu khi CMS có logoDark, comment BrandLogo.tsx:5 dài"
     }
   ],
   "bugs": [

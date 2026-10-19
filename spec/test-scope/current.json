@@ -1,115 +1,77 @@
 {
-  "specVersion": "1.12.0",
-  "scopeVersion": 13,
-  "generatedAt": "2026-10-19T23:55:00+07:00",
+  "specVersion": "1.12.1",
+  "scopeVersion": 14,
+  "generatedAt": "2026-10-19T23:59:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/list-page-banner-image",
-  "backlog": "BL-017",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/archive/2026-10-19-list-page-banner-image.md",
+  "workItem": "feature/header-logo-gold",
+  "backlog": "BL-018",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-19-header-logo-gold.md",
   "task": [
-    "tasks/feature-list-page-banner-image/phase-1-task-01.md"
+    "tasks/feature-header-logo-gold/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-list-page-banner-image.md",
+  "specUpdate": "spec/updates/2026-10-19-header-logo-gold.md",
   "specRefs": [
-    "FR-ADM-20",
-    "FR-PUB-02",
-    "FR-PUB-04",
-    "FR-PUB-06",
-    "FR-PUB-08",
-    "FR-PUB-09",
+    "Khung trang",
+    "design-spec §2.1",
     "NFR-07"
   ],
   "specRefNotes": {
-    "FR-ADM-20": "THÊM (F10) — site-settings nhóm 'Ảnh banner trang danh sách' (mặc định + Dự án/Cho thuê/Đăng tin BĐS/Tin tức/Tuyển dụng, không localized, chỉ admin sửa); trang danh sách + danh mục con: ảnh riêng → mặc định → biến thể Chữ; scrim AA, priority, không CLS",
-    "FR-PUB-02": "Không đổi chữ — trang danh sách Dự án /du-an hiển thị banner theo FR-ADM-20",
-    "FR-PUB-04": "Không đổi chữ — trang danh sách Cho thuê /cho-thue + danh mục con hiển thị banner theo FR-ADM-20",
-    "FR-PUB-06": "Không đổi chữ — trang danh sách Đăng tin BĐS /tin-bds + danh mục con hiển thị banner theo FR-ADM-20",
-    "FR-PUB-08": "Không đổi chữ — trang danh sách Tin tức /tin-tuc + danh mục con hiển thị banner theo FR-ADM-20",
-    "FR-PUB-09": "Không đổi chữ — trang danh sách Tuyển dụng /tuyen-dung hiển thị banner theo FR-ADM-20",
-    "NFR-07": "Không đổi chữ — chữ trên ảnh banner contrast AA, responsive"
+    "Khung trang": "SPECIFICATIONS.md 'Khung trang' (làm rõ, PATCH): logo mặc định khi CMS chưa có site-settings.logo/logoDark = bản vàng /brand/tami-logo-gold.png cho nền sáng, bản trắng cho nền tối; logo CMS ưu tiên",
+    "design-spec §2.1": ".context/design-spec.md §2.1: header biến thể Đặc dùng logo vàng; dòng Logo mặc định; docs/DESIGN.md § Logo + bảng Header",
+    "NFR-07": "Không đổi chữ — logo vàng trên nền sáng ~1.5:1 (< 3:1 non-text), user chấp nhận phương án B; logo/logotype được WCAG miễn trừ"
   },
   "changed": {
     "files": [
-      "src/globals/SiteSettings.ts",
-      "migrations/20261019_082627_site_settings_page_banners.ts",
-      "migrations/20261019_082627_site_settings_page_banners.json",
-      "migrations/index.ts",
-      "src/payload-types.ts",
-      "src/lib/content/page-banner.ts",
-      "src/lib/content/load-page-banner.ts",
-      "src/lib/content/page-banner.test.ts",
-      "src/components/layout/PageBanner.tsx",
-      "src/components/layout/PageBanner.test.tsx",
-      "src/app/(frontend)/globals.css",
-      "src/lib/contrast.test.ts",
-      "src/components/projects/ProjectListPage.tsx",
-      "src/components/projects/ProjectListPage.test.tsx",
-      "src/components/rentals/RentalListPage.tsx",
-      "src/components/rentals/RentalListPage.test.tsx",
-      "src/components/posts/PostListPage.tsx",
-      "src/components/news/NewsListPage.tsx",
-      "src/components/careers/JobListPage.tsx",
-      "src/components/careers/JobListPage.test.tsx",
-      "docs/ERD.md",
-      "docs/ARCHITECTURE.md"
+      "src/components/layout/BrandLogo.tsx",
+      "src/components/layout/Header.test.tsx",
+      "src/components/layout/Footer.test.tsx",
+      "src/components/layout/MobileMenu.test.tsx"
     ],
-    "filesNote": "dự kiến — builder chốt theo diff thật lúc close-out (có thể thêm test contrast scrim, CategoryListTemplate, docs/ERD.md)",
+    "filesNote": "Chốt theo diff thật lúc close-out (NORMAL PASS round 1); no as-built doc impact",
     "modules": [
-      "Payload global site-settings (schema + admin tab 'Ảnh banner')",
-      "DB migration additive trên site_settings",
-      "Public layout — PageBanner biến thể Ảnh (scrim riêng)",
-      "Trang danh sách công khai VI/EN: Dự án, Cho thuê, Đăng tin BĐS, Tin tức, Tuyển dụng (+ danh mục con)"
+      "Public layout — BrandLogo (logo tĩnh mặc định tone on-light)",
+      "Header công khai VI/EN"
     ]
   },
   "impact": {
     "direct": [
-      "Admin › Cài đặt website: nhóm 'Ảnh banner trang danh sách' gồm Ảnh mặc định + Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng (nhãn VI, chỉ ảnh từ media); lưu và đọc lại đúng",
-      "Trang danh sách có ảnh riêng → banner biến thể Ảnh dùng ảnh riêng",
-      "Trang danh sách không có ảnh riêng nhưng có ảnh mặc định → dùng ảnh mặc định",
-      "Không có cả ảnh riêng lẫn mặc định → biến thể Chữ y như trước",
-      "Danh mục con /cho-thue/danh-muc/*, /tin-bds/danh-muc/*, /tin-tuc/danh-muc/* dùng ảnh của trang danh sách cha",
-      "VI và /en cùng ảnh (field không localized)",
-      "Biến thể Ảnh: tiêu đề + mô tả chữ trắng ≥ 4.5:1 kể cả trên ảnh trắng; ảnh priority (LCP); khung cao cố định, không CLS"
+      "Header nền sáng (sticky khi cuộn) trên mọi trang công khai VI/EN hiện /brand/tami-logo-gold.png khi CMS chưa cấu hình logo",
+      "Trang không có hero (header đặc ngay từ đầu) hiện logo vàng khi CMS chưa cấu hình logo",
+      "Logo vàng giữ khung 800×416 như bản cũ — không đổi kích thước hiển thị, không CLS"
     ],
     "dependents": [
-      "PageBanner + CategoryListTemplate dùng chung ở nhiều trang danh sách",
-      "getSiteSettings (cache theo tag) — trang danh sách nay đọc thêm site-settings",
-      "payload-types.ts (thêm kiểu pageBanners)",
-      "Test quét nhãn admin (admin-labels) phải vẫn PASS với field mới"
+      "BrandLogo dùng chung ở Header, Footer, MobileMenu (tone on-light / on-dark)",
+      "Test Header.test.tsx khoá đường dẫn logo tĩnh"
     ],
     "regression": [
-      "Biến thể Chữ khi không có ảnh (watermark, mô tả danh mục) không đổi",
-      "Header và hero trang chủ không đổi (token --color-overlay toàn cục giữ nguyên)",
-      "site-settings đọc lỗi → trang danh sách vẫn render biến thể Chữ, không 500",
-      "Lưu/đọc các tab khác của Cài đặt website (logo, liên hệ, mạng xã hội...) giữ nguyên dữ liệu",
-      "Quyền: sale không sửa được site-settings; đọc công khai không đổi",
-      "ISR/dynamic của các route danh sách không đổi; bộ lọc/phân trang danh sách không đổi",
-      "Migration chạy up trên DB có dữ liệu: chỉ thêm cột nullable, dữ liệu cũ giữ nguyên"
+      "Header trong suốt trên hero (trang chủ, trang có hero) giữ logo trắng /brand/tami-logo-white.png",
+      "Footer giữ logo trắng",
+      "Menu toàn màn hình giữ logo trắng",
+      "site-settings.logo / logoDark có cấu hình → dùng logo CMS, không bị thay bằng logo tĩnh",
+      "Chuyển trạng thái header trong suốt ↔ đặc khi cuộn vẫn đổi đúng logo trắng ↔ vàng",
+      "Logo admin (/admin) và ảnh OG fallback không đổi"
     ]
   },
   "acceptance": [
-    "Admin › Cài đặt website có nhóm 'Ảnh banner trang danh sách': Ảnh mặc định + Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng (nhãn VI; test quét nhãn admin PASS)",
-    "Trang danh sách: ảnh riêng → biến thể Ảnh; thiếu → ảnh mặc định; thiếu cả hai → biến thể Chữ như trước",
-    "Trang danh mục con dùng ảnh của danh sách cha",
-    "Chữ trên ảnh ≥ 4.5:1 ở trường hợp ảnh trắng (test contrast); ảnh priority; khung cao cố định (không CLS)",
-    "VI và EN cùng ảnh",
-    "Migration versioned additive (chỉ ADD COLUMN nullable + FK/index), không HIGH_RISK",
-    "site-settings đọc lỗi → trang vẫn render biến thể Chữ (không 500)"
+    "Header đặc (sticky + trang không hero) hiện /brand/tami-logo-gold.png khi CMS chưa có logo",
+    "Header trong suốt trên hero, footer, menu toàn màn hình giữ /brand/tami-logo-white.png",
+    "site-settings.logo có → dùng logo CMS (không đổi)",
+    "Test cập nhật; pnpm lint / pnpm typecheck / pnpm test PASS"
   ],
   "outOfScope": [
-    "BL-020: banner thấp ~240px, băng tìm kiếm dưới banner, header trong suốt trên banner ảnh",
-    "Trang Liên hệ và chi tiết dịch vụ không dùng nhóm ảnh này",
-    "BL-018 (logo vàng) không thuộc scope này"
+    "Xuất bản logo vàng đậm (phương án C) — không làm",
+    "Không xoá public/brand/tami-logo-dark.png (bản in ấn/dự phòng)",
+    "Không thêm test contrast cho logo (user chấp nhận ~1.5:1)"
   ],
+  "contrastNote": "Logo vàng trên #FFFFFF trung vị 1.50:1 (1.04–2.01:1), trên #F7F5F4 1.38:1 — không đạt 3:1 non-text (WCAG 1.4.11); user chọn phương án B 2026-10-19, chấp nhận. Test không nên fail vì tương phản logo.",
   "viewports": [
     390,
     768,
     1280
   ],
   "uiTests": true,
-  "migration": "additive",
-  "risk": "medium",
-  "riskNote": "Schema/migration additive trên site_settings (6 cột upload nullable + FK media) và shared component PageBanner/CategoryListTemplate dùng ở nhiều trang danh sách → reviewer STRICT. Không đổi quyền/API; header/hero không đổi.",
-  "filesNote": "Chốt theo diff thật lúc close-out (STRICT PASS round 1)"
+  "migration": "none",
+  "risk": "low",
+  "riskNote": "Đổi 1 hằng số URL ảnh tĩnh trong component dùng chung của header; không đổi schema/API/quyền → reviewer NORMAL."
 }

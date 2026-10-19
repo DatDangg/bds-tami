@@ -57,14 +57,14 @@ describe("Header: khung và landmark", () => {
     expect(menuTrigger().className).not.toMatch(/\bxl:hidden\b/);
   });
 
-  it("logo: không có trong CMS thì dùng file tĩnh (2 bản sáng/tối); có thì dùng URL từ site-settings", () => {
+  it("logo: không có trong CMS thì dùng file tĩnh (vàng cho header đặc, trắng cho header trong suốt); có thì dùng URL từ site-settings", () => {
     const { unmount } = renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
     const home = screen.getByRole("link", { name: "TAMI, về trang chủ" });
     // Logo tĩnh vẫn qua trình tối ưu ảnh của Next (`/_next/image?url=...`), như trước BL-001.
     const staticSources = within(home)
       .getAllByRole("presentation")
       .map((img) => new URLSearchParams(img.getAttribute("src")?.split("?")[1]).get("url"));
-    expect(staticSources).toEqual(["/brand/tami-logo-dark.png", "/brand/tami-logo-white.png"]);
+    expect(staticSources).toEqual(["/brand/tami-logo-gold.png", "/brand/tami-logo-white.png"]);
     unmount();
 
     renderIntl(<Header items={viItems} contact={contact} logo={cmsLogo} />);

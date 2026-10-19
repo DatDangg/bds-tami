@@ -93,3 +93,13 @@ describe("MobileMenu: accordion menu con (design-spec §2.2)", () => {
     expect(within(dialog).getByRole("button", { name: "Open submenu of Dự án" })).toBeInTheDocument();
   });
 });
+
+describe("MobileMenu: logo nền tối", () => {
+  it("logo tĩnh mặc định là bản trắng (không dùng bản vàng của nền sáng)", async () => {
+    const { dialog } = await openMenu();
+    const sources = within(dialog)
+      .getAllByRole("presentation")
+      .map((img) => new URLSearchParams(img.getAttribute("src")?.split("?")[1]).get("url"));
+    expect(sources).toEqual(["/brand/tami-logo-white.png"]);
+  });
+});

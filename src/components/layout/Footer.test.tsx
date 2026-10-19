@@ -79,6 +79,18 @@ describe("Footer < md: cột link là accordion (design-spec §2.4)", () => {
   });
 });
 
+describe("Footer: logo nền tối", () => {
+  it("logo tĩnh mặc định là bản trắng (không dùng bản vàng của nền sáng)", () => {
+    stubViewport(true);
+    renderFooter();
+    const sources = screen
+      .getAllByRole("presentation")
+      .map((img) => new URLSearchParams(img.getAttribute("src")?.split("?")[1]).get("url"));
+    expect(sources).toContain("/brand/tami-logo-white.png");
+    expect(sources).not.toContain("/brand/tami-logo-gold.png");
+  });
+});
+
 describe("Footer ≥ md: lưới như cũ", () => {
   beforeEach(() => stubViewport(true));
 
