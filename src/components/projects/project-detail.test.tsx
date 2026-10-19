@@ -106,9 +106,13 @@ describe("ProjectDetail (S03)", () => {
     expect(within(nav).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
       "#overview", "#location", "#amenities", "#floor-plans", "#legal", "#sales-policy", "#gallery",
     ]);
-    for (const name of ["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách bán hàng", "Thư viện ảnh", "Tài liệu", "Nhận thông tin dự án"]) {
+    for (const name of ["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách bán hàng", "Thư viện ảnh", "Nhận thông tin dự án"]) {
       expect(screen.getByRole("heading", { level: 2, name: new RegExp(name) }), name).toBeInTheDocument();
     }
+    // Tài liệu nằm TRONG khối Pháp lý (h3 dưới h2 Pháp lý), neo #documents cho nút hero vẫn có thật.
+    const legal = container.querySelector("#legal") as HTMLElement;
+    expect(within(legal).getByRole("heading", { level: 3, name: "Tài liệu" })).toBeInTheDocument();
+    expect(legal.querySelector("#documents")).not.toBeNull();
     // Mỗi neo của thanh mục con trỏ tới phần tử có thật.
     for (const link of within(nav).getAllByRole("link")) expect(container.querySelector(link.getAttribute("href")!), link.getAttribute("href")!).not.toBeNull();
     expect(screen.getByText("Nội dung tổng quan")).toBeInTheDocument();
@@ -197,7 +201,7 @@ describe("ProjectDetail (S03)", () => {
     const doc = baseProject({ title: "Saigon Riverside", gallery: [{ ...image("g1"), alt: "" }, image("g2"), image("g3")], documents: [pdf("d1", "Price list")] });
     const { container } = renderDetail(doc, "en");
     const nav = screen.getByRole("navigation", { name: "Project contents" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Overview", "Gallery"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Overview", "Legal", "Gallery"]);
     expect(screen.getByRole("link", { name: "Download documents" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Get project information" })).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/Nhận|Tổng quan|Tài liệu|Thư viện/);

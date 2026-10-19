@@ -43,7 +43,7 @@ export function ProjectListings({ rentals, posts }: ProjectListingCards) {
           <Group label={t("rentals")}>
             {rentals.map((card) => (
               <li key={card.id}>
-                <RentalCard data={card} headingLevel={3} />
+                <RentalCard data={card} headingLevel={3} imageSizes="(min-width: 1280px) 390px, (min-width: 640px) 45vw, 100vw" />
               </li>
             ))}
           </Group>

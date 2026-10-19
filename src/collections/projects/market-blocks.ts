@@ -97,11 +97,6 @@ const availabilityField: SelectField = {
   options: PRICE_AVAILABILITIES.map((value) => ({ label: PRICE_AVAILABILITY_LABELS[value], value })),
 };
 
-const vndRange = (name: string, label: string, validate?: NumberFieldSingleValidation): NumberField => ({
-  ...rangeNumber(name, label, validate),
-  admin: { components: { Cell: "/components/admin/VndCell#VndCell" } },
-});
-
 const priceTableField: ArrayField = {
   name: "priceTable",
   type: "array",
@@ -119,8 +114,8 @@ const priceTableField: ArrayField = {
       rangeNumber("areaTo", "Diện tích đến (m²)", notBelow("areaFrom", "Diện tích đến không được nhỏ hơn diện tích từ.")),
     ),
     formRow(
-      vndRange("priceFrom", "Giá từ (VNĐ)"),
-      vndRange("priceTo", "Giá đến (VNĐ)", notBelow("priceFrom", "Giá đến không được nhỏ hơn giá từ.")),
+      rangeNumber("priceFrom", "Giá từ (VNĐ)"),
+      rangeNumber("priceTo", "Giá đến (VNĐ)", notBelow("priceFrom", "Giá đến không được nhỏ hơn giá từ.")),
     ),
     availabilityField,
     { name: "note", type: "text", label: "Ghi chú", localized: true },

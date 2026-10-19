@@ -32,6 +32,48 @@ export interface AmenityView {
   name: string;
 }
 
+export interface HighlightView {
+  id: string;
+  title: string;
+  description: string | null;
+}
+
+/** Nhóm tiện ích quanh dự án (cùng giá trị với trường `category` của schema), theo thứ tự hiển thị của các tab. */
+export type NearbyCategory = NonNullable<Project["nearbyAmenities"]>[number]["category"];
+export const NEARBY_CATEGORY_ORDER: readonly NearbyCategory[] = ["education", "healthcare", "shopping", "park", "transport", "other"];
+
+export interface NearbyItemView {
+  id: string;
+  name: string;
+  distance: string | null;
+  location: LatLng | null;
+}
+
+/** Chỉ các nhóm có dòng (tab rỗng không hiện), đúng thứ tự `NEARBY_CATEGORY_ORDER`. */
+export interface NearbyGroupView {
+  category: NearbyCategory;
+  items: NearbyItemView[];
+}
+
+export type PriceAvailability = NonNullable<NonNullable<Project["priceTable"]>[number]["availability"]>;
+
+export interface PriceRowView {
+  id: string;
+  unitType: string;
+  areaFrom: number | null;
+  areaTo: number | null;
+  priceFrom: number | null;
+  priceTo: number | null;
+  availability: PriceAvailability | null;
+  note: string | null;
+}
+
+export interface FaqView {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export interface ProjectDetailView {
   title: string;
   summary: string;
@@ -56,6 +98,12 @@ export interface ProjectDetailView {
   hasLegal: boolean;
   hasPolicy: boolean;
   location: LatLng | null;
+  highlights: HighlightView[];
+  nearby: NearbyGroupView[];
+  priceRows: PriceRowView[];
+  /** Ngày cập nhật bảng giá (ISO) — chỉ có nghĩa khi có `priceRows`. */
+  priceUpdatedAt: string | null;
+  faqs: FaqView[];
 }
 
 const positive = (value: number | null | undefined): number | undefined => (typeof value === "number" && value > 0 ? value : undefined);
@@ -129,6 +177,49 @@ function toLocation(point: Project["location"]): LatLng | null {
   return isValidLocation(location) ? location : null;
 }
 
+const numberOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null);
+
+const trimmedOrNull = (value: string | null | undefined): string | null => (hasText(value) ? value.trim() : null);
+
+/** Dòng thiếu chữ (vd bản EN chưa dịch: `/en` không rơi về tiếng Việt) bị bỏ, không hiện ô trống. */
+function toHighlights(items: Project["highlights"]): HighlightView[] {
+  return (items ?? []).flatMap((item, index) => (hasText(item.title) ? [{ id: item.id ?? String(index), title: item.title.trim(), description: trimmedOrNull(item.description) }] : []));
+}
+
+function toNearby(items: Project["nearbyAmenities"]): NearbyGroupView[] {
+  const rows = (items ?? []).flatMap((item, index) =>
+    hasText(item.name) ? [{ category: item.category, view: { id: item.id ?? String(index), name: item.name.trim(), distance: trimmedOrNull(item.distance), location: toLocation(item.location) } }] : [],
+  );
+  return NEARBY_CATEGORY_ORDER.flatMap((category) => {
+    const groupItems = rows.filter((row) => row.category === category).map((row) => row.view);
+    return groupItems.length > 0 ? [{ category, items: groupItems }] : [];
+  });
+}
+
+function toPriceRows(items: Project["priceTable"]): PriceRowView[] {
+  return (items ?? []).flatMap((item, index) =>
+    hasText(item.unitType)
+      ? [
+          {
+            id: item.id ?? String(index),
+            unitType: item.unitType.trim(),
+            areaFrom: numberOrNull(item.areaFrom),
+            areaTo: numberOrNull(item.areaTo),
+            priceFrom: numberOrNull(item.priceFrom),
+            priceTo: numberOrNull(item.priceTo),
+            availability: item.availability ?? null,
+            note: trimmedOrNull(item.note),
+          },
+        ]
+      : [],
+  );
+}
+
+/** Chỉ câu hỏi có đủ cả câu hỏi và trả lời ở ngôn ngữ đang xem (cùng tập dùng cho accordion và JSON-LD). */
+function toFaqs(items: Project["faqs"]): FaqView[] {
+  return (items ?? []).flatMap((item, index) => (hasText(item.question) && hasText(item.answer) ? [{ id: item.id ?? String(index), question: item.question.trim(), answer: item.answer.trim() }] : []));
+}
+
 function areaLabel(ward: Project["ward"], province: Project["province"]): string | null {
   const wardName = ward && typeof ward === "object" ? (ward as Ward).name : null;
   const provinceName = province && typeof province === "object" ? ((province as Province).shortName || (province as Province).name) : null;
@@ -175,11 +266,16 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     hasLegal: lexicalPlainText(doc.legalInfo).trim() !== "",
     hasPolicy: lexicalPlainText(doc.salesPolicy).trim() !== "",
     location: toLocation(doc.location),
+    highlights: toHighlights(doc.highlights),
+    nearby: toNearby(doc.nearbyAmenities),
+    priceRows: toPriceRows(doc.priceTable),
+    priceUpdatedAt: trimmedOrNull(doc.priceUpdatedAt),
+    faqs: toFaqs(doc.faqs),
   };
 }
 
 /** Mã mục của thanh mục con, theo thứ tự hiển thị (design-spec S03 khối 3). */
-export const SECTION_IDS = ["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery", "listings"] as const;
+export const SECTION_IDS = ["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "gallery", "listings", "faq"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 /**
@@ -189,13 +285,17 @@ export type SectionId = (typeof SECTION_IDS)[number];
 export function visibleSections(view: ProjectDetailView, { hasListings = false }: { hasListings?: boolean } = {}): SectionId[] {
   const present: Record<SectionId, boolean> = {
     overview: true,
-    location: view.location !== null || view.address !== null,
+    highlights: view.highlights.length > 0,
+    location: view.location !== null || view.address !== null || view.nearby.length > 0,
     amenities: view.amenities.length > 0,
     floorPlans: view.floorPlans.length > 0,
-    legal: view.hasLegal,
+    // Pháp lý gộp richText + tài liệu PDF: chỉ có tài liệu vẫn là một khối Pháp lý.
+    legal: view.hasLegal || view.documents.length > 0,
     policy: view.hasPolicy,
+    pricing: view.priceRows.length > 0,
     gallery: view.gallery.length > 0,
     listings: hasListings,
+    faq: view.faqs.length > 0,
   };
   return SECTION_IDS.filter((id) => present[id]);
 }
@@ -203,13 +303,16 @@ export function visibleSections(view: ProjectDetailView, { hasListings = false }
 /** `id` phần tử của từng mục (đích của thanh mục con và neo `#...`), không dịch theo ngôn ngữ để link chia sẻ dùng được ở cả hai bản. */
 export const SECTION_DOM_ID: Record<SectionId, string> = {
   overview: "overview",
+  highlights: "highlights",
   location: "location",
   amenities: "amenities",
   floorPlans: "floor-plans",
   legal: "legal",
   policy: "sales-policy",
+  pricing: "pricing",
   gallery: "gallery",
   listings: "related-listings",
+  faq: "faq",
 };
 
 export const DOCUMENTS_DOM_ID = "documents";

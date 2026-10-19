@@ -12,6 +12,8 @@ const maplibre = vi.hoisted(() => ({
   addSource: vi.fn(),
   addControl: vi.fn(),
   markerAdded: vi.fn(),
+  fitBounds: vi.fn(),
+  popupText: vi.fn(),
   setWorkerUrl: vi.fn(),
   loadHandlers: [] as Array<() => void>,
 }));
@@ -26,12 +28,27 @@ vi.mock("maplibre-gl", () => {
     addSource = maplibre.addSource;
     addLayer = maplibre.addLayer;
     remove = maplibre.remove;
+    fitBounds = maplibre.fitBounds;
     on(_event: string, handler: () => void) {
       maplibre.loadHandlers.push(handler);
     }
   }
+  class FakePopup {
+    setText(text: string) {
+      maplibre.popupText(text);
+      return this;
+    }
+  }
+  class FakeBounds {
+    extend() {
+      return this;
+    }
+  }
   class FakeMarker {
     setLngLat() {
+      return this;
+    }
+    setPopup() {
       return this;
     }
     addTo() {
@@ -39,7 +56,7 @@ vi.mock("maplibre-gl", () => {
       return this;
     }
   }
-  return { Map: FakeMap, Marker: FakeMarker, NavigationControl: class {}, setWorkerUrl: maplibre.setWorkerUrl };
+  return { Map: FakeMap, Marker: FakeMarker, Popup: FakePopup, LngLatBounds: FakeBounds, NavigationControl: class {}, setWorkerUrl: maplibre.setWorkerUrl };
 });
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
 
@@ -155,6 +172,22 @@ describe("LazyMap", () => {
       expect(JSON.stringify({ center: options.center, zoom: options.zoom, style: options.style })).not.toContain(exact);
       expect(href).not.toContain(exact);
     }
+  });
+
+  it("điểm phụ (tiện ích quanh dự án): mỗi điểm một ghim nhỏ + popup tên, bản đồ khung vừa tất cả; không có điểm phụ thì không fitBounds", async () => {
+    const { unmount } = renderWithIntl(<LazyMap location={location} markers={[{ lat: 10.78, lng: 106.71, label: "Trường A" }]} />);
+    await act(async () => observer().intersect());
+    await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(maplibre.markerAdded).toHaveBeenCalledTimes(2));
+    expect(maplibre.popupText).toHaveBeenCalledWith("Trường A");
+    expect(maplibre.fitBounds).toHaveBeenCalledWith(expect.anything(), { padding: 48, maxZoom: 15, duration: 0 });
+    unmount();
+    maplibre.fitBounds.mockClear();
+    observers = [];
+    renderWithIntl(<LazyMap location={location} />);
+    await act(async () => observer().intersect());
+    await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(2));
+    expect(maplibre.fitBounds).not.toHaveBeenCalled();
   });
 
   it("tin hiện địa chỉ: tâm bản đồ là toạ độ thật", async () => {

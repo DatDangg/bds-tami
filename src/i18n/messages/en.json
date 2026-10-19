@@ -400,7 +400,10 @@
         "floorPlans": "Floor plans",
         "legal": "Legal information",
         "policy": "Sales policy",
-        "gallery": "Photo gallery"
+        "gallery": "Photo gallery",
+        "highlights": "Highlights",
+        "pricing": "Price list",
+        "faq": "Frequently asked questions"
       },
       "subNav": {
         "overview": "Overview",
@@ -410,7 +413,10 @@
         "legal": "Legal",
         "policy": "Policy",
         "gallery": "Gallery",
-        "listings": "Related listings"
+        "listings": "Related listings",
+        "highlights": "Highlights",
+        "pricing": "Pricing",
+        "faq": "FAQ"
       },
       "specs": {
         "label": "Project facts",
@@ -429,6 +435,38 @@
       "location": {
         "mapLabel": "{name} location on the map",
         "address": "Address"
+      },
+      "nearby": {
+        "title": "Nearby amenities",
+        "tabs": "Nearby amenity groups",
+        "categories": {
+          "education": "Education",
+          "healthcare": "Healthcare",
+          "shopping": "Shopping",
+          "park": "Parks",
+          "transport": "Transport",
+          "other": "Other"
+        }
+      },
+      "price": {
+        "caption": "Reference prices by unit type",
+        "updated": "Updated on {date}",
+        "columns": {
+          "unit": "Unit type",
+          "area": "Area (m²)",
+          "price": "Price",
+          "status": "Availability",
+          "note": "Notes"
+        },
+        "from": "From {value}",
+        "to": "Up to {value}",
+        "contact": "Contact us",
+        "unknown": "Not specified",
+        "availability": {
+          "available": "Available",
+          "few_left": "Few left",
+          "sold_out": "Sold out"
+        }
       },
       "amenitiesLabel": "Amenities list",
       "floorPlans": {

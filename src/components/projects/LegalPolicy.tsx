@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 export interface PolicyBlock {
   /** `id` của khối: đích của thanh mục con. */
   id: string;
+  /** Neo phụ cũng mở khối này (vd `#documents` nằm trong khối Pháp lý). */
+  anchorIds?: string[];
   title: string;
   /** Nội dung richText đã render ở server. */
   content: ReactNode;
@@ -70,7 +72,6 @@ export function LegalPolicy({ blocks }: { blocks: PolicyBlock[] }) {
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set(blocks.slice(0, 1).map((block) => block.id)));
 
   useEffect(() => {
-    const ids = blocks.map((block) => block.id);
     function openBlockFromHash() {
       let hashId: string;
       try {
@@ -78,8 +79,9 @@ export function LegalPolicy({ blocks }: { blocks: PolicyBlock[] }) {
       } catch {
         return;
       }
-      if (!ids.includes(hashId)) return;
-      setOpenIds((current) => (current.has(hashId) ? current : new Set(current).add(hashId)));
+      const target = blocks.find((block) => block.id === hashId || block.anchorIds?.includes(hashId));
+      if (!target) return;
+      setOpenIds((current) => (current.has(target.id) ? current : new Set(current).add(target.id)));
     }
     openBlockFromHash();
     window.addEventListener("hashchange", openBlockFromHash);

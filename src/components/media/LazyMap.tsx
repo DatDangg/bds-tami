@@ -22,6 +22,9 @@ const OSM_STYLE = {
   layers: [{ id: "osm", type: "raster" as const, source: "osm" }],
 };
 
+/** Điểm phụ (vd tiện ích quanh dự án) vẽ nhỏ hơn ghim chính; chỉ dùng khi không `approximate`. */
+export type MapMarker = { lat: number; lng: number; label: string };
+
 type LazyMapProps = {
   /**
    * Với `approximate`, nơi gọi phía server phải truyền toạ độ đã làm tròn bằng `approximateLocation`
@@ -32,6 +35,8 @@ type LazyMapProps = {
   approximate?: boolean;
   /** Ảnh tĩnh hiện trước khi bản đồ tải (ảnh `media` của mình); không có thì dùng nền trơn. */
   previewImage?: MediaImage | null;
+  /** Điểm phụ ngoài ghim chính; có thì bản đồ tự khung vừa tất cả các điểm (zoom tối đa như bản đồ thường). */
+  markers?: readonly MapMarker[];
   /** Nhãn bản đồ cho trình đọc màn hình (vd tên dự án/địa chỉ). */
   label?: string;
   /** Tỉ lệ cố định để CLS = 0; mặc định 4:3 (design-spec §3.8). */
@@ -47,6 +52,7 @@ type MountOptions = {
   approximate: boolean;
   locale: Record<string, string>;
   markerLabel: string;
+  markers: readonly MapMarker[];
 };
 
 // `location` đã được làm tròn từ trước nếu tin ẩn địa chỉ.
@@ -56,7 +62,7 @@ function googleMapsUrl(location: LatLng, approximate: boolean) {
 }
 
 /** Dựng bản đồ vào `container`, trả hàm dọn. MapLibre và CSS của nó chỉ được import ở đây (khi thật sự cần). */
-async function mountMap(container: HTMLElement, { location, approximate, locale, markerLabel }: MountOptions): Promise<() => void> {
+async function mountMap(container: HTMLElement, { location, approximate, locale, markerLabel, markers }: MountOptions): Promise<() => void> {
   const [maplibre] = await Promise.all([import("maplibre-gl"), import("maplibre-gl/dist/maplibre-gl.css")]);
   maplibre.setWorkerUrl(MAPLIBRE_WORKER_URL);
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -87,11 +93,23 @@ async function mountMap(container: HTMLElement, { location, approximate, locale,
     pin.setAttribute("role", "img");
     pin.setAttribute("aria-label", markerLabel);
     new maplibre.Marker({ element: pin }).setLngLat([location.lng, location.lat]).addTo(map);
+    for (const point of markers) {
+      const dot = document.createElement("div");
+      dot.className = "size-3.5 rounded-full border-2 border-surface bg-dark shadow-md";
+      dot.setAttribute("role", "img");
+      dot.setAttribute("aria-label", point.label);
+      new maplibre.Marker({ element: dot }).setLngLat([point.lng, point.lat]).setPopup(new maplibre.Popup({ offset: 10, closeButton: false }).setText(point.label)).addTo(map);
+    }
+    if (markers.length > 0) {
+      const bounds = new maplibre.LngLatBounds([location.lng, location.lat], [location.lng, location.lat]);
+      for (const point of markers) bounds.extend([point.lng, point.lat]);
+      map.fitBounds(bounds, { padding: 48, maxZoom: 15, duration: 0 });
+    }
   }
   return () => map.remove();
 }
 
-export function LazyMap({ location, approximate = false, previewImage, label, aspectRatio = "4/3", className }: LazyMapProps) {
+export function LazyMap({ location, approximate = false, previewImage, markers = [], label, aspectRatio = "4/3", className }: LazyMapProps) {
   const t = useTranslations("media.map");
   const [phase, setPhase] = useState<Phase>("idle");
   // Số lần yêu cầu tải (0 = chưa). Effect dựng map chỉ phụ thuộc giá trị này: đổi `phase` không được gỡ map.
@@ -101,6 +119,12 @@ export function LazyMap({ location, approximate = false, previewImage, label, as
   const valid = isValidLocation(location);
   const shown = valid && approximate ? approximateLocation(location) : location;
   const { lat, lng } = shown;
+  // Khoá chuỗi để effect dựng map không chạy lại chỉ vì nơi gọi truyền mảng mới cùng nội dung.
+  const markersKey = JSON.stringify(markers);
+  const markersRef = useRef(markers);
+  useEffect(() => {
+    markersRef.current = markers;
+  });
   const translateRef = useRef<Translate>(t);
   useEffect(() => {
     translateRef.current = t;
@@ -137,6 +161,7 @@ export function LazyMap({ location, approximate = false, previewImage, label, as
       location: { lat, lng },
       approximate,
       markerLabel: t("controls.marker"),
+      markers: markersRef.current,
       locale: {
         "NavigationControl.ZoomIn": t("controls.zoomIn"),
         "NavigationControl.ZoomOut": t("controls.zoomOut"),
@@ -165,7 +190,7 @@ export function LazyMap({ location, approximate = false, previewImage, label, as
       cancelled = true;
       dispose?.();
     };
-  }, [loadAttempt, lat, lng, approximate]);
+  }, [loadAttempt, lat, lng, approximate, markersKey]);
 
   if (!valid) return null;
   const showMap = phase === "loading" || phase === "ready";

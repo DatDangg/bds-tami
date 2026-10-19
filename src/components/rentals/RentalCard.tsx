@@ -12,13 +12,15 @@ interface RentalCardProps {
   headingLevel?: 2 | 3;
   /** Ảnh đầu danh sách (LCP): tải sớm. */
   priority?: boolean;
+  /** Ghi đè `sizes` của ảnh khi thẻ nằm trong khung không theo lưới danh sách (vd lưới 2 cột trong cột chính chi tiết dự án). */
+  imageSizes?: string;
 }
 
 /**
  * Thẻ tin cho thuê DÙNG CHUNG cho danh sách S04 và "tin tương tự" S07: ảnh 4:3, tên (2 dòng), khu vực, giá/tháng + diện tích + phòng ngủ.
  * Cả thẻ là MỘT link. Dữ liệu từ `RentalCardData` (dựng từ doc Payload hoặc từ DTO của `SearchService`).
  */
-export function RentalCard({ data, headingLevel = 3, priority = false }: RentalCardProps) {
+export function RentalCard({ data, headingLevel = 3, priority = false, imageSizes }: RentalCardProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentals.card");
   const Heading = headingLevel === 2 ? "h2" : "h3";
@@ -28,7 +30,7 @@ export function RentalCard({ data, headingLevel = 3, priority = false }: RentalC
       <Link href={data.href} className="group flex h-full min-h-11 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
           {data.cover ? (
-            <ResponsiveImage media={data.cover} sizes="(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" priority={priority} decorative />
+            <ResponsiveImage media={data.cover} sizes={imageSizes ?? "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"} priority={priority} decorative />
           ) : (
             <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
           )}

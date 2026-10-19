@@ -250,3 +250,20 @@ export function buildJobPostingJsonLd(input: JobPostingInput) {
 export function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
+
+export interface FaqPageInput {
+  locale: Locale;
+  /** Chỉ các câu đã có cả câu hỏi và trả lời ở `locale` (nơi gọi lọc; không dùng chữ ngôn ngữ khác thay thế). */
+  items: readonly { question: string; answer: string }[];
+}
+
+/** FAQPage (schema.org) cho khối "Câu hỏi thường gặp" của chi tiết dự án; `null` khi không có câu nào (không nhúng JSON-LD rỗng). */
+export function buildFaqPageJsonLd({ locale, items }: FaqPageInput) {
+  if (items.length === 0) return null;
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@type": "FAQPage",
+    inLanguage: locale,
+    mainEntity: items.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })),
+  };
+}

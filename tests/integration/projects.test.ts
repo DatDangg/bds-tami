@@ -237,6 +237,8 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect(await statusOf(createProject({ title: "Diện tích ngược", priceTable: [{ unitType: "A", areaFrom: 80, areaTo: 70 }] }))).toBe(400);
       expect(await statusOf(createProject({ title: "Giá ngược", priceTable: [{ unitType: "A", priceFrom: 5, priceTo: 4 }] }))).toBe(400);
       expect(await statusOf(createProject({ title: "Giá âm", priceTable: [{ unitType: "A", priceFrom: -1 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Diện tích đến âm", priceTable: [{ unitType: "A", areaTo: -1 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Giá đến âm", priceTable: [{ unitType: "A", priceTo: -1 }] }))).toBe(400);
       expect(await statusOf(createProject({ title: "Tình trạng lạ", priceTable: [{ unitType: "A", availability: "xyz" }] }))).toBe(400);
       expect(await statusOf(createProject({ title: "Nhóm lạ", nearbyAmenities: [{ category: "xyz", name: "B" }] }))).toBe(400);
       expect(await statusOf(createProject({ title: "Thiếu tiêu đề", highlights: [{ description: "x" }] }))).toBe(400);

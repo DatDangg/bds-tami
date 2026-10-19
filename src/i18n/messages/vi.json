@@ -400,7 +400,10 @@
         "floorPlans": "Mặt bằng",
         "legal": "Pháp lý",
         "policy": "Chính sách bán hàng",
-        "gallery": "Thư viện ảnh"
+        "gallery": "Thư viện ảnh",
+        "highlights": "Điểm nổi bật",
+        "pricing": "Bảng giá",
+        "faq": "Câu hỏi thường gặp"
       },
       "subNav": {
         "overview": "Tổng quan",
@@ -410,7 +413,10 @@
         "legal": "Pháp lý",
         "policy": "Chính sách",
         "gallery": "Thư viện",
-        "listings": "Tin liên quan"
+        "listings": "Tin liên quan",
+        "highlights": "Nổi bật",
+        "pricing": "Giá",
+        "faq": "Hỏi đáp"
       },
       "specs": {
         "label": "Thông số dự án",
@@ -429,6 +435,38 @@
       "location": {
         "mapLabel": "Vị trí {name} trên bản đồ",
         "address": "Địa chỉ"
+      },
+      "nearby": {
+        "title": "Tiện ích xung quanh",
+        "tabs": "Nhóm tiện ích xung quanh",
+        "categories": {
+          "education": "Giáo dục",
+          "healthcare": "Y tế",
+          "shopping": "Mua sắm",
+          "park": "Công viên",
+          "transport": "Giao thông",
+          "other": "Khác"
+        }
+      },
+      "price": {
+        "caption": "Bảng giá tham khảo theo loại căn",
+        "updated": "Cập nhật ngày {date}",
+        "columns": {
+          "unit": "Loại căn",
+          "area": "Diện tích (m²)",
+          "price": "Giá",
+          "status": "Tình trạng",
+          "note": "Ghi chú"
+        },
+        "from": "Từ {value}",
+        "to": "Đến {value}",
+        "contact": "Liên hệ",
+        "unknown": "Chưa cập nhật",
+        "availability": {
+          "available": "Còn hàng",
+          "few_left": "Sắp hết",
+          "sold_out": "Hết hàng"
+        }
       },
       "amenitiesLabel": "Danh sách tiện ích",
       "floorPlans": {

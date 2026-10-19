@@ -9,8 +9,11 @@ import { Gallery } from "@/components/media/Gallery";
 import { Documents } from "@/components/projects/Documents";
 import { FloorPlans } from "@/components/projects/FloorPlans";
 import { LegalPolicy, type PolicyBlock } from "@/components/projects/LegalPolicy";
+import { PriceTable } from "@/components/projects/PriceTable";
 import { ProjectAmenities } from "@/components/projects/ProjectAmenities";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ProjectFaq } from "@/components/projects/ProjectFaq";
+import { ProjectHighlights } from "@/components/projects/ProjectHighlights";
 import { ProjectListings, type ProjectListingCards } from "@/components/projects/ProjectListings";
 import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectLocation } from "@/components/projects/ProjectLocation";
@@ -20,7 +23,7 @@ import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { ProjectSubNav } from "@/components/projects/ProjectSubNav";
 import { publicPath } from "@/lib/content/content-paths";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
-import { LEAD_FORM_DOM_ID, SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
+import { DOCUMENTS_DOM_ID, LEAD_FORM_DOM_ID, SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { ProjectCardData } from "@/lib/projects/project-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
@@ -47,8 +50,8 @@ interface ProjectDetailProps {
 }
 
 /**
- * Bố cục S03 theo thứ tự design-spec: hero → breadcrumb → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính: Tổng quan → Vị trí → Tiện ích → Mặt bằng → Pháp lý +
- * Chính sách → Thư viện (thẻ tối duy nhất) → Tài liệu → Tin liên quan; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác → CTA "Đăng ký tham quan" (banner tối). Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
+ * Bố cục S03 theo thứ tự design-spec: hero → breadcrumb → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính: Tổng quan → Điểm nổi bật → Vị trí (bản đồ + tiện ích quanh) → Tiện ích →
+ * Mặt bằng → Pháp lý (richText + tài liệu PDF) + Chính sách → Bảng giá → Thư viện (thẻ tối duy nhất) → Tin liên quan → FAQ; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác → CTA "Đăng ký tham quan" (banner tối). Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
  * với thanh mục con: `visibleSections`). `h1` chỉ ở hero. Server Component; phần tương tác (thanh mục con, mặt bằng, accordion, thanh dính đáy) là client.
  */
 export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath }: ProjectDetailProps) {
@@ -62,8 +65,21 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
   const shown = new Set(sections);
 
   const policyBlocks: PolicyBlock[] = [
-    ...(view.hasLegal
-      ? [{ id: SECTION_DOM_ID.legal, title: t("sections.legal"), content: <RichText data={doc.legalInfo} locale={locale} tableLabel={tRich("table")} /> }]
+    ...(shown.has("legal")
+      ? [
+          {
+            id: SECTION_DOM_ID.legal,
+            anchorIds: [DOCUMENTS_DOM_ID],
+            title: t("sections.legal"),
+            // Pháp lý gộp richText + danh sách PDF; một trong hai có là đủ dựng khối.
+            content: (
+              <div className="flex flex-col gap-8">
+                {view.hasLegal && <RichText data={doc.legalInfo} locale={locale} tableLabel={tRich("table")} />}
+                <Documents documents={view.documents} />
+              </div>
+            ),
+          },
+        ]
       : []),
     ...(view.hasPolicy
       ? [{ id: SECTION_DOM_ID.policy, title: t("sections.policy"), content: <RichText data={doc.salesPolicy} locale={locale} tableLabel={tRich("table")} /> }]
@@ -84,7 +100,8 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
       <div className="mx-auto w-full max-w-container px-gutter lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-10 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-12">
         <div className="min-w-0">
           <ProjectOverview view={view} overview={doc.overview} />
-          {shown.has("location") && <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} />}
+          {shown.has("highlights") && <ProjectHighlights highlights={view.highlights} />}
+          {shown.has("location") && <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />}
           {shown.has("amenities") && <ProjectAmenities amenities={view.amenities} />}
           {shown.has("floorPlans") && (
             <ProjectSection id={SECTION_DOM_ID.floorPlans} title={t("sections.floorPlans")}>
@@ -96,14 +113,15 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
               <LegalPolicy blocks={policyBlocks} />
             </div>
           )}
+          {shown.has("pricing") && <PriceTable rows={view.priceRows} updatedAt={view.priceUpdatedAt} />}
           {shown.has("gallery") && (
             <ProjectSection id={SECTION_DOM_ID.gallery} title={t("sections.gallery")} tone="dark">
               {/* Ảnh LCP của trang là ảnh hero (cùng ảnh đầu thư viện): thư viện ở đây lazy. */}
               <Gallery images={view.gallery} />
             </ProjectSection>
           )}
-          <Documents documents={view.documents} />
           <ProjectListings {...listings} />
+          {shown.has("faq") && <ProjectFaq faqs={view.faqs} />}
         </div>
         {/* Cột phải ≥ lg; < lg nằm dưới nội dung (đúng chỗ form cũ). Form chỉ có MỘT bản trong DOM (không nhân đôi id). Chỉ thẻ bên trong dính (sticky trong chiều cao cột). */}
         <aside aria-labelledby={CONSULT_HEADING_ID} className="border-t border-border py-section-tight lg:border-t-0">

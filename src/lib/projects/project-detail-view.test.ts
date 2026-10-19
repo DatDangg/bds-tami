@@ -116,6 +116,53 @@ describe("toProjectDetailView", () => {
     expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery", "listings"]);
   });
 
+  it("khối market (BL-020 P5): đủ dữ liệu → thứ tự mục con theo spec; chỉ có tiện ích quanh vẫn có mục Vị trí; chỉ có tài liệu vẫn có mục Pháp lý", () => {
+    const full = toProjectDetailView(
+      project({
+        location: [105.8, 21.03],
+        highlights: [{ title: "Gần metro" }],
+        amenities: [{ name: "Hồ bơi" }],
+        floorPlans: [{ title: "A", image: image("f1") }],
+        legalInfo: lexical("Sổ hồng") as never,
+        salesPolicy: lexical("Chiết khấu") as never,
+        priceTable: [{ unitType: "2PN" }],
+        faqs: [{ question: "Q?", answer: "A." }],
+      }),
+      "vi",
+    );
+    expect(visibleSections(full, { hasListings: true })).toEqual(["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "gallery", "listings", "faq"]);
+    const nearbyOnly = toProjectDetailView(project({ nearbyAmenities: [{ category: "park", name: "Công viên A" }] }), "vi");
+    expect(visibleSections(nearbyOnly)).toContain("location");
+    const docsOnly = toProjectDetailView(project({ documents: [pdf("d1")] }), "vi");
+    expect(visibleSections(docsOnly)).toContain("legal");
+    expect(docsOnly.hasLegal).toBe(false);
+  });
+
+  it("dòng thiếu chữ bị bỏ (bản EN chưa dịch không rơi về tiếng Việt); tiện ích gom theo nhóm đúng thứ tự, chỉ nhóm có dòng; FAQ cần đủ câu hỏi + trả lời", () => {
+    const view = toProjectDetailView(
+      project({
+        highlights: [{ title: "" , description: "x" }, { title: "Gần metro", description: " " }],
+        nearbyAmenities: [
+          { category: "transport", name: "Ga A", distance: "500 m" },
+          { category: "education", name: "Trường B", location: [105.81, 21.04] },
+          { category: "education", name: "  " },
+          { category: "transport", name: "Ga C", location: [200, 100] },
+        ],
+        priceTable: [{ unitType: "" }, { unitType: "2PN", areaFrom: 60, priceFrom: 3_000_000_000, availability: "few_left" }],
+        priceUpdatedAt: "2026-10-01T00:00:00.000Z",
+        faqs: [{ question: "Q1", answer: "" }, { question: "", answer: "A2" }, { question: " Q3 ", answer: " A3 " }],
+      } as Partial<Project>),
+      "en",
+    );
+    expect(view.highlights).toEqual([{ id: "1", title: "Gần metro", description: null }]);
+    expect(view.nearby.map((group) => group.category)).toEqual(["education", "transport"]);
+    expect(view.nearby[0]?.items).toEqual([{ id: "1", name: "Trường B", distance: null, location: { lat: 21.04, lng: 105.81 } }]);
+    expect(view.nearby[1]?.items.map((item) => [item.name, item.location])).toEqual([["Ga A", null], ["Ga C", null]]);
+    expect(view.priceRows).toEqual([{ id: "1", unitType: "2PN", areaFrom: 60, areaTo: null, priceFrom: 3_000_000_000, priceTo: null, availability: "few_left", note: null }]);
+    expect(view.priceUpdatedAt).toBe("2026-10-01T00:00:00.000Z");
+    expect(view.faqs).toEqual([{ id: "2", question: "Q3", answer: "A3" }]);
+  });
+
   it("richText chỉ có đoạn rỗng không tính là có nội dung", () => {
     expect(toProjectDetailView(project({ overview: lexical("  ") as never, legalInfo: lexical("") as never }), "vi")).toMatchObject({ hasOverview: false, hasLegal: false });
   });
