@@ -144,7 +144,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
                   active ? "translate-y-0 opacity-100 delay-200" : "translate-y-6 opacity-0",
                 )}
               >
-                {slide.title && <p className="max-w-[22ch] font-display text-display text-balance text-on-dark uppercase">{slide.title}</p>}
+                {slide.title && <p className="max-w-[22ch] font-display text-display text-balance text-on-dark">{slide.title}</p>}
                 {slide.subtitle && <p className="max-w-[48ch] text-lead text-on-dark-muted">{slide.subtitle}</p>}
                 {slide.ctaHref && slide.ctaLabel && (
                   <Button asChild size="lg" className="w-full max-w-xs sm:w-auto">

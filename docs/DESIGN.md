@@ -45,7 +45,8 @@
 | Primary Subtle | `#F8F3EB` | Nền khối nổi bật (panel lợi ích, vùng nhấn kem) | Đo từ panel bên phải trang chi tiết |
 | Accent Text | `#8C6733` | Chữ vàng cỡ nhỏ: link "Xem tất cả", "Đọc thêm", nhãn eyebrow (DỰ ÁN, TIN TỨC), tab active | Mockup ~#B58C50 chỉ đạt 3.1:1 trên nền trắng → **đậm lên** để đạt 5.1:1 |
 | Accent Display | `#A07A3F` | Giá tiền cỡ lớn (≥ 24px), icon viền vàng, gạch chân tab | Chỉ dùng cho chữ lớn / icon. Mockup `#B58C50` chỉ 2.83:1 → đổi `#A07A3F` (3.61:1), chốt 16/10/2026 |
-| Badge Foreground | `#3C2704` | Chữ trên badge vàng ("Đang mở bán") | Đo từ badge, 8.1:1 |
+| Badge Foreground | `#3C2704` | Chữ trên badge vàng ("Sắp mở bán") | Đo từ badge, 8.1:1 (đầu sáng), 5.9:1 (đầu đậm gradient) |
+| Primary Deep | `#C9A15F` | Đầu đậm của `--gradient-gold` (badge/nhấn vàng) | Chữ Badge Foreground trên đó 5.9:1 |
 
 **Nền & bề mặt**
 
@@ -86,6 +87,23 @@
 | Error | `#B42318` | Lỗi form, trạng thái lỗi |
 | Info | `#2B6CB0` | Thông báo trung tính |
 
+### Bo góc, kính mờ, gradient (BL-020)
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--radius-sm` | 2px | Ô nhập nhỏ |
+| `--radius-md` / `--radius-lg` | 12px / 16px | Panel, hộp thông báo |
+| `--radius-xl` | 20px | Thẻ (dự án, cho thuê, tin, việc làm) và ảnh trong thẻ |
+| `--radius-pill` | 9999px | Mọi nút (Button), badge |
+| `--color-glass` | `rgb(250 248 246 / 0.8)` | Nền kính mờ sáng của header nổi; đi cùng `--blur-glass` |
+| `--blur-glass` | 24px | `backdrop-filter: blur()` của header kính |
+| `--gradient-gold` | `135deg, Primary → Primary Deep` | Badge "Sắp mở bán", nhấn vàng |
+| `--gradient-success` | `135deg, Success → Success Text` | Badge "Đang bán" (chữ trắng ≥ 5:1 cả hai đầu) |
+
+Biến thể nút `chip` (viền `on-dark/30`, chữ trắng) chỉ dùng trong `.theme-dark-block` hoặc trên scrim ≥ `--color-overlay`; trên nền sáng không đọc được.
+
+Trên kính chỉ dùng chữ `--color-text` (≥ 10.8:1 trên đen, 17.5:1 trên trắng); `--color-accent-text` chỉ ~3.0:1 khi nền sau kính là đen nên mục đang chọn đánh dấu bằng gạch chân/đậm.
+
 **Gợi ý CSS variables** (để `/design` sinh tokens chính thức):
 
 ```css
@@ -97,6 +115,11 @@
   --color-accent-text: #8C6733;
   --color-accent-display: #A07A3F;
   --color-badge-foreground: #3C2704;
+  --color-primary-deep: #C9A15F;
+  --color-glass: rgb(250 248 246 / 0.8);
+  --blur-glass: 24px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
 
   --color-bg: #F7F5F4;
   --color-bg-alt: #FAF8F6;
@@ -159,23 +182,22 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Vai trò | Font | Fallback |
 |---|---|---|
-| Display (tiêu đề, tên dự án, chữ chìm) | **EB Garamond** (subset `latin`, `vietnamese`) | `Georgia, 'Times New Roman', serif` |
+| Display (tiêu đề, tên dự án) | **EB Garamond** (subset `latin`, `vietnamese`) | `Georgia, 'Times New Roman', serif` |
 | Text (nội dung, menu, nút, form) | **Montserrat** (subset `latin`, `vietnamese`) | `system-ui, Arial, sans-serif` |
 
 | Token | Font | Size (mobile → desktop) | Weight | Kiểu | Usage |
 |-------|------|------|--------|------|-------|
-| Display XL | EB Garamond | `clamp(32px, 5vw, 56px)` | 500 | IN HOA, letter-spacing 0.02em | Câu chính trên hero |
-| Watermark | EB Garamond | `clamp(64px, 14vw, 180px)` | 500 | IN HOA, màu `--color-primary` độ mờ ~12% | Chữ chìm to phía sau tiêu đề section (vd "TAMI", "DỰ ÁN") |
-| Heading 1 | EB Garamond | `clamp(28px, 4vw, 40px)` | 500 | IN HOA | Tiêu đề section, tiêu đề trang |
-| Heading 2 | EB Garamond | `clamp(24px, 3vw, 30px)` | 500 | IN HOA | Tên dự án trên slider, tiêu đề khối |
-| Heading 3 | EB Garamond | 22–25px | 500 | Thường | Tên thẻ (dự án, dịch vụ) |
+| Display XL | EB Garamond | `clamp(32px, 1.3rem + 3.2vw, 60px)` (60px desktop) | 400 | Viết thường, letter-spacing 0 | Câu chính trên hero |
+| Heading 1 | EB Garamond | `clamp(30px, 1.2rem + 2.9vw, 56px)` (56px desktop) | 400 | Viết thường | Tiêu đề trang |
+| Heading 2 | EB Garamond | `clamp(26px, 1.15rem + 2vw, 44px)` (44px desktop) | 400 | Viết thường | Tiêu đề section/khối |
+| Heading 3 | EB Garamond | 22–25px | 400 | Thường | Tên thẻ (dự án, dịch vụ), tên dự án trên slider, heading phụ trong nội dung |
 | Eyebrow | Montserrat | 12–13px | 600 | IN HOA, letter-spacing 0.12em, `--color-accent-text` | Nhãn nhỏ trên tiêu đề ("KHU ĐÔ THỊ", "DỰ ÁN") |
 | Body | Montserrat | 15–16px, line-height 1.7 | 400 | Thường | Nội dung |
 | Small | Montserrat | 14px | 400 | Thường | Nhãn, chú thích |
 | XSmall | Montserrat | 12px | 500 | Thường | Meta, ngày đăng |
 | Button | Montserrat | 13–14px | 600 | IN HOA, letter-spacing 0.08em | Nút ("KHÁM PHÁ DỰ ÁN", "XEM TẤT CẢ") |
 
-> In hoa bằng CSS `text-transform: uppercase`, **không** gõ in hoa trong CMS (để SEO và bản dịch giữ chữ thường).
+> Heading viết thường (BL-020); chỉ nút, eyebrow, menu in hoa bằng CSS `text-transform: uppercase`, **không** gõ in hoa trong CMS (để SEO và bản dịch giữ chữ thường).
 > Tiếng Anh thường **ngắn hơn** tiếng Việt khoảng 10–20%, nhưng một số nhãn lại dài hơn (vd "Liên hệ" → "Contact us"): nút và menu không đặt chiều rộng cố định.
 
 ### Spacing Scale

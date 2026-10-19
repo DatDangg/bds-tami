@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MapPin } from "@/components/icons";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Badge } from "@/components/ui/badge";
-import type { ProjectCardData } from "@/lib/projects/project-view";
+import { SALES_STATUS_BADGE_VARIANT, type ProjectCardData } from "@/lib/projects/project-view";
 
 const IMAGE_ZOOM =
   "[&_img]:transition-transform [&_img]:duration-(--duration-slow) group-hover:[&_img]:scale-105 motion-reduce:[&_img]:transition-none motion-reduce:group-hover:[&_img]:scale-100";
@@ -27,16 +27,16 @@ export function ProjectCard({ data, priority = false, headingLevel = "h2" }: Pro
     <article>
       <Link
         href={data.href}
-        className="group flex min-h-11 flex-col gap-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+        className="group flex min-h-11 flex-col gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
       >
-        <div className={`relative aspect-[4/5] w-full overflow-hidden bg-surface-muted md:aspect-[4/3] ${IMAGE_ZOOM}`}>
+        <div className={`relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-surface-muted md:aspect-[4/3] ${IMAGE_ZOOM}`}>
           {data.cover ? (
             <ResponsiveImage media={data.cover} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" priority={priority} decorative />
           ) : (
             // Dự án xuất bản nhưng mọi ảnh thư viện đã bị xoá: khung giữ nguyên tỉ lệ, không vỡ lưới.
             <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
           )}
-          <Badge variant={data.salesStatus === "handed_over" ? "neutral" : "primary"} className="absolute top-3 left-3">
+          <Badge variant={SALES_STATUS_BADGE_VARIANT[data.salesStatus]} className="absolute top-3 left-3">
             {t(`salesStatus.${data.salesStatus}`)}
           </Badge>
         </div>

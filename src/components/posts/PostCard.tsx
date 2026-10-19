@@ -37,11 +37,11 @@ export function PostCard({ data, variant = "card", headingLevel, priority = fals
       <Link
         href={data.href}
         className={cn(
-          "group grid min-h-11 gap-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
+          "group grid min-h-11 gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
           isFeature && "lg:grid-cols-12 lg:items-center lg:gap-10",
         )}
       >
-        <div className={cn("relative w-full overflow-hidden bg-surface-muted aspect-[16/10]", IMAGE_ZOOM, isFeature && "lg:col-span-7")}>
+        <div className={cn("relative w-full overflow-hidden rounded-xl bg-surface-muted aspect-[16/10]", IMAGE_ZOOM, isFeature && "lg:col-span-7")}>
           {data.cover && (
             <ResponsiveImage
               media={data.cover}

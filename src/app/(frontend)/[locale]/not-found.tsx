@@ -23,7 +23,7 @@ export default function NotFoundPage() {
   const href = (key: Parameters<typeof resolveNavLink>[0]) => resolveNavLink(key, locale)?.href ?? "/";
   return (
     <>
-      <PageBanner title={t("title")} description={t("description")} watermark="404">
+      <PageBanner title={t("title")} description={t("description")}>
         <div className="flex flex-wrap gap-3">
           <Button asChild variant="dark">
             <Link href={href("home")}>{t("backHome")}</Link>

@@ -650,11 +650,7 @@
         "dots": "Chọn slide",
         "goTo": "Chuyển tới slide {index}"
       },
-      "about": {
-        "watermark": "TAMI"
-      },
       "projects": {
-        "watermark": "DỰ ÁN",
         "viewAll": "Xem tất cả",
         "explore": "Khám phá dự án",
         "region": "Dự án nổi bật",

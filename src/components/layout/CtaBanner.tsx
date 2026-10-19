@@ -22,7 +22,7 @@ export function CtaBanner({ title, description, actionLabel, actionHref, backgro
     <section aria-labelledby={headingId} className="theme-dark-block relative isolate overflow-hidden py-section print:hidden">
       {backgroundImage && <ResponsiveImage media={backgroundImage} sizes="100vw" decorative className="absolute inset-0 -z-10 opacity-20" />}
       <div className="mx-auto flex w-full max-w-container flex-col items-center gap-6 px-gutter text-center">
-        <h2 id={headingId} className="max-w-[24ch] font-display text-h1 text-balance uppercase">
+        <h2 id={headingId} className="max-w-[24ch] font-display text-h2 text-balance">
           {title}
         </h2>
         {description && <p className="max-w-[60ch] text-lead text-text-secondary">{description}</p>}

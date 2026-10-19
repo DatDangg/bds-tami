@@ -45,7 +45,7 @@ export function ServicesBento({ title, items }: { title: string; items: ServiceC
   return (
     <section aria-labelledby={headingId} className="bg-bg py-section">
       <div className="mx-auto w-full max-w-container px-gutter">
-        <h2 id={headingId} className="mb-10 font-display text-h1 uppercase">
+        <h2 id={headingId} className="mb-10 font-display text-h2">
           {title}
         </h2>
         <Cards items={items} labelledBy={headingId} />

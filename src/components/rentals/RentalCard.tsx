@@ -25,8 +25,8 @@ export function RentalCard({ data, headingLevel = 3, priority = false }: RentalC
   const facts = [formatArea(data.areaM2, locale), ...(data.bedrooms !== null ? [t("bedrooms", { count: data.bedrooms })] : [])];
   return (
     <article className="h-full">
-      <Link href={data.href} className="group flex min-h-11 flex-col gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+      <Link href={data.href} className="group flex min-h-11 flex-col gap-3 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted">
           {data.cover ? (
             <ResponsiveImage media={data.cover} sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 80vw" priority={priority} decorative />
           ) : (

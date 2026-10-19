@@ -77,7 +77,7 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
               </div>
               <div className="flex flex-col gap-3 bg-surface py-6 lg:absolute lg:bottom-8 lg:left-8 lg:w-[440px] lg:p-10">
                 {slide.eyebrow && <p className="text-xsmall font-semibold tracking-wide text-accent-text uppercase">{slide.eyebrow}</p>}
-                <h3 className="font-display text-h2">{slide.title}</h3>
+                <h3 className="font-display text-h3">{slide.title}</h3>
                 {slide.provinceName && <p className="text-small text-text-muted">{slide.provinceName}</p>}
                 {slide.summary && <p className="line-clamp-2 text-body text-text-secondary lg:line-clamp-3">{slide.summary}</p>}
                 <Button asChild variant="outline" className="mt-2 w-fit">

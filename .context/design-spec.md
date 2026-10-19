@@ -60,13 +60,14 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - GA4 chỉ tải sau đồng ý cookie (§3.10). Turnstile tải khi form vào viewport hoặc khi focus ô đầu tiên.
 - Trang công khai cache CDN `s-maxage=60` (ARCHITECTURE §5): HTML **không** được khác nhau theo cookie. Mọi thứ phụ thuộc cookie (consent, ghi nhớ ngôn ngữ) xử lý ở client.
 
-### 1.6. Ngân sách eyebrow và chữ chìm
+### 1.6. Ngân sách eyebrow; không còn chữ chìm
 - Eyebrow (nhãn nhỏ in hoa trên tiêu đề): tối đa **ceil(số section / 3)** mỗi trang (taste-skill §4.7). Mỗi screen dưới đây ghi rõ section nào có.
-- Chữ chìm (watermark): tối đa **2** mỗi trang, `aria-hidden="true"`, chỉ hiện ≥ md (mobile ẩn để không chiếm chiều cao).
+- **Chữ chìm (watermark) đã bỏ** (BL-020, user duyệt 2026-10-19): không còn token `--text-watermark`, prop `watermark` của PageBanner, hay chữ chìm ở trang chủ/404. Mọi chỗ dưới đây ghi "watermark" là lịch sử, không còn áp dụng.
 
-### 1.7. In hoa
-- **In hoa** (CSS `uppercase`): tiêu đề trang/section, tên dự án trên hero/slider, nút, eyebrow, menu.
-- **Chữ thường**: tiêu đề bài viết, tin cho thuê, việc làm, tên trên thẻ tin (câu dài in hoa khó đọc, nhất là tiếng Việt có dấu).
+### 1.7. Kiểu chữ: viết thường (sentence case)
+- **Viết thường (sentence case)**, weight 400, EB Garamond: mọi heading h1/h2/display (tiêu đề trang, tiêu đề section, câu chính hero, tên dự án trên hero/slider, tiêu đề CTA, bài viết, tin cho thuê, việc làm, tên trên thẻ). Không dùng CSS `uppercase` cho heading (BL-020; trước đây in hoa).
+- **In hoa (CSS `uppercase`) chỉ còn**: nút (Button), eyebrow, menu.
+- Cỡ (desktop → mobile, token `--text-*`): display 60px → ~32px, h1 56px → ~30px, h2 44px → ~26px; h3 và nhỏ hơn không đổi. Heading phụ trong nội dung/trang chi tiết (RichText h2, mục chi tiết tin cho thuê, mục việc làm, form, khung phải, "tin tương tự") dùng `--text-h2-sm` (30px, cỡ h2 cũ) để h1 ≥ h2 ≥ h3; tiêu đề tin cho thuê (h1) dùng `--text-h2`.
 
 ---
 
@@ -121,7 +122,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### 2.7. Page banner (đầu trang danh sách)
 - Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)`, ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
-- Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` + watermark phía sau (≥ md), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
+- Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` (viết thường, không còn chữ chìm), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
 - Header trên trang có banner ảnh: biến thể Trong suốt.
 
 ---
@@ -129,16 +130,18 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 ## 3. Component và pattern dùng chung
 
 ### 3.1. Section heading
-- Thành phần: [eyebrow tuỳ chọn theo ngân sách §1.6] + tiêu đề `--text-h1` + mô tả tuỳ chọn (≤ 25 từ, `--text-lead`, `max-width: 60ch`) + link "Xem tất cả" (Ghost, `--color-accent-text`).
+- Thành phần: [eyebrow tuỳ chọn theo ngân sách §1.6] + tiêu đề `--text-h2` + mô tả tuỳ chọn (≤ 25 từ, `--text-lead`, `max-width: 60ch`) + link "Xem tất cả" (Ghost, `--color-accent-text`).
 - Căn giữa (trang chủ) hoặc căn trái (trang trong). **Không** dùng kiểu tiêu đề trái + đoạn nhỏ trôi bên phải (split-header ban). Link "Xem tất cả" đặt **dưới** nội dung khối trên mobile, cạnh tiêu đề (căn đáy) ≥ md.
 
 ### 3.2. Thẻ (Card)
 
+Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--radius-pill`; panel/hộp thông báo `--radius-md`/`--radius-lg` (12/16px); ô nhập nhỏ `--radius-sm`. Badge bo viên thuốc: Sắp mở bán = `--gradient-gold`, Đang bán = `--gradient-success` (chữ trắng), Đã bàn giao = trung tính.
+
 | Thẻ | Ảnh | Nội dung | Hover/focus |
 |---|---|---|---|
-| **Dự án** | 4:5 (< md) / 4:3 (≥ md), `--radius-none` | Badge `salesStatus`; tên `--text-h3` serif; tỉnh/thành `--text-small` muted; "Từ <giá>" `--text-small` 600 nếu có | Ảnh `--hover-zoom` `--duration-slow`; tên gạch chân. Cả thẻ là 1 link (`<a>` bọc, không lồng link) |
-| **Tin cho thuê** | 4:3, `--radius-sm` trên, nền `--color-surface`, viền `--color-border` | Giá/tháng `--text-h4` `--color-text` (hoặc "Thoả thuận / Negotiable"); tiêu đề 2 dòng `--text-body` 600; hàng thông số icon + số: diện tích, phòng ngủ, WC (`tabular-nums`); phường, tỉnh `--text-small` muted; mã tin `--text-xsmall` muted | Ảnh zoom; viền đổi `--color-input-border`. Tin `rented` không bao giờ xuất hiện trong lưới/tin tương tự nên thẻ không cần badge "Đã thuê" |
-| **Tin/ưu đãi** (Đăng tin BĐS, Tin tức) | 16:10 | Danh mục `--text-xsmall` 600 `--color-accent-text` (đây là metadata, không tính eyebrow section); tiêu đề 2-3 dòng `--text-h4`; excerpt 2 dòng (chỉ thẻ lớn); ngày `--text-xsmall` muted; Đăng tin BĐS: badge "Đã kết thúc" / "Còn <n> ngày" nếu có `offer.endAt` | Ảnh zoom; tiêu đề gạch chân |
+| **Dự án** | 4:5 (< md) / 4:3 (≥ md), `--radius-xl` (20px) | Badge `salesStatus`; tên `--text-h3` serif; tỉnh/thành `--text-small` muted; "Từ <giá>" `--text-small` 600 nếu có | Ảnh `--hover-zoom` `--duration-slow`; tên gạch chân. Cả thẻ là 1 link (`<a>` bọc, không lồng link) |
+| **Tin cho thuê** | 4:3, `--radius-xl` (20px), nền `--color-surface`, viền `--color-border` | Giá/tháng `--text-h4` `--color-text` (hoặc "Thoả thuận / Negotiable"); tiêu đề 2 dòng `--text-body` 600; hàng thông số icon + số: diện tích, phòng ngủ, WC (`tabular-nums`); phường, tỉnh `--text-small` muted; mã tin `--text-xsmall` muted | Ảnh zoom; viền đổi `--color-input-border`. Tin `rented` không bao giờ xuất hiện trong lưới/tin tương tự nên thẻ không cần badge "Đã thuê" |
+| **Tin/ưu đãi** (Đăng tin BĐS, Tin tức) | 16:10, `--radius-xl` | Danh mục `--text-xsmall` 600 `--color-accent-text` (đây là metadata, không tính eyebrow section); tiêu đề 2-3 dòng `--text-h4`; excerpt 2 dòng (chỉ thẻ lớn); ngày `--text-xsmall` muted; Đăng tin BĐS: badge "Đã kết thúc" / "Còn <n> ngày" nếu có `offer.endAt` | Ảnh zoom; tiêu đề gạch chân |
 | **Dịch vụ** | 3:4 (nhỏ) / 4:5 (lớn), scrim dưới | Tên `--text-h2` trắng đè trên ảnh (đáy trái), `summary` 2 dòng `--color-on-dark-muted` ≥ md | Ảnh zoom; mũi tên `ArrowRight` trượt 4px |
 | **Việc làm** (hàng) | không ảnh | Tên vị trí `--text-h4`; nơi làm, hình thức, lương (`salaryText`), hạn nộp; nút mũi tên | Nền `--color-surface` → `--color-primary-subtle` |
 
@@ -222,8 +225,8 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | # | Khối | Layout family | Nền | Eyebrow / watermark |
 |---|---|---|---|---|
 | 1 | Hero | Full-bleed media, chữ giữa | Ảnh/video | Không |
-| 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 + hàng số liệu | `--color-bg` | Watermark "TAMI" |
-| 3 | Dự án nổi bật | Slider full-bleed | `--color-bg-alt` | Watermark "DỰ ÁN"/"PROJECTS"; eyebrow = loại hình trên từng slide (1) |
+| 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 + hàng số liệu | `--color-bg` | Không |
+| 3 | Dự án nổi bật | Slider full-bleed | `--color-bg-alt` | Eyebrow = loại hình trên từng slide (1) |
 | 4 | Dịch vụ | Bento bất đối xứng | `--color-bg` | Không |
 | 5 | Ưu đãi nổi bật | Lưới thẻ | `--color-bg-alt` | Không |
 | 6 | Đối tác | Lưới logo | `--color-bg` | Không |
@@ -243,13 +246,13 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 **2. Về TAMI** (`about`)
 - < md: tiêu đề → ảnh 4:3 → nội dung (richText, tối đa ~120 từ hiển thị, phần còn lại không cắt: admin chịu trách nhiệm độ dài) → số liệu.
-- ≥ md: lưới 12 cột: ảnh cột 1-5 (4:5), chữ cột 7-12; watermark "TAMI" sau tiêu đề.
-- Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h1` serif `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
+- ≥ md: lưới 12 cột: ảnh cột 1-5 (4:5), chữ cột 7-12.
+- Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h2` serif `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
 
 **3. Dự án nổi bật** (`featuredProjects`, tối đa 6; trống thì lấy `isFeatured` mới nhất)
-- Heading căn giữa + watermark. Slider full-bleed (tràn viền, không theo container).
+- Heading căn giữa. Slider full-bleed (tràn viền, không theo container).
 - Mỗi slide: ảnh đại diện dự án tỉ lệ 16:9 (≥ md) / 4:5 (< md).
-  - ≥ lg: khung chữ `--color-surface` rộng 440px đè lên ảnh, đáy trái lệch vào trong `--gutter`, padding 40px: eyebrow loại hình (`category.name`), tên `--text-h2`, tỉnh/thành, `summary` 3 dòng, nút Outline **Khám phá dự án**.
+  - ≥ lg: khung chữ `--color-surface` rộng 440px đè lên ảnh, đáy trái lệch vào trong `--gutter`, padding 40px: eyebrow loại hình (`category.name`), tên `--text-h3`, tỉnh/thành, `summary` 3 dòng, nút Outline **Khám phá dự án**.
   - < lg: khung chữ nằm **dưới** ảnh (không đè), cùng nội dung, `summary` 2 dòng.
 - Điều khiển: mũi tên ≥ md (ngoài khung chữ), chấm phân trang dưới. Không autoplay (người dùng tự chuyển). Hiện một phần slide kế bên ở mobile (slide rộng 88%) để gợi ý vuốt.
 - "Xem tất cả" → `/du-an`.

@@ -13,6 +13,15 @@ describe("cn", () => {
     expect(cn("text-button", "text-lg")).toBe("text-lg");
   });
 
+  it("token bo góc pill ghi đè/bị ghi đè đúng nhóm rounded", () => {
+    expect(cn("rounded-xl", "rounded-pill")).toBe("rounded-pill");
+    expect(cn("rounded-pill", "rounded-sm")).toBe("rounded-sm");
+  });
+
+  it("token text-h2-sm là cỡ chữ, không bị xoá khi đi cùng màu", () => {
+    expect(cn("text-h2-sm text-text")).toBe("text-h2-sm text-text");
+  });
+
   it("hai màu chữ: cái sau thắng", () => {
     expect(cn("text-text", "text-on-dark")).toBe("text-on-dark");
   });

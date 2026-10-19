@@ -7,7 +7,7 @@
 
 ## 0. Design Read và Dials
 
-**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo vinhomes.vn (ảnh lớn, tiêu đề serif in hoa, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
+**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo vinhomes.vn (ảnh lớn, tiêu đề serif viết thường, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
 
 | Dial | Giá trị | Lý do |
 |---|---|---|
@@ -124,7 +124,7 @@ Lớp `.theme-dark-block` đặt trên section tối, đổi giá trị biến �
 
 | Token | Font | Weight tải | Fallback |
 |---|---|---|---|
-| `--font-display` | EB Garamond | 500 (+ 500 italic nếu cần nhấn) | `Georgia, 'Times New Roman', serif` |
+| `--font-display` | EB Garamond | 400 (heading) + 500 (tiêu đề thẻ tin nổi bật `font-semibold`) | `Georgia, 'Times New Roman', serif` |
 | `--font-sans` | Montserrat | 400, 500, 600 | `system-ui, -apple-system, 'Segoe UI', Arial, sans-serif` |
 
 Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) nếu cần căn số: dùng `font-variant-numeric: tabular-nums` của Montserrat thay vì đổi font.
@@ -135,11 +135,11 @@ Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) n�
 
 | Token | Font | Size | Line-height | Weight | Kiểu | Dùng cho |
 |---|---|---|---|---|---|---|
-| `--text-display` | display | `clamp(2rem, 1.42rem + 2.48vw, 3.5rem)` (32→56px) | 1.1 | 500 | IN HOA, `letter-spacing: 0.02em` | Câu chính hero |
-| `--text-watermark` | display | `clamp(4rem, 2.1rem + 8.1vw, 11.25rem)` (64→180px) | 1 | 500 | IN HOA, màu `--color-primary` opacity 0.12, `aria-hidden` | Chữ chìm sau tiêu đề section (tối đa 2 lần/trang) |
-| `--text-h1` | display | `clamp(1.75rem, 1.46rem + 1.24vw, 2.5rem)` (28→40px) | 1.15 | 500 | IN HOA, `0.02em` | Tiêu đề trang, tiêu đề section |
-| `--text-h2` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` (24→30px) | 1.2 | 500 | IN HOA, `0.02em` | Tên dự án trên slider, tiêu đề khối |
-| `--text-h3` | display | `clamp(1.375rem, 1.32rem + 0.25vw, 1.5625rem)` (22→25px) | 1.25 | 500 | Thường | Tên trên thẻ dự án/dịch vụ, tiêu đề bài trên thẻ lớn |
+| `--text-display` | display | `clamp(2rem, 1.3rem + 3.2vw, 3.75rem)` (32→60px) | 1.08 | 400 | Viết thường, `letter-spacing: 0` | Câu chính hero |
+| `--text-h1` | display | `clamp(1.875rem, 1.2rem + 2.9vw, 3.5rem)` (30→56px) | 1.1 | 400 | Viết thường | Tiêu đề trang |
+| `--text-h2` | display | `clamp(1.625rem, 1.15rem + 2vw, 2.75rem)` (26→44px) | 1.15 | 400 | Viết thường | Tiêu đề section/khối |
+| `--text-h2-sm` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` (24→30px) | 1.2 | 400 | Viết thường | Heading phụ trong nội dung/trang chi tiết (RichText h2, mục chi tiết, form) |
+| `--text-h3` | display | `clamp(1.375rem, 1.32rem + 0.25vw, 1.5625rem)` (22→25px) | 1.25 | 400 | Thường | Tên trên thẻ dự án/dịch vụ, tiêu đề bài trên thẻ lớn |
 | `--text-h4` | sans | `1.125rem` (18px) | 1.4 | 600 | Thường | Tiêu đề thẻ tin cho thuê, tiêu đề nhóm thông số |
 | `--text-lead` | sans | `clamp(1rem, 0.95rem + 0.2vw, 1.125rem)` (16→18px) | 1.6 | 400 | Thường | Câu phụ hero, đoạn mở đầu |
 | `--text-body` | sans | `1rem` (16px) | 1.7 | 400 | Thường | Nội dung |
@@ -151,7 +151,7 @@ Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) n�
 | `--text-price` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` | 1.2 | 500 | `tabular-nums`, `--color-accent-display` hoặc `--color-text` | Giá ở trang chi tiết |
 
 **Quy tắc chữ:**
-- In hoa bằng `text-transform: uppercase`, **không** gõ in hoa trong CMS. Tiếng Việt in hoa bằng CSS vẫn giữ dấu đúng khi có `lang` đúng.
+- Heading viết thường (BL-020); chỉ nút, eyebrow, menu in hoa bằng `text-transform: uppercase`, **không** gõ in hoa trong CMS. Tiếng Việt in hoa bằng CSS vẫn giữ dấu đúng khi có `lang` đúng.
 - Độ dài dòng nội dung bài: `max-width: 68ch`.
 - Tiêu đề hero tối đa 2 dòng ở desktop; câu phụ ≤ 20 từ (taste-skill §4.7).
 - Không gạch ngang dài (em-dash/en-dash) trong chuỗi giao diện `vi.json` / `en.json` (taste-skill §9.G); khoảng giá dùng dấu gạch nối `-`.
@@ -183,12 +183,15 @@ Hệ góc **vuông kiến trúc**, một quy tắc duy nhất cho toàn site:
 
 | Token | Giá trị | Áp cho |
 |---|---|---|
-| `--radius-none` | 0 | Ảnh, hero, slider, section, thẻ dự án, thẻ dịch vụ |
-| `--radius-sm` | 2px | Nút, input, select, checkbox, chip, badge, thẻ tin, cookie banner |
-| `--radius-md` | 4px | Dropdown, popover, dialog, toast |
+| `--radius-none` | 0 | Hero, slider, section |
+| `--radius-sm` | 2px | Input, select, checkbox, cookie banner |
+| `--radius-md` | 12px | Dropdown, popover, dialog, toast, hộp thông báo |
+| `--radius-lg` | 16px | Panel |
+| `--radius-xl` | 20px | Thẻ (dự án, cho thuê, tin, việc làm) và ảnh trong thẻ |
+| `--radius-pill` | 9999px | Nút (Button), badge |
 | `--radius-full` | 9999px | Chấm phân trang slider, avatar sale, nút nổi Hotline/Zalo/Fanpage |
 
-shadcn: `--radius: 2px`. Không bo 8-16px ở bất kỳ đâu.
+shadcn: `--radius: 2px`. **BL-020:** thang bo góc mới (thẻ 20px, nút/badge viên thuốc); bỏ nguyên tắc "không bo 8-16px"; không còn `--text-watermark`/chữ chìm. Nguồn sự thật: `globals.css` + `docs/DESIGN.md`.
 
 ## 5. Shadows (ấm, ít)
 
@@ -363,9 +366,10 @@ Ba lớp, **không** khai cùng một tên biến ở hai nơi (tránh vòng tha
   --font-sans: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 
   --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 4px;   /* shadcn dùng lg/xl cho dialog, card: ép về 4px */
-  --radius-xl: 4px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;  /* thẻ */
+  --radius-pill: 9999px;
 
   --shadow-sm: 0 1px 2px rgb(40 30 15 / 0.06);
   --shadow-md: 0 6px 16px -4px rgb(40 30 15 / 0.12);
@@ -456,7 +460,7 @@ Biến font sinh bởi `next/font`:
 ```ts
 // src/app/(frontend)/fonts.ts
 import { EB_Garamond, Montserrat } from 'next/font/google'
-export const ebGaramond = EB_Garamond({ subsets: ['latin', 'vietnamese'], weight: ['500'], variable: '--font-eb-garamond', display: 'swap' })
+export const ebGaramond = EB_Garamond({ subsets: ['latin', 'vietnamese'], weight: ['400', '500'], variable: '--font-eb-garamond', display: 'swap' })
 export const montserrat = Montserrat({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600'], variable: '--font-montserrat', display: 'swap' })
 ```
 

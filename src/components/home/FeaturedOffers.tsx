@@ -16,7 +16,7 @@ export function FeaturedOffers({ title, cards }: { title: string; cards: PostCar
     <section aria-labelledby={headingId} className="bg-bg-alt py-section">
       <div className="mx-auto w-full max-w-container px-gutter">
         <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <h2 id={headingId} className="font-display text-h1 uppercase">
+          <h2 id={headingId} className="font-display text-h2">
             {title}
           </h2>
           <Button asChild variant="ghost">

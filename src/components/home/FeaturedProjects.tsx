@@ -7,20 +7,14 @@ import type { ProjectSlideView } from "@/lib/home/home-view";
 import type { Locale } from "@/i18n/routing";
 import { ProjectsSlider } from "./ProjectsSlider";
 
-/** Dự án nổi bật (design-spec S01.3): tiêu đề giữa + watermark, slider tràn viền (client), "Xem tất cả" → danh sách dự án. */
+/** Dự án nổi bật (design-spec S01.3): tiêu đề giữa, slider tràn viền (client), "Xem tất cả" → danh sách dự án. */
 export function FeaturedProjects({ title, slides }: { title: string; slides: ProjectSlideView[] }) {
   const t = useTranslations("page.home.projects");
   const locale = useLocale() as Locale;
   const headingId = useId();
   return (
     <section className="relative isolate overflow-hidden bg-bg-alt py-section">
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-8 left-1/2 -z-10 hidden -translate-x-1/2 font-display text-watermark text-accent-display/10 uppercase select-none md:block"
-      >
-        {t("watermark")}
-      </span>
-      <h2 id={headingId} className="mx-auto mb-10 w-full max-w-container px-gutter text-center font-display text-h1 uppercase">
+      <h2 id={headingId} className="mx-auto mb-10 w-full max-w-container px-gutter text-center font-display text-h2">
         {title}
       </h2>
       <ProjectsSlider slides={slides} labelledBy={headingId} />

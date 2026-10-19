@@ -60,7 +60,7 @@ export function RentalDetails({ view }: { view: RentalDetailView }) {
   if (items.length === 0) return null;
   return (
     <section aria-labelledby="rental-details-title">
-      <h2 id="rental-details-title" className="mb-4 font-display text-h3">
+      <h2 id="rental-details-title" className="mb-4 font-display text-h2-sm">
         {t("details.title")}
       </h2>
       <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">

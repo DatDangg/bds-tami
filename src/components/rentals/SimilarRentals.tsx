@@ -12,7 +12,7 @@ export function SimilarRentals({ cards, rented = false }: { cards: RentalCardDat
   return (
     <section aria-labelledby="similar-rentals" className="bg-bg-alt py-section-tight">
       <div className="mx-auto w-full max-w-container px-gutter">
-        <h2 id="similar-rentals" className="mb-8 font-display text-h2">
+        <h2 id="similar-rentals" className="mb-8 font-display text-h2-sm">
           {rented ? t("similar.titleRented") : t("similar.title")}
         </h2>
         <ul className="-mx-gutter flex snap-x snap-mandatory gap-4 overflow-x-auto px-gutter pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">

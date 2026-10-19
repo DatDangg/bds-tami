@@ -105,7 +105,7 @@ function MenuItem({ item, active, onNavigate }: { item: NavItemView; active: boo
           link={item}
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
-          className="flex min-h-14 min-w-0 flex-1 items-center font-display text-h2 uppercase hover:text-accent-text aria-[current=page]:text-accent-text"
+          className="flex min-h-14 min-w-0 flex-1 items-center font-display text-h3 uppercase hover:text-accent-text aria-[current=page]:text-accent-text"
         />
         {hasChildren && (
           <button

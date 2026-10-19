@@ -34,7 +34,7 @@ const BLOCK_SPACING = "mb-5 last:mb-0";
 
 const TEXT_CLASS = {
   p: cn("text-body", BLOCK_SPACING),
-  h2: "mt-10 mb-4 font-display text-h2 first:mt-0",
+  h2: "mt-10 mb-4 font-display text-h2-sm first:mt-0",
   h3: "mt-8 mb-3 font-display text-h3 first:mt-0",
   quote: cn("border-l-2 border-primary pl-6 text-lead italic", BLOCK_SPACING),
   list: cn("ml-6 text-body marker:text-accent-text", BLOCK_SPACING),

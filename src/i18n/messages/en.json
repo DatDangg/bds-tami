@@ -650,11 +650,7 @@
         "dots": "Choose a slide",
         "goTo": "Go to slide {index}"
       },
-      "about": {
-        "watermark": "TAMI"
-      },
       "projects": {
-        "watermark": "PROJECTS",
         "viewAll": "View all",
         "explore": "Explore project",
         "region": "Featured projects",

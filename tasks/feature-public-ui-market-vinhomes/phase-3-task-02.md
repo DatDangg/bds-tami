@@ -1,0 +1,19 @@
+# feature-public-ui-market-vinhomes · phase-3-task-02 — Băng tìm kiếm gọn: Dự án, Tin BĐS
+
+- Change doc: `spec/changes/2026-10-19-public-ui-market-vinhomes.md` (BL-020) · plan tổng: `README.md`
+- Status: **approved 2026-10-19** (user duyệt plan theo đề xuất)
+- Verify: `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm build` (`.context/project-config.md`)
+- Retry/Escalation: attempt ≤ 3, review ≤ 2 vòng → `architecture_review_needed`
+- Report: `.context/review-reports/feature-public-ui-market-vinhomes-phase-<N>-task-<NN>-round-<R>-review.md`
+- Không sửa: SPECIFICATIONS.md, spec/CHANGELOG.md, spec/updates/, spec/test-scope/, BACKLOG, progress.json (session chính publish)
+
+## Classification / Risk
+MODIFY UI · bộ lọc + template dùng chung `CategoryListTemplate` → STRICT.
+
+## Việc
+- Áp `ListSearchBar` + banner 240px + "Có N kết quả" + lưới 4 cột cho `/du-an` (ProjectFilters) và `/tin-bds` (+ danh mục). `/tuyen-dung` chỉ nhận banner/thẻ mới, giữ bộ lọc hiện tại.
+- Test params; lọc dự án không JS vẫn chạy (progressive của BL-016).
+
+## Acceptance
+- [ ] Như P3-T01 cho 2 trang; template dùng chung không làm vỡ Tin tức / Tuyển dụng
+

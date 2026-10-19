@@ -16,7 +16,7 @@ describe("PageBanner", () => {
   });
 
   it("không có ảnh: biến thể Chữ như trước (không scrim, không ảnh)", () => {
-    const { container } = render(<PageBanner title="Dự án" description="Danh sách dự án" watermark="DỰ ÁN" />);
+    const { container } = render(<PageBanner title="Dự án" description="Danh sách dự án" />);
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
     expect(container.querySelector("img")).toBeNull();
     expect(container.querySelector("section")).toHaveClass("bg-bg-alt");

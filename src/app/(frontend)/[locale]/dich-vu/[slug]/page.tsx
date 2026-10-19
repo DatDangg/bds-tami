@@ -99,7 +99,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <ResponsiveImage media={cover} sizes="100vw" priority decorative className="absolute inset-0 -z-10" />
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-dark-deep/80 via-dark-deep/30 to-transparent" />
           <div className="mx-auto flex w-full max-w-container flex-col gap-4 px-gutter pb-10 text-on-dark lg:pb-16">
-            <h1 className="font-display text-display text-balance uppercase">{title}</h1>
+            <h1 className="font-display text-display text-balance">{title}</h1>
             {doc.summary && <p className="max-w-[60ch] text-lead text-on-dark-muted">{doc.summary}</p>}
           </div>
         </section>

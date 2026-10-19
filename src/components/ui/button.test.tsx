@@ -7,11 +7,13 @@ describe("Button", () => {
     render(<Button>Nhận tư vấn</Button>);
     const button = screen.getByRole("button", { name: "Nhận tư vấn" });
     expect(button).toHaveAttribute("type", "button");
-    expect(button).toHaveClass("bg-primary", "text-primary-foreground", "text-button", "h-11", "uppercase");
+    expect(button).toHaveClass("bg-primary", "text-primary-foreground", "text-button", "h-11", "uppercase", "rounded-pill");
   });
 
   it.each([
     ["primary", ["bg-primary", "hover:bg-primary-hover"]],
+    ["secondary", ["bg-surface", "border-border", "text-accent-text"]],
+    ["chip", ["border-on-dark/30", "bg-transparent", "text-on-dark"]],
     ["outline", ["border-text", "bg-transparent", "hover:bg-text"]],
     ["dark", ["bg-dark", "text-on-dark"]],
     ["ghost", ["bg-transparent", "hover:underline"]],

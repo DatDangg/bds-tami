@@ -21,7 +21,7 @@ export function ContactDetails({ contact, socials }: ContactDetailsProps) {
   const { hotline, email, address } = contact;
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="font-display text-h2">{t("infoTitle")}</h2>
+      <h2 className="font-display text-h2-sm">{t("infoTitle")}</h2>
       {hotline && (
         <div className="flex flex-col gap-2">
           <p className={LABEL_CLASS}>{t("hotline")}</p>

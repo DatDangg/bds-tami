@@ -55,7 +55,7 @@ export function RentalTerms({ terms, collapsed = false }: RentalTermsProps) {
   }
   return (
     <section aria-labelledby="rental-terms-title">
-      <h2 id="rental-terms-title" className="mb-4 font-display text-h3">
+      <h2 id="rental-terms-title" className="mb-4 font-display text-h2-sm">
         {t("terms.title")}
       </h2>
       {body}

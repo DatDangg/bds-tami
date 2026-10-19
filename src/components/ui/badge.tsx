@@ -4,12 +4,14 @@ import { cn } from "@/lib/utils";
 
 // Biến thể theo bảng badge nội dung công khai (tokens §1.5).
 const badgeVariants = cva(
-  "inline-flex items-center rounded-sm px-2.5 py-1 font-sans text-xsmall font-medium whitespace-nowrap",
+  "inline-flex items-center rounded-pill px-2.5 py-1 font-sans text-xsmall font-medium whitespace-nowrap",
   {
     variants: {
       variant: {
-        // Đang mở bán / Sắp mở bán
-        primary: "bg-primary text-badge-foreground",
+        // Sắp mở bán
+        primary: "bg-(image:--gradient-gold) text-badge-foreground",
+        // Đang bán (BL-020): gradient xanh từ --color-success.
+        success: "bg-(image:--gradient-success) text-on-dark",
         // Đã bàn giao
         neutral: "bg-surface-muted text-text",
         // Đã thuê

@@ -27,7 +27,7 @@ interface RentalDetailProps {
   ownPath: string;
 }
 
-const SECTION_HEADING = "mb-4 font-display text-h3";
+const SECTION_HEADING = "mb-4 font-display text-h2-sm";
 
 /** Băng "Đã thuê" đầu trang (`role=status`): tin vẫn mở nhưng không còn nhận khách cho căn này. */
 function RentedBanner() {

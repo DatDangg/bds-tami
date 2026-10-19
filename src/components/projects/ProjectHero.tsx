@@ -3,6 +3,7 @@ import { ResponsiveImage, type MediaImage } from "@/components/media/ResponsiveI
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DOCUMENTS_DOM_ID, LEAD_FORM_DOM_ID } from "@/lib/projects/project-detail-view";
+import { SALES_STATUS_BADGE_VARIANT } from "@/lib/projects/project-view";
 import type { SalesStatus } from "@/collections/Projects";
 
 interface ProjectHeroProps {
@@ -28,7 +29,7 @@ export function ProjectHero({ title, salesStatus, areaLabel, image, hasDocuments
       {image && <ResponsiveImage media={image} sizes="100vw" priority decorative className="absolute inset-0 -z-10" />}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-dark-deep/85 via-dark-deep/35 to-dark-deep/10" />
       <div className="mx-auto flex w-full max-w-container flex-col items-start gap-4 px-gutter pt-24 pb-10 lg:pb-16">
-        <Badge variant={salesStatus === "handed_over" ? "neutral" : "primary"}>{tStatus(salesStatus)}</Badge>
+        <Badge variant={SALES_STATUS_BADGE_VARIANT[salesStatus]}>{tStatus(salesStatus)}</Badge>
         <h1 className="max-w-[20ch] font-display text-display text-balance">{title}</h1>
         {areaLabel && <p className="text-lead text-on-dark-muted">{areaLabel}</p>}
         <div className="mt-2 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

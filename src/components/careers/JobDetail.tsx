@@ -84,7 +84,7 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turns
       <div className="mx-auto grid w-full max-w-container gap-8 px-gutter pb-section-tight lg:grid-cols-12 lg:gap-12">
         <aside aria-labelledby="job-summary-title" className="lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:self-start lg:sticky lg:top-28">
           <div className="flex flex-col gap-6 rounded-sm bg-bg-alt p-6">
-            <h2 id="job-summary-title" className="font-display text-h3">
+            <h2 id="job-summary-title" className="font-display text-h2-sm">
               {t("summaryTitle")}
             </h2>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-1">
@@ -115,7 +115,7 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turns
         <div className="flex min-w-0 flex-col gap-10 lg:col-span-8 lg:row-start-1">
           {sections.map((key) => (
             <section key={key} aria-labelledby={`job-${key}`} className="flex flex-col gap-4">
-              <h2 id={`job-${key}`} className="font-display text-h2">
+              <h2 id={`job-${key}`} className="font-display text-h2-sm">
                 {t(`sections.${key}`)}
               </h2>
               <RichText data={doc[key]} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
@@ -127,7 +127,7 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turns
         others.length > 0 && (
           <section aria-labelledby="other-jobs" className="bg-bg-alt py-section-tight">
             <div className="mx-auto w-full max-w-container px-gutter">
-              <h2 id="other-jobs" className="mb-6 font-display text-h2">
+              <h2 id="other-jobs" className="mb-6 font-display text-h2-sm">
                 {t("otherTitle")}
               </h2>
               <ul className="flex flex-col gap-2">

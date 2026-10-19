@@ -48,3 +48,6 @@ export function toProjectCards(docs: readonly Project[], locale: Locale): Projec
     return card ? [card] : [];
   });
 }
+
+/** Màu badge trạng thái mở bán (BL-020): Đang bán = gradient xanh, Sắp mở bán = gradient vàng, Đã bàn giao = trung tính. */
+export const SALES_STATUS_BADGE_VARIANT = { upcoming: "primary", selling: "success", handed_over: "neutral" } as const satisfies Record<SalesStatus, string>;

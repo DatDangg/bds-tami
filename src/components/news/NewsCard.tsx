@@ -40,11 +40,11 @@ export function NewsCard({ data, variant = "card", headingLevel, priority = fals
       <Link
         href={data.href}
         className={cn(
-          "group flex min-h-11 gap-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
+          "group flex min-h-11 gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
           isRow ? "flex-row items-start" : "flex-col",
         )}
       >
-        <div className={cn("shrink-0 overflow-hidden bg-surface-muted", isRow ? "w-24 sm:w-[120px]" : "w-full", IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
+        <div className={cn("shrink-0 overflow-hidden rounded-xl bg-surface-muted", isRow ? "w-24 sm:w-[120px]" : "w-full", IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
           {data.cover && (
             <ResponsiveImage media={data.cover} sizes={IMAGE_SIZES[variant]} aspectRatio={IMAGE_RATIO[variant]} priority={priority} decorative />
           )}

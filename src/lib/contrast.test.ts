@@ -73,7 +73,12 @@ describe("tương phản token (tokens §9)", () => {
     ["Button dark", "--color-on-dark", "--color-dark", TEXT],
     ["Button dark hover", "--color-on-dark", "--color-dark-deep", TEXT],
     ["Button outline hover", "--color-surface", "--color-text", TEXT],
-    ["Badge primary", "--color-badge-foreground", "--color-primary", TEXT],
+    ["Badge primary (đầu sáng gradient vàng)", "--color-badge-foreground", "--color-primary", TEXT],
+    ["Badge primary (đầu đậm gradient vàng)", "--color-badge-foreground", "--color-primary-deep", TEXT],
+    ["Badge Đang bán (đầu sáng gradient xanh)", "--color-on-dark", "--color-success", TEXT],
+    ["Badge Đang bán (đầu đậm gradient xanh)", "--color-on-dark", "--color-success-text", TEXT],
+    ["Button secondary", "--color-accent-text", "--color-surface", TEXT],
+    ["text/bg-alt", "--color-text", "--color-bg-alt", TEXT],
     ["Badge neutral", "--color-text", "--color-surface-muted", TEXT],
     ["Badge dark", "--color-on-dark", "--color-dark", TEXT],
     ["Badge muted", "--color-text-muted", "--color-surface-muted", TEXT],
@@ -129,5 +134,31 @@ describe("PageBanner biến thể Ảnh: chữ trên scrim (FR-ADM-20)", () => {
 
   it("không đổi --color-overlay dùng chung (hero, dialog, sheet)", () => {
     expect(light("--color-overlay")).toBe("rgb(10 12 16 / 0.55)");
+  });
+});
+
+describe("kính mờ sáng của header (BL-020)", () => {
+  // Trường hợp xấu nhất của kính nửa trong suốt: nền phía sau là đen (ảnh hero tối) hoặc trắng; chỉ --color-text được dùng làm chữ trên kính: accent-text chỉ đạt ~3.0:1 khi nền sau kính là đen (task header phải đánh dấu mục đang chọn bằng gạch chân/đậm, không bằng màu accent).
+  function glassOver(backdrop: number): string {
+    const match = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light("--color-glass"));
+    if (!match) throw new Error("--color-glass không phải rgb(r g b / a)");
+    const [, r, g, b, alpha] = match;
+    const blend = (channel: string) => Math.round(Number(alpha) * Number(channel) + (1 - Number(alpha)) * backdrop);
+    return `#${[r, g, b].map((channel) => blend(channel!).toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  it.each([
+    ["đen", 0],
+    ["trắng", 255],
+  ])("chữ --color-text trên kính trước nền %s đạt 4.5:1", (_label, backdrop) => {
+    expect(contrast(light("--color-text"), glassOver(backdrop))).toBeGreaterThanOrEqual(TEXT);
+  });
+
+  it("khai báo token kính và gradient", () => {
+    expect(css).toMatch(/--blur-glass:\s*24px;/);
+    expect(css).toMatch(/--gradient-gold:\s*linear-gradient\(/);
+    expect(css).toMatch(/--gradient-success:\s*linear-gradient\(/);
+    expect(css).toMatch(/--radius-xl:\s*20px;/);
+    expect(css).toMatch(/--radius-pill:\s*9999px;/);
   });
 });

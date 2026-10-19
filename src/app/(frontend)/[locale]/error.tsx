@@ -21,7 +21,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
   return (
     <div className="mx-auto flex w-full max-w-container flex-col items-center gap-4 px-gutter py-section-tight text-center">
       <WarningCircle size={40} aria-hidden="true" className="text-text-muted" />
-      <h1 className="font-display text-h1 uppercase">{t("title")}</h1>
+      <h1 className="font-display text-h1">{t("title")}</h1>
       <p className="max-w-[60ch] text-body text-text-secondary">
         {hotline ? t("descriptionWithHotline", { hotline }) : t("description")}
       </p>
