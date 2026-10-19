@@ -667,16 +667,23 @@
       },
       "projects": {
         "viewAll": "View all",
-        "explore": "Explore project",
         "region": "Featured projects",
         "slide": "Project {index} of {total}",
         "previous": "Previous project",
         "next": "Next project",
         "dots": "Choose a project",
-        "goTo": "Go to project {index}"
+        "goTo": "Go to project {index}",
+        "stats": {
+          "landArea": "Land area",
+          "units": "Total units",
+          "handover": "Handover"
+        }
       },
       "offers": {
-        "viewAll": "View all"
+        "viewMore": "See more",
+        "slide": "Offer {index} of {total}",
+        "previous": "Previous offers",
+        "next": "Next offers"
       }
     }
   }

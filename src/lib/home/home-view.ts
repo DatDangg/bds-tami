@@ -5,6 +5,7 @@ import type { Homepage, Project, PropertyPost, Province, Service } from "../../p
 import { announcementHash } from "./announcement-hash";
 import { resolveNavLink } from "../content/nav-link";
 import { isOfferEnded } from "../content/offer-status";
+import type { SalesStatus } from "../../collections/Projects";
 import { populatedMedia } from "../news/news-view";
 import { type PostCardData, toPostCards, toPublicImage } from "../posts/post-view";
 import { renderableImage } from "../projects/project-detail-view";
@@ -44,6 +45,9 @@ export interface ProjectSlideView {
   provinceName: string | null;
   summary: string;
   image: MediaImage | null;
+  salesStatus: SalesStatus;
+  /** Số liệu từ field `scale.*` có sẵn; thiếu/không dương → `null` (thẻ ẩn ô đó). */
+  stats: { landAreaM2: number | null; totalUnits: number | null; handoverTime: string | null };
 }
 
 export interface AboutView {
@@ -177,6 +181,8 @@ function toAbout(homepage: Homepage): AboutView {
   };
 }
 
+const positiveOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && value > 0 ? value : null);
+
 function toProjectSlides(docs: readonly Project[], locale: Locale): ProjectSlideView[] {
   return docs.flatMap((doc) => {
     const card = toProjectCardData(doc, locale);
@@ -190,6 +196,12 @@ function toProjectSlides(docs: readonly Project[], locale: Locale): ProjectSlide
         provinceName: card.provinceName,
         summary: text(doc.summary),
         image: toPublicImage(card.cover),
+        salesStatus: card.salesStatus,
+        stats: {
+          landAreaM2: positiveOrNull(doc.scale?.landAreaM2),
+          totalUnits: positiveOrNull(doc.scale?.totalUnits),
+          handoverTime: text(doc.scale?.handoverTime) || null,
+        },
       },
     ];
   });

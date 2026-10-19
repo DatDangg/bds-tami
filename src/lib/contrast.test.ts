@@ -163,6 +163,13 @@ describe("kính mờ sáng của header (BL-020)", () => {
     expect(flat).toContain(".site-header-bar :focus-visible { outline-color: var(--color-text); }");
   });
 
+  it("khung kính của thẻ dự án (.glass-panel) theo cùng quy tắc: nền đặc mặc định, kính trong @supports, đặc lại khi giảm trong suốt", () => {
+    const flat = css.slice(css.indexOf(".glass-panel {")).replace(/\s+/g, " ");
+    expect(flat).toContain(".glass-panel { background-color: var(--color-surface); }");
+    expect(flat).toContain("@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass-panel { background-color: var(--color-glass);");
+    expect(flat).toContain("@media (prefers-reduced-transparency: reduce) { .glass-panel { background-color: var(--color-surface);");
+  });
+
   it("khai báo token kính và gradient", () => {
     expect(css).toMatch(/--blur-glass:\s*24px;/);
     expect(css).toMatch(/--gradient-gold:\s*linear-gradient\(/);

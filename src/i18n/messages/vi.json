@@ -667,16 +667,23 @@
       },
       "projects": {
         "viewAll": "Xem tất cả",
-        "explore": "Khám phá dự án",
         "region": "Dự án nổi bật",
         "slide": "Dự án {index} / {total}",
         "previous": "Dự án trước",
         "next": "Dự án sau",
         "dots": "Chọn dự án",
-        "goTo": "Chuyển tới dự án {index}"
+        "goTo": "Chuyển tới dự án {index}",
+        "stats": {
+          "landArea": "Diện tích đất",
+          "units": "Tổng số căn",
+          "handover": "Bàn giao"
+        }
       },
       "offers": {
-        "viewAll": "Xem tất cả"
+        "viewMore": "Xem thêm",
+        "slide": "Ưu đãi {index} / {total}",
+        "previous": "Ưu đãi trước",
+        "next": "Ưu đãi sau"
       }
     }
   }

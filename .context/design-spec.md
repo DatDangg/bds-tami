@@ -262,14 +262,14 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - ≥ md: lưới 12 cột: ảnh cột 1-5 (4:5), chữ cột 7-12.
 - Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h2` serif `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
 
-**3. Dự án nổi bật** (`featuredProjects`, tối đa 6; trống thì lấy `isFeatured` mới nhất)
-- Heading căn giữa. Slider full-bleed (tràn viền, không theo container).
-- Mỗi slide: ảnh đại diện dự án tỉ lệ 16:9 (≥ md) / 4:5 (< md).
-  - ≥ lg: khung chữ `--color-surface` rộng 440px đè lên ảnh, đáy trái lệch vào trong `--gutter`, padding 40px: eyebrow loại hình (`category.name`), tên `--text-h3`, tỉnh/thành, `summary` 3 dòng, nút Outline **Khám phá dự án**.
-  - < lg: khung chữ nằm **dưới** ảnh (không đè), cùng nội dung, `summary` 2 dòng.
-- Điều khiển: mũi tên ≥ md (ngoài khung chữ), chấm phân trang dưới. Không autoplay (người dùng tự chuyển). Hiện một phần slide kế bên ở mobile (slide rộng 88%) để gợi ý vuốt.
-- "Xem tất cả" → `/du-an`.
-- 0 dự án: ẩn khối. 1 dự án: không điều khiển.
+**3. Dự án nổi bật** (`featuredProjects`, tối đa 6; trống thì lấy `isFeatured` mới nhất) — BL-020
+- Heading căn giữa. Slider tràn viền (cuộn ngang scroll-snap, vuốt/phím mũi tên, **không autoplay**).
+- Mỗi slide là **thẻ lớn ~464×600** (`aspect 464/600`, rộng 464px ≥ sm, 82% < sm để lộ thẻ kế), bo `--radius-xl` 20px, ảnh đại diện phủ kín (`object-cover`, lazy, `sizes` 464px/82vw, khung tỉ lệ cố định → không CLS). Cả thẻ là MỘT link tới chi tiết dự án; hover phóng ảnh nhẹ + gạch chân tên.
+  - Badge trạng thái mở bán góc trên trái ảnh: Đang mở bán = gradient xanh (`success`), Sắp mở bán = gradient vàng (`primary`), Đã bàn giao = trung tính.
+  - **Khung kính mờ** `.glass-panel` đè đáy ảnh (cách mép 12/16px, bo 16px, padding 16/20px): tên dự án serif `--text-h3` (viết thường, tối đa 2 dòng), địa điểm (tỉnh/thành, icon pin), hàng **số liệu** `<dl>` từ field sẵn có `scale.landAreaM2` (Diện tích đất, m²), `scale.totalUnits` (Tổng số căn), `scale.handoverTime` (Bàn giao). Ô thiếu dữ liệu **ẩn**; không còn ô nào thì không dựng hàng. Không còn eyebrow/summary/nút "Khám phá dự án".
+  - Kính theo quy tắc header: nền `--color-surface` đặc mặc định → `--color-glass` + blur chỉ trong `@supports (backdrop-filter)`, đặc lại khi `prefers-reduced-transparency`. **Chỉ `--color-text`** trên kính (4.5:1 dù ảnh sau kính đen/trắng — `contrast.test`); không dùng muted/accent trên kính.
+- Điều khiển: mũi tên ≥ md (44px) + chấm phân trang dưới (cơ chế dùng chung `useSnapSlider`). 
+- "Xem tất cả" → `/du-an`. 0 dự án: ẩn khối. 1 dự án: không điều khiển.
 
 **4. Dịch vụ** (`services.items`)
 - Heading căn trái.
@@ -277,9 +277,9 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - < md: 3 thẻ xếp dọc, thẻ 4:3, chữ đè đáy ảnh.
 - Thẻ link tới `/dich-vu/[slug]`.
 
-**5. Ưu đãi nổi bật** (`featuredOffers`; trống thì `isFeatured` còn hạn)
-- Heading căn giữa + "Xem tất cả" → `/tin-bds`.
-- Lưới thẻ Tin/ưu đãi: < sm 1 cột · sm 2 cột · lg 3 cột; tối đa 6 thẻ. Bài hết hạn **không** xuất hiện (BR-06). 0 bài: ẩn khối.
+**5. Mua từ chủ đầu tư / Ưu đãi nổi bật** (`featuredOffers`; trống thì `isFeatured` còn hạn) — BL-020
+- Heading căn giữa. **Slider thẻ** (trong container): cuộn ngang scroll-snap, vuốt/phím mũi tên, không autoplay; thẻ = `PostCard` (bo 20px, ảnh 16:10 lazy, badge ưu đãi, loại, tiêu đề, giá). Rộng 80% < sm · 2 thẻ ≥ sm · 3 thẻ ≥ lg; tối đa 6 thẻ. Nút trước/sau tròn 44px từ md (≥ 2 thẻ), cuộn ~90% bề rộng. Bài hết hạn **không** xuất hiện (BR-06). 0 bài: ẩn khối.
+- Nút Outline **Xem thêm** dưới slider → `/tin-bds` (theo ngôn ngữ).
 
 **6. Đối tác** (`partners`, `developers.showAsPartner`)
 - Tiêu đề `--text-h2` căn giữa. Lưới logo **chỉ logo** (không chữ dưới logo), ô cao 80px, logo `max-height: 48px`, grayscale + opacity 0.7, hover/focus về màu gốc. Logo có link `website` (tab mới) nếu có, `alt` = tên chủ đầu tư.

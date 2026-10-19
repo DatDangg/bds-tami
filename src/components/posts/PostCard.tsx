@@ -15,6 +15,8 @@ interface PostCardProps {
   headingLevel: "h2" | "h3";
   /** Ảnh LCP của trang (chỉ bài nổi bật đầu trang): tải ngay thay vì lazy. */
   priority?: boolean;
+  /** Ghi đè `sizes` của ảnh khi thẻ nằm trong khung không theo lưới mặc định (slider trang chủ). */
+  imageSizes?: string;
 }
 
 const IMAGE_ZOOM = "[&_img]:transition-transform [&_img]:duration-(--duration-slow) group-hover:[&_img]:scale-105 motion-reduce:[&_img]:transition-none motion-reduce:group-hover:[&_img]:scale-100";
@@ -25,9 +27,9 @@ const IMAGE_SIZES: Record<PostCardVariant, string> = {
 
 /**
  * Thẻ Đăng tin BĐS (design-spec §3.2 "Tin/ưu đãi", S08): cả thẻ là MỘT link. Có `offer.endAt`: badge "Còn n ngày" (≤ 3 ngày) hoặc "Đã kết thúc"
- * (ảnh mờ `opacity 0.7`, thẻ vẫn hiện, BR-06). Bài nổi bật `feature` ngang 7/5 ở ≥ lg, dọc ở nhỏ hơn. Server Component.
+ * (ảnh mờ `opacity 0.7`, thẻ vẫn hiện, BR-06). Bài nổi bật `feature` ngang 7/5 ở ≥ lg, dọc ở nhỏ hơn. Server hoặc Client Component (dùng được trong slider client của trang chủ).
  */
-export function PostCard({ data, variant = "card", headingLevel, priority = false }: PostCardProps) {
+export function PostCard({ data, variant = "card", headingLevel, priority = false, imageSizes }: PostCardProps) {
   const t = useTranslations("page.posts");
   const Heading = headingLevel;
   const isFeature = variant === "feature";
@@ -45,7 +47,7 @@ export function PostCard({ data, variant = "card", headingLevel, priority = fals
           {data.cover && (
             <ResponsiveImage
               media={data.cover}
-              sizes={IMAGE_SIZES[variant]}
+              sizes={imageSizes ?? IMAGE_SIZES[variant]}
               aspectRatio="16/10"
               priority={priority}
               decorative

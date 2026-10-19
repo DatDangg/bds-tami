@@ -258,6 +258,26 @@
   outline-color: var(--color-text);
 }
 
+/* Khung kính mờ đè đáy ảnh thẻ dự án (BL-020): cùng quy tắc với header — mặc định nền ĐẶC, kính chỉ khi có backdrop-filter, giảm trong suốt → đặc.
+   Chữ trên khung chỉ dùng --color-text (đạt 4.5:1 dù ảnh phía sau đen hay trắng, xem contrast.test). */
+.glass-panel {
+  background-color: var(--color-surface);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-panel {
+    background-color: var(--color-glass);
+    -webkit-backdrop-filter: blur(var(--blur-glass));
+    backdrop-filter: blur(var(--blur-glass));
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel {
+    background-color: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* 3. Tên shadcn chưa có ở lớp 1. */
 @theme inline {
   --color-background: var(--background);

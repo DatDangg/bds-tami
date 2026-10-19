@@ -1,53 +1,53 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { CaretLeft, CaretRight, MapPin } from "@/components/icons";
+import { MapPin } from "@/components/icons";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { formatArea, formatNumber } from "@/lib/format";
 import type { ProjectSlideView } from "@/lib/home/home-view";
+import { SALES_STATUS_BADGE_VARIANT } from "@/lib/projects/project-view";
+import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { useMediaQuery } from "./use-environment";
+import { SliderArrow, useSnapSlider } from "./use-snap-slider";
 
-const ARROW_BUTTON =
-  "hidden size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-text text-text transition-colors duration-(--duration-fast) hover:bg-text hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring md:inline-flex";
+const IMAGE_ZOOM =
+  "[&_img]:transition-transform [&_img]:duration-(--duration-slow) group-hover:[&_img]:scale-105 motion-reduce:[&_img]:transition-none motion-reduce:group-hover:[&_img]:scale-100";
+
+/** Số liệu từ field `scale.*` có sẵn của dự án; ô nào thiếu dữ liệu thì không hiện (chốt câu 3, BL-020). */
+function ProjectStats({ stats }: { stats: ProjectSlideView["stats"] }) {
+  const t = useTranslations("page.home.projects.stats");
+  const locale = useLocale() as Locale;
+  const items = [
+    stats.landAreaM2 ? { key: "landArea", label: t("landArea"), value: formatArea(stats.landAreaM2, locale) } : null,
+    stats.totalUnits ? { key: "units", label: t("units"), value: formatNumber(stats.totalUnits, locale) } : null,
+    stats.handoverTime ? { key: "handover", label: t("handover"), value: stats.handoverTime } : null,
+  ].filter((item) => item !== null);
+  if (items.length === 0) return null;
+  return (
+    <dl className="mt-1 flex flex-wrap gap-x-5 gap-y-2 border-t border-text/15 pt-3">
+      {items.map((item) => (
+        <div key={item.key} className="min-w-0">
+          <dt className="text-xsmall">{item.label}</dt>
+          <dd className="text-small font-semibold">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
 /**
- * Slider dự án nổi bật (design-spec S01.3): cuộn ngang bằng CSS scroll-snap (vuốt/phím mũi tên/cuộn gốc của trình duyệt, KHÔNG autoplay),
- * slide rộng 88% ở mobile để lộ slide kế. Mũi tên từ md và chấm phân trang chỉ khi có ≥ 2 dự án. Slide hiện tại lấy bằng IntersectionObserver
- * (không dùng scroll listener). Khung chữ đè ảnh ở ≥ lg, nằm dưới ảnh ở nhỏ hơn.
+ * Slider dự án nổi bật (design-spec S01 khối 3, BL-020): cuộn ngang CSS scroll-snap (vuốt/phím mũi tên, KHÔNG autoplay); thẻ lớn ~464×600 bo 20px,
+ * ảnh phủ kín, khung kính mờ đè đáy ảnh (tên, địa điểm, số liệu) — chữ trên kính chỉ dùng --color-text. Mỗi thẻ là MỘT link.
+ * Mũi tên từ md và chấm phân trang chỉ khi có ≥ 2 dự án.
  */
 export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideView[]; labelledBy: string }) {
   const t = useTranslations("page.home.projects");
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const listRef = useRef<HTMLUListElement>(null);
-  const [current, setCurrent] = useState(0);
+  const tStatus = useTranslations("page.projects.salesStatus");
   const count = slides.length;
   const multiple = count > 1;
-
-  useEffect(() => {
-    const list = listRef.current;
-    if (!multiple || !list || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setCurrent(Number((entry.target as HTMLElement).dataset.index));
-        }
-      },
-      { root: list, threshold: 0.6 },
-    );
-    for (const item of list.children) observer.observe(item);
-    return () => observer.disconnect();
-  }, [multiple, count]);
-
-  const scrollToSlide = useCallback(
-    (target: number) => {
-      const slide = listRef.current?.children[(target + count) % count];
-      slide?.scrollIntoView?.({ behavior: reducedMotion ? "auto" : "smooth", inline: "start", block: "nearest" });
-    },
-    [count, reducedMotion],
-  );
+  const { listRef, current, scrollToSlide } = useSnapSlider(count, true);
 
   return (
     <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy}>
@@ -65,25 +65,37 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
             role="group"
             aria-roledescription="slide"
             aria-label={t("slide", { index: position + 1, total: count })}
-            className="w-[88%] shrink-0 snap-start md:w-[80%] lg:w-[min(80%,1100px)]"
+            className="w-[82%] shrink-0 snap-start sm:w-[464px]"
           >
-            <article className="relative flex flex-col lg:block">
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-muted md:aspect-[16/9]">
+            <article>
+              <Link
+                href={slide.href}
+                // Tên truy cập = tên dự án (không đọc cả số liệu); số liệu vẫn đọc được khi duyệt vào thẻ.
+                aria-labelledby={`${labelledBy}-${slide.id}`}
+                className={cn(
+                  "group relative block aspect-[464/600] w-full overflow-hidden rounded-xl bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-focus-ring",
+                  IMAGE_ZOOM,
+                )}
+              >
                 {slide.image ? (
-                  <ResponsiveImage media={slide.image} sizes="(min-width: 1024px) 1100px, (min-width: 768px) 80vw, 88vw" decorative />
+                  <ResponsiveImage media={slide.image} sizes="(min-width: 640px) 464px, 82vw" decorative />
                 ) : (
                   <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
                 )}
-              </div>
-              <div className="flex flex-col gap-3 bg-surface py-6 lg:absolute lg:bottom-8 lg:left-8 lg:w-[440px] lg:p-10">
-                {slide.eyebrow && <p className="text-xsmall font-semibold tracking-wide text-accent-text uppercase">{slide.eyebrow}</p>}
-                <h3 className="font-display text-h3">{slide.title}</h3>
-                {slide.provinceName && <p className="text-small text-text-muted">{slide.provinceName}</p>}
-                {slide.summary && <p className="line-clamp-2 text-body text-text-secondary lg:line-clamp-3">{slide.summary}</p>}
-                <Button asChild variant="outline" className="mt-2 w-fit">
-                  <Link href={slide.href}>{t("explore")}</Link>
-                </Button>
-              </div>
+                <Badge variant={SALES_STATUS_BADGE_VARIANT[slide.salesStatus]} className="absolute top-4 left-4">
+                  {tStatus(slide.salesStatus)}
+                </Badge>
+                <div className="glass-panel absolute inset-x-3 bottom-3 flex flex-col gap-1 rounded-lg p-4 text-text sm:inset-x-4 sm:bottom-4 sm:p-5">
+                  <h3 id={`${labelledBy}-${slide.id}`} className="line-clamp-2 font-display text-h3 group-hover:underline group-hover:underline-offset-4">{slide.title}</h3>
+                  {slide.provinceName && (
+                    <p className="flex items-center gap-1 text-small">
+                      <MapPin size={16} aria-hidden="true" className="shrink-0" />
+                      {slide.provinceName}
+                    </p>
+                  )}
+                  <ProjectStats stats={slide.stats} />
+                </div>
+              </Link>
             </article>
           </li>
         ))}
@@ -91,9 +103,7 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
 
       {multiple && (
         <div className="mx-auto mt-6 flex w-full max-w-container items-center justify-center gap-4 px-gutter">
-          <button type="button" aria-label={t("previous")} onClick={() => scrollToSlide(current - 1)} className={ARROW_BUTTON}>
-            <CaretLeft size={20} aria-hidden="true" />
-          </button>
+          <SliderArrow direction="previous" label={t("previous")} onClick={() => scrollToSlide(current - 1)} />
           <div role="group" aria-label={t("dots")} className="flex items-center">
             {slides.map((slide, position) => (
               <button
@@ -111,9 +121,7 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
               </button>
             ))}
           </div>
-          <button type="button" aria-label={t("next")} onClick={() => scrollToSlide(current + 1)} className={ARROW_BUTTON}>
-            <CaretRight size={20} aria-hidden="true" />
-          </button>
+          <SliderArrow direction="next" label={t("next")} onClick={() => scrollToSlide(current + 1)} />
         </div>
       )}
     </div>

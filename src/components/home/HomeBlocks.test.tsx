@@ -77,13 +77,14 @@ describe("HomeBlocks: nội dung khối", () => {
     expect(screen.getByText("năm kinh nghiệm").tagName).toBe("DT");
   });
 
-  it("dự án: eyebrow là loại hình, nút 'Khám phá dự án' → trang dự án; có điều khiển khi ≥ 2 dự án", () => {
+  it("dự án: thẻ là một link tới trang dự án kèm badge trạng thái; có điều khiển khi ≥ 2 dự án", () => {
     renderHome(homepage());
     const region = screen.getByRole("region", { name: "Dự án nổi bật" });
-    expect(within(region).getAllByText("Căn hộ")).toHaveLength(3);
-    expect(within(region).getAllByRole("link", { name: "Khám phá dự án" })[0]).toHaveAttribute("href", "/du-an/du-an-1");
+    expect(within(region).getAllByText("Đang mở bán")).toHaveLength(3);
+    expect(within(region).getAllByRole("link", { name: /Dự án 1/ })[0]).toHaveAttribute("href", "/du-an/du-an-1");
     expect(within(region).getByRole("button", { name: "Chuyển tới dự án 3" })).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: "Xem tất cả" }).map((link) => link.getAttribute("href"))).toEqual(["/du-an", "/tin-bds"]);
+    expect(screen.getByRole("link", { name: "Xem tất cả" })).toHaveAttribute("href", "/du-an");
+    expect(screen.getByRole("link", { name: "Xem thêm" })).toHaveAttribute("href", "/tin-bds");
   });
 
   it("1 dự án: không điều khiển", () => {

@@ -146,6 +146,19 @@ describe("buildHomeView: hero", () => {
     ]);
     expect(JSON.stringify(view)).not.toContain("staff-secret");
   });
+
+  it("dự án: số liệu từ scale.* sẵn có; thiếu/không dương/chỉ khoảng trắng → null (thẻ ẩn ô)", () => {
+    const full = project("1", { salesStatus: "upcoming", scale: { landAreaM2: 12000, totalUnits: 350, handoverTime: " Q4/2027 " } });
+    const empty = project("2", { scale: { landAreaM2: 0, totalUnits: null, handoverTime: "  " } });
+    const none = project("3");
+    const block = buildHomeView(homepage(), docs({ projects: [full, empty, none] }), "vi", NOW).blocks.find((item) => item.kind === "featuredProjects");
+    const slides = block && "slides" in block ? block.slides : [];
+    expect(slides.map((slide) => [slide.salesStatus, slide.stats])).toEqual([
+      ["upcoming", { landAreaM2: 12000, totalUnits: 350, handoverTime: "Q4/2027" }],
+      ["selling", { landAreaM2: null, totalUnits: null, handoverTime: null }],
+      ["selling", { landAreaM2: null, totalUnits: null, handoverTime: null }],
+    ]);
+  });
 });
 
 describe("buildHomeView: nội dung khối", () => {
