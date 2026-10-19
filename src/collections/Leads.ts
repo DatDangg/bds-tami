@@ -11,6 +11,7 @@ import { computeAssigneeInactive, recordStatusChange, stampLeadTimestamps } from
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
+import { hideTechnicalListFilters } from "../lib/admin/list-filter";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
 import { isUuid } from "../lib/uuid";
@@ -183,6 +184,9 @@ const trackingFields: Field[] = [
 // Cột ảo (không có trong DB): lịch sử chăm sóc hiện ngay trong trang lead; quyền đọc theo `lead-activities`.
 const activitiesField: Field = { name: "activities", type: "join", label: "Lịch sử chăm sóc", collection: "lead-activities", on: "lead", defaultSort: "-createdAt", defaultLimit: 50 };
 
+/** Trường kỹ thuật/định danh ẩn khỏi "Thêm bộ lọc" (BL-021 #06): tên/SĐT/email đã có ô tìm kiếm riêng; còn lại là dấu hệ thống ghi. Giữ: trạng thái, nguồn, sale, các mốc ngày, UTM. */
+const LEAD_HIDDEN_FILTER_PATHS = ["fullName", "phone", "phoneNormalized", "email", "locale", "consentAt", "consentVersion", "pageUrl", "referrer", "mergedCount", "remindedAt", "anonymizedAt"];
+
 /**
  * Lead khách để lại (ERD §4.11, FR-ADM-09, PERMISSION §3.3-§4, BR-11/BR-32):
  * - Không ai tạo qua REST/admin (`create: denyAll`); bản ghi do endpoint `POST /api/public/leads` tạo bằng Local API
@@ -192,7 +196,7 @@ const activitiesField: Field = { name: "activities", type: "join", label: "Lịc
  * - SĐT/email thuộc lead nên chỉ admin và sale phụ trách thấy (BR-32); lead chưa giao: chỉ admin.
  * - Admin xoá mềm/khôi phục/xoá hẳn có audit (PERMISSION §6); bản đã xoá mềm chỉ admin sửa. Xuất Excel không thuộc collection này.
  */
-export const Leads: CollectionConfig = {
+export const Leads: CollectionConfig = hideTechnicalListFilters({
   slug: "leads",
   labels: collectionLabels("leads"),
   admin: {
@@ -229,4 +233,4 @@ export const Leads: CollectionConfig = {
     ...assignmentFields,
     ...timelineFields,
   ],
-};
+}, LEAD_HIDDEN_FILTER_PATHS);

@@ -18,6 +18,7 @@ import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
+import { hideTechnicalListFilters } from "../lib/admin/list-filter";
 import { textRowLabel } from "../lib/admin/row-label";
 import { withContentDefaults } from "./_shared/content-defaults";
 
@@ -106,7 +107,7 @@ const floorPlansField: ArrayField = {
  */
 export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
   const revalidateHomepage = createRevalidateHomepageOnUnpublish({ paths: revalidate, tags: revalidateTags });
-  return withContentDefaults(
+  const collection = withContentDefaults(
     {
       slug: "projects",
       labels: collectionLabels("projects"),
@@ -181,6 +182,8 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
     },
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },
   );
+  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
+  return hideTechnicalListFilters(collection, ["address", "scale"]);
 }
 
 export const Projects = createProjects();

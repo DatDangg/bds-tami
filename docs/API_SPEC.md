@@ -25,7 +25,7 @@ Staging:     https://staging.<domain>/api
 Production:  https://<domain>/api
 ```
 
-**Ngôn ngữ** (song ngữ, BRD FR-PUB-18): endpoint công khai nhận `locale` = `vi` (mặc định) | `en`. Giá trị khác trả 400. Với `locale=en`, chỉ trả nội dung có `hasEnglish = true` và trả trường chữ bản tiếng Anh (không fallback sang tiếng Việt, ERD §1.1). Thông báo lỗi trong `error` / `details` trả theo `locale` để hiện thẳng lên form. Payload Local API / REST dùng tham số `locale` có sẵn của Payload (`fallbackLocale: false` ở phía công khai).
+**Ngôn ngữ** (song ngữ, BRD FR-PUB-18): endpoint công khai nhận `locale` = `vi` (mặc định) | `en`. Giá trị khác trả 400. Với `locale=en`, chỉ trả nội dung có `hasEnglish = true` và trả trường chữ bản tiếng Anh (không fallback sang tiếng Việt, ERD §1.1). Thông báo lỗi trong `error` / `details` trả theo `locale` để hiện thẳng lên form. Payload Local API / REST dùng tham số `locale` có sẵn của Payload (`fallbackLocale: false` ở phía công khai). REST đọc (`find`/`findByID`) của các collection nội dung (`withContentDefaults`) không kèm `locale` đọc theo `vi` (hook `defaultReadLocale`, BL-021 #07); `locale=en` / `locale=all` giữ nguyên, vẫn không fallback.
 
 **Xác thực**: session cookie của Payload (`payload-token`, HttpOnly, Secure, SameSite=Lax). Không có API key công khai.
 

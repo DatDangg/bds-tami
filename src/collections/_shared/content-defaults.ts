@@ -11,6 +11,7 @@ import { CONTENT_STATUSES, type ContentStatus, statusField } from "../../fields/
 import { translationFields } from "../../fields/translation";
 import { auditContentPurge, auditContentTrash } from "../../hooks/audit-content-delete";
 import { createSlugRedirect } from "../../hooks/create-slug-redirect";
+import { defaultReadLocale } from "../../hooks/default-read-locale";
 import { guardTrashedEdit } from "../../hooks/guard-trashed-edit";
 import { requireEnglishFields } from "../../hooks/require-english-fields";
 import { createRevalidateContent, type RevalidatePaths } from "../../hooks/revalidate-content";
@@ -182,6 +183,8 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
     },
     hooks: {
       ...collection.hooks,
+      // REST đọc không có `?locale` (fallback tắt, BR-07) phải đọc theo ngôn ngữ mặc định, nếu không nhãn bộ lọc quan hệ trong admin trống.
+      beforeOperation: [defaultReadLocale, ...(collection.hooks?.beforeOperation ?? [])],
       beforeValidate: [
         guardTrashedEdit,
         requireEnglishFields(options.englishRequiredFields ?? ["title", "slug"]),

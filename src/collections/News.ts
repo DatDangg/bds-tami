@@ -7,6 +7,7 @@ import { titleField } from "../fields/title";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
+import { hideTechnicalListFilters } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /**
@@ -15,7 +16,7 @@ import { withContentDefaults } from "./_shared/content-defaults";
  * (BR-04: tin tức không thu lead). `revalidate` chỉ để test ghi đè.
  */
 export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
-  return withContentDefaults(
+  const collection = withContentDefaults(
     {
       slug: "news",
       labels: collectionLabels("news"),
@@ -57,6 +58,8 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
     },
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
+  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): tags ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
+  return hideTechnicalListFilters(collection, ["tags"]);
 }
 
 export const News = createNews();

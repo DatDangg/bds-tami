@@ -1,7 +1,7 @@
 import type { EventEmitter } from "node:events";
 import { rm } from "node:fs/promises";
 import pg from "pg";
-import type { Payload } from "payload";
+import { handleEndpoints, type Payload } from "payload";
 import type { Project } from "../../src/payload-types";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -507,6 +507,27 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect((await queries.findProjectCategoryBySlug(payload, "vi", "loai-x-danh-sach"))?.id).toBe(catX);
       expect(await queries.findProjectCategoryBySlug(payload, "en", "loai-x-danh-sach")).toBeNull();
       expect((await queries.listProvinces(payload)).map((province) => province.slug)).toEqual(expect.arrayContaining(["ha-noi", "da-nang-list"]));
+    });
+  });
+
+  describe("REST đọc không có ?locale (BL-021 #07)", () => {
+    // Bộ lọc quan hệ trong admin gọi GET /api/projects/:id?depth=0 không kèm locale để lấy nhãn; fallback tắt (BR-07) từng khiến title = null.
+    const getProject = async (id: string, query: string): Promise<Record<string, unknown>> => {
+      const response = await handleEndpoints({ config: payload.config, request: new Request(`http://localhost/api/projects/${id}?depth=0${query}`, { method: "GET" }) });
+      expect(response.status).toBe(200);
+      return (await response.json()) as Record<string, unknown>;
+    };
+
+    it("không locale → tên VI; locale=vi/en/all giữ nguyên hành vi (fallback vẫn tắt)", async () => {
+      const project = await createProject({ title: "Dự án nhãn bộ lọc", status: "published", gallery: [mediaIds[0]] });
+      await updateProject(project.id, { title: "Filter Label Project" }, { locale: "en" });
+      expect((await getProject(project.id, "")).title).toBe("Dự án nhãn bộ lọc");
+      expect((await getProject(project.id, "&locale=vi")).title).toBe("Dự án nhãn bộ lọc");
+      expect((await getProject(project.id, "&locale=en")).title).toBe("Filter Label Project");
+      expect((await getProject(project.id, "&locale=all")).title).toEqual({ vi: "Dự án nhãn bộ lọc", en: "Filter Label Project" });
+      // Danh sách (find) cũng đọc theo locale mặc định khi không nêu locale.
+      const listResponse = await handleEndpoints({ config: payload.config, request: new Request(`http://localhost/api/projects?depth=0&where[id][equals]=${project.id}`, { method: "GET" }) });
+      expect(((await listResponse.json()) as { docs: Array<{ title: unknown }> }).docs[0]?.title).toBe("Dự án nhãn bộ lọc");
     });
   });
 
