@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import { NewsListBody } from "@/components/news/NewsListBody";
 import { CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { parsePagination, type RawPageParam } from "@/lib/content/pagination";
 import { buildNewsChips, categoryFilterIds, loadNewsCategoryContext, loadNewsListing } from "@/lib/news/news-listing";
@@ -37,10 +38,11 @@ export async function NewsListPage({ locale, rawPage, categorySlug }: NewsListPa
   const context = categorySlug ? await loadNewsCategoryContext(payload, locale, categorySlug) : null;
   if (categorySlug && !context) notFound();
 
-  const [listing, t, tNav] = await Promise.all([
+  const [listing, t, tNav, bannerImage] = await Promise.all([
     loadNewsListing(payload, locale, { page, ...(context ? { categoryIds: categoryFilterIds(context) } : {}) }),
     getTranslations({ locale, namespace: "page.news" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
+    loadPageBanner(locale, "news"),
   ]);
   if (listing.outOfRange) notFound();
   const chips = await buildNewsChips(payload, locale, t("all"), context);
@@ -57,6 +59,7 @@ export async function NewsListPage({ locale, rawPage, categorySlug }: NewsListPa
     <CategoryListTemplate
       title={context?.category.name ?? t("title")}
       description={context ? (context.category.description ?? undefined) : t("description")}
+      bannerImage={bannerImage}
       breadcrumb={breadcrumb}
       chips={chips.length > 0 ? chips : undefined}
       parentListHref={listPath}

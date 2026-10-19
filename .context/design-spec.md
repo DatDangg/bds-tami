@@ -120,7 +120,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Kèm JSON-LD `BreadcrumbList` theo ngôn ngữ.
 
 ### 2.7. Page banner (đầu trang danh sách)
-- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)`, ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ đề xuất `site-settings.pageBanners` (§6.3).
+- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)`, ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
 - Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` + watermark phía sau (≥ md), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
 - Header trên trang có banner ảnh: biến thể Trong suốt.
 
@@ -335,7 +335,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### S04. Danh sách Cho thuê · `/cho-thue` · `/en/for-rent` (FR-PUB-04) · density 5
 
-- Page banner **Chữ** gọn (padding `--space-section-tight` × 0.6): tiêu đề "Cho thuê / For rent" + dòng mô tả. Breadcrumb.
+- Page banner §2.7: biến thể Ảnh nếu có `pageBanners.rentals` / `pageBanners.default` (FR-ADM-20), không thì **Chữ** gọn (padding `--space-section-tight` × 0.6): tiêu đề "Cho thuê / For rent" + dòng mô tả. Breadcrumb.
 - Bộ lọc §3.5 + hàng "Đang lọc" + số kết quả + sắp xếp.
 - Lưới thẻ Tin cho thuê, 12/trang (`limit=12`), phân trang §3.6.
 - Chip danh mục nhanh ngay trên lưới (link tới trang danh mục S05, không phải bộ lọc ẩn).
@@ -581,7 +581,7 @@ Responsive: theo màn cha.
 
 ## 6. Quyết định khối trang chủ + đề xuất thay đổi ERD
 
-> ✅ User duyệt 16/10/2026: §6.1 + §6.2 + `services.coverImage` đã đưa vào `docs/ERD.md`. **Không** làm `pageBanners`, `provinces.intro`. Hero: admin có thể chỉ dùng ảnh, video hoàn toàn tuỳ chọn.
+> ✅ User duyệt 16/10/2026: §6.1 + §6.2 + `services.coverImage` đã đưa vào `docs/ERD.md`. **Không** làm `pageBanners`, `provinces.intro` (đã đổi 19/10/2026: `pageBanners` làm ở BL-017, FR-ADM-20). Hero: admin có thể chỉ dùng ảnh, video hoàn toàn tuỳ chọn.
 
 ### 6.1. Ba khối còn lệch (Spec § Câu hỏi mở)
 
@@ -613,7 +613,7 @@ Kéo theo:
 
 | Đề xuất | Kiểu | Dùng ở | Nếu không thêm |
 |---|---|---|---|
-| `site-settings.pageBanners` (group: `projects`, `rentals`, `propertyPosts`, `news`, `careers`, `contact`; mỗi mục upload `rel→media`) | upload | Page banner Ảnh §2.7 (S02, S04, S05, S08, S10, S12, S15) | Dùng banner Chữ (đã thiết kế, không lỗi giao diện) |
+| `site-settings.pageBanners` (group: `default`, `projects`, `rentals`, `propertyPosts`, `news`, `careers`; mỗi mục upload `rel→media`) — **làm ở BL-017 (FR-ADM-20)**; `contact` (S15) chưa làm | upload | Page banner Ảnh §2.7 (S02, S04, S05, S08, S10, S12) | Dùng banner Chữ (đã thiết kế, không lỗi giao diện) |
 | `services.coverImage` | upload `rel→media`, R khi published | Hero S14, thẻ Dịch vụ trang chủ | Thẻ Dịch vụ trang chủ **cần ảnh**; trường `icon` hiện có không đủ cho thẻ ảnh 3:4. **Khuyến nghị thêm** (nếu không, thẻ dịch vụ phải đổi sang dạng chữ trên nền `--color-primary-subtle`) |
 | `provinces.intro` | textarea, localized | Trang đích khu vực S06 (SEO) | Dùng câu template i18n |
 

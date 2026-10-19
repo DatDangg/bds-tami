@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import { PostListBody } from "@/components/posts/PostListBody";
 import { CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { parsePagination, type RawPageParam } from "@/lib/content/pagination";
 import { findLocalizedSlugs } from "@/lib/news/news-queries";
@@ -37,10 +38,11 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
   const context = categorySlug ? await loadPostCategoryContext(payload, locale, categorySlug) : null;
   if (categorySlug && !context) notFound();
 
-  const [listing, t, tNav] = await Promise.all([
+  const [listing, t, tNav, bannerImage] = await Promise.all([
     loadPostListing(payload, locale, { page, now: new Date(), ...(context ? { categoryIds: postCategoryFilterIds(context) } : {}) }),
     getTranslations({ locale, namespace: "page.posts" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
+    loadPageBanner(locale, "propertyPosts"),
   ]);
   if (listing.outOfRange) notFound();
   const chips = await buildPostChips(payload, locale, t("all"), context);
@@ -57,6 +59,7 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
     <CategoryListTemplate
       title={context?.category.name ?? t("title")}
       description={context ? (context.category.description ?? undefined) : t("description")}
+      bannerImage={bannerImage}
       breadcrumb={breadcrumb}
       chips={chips.length > 0 ? chips : undefined}
       chipsLabel={t("tabsLabel")}

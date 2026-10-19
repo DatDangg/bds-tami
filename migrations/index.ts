@@ -26,6 +26,7 @@ import * as migration_20261018_130000_data_retention from './20261018_130000_dat
 import * as migration_20261018_140000_translate_content from './20261018_140000_translate_content';
 import * as migration_20261018_203017_rentals_reindex_job from './20261018_203017_rentals_reindex_job';
 import * as migration_20261018_212611_leads_remind_scan_index from './20261018_212611_leads_remind_scan_index';
+import * as migration_20261019_082627_site_settings_page_banners from './20261019_082627_site_settings_page_banners';
 
 export const migrations = [
   {
@@ -166,6 +167,11 @@ export const migrations = [
   {
     up: migration_20261018_212611_leads_remind_scan_index.up,
     down: migration_20261018_212611_leads_remind_scan_index.down,
-    name: '20261018_212611_leads_remind_scan_index'
+    name: '20261018_212611_leads_remind_scan_index',
+  },
+  {
+    up: migration_20261019_082627_site_settings_page_banners.up,
+    down: migration_20261019_082627_site_settings_page_banners.down,
+    name: '20261019_082627_site_settings_page_banners'
   },
 ];

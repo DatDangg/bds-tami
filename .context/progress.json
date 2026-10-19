@@ -369,6 +369,34 @@
       "completedAt": "2026-10-19",
       "phaseValidation": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-validation.md (GAPS: G1 ảnh trước/sau, G2 kiểm trình duyệt — residual chờ user; G3 doc reconcile đã làm)",
       "residual": "Ảnh trước/sau + kiểm trình duyệt 1440/768/390 sáng/tối (dashboard, list, form Projects/Leads/Cấu hình chung, lưu form, chọn bản ghi trong ListDrawer) — không có tài khoản test để đăng nhập admin"
+    },
+    {
+      "slug": "list-page-banner-image",
+      "title": "Ảnh banner trang danh sách: site-settings.pageBanners (mặc định + 5 trang) + PageBanner biến thể Ảnh, scrim AA riêng (BL-017)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-017",
+      "changeDoc": "spec/changes/archive/2026-10-19-list-page-banner-image.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-list-page-banner-image/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-list-page-banner-image-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": "2026-10-19",
+      "specVersion": "1.12.0",
+      "scopeVersion": 13,
+      "migration": "migrations/20261019_082627_site_settings_page_banners.ts (additive: 6 cột uuid nullable + FK media ON DELETE SET NULL + index)",
+      "specValidation": ".context/review-reports/feature-list-page-banner-image-spec-validation.md (PASS)",
+      "residual": "pnpm build chưa chạy (dev server khác giữ .next); chưa xem trình duyệt 375/768/1280; MINOR r1: truyền nguyên doc media xuống client, thiếu test nhánh lỗi load-page-banner + test NewsListPage/PostListPage, cache 60s khi xoá media banner; chiều cao 42svh/header trong suốt/băng tìm kiếm để BL-020; media-upload.test.ts:145 chập chờn khi chạy song song"
     }
   ],
   "bugs": [

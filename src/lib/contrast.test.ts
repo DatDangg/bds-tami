@@ -107,3 +107,27 @@ describe("tương phản token (tokens §9)", () => {
     expect(contrast(dark("--color-focus-ring"), dark("--color-bg"))).toBeGreaterThanOrEqual(UI);
   });
 });
+
+describe("PageBanner biến thể Ảnh: chữ trên scrim (FR-ADM-20)", () => {
+  // Trường hợp xấu nhất: ảnh trắng tinh (255) dưới scrim `--color-banner-scrim` (rgb + alpha).
+  function scrimOverWhite(token: string): string {
+    const match = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light(token));
+    if (!match) throw new Error(`${token} không phải rgb(r g b / a)`);
+    const [, r, g, b, alpha] = match;
+    const blend = (channel: string) => Math.round(Number(alpha) * Number(channel) + (1 - Number(alpha)) * 255);
+    return `#${[r, g, b].map((channel) => blend(channel!).toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  it("h1 (--color-on-dark) trên ảnh trắng đạt 4.5:1", () => {
+    expect(contrast(light("--color-on-dark"), scrimOverWhite("--color-banner-scrim"))).toBeGreaterThanOrEqual(TEXT);
+  });
+
+  it("mô tả dùng on-dark vì on-dark-muted không đạt 4.5:1 trên ảnh trắng", () => {
+    // PageBanner.tsx dùng `text-on-dark` cho mô tả; on-dark-muted không đạt trên ảnh sáng nên không được dùng ở đây.
+    expect(contrast(light("--color-on-dark-muted"), scrimOverWhite("--color-banner-scrim"))).toBeLessThan(TEXT);
+  });
+
+  it("không đổi --color-overlay dùng chung (hero, dialog, sheet)", () => {
+    expect(light("--color-overlay")).toBe("rgb(10 12 16 / 0.55)");
+  });
+});

@@ -53,10 +53,12 @@ const notFound = vi.hoisted(() =>
   }),
 );
 const replace = vi.hoisted(() => vi.fn());
+const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({ find: wardsFind, findByID }) }));
 vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ replace }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
 vi.mock("@/lib/content/public-queries", () => ({ findPublicList, findPublicBySlug }));
 vi.mock("@/lib/projects/project-queries", () => ({ listProvinces: async () => provinces }));
 vi.mock("@/lib/logger", () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
@@ -437,5 +439,24 @@ describe("generateMetadata của trang danh mục", () => {
     findPublicBySlug.mockResolvedValueOnce({ ...categories[0], seo: { noindex: true } });
     expect((await meta({}, "can-ho")).robots).toEqual({ index: false, follow: true });
     expect(await meta({}, "khong-co")).toEqual({});
+  });
+});
+
+describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
+  afterEach(() => loadPageBanner.mockReset());
+
+  it("có ảnh → biến thể Ảnh (scrim riêng), loader gọi đúng key \"rentals\"", async () => {
+    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+    const { container } = await render("vi");
+    expect(loadPageBanner).toHaveBeenCalledWith("vi", "rentals");
+    expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
+    expect(container.querySelector("section.bg-dark-deep img")).not.toBeNull();
+  });
+
+  it("không có ảnh (hoặc đọc lỗi) → banner chữ như trước", async () => {
+    loadPageBanner.mockResolvedValue(undefined);
+    const { container } = await render("vi");
+    expect(container.querySelector(".bg-banner-scrim")).toBeNull();
+    expect(container.querySelector("section.bg-bg-alt")).not.toBeNull();
   });
 });

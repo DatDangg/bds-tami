@@ -301,7 +301,7 @@ Không được bỏ trống mục này — Review sẽ FAIL nếu thiếu.
 Nguồn chi tiết: tokens `skills/react-nodejs/design-tokens.md`, screen specs `.context/design-spec.md`.
 
 - **Tokens:** 4 giá trị đổi để đạt WCAG AA (Text Muted `#6B6B6B`, Accent Display `#A07A3F`, Warning `#8A5A0A`, thêm Border Input `#857F79`); bảng màu ở trên đã cập nhật.
-- **Trang chủ:** hero dùng ảnh (bắt buộc), video **tuỳ chọn** từng slide: admin có thể chỉ dùng ảnh. **Bỏ** dải 4 lối tắt. **Giữ** banner CTA tối (khối `ctaBanner`). Thẻ Dịch vụ dùng ảnh `services.coverImage`. Không làm `pageBanners` / `provinces.intro` (dùng banner chữ / câu mẫu).
+- **Trang chủ:** hero dùng ảnh (bắt buộc), video **tuỳ chọn** từng slide: admin có thể chỉ dùng ảnh. **Bỏ** dải 4 lối tắt. **Giữ** banner CTA tối (khối `ctaBanner`). Thẻ Dịch vụ dùng ảnh `services.coverImage`. Không làm `provinces.intro` (dùng câu mẫu). `pageBanners` (ảnh banner trang danh sách + ảnh mặc định trong Cài đặt website) **làm ở BL-017** (FR-ADM-20, user chốt 2026-10-19); chưa có ảnh → banner chữ.
 - **SEO:** tin "Đã thuê" và tin tuyển dụng quá hạn vẫn mở trang (có băng thông báo), gắn `noindex, follow`, bỏ khỏi sitemap; tuyển dụng quá hạn ẩn form và bỏ JSON-LD `JobPosting`.
 - **Cookie:** banner đồng ý không chặn trang, nút Từ chối ngang hàng Đồng ý; GA4 chỉ tải sau khi đồng ý.
 - **Eyebrow:** tối đa 1 trên 3 section.

@@ -13,6 +13,7 @@ import { findJobCategoryBySlug, listChildJobCategories, listOpenJobs, listRootJo
 import { toJobCards } from "@/lib/careers/job-view";
 import { publicPath } from "@/lib/content/content-paths";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { parsePagination } from "@/lib/content/pagination";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
@@ -91,12 +92,13 @@ export async function JobListPage({ locale, searchParams }: JobListPageProps) {
   const { page } = parsePagination(searchParams.page, undefined);
   const filters = parseJobFilters(searchParams);
   const payload = await getPayload({ config });
-  const [context, provinces, t, tNav, roots] = await Promise.all([
+  const [context, provinces, t, tNav, roots, bannerImage] = await Promise.all([
     filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
     listProvinces(payload),
     getTranslations({ locale, namespace: "page.careers" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     listRootJobCategories(payload, locale),
+    loadPageBanner(locale, "careers"),
   ]);
   const province = provinces.find((item) => item.slug === filters.provinceSlug);
   const now = new Date();
@@ -118,6 +120,7 @@ export async function JobListPage({ locale, searchParams }: JobListPageProps) {
     <CategoryListTemplate
       title={t("title")}
       description={t("description")}
+      bannerImage={bannerImage}
       breadcrumb={[{ label: tNav("careers"), href: listPath }]}
       chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
       chipsLabel={t("categoriesLabel")}

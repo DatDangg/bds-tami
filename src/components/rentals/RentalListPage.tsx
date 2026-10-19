@@ -14,6 +14,7 @@ import { RentalFilters } from "@/components/rentals/RentalFilters";
 import { RentalPendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
 import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
 import { publicPath } from "@/lib/content/content-paths";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { logger } from "@/lib/logger";
 import { visibleCategory } from "@/lib/news/news-view";
 import { listProvinces } from "@/lib/projects/project-queries";
@@ -88,10 +89,11 @@ function categoryChips(filters: RentalFilterValues, options: RentalFilterOptions
  */
 export async function RentalListPage({ locale, searchParams, categorySlug }: RentalListPageProps) {
   const parsed = parseRentalFilters(searchParams);
-  const [{ payload, options, filters }, t, tNav] = await Promise.all([
+  const [{ payload, options, filters }, t, tNav, bannerImage] = await Promise.all([
     loadFilterContext(locale, categorySlug ? withoutCategory(parsed) : parsed),
     getTranslations({ locale, namespace: "page.rentals" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
+    loadPageBanner(locale, "rentals"),
   ]);
   const category = categorySlug ? await findRentalCategory(payload, locale, categorySlug) : null;
   if (categorySlug && !category) notFound();
@@ -115,7 +117,11 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
 
   return (
     <>
-      <PageBanner title={category?.name ?? t("title")} description={category ? (category.description ?? undefined) : t("description")} />
+      <PageBanner
+        title={category?.name ?? t("title")}
+        description={category ? (category.description ?? undefined) : t("description")}
+        image={bannerImage}
+      />
       <Breadcrumb items={breadcrumb} className="py-2" />
       <RentalListNavigationProvider actionPath={listPath}>
         <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter pt-4 pb-section-tight">

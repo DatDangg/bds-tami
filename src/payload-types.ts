@@ -2396,6 +2396,20 @@ export interface SiteSetting {
    */
   mapLocation?: [number, number] | null;
   /**
+   * Ảnh nền đầu trang danh sách. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ.
+   */
+  pageBanners?: {
+    /**
+     * Dùng cho trang danh sách chưa có ảnh riêng.
+     */
+    default?: (string | null) | Media;
+    projects?: (string | null) | Media;
+    rentals?: (string | null) | Media;
+    propertyPosts?: (string | null) | Media;
+    news?: (string | null) | Media;
+    careers?: (string | null) | Media;
+  };
+  /**
    * Số hiển thị và gọi từ nút nổi (FR-PUB-12)
    */
   hotline?: string | null;
@@ -2742,6 +2756,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   favicon?: T;
   address?: T;
   mapLocation?: T;
+  pageBanners?:
+    | T
+    | {
+        default?: T;
+        projects?: T;
+        rentals?: T;
+        propertyPosts?: T;
+        news?: T;
+        careers?: T;
+      };
   hotline?: T;
   zaloUrl?: T;
   fanpageUrl?: T;

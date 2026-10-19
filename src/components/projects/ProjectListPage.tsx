@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
 import { CategoryListTemplate, type CategoryChip } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { parsePagination } from "@/lib/content/pagination";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { visibleCategory } from "@/lib/news/news-view";
@@ -68,12 +69,13 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
   const { page } = parsePagination(searchParams.page, undefined);
   const filters = parseProjectFilters(searchParams);
   const payload = await getPayload({ config });
-  const [context, provinces, t, tNav, roots] = await Promise.all([
+  const [context, provinces, t, tNav, roots, bannerImage] = await Promise.all([
     filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
     listProvinces(payload),
     getTranslations({ locale, namespace: "page.projects" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     listRootProjectCategories(payload, locale),
+    loadPageBanner(locale, "projects"),
   ]);
   const province = provinces.find((item) => item.slug === filters.provinceSlug);
   const listing = await listPublicProjects(payload, locale, {
@@ -93,6 +95,7 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
     <CategoryListTemplate
       title={t("title")}
       description={t("description")}
+      bannerImage={bannerImage}
       breadcrumb={[{ label: tNav("projects"), href: listPath }]}
       chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
       chipsLabel={t("categoriesLabel")}

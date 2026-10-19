@@ -23,6 +23,8 @@
   --color-border: #e8e6e3;
   --color-input-border: #857f79;
   --color-overlay: rgb(10 12 16 / 0.55);
+  /* Scrim riêng của PageBanner biến thể Ảnh: đậm hơn --color-overlay (hero dùng chung) để chữ trắng đạt 4.5:1 cả trên ảnh trắng tinh (FR-ADM-20). */
+  --color-banner-scrim: rgb(10 12 16 / 0.6);
 
   --color-text: #141414;
   --color-text-secondary: #555555;

@@ -56,10 +56,12 @@ const notFound = vi.hoisted(() =>
     throw new Error("NEXT_NOT_FOUND");
   }),
 );
+const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
 vi.mock("next/navigation", () => ({ notFound }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
 vi.mock("@/lib/projects/project-queries", () => ({
   listProvinces: async () => [hanoi, danang],
   listRootProjectCategories: async (_payload: unknown, locale: string) => ({
@@ -229,5 +231,24 @@ describe("generateMetadata", () => {
     }
     const en = await buildProjectListMetadata({ locale: "en", searchParams: { category: "can-ho" } });
     expect(en.alternates?.canonical).toBe("https://tami.example/en/projects");
+  });
+});
+
+describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
+  afterEach(() => loadPageBanner.mockReset());
+
+  it("có ảnh → biến thể Ảnh (scrim riêng), loader gọi đúng key \"projects\"", async () => {
+    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+    const { container } = await render("vi");
+    expect(loadPageBanner).toHaveBeenCalledWith("vi", "projects");
+    expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
+    expect(container.querySelector("section.bg-dark-deep img")).not.toBeNull();
+  });
+
+  it("không có ảnh (hoặc đọc lỗi) → banner chữ như trước", async () => {
+    loadPageBanner.mockResolvedValue(undefined);
+    const { container } = await render("vi");
+    expect(container.querySelector(".bg-banner-scrim")).toBeNull();
+    expect(container.querySelector("section.bg-bg-alt")).not.toBeNull();
   });
 });

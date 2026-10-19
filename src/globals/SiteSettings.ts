@@ -88,6 +88,26 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
           ],
         },
         {
+          label: "Ảnh banner",
+          fields: [
+            {
+              // Không localized: VI và EN dùng chung ảnh (ảnh banner là trang trí, `alt` rỗng). FR-ADM-20.
+              name: "pageBanners",
+              type: "group",
+              label: "Ảnh banner trang danh sách",
+              admin: { description: "Ảnh nền đầu trang danh sách. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ." },
+              fields: [
+                { ...imageUpload("default", "Ảnh mặc định"), admin: { description: "Dùng cho trang danh sách chưa có ảnh riêng." } },
+                imageUpload("projects", "Dự án"),
+                imageUpload("rentals", "Cho thuê"),
+                imageUpload("propertyPosts", "Đăng tin BĐS"),
+                imageUpload("news", "Tin tức"),
+                imageUpload("careers", "Tuyển dụng"),
+              ],
+            },
+          ],
+        },
+        {
           label: "Liên hệ & mạng xã hội",
           fields: [
             { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },

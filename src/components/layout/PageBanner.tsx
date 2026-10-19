@@ -19,10 +19,10 @@ export function PageBanner({ title, description, image, watermark, children }: P
     return (
       <section className="relative isolate flex h-[clamp(240px,42svh,440px)] items-center justify-center overflow-hidden bg-dark-deep">
         <ResponsiveImage media={image} sizes="100vw" priority decorative className="absolute inset-0 -z-10" />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-overlay" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-banner-scrim" />
         <div className="mx-auto flex w-full max-w-container flex-col items-center gap-4 px-gutter text-center text-on-dark">
           <h1 className="font-display text-h1 uppercase">{title}</h1>
-          {description && <p className="max-w-[60ch] text-lead text-on-dark-muted">{description}</p>}
+          {description && <p className="max-w-[60ch] text-lead text-on-dark">{description}</p>}
           {children}
         </div>
       </section>

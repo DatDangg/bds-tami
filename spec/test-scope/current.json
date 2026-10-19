@@ -1,90 +1,106 @@
 {
-  "specVersion": "1.11.0",
-  "scopeVersion": 12,
-  "generatedAt": "2026-10-19T23:30:00+07:00",
+  "specVersion": "1.12.0",
+  "scopeVersion": 13,
+  "generatedAt": "2026-10-19T23:55:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/admin-ui-saas-refresh",
-  "backlog": "BL-015",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-admin-ui-saas-refresh.md",
-  "changeDocNote": "Đường dẫn hiện tại; chuyển sang spec/changes/archive/ khi change đóng",
+  "workItem": "feature/list-page-banner-image",
+  "backlog": "BL-017",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-10-19-list-page-banner-image.md",
   "task": [
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-01.md",
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-02.md",
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-03.md",
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-04.md",
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-05.md",
-    "tasks/feature-admin-ui-saas-refresh/phase-1-task-06.md"
+    "tasks/feature-list-page-banner-image/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-admin-ui-saas-refresh.md",
+  "specUpdate": "spec/updates/2026-10-19-list-page-banner-image.md",
   "specRefs": [
-    "FR-ADM-19",
-    "FR-ADM-14",
+    "FR-ADM-20",
+    "FR-PUB-02",
+    "FR-PUB-04",
+    "FR-PUB-06",
+    "FR-PUB-08",
+    "FR-PUB-09",
     "NFR-07"
   ],
   "specRefNotes": {
-    "FR-ADM-19": "THÊM (F10) — giao diện quản trị kiểu SaaS: style/tokens AA sáng+tối, sidebar 7 nhóm tiếng Việt, nhãn tiếng Việt toàn bộ, Tổng quan theo quyền, list badge/thumbnail, form tab không tên/row/collapsible",
-    "FR-ADM-14": "Không đổi chữ — dashboard (Should, docs/BRD.md): màn Tổng quan của FR-ADM-19 là khung để FR-ADM-14 (biểu đồ, lượt bấm, chi phí dịch) cắm vào sau",
-    "NFR-07": "Không đổi chữ — responsive mobile-first + WCAG: admin không vỡ ở 390px, contrast AA"
+    "FR-ADM-20": "THÊM (F10) — site-settings nhóm 'Ảnh banner trang danh sách' (mặc định + Dự án/Cho thuê/Đăng tin BĐS/Tin tức/Tuyển dụng, không localized, chỉ admin sửa); trang danh sách + danh mục con: ảnh riêng → mặc định → biến thể Chữ; scrim AA, priority, không CLS",
+    "FR-PUB-02": "Không đổi chữ — trang danh sách Dự án /du-an hiển thị banner theo FR-ADM-20",
+    "FR-PUB-04": "Không đổi chữ — trang danh sách Cho thuê /cho-thue + danh mục con hiển thị banner theo FR-ADM-20",
+    "FR-PUB-06": "Không đổi chữ — trang danh sách Đăng tin BĐS /tin-bds + danh mục con hiển thị banner theo FR-ADM-20",
+    "FR-PUB-08": "Không đổi chữ — trang danh sách Tin tức /tin-tuc + danh mục con hiển thị banner theo FR-ADM-20",
+    "FR-PUB-09": "Không đổi chữ — trang danh sách Tuyển dụng /tuyen-dung hiển thị banner theo FR-ADM-20",
+    "NFR-07": "Không đổi chữ — chữ trên ảnh banner contrast AA, responsive"
   },
   "changed": {
     "files": [
-      "src/app/(payload)/custom.scss",
-      "src/app/(payload)/admin/importMap.js",
-      "src/components/admin/** (admin-tokens, admin-groups, styles/*, dashboard/*, StatusBadge, status-tones, ThumbnailCell, LinkedCell, TitleLinkCell, AssigneeCell, row-labels/*)",
-      "src/lib/admin/* (collection-labels, form-layout, row-label)",
-      "src/collections/* (nhãn, admin.group qua plugin, Cell, defaultColumns, tab không tên/row)",
-      "src/collections/_shared/content-defaults.ts",
-      "src/globals/* (nhãn, tab)",
-      "src/fields/* (nhãn, Cell trạng thái/tiêu đề, scoped-category vào tab)",
-      "src/lib/translation/admin-ui.ts",
-      "src/lib/click-stats/click-types.ts",
-      "src/payload.config.ts",
-      "src/payload-types.ts (chỉ thứ tự/JSDoc)",
-      "tests/unit/admin-labels.test.ts",
-      "tests/integration/admin-dashboard.test.ts",
-      "tests/integration/admin-form-layout.test.ts"
+      "src/globals/SiteSettings.ts",
+      "migrations/20261019_082627_site_settings_page_banners.ts",
+      "migrations/20261019_082627_site_settings_page_banners.json",
+      "migrations/index.ts",
+      "src/payload-types.ts",
+      "src/lib/content/page-banner.ts",
+      "src/lib/content/load-page-banner.ts",
+      "src/lib/content/page-banner.test.ts",
+      "src/components/layout/PageBanner.tsx",
+      "src/components/layout/PageBanner.test.tsx",
+      "src/app/(frontend)/globals.css",
+      "src/lib/contrast.test.ts",
+      "src/components/projects/ProjectListPage.tsx",
+      "src/components/projects/ProjectListPage.test.tsx",
+      "src/components/rentals/RentalListPage.tsx",
+      "src/components/rentals/RentalListPage.test.tsx",
+      "src/components/posts/PostListPage.tsx",
+      "src/components/news/NewsListPage.tsx",
+      "src/components/careers/JobListPage.tsx",
+      "src/components/careers/JobListPage.test.tsx",
+      "docs/ERD.md",
+      "docs/ARCHITECTURE.md"
     ],
-    "filesNote": "chốt theo diff thật 1c0554a..fb4d797 (close-out 2026-10-19)",
+    "filesNote": "dự kiến — builder chốt theo diff thật lúc close-out (có thể thêm test contrast scrim, CategoryListTemplate, docs/ERD.md)",
     "modules": [
-      "Payload admin UI — style/tokens (custom.scss)",
-      "Payload admin config — labels, admin.group, defaultColumns, tab/row/collapsible, sidebar fields",
-      "Admin components — Dashboard (Tổng quan), Cell badge/thumbnail, RowLabel"
+      "Payload global site-settings (schema + admin tab 'Ảnh banner')",
+      "DB migration additive trên site_settings",
+      "Public layout — PageBanner biến thể Ảnh (scrim riêng)",
+      "Trang danh sách công khai VI/EN: Dự án, Cho thuê, Đăng tin BĐS, Tin tức, Tuyển dụng (+ danh mục con)"
     ]
   },
   "impact": {
     "direct": [
-      "Style chung /admin sáng + tối: nền/viền trung tính ấm, nhấn TAMI #8C6733 (tối #E0BF89) chỉ ở nút chính/link/focus/mục chọn; contrast chữ ≥ 4.5:1, biên điều khiển ≥ 3:1; select admin cùng style",
-      "Sidebar 7 nhóm nghiệp vụ tiếng Việt (Khách hàng · Nội dung · Tuyển dụng · Thư viện · Danh mục · Website · Hệ thống), không icon, mọi mục giữ nguyên",
-      "Nhãn tiếng Việt cho mọi collection/global/field hiển thị/option/hàng array (kể cả redirects, Media, PrivateFiles)",
-      "Tổng quan: thẻ đếm theo vai trò (admin vs sale), lối tắt tạo nội dung, lead mới nhất, "Bài của bạn cập nhật gần đây" — đếm qua Local API overrideAccess: false; không quyền → không thẻ/lối tắt",
-      "Danh sách: badge trạng thái có chữ, thumbnail 40px (projects/rentals = gallery[0], property-posts/news = cover), dòng 48px, defaultColumns",
-      "Form: tab không tên / row / collapsible, trường phụ sidebar phải (projects, rentals, property-posts, news, job-postings, services, leads, homepage, site-settings)"
+      "Admin › Cài đặt website: nhóm 'Ảnh banner trang danh sách' gồm Ảnh mặc định + Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng (nhãn VI, chỉ ảnh từ media); lưu và đọc lại đúng",
+      "Trang danh sách có ảnh riêng → banner biến thể Ảnh dùng ảnh riêng",
+      "Trang danh sách không có ảnh riêng nhưng có ảnh mặc định → dùng ảnh mặc định",
+      "Không có cả ảnh riêng lẫn mặc định → biến thể Chữ y như trước",
+      "Danh mục con /cho-thue/danh-muc/*, /tin-bds/danh-muc/*, /tin-tuc/danh-muc/* dùng ảnh của trang danh sách cha",
+      "VI và /en cùng ảnh (field không localized)",
+      "Biến thể Ảnh: tiêu đề + mô tả chữ trắng ≥ 4.5:1 kể cả trên ảnh trắng; ảnh priority (LCP); khung cao cố định, không CLS"
     ],
     "dependents": [
-      "Mọi role đăng nhập /admin (admin, sale) — menu, dashboard, list, form",
-      "Hook/validate/condition dùng siblingData trên các field được bọc tab/row/collapsible",
-      "payload-types.ts (có thể đổi comment do label) — không đổi kiểu dữ liệu"
+      "PageBanner + CategoryListTemplate dùng chung ở nhiều trang danh sách",
+      "getSiteSettings (cache theo tag) — trang danh sách nay đọc thêm site-settings",
+      "payload-types.ts (thêm kiểu pageBanners)",
+      "Test quét nhãn admin (admin-labels) phải vẫn PASS với field mới"
     ],
     "regression": [
-      "Lưu/đọc nội dung mọi collection + global qua admin giữ nguyên dữ liệu (đường dẫn field không đổi, không migration)",
-      "Quyền sale ở admin: chỉ thấy mục/số liệu/lối tắt trong quyền; không lộ lead không được giao",
-      "Nút dịch (translation buttons) trên form vẫn hoạt động",
-      "Xuất Excel lead (bộ lọc, nút khoá/ẩn) không đổi",
-      "Tải CV hồ sơ ứng tuyển (PrivateFiles) không đổi",
-      "Site public (src/app/(frontend)) không đổi"
+      "Biến thể Chữ khi không có ảnh (watermark, mô tả danh mục) không đổi",
+      "Header và hero trang chủ không đổi (token --color-overlay toàn cục giữ nguyên)",
+      "site-settings đọc lỗi → trang danh sách vẫn render biến thể Chữ, không 500",
+      "Lưu/đọc các tab khác của Cài đặt website (logo, liên hệ, mạng xã hội...) giữ nguyên dữ liệu",
+      "Quyền: sale không sửa được site-settings; đọc công khai không đổi",
+      "ISR/dynamic của các route danh sách không đổi; bộ lọc/phân trang danh sách không đổi",
+      "Migration chạy up trên DB có dữ liệu: chỉ thêm cột nullable, dữ liệu cũ giữ nguyên"
     ]
   },
   "acceptance": [
-    "Style chung (nền/viền trung tính, bo góc, bóng, khoảng cách, typography) nhất quán sáng + tối; giữ màu nhấn TAMI; mọi cặp chữ/nền ≥ 4.5:1, UI ≥ 3:1",
-    "Dashboard tuỳ biến có thống kê nhanh + lối tắt, tôn trọng phân quyền (role không có quyền collection thì không thấy số liệu/lối tắt của nó)",
-    "Sidebar nhóm theo nghiệp vụ, nhãn tiếng Việt",
-    "Việt hoá toàn bộ nhãn admin (field, collection, global, option select, hàng array — kể cả redirects, Media/PrivateFiles); test quét config: không field hiển thị nào thiếu label",
-    "Màn danh sách các collection chính có cột mặc định + badge trạng thái + thumbnail (nơi có ảnh)",
-    "Form các collection chính chia tab/nhóm, trường phụ ở sidebar",
-    "Không đổi schema/DB, access control, API — chỉ cấu hình admin.* + CSS + component admin (không sinh migration)",
-    "Responsive admin không vỡ ở mobile/tablet (390px)",
-    "Ảnh chụp trước/sau các màn chính để user duyệt"
+    "Admin › Cài đặt website có nhóm 'Ảnh banner trang danh sách': Ảnh mặc định + Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng (nhãn VI; test quét nhãn admin PASS)",
+    "Trang danh sách: ảnh riêng → biến thể Ảnh; thiếu → ảnh mặc định; thiếu cả hai → biến thể Chữ như trước",
+    "Trang danh mục con dùng ảnh của danh sách cha",
+    "Chữ trên ảnh ≥ 4.5:1 ở trường hợp ảnh trắng (test contrast); ảnh priority; khung cao cố định (không CLS)",
+    "VI và EN cùng ảnh",
+    "Migration versioned additive (chỉ ADD COLUMN nullable + FK/index), không HIGH_RISK",
+    "site-settings đọc lỗi → trang vẫn render biến thể Chữ (không 500)"
+  ],
+  "outOfScope": [
+    "BL-020: banner thấp ~240px, băng tìm kiếm dưới banner, header trong suốt trên banner ảnh",
+    "Trang Liên hệ và chi tiết dịch vụ không dùng nhóm ảnh này",
+    "BL-018 (logo vàng) không thuộc scope này"
   ],
   "viewports": [
     390,
@@ -92,6 +108,8 @@
     1280
   ],
   "uiTests": true,
+  "migration": "additive",
   "risk": "medium",
-  "riskNote": "Chỉ UI admin (CSS + config admin.* + component admin), không schema/API/access. Điểm rủi ro: dashboard đếm theo quyền (RBAC — T04 STRICT) và bọc field vào tab/row/collapsible có thể đổi đường dẫn dữ liệu nếu sai loại (T06 STRICT — phải chứng minh không migration). Site public không đổi."
+  "riskNote": "Schema/migration additive trên site_settings (6 cột upload nullable + FK media) và shared component PageBanner/CategoryListTemplate dùng ở nhiều trang danh sách → reviewer STRICT. Không đổi quyền/API; header/hero không đổi.",
+  "filesNote": "Chốt theo diff thật lúc close-out (STRICT PASS round 1)"
 }
