@@ -150,7 +150,7 @@ describe("S12 /tuyen-dung: render", () => {
     await render("vi", { province: "ho-chi-minh" });
     expect(listOpenJobs).toHaveBeenCalledWith({}, "vi", { page: 1, now: NOW, provinceId: "p2" });
     expect(cardTitles()).toEqual(["Tư vấn BĐS"]);
-    expect(screen.getByLabelText("Nơi làm việc")).toHaveValue("ho-chi-minh");
+    expect(document.querySelector("input[name=province]")).toHaveValue("ho-chi-minh");
     expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/tuyen-dung");
   });
 

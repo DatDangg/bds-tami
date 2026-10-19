@@ -1,4 +1,5 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import type userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactElement } from "react";
 import en from "@/i18n/messages/en.json";
@@ -27,4 +28,10 @@ export function fakeMedia(name: string, alt = `Ảnh ${name}`): MediaImage {
       large: { url: `/api/media/file/${name}-1600.webp`, width: 1600 },
     },
   };
+}
+
+/** Chọn một mục của ô chọn TAMI (Radix) bằng bàn phím/chuột: mở trigger rồi bấm option theo tên. */
+export async function chooseOption(user: ReturnType<typeof userEvent.setup>, trigger: HTMLElement, optionName: string | RegExp) {
+  await user.click(trigger);
+  await user.click(await screen.findByRole("option", { name: optionName }));
 }

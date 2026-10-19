@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { renderWithIntl } from "../media/test-utils";
+import { chooseOption, renderWithIntl } from "../media/test-utils";
 import { FormField } from "./FormField";
 
 describe("FormField", () => {
@@ -33,10 +34,70 @@ describe("FormField", () => {
     );
     expect(screen.getByLabelText("Lời nhắn").tagName).toBe("TEXTAREA");
     expect(screen.getByLabelText("Lời nhắn")).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByLabelText("Nguồn").tagName).toBe("SELECT");
+    expect(screen.getByLabelText("Nguồn")).toHaveAttribute("role", "combobox");
     const file = screen.getByLabelText("CV");
     expect(file).toHaveAttribute("type", "file");
     expect(file).toHaveAttribute("accept", ".pdf,.doc,.docx");
     expect(file).toHaveAttribute("aria-invalid", "true");
+  });
+
+  describe("select (Select TAMI)", () => {
+    const sourceOptions = [
+      { value: "", label: "Chọn nguồn" },
+      { value: "fb", label: "Facebook" },
+      { value: "friend", label: "Bạn bè" },
+    ];
+
+    it("giữ id/label, aria-invalid, aria-describedby, aria-required và disabled trên trigger", () => {
+      renderWithIntl(
+        <FormField as="select" name="source" label="Nguồn" required requiredLabel="bắt buộc" helper="Gợi ý" error="Chưa chọn." options={sourceOptions} />,
+      );
+      const trigger = screen.getByLabelText(/Nguồn/);
+      expect(trigger).toHaveAttribute("aria-invalid", "true");
+      expect(trigger).toHaveAttribute("aria-required", "true");
+      expect(trigger.getAttribute("aria-describedby")?.split(" ")).toHaveLength(2);
+      expect(trigger).toHaveTextContent("Chọn nguồn");
+    });
+
+    it("submit qua input ẩn có name: rỗng khi chưa chọn, giá trị thật sau khi chọn (không lộ sentinel)", async () => {
+      const user = userEvent.setup();
+      const { container } = renderWithIntl(
+        <form>
+          <FormField as="select" name="source" label="Nguồn" options={sourceOptions} />
+        </form>,
+      );
+      const form = container.querySelector("form") as HTMLFormElement;
+      expect(new FormData(form).get("source")).toBe("");
+      await chooseOption(user, screen.getByLabelText("Nguồn"), "Bạn bè");
+      expect(new FormData(form).get("source")).toBe("friend");
+      expect(screen.getByLabelText("Nguồn")).toHaveTextContent("Bạn bè");
+    });
+
+    it("không có mục rỗng: hiện placeholder (data-placeholder) và FormData là chuỗi rỗng", () => {
+      const { container } = renderWithIntl(
+        <form>
+          <FormField as="select" name="source" label="Nguồn" placeholder="Chọn nguồn…" options={sourceOptions.slice(1)} />
+        </form>,
+      );
+      const trigger = screen.getByLabelText("Nguồn");
+      expect(trigger).toHaveTextContent("Chọn nguồn…");
+      expect(trigger).toHaveAttribute("data-placeholder");
+      expect(new FormData(container.querySelector("form") as HTMLFormElement).get("source")).toBe("");
+    });
+
+    it("giá trị không khớp mục nào coi như rỗng (hiện placeholder, không gửi giá trị lạ)", () => {
+      const { container } = renderWithIntl(
+        <form>
+          <FormField as="select" name="source" label="Nguồn" placeholder="Chọn nguồn…" defaultValue="zzz" options={sourceOptions.slice(1)} />
+        </form>,
+      );
+      expect(screen.getByLabelText("Nguồn")).toHaveTextContent("Chọn nguồn…");
+      expect(new FormData(container.querySelector("form") as HTMLFormElement).get("source")).toBe("");
+    });
+
+    it("disabled: trigger khoá", () => {
+      renderWithIntl(<FormField as="select" name="source" label="Nguồn" disabled options={sourceOptions} />);
+      expect(screen.getByLabelText("Nguồn")).toBeDisabled();
+    });
   });
 });

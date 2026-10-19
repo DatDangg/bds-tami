@@ -18,14 +18,14 @@ export function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-surface px-4 font-sans text-body text-text focus-visible:border-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 aria-invalid:border-error data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1",
+        "flex h-12 w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-surface px-4 font-sans text-body text-text focus-visible:border-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 aria-invalid:border-error data-[placeholder]:text-muted-foreground [&>span]:min-w-0 [&>span]:truncate [&>span]:text-left",
         className,
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <CaretDown size={16} aria-hidden="true" />
+        <CaretDown size={16} aria-hidden="true" className="shrink-0" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -43,8 +43,9 @@ export function SelectContent({
         data-slot="select-content"
         position={position}
         sideOffset={4}
+        collisionPadding={8}
         className={cn(
-          "relative z-(--z-modal) max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) overflow-y-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out",
+          "relative z-(--z-modal) max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) max-w-(--radix-select-content-available-width) overflow-y-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out",
           className,
         )}
         {...props}

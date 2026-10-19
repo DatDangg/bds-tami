@@ -1,6 +1,10 @@
 import { screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
+import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
+import { NextIntlClientProvider } from "next-intl";
+import vi_ from "@/i18n/messages/vi.json";
+import { describe, expect, it, vi } from "vitest";
+import { chooseOption, fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { ProjectCardData } from "@/lib/projects/project-view";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectFilters } from "./ProjectFilters";
@@ -75,16 +79,12 @@ describe("ProjectFilters", () => {
     // next/form: GET là mặc định của <form> nên không ghi `method`; vẫn là form GET thường khi không có JS.
     expect(form.getAttribute("method")).toBeNull();
     expect(form).toHaveAttribute("action", "/du-an");
-    expect(screen.getByLabelText("Tỉnh/thành")).toHaveValue("da-nang");
-    expect(screen.getByLabelText("Trạng thái")).toHaveValue("upcoming");
-    expect(within(screen.getByLabelText("Trạng thái")).getAllByRole("option").map((option) => option.textContent)).toEqual([
-      "Tất cả",
-      "Sắp mở bán",
-      "Đang mở bán",
-      "Đã bàn giao",
-    ]);
+    // Sau mount: Select TAMI; trigger có nhãn, hiện mục đang chọn, giá trị gửi đi nằm ở input ẩn có name.
+    expect(screen.getByLabelText("Tỉnh/thành")).toHaveTextContent("Đà Nẵng");
+    expect(screen.getByLabelText("Trạng thái")).toHaveTextContent("Sắp mở bán");
+    expect(container.querySelector("input[type=hidden][name=province]")).toHaveValue("da-nang");
+    expect(container.querySelector("input[type=hidden][name=status]")).toHaveValue("upcoming");
     expect(screen.getByRole("button", { name: "Lọc" })).toHaveAttribute("type", "submit");
-    expect(container.querySelector("input[type=hidden]")).toBeNull();
   });
 
   it("nút Xoá bộ lọc là link thật về trang không tham số, chỉ hiện khi đang lọc", () => {
@@ -95,11 +95,36 @@ describe("ProjectFilters", () => {
     expect(screen.queryByRole("link", { name: "Xoá bộ lọc" })).toBeNull();
   });
 
+  it("no-JS: SSR vẫn render <select name> gốc (lọc được bằng form GET), giữ giá trị chọn sẵn, không có sentinel", () => {
+    const html = renderToString(
+      <NextIntlClientProvider locale="vi" messages={vi_}>
+        <ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" active={false} />
+      </NextIntlClientProvider>,
+    );
+    expect(html).toContain('<select id="project-filter-province" name="province"');
+    expect(html).toContain('<select id="project-filter-status" name="status"');
+    expect(html).toMatch(/<option value="da-nang" selected="">/);
+    expect(html).toContain('<option value="" selected="">Tất cả</option>');
+    expect(html).not.toContain("__tami_empty__");
+  });
+
+  it("chọn 'Tất cả' gửi giá trị rỗng (không lộ sentinel) và chưa gửi form khi đổi (WCAG 3.2.2)", async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" active />);
+    const submit = vi.fn((event: Event) => event.preventDefault());
+    container.querySelector("form")?.addEventListener("submit", submit);
+    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Hà Nội");
+    expect(container.querySelector("input[name=province]")).toHaveValue("ha-noi");
+    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Tất cả");
+    expect(container.querySelector("input[name=province]")).toHaveValue("");
+    expect(new FormData(container.querySelector("form") as HTMLFormElement).get("province")).toBe("");
+    expect(submit).not.toHaveBeenCalled();
+  });
+
   it("giữ ?category= bằng input ẩn; EN dùng nhãn tiếng Anh", () => {
     const { container } = renderWithIntl(<ProjectFilters actionPath="/en/projects" provinces={provinces} hiddenCategory="apartments" active={false} />, "en");
     expect(container.querySelector("input[type=hidden][name=category]")).toHaveAttribute("value", "apartments");
     expect(screen.getByLabelText("Province/city")).toBeInTheDocument();
     expect(screen.getByLabelText("Status")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Now selling" })).toBeInTheDocument();
   });
 });

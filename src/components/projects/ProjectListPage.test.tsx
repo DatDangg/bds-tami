@@ -128,14 +128,14 @@ describe("S02 /du-an: render", () => {
     await render("vi", { province: "da-nang" });
     expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, provinceId: "p2" });
     expect(cardTitles()).toEqual(["Biển Đà Nẵng"]);
-    expect(screen.getByLabelText("Tỉnh/thành")).toHaveValue("da-nang");
+    expect(document.querySelector("input[name=province]")).toHaveValue("da-nang");
     expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
   });
 
   it("lọc theo trạng thái mở bán và kết hợp tỉnh + trạng thái", async () => {
     await render("vi", { status: "upcoming" });
     expect(cardTitles()).toEqual(["Tây Hồ"]);
-    expect(screen.getByLabelText("Trạng thái")).toHaveValue("upcoming");
+    expect(document.querySelector("input[name=status]")).toHaveValue("upcoming");
   });
 
   it("?category= hợp lệ lọc theo danh mục (giữ bằng input ẩn); slug lạ bị bỏ qua", async () => {

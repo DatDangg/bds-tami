@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { Lightbox } from "@/components/media/Lightbox";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { OptionSelect } from "@/components/ui/option-select";
 import type { FloorPlanView } from "@/lib/projects/project-detail-view";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +13,7 @@ const SELECT_MIN_PLANS = 6;
 
 /**
  * Mặt bằng (S03 khối 7): tab theo tên mặt bằng (mẫu ARIA tabs: ← → Home End, tab đang chọn là điểm dừng Tab duy nhất), ảnh 4:3 nền trắng,
- * bấm mở lightbox của cả bộ mặt bằng. ≥ 6 mặt bằng: < md là `<select>` (hai điều khiển dùng chung một state, chỉ một cái hiện).
+ * bấm mở lightbox của cả bộ mặt bằng. ≥ 6 mặt bằng: < md là ô chọn TAMI (hai điều khiển dùng chung một state, chỉ một cái hiện).
  */
 export function FloorPlans({ plans }: { plans: FloorPlanView[] }) {
   const t = useTranslations("page.projectDetail.floorPlans");
@@ -45,18 +46,12 @@ export function FloorPlans({ plans }: { plans: FloorPlanView[] }) {
           <label htmlFor={`${baseId}-select`} className="sr-only">
             {t("select")}
           </label>
-          <select
+          <OptionSelect
             id={`${baseId}-select`}
-            value={activeIndex}
-            onChange={(event) => setActiveIndex(Number(event.target.value))}
-            className="min-h-11 w-full rounded-sm border border-input-border bg-surface px-3 text-body"
-          >
-            {plans.map((plan, index) => (
-              <option key={plan.id} value={index}>
-                {plan.title}
-              </option>
-            ))}
-          </select>
+            value={String(activeIndex)}
+            onValueChange={(next) => setActiveIndex(Number(next))}
+            options={plans.map((plan, index) => ({ value: String(index), label: plan.title }))}
+          />
         </div>
       )}
       <div

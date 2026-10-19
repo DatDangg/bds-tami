@@ -13,3 +13,10 @@ if (typeof globalThis.ResizeObserver === "undefined") {
     disconnect() {}
   };
 }
+
+// jsdom thiếu các API con trỏ/cuộn mà Radix Select gọi khi mở danh sách.
+const elementProto = Element.prototype as unknown as Record<string, unknown>;
+elementProto.hasPointerCapture ??= () => false;
+elementProto.setPointerCapture ??= () => {};
+elementProto.releasePointerCapture ??= () => {};
+elementProto.scrollIntoView ??= () => {};

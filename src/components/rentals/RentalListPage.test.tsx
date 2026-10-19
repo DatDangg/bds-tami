@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import type { RentalCard, RentalSearchParams, RentalSearchResult } from "@/shared/types/api";
@@ -169,8 +170,8 @@ describe("S04 /cho-thue: render", () => {
       sort: "price_asc",
     });
     expect(screen.getByRole("heading", { level: 2, name: "Kết quả cho “studio quan 1”" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Tỉnh/thành", { selector: "#rental-panel-province" })).toHaveValue("ha-noi");
-    expect(screen.getByLabelText("Phường/xã", { selector: "#rental-panel-ward" })).toHaveValue("ba-dinh");
+    expect(screen.getByLabelText("Tỉnh/thành", { selector: "#rental-panel-province" })).toHaveTextContent("Hà Nội");
+    expect(screen.getByLabelText("Phường/xã", { selector: "#rental-panel-ward" })).toHaveTextContent("Ba Đình");
     expect(screen.getByLabelText("Giá từ", { selector: "#rental-panel-priceMin" })).toHaveValue(5_000_000);
   });
 
@@ -193,7 +194,8 @@ describe("S04 /cho-thue: render", () => {
   it("lọc phường phụ thuộc tỉnh: chưa chọn tỉnh thì ô phường bị khoá; danh mục gồm danh mục con (thụt vào)", async () => {
     await render("vi");
     expect(screen.getByLabelText("Phường/xã", { selector: "#rental-panel-ward" })).toBeDisabled();
-    const options = within(screen.getByLabelText("Danh mục", { selector: "#rental-panel-category" })).getAllByRole("option").map((option) => option.textContent);
+    await userEvent.setup().click(screen.getByLabelText("Danh mục", { selector: "#rental-panel-category" }));
+    const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
     expect(options).toEqual(["Tất cả danh mục", "Căn hộ", "– Căn hộ dịch vụ", "Nhà phố"]);
   });
 

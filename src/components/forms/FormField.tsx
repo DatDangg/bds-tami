@@ -1,6 +1,7 @@
 import { useId, type ComponentProps } from "react";
 import { WarningCircle } from "@/components/icons";
 import { Input } from "@/components/ui/input";
+import { OptionSelect } from "@/components/ui/option-select";
 import { cn } from "@/lib/utils";
 
 type Chrome = {
@@ -19,7 +20,10 @@ type Chrome = {
 type Reserved = Exclude<keyof Chrome, "name"> | "id" | "aria-invalid" | "aria-describedby";
 type InputProps = Omit<ComponentProps<"input">, Reserved>;
 type TextareaProps = Omit<ComponentProps<"textarea">, Reserved>;
-type SelectProps = Omit<ComponentProps<"select">, Reserved>;
+type SelectProps = Pick<ComponentProps<"select">, "name" | "disabled" | "defaultValue" | "value"> & {
+  placeholder?: string;
+  onValueChange?: (value: string) => void;
+};
 type ControlProps =
   | ({ as?: "input" } & InputProps)
   | ({ as: "textarea" } & TextareaProps)
@@ -53,16 +57,21 @@ function Control({ control, shared }: { control: ControlProps; shared: Shared })
     return <textarea rows={4} {...attrs} {...shared} className={cn(controlBase, "min-h-28 px-4 py-3")} />;
   }
   if (control.as === "select") {
-    const { options } = control;
-    const attrs = withoutKind(control);
+    const { options, name, disabled, placeholder, onValueChange } = control;
     return (
-      <select {...attrs} {...shared} className={cn(controlBase, "h-12 cursor-pointer px-4")}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <OptionSelect
+        id={shared.id}
+        name={name}
+        options={options}
+        value={typeof control.value === "string" ? control.value : undefined}
+        defaultValue={typeof control.defaultValue === "string" ? control.defaultValue : undefined}
+        onValueChange={onValueChange}
+        placeholder={placeholder}
+        disabled={disabled}
+        aria-invalid={shared["aria-invalid"]}
+        aria-describedby={shared["aria-describedby"]}
+        aria-required={shared["aria-required"]}
+      />
     );
   }
   if (control.as === "file") {

@@ -3,10 +3,11 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Input } from "@/components/ui/input";
+import { OptionSelect } from "@/components/ui/option-select";
 import type { CategoryOption, ProvinceOption, WardOption } from "@/lib/rentals/rental-list-queries";
 import { cn } from "@/lib/utils";
 import { RENTAL_FURNISHINGS } from "@/shared/types/api";
-import { FIELD_CLASS, SortSelect } from "./SortSelect";
+import { SortSelect } from "./SortSelect";
 import type { FilterDraft } from "./use-rental-draft";
 
 export interface FieldOptions {
@@ -112,7 +113,7 @@ function RangeFields({ legend, fromLabel, toLabel, fromId, toId, fromValue, toVa
 
 /**
  * Mọi ô của bộ lọc Cho thuê (design-spec §3.5), dùng chung cho thanh lọc desktop và Sheet mobile: chỉ khác `layout` và cách cha xử lý `onChange`.
- * `select` gốc cho Danh mục/Tỉnh/Phường (bàn phím + trình đọc màn hình tốt, mobile mở bộ chọn hệ điều hành); giá/diện tích là hai ô số
+ * Ô chọn TAMI (Radix) cho Danh mục/Tỉnh/Phường; giá/diện tích là hai ô số
  * (không slider); chip bấm lại để bỏ chọn. Phường bị khoá cho tới khi chọn tỉnh.
  */
 export function FilterFields({ idPrefix, draft, onChange, options, layout, showSort = false }: FilterFieldsProps) {
@@ -138,35 +139,36 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
       {/* Trang danh mục (S05) truyền danh sách rỗng: danh mục đã khoá, đổi danh mục = sang trang khác bằng chip. */}
       {options.categories.length > 0 && (
         <Field label={t("fields.category")} htmlFor={id("category")} className={span("lg:col-span-2")}>
-          <select id={id("category")} value={draft.category} onChange={(event) => onChange({ category: event.target.value }, "now")} className={FIELD_CLASS}>
-            <option value="">{t("fields.allCategories")}</option>
-            {options.categories.map((category) => (
-              <option key={category.slug} value={category.slug}>
-                {category.depth === 1 ? `– ${category.label}` : category.label}
-              </option>
-            ))}
-          </select>
+          <OptionSelect
+            id={id("category")}
+            value={draft.category}
+            onValueChange={(category) => onChange({ category }, "now")}
+            options={[
+              { value: "", label: t("fields.allCategories") },
+              ...options.categories.map((category) => ({ value: category.slug, label: category.depth === 1 ? `– ${category.label}` : category.label })),
+            ]}
+          />
         </Field>
       )}
       <Field label={t("fields.province")} htmlFor={id("province")} className={span("lg:col-span-2")}>
-        <select id={id("province")} value={draft.province} onChange={(event) => onChange({ province: event.target.value, ward: "" }, "now")} className={FIELD_CLASS}>
-          <option value="">{t("fields.allProvinces")}</option>
-          {options.provinces.map((province) => (
-            <option key={province.slug} value={province.slug}>
-              {province.name}
-            </option>
-          ))}
-        </select>
+        <OptionSelect
+          id={id("province")}
+          value={draft.province}
+          onValueChange={(province) => onChange({ province, ward: "" }, "now")}
+          options={[{ value: "", label: t("fields.allProvinces") }, ...options.provinces.map((province) => ({ value: province.slug, label: province.name }))]}
+        />
       </Field>
       <Field label={t("fields.ward")} htmlFor={id("ward")} className={span("lg:col-span-2")}>
-        <select id={id("ward")} value={draft.ward} disabled={wardDisabled} onChange={(event) => onChange({ ward: event.target.value }, "now")} className={FIELD_CLASS}>
-          <option value="">{draft.province === "" ? t("fields.wardNeedsProvince") : t("fields.allWards")}</option>
-          {options.wards.map((ward) => (
-            <option key={ward.slug} value={ward.slug}>
-              {ward.name}
-            </option>
-          ))}
-        </select>
+        <OptionSelect
+          id={id("ward")}
+          value={draft.ward}
+          disabled={wardDisabled}
+          onValueChange={(ward) => onChange({ ward }, "now")}
+          options={[
+            { value: "", label: draft.province === "" ? t("fields.wardNeedsProvince") : t("fields.allWards") },
+            ...options.wards.map((ward) => ({ value: ward.slug, label: ward.name })),
+          ]}
+        />
       </Field>
       <RangeFields
         legend={t("fields.price")}

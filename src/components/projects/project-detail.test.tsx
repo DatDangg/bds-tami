@@ -1,7 +1,7 @@
 import { act, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
+import { chooseOption, fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import { toProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { Locale } from "@/i18n/routing";
 import type { Media, Project, Province } from "@/payload-types";
@@ -346,7 +346,7 @@ describe("FloorPlans", () => {
     const select = screen.getByRole("combobox", { name: "Chọn mặt bằng" });
     expect(select.parentElement?.className).toContain("md:hidden");
     expect(screen.getByRole("tablist").className).toContain("hidden md:flex");
-    await user.selectOptions(select, "3");
+    await chooseOption(user, select, "Căn 4PN");
     expect(screen.getAllByRole("tab", { hidden: true })[3]).toHaveAttribute("aria-selected", "true");
   });
 });

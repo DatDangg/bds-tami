@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import Form from "next/form";
 import { FormPendingMarker, PendingLink } from "@/components/layout/PendingRegion";
 import { Button } from "@/components/ui/button";
+import { OptionSelect } from "@/components/ui/option-select";
 import { SALES_STATUS_VALUES } from "@/lib/projects/project-filters";
 
 export interface ProvinceOption {
@@ -21,12 +22,9 @@ interface ProjectFiltersProps {
   active: boolean;
 }
 
-const SELECT_CLASS =
-  "h-12 w-full rounded-sm border border-input bg-surface px-3 font-sans text-body text-text focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
-
 /**
  * Hai ô lọc Tỉnh/thành và Trạng thái (design-spec S02): `<Form>` (next/form, GET) nên chia sẻ được qua URL, dùng được
- * không cần JS (rơi về form GET thường) và bằng bàn phím (`select` gốc + nút "Lọc"; không tự gửi khi đổi giá trị, WCAG 3.2.2). Gửi form luôn về trang 1.
+ * không cần JS (rơi về form GET thường) và bằng bàn phím (ô chọn TAMI, trước khi hydrate là `select` gốc đã style + nút "Lọc"; không tự gửi khi đổi giá trị, WCAG 3.2.2). Gửi form luôn về trang 1.
  * Chờ gửi báo lên `PendingRegion`.
  */
 export function ProjectFilters({ actionPath, provinces, selectedProvince, selectedStatus, hiddenCategory, active }: ProjectFiltersProps) {
@@ -34,28 +32,30 @@ export function ProjectFilters({ actionPath, provinces, selectedProvince, select
   return (
     <Form action={actionPath} aria-label={t("filtersLabel")} className="grid w-full grid-cols-2 gap-3 lg:flex lg:w-auto lg:items-end">
       {hiddenCategory && <input type="hidden" name="category" value={hiddenCategory} />}
-      <label className="flex min-w-0 flex-col gap-1 text-small font-semibold lg:w-56">
-        {t("provinceLabel")}
-        <select name="province" defaultValue={selectedProvince ?? ""} className={SELECT_CLASS}>
-          <option value="">{t("allProvinces")}</option>
-          {provinces.map((province) => (
-            <option key={province.slug} value={province.slug}>
-              {province.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="flex min-w-0 flex-col gap-1 text-small font-semibold lg:w-48">
-        {t("statusLabel")}
-        <select name="status" defaultValue={selectedStatus ?? ""} className={SELECT_CLASS}>
-          <option value="">{t("allStatuses")}</option>
-          {SALES_STATUS_VALUES.map((status) => (
-            <option key={status} value={status}>
-              {t(`salesStatus.${status}`)}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="flex min-w-0 flex-col gap-1 lg:w-56">
+        <label htmlFor="project-filter-province" className="text-small font-semibold">
+          {t("provinceLabel")}
+        </label>
+        <OptionSelect
+          progressive
+          id="project-filter-province"
+          name="province"
+          defaultValue={selectedProvince ?? ""}
+          options={[{ value: "", label: t("allProvinces") }, ...provinces.map((province) => ({ value: province.slug, label: province.name }))]}
+        />
+      </div>
+      <div className="flex min-w-0 flex-col gap-1 lg:w-48">
+        <label htmlFor="project-filter-status" className="text-small font-semibold">
+          {t("statusLabel")}
+        </label>
+        <OptionSelect
+          progressive
+          id="project-filter-status"
+          name="status"
+          defaultValue={selectedStatus ?? ""}
+          options={[{ value: "", label: t("allStatuses") }, ...SALES_STATUS_VALUES.map((status) => ({ value: status, label: t(`salesStatus.${status}`) }))]}
+        />
+      </div>
       <div className="col-span-2 flex items-center gap-3 lg:col-span-1">
         <Button type="submit" variant="outline" className="flex-1 lg:flex-none">
           {t("apply")}

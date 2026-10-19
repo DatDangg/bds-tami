@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import en from "@/i18n/messages/en.json";
 import vi_ from "@/i18n/messages/vi.json";
+import { chooseOption } from "../media/test-utils";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
 import type { RentalFilters as RentalFilterValues } from "@/lib/search/url-params";
 
@@ -74,8 +75,16 @@ describe("RentalFilters: thanh lọc desktop (áp dụng ngay, URL là nguồn s
   it("chọn tỉnh: đổi ngay, bỏ phường đang chọn và về trang 1 (không có page)", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui({ province: "ha-noi", ward: "ba-dinh", sort: "newest", page: 3 }, withHanoiWards));
-    await user.selectOptions(panel().getByLabelText("Tỉnh/thành"), "ho-chi-minh");
+    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
     expect(lastUrl()).toBe("/cho-thue?province=ho-chi-minh");
+  });
+
+  it("chọn 'Tất cả tỉnh' bỏ province khỏi URL (không lộ sentinel) và bỏ luôn phường", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui({ province: "ha-noi", ward: "ba-dinh", sort: "newest", page: 1 }, withHanoiWards));
+    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), /^Tất cả/);
+    expect(lastUrl()).toBe("/cho-thue");
+    expect(String(lastUrl())).not.toContain("__");
   });
 
   it("phường bị khoá khi chưa chọn tỉnh; có tỉnh thì chọn được và URL có ward", async () => {
@@ -85,14 +94,14 @@ describe("RentalFilters: thanh lọc desktop (áp dụng ngay, URL là nguồn s
     rerender(ui({ province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
     const ward = panel().getByLabelText("Phường/xã");
     expect(ward).toBeEnabled();
-    await user.selectOptions(ward, "cau-giay");
+    await chooseOption(user, ward, "Phường Cầu Giấy");
     expect(lastUrl()).toBe("/cho-thue?province=ha-noi&ward=cau-giay");
   });
 
   it("đổi tỉnh khi server chưa trả phường mới: ô phường khoá cho tới khi props đổi", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui({ province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
-    await user.selectOptions(panel().getByLabelText("Tỉnh/thành"), "ho-chi-minh");
+    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
     expect(panel().getByLabelText("Phường/xã")).toBeDisabled();
   });
 
@@ -124,9 +133,9 @@ describe("RentalFilters: thanh lọc desktop (áp dụng ngay, URL là nguồn s
   it("sắp xếp đổi ngay và đặt sort vào URL; về mặc định thì bỏ khỏi URL", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none));
-    await user.selectOptions(panel().getByLabelText("Sắp xếp"), "price_desc");
+    await chooseOption(user, panel().getByLabelText("Sắp xếp"), "Giá giảm dần");
     expect(lastUrl()).toBe("/cho-thue?sort=price_desc");
-    await user.selectOptions(panel().getByLabelText("Sắp xếp"), "newest");
+    await chooseOption(user, panel().getByLabelText("Sắp xếp"), "Mới nhất");
     expect(lastUrl()).toBe("/cho-thue");
   });
 
@@ -198,7 +207,7 @@ describe("RentalFilters: trang danh mục (danh mục khoá)", () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none, { ...options, categories: [] }, "vi", "can-ho", "/cho-thue/danh-muc/can-ho"));
     expect(panel().queryByLabelText("Danh mục")).toBeNull();
-    await user.selectOptions(panel().getByLabelText("Tỉnh/thành"), "ha-noi");
+    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hà Nội");
     expect(lastUrl()).toBe("/cho-thue/danh-muc/can-ho?province=ha-noi");
   });
 
@@ -231,7 +240,7 @@ describe("RentalFilters: thanh dính + Sheet mobile", () => {
     await user.type(bar().getByLabelText("Từ khoá"), "q");
     act(() => vi.advanceTimersByTime(300));
     expect(lastUrl()).toBe("/cho-thue?q=q&province=ha-noi&priceMin=1&bedrooms=2");
-    await user.selectOptions(bar().getByLabelText("Sắp xếp"), "price_asc");
+    await chooseOption(user, bar().getByLabelText("Sắp xếp"), "Giá tăng dần");
     expect(lastUrl()).toContain("sort=price_asc");
   });
 
@@ -265,11 +274,11 @@ describe("RentalFilters: thanh dính + Sheet mobile", () => {
     expect(within(dialog).getByLabelText("Từ khoá")).toHaveValue("");
 
     expect(within(dialog).getByLabelText("Phường/xã")).toBeDisabled();
-    await user.selectOptions(within(dialog).getByLabelText("Tỉnh/thành"), "ho-chi-minh");
+    await chooseOption(user, within(dialog).getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
     await waitFor(() => expect(within(dialog).getByLabelText("Phường/xã")).toBeEnabled());
     const wardsCall = fetchSpy.mock.calls.map(([url]) => String(url)).find((url) => url.startsWith("/api/wards"))!;
     expect(decodeURIComponent(wardsCall)).toContain("where[province][equals]=p2");
-    await user.selectOptions(within(dialog).getByLabelText("Phường/xã"), "ben-nghe");
+    await chooseOption(user, within(dialog).getByLabelText("Phường/xã"), "Phường Bến Nghé");
 
     await user.click(within(dialog).getByRole("button", { name: /^Xem/ }));
     expect(replace).toHaveBeenLastCalledWith("/cho-thue?province=ho-chi-minh&ward=ben-nghe&sort=price_asc", { scroll: false });
