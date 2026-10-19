@@ -53,16 +53,15 @@ describe("createRevalidateHomepageOnUnpublish (dự án/ưu đãi chọn tay hi�
 
 describe("createRevalidateHomepageOnListing (khối Cho thuê / Tin tức)", () => {
   function setupListing() {
-    const tags: string[][] = [];
     const paths: string[][] = [];
-    const hooks = createRevalidateHomepageOnListing({ tags: (value) => void tags.push(value), paths: (value) => void paths.push(value) });
+    const hooks = createRevalidateHomepageOnListing({ paths: (value) => void paths.push(value) });
     const change = (doc: Record<string, unknown>, previousDoc?: Record<string, unknown>) =>
       hooks.afterChange({ doc, previousDoc, req } as Parameters<CollectionAfterChangeHook>[0]);
     const remove = (doc: Record<string, unknown>) => hooks.afterDelete({ doc, req } as Parameters<CollectionAfterDeleteHook>[0]);
-    return { tags, paths, change, remove };
+    return { paths, change, remove };
   }
 
-  it("xuất bản, sửa khi đang công khai, ẩn/xoá mềm/chuyển đã thuê → làm mới tag + /vi /en", async () => {
+  it("xuất bản, sửa khi đang công khai, ẩn/xoá mềm/chuyển đã thuê → chỉ làm mới /vi /en (không tag toàn site)", async () => {
     const cases: Array<[Record<string, unknown>, Record<string, unknown>]> = [
       [{ id: "r", status: "published" }, { id: "r", status: "draft" }],
       [{ id: "r", status: "published", title: "Mới" }, { id: "r", status: "published" }],
@@ -71,25 +70,23 @@ describe("createRevalidateHomepageOnListing (khối Cho thuê / Tin tức)", () 
       [{ id: "r", status: "published", deletedAt: "2026-10-19T00:00:00.000Z" }, { id: "r", status: "published" }],
     ];
     for (const [doc, previousDoc] of cases) {
-      const { tags, paths, change } = setupListing();
+      const { paths, change } = setupListing();
       await change(doc, previousDoc);
-      expect(tags.flat(), JSON.stringify(doc)).toContain("global:homepage");
-      expect(paths.flat()).toEqual(expect.arrayContaining(["/vi", "/en"]));
+      expect(paths.flat(), JSON.stringify(doc)).toEqual(["/vi", "/en"]);
     }
   });
 
-  it("xoá hẳn bản đang công khai → làm mới", async () => {
-    const { tags, remove } = setupListing();
+  it("xoá hẳn bản đang công khai → làm mới /vi /en", async () => {
+    const { paths, remove } = setupListing();
     await remove({ id: "r", status: "published" });
-    expect(tags.flat()).toContain("global:homepage");
+    expect(paths.flat()).toEqual(["/vi", "/en"]);
   });
 
   it("nháp sửa tiếp / xoá nháp / bản đã ẩn sửa tiếp → không làm mới", async () => {
-    const { tags, paths, change, remove } = setupListing();
+    const { paths, change, remove } = setupListing();
     await change({ id: "r", status: "draft" }, { id: "r", status: "draft" });
     await change({ id: "r", status: "hidden", title: "x" }, { id: "r", status: "hidden" });
     await remove({ id: "r", status: "draft" });
-    expect(tags).toHaveLength(0);
     expect(paths).toHaveLength(0);
   });
 });

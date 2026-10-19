@@ -227,9 +227,9 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 | 0 | Thanh thông báo (1a) | Dải chữ trong luồng, TRÊN header | `--color-primary` | Không |
 | 1 | Hero (+ ô tìm kiếm + chip 1b) | Full-bleed media, chữ giữa; ô tìm kiếm đè đáy hero từ md | Ảnh/video | Không |
 | 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 (ảnh bo 20px) + hàng số liệu | `--color-bg` | Không |
-| 3 | Dự án nổi bật | Slider full-bleed | `--color-bg-alt` | Eyebrow = loại hình trên từng slide (1) |
+| 3 | Dự án nổi bật | Slider thẻ lớn ~464×600 bo 20px + khung kính | `--color-bg-alt` | Không |
 | 4 | Dịch vụ | Bento bất đối xứng, thẻ ảnh bo 20px + khung kính | `--color-bg` | Không |
-| 5 | Ưu đãi nổi bật | Lưới thẻ | `--color-bg-alt` | Không |
+| 5 | Ưu đãi nổi bật | Slider thẻ | `--color-bg-alt` | Không |
 | 6 | Đối tác (FR-PUB-17, Should; **chưa có giao diện**) | Lưới logo | `--color-bg` | Không |
 | 7 | Banner CTA (đề xuất §6.1; BL-020 #7 "Đăng ký tham quan") | Khối tối full-width; có ảnh → ảnh tràn viền + scrim, 2 nút | `.theme-dark-block` `--color-dark-deep`; ảnh `ctaBanner.image` + `--color-banner-scrim` | Không |
 | 8 | Cho thuê (`rentals`, BL-020 #8) | Tab danh mục + slider thẻ | `--color-bg` | Không |
@@ -238,7 +238,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 **Đối chiếu #1–#11 của market (BL-020):** #1 thanh thông báo = khối 0 · #2 hero = 1 · #3 ô tìm kiếm + chip = 1 (1b) · #4 Giới thiệu = 2 · #5 "Mua từ chủ đầu tư" (slider thẻ) = 5 Ưu đãi · #6 slider dự án = 3 · #7 "Đăng ký tham quan" = 7 Banner CTA · #8 + #10 "Thuê nhà ở / kinh doanh" (gộp) = 8 Cho thuê · #9 "Đồng hành trọn hành trình" = 4 Dịch vụ · #11 Tin tức = 9. **GAP MỞ:** #3 còn một phần chưa dựng — "slider banner ưu đãi" dưới ô tìm kiếm (chip + ô tìm kiếm đã có ở 1b). Chưa task nào xây; chờ user quyết ở checkpoint Phase 2: (a) dựng slider banner ưu đãi (cần dữ liệu/schema CMS mới), (b) ánh xạ vào slider Ưu đãi (khối 5, tin ưu đãi) hoặc slide hero, (c) bỏ khỏi phạm vi. Các mục #1–#2, #4–#11 đã có khối tương ứng. Đối tác (6, Should) chưa dựng giao diện (ngoài #1–#11, không đổi schema).
 
-9 section → layout family khác nhau (Cho thuê = tab + slider, Tin tức = split intro/3 thẻ); eyebrow 1/3 cho phép; **2 khối tối nội dung (CTA + Tin tức)** + footer: ngoại lệ tokens §0 (user chốt 2026-10-19: nền "thương hiệu" của BL-020 #11 = khối tối đen/kem + vàng của TAMI). Khi Tin tức đứng ngay trên footer (blockOrder mặc định) có đường viền `--color-dark-border` dưới khối để tách khỏi footer.
+9 section → layout family khác nhau (Cho thuê = tab + slider, Tin tức = split intro/3 thẻ); eyebrow 0/3 (khối Dự án nổi bật đã bỏ eyebrow ở P2-T03; ngân sách 3 vẫn còn nguyên); **2 khối tối nội dung (CTA + Tin tức)** + footer: ngoại lệ tokens §0 (user chốt 2026-10-19: nền "thương hiệu" của BL-020 #11 = khối tối đen/kem + vàng của TAMI). Khi Tin tức đứng ngay trên footer (blockOrder mặc định) có đường viền `--color-dark-border` dưới khối để tách khỏi footer.
 
 **1. Hero** (`homepage.hero.slides`, 1-8)
 - Cao `100svh` (tối thiểu 560px, tối đa 1080px), thanh header nổi kính mờ sáng đè lên (hero kéo lên `-mt-(--header-offset)`, nội dung hero đệm trên `--header-offset`).

@@ -6,7 +6,6 @@ import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
-import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFilters } from "../lib/admin/list-filter";
@@ -17,8 +16,8 @@ import { withContentDefaults } from "./_shared/content-defaults";
  * (PERMISSION §3.1; access mặc định của `withContentDefaults`). `category` thuộc scope `news`. Không có quan hệ tới `leads`
  * (BR-04: tin tức không thu lead). `revalidate` chỉ để test ghi đè.
  */
-export function createNews(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
-  const revalidateHomepage = createRevalidateHomepageOnListing({ paths: revalidate, tags: revalidateTags });
+export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
+  const revalidateHomepage = createRevalidateHomepageOnListing({ paths: revalidate });
   const collection = withContentDefaults(
     {
       slug: "news",

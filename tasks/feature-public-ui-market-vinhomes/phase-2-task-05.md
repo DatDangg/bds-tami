@@ -41,3 +41,11 @@ MODIFY UI · NORMAL.
 - MINOR-2: `Homepage.ts` thêm `admin.description` cho `ctaBanner.backgroundImage`/`image`. `pnpm generate:types` → diff `payload-types.ts` chỉ 6 dòng JSDoc comment (không đổi kiểu) → không cần migration.
 - MINOR-3: `docs/DESIGN.md` Trang chủ: "Đối tác (dải logo; chưa dựng giao diện)".
 - MINOR-4: `min-h-[26rem]` làm nền, `supports-[height:1svh]:min-h-[clamp(26rem,60svh,40rem)]` (viết thế vì tailwind-merge sẽ bỏ một trong hai `min-h-*` cùng nhóm).
+
+## Phase 2 close-out (validator D1–D4)
+
+- D1 `docs/DESIGN.md` hàng Trang chủ: thêm thanh thông báo (trên cùng) + ô tìm kiếm/chip vào luồng trang; slider dự án mô tả đúng P2-T03 (thẻ ~464×600, khung kính, badge, số liệu); thứ tự khối nêu theo `blockOrder` (mặc định 6 khối, Cho thuê/Tin tức chỉ hiện khi thêm vào thứ tự).
+- D2 `.context/design-spec.md` S01: khối 3 = slider thẻ, không eyebrow; khối 5 = slider thẻ; dòng ngân sách eyebrow = 0/3.
+- D3 `docs/ERD.md` §4.15: ngoại lệ title tuỳ chọn của `rentals`/`news`; bỏ ghi chú "header trong suốt CHƯA làm"; "khi P2-T03/T04 xong" → đã dựng; thêm hook `createRevalidateHomepageOnListing`; danh sách guard media thêm `ctaBanner.image`.
+- D4 `createRevalidateHomepageOnListing` chỉ gọi `paths(homepagePaths())` (`/vi`, `/en`), không đụng tag `global:homepage` (nhận `Pick<HomepageRevalidators,"paths">`); `News.ts`/`Rentals.ts` bỏ tham số `revalidateTags` thừa (không caller nào truyền). Hook global/service/unpublish (dự án, ưu đãi) giữ nguyên, vẫn dùng `revalidateHomepage` (tag + paths) — cần tag cho hook global (chính global được cache theo tag); với hook dịch vụ/gỡ xuất bản, tag là thừa (dịch vụ, dự án, ưu đãi cũng đọc trực tiếp theo id ở `home-queries`) → đề xuất follow-up bỏ tag ở 2 hook đó (reviewer close-out MINOR). Unit test listing cập nhật (chỉ paths). `docs/DESIGN.md` hàng Announcement Bar nêu rõ lưu nào làm mới toàn site vs chỉ `/` `/en`.
+- Verify: `pnpm lint` 0 error (2 warning cũ ở tools/task-dashboard), `pnpm typecheck` pass, vitest `src/components src/lib src/i18n src/app src/hooks` 1869/1869, integration homepage+rentals+news (DB `tami_wt_bl020`) 90/90.
