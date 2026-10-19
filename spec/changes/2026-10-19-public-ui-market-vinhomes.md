@@ -62,7 +62,7 @@ Plan phase/task: `tasks/feature-public-ui-market-vinhomes/README.md`.
 |---|---|---|---|---|
 | P1 | Tokens phong cách market (màu TAMI) + header nổi bo tròn kính mờ sáng | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, spec-validation PASS) | 3c1621d, ab3f95a, f25afe1 | 1.16.0 / v19 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md` |
 | P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | **done** (T01 STRICT PASS r1, T02 PASS r3, T03/T04/T05 PASS r2, close-out NORMAL PASS, spec-validation PASS) | 4f48764, b2fe4e4, 4b7ab7e, 4058ae4, 1be4209, 2391bb6, fb360ab | 1.17.0 / v20 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md` |
-| P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | pending | — | — |
+| P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, T03 STRICT PASS r3, close-out NORMAL PASS, spec-validation GAPS → xử lý ở close-out) | 16c5e81, 1511db5, 0b95083, close-out | 1.19.0 / v23 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md` |
 | P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | pending | — | — |
 | P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | pending | — | — |
 
@@ -73,14 +73,21 @@ Ghi chú P2 (quyết định user tại checkpoint 2026-10-20):
 - **Q2** bản ghi trang chủ có sẵn không tự hiện Cho thuê/Tin tức: **sau deploy admin thêm "Cho thuê", "Tin tức" vào "Thứ tự khối"** (không auto-append, không data migration).
 - **Q3** tiêu đề khối Cho thuê/Tin tức tuỳ chọn (trống → mặc định i18n, kể cả EN); khối chỉ ẩn ở `/en` khi không có tin/bài có bản EN.
 - Migration `20261019_144259_homepage_market_blocks` (additive) — staging → verify → promote prod. Tab Dự án của ô tìm kiếm chỉ lọc `province`/`status` (không có từ khoá); số liệu thẻ dự án = diện tích đất / tổng số căn / bàn giao.
-- Phase 3 **chưa bắt đầu** — chờ user duyệt.
+- Phase 3 user duyệt bắt đầu 2026-10-20 ("còn lại 3 cái BL, làm lần lượt cho xong hết đi nhé, tự quyết định đừng hỏi lại anh") — kèm ủy quyền qua mọi checkpoint P3–P5.
+
+Ghi chú P3 — **quyết định agent (user ủy quyền 2026-10-20)** (chi tiết trong task file + `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md`):
+- Băng tìm kiếm dùng chung `ListSearchBar`; Cho thuê: từ khoá + Loại (`category`) + Khoảng giá (4 mức gợi ý) + "Bộ lọc" (Popover ≥ lg có nút Đóng / Sheet < lg, badge đếm lọc phụ + khoảng giá tuỳ chọn); sắp xếp ra hàng "Có N kết quả"; **bỏ thanh lọc dính mobile**.
+- `/du-an`: Tỉnh + Trạng thái + Lọc (không từ khoá vì không có `q`); `/tin-bds`: không băng tìm kiếm (không có lọc sẵn), chỉ banner compact + "Có N kết quả" + lưới 4 cột; `/tuyen-dung`: banner compact, giữ lọc.
+- Banner compact 240px chỉ trang danh sách; đệm đáy chỉ khi có băng tìm kiếm đè.
+- Tin tức: pill danh mục (link) → Tin nổi bật 1+4 → hàng danh mục cấp 1 (≤ 6 hàng × ≤ 4 bài) → "Tin khác" (không bài nào mất khỏi phân trang) → phân trang → form "Tư vấn nhu cầu" (`source=contact`, mọi trang `/tin-tuc`, không trang danh mục). BRD 1.7 + BR-10 cập nhật theo change doc §Tin tức.
+- Thẻ trắng bo 20px (Rental/Project/Post/NewsCard) trên nền sáng; khối Tin tức tối trang chủ giữ thẻ trong suốt (`onDark`).
 
 ## Acceptance (bắt buộc)
 - [x] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
 - [x] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
 - [x] Trang chủ có đủ các section #1–#11 ở bảng trên (các section quản lý qua global Homepage: bật/tắt + thứ tự như hiện có). — P2; #3 "slider banner ưu đãi" ánh xạ vào slider Ưu đãi (Q1); Cho thuê/Tin tức hiện sau khi admin thêm vào "Thứ tự khối" (Q2).
-- [ ] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
-- [ ] Tin tức: hàng theo danh mục + form tư vấn cuối trang.
+- [x] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
+- [x] Tin tức: hàng theo danh mục + form tư vấn cuối trang. — P3; `/tin-bds` không có băng tìm kiếm (không có bộ lọc sẵn — quyết định agent).
 - [ ] Chi tiết dự án: thẻ tư vấn dính bên phải ≥ lg + tin liên quan; phần cần schema mới tách phase riêng sau khi user duyệt.
 - [ ] Responsive mobile (thanh/khối tìm kiếm, slider vuốt được), VI/EN cùng bố cục, không CLS, giữ NFR hiệu năng (LCP).
 

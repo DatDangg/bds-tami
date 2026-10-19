@@ -1,0 +1,123 @@
+{
+  "specVersion": "1.18.0",
+  "scopeVersion": 22,
+  "generatedAt": "2026-10-20T16:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-022 — chip lọc nhanh danh sách admin (#11 #12): Tin cho thuê (Trạng thái / Số PN / Khoảng giá) + Lead (Trạng thái) + xuất Excel lead theo chip (statusIn, unassigned=1). Spec 1.17.0 → 1.18.0 (MINOR). Đã build: T01 7cb85fd, T02 = commit close-out (cùng commit với file này).",
+  "workItem": "feature/admin-list-quick-filter-chips",
+  "backlog": "BL-022",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/2026-10-19-admin-list-quick-filter-chips.md",
+  "task": [
+    "tasks/feature-admin-list-quick-filter-chips/phase-1-task-01.md",
+    "tasks/feature-admin-list-quick-filter-chips/phase-1-task-02.md"
+  ],
+  "commits": [
+    "7cb85fd"
+  ],
+  "commitNotes": {
+    "7cb85fd": "T01 — helper quick-filters + QuickFilterChips + chip Tin cho thuê + spec 1.18.0/scope v22",
+    "(commit này)": "T02 — chip Trạng thái Lead + xuất Excel theo chip (statusIn/unassigned) + giá trị chuỗi \"false\"/\"0\" tránh WhereBuilder bỏ giá trị falsy + API_SPEC + close-out"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.17.0-21.json",
+  "specUpdate": "spec/updates/2026-10-20-admin-list-quick-filter-chips.md",
+  "specRefs": [
+    "FR-ADM-19",
+    "F9"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Giao diện quản trị — mục mới 'Chip lọc nhanh (BL-022)': thanh chip trên bảng Tin cho thuê (Trạng thái / Số phòng ngủ / Khoảng giá) và Lead (Trạng thái); mỗi nhóm chọn 1, AND theo từng nhánh or, where trên URL, chip sáng/bỏ sáng theo bộ lọc tay cùng trường; không nới quyền.",
+    "F9": "Lead — xuất Excel nhận thêm điều kiện chip: status 'nằm trong' tập trạng thái hợp lệ và assignedTo 'chưa có sale phụ trách'; toán tử khác vẫn khoá nút (FR-ADM-10 endpoint GET /api/admin/leads/export)."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/lib/admin/quick-filters.ts",
+      "src/lib/admin/quick-filters.test.ts",
+      "src/components/admin/QuickFilterChips.tsx",
+      "src/components/admin/QuickFilterChips.test.tsx",
+      "src/components/admin/RentalQuickFilterSlot.tsx",
+      "src/components/admin/LeadQuickFilterSlot.tsx",
+      "src/collections/Rentals.ts",
+      "src/collections/Leads.ts",
+      "src/lib/translation/admin-ui.ts",
+      "src/lib/leads/export-filters.ts",
+      "src/lib/leads/export-filters.test.ts",
+      "src/endpoints/admin/leads-export.test.ts",
+      "src/components/admin/LeadExportButton.test.tsx",
+      "src/components/admin/LeadExportSlot.test.tsx",
+      "src/components/admin/styles/_lists.scss",
+      "src/app/(payload)/admin/importMap.js",
+      "docs/API_SPEC.md"
+    ],
+    "filesNote": "Diff thật (T01 + T02). src/endpoints/admin/leads-export.ts không đổi (dùng parse/build mới của export-filters). Không schema/migration/access control.",
+    "modules": [
+      "Helper where chip — src/lib/admin/quick-filters.ts (currentChip / withChip, ghép điều kiện vào từng nhánh or, thay điều kiện lá cùng trường, chuẩn hoá giá trị chuỗi từ URL)",
+      "Component client — src/components/admin/QuickFilterChips.tsx (useListQuery + refineListData, role=group, aria-pressed, cuộn ngang)",
+      "Đăng ký slot beforeListTable — src/collections/Rentals.ts (3 nhóm), src/collections/Leads.ts (nhóm Trạng thái, cạnh LeadExportSlot)",
+      "Xuất Excel lead — src/lib/leads/export-filters.ts (client leadExportQueryFromWhere + server parse/build: status in, assignedTo exists false), src/endpoints/admin/leads-export.ts",
+      "SCSS thanh công cụ — src/components/admin/styles/_lists.scss",
+      "Doc as-built — docs/API_SPEC.md mục GET /api/admin/leads/export"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Rentals /admin/collections/rentals: nhóm Trạng thái — Đang cho thuê = published, Đã thuê = rented, Nháp = draft; hidden chỉ thấy ở Tất cả",
+      "Rentals: nhóm Số phòng ngủ — Studio = 0, 1 PN = 1, 2 PN = 2, 3 PN+ = ≥ 3; tin không nhập bedrooms không lọt chip nào",
+      "Rentals: nhóm Khoảng giá priceMonthlyVnd — Dưới 10tr < 10.000.000; 10 – 20tr ≥ 10.000.000 và < 20.000.000; 20 – 50tr ≥ 20.000.000 và ≤ 50.000.000; Trên 50tr > 50.000.000 (biên 10tr/20tr/50tr đúng nhóm); tin không nhập giá không lọt chip nào; nhóm giá không có chip Tất cả",
+      "Leads /admin/collections/leads: nhóm Trạng thái — Mới (chưa giao) = new VÀ chưa có sale phụ trách (lead new đã giao không hiện); Đang tư vấn = contacted + consulting; Đã chốt = won; Không thành = lost; spam chỉ ở Tất cả",
+      "Mỗi nhóm chọn 1; bấm lại chip đang sáng hoặc Tất cả = bỏ lọc nhóm; các nhóm AND với nhau",
+      "Chip AND với bộ lọc tay + ô tìm kiếm + Lọc dịch (ghép vào từng nhánh or, không mất điều kiện khác); đổi Lọc dịch sau khi chọn chip vẫn giữ chip và ngược lại",
+      "Chip ghi where lên URL: F5 / mở link chia sẻ giữ chip sáng + đúng kết quả; tự sửa bộ lọc trên cùng trường khác chip → chip bỏ sáng; chọn chip thay bộ lọc tay cùng trường (vd Giá ≥ 5tr bị thay khi bấm chip giá)",
+      "Xuất Excel lead khi đang chọn bất kỳ chip Trạng thái nào (kể cả kèm tìm kiếm / bộ lọc khác) → file đúng tập lead đang thấy",
+      "API GET /api/admin/leads/export: tham số mới cho status 'nằm trong' + assignedTo 'chưa có'; giá trị ngoài whitelist / trùng / mâu thuẫn → 400 kèm details",
+      "A11y: chip là button aria-pressed, nhóm role=group có nhãn; Tab tới chip, Enter/Space bật/tắt; focus-visible rõ; AA sáng/tối; vùng bấm ≥ 44px",
+      "375px: thanh chip cuộn ngang nội bộ, documentElement.scrollWidth không tăng do thanh chip"
+    ],
+    "dependents": [
+      "Ô Lọc dịch (TranslationStatusFilter, withTranslationFilter) — cùng thanh công cụ beforeListTable; có thể dùng chung toBranches",
+      "Xuất Excel lead (LeadExportButton / LeadExportSlot, export-filters, leads-export endpoint) — ánh xạ where → query mở rộng",
+      "Thanh công cụ danh sách .list-toolbar-item (_lists.scss) dùng chung mọi collection",
+      "Access Leads isAssignedOrAdmin — chip chỉ thêm điều kiện where, không thay access"
+    ],
+    "regression": [
+      "BL-021 #01: đổi Trạng thái dịch giữ bộ lọc khác (nay kèm chip) trên rentals",
+      "BL-021 T3: xuất Excel lead với bộ lọc cũ (status/source/assignedTo equals, createdAt >=/<=) + ô tìm kiếm vẫn đúng file; bộ lọc không hỗ trợ (nhiều nhánh or, toán tử khác) vẫn khoá nút kèm thông báo; audit lead.export chỉ cờ search, không PII; 401/403/429/422 như cũ",
+      "BL-021 T6: thanh công cụ — nút Xuất Excel / ô Lọc dịch vẫn trong lề, cùng hàng, tự xuống dòng, không tràn 375px, 0 kết quả vẫn thấy ô lọc dịch",
+      "Sale chỉ thấy lead được giao — mọi chip Lead không làm lộ thêm lead; sale không thấy nút Xuất Excel",
+      "Thùng rác và list drawer: nút Xuất Excel vẫn ẩn; chip không gây lỗi ở đó",
+      "Tìm kiếm Lead (mã/họ tên/SĐT mọi dạng/email) và Tin cho thuê (mã/tiêu đề/địa chỉ) vẫn đúng khi kèm chip",
+      "Phân trang: chọn chip quay về trang 1; sắp xếp cột giữ nguyên"
+    ]
+  },
+  "acceptance": [
+    "Chip áp/bỏ 1 chạm, kết hợp đúng với bộ lọc khác và Lọc dịch (không lặp lại bug #01)",
+    "Rentals: 3 nhóm chip đúng bảng (Trạng thái / Số phòng ngủ / Khoảng giá, biên giá đúng); Leads: nhóm Trạng thái đúng bảng",
+    "Chip đang chọn nằm trên URL (where) → F5 / chia sẻ link giữ nguyên; tự sửa bộ lọc trùng nhóm thì chip bỏ sáng tương ứng",
+    "Xuất Excel lead khi đang chọn chip xuất đúng tập đang lọc; toán tử không hỗ trợ khác vẫn khoá nút",
+    "Sale không thấy thêm lead nào ngoài lead được giao",
+    "Đạt AA sáng/tối, thao tác được bằng bàn phím, 375px không tràn ngang trang (thanh chip cuộn ngang)",
+    "pnpm lint / typecheck / test PASS (quick-filters, QuickFilterChips, export-filters)"
+  ],
+  "outOfScope": [
+    "Chip diện tích (areaM2)",
+    "Chip trên Dự án / Đăng tin BĐS / Tin tức",
+    "Dashboard /admin và danh sách rentals vẫn có thể tràn ngang ở 375px do bảng/khác (BL-024) — chỉ kiểm thanh chip không làm tăng tràn"
+  ],
+  "viewports": [
+    1280,
+    375
+  ],
+  "locales": [
+    "vi"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "GET /api/admin/leads/export — tham số chip mới (status 'nằm trong', assignedTo 'chưa có'): hợp lệ → 200 đúng tập; giá trị lạ / trùng / mâu thuẫn → 400; sale → 403; không đăng nhập → 401"
+  ],
+  "risk": "high",
+  "riskNote": "Theo chỉ định phát hành: medium. Lưu ý T02 tự đánh giá HIGH → review STRICT (endpoint xuất PII, parse tham số server, audit); T01 MEDIUM (helper where dùng chung với Lọc dịch). Không schema/migration/quyền. Bên test nên ưu tiên ca xuất Excel + quyền sale."
+}

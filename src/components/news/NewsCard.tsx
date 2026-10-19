@@ -16,6 +16,8 @@ interface NewsCardProps {
   priority?: boolean;
   /** Ghi đè `sizes` mặc định của biến thể khi thẻ nằm trong cột hẹp hơn (vd khối Tin tức trang chủ). */
   sizes?: string;
+  /** Thẻ `card` nằm trên nền tối (khối Tin tức trang chủ): giữ thẻ phẳng trong suốt như chợ; mặc định thẻ trắng bo 20px ở trang danh sách. */
+  onDark?: boolean;
 }
 
 const IMAGE_ZOOM = "[&_img]:transition-transform [&_img]:duration-(--duration-slow) group-hover:[&_img]:scale-105 motion-reduce:[&_img]:transition-none motion-reduce:group-hover:[&_img]:scale-100";
@@ -33,25 +35,28 @@ const IMAGE_RATIO: Record<NewsCardVariant, string> = { card: "16/10", feature: "
  * Thẻ Tin tức (design-spec §3.2 "Tin/ưu đãi"): cả thẻ là MỘT link (không lồng link). Danh mục là chữ metadata, không phải link riêng
  * (nên không lồng `<a>`); tiêu đề là heading để người đọc màn hình duyệt theo heading. Server Component.
  */
-export function NewsCard({ data, variant = "card", headingLevel, priority = false, sizes }: NewsCardProps) {
+export function NewsCard({ data, variant = "card", headingLevel, priority = false, sizes, onDark = false }: NewsCardProps) {
   const Heading = headingLevel;
   const isRow = variant === "row";
   const isFeature = variant === "feature";
+  // Chỉ thẻ lưới `card` trên nền sáng là thẻ trắng viền (như PostCard); feature/row và thẻ trên nền tối giữ phẳng.
+  const isBoxed = variant === "card" && !onDark;
   return (
-    <article>
+    <article className={cn(isBoxed && "h-full")}>
       <Link
         href={data.href}
         className={cn(
-          "group flex min-h-11 gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
+          "group flex min-h-11 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
+          isBoxed ? "h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md" : "gap-4 rounded-xl",
           isRow ? "flex-row items-start" : "flex-col",
         )}
       >
-        <div className={cn("shrink-0 overflow-hidden rounded-xl bg-surface-muted", isRow ? "w-24 sm:w-[120px]" : "w-full", IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
+        <div className={cn("shrink-0 overflow-hidden bg-surface-muted", !isBoxed && "rounded-xl", isRow ? "w-24 sm:w-[120px]" : "w-full", IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
           {data.cover && (
             <ResponsiveImage media={data.cover} sizes={sizes ?? IMAGE_SIZES[variant]} aspectRatio={IMAGE_RATIO[variant]} priority={priority} decorative />
           )}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className={cn("flex min-w-0 flex-1 flex-col gap-2", isBoxed && "p-4")}>
           {data.categoryName && <p className="text-xsmall font-semibold text-accent-text">{data.categoryName}</p>}
           <Heading
             className={cn(

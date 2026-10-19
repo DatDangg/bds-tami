@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
@@ -45,6 +46,22 @@ describe("NewsCard", () => {
     expect(screen.queryByText("Tóm tắt 1")).toBeNull();
     expect(container.querySelector("time")).toBeNull();
     expect(screen.queryByText("Thị trường")).toBeNull();
+  });
+});
+
+describe("NewsCard bề mặt thẻ", () => {
+  it("thẻ lưới là thẻ trắng viền + hover:shadow-md; onDark và row/feature giữ phẳng", () => {
+    const link = (ui: ReactElement) => renderWithIntl(ui).container.querySelector("a");
+    expect(link(<NewsCard data={card("1")} headingLevel="h2" />)).toHaveClass("bg-surface", "border", "hover:shadow-md", "overflow-hidden");
+    const flats = [
+      link(<NewsCard data={card("2")} headingLevel="h2" onDark />),
+      link(<NewsCard data={card("3")} headingLevel="h2" variant="row" />),
+      link(<NewsCard data={card("4")} headingLevel="h2" variant="feature" />),
+    ];
+    for (const flat of flats) {
+      expect(flat).not.toHaveClass("bg-surface");
+      expect(flat).not.toHaveClass("border");
+    }
   });
 });
 

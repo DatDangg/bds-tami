@@ -3,8 +3,8 @@
 | Thông tin | Nội dung |
 |---|---|
 | Tên dự án | Website thương hiệu TAMI |
-| Phiên bản | 1.6 |
-| Ngày | 19/10/2026 |
+| Phiên bản | 1.7 |
+| Ngày | 20/10/2026 |
 | Trạng thái | Đã duyệt phạm vi giai đoạn 1 |
 | Người soạn | (điền) |
 | Người phê duyệt | (điền) |
@@ -21,6 +21,7 @@
 | 1.4 | 16/10/2026 | **Song ngữ Việt – Anh**: website công khai có bản tiếng Anh (URL `/en/...`), tiếng Việt là mặc định. Thêm §2.1, FR-PUB-18, 19, FR-ADM-17, BR-07, BR-17; sửa FR-PUB-15, BR-05, A5. Chốt giao diện theo phong cách vinhomes.vn. Trang quản trị vẫn chỉ tiếng Việt |
 | 1.5 | 16/10/2026 | **AI tự dịch sang tiếng Anh** (Claude API): xuất bản bản tiếng Việt là tự dịch và hiện bản tiếng Anh, nhân viên sửa tay được; trang pháp lý phải duyệt tay. Thêm FR-ADM-18, BR-08; sửa FR-ADM-17, BR-07, NFR-09, A5, Q5, ngoài phạm vi |
 | 1.6 | 19/10/2026 | BR-08: sửa tay bản tiếng Anh của trang pháp lý đã duyệt → ẩn `/en` tới khi admin duyệt lại (user quyết 19/10/2026, BL-013) |
+| 1.7 | 20/10/2026 | Tin tức có form "Tư vấn nhu cầu" (nguồn lead `contact`) cuối trang danh sách `/tin-tuc`; trang danh mục + chi tiết tin tức vẫn không thu lead. Sửa ghi chú "Đăng tin BĐS ≠ Tin tức", BR-10 (change request BL-020 user duyệt 19/10/2026, giao agent quyết phần còn lại 20/10/2026) |
 
 ---
 
@@ -118,7 +119,7 @@ Tiếng Việt **không có tiền tố**; tiếng Anh có tiền tố `/en` và
 - Khách vào lần đầu luôn thấy tiếng Việt; **không** tự chuyển theo ngôn ngữ trình duyệt (để Google index đủ cả hai bản). Lựa chọn của khách được nhớ bằng cookie.
 - Tên tỉnh/thành, phường/xã giữ nguyên tiếng Việt ở cả hai bản (tên riêng); slug địa danh dùng chung.
 
-> **Đăng tin BĐS ≠ Tin tức.** *Đăng tin BĐS* là tin thương mại của TAMI (tin BĐS, voucher, ưu đãi) và có form thu lead. *Tin tức* là tin tức chung (thị trường, đời sống, sự kiện), không thu lead.
+> **Đăng tin BĐS ≠ Tin tức.** *Đăng tin BĐS* là tin thương mại của TAMI (tin BĐS, voucher, ưu đãi) và có form thu lead. *Tin tức* là tin tức chung (thị trường, đời sống, sự kiện); bài tin tức không có form thu lead — chỉ trang danh sách `/tin-tuc` có form "Tư vấn nhu cầu" chung (nguồn `contact`, BL-020).
 >
 > **Cho thuê ≠ Đăng tin BĐS.** *Cho thuê* là danh sách BĐS cho thuê **có cấu trúc** (giá, diện tích, phòng…) để lọc. *Đăng tin BĐS* là **bài đăng dạng tin**.
 
@@ -198,7 +199,7 @@ Quy ước ưu tiên: **Must** = bắt buộc cho go-live, **Should** = nên có
 
 ### 4.2. Lead
 
-- **BR-10** Nguồn lead: form tin cho thuê, form bài Đăng tin BĐS, form dự án, form liên hệ chung.
+- **BR-10** Nguồn lead: form tin cho thuê, form bài Đăng tin BĐS, form dự án, form liên hệ chung (trang Liên hệ và form "Tư vấn nhu cầu" cuối trang danh sách Tin tức `/tin-tuc` — cùng nguồn `contact`, BL-020).
 - **BR-11** Trạng thái: `Mới → Đã liên hệ → Đang tư vấn → Đã chốt | Không thành (bắt buộc lý do) | Spam`.
 - **BR-12** Phân công:
   - Lead từ **tin cho thuê / bài Đăng tin BĐS**: tự giao cho **sale đã đăng nội dung đó** (nếu sale còn hoạt động; nếu không thì chờ admin giao).

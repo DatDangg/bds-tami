@@ -121,7 +121,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Kèm JSON-LD `BreadcrumbList` theo ngôn ngữ.
 
 ### 2.7. Page banner (đầu trang danh sách)
-- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)` (`size="default"`; trang danh sách dùng `size="compact"` — **cao cố định 240px** + chừa 3rem đáy cho băng tìm kiếm đè lên, mô tả tối đa 2 dòng; BL-020 P3), ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
+- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)` (`size="default"`; trang danh sách dùng `size="compact"` — **cao cố định 240px**; chỉ khi có băng tìm kiếm đè (prop `overlap`) mới chừa 3rem đáy, mô tả tối đa 2 dòng; BL-020 P3), ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
 - Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` (viết thường, không còn chữ chìm), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
 - Header trên trang có banner ảnh: vẫn là thanh nổi kính mờ sáng §2.1 (không còn biến thể trong suốt).
 
@@ -139,9 +139,9 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 | Thẻ | Ảnh | Nội dung | Hover/focus |
 |---|---|---|---|
-| **Dự án** | 4:5 (< md) / 4:3 (≥ md), `--radius-xl` (20px) | Badge `salesStatus`; tên `--text-h3` serif; tỉnh/thành `--text-small` muted; "Từ <giá>" `--text-small` 600 nếu có | Ảnh `--hover-zoom` `--duration-slow`; tên gạch chân. Cả thẻ là 1 link (`<a>` bọc, không lồng link) |
+| **Dự án** | 4:5 (< md) / 4:3 (≥ md), `--radius-xl` (20px); thẻ trắng `--color-surface`, viền `--color-border`, khung `overflow-hidden` bo 20px, nội dung `p-4` | Badge `salesStatus`; tên `--text-h4`; tỉnh/thành `--text-small` muted; "Từ <giá>" `--text-small` 600 nếu có | Ảnh `--hover-zoom` `--duration-slow`; thẻ `hover:shadow-md`; tên gạch chân. Cả thẻ là 1 link (`<a>` bọc, không lồng link) |
 | **Tin cho thuê** | 4:3, `--radius-xl` (20px), nền `--color-surface`, viền `--color-border` | Giá/tháng `--text-h4` `--color-text` (hoặc "Thoả thuận / Negotiable"); tiêu đề 2 dòng `--text-body` 600; hàng thông số icon + số: diện tích, phòng ngủ, WC (`tabular-nums`); phường, tỉnh `--text-small` muted; mã tin `--text-xsmall` muted | Ảnh zoom; viền đổi `--color-input-border`. Tin `rented` không bao giờ xuất hiện trong lưới/tin tương tự nên thẻ không cần badge "Đã thuê" |
-| **Tin/ưu đãi** (Đăng tin BĐS, Tin tức) | 16:10, `--radius-xl` | Danh mục `--text-xsmall` 600 `--color-accent-text` (đây là metadata, không tính eyebrow section); tiêu đề 2-3 dòng `--text-h4`; excerpt 2 dòng (chỉ thẻ lớn); ngày `--text-xsmall` muted; Đăng tin BĐS: badge "Đã kết thúc" / "Còn <n> ngày" nếu có `offer.endAt` | Ảnh zoom; tiêu đề gạch chân |
+| **Tin/ưu đãi** (Đăng tin BĐS, Tin tức) | 16:10; thẻ lưới `card` trắng bo 20px viền `--color-border`, nội dung `p-4` (PostCard, NewsCard; NewsCard trên nền tối khối Tin tức trang chủ giữ phẳng trong suốt, ảnh bo 20px; bài lớn `feature` và hàng `row` của trang Tin tức cũng phẳng) | Danh mục `--text-xsmall` 600 `--color-accent-text` (đây là metadata, không tính eyebrow section); tiêu đề 2-3 dòng `--text-h4`; excerpt 2 dòng (chỉ thẻ lớn); ngày `--text-xsmall` muted; Đăng tin BĐS: badge "Đã kết thúc" / "Còn <n> ngày" nếu có `offer.endAt` | Ảnh zoom; thẻ trắng `hover:shadow-md`; tiêu đề gạch chân |
 | **Dịch vụ** | 3:4 (nhỏ) / 4:5 (lớn), scrim dưới | Tên `--text-h2` trắng đè trên ảnh (đáy trái), `summary` 2 dòng `--color-on-dark-muted` ≥ md | Ảnh zoom; mũi tên `ArrowRight` trượt 4px |
 | **Việc làm** (hàng) | không ảnh | Tên vị trí `--text-h4`; nơi làm, hình thức, lương (`salaryText`), hạn nộp; nút mũi tên | Nền `--color-surface` → `--color-primary-subtle` |
 
@@ -333,10 +333,10 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 | Mốc | Thay đổi |
 |---|---|
-| 375 | Chip cuộn ngang (scroll-snap, có fade mép phải báo còn), 2 select xếp hàng 50/50; lưới 1 cột |
+| 375 | Chip cuộn ngang (scroll-snap, có fade mép phải báo còn), hai ô chọn Tỉnh/thành + Trạng thái và nút "Lọc" xếp dọc trong băng đè banner (§2.7 `overlap`); lưới 1 cột |
 | 640 | Lưới 2 cột |
-| 1024 | Chip + select cùng 1 hàng (select bên phải); lưới 3 cột |
-| 1536 | Giữ 3 cột, nới gap |
+| 1024 | Băng tìm kiếm một hàng (2 ô chọn + "Lọc"); lưới 3 cột |
+| 1280 | Lưới 4 cột (giữ 4 cột ở 1536, nới gap) |
 
 **States:** đổi chip/trang: giữ lưới cũ, mờ 50% + `aria-busy`, link đang chờ mờ nhẹ (`useLinkStatus`); không skeleton cấp route (§3.2); trống khi lọc §3.9 (câu: "Chưa có dự án phù hợp."); EN: chỉ dự án `hasEnglish`.
 **A11y:** chip là `button[aria-pressed]` trong `role="group" aria-label="Loại hình"`; kết quả `aria-live`.
@@ -477,6 +477,7 @@ Responsive: theo màn cha.
 | 375 | Tab cuộn ngang; bài nổi bật = thẻ dọc thường lớn hơn (ảnh 16:10, tiêu đề `--text-h3`); lưới 1 cột |
 | 640 | Lưới 2 cột |
 | 1024 | Bài nổi bật split 7/5; lưới 3 cột |
+| 1280 | Lưới 4 cột |
 
 **States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống §3.9; EN theo `hasEnglish`. **Eyebrow:** 0 (nhãn danh mục trên thẻ là metadata).
 

@@ -30,7 +30,7 @@ export function HomeNews({ block }: { block: NewsBlockView }) {
         <ul className="grid gap-6 sm:grid-cols-3">
           {block.posts.map((post) => (
             <li key={post.id}>
-              <NewsCard data={post} headingLevel="h3" sizes={NEWS_IMAGE_SIZES} />
+              <NewsCard data={post} headingLevel="h3" sizes={NEWS_IMAGE_SIZES} onDark />
             </li>
           ))}
         </ul>
