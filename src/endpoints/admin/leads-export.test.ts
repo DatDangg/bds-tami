@@ -7,12 +7,12 @@ import { handleLeadsExport, toExportRow } from "./leads-export";
 
 const allowed = vi.fn(async () => ({ allowed: true as const, remaining: 9 }));
 
-function fakeRequest(role: string, count = 0) {
+function fakeRequest(role: string, count = 0, query = "") {
   const create = vi.fn(async () => ({}));
   const countFn = vi.fn(async () => ({ totalDocs: count }));
   const find = vi.fn(async () => ({ docs: [], hasNextPage: false }));
   const req = {
-    url: "http://localhost/api/admin/leads/export",
+    url: `http://localhost/api/admin/leads/export${query}`,
     user: { id: "u1", role, active: true, collection: "staff" },
     headers: new Headers(),
     payload: { create, count: countFn, find },
@@ -108,5 +108,38 @@ describe("toExportRow", () => {
     const row = toExportRow(lead({ anonymizedAt: "2026-10-18T00:00:00.000Z" }), undefined);
     expect(row.slice(1, 5)).toEqual(["Đã ẩn danh", "Đã ẩn danh", "", ""]);
     expect(JSON.stringify(row)).not.toContain("0901234567");
+  });
+});
+
+describe("handleLeadsExport — chip Lead (BL-022 T02)", () => {
+  it("statusIn + unassigned: đếm và đọc đúng where; audit chỉ ghi bộ lọc chuẩn hoá + rowCount", async () => {
+    const { req, create, countFn, find } = fakeRequest("admin", 1, "?statusIn=contacted,consulting,contacted&unassigned=1");
+    find.mockImplementation((async () => ({ docs: [lead()] })) as never);
+    const response = await handleLeadsExport(req, allowed, 10, 5);
+    expect(response.status).toBe(200);
+    await response.arrayBuffer();
+    const expectedWhere = { and: [{ status: { in: ["contacted", "consulting"] } }, { assignedTo: { exists: false } }] };
+    expect((countFn.mock.calls as unknown as [{ where: unknown; overrideAccess: boolean }][])[0]![0]).toMatchObject({ where: expectedWhere, overrideAccess: false });
+    expect((find.mock.calls as unknown as [{ where: unknown; overrideAccess: boolean }][])[0]![0]).toMatchObject({ where: expectedWhere, overrideAccess: false });
+    const audit = (create.mock.calls as unknown as [{ data: { meta: unknown } }][])[0]![0];
+    expect(audit.data.meta).toEqual({ filters: { statusIn: ["contacted", "consulting"], unassigned: true }, rowCount: 1 });
+  });
+
+  it.each(["?statusIn=hacked", "?statusIn=won&status=new", "?unassigned=1&assignedTo=0a1b2c3d-1111-4222-8333-444455556666", "?statusIn=,", "?unassigned=true"])(
+    "tham số sai/mâu thuẫn %s -> 400 trước rate limit, không đếm, không audit",
+    async (query) => {
+      const { req, create, countFn } = fakeRequest("admin", 0, query);
+      const limiter = vi.fn(allowed);
+      const response = await handleLeadsExport(req, limiter);
+      expect(response.status).toBe(400);
+      expect(limiter).not.toHaveBeenCalled();
+      expect(countFn).not.toHaveBeenCalled();
+      expect(create).not.toHaveBeenCalled();
+    },
+  );
+
+  it("sale vẫn 403 dù có chip (quyền xuất không đổi)", async () => {
+    const { req } = fakeRequest("sale", 0, "?unassigned=1");
+    expect((await handleLeadsExport(req, allowed)).status).toBe(403);
   });
 });

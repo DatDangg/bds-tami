@@ -3,7 +3,7 @@
   "scopeVersion": 22,
   "generatedAt": "2026-10-20T16:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-022 — chip lọc nhanh danh sách admin (#11 #12): Tin cho thuê (Trạng thái / Số PN / Khoảng giá) + Lead (Trạng thái) + xuất Excel lead theo chip. Spec 1.17.0 → 1.18.0 (MINOR). Phát hành trước khi build (T01, T02 chưa code) — commits/files là kế hoạch, cập nhật ở close-out.",
+  "triggerNote": "BL-022 — chip lọc nhanh danh sách admin (#11 #12): Tin cho thuê (Trạng thái / Số PN / Khoảng giá) + Lead (Trạng thái) + xuất Excel lead theo chip (statusIn, unassigned=1). Spec 1.17.0 → 1.18.0 (MINOR). Đã build: T01 7cb85fd, T02 = commit close-out (cùng commit với file này).",
   "workItem": "feature/admin-list-quick-filter-chips",
   "backlog": "BL-022",
   "classification": "ADDITIVE",
@@ -12,8 +12,13 @@
     "tasks/feature-admin-list-quick-filter-chips/phase-1-task-01.md",
     "tasks/feature-admin-list-quick-filter-chips/phase-1-task-02.md"
   ],
-  "commits": [],
-  "commitNotes": {},
+  "commits": [
+    "7cb85fd"
+  ],
+  "commitNotes": {
+    "7cb85fd": "T01 — helper quick-filters + QuickFilterChips + chip Tin cho thuê + spec 1.18.0/scope v22",
+    "(commit này)": "T02 — chip Trạng thái Lead + xuất Excel theo chip (statusIn/unassigned) + giá trị chuỗi \"false\"/\"0\" tránh WhereBuilder bỏ giá trị falsy + API_SPEC + close-out"
+  },
   "previousScope": "spec/test-scope/archive/test-scope-1.17.0-21.json",
   "specUpdate": "spec/updates/2026-10-20-admin-list-quick-filter-chips.md",
   "specRefs": [
@@ -31,15 +36,21 @@
       "src/lib/admin/quick-filters.test.ts",
       "src/components/admin/QuickFilterChips.tsx",
       "src/components/admin/QuickFilterChips.test.tsx",
+      "src/components/admin/RentalQuickFilterSlot.tsx",
+      "src/components/admin/LeadQuickFilterSlot.tsx",
       "src/collections/Rentals.ts",
       "src/collections/Leads.ts",
+      "src/lib/translation/admin-ui.ts",
       "src/lib/leads/export-filters.ts",
       "src/lib/leads/export-filters.test.ts",
-      "src/endpoints/admin/leads-export.ts",
+      "src/endpoints/admin/leads-export.test.ts",
+      "src/components/admin/LeadExportButton.test.tsx",
+      "src/components/admin/LeadExportSlot.test.tsx",
       "src/components/admin/styles/_lists.scss",
+      "src/app/(payload)/admin/importMap.js",
       "docs/API_SPEC.md"
     ],
-    "filesNote": "KẾ HOẠCH (task T01/T02, chưa code). Có thể thêm src/app/(payload)/admin/importMap.js, src/components/admin/LeadExportButton.tsx, src/lib/translation/admin-ui.ts (nếu tách toBranches dùng chung). Thay bằng diff thật ở close-out. Không schema/migration/access control.",
+    "filesNote": "Diff thật (T01 + T02). src/endpoints/admin/leads-export.ts không đổi (dùng parse/build mới của export-filters). Không schema/migration/access control.",
     "modules": [
       "Helper where chip — src/lib/admin/quick-filters.ts (currentChip / withChip, ghép điều kiện vào từng nhánh or, thay điều kiện lá cùng trường, chuẩn hoá giá trị chuỗi từ URL)",
       "Component client — src/components/admin/QuickFilterChips.tsx (useListQuery + refineListData, role=group, aria-pressed, cuộn ngang)",

@@ -1,7 +1,8 @@
 ---
 id: admin-list-quick-filter-chips
 type: feature
-status: in_progress
+status: done
+completed: 2026-10-20
 created: 2026-10-19
 ---
 
@@ -37,11 +38,11 @@ Chip không nới quyền: Sale vẫn chỉ thấy lead được phép như hi�
 Chip diện tích (`areaM2`), màn Dự án / Đăng tin BĐS.
 
 ## Acceptance
-- [ ] Chip áp/bỏ 1 chạm, kết hợp đúng với bộ lọc khác và Lọc dịch (không lặp lại bug #01).
-- [ ] Rentals: 3 nhóm chip đúng bảng trên; Leads: nhóm Trạng thái đúng bảng trên.
-- [ ] Chip đang chọn nằm trên URL (`where`) → F5 / chia sẻ link giữ nguyên; tự sửa bộ lọc trùng nhóm thì chip bỏ sáng tương ứng.
-- [ ] Xuất Excel lead khi đang chọn chip xuất đúng tập đang lọc.
-- [ ] Đạt AA sáng/tối, thao tác được bằng bàn phím, 375px không tràn ngang trang (thanh chip cuộn ngang).
+- [x] Chip áp/bỏ 1 chạm, kết hợp đúng với bộ lọc khác và Lọc dịch (không lặp lại bug #01).
+- [x] Rentals: 3 nhóm chip đúng bảng trên; Leads: nhóm Trạng thái đúng bảng trên.
+- [x] Chip đang chọn nằm trên URL (`where`) → F5 / chia sẻ link giữ nguyên; tự sửa bộ lọc trùng nhóm thì chip bỏ sáng tương ứng.
+- [x] Xuất Excel lead khi đang chọn chip xuất đúng tập đang lọc.
+- [x] Đạt AA sáng/tối, thao tác được bằng bàn phím, 375px không tràn ngang trang (thanh chip cuộn ngang).
 
 ## Quyết định agent (user ủy quyền 2026-10-20: "tự quyết định đừng hỏi lại")
 - D1 Chia 2 task tuần tự: T01 chip Tin cho thuê (helper chip dùng chung + component), T02 chip Lead + xuất Excel theo chip. Không song song vì T02 dùng lại helper/component của T01.
@@ -51,3 +52,7 @@ Chip diện tích (`areaM2`), màn Dự án / Đăng tin BĐS.
 - D5 Điều kiện: `Đang tư vấn` = `status in [contacted, consulting]`; `Mới (chưa giao)` = `status equals new` + `assignedTo exists false`; `3 PN+` = `bedrooms >= 3`; giá theo bảng (`less_than` / `greater_than_equal` / `less_than_equal` / `greater_than`).
 - D6 Xuất Excel lead: mở rộng ánh xạ where → query (client) và parse/build (server) chỉ cho 2 dạng chip mới: `status` "nằm trong" (giá trị thuộc danh sách trạng thái hợp lệ) và `assignedTo` "chưa có" (`exists: false`). Toán tử khác vẫn khoá nút (không over-export PII). Cập nhật `docs/API_SPEC.md` (as-built).
 - D7 Không đổi schema/DB/quyền, không endpoint mới → không migration. Spec MINOR 1.17.0 → 1.18.0.
+
+## Kết quả (2026-10-20)
+- T01 chip Tin cho thuê — 7cb85fd (STRICT PASS r1). T02 chip Lead + xuất Excel theo chip — commit close-out (STRICT PASS r2). Phase 1 spec-validation PASS. Spec 1.18.0 / scope v22.
+- Ghi chú triển khai: chip ghi giá trị chuỗi `"false"` / `"0"` vì WhereBuilder Payload bỏ giá trị falsy khi ghi lại where; nhãn toán tử thông báo xuất theo Payload vi ("có trong", "tồn tại" = Sai).

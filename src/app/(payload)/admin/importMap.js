@@ -1,6 +1,7 @@
 import { StatusBadgeCell as StatusBadgeCell_049a377af467778f75412fe47ce1c48b } from '../../../components/admin/StatusBadge'
 import { AssigneeCell as AssigneeCell_50dd5bd65132638dfcb9d482bf780df9 } from '../../../components/admin/AssigneeCell'
 import { LeadAssigneeWarning as LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef } from '../../../components/admin/LeadAssigneeWarning'
+import { LeadQuickFilterSlot as LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507 } from '../../../components/admin/LeadQuickFilterSlot'
 import { LeadExportSlot as LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b } from '../../../components/admin/LeadExportSlot'
 import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd } from '../../../components/admin/SearchReindexPendingWarning'
 import { TitleLinkCell as TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc } from '../../../components/admin/TitleLinkCell'
@@ -48,6 +49,7 @@ export const importMap = {
   "/components/admin/StatusBadge#StatusBadgeCell": StatusBadgeCell_049a377af467778f75412fe47ce1c48b,
   "/components/admin/AssigneeCell#AssigneeCell": AssigneeCell_50dd5bd65132638dfcb9d482bf780df9,
   "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning": LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76aaef,
+  "/components/admin/LeadQuickFilterSlot#LeadQuickFilterSlot": LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507,
   "/components/admin/LeadExportSlot#LeadExportSlot": LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b,
   "/components/admin/SearchReindexPendingWarning#SearchReindexPendingWarning": SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd,
   "/components/admin/TitleLinkCell#TitleLinkCell": TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc,

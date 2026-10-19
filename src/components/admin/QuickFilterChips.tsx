@@ -3,7 +3,7 @@
 import { useListDrawerContext, useListQuery } from "@payloadcms/ui";
 import type { Where } from "payload";
 
-import { currentChip, type QuickFilterGroup, withChip } from "@/lib/admin/quick-filters";
+import { currentChip, hasGroupCondition, type QuickFilterGroup, withChip } from "@/lib/admin/quick-filters";
 
 /**
  * Thanh chip lọc nhanh trên danh sách (BL-022): mỗi nhóm chọn 1, bấm lại chip đang sáng hoặc `Tất cả` = bỏ lọc nhóm.
@@ -20,6 +20,8 @@ export function QuickFilterChips({ groups }: { groups: QuickFilterGroup[] }) {
     <div className="list-toolbar-item quick-filter-chips">
       {groups.map((group) => {
         const active = currentChip(where, group);
+        // `Tất cả` sáng khi nhóm không có điều kiện nào (kể cả bộ lọc tay không khớp chip); bấm khi đang sáng thì không gọi refineListData.
+        const allActive = active === "" && !hasGroupCondition(where, group);
         const choose = (key: string) => void refineListData({ where: withChip(where, group, key), page: 1 });
         return (
           <div aria-label={group.label} className="quick-filter-chips__group" key={group.id} role="group">
@@ -28,7 +30,7 @@ export function QuickFilterChips({ groups }: { groups: QuickFilterGroup[] }) {
             </span>
             <div className="quick-filter-chips__scroller">
               {group.allLabel ? (
-                <button aria-pressed={active === ""} className="quick-filter-chips__chip" onClick={() => choose("")} type="button">
+                <button aria-pressed={allActive} className="quick-filter-chips__chip" onClick={() => (allActive ? undefined : choose(""))} type="button">
                   {group.allLabel}
                 </button>
               ) : null}

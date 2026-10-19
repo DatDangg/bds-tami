@@ -72,6 +72,11 @@ export function currentChip(where: Where | undefined, group: QuickFilterGroup): 
   return match?.key ?? "";
 }
 
+/** Có nhánh nào đang chứa điều kiện lá trên trường của nhóm (bộ lọc tay hay chip) — `Tất cả` chỉ sáng khi không có. */
+export function hasGroupCondition(where: Where | undefined, group: QuickFilterGroup): boolean {
+  return toBranches(where).some((entries) => entries.some((entry) => touchesAnyField(entry, group.fields)));
+}
+
 /**
  * `where` mới: trong từng nhánh giữ các điều kiện khác, bỏ điều kiện cũ của nhóm (mọi toán tử trên trường chip thay thế + điều kiện chip của nhóm
  * trên trường phụ) rồi thêm điều kiện của chip `key` (`""` = chỉ bỏ). Dạng đầu vào/đầu ra như `withTranslationFilter`.
@@ -95,6 +100,23 @@ const cond = (field: string, operator: string, value: unknown): Where => ({ [fie
 
 const MILLION = 1_000_000;
 
+/** Chip danh sách Lead (BL-022): `Mới (chưa giao)` thay cả `status` lẫn `assignedTo`; chip khác chỉ thay `status` (giữ Sale phụ trách chọn tay). `spam` chỉ ở `Tất cả`. */
+export const LEAD_QUICK_FILTER_GROUPS: QuickFilterGroup[] = [
+  {
+    id: "status",
+    label: "Trạng thái",
+    fields: ["status"],
+    allLabel: "Tất cả",
+    // Giá trị chuỗi "false" (không phải boolean): WhereBuilder của Payload đọc `value || undefined` nên giá trị falsy bị bỏ khi ghi lại where.
+    chips: [
+      { key: "new", label: "Mới (chưa giao)", replaces: ["status", "assignedTo"], conditions: [cond("status", "equals", "new"), cond("assignedTo", "exists", "false")] },
+      { key: "consulting", label: "Đang tư vấn", conditions: [cond("status", "in", ["contacted", "consulting"])] },
+      { key: "won", label: "Đã chốt", conditions: [cond("status", "equals", "won")] },
+      { key: "lost", label: "Không thành", conditions: [cond("status", "equals", "lost")] },
+    ],
+  },
+];
+
 /** Chip danh sách Tin cho thuê (BL-022, bảng trong change doc §1). `hidden` chỉ thấy ở `Tất cả`; tin thiếu số PN / giá không lọt chip nào của nhóm đó. */
 export const RENTAL_QUICK_FILTER_GROUPS: QuickFilterGroup[] = [
   {
@@ -113,8 +135,9 @@ export const RENTAL_QUICK_FILTER_GROUPS: QuickFilterGroup[] = [
     label: "Số phòng ngủ",
     fields: ["bedrooms"],
     allLabel: "Tất cả",
+    // "0" chuỗi (không phải số 0) cùng lý do: WhereBuilder bỏ giá trị falsy; Payload ép về số cho trường number.
     chips: [
-      { key: "studio", label: "Studio", conditions: [cond("bedrooms", "equals", 0)] },
+      { key: "studio", label: "Studio", conditions: [cond("bedrooms", "equals", "0")] },
       { key: "1", label: "1 PN", conditions: [cond("bedrooms", "equals", 1)] },
       { key: "2", label: "2 PN", conditions: [cond("bedrooms", "equals", 2)] },
       { key: "3plus", label: "3 PN+", conditions: [cond("bedrooms", "greater_than_equal", 3)] },

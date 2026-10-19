@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { TRANSLATION_FILTERS, withTranslationFilter } from "@/lib/translation/admin-ui";
 
-import { currentChip, type QuickFilterGroup, RENTAL_QUICK_FILTER_GROUPS, withChip } from "./quick-filters";
+import { currentChip, hasGroupCondition, LEAD_QUICK_FILTER_GROUPS, type QuickFilterGroup, RENTAL_QUICK_FILTER_GROUPS, withChip } from "./quick-filters";
 
 const [statusGroup, bedroomsGroup, priceGroup] = RENTAL_QUICK_FILTER_GROUPS as [QuickFilterGroup, QuickFilterGroup, QuickFilterGroup];
 const published: Where = { status: { equals: "published" } };
@@ -14,7 +14,7 @@ const leadLike: QuickFilterGroup = {
   label: "Trạng thái",
   fields: ["status"],
   chips: [
-    { key: "new", label: "Mới", replaces: ["status", "assignedTo"], conditions: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }] },
+    { key: "new", label: "Mới", replaces: ["status", "assignedTo"], conditions: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] },
     { key: "consulting", label: "Đang tư vấn", conditions: [{ status: { in: ["contacted", "consulting"] } }] },
   ],
 };
@@ -93,7 +93,7 @@ describe("withChip / currentChip", () => {
   it("replaces theo chip (Lead): rời chip Mới chỉ bỏ assignedTo chưa có, giữ Sale phụ trách tay", () => {
     const manualAssignee: Where = { assignedTo: { equals: "7" } };
     const fresh = withChip({ and: [manualAssignee] }, leadLike, "new");
-    expect(fresh).toEqual({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }] });
+    expect(fresh).toEqual({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] });
     const leaveNew = withChip({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }, { title: { like: "x" } }] }, leadLike, "consulting");
     expect(leaveNew).toEqual({ and: [{ title: { like: "x" } }, { status: { in: ["contacted", "consulting"] } }] });
     const keepManual = withChip({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }, manualAssignee] }, leadLike, "consulting");
@@ -102,5 +102,60 @@ describe("withChip / currentChip", () => {
     // Có Sale phụ trách tay cùng chip Mới: chip Mới không sáng (thừa điều kiện trên trường nó thay), chip khác thì sáng.
     expect(currentChip({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }, manualAssignee] }, leadLike)).toBe("");
     expect(currentChip({ and: [{ status: { in: ["contacted", "consulting"] } }, manualAssignee] }, leadLike)).toBe("consulting");
+  });
+});
+
+describe("LEAD_QUICK_FILTER_GROUPS (BL-022 T02)", () => {
+  const [group] = LEAD_QUICK_FILTER_GROUPS as [QuickFilterGroup];
+  const saleA: Where = { assignedTo: { equals: "sale-a" } };
+
+  it("đúng bảng chip; spam chỉ ở Tất cả", () => {
+    expect(group.chips.map((chip) => chip.key)).toEqual(["new", "consulting", "won", "lost"]);
+    expect(withChip(undefined, group, "new")).toEqual({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] });
+    expect(withChip(undefined, group, "consulting")).toEqual({ and: [{ status: { in: ["contacted", "consulting"] } }] });
+    expect(JSON.stringify(group)).not.toContain("spam");
+  });
+
+  it("W1: lọc Sale = A rồi bấm Đã chốt vẫn còn Sale = A; chip sáng, bấm lại bỏ đúng status", () => {
+    const won = withChip({ and: [saleA] }, group, "won");
+    expect(won).toEqual({ and: [saleA, { status: { equals: "won" } }] });
+    expect(currentChip(won, group)).toBe("won");
+    expect(withChip(won, group, "")).toEqual({ and: [saleA] });
+  });
+
+  it("rời chip Mới chỉ bỏ assignedTo chưa có; Tất cả bỏ cả hai; dạng URL (chuỗi) vẫn nhận", () => {
+    const fresh = withChip({ and: [saleA] }, group, "new");
+    expect(fresh).toEqual({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] });
+    expect(withChip(fresh, group, "lost")).toEqual({ and: [{ status: { equals: "lost" } }] });
+    expect(withChip(fresh, group, "")).toEqual({ and: [] });
+    const fromUrl: Where = { or: [{ and: [{ status: { in: ["contacted", "consulting"] } }, { createdAt: { greater_than_equal: "2026-10-01T00:00:00.000Z" } }] }] };
+    expect(currentChip(fromUrl, group)).toBe("consulting");
+    expect(currentChip({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] }, group)).toBe("new");
+  });
+
+  it("hasGroupCondition: bộ lọc tay trên status (không khớp chip) cũng tính; where rỗng / chỉ trường khác thì không", () => {
+    expect(hasGroupCondition(undefined, group)).toBe(false);
+    expect(hasGroupCondition({ and: [saleA] }, group)).toBe(false);
+    expect(hasGroupCondition({ and: [{ status: { equals: "spam" } }] }, group)).toBe(true);
+    expect(hasGroupCondition({ or: [{ and: [{ status: { not_equals: "new" } }] }] }, group)).toBe(true);
+    expect(currentChip({ and: [{ status: { equals: "spam" } }] }, group)).toBe("");
+  });
+});
+
+describe("giá trị điều kiện chip phải sống sót qua WhereBuilder của Payload", () => {
+  // WhereBuilder đọc `condition[field][operator] || undefined` → false / 0 / "" bị nuốt, Condition ghi lại where thiếu điều kiện đó.
+  it("không chip nào chứa giá trị lá falsy (boolean false, số 0, chuỗi rỗng)", () => {
+    const leaves = [...LEAD_QUICK_FILTER_GROUPS, ...RENTAL_QUICK_FILTER_GROUPS]
+      .flatMap((group) => group.chips)
+      .flatMap((chip) => chip.conditions)
+      .flatMap((entry) => Object.values(entry))
+      .flatMap((condition) => Object.values(condition as Record<string, unknown>));
+    expect(leaves.length).toBeGreaterThan(0);
+    expect(leaves.filter((value) => !value)).toEqual([]);
+  });
+
+  it("Studio ghi bedrooms = \"0\" và nhận lại cả dạng số 0", () => {
+    expect(withChip(undefined, bedroomsGroup, "studio")).toEqual({ and: [{ bedrooms: { equals: "0" } }] });
+    expect(currentChip({ and: [{ bedrooms: { equals: 0 } }] }, bedroomsGroup)).toBe("studio");
   });
 });

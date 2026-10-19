@@ -12,8 +12,10 @@ vi.mock("@payloadcms/ui", () => ({
   useListDrawerContext: () => ({ isInDrawer: state.isInDrawer }),
 }));
 
+import { Leads } from "../../collections/Leads";
 import { Rentals } from "../../collections/Rentals";
 import { RENTAL_QUICK_FILTER_GROUPS, withChip } from "../../lib/admin/quick-filters";
+import { LeadQuickFilterSlot } from "./LeadQuickFilterSlot";
 import { QuickFilterChips } from "./QuickFilterChips";
 import { RentalQuickFilterSlot } from "./RentalQuickFilterSlot";
 
@@ -80,5 +82,52 @@ describe("RentalQuickFilterSlot + cấu hình Rentals", () => {
 
   it("dùng chung kết quả withChip", () => {
     expect(withChip(undefined, statusGroup!, "draft")).toEqual({ and: [{ status: { equals: "draft" } }] });
+  });
+});
+
+describe("QuickFilterChips — `Tất cả` (minor review T01)", () => {
+  it("bộ lọc tay không khớp chip (vd status = spam): `Tất cả` không sáng, chip nào cũng không sáng", () => {
+    setup({ and: [{ status: { equals: "spam" } }] });
+    const status = screen.getByRole("group", { name: "Trạng thái" });
+    expect(Array.from(status.querySelectorAll("button")).every((button) => button.getAttribute("aria-pressed") === "false")).toBe(true);
+  });
+
+  it("bấm `Tất cả` đang sáng: không gọi refineListData", () => {
+    setup();
+    fireEvent.click(screen.getAllByRole("button", { name: "Tất cả" })[0]!);
+    expect(state.refineListData).not.toHaveBeenCalled();
+  });
+
+  it("bấm `Tất cả` khi bộ lọc tay không khớp chip: bỏ điều kiện status", () => {
+    setup({ and: [{ status: { equals: "spam" } }] });
+    fireEvent.click(screen.getAllByRole("button", { name: "Tất cả" })[0]!);
+    expect(state.refineListData).toHaveBeenCalledWith({ where: { and: [] }, page: 1 });
+  });
+});
+
+describe("LeadQuickFilterSlot + chip Lead", () => {
+  const renderLead = (segments: string[]) => render(<LeadQuickFilterSlot params={{ segments }} />);
+
+  it("danh sách thường: 5 nút Trạng thái; thùng rác thì không render", () => {
+    state.where = undefined;
+    state.isInDrawer = false;
+    const normal = renderLead(["collections", "leads"]);
+    const labels = Array.from(normal.getByRole("group", { name: "Trạng thái" }).querySelectorAll("button")).map((button) => button.textContent);
+    expect(labels).toEqual(["Tất cả", "Mới (chưa giao)", "Đang tư vấn", "Đã chốt", "Không thành"]);
+    expect(renderLead(["collections", "leads", "trash"]).container.innerHTML).toBe("");
+  });
+
+  it("bấm Mới (chưa giao): ghi status = new + assignedTo exists false, về trang 1", () => {
+    setup(undefined);
+    render(<LeadQuickFilterSlot params={{ segments: ["collections", "leads"] }} />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Mới (chưa giao)" })[0]!);
+    expect(state.refineListData).toHaveBeenLastCalledWith({ where: { and: [{ status: { equals: "new" } }, { assignedTo: { exists: "false" } }] }, page: 1 });
+  });
+
+  it("đăng ký ở beforeListTable cùng hàng với nút xuất, chip trước", () => {
+    expect(Leads.admin?.components?.beforeListTable).toEqual([
+      "/components/admin/LeadQuickFilterSlot#LeadQuickFilterSlot",
+      "/components/admin/LeadExportSlot#LeadExportSlot",
+    ]);
   });
 });

@@ -1,11 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "admin-list-quick-filter-chips",
-    "phaseTask": "phase-1-task-02",
-    "journal": ".context/runs/feature-admin-list-quick-filter-chips-phase-1.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -635,10 +630,10 @@
       "slug": "admin-list-quick-filter-chips",
       "title": "Chip lọc nhanh danh sách admin: Tin cho thuê (Trạng thái / Số PN / Khoảng giá) + Lead (Trạng thái, xuất Excel theo chip) (BL-022)",
       "type": "ADDITIVE",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-022",
-      "changeDoc": "spec/changes/2026-10-19-admin-list-quick-filter-chips.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-admin-list-quick-filter-chips.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -648,13 +643,19 @@
           "round": 1,
           "reviewerResult": "PASS",
           "reviewLevel": "STRICT",
-          "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-01-round-1-review.md"
+          "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-01-round-1-review.md",
+          "commit": "7cb85fd"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-admin-list-quick-filter-chips/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-02-round-2-review.md",
+          "note": "attempt 2: giá trị chuỗi \"false\"/\"0\" (WhereBuilder bỏ giá trị falsy)"
         }
       ],
       "specValidation": {
@@ -663,11 +664,22 @@
         "report": ".context/review-reports/feature-admin-list-quick-filter-chips-spec-validation-round-2.md"
       },
       "startedAt": "2026-10-20",
-      "completedAt": null,
+      "completedAt": "2026-10-20",
       "specVersion": "1.18.0",
       "scopeVersion": 22,
       "specUpdate": "spec/updates/2026-10-20-admin-list-quick-filter-chips.md",
-      "decisions": "D1–D7 trong change doc — quyết định agent (user ủy quyền 2026-10-20)"
+      "decisions": "D1–D7 trong change doc — quyết định agent (user ủy quyền 2026-10-20)",
+      "phaseValidations": [
+        {
+          "phase": 1,
+          "result": "PASS",
+          "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-round-1-review.md"
+        }
+      ],
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-02-round-2-review.md",
+      "residual": "Dark mode + bàn phím chưa kiểm tay trên trình duyệt; 768/1280 chưa kiểm; chip chưa test với DB thật (unit + handler); chưa có tin Studio để kiểm kết quả; entry where nhiều trường trong 1 điều kiện (chỉ URL viết tay) bị bỏ cả cụm khi chọn chip."
     }
   ],
   "bugs": [
@@ -1490,7 +1502,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-20T17:00:00+07:00",
+  "lastUpdated": "2026-10-20T19:00:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

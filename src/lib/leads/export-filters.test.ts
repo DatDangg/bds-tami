@@ -132,7 +132,6 @@ describe("leadExportQueryFromWhere", () => {
 
   it.each([
     ["nhiều nhánh or", { or: [{ and: [{ status: { equals: "new" } }] }, { and: [{ status: { equals: "won" } }] }] }],
-    ["toán tử in", { or: [{ and: [{ status: { in: ["new", "won"] } }] }] }],
     ["toán tử not_equals", { or: [{ and: [{ status: { not_equals: "new" } }] }] }],
     ["field không hỗ trợ", { or: [{ and: [{ fullName: { like: "An" } }] }] }],
     ["ngày greater_than (không gồm đầu mút)", { or: [{ and: [{ createdAt: { greater_than: "2026-01-01T00:00:00.000Z" } }] }] }],
@@ -161,5 +160,89 @@ describe("leadExportQueryFromWhere", () => {
       expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
     }
     expect(UNSUPPORTED_FILTER_MESSAGE).not.toContain("tìm kiếm");
+  });
+});
+
+describe("chip Lead: status in + assignedTo exists false (BL-022 T02)", () => {
+  const queryOf = (where: unknown) => {
+    const result = leadExportQueryFromWhere(where);
+    return result.ok ? result.query : null;
+  };
+
+  it("client: status in (mảng / chuỗi phẩy / 1 phần tử từ URL) -> statusIn, khử trùng", () => {
+    expect(queryOf({ or: [{ and: [{ status: { in: ["contacted", "consulting"] } }] }] })).toBe("statusIn=contacted%2Cconsulting");
+    expect(queryOf({ and: [{ status: { in: "contacted,consulting" } }] })).toBe("statusIn=contacted%2Cconsulting");
+    expect(queryOf({ and: [{ status: { in: "won" } }] })).toBe("statusIn=won");
+    expect(queryOf({ and: [{ status: { in: ["won", "won"] } }] })).toBe("statusIn=won");
+  });
+
+  it("client: giá trị status in có khoảng trắng (Payload không trim, danh sách rỗng) -> khoá nút, không xuất", () => {
+    expect(leadExportQueryFromWhere({ and: [{ status: { in: " won" } }] })).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+    expect(leadExportQueryFromWhere({ and: [{ status: { in: ["contacted", "consulting "] } }] })).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+  });
+
+  it("client: assignedTo exists false (boolean hoặc chuỗi từ URL) -> unassigned=1; exists true bị khoá", () => {
+    expect(queryOf({ and: [{ assignedTo: { exists: false } }] })).toBe("unassigned=1");
+    expect(queryOf({ and: [{ assignedTo: { exists: "false" } }] })).toBe("unassigned=1");
+    expect(queryOf({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }] })).toBe("status=new&unassigned=1");
+    expect(leadExportQueryFromWhere({ and: [{ assignedTo: { exists: true } }] })).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+    expect(leadExportQueryFromWhere({ and: [{ assignedTo: { exists: "true" } }] })).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+  });
+
+  it("client: chip + tìm kiếm + ngày", () => {
+    const where = { or: [{ and: [{ status: { in: ["contacted", "consulting"] } }, { createdAt: { greater_than_equal: "2026-10-01T12:00:00.000Z" } }] }] };
+    expect(leadExportQueryFromWhere(where, "an")).toEqual({ ok: true, query: "statusIn=contacted%2Cconsulting&createdFrom=2026-10-01T12%3A00%3A00.000Z&search=an" });
+  });
+
+  it.each([
+    ["status in + status equals", { and: [{ status: { in: ["won"] } }, { status: { equals: "new" } }] }],
+    ["status equals + status in", { and: [{ status: { equals: "new" } }, { status: { in: ["won"] } }] }],
+    ["assignedTo equals + exists false", { and: [{ assignedTo: { equals: SALE_ID } }, { assignedTo: { exists: false } }] }],
+    ["exists false + assignedTo equals", { and: [{ assignedTo: { exists: false } }, { assignedTo: { equals: SALE_ID } }] }],
+    ["status in rỗng", { and: [{ status: { in: [] } }] }],
+    ["status in chuỗi rỗng", { and: [{ status: { in: "" } }] }],
+    ["status in giá trị lạ", { and: [{ status: { in: ["won", "hacked"] } }] }],
+    ["status in quá nhiều giá trị", { and: [{ status: { in: ["new", "contacted", "consulting", "won", "lost", "spam", "new"] } }] }],
+    ["status in không phải chuỗi", { and: [{ status: { in: [1] } }] }],
+    ["status not_in", { and: [{ status: { not_in: ["won"] } }] }],
+    ["source in", { and: [{ source: { in: ["rental"] } }] }],
+    ["field khác exists", { and: [{ source: { exists: false } }] }],
+    ["hai status in", { and: [{ status: { in: ["won"] } }, { status: { in: ["lost"] } }] }],
+  ])("client: %s -> khoá", (_name, where) => {
+    expect(leadExportQueryFromWhere(where)).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
+  });
+
+  it("server: statusIn + unassigned hợp lệ -> bộ lọc chuẩn hoá; build where đúng", () => {
+    const result = parse("statusIn=contacted,consulting,contacted&unassigned=1");
+    expect(result).toEqual({ ok: true, filters: { statusIn: ["contacted", "consulting"], unassigned: true } });
+    if (!result.ok) return;
+    expect(buildLeadExportWhere(result.filters)).toEqual({ and: [{ status: { in: ["contacted", "consulting"] } }, { assignedTo: { exists: false } }] });
+    expect(buildLeadExportWhere({ status: "new", unassigned: true })).toEqual({ and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }] });
+  });
+
+  it.each([
+    ["statusIn=won&status=new", "statusIn"],
+    ["status=new&statusIn=won", "statusIn"],
+    [`unassigned=1&assignedTo=${SALE_ID}`, "unassigned"],
+    ["statusIn=hacked", "statusIn"],
+    ["statusIn=won,,lost", "statusIn"],
+    ["statusIn=,", "statusIn"],
+    ["statusIn=new,contacted,consulting,won,lost,spam,new", "statusIn"],
+    ["statusIn=won%27%3B--", "statusIn"],
+    ["unassigned=0", "unassigned"],
+    ["unassigned=true", "unassigned"],
+    ["unassigned=1,2", "unassigned"],
+  ])("server: %s -> 400 ở %s", (query, field) => {
+    const result = parse(query);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues.map((issue) => issue.path[0])).toContain(field);
+  });
+
+  it("server: tham số rỗng = không lọc", () => {
+    expect(parse("statusIn=&unassigned=")).toEqual({ ok: true, filters: {} });
+  });
+
+  it("thông báo khoá nút nêu thêm toán tử mới đúng nhãn Payload vi", () => {
+    for (const expected of ['"có trong"', '"tồn tại"', "= Sai"]) expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
   });
 });

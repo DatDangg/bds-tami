@@ -89,7 +89,7 @@ describe("LeadExportButton", () => {
 
   it.each([
     ["nhiều nhánh or", { or: [{ and: [{ status: { equals: "new" } }] }, { and: [{ status: { equals: "won" } }] }] }, undefined],
-    ["toán tử in", { or: [{ and: [{ status: { in: ["new"] } }] }] }, undefined],
+    ["toán tử not_in", { or: [{ and: [{ status: { not_in: ["new"] } }] }] }, undefined],
   ])("%s: khoá nút, báo rõ, không gọi endpoint (không xuất toàn bộ)", (_name, where, search) => {
     state.where = where;
     state.search = search;
@@ -147,7 +147,7 @@ describe("LeadExportButton", () => {
   });
 
   it("search + bộ lọc không ánh xạ được: vẫn khoá nút", () => {
-    state.where = { or: [{ and: [{ status: { in: ["new"] } }] }] };
+    state.where = { or: [{ and: [{ status: { not_in: ["new"] } }] }] };
     state.search = "abc";
     vi.stubGlobal("fetch", vi.fn());
     render(<LeadExportButton />);

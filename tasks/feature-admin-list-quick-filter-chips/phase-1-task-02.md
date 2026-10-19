@@ -15,7 +15,8 @@
    - Server `parseLeadExportFilters` / `buildLeadExportWhere`: tham số mới (chọn 1 cách, vd `statusIn=contacted,consulting` + `unassigned=1`), validate whitelist, trùng/mâu thuẫn/quá số giá trị → 400; where `status in` / `assignedTo exists false`. Không ghép chuỗi thô.
    - Cập nhật `UNSUPPORTED_FILTER_MESSAGE` nếu cần (giữ test hiện có hợp lệ). Audit như cũ (bộ lọc chuẩn hoá, không PII).
    - Cập nhật `docs/API_SPEC.md` mục xuất lead.
-4. Test: unit export-filters (client + server, dạng chuỗi từ URL, giá trị lạ → 400/khoá), test chip Lead, test endpoint/tích hợp nếu harness sẵn có (chip `Mới (chưa giao)` / `Đang tư vấn` ra đúng tập).
+4. Sửa 2 minor từ review T01 (`QuickFilterChips.tsx:31`): (a) `Tất cả` chỉ sáng khi không nhánh nào có điều kiện lá trên `fields` của nhóm (helper `hasGroupCondition` + test); (b) bấm `Tất cả` đang sáng → không gọi refineListData.
+5. Test: unit export-filters (client + server, dạng chuỗi từ URL, giá trị lạ → 400/khoá), test chip Lead, test endpoint/tích hợp nếu harness sẵn có (chip `Mới (chưa giao)` / `Đang tư vấn` ra đúng tập).
 
 ## Acceptance
 - [ ] Nhóm Trạng thái Lead đúng bảng; kết hợp với tìm kiếm / bộ lọc khác; F5 giữ chip.
@@ -29,4 +30,18 @@
 Attempt tối đa 3; review tối đa 2 vòng → `architecture_review_needed`.
 
 ## Verification summary
-(builder điền)
+- Builder (T02), chưa commit. Files: `src/lib/admin/quick-filters.ts` (+`hasGroupCondition`, `LEAD_QUICK_FILTER_GROUPS`), `src/components/admin/QuickFilterChips.tsx` (`Tất cả` chỉ sáng khi nhóm không có điều kiện; bấm khi đang sáng không gọi refineListData), `src/components/admin/LeadQuickFilterSlot.tsx` (mới), `src/collections/Leads.ts` (beforeListTable: chip rồi export), importMap, `src/lib/leads/export-filters.ts` (client `status in` / `assignedTo exists false`; server `statusIn=a,b` + `unassigned=1`, whitelist, mâu thuẫn → 400/khoá), `docs/API_SPEC.md` (~193, ~202; `beforeList` → `beforeListTable`), tests tương ứng. Access Leads (`isAssignedOrAdmin`), schema, migration không đổi; audit meta chỉ có giá trị chuẩn hoá.
+- `UNSUPPORTED_FILTER_MESSAGE` dùng đúng nhãn Payload vi: `isIn` = "có trong", `exists` = "tồn tại" (giá trị Không) thay vì "nằm trong"/"chưa có" ghi trong acceptance (nhãn thật của Payload).
+- Verify: `pnpm test` (vitest) PASS (sau khi sửa 2 test LeadExportButton dùng `in` làm ví dụ không hỗ trợ → `not_in`); `pnpm lint` 0 error (2 warning cũ ở tools/task-dashboard/server.mjs); `pnpm typecheck` PASS; `pnpm generate:importmap` đã thêm LeadQuickFilterSlot. Chưa kiểm tay trên trình duyệt (375px, F5) — để reviewer/manual.
+- **Attempt 2 (defect trình duyệt):** bấm `Đang tư vấn` → `Mới (chưa giao)` làm URL thành `where[or][0][and][0][status][equals]=new`, mất `assignedTo exists`, chip không sáng. Root cause: `@payloadcms/ui` WhereBuilder (`index.js:173`) đọc `condition?.[fieldPath]?.[operator] || undefined` → giá trị falsy (boolean `false`, số `0`) thành `undefined`, Condition (debounced `updateValue`) ghi lại where thiếu điều kiện đó. Fix: chip ghi giá trị chuỗi như UI lọc Payload — Lead `assignedTo exists "false"`, Rentals Studio `bedrooms equals "0"` (`src/lib/admin/quick-filters.ts`); `leafSignature` đã so bằng chuỗi nên `currentChip`/`withChip` nhận cả dạng boolean/số cũ (rời chip Mới vẫn chỉ bỏ điều kiện exists, cả hai dạng); `export-filters.ts` đã nhận `false`/`"false"` → `unassigned=1`; server Payload parse `exists: "false"` = rỗng. Test: cập nhật kỳ vọng sang chuỗi + test hồi quy "không chip nào có giá trị lá falsy" + Studio `"0"`.
+- Browser (:3000, admin): leads `Đang tư vấn` → `Mới (chưa giao)` giữ `[and][0][status][equals]=new&[and][1][assignedTo][exists]=false` sau >3s, chip sáng, 1 dòng; Đã chốt/Không thành/Đang tư vấn/Mới đều sáng đúng, `Xuất Excel` enabled ở mọi chip; F5 từ chip `in` và từ chip Mới giữ nguyên URL + chip sáng. Rentals: Studio/2 PN/Dưới 10tr ghi đúng URL, F5 giữ Studio (`equals=0`, bảng lọc hiện giá trị 0; API 0 tin Studio = chưa có dữ liệu Studio), 2 PN 10 dòng. 375px: leads + rentals `scrollWidth = 375`, không tràn ngang; đã reset viewport. `pnpm test` 2954 PASS, `pnpm lint` 0 error, `pnpm typecheck` PASS.
+
+## Review
+- Round 1 STRICT PASS (3 minor) — `.context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-02-round-1-review.md`; MINOR-1 ("tồn tại" = Sai) + MINOR-2 (giá trị `status in` có khoảng trắng → khoá nút) sửa ngay.
+- Kiểm trình duyệt sau round 1 phát hiện chip `Mới (chưa giao)` mất `assignedTo exists false` (WhereBuilder Payload `value || undefined`) → attempt 2 ghi giá trị chuỗi `"false"` / Studio `"0"`.
+- Round 2 STRICT PASS — `.context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-02-round-2-review.md`; MINOR-A (comment cạnh giá trị chuỗi) đã thêm.
+- Phase 1 spec-validation PASS — `.context/review-reports/feature-admin-list-quick-filter-chips-phase-1-round-1-review.md`.
+- Quyết định agent (user ủy quyền 2026-10-20): nhãn toán tử trong thông báo khoá nút theo đúng nhãn Payload vi ("có trong", "tồn tại" = Sai) thay cho "nằm trong"/"chưa có" của task.
+
+## Doc impact / Reconcile
+- `docs/API_SPEC.md` §4 (cột mục đích + as-built `GET /api/admin/leads/export`: `statusIn`, `unassigned=1`, slot `beforeListTable`). Không schema/ERD.

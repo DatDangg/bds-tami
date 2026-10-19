@@ -25,7 +25,7 @@ describe("LeadExportSlot (server slot beforeListTable của leads)", () => {
 
 describe("cấu hình slot của Leads (BL-021 T6)", () => {
   it("nút xuất nằm ở beforeListTable (trong lề trang, dưới hàng tìm kiếm), không ở beforeList", () => {
-    expect(Leads.admin?.components?.beforeListTable).toEqual(["/components/admin/LeadExportSlot#LeadExportSlot"]);
+    expect(Leads.admin?.components?.beforeListTable).toContain("/components/admin/LeadExportSlot#LeadExportSlot");
     expect(Leads.admin?.components?.beforeList).toBeUndefined();
   });
 });
