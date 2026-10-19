@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Category, Homepage, Media, Project, PropertyPost, Service } from "../../payload-types";
-import { buildHomeView, type HomeDocs, visibleBlockKeys } from "./home-view";
+import type { Category, Homepage, Media, Project, PropertyPost, Province, Service } from "../../payload-types";
+import { buildAnnouncementView, buildHomeView, type HomeDocs, visibleBlockKeys } from "./home-view";
 
 const NOW = new Date("2026-10-18T03:00:00.000Z");
 const stamp = "2026-01-01T00:00:00.000Z";
@@ -34,6 +34,8 @@ const docs = (overrides: Partial<HomeDocs> = {}): HomeDocs => ({
   projects: [project("1"), project("2")],
   services: [service("1"), service("2"), service("3")],
   offers: [post("1")],
+  chipProjects: [],
+  provinces: [],
   ...overrides,
 });
 
@@ -177,5 +179,66 @@ describe("buildHomeView: nội dung khối", () => {
       "/api/media/file/s2.jpg",
       "/api/media/file/s3.jpg",
     ]);
+  });
+});
+
+describe("buildHomeView: thanh thông báo (BL-020)", () => {
+  const bar = (overrides: Partial<NonNullable<Homepage["announcementBar"]>> = {}) => homepage({ announcementBar: { enabled: true, text: "  Mở bán đợt 2  ", link: "projects", ...overrides } });
+  const announcement = (page: Homepage, locale: "vi" | "en" = "vi") => buildAnnouncementView(page, locale);
+
+  it("tắt (mặc định) hoặc chưa cấu hình → không có thanh", () => {
+    expect(announcement(homepage())).toBeNull();
+    expect(announcement(bar({ enabled: false }))).toBeNull();
+    expect(announcement(bar({ enabled: null }))).toBeNull();
+  });
+
+  it("bật nhưng chữ trống/khoảng trắng (kể cả /en chưa có bản dịch) → ẩn, không lấy chữ Việt", () => {
+    expect(announcement(bar({ text: "   " }))).toBeNull();
+    expect(announcement(bar({ text: null }), "en")).toBeNull();
+  });
+
+  it("bật có chữ: cắt khoảng trắng, link theo ngôn ngữ, link sai → chỉ chữ; hash đổi theo chữ/link", () => {
+    const vi = announcement(bar());
+    expect(vi).toMatchObject({ text: "Mở bán đợt 2", href: "/du-an", external: false });
+    expect(announcement(bar({ text: "Open now" }), "en")).toMatchObject({ href: "/en/projects" });
+    expect(announcement(bar({ link: "javascript:alert(1)" }))).toMatchObject({ href: null, external: false });
+    expect(announcement(bar({ link: "https://ex.test/x" }))).toMatchObject({ href: "https://ex.test/x", external: true });
+    expect(announcement(bar({ text: "Khác" }))?.hash).not.toBe(vi?.hash);
+    expect(announcement(bar({ link: "rentals" }))?.hash).not.toBe(vi?.hash);
+  });
+});
+
+describe("buildHomeView: ô tìm kiếm hero (BL-020)", () => {
+  const view = (page: Homepage, chipProjects: Project[], locale: "vi" | "en" = "vi") => buildHomeView(page, docs({ chipProjects }), locale, NOW).heroSearch;
+
+  it("mặc định bật; enabled=false → null", () => {
+    expect(view(homepage(), [])).toMatchObject({ placeholder: null, chips: [] });
+    expect(view(homepage({ heroSearch: { enabled: false } }), [project("1")])).toBeNull();
+  });
+
+  it("đích form theo ngôn ngữ; placeholder CMS được cắt khoảng trắng, trống → null (dùng chữ mặc định)", () => {
+    expect(view(homepage({ heroSearch: { enabled: true, placeholder: " Tìm căn hộ " } }), [])).toMatchObject({ placeholder: "Tìm căn hộ", rentalsHref: "/cho-thue", projectsHref: "/du-an" });
+    expect(view(homepage({ heroSearch: { enabled: true, placeholder: "" } }), [], "en")).toMatchObject({ placeholder: null, rentalsHref: "/en/for-rent", projectsHref: "/en/projects" });
+  });
+
+  it("tỉnh/thành cho ô lọc tab Dự án: slug + tên ngắn nếu có", () => {
+    const provinces = [
+      { id: "1", slug: "ha-noi", name: "Thành phố Hà Nội", shortName: "Hà Nội" },
+      { id: "2", slug: "tp-hcm", name: "TP.HCM" },
+    ] as Province[];
+    const search = buildHomeView(homepage(), docs({ provinces }), "vi", NOW).heroSearch;
+    expect(search?.provinces).toEqual([
+      { slug: "ha-noi", name: "Hà Nội" },
+      { slug: "tp-hcm", name: "TP.HCM" },
+    ]);
+  });
+
+  it("chip: giữ thứ tự, link chi tiết dự án theo ngôn ngữ, bỏ dự án thiếu tên/slug", () => {
+    const chips = view(homepage(), [project("2"), project("x", { slug: "" }), project("1")])?.chips;
+    expect(chips).toEqual([
+      { id: "2", title: "Dự án 2", href: "/du-an/du-an-2" },
+      { id: "1", title: "Dự án 1", href: "/du-an/du-an-1" },
+    ]);
+    expect(view(homepage(), [project("1")], "en")?.chips[0]?.href).toBe("/en/projects/du-an-1");
   });
 });

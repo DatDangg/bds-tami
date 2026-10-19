@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CookieBanner } from "@/components/consent/CookieBanner";
+import { HomeAnnouncementBar } from "@/components/home/HomeAnnouncementBar";
 import { UtmCapture } from "@/components/leads/UtmCapture";
 import { isValidGaMeasurementId } from "@/lib/consent/consent-cookie";
 import { FloatingContact } from "./FloatingContact";
@@ -11,6 +12,7 @@ import { SkipLink } from "./SkipLink";
 /**
  * Khung mọi trang công khai: skip link (focus đầu tiên) → `header` → `main#main` → `footer` → nút nổi → banner cookie (cuối DOM nên đứng sau nội dung chính trong thứ tự focus).
  * `main` có `tabIndex={-1}` để skip link chuyển focus vào nội dung; outline bỏ vì main không phải điều khiển tương tác.
+ * Thanh thông báo (`shell.announcement`, chỉ hiện ở trang chủ: `HomeAnnouncementBar` tự kiểm đường dẫn) đứng TRÊN `header` trong luồng, sau skip link; header dính vẫn bám mép trên khi cuộn qua thanh.
  * `UtmCapture` không render gì — chỉ lưu `utm_*` của URL cho lead (BR-10) ở mọi trang.
  */
 export function PublicShell({ shell, children }: { shell: ShellView; children: ReactNode }) {
@@ -18,6 +20,7 @@ export function PublicShell({ shell, children }: { shell: ShellView; children: R
     <>
       <UtmCapture />
       <SkipLink />
+      {shell.announcement && <HomeAnnouncementBar announcement={shell.announcement} />}
       <Header items={shell.navItems} contact={shell.contact} logo={shell.logo} cta={shell.cta} />
       <main id="main" tabIndex={-1} className="min-h-[60dvh] focus:outline-none">
         {children}

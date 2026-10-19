@@ -1,7 +1,8 @@
 import "server-only";
 
 import { getTranslations } from "next-intl/server";
-import { getFooter, getHeader, getSiteSettings } from "@/lib/content/get-globals";
+import { getFooter, getHeader, getHomepage, getSiteSettings } from "@/lib/content/get-globals";
+import { buildAnnouncementView } from "@/lib/home/home-view";
 import { type PageLinkKey, resolveNavLink } from "@/lib/content/nav-link";
 import { logger } from "@/lib/logger";
 import type { Locale } from "@/i18n/routing";
@@ -38,10 +39,12 @@ async function readOrNull<T>(name: string, read: () => Promise<T>): Promise<T | 
  * HTML trang công khai phải giống nhau cho mọi khách để CDN cache được.
  */
 export async function loadShell(locale: Locale): Promise<ShellView> {
-  const [header, footer, settings, t] = await Promise.all([
+  const [header, footer, settings, homepage, t] = await Promise.all([
     readOrNull("header", () => getHeader(locale)),
     readOrNull("footer", () => getFooter(locale)),
     readOrNull("site-settings", () => getSiteSettings(locale)),
+    // Cùng bản cache + tag `global:homepage` với trang chủ (không thêm truy vấn); lưu homepage làm mới thanh trên mọi trang đã cache.
+    readOrNull("homepage", () => getHomepage(locale)),
     getTranslations({ locale, namespace: "layout" }),
   ]);
 
@@ -58,6 +61,7 @@ export async function loadShell(locale: Locale): Promise<ShellView> {
   ];
 
   return {
+    announcement: homepage ? buildAnnouncementView(homepage, locale) : null,
     navItems: header ? buildNavItems(header.navItems, locale, menuLabels) : fixedMenuItems(locale, menuLabels),
     cta: buildCta(header?.ctaButton, locale),
     // `readPublicGlobal` đọc depth 1 nên `logo`/`logoDark` đã là doc media (url + kích thước); chưa populate thì logo tĩnh.

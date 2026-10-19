@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { type KeyboardEvent, type TouchEvent, useCallback, useEffect, useRef, useState } from "react";
-import { CaretLeft, CaretRight, Pause, Play } from "@/components/icons";
+import { type KeyboardEvent, type MouseEvent, type TouchEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ArrowDown, CaretLeft, CaretRight, Pause, Play } from "@/components/icons";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 import type { HeroSlideView } from "@/lib/home/home-view";
@@ -33,6 +33,12 @@ function HeroVideo({ src, paused }: { src: string; paused: boolean }) {
   return <video ref={ref} src={src} muted loop playsInline autoPlay preload="metadata" aria-hidden="true" tabIndex={-1} className="absolute inset-0 size-full object-cover" />;
 }
 
+interface HeroSliderProps {
+  slides: HeroSlideView[];
+  /** Ô tìm kiếm đè đáy hero từ md: chừa chỗ dưới nội dung và nâng nhóm điều khiển/nút cuộn lên trên ô. */
+  overlapsSearch?: boolean;
+}
+
 /**
  * Hero trang chủ (design-spec S01.1, §1.4): carousel 1-8 slide, ảnh slide 1 là ảnh LCP (`priority`), các slide sau chỉ tải sau khi trang tải xong.
  * Video (tuỳ chọn) chỉ dựng ở client khi ≥ 1024px, không reduced-motion, không Save-Data nên HTML server không kèm video.
@@ -40,7 +46,7 @@ function HeroVideo({ src, paused }: { src: string; paused: boolean }) {
  * phím mũi tên chỉ khi focus ở điều khiển carousel (không cướp phím của nút CTA trong slide), vuốt ngang trên cảm ứng.
  * Tiêu đề slide là `p`: `h1` của trang nằm ngoài carousel (HomeBlocks) để không bị `aria-hidden`/`inert` theo slide.
  */
-export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
+export function HeroSlider({ slides, overlapsSearch = false }: HeroSliderProps) {
   const t = useTranslations("page.home.hero");
   const count = slides.length;
   const multiple = count > 1;
@@ -83,6 +89,23 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
     return () => window.clearTimeout(timer);
   }, [multiple, index, count, markVisited]);
 
+  /**
+   * Cuộn mượt (reduced-motion: nhảy ngay). Có ô tìm kiếm ngay sau hero (`data-hero-search`, đè đáy hero từ md) thì đưa ĐỈNH ô đó xuống ngay dưới header
+   * (`scroll-mt-(--header-offset)` của nó) để tab không bị header che; không thì tới đáy hero trừ chiều cao header nổi.
+   */
+  const scrollToContent = (event: MouseEvent<HTMLButtonElement>) => {
+    const hero = event.currentTarget.closest("section");
+    if (!hero) return;
+    const behavior = reducedMotion ? "auto" : "smooth";
+    const search = hero.nextElementSibling;
+    if (search instanceof HTMLElement && search.hasAttribute("data-hero-search")) {
+      search.scrollIntoView({ behavior, block: "start" });
+      return;
+    }
+    const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height ?? 0;
+    const top = hero.getBoundingClientRect().bottom + window.scrollY - headerHeight;
+    window.scrollTo({ top, behavior });
+  };
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (!multiple || !(event.target instanceof Element) || !event.target.closest(CONTROL_SELECTOR)) return;
     if (event.key === "ArrowLeft") goTo(index - 1);
@@ -140,6 +163,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
               <div
                 className={cn(
                   "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pt-(--header-offset) pb-40 text-center sm:pb-24 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
+                  overlapsSearch && "md:pb-52",
                   active ? "translate-y-0 opacity-100 delay-200" : "translate-y-6 opacity-0",
                 )}
               >
@@ -158,7 +182,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
 
       {/* Dừng/Phát đứng ĐẦU thứ tự tab (WAI-ARIA carousel) và cùng nhóm với chấm: 375px xếp dọc, từ sm xếp ngang → không đè nhau (8 chấm × 44px = 352px). */}
       {(multiple || showPauseButton) && (
-        <div className="absolute inset-x-0 bottom-4 flex flex-col items-center sm:flex-row sm:justify-center">
+        <div className={cn("absolute inset-x-0 bottom-4 flex flex-col items-center sm:flex-row sm:justify-center", overlapsSearch && "md:bottom-28")}>
           {showPauseButton && (
             <button type="button" data-carousel-control="" aria-label={userPaused ? t("play") : t("pause")} onClick={() => setUserPaused((paused) => !paused)} className={CONTROL_BUTTON}>
               {userPaused ? <Play size={20} weight="fill" aria-hidden="true" /> : <Pause size={20} weight="fill" aria-hidden="true" />}
@@ -186,6 +210,14 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
           )}
         </div>
       )}
+      <button
+        type="button"
+        aria-label={t("scrollDown")}
+        onClick={scrollToContent}
+        className={cn(CONTROL_BUTTON, "absolute right-4 bottom-4 hidden border border-on-dark/40 sm:inline-flex lg:right-6", overlapsSearch && "md:bottom-28")}
+      >
+        <ArrowDown size={20} aria-hidden="true" />
+      </button>
       {multiple && (
         <>
           <button type="button" data-carousel-control="" aria-label={t("previous")} onClick={() => goTo(index - 1)} className={cn(CONTROL_BUTTON, "absolute top-1/2 left-6 hidden size-12 -translate-y-1/2 lg:inline-flex")}>

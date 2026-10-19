@@ -648,7 +648,22 @@
         "pause": "Dừng trình chiếu",
         "play": "Phát trình chiếu",
         "dots": "Chọn slide",
-        "goTo": "Chuyển tới slide {index}"
+        "goTo": "Chuyển tới slide {index}",
+        "scrollDown": "Cuộn xuống nội dung"
+      },
+      "announcement": {
+        "label": "Thông báo",
+        "close": "Đóng thông báo"
+      },
+      "search": {
+        "region": "Tìm kiếm nhanh",
+        "tabs": "Loại tìm kiếm",
+        "rentals": "Cho thuê",
+        "projects": "Dự án",
+        "keywordLabel": "Từ khoá tìm căn hộ cho thuê",
+        "placeholder": "Nhập khu vực, tên toà nhà hoặc loại căn hộ",
+        "submit": "Tìm kiếm",
+        "chips": "Dự án được quan tâm"
       },
       "projects": {
         "viewAll": "Xem tất cả",

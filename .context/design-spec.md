@@ -224,7 +224,8 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 | # | Khối | Layout family | Nền | Eyebrow |
 |---|---|---|---|---|
-| 1 | Hero | Full-bleed media, chữ giữa | Ảnh/video | Không |
+| 0 | Thanh thông báo (1a) | Dải chữ trong luồng, TRÊN header | `--color-primary` | Không |
+| 1 | Hero (+ ô tìm kiếm + chip 1b) | Full-bleed media, chữ giữa; ô tìm kiếm đè đáy hero từ md | Ảnh/video | Không |
 | 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 + hàng số liệu | `--color-bg` | Không |
 | 3 | Dự án nổi bật | Slider full-bleed | `--color-bg-alt` | Eyebrow = loại hình trên từng slide (1) |
 | 4 | Dịch vụ | Bento bất đối xứng | `--color-bg` | Không |
@@ -241,8 +242,20 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Chữ căn giữa, `max-width: 22ch` cho tiêu đề: `title` (`--text-display`, ≤ 2 dòng desktop), `subtitle` (`--text-lead`, ≤ 20 từ, `#FFFFFF` opacity 0.85 trên scrim), nút Primary `ctaLabel` → `ctaLink`. Tối đa 3 phần tử chữ.
 - Chữ slide hiện dần (trượt 24px + opacity, `--duration-reveal`) khi slide vào; ảnh chuyển crossfade 700ms.
 - Điều khiển (≥ 2 slide): chấm phân trang đáy giữa (chấm 8px trong vùng chạm 44px, đang chọn `--color-primary` rộng 24px), nút Dừng/Phát góc dưới phải cạnh chấm. Mũi tên Trước/Sau ≥ lg ở hai mép giữa. Vuốt trên cảm ứng. Autoplay `--slider-interval`, dừng khi hover/focus/tab ẩn/reduced motion.
-- Không có chữ "Scroll" hay icon cuộn (taste §9.F).
+- Nút cuộn xuống (BL-020, thay quyết định "không scroll cue" cũ): nút tròn 44px chỉ có icon mũi tên (không chữ "Scroll"), có `aria-label`, góc dưới phải, chỉ từ `sm` (mobile đã có ô tìm kiếm ngay dưới hero); bấm cuộn mượt (reduced-motion: nhảy ngay): có ô tìm kiếm thì đưa đỉnh ô đó xuống ngay dưới header (`scroll-mt-(--header-offset)`), không thì tới đáy hero trừ chiều cao header.
 - 1 slide: không chấm, không autoplay.
+- Khi có ô tìm kiếm (≥ md) đệm dưới 13rem và nhóm điều khiển + nút cuộn nâng lên `bottom-28` để nằm trên ô.
+
+**1a. Thanh thông báo** (`homepage.announcementBar`: `enabled` mặc định tắt, `text`, `link`; CHỈ trang chủ)
+- Đứng TRÊN CÙNG trang, phía trên header nổi (mẫu market), là phần tử trong luồng: dải full-width nền `--color-primary`, chữ `--color-primary-foreground` (AA), chữ căn giữa `--text-small`, cao tối thiểu 44px (chữ dài thì xuống dòng, chiều cao do HTML server quyết định nên không CLS lúc tải), nội dung trong container; có `link` thì cả chữ là liên kết gạch chân. Cuộn trang thì thanh trôi đi, header vẫn dính mép trên. Hero chỉ kéo lên theo `--header-offset` (xuống dưới header) nên công thức offset không đổi.
+- Render ở khung trang dùng chung (`PublicShell`, dữ liệu từ global `homepage` qua cache tag `global:homepage` sẵn có, lưu homepage làm mới mọi trang đã cache); `HomeAnnouncementBar` chỉ dựng khi đường dẫn là `/` · `/en` (không dùng slot song song: làm mất ISR các route khác). Hiện kể cả khi trang chủ không có slide hero.
+- Nút đóng 44×44px (`aria-label` "Đóng thông báo"); vùng là `<section aria-label="Thông báo">`. Đóng → nhớ trong `localStorage` theo hash (chữ + link), khoá RIÊNG theo ngôn ngữ: đổi nội dung thì hiện lại. Khách đã đóng: script inline ngay trong thanh giấu TRƯỚC paint (chưa từng vẽ nên không dịch chuyển layout); chỉ HTML server mang script. Bấm đóng làm nội dung dịch lên (do người dùng chủ động, không tính CLS). `localStorage` bị chặn thì đóng chỉ trong phiên.
+- Ẩn khi tắt, chữ trống, hoặc `/en` chưa có chữ EN.
+
+**1b. Ô tìm kiếm + chip dự án** (`homepage.heroSearch`: `enabled`, `placeholder`, `chipProjects` ≤ 6)
+- ≥ md: thẻ `--color-surface` bo 20px, đổ bóng, rộng tối đa 56rem, căn giữa, đè đáy hero 96px (phần còn lại nằm dưới hero). < md: thẻ nằm ngay dưới hero (không đè).
+- Tablist "Cho thuê" / "Dự án" (nút viên thuốc 44px, đang chọn nền `--color-dark`; mũi tên trái/phải đổi tab). Tab Cho thuê: form GET → `/cho-thue` · `/en/for-rent` với tham số từ khoá **có sẵn** `q` (tối đa 100 ký tự), ô nhập 48px có nhãn ẩn + nút Tìm kiếm; dùng được khi chưa có JS (HTML server dựng sẵn tab Cho thuê). `/du-an` chưa có tham số từ khoá nên tab Dự án là form GET → `/du-an` · `/en/projects` với đúng hai tham số lọc có sẵn của trang đó: `province` (slug tỉnh, danh sách từ `listProvinces` như `/du-an`) và `status` (`upcoming`/`selling`/`handed_over`), ô chọn TAMI dạng progressive (select gốc khi chưa có JS) + nút Tìm kiếm; không thêm tham số mới. Tablist hỗ trợ ←/→/Home/End.
+- Chip "Dự án được quan tâm": dự án admin chọn (đã xuất bản, `/en` chỉ bản có EN); không có thì `isFeatured` mới nhất; tối đa 6; link tới chi tiết dự án; viên thuốc cao 44px; mobile vuốt ngang, ≥ md xuống dòng. Không có chip thì bỏ cả hàng. Chữ gợi ý ô nhập: CMS, trống thì chuỗi mặc định theo ngôn ngữ.
 
 **2. Về TAMI** (`about`)
 - < md: tiêu đề → ảnh 4:3 → nội dung (richText, tối đa ~120 từ hiển thị, phần còn lại không cắt: admin chịu trách nhiệm độ dài) → số liệu.
@@ -654,7 +667,7 @@ Code dùng ảnh mẫu (picsum seed) ở dev/staging cho tới khi có Q4. Ảnh
 | CTA không xuống dòng, không trùng ý định | ✅ §1.2 |
 | Serif | ✅ EB Garamond do brand nêu, không Fraunces/Instrument Serif |
 | Palette premium | ⚠️ ngoại lệ có chủ đích (màu thương hiệu đo từ nhận diện TAMI) |
-| Hero ≤ 4 phần tử chữ, không scroll cue, không strip trang trí | ✅ S01.1 |
+| Hero ≤ 4 phần tử chữ, không strip trang trí; nút cuộn xuống chỉ icon (BL-020 ghi đè "không scroll cue") | ✅ S01.1 |
 | Eyebrow ≤ ceil(n/3) | ✅ ghi từng màn (trang chủ 1/3) |
 | Không split-header, không zigzag 3 lần, layout family không lặp | ✅ S01 (6 family / 7 section) |
 | Logo wall chỉ logo, dưới hero | ✅ S01.6 |

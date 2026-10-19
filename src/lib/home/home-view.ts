@@ -1,7 +1,8 @@
 import type { MediaImage } from "../../components/media/ResponsiveImage";
 import { HOMEPAGE_BLOCKS } from "../../globals/Homepage";
 import type { Locale } from "../../i18n/routing";
-import type { Homepage, Project, PropertyPost, Service } from "../../payload-types";
+import type { Homepage, Project, PropertyPost, Province, Service } from "../../payload-types";
+import { announcementHash } from "./announcement-hash";
 import { resolveNavLink } from "../content/nav-link";
 import { isOfferEnded } from "../content/offer-status";
 import { populatedMedia } from "../news/news-view";
@@ -64,6 +65,33 @@ export interface CtaBannerView {
   image: MediaImage | null;
 }
 
+/** Thanh thông báo đầu trang chủ; `null` khi tắt, trống chữ hoặc chưa có bản EN. */
+export interface AnnouncementView {
+  text: string;
+  /** `null` khi không có link hoặc link không hợp lệ: thông báo chỉ là chữ. */
+  href: string | null;
+  external: boolean;
+  /** Khoá "đã đóng": đổi chữ/link thì hiện lại (xem `announcementHash`). */
+  hash: string;
+}
+
+export interface HeroSearchChipView {
+  id: string;
+  title: string;
+  href: string;
+}
+
+export interface HeroSearchView {
+  /** `null` → nơi hiển thị dùng chữ mặc định theo ngôn ngữ. */
+  placeholder: string | null;
+  /** Đường dẫn bản địa hoá của danh sách cho thuê / dự án: đích của form GET và link tab Dự án. */
+  rentalsHref: string;
+  projectsHref: string;
+  /** Tỉnh/thành cho ô lọc của tab Dự án (cùng nguồn `listProvinces` với `/du-an`). */
+  provinces: { slug: string; name: string }[];
+  chips: HeroSearchChipView[];
+}
+
 export type HomeBlockView =
   | AboutView
   | { kind: "featuredProjects"; title: string; slides: ProjectSlideView[] }
@@ -73,6 +101,8 @@ export type HomeBlockView =
 
 export interface HomeView {
   hero: HeroSlideView[];
+  /** `null` khi tắt ô tìm kiếm. */
+  heroSearch: HeroSearchView | null;
   blocks: HomeBlockView[];
 }
 
@@ -81,6 +111,10 @@ export interface HomeDocs {
   projects: Project[];
   services: Service[];
   offers: PropertyPost[];
+  /** Dự án cho chip ở ô tìm kiếm hero (đã đọc như khách; chọn tay hoặc `isFeatured` mới nhất). */
+  chipProjects: Project[];
+  /** Tỉnh/thành cho ô lọc của tab Dự án (rỗng khi ô tìm kiếm không hiển thị). */
+  provinces: Province[];
 }
 
 const text = (value: string | null | undefined): string => value?.trim() ?? "";
@@ -173,6 +207,30 @@ function toCta(homepage: Homepage, locale: Locale): CtaBannerView {
   };
 }
 
+/** Thanh thông báo của trang chủ (render ở khung trang `PublicShell`, trên header), nên tách khỏi `HomeView`. */
+export function buildAnnouncementView(homepage: Homepage, locale: Locale): AnnouncementView | null {
+  const bar = homepage.announcementBar;
+  // Mặc định tắt. `/en` đọc với `fallbackLocale: false` nên chữ trống = chưa có bản EN → ẩn, không lấy chữ Việt.
+  if (bar?.enabled !== true) return null;
+  const message = text(bar.text);
+  if (message === "") return null;
+  const link = resolveNavLink(bar.link, locale);
+  return { text: message, href: link?.href ?? null, external: link?.external ?? false, hash: announcementHash(message, link?.href ?? null) };
+}
+
+function toHeroSearch(homepage: Homepage, docs: HomeDocs, locale: Locale): HeroSearchView | null {
+  const search = homepage.heroSearch;
+  if (search?.enabled === false) return null;
+  const chips = toProjectSlides(docs.chipProjects, locale).map(({ id, title, href }) => ({ id, title, href }));
+  return {
+    placeholder: text(search?.placeholder) || null,
+    rentalsHref: resolveNavLink("rentals", locale)?.href ?? "/",
+    projectsHref: resolveNavLink("projects", locale)?.href ?? "/",
+    provinces: docs.provinces.map((province) => ({ slug: province.slug, name: province.shortName || province.name })),
+    chips,
+  };
+}
+
 /** Khối có danh sách mà danh sách rỗng (sau khi bỏ bản ghi ẩn/chưa có EN/đã kết thúc) thì ẩn cả khối: trả `null`. */
 function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale: Locale, now: Date): HomeBlockView | null {
   const title = titleOf(homepage, block);
@@ -209,5 +267,5 @@ export function buildHomeView(homepage: Homepage, docs: HomeDocs, locale: Locale
     const block = toBlock(key, homepage, docs, locale, now);
     return block ? [block] : [];
   });
-  return { hero: toHeroSlides(homepage, locale), blocks };
+  return { hero: toHeroSlides(homepage, locale), heroSearch: toHeroSearch(homepage, docs, locale), blocks };
 }

@@ -178,7 +178,7 @@ describe("HeroSlider", () => {
 
   it("1 slide không video: không chấm, không nút điều khiển, không autoplay", () => {
     renderWithIntl(<HeroSlider slides={[slide(1)]} />);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryAllByRole("button").filter((button) => button.getAttribute("aria-label") !== "Cuộn xuống nội dung")).toHaveLength(0);
     tick(SLIDE_INTERVAL_MS * 2);
     expect(activeTitle()).toContain("Tiêu đề 1");
   });
@@ -197,7 +197,7 @@ describe("HeroSlider", () => {
 
   it("1 slide video nhưng mobile (video không dựng): không cần nút Dừng", () => {
     renderWithIntl(<HeroSlider slides={[slide(1, { videoUrl: "/api/media/file/v.mp4" })]} />);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryAllByRole("button").filter((button) => button.getAttribute("aria-label") !== "Cuộn xuống nội dung")).toHaveLength(0);
   });
 
   it("video chỉ dựng khi ≥ 1024px, không reduced-motion, không Save-Data", () => {
@@ -223,5 +223,33 @@ describe("HeroSlider", () => {
     } finally {
       Reflect.deleteProperty(navigator, "connection");
     }
+  });
+
+  it("nút cuộn xuống có tên; cuộn mượt tới đáy hero, reduced-motion thì nhảy ngay", () => {
+    const scrollTo = vi.fn();
+    vi.stubGlobal("scrollTo", scrollTo);
+    const smooth = renderWithIntl(<HeroSlider slides={[slide(1)]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Cuộn xuống nội dung" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ behavior: "smooth" }));
+    smooth.unmount();
+
+    stubMedia(["(prefers-reduced-motion: reduce)"]);
+    renderWithIntl(<HeroSlider slides={[slide(1)]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Cuộn xuống nội dung" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ behavior: "auto" }));
+  });
+
+  it("nút cuộn xuống: có ô tìm kiếm ngay sau hero thì đưa đỉnh ô đó xuống dưới header; ảnh slide 1 vẫn là ảnh ưu tiên", () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    const { container } = renderWithIntl(
+      <>
+        <HeroSlider slides={[slide(1), slide(2)]} overlapsSearch />
+        <section data-hero-search="" />
+      </>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Cuộn xuống nội dung" }));
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
+    expect(container.querySelector("img")).toHaveAttribute("fetchpriority", "high");
   });
 });

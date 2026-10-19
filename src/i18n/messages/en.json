@@ -648,7 +648,22 @@
         "pause": "Pause slideshow",
         "play": "Play slideshow",
         "dots": "Choose a slide",
-        "goTo": "Go to slide {index}"
+        "goTo": "Go to slide {index}",
+        "scrollDown": "Scroll to content"
+      },
+      "announcement": {
+        "label": "Announcement",
+        "close": "Dismiss announcement"
+      },
+      "search": {
+        "region": "Quick search",
+        "tabs": "Search type",
+        "rentals": "For rent",
+        "projects": "Projects",
+        "keywordLabel": "Keyword to find apartments for rent",
+        "placeholder": "Enter an area, building name or apartment type",
+        "submit": "Search",
+        "chips": "Popular projects"
       },
       "projects": {
         "viewAll": "View all",

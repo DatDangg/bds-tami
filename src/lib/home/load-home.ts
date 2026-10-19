@@ -22,7 +22,7 @@ export interface HomePageData {
   structuredData: object[];
 }
 
-const EMPTY_VIEW: HomeView = { hero: [], blocks: [] };
+const EMPTY_VIEW: HomeView = { hero: [], heroSearch: null, blocks: [] };
 
 async function readOrNull<T>(name: string, read: () => Promise<T>): Promise<T | null> {
   try {
@@ -68,7 +68,7 @@ export async function loadHomePage(locale: Locale, now: Date = new Date()): Prom
   if (!homepage) return { view: EMPTY_VIEW, siteName: identity.siteName, structuredData };
   const docs = await readOrNull("homepage-content", async () => loadHomeDocs(await getPayload({ config }), locale, homepage, visibleBlockKeys(homepage), now));
   // Truy vấn bản ghi lỗi: các khối danh sách tự ẩn, hero/Về TAMI/CTA vẫn hiện.
-  const view = buildHomeView(homepage, docs ?? { projects: [], services: [], offers: [] }, locale, now);
+  const view = buildHomeView(homepage, docs ?? { projects: [], services: [], offers: [], chipProjects: [], provinces: [] }, locale, now);
   return { view, siteName: identity.siteName, structuredData };
 }
 

@@ -1,4 +1,5 @@
 import { isHttpUrl, type PageLinkKey, resolveNavLink } from "@/lib/content/nav-link";
+import type { AnnouncementView } from "@/lib/home/home-view";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -72,6 +73,8 @@ export interface LogoView {
 }
 
 export interface ShellView {
+  /** Thanh thông báo của trang chủ (global `homepage`); chỉ `HomeAnnouncementBar` hiển thị, và chỉ ở `/` · `/en`. `null` khi tắt/trống/chưa có EN. */
+  announcement: AnnouncementView | null;
   navItems: NavItemView[];
   /** Nút CTA trong header (`header.ctaButton`); không có khi thiếu nhãn ở ngôn ngữ này hoặc link không hợp lệ. */
   cta?: LinkView;

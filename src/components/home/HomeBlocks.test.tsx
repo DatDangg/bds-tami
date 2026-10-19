@@ -16,6 +16,8 @@ const docs: HomeDocs = {
   projects: [1, 2, 3].map((n) => ({ id: `p${n}`, title: `Dự án ${n}`, slug: `du-an-${n}`, summary: `Tóm tắt ${n}`, salesStatus: "selling", category, gallery: [media(`pg${n}`)] }) as Project),
   services: [1, 2, 3].map((n) => ({ id: `s${n}`, title: `Dịch vụ ${n}`, slug: `dich-vu-${n}`, summary: "Mô tả", coverImage: media(`sv${n}`) }) as Service),
   offers: [{ id: "o1", title: "Voucher 1", slug: "voucher-1", excerpt: "Ưu đãi", cover: media("oc1") } as PropertyPost],
+  chipProjects: [],
+  provinces: [],
 };
 
 const richText = {
@@ -164,5 +166,32 @@ describe("HomeBlocks: /en không lấy chữ Việt", () => {
   it("có title EN thì ctaBanner hiện với nút mặc định 'Get advice' → /en/contact", () => {
     renderHome(enPage({ ctaBanner: { enabled: true, title: "Need advice?" } }), "en");
     expect(screen.getByRole("link", { name: "Get advice" })).toHaveAttribute("href", "/en/contact");
+  });
+});
+
+describe("HomeBlocks: thanh thông báo + ô tìm kiếm hero (BL-020)", () => {
+  const withChips: HomeDocs = { ...docs, chipProjects: docs.projects.slice(0, 2) };
+
+  it("trang chủ không còn tự render thanh thông báo (nằm ở PublicShell, trên header)", () => {
+    renderHome(homepage({ announcementBar: { enabled: true, text: "Mở bán đợt 2", link: "projects" } }));
+    expect(screen.queryByRole("region", { name: "Thông báo" })).toBeNull();
+  });
+
+  it("ô tìm kiếm đứng ngay sau hero: form q → /cho-thue, chip dự án; ảnh hero vẫn ưu tiên (LCP)", () => {
+    const { container } = renderHome(homepage(), "vi", withChips);
+    expect(container.children[1]).toHaveAttribute("aria-roledescription", "carousel");
+    const search = screen.getByRole("region", { name: "Tìm kiếm nhanh" });
+    expect(container.children[2]).toBe(search);
+    expect(search.querySelector("form")).toHaveAttribute("action", "/cho-thue");
+    expect(within(search).getByRole("link", { name: "Dự án 1" })).toHaveAttribute("href", "/du-an/du-an-1");
+    expect(container.querySelector("section[aria-roledescription=carousel] img")).toHaveAttribute("fetchpriority", "high");
+  });
+
+  it("/en: form tới /en/for-rent; tắt ô tìm kiếm → không render", () => {
+    const en = renderHome(homepage({ hero: { slides: [{ id: "s1", image: media("hero"), title: "Hero EN" }] }, heroSearch: { enabled: true } }), "en", withChips);
+    expect(screen.getByRole("region", { name: "Quick search" }).querySelector("form")).toHaveAttribute("action", "/en/for-rent");
+    en.unmount();
+    renderHome(homepage({ heroSearch: { enabled: false } }), "vi", withChips);
+    expect(screen.queryByRole("region", { name: "Tìm kiếm nhanh" })).toBeNull();
   });
 });

@@ -4,6 +4,7 @@ import { AboutBlock } from "./AboutBlock";
 import { CtaBanner } from "./CtaBanner";
 import { FeaturedOffers } from "./FeaturedOffers";
 import { FeaturedProjects } from "./FeaturedProjects";
+import { HeroSearch } from "./HeroSearch";
 import { HeroSlider } from "./HeroSlider";
 import { ServicesBento } from "./ServicesBento";
 
@@ -30,7 +31,10 @@ export function HomeBlocks({ view, siteName }: { view: HomeView; siteName: strin
   return (
     <>
       <h1 className="sr-only">{view.hero[0]?.title || siteName}</h1>
-      {view.hero.length > 0 && <HeroSlider slides={view.hero} />}
+      {view.hero.length > 0 && (
+        <HeroSlider slides={view.hero} overlapsSearch={view.heroSearch !== null} />
+      )}
+      {view.hero.length > 0 && view.heroSearch && <HeroSearch {...view.heroSearch} />}
       {view.blocks.map((block) => (
         <Fragment key={block.kind}>{renderBlock(block)}</Fragment>
       ))}

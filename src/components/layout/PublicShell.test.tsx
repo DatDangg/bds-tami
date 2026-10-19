@@ -9,9 +9,13 @@ import { OPEN_COOKIE_SETTINGS_EVENT } from "./cookie-settings-event";
 import { PublicShell } from "./PublicShell";
 import { buildFooterColumns, buildNavItems, type ShellView } from "./shell-data";
 
-vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), usePathname: () => "/" }));
+const pathname = vi.hoisted(() => ({ current: "/" }));
+vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), usePathname: () => pathname.current }));
+
+const announcement = { text: "Thông báo trên cùng", href: null, external: false, hash: "h1" };
 
 const shell: ShellView = {
+  announcement: null,
   navItems: buildNavItems(null, "vi", vi_.layout.nav.items),
   contact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" }, email: "info@tami.vn", address: "Quận 1" },
   floatingContact: { hotline: { label: "0901 234 567", telHref: "tel:0901234567" } },
@@ -49,10 +53,46 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  pathname.current = "/";
   document.cookie = "NEXT_LOCALE=; Path=/; Max-Age=0";
 });
 
 describe("PublicShell", () => {
+  describe("thanh thông báo (shell.announcement)", () => {
+    const withBar: ShellView = { ...shell, announcement };
+
+    it("trang chủ VI: đứng TRÊN header, sau skip link (skip link vẫn focus đầu tiên)", async () => {
+      const user = userEvent.setup();
+      renderShell("vi", withBar);
+      const header = screen.getByRole("banner");
+      const bar = screen.getByRole("region", { name: "Thông báo" });
+      expect(bar.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      await user.tab();
+      expect(screen.getByRole("link", { name: "Bỏ qua tới nội dung" })).toHaveFocus();
+    });
+
+    it("trang chủ EN (/en) cũng hiện", () => {
+      pathname.current = "/en";
+      renderShell("en", withBar);
+      expect(screen.getByRole("region", { name: "Announcement" })).toBeInTheDocument();
+    });
+
+    it.each([
+      ["vi", "/du-an"],
+      ["vi", "/cho-thue"],
+      ["en", "/en/projects"],
+    ] as const)("trang khác (%s %s): không hiện", (locale, path) => {
+      pathname.current = path;
+      renderShell(locale, withBar);
+      expect(screen.queryByRole("region", { name: /Thông báo|Announcement/ })).toBeNull();
+    });
+
+    it("không có thông báo (announcement null) thì không dựng gì ở trang chủ", () => {
+      renderShell("vi", shell);
+      expect(screen.queryByRole("region", { name: "Thông báo" })).toBeNull();
+    });
+  });
+
   it("skip link là phần tử focus đầu tiên và trỏ tới main#main", async () => {
     const user = userEvent.setup();
     renderShell();
