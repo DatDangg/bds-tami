@@ -1,6 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": "build/tami-website",
+  "activeWorkItem": "feature/admin-ui-saas-refresh",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -293,6 +293,68 @@
       "round": 1,
       "report": ".context/review-reports/feature-ci-postgis-image-bookworm-phase-1-task-01-round-1-review.md",
       "residual": "CI thật chưa chạy trên GitHub runner — cần push để xác nhận (build không cache, vòng chờ, assert phiên bản, pnpm test xanh)"
+    },
+    {
+      "slug": "admin-ui-saas-refresh",
+      "title": "Làm lại UI admin (Payload) kiểu SaaS: tokens AA sáng/tối, sidebar nhóm, dashboard theo quyền, list badge/thumbnail, form tab, việt hoá nhãn (BL-015)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-015",
+      "changeDoc": "spec/changes/2026-10-19-admin-ui-saas-refresh.md",
+      "design": "docs/specs/2026-10-19-admin-ui-saas-design.md",
+      "mock": "docs/specs/2026-10-19-admin-ui-saas-mock.html",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 3,
+          "round": 3,
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-task-01-round-3-review.md",
+          "note": "round 3 = ngoại lệ user duyệt 2026-10-19; residual: đo hit-test trình duyệt 390px"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-02.md",
+          "status": "review_passed",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-task-02-round-1-review.md",
+          "note": "chưa commit — chờ commit T01 trước"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-04.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-05.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-06",
+          "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-06.md",
+          "status": "pending",
+          "attempt": 0
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "note": "User duyệt design + plan 2026-10-19 (ok theo đề xuất), auto proceed. T01∥T02 → T03 → T04∥T05 → T06. Ảnh trước: docs/specs/admin-ui-saas-screenshots/before/",
+      "specVersion": "1.11.0",
+      "scopeVersion": 12,
+      "specValidation": ".context/review-reports/feature-admin-ui-saas-refresh-spec-validation.md (PASS pre-plan)"
     }
   ],
   "bugs": [
@@ -968,7 +1030,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-18T23:05:46.952Z",
+  "lastUpdated": "2026-10-19",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,0 +1,172 @@
+// Bảng list view, card, tab, pill (BL-015 T01, tách từ _surfaces để file ≤ 300 dòng). Không dùng !important.
+
+// ---- Bảng list view (design §4): card surface, header 12/500 muted (không dính: .table của Payload có overflow:auto nên sticky vô hiệu), dòng 48px, hover ----
+.collection-list .table {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-l);
+  box-shadow: var(--admin-shadow-sm);
+  margin-bottom: 24px;
+
+  thead {
+    color: var(--admin-text-muted);
+
+    th {
+      height: 40px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background: var(--admin-canvas);
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  }
+
+  tbody tr {
+    // Bỏ sọc hàng lẻ của Payload; dùng đường kẻ + hover.
+    &:nth-child(odd) {
+      background: transparent;
+    }
+
+    &:hover td {
+      background: var(--admin-surface-hover);
+    }
+
+    td {
+      height: 48px;
+      vertical-align: middle;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    &:last-child td {
+      border-bottom: 0;
+    }
+  }
+
+  // Cột tiêu đề: màu chữ, nhấn khi hover.
+  td a {
+    color: var(--admin-text);
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--admin-accent);
+    }
+  }
+}
+
+// ≤ 1024: Payload kéo bảng tràn gutter để cuộn ngang → bỏ bo góc/viền dọc cho khỏi lệch.
+@media (max-width: 1024px) {
+  .collection-list .table {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+.sort-column__label {
+  color: inherit;
+}
+
+.paginator__page--is-current {
+  background: var(--admin-accent-soft);
+  color: var(--admin-accent-soft-text);
+}
+
+.per-page__button {
+  color: var(--admin-text-muted);
+}
+
+.where-builder,
+.pill-selector,
+.column-selector {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-m);
+}
+
+// ---- Card (dashboard collection card) ----
+.card {
+  background: var(--admin-surface);
+  border-color: var(--admin-border);
+  border-radius: var(--admin-radius-l);
+  box-shadow: var(--admin-shadow-sm);
+  padding: 16px 20px;
+
+  &__title {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--admin-text);
+  }
+
+  &--has-onclick:hover {
+    background: var(--admin-surface);
+    border-color: var(--admin-border-strong);
+    box-shadow: var(--admin-shadow-sm);
+  }
+}
+
+// ---- Tab (field tabs + tab tài liệu Edit/API/Versions) ----
+.tabs-field__tab-button {
+  opacity: 1;
+  color: var(--admin-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+
+  &::after {
+    background: var(--admin-accent);
+  }
+
+  &:hover {
+    opacity: 1;
+    color: var(--admin-text);
+  }
+
+  &--active {
+    color: var(--admin-text);
+  }
+}
+
+.tabs-field__tabs {
+  border-bottom-color: var(--admin-border);
+}
+
+// Tab tài liệu (Chỉnh sửa / Phiên bản / API): phần tử .btn mang luôn lớp doc-tab--active (+ btn--disabled).
+.doc-tab--active.btn--style-tab {
+  --bg-color: var(--admin-accent-soft);
+  --color: var(--admin-accent-soft-text);
+  --hover-bg: var(--admin-accent-soft);
+}
+
+// ---- Pill / badge ----
+.pill {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--theme-elevation-100);
+  color: var(--admin-text);
+}
+
+.pill--style-success {
+  background: var(--admin-badge-success-bg);
+  color: var(--admin-badge-success-fg);
+}
+
+.pill--style-warning {
+  background: var(--admin-badge-warning-bg);
+  color: var(--admin-badge-warning-fg);
+}
+
+.pill--style-error {
+  background: var(--admin-badge-danger-bg);
+  color: var(--admin-badge-danger-fg);
+}
+

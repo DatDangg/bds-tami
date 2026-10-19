@@ -1,0 +1,208 @@
+// Bề mặt admin (BL-015 T01): chữ, nav trái, popup, alert, trang đăng nhập (bảng/card/tab/pill ở _lists.scss).
+// Selector lấy từ @payloadcms/ui + @payloadcms/next 3.91. Không dùng !important.
+
+// ---- Chữ (design §1.5; không đổi --base / --base-body-size) ----
+.list-header__title,
+.doc-header__title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+label.field-label:not(.unstyled) {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--admin-text);
+}
+
+.field-description {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--admin-text-subtle);
+}
+
+.view-description,
+.document-fields__label,
+.status__label,
+.doc-controls__label {
+  color: var(--admin-text-subtle);
+}
+
+// Link chữ thường (không phải nút/mục menu/pill — các lớp đó tự đặt màu qua biến --color của Payload).
+a:not([class]),
+.field-description a,
+.view-description a {
+  color: var(--admin-accent);
+}
+
+// Dấu * bắt buộc: error-500 của Payload chỉ 4.13:1 trên nền trắng → dùng tone danger (7.03 / 8.63).
+label.field-label .required {
+  color: var(--admin-badge-danger-fg);
+}
+
+::selection {
+  background: var(--admin-accent-soft);
+  color: var(--admin-text);
+}
+
+// ---- Nav trái (design §2) ----
+.nav {
+  background: var(--admin-nav-bg);
+  border-right: 1px solid var(--admin-border);
+}
+
+.nav-group__toggle {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--admin-text-subtle);
+  padding: 12px 10px 4px;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--admin-text);
+  }
+}
+
+.nav__label {
+  color: var(--admin-text-subtle);
+}
+
+.nav__link {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: var(--admin-radius-s);
+  color: var(--admin-text);
+  font-size: 14px;
+  font-weight: 500;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--theme-elevation-100);
+    text-decoration: none;
+  }
+
+  &.active,
+  &:has(.nav__link-indicator) {
+    background: var(--admin-accent-soft);
+    color: var(--admin-accent-soft-text);
+    font-weight: 600;
+  }
+}
+
+// Vạch 3px bên trái mục đang chọn, dính mép nav (nav padding-inline-start = 20px của Payload).
+.nav__link-indicator {
+  inset-inline-start: -20px;
+  width: 3px;
+  height: 20px;
+  border-start-end-radius: 3px;
+  border-end-end-radius: 3px;
+  background: var(--admin-accent);
+}
+
+.nav__controls .btn,
+.nav__log-out {
+  color: var(--admin-text-muted);
+}
+
+// ---- Popup / dropdown ----
+.popup__content {
+  --popup-button-highlight: var(--theme-elevation-100);
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-m);
+  box-shadow: var(--admin-shadow-md);
+}
+
+.popup-button-list__button--selected {
+  background-color: var(--admin-accent-soft);
+  color: var(--admin-accent-soft-text);
+}
+
+.collapsible--style-default {
+  border-color: var(--admin-border);
+  border-radius: var(--admin-radius-m);
+
+  &:hover {
+    border-color: var(--admin-border-strong);
+  }
+}
+
+// ---- Alert / banner (design §1.3 tone danger/warning/success) ----
+.banner {
+  border-radius: var(--admin-radius-m);
+  font-weight: 500;
+
+  &--type-error {
+    background: var(--admin-badge-danger-bg);
+    color: var(--admin-badge-danger-fg);
+  }
+
+  &--type-warning {
+    background: var(--admin-badge-warning-bg);
+    color: var(--admin-badge-warning-fg);
+  }
+
+  &--type-success {
+    background: var(--admin-badge-success-bg);
+    color: var(--admin-badge-success-fg);
+  }
+}
+
+// Alert của component riêng (TranslationFailedBanner): cùng token badge, link kế thừa màu chữ.
+.tami-admin-alert {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  border-radius: var(--admin-radius-l);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+
+  &--danger {
+    background: var(--admin-badge-danger-bg);
+    color: var(--admin-badge-danger-fg);
+  }
+
+  &__list {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    font-weight: 400;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+// ---- Trang đăng nhập / quên mật khẩu: form trong card surface ----
+.template-minimal {
+  background: var(--admin-canvas);
+
+  &__wrap {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-l);
+    box-shadow: var(--admin-shadow-sm);
+    padding: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  .template-minimal__wrap {
+    padding: 20px;
+  }
+
+  .nav__link {
+    min-height: 44px;
+  }
+
+  // Pill "Tạo mới" cạnh tiêu đề list: vùng chạm 44px.
+  .list-header__title-actions .btn {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+}

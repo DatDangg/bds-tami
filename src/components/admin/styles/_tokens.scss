@@ -1,0 +1,154 @@
+// Token admin (BL-015, design §1). GIÁ TRỊ PHẢI TRÙNG src/components/admin/admin-tokens.ts —
+// test admin-tokens.test.ts đọc file này, so từng --admin-* / --theme-elevation-* với TS và tính contrast WCAG.
+// Khối `:root` = giao diện sáng, `html[data-theme="dark"]` = tối. CSS ngoài @layer nên thắng payload-default.
+
+:root {
+  --admin-canvas: #f7f7f5;
+  --admin-surface: #ffffff;
+  --admin-surface-hover: #faf9f7;
+  --admin-nav-bg: #fbfbfa;
+  --admin-border: #e7e5e4;
+  --admin-border-strong: #8f8984;
+  --admin-text: #1c1917;
+  --admin-text-muted: #57534e;
+  --admin-text-subtle: #6b6560;
+  --admin-accent: #8c6733;
+  --admin-accent-hover: #7a5a2c;
+  --admin-accent-soft: #f8f3eb;
+  --admin-accent-soft-text: #6a4e26;
+  --admin-on-accent: #ffffff;
+  --admin-focus: #8c6733;
+
+  --admin-badge-neutral-fg: #44403c;
+  --admin-badge-neutral-bg: #f0efed;
+  --admin-badge-success-fg: #166534;
+  --admin-badge-success-bg: #e7f5ec;
+  --admin-badge-warning-fg: #854d0e;
+  --admin-badge-warning-bg: #fdf3dc;
+  --admin-badge-danger-fg: #9f1239;
+  --admin-badge-danger-bg: #fdecef;
+  --admin-badge-info-fg: #1e4e8c;
+  --admin-badge-info-bg: #e8f0fb;
+  --admin-badge-accent-fg: #6a4e26;
+  --admin-badge-accent-bg: #f8f3eb;
+
+  --admin-radius-s: 6px;
+  --admin-radius-m: 8px;
+  --admin-radius-l: 12px;
+  --admin-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --admin-shadow-md: 0 1px 3px rgba(28, 25, 23, 0.08), 0 8px 24px rgba(28, 25, 23, 0.06);
+
+  // Thang elevation của Payload → xám ấm (design §1.6.1). Bậc 400+ là màu chữ phụ, phải ≥ 4.5:1 trên 0/50/100.
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #f7f7f5;
+  --theme-elevation-100: #efeeec;
+  --theme-elevation-150: #e7e5e4;
+  --theme-elevation-200: #d6d3d1;
+  --theme-elevation-250: #c4c0bc;
+  --theme-elevation-300: #a8a29e;
+  --theme-elevation-350: #8f8984;
+  --theme-elevation-400: #6e6862;
+  --theme-elevation-450: #625c57;
+  --theme-elevation-500: #57534e;
+  --theme-elevation-550: #4d4945;
+  --theme-elevation-600: #44403c;
+  --theme-elevation-650: #3b3835;
+  --theme-elevation-700: #332f2d;
+  --theme-elevation-750: #2e2a28;
+  --theme-elevation-800: #292524;
+  --theme-elevation-850: #1f1c1a;
+  --theme-elevation-900: #1c1917;
+  --theme-elevation-950: #141210;
+  --theme-elevation-1000: #0c0a09;
+
+  // Map vào biến Payload (giống nhau ở hai theme, chỉ đổi giá trị --admin-*).
+  --theme-bg: var(--admin-canvas);
+  --theme-input-bg: var(--admin-surface);
+  --theme-text: var(--admin-text);
+  --theme-border-color: var(--admin-border);
+  --style-radius-s: var(--admin-radius-s);
+  --style-radius-m: var(--admin-radius-m);
+  --style-radius-l: var(--admin-radius-l);
+  --accessibility-outline: 2px solid var(--admin-focus);
+  --accessibility-outline-offset: 2px;
+  --nav-width: 256px;
+  --gutter-h: 32px;
+}
+
+html[data-theme="dark"] {
+  --admin-canvas: #121110;
+  --admin-surface: #1a1918;
+  --admin-surface-hover: #222120;
+  --admin-nav-bg: #161514;
+  --admin-border: #2e2c2a;
+  --admin-border-strong: #6e6862;
+  --admin-text: #f5f5f4;
+  --admin-text-muted: #a8a29e;
+  --admin-text-subtle: #8f8984;
+  --admin-accent: #e0bf89;
+  --admin-accent-hover: #ebd2a8;
+  --admin-accent-soft: #2a2013;
+  --admin-accent-soft-text: #ebd2a8;
+  --admin-on-accent: #141414;
+  --admin-focus: #e0bf89;
+
+  --admin-badge-neutral-fg: #d6d3d1;
+  --admin-badge-neutral-bg: #2e2c2a;
+  --admin-badge-success-fg: #86efac;
+  --admin-badge-success-bg: #12301e;
+  --admin-badge-warning-fg: #fcd34d;
+  --admin-badge-warning-bg: #3a2a08;
+  --admin-badge-danger-fg: #fda4af;
+  --admin-badge-danger-bg: #3b1219;
+  --admin-badge-info-fg: #93c5fd;
+  --admin-badge-info-bg: #132a4a;
+  --admin-badge-accent-fg: #ebd2a8;
+  --admin-badge-accent-bg: #2a2013;
+
+  // Tối: viền thay bóng (bóng không đọc được trên nền tối).
+  --admin-shadow-sm: none;
+  --admin-shadow-md: none;
+
+  --theme-elevation-0: #1a1918;
+  --theme-elevation-50: #222120;
+  --theme-elevation-100: #292524;
+  --theme-elevation-150: #36322f;
+  --theme-elevation-200: #44403c;
+  --theme-elevation-250: #4a4642;
+  --theme-elevation-300: #57534e;
+  --theme-elevation-350: #6e6862;
+  --theme-elevation-400: #a8a29e;
+  --theme-elevation-450: #b0aba6;
+  --theme-elevation-500: #c4c0bc;
+  --theme-elevation-550: #cfcbc7;
+  --theme-elevation-600: #d6d3d1;
+  --theme-elevation-650: #dddad7;
+  --theme-elevation-700: #e3e0dd;
+  --theme-elevation-750: #e9e7e4;
+  --theme-elevation-800: #efeeec;
+  --theme-elevation-850: #f3f2f0;
+  --theme-elevation-900: #f7f7f5;
+  --theme-elevation-950: #fbfbfa;
+  --theme-elevation-1000: #ffffff;
+
+  // Payload đặt --theme-bg / --theme-input-bg riêng cho dark trong @layer; khai lại ngoài layer để thắng.
+  --theme-bg: var(--admin-canvas);
+  --theme-input-bg: var(--admin-surface);
+  --theme-text: var(--admin-text);
+  --theme-border-color: var(--admin-border);
+}
+
+// Payload khai --gutter-h / --nav-width theo breakpoint TRONG @layer; biến ngoài layer thắng cả media query
+// của Payload nên phải khai lại đủ các mốc (design §1.4: 32 / 20 / 16).
+@media (max-width: 1024px) {
+  :root {
+    --gutter-h: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --gutter-h: 16px;
+    --nav-width: 100vw;
+  }
+}

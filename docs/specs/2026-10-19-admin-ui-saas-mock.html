@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAMI Admin mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Mock tĩnh BL-015 — token theo docs/specs/2026-10-19-admin-ui-saas-design.md §1. Không phải code production. */
+:root{
+  --canvas:#F7F7F5;--surface:#FFFFFF;--surface-hover:#FAF9F7;--nav-bg:#FBFBFA;
+  --border:#E7E5E4;--border-strong:#8F8984;--text:#1C1917;--muted:#57534E;--subtle:#6B6560;
+  --accent:#8C6733;--accent-hover:#7A5A2C;--on-accent:#FFFFFF;--accent-soft:#F8F3EB;--accent-soft-text:#6A4E26;
+  --hover:#EFEEEC;
+  --shadow-sm:0 1px 2px rgba(28,25,23,.06);--shadow-md:0 1px 3px rgba(28,25,23,.08),0 8px 24px rgba(28,25,23,.06);
+  --r-s:6px;--r-m:8px;--r-l:12px;
+  --b-neutral-fg:#44403C;--b-neutral-bg:#F0EFED;--b-success-fg:#166534;--b-success-bg:#E7F5EC;
+  --b-warning-fg:#854D0E;--b-warning-bg:#FDF3DC;--b-danger-fg:#9F1239;--b-danger-bg:#FDECEF;
+  --b-info-fg:#1E4E8C;--b-info-bg:#E8F0FB;--b-accent-fg:#6A4E26;--b-accent-bg:#F8F3EB;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --canvas:#121110;--surface:#1A1918;--surface-hover:#222120;--nav-bg:#161514;
+  --border:#2E2C2A;--border-strong:#6E6862;--text:#F5F5F4;--muted:#A8A29E;--subtle:#8F8984;
+  --accent:#E0BF89;--accent-hover:#EBD2A8;--on-accent:#141414;--accent-soft:#2A2013;--accent-soft-text:#EBD2A8;
+  --hover:#292524;--shadow-sm:none;--shadow-md:none;
+  --b-neutral-fg:#D6D3D1;--b-neutral-bg:#2E2C2A;--b-success-fg:#86EFAC;--b-success-bg:#12301E;
+  --b-warning-fg:#FCD34D;--b-warning-bg:#3A2A08;--b-danger-fg:#FDA4AF;--b-danger-bg:#3B1219;
+  --b-info-fg:#93C5FD;--b-info-bg:#132A4A;--b-accent-fg:#EBD2A8;--b-accent-bg:#2A2013;}}
+:root[data-theme="dark"]{
+  --canvas:#121110;--surface:#1A1918;--surface-hover:#222120;--nav-bg:#161514;
+  --border:#2E2C2A;--border-strong:#6E6862;--text:#F5F5F4;--muted:#A8A29E;--subtle:#8F8984;
+  --accent:#E0BF89;--accent-hover:#EBD2A8;--on-accent:#141414;--accent-soft:#2A2013;--accent-soft-text:#EBD2A8;
+  --hover:#292524;--shadow-sm:none;--shadow-md:none;
+  --b-neutral-fg:#D6D3D1;--b-neutral-bg:#2E2C2A;--b-success-fg:#86EFAC;--b-success-bg:#12301E;
+  --b-warning-fg:#FCD34D;--b-warning-bg:#3A2A08;--b-danger-fg:#FDA4AF;--b-danger-bg:#3B1219;
+  --b-info-fg:#93C5FD;--b-info-bg:#132A4A;--b-accent-fg:#EBD2A8;--b-accent-bg:#2A2013;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--canvas);color:var(--text);font:400 14px/20px Montserrat,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--accent)}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.mockbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:5}
+.mockbar strong{margin-right:8px;font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:var(--r-s);overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;cursor:pointer;min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-soft-text);font-weight:600}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--border-strong);background:var(--surface);color:var(--text);cursor:pointer;font-weight:500;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+
+.app{display:grid;grid-template-columns:256px 1fr;min-height:calc(100vh - 53px)}
+nav.side{background:var(--nav-bg);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;font-weight:600;letter-spacing:.02em}
+.brand i{width:28px;height:28px;border-radius:8px;background:var(--accent);display:inline-block}
+.grp{font-size:12px;line-height:16px;font-weight:600;color:var(--subtle);padding:16px 10px 6px}
+.item{display:flex;align-items:center;height:36px;padding:0 10px;border-radius:var(--r-s);color:var(--text);text-decoration:none;font-weight:500;position:relative}
+.item:hover{background:var(--hover)}
+.item.on{background:var(--accent-soft);color:var(--accent-soft-text)}
+.item.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.item .count{margin-left:auto;font-size:12px;color:var(--subtle);font-variant-numeric:tabular-nums}
+
+main{padding:32px;min-width:0}
+.ph{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.ph h1{font-size:24px;line-height:32px;font-weight:600;margin:0}
+.ph p{margin:4px 0 0;color:var(--subtle);font-size:13px}
+.ph .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);box-shadow:var(--shadow-sm)}
+.alert{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:var(--r-l);background:var(--b-danger-bg);color:var(--b-danger-fg);margin-bottom:24px;font-weight:500}
+.alert a{color:inherit;margin-left:auto;font-weight:600}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:24px}
+.stat{padding:16px 20px;text-decoration:none;color:inherit;display:block}
+.stat:hover{border-color:var(--border-strong)}
+.stat .lbl{font-size:13px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:8px}
+.stat .num{font-size:28px;line-height:36px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:6px}
+.stat .sub{font-size:12px;color:var(--subtle)}
+.ico{width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent-soft-text);display:inline-grid;place-items:center;font-size:14px}
+.shortcuts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;align-items:center}
+.shortcuts .t{font-size:13px;font-weight:600;color:var(--muted);margin-right:4px}
+.two{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:24px}
+.card h2{font-size:16px;line-height:24px;font-weight:600;margin:0;padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center}
+.card h2 a{margin-left:auto;font-size:13px;font-weight:500}
+.list{list-style:none;margin:0;padding:4px 0}
+.list li{display:flex;align-items:center;gap:12px;padding:10px 20px;min-height:48px}
+.list li+li{border-top:1px solid var(--border)}
+.list .meta{font-size:12px;color:var(--subtle)}
+.list .grow{flex:1;min-width:0}
+.list .title{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.groups .card{padding:16px 20px}
+.groups h3{margin:0 0 8px;font-size:12px;line-height:16px;font-weight:600;color:var(--subtle)}
+.groups a{display:flex;justify-content:space-between;padding:6px 0;color:var(--text);text-decoration:none}
+.groups a:hover{color:var(--accent)}
+.groups a span{color:var(--subtle);font-variant-numeric:tabular-nums}
+
+.badge{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.neutral{color:var(--b-neutral-fg);background:var(--b-neutral-bg)}.success{color:var(--b-success-fg);background:var(--b-success-bg)}
+.warning{color:var(--b-warning-fg);background:var(--b-warning-bg)}.danger{color:var(--b-danger-fg);background:var(--b-danger-bg)}
+.info{color:var(--b-info-fg);background:var(--b-info-bg)}.accent{color:var(--b-accent-fg);background:var(--b-accent-bg)}
+
+.toolbar{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.input{height:36px;border:1px solid var(--border-strong);border-radius:var(--r-s);background:var(--surface);color:var(--text);padding:0 12px;font:inherit;min-width:0}
+.input::placeholder{color:var(--subtle)}
+.toolbar .input{flex:1;min-width:180px}
+.select{appearance:none;padding-right:32px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 16px) 15px,calc(100% - 11px) 15px;background-size:5px 5px;background-repeat:no-repeat}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{position:sticky;top:0;background:var(--canvas);text-align:left;font-size:12px;font-weight:500;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:0 12px;height:56px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr:hover td{background:var(--surface-hover)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;display:block;background:linear-gradient(135deg,#C19B60,#4D391B)}
+.ttl{font-weight:500;color:var(--text);text-decoration:none}
+.ttl:hover{color:var(--accent)}
+.pager{display:flex;align-items:center;gap:8px;padding:12px 16px;color:var(--subtle);font-size:13px;flex-wrap:wrap}
+.pager .spacer{flex:1}
+
+.edit{display:grid;grid-template-columns:minmax(0,760px) 320px;gap:24px;align-items:start}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tabs button{border:0;background:none;color:var(--muted);padding:10px 12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-height:40px}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;line-height:18px;font-weight:500;margin-bottom:6px}
+.field label em{color:var(--b-danger-fg);font-style:normal}
+.field .input{width:100%}
+.field .desc{font-size:12px;line-height:18px;color:var(--subtle);margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rte{min-height:140px;border:1px solid var(--border-strong);border-radius:var(--r-s);padding:12px;color:var(--muted)}
+.rte .bar{display:flex;gap:6px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border);font-size:12px}
+.side-panel{padding:20px;position:sticky;top:72px}
+.side-panel .field:last-child{margin-bottom:0}
+.check{display:flex;gap:8px;align-items:center}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.coll{border:1px solid var(--border);border-radius:var(--r-m);margin-bottom:20px}
+.coll summary{padding:12px 16px;font-weight:600;cursor:pointer}
+.coll > div{padding:0 16px 4px}
+
+.map table{min-width:0}
+.map td{height:auto;padding:10px 12px;white-space:normal;vertical-align:top}
+.screen[hidden]{display:none}
+.note{font-size:12px;color:var(--subtle);margin-top:16px}
+
+@media (max-width:1023px){
+  .app{grid-template-columns:1fr}
+  nav.side{display:none}
+  main{padding:20px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two,.edit{grid-template-columns:1fr}
+  .groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .side-panel{position:static}
+}
+@media (max-width:767px){
+  main{padding:16px}
+  .stats,.groups,.row{grid-template-columns:1fr}
+  .ph .actions{margin-left:0;width:100%}
+  .btn,.input,.seg button{min-height:44px}
+  td{height:60px}
+}
+</style>
+</head>
+<body>
+<div class="mockbar" role="toolbar" aria-label="Điều khiển mock">
+  <strong>Mock BL-015</strong>
+  <div class="seg" id="screens">
+    <button aria-pressed="true" data-s="dash">Tổng quan</button>
+    <button aria-pressed="false" data-s="list">Danh sách</button>
+    <button aria-pressed="false" data-s="edit">Form sửa</button>
+    <button aria-pressed="false" data-s="map">Nhóm menu</button>
+  </div>
+  <div class="seg" id="role">
+    <button aria-pressed="true" data-r="admin">Admin</button>
+    <button aria-pressed="false" data-r="sale">Sale</button>
+  </div>
+  <span class="spacer"></span>
+  <button class="btn" id="theme" type="button">Đổi sáng / tối</button>
+</div>
+
+<div class="app">
+  <nav class="side" aria-label="Menu quản trị">
+    <div class="brand"><i aria-hidden="true"></i>TAMI Admin</div>
+    <a class="item on" href="#" data-nav="dash">Tổng quan</a>
+    <div class="grp">Khách hàng</div>
+    <a class="item" href="#">Khách hàng tiềm năng <span class="count">128</span></a>
+    <div class="grp">Nội dung</div>
+    <a class="item" href="#" data-nav="list">Dự án</a>
+    <a class="item" href="#">Cho thuê</a>
+    <a class="item" href="#">Tin bất động sản</a>
+    <a class="item" href="#">Tin tức</a>
+    <a class="item admin-only" href="#">Dịch vụ</a>
+    <a class="item admin-only" href="#">Trang pháp lý</a>
+    <div class="grp">Tuyển dụng</div>
+    <a class="item" href="#">Tin tuyển dụng</a>
+    <a class="item admin-only" href="#">Hồ sơ ứng tuyển</a>
+    <div class="grp">Thư viện</div>
+    <a class="item" href="#">Ảnh &amp; tệp</a>
+    <a class="item admin-only" href="#">Tệp riêng tư</a>
+    <div class="grp">Danh mục</div>
+    <a class="item" href="#">Danh mục</a>
+    <a class="item" href="#">Chủ đầu tư</a>
+    <a class="item" href="#">Tỉnh/thành · Phường/xã</a>
+    <div class="grp admin-only">Website</div>
+    <a class="item admin-only" href="#">Cấu hình chung</a>
+    <a class="item admin-only" href="#">Trang chủ</a>
+    <a class="item admin-only" href="#">Đầu trang · Chân trang</a>
+    <a class="item admin-only" href="#">Chuyển hướng 301</a>
+    <div class="grp">Hệ thống</div>
+    <a class="item" href="#">Nhân viên</a>
+    <a class="item admin-only" href="#">Nhật ký thao tác</a>
+    <a class="item admin-only" href="#">Lượt bấm liên hệ</a>
+    <a class="item admin-only" href="#">Chi phí dịch AI</a>
+  </nav>
+
+  <main>
+    <!-- Tổng quan -->
+    <section class="screen" id="s-dash" aria-label="Tổng quan">
+      <div class="ph">
+        <div><h1>Chào buổi sáng, <span class="who">Minh</span></h1><p>Thứ Hai, 19/10/2026</p></div>
+        <div class="actions"><a class="btn btn-primary" href="#">＋ Tạo mới</a></div>
+      </div>
+      <div class="alert admin-only" role="status">2 nội dung dịch tiếng Anh bị lỗi (1 dự án, 1 tin tức).<a href="#">Xem danh sách</a></div>
+      <div class="stats">
+        <a class="card stat" href="#"><div class="lbl"><span class="ico" aria-hidden="true">✦</span><span class="for-admin">Lead mới</span><span class="for-sale">Lead mới được giao</span></div><div class="num"><span class="for-admin">14</span><span class="for-sale">3</span></div><div class="sub">trạng thái Mới</div></a>
+        <a class="card stat admin-only" href="#"><div class="lbl"><span class="ico" aria-hidden="true">!</span>Lead chưa phân công</div><div class="num">4 <span class="badge warning" style="vertical-align:middle">Cần giao</span></div><div class="sub">Mới, chưa có người phụ trách</div></a>
+        <a class="card stat sale-only" href="#"><div class="lbl"><span class="ico" aria-hidden="true">↻</span>Lead đang chăm sóc</div><div class="num">9</div><div class="sub">Đã liên hệ + Đang tư vấn</div></a>
+        <a class="card stat admin-only" href="#"><div class="lbl"><span class="ico" aria-hidden="true">✉</span>Hồ sơ ứng tuyển mới</div><div class="num">6</div><div class="sub">trạng thái Mới</div></a>
+        <a class="card stat sale-only" href="#"><div class="lbl"><span class="ico" aria-hidden="true">✎</span>Bài nháp của tôi</div><div class="num">2</div><div class="sub">chưa xuất bản</div></a>
+        <a class="card stat" href="#"><div class="lbl"><span class="ico" aria-hidden="true">◉</span><span class="for-admin">Nội dung đang hiển thị</span><span class="for-sale">Bài của tôi đang hiển thị</span></div><div class="num"><span class="for-admin">312</span><span class="for-sale">27</span></div><div class="sub">dự án · cho thuê · tin BĐS · tin tức</div></a>
+      </div>
+      <div class="shortcuts"><span class="t">Tạo nhanh</span>
+        <a class="btn" href="#">＋ Dự án</a><a class="btn" href="#">＋ Tin cho thuê</a><a class="btn" href="#">＋ Tin BĐS</a><a class="btn" href="#">＋ Tin tức</a><a class="btn" href="#">＋ Tin tuyển dụng</a><a class="btn admin-only" href="#">＋ Dịch vụ</a>
+      </div>
+      <div class="two">
+        <div class="card"><h2><span class="for-admin">Lead mới nhất</span><span class="for-sale">Lead được giao gần đây</span><a href="#">Xem tất cả</a></h2>
+          <ul class="list">
+            <li><div class="grow"><div class="title">Nguyễn Thị Lan · 0912 *** 456</div><div class="meta">Cho thuê · Căn 2PN Vinhomes Smart City · 8 phút trước</div></div><span class="badge warning">Mới</span></li>
+            <li><div class="grow"><div class="title">Trần Văn Hùng · 0983 *** 120</div><div class="meta">Dự án · The Sola Park · 1 giờ trước · <span class="admin-only">Chưa phân công</span></div></div><span class="badge warning">Mới</span></li>
+            <li><div class="grow"><div class="title">Phạm Minh Đức · 0905 *** 771</div><div class="meta">Liên hệ · hôm qua · Sale: Hoà</div></div><span class="badge info">Đang tư vấn</span></li>
+            <li><div class="grow"><div class="title">Lê Thu Hà · 0936 *** 002</div><div class="meta">Tin BĐS · 2 ngày trước · Sale: Minh</div></div><span class="badge success">Thành công</span></li>
+            <li><div class="grow"><div class="title">Đỗ Quang · 0977 *** 845</div><div class="meta">Cho thuê · 3 ngày trước</div></div><span class="badge danger">Không thành</span></li>
+          </ul></div>
+        <div class="card"><h2>Bạn sửa gần đây</h2>
+          <ul class="list">
+            <li><div class="grow"><div class="title">Căn 2PN view hồ, full nội thất</div><div class="meta">Cho thuê · 20 phút trước</div></div><span class="badge success">Đã xuất bản</span></li>
+            <li><div class="grow"><div class="title">The Sola Park — bảng giá tháng 10</div><div class="meta">Dự án · hôm qua</div></div><span class="badge neutral">Nháp</span></li>
+            <li><div class="grow"><div class="title">Thị trường căn hộ Hà Nội quý III</div><div class="meta">Tin tức · 2 ngày trước</div></div><span class="badge info">Hẹn giờ</span></li>
+          </ul></div>
+      </div>
+      <div class="groups">
+        <div class="card"><h3>Nội dung</h3><a href="#">Dự án <span>42</span></a><a href="#">Cho thuê <span>186</span></a><a href="#">Tin bất động sản <span>58</span></a><a href="#">Tin tức <span>71</span></a></div>
+        <div class="card"><h3>Tuyển dụng</h3><a href="#">Tin tuyển dụng <span>8</span></a><a class="admin-only" href="#">Hồ sơ ứng tuyển <span>54</span></a></div>
+        <div class="card"><h3>Danh mục</h3><a href="#">Danh mục <span>23</span></a><a href="#">Chủ đầu tư <span>17</span></a><a href="#">Tỉnh/thành <span>34</span></a></div>
+      </div>
+      <p class="note">Số liệu minh hoạ. Thẻ/lối tắt/nhóm ẩn hẳn (không render) khi vai trò không có quyền đọc/tạo collection đó — bấm "Sale" ở thanh trên để xem.</p>
+    </section>
+
+    <!-- Danh sách -->
+    <section class="screen" id="s-list" hidden aria-label="Danh sách dự án">
+      <div class="ph">
+        <div><h1>Dự án</h1><p>Dự án phân phối: thông tin, mặt bằng, chính sách bán hàng.</p></div>
+        <div class="actions"><a class="btn btn-primary" href="#">＋ Tạo dự án</a></div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <input class="input" type="search" placeholder="Tìm theo tên dự án" aria-label="Tìm theo tên dự án">
+          <select class="input select" aria-label="Trạng thái dịch"><option>Trạng thái dịch: tất cả</option><option>Dịch lỗi</option></select>
+          <button class="btn" type="button">Cột</button><button class="btn" type="button">Bộ lọc</button>
+        </div>
+        <div class="tablewrap"><table>
+          <thead><tr><th style="width:56px"><span class="sr" style="position:absolute;left:-9999px">Ảnh</span></th><th>Tên dự án</th><th>Danh mục</th><th>Tình trạng bán</th><th>Trạng thái</th><th>Ngày xuất bản</th><th>Người đăng</th></tr></thead>
+          <tbody>
+            <tr><td><span class="thumb" aria-hidden="true"></span></td><td><a class="ttl" href="#">The Sola Park</a></td><td>Căn hộ</td><td><span class="badge success">Đang bán</span></td><td><span class="badge success">Đã xuất bản</span></td><td>12/10/2026 09:30</td><td>Minh</td></tr>
+            <tr><td><span class="thumb" aria-hidden="true" style="background:linear-gradient(135deg,#B0ABA6,#44403C)"></span></td><td><a class="ttl" href="#">Vinhomes Global Gate</a> <span class="badge accent">Nổi bật</span></td><td>Khu đô thị</td><td><span class="badge info">Sắp mở bán</span></td><td><span class="badge neutral">Nháp</span></td><td>—</td><td>Hoà</td></tr>
+            <tr><td><span class="thumb" aria-hidden="true" style="background:linear-gradient(135deg,#E0BF89,#6A4E26)"></span></td><td><a class="ttl" href="#">Masteri West Heights</a></td><td>Căn hộ</td><td><span class="badge neutral">Đã bàn giao</span></td><td><span class="badge success">Đã xuất bản</span></td><td>02/09/2026 15:10</td><td>Minh</td></tr>
+            <tr><td><span class="thumb" aria-hidden="true" style="background:linear-gradient(135deg,#8F8984,#292524)"></span></td><td><a class="ttl" href="#">Lumière Evergreen</a></td><td>Căn hộ</td><td><span class="badge success">Đang bán</span></td><td><span class="badge info">Hẹn giờ</span></td><td>25/10/2026 08:00</td><td>Lan</td></tr>
+          </tbody>
+        </table></div>
+        <div class="pager"><span>1–4 trong 42</span><span class="spacer"></span><span>Số dòng</span><select class="input select" aria-label="Số dòng mỗi trang"><option>20</option></select><button class="btn" type="button">Trước</button><button class="btn" type="button">Sau</button></div>
+      </div>
+      <p class="note">Badge dùng chung một bảng value → tone. Ảnh 40×40 lấy size nhỏ nhất của Media, lazy. Tiền/số căn phải.</p>
+    </section>
+
+    <!-- Form sửa -->
+    <section class="screen" id="s-edit" hidden aria-label="Sửa dự án">
+      <div class="ph">
+        <div><p style="margin:0 0 4px">Dự án / The Sola Park</p><h1>The Sola Park <span class="badge success" style="vertical-align:middle">Đã xuất bản</span></h1></div>
+        <div class="actions"><button class="btn" type="button">Lưu nháp</button><button class="btn btn-primary" type="button">Xuất bản thay đổi</button></div>
+      </div>
+      <div class="edit">
+        <div>
+          <div class="tabs" role="tablist" aria-label="Nhóm trường">
+            <button role="tab" aria-selected="true">Nội dung</button><button role="tab" aria-selected="false">Thông tin dự án</button><button role="tab" aria-selected="false">Hình ảnh &amp; tài liệu</button><button role="tab" aria-selected="false">SEO</button><button role="tab" aria-selected="false">Bản dịch</button>
+          </div>
+          <div class="field"><label for="f1">Tên dự án <em aria-hidden="true">*</em></label><input class="input" id="f1" value="The Sola Park"></div>
+          <div class="row">
+            <div class="field"><label for="f2">Danh mục</label><select class="input select" id="f2"><option>Căn hộ</option></select></div>
+            <div class="field"><label for="f3">Chủ đầu tư</label><select class="input select" id="f3"><option>Vinhomes</option></select></div>
+          </div>
+          <div class="field"><label for="f4">Tóm tắt</label><textarea class="input" id="f4" rows="3" style="height:auto;padding:10px 12px">Tổ hợp căn hộ cao cấp phía tây Hà Nội, 4 toà, bàn giao quý II/2027.</textarea><div class="desc">Hiện ở thẻ dự án và đầu trang chi tiết. Tối đa 300 ký tự.</div></div>
+          <div class="field"><span style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Tổng quan</span><div class="rte"><div class="bar"><b>B</b><i>I</i><span>H2</span><span>Danh sách</span><span>Liên kết</span></div>Nội dung mô tả dự án…</div></div>
+          <details class="coll" open><summary>Quy mô</summary><div>
+            <div class="row"><div class="field"><label for="f5">Tổng số căn</label><input class="input" id="f5" value="2.300"></div><div class="field"><label for="f6">Số toà</label><input class="input" id="f6" value="4"></div></div>
+          </div></details>
+        </div>
+        <aside class="card side-panel" aria-label="Thông tin xuất bản">
+          <div class="field"><label for="g1">Trạng thái</label><select class="input select" id="g1"><option>Đã xuất bản</option></select></div>
+          <div class="field"><label for="g2">Ngày xuất bản</label><input class="input" id="g2" value="12/10/2026 09:30"></div>
+          <div class="field"><label for="g3">Người đăng</label><select class="input select" id="g3"><option>Minh</option></select></div>
+          <div class="field"><label for="g4">Đường dẫn</label><input class="input" id="g4" value="the-sola-park"><div class="desc">/du-an/the-sola-park</div></div>
+          <div class="field check"><input type="checkbox" id="g5" checked><label for="g5" style="margin:0">Nổi bật trên trang chủ</label></div>
+          <div class="field"><span style="font-size:13px;font-weight:500">Bản tiếng Anh</span><div style="margin-top:6px"><span class="badge success">AI đã dịch</span></div></div>
+        </aside>
+      </div>
+      <p class="note">Tab không tên + collapsible + row: không đổi đường dẫn dữ liệu, không sinh migration. Group có sẵn (scale, seo, translation) giữ nguyên tên.</p>
+    </section>
+
+    <!-- Bảng nhóm menu -->
+    <section class="screen map" id="s-map" hidden aria-label="Bảng nhóm menu">
+      <div class="ph"><div><h1>Nhóm menu đề xuất</h1><p>admin.group + thứ tự mảng collections/globals trong payload.config.ts</p></div></div>
+      <div class="card tablewrap"><table>
+        <thead><tr><th>Nhóm</th><th>Mục (slug)</th><th>Ai thấy</th></tr></thead>
+        <tbody>
+          <tr><td><b>Khách hàng</b></td><td>Khách hàng tiềm năng (leads) · Lịch sử chăm sóc (lead-activities — đề xuất ẩn khỏi menu?)</td><td>admin, sale</td></tr>
+          <tr><td><b>Nội dung</b></td><td>Dự án · Cho thuê · Tin bất động sản · Tin tức · Dịch vụ · Trang pháp lý</td><td>admin, sale (Dịch vụ, Trang pháp lý: chỉ admin sửa)</td></tr>
+          <tr><td><b>Tuyển dụng</b></td><td>Tin tuyển dụng (job-postings) · Hồ sơ ứng tuyển (job-applications)</td><td>tin: cả hai · hồ sơ: admin</td></tr>
+          <tr><td><b>Thư viện</b></td><td>Ảnh &amp; tệp (media) · Tệp riêng tư (private-files)</td><td>ảnh: cả hai · tệp riêng: admin</td></tr>
+          <tr><td><b>Danh mục</b></td><td>Danh mục · Chủ đầu tư · Tỉnh/thành · Phường/xã</td><td>cả hai (sửa: admin)</td></tr>
+          <tr><td><b>Website</b></td><td>Cấu hình chung · Trang chủ · Đầu trang · Chân trang · Chuyển hướng 301 (redirects)</td><td>admin</td></tr>
+          <tr><td><b>Hệ thống</b></td><td>Nhân viên · Nhật ký thao tác · Lượt bấm liên hệ · Thống kê lượt bấm theo ngày · Chi phí dịch AI</td><td>admin (sale: chỉ hồ sơ của mình)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(sel,attr,val){document.querySelectorAll(sel).forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute(attr)===val));});}
+  function show(s){document.querySelectorAll('.screen').forEach(function(el){el.hidden=el.id!=='s-'+s;});set('#screens button','data-s',s);
+    document.querySelectorAll('.item').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-nav')===s);});}
+  function role(r){set('#role button','data-r',r);
+    document.querySelectorAll('.admin-only,.for-admin').forEach(function(el){el.style.display=r==='admin'?'':'none';});
+    document.querySelectorAll('.sale-only,.for-sale').forEach(function(el){el.style.display=r==='sale'?'':'none';});
+    document.querySelectorAll('.who').forEach(function(el){el.textContent=r==='admin'?'Minh':'Hoà';});}
+  document.getElementById('screens').addEventListener('click',function(e){var s=e.target.getAttribute('data-s');if(s)show(s);});
+  document.getElementById('role').addEventListener('click',function(e){var r=e.target.getAttribute('data-r');if(r)role(r);});
+  document.querySelectorAll('[data-nav]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();show(a.getAttribute('data-nav'));});});
+  document.getElementById('theme').addEventListener('click',function(){
+    var dark=root.getAttribute('data-theme')==='dark'||(root.getAttribute('data-theme')!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme',dark?'light':'dark');});
+  role('admin');show('dash');
+})();
+</script>
+</body>
+</html>

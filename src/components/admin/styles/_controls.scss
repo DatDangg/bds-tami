@@ -1,0 +1,297 @@
+// Điều khiển admin (BL-015 T01): nút, input, react-select của Payload, checkbox/radio, dropzone, focus.
+// Selector lấy từ @payloadcms/ui 3.91 (dist/scss + elements/*/index.scss). Không dùng !important.
+
+// ---- Focus: 2px màu nhấn, offset 2px (design §1.1 --admin-focus) ----
+.btn:focus-visible,
+.pill:focus-visible,
+.nav__link:focus-visible,
+.popup-button-list__button:focus-visible,
+.paginator__page:focus-visible,
+.hamburger:focus-visible,
+.tabs-field__tab-button:focus-visible,
+.doc-tab:focus-visible,
+.card__click:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+// ---- Nút ----
+.btn {
+  --btn-font-weight: 500;
+  font-size: 14px;
+}
+
+// 36px thường / 40px nút lớn (header), design §1.4.
+.btn--size-medium {
+  --btn-padding-block-start: 6px;
+  --btn-padding-block-end: 6px;
+  --btn-padding-inline-start: 14px;
+  --btn-padding-inline-end: 14px;
+}
+
+.btn--size-large {
+  --btn-padding-block-start: 8px;
+  --btn-padding-block-end: 8px;
+}
+
+.btn--style-primary:not(.btn--disabled) {
+  --btn-border: 1px solid var(--admin-accent);
+  --hover-btn-border: 1px solid var(--admin-accent-hover);
+}
+
+.btn--style-secondary:not(.btn--disabled) {
+  --bg-color: var(--admin-surface);
+  --btn-border: 1px solid var(--admin-border-strong);
+  --hover-bg: var(--theme-elevation-100);
+  --hover-color: var(--admin-text);
+  --hover-btn-border: 1px solid var(--admin-border-strong);
+}
+
+.btn--style-pill:not(.btn--disabled) {
+  --bg-color: var(--theme-elevation-100);
+  --hover-bg: var(--theme-elevation-150);
+}
+
+.btn--style-subtle:not(.btn--disabled) {
+  --btn-border: 1px solid var(--admin-border);
+  --hover-btn-border: 1px solid var(--admin-border-strong);
+}
+
+// ---- Input: viền border-strong (≥ 3:1), bo 6px, bỏ bóng, cao 36px ----
+// `.rs__input` là input ẩn của react-select (có style riêng bên dưới) nên loại khỏi rule input.
+.field-type input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.rs__input),
+.field-type textarea,
+.search-filter input,
+.condition-value-text,
+.condition-value-number,
+.file-field__filename,
+.file-field__remote-file,
+.code-editor,
+.login input {
+  border-color: var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  box-shadow: none;
+  color: var(--admin-text);
+  font-size: 14px;
+
+  &::placeholder {
+    color: var(--admin-text-subtle);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--admin-text-subtle);
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    border-color: var(--admin-accent);
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    border-color: var(--admin-border);
+    color: var(--theme-elevation-400);
+  }
+}
+
+.field-type input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.rs__input),
+.condition-value-text,
+.condition-value-number,
+.login input {
+  height: 36px;
+  padding: 7px 12px;
+}
+
+.field-type textarea {
+  padding: 8px 12px;
+}
+
+// Thanh tìm kiếm list view: nền surface + viền như input (Payload mặc định nền elevation-50 không viền).
+.search-bar {
+  --search-bg: var(--admin-surface);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  min-height: 36px;
+
+  .search-filter input {
+    border: 0;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  &__actions {
+    padding: 4px 6px;
+  }
+
+  &:focus-within {
+    border-color: var(--admin-accent);
+  }
+}
+
+// ---- react-select của Payload (field select / relationship / bộ lọc) ----
+.react-select {
+  .rs__control {
+    min-height: 36px;
+    padding: 2px 6px;
+    border-color: var(--admin-border-strong);
+    border-radius: var(--admin-radius-s);
+    background: var(--theme-input-bg);
+    box-shadow: none;
+    font-size: 14px;
+
+    &:hover {
+      border-color: var(--admin-text-subtle);
+      box-shadow: none;
+    }
+
+    &.rs__control--is-focused,
+    &.rs__control--menu-is-open {
+      border-color: var(--admin-accent);
+      outline: 2px solid var(--admin-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .rs__placeholder {
+    color: var(--admin-text-subtle);
+  }
+
+  .rs__single-value,
+  .rs__input-container {
+    color: var(--admin-text);
+  }
+
+  .rs__multi-value {
+    border-radius: 4px;
+    background: var(--theme-elevation-100);
+  }
+
+  .rs__menu {
+    margin-top: 4px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-m);
+    background: var(--admin-surface);
+    box-shadow: var(--admin-shadow-md);
+    overflow: hidden;
+  }
+
+  .rs__option {
+    color: var(--admin-text);
+    font-size: 14px;
+
+    &--is-focused {
+      background-color: var(--theme-elevation-100);
+    }
+
+    &--is-selected {
+      background-color: var(--admin-accent-soft);
+      color: var(--admin-accent-soft-text);
+      font-weight: 500;
+    }
+  }
+
+  &.rs--is-disabled .rs__control {
+    border-color: var(--admin-border);
+  }
+}
+
+// ---- Checkbox / radio: viền border-strong, chọn = màu nhấn ----
+.checkbox-input__input {
+  border-color: var(--admin-border-strong);
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.checkbox-input:not(.checkbox-input--read-only):hover .checkbox-input__input {
+  border-color: var(--admin-text-subtle);
+}
+
+.checkbox-input--checked:not(.checkbox-input--read-only) .checkbox-input__input {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent);
+
+  .icon--check .stroke {
+    stroke: var(--admin-on-accent);
+  }
+}
+
+.radio-input__styled-radio {
+  border-color: var(--admin-border-strong);
+  box-shadow: none;
+
+  &::before {
+    background-color: var(--admin-accent);
+    border-color: var(--theme-input-bg);
+  }
+}
+
+// ---- Upload dropzone: biên điều khiển ≥ 3:1 ----
+.dropzone {
+  border: 1px dashed var(--admin-border-strong);
+  border-radius: var(--admin-radius-m);
+
+  &.dragging {
+    border-color: var(--admin-accent);
+    background: var(--admin-accent-soft);
+    box-shadow: none;
+  }
+}
+
+.file-field {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-m);
+}
+
+// ---- Mobile < 768: vùng chạm 44px (design §1.4) ----
+@media (max-width: 767px) {
+  .btn--size-medium,
+  .btn--size-large,
+  .react-select .rs__control,
+  .search-bar {
+    min-height: 44px;
+  }
+
+  .field-type input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.rs__input),
+  .login input {
+    height: 44px;
+  }
+
+  // Hộp giữ 22px; vùng bấm thật 44x44. Payload: input checkbox là position:absolute trong
+  // .checkbox-input__input (relative, 22px, viền 1px), div cha không phải label nên không toggle.
+  // (a) hàng stretch + label cao 44px => mọi điểm trong hàng thuộc label/input;
+  // (b) input ẩn mở 44x44 căn giữa quanh hộp (tâm hộp cách gốc padding-box 10px => margin -12px),
+  //     phủ cả checkbox không label (chọn dòng/chọn tất cả ở list view).
+  .checkbox-input {
+    min-height: 44px;
+    align-items: stretch;
+
+    label.field-label {
+      min-height: 44px;
+      align-items: center;
+    }
+  }
+
+  .checkbox-input__input {
+    align-self: center;
+
+    & input[type="checkbox"] {
+      width: 44px;
+      height: 44px;
+      margin-left: -12px;
+      margin-top: -12px;
+    }
+  }
+
+  .radio-input {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .checkbox-input__input,
+  .radio-input__styled-radio {
+    width: 22px;
+    height: 22px;
+  }
+}

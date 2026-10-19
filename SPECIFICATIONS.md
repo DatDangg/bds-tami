@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.10.0
+- **spec_version:** 1.11.0
 - **updated_at:** 2026-10-19
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
@@ -74,8 +74,10 @@ Hotline / Zalo / Fanpage ở góc dưới phải mọi trang; ghi nhận lượt
 ### F9. Lead: FR-PUB-13, FR-ADM-09, FR-ADM-10; BR-10…16
 Form lead ở tin cho thuê, bài Đăng tin BĐS, dự án, trang liên hệ; consent bắt buộc; Turnstile + rate limit; chống trùng 7 ngày; tự giao cho sale đăng bài (tin cho thuê / bài Đăng tin BĐS), còn lại admin giao; email thông báo; nhắc lead chưa giao sau 30 phút; trạng thái `new/contacted/consulting/won/lost/spam`, chuyển `lost` bắt buộc nhập lý do (BR-11); admin giao lại thì email cho sale mới (BR-13); nhắc admin khi lead `new` chưa có người phụ trách sau 30 phút **giờ hành chính** (BR-14, định nghĩa ở § Quy tắc biên); lịch sử chăm sóc; xuất Excel (admin, ghi audit log; xuất đúng bộ lọc đang áp trong danh sách lead — trạng thái / nguồn / sale phụ trách với toán tử "bằng", ngày tạo với "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng"; bộ lọc khác thì nút khoá kèm thông báo nêu rõ các toán tử được hỗ trợ; nút không hiện ở thùng rác và trong cửa sổ chọn lead (list drawer)). UTM (`utm_source/medium/campaign/term/content`) được ghi ở **mọi** trang công khai VI/EN (island client ở khung trang, không làm trang thành dynamic) vào `sessionStorage` của phiên — URL mới có UTM ghi đè bản đã lưu, URL không có UTM không ghi; form lead gửi kèm UTM của URL hiện tại, không có thì bản đã lưu (BR-10, design-spec §3.3). Phân công chỉ sinh activity/email/audit ở **một** nơi (hook `leads.afterChange`, `docs/API_SPEC.md` §5).
 
-### F10. Quản trị: FR-ADM-06, 07, 08, 11, 12, 13, 14, 15, 16
+### F10. Quản trị: FR-ADM-06, 07, 08, 11, 12, 13, 14, 15, 16, 19
 Danh mục cha–con theo từng loại nội dung (danh mục đang có nội dung thì không xoá được), chủ đầu tư, dịch vụ (chỉ admin), trang pháp lý (chỉ admin, `docs/ERD.md` §4.9b), menu/footer/cấu hình chung, tài khoản sale, thư viện ảnh (ảnh ≤ 10MB, tự resize WebP), audit log, dashboard, redirect 301, hẹn giờ xuất bản, lịch sử phiên bản, xoá mềm. Nội dung xuất bản/sửa lên trang công khai trong ≤ 1 phút (BRD §7.2).
+
+**FR-ADM-19 — Giao diện quản trị** (BL-015, design `docs/specs/2026-10-19-admin-ui-saas-design.md`): `/admin` theo phong cách gọn kiểu SaaS — nền/viền trung tính ấm, màu nhấn TAMI `#8C6733` (tối `#E0BF89`) chỉ cho nút chính/link/focus/mục đang chọn; mọi cặp chữ/nền ≥ 4.5:1 và biên điều khiển ≥ 3:1 ở cả sáng lẫn tối (token có test contrast tự động); ô chọn (select) admin cùng một style. Menu trái chia 7 nhóm nghiệp vụ tiếng Việt (Khách hàng · Nội dung · Tuyển dụng · Thư viện · Danh mục · Website · Hệ thống), không icon, quyền xem từng mục giữ nguyên. **Toàn bộ nhãn admin tiếng Việt**: mọi collection có `labels`, mọi field hiển thị có `label`, hàng array có nhãn (test quét config chặn thiếu nhãn). Màn Tổng quan tuỳ biến: thẻ đếm nhanh (admin: lead mới, lead chưa phân công, hồ sơ ứng tuyển mới, nội dung đang hiển thị; sale: lead mới được giao, lead đang xử lý, bản nháp của mình, tin đang đăng — không so sánh theo ngày), lối tắt tạo nội dung, lead mới nhất + bản sửa gần đây; số đếm bằng Local API theo quyền người xem (`overrideAccess: false`), collection không có quyền đọc/tạo thì không hiện thẻ/lối tắt; FR-ADM-14 (biểu đồ, lượt bấm, chi phí dịch) cắm vào khung này sau. Danh sách: badge trạng thái có chữ, thumbnail 40px (dự án/cho thuê = ảnh đầu `gallery`, tin BĐS/tin tức = `cover`), dòng 48px. Form: tab không tên / `row` / `collapsible`, trường phụ ở sidebar phải. Ràng buộc: **không đổi schema/DB, access control, API** (không sinh migration); responsive không vỡ ở 390px.
 
 ### F11. SEO: FR-PUB-15, NFR-03
 SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG theo từng ngôn ngữ, `hreflang` (`vi`, `en`, `x-default`), `<html lang>`, `sitemap.xml` gồm cả hai bản, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`, có `inLanguage`), redirect 301 khi đổi slug (theo từng ngôn ngữ).

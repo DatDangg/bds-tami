@@ -68,9 +68,10 @@ export function TranslationFailedBanner() {
   if (!isAdmin || groups.length === 0) return null;
   const overBudget = groups.some((group) => group.overBudget);
   return (
-    <div role="alert" style={{ border: "1px solid var(--theme-error-500)", borderRadius: 4, padding: 16, marginBottom: 24 }}>
+    // Style: .tami-admin-alert trong src/components/admin/styles/_surfaces.scss (tone danger, token BL-015).
+    <div role="alert" className="tami-admin-alert tami-admin-alert--danger">
       <strong>{overBudget ? "Dịch tự động bị dừng do vượt hạn mức tháng." : "Có nội dung dịch lỗi."}</strong>
-      <ul style={{ margin: "8px 0 0", paddingLeft: 20 }}>
+      <ul className="tami-admin-alert__list">
         {groups.map((group) => (
           <li key={group.slug}>
             <a href={group.href}>
