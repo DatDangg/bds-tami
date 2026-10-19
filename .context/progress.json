@@ -1,6 +1,11 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "bug",
+    "slug": "admin-misc-needs-repro",
+    "phaseTask": "phase-1-task-01",
+    "journal": ".context/runs/bug-admin-misc-needs-repro-phase-1-task-01.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -745,6 +750,50 @@
       "specUpdates": [
         "spec/updates/2026-10-19-admin-list-fixes.md",
         "spec/updates/2026-10-19-admin-list-fixes-toolbar.md"
+      ]
+    },
+    {
+      "slug": "admin-misc-needs-repro",
+      "title": "Admin: vỡ dấu tiếng Việt Lexical (#05), form tràn ngang 375px (#10), toast \"Fetching user failed\" khi chuyển trang nhanh (#16) (BL-023)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "fixing",
+      "currentPhase": 1,
+      "backlog": "BL-023",
+      "changeDoc": "spec/changes/2026-10-19-admin-misc-needs-repro.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-misc-needs-repro/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "note": "#05 Lexical dùng --font-serif Georgia thiếu glyph tiếng Việt 2 dấu",
+          "reviewLevel": "FAST",
+          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-01-round-1-review.md"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/bug-admin-misc-needs-repro/phase-1-task-02.md",
+          "status": "review",
+          "attempt": 1,
+          "round": 0,
+          "reviewerResult": null,
+          "note": "#10 breadcrumb header không co + vạch kẻ payload-settings rộng 100%+5base"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/bug-admin-misc-needs-repro/phase-1-task-03.md",
+          "status": "fixing",
+          "attempt": 2,
+          "round": 1,
+          "reviewerResult": "FAIL",
+          "note": "#16 link <a> dashboard điều hướng toàn trang + toast Payload khi fetch /me bị huỷ",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-03-round-1-review.md"
+        }
       ]
     }
   ],
