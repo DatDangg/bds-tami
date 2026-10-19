@@ -209,6 +209,9 @@
       "readTime": "{minutes} min read",
       "moreNews": "More news",
       "featuredLabel": "Featured news",
+      "viewMore": "View more",
+      "viewMoreIn": "View more {name} news",
+      "consultTitle": "Get a consultation",
       "relatedTitle": "Related articles",
       "tagsLabel": "Tags",
       "share": {

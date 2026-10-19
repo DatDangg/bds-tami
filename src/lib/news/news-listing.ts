@@ -13,7 +13,7 @@ import {
 import { categoryHref, type NewsCardData, toNewsCards, visibleCategory } from "./news-view";
 
 export interface NewsListing {
-  /** Chỉ có ở trang 1 của `/tin-tuc` (không lọc danh mục): 1 bài lớn + tối đa 3 bài hàng (S10). */
+  /** Chỉ có ở trang 1 của `/tin-tuc` (không lọc danh mục): {@link NEWS_FEATURED_COUNT} bài mới nhất bị loại khỏi lưới ở mọi trang. Trang 1 đưa các bài này (trừ bài đã hiện ở "Tin nổi bật" hoặc hàng danh mục) lên đầu mục "Tin khác" qua `buildMoreNews` để không bài nào mất chỗ; `tests/integration/news.test.ts` kiểm hợp đồng không trùng/không mất bài. */
   featured: NewsCardData[];
   items: NewsCardData[];
   totalPages: number;
@@ -25,6 +25,7 @@ export interface NewsListing {
 /**
  * Dữ liệu một trang danh sách tin. `/tin-tuc` (không danh mục): khối nổi bật = {@link NEWS_FEATURED_COUNT} bài mới nhất, lưới là
  * phần còn lại (loại các bài nổi bật ở MỌI trang để không trùng khi sang trang 2) nên khối nổi bật không tính vào 12 bài/trang.
+ * (BL-020 P3-T03: trang 1 hiển thị `loadNewsHome` rồi mục "Tin khác" = `buildMoreNews(home, featured, items)`; phân trang/offset không đổi.)
  * Trang danh mục: chỉ lưới. `categoryIds` gồm danh mục + con của nó (chip "Tất cả" của danh mục cha gồm cả bài của con).
  */
 export async function loadNewsListing(
@@ -95,6 +96,8 @@ export async function buildNewsChips(
   locale: Locale,
   allLabel: string,
   context: CategoryContext | null,
+  /** Danh mục cấp 1 đã tải sẵn (trang 1 `/tin-tuc` cũng cần để dựng hàng theo danh mục): bỏ qua một truy vấn. */
+  preloadedRoots?: readonly Category[],
 ): Promise<NewsChip[]> {
   if (context && context.children.length > 0) {
     return [
@@ -102,7 +105,7 @@ export async function buildNewsChips(
       ...context.children.map((child) => ({ label: child.name ?? "", href: categoryHref(child, locale), current: child.id === context.category.id })),
     ].filter((chip) => chip.label !== "");
   }
-  const roots = (await listRootNewsCategories(payload, locale)).docs.filter((doc) => doc.slug && doc.name);
+  const roots = (preloadedRoots ?? (await listRootNewsCategories(payload, locale)).docs).filter((doc) => doc.slug && doc.name);
   if (roots.length === 0) return [];
   return [
     { label: allLabel, href: publicPath("/tin-tuc", locale), current: context === null },

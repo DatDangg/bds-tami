@@ -120,6 +120,7 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
     <>
       <PageBanner
         size="compact"
+        overlap
         title={category?.name ?? t("title")}
         description={category ? (category.description ?? undefined) : t("description")}
         image={bannerImage}

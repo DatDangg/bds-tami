@@ -127,11 +127,11 @@ describe("S02 /du-an: render", () => {
   it("bố cục market: banner gọn 240px, băng tìm kiếm đè banner (trước breadcrumb), lưới 1/2/3/4 cột, không có ô từ khoá / nút Bộ lọc", async () => {
     loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
     const { container } = await render("vi");
-    expect(container.querySelector("section.h-60")).not.toBeNull();
+    expect(container.querySelector("[data-banner-size=compact][data-banner-overlap=true]")).not.toBeNull();
     const bar = screen.getByRole("search", { name: "Bộ lọc dự án" });
-    expect(bar.parentElement?.className).toContain("-mt-12");
+    expect(bar.parentElement).toHaveAttribute("data-search-overlay", "true");
     expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
+    expect(container.querySelector("[data-grid-max-cols]")).toHaveAttribute("data-grid-max-cols", "4");
     expect(within(bar).queryByRole("searchbox")).toBeNull();
     expect(within(bar).queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
   });

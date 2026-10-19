@@ -136,7 +136,7 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
             </PendingLink>
           )}
         </div>
-        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul data-grid-max-cols="4" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {toProjectCards(listing.docs, locale).map((card, index) => (
             <li key={card.id}>
               <ProjectCard data={card} priority={index === 0} />

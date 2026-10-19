@@ -504,16 +504,21 @@ Responsive: theo màn cha.
 
 ### S10. Tin tức · `/tin-tuc` · `/en/news` (FR-PUB-08)
 
-- Page banner + breadcrumb + tab danh mục (link S05).
-- Trang 1 tab "Tất cả": **bố cục nổi bật**: 1 bài lớn (ảnh 16:10, cột 1-7) + 3 bài dạng hàng (ảnh 4:3 nhỏ 120px + tiêu đề + ngày) cột 8-12 (≥ lg). Bên dưới: lưới thẻ Tin/ưu đãi 3 cột cho phần còn lại. Khác layout với S08 (S08 = 1 bài ngang + lưới) để mỗi mục có nhận diện riêng.
-- Không có form, không CTA lead (BRD: Tin tức không thu lead).
-- 12 bài/trang (không tính khối nổi bật ở trang 1).
+**As-built (BL-020 P3-T03, market.vinhomes.vn):**
+- Banner gọn 240px (`compactBanner`, không băng đè → không đệm đáy) + breadcrumb + **tab danh mục** = hàng viên thuốc là link (`/tin-tuc` = Tất cả, `/tin-tuc/danh-muc/<slug>`), mục hiện tại `aria-current="page"`, cuộn ngang ở < sm (không phải ARIA tabs).
+- **Trang 1**: "Tin nổi bật" (h2) = 1 bài lớn (ảnh 16:10, cột 1-7 ≥ lg) + list ≤ 4 bài dạng hàng (ảnh 4:3, cột 8-12); bài `isFeatured` trước rồi mới nhất, không trùng. Tiếp theo **mỗi danh mục cấp 1 một hàng** (h2 tên + "Xem thêm" → trang danh mục, ≤ 4 thẻ 1/2/4 cột; tối đa 6 hàng theo thứ tự CMS; danh mục không có bài công khai ở ngôn ngữ đang xem thì không có hàng; bài của danh mục con tính vào hàng của cha; không loại trùng với "Tin nổi bật"). Cuối cùng **"Tin khác"** (h2, lưới 1/2/3/4 cột, thẻ h3) = 4 bài mới nhất không thuộc "Tin nổi bật"/hàng danh mục (lưới các trang bỏ chúng) + lưới phân trang của trang 1 (12 bài), loại bài đã hiện ở "Tin nổi bật", để mọi bài còn truy cập được ở trang 1 hoặc 2+; nằm trước phân trang. Thẻ là h3 dưới h2 khối. Số truy vấn trang 1 cố định (≤ 12).
+- **Trang 2+** (`?page=n`): lưới thẻ 1/2/3/4 cột (4 ≥ xl) + phân trang như trước (12 bài/trang, bỏ 4 bài mới nhất ở mọi trang); canonical, `rel` prev/next, noindex không đổi. Trang 1 vẫn hiện phân trang (link tới trang 2).
+- Cuối **mọi trang `/tin-tuc`** (không có ở trang danh mục): section nền sáng `--color-bg-alt`, thẻ trắng bo `--radius-xl` (20px) viền nhạt rộng tối đa 42rem chứa `LeadFormSlot` "Tư vấn nhu cầu" / "Get a consultation" + `LeadForm` (`source=contact`, Turnstile + consent + honeypot/UTM như trang Liên hệ). Một form mỗi trang.
+- Trang danh mục (S05 của Tin tức): banner gọn + lưới 4 cột, không form.
+- (Bản trước BL-020: 1 bài lớn + 3 bài hàng + lưới 3 cột; "Không có form, không CTA lead" — nay thay bằng form tư vấn trang `/tin-tuc`; BRD: lead Tin tức đi nguồn `contact`.)
+- 12 bài/trang (không tính khối nổi bật).
 
 | Mốc | Thay đổi |
 |---|---|
-| 375 | Bài lớn thẻ dọc; 3 bài hàng (ảnh 96px); lưới 1 cột |
-| 640 | Lưới 2 cột |
-| 1024 | Khối nổi bật 7/5; lưới 3 cột |
+| 375 | Tab cuộn ngang; bài lớn thẻ dọc; list bài hàng (ảnh 96px); hàng danh mục 1 cột; form full-width |
+| 640 | Hàng danh mục + lưới 2 cột |
+| 1024 | Nổi bật 7/5; hàng danh mục 4 cột; lưới trang 2+ 3 cột |
+| 1280 | Lưới trang 2+ 4 cột |
 
 **States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống; EN. **Eyebrow:** 0.
 

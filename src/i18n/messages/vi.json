@@ -209,6 +209,9 @@
       "readTime": "{minutes} phút đọc",
       "moreNews": "Tin khác",
       "featuredLabel": "Tin nổi bật",
+      "viewMore": "Xem thêm",
+      "viewMoreIn": "Xem thêm tin {name}",
+      "consultTitle": "Tư vấn nhu cầu",
       "relatedTitle": "Bài liên quan",
       "tagsLabel": "Từ khoá",
       "share": {

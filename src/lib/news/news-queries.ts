@@ -35,6 +35,16 @@ export function listChildNewsCategories(payload: Payload, locale: Locale, parent
   });
 }
 
+/** Danh mục con (cấp 2) của NHIỀU danh mục cấp 1 trong một truy vấn (hàng theo danh mục của `/tin-tuc`, tránh N+1). */
+export function listChildNewsCategoriesOf(payload: Payload, locale: Locale, parentIds: readonly string[]): Promise<PublicListResult<Category>> {
+  return findPublicList<Category>(payload, "categories", locale, {
+    where: { and: [{ scope: { equals: "news" } }, { parent: { in: [...parentIds] } }] },
+    sort: CATEGORY_SORT,
+    limit: CATEGORY_LIMIT,
+    depth: 0,
+  });
+}
+
 /** Danh mục `news` theo slug của ngôn ngữ đang xem (slug chỉ duy nhất trong cùng scope). `parent` đã populate. */
 export function findNewsCategoryBySlug(payload: Payload, locale: Locale, slug: string): Promise<Category | null> {
   return findPublicBySlug<Category>(payload, "categories", locale, slug, { where: { scope: { equals: "news" } }, depth: 1 });
@@ -46,6 +56,8 @@ export interface NewsPageQuery {
   categoryIds?: readonly string[];
   /** Bài đã hiện ở khối nổi bật, loại khỏi lưới để không trùng. */
   excludeIds?: readonly string[];
+  /** Chỉ bài đánh dấu `isFeatured` (khối "Tin nổi bật" của trang 1 `/tin-tuc`). */
+  featuredOnly?: boolean;
   limit?: number;
 }
 
@@ -53,6 +65,7 @@ export interface NewsPageQuery {
 export function listPublicNews(payload: Payload, locale: Locale, query: NewsPageQuery): Promise<PublicListResult<News>> {
   const conditions: Where[] = [
     ...(query.categoryIds ? [{ category: { in: [...query.categoryIds] } }] : []),
+    ...(query.featuredOnly ? [{ isFeatured: { equals: true } }] : []),
     ...(query.excludeIds?.length ? [{ id: { not_in: [...query.excludeIds] } }] : []),
   ];
   return findPublicList<News>(payload, "news", locale, {

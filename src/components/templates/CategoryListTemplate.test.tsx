@@ -41,30 +41,41 @@ describe("CategoryListTemplate: banner gọn + băng tìm kiếm (BL-020 P3-T02)
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("section.h-60")).toBeNull();
-    expect(container.querySelector(".-mt-12")).toBeNull();
+    expect(container.querySelector("[data-banner-size=compact]")).toBeNull();
+    expect(container.querySelector("[data-search-overlay]")).toBeNull();
   });
 
-  it("compactBanner + searchBar: banner 240px, băng đè mép dưới và đứng trước breadcrumb", () => {
+  it("compactBanner + searchBar: banner gọn chừa đáy cho băng, băng đè mép dưới và đứng trước breadcrumb", () => {
     const { container } = renderWithIntl(
       <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner searchBar={<form aria-label="băng" />} isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("section.h-60")).not.toBeNull();
+    expect(container.querySelector("[data-banner-size=compact][data-banner-overlap=true]")).not.toBeNull();
     const bar = screen.getByRole("form", { name: "băng" });
-    expect(bar.parentElement?.className).toContain("-mt-12");
+    expect(bar.parentElement).toHaveAttribute("data-search-overlay", "true");
     expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("compactBanner không có searchBar (Tuyển dụng): chỉ banner gọn, không chừa khối băng", () => {
+  it("compactBanner không có searchBar (Tuyển dụng/Tin tức): banner gọn KHÔNG đệm đáy, không khối băng", () => {
     const { container } = renderWithIntl(
       <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("section.h-60")).not.toBeNull();
-    expect(container.querySelector(".-mt-12")).toBeNull();
+    expect(container.querySelector("[data-banner-size=compact]")).not.toBeNull();
+    expect(container.querySelector("[data-banner-overlap]")).toBeNull();
+    expect(container.querySelector("[data-search-overlay]")).toBeNull();
+  });
+
+  it("belowContent hiện sau vùng danh sách, cả khi danh sách trống", () => {
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} isEmpty belowContent={<p>cuối trang</p>}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.getByText("cuối trang")).toBeInTheDocument();
+    expect(screen.queryByText("lưới")).toBeNull();
   });
 });
 

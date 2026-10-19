@@ -13,7 +13,10 @@ export interface CategoryChip {
   current?: boolean;
 }
 
-interface CategoryListTemplateProps {
+/** `searchBar` chỉ có nghĩa khi banner gọn (nó đè lên mép dưới banner gọn): kiểu cấm truyền `searchBar` mà thiếu `compactBanner`. */
+type BannerProps = { compactBanner?: false; searchBar?: never } | { compactBanner: true; searchBar?: ReactNode };
+
+type CategoryListTemplateProps = BannerProps & {
   title: string;
   description?: string;
   bannerImage?: MediaImage;
@@ -25,10 +28,6 @@ interface CategoryListTemplateProps {
   chipsLabel?: string;
   /** < sm: chip cuộn ngang (scroll-snap) có mép phải mờ báo còn chip (design-spec S02); mặc định chip xuống dòng. */
   scrollChips?: boolean;
-  /** Banner gọn 240px kiểu market (BL-020 P3): trang danh sách Dự án/Tin BĐS/Tuyển dụng. Mặc định giữ banner cao theo viewport (Tin tức). */
-  compactBanner?: boolean;
-  /** Băng tìm kiếm gọn (`ListSearchBar`) đè 3rem lên mép dưới banner gọn; dựng trong template để nằm trong vùng chờ của danh sách. Cần `compactBanner`. */
-  searchBar?: ReactNode;
   /** Thanh lọc đặt cạnh hàng chip (≥ lg cùng một hàng, nhỏ hơn xếp dưới); luôn hiện kể cả khi kết quả trống để người dùng đổi/xoá bộ lọc. */
   toolbar?: ReactNode;
   /** Thay trạng thái trống mặc định (vd "Chưa có dự án phù hợp." kèm nút xoá bộ lọc). */
@@ -39,7 +38,9 @@ interface CategoryListTemplateProps {
   children: ReactNode;
   isEmpty: boolean;
   pagination: { page: number; totalPages: number; buildHref: (page: number) => string };
-}
+  /** Khối cuối trang, ngoài vùng danh sách/phân trang (vd form "Tư vấn nhu cầu" của Tin tức); luôn hiện kể cả khi danh sách trống. */
+  belowContent?: ReactNode;
+};
 
 /**
  * Template trang danh mục dùng chung (design-spec S05): banner chữ/ảnh → breadcrumb → chip danh mục con → lưới → phân trang.
@@ -65,6 +66,7 @@ export function CategoryListTemplate({
   children,
   isEmpty,
   pagination,
+  belowContent,
 }: CategoryListTemplateProps) {
   const chipList =
     chips && chips.length > 0 ? (
@@ -98,10 +100,14 @@ export function CategoryListTemplate({
 
   return (
     <>
-      <PageBanner title={title} description={description} image={bannerImage} size={compactBanner ? "compact" : "default"} />
+      <PageBanner title={title} description={description} image={bannerImage} size={compactBanner ? "compact" : "default"} overlap={Boolean(searchBar)} />
       <ListPendingProvider>
-        {/* PageBanner compact chừa đúng 3rem đáy cho băng đè lên. */}
-        {searchBar && <div className="relative z-10 mx-auto -mt-12 w-full max-w-container px-gutter">{searchBar}</div>}
+        {/* PageBanner `overlap` chừa đúng 3rem đáy cho băng đè lên. */}
+        {searchBar && (
+          <div data-search-overlay="true" className="relative z-10 mx-auto -mt-12 w-full max-w-container px-gutter">
+            {searchBar}
+          </div>
+        )}
         <Breadcrumb items={breadcrumb} className="py-2" />
         <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter pt-4 pb-section-tight">
           {chipsToolbar}
@@ -117,6 +123,7 @@ export function CategoryListTemplate({
           </PendingRegion>
         </div>
       </ListPendingProvider>
+      {belowContent}
     </>
   );
 }

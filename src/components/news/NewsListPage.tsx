@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
+import { LeadForm } from "@/components/leads/LeadForm";
+import { NewsHomeBody } from "@/components/news/NewsHomeBody";
 import { NewsListBody } from "@/components/news/NewsListBody";
 import { CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
@@ -10,7 +13,9 @@ import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { parsePagination, type RawPageParam } from "@/lib/content/pagination";
 import { buildNewsChips, categoryFilterIds, loadNewsCategoryContext, loadNewsListing } from "@/lib/news/news-listing";
-import { findLocalizedSlugs } from "@/lib/news/news-queries";
+import { buildMoreNews, loadNewsHome } from "@/lib/news/news-home";
+import { findLocalizedSlugs, listRootNewsCategories } from "@/lib/news/news-queries";
+import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import { categoryHref } from "@/lib/news/news-view";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Locale } from "@/i18n/routing";
@@ -28,9 +33,10 @@ function withPage(path: string, page: number): string {
 }
 
 /**
- * Dữ liệu + bố cục S10 (`/tin-tuc`) và S05 (`/tin-tuc/danh-muc/[category]`): cùng `CategoryListTemplate`. Danh mục không tồn tại
- * (hoặc chưa có bản EN ở `/en`) và trang vượt số trang → `notFound()`. Trang đọc `searchParams` nên render theo request
- * (không ISR); CDN vẫn giữ theo `Cache-Control` của `next.config.ts`.
+ * Dữ liệu + bố cục S10 (`/tin-tuc`) và S05 (`/tin-tuc/danh-muc/[category]`): cùng `CategoryListTemplate` (banner gọn). Trang 1 của `/tin-tuc`
+ * là "Tin nổi bật" + mỗi danh mục một hàng + "Tin khác" (= bài mới nhất bị loại khỏi lưới + lưới phân trang của trang 1, trừ bài đã hiện ở trên; `NewsHomeBody`); trang 2+ và trang danh mục là lưới 4 cột có phân trang. Phân trang/canonical không đổi.
+ * `/tin-tuc` (mọi trang) có form "Tư vấn nhu cầu" cuối trang. Danh mục không tồn tại (hoặc chưa có bản EN ở `/en`) và trang vượt số trang
+ * → `notFound()`. Trang đọc `searchParams` nên render theo request (không ISR); CDN vẫn giữ theo `Cache-Control` của `next.config.ts`.
  */
 export async function NewsListPage({ locale, rawPage, categorySlug }: NewsListPageProps) {
   const { page } = parsePagination(rawPage, undefined);
@@ -38,14 +44,20 @@ export async function NewsListPage({ locale, rawPage, categorySlug }: NewsListPa
   const context = categorySlug ? await loadNewsCategoryContext(payload, locale, categorySlug) : null;
   if (categorySlug && !context) notFound();
 
-  const [listing, t, tNav, bannerImage] = await Promise.all([
+  // Danh mục cấp 1 dùng chung cho hàng tab và các hàng theo danh mục của trang 1: tải một lần, hàng bắt đầu dựng ngay khi có.
+  const rootsPromise = context ? Promise.resolve(undefined) : listRootNewsCategories(payload, locale).then((result) => result.docs);
+  const homePromise = !context && page === 1 ? rootsPromise.then((roots) => loadNewsHome(payload, locale, roots ?? [])) : Promise.resolve(null);
+  const [listing, t, tNav, bannerImage, roots, home] = await Promise.all([
     loadNewsListing(payload, locale, { page, ...(context ? { categoryIds: categoryFilterIds(context) } : {}) }),
     getTranslations({ locale, namespace: "page.news" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     loadPageBanner(locale, "news"),
+    rootsPromise,
+    homePromise,
   ]);
   if (listing.outOfRange) notFound();
-  const chips = await buildNewsChips(payload, locale, t("all"), context);
+  const chips = await buildNewsChips(payload, locale, t("all"), context, roots);
+  const turnstileSiteKey = readTurnstileSiteKey();
 
   const listPath = publicPath("/tin-tuc", locale);
   const ownPath = context ? categoryHref(context.category, locale) : listPath;
@@ -60,14 +72,29 @@ export async function NewsListPage({ locale, rawPage, categorySlug }: NewsListPa
       title={context?.category.name ?? t("title")}
       description={context ? (context.category.description ?? undefined) : t("description")}
       bannerImage={bannerImage}
+      compactBanner
       breadcrumb={breadcrumb}
       chips={chips.length > 0 ? chips : undefined}
+      chipsLabel={t("tabsLabel")}
+      scrollChips
       parentListHref={listPath}
       isEmpty={listing.isEmpty}
       pagination={{ page, totalPages: listing.totalPages, buildHref: (n) => withPage(ownPath, n) }}
+      belowContent={context ? undefined : <ConsultSection title={t("consultTitle")} turnstileSiteKey={turnstileSiteKey} />}
     >
-      <NewsListBody featured={listing.featured} items={listing.items} />
+      {home ? <NewsHomeBody home={home} moreItems={buildMoreNews(home, listing.featured, listing.items)} /> : <NewsListBody items={listing.items} />}
     </CategoryListTemplate>
+  );
+}
+
+/** Form "Tư vấn nhu cầu" cuối `/tin-tuc` (nguồn `contact`, cùng LeadForm của trang Liên hệ): nền sáng, form trong thẻ trắng bo 20px. */
+function ConsultSection({ title, turnstileSiteKey }: { title: string; turnstileSiteKey: string | undefined }) {
+  return (
+    <div className="bg-bg-alt px-gutter py-section-tight">
+      <LeadFormSlot title={title} className="mx-auto max-w-2xl rounded-xl border border-border bg-surface">
+        <LeadForm source="contact" {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
+      </LeadFormSlot>
+    </div>
   );
 }
 

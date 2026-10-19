@@ -25,12 +25,30 @@ describe("PageBanner", () => {
 });
 
 describe("PageBanner size", () => {
-  it("compact: ảnh cao cố định 240px + chừa 3rem đáy cho băng tìm kiếm, mô tả tối đa 2 dòng", () => {
-    const { container } = render(<PageBanner title="Cho thuê" description="Mô tả" image={image} size="compact" />);
+  it("compact: ảnh cao cố định 240px, không đệm đáy khi không có băng; mô tả tối đa 2 dòng", () => {
+    const { container } = render(<PageBanner title="Tin tức" description="Mô tả" image={image} size="compact" />);
     const section = container.querySelector("section")!;
-    expect(section).toHaveClass("h-60", "pb-12");
+    expect(section).toHaveAttribute("data-banner-size", "compact");
+    expect(section).not.toHaveAttribute("data-banner-overlap");
+    expect(section).toHaveClass("h-60");
+    expect(section).not.toHaveClass("pb-12");
     expect(section.className).not.toContain("clamp");
     expect(screen.getByText("Mô tả")).toHaveClass("line-clamp-2");
+  });
+
+  it("compact + overlap: chừa 3rem đáy cho băng tìm kiếm đè lên (cả biến thể ảnh và chữ)", () => {
+    const withImage = render(<PageBanner title="Cho thuê" image={image} size="compact" overlap />);
+    expect(withImage.container.querySelector("section")).toHaveAttribute("data-banner-overlap", "true");
+    expect(withImage.container.querySelector("section")).toHaveClass("h-60", "pb-12");
+    withImage.unmount();
+    const textOnly = render(<PageBanner title="Cho thuê" size="compact" overlap />);
+    expect(textOnly.container.querySelector("section")).toHaveAttribute("data-banner-overlap", "true");
+    expect(textOnly.container.querySelector("section")).toHaveClass("pb-24");
+  });
+
+  it("overlap bị bỏ qua ở banner mặc định", () => {
+    const { container } = render(<PageBanner title="Liên hệ" image={image} overlap />);
+    expect(container.querySelector("section")).not.toHaveAttribute("data-banner-overlap");
   });
 
   it("mặc định: giữ chiều cao theo viewport như trước (pháp lý, liên hệ, dịch vụ, 404)", () => {

@@ -22,7 +22,7 @@ const IMAGE_ZOOM = "[&_img]:transition-transform [&_img]:duration-(--duration-sl
 
 /** `sizes` theo cột thật của từng biến thể (design-spec §1.3): ảnh nhỏ không tải bản lớn. */
 const IMAGE_SIZES: Record<NewsCardVariant, string> = {
-  card: "(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw",
+  card: "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
   feature: "(min-width: 1024px) 700px, 100vw",
   row: "120px",
 };
@@ -55,8 +55,9 @@ export function NewsCard({ data, variant = "card", headingLevel, priority = fals
           {data.categoryName && <p className="text-xsmall font-semibold text-accent-text">{data.categoryName}</p>}
           <Heading
             className={cn(
-              "font-semibold group-hover:underline group-hover:underline-offset-4",
-              isFeature ? "font-display text-h3 lg:text-h2" : "text-h4",
+              "group-hover:underline group-hover:underline-offset-4",
+              // Chỉ nạp font-display 400/500 (fonts.ts): 600 sẽ bị tổng hợp thành bold giả.
+              isFeature ? "font-display font-medium text-h3 lg:text-h2-sm" : "text-h4 font-semibold",
             )}
           >
             {data.title}
