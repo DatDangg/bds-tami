@@ -67,11 +67,10 @@ export function LeadExportButton() {
   }
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
+    <div className="list-toolbar-item">
       <button
         type="button"
         className="btn btn--style-secondary btn--size-medium"
-        style={{ minHeight: 44 }}
         disabled={busy || !converted.ok}
         aria-busy={busy}
         onClick={exportLeads}
@@ -79,12 +78,12 @@ export function LeadExportButton() {
         {busy ? "Đang xuất…" : "Xuất Excel"}
       </button>
       {!converted.ok ? (
-        <p role="status" className="field-description" style={{ margin: 0 }}>
+        <p role="status" className="field-description list-toolbar-item__note">
           {converted.reason}
         </p>
       ) : null}
       {message ? (
-        <p role="alert" className="field-description" style={{ margin: 0 }}>
+        <p role="alert" className="field-description list-toolbar-item__note">
           {message}
         </p>
       ) : null}

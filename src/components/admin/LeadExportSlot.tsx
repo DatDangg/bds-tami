@@ -7,7 +7,7 @@ import { LeadExportButton } from "./LeadExportButton";
 const TRASH_SEGMENT_INDEX = 2;
 
 /**
- * Slot `beforeList` (server) của danh sách lead: xác định thùng rác phía server rồi mới render nút xuất (client).
+ * Slot `beforeListTable` (server) của danh sách lead: xác định thùng rác phía server rồi mới render nút xuất (client).
  * Ẩn ở thùng rác vì endpoint chỉ xuất lead chưa xoá; quyền admin và list drawer do `LeadExportButton` xử lý.
  */
 export function LeadExportSlot({ params }: Partial<Pick<BeforeListServerProps, "params">>) {

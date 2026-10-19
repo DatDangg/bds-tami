@@ -170,7 +170,7 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
     ...collection,
     trash: true,
     // Lọc theo trạng thái dịch (FR-ADM-18) cho mọi collection có nhóm `translation`.
-    admin: { ...collection.admin, components: { ...collection.admin?.components, beforeList: [...(collection.admin?.components?.beforeList ?? []), ...(omitsTranslation ? [] : [TRANSLATION_FILTER_COMPONENT])] } },
+    admin: { ...collection.admin, components: { ...collection.admin?.components, beforeListTable: [...(collection.admin?.components?.beforeListTable ?? []), ...(omitsTranslation ? [] : [TRANSLATION_FILTER_COMPONENT])] } },
     // Job dịch đọc lại danh sách này để quyết định bật `hasEnglish` bằng đúng vị từ của hook `requireEnglishFields`.
     custom: { ...collection.custom, englishRequiredFields: options.englishRequiredFields ?? ["title", "slug"] },
     versions: collection.versions ?? { maxPerDoc: MAX_VERSIONS_PER_DOC, drafts: false },

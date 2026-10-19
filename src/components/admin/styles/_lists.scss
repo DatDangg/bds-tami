@@ -189,3 +189,28 @@
     align-items: center;
   }
 }
+
+// Mục thanh công cụ danh sách (BL-021 T6): các control trong slot `beforeListTable` (Xuất Excel, Trạng thái dịch) nằm trong lề trang,
+// ngay dưới hàng tìm kiếm/Cột/Bộ lọc. Mỗi slot là một khối riêng nên dùng inline-flex để các mục xếp CÙNG một hàng, căn đáy,
+// tự xuống dòng khi hẹp; max-width 100% để không tràn ngang ở 375px.
+.list-toolbar-item {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+  max-width: 100%;
+  margin: 0 16px 12px 0;
+  vertical-align: bottom;
+
+  > .btn {
+    min-height: 44px;
+    margin: 0;
+  }
+
+  &__note {
+    flex: 1 1 200px;
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}

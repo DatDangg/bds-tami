@@ -298,9 +298,6 @@
 
 // ---- Ô lọc "Trạng thái dịch" (BL-016): SelectInput của Payload, vùng chạm ≥ 44px ----
 .translation-status-filter {
-  max-width: 100%;
-  margin-bottom: 12px;
-
   // label.field-label của Payload là hàng flex: xếp nhãn trên ô, ô rộng cố định để không co giãn theo lựa chọn.
   > label.field-label {
     flex-direction: column;

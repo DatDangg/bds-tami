@@ -214,8 +214,8 @@ export const Leads: CollectionConfig = hideTechnicalListFilters({
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "createdAt"],
     listSearchableFields: [...LEAD_LIST_SEARCHABLE_FIELDS],
     description: "Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.",
-    // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
-    components: { beforeList: ["/components/admin/LeadExportSlot#LeadExportSlot"] },
+    // Nút xuất Excel (slot beforeListTable: trong lề trang, ngay dưới hàng tìm kiếm/Cột/Bộ lọc) theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
+    components: { beforeListTable: ["/components/admin/LeadExportSlot#LeadExportSlot"] },
   },
   defaultSort: "-createdAt",
   trash: true,

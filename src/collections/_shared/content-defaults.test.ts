@@ -117,3 +117,21 @@ describe("withContentDefaults: scopeField (G7)", () => {
     expect((find(config, "scopeSlug").access as { update: () => boolean }).update()).toBe(false);
   });
 });
+
+describe("withContentDefaults: vị trí ô lọc dịch (BL-021 T6)", () => {
+  it("đặt TranslationStatusFilter ở beforeListTable (trong lề trang, dưới hàng tìm kiếm), không ở beforeList", () => {
+    const components = withContentDefaults(base).admin?.components;
+    expect(components?.beforeListTable).toEqual(["/components/admin/TranslationStatusFilter#TranslationStatusFilter"]);
+    expect(components?.beforeList).toBeUndefined();
+  });
+
+  it("giữ slot beforeListTable có sẵn của collection, nối ô lọc dịch phía sau", () => {
+    const config = withContentDefaults({ ...base, admin: { components: { beforeListTable: ["/x#X"] } } });
+    expect(config.admin?.components?.beforeListTable).toEqual(["/x#X", "/components/admin/TranslationStatusFilter#TranslationStatusFilter"]);
+  });
+
+  it("omit translation thì không gắn ô lọc dịch", () => {
+    const config = withContentDefaults(base, { omit: ["translation"] });
+    expect(config.admin?.components?.beforeListTable ?? []).toEqual([]);
+  });
+});

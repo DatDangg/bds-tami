@@ -27,7 +27,7 @@ export function TranslationStatusFilter() {
   const current = currentTranslationFilter(where);
 
   return (
-    <div className="translation-status-filter">
+    <div className="list-toolbar-item translation-status-filter">
       {/* Không dùng prop `label` của SelectInput: FieldLabel htmlFor trỏ vào div wrapper, không phải input react-select. Bọc <label> để combobox có tên truy cập. */}
       <label className="field-label">
         Trạng thái dịch
