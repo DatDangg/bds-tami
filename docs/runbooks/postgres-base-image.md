@@ -234,6 +234,6 @@ Chưa có container lẫn volume (server mới) ⇒ cho qua; `--dry-run` không 
 
 | Ngày | Môi trường | glibc trước → sau | DB (kích thước) | REINDEX | amcheck | Ghi chú |
 |---|---|---|---|---|---|---|
-| _chưa thực hiện_ | dev | | | | | |
+| 2026-10-19 | dev (máy local) | 2.31 → 2.36 | tami 186 MB (+ 36 DB tạm của integration test) | 37 DB, PASS | 2797 index btree sạch, 0 lỗi | dump + globals ở `~/tami-old-pg`; mismatch 0; PostGIS 3.5.2; integration 704/704 PASS |
 | _chưa thực hiện_ | staging | | | | | |
 | _chưa thực hiện_ | production | | | | | |
