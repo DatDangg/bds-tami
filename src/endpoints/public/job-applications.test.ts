@@ -60,8 +60,9 @@ async function makeRequest({ fields = {}, cv = { bytes: PDF, name: "CV.pdf", typ
   return { headers: reqHeaders, body: chunkedBody(bytes) };
 }
 
-const IN_30_DAYS = () => new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
-const YESTERDAY_MORNING = () => new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
+const IN_30_DAYS = () => new Date(NOW.getTime() + 30 * 24 * 3600 * 1000).toISOString();
+// Tính theo NOW cố định của handler (không theo giờ thật) để test không hỏng khi lịch trôi qua mốc NOW.
+const YESTERDAY_MORNING = () => new Date(NOW.getTime() - 2 * 24 * 3600 * 1000).toISOString();
 
 interface FakeOptions {
   posting?: { id: string; title: string; deadline: string } | null;
