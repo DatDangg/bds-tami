@@ -17,3 +17,7 @@ next-env.d.ts
 
 # Worker MapLibre chép từ node_modules (scripts/copy-maplibre-worker.mjs, chạy trong `pnpm dev` / `pnpm build`)
 public/vendor/maplibre/
+
+# Dữ liệu demo lấy từ site tham chiếu (chỉ staging/dev, không commit)
+seed/scraped/
+seed/scraped-cache/
