@@ -32,7 +32,7 @@ export function ListPendingProvider({ children }: { children: ReactNode }) {
 }
 
 /** Đăng ký nguồn chờ với vùng gần nhất; nhả khi hết chờ hoặc khi unmount. Ngoài provider thì không làm gì. */
-function useReportPending(pending: boolean) {
+export function useReportPending(pending: boolean) {
   const context = useContext(PendingContext);
   const sourceId = useId();
   const report = context?.report;

@@ -18,6 +18,8 @@ export interface PostListing {
   featured: PostCardData | null;
   items: PostCardData[];
   totalPages: number;
+  /** Tổng số bài của danh sách (lưới + bài nổi bật) cho "Có N kết quả"; không đổi theo trang. */
+  totalDocs: number;
   /** Trang yêu cầu vượt số trang có dữ liệu (trang 1 luôn hợp lệ, kể cả khi trống). */
   outOfRange: boolean;
   isEmpty: boolean;
@@ -46,6 +48,7 @@ export async function loadPostListing(
     featured,
     items: toPostCards(grid.docs, locale, now),
     totalPages: grid.totalPages,
+    totalDocs: grid.totalDocs + (featuredDoc ? 1 : 0),
     outOfRange: page > 1 && page > grid.totalPages,
     isEmpty: grid.isEmpty && featuredDoc === null,
   };

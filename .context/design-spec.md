@@ -325,6 +325,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 ### S02. Danh sách dự án · `/du-an` · `/en/projects` (FR-PUB-02)
 
+- **Bố cục as-built (BL-020 P3-T02):** page banner gọn 240px (§2.7 `compact`) + **băng tìm kiếm gọn** `ListSearchBar` đè mép dưới banner: hai ô chọn **Tỉnh/thành** ("Tất cả tỉnh/thành") và **Trạng thái** ("Mọi trạng thái") + nút "Lọc"; **không có ô từ khoá** (danh sách dự án không hỗ trợ `q`, không thêm tham số) và **không có nút "Bộ lọc"** (không có lọc phụ). Không tự gửi khi đổi ô (WCAG 3.2.2); form GET thật (`<select name>` gốc trước hydrate, `category` giữ bằng input ẩn), có JS thì `router.push` cùng query. Dưới breadcrumb: hàng chip Loại hình → dòng "Có N kết quả" (aria-live) + link "Xoá bộ lọc" khi đang lọc → lưới 1/2/3/4 cột (4 ≥ xl); thẻ `ProjectCard` trắng bo 20px viền nhạt như `RentalCard`. **URL không đổi.**
 - Page banner (§2.7) "Dự án / Projects". Breadcrumb.
 - Lọc: hàng chip **Loại hình** (danh mục `scope=project`, chip "Tất cả" đầu); hai select **Tỉnh/thành** và **Trạng thái** (Sắp mở bán / Đang mở bán / Đã bàn giao). URL: `?category=&province=&status=&page=`.
 - Lưới thẻ Dự án, 12/trang, sắp mới nhất. Thẻ đầu tiên của trang 1 **không** phóng to (giữ lưới đều, đây là danh sách để duyệt).
@@ -465,6 +466,7 @@ Responsive: theo màn cha.
 
 ### S08. Danh sách Đăng tin BĐS · `/tin-bds` · `/en/property-news` (FR-PUB-06)
 
+- **Bố cục as-built (BL-020 P3-T02):** banner gọn 240px; **chưa có băng tìm kiếm** (trang hiện không có từ khoá/lọc/sắp xếp — không thêm); dòng "Có N kết quả" (aria-live, gồm cả bài nổi bật) trên bài nổi bật; lưới 1/2/3/4 cột (4 ≥ xl); thẻ `PostCard` trắng bo 20px viền nhạt, tiêu đề thẻ nổi bật `font-display font-medium lg:text-h2-sm` (EB Garamond chỉ nạp 400/500). Áp cho cả trang danh mục `/tin-bds/danh-muc/[category]`.
 - Page banner + breadcrumb. Tab danh mục (link tới S05): "Tất cả" · Tin BĐS · Voucher / Ưu đãi · … (tab cuộn ngang < md).
 - Trang 1, tab Tất cả: **bài nổi bật** đầu tiên (`isFeatured` mới nhất còn hạn) thẻ ngang lớn: ảnh 16:10 7 cột + chữ 5 cột (tiêu đề `--text-h2`, excerpt 3 dòng, hạn ưu đãi) (≥ lg); dưới là lưới thẻ Tin/ưu đãi.
 - Thẻ có `offer.endAt`: còn ≤ 3 ngày → badge "Còn <n> ngày / <n> days left" (warning); đã qua → badge "Đã kết thúc / Ended" + ảnh `opacity 0.7`, **vẫn** hiện trong danh sách (BR-06 chỉ rút khỏi khối trang chủ) nhưng xếp sau bài còn hạn.
@@ -524,7 +526,7 @@ Responsive: theo màn cha.
 
 ### S12. Tuyển dụng · `/tuyen-dung` · `/en/careers` (FR-PUB-09)
 
-- Page banner (ảnh môi trường làm việc nếu có `pageBanners.careers`) + breadcrumb.
+- Page banner (ảnh môi trường làm việc nếu có `pageBanners.careers`) + breadcrumb. **As-built (BL-020 P3-T02):** banner gọn 240px (`compactBanner`), thẻ việc làm thêm viền nhạt + bóng khi hover; bộ lọc/URL giữ nguyên, không có băng tìm kiếm.
 - Đoạn giới thiệu ngắn (chuỗi i18n hoặc đề xuất `pageBanners` mô tả) ≤ 40 từ.
 - Lọc nhẹ: chip danh mục (`scope=job`) + select nơi làm việc (tỉnh). URL params.
 - **Danh sách dạng hàng** (thẻ Việc làm §3.2), phân cách bằng khoảng trắng 8px giữa các hàng có nền `--color-surface` (không kẻ dòng). Chỉ vị trí `published` và `deadline ≥ hôm nay`. Sắp xếp mới đăng trước, hiện hạn nộp rõ; còn ≤ 3 ngày: badge warning.

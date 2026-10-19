@@ -33,7 +33,7 @@ beforeEach(() => {
 describe("listPublicPosts: bài còn hạn trước, đã kết thúc sau", () => {
   it("trang 1: bài còn hạn; totalPages gồm cả hai nhóm", async () => {
     stubGroups({ ids: ["a1", "a2"], total: 2 }, { ids: ["e1"], total: 1 });
-    expect(await listPublicPosts(payload, "vi", { page: 1, now: NOW })).toEqual({ docs: [doc("a1"), doc("a2")], totalPages: 2, isEmpty: false });
+    expect(await listPublicPosts(payload, "vi", { page: 1, now: NOW })).toEqual({ docs: [doc("a1"), doc("a2")], totalPages: 2, totalDocs: 3, isEmpty: false });
   });
 
   it("trang kế (sau hết nhóm còn hạn): bài đã kết thúc, tái dùng trang đầu của nhóm đó (không truy vấn lại)", async () => {
@@ -47,7 +47,7 @@ describe("listPublicPosts: bài còn hạn trước, đã kết thúc sau", () =
     stubGroups({ ids: [], total: 0 }, { ids: ["e1"], total: 1 });
     expect((await listPublicPosts(payload, "vi", { page: 1, now: NOW })).docs).toEqual([doc("e1")]);
     stubGroups({ ids: [], total: 0 }, { ids: [], total: 0 });
-    expect(await listPublicPosts(payload, "vi", { page: 1, now: NOW })).toEqual({ docs: [], totalPages: 1, isEmpty: true });
+    expect(await listPublicPosts(payload, "vi", { page: 1, now: NOW })).toEqual({ docs: [], totalPages: 1, totalDocs: 0, isEmpty: true });
   });
 
   it("trang vượt tổng → rỗng (để trang gọi notFound); loại id nổi bật và lọc danh mục ở cả hai nhóm", async () => {

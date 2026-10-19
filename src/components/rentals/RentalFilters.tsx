@@ -76,7 +76,7 @@ export function RentalFilters({ filters, options, focusSearch = false, fixedCate
         isDesktop ? (
           <RentalFilterPopover draft={draft} onChange={update} options={{ provinces: options.provinces, wards: options.wards, wardsLoading }} activeCount={activeCount} />
         ) : (
-          <RentalFilterSheet filters={filters} sort={draft.sort} options={options} fixedCategory={fixedCategory} />
+          <RentalFilterSheet filters={filters} options={options} fixedCategory={fixedCategory} />
         )
       }
     >

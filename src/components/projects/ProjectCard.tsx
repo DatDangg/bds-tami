@@ -17,21 +17,21 @@ interface ProjectCardProps {
 }
 
 /**
- * Thẻ Dự án (design-spec §3.2): ảnh 4:5 (< md) / 4:3 (≥ md), badge trạng thái mở bán góc trên trái ảnh, tên dự án tối đa 2 dòng,
+ * Thẻ Dự án (design-spec §3.2): thẻ trắng bo 20px như RentalCard (BL-020 P3), ảnh 4:5 (< md) / 4:3 (≥ md), badge trạng thái mở bán góc trên trái ảnh, tên dự án tối đa 2 dòng,
  * tỉnh/thành và "Từ <giá>". Cả thẻ là MỘT link (không lồng link); tên là `h2` vì thẻ nằm ngay dưới `h1` của banner. Server Component.
  */
 export function ProjectCard({ data, priority = false, headingLevel = "h2" }: ProjectCardProps) {
   const t = useTranslations("page.projects");
   const Heading = headingLevel;
   return (
-    <article>
+    <article className="h-full">
       <Link
         href={data.href}
-        className="group flex min-h-11 flex-col gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+        className="group flex h-full min-h-11 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
       >
-        <div className={`relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-surface-muted md:aspect-[4/3] ${IMAGE_ZOOM}`}>
+        <div className={`relative aspect-[4/5] w-full overflow-hidden bg-surface-muted md:aspect-[4/3] ${IMAGE_ZOOM}`}>
           {data.cover ? (
-            <ResponsiveImage media={data.cover} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" priority={priority} decorative />
+            <ResponsiveImage media={data.cover} sizes="(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" priority={priority} decorative />
           ) : (
             // Dự án xuất bản nhưng mọi ảnh thư viện đã bị xoá: khung giữ nguyên tỉ lệ, không vỡ lưới.
             <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
@@ -40,8 +40,8 @@ export function ProjectCard({ data, priority = false, headingLevel = "h2" }: Pro
             {t(`salesStatus.${data.salesStatus}`)}
           </Badge>
         </div>
-        <div className="flex min-w-0 flex-col gap-1">
-          <Heading className="line-clamp-2 font-display text-h3 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
+        <div className="flex min-w-0 flex-col gap-1 p-4">
+          <Heading className="line-clamp-2 font-display text-h4 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
           {data.provinceName && <p className="text-small text-text-muted">{data.provinceName}</p>}
           {data.priceFrom && <p className="text-small font-semibold">{t("priceFrom", { price: data.priceFrom })}</p>}
         </div>

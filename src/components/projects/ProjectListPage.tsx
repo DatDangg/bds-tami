@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload, type Payload } from "payload";
 import { EmptyState } from "@/components/layout/EmptyState";
+import { PendingLink } from "@/components/layout/PendingRegion";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
 import { CategoryListTemplate, type CategoryChip } from "@/components/templates/CategoryListTemplate";
@@ -96,19 +97,20 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
       title={t("title")}
       description={t("description")}
       bannerImage={bannerImage}
+      compactBanner
       breadcrumb={[{ label: tNav("projects"), href: listPath }]}
       chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
       chipsLabel={t("categoriesLabel")}
       scrollChips
-      toolbar={
+      searchBar={
         <ProjectFilters
+          // `key` theo bộ lọc trên URL: URL đổi từ ngoài (chip, "Xoá bộ lọc", back) thì hai ô nạp lại.
+          key={`${province?.slug ?? ""}|${filters.status ?? ""}`}
           actionPath={listPath}
           provinces={provinces.map((item) => ({ slug: item.slug, name: item.shortName || item.name }))}
           {...(province ? { selectedProvince: province.slug } : {})}
           {...(filters.status ? { selectedStatus: filters.status } : {})}
           {...(context ? { hiddenCategory: context.slug } : {})}
-          // Hết kết quả thì nút xoá nằm ở EmptyState (tránh hai link trùng tên liền nhau).
-          active={filtersActive && listing.totalDocs > 0}
         />
       }
       emptyState={
@@ -123,10 +125,18 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
       pagination={{ page, totalPages: listing.totalPages, buildHref }}
     >
       <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-        <p role="status" aria-live="polite" className="text-small text-text-secondary">
-          {t("resultCount", { count: listing.totalDocs })}
-        </p>
-        <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-4">
+          <p role="status" aria-live="polite" className="text-small text-text-secondary">
+            {t("resultCount", { count: listing.totalDocs })}
+          </p>
+          {/* Hết kết quả thì nút xoá nằm ở EmptyState (khối này không render), tránh hai link trùng tên. */}
+          {filtersActive && (
+            <PendingLink href={listPath} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+              {t("clear")}
+            </PendingLink>
+          )}
+        </div>
+        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {toProjectCards(listing.docs, locale).map((card, index) => (
             <li key={card.id}>
               <ProjectCard data={card} priority={index === 0} />

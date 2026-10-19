@@ -3,11 +3,16 @@ import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import vi_ from "@/i18n/messages/vi.json";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { chooseOption, fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { ProjectCardData } from "@/lib/projects/project-view";
+const push = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+
 import { ProjectCard } from "./ProjectCard";
 import { ProjectFilters } from "./ProjectFilters";
+
+afterEach(() => push.mockReset());
 
 const card = (overrides: Partial<ProjectCardData> = {}): ProjectCardData => ({
   id: "d1",
@@ -71,13 +76,10 @@ const provinces = [
 ];
 
 describe("ProjectFilters", () => {
-  it("form GET về đúng trang, hai select có nhãn, chọn sẵn giá trị từ URL, nút Lọc", () => {
-    const { container } = renderWithIntl(
-      <ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" selectedStatus="upcoming" active />,
-    );
-    const form = screen.getByRole("form", { name: "Bộ lọc dự án" });
-    // next/form: GET là mặc định của <form> nên không ghi `method`; vẫn là form GET thường khi không có JS.
-    expect(form.getAttribute("method")).toBeNull();
+  it("băng tìm kiếm GET về đúng trang: hai ô chọn có nhãn, chọn sẵn giá trị từ URL, nút Lọc, KHÔNG có ô từ khoá / nút Bộ lọc", () => {
+    const { container } = renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" selectedStatus="upcoming" />);
+    const form = screen.getByRole("search", { name: "Bộ lọc dự án" });
+    expect(form).toHaveAttribute("method", "get");
     expect(form).toHaveAttribute("action", "/du-an");
     // Sau mount: Select TAMI; trigger có nhãn, hiện mục đang chọn, giá trị gửi đi nằm ở input ẩn có name.
     expect(screen.getByLabelText("Tỉnh/thành")).toHaveTextContent("Đà Nẵng");
@@ -85,46 +87,54 @@ describe("ProjectFilters", () => {
     expect(container.querySelector("input[type=hidden][name=province]")).toHaveValue("da-nang");
     expect(container.querySelector("input[type=hidden][name=status]")).toHaveValue("upcoming");
     expect(screen.getByRole("button", { name: "Lọc" })).toHaveAttribute("type", "submit");
-  });
-
-  it("nút Xoá bộ lọc là link thật về trang không tham số, chỉ hiện khi đang lọc", () => {
-    const { unmount } = renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} active />);
-    expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
-    unmount();
-    renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} active={false} />);
-    expect(screen.queryByRole("link", { name: "Xoá bộ lọc" })).toBeNull();
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
+    expect(container.querySelector("input[name=q]")).toBeNull();
   });
 
   it("no-JS: SSR vẫn render <select name> gốc (lọc được bằng form GET), giữ giá trị chọn sẵn, không có sentinel", () => {
     const html = renderToString(
       <NextIntlClientProvider locale="vi" messages={vi_}>
-        <ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" active={false} />
+        <ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" hiddenCategory="can-ho" />
       </NextIntlClientProvider>,
     );
+    expect(html).toContain('method="get"');
     expect(html).toContain('<select id="project-filter-province" name="province"');
     expect(html).toContain('<select id="project-filter-status" name="status"');
     expect(html).toMatch(/<option value="da-nang" selected="">/);
-    expect(html).toContain('<option value="" selected="">Tất cả</option>');
+    expect(html).toContain('<option value="" selected="">Mọi trạng thái</option>');
+    expect(html).toContain('<input type="hidden" name="category" value="can-ho"/>');
     expect(html).not.toContain("__tami_empty__");
   });
 
-  it("chọn 'Tất cả' gửi giá trị rỗng (không lộ sentinel) và chưa gửi form khi đổi (WCAG 3.2.2)", async () => {
+  it("chọn 'Tất cả' gửi giá trị rỗng (không lộ sentinel) và chưa đổi URL khi đổi ô (WCAG 3.2.2)", async () => {
     const user = userEvent.setup();
-    const { container } = renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" active />);
-    const submit = vi.fn((event: Event) => event.preventDefault());
-    container.querySelector("form")?.addEventListener("submit", submit);
+    const { container } = renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} selectedProvince="da-nang" />);
     await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Hà Nội");
     expect(container.querySelector("input[name=province]")).toHaveValue("ha-noi");
-    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Tất cả");
+    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Tất cả tỉnh/thành");
     expect(container.querySelector("input[name=province]")).toHaveValue("");
     expect(new FormData(container.querySelector("form") as HTMLFormElement).get("province")).toBe("");
-    expect(submit).not.toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
   });
 
-  it("giữ ?category= bằng input ẩn; EN dùng nhãn tiếng Anh", () => {
-    const { container } = renderWithIntl(<ProjectFilters actionPath="/en/projects" provinces={provinces} hiddenCategory="apartments" active={false} />, "en");
+  it("bấm Lọc: router.push đúng query theo thứ tự cũ (category, province, status), trang 1; ô 'Tất cả' bị bỏ", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ProjectFilters actionPath="/du-an" provinces={provinces} hiddenCategory="can-ho" />);
+    await chooseOption(user, screen.getByLabelText("Trạng thái"), "Đang mở bán");
+    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Hà Nội");
+    await user.click(screen.getByRole("button", { name: "Lọc" }));
+    expect(push).toHaveBeenLastCalledWith("/du-an?category=can-ho&province=ha-noi&status=selling");
+    await chooseOption(user, screen.getByLabelText("Tỉnh/thành"), "Tất cả tỉnh/thành");
+    await chooseOption(user, screen.getByLabelText("Trạng thái"), "Mọi trạng thái");
+    await user.click(screen.getByRole("button", { name: "Lọc" }));
+    expect(push).toHaveBeenLastCalledWith("/du-an?category=can-ho");
+  });
+
+  it("giữ ?category= bằng input ẩn; EN dùng nhãn tiếng Anh và đường dẫn /en/projects", () => {
+    const { container } = renderWithIntl(<ProjectFilters actionPath="/en/projects" provinces={provinces} hiddenCategory="apartments" />, "en");
     expect(container.querySelector("input[type=hidden][name=category]")).toHaveAttribute("value", "apartments");
-    expect(screen.getByLabelText("Province/city")).toBeInTheDocument();
-    expect(screen.getByLabelText("Status")).toBeInTheDocument();
+    expect(screen.getByLabelText("Province/city")).toHaveTextContent("All provinces/cities");
+    expect(screen.getByLabelText("Status")).toHaveTextContent("Any status");
   });
 });

@@ -15,9 +15,13 @@ MODIFY UI · bộ lọc + template dùng chung `CategoryListTemplate` → STRICT
 - Test params; lọc dự án không JS vẫn chạy (progressive của BL-016).
 
 ## Acceptance
-- [ ] Như P3-T01 cho 2 trang; template dùng chung không làm vỡ Tin tức / Tuyển dụng
+- [x] Như P3-T01 cho 2 trang; template dùng chung không làm vỡ Tin tức / Tuyển dụng (STRICT PASS r1)
 
 
 ## Carry-over từ P3-T01 (reviewer r2)
 - MINOR-1: `RentalFilterSheet` seed từ `filters` URL, không từ draft chung (`RentalFilters.tsx:193`, `RentalFilterSheet.tsx:52`) → seed từ `useRentalListNavigation().draft` + áp qua `update`/`submit` chung (xoá timer debounce trước điều hướng).
 - NIT-1: `useMemo` cho context value `RentalListNavigation.tsx:289`.
+
+## Kết quả (2026-10-20)
+- Reviewer STRICT r1 PASS.
+- Quyết định agent (user ủy quyền 2026-10-20): `/du-an` băng tìm kiếm = Tỉnh + Trạng thái + nút Lọc (không có ô từ khoá vì danh sách dự án không có `q`; không nút "Bộ lọc" vì không có lọc phụ; đổi select không tự gửi — WCAG 3.2.2); `/tin-bds` không có bộ lọc sẵn → không dựng băng tìm kiếm, chỉ banner compact + "Có N kết quả" (tính cả bài nổi bật) + lưới 4 cột; `/tuyen-dung` chỉ banner compact + thẻ viền, giữ bộ lọc; ProjectCard/PostCard thẻ trắng bo 20px áp mọi nơi dùng (OffersSlider trang chủ, "Dự án khác", bài liên quan).

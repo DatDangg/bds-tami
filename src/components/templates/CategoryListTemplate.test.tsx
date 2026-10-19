@@ -32,6 +32,42 @@ function chipLinks(container: HTMLElement) {
   return list ? [...list.querySelectorAll("a")] : [];
 }
 
+describe("CategoryListTemplate: banner gọn + băng tìm kiếm (BL-020 P3-T02)", () => {
+  const bannerImage = { url: "/api/media/file/b.jpg", alt: "", width: 1600 };
+
+  it("mặc định (Tin tức) giữ banner cũ, không có băng đè", () => {
+    const { container } = renderWithIntl(
+      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(container.querySelector("section.h-60")).toBeNull();
+    expect(container.querySelector(".-mt-12")).toBeNull();
+  });
+
+  it("compactBanner + searchBar: banner 240px, băng đè mép dưới và đứng trước breadcrumb", () => {
+    const { container } = renderWithIntl(
+      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner searchBar={<form aria-label="băng" />} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(container.querySelector("section.h-60")).not.toBeNull();
+    const bar = screen.getByRole("form", { name: "băng" });
+    expect(bar.parentElement?.className).toContain("-mt-12");
+    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("compactBanner không có searchBar (Tuyển dụng): chỉ banner gọn, không chừa khối băng", () => {
+    const { container } = renderWithIntl(
+      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(container.querySelector("section.h-60")).not.toBeNull();
+    expect(container.querySelector(".-mt-12")).toBeNull();
+  });
+});
+
 describe("CategoryListTemplate (spec-validation L5 G18)", () => {
   it("chip danh mục là link thật, đúng một chip aria-current=page = mục đang chọn", () => {
     const { container } = renderWithIntl(

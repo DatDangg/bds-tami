@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, type ReactNode, useCallback, useContext, useTransition } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useTransition } from "react";
 import { ListPendingProvider, PendingRegion as ListPendingRegion } from "@/components/layout/PendingRegion";
 import type { RentalFilters } from "@/lib/search/url-params";
 import { type FilterDraft, useLiveDraft } from "./use-rental-draft";
@@ -34,7 +34,7 @@ export function RentalListNavigationProvider({ actionPath, filters, children }: 
     [actionPath, router],
   );
   const { draft, update, submit } = useLiveDraft(filters, navigate);
-  const value = { actionPath, pending, navigate, draft, update, submit };
+  const value = useMemo(() => ({ actionPath, pending, navigate, draft, update, submit }), [actionPath, pending, navigate, draft, update, submit]);
   return (
     <NavigationContext value={value}>
       <ListPendingProvider>{children}</ListPendingProvider>

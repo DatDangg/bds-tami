@@ -59,7 +59,7 @@ const notFound = vi.hoisted(() =>
 const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
-vi.mock("next/navigation", () => ({ notFound }));
+vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
 vi.mock("@/lib/projects/project-queries", () => ({
@@ -119,9 +119,21 @@ describe("S02 /du-an: render", () => {
     await render("vi");
     expect(screen.getByRole("heading", { level: 1, name: "Dự án" })).toBeInTheDocument();
     expect(cardTitles()).toEqual(["Sông Sài Gòn", "Tây Hồ", "Biển Đà Nẵng"]);
-    expect(screen.getByRole("status")).toHaveTextContent("3 dự án");
+    expect(screen.getByRole("status")).toHaveTextContent("Có 3 kết quả");
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
     expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1 });
+  });
+
+  it("bố cục market: banner gọn 240px, băng tìm kiếm đè banner (trước breadcrumb), lưới 1/2/3/4 cột, không có ô từ khoá / nút Bộ lọc", async () => {
+    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+    const { container } = await render("vi");
+    expect(container.querySelector("section.h-60")).not.toBeNull();
+    const bar = screen.getByRole("search", { name: "Bộ lọc dự án" });
+    expect(bar.parentElement?.className).toContain("-mt-12");
+    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
+    expect(within(bar).queryByRole("searchbox")).toBeNull();
+    expect(within(bar).queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
   });
 
   it("lọc theo tỉnh: truy vấn đúng id tỉnh, chỉ dự án của tỉnh; select giữ giá trị; có nút xoá bộ lọc về /du-an", async () => {
@@ -166,7 +178,7 @@ describe("S02 /du-an: render", () => {
     expect(current.map((link) => link.textContent)).toEqual(["Căn hộ"]);
     expect(cardTitles()).toEqual(["Sông Sài Gòn", "Biển Đà Nẵng"]);
     expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
-    expect(screen.getByRole("form", { name: "Bộ lọc dự án" })).toHaveAttribute("action", "/du-an");
+    expect(screen.getByRole("search", { name: "Bộ lọc dự án" })).toHaveAttribute("action", "/du-an");
   });
 
   it("danh mục cấp 2: chip cấp 1 của danh mục cha là chip hiện tại, lọc chỉ theo danh mục con", async () => {
@@ -181,7 +193,7 @@ describe("S02 /du-an: render", () => {
     expect(listPublicProjects).toHaveBeenCalledWith({}, "en", { page: 1 });
     expect(cardTitles()).toEqual(["Sông Sài Gòn", "Tây Hồ"]);
     expect(screen.getByRole("heading", { level: 1, name: "Projects" })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("2 projects");
+    expect(screen.getByRole("status")).toHaveTextContent("2 results");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/projects", "/en/projects?category=can-ho"]);
     expect(screen.getByRole("link", { name: /Sông Sài Gòn/ })).toHaveAttribute("href", "/en/projects/slug-1");
   });
@@ -191,7 +203,7 @@ describe("S02 /du-an: render", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Chưa có dự án phù hợp.");
     expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
     expect(screen.getByRole("link", { name: "Nhận tư vấn" })).toHaveAttribute("href", "/lien-he");
-    expect(screen.getByRole("form", { name: "Bộ lọc dự án" })).toBeInTheDocument();
+    expect(screen.getByRole("search", { name: "Bộ lọc dự án" })).toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "Danh sách dự án" })).toBeNull();
   });
 

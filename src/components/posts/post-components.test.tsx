@@ -71,14 +71,15 @@ describe("PostCard", () => {
 
 describe("PostListBody", () => {
   it("nổi bật + lưới: mọi tiêu đề h2, hai vùng có tên", () => {
-    renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} />);
+    renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} totalDocs={3} />);
+    expect(screen.getByRole("status")).toHaveTextContent("Có 3 kết quả");
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 1", "Tin 2", "Tin 3"]);
     expect(screen.getByRole("region", { name: "Tin nổi bật" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Tin đăng khác" })).toBeInTheDocument();
   });
 
   it("không có bài nổi bật: chỉ lưới, vùng mang tên trang", () => {
-    renderWithIntl(<PostListBody featured={null} items={[card("2")]} />);
+    renderWithIntl(<PostListBody featured={null} items={[card("2")]} totalDocs={1} />);
     expect(screen.queryByRole("region", { name: "Tin nổi bật" })).toBeNull();
     expect(screen.getByRole("region", { name: "Đăng tin BĐS" })).toBeInTheDocument();
   });

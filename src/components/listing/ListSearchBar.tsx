@@ -11,7 +11,8 @@ interface ListSearchBarProps {
   action: string;
   /** Nhãn vùng `role="search"`. */
   label: string;
-  keyword: { id: string; name: string; label: string; placeholder: string; value: string; onChange: (value: string) => void };
+  /** Ô từ khoá (`q`). Bỏ trống khi trang không hỗ trợ tìm theo chữ (vd `/du-an`): băng chỉ còn các ô chọn + nút gửi. */
+  keyword?: { id: string; name: string; label: string; placeholder: string; value: string; onChange: (value: string) => void };
   submitLabel: string;
   /** Có JS: chặn submit gốc và áp dụng bộ lọc bằng đổi URL phía client (cùng query với form GET). */
   onSubmit: () => void;
@@ -42,19 +43,21 @@ export function ListSearchBar({ action, label, keyword, submitLabel, onSubmit, p
       className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-lg lg:flex-row lg:items-center lg:p-5"
     >
       {Object.entries(preservedParams).map(([name, value]) => (value === "" ? null : <input key={name} type="hidden" name={name} value={value} />))}
-      <ListSearchField label={keyword.label} htmlFor={keyword.id} className="lg:flex-[1.4]">
-        <Input
-          id={keyword.id}
-          name={keyword.name}
-          type="search"
-          maxLength={100}
-          autoComplete="off"
-          placeholder={keyword.placeholder}
-          value={keyword.value}
-          onChange={(event) => keyword.onChange(event.target.value)}
-          className="rounded-md"
-        />
-      </ListSearchField>
+      {keyword && (
+        <ListSearchField label={keyword.label} htmlFor={keyword.id} className="lg:flex-[1.4]">
+          <Input
+            id={keyword.id}
+            name={keyword.name}
+            type="search"
+            maxLength={100}
+            autoComplete="off"
+            placeholder={keyword.placeholder}
+            value={keyword.value}
+            onChange={(event) => keyword.onChange(event.target.value)}
+            className="rounded-md"
+          />
+        </ListSearchField>
+      )}
       {children}
       <div className="flex gap-3 lg:contents">
         {filtersSlot}

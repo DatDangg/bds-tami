@@ -22,3 +22,8 @@ MODIFY UI · NORMAL (form dùng LeadForm sẵn có, `source=contact`, không đ�
 ## Carry-over từ P1-T01 (reviewer r2)
 - m-b: chú thích `src/lib/fonts.ts:7` ("tránh bold giả") — PostCard `font-semibold` (600) > 500: đổi thẻ sang `font-medium` + chỉ nạp 400/500 phù hợp, hoặc sửa chú thích.
 - m-c: `NewsCard.tsx:57`, `PostCard.tsx:59` `lg:text-h2` (nay 44px) → cân nhắc `lg:text-h2-sm`.
+
+## Carry-over từ P3-T02 (reviewer r1)
+- MINOR-1: `CategoryListTemplate.tsx` render `searchBar` (`-mt-12`) cả khi `compactBanner` false → chỉ render khi cả hai / union type.
+- MINOR-2: banner compact giữ đệm đáy 3rem khi không có `searchBar` (`/tin-bds`, `/tuyen-dung`) → biến thể không đệm đáy.
+- MINOR-3: test assert chuỗi class Tailwind (`ProjectListPage.test.tsx`, `CategoryListTemplate.test.tsx`) → `data-*`/role.

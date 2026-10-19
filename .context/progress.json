@@ -3,8 +3,8 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "public-ui-market-vinhomes",
-    "phaseTask": "phase-3-task-02",
-    "journal": ".context/runs/feature-public-ui-market-vinhomes-phase-3-task-02.md"
+    "phaseTask": "phase-3-task-03",
+    "journal": ".context/runs/feature-public-ui-market-vinhomes-phase-3-task-03.md"
   },
   "features": [
     {
@@ -608,6 +608,17 @@
           "reviewLevel": "STRICT",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-3-task-01-round-2-review.md",
           "note": "ListSearchBar dùng chung + banner compact 240px + lưới 4 cột /cho-thue; URL params giữ nguyên"
+        },
+        {
+          "task": "phase-3-task-02",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-3-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-3-task-02-round-1-review.md",
+          "note": "/du-an ListSearchBar (Tỉnh + Trạng thái), /tin-bds + /tuyen-dung banner compact + lưới 4 cột; URL params giữ nguyên"
         }
       ],
       "phaseValidations": [
@@ -632,7 +643,7 @@
       "specVersion": "1.17.0",
       "scopeVersion": 20,
       "specUpdate": "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md",
-      "next": "P3-T02 (ListSearchBar cho /du-an, /tin-bds)",
+      "next": "P3-T03 (Tin tức theo danh mục + form tư vấn)",
       "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra",
       "specUpdates": [
         "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
@@ -1518,7 +1529,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-20T03:15:42+07:00",
+  "lastUpdated": "2026-10-20T03:30:48+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

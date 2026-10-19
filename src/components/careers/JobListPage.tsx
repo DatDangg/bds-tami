@@ -121,6 +121,7 @@ export async function JobListPage({ locale, searchParams }: JobListPageProps) {
       title={t("title")}
       description={t("description")}
       bannerImage={bannerImage}
+      compactBanner
       breadcrumb={[{ label: tNav("careers"), href: listPath }]}
       chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
       chipsLabel={t("categoriesLabel")}

@@ -25,6 +25,10 @@ interface CategoryListTemplateProps {
   chipsLabel?: string;
   /** < sm: chip cuộn ngang (scroll-snap) có mép phải mờ báo còn chip (design-spec S02); mặc định chip xuống dòng. */
   scrollChips?: boolean;
+  /** Banner gọn 240px kiểu market (BL-020 P3): trang danh sách Dự án/Tin BĐS/Tuyển dụng. Mặc định giữ banner cao theo viewport (Tin tức). */
+  compactBanner?: boolean;
+  /** Băng tìm kiếm gọn (`ListSearchBar`) đè 3rem lên mép dưới banner gọn; dựng trong template để nằm trong vùng chờ của danh sách. Cần `compactBanner`. */
+  searchBar?: ReactNode;
   /** Thanh lọc đặt cạnh hàng chip (≥ lg cùng một hàng, nhỏ hơn xếp dưới); luôn hiện kể cả khi kết quả trống để người dùng đổi/xoá bộ lọc. */
   toolbar?: ReactNode;
   /** Thay trạng thái trống mặc định (vd "Chưa có dự án phù hợp." kèm nút xoá bộ lọc). */
@@ -49,6 +53,8 @@ export function CategoryListTemplate({
   title,
   description,
   bannerImage,
+  compactBanner = false,
+  searchBar,
   breadcrumb,
   chips,
   chipsLabel,
@@ -92,9 +98,11 @@ export function CategoryListTemplate({
 
   return (
     <>
-      <PageBanner title={title} description={description} image={bannerImage} />
-      <Breadcrumb items={breadcrumb} className="py-2" />
+      <PageBanner title={title} description={description} image={bannerImage} size={compactBanner ? "compact" : "default"} />
       <ListPendingProvider>
+        {/* PageBanner compact chừa đúng 3rem đáy cho băng đè lên. */}
+        {searchBar && <div className="relative z-10 mx-auto -mt-12 w-full max-w-container px-gutter">{searchBar}</div>}
+        <Breadcrumb items={breadcrumb} className="py-2" />
         <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter pt-4 pb-section-tight">
           {chipsToolbar}
           <PendingRegion className="flex flex-col gap-8">

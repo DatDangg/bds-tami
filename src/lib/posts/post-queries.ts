@@ -66,6 +66,8 @@ export interface PostPageQuery {
 export interface PostPage {
   docs: PropertyPost[];
   totalPages: number;
+  /** Số bài của lưới (còn hạn + đã kết thúc, đã trừ `excludeIds`) — dùng cho dòng "Có N kết quả". */
+  totalDocs: number;
   isEmpty: boolean;
 }
 
@@ -103,7 +105,8 @@ export async function listPublicPosts(payload: Payload, locale: Locale, query: P
   if (page <= activePages) docs = active.docs;
   else if (endedPage === 1) docs = endedHead.docs;
   else if (endedPage <= endedPages) docs = (await listPostsWhere([...base, offerEndedWhere(now)], locale, endedPage, payload)).docs;
-  return { docs, totalPages: Math.max(1, activePages + endedPages), isEmpty: active.totalDocs + endedHead.totalDocs === 0 };
+  const totalDocs = active.totalDocs + endedHead.totalDocs;
+  return { docs, totalPages: Math.max(1, activePages + endedPages), totalDocs, isEmpty: totalDocs === 0 };
 }
 
 /** Bài nổi bật đầu danh sách: `isFeatured` mới nhất còn hạn (S08). */

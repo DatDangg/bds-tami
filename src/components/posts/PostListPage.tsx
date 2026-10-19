@@ -60,6 +60,7 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
       title={context?.category.name ?? t("title")}
       description={context ? (context.category.description ?? undefined) : t("description")}
       bannerImage={bannerImage}
+      compactBanner
       breadcrumb={breadcrumb}
       chips={chips.length > 0 ? chips : undefined}
       chipsLabel={t("tabsLabel")}
@@ -68,7 +69,7 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
       isEmpty={listing.isEmpty}
       pagination={{ page, totalPages: listing.totalPages, buildHref: (n) => withPage(ownPath, n) }}
     >
-      <PostListBody featured={listing.featured} items={listing.items} />
+      <PostListBody featured={listing.featured} items={listing.items} totalDocs={listing.totalDocs} />
     </CategoryListTemplate>
   );
 }

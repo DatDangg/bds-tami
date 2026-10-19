@@ -25,6 +25,23 @@ function Harness({ onSubmit = () => undefined, count = 0 }: { onSubmit?: () => v
   );
 }
 
+describe("ListSearchBar không có ô từ khoá (trang không tìm theo chữ)", () => {
+  it("chỉ còn ô chọn + nút gửi; vẫn là form GET giữ tham số ẩn", () => {
+    const { container } = render(
+      <ListSearchBar action="/du-an" label="Lọc dự án" submitLabel="Lọc" onSubmit={() => undefined} preservedParams={{ category: "can-ho" }}>
+        <ListSearchField label="Tỉnh" htmlFor="p">
+          <select id="p" name="province" />
+        </ListSearchField>
+      </ListSearchBar>,
+    );
+    const form = screen.getByRole("search", { name: "Lọc dự án" });
+    expect(form).toHaveAttribute("method", "get");
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(container.querySelector("input[type=hidden][name=category]")).toHaveValue("can-ho");
+    expect(screen.getByRole("button", { name: "Lọc" })).toHaveAttribute("type", "submit");
+  });
+});
+
 describe("ListSearchBar", () => {
   it("render: vùng tìm kiếm, từ khoá có nhãn, ô chọn, nút Bộ lọc và Tìm kiếm", () => {
     render(<Harness />);

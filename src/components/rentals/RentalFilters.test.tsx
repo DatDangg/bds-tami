@@ -387,6 +387,23 @@ describe("RentalFilters: Sheet lọc phụ (< lg)", () => {
     expect(replace).toHaveBeenLastCalledWith("/cho-thue?q=c%C5%A9&category=can-ho&province=ho-chi-minh&ward=ben-nghe&sort=price_asc", { scroll: false });
   });
 
+  it("Sheet nạp từ bản nháp chung (Loại vừa đổi, URL chưa kịp cập nhật) và áp qua update chung: không mất Loại, không bắn thêm lần debounce", async () => {
+    fetchMock();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui(none));
+    await chooseOption(user, bar().getByLabelText("Danh mục"), "Căn hộ");
+    expect(lastUrl()).toBe("/cho-thue?category=can-ho");
+    await user.type(bar().getByRole("searchbox"), "abc");
+    await user.click(bar().getByRole("button", { name: "Bộ lọc" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "3" }));
+    await user.click(within(dialog).getByRole("button", { name: /^Xem/ }));
+    expect(lastUrl()).toBe("/cho-thue?q=abc&category=can-ho&bedrooms=3");
+    const calls = replace.mock.calls.length;
+    act(() => vi.advanceTimersByTime(1000));
+    expect(replace.mock.calls).toHaveLength(calls);
+  });
+
   it("đếm lỗi: nút vẫn bấm được với nhãn không kèm số", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response("x", { status: 500 })));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });

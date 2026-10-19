@@ -10,7 +10,7 @@ import { parseRentalFilters, type RentalFilters, rentalCountApiPath, secondaryFi
 import { FilterFields } from "./FilterFields";
 import { useRentalListNavigation } from "./RentalListNavigation";
 import { useApiJson } from "./use-api-json";
-import { draftOf, type FilterDraft, queryOfDraft } from "./use-rental-draft";
+import type { FilterDraft } from "./use-rental-draft";
 import { useWardOptions } from "./use-ward-options";
 
 interface CountResponse {
@@ -18,10 +18,8 @@ interface CountResponse {
 }
 
 interface RentalFilterSheetProps {
-  /** Bộ lọc đang trên URL (nạp vào Sheet mỗi lần mở; số trên nút "Bộ lọc (n)"). */
+  /** Bộ lọc đang trên URL (số trên nút "Bộ lọc (n)"). Nội dung Sheet nạp từ bản nháp chung của trang, không từ URL. */
   filters: RentalFilters;
-  /** Sắp xếp đang chọn (Sheet không có ô sắp xếp nhưng khi áp dụng phải giữ nó). */
-  sort: string;
   options: RentalFilterOptions;
   /** Trang danh mục (S05): danh mục khoá, không nằm trong bản nháp nhưng phải có trong truy vấn đếm. */
   fixedCategory?: string | undefined;
@@ -30,16 +28,21 @@ interface RentalFilterSheetProps {
 /** "Xoá" chỉ dọn các lọc PHỤ trong Sheet; từ khoá và danh mục nằm ở băng tìm kiếm nên giữ nguyên. */
 const CLEARED: Pick<FilterDraft, "province" | "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax" | "bedrooms" | "furnishing"> = { province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "" };
 
+function secondaryPatch(draft: FilterDraft): typeof CLEARED {
+  const { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing } = draft;
+  return { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing };
+}
+
 /**
  * Nút "Bộ lọc" (+ huy hiệu n) + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg) chứa các lọc phụ. Khác Popover desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
  * dính có "Xoá" và "Xem n tin" (n lấy sống từ `GET /api/public/rentals?limit=1` theo bản nháp). Áp dụng mới đổi URL.
  */
-export function RentalFilterSheet({ filters, sort, options, fixedCategory }: RentalFilterSheetProps) {
+export function RentalFilterSheet({ filters, options, fixedCategory }: RentalFilterSheetProps) {
   const t = useTranslations("page.rentals.mobile");
   const locale = useLocale() as "vi" | "en";
-  const { navigate } = useRentalListNavigation();
+  const { draft: sharedDraft, update } = useRentalListNavigation();
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState(() => draftOf(filters));
+  const [draft, setDraft] = useState<FilterDraft>(sharedDraft);
   const { wards, loading: wardsLoading } = useWardOptions(draft.province, options);
   const draftFilters = parseRentalFilters(fixedCategory ? { ...draft, category: fixedCategory } : draft);
   const count = useApiJson<CountResponse>(open ? rentalCountApiPath(draftFilters, locale) : null, 300);
@@ -47,12 +50,13 @@ export function RentalFilterSheet({ filters, sort, options, fixedCategory }: Ren
   const activeCount = secondaryFilterCount(filters);
 
   function handleOpenChange(next: boolean) {
-    if (next) setDraft(draftOf(filters));
+    if (next) setDraft(sharedDraft);
     setOpen(next);
   }
 
   function apply() {
-    navigate(queryOfDraft({ ...draft, sort }));
+    // Qua `update` chung: huỷ hẹn giờ debounce của ô từ khoá rồi mới đổi URL, nên chữ đang gõ không bị URL cũ đè lên.
+    update(secondaryPatch(draft), "now");
     setOpen(false);
   }
 
