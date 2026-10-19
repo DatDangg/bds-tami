@@ -170,3 +170,13 @@
   color: var(--admin-badge-danger-fg);
 }
 
+
+// Mobile: checkbox chọn dòng / chọn tất cả giữ vùng bấm 44x44 (input trong _controls) nhưng KHÔNG ép cả khối cao 44px,
+// nếu không hàng bảng thành 60px / header 64px. Hộp 22px căn giữa theo chiều dọc bằng flex.
+@media (max-width: 767px) {
+  .select-row .checkbox-input,
+  .select-all .checkbox-input {
+    min-height: 0;
+    align-items: center;
+  }
+}

@@ -67,28 +67,28 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    staff: Staff;
+    leads: Lead;
+    'lead-activities': LeadActivity;
+    projects: Project;
+    rentals: Rental;
+    'property-posts': PropertyPost;
+    news: News;
+    services: Service;
+    pages: Page;
+    'job-postings': JobPosting;
+    'job-applications': JobApplication;
     media: Media;
     'private-files': PrivateFile;
-    'audit-logs': AuditLog;
-    'click-events': ClickEvent;
-    'click-stats-daily': ClickStatsDaily;
-    'translation-usage': TranslationUsage;
     categories: Category;
     developers: Developer;
     provinces: Province;
     wards: Ward;
-    services: Service;
-    pages: Page;
-    news: News;
-    projects: Project;
-    rentals: Rental;
-    'property-posts': PropertyPost;
-    'job-postings': JobPosting;
-    'job-applications': JobApplication;
-    leads: Lead;
-    'lead-activities': LeadActivity;
     redirects: Redirect;
+    staff: Staff;
+    'audit-logs': AuditLog;
+    'click-events': ClickEvent;
+    'click-stats-daily': ClickStatsDaily;
+    'translation-usage': TranslationUsage;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -101,28 +101,28 @@ export interface Config {
     };
   };
   collectionsSelect: {
-    staff: StaffSelect<false> | StaffSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    'lead-activities': LeadActivitiesSelect<false> | LeadActivitiesSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    rentals: RentalsSelect<false> | RentalsSelect<true>;
+    'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
+    'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
-    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
-    'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
-    'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
-    'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
     provinces: ProvincesSelect<false> | ProvincesSelect<true>;
     wards: WardsSelect<false> | WardsSelect<true>;
-    services: ServicesSelect<false> | ServicesSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
-    news: NewsSelect<false> | NewsSelect<true>;
-    projects: ProjectsSelect<false> | ProjectsSelect<true>;
-    rentals: RentalsSelect<false> | RentalsSelect<true>;
-    'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
-    'job-postings': JobPostingsSelect<false> | JobPostingsSelect<true>;
-    'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
-    leads: LeadsSelect<false> | LeadsSelect<true>;
-    'lead-activities': LeadActivitiesSelect<false> | LeadActivitiesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    staff: StaffSelect<false> | StaffSelect<true>;
+    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
+    'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
+    'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
+    'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -189,38 +189,213 @@ export interface StaffAuthOperations {
   };
 }
 /**
- * Tài khoản nội bộ đăng nhập trang quản trị (admin / sale).
+ * Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "staff".
+ * via the `definition` "leads".
  */
-export interface Staff {
+export interface Lead {
   id: string;
+  code: string;
+  source: 'rental' | 'property_post' | 'project' | 'contact';
+  rental?: (string | null) | Rental;
+  propertyPost?: (string | null) | PropertyPost;
+  project?: (string | null) | Project;
   fullName: string;
-  phone?: string | null;
-  role: 'admin' | 'sale';
-  active: boolean;
-  avatar?: (string | null) | Media;
-  lastLoginAt?: string | null;
+  phone: string;
+  phoneNormalized: string;
+  email?: string | null;
+  message?: string | null;
+  locale: 'vi' | 'en';
+  status: 'new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam';
+  lostReason?: string | null;
+  assignedTo?: (string | null) | Staff;
+  assignedAt?: string | null;
+  assigneeInactive?: boolean | null;
+  firstContactedAt?: string | null;
+  lastActivityAt?: string | null;
+  mergedCount?: number | null;
+  consentAt: string;
+  consentVersion: string;
+  utm?: {
+    source?: string | null;
+    medium?: string | null;
+    campaign?: string | null;
+    term?: string | null;
+    content?: string | null;
+  };
+  pageUrl?: string | null;
+  referrer?: string | null;
+  ipHash?: string | null;
+  userAgent?: string | null;
+  remindedAt?: string | null;
+  anonymizedAt?: string | null;
+  activities?: {
+    docs?: (string | LeadActivity)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'staff';
+  deletedAt?: string | null;
+}
+/**
+ * Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rentals".
+ */
+export interface Rental {
+  id: string;
+  code: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  project?: (string | null) | Project;
+  province: string | Province;
+  ward: string | Ward;
+  address: string;
+  showExactAddress?: boolean | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
+  priceMonthlyVnd?: number | null;
+  priceNegotiable?: boolean | null;
+  areaM2: number;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  floor?: string | null;
+  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  furnishing?: ('none' | 'basic' | 'full') | null;
+  rentalTerms?: {
+    minLeaseMonths?: number | null;
+    depositMonths?: number | null;
+    paymentCycle?: ('monthly' | 'quarterly' | 'semiannual' | 'annual') | null;
+    includedServices?:
+      | ('electricity' | 'water' | 'internet' | 'cleaning' | 'laundry' | 'parking' | 'management_fee' | 'security')[]
+      | null;
+    availableFrom?: string | null;
+  };
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Ảnh đầu tiên là ảnh đại diện của tin.
+   */
+  gallery?: (string | Media)[] | null;
+  videoUrl?: string | null;
+  legalNote?: string | null;
+  rentedAt?: string | null;
+  searchText?: string | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden' | 'rented';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * Danh mục riêng cho từng loại nội dung (dự án, cho thuê, tin BĐS, tin tức, tuyển dụng), tối đa 2 cấp.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name?: string | null;
+  scope: 'rental' | 'property_post' | 'news' | 'project' | 'job';
+  parent?: (string | null) | Category;
+  description?: string | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  scopeSlug?: string | null;
+  hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
 }
 /**
  * Ảnh, PDF và video công khai dùng cho mọi nội dung; ảnh cần mô tả (alt).
@@ -281,479 +456,38 @@ export interface Media {
   };
 }
 /**
- * CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).
+ * Tài khoản nội bộ đăng nhập trang quản trị (admin / sale).
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "private-files".
+ * via the `definition` "staff".
  */
-export interface PrivateFile {
+export interface Staff {
   id: string;
-  _objectKey?: string | null;
+  fullName: string;
+  phone?: string | null;
+  role: 'admin' | 'sale';
+  active: boolean;
+  avatar?: (string | null) | Media;
+  lastLoginAt?: string | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * Dấu vết các thao tác nhạy cảm (chỉ đọc, giữ 24 tháng).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-logs".
- */
-export interface AuditLog {
-  id: string;
-  actor?: (string | null) | Staff;
-  action:
-    | 'lead.assign'
-    | 'lead.export'
-    | 'content.delete'
-    | 'content.restore'
-    | 'content.purge'
-    | 'staff.create'
-    | 'staff.reset_password'
-    | 'staff.update_role'
-    | 'staff.deactivate'
-    | 'staff.activate'
-    | 'staff.delete'
-    | 'auth.login_failed'
-    | 'application.view_cv'
-    | 'content.retranslate'
-    | 'content.approve_translation'
-    | 'system.data_retention';
-  collection?: string | null;
-  docId?: string | null;
-  summary: string;
-  meta?:
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  ipHash?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Từng lượt bấm nút Hotline/Zalo/Fanpage trên website (giữ 90 ngày rồi gộp thành thống kê ngày).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "click-events".
- */
-export interface ClickEvent {
-  id: string;
-  type: 'hotline' | 'zalo' | 'fanpage';
-  pagePath: string;
-  refCollection?: string | null;
-  refId?: string | null;
-  aggregatedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Số lượt bấm Hotline/Zalo/Fanpage gộp theo ngày (giờ Việt Nam), do hệ thống tổng hợp.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "click-stats-daily".
- */
-export interface ClickStatsDaily {
-  id: string;
-  date: string;
-  type: 'hotline' | 'zalo' | 'fanpage';
-  refCollection?: string | null;
-  refId?: string | null;
-  count: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Mức dùng AI dịch theo tháng (số lần gọi, token, chi phí ước tính) để theo dõi hạn mức.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "translation-usage".
- */
-export interface TranslationUsage {
-  id: string;
-  month: string;
-  inputTokens: number;
-  outputTokens: number;
-  requests: number;
-  estimatedCostUsd: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Danh mục riêng cho từng loại nội dung (dự án, cho thuê, tin BĐS, tin tức, tuyển dụng), tối đa 2 cấp.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  name?: string | null;
-  scope: 'rental' | 'property_post' | 'news' | 'project' | 'job';
-  parent?: (string | null) | Category;
-  description?: string | null;
-  sortOrder?: number | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  scopeSlug?: string | null;
-  hasEnglish?: boolean | null;
-  /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
-   */
-  translation?: {
-    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
-    enSource?: ('ai' | 'manual') | null;
-    viChangedAfterManual?: boolean | null;
-    sourceHash?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    translatedAt?: string | null;
-    model?: string | null;
-    lastError?: string | null;
-  };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * Chủ đầu tư của dự án; bật "Hiện ở khối đối tác" để đưa logo lên trang chủ.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "developers".
- */
-export interface Developer {
-  id: string;
-  name?: string | null;
-  logo?: (string | null) | Media;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Địa chỉ trang web, bắt đầu bằng https://
-   */
-  website?: string | null;
-  showAsPartner?: boolean | null;
-  sortOrder?: number | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  hasEnglish?: boolean | null;
-  /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
-   */
-  translation?: {
-    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
-    enSource?: ('ai' | 'manual') | null;
-    viChangedAfterManual?: boolean | null;
-    sourceHash?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    translatedAt?: string | null;
-    model?: string | null;
-    lastError?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * 34 tỉnh/thành sau sáp nhập 01/07/2025 (danh mục nền).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "provinces".
- */
-export interface Province {
-  id: string;
-  searchReindexPending?: boolean | null;
-  code: string;
-  name: string;
-  /**
-   * Vd: TP.HCM
-   */
-  shortName?: string | null;
-  slug: string;
-  sortOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Phường/xã/đặc khu sau sáp nhập 01/07/2025; kèm tên cũ để tìm kiếm.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wards".
- */
-export interface Ward {
-  id: string;
-  searchReindexPending?: boolean | null;
-  province: string | Province;
-  code: string;
-  name: string;
-  type: 'phuong' | 'xa' | 'dac_khu';
-  slug: string;
-  /**
-   * Tên đơn vị cũ trước 01/07/2025, dùng cho tìm kiếm.
-   */
-  legacyNames?:
-    | {
-        name: string;
-        id?: string | null;
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Các dịch vụ công ty cung cấp (phân phối, môi giới, khai thác căn hộ dịch vụ); chỉ admin sửa.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: string;
-  title?: string | null;
-  icon?: (string | null) | Media;
-  coverImage?: (string | null) | Media;
-  summary?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  sortOrder?: number | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  hasEnglish?: boolean | null;
-  /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
-   */
-  translation?: {
-    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
-    enSource?: ('ai' | 'manual') | null;
-    viChangedAfterManual?: boolean | null;
-    sourceHash?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    translatedAt?: string | null;
-    model?: string | null;
-    lastError?: string | null;
-  };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * Chính sách bảo mật và Điều khoản sử dụng; bản tiếng Anh phải được admin duyệt trước khi hiển thị.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: string;
-  kind: 'privacy' | 'terms';
-  title?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30).
-   */
-  version: string;
-  effectiveDate: string;
-  status: 'draft' | 'published' | 'hidden';
-  hasEnglish?: boolean | null;
-  /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
-   */
-  translation?: {
-    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
-    enSource?: ('ai' | 'manual') | null;
-    viChangedAfterManual?: boolean | null;
-    sourceHash?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    translatedAt?: string | null;
-    model?: string | null;
-    lastError?: string | null;
-  };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * Bài viết tin tức, kiến thức thị trường; không thu lead.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news".
- */
-export interface News {
-  id: string;
-  title?: string | null;
-  category?: (string | null) | Category;
-  cover?: (string | null) | Media;
-  excerpt?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  tags?: string[] | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  hasEnglish?: boolean | null;
-  /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
-   */
-  translation?: {
-    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
-    enSource?: ('ai' | 'manual') | null;
-    viChangedAfterManual?: boolean | null;
-    sourceHash?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    translatedAt?: string | null;
-    model?: string | null;
-    lastError?: string | null;
-  };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
+  password?: string | null;
+  collection: 'staff';
 }
 /**
  * Dự án bất động sản giới thiệu trên website: thông tin, quy mô, tiện ích, mặt bằng và tài liệu.
@@ -899,44 +633,15 @@ export interface Project {
   deletedAt?: string | null;
 }
 /**
- * Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.
+ * Chủ đầu tư của dự án; bật "Hiện ở khối đối tác" để đưa logo lên trang chủ.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rentals".
+ * via the `definition` "developers".
  */
-export interface Rental {
+export interface Developer {
   id: string;
-  code: string;
-  title?: string | null;
-  category?: (string | null) | Category;
-  project?: (string | null) | Project;
-  province: string | Province;
-  ward: string | Ward;
-  address: string;
-  showExactAddress?: boolean | null;
-  /**
-   * @minItems 2
-   * @maxItems 2
-   */
-  location?: [number, number] | null;
-  priceMonthlyVnd?: number | null;
-  priceNegotiable?: boolean | null;
-  areaM2: number;
-  bedrooms?: number | null;
-  bathrooms?: number | null;
-  floor?: string | null;
-  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
-  balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
-  furnishing?: ('none' | 'basic' | 'full') | null;
-  rentalTerms?: {
-    minLeaseMonths?: number | null;
-    depositMonths?: number | null;
-    paymentCycle?: ('monthly' | 'quarterly' | 'semiannual' | 'annual') | null;
-    includedServices?:
-      | ('electricity' | 'water' | 'internet' | 'cleaning' | 'laundry' | 'parking' | 'management_fee' | 'security')[]
-      | null;
-    availableFrom?: string | null;
-  };
+  name?: string | null;
+  logo?: (string | null) | Media;
   description?: {
     root: {
       type: string;
@@ -953,21 +658,15 @@ export interface Rental {
     [k: string]: unknown;
   } | null;
   /**
-   * Ảnh đầu tiên là ảnh đại diện của tin.
+   * Địa chỉ trang web, bắt đầu bằng https://
    */
-  gallery?: (string | Media)[] | null;
-  videoUrl?: string | null;
-  legalNote?: string | null;
-  rentedAt?: string | null;
-  searchText?: string | null;
+  website?: string | null;
+  showAsPartner?: boolean | null;
+  sortOrder?: number | null;
   /**
    * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
    */
   slug?: string | null;
-  status: 'draft' | 'published' | 'hidden' | 'rented';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
   hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
@@ -989,19 +688,55 @@ export interface Rental {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
+}
+/**
+ * 34 tỉnh/thành sau sáp nhập 01/07/2025 (danh mục nền).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces".
+ */
+export interface Province {
+  id: string;
+  searchReindexPending?: boolean | null;
+  code: string;
+  name: string;
+  /**
+   * Vd: TP.HCM
+   */
+  shortName?: string | null;
+  slug: string;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Phường/xã/đặc khu sau sáp nhập 01/07/2025; kèm tên cũ để tìm kiếm.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards".
+ */
+export interface Ward {
+  id: string;
+  searchReindexPending?: boolean | null;
+  province: string | Province;
+  code: string;
+  name: string;
+  type: 'phuong' | 'xa' | 'dac_khu';
+  slug: string;
+  /**
+   * Tên đơn vị cũ trước 01/07/2025, dùng cho tìm kiếm.
+   */
+  legacyNames?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.
@@ -1054,6 +789,230 @@ export interface PropertyPost {
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * Ghi chú, cuộc gọi và các thay đổi của lead; chỉ thêm, không sửa/xoá.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-activities".
+ */
+export interface LeadActivity {
+  id: string;
+  lead: string | Lead;
+  type: 'note' | 'call' | 'status_change' | 'assignment' | 'merged' | 'email_sent';
+  content?: string | null;
+  fromStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
+  toStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
+  fromAssignee?: (string | null) | Staff;
+  toAssignee?: (string | null) | Staff;
+  actor?: (string | null) | Staff;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Bài viết tin tức, kiến thức thị trường; không thu lead.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: string;
+  title?: string | null;
+  category?: (string | null) | Category;
+  cover?: (string | null) | Media;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tags?: string[] | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * Các dịch vụ công ty cung cấp (phân phối, môi giới, khai thác căn hộ dịch vụ); chỉ admin sửa.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: string;
+  title?: string | null;
+  icon?: (string | null) | Media;
+  coverImage?: (string | null) | Media;
+  summary?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  status: 'draft' | 'published' | 'hidden';
+  hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
+  translation?: {
+    status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
+    enSource?: ('ai' | 'manual') | null;
+    viChangedAfterManual?: boolean | null;
+    sourceHash?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    translatedAt?: string | null;
+    model?: string | null;
+    lastError?: string | null;
+  };
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * Chính sách bảo mật và Điều khoản sử dụng; bản tiếng Anh phải được admin duyệt trước khi hiển thị.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  kind: 'privacy' | 'terms';
+  title?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30).
+   */
+  version: string;
+  effectiveDate: string;
+  status: 'draft' | 'published' | 'hidden';
   hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
@@ -1225,74 +1184,25 @@ export interface JobApplication {
   createdAt: string;
 }
 /**
- * Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.
+ * CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads".
+ * via the `definition` "private-files".
  */
-export interface Lead {
+export interface PrivateFile {
   id: string;
-  code: string;
-  source: 'rental' | 'property_post' | 'project' | 'contact';
-  rental?: (string | null) | Rental;
-  propertyPost?: (string | null) | PropertyPost;
-  project?: (string | null) | Project;
-  fullName: string;
-  phone: string;
-  phoneNormalized: string;
-  email?: string | null;
-  message?: string | null;
-  locale: 'vi' | 'en';
-  status: 'new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam';
-  lostReason?: string | null;
-  assignedTo?: (string | null) | Staff;
-  assignedAt?: string | null;
-  assigneeInactive?: boolean | null;
-  firstContactedAt?: string | null;
-  lastActivityAt?: string | null;
-  mergedCount?: number | null;
-  consentAt: string;
-  consentVersion: string;
-  utm?: {
-    source?: string | null;
-    medium?: string | null;
-    campaign?: string | null;
-    term?: string | null;
-    content?: string | null;
-  };
-  pageUrl?: string | null;
-  referrer?: string | null;
-  ipHash?: string | null;
-  userAgent?: string | null;
-  remindedAt?: string | null;
-  anonymizedAt?: string | null;
-  activities?: {
-    docs?: (string | LeadActivity)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * Ghi chú, cuộc gọi và các thay đổi của lead; chỉ thêm, không sửa/xoá.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lead-activities".
- */
-export interface LeadActivity {
-  id: string;
-  lead: string | Lead;
-  type: 'note' | 'call' | 'status_change' | 'assignment' | 'merged' | 'email_sent';
-  content?: string | null;
-  fromStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
-  toStatus?: ('new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam') | null;
-  fromAssignee?: (string | null) | Staff;
-  toAssignee?: (string | null) | Staff;
-  actor?: (string | null) | Staff;
-  updatedAt: string;
-  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * Chuyển hướng 301 từ đường dẫn cũ sang mới (tự tạo khi đổi slug; sửa tay khi cần).
@@ -1305,6 +1215,96 @@ export interface Redirect {
   from: string;
   to: string;
   type: '301';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Dấu vết các thao tác nhạy cảm (chỉ đọc, giữ 24 tháng).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs".
+ */
+export interface AuditLog {
+  id: string;
+  actor?: (string | null) | Staff;
+  action:
+    | 'lead.assign'
+    | 'lead.export'
+    | 'content.delete'
+    | 'content.restore'
+    | 'content.purge'
+    | 'staff.create'
+    | 'staff.reset_password'
+    | 'staff.update_role'
+    | 'staff.deactivate'
+    | 'staff.activate'
+    | 'staff.delete'
+    | 'auth.login_failed'
+    | 'application.view_cv'
+    | 'content.retranslate'
+    | 'content.approve_translation'
+    | 'system.data_retention';
+  collection?: string | null;
+  docId?: string | null;
+  summary: string;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  ipHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Từng lượt bấm nút Hotline/Zalo/Fanpage trên website (giữ 90 ngày rồi gộp thành thống kê ngày).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-events".
+ */
+export interface ClickEvent {
+  id: string;
+  type: 'hotline' | 'zalo' | 'fanpage';
+  pagePath: string;
+  refCollection?: string | null;
+  refId?: string | null;
+  aggregatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Số lượt bấm Hotline/Zalo/Fanpage gộp theo ngày (giờ Việt Nam), do hệ thống tổng hợp.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-stats-daily".
+ */
+export interface ClickStatsDaily {
+  id: string;
+  date: string;
+  type: 'hotline' | 'zalo' | 'fanpage';
+  refCollection?: string | null;
+  refId?: string | null;
+  count: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Mức dùng AI dịch theo tháng (số lần gọi, token, chi phí ước tính) để theo dõi hạn mức.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translation-usage".
+ */
+export interface TranslationUsage {
+  id: string;
+  month: string;
+  inputTokens: number;
+  outputTokens: number;
+  requests: number;
+  estimatedCostUsd: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -1455,8 +1455,44 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
-        relationTo: 'staff';
-        value: string | Staff;
+        relationTo: 'leads';
+        value: string | Lead;
+      } | null)
+    | ({
+        relationTo: 'lead-activities';
+        value: string | LeadActivity;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'rentals';
+        value: string | Rental;
+      } | null)
+    | ({
+        relationTo: 'property-posts';
+        value: string | PropertyPost;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: string | News;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'job-postings';
+        value: string | JobPosting;
+      } | null)
+    | ({
+        relationTo: 'job-applications';
+        value: string | JobApplication;
       } | null)
     | ({
         relationTo: 'media';
@@ -1465,22 +1501,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'private-files';
         value: string | PrivateFile;
-      } | null)
-    | ({
-        relationTo: 'audit-logs';
-        value: string | AuditLog;
-      } | null)
-    | ({
-        relationTo: 'click-events';
-        value: string | ClickEvent;
-      } | null)
-    | ({
-        relationTo: 'click-stats-daily';
-        value: string | ClickStatsDaily;
-      } | null)
-    | ({
-        relationTo: 'translation-usage';
-        value: string | TranslationUsage;
       } | null)
     | ({
         relationTo: 'categories';
@@ -1499,48 +1519,28 @@ export interface PayloadLockedDocument {
         value: string | Ward;
       } | null)
     | ({
-        relationTo: 'services';
-        value: string | Service;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: string | Page;
-      } | null)
-    | ({
-        relationTo: 'news';
-        value: string | News;
-      } | null)
-    | ({
-        relationTo: 'projects';
-        value: string | Project;
-      } | null)
-    | ({
-        relationTo: 'rentals';
-        value: string | Rental;
-      } | null)
-    | ({
-        relationTo: 'property-posts';
-        value: string | PropertyPost;
-      } | null)
-    | ({
-        relationTo: 'job-postings';
-        value: string | JobPosting;
-      } | null)
-    | ({
-        relationTo: 'job-applications';
-        value: string | JobApplication;
-      } | null)
-    | ({
-        relationTo: 'leads';
-        value: string | Lead;
-      } | null)
-    | ({
-        relationTo: 'lead-activities';
-        value: string | LeadActivity;
-      } | null)
-    | ({
         relationTo: 'redirects';
         value: string | Redirect;
+      } | null)
+    | ({
+        relationTo: 'staff';
+        value: string | Staff;
+      } | null)
+    | ({
+        relationTo: 'audit-logs';
+        value: string | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'click-events';
+        value: string | ClickEvent;
+      } | null)
+    | ({
+        relationTo: 'click-stats-daily';
+        value: string | ClickStatsDaily;
+      } | null)
+    | ({
+        relationTo: 'translation-usage';
+        value: string | TranslationUsage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1586,383 +1586,65 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "staff_select".
+ * via the `definition` "leads_select".
  */
-export interface StaffSelect<T extends boolean = true> {
+export interface LeadsSelect<T extends boolean = true> {
+  code?: T;
+  source?: T;
+  rental?: T;
+  propertyPost?: T;
+  project?: T;
   fullName?: T;
   phone?: T;
-  role?: T;
-  active?: T;
-  avatar?: T;
-  lastLoginAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
+  phoneNormalized?: T;
   email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+  message?: T;
+  locale?: T;
+  status?: T;
+  lostReason?: T;
+  assignedTo?: T;
+  assignedAt?: T;
+  assigneeInactive?: T;
+  firstContactedAt?: T;
+  lastActivityAt?: T;
+  mergedCount?: T;
+  consentAt?: T;
+  consentVersion?: T;
+  utm?:
     | T
     | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
+        source?: T;
+        medium?: T;
+        campaign?: T;
+        term?: T;
+        content?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  uploadedBy?: T;
-  _objectKey?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumb?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        og?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "private-files_select".
- */
-export interface PrivateFilesSelect<T extends boolean = true> {
-  _objectKey?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-logs_select".
- */
-export interface AuditLogsSelect<T extends boolean = true> {
-  actor?: T;
-  action?: T;
-  collection?: T;
-  docId?: T;
-  summary?: T;
-  meta?: T;
+  pageUrl?: T;
+  referrer?: T;
   ipHash?: T;
+  userAgent?: T;
+  remindedAt?: T;
+  anonymizedAt?: T;
+  activities?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "click-events_select".
+ * via the `definition` "lead-activities_select".
  */
-export interface ClickEventsSelect<T extends boolean = true> {
+export interface LeadActivitiesSelect<T extends boolean = true> {
+  lead?: T;
   type?: T;
-  pagePath?: T;
-  refCollection?: T;
-  refId?: T;
-  aggregatedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "click-stats-daily_select".
- */
-export interface ClickStatsDailySelect<T extends boolean = true> {
-  date?: T;
-  type?: T;
-  refCollection?: T;
-  refId?: T;
-  count?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "translation-usage_select".
- */
-export interface TranslationUsageSelect<T extends boolean = true> {
-  month?: T;
-  inputTokens?: T;
-  outputTokens?: T;
-  requests?: T;
-  estimatedCostUsd?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
-  name?: T;
-  scope?: T;
-  parent?: T;
-  description?: T;
-  sortOrder?: T;
-  slug?: T;
-  scopeSlug?: T;
-  hasEnglish?: T;
-  translation?:
-    | T
-    | {
-        status?: T;
-        enSource?: T;
-        viChangedAfterManual?: T;
-        sourceHash?: T;
-        translatedAt?: T;
-        model?: T;
-        lastError?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "developers_select".
- */
-export interface DevelopersSelect<T extends boolean = true> {
-  name?: T;
-  logo?: T;
-  description?: T;
-  website?: T;
-  showAsPartner?: T;
-  sortOrder?: T;
-  slug?: T;
-  hasEnglish?: T;
-  translation?:
-    | T
-    | {
-        status?: T;
-        enSource?: T;
-        viChangedAfterManual?: T;
-        sourceHash?: T;
-        translatedAt?: T;
-        model?: T;
-        lastError?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "provinces_select".
- */
-export interface ProvincesSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  code?: T;
-  name?: T;
-  shortName?: T;
-  slug?: T;
-  sortOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wards_select".
- */
-export interface WardsSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  province?: T;
-  code?: T;
-  name?: T;
-  type?: T;
-  slug?: T;
-  legacyNames?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services_select".
- */
-export interface ServicesSelect<T extends boolean = true> {
-  title?: T;
-  icon?: T;
-  coverImage?: T;
-  summary?: T;
   content?: T;
-  sortOrder?: T;
-  slug?: T;
-  status?: T;
-  hasEnglish?: T;
-  translation?:
-    | T
-    | {
-        status?: T;
-        enSource?: T;
-        viChangedAfterManual?: T;
-        sourceHash?: T;
-        translatedAt?: T;
-        model?: T;
-        lastError?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  fromStatus?: T;
+  toStatus?: T;
+  fromAssignee?: T;
+  toAssignee?: T;
+  actor?: T;
   updatedAt?: T;
   createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  kind?: T;
-  title?: T;
-  content?: T;
-  version?: T;
-  effectiveDate?: T;
-  status?: T;
-  hasEnglish?: T;
-  translation?:
-    | T
-    | {
-        status?: T;
-        enSource?: T;
-        viChangedAfterManual?: T;
-        sourceHash?: T;
-        translatedAt?: T;
-        model?: T;
-        lastError?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news_select".
- */
-export interface NewsSelect<T extends boolean = true> {
-  title?: T;
-  category?: T;
-  cover?: T;
-  excerpt?: T;
-  content?: T;
-  tags?: T;
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  hasEnglish?: T;
-  translation?:
-    | T
-    | {
-        status?: T;
-        enSource?: T;
-        viChangedAfterManual?: T;
-        sourceHash?: T;
-        translatedAt?: T;
-        model?: T;
-        lastError?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2166,6 +1848,121 @@ export interface PropertyPostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  cover?: T;
+  excerpt?: T;
+  content?: T;
+  tags?: T;
+  slug?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  coverImage?: T;
+  summary?: T;
+  content?: T;
+  sortOrder?: T;
+  slug?: T;
+  status?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  kind?: T;
+  title?: T;
+  content?: T;
+  version?: T;
+  effectiveDate?: T;
+  status?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings_select".
  */
 export interface JobPostingsSelect<T extends boolean = true> {
@@ -2234,63 +2031,183 @@ export interface JobApplicationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads_select".
+ * via the `definition` "media_select".
  */
-export interface LeadsSelect<T extends boolean = true> {
-  code?: T;
-  source?: T;
-  rental?: T;
-  propertyPost?: T;
-  project?: T;
-  fullName?: T;
-  phone?: T;
-  phoneNormalized?: T;
-  email?: T;
-  message?: T;
-  locale?: T;
-  status?: T;
-  lostReason?: T;
-  assignedTo?: T;
-  assignedAt?: T;
-  assigneeInactive?: T;
-  firstContactedAt?: T;
-  lastActivityAt?: T;
-  mergedCount?: T;
-  consentAt?: T;
-  consentVersion?: T;
-  utm?:
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  uploadedBy?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
     | T
     | {
-        source?: T;
-        medium?: T;
-        campaign?: T;
-        term?: T;
-        content?: T;
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
-  pageUrl?: T;
-  referrer?: T;
-  ipHash?: T;
-  userAgent?: T;
-  remindedAt?: T;
-  anonymizedAt?: T;
-  activities?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "private-files_select".
+ */
+export interface PrivateFilesSelect<T extends boolean = true> {
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  scope?: T;
+  parent?: T;
+  description?: T;
+  sortOrder?: T;
+  slug?: T;
+  scopeSlug?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lead-activities_select".
+ * via the `definition` "developers_select".
  */
-export interface LeadActivitiesSelect<T extends boolean = true> {
-  lead?: T;
+export interface DevelopersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  description?: T;
+  website?: T;
+  showAsPartner?: T;
+  sortOrder?: T;
+  slug?: T;
+  hasEnglish?: T;
+  translation?:
+    | T
+    | {
+        status?: T;
+        enSource?: T;
+        viChangedAfterManual?: T;
+        sourceHash?: T;
+        translatedAt?: T;
+        model?: T;
+        lastError?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces_select".
+ */
+export interface ProvincesSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  code?: T;
+  name?: T;
+  shortName?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards_select".
+ */
+export interface WardsSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  province?: T;
+  code?: T;
+  name?: T;
   type?: T;
-  content?: T;
-  fromStatus?: T;
-  toStatus?: T;
-  fromAssignee?: T;
-  toAssignee?: T;
-  actor?: T;
+  slug?: T;
+  legacyNames?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2302,6 +2219,89 @@ export interface RedirectsSelect<T extends boolean = true> {
   from?: T;
   to?: T;
   type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff_select".
+ */
+export interface StaffSelect<T extends boolean = true> {
+  fullName?: T;
+  phone?: T;
+  role?: T;
+  active?: T;
+  avatar?: T;
+  lastLoginAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  actor?: T;
+  action?: T;
+  collection?: T;
+  docId?: T;
+  summary?: T;
+  meta?: T;
+  ipHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-events_select".
+ */
+export interface ClickEventsSelect<T extends boolean = true> {
+  type?: T;
+  pagePath?: T;
+  refCollection?: T;
+  refId?: T;
+  aggregatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "click-stats-daily_select".
+ */
+export interface ClickStatsDailySelect<T extends boolean = true> {
+  date?: T;
+  type?: T;
+  refCollection?: T;
+  refId?: T;
+  count?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translation-usage_select".
+ */
+export interface TranslationUsageSelect<T extends boolean = true> {
+  month?: T;
+  inputTokens?: T;
+  outputTokens?: T;
+  requests?: T;
+  estimatedCostUsd?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -29,6 +29,7 @@ import { PropertyPosts } from "./collections/PropertyPosts";
 import { Rentals } from "./collections/Rentals";
 import { Services } from "./collections/Services";
 import { Staff } from "./collections/Staff";
+import { adminNavGroupsPlugin } from "./components/admin/admin-groups";
 import { Footer } from "./globals/Footer";
 import { Header } from "./globals/Header";
 import { Homepage } from "./globals/Homepage";
@@ -125,5 +126,7 @@ export default buildConfig({
       clientCacheKey: "s3-private",
       collections: { "private-files": { disablePayloadAccessControl: true, generateFileURL: () => "" } },
     }),
+    // Cuối cùng: sau khi plugin redirects đã nối collection, gán nhóm menu + sắp thứ tự (BL-015 T03).
+    adminNavGroupsPlugin,
   ],
 });

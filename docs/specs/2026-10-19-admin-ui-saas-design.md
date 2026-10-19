@@ -165,6 +165,8 @@ Dùng `admin.group` (chuỗi tiếng Việt) + **sắp xếp lại mảng `colle
 | 6 | **Website** (globals + redirect) | Cấu hình chung · Trang chủ · Đầu trang · Chân trang · Chuyển hướng 301 (`redirects`) | admin |
 | 7 | **Hệ thống** | Nhân viên (`staff`) · Nhật ký thao tác (`audit-logs`) · Lượt bấm liên hệ (`click-events`) · Thống kê lượt bấm theo ngày (`click-stats-daily`) · Chi phí dịch AI (`translation-usage`) | admin (sale chỉ thấy "Nhân viên" = hồ sơ của mình, như quyền hiện tại) |
 
+**As-built (T03):** nhóm + thứ tự ở `src/components/admin/admin-groups.ts` (`ADMIN_NAV_GROUPS`, plugin chạy cuối). Payload 3.91 luôn xếp collection trước global trong cùng nhóm → nhóm Website thực tế: Chuyển hướng 301 · Cấu hình chung · Trang chủ · Đầu trang · Chân trang.
+
 Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
 
 **Icon:** Payload 3.91 không hỗ trợ icon cho mục nav qua config; muốn có phải thay cả `admin.components.Nav` (component tự viết, phải tự xử lý quyền/ẩn/active/collapse/mobile) → rủi ro cao, bảo trì khi nâng Payload. **Đề xuất: không icon ở menu** (nhóm + khoảng trắng đã đủ phân cấp); icon chỉ dùng ở card dashboard + lối tắt (component của mình). → hỏi user §7.
