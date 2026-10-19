@@ -2,7 +2,7 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import { buildHomeView, type HomeDocs } from "@/lib/home/home-view";
-import type { Category, Homepage, Media, Project, PropertyPost, Service } from "@/payload-types";
+import type { Category, Homepage, Media, News, Project, PropertyPost, Service } from "@/payload-types";
 import { HomeBlocks } from "./HomeBlocks";
 
 const NOW = new Date("2026-10-18T03:00:00.000Z");
@@ -18,6 +18,8 @@ const docs: HomeDocs = {
   offers: [{ id: "o1", title: "Voucher 1", slug: "voucher-1", excerpt: "Ưu đãi", cover: media("oc1") } as PropertyPost],
   chipProjects: [],
   provinces: [],
+  rentalTabs: [],
+  news: [],
 };
 
 const richText = {
@@ -194,5 +196,56 @@ describe("HomeBlocks: thanh thông báo + ô tìm kiếm hero (BL-020)", () => {
     en.unmount();
     renderHome(homepage({ heroSearch: { enabled: false } }), "vi", withChips);
     expect(screen.queryByRole("region", { name: "Tìm kiếm nhanh" })).toBeNull();
+  });
+});
+
+describe("HomeBlocks: Cho thuê + Tin tức (BL-020)", () => {
+  const rentalItem = (id: string) => ({
+    id,
+    code: `CT-${id}`,
+    title: `Căn hộ ${id}`,
+    slug: `can-ho-${id}`,
+    status: "published" as const,
+    thumbnail: null,
+    priceMonthlyVnd: 9_000_000,
+    priceNegotiable: false,
+    areaM2: 40,
+    bedrooms: 1,
+    bathrooms: 1,
+    furnishing: null,
+    province: { name: "TP.HCM", slug: "tp-hcm" },
+    ward: { name: "Phường 1", slug: "phuong-1" },
+    publishedAt: null,
+  });
+  const marketDocs: HomeDocs = {
+    ...docs,
+    rentalTabs: [{ category: { id: "rc1", name: "Thuê nhà ở", slug: "nha-o" }, items: [rentalItem("1")] }],
+    news: [1, 2, 3].map((n) => ({ id: `n${n}`, title: `Bài ${n}`, slug: `bai-${n}`, excerpt: "Tóm tắt", cover: media(`n${n}`) }) as News),
+  };
+  const marketPage = (order: string[], overrides: Partial<Homepage> = {}) =>
+    homepage({
+      rentals: { enabled: true, title: "Thuê nhà" },
+      news: { enabled: true, title: "Tin tức", intro: "Giới thiệu tin" },
+      blockOrder: order.map((block) => ({ block })) as Homepage["blockOrder"],
+      ...overrides,
+    });
+
+  it("render theo blockOrder: Cho thuê và Tin tức xen giữa các khối khác", () => {
+    renderHome(marketPage(["about", "rentals", "featuredOffers", "news"]), "vi", marketDocs);
+    expect(blockHeadings()).toEqual(["Về TAMI", "Thuê nhà", "Ưu đãi nổi bật", "Tin tức"]);
+    expect(screen.getByRole("link", { name: /Căn hộ 1/ })).toHaveAttribute("href", "/cho-thue/can-ho-1");
+    expect(screen.getByRole("link", { name: "Xem tất cả" })).toHaveAttribute("href", "/tin-tuc");
+    expect(screen.getByText("Giới thiệu tin")).toBeInTheDocument();
+  });
+
+  it("homepage chưa có hai khối trong blockOrder (bản ghi cũ) → không hiện, dù có dữ liệu", () => {
+    renderHome(marketPage(["about", "featuredOffers"]), "vi", marketDocs);
+    expect(blockHeadings()).toEqual(["Về TAMI", "Ưu đãi nổi bật"]);
+    expect(screen.queryByText("Thuê nhà")).toBeNull();
+  });
+
+  it("tắt khối hoặc không có dữ liệu → ẩn khối", () => {
+    renderHome(marketPage(["about", "rentals", "news"], { rentals: { enabled: false, title: "Thuê nhà" } }), "vi", { ...marketDocs, news: [] });
+    expect(blockHeadings()).toEqual(["Về TAMI"]);
   });
 });

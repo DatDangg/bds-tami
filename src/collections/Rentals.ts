@@ -15,7 +15,9 @@ import {
 } from "../hooks/rentals/field-validators";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
+import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFilters } from "../lib/admin/list-filter";
@@ -117,7 +119,8 @@ const rentalTermsGroup: GroupField = {
  * `ward` phải thuộc `province` (G22). Index tổng hợp, GIST `location` (ERD §5) và `CREATE SEQUENCE rentals_code_seq` là SQL tuỳ
  * biến trong migration `rentals`; index trigram `search_text` làm ở task SearchService. `revalidate` chỉ để test ghi đè.
  */
-export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
+export function createRentals(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
+  const revalidateHomepage = createRevalidateHomepageOnListing({ paths: revalidate, tags: revalidateTags });
   const collection = withContentDefaults(
     {
       slug: "rentals",
@@ -132,7 +135,8 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       hooks: {
         beforeValidate: [assignRentalCode],
         beforeChange: [buildRentalSearchText],
-        afterChange: [refreshOtherLocaleSearchText],
+        afterChange: [refreshOtherLocaleSearchText, revalidateHomepage.afterChange],
+        afterDelete: [revalidateHomepage.afterDelete],
       },
       fields: [
         codeField,

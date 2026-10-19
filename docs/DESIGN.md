@@ -59,7 +59,7 @@
 | Border | `#E8E6E3` | Viền card, đường kẻ chia (trang trí) |
 | Border Input | `#857F79` | Viền input / select / checkbox (≥ 3:1 theo WCAG 1.4.11), chốt 16/10/2026 | 
 
-**Tối (section tối, footer, banner CTA)**
+**Tối (section tối, footer, banner CTA, khối Tin tức trang chủ — tối đa 2 section nội dung tối/trang, BL-020)**
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -235,7 +235,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Màn | Route VI · EN | Bố cục tham chiếu (market.vinhomes.vn) |
 |---|---|---|
-| Trang chủ | `/` · `/en` | Hero full màn hình (ảnh bắt buộc; video tuỳ chọn theo từng slide, chỉ phát ≥ 1024px, câu chính serif viết thường ở giữa, chữ chạy nhẹ) → dải giới thiệu ngắn + số liệu (kiểu "Thương hiệu… / Top 10…") → **Dự án nổi bật**: tiêu đề (không chữ chìm), slider full-bleed mỗi slide 1 dự án (ảnh lớn + khung chữ: tagline, TÊN DỰ ÁN, mô tả, nút "KHÁM PHÁ DỰ ÁN"), chấm phân trang → **Dịch vụ**: tiêu đề giữa + 3 thẻ ảnh có eyebrow → Ưu đãi nổi bật (lưới thẻ) → Đối tác (dải logo) → banner CTA tối → footer tối |
+| Trang chủ | `/` · `/en` | Hero full màn hình (ảnh bắt buộc; video tuỳ chọn theo từng slide, chỉ phát ≥ 1024px, câu chính serif viết thường ở giữa, chữ chạy nhẹ) → dải giới thiệu ngắn + số liệu (kiểu "Thương hiệu… / Top 10…") → **Dự án nổi bật**: tiêu đề (không chữ chìm), slider full-bleed mỗi slide 1 dự án (ảnh lớn + khung chữ: tagline, TÊN DỰ ÁN, mô tả, nút "KHÁM PHÁ DỰ ÁN"), chấm phân trang → **Dịch vụ**: tiêu đề giữa + 3 thẻ ảnh có eyebrow → Ưu đãi nổi bật (slider thẻ) → Đối tác (dải logo) → banner CTA tối → **Cho thuê** (tab theo danh mục + slider thẻ tin cho thuê, "Xem thêm" → trang danh mục) → **Tin tức** (khối tối: giới thiệu trái + 3 bài phải, "Xem tất cả" → `/tin-tuc`) → footer tối. Cho thuê/Tin tức là khối trang chủ `rentals`/`news`, chỉ hiện khi có trong "Thứ tự khối" của global Trang chủ, tự ẩn khi không có tin; tin xuất bản/sửa/ẩn làm mới trang chủ (hook `createRevalidateHomepageOnListing`) |
 | Danh sách dự án | `/du-an` · `/en/projects` | Banner ảnh + tiêu đề serif → bộ lọc dạng tab/chip → lưới thẻ dự án ảnh lớn (ảnh, eyebrow loại hình, tên serif, địa điểm) |
 | Chi tiết dự án | `/du-an/[slug]` · `/en/projects/[slug]` | Hero ảnh full màn hình + tên dự án → thanh mục con dính khi cuộn (Tổng quan · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Thư viện) → các section xen nền sáng/kem/tối → form để lại thông tin |
 | Cho thuê (danh sách) | `/cho-thue` · `/en/for-rent` | Banner + thanh tìm kiếm/lọc → lưới thẻ tin (ảnh, giá, diện tích, phòng, khu vực) + phân trang |
@@ -280,7 +280,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 ## Design Style
 
 - **Overall feel:** sang trọng, tối giản, nhiều khoảng trắng — theo phong cách market.vinhomes.vn, mang màu TAMI (vàng champagne + đen + nền kem).
-- **Color scheme:** Light, có section tối xen kẽ (footer, banner CTA, menu toàn màn hình).
+- **Color scheme:** Light, có section tối xen kẽ (footer, banner CTA, khối Tin tức trang chủ, menu toàn màn hình; tối đa 2 section nội dung tối/trang — CTA + Tin tức, BL-020).
 - **UI Library:** Tailwind CSS + shadcn/ui (tuỳ biến lại thang bo góc (2/12/16/20px/pill), font, màu theo token trên).
 - **Animation level:** Subtle — hero chữ hiện dần, ảnh phóng nhẹ khi hover, nội dung trượt lên khi cuộn tới (tắt khi `prefers-reduced-motion`). Không dùng parallax nặng làm hỏng LCP/CLS (NFR-01).
 - **Ảnh:** ảnh lớn chất lượng cao là trung tâm; tỉ lệ cố định (16:9 hero/slider, 4:3 thẻ) để không nhảy layout.

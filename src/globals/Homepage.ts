@@ -216,7 +216,7 @@ const blockOrderField: Field = {
   labels: { singular: "Khối", plural: "Khối" },
   defaultValue: HOMEPAGE_BLOCKS.map((block) => ({ block })),
   validate: validateBlockOrder,
-  admin: { description: "Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại.", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
+  admin: { description: "Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
   fields: [{ name: "block", type: "select", label: "Khối", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: BLOCK_LABELS[block], value: block })) }],
 };
 

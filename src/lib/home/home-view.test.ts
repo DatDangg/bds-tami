@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { Category, Homepage, Media, Project, PropertyPost, Province, Service } from "../../payload-types";
+import type { Category, Homepage, Media, News, Project, PropertyPost, Province, Service } from "../../payload-types";
+import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
 import { buildAnnouncementView, buildHomeView, type HomeDocs, visibleBlockKeys } from "./home-view";
+import type { HomeRentalTabDocs } from "./home-view-listings";
 
 const NOW = new Date("2026-10-18T03:00:00.000Z");
 const stamp = "2026-01-01T00:00:00.000Z";
@@ -36,6 +38,8 @@ const docs = (overrides: Partial<HomeDocs> = {}): HomeDocs => ({
   offers: [post("1")],
   chipProjects: [],
   provinces: [],
+  rentalTabs: [],
+  news: [],
   ...overrides,
 });
 
@@ -70,11 +74,14 @@ describe("buildHomeView: thứ tự và bật/tắt khối", () => {
     expect(visibleBlockKeys(homepage({ services: { enabled: false, title: "Dịch vụ" } }))).toEqual(["about", "featuredProjects", "featuredOffers", "ctaBanner"]);
   });
 
-  it("visibleBlockKeys: rentals/news có trong blockOrder và đã bật vẫn chưa hiện (giao diện làm ở P2-T03/T04); homepage cũ thiếu khối mới vẫn render như cũ", () => {
+  it("visibleBlockKeys: rentals/news hiện theo blockOrder khi đã bật + có tiêu đề; homepage cũ thiếu khối mới (không có trong blockOrder) vẫn render như cũ", () => {
     const order = ["rentals", "about", "news"].map((block) => ({ block })) as Homepage["blockOrder"];
     const page = homepage({ blockOrder: order, rentals: { enabled: true, title: "Cho thuê" }, news: { enabled: true, title: "Tin tức" } });
-    expect(visibleBlockKeys(page)).toEqual(["about"]);
-    expect(visibleBlockKeys(homepage()).length).toBeGreaterThan(0);
+    expect(visibleBlockKeys(page)).toEqual(["rentals", "about", "news"]);
+    expect(visibleBlockKeys({ ...page, news: { enabled: false, title: "Tin tức" } })).toEqual(["rentals", "about"]);
+    // Tiêu đề CMS tuỳ chọn cho hai khối này (có chữ mặc định theo ngôn ngữ): thiếu tiêu đề KHÔNG ẩn khối.
+    expect(visibleBlockKeys({ ...page, rentals: { enabled: true, title: " " } })).toEqual(["rentals", "about", "news"]);
+    expect(visibleBlockKeys(homepage())).not.toContain("rentals");
   });
 });
 
@@ -253,5 +260,103 @@ describe("buildHomeView: ô tìm kiếm hero (BL-020)", () => {
       { id: "1", title: "Dự án 1", href: "/du-an/du-an-1" },
     ]);
     expect(view(homepage(), [project("1")], "en")?.chips[0]?.href).toBe("/en/projects/du-an-1");
+  });
+});
+
+const rentalDto = (id: string, extra: Partial<RentalSearchCard> = {}): RentalSearchCard => ({
+  id,
+  code: `CT-${id}`,
+  title: `Căn hộ ${id}`,
+  slug: `can-ho-${id}`,
+  status: "published",
+  thumbnail: { url: `/api/media/file/r${id}.webp`, alt: null },
+  priceMonthlyVnd: 9_000_000,
+  priceNegotiable: false,
+  areaM2: 40,
+  bedrooms: 1,
+  bathrooms: 1,
+  furnishing: null,
+  province: { name: "TP.HCM", slug: "tp-hcm" },
+  ward: { name: "Phường 1", slug: "phuong-1" },
+  publishedAt: null,
+  ...extra,
+});
+const tab = (slug: string, ids: string[], name = `Danh mục ${slug}`): HomeRentalTabDocs => ({ category: { id: `c-${slug}`, name, slug }, items: ids.map((id) => rentalDto(id)) });
+const newsDoc = (id: string, extra: Partial<News> = {}): News =>
+  ({ id, title: `Bài ${id}`, slug: `bai-${id}`, excerpt: "Tóm tắt", publishedAt: "2026-10-01T00:00:00.000Z", cover: media(`n${id}`), ...extra }) as News;
+const marketPage = (overrides: Partial<Homepage> = {}) =>
+  homepage({
+    blockOrder: ["news", "rentals"].map((block) => ({ block })) as Homepage["blockOrder"],
+    rentals: { enabled: true, title: "Thuê nhà" },
+    news: { enabled: true, title: "Tin tức", intro: "  Giới thiệu  " },
+    ...overrides,
+  });
+
+describe("buildHomeView: khối Cho thuê (BL-020 #8)", () => {
+  const rentalsOf = (page: Homepage, d: HomeDocs, locale: "vi" | "en" = "vi") => {
+    const block = buildHomeView(page, d, locale, NOW).blocks.find((item) => item.kind === "rentals");
+    return block?.kind === "rentals" ? block : null;
+  };
+
+  it("mỗi tab: nhãn danh mục, link danh mục theo ngôn ngữ, thẻ từ DTO của SearchService; giữ thứ tự tab", () => {
+    const block = rentalsOf(marketPage(), docs({ rentalTabs: [tab("can-ho", ["1", "2"]), tab("mat-bang", ["3"])] }));
+    expect(block?.title).toBe("Thuê nhà");
+    expect(block?.tabs.map((item) => [item.label, item.href, item.cards.length])).toEqual([
+      ["Danh mục can-ho", "/cho-thue/danh-muc/can-ho", 2],
+      ["Danh mục mat-bang", "/cho-thue/danh-muc/mat-bang", 1],
+    ]);
+    expect(block?.tabs[0]?.cards[0]).toMatchObject({ title: "Căn hộ 1", href: "/cho-thue/can-ho-1" });
+    expect(rentalsOf(marketPage(), docs({ rentalTabs: [tab("can-ho", ["1"])] }), "en")?.tabs[0]?.href).toBe("/en/for-rent/category/can-ho");
+  });
+
+  it("giới hạn: ≤ 8 tin mỗi tab, ≤ 4 tab", () => {
+    const ids = Array.from({ length: 12 }, (_, index) => String(index));
+    const many = ["a", "b", "c", "d", "e"].map((slug) => tab(slug, ids));
+    const block = rentalsOf(marketPage(), docs({ rentalTabs: many }));
+    expect(block?.tabs).toHaveLength(4);
+    expect(block?.tabs.every((item) => item.cards.length === 8)).toBe(true);
+  });
+
+  it("bỏ tab không có tin hoặc danh mục thiếu tên/slug; không còn tab nào → ẩn cả khối", () => {
+    const kept = rentalsOf(marketPage(), docs({ rentalTabs: [tab("rong", []), tab("", ["1"]), tab("can-ho", ["2"], "  "), tab("ok", ["3"])] }));
+    expect(kept?.tabs.map((item) => item.label)).toEqual(["Danh mục ok"]);
+    expect(rentalsOf(marketPage(), docs({ rentalTabs: [tab("rong", [])] }))).toBeNull();
+    expect(rentalsOf(marketPage(), docs())).toBeNull();
+  });
+
+  it("tắt khối hoặc không có trong blockOrder → không hiện; thiếu tiêu đề CMS (kể cả /en) vẫn hiện với title rỗng để dùng chữ mặc định", () => {
+    const d = docs({ rentalTabs: [tab("can-ho", ["1"])] });
+    expect(rentalsOf(marketPage({ rentals: { enabled: false, title: "Thuê nhà" } }), d)).toBeNull();
+    expect(rentalsOf(marketPage({ rentals: { enabled: true, title: "" } }), d, "en")?.title).toBe("");
+    expect(rentalsOf(marketPage({ rentals: { enabled: true } }), d)?.tabs).toHaveLength(1);
+    expect(rentalsOf(marketPage({ blockOrder: [{ block: "about" }] }), d)).toBeNull();
+  });
+});
+
+describe("buildHomeView: khối Tin tức (BL-020 #11)", () => {
+  const newsOf = (page: Homepage, d: HomeDocs, locale: "vi" | "en" = "vi") => {
+    const block = buildHomeView(page, d, locale, NOW).blocks.find((item) => item.kind === "news");
+    return block?.kind === "news" ? block : null;
+  };
+
+  it("tiêu đề + intro (cắt khoảng trắng), thẻ theo thứ tự, link Xem tất cả theo ngôn ngữ; ≤ 3 bài", () => {
+    const block = newsOf(marketPage(), docs({ news: ["1", "2", "3", "4"].map((id) => newsDoc(id)) }));
+    expect(block).toMatchObject({ title: "Tin tức", intro: "Giới thiệu", href: "/tin-tuc" });
+    expect(block?.posts.map((post) => post.title)).toEqual(["Bài 1", "Bài 2", "Bài 3"]);
+    expect(block?.posts[0]?.href).toBe("/tin-tuc/bai-1");
+    expect(newsOf(marketPage(), docs({ news: [newsDoc("1")] }), "en")).toMatchObject({ href: "/en/news" });
+  });
+
+  it("intro trống → null; bài thiếu tiêu đề/slug bị bỏ; không còn bài → ẩn khối", () => {
+    expect(newsOf(marketPage({ news: { enabled: true, title: "Tin tức", intro: " " } }), docs({ news: [newsDoc("1")] }))?.intro).toBeNull();
+    expect(newsOf(marketPage(), docs({ news: [newsDoc("1", { slug: "" }), newsDoc("2")] }))?.posts).toHaveLength(1);
+    expect(newsOf(marketPage(), docs({ news: [newsDoc("1", { title: "" })] }))).toBeNull();
+    expect(newsOf(marketPage(), docs())).toBeNull();
+  });
+
+  it("thứ tự theo blockOrder (tin tức đứng trước cho thuê) và tắt khối thì ẩn", () => {
+    const d = docs({ rentalTabs: [tab("can-ho", ["1"])], news: [newsDoc("1")] });
+    expect(kinds(marketPage(), d)).toEqual(["news", "rentals"]);
+    expect(kinds(marketPage({ news: { enabled: false, title: "Tin tức" } }), d)).toEqual(["rentals"]);
   });
 });

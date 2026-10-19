@@ -39,3 +39,22 @@ export function createRevalidateHomepageOnUnpublish(revalidators?: HomepageReval
   };
   return { afterChange, afterDelete };
 }
+
+/**
+ * Khối Cho thuê / Tin tức của trang chủ lấy tin MỚI NHẤT khi admin không chọn tay, và hiện tên/giá/ảnh của tin: mọi thay đổi trên một bản ghi đang
+ * hoặc vừa công khai (xuất bản, sửa, ẩn, xoá mềm, xoá hẳn) đều làm mới trang chủ (tag + `/vi` `/en`). Bản nháp sửa tiếp thì không.
+ * Chỉ tính trạng thái `published`: tin cho thuê chuyển `rented` rời khỏi trang chủ (chỉ tin còn trống) nên cũng được làm mới nhờ `previousDoc`.
+ */
+export function createRevalidateHomepageOnListing(revalidators?: HomepageRevalidators) {
+  const afterChange: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
+    if (isPubliclyVisible(doc, ["published"]) || isPubliclyVisible(previousDoc, ["published"])) {
+      await revalidateHomepage(req, revalidators);
+    }
+    return doc;
+  };
+  const afterDelete: CollectionAfterDeleteHook = async ({ doc, req }) => {
+    if (isPubliclyVisible(doc, ["published"])) await revalidateHomepage(req, revalidators);
+    return doc;
+  };
+  return { afterChange, afterDelete };
+}

@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from "payload";
 import { describe, expect, it } from "vitest";
-import { createRevalidateHomepageOnUnpublish } from "./revalidate-homepage-on-service";
+import { createRevalidateHomepageOnListing, createRevalidateHomepageOnUnpublish } from "./revalidate-homepage-on-service";
 
 const req = {} as PayloadRequest;
 
@@ -46,6 +46,49 @@ describe("createRevalidateHomepageOnUnpublish (dự án/ưu đãi chọn tay hi�
     const { tags, paths, change, remove } = setup();
     await change({ id: "p1", status: "draft" }, { id: "p1", status: "draft" });
     await remove({ id: "p2", status: "draft" });
+    expect(tags).toHaveLength(0);
+    expect(paths).toHaveLength(0);
+  });
+});
+
+describe("createRevalidateHomepageOnListing (khối Cho thuê / Tin tức)", () => {
+  function setupListing() {
+    const tags: string[][] = [];
+    const paths: string[][] = [];
+    const hooks = createRevalidateHomepageOnListing({ tags: (value) => void tags.push(value), paths: (value) => void paths.push(value) });
+    const change = (doc: Record<string, unknown>, previousDoc?: Record<string, unknown>) =>
+      hooks.afterChange({ doc, previousDoc, req } as Parameters<CollectionAfterChangeHook>[0]);
+    const remove = (doc: Record<string, unknown>) => hooks.afterDelete({ doc, req } as Parameters<CollectionAfterDeleteHook>[0]);
+    return { tags, paths, change, remove };
+  }
+
+  it("xuất bản, sửa khi đang công khai, ẩn/xoá mềm/chuyển đã thuê → làm mới tag + /vi /en", async () => {
+    const cases: Array<[Record<string, unknown>, Record<string, unknown>]> = [
+      [{ id: "r", status: "published" }, { id: "r", status: "draft" }],
+      [{ id: "r", status: "published", title: "Mới" }, { id: "r", status: "published" }],
+      [{ id: "r", status: "hidden" }, { id: "r", status: "published" }],
+      [{ id: "r", status: "rented" }, { id: "r", status: "published" }],
+      [{ id: "r", status: "published", deletedAt: "2026-10-19T00:00:00.000Z" }, { id: "r", status: "published" }],
+    ];
+    for (const [doc, previousDoc] of cases) {
+      const { tags, paths, change } = setupListing();
+      await change(doc, previousDoc);
+      expect(tags.flat(), JSON.stringify(doc)).toContain("global:homepage");
+      expect(paths.flat()).toEqual(expect.arrayContaining(["/vi", "/en"]));
+    }
+  });
+
+  it("xoá hẳn bản đang công khai → làm mới", async () => {
+    const { tags, remove } = setupListing();
+    await remove({ id: "r", status: "published" });
+    expect(tags.flat()).toContain("global:homepage");
+  });
+
+  it("nháp sửa tiếp / xoá nháp / bản đã ẩn sửa tiếp → không làm mới", async () => {
+    const { tags, paths, change, remove } = setupListing();
+    await change({ id: "r", status: "draft" }, { id: "r", status: "draft" });
+    await change({ id: "r", status: "hidden", title: "x" }, { id: "r", status: "hidden" });
+    await remove({ id: "r", status: "draft" });
     expect(tags).toHaveLength(0);
     expect(paths).toHaveLength(0);
   });

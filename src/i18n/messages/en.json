@@ -684,6 +684,18 @@
         "slide": "Offer {index} of {total}",
         "previous": "Previous offers",
         "next": "Next offers"
+      },
+      "rentals": {
+        "defaultTitle": "Homes & commercial space for rent",
+        "tabs": "Rental categories",
+        "viewMore": "See more",
+        "slide": "Listing {index} of {total}",
+        "previous": "Previous listings",
+        "next": "Next listings"
+      },
+      "news": {
+        "defaultTitle": "News",
+        "viewAll": "View all"
       }
     }
   }

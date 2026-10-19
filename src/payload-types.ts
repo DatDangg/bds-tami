@@ -2578,6 +2578,9 @@ export interface Homepage {
      */
     posts?: (string | PropertyPost)[] | null;
   };
+  /**
+   * Khối chỉ hiện khi có trong mục Thứ tự khối.
+   */
   rentals?: {
     enabled?: boolean | null;
     title?: string | null;
@@ -2586,6 +2589,9 @@ export interface Homepage {
      */
     categories?: (string | Category)[] | null;
   };
+  /**
+   * Khối chỉ hiện khi có trong mục Thứ tự khối.
+   */
   news?: {
     enabled?: boolean | null;
     title?: string | null;
@@ -2620,7 +2626,7 @@ export interface Homepage {
     secondaryLink?: string | null;
   };
   /**
-   * Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại.
+   * Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).
    */
   blockOrder?:
     | {

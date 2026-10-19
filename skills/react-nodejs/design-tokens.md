@@ -21,7 +21,7 @@
 |---|---|---|
 | §4.1 hạn chế serif | Dùng EB Garamond cho tiêu đề | Brand brief nêu đích danh font; phong cách luxury/editorial |
 | §4.2 cấm nền kem + vàng đồng mặc định | Giữ vàng champagne `#E0BF89` + nền kem | Màu đo từ bộ nhận diện TAMI, không phải chọn mặc định |
-| §4.11 khoá một theme | Section tối xen kẽ (footer, banner CTA, menu toàn màn hình, tối đa **1** section nội dung tối mỗi trang) | DESIGN.md "Color scheme: Light, có section tối xen kẽ" |
+| §4.11 khoá một theme | Section tối xen kẽ (footer, banner CTA, menu toàn màn hình, tối đa **2** section nội dung tối mỗi trang: banner CTA + Tin tức trang chủ, BL-020 #11 user chốt 2026-10-19) | DESIGN.md "Color scheme: Light, có section tối xen kẽ" |
 | §6.C bắt buộc dark mode | **Không** làm dark mode toàn trang giai đoạn 1 | User chốt trong DESIGN.md ("Không làm dark mode toàn trang") |
 | impeccable: cấm eyebrow | Eyebrow được dùng nhưng **tối đa 1 trên 3 section** (taste-skill §4.7) | Nhịp market.vinhomes.vn; giới hạn để không thành template |
 

@@ -82,9 +82,11 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
                 ) : (
                   <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
                 )}
-                <Badge variant={SALES_STATUS_BADGE_VARIANT[slide.salesStatus]} className="absolute top-4 left-4">
-                  {tStatus(slide.salesStatus)}
-                </Badge>
+                {slide.salesStatus && (
+                  <Badge variant={SALES_STATUS_BADGE_VARIANT[slide.salesStatus]} className="absolute top-4 left-4">
+                    {tStatus(slide.salesStatus)}
+                  </Badge>
+                )}
                 <div className="glass-panel absolute inset-x-3 bottom-3 flex flex-col gap-1 rounded-lg p-4 text-text sm:inset-x-4 sm:bottom-4 sm:p-5">
                   <h3 id={`${labelledBy}-${slide.id}`} className="line-clamp-2 font-display text-h3 group-hover:underline group-hover:underline-offset-4">{slide.title}</h3>
                   {slide.provinceName && (

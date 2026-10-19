@@ -8,6 +8,8 @@ export const RENTAL_CATEGORIES_MAX = 4;
 export const HOME_NEWS_POSTS_MAX = 3;
 export const RENTALS_BLOCK_LABEL = "Cho thuê";
 export const NEWS_BLOCK_LABEL = "Tin tức";
+/** Khối không có trong "Thứ tự khối" thì không hiện (bản ghi trang chủ có từ trước chưa có hai khối này): nhắc ở admin thay vì tự thêm lúc render. */
+export const BLOCK_ORDER_NOTE = "Khối chỉ hiện khi có trong mục Thứ tự khối.";
 
 export const enabledField = { name: "enabled", type: "checkbox", label: "Hiển thị khối này", defaultValue: true } as const satisfies Field;
 export const titleField = { name: "title", type: "text", label: "Tiêu đề khối", localized: true } as const satisfies Field;
@@ -60,6 +62,7 @@ export const rentalsBlock: Field = {
   name: "rentals",
   type: "group",
   label: RENTALS_BLOCK_LABEL,
+  admin: { description: BLOCK_ORDER_NOTE },
   fields: [
     enabledField,
     titleField,
@@ -82,6 +85,7 @@ export const newsBlock: Field = {
   name: "news",
   type: "group",
   label: NEWS_BLOCK_LABEL,
+  admin: { description: BLOCK_ORDER_NOTE },
   fields: [
     enabledField,
     titleField,

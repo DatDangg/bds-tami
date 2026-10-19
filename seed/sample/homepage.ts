@@ -1,5 +1,6 @@
 import type { Payload } from "payload";
 
+import type { Homepage } from "../../src/payload-types";
 import { paragraphsToLexical } from "../lexical";
 
 const options = { overrideAccess: true, depth: 0 } as const;
@@ -34,6 +35,9 @@ interface LocaleText {
   projectsTitle: string;
   servicesTitle: string;
   offersTitle: string;
+  rentalsTitle: string;
+  newsTitle: string;
+  newsIntro: string;
   partnersTitle: string;
   ctaTitle: string;
   ctaDescription: string;
@@ -51,6 +55,9 @@ const TEXT: Record<"vi" | "en", LocaleText> = {
     projectsTitle: "Dự án nổi bật",
     servicesTitle: "Dịch vụ",
     offersTitle: "Ưu đãi nổi bật",
+    rentalsTitle: "Thuê nhà ở & kinh doanh",
+    newsTitle: "Tin tức & kiến thức thị trường",
+    newsIntro: "Cập nhật thị trường bất động sản, kinh nghiệm thuê và đầu tư từ đội ngũ TAMI HOMES.",
     partnersTitle: "Đối tác chủ đầu tư",
     ctaTitle: "Cần tư vấn bất động sản?",
     ctaDescription: "Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất.",
@@ -66,12 +73,18 @@ const TEXT: Record<"vi" | "en", LocaleText> = {
     projectsTitle: "Featured projects",
     servicesTitle: "Services",
     offersTitle: "Featured offers",
+    rentalsTitle: "Homes & commercial space for rent",
+    newsTitle: "News & market insights",
+    newsIntro: "Real estate market updates, renting and investing tips from the TAMI HOMES team.",
     partnersTitle: "Developer partners",
     ctaTitle: "Need real estate advice?",
     ctaDescription: "Leave your details and we will get back to you shortly.",
     ctaLabel: "Get advice",
   },
 };
+
+/** Khối chỉ hiện khi có trong `blockOrder`: mẫu liệt kê đủ 8 khối (gồm Cho thuê, Tin tức) theo thứ tự trang market. */
+const SAMPLE_BLOCK_ORDER = ["about", "featuredProjects", "services", "featuredOffers", "rentals", "news", "partners", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"];
 
 type Row = { id?: string | null };
 const withIds = <T extends object>(rows: readonly T[], saved: Row[] | null | undefined) =>
@@ -105,6 +118,9 @@ export async function seedSampleHomepage(payload: Payload): Promise<{ created: b
       featuredProjects: { enabled: true, title: text.projectsTitle, projects },
       services: { enabled: true, title: text.servicesTitle, items },
       featuredOffers: { enabled: true, title: text.offersTitle },
+      // Không chọn tay: khối tự lấy các danh mục cho thuê đang có tin / 3 bài mới nhất.
+      rentals: { enabled: true, title: text.rentalsTitle },
+      news: { enabled: true, title: text.newsTitle, intro: text.newsIntro },
       partners: { enabled: true, title: text.partnersTitle },
       ctaBanner: { enabled: true, title: text.ctaTitle, description: text.ctaDescription, ctaLabel: text.ctaLabel, ctaLink: "contact" },
     };
@@ -114,7 +130,7 @@ export async function seedSampleHomepage(payload: Payload): Promise<{ created: b
   const saved = await payload.updateGlobal({
     slug: "homepage",
     locale: "vi",
-    data: { hero: { slides: slidesFor("vi") }, ...vi },
+    data: { hero: { slides: slidesFor("vi") }, ...vi, blockOrder: SAMPLE_BLOCK_ORDER },
     ...options,
   });
   // Bản en: gắn `id` dòng mảng của bản vi để Payload cập nhật đúng dòng thay vì tạo dòng mới.

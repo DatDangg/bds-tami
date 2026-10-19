@@ -1,12 +1,13 @@
 import type { MediaImage } from "../../components/media/ResponsiveImage";
 import { HOMEPAGE_BLOCKS } from "../../globals/Homepage";
 import type { Locale } from "../../i18n/routing";
-import type { Homepage, Project, PropertyPost, Province, Service } from "../../payload-types";
+import type { Homepage, News, Project, PropertyPost, Province, Service } from "../../payload-types";
 import { announcementHash } from "./announcement-hash";
 import { resolveNavLink } from "../content/nav-link";
 import { isOfferEnded } from "../content/offer-status";
 import type { SalesStatus } from "../../collections/Projects";
 import { populatedMedia } from "../news/news-view";
+import { type HomeRentalTabDocs, type NewsBlockView, type RentalsBlockView, toNewsBlock, toRentalsBlock } from "./home-view-listings";
 import { type PostCardData, toPostCards, toPublicImage } from "../posts/post-view";
 import { renderableImage } from "../projects/project-detail-view";
 import { toProjectCardData } from "../projects/project-view";
@@ -16,7 +17,10 @@ import { type ServiceCardData, toServiceCards } from "../services/service-view";
 export type HomeBlockKey = (typeof HOMEPAGE_BLOCKS)[number];
 
 /** Khối ĐÃ có giao diện. `partners` (FR-PUB-17, Should) làm ở task riêng: tới lúc đó thứ tự/bật tắt của nó được bỏ qua. */
-const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["about", "featuredProjects", "services", "featuredOffers", "ctaBanner"]);
+/** Khối có chữ mặc định theo ngôn ngữ nên KHÔNG bị ẩn khi CMS chưa đặt tiêu đề (global mới chưa có tiêu đề cho hai khối này). */
+const TITLE_OPTIONAL_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["rentals", "news"]);
+
+const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["about", "featuredProjects", "services", "featuredOffers", "ctaBanner", "rentals", "news"]);
 
 export const FEATURED_OFFERS_MAX = 6;
 
@@ -45,7 +49,8 @@ export interface ProjectSlideView {
   provinceName: string | null;
   summary: string;
   image: MediaImage | null;
-  salesStatus: SalesStatus;
+  /** `null` khi dữ liệu thiếu trạng thái: thẻ không dựng badge (không gọi i18n với giá trị rỗng). */
+  salesStatus: SalesStatus | null;
   /** Số liệu từ field `scale.*` có sẵn; thiếu/không dương → `null` (thẻ ẩn ô đó). */
   stats: { landAreaM2: number | null; totalUnits: number | null; handoverTime: string | null };
 }
@@ -101,6 +106,8 @@ export type HomeBlockView =
   | { kind: "featuredProjects"; title: string; slides: ProjectSlideView[] }
   | { kind: "services"; title: string; items: ServiceCardData[] }
   | { kind: "featuredOffers"; title: string; cards: PostCardData[] }
+  | RentalsBlockView
+  | NewsBlockView
   | CtaBannerView;
 
 export interface HomeView {
@@ -119,6 +126,10 @@ export interface HomeDocs {
   chipProjects: Project[];
   /** Tỉnh/thành cho ô lọc của tab Dự án (rỗng khi ô tìm kiếm không hiển thị). */
   provinces: Province[];
+  /** Tab của khối Cho thuê, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
+  rentalTabs: HomeRentalTabDocs[];
+  /** Bài của khối Tin tức, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
+  news: News[];
 }
 
 const text = (value: string | null | undefined): string => value?.trim() ?? "";
@@ -140,12 +151,12 @@ function isEnabled(homepage: Homepage, block: HomeBlockKey): boolean {
 }
 
 /**
- * Khối sẽ hiển thị (theo thứ tự): đã bật, đã có giao diện và CÓ TIÊU ĐỀ ở ngôn ngữ đang xem. Global đọc với `fallbackLocale: false` nên ở `/en`
+ * Khối sẽ hiển thị (theo thứ tự): đã bật, đã có giao diện và CÓ TIÊU ĐỀ ở ngôn ngữ đang xem (trừ `rentals`/`news`: có chữ mặc định nên tiêu đề CMS tuỳ chọn). Global đọc với `fallbackLocale: false` nên ở `/en`
  * tiêu đề trống = chưa có bản EN → ẩn khối, không lấy chữ Việt (Spec § Quy tắc biên). Ở `vi`, tiêu đề trống (admin để sót; race 2 admin có thể để
  * CTA bật mà không có title) cũng ẩn: phòng thủ ở lớp hiển thị. Dùng cả để quyết định truy vấn nào cần chạy.
  */
 export function visibleBlockKeys(homepage: Homepage): HomeBlockKey[] {
-  return orderedBlocks(homepage).filter((block) => RENDERED_BLOCKS.has(block) && isEnabled(homepage, block) && titleOf(homepage, block) !== "");
+  return orderedBlocks(homepage).filter((block) => RENDERED_BLOCKS.has(block) && isEnabled(homepage, block) && (TITLE_OPTIONAL_BLOCKS.has(block) || titleOf(homepage, block) !== ""));
 }
 
 function toHeroSlides(homepage: Homepage, locale: Locale): HeroSlideView[] {
@@ -196,7 +207,7 @@ function toProjectSlides(docs: readonly Project[], locale: Locale): ProjectSlide
         provinceName: card.provinceName,
         summary: text(doc.summary),
         image: toPublicImage(card.cover),
-        salesStatus: card.salesStatus,
+        salesStatus: card.salesStatus ?? null,
         stats: {
           landAreaM2: positiveOrNull(doc.scale?.landAreaM2),
           totalUnits: positiveOrNull(doc.scale?.totalUnits),
@@ -265,10 +276,12 @@ function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale
     }
     case "ctaBanner":
       return toCta(homepage, locale);
-    // Chưa có giao diện (P2-T02..T05): không nằm trong RENDERED_BLOCKS nên không bao giờ tới đây.
-    case "partners":
     case "rentals":
+      return toRentalsBlock(title, docs.rentalTabs, locale);
     case "news":
+      return toNewsBlock(title, homepage.news?.intro, docs.news, locale);
+    // Chưa có giao diện (FR-PUB-17, Should): không nằm trong RENDERED_BLOCKS nên không bao giờ tới đây.
+    case "partners":
       return null;
   }
 }

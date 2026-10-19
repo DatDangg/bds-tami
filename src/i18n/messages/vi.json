@@ -684,6 +684,18 @@
         "slide": "Ưu đãi {index} / {total}",
         "previous": "Ưu đãi trước",
         "next": "Ưu đãi sau"
+      },
+      "rentals": {
+        "defaultTitle": "Thuê nhà ở & kinh doanh",
+        "tabs": "Danh mục cho thuê",
+        "viewMore": "Xem thêm",
+        "slide": "Tin {index} / {total}",
+        "previous": "Tin trước",
+        "next": "Tin sau"
+      },
+      "news": {
+        "defaultTitle": "Tin tức",
+        "viewAll": "Xem tất cả"
       }
     }
   }

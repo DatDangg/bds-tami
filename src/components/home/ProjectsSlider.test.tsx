@@ -91,6 +91,12 @@ describe("ProjectsSlider: thẻ lớn kính mờ + số liệu", () => {
     expect(within(link).getByText("Q4/2027")).toBeInTheDocument();
   });
 
+  it("thiếu trạng thái (dữ liệu cũ/select thiếu) → không badge, không lỗi i18n", () => {
+    renderOne({ ...slide(1), salesStatus: null });
+    expect(screen.getByRole("link", { name: "Dự án 1" })).toBeInTheDocument();
+    expect(screen.queryByText(/mở bán|bàn giao/i)).toBeNull();
+  });
+
   it("Đang mở bán dùng badge success; số liệu thiếu thì ẩn từng ô, không còn ô nào thì không có <dl>", () => {
     renderOne({ ...slide(1), stats: { landAreaM2: null, totalUnits: 120, handoverTime: null } });
     expect(screen.getByText("Đang mở bán")).toHaveAttribute("data-variant", "success");

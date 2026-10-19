@@ -232,9 +232,11 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 | 5 | Ưu đãi nổi bật | Lưới thẻ | `--color-bg-alt` | Không |
 | 6 | Đối tác | Lưới logo | `--color-bg` | Không |
 | 7 | Banner CTA (đề xuất §6.1) | Khối tối full-width | `.theme-dark-block` `--color-dark-deep` + ảnh mờ | Không |
+| 8 | Cho thuê (`rentals`, BL-020 #8) | Tab danh mục + slider thẻ | `--color-bg` | Không |
+| 9 | Tin tức (`news`, BL-020 #11) | Split intro trái / 3 thẻ phải | `.theme-dark-block` (nền tối thương hiệu) | Không |
 | | Footer | | `--color-dark` | |
 
-7 section → 6 layout family khác nhau; eyebrow 1/3 cho phép; 1 khối tối nội dung (CTA) + footer: đúng ngoại lệ tokens §0.
+9 section → layout family khác nhau (Cho thuê = tab + slider, Tin tức = split intro/3 thẻ); eyebrow 1/3 cho phép; **2 khối tối nội dung (CTA + Tin tức)** + footer: ngoại lệ tokens §0 (user chốt 2026-10-19: nền "thương hiệu" của BL-020 #11 = khối tối đen/kem + vàng của TAMI). Khi Tin tức đứng ngay trên footer (blockOrder mặc định) có đường viền `--color-dark-border` dưới khối để tách khỏi footer.
 
 **1. Hero** (`homepage.hero.slides`, 1-8)
 - Cao `100svh` (tối thiểu 560px, tối đa 1080px), thanh header nổi kính mờ sáng đè lên (hero kéo lên `-mt-(--header-offset)`, nội dung hero đệm trên `--header-offset`).
@@ -286,6 +288,17 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - < sm 2 cột · sm 3 · md 4 · lg 6. Không marquee. 0 đối tác: ẩn khối.
 
 **7. Banner CTA** (đề xuất §6.1): khối tối, ảnh nền mờ 20% (tuỳ chọn), tiêu đề `--text-h1` (≤ 8 từ), câu phụ ≤ 20 từ, nút Primary **Nhận tư vấn** → `/lien-he` (hoặc `ctaLink`). Căn giữa, padding `--space-section`.
+
+**8. Cho thuê** (`rentals`: `enabled`, `title`, `categories` ≤ 4 danh mục scope Cho thuê; BL-020 #8 "Thuê nhà ở / kinh doanh")
+- Heading `h2` căn giữa (tiêu đề CMS; để trống thì dùng chữ mặc định theo ngôn ngữ, không ẩn khối); dưới là **tablist** danh mục (viên thuốc cao 44px, đang chọn nền `--color-dark`, chưa chọn có viền `--color-border` + viền đậm khi hover; ←/→ vòng, Home/End, roving tabindex, `aria-selected`/`aria-controls`). Mỗi tab một `tabpanel` chứa **slider** thẻ `RentalCard` dùng chung (cuộn ngang scroll-snap, vuốt/phím mũi tên, không autoplay; 80% < sm · 2 thẻ ≥ sm · 4 thẻ ≥ lg; nút trước/sau ≥ md khi > 1 thẻ — cơ chế `useSnapSlider`/`SliderArrow` dùng chung với Dự án/Ưu đãi). Nút Outline **Xem thêm** dưới slider → `/cho-thue/danh-muc/<slug>` · `/en/for-rent/category/<slug>` của tab đang xem.
+- Dữ liệu: danh mục admin chọn (theo thứ tự admin, ≤ 4; `/en` chỉ danh mục có EN); để trống (hoặc không tab nào có tin) thì lấy các danh mục cho thuê cấp 1 đang có tin (≤ 4, thứ tự như `/cho-thue`). Mỗi tab ≤ 8 tin **còn trống** mới nhất (cùng `SearchService` + luật hiển thị với trang danh mục: `/en` chỉ tin có bản EN). Tab không có tin bị bỏ; 0 tab: ẩn khối. 1 tab: không dựng tablist (panel gắn nhãn bằng tiêu đề khối).
+- Server dựng HTML đủ mọi tab (panel không chọn chỉ có `hidden`), không fetch ở client. Chưa có JS: tab đầu hiện sẵn, thẻ + "Xem thêm" là link thật.
+
+**9. Tin tức** (`news`: `enabled`, `title`, `intro`, `posts` ≤ 3; BL-020 #11)
+- Tiêu đề CMS, để trống thì dùng chữ mặc định theo ngôn ngữ (không ẩn khối). `.theme-dark-block` (nền tối thương hiệu, token chữ/viền tự đảo), viền dưới `--color-dark-border`. ≥ lg lưới 1fr / 2fr: **trái** = `h2` tiêu đề + đoạn giới thiệu `intro` (`--text-lead`, ≤ 48ch; trống thì bỏ) + nút Outline **Xem tất cả** → `/tin-tuc` · `/en/news`; **phải** = 3 `NewsCard` (`h3`, 3 cột ≥ sm, 1 cột < sm). < lg: intro rồi thẻ xếp dọc.
+- Dữ liệu: bài admin chọn (theo thứ tự, ≤ 3, đã xuất bản, `/en` chỉ bài có EN); để trống (hoặc không bài nào còn công khai) thì 3 bài mới nhất. 0 bài: ẩn khối.
+
+**Khối chỉ hiện khi có trong `blockOrder`:** bản ghi trang chủ có từ trước (staging/prod) chưa có `rentals`/`news` trong "Thứ tự khối" nên chưa hiện cho tới khi admin thêm; admin có mô tả nhắc ở tab Cho thuê / Tin tức / Thứ tự khối. Không tự thêm lúc render.
 
 **States:** dữ liệu từ global, render server; không có loading riêng. Khối lỗi dữ liệu (quan hệ trỏ tới bài đã ẩn) → bỏ qua mục đó, không vỡ khối.
 
@@ -660,7 +673,7 @@ Code dùng ảnh mẫu (picsum seed) ở dev/staging cho tới khi có Q4. Ảnh
 |---|---|
 | Brief inference + dials | ✅ đầu file + tokens §0 |
 | Không em-dash/en-dash trong chuỗi UI | ✅ mọi chuỗi UI trong file này dùng `-`; builder giữ luật trong `vi.json`/`en.json` |
-| Theme lock | ✅ light; khối tối có chủ đích (footer, CTA, menu, ≤ 1 section nội dung/trang): ngoại lệ ghi ở tokens §0 |
+| Theme lock | ✅ light; khối tối có chủ đích (footer, CTA, Tin tức, menu, ≤ 2 section nội dung/trang): ngoại lệ ghi ở tokens §0 |
 | Color lock (1 accent) | ✅ chỉ vàng TAMI; trạng thái dùng màu riêng có lý do |
 | Shape lock | ✅ 0 / 2px / 12 / 16 / 20px / pill / full theo thang BL-020 (tokens §4) |
 | Button + form contrast | ✅ tokens §9 (đã sửa 4 giá trị) |

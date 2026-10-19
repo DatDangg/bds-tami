@@ -6,6 +6,8 @@ import { FeaturedOffers } from "./FeaturedOffers";
 import { FeaturedProjects } from "./FeaturedProjects";
 import { HeroSearch } from "./HeroSearch";
 import { HeroSlider } from "./HeroSlider";
+import { HomeNews } from "./HomeNews";
+import { HomeRentals } from "./HomeRentals";
 import { ServicesBento } from "./ServicesBento";
 
 function renderBlock(block: HomeBlockView) {
@@ -20,6 +22,10 @@ function renderBlock(block: HomeBlockView) {
       return <FeaturedOffers title={block.title} cards={block.cards} />;
     case "ctaBanner":
       return <CtaBanner block={block} />;
+    case "rentals":
+      return <HomeRentals title={block.title} tabs={block.tabs} />;
+    case "news":
+      return <HomeNews block={block} />;
   }
 }
 

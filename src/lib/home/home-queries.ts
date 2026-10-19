@@ -1,14 +1,18 @@
 import type { Payload, Where } from "payload";
 
 import type { Locale } from "../../i18n/routing";
-import type { Homepage, Project, PropertyPost, Service } from "../../payload-types";
+import type { Category, Homepage, News, Project, PropertyPost, Service } from "../../payload-types";
 import { offerNotEndedWhere } from "../content/offer-status";
 import { findPublicList } from "../content/public-queries";
 import { relationId } from "../payload/relation-id";
 import { POST_CARD_FIELDS } from "../posts/post-queries";
-import { HERO_CHIP_PROJECTS_MAX } from "../../globals/homepage/blocks";
+import { HERO_CHIP_PROJECTS_MAX, HOME_NEWS_POSTS_MAX, RENTAL_CATEGORIES_MAX } from "../../globals/homepage/blocks";
 import { listProvinces } from "../projects/project-queries";
+import { listRentalCategoryOptions } from "../rentals/rental-list-queries";
+import { PostgresRentalSearch, sqlExecutorOf } from "../search/search-service";
+import { rentalSearchParamsSchema } from "../../shared/types/api";
 import { FEATURED_OFFERS_MAX, type HomeBlockKey, type HomeDocs } from "./home-view";
+import { HOME_RENTALS_PER_TAB_MAX, type HomeRentalTabDocs } from "./home-view-listings";
 
 /** Tối đa 6 dự án nổi bật (ERD §4.15, S01). */
 export const FEATURED_PROJECTS_MAX = 6;
@@ -18,9 +22,15 @@ export const HOME_SERVICES_MAX = 12;
 const NEWEST_FIRST = ["-publishedAt", "-createdAt"];
 
 /** Trường thẻ slide dự án: có `summary`, bỏ `overview` và các richText dài. */
-const HOME_PROJECT_FIELDS = { title: true, slug: true, summary: true, province: true, category: true, gallery: true } as const;
+/** `salesStatus` (badge) và `scale` (số liệu trên thẻ) PHẢI nằm trong select: thiếu thì `select` trả undefined cho field đó. */
+const HOME_PROJECT_FIELDS = { title: true, slug: true, summary: true, province: true, category: true, gallery: true, salesStatus: true, scale: true } as const;
 
-type Collection = "projects" | "services" | "property-posts";
+type Collection = "projects" | "services" | "property-posts" | "categories" | "news";
+
+/** Thẻ tin tức chỉ cần các trường này (bỏ `content` richText dài); `category` được populate ở depth 1 để lấy nhãn. */
+const HOME_NEWS_FIELDS = { title: true, slug: true, excerpt: true, publishedAt: true, category: true, cover: true } as const;
+/** Fallback "danh mục cho thuê đang có tin": số danh mục gốc tối đa được dò (mỗi danh mục 1 truy vấn tìm kiếm song song). */
+const RENTAL_FALLBACK_CANDIDATES_MAX = 8;
 
 function selectedIds(values: readonly (string | { id: string })[] | null | undefined, max: number): string[] {
   const ids = (values ?? []).flatMap((value) => {
@@ -100,16 +110,75 @@ function loadOffers(payload: Payload, locale: Locale, homepage: Homepage, now: D
     : findFeaturedFallback<PropertyPost>(payload, "property-posts", locale, { where, limit: FEATURED_OFFERS_MAX, sort: NEWEST_FIRST, select: POST_CARD_FIELDS });
 }
 
+async function loadNews(payload: Payload, locale: Locale, homepage: Homepage): Promise<News[]> {
+  const ids = selectedIds(homepage.news?.posts, HOME_NEWS_POSTS_MAX);
+  if (ids.length > 0) {
+    const picked = await findSelected<News>(payload, "news", locale, ids, { select: HOME_NEWS_FIELDS });
+    // Chọn tay mà không bài nào còn công khai (đã gỡ/chưa có EN) thì rơi về bài mới nhất để khối không trống vô lý.
+    if (picked.length > 0) return picked;
+  }
+  const { docs } = await findPublicList<News>(payload, "news", locale, { sort: NEWEST_FIRST, limit: HOME_NEWS_POSTS_MAX, depth: 1, select: HOME_NEWS_FIELDS });
+  return docs;
+}
+
+type RentalTabCategory = HomeRentalTabDocs["category"];
+
+/** Một truy vấn tìm kiếm cho thuê (cùng `SearchService` + luật hiển thị của `/cho-thue/danh-muc/<slug>`: chỉ tin còn trống, `/en` chỉ tin có bản EN, tin mới nhất trước). */
+async function loadRentalTab(payload: Payload, locale: Locale, category: RentalTabCategory): Promise<HomeRentalTabDocs> {
+  const params = rentalSearchParamsSchema.parse({ locale, category: category.slug, limit: HOME_RENTALS_PER_TAB_MAX, available: true });
+  const { items } = await new PostgresRentalSearch(sqlExecutorOf(payload)).search(params);
+  return { category, items };
+}
+
+const toTabCategory = (category: Pick<Category, "id" | "name" | "slug">): RentalTabCategory => ({ id: category.id, name: category.name, slug: category.slug });
+
+/** Danh mục `rental` admin chọn (đọc như khách: `/en` chỉ danh mục có EN), theo thứ tự admin. */
+async function findSelectedRentalCategories(payload: Payload, locale: Locale, ids: readonly string[]): Promise<RentalTabCategory[]> {
+  const docs = await findSelected<Category>(payload, "categories", locale, ids, { where: { scope: { equals: "rental" } }, select: { name: true, slug: true } });
+  return docs.map(toTabCategory);
+}
+
+/** Dò các danh mục cho thuê gốc (cùng thứ tự `/cho-thue`) để lấy những danh mục đang có tin. */
+async function findFallbackRentalCategories(payload: Payload, locale: Locale): Promise<RentalTabCategory[]> {
+  const options = await listRentalCategoryOptions(payload, locale);
+  return options
+    .filter((option) => option.depth === 0)
+    .slice(0, RENTAL_FALLBACK_CANDIDATES_MAX)
+    .map((option) => ({ id: option.slug, name: option.label, slug: option.slug }));
+}
+
+/**
+ * Tab Cho thuê: danh mục admin chọn (≤ 4, theo thứ tự) nếu có, ngược lại các danh mục cho thuê gốc đang có tin (≤ 4). Tab không có tin bị bỏ.
+ * Chi phí: 1 truy vấn danh mục + mỗi danh mục 1 lần `SearchService` (đếm + trang, song song). CMS ≤ 4 lần; fallback dò 4 danh mục đầu, chỉ dò thêm (từng lô 4, tới ≤ 8) khi chưa đủ 4 tab có tin. Không N+1 theo tin (ảnh/khu vực lấy trong chính SQL).
+ */
+async function loadRentalTabs(payload: Payload, locale: Locale, homepage: Homepage): Promise<HomeRentalTabDocs[]> {
+  const ids = selectedIds(homepage.rentals?.categories, RENTAL_CATEGORIES_MAX);
+  const withItems = async (categories: readonly RentalTabCategory[]) =>
+    (await Promise.all(categories.map((category) => loadRentalTab(payload, locale, category)))).filter((tab) => tab.items.length > 0);
+  if (ids.length > 0) {
+    const picked = await withItems(await findSelectedRentalCategories(payload, locale, ids));
+    if (picked.length > 0) return picked;
+  }
+  const candidates = await findFallbackRentalCategories(payload, locale);
+  const found: HomeRentalTabDocs[] = [];
+  for (let start = 0; start < candidates.length && found.length < RENTAL_CATEGORIES_MAX; start += RENTAL_CATEGORIES_MAX) {
+    found.push(...(await withItems(candidates.slice(start, start + RENTAL_CATEGORIES_MAX))));
+  }
+  return found.slice(0, RENTAL_CATEGORIES_MAX);
+}
+
 /** Chỉ truy vấn bản ghi của khối sẽ hiển thị (`visible`) và chip của ô tìm kiếm hero: khối tắt/ẩn không tốn truy vấn. Các truy vấn chạy song song. */
 export async function loadHomeDocs(payload: Payload, locale: Locale, homepage: Homepage, visible: readonly HomeBlockKey[], now: Date): Promise<HomeDocs> {
   const has = (block: HomeBlockKey) => visible.includes(block);
   const heroSearch = needsHeroSearchData(homepage);
-  const [projects, services, offers, chipProjects, provinces] = await Promise.all([
+  const [projects, services, offers, chipProjects, provinces, rentalTabs, news] = await Promise.all([
     has("featuredProjects") ? loadProjects(payload, locale, homepage) : [],
     has("services") ? loadServices(payload, locale, homepage) : [],
     has("featuredOffers") ? loadOffers(payload, locale, homepage, now) : [],
     heroSearch ? loadChipProjects(payload, locale, homepage) : [],
     heroSearch ? listProvinces(payload) : [],
+    has("rentals") ? loadRentalTabs(payload, locale, homepage) : [],
+    has("news") ? loadNews(payload, locale, homepage) : [],
   ]);
-  return { projects, services, offers, chipProjects, provinces };
+  return { projects, services, offers, chipProjects, provinces, rentalTabs, news };
 }
