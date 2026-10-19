@@ -525,10 +525,10 @@
       "title": "Sửa màn danh sách admin: bộ lọc dịch, tìm kiếm, xuất Excel khi tìm, trường lọc, hiển thị cột (BL-021, T1–T6)",
       "type": "BUG + MODIFY",
       "severity": "medium",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-021",
-      "changeDoc": "spec/changes/2026-10-19-admin-list-fixes.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-admin-list-fixes.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -593,15 +593,26 @@
         {
           "task": "phase-1-task-06",
           "file": "tasks/bug-admin-list-fixes/phase-1-task-06.md",
-          "status": "pending",
-          "note": "#08 Xuất Excel + Lọc dịch cùng hàng thanh công cụ danh sách (desktop + mobile) — chưa làm, task file chưa tạo"
+          "status": "done",
+          "note": "#08 Xuất Excel + Lọc dịch vào thanh công cụ danh sách (beforeListTable, .list-toolbar-item), desktop + 375px",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-06-round-1-review.md",
+          "commit": "c69f6e5"
         }
       ],
       "startedAt": "2026-10-19",
-      "specVersion": "1.15.0",
-      "scopeVersion": 17,
-      "specUpdate": "spec/updates/2026-10-19-admin-list-fixes.md",
-      "residual": "dayOnly không khai displayFormat hiện kèm giờ; cột quan hệ khác vẫn có thể nháy 'Đang tải...'; id / 'Đã Xoá Lúc' còn trong menu lọc; tìm không dấu bộ lọc quan hệ chưa làm; tìm một phần SĐT có dấu cách chưa khớp; REST OR/AND chữ hoa không mở rộng SĐT; count hook SĐT chưa có integration test riêng"
+      "completedAt": "2026-10-19",
+      "specVersion": "1.15.1",
+      "scopeVersion": 18,
+      "specUpdate": "spec/updates/2026-10-19-admin-list-fixes-toolbar.md",
+      "residual": "dayOnly không khai displayFormat hiện kèm giờ; cột quan hệ khác vẫn có thể nháy 'Đang tải...'; id / 'Đã Xoá Lúc' còn trong menu lọc; tìm không dấu bộ lọc quan hệ chưa làm; tìm một phần SĐT có dấu cách chưa khớp; REST OR/AND chữ hoa không mở rộng SĐT; count hook SĐT chưa có integration test riêng; T6: cùng hàng Xuất Excel + Lọc dịch chỉ kiểm bằng chèn tạm DOM (chưa collection nào có cả hai), đáy nút lệch ô select ~5px, 768px chưa kiểm, phụ thuộc vị trí BeforeListTable của Payload 3.91",
+      "specUpdates": [
+        "spec/updates/2026-10-19-admin-list-fixes.md",
+        "spec/updates/2026-10-19-admin-list-fixes-toolbar.md"
+      ]
     }
   ],
   "projectName": "tami-website",

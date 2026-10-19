@@ -1,0 +1,93 @@
+{
+  "specVersion": "1.15.1",
+  "scopeVersion": 18,
+  "generatedAt": "2026-10-19T23:59:30+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-021 T6 (#08) — task cuối; BL-021 done (T1–T5 đã ở scope v17)",
+  "workItem": "bug/admin-list-fixes",
+  "backlog": "BL-021",
+  "classification": "MODIFY (bố cục UI admin)",
+  "changeDoc": "spec/changes/archive/2026-10-19-admin-list-fixes.md",
+  "task": [
+    "tasks/bug-admin-list-fixes/phase-1-task-06.md"
+  ],
+  "commits": [
+    "c69f6e5"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.15.0-17.json",
+  "specUpdate": "spec/updates/2026-10-19-admin-list-fixes-toolbar.md",
+  "specRefs": [
+    "FR-ADM-19",
+    "FR-ADM-18",
+    "F9"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Thanh công cụ danh sách admin: Xuất Excel + Trạng thái dịch trong lề, ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, cùng hàng, wrap không tràn 375px, vùng bấm ≥ 44px",
+    "FR-ADM-18": "Ô lọc 'Trạng thái dịch' đổi vị trí (slot beforeListTable), vẫn SelectInput + <label> (BL-016), 0 kết quả vẫn thấy để bỏ lọc",
+    "F9": "Nút Xuất Excel lead đổi vị trí; quyền admin, ẩn ở thùng rác + list drawer, thông báo lỗi giữ nguyên"
+  },
+  "changed": {
+    "files": [
+      "src/collections/Leads.ts",
+      "src/collections/_shared/content-defaults.ts",
+      "src/components/admin/LeadExportButton.tsx",
+      "src/components/admin/LeadExportSlot.tsx",
+      "src/components/admin/TranslationStatusFilter.tsx",
+      "src/components/admin/styles/_controls.scss",
+      "src/components/admin/styles/_lists.scss",
+      "src/collections/_shared/content-defaults.test.ts",
+      "src/components/admin/LeadExportSlot.test.tsx"
+    ],
+    "filesNote": "Theo diff thật commit c69f6e5 (bỏ task/report/run journal). Không migration, importMap không đổi nội dung.",
+    "modules": [
+      "Admin — slot danh sách: beforeList → beforeListTable (Leads + withContentDefaults dùng chung mọi collection nội dung)",
+      "Admin — SCSS toàn cục: .list-toolbar-item (_lists.scss), .translation-status-filter (_controls.scss)",
+      "Admin — LeadExportButton (bỏ inline style bố cục, dùng class)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Danh sách Cho thuê / Dự án / Đăng tin BĐS / Tin tức (và collection nội dung khác): ô 'Trạng thái dịch' nằm ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, thẳng lề tiêu đề — không còn ở trên tiêu đề",
+      "Danh sách Leads (admin): nút 'Xuất Excel' cùng vị trí thanh công cụ, cao ≥ 44px",
+      "Lọc ra 0 kết quả: ô 'Trạng thái dịch' vẫn hiện để bỏ lọc",
+      "375px: các mục thanh công cụ xuống dòng gọn, không cuộn ngang (scrollWidth = viewport), select + nút cao 44px, thông báo dài của nút xuất wrap trong mục",
+      "1024–1440px: nếu một trang có cả hai mục thì cùng một hàng"
+    ],
+    "dependents": [
+      "withContentDefaults — mọi collection nội dung (projects, rentals, property-posts, news, services, job-postings, pages, categories, developers): slot beforeListTable có sẵn của collection giữ nguyên, ô lọc nối sau; omit translation thì không nối",
+      "List drawer (chọn quan hệ) + thùng rác render qua cùng slot",
+      "SCSS admin toàn cục .list-toolbar-item / .translation-status-filter"
+    ],
+    "regression": [
+      "Sale không thấy nút Xuất Excel; nút ẩn ở thùng rác và trong list drawer; không còn mục rỗng chiếm chỗ",
+      "Xuất Excel hoạt động như 1.15.0 (bộ lọc + search, 400/403/422/429, audit, thông báo role=status/alert, trạng thái busy)",
+      "Lọc 'Trạng thái dịch' hoạt động như 1.15.0 (giữ bộ lọc khác, nhiều nhánh 'hoặc'), vẫn là SelectInput Payload có <label>, xoá được = 'Tất cả'",
+      "Collection có slot beforeList/beforeListTable riêng không mất entry",
+      "Giao diện admin sáng/tối: ô select 280px (max-width 100%), viền/màu theo token FR-ADM-19"
+    ]
+  },
+  "acceptance": [
+    "Ô 'Trạng thái dịch' ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, trong lề trang, ở mọi danh sách nội dung",
+    "Nút 'Xuất Excel' (admin) cùng vị trí thanh công cụ ở danh sách Leads; sale/thùng rác/list drawer không thấy",
+    "Cùng hàng ở desktop, wrap không tràn ngang ở 375px, vùng bấm ≥ 44px",
+    "0 kết quả vẫn thấy ô lọc dịch",
+    "pnpm lint / pnpm typecheck / pnpm vitest run --project unit --project ui PASS"
+  ],
+  "outOfScope": [
+    "Logic export lead, export-filters, lọc dịch admin-ui — không đổi (đã test ở scope v17)",
+    "Chip lọc nhanh + khoảng giá/diện tích (#11 #12) — BL-022",
+    "Vỡ dấu Lexical, tràn mobile 375px khác, toast 'Fetching user failed' (#05 #10 #16) — BL-023",
+    "Đáy nút lệch đáy ô select ~5px (thẩm mỹ, chỉ lộ khi cùng hàng) — residual"
+  ],
+  "viewports": [
+    1440,
+    1024,
+    768,
+    375
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "migration": "none",
+  "risk": "medium",
+  "riskNote": "Chỉ bố cục, nhưng đổi slot trong shared helper withContentDefaults (mọi collection nội dung) + SCSS admin toàn cục → reviewer NORMAL PASS round 1. Không auth/schema/API. Residual: chưa collection nào có cả hai mục (cùng hàng chỉ kiểm bằng chèn tạm DOM), 768px chưa kiểm trực quan, phụ thuộc Payload 3.91 đặt BeforeListTable trong Gutter sau ListControls (test chỉ ghim key slot)."
+}

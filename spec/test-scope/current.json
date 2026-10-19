@@ -1,157 +1,93 @@
 {
-  "specVersion": "1.15.0",
-  "scopeVersion": 17,
-  "generatedAt": "2026-10-19T23:59:00+07:00",
+  "specVersion": "1.15.1",
+  "scopeVersion": 18,
+  "generatedAt": "2026-10-19T23:59:30+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BUG + MODIFY (BL-021 T1–T5); T6 còn mở — sẽ có scope mới khi xong",
+  "triggerNote": "BL-021 T6 (#08) — task cuối; BL-021 done (T1–T5 đã ở scope v17)",
   "workItem": "bug/admin-list-fixes",
   "backlog": "BL-021",
-  "classification": "BUG + MODIFY",
-  "changeDoc": "spec/changes/2026-10-19-admin-list-fixes.md",
+  "classification": "MODIFY (bố cục UI admin)",
+  "changeDoc": "spec/changes/archive/2026-10-19-admin-list-fixes.md",
   "task": [
-    "tasks/bug-admin-list-fixes/phase-1-task-01.md",
-    "tasks/bug-admin-list-fixes/phase-1-task-02.md",
-    "tasks/bug-admin-list-fixes/phase-1-task-03.md",
-    "tasks/bug-admin-list-fixes/phase-1-task-04.md",
-    "tasks/bug-admin-list-fixes/phase-1-task-05.md"
+    "tasks/bug-admin-list-fixes/phase-1-task-06.md"
   ],
   "commits": [
-    "044512c",
-    "adccd72",
-    "05e5767",
-    "6a654ee",
-    "739b12a"
+    "c69f6e5"
   ],
-  "pending": [
-    "T6 (#08): Xuất Excel + Lọc dịch cùng hàng thanh công cụ danh sách admin (desktop + mobile) — chưa làm, KHÔNG test trong scope này"
-  ],
-  "specUpdate": "spec/updates/2026-10-19-admin-list-fixes.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.15.0-17.json",
+  "specUpdate": "spec/updates/2026-10-19-admin-list-fixes-toolbar.md",
   "specRefs": [
-    "FR-ADM-09",
-    "FR-ADM-18",
     "FR-ADM-19",
-    "F9",
-    "F12",
-    "BR-07"
+    "FR-ADM-18",
+    "F9"
   ],
   "specRefNotes": {
-    "FR-ADM-09": "Lead admin: tìm theo SĐT/email; cột Sale phụ trách hiện họ tên (assigneeName ảo)",
-    "FR-ADM-18": "Lọc trạng thái dịch giữ mọi bộ lọc khác (BUG #01, WhereBuilder dạng or[i].and)",
-    "FR-ADM-19": "Danh sách admin: tìm kiếm, 'Thêm bộ lọc' chỉ trường nghiệp vụ, VNĐ 110.000.000 ₫, ô trống —, ngày dd/MM/yyyy HH:mm",
-    "F9": "Xuất Excel lead kèm từ khoá tìm kiếm (search ≤ 100 ký tự, audit chỉ cờ filters.search: true)",
-    "F12": "REST đọc collection nội dung không locale → vi; en/all giữ, không fallback",
-    "BR-07": "Không fallback EN → VI (localization.fallback vẫn false)"
+    "FR-ADM-19": "Thanh công cụ danh sách admin: Xuất Excel + Trạng thái dịch trong lề, ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, cùng hàng, wrap không tràn 375px, vùng bấm ≥ 44px",
+    "FR-ADM-18": "Ô lọc 'Trạng thái dịch' đổi vị trí (slot beforeListTable), vẫn SelectInput + <label> (BL-016), 0 kết quả vẫn thấy để bỏ lọc",
+    "F9": "Nút Xuất Excel lead đổi vị trí; quyền admin, ẩn ở thùng rác + list drawer, thông báo lỗi giữ nguyên"
   },
   "changed": {
     "files": [
-      "src/lib/translation/admin-ui.ts",
       "src/collections/Leads.ts",
-      "src/collections/Rentals.ts",
-      "src/collections/Projects.ts",
-      "src/collections/PropertyPosts.ts",
-      "src/collections/News.ts",
       "src/collections/_shared/content-defaults.ts",
-      "src/hooks/leads/expand-phone-search.ts",
-      "src/hooks/leads/status-activity.ts",
-      "src/hooks/default-read-locale.ts",
-      "src/lib/leads/phone-search.ts",
-      "src/lib/leads/export-filters.ts",
-      "src/lib/leads/lead-values.ts",
-      "src/lib/admin/list-filter.ts",
-      "src/endpoints/admin/leads-export.ts",
       "src/components/admin/LeadExportButton.tsx",
-      "src/components/admin/AssigneeCell.tsx",
-      "src/components/admin/VndCell.tsx",
-      "src/app/(payload)/admin/importMap.js",
-      "src/payload.config.ts",
-      "src/payload-types.ts",
-      "docs/API_SPEC.md",
-      "src/lib/translation/admin-ui.test.ts",
-      "src/lib/leads/phone-search.test.ts",
-      "src/lib/leads/export-filters.test.ts",
-      "src/lib/admin/list-filter.test.ts",
-      "src/components/admin/LeadExportButton.test.tsx",
-      "src/components/admin/AssigneeCell.test.tsx",
-      "src/components/admin/VndCell.test.tsx",
-      "tests/integration/leads.test.ts",
-      "tests/integration/rentals.test.ts",
-      "tests/integration/leads-export.test.ts",
-      "tests/integration/projects.test.ts"
+      "src/components/admin/LeadExportSlot.tsx",
+      "src/components/admin/TranslationStatusFilter.tsx",
+      "src/components/admin/styles/_controls.scss",
+      "src/components/admin/styles/_lists.scss",
+      "src/collections/_shared/content-defaults.test.ts",
+      "src/components/admin/LeadExportSlot.test.tsx"
     ],
-    "filesNote": "Theo diff thật 5 commit 044512c, adccd72, 05e5767, 6a654ee, 739b12a (bỏ task/report/run journal). Không migration.",
+    "filesNote": "Theo diff thật commit c69f6e5 (bỏ task/report/run journal). Không migration, importMap không đổi nội dung.",
     "modules": [
-      "Admin — lọc trạng thái dịch (src/lib/translation/admin-ui.ts)",
-      "Admin — danh sách Leads (tìm kiếm SĐT/email, cột Sale phụ trách, export)",
-      "Admin — danh sách Rentals/Projects/PropertyPosts/News (tìm kiếm, trường lọc, cột VNĐ)",
-      "API admin — GET /api/admin/leads/export (tham số search)",
-      "Payload REST — locale mặc định khi đọc collection nội dung (hook defaultReadLocale)",
-      "Payload config — admin.dateFormat, i18n general.noLabel"
+      "Admin — slot danh sách: beforeList → beforeListTable (Leads + withContentDefaults dùng chung mọi collection nội dung)",
+      "Admin — SCSS toàn cục: .list-toolbar-item (_lists.scss), .translation-status-filter (_controls.scss)",
+      "Admin — LeadExportButton (bỏ inline style bố cục, dùng class)"
     ]
   },
   "impact": {
     "direct": [
-      "T1: Cho thuê lọc 'Trạng thái = Đã xuất bản' + 'Giá thuê >= 50.000.000' → chọn mục Trạng thái dịch → đổi mục khác → bỏ mục: bộ lọc khác giữ nguyên ở mọi bước; ô lọc dịch hiện đúng mục đang chọn sau tải lại",
-      "T1: bộ lọc nhiều nhánh 'hoặc' (or nhiều nhánh) — điều kiện dịch thêm/thay trong từng nhánh, không mất nhánh",
-      "T2: danh sách Leads gõ 0956789012 / 0956 789 012 / +84956789012 / 84956789012 đều ra lead có SĐT đó; gõ một phần email ra lead; mã + họ tên vẫn tìm được",
-      "T2: tài khoản sale tìm SĐT của lead KHÔNG được giao → không ra",
-      "T2: danh sách Cho thuê gõ CT-000089 hoặc tên đường (địa chỉ) ra tin; tiêu đề vẫn tìm được",
-      "T3: đang tìm kiếm (SĐT/email/mã/họ tên) + bộ lọc trạng thái → nút Xuất Excel bật; file đúng tập lead danh sách đang thấy",
-      "T3: GET /api/admin/leads/export?search=<101 ký tự> → 400 kèm details; nút client cũng khoá với thông báo riêng",
-      "T3: audit lead.export có filters.search: true, không chứa từ khoá",
-      "T4: 'Thêm bộ lọc' của Cho thuê/Dự án/Đăng tin BĐS/Tin tức/Lead không còn trường SEO, bản dịch, slug, nội dung dài, media, toạ độ, trường kỹ thuật (Cho thuê 50 → 29 trường)",
-      "T4: lọc 'Thuộc dự án' chọn theo tên → tải lại trang → ô giá trị vẫn hiện tên dự án",
-      "T4: GET /api/projects/<id>?depth=0 (không locale) trả title bản vi (trước: null)",
-      "T5: cột giá Cho thuê/Dự án (từ–đến)/Đăng tin BĐS hiện 18.000.000 ₫; null hiện —; sắp xếp theo giá đúng thứ tự số",
-      "T5: ô trống mọi cột hiện — (không còn <Không có …>)",
-      "T5: cột Sale phụ trách danh sách Leads hiện họ tên ngay khi vẽ (không 'Đang tải...'), admin và sale",
-      "T5: ngày giờ admin dạng dd/MM/yyyy HH:mm"
+      "Danh sách Cho thuê / Dự án / Đăng tin BĐS / Tin tức (và collection nội dung khác): ô 'Trạng thái dịch' nằm ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, thẳng lề tiêu đề — không còn ở trên tiêu đề",
+      "Danh sách Leads (admin): nút 'Xuất Excel' cùng vị trí thanh công cụ, cao ≥ 44px",
+      "Lọc ra 0 kết quả: ô 'Trạng thái dịch' vẫn hiện để bỏ lọc",
+      "375px: các mục thanh công cụ xuống dòng gọn, không cuộn ngang (scrollWidth = viewport), select + nút cao 44px, thông báo dài của nút xuất wrap trong mục",
+      "1024–1440px: nếu một trang có cả hai mục thì cùng một hàng"
     ],
     "dependents": [
-      "Mọi danh sách có lọc 'Trạng thái dịch' (projects, rentals, property-posts, news, services, job-postings, pages, categories, developers)",
-      "withContentDefaults (hook defaultReadLocale + disableListFilter dùng chung)",
-      "Hook leads beforeOperation (read/count) — mọi truy vấn Leads có phone like",
-      "Export lead dùng chung LEAD_LIST_SEARCHABLE_FIELDS với Leads.admin.listSearchableFields",
-      "assigneeName (afterRead) — 1 truy vấn staff/sale/request, chỉ fullName",
-      "admin.dateFormat ảnh hưởng mọi trường ngày trong admin"
+      "withContentDefaults — mọi collection nội dung (projects, rentals, property-posts, news, services, job-postings, pages, categories, developers): slot beforeListTable có sẵn của collection giữ nguyên, ô lọc nối sau; omit translation thì không nối",
+      "List drawer (chọn quan hệ) + thùng rác render qua cùng slot",
+      "SCSS admin toàn cục .list-toolbar-item / .translation-status-filter"
     ],
     "regression": [
-      "Export lead không search: hành vi y như BL-009 (bộ lọc status/source/assignedTo/createdFrom/createdTo, 401/403/400/429/422/500 audit fail-closed, ẩn ở thùng rác + list drawer)",
-      "Export: sale → 403; bộ lọc không ánh xạ được vẫn khoá nút; thông báo không còn nhắc ô tìm kiếm",
-      "REST ?locale=en trả bản EN, ?locale=all trả mọi locale; không fallback EN → VI; endpoint công khai /api/public/* không đổi",
-      "Media REST không locale (ngoài withContentDefaults) vẫn như cũ",
-      "Lọc 'Trạng thái dịch' dạng where { and } cũ vẫn đúng; lọc theo translation.* qua where vẫn query được dù disableListFilter",
-      "Cột danh sách, form sửa không đổi khi field có disableListFilter",
-      "Quyền đọc staff không mở rộng (sale chỉ đọc hồ sơ chính mình); assigneeName không ghi được qua API (create/update denyAll), không có trong form/cột/bộ lọc",
-      "Form sửa field giá vẫn nhập số; i18n admin các chuỗi khác không đổi"
+      "Sale không thấy nút Xuất Excel; nút ẩn ở thùng rác và trong list drawer; không còn mục rỗng chiếm chỗ",
+      "Xuất Excel hoạt động như 1.15.0 (bộ lọc + search, 400/403/422/429, audit, thông báo role=status/alert, trạng thái busy)",
+      "Lọc 'Trạng thái dịch' hoạt động như 1.15.0 (giữ bộ lọc khác, nhiều nhánh 'hoặc'), vẫn là SelectInput Payload có <label>, xoá được = 'Tất cả'",
+      "Collection có slot beforeList/beforeListTable riêng không mất entry",
+      "Giao diện admin sáng/tối: ô select 280px (max-width 100%), viền/màu theo token FR-ADM-19"
     ]
   },
   "acceptance": [
-    "T1: đổi/bỏ mục dịch giữ mọi điều kiện khác ở dạng and, or-1-nhánh, or-nhiều-nhánh, phẳng",
-    "T2: Lead tìm theo SĐT mọi dạng + email; sale không thấy lead người khác; Rentals tìm theo mã/tiêu đề/địa chỉ",
-    "T3: export có search ra đúng tập danh sách; search > 100 ký tự → 400; audit không có từ khoá",
-    "T4: 'Thêm bộ lọc' chỉ trường nghiệp vụ; bộ lọc 'Thuộc dự án' giữ tên sau tải lại; locale=en/all không đổi",
-    "T5: 110.000.000 ₫; ô trống —; Sale phụ trách hiện tên ngay; dd/MM/yyyy HH:mm",
-    "pnpm lint / pnpm typecheck / pnpm test (unit/ui + integration liên quan) PASS"
+    "Ô 'Trạng thái dịch' ngay dưới hàng tìm kiếm / Hiển thị cột / Bộ lọc, trong lề trang, ở mọi danh sách nội dung",
+    "Nút 'Xuất Excel' (admin) cùng vị trí thanh công cụ ở danh sách Leads; sale/thùng rác/list drawer không thấy",
+    "Cùng hàng ở desktop, wrap không tràn ngang ở 375px, vùng bấm ≥ 44px",
+    "0 kết quả vẫn thấy ô lọc dịch",
+    "pnpm lint / pnpm typecheck / pnpm vitest run --project unit --project ui PASS"
   ],
   "outOfScope": [
-    "T6 (#08) thanh công cụ Xuất Excel + Lọc dịch — chưa làm",
+    "Logic export lead, export-filters, lọc dịch admin-ui — không đổi (đã test ở scope v17)",
     "Chip lọc nhanh + khoảng giá/diện tích (#11 #12) — BL-022",
-    "Vỡ dấu Lexical, tràn mobile 375px, toast 'Fetching user failed' (#05 #10 #16) — BL-023",
-    "Tìm không dấu trong bộ lọc quan hệ; id / 'Đã Xoá Lúc' trong menu lọc; dayOnly hiện kèm giờ — residual"
+    "Vỡ dấu Lexical, tràn mobile 375px khác, toast 'Fetching user failed' (#05 #10 #16) — BL-023",
+    "Đáy nút lệch đáy ô select ~5px (thẩm mỹ, chỉ lộ khi cùng hàng) — residual"
   ],
   "viewports": [
     1440,
-    390
+    1024,
+    768,
+    375
   ],
   "uiTests": true,
-  "apiTests": [
-    "GET /api/admin/leads/export?search=",
-    "GET /api/projects/:id (không locale / locale=en / locale=all)"
-  ],
+  "apiTests": [],
   "migration": "none",
-  "risk": "high",
-  "riskNote": "PII (tìm SĐT/email lead, export kèm từ khoá), API contract export thêm tham số, REST locale mặc định dùng chung mọi client, cấu hình field dùng chung withContentDefaults → reviewer STRICT cho T2–T5 (T3 PASS round 2), T1 NORMAL. Không schema/migration. Residual: dayOnly kèm giờ, cột quan hệ khác vẫn có thể 'Đang tải...', count hook SĐT chưa có integration test riêng, REST OR/AND chữ hoa không mở rộng SĐT.",
-  "relatedBrd": {
-    "BR-32": "docs/BRD.md BR-32 — SĐT/email khách chỉ hiện cho admin và sale phụ trách: sale không dò được lead người khác bằng SĐT; từ khoá tìm kiếm không vào audit"
-  }
+  "risk": "medium",
+  "riskNote": "Chỉ bố cục, nhưng đổi slot trong shared helper withContentDefaults (mọi collection nội dung) + SCSS admin toàn cục → reviewer NORMAL PASS round 1. Không auth/schema/API. Residual: chưa collection nào có cả hai mục (cùng hàng chỉ kiểm bằng chèn tạm DOM), 768px chưa kiểm trực quan, phụ thuộc Payload 3.91 đặt BeforeListTable trong Gutter sau ListControls (test chỉ ghim key slot)."
 }

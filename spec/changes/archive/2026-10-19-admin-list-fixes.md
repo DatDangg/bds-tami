@@ -1,7 +1,7 @@
 ---
 id: admin-list-fixes
 type: bug
-status: in_progress
+status: done
 created: 2026-10-19
 ---
 
@@ -45,9 +45,10 @@ Chip lọc nhanh (#11 #12) tách sang `2026-10-19-admin-list-quick-filter-chips.
 - [x] Ngày giờ admin `dd/MM/yyyy HH:mm` (`admin.dateFormat` hiện chưa khai).
 
 ### T6 — #08: thanh công cụ (sau BL-016)
-- [ ] Xuất Excel + Lọc dịch nằm cùng hàng thanh công cụ danh sách, desktop + mobile.
+- [x] Xuất Excel + Lọc dịch nằm cùng hàng thanh công cụ danh sách, desktop + mobile.
 
 ## Tiến độ (spec-publisher, 2026-10-19)
 - T1 `044512c` · T2 `adccd72` · T3 `05e5767` · T4 `6a654ee` · T5 `739b12a` — done (reviewer PASS, report `.context/review-reports/bug-admin-list-fixes-phase-1-task-0{1..5}-round-*-review.md`).
 - Đã phát hành: spec 1.15.0 / scope v17 (`spec/updates/2026-10-19-admin-list-fixes.md`).
-- **T6 còn mở** → change doc giữ ở `spec/changes/` tới khi T6 xong.
+- T6 `c69f6e5` — done (NORMAL PASS r1, `.context/review-reports/bug-admin-list-fixes-phase-1-task-06-round-1-review.md`). Phát hành spec 1.15.1 / scope v18 (`spec/updates/2026-10-19-admin-list-fixes-toolbar.md`).
+- **BL-021 done 2026-10-19** (T1–T6) → change doc archive `spec/changes/archive/`.

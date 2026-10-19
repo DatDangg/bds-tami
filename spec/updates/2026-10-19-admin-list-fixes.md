@@ -18,7 +18,7 @@
 
 ## Còn mở
 
-- **T6 (#08)** — Xuất Excel + Lọc dịch nằm cùng hàng thanh công cụ danh sách (desktop + mobile). Làm sau BL-016 (đã xong). **Chưa làm** → BL-021 `in_progress`; khi T6 xong sẽ publish tiếp (scope mới) và archive change doc.
+- **T6 (#08)** — Xuất Excel + Lọc dịch nằm cùng hàng thanh công cụ danh sách (desktop + mobile). Làm sau BL-016 (đã xong). **Cập nhật:** T6 xong (`c69f6e5`, NORMAL PASS) → phát hành 1.15.1 / scope v18, delta `spec/updates/2026-10-19-admin-list-fixes-toolbar.md`; change doc đã archive `spec/changes/archive/2026-10-19-admin-list-fixes.md`.
 
 ## Requirements
 
