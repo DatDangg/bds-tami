@@ -4,12 +4,14 @@ import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
+import { CtaBanner } from "@/components/layout/CtaBanner";
 import { Gallery } from "@/components/media/Gallery";
 import { Documents } from "@/components/projects/Documents";
 import { FloorPlans } from "@/components/projects/FloorPlans";
 import { LegalPolicy, type PolicyBlock } from "@/components/projects/LegalPolicy";
 import { ProjectAmenities } from "@/components/projects/ProjectAmenities";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ProjectListings, type ProjectListingCards } from "@/components/projects/ProjectListings";
 import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectLocation } from "@/components/projects/ProjectLocation";
 import { ProjectOverview } from "@/components/projects/ProjectOverview";
@@ -18,7 +20,7 @@ import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { ProjectSubNav } from "@/components/projects/ProjectSubNav";
 import { publicPath } from "@/lib/content/content-paths";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
-import { SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
+import { LEAD_FORM_DOM_ID, SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { ProjectCardData } from "@/lib/projects/project-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
@@ -36,6 +38,8 @@ interface ProjectDetailProps {
   doc: Pick<Project, "id" | "overview" | "legalInfo" | "salesPolicy">;
   view: ProjectDetailView;
   related: ProjectCardData[];
+  /** Tin cho thuê + tin BĐS thuộc dự án (đã lọc công khai/ngôn ngữ ở truy vấn); bỏ trống = không có khối "Tin liên quan". */
+  listings?: ProjectListingCards;
   /** Hotline chung của site (khối form chưa có form thật thì hướng khách gọi). */
   hotline?: { label: string; telHref: string };
   /** Đường dẫn công khai của chính trang (mục cuối breadcrumb). */
@@ -44,16 +48,17 @@ interface ProjectDetailProps {
 
 /**
  * Bố cục S03 theo thứ tự design-spec: hero → breadcrumb → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính: Tổng quan → Vị trí → Tiện ích → Mặt bằng → Pháp lý +
- * Chính sách → Thư viện (thẻ tối duy nhất) → Tài liệu; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác. Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
+ * Chính sách → Thư viện (thẻ tối duy nhất) → Tài liệu → Tin liên quan; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác → CTA "Đăng ký tham quan" (banner tối). Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
  * với thanh mục con: `visibleSections`). `h1` chỉ ở hero. Server Component; phần tương tác (thanh mục con, mặt bằng, accordion, thanh dính đáy) là client.
  */
-export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectDetailProps) {
+export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath }: ProjectDetailProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail");
   const tNav = useTranslations("layout.nav.items");
   const tRich = useTranslations("page.richText");
   const turnstileSiteKey = readTurnstileSiteKey();
-  const sections = visibleSections(view);
+  const hasListings = listings.rentals.length > 0 || listings.posts.length > 0;
+  const sections = visibleSections(view, { hasListings });
   const shown = new Set(sections);
 
   const policyBlocks: PolicyBlock[] = [
@@ -98,6 +103,7 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
             </ProjectSection>
           )}
           <Documents documents={view.documents} />
+          <ProjectListings {...listings} />
         </div>
         {/* Cột phải ≥ lg; < lg nằm dưới nội dung (đúng chỗ form cũ). Form chỉ có MỘT bản trong DOM (không nhân đôi id). Chỉ thẻ bên trong dính (sticky trong chiều cao cột). */}
         <aside aria-labelledby={CONSULT_HEADING_ID} className="border-t border-border py-section-tight lg:border-t-0">
@@ -132,6 +138,14 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
           </div>
         </section>
       )}
+      {/* CTA cuối trang: cuộn tới thẻ Tư vấn (form lead duy nhất), không nhân đôi form. */}
+      <CtaBanner
+        title={t("visitCta.title")}
+        description={t("visitCta.description")}
+        actionLabel={t("visitCta.button")}
+        actionHref={`#${LEAD_FORM_DOM_ID}`}
+        {...(hotline ? { secondaryLabel: `${t("visitCta.hotline")}: ${hotline.label}`, secondaryHref: hotline.telHref } : {})}
+      />
       <ClickRefMarker collection="projects" id={doc.id} />
       <ProjectStickyCta />
     </article>

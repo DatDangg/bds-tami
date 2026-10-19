@@ -18,7 +18,7 @@ const COVER_CANDIDATES = 3;
 const RENTAL_SORT = ["-publishedAt", "-createdAt"];
 
 /** Trường thẻ tin cho thuê dùng: bỏ mô tả richText, điều khoản, `searchText`... khỏi truy vấn danh sách. */
-const RENTAL_CARD_FIELDS = {
+export const RENTAL_CARD_FIELDS = {
   code: true,
   title: true,
   slug: true,
@@ -82,7 +82,7 @@ export async function findSimilarRentals(payload: Payload, locale: Locale, curre
  * thứ tự thư viện và chỉ gồm ảnh đọc được: ảnh đầu không còn thì ảnh kế tiếp thế chỗ (`toRentalCardData` lấy ảnh dùng được đầu tiên); không ảnh nào
  * dùng được thì `gallery` rỗng.
  */
-async function withCoverImages(payload: Payload, docs: Rental[], locale: Locale): Promise<Rental[]> {
+export async function withCoverImages(payload: Payload, docs: Rental[], locale: Locale): Promise<Rental[]> {
   if (docs.length === 0) return docs;
   const { docs: galleries } = await payload.find({
     collection: "rentals",

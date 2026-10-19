@@ -179,11 +179,14 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
 }
 
 /** Mã mục của thanh mục con, theo thứ tự hiển thị (design-spec S03 khối 3). */
-export const SECTION_IDS = ["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery"] as const;
+export const SECTION_IDS = ["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery", "listings"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
-/** Mục có dữ liệu mới vào thanh mục con. Tổng quan luôn có (mô tả ngắn `summary` bắt buộc ở bản vi và `en` khi xuất bản). */
-export function visibleSections(view: ProjectDetailView): SectionId[] {
+/**
+ * Mục có dữ liệu mới vào thanh mục con. Tổng quan luôn có (mô tả ngắn `summary` bắt buộc ở bản vi và `en` khi xuất bản). "Tin liên quan" không nằm trong view
+ * (đọc từ truy vấn riêng) nên trang báo qua `hasListings`.
+ */
+export function visibleSections(view: ProjectDetailView, { hasListings = false }: { hasListings?: boolean } = {}): SectionId[] {
   const present: Record<SectionId, boolean> = {
     overview: true,
     location: view.location !== null || view.address !== null,
@@ -192,6 +195,7 @@ export function visibleSections(view: ProjectDetailView): SectionId[] {
     legal: view.hasLegal,
     policy: view.hasPolicy,
     gallery: view.gallery.length > 0,
+    listings: hasListings,
   };
   return SECTION_IDS.filter((id) => present[id]);
 }
@@ -205,6 +209,7 @@ export const SECTION_DOM_ID: Record<SectionId, string> = {
   legal: "legal",
   policy: "sales-policy",
   gallery: "gallery",
+  listings: "related-listings",
 };
 
 export const DOCUMENTS_DOM_ID = "documents";

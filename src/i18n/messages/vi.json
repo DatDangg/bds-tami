@@ -409,7 +409,8 @@
         "floorPlans": "Mặt bằng",
         "legal": "Pháp lý",
         "policy": "Chính sách",
-        "gallery": "Thư viện"
+        "gallery": "Thư viện",
+        "listings": "Tin liên quan"
       },
       "specs": {
         "label": "Thông số dự án",
@@ -444,6 +445,17 @@
       "leadForm": {
         "title": "Nhận thông tin dự án",
         "hotline": "Hotline"
+      },
+      "listings": {
+        "title": "Tin liên quan",
+        "rentals": "Cho thuê",
+        "posts": "Tin BĐS"
+      },
+      "visitCta": {
+        "title": "Đăng ký tham quan",
+        "description": "Để lại thông tin, TAMI sắp xếp lịch tham quan dự án phù hợp với bạn.",
+        "button": "Đăng ký tham quan",
+        "hotline": "Gọi hotline"
       },
       "relatedTitle": "Dự án khác",
       "stickyConsult": "Nhận tư vấn"

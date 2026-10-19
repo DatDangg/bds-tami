@@ -641,6 +641,17 @@
           "reviewLevel": "NORMAL",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-4-task-01-round-2-review.md",
           "note": "hero viết thường, pill subnav dính, 2 cột ≥ lg + thẻ Tư vấn 1:1 sticky (1 LeadForm source=project)"
+        },
+        {
+          "task": "phase-4-task-02",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-4-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-4-task-02-round-1-review.md",
+          "note": "Tin liên quan (≤4 cho thuê + ≤4 tin BĐS) + CTA Đăng ký tham quan + hook revalidate chi tiết dự án khi tin liên quan đổi"
         }
       ],
       "phaseValidations": [
@@ -672,7 +683,7 @@
       "specVersion": "1.19.0",
       "scopeVersion": 23,
       "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md",
-      "next": "P4-T02 (tin liên quan + CTA tham quan + restyle khối)",
+      "next": "spec-validator Phase 4 → spec-publish → close-out",
       "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra P3: chưa Lighthouse LCP/CLS; 2 ảnh priority/trang (banner + thẻ đầu/bài lớn); h1 EN dài trong banner 240px; đổi Khoảng giá cần JS; NewsCard card trong khối tối phải truyền onDark; kiểm trình duyệt dev :3001 chỉ 375/1280.",
       "specUpdates": [
         "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
@@ -1559,7 +1570,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-20T04:36:50+07:00",
+  "lastUpdated": "2026-10-20T04:48:46+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

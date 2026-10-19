@@ -113,6 +113,7 @@ describe("toProjectDetailView", () => {
     );
     expect(view.hasOverview).toBe(true);
     expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery"]);
+    expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery", "listings"]);
   });
 
   it("richText chỉ có đoạn rỗng không tính là có nội dung", () => {

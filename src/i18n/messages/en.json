@@ -409,7 +409,8 @@
         "floorPlans": "Floor plans",
         "legal": "Legal",
         "policy": "Policy",
-        "gallery": "Gallery"
+        "gallery": "Gallery",
+        "listings": "Related listings"
       },
       "specs": {
         "label": "Project facts",
@@ -444,6 +445,17 @@
       "leadForm": {
         "title": "Get project information",
         "hotline": "Hotline"
+      },
+      "listings": {
+        "title": "Related listings",
+        "rentals": "For rent",
+        "posts": "Property posts"
+      },
+      "visitCta": {
+        "title": "Book a site visit",
+        "description": "Leave your details and TAMI will arrange a visit that suits you.",
+        "button": "Book a site visit",
+        "hotline": "Call hotline"
       },
       "relatedTitle": "Other projects",
       "stickyConsult": "Get advice"

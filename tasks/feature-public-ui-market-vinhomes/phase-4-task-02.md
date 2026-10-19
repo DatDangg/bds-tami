@@ -17,5 +17,10 @@ ADDITIVE UI · NORMAL (truy vấn mới qua `rentals.project`, `property-posts.r
 - Chi tiết dự án revalidate khi tin liên quan đổi (kiểm hook hiện có).
 
 ## Acceptance
-- [ ] Tin liên quan đúng dự án + locale; không N+1; LCP vẫn là ảnh hero
+- [x] Tin liên quan đúng dự án + locale; không N+1; LCP vẫn là ảnh hero (STRICT PASS r1)
 
+
+## Kết quả (2026-10-20)
+- Reviewer STRICT r1 PASS (nâng từ NORMAL vì hook trên collection Rentals/PropertyPosts).
+- Quyết định agent (user ủy quyền 2026-10-20): "Tin liên quan" trong cột chính sau Tài liệu, mục cuối thanh mục con; 2 nhóm Cho thuê (≤ 4, chỉ `published`) / Tin BĐS (≤ 4, ưu đãi chưa kết thúc), ẩn nhóm/khối khi trống; **không "Xem thêm"** (không có URL param lọc theo dự án — không thêm param); CTA "Đăng ký tham quan" dùng lại `CtaBanner` tối ở cuối trang (→ `#lead-form`, nút phụ `tel:` hotline khi có), chữ i18n, không field CMS mới; hook làm mới chi tiết dự án cũ + mới (vi/en) khi tin công khai đổi, không đụng danh sách/trang chủ; nhãn nhóm là `<p>` (không heading) để h3 thẻ ngay dưới h2.
+- Kiểm dev :3001: dự án không có tin liên quan → khối + mục menu ẩn đúng; DB worktree không có tin gắn dự án nên chưa thấy khối có dữ liệu (residual).

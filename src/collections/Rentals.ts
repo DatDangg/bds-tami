@@ -15,6 +15,7 @@ import {
 } from "../hooks/rentals/field-validators";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
+import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
@@ -120,6 +121,7 @@ const rentalTermsGroup: GroupField = {
  */
 export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
   const revalidateHomepage = createRevalidateHomepageOnListing({ paths: revalidate });
+  const revalidateProject = createRevalidateProjectOnListing({ field: "project", publicStatuses: PUBLIC_STATUSES.rentals, revalidate });
   const collection = withContentDefaults(
     {
       slug: "rentals",
@@ -136,8 +138,8 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       hooks: {
         beforeValidate: [assignRentalCode],
         beforeChange: [buildRentalSearchText],
-        afterChange: [refreshOtherLocaleSearchText, revalidateHomepage.afterChange],
-        afterDelete: [revalidateHomepage.afterDelete],
+        afterChange: [refreshOtherLocaleSearchText, revalidateHomepage.afterChange, revalidateProject.afterChange],
+        afterDelete: [revalidateHomepage.afterDelete, revalidateProject.afterDelete],
       },
       fields: [
         codeField,

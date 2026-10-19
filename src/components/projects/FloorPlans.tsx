@@ -76,7 +76,7 @@ export function FloorPlans({ plans }: { plans: FloorPlanView[] }) {
               onClick={() => setActiveIndex(index)}
               onKeyDown={(event) => handleTabKeyDown(event, index)}
               className={cn(
-                "inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-sm border px-5 text-small font-semibold transition-colors duration-(--duration-fast)",
+                "inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-pill border px-5 text-small font-semibold transition-colors duration-(--duration-fast)",
                 selected ? "border-text bg-text text-surface" : "border-border bg-surface text-text hover:border-text",
               )}
             >
@@ -93,7 +93,7 @@ export function FloorPlans({ plans }: { plans: FloorPlanView[] }) {
             openerRef.current = event.currentTarget;
             setLightboxOpen(true);
           }}
-          className="block w-full cursor-zoom-in overflow-hidden rounded-sm bg-surface"
+          className="block w-full cursor-zoom-in overflow-hidden rounded-[20px] bg-surface"
         >
           <ResponsiveImage media={active.image} aspectRatio="4/3" fit="contain" sizes="(min-width: 1024px) 896px, 100vw" />
         </button>

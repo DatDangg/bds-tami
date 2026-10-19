@@ -5,10 +5,12 @@ import type { Media, Project, Province } from "@/payload-types";
 
 const findPublicProjectBySlug = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<Partial<Project> | null>>());
 const findOtherProjects = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<Partial<Project>[]>>());
+const findProjectListings = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<{ rentals: unknown[]; posts: unknown[] }>>());
 const getSiteSettings = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: vi.fn().mockResolvedValue({}) }));
 vi.mock("@/lib/projects/project-queries", () => ({ findPublicProjectBySlug, findOtherProjects }));
+vi.mock("@/lib/projects/project-listings", () => ({ findProjectListings }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "song-sai-gon", en: "saigon-riverside" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
@@ -55,8 +57,10 @@ beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
   getSiteSettings.mockResolvedValue({ hotline: "0901 234 567" });
   findOtherProjects.mockResolvedValue([]);
+  findProjectListings.mockResolvedValue({ rentals: [], posts: [] });
 });
 afterEach(() => {
+  findProjectListings.mockReset();
   vi.unstubAllEnvs();
   findPublicProjectBySlug.mockReset();
   findOtherProjects.mockReset();
@@ -76,6 +80,28 @@ describe("trang chi tiết dự án (S03)", () => {
     expect(within(related).getByRole("heading", { level: 3, name: "Dự án B" })).toBeInTheDocument();
     expect(within(related).getByRole("link")).toHaveAttribute("href", "/du-an/du-an-b");
     expect(findOtherProjects).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ id: "d1" }));
+  });
+
+  it("Tin liên quan: đọc đúng dự án + locale, thẻ cho thuê/tin BĐS hiện trong khối có neo; trống → không có khối", async () => {
+    findPublicProjectBySlug.mockResolvedValue(project());
+    findProjectListings.mockResolvedValue({
+      rentals: [{ id: "r1", title: "Căn 2PN view sông", slug: "can-2pn", status: "published", code: "CT-000001", areaM2: 70, priceMonthlyVnd: 12_000_000, gallery: [] }],
+      posts: [{ id: "a1", title: "Ưu đãi tháng 10", slug: "uu-dai", excerpt: "Giảm 5%", gallery: [] }],
+    });
+    await renderProject();
+    expect(findProjectListings).toHaveBeenCalledWith({}, "vi", "d1", expect.any(Date));
+    const block = screen.getByRole("heading", { level: 2, name: "Tin liên quan" }).closest("section") as HTMLElement;
+    expect(block.id).toBe("related-listings");
+    expect(within(block).getByRole("heading", { level: 3, name: "Căn 2PN view sông" }).closest("a")).toHaveAttribute("href", "/cho-thue/can-2pn");
+    expect(within(block).getByRole("heading", { level: 3, name: "Ưu đãi tháng 10" }).closest("a")).toHaveAttribute("href", "/tin-bds/uu-dai");
+    expect(screen.getByRole("navigation", { name: "Mục lục dự án" })).toHaveTextContent("Tin liên quan");
+  });
+
+  it("không có tin liên quan → không khối, không mục con", async () => {
+    findPublicProjectBySlug.mockResolvedValue(project());
+    await renderProject();
+    expect(screen.queryByRole("heading", { name: "Tin liên quan" })).toBeNull();
+    expect(screen.getByRole("navigation", { name: "Mục lục dự án" })).not.toHaveTextContent("Tin liên quan");
   });
 
   it("site-settings lỗi (DB tắt) → trang vẫn dựng, chỉ không có hotline", async () => {

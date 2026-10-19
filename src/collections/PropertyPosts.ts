@@ -1,11 +1,13 @@
 import type { CollectionConfig, DateFieldValidation, GroupField } from "payload";
 import { date } from "payload/shared";
 
+import { PUBLIC_STATUSES } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
@@ -50,6 +52,7 @@ const offerGroup: GroupField = {
  */
 export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
   const revalidateHomepage = createRevalidateHomepageOnUnpublish({ paths: revalidate, tags: revalidateTags });
+  const revalidateProject = createRevalidateProjectOnListing({ field: "relatedProject", publicStatuses: PUBLIC_STATUSES.default, revalidate });
   const collection = withContentDefaults(
     {
       slug: "property-posts",
@@ -60,7 +63,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
         description: "Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.",
       },
       defaultSort: "-publishedAt",
-      hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
+      hooks: { afterChange: [revalidateHomepage.afterChange, revalidateProject.afterChange], afterDelete: [revalidateHomepage.afterDelete, revalidateProject.afterDelete] },
       fields: [
         formTabs([
           {

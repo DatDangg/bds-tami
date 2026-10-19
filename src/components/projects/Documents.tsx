@@ -13,7 +13,7 @@ export function Documents({ documents }: { documents: DocumentView[] }) {
   if (documents.length === 0) return null;
   return (
     <ProjectSection id={DOCUMENTS_DOM_ID} title={t("documents.title")}>
-      <ul className="flex flex-col divide-y divide-border border-y border-border">
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface px-5">
         {documents.map((file) => (
           <li key={file.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             <div className="min-w-0">

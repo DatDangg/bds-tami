@@ -15,9 +15,12 @@ import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
 import { findLocalizedSlugs } from "@/lib/news/news-queries";
 import { populatedMedia } from "@/lib/news/news-view";
+import { findProjectListings } from "@/lib/projects/project-listings";
 import { toProjectDetailView } from "@/lib/projects/project-detail-view";
 import { findOtherProjects, findPublicProjectBySlug } from "@/lib/projects/project-queries";
 import { toProjectCards } from "@/lib/projects/project-view";
+import { toPostCards } from "@/lib/posts/post-view";
+import { toRentalCards } from "@/lib/rentals/rental-view";
 import { buildRealEstateListingJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata, toOgImage } from "@/lib/seo/metadata";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
@@ -97,7 +100,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [relatedDocs, hotline, identity] = await Promise.all([findOtherProjects(payload, locale, doc), loadHotline(locale), loadSiteIdentity(locale)]);
+  const now = new Date();
+  const [relatedDocs, listingDocs, hotline, identity] = await Promise.all([
+    findOtherProjects(payload, locale, doc),
+    findProjectListings(payload, locale, doc.id, now),
+    loadHotline(locale),
+    loadSiteIdentity(locale),
+  ]);
   const view = toProjectDetailView(doc, locale);
   const ownPath = publicDetailPath(CONTENT_ROUTES.projects, locale, doc.slug ?? slug);
   const siteUrl = getSiteUrl();
@@ -110,7 +119,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <ProjectDetail doc={doc} view={view} related={toProjectCards(relatedDocs, locale)} {...(hotline ? { hotline } : {})} ownPath={ownPath} />
+      <ProjectDetail doc={doc} view={view} related={toProjectCards(relatedDocs, locale)}
+        listings={{ rentals: toRentalCards(listingDocs.rentals, locale), posts: toPostCards(listingDocs.posts, locale, now) }}
+        {...(hotline ? { hotline } : {})} ownPath={ownPath} />
       {pageUrl && siteUrl && (
         <JsonLd
           data={buildRealEstateListingJsonLd({

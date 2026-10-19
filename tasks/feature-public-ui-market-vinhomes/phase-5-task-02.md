@@ -17,3 +17,6 @@ ADDITIVE UI + SEO (JSON-LD) → STRICT.
 
 ## Acceptance
 - [ ] Mỗi khối ẩn khi trống; JSON-LD hợp lệ; VI/EN cùng bố cục
+
+## Carry-over từ P4-T02 (reviewer r1)
+- MINOR-2: `ProjectListings.tsx:47` RentalCard dùng `sizes` của lưới 4 cột → thêm prop `imageSizes` cho RentalCard, truyền `(min-width:1280px) 390px, (min-width:640px) 45vw, 100vw`.
