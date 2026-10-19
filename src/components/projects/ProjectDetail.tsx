@@ -23,6 +23,15 @@ import type { ProjectCardData } from "@/lib/projects/project-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
 
+/** Id tiêu đề thẻ Tư vấn: nhãn cho `aside` (một thẻ duy nhất mỗi trang). */
+const CONSULT_HEADING_ID = "project-consult-heading";
+/**
+ * Thẻ "Tư vấn 1:1" (trắng, bo 20px). ≥ lg dính ngay dưới header nổi + thanh mục con (top = 6.5rem + 4.5rem); cao tối đa bằng phần viewport còn lại và tự cuộn bên trong nếu
+ * form dài hơn, nên không bao giờ kẹt dính / che nội dung (cột phải có bề rộng riêng).
+ */
+const CONSULT_CARD_CLASS =
+  "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:sticky lg:top-[calc(var(--header-offset)+4.5rem)] lg:max-h-[calc(100dvh-var(--header-offset)-5.5rem)] lg:overflow-y-auto lg:p-6 scroll-mt-[calc(var(--header-offset)+4.5rem)]";
+
 interface ProjectDetailProps {
   doc: Pick<Project, "id" | "overview" | "legalInfo" | "salesPolicy">;
   view: ProjectDetailView;
@@ -34,8 +43,8 @@ interface ProjectDetailProps {
 }
 
 /**
- * Bố cục S03 theo thứ tự design-spec: hero → breadcrumb → thanh mục con dính → Tổng quan → Vị trí → Tiện ích → Mặt bằng → Pháp lý +
- * Chính sách → Thư viện (khối tối duy nhất) → Tài liệu → Form lead → Dự án khác. Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
+ * Bố cục S03 theo thứ tự design-spec: hero → breadcrumb → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính: Tổng quan → Vị trí → Tiện ích → Mặt bằng → Pháp lý +
+ * Chính sách → Thư viện (thẻ tối duy nhất) → Tài liệu; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác. Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
  * với thanh mục con: `visibleSections`). `h1` chỉ ở hero. Server Component; phần tương tác (thanh mục con, mặt bằng, accordion, thanh dính đáy) là client.
  */
 export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectDetailProps) {
@@ -67,33 +76,33 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
         ]}
       />
       <ProjectSubNav items={sections.map((id) => ({ id: SECTION_DOM_ID[id], label: t(`subNav.${id}`) }))} />
-      <ProjectOverview view={view} overview={doc.overview} />
-      {shown.has("location") && <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} />}
-      {shown.has("amenities") && <ProjectAmenities amenities={view.amenities} />}
-      {shown.has("floorPlans") && (
-        <ProjectSection id={SECTION_DOM_ID.floorPlans} title={t("sections.floorPlans")} tone="alt">
-          <FloorPlans plans={view.floorPlans} />
-        </ProjectSection>
-      )}
-      {policyBlocks.length > 0 && (
-        <div className="bg-bg py-section-tight">
-          <div className="mx-auto w-full max-w-container px-gutter">
-            <LegalPolicy blocks={policyBlocks} />
-          </div>
+      <div className="mx-auto w-full max-w-container px-gutter lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-10 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-12">
+        <div className="min-w-0">
+          <ProjectOverview view={view} overview={doc.overview} />
+          {shown.has("location") && <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} />}
+          {shown.has("amenities") && <ProjectAmenities amenities={view.amenities} />}
+          {shown.has("floorPlans") && (
+            <ProjectSection id={SECTION_DOM_ID.floorPlans} title={t("sections.floorPlans")}>
+              <FloorPlans plans={view.floorPlans} />
+            </ProjectSection>
+          )}
+          {policyBlocks.length > 0 && (
+            <div className="border-t border-border py-section-tight">
+              <LegalPolicy blocks={policyBlocks} />
+            </div>
+          )}
+          {shown.has("gallery") && (
+            <ProjectSection id={SECTION_DOM_ID.gallery} title={t("sections.gallery")} tone="dark">
+              {/* Ảnh LCP của trang là ảnh hero (cùng ảnh đầu thư viện): thư viện ở đây lazy. */}
+              <Gallery images={view.gallery} />
+            </ProjectSection>
+          )}
+          <Documents documents={view.documents} />
         </div>
-      )}
-      {shown.has("gallery") && (
-        <ProjectSection id={SECTION_DOM_ID.gallery} title={t("sections.gallery")} tone="dark">
-          {/* Ảnh LCP của trang là ảnh hero (cùng ảnh đầu thư viện): thư viện ở đây lazy. */}
-          <Gallery images={view.gallery} />
-        </ProjectSection>
-      )}
-      <Documents documents={view.documents} />
-      <div className="bg-bg py-section-tight">
-        <div className="mx-auto w-full max-w-container px-gutter">
-          <LeadFormSlot title={t("leadForm.title")} className="scroll-mt-[calc(var(--header-offset)+3.5rem)]">
+        {/* Cột phải ≥ lg; < lg nằm dưới nội dung (đúng chỗ form cũ). Form chỉ có MỘT bản trong DOM (không nhân đôi id). Chỉ thẻ bên trong dính (sticky trong chiều cao cột). */}
+        <aside aria-labelledby={CONSULT_HEADING_ID} className="border-t border-border py-section-tight lg:border-t-0">
+          <LeadFormSlot title={t("leadForm.title")} headingId={CONSULT_HEADING_ID} className={CONSULT_CARD_CLASS}>
             <div className="flex flex-col gap-4">
-              <LeadForm source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
               {hotline && (
                 <p>
                   <span className="text-small text-text-muted">{t("leadForm.hotline")}: </span>
@@ -102,9 +111,10 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
                   </a>
                 </p>
               )}
+              <LeadForm source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
             </div>
           </LeadFormSlot>
-        </div>
+        </aside>
       </div>
       {related.length > 0 && (
         <section aria-labelledby="related-projects" className="bg-bg-alt py-section-tight">

@@ -11,7 +11,7 @@ export function ProjectAmenities({ amenities }: { amenities: AmenityView[] }) {
   const t = useTranslations("page.projectDetail");
   return (
     <ProjectSection id={SECTION_DOM_ID.amenities} title={t("sections.amenities")}>
-      <ul aria-label={t("amenitiesLabel")} className="grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-4">
+      <ul aria-label={t("amenitiesLabel")} className="grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-3">
         {amenities.map((amenity) => (
           <li key={amenity.id} className="flex items-start gap-3 text-body">
             <Check size={20} weight="bold" aria-hidden="true" className="mt-0.5 shrink-0 text-accent-text" />

@@ -345,24 +345,25 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 ### S03. Chi tiết dự án · `/du-an/[slug]` · `/en/projects/[slug]` (FR-PUB-03)
 
 **Cấu trúc:**
-1. **Hero** full màn hình (`100svh`, tối đa 900px) ảnh đại diện + scrim; đáy trái: badge `salesStatus`, tên `--text-display`, địa chỉ ngắn (phường, tỉnh). Nút Primary **Nhận tư vấn** (cuộn tới form) + nút Outline sáng **Tải tài liệu** (nếu có `documents`).
+1. **Hero** full màn hình (`100svh`, tối đa 900px) ảnh đại diện + scrim; đáy bo 32px (BL-020 P4-T01); đáy trái: badge `salesStatus` (gradient xanh / vàng), tên `--text-display` serif độ đậm 400 (không viết hoa), địa chỉ ngắn (phường, tỉnh). Nút Primary **Nhận tư vấn** (cuộn tới form) + nút Outline sáng **Tải tài liệu** (nếu có `documents`).
 2. Breadcrumb.
-3. **Thanh mục con dính** (`z: --z-sticky`, dưới header): Tổng quan · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Thư viện. Chỉ hiện mục có dữ liệu. Mục đang xem tự đánh dấu (IntersectionObserver), bấm cuộn mượt (tắt khi reduced motion), `scroll-margin-top` = header + thanh. < lg: cuộn ngang, mục đang xem tự cuộn vào giữa.
-4. **Tổng quan** (`--color-bg`): lưới thông số dạng `<dl>` 2 cột (< md) / 4 cột (≥ md): Chủ đầu tư (link), Loại hình, Quy mô (`scale`), Diện tích, Giá từ, Bàn giao. Không kẻ dòng từng hàng. Dưới: `overview` richText `max-width: 68ch`.
-5. **Vị trí** (`--color-bg-alt`): split bản đồ 7 cột + địa chỉ 5 cột (≥ lg); < lg bản đồ trên, địa chỉ dưới. Bản đồ §3.8.
-6. **Tiện ích** (`--color-bg`): lưới icon + tên (`amenities`), 2 cột mobile, 4 cột ≥ lg. Không có icon → chỉ tên dạng danh sách 2 cột.
-7. **Mặt bằng** (`--color-bg-alt`): tab theo `floorPlans.title`, ảnh mặt bằng 4:3 nền trắng, bấm mở lightbox. ≥ 6 mặt bằng → select thay tab trên mobile.
-8. **Pháp lý** (`legalInfo`) và **Chính sách bán hàng** (`salesPolicy`) (`--color-bg`): 2 khối richText; ≥ lg 2 cột cạnh nhau, < lg accordion (mở sẵn mục đầu).
-9. **Thư viện** (`.theme-dark-block` `--color-dark`: section nội dung tối duy nhất của trang): bento §3.7 trên nền tối.
+3. **Thanh mục con dạng viên thuốc dính** (`z: --z-sticky`; `top: var(--header-offset)` nên giữ khe như thanh nổi thứ hai; viên thuốc trắng bo tròn + viền + `--shadow-md`, mục đang xem nền `--color-dark` chữ sáng; nav trong suốt `pointer-events-none`): Tổng quan · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Thư viện. Chỉ hiện mục có dữ liệu. Mục đang xem tự đánh dấu (IntersectionObserver), bấm cuộn mượt (tắt khi reduced motion), `scroll-margin-top` = `--header-offset` + 4.5rem (thanh ~54px + khe 18px). < lg: cuộn ngang, mục đang xem tự cuộn vào giữa.
+**Bố cục (BL-020 P4-T01):** từ mục 4 tới 11 nằm trong lưới 2 cột ≥ lg (`minmax(0,1fr)` + 22rem, xl 24rem) trong container; cột chính KHÔNG còn nền full-bleed xen kẽ — các khối ngăn bằng đường kẻ trên, Thư viện là thẻ tối bo 20px; cột phải = `aside` thẻ **Tư vấn 1:1** (trắng, bo 20px, viền, `--shadow-md`): tiêu đề "Nhận thông tin dự án", hotline (link `tel:`), form lead (`source=project`). Thẻ `position: sticky` tại `top = header + 4.5rem`, cao tối đa phần viewport còn lại (`100dvh - header - 5.5rem`) và tự cuộn bên trong khi form dài (không kẹt trang). Form chỉ có MỘT bản trong DOM: < lg `aside` nằm dưới Tài liệu (chỗ form cũ) và `ProjectStickyCta` dẫn tới `#lead-form`.
+4. **Tổng quan**: lưới thông số dạng `<dl>` 2 cột (< md) / 4 cột (≥ md): Chủ đầu tư (link), Loại hình, Quy mô (`scale`), Diện tích, Giá từ, Bàn giao. Không kẻ dòng từng hàng. Dưới: `overview` richText `max-width: 68ch`.
+5. **Vị trí**: split bản đồ 7 cột + địa chỉ 5 cột (≥ xl; < xl bản đồ trên, địa chỉ dưới, vì cột chính ở lg chỉ ~568px). Bản đồ §3.8.
+6. **Tiện ích**: lưới icon + tên (`amenities`), 2 cột mobile, 3 cột ≥ lg (cột chính hẹp hơn). Không có icon → chỉ tên dạng danh sách 2 cột.
+7. **Mặt bằng**: tab theo `floorPlans.title`, ảnh mặt bằng 4:3 nền trắng, bấm mở lightbox. ≥ 6 mặt bằng → select thay tab trên mobile.
+8. **Pháp lý** (`legalInfo`) và **Chính sách bán hàng** (`salesPolicy`): 2 khối richText; ≥ xl 2 cột cạnh nhau (lg: xếp dọc trong cột chính), < lg accordion (mở sẵn mục đầu).
+9. **Thư viện** (`.theme-dark-block` `--color-dark`: thẻ tối bo 20px duy nhất của cột chính; padding 24px, xl 40px): bento §3.7 trên nền tối.
 10. **Tài liệu**: danh sách file PDF (tên, dung lượng) với nút **Tải tài liệu** (Dark). Bỏ nếu trống.
-11. **Form** (`--color-primary-subtle`): split: trái tiêu đề "Nhận thông tin dự án / Get project information" + hotline + sale/hotline chung; phải Lead form Đầy đủ (`source=project`).
+11. **Tư vấn 1:1** (`aside`, `aria-labelledby` = tiêu đề thẻ): thẻ trắng bo 20px ở cột phải ≥ lg, < lg nằm dưới Tài liệu; tiêu đề "Nhận thông tin dự án / Get project information" + hotline (link `tel:`) + Lead form Đầy đủ (`source=project`). `scroll-margin-top` = `--header-offset` + 4.5rem để thanh mục con dính không che tiêu đề khi nhảy tới `#lead-form`.
 12. **Dự án khác**: 3 thẻ Dự án cùng tỉnh hoặc cùng loại hình (lưới 1/2/3 cột).
 
 | Mốc | Thay đổi |
 |---|---|
 | 375 | Hero chữ `--text-display` 32px, 2 nút xếp dọc full-width; thanh mục con cuộn ngang; thông số 2 cột; form 1 cột (tiêu đề trên form); thanh dính đáy "Nhận tư vấn" (cao 64px, `--color-surface`, `--shadow-md`) xuất hiện khi form chưa trong viewport |
 | 768 | Thông số 4 cột; thư viện bento |
-| 1024 | Vị trí split 7/5; pháp lý + chính sách 2 cột; form split 5/7; bỏ thanh dính đáy |
+| 1024 | Lưới 2 cột (cột chính + thẻ Tư vấn dính 22rem); Vị trí xếp dọc (split 7/5 từ xl); bỏ thanh dính đáy |
 | 1280 | Container 1280 |
 
 **States:** loading: skeleton hero (khối `--color-surface-muted` 100svh) + thanh mục con; dự án `handed_over` vẫn có form với tiêu đề chung (không thêm ý định CTA mới); form §3.3.

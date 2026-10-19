@@ -3,8 +3,8 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "public-ui-market-vinhomes",
-    "phaseTask": "phase-4-task-01",
-    "journal": ".context/runs/feature-public-ui-market-vinhomes-phase-4-task-01.md"
+    "phaseTask": "phase-4-task-02",
+    "journal": ".context/runs/feature-public-ui-market-vinhomes-phase-4-task-02.md"
   },
   "features": [
     {
@@ -503,13 +503,13 @@
       "title": "Website công khai theo market.vinhomes.vn: section + phong cách (bo góc, nút viên thuốc, header nổi kính mờ, serif viết thường), màu TAMI — 5 phase (BL-020)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 3,
+      "currentPhase": 4,
       "totalPhases": 5,
       "phaseStatus": {
         "1": "done",
         "2": "done",
         "3": "done",
-        "4": "pending",
+        "4": "in_progress",
         "5": "pending"
       },
       "backlog": "BL-020",
@@ -630,6 +630,17 @@
           "reviewLevel": "STRICT",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-3-task-03-round-3-review.md",
           "note": "Tin tức: pill danh mục, Tin nổi bật 1+4, hàng theo danh mục, Tin khác, form tư vấn (contact). Round 3 hẹp vượt giới hạn 2 vòng theo tiền lệ 2cfe320"
+        },
+        {
+          "task": "phase-4-task-01",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-4-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-4-task-01-round-2-review.md",
+          "note": "hero viết thường, pill subnav dính, 2 cột ≥ lg + thẻ Tư vấn 1:1 sticky (1 LeadForm source=project)"
         }
       ],
       "phaseValidations": [
@@ -661,7 +672,7 @@
       "specVersion": "1.19.0",
       "scopeVersion": 23,
       "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md",
-      "next": "P4-T01 (chi tiết dự án: hero, menu neo, thẻ Tư vấn 1:1 dính)",
+      "next": "P4-T02 (tin liên quan + CTA tham quan + restyle khối)",
       "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra P3: chưa Lighthouse LCP/CLS; 2 ảnh priority/trang (banner + thẻ đầu/bài lớn); h1 EN dài trong banner 240px; đổi Khoảng giá cần JS; NewsCard card trong khối tối phải truyền onDark; kiểm trình duyệt dev :3001 chỉ 375/1280.",
       "specUpdates": [
         "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
@@ -1548,7 +1559,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-20T04:18:27+07:00",
+  "lastUpdated": "2026-10-20T04:36:50+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

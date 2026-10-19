@@ -115,6 +115,34 @@ describe("ProjectDetail (S03)", () => {
     expect(screen.getByText("Chiết khấu 5%")).toBeInTheDocument();
   });
 
+  it("bố cục 2 cột: form lead chỉ MỘT bản (một id) nằm trong aside cùng thẻ Tư vấn dính; hotline là link tel:; mục con không bị che (scroll-mt gồm thanh)", () => {
+    const { container } = renderDetail(fullProject);
+    expect(container.querySelectorAll("#lead-form")).toHaveLength(1);
+    expect(container.querySelectorAll("form")).toHaveLength(1);
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1.className).toContain("font-normal");
+    expect(h1.className).not.toContain("uppercase");
+    const aside = container.querySelector("aside") as HTMLElement;
+    expect(aside).not.toBeNull();
+    const card = aside.querySelector("#lead-form") as HTMLElement;
+    expect(card).not.toBeNull();
+    expect(card.contains(aside.querySelector("form"))).toBe(true);
+    expect(card.className).toContain("lg:sticky");
+    expect(card.className).toContain("lg:max-h-");
+    expect(card.className).toContain("overflow-y-auto");
+    expect(within(aside).getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+    // Cột chính và aside là hai cột của cùng một lưới ≥ lg; aside không nằm trong cột chính.
+    const grid = aside.parentElement as HTMLElement;
+    expect(grid.className).toContain("lg:grid-cols-");
+    expect(grid.firstElementChild?.contains(aside)).toBe(false);
+    // Thẻ Tư vấn (đích #lead-form) ghi đè scroll-mt mặc định của LeadFormSlot để pill dính không che tiêu đề (M-1).
+    expect(card.className).toContain("scroll-mt-[calc(var(--header-offset)+4.5rem)]");
+    expect(aside.getAttribute("aria-labelledby")).toBe(card.querySelector("h2")?.id);
+    for (const id of ["overview", "location", "amenities", "floor-plans", "gallery", "legal", "sales-policy"]) {
+      expect(container.querySelector(`#${id}`)?.className, id).toContain("scroll-mt-[calc(var(--header-offset)+4.5rem)]");
+    }
+  });
+
   it("hero: ảnh đầu tải ưu tiên (LCP) và là ảnh duy nhất được preload; nút Nhận tư vấn → #lead-form, Tải tài liệu → #documents", () => {
     const { container } = renderDetail(fullProject);
     const hero = container.querySelector("section img") as HTMLImageElement;
@@ -240,8 +268,14 @@ describe("ProjectSubNav", () => {
     matchMedia.mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() });
     await user.click(screen.getByRole("link", { name: "Tổng quan" }));
     expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: "auto", block: "start" });
-    expect(screen.getByRole("link", { name: "Vị trí" }).className).toContain("min-h-12");
-    expect(screen.getByRole("navigation").className).toContain("sticky");
+    expect(screen.getByRole("link", { name: "Vị trí" }).className).toContain("min-h-11");
+    const nav = screen.getByRole("navigation");
+    expect(nav.className).toContain("sticky");
+    // Viên thuốc dính dưới header nổi: nav trong suốt không chặn click, viên thuốc (ul) mới nhận chuột.
+    expect(nav.className).toContain("top-(--header-offset)");
+    expect(nav.className).toContain("pointer-events-none");
+    expect(within(nav).getByRole("list").className).toContain("rounded-pill");
+    expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute("aria-current", "location");
   });
 });
 

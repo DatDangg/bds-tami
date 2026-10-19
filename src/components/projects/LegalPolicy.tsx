@@ -34,7 +34,7 @@ function PolicyBlockView({ block, open, onToggle, isLg }: { block: PolicyBlock; 
   const headingId = useId();
   const panelId = useId();
   return (
-    <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--header-offset)+3.5rem)] min-w-0 focus:outline-none">
+    <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--header-offset)+4.5rem)] min-w-0 focus:outline-none">
       <h2 id={headingId} className="font-display text-h2">
         {isLg ? (
           block.title
@@ -95,7 +95,7 @@ export function LegalPolicy({ blocks }: { blocks: PolicyBlock[] }) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+    <div className="grid gap-8 xl:grid-cols-2 xl:gap-12">
       {blocks.map((block) => (
         <PolicyBlockView key={block.id} block={block} open={openIds.has(block.id)} onToggle={() => toggle(block.id)} isLg={isLg} />
       ))}

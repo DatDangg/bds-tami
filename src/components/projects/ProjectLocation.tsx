@@ -19,15 +19,15 @@ export function ProjectLocation({ projectName, location, address, areaLabel }: P
   const t = useTranslations("page.projectDetail");
   const addressText = [address, areaLabel].filter(Boolean).join(", ");
   return (
-    <ProjectSection id={SECTION_DOM_ID.location} title={t("sections.location")} tone="alt">
-      <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
+    <ProjectSection id={SECTION_DOM_ID.location} title={t("sections.location")}>
+      <div className="grid gap-8 xl:grid-cols-12 xl:gap-12">
         {location && (
-          <div className="lg:col-span-7">
+          <div className="xl:col-span-7">
             <LazyMap location={location} label={t("location.mapLabel", { name: projectName })} />
           </div>
         )}
         {addressText && (
-          <div className={location ? "lg:col-span-5" : "lg:col-span-12"}>
+          <div className={location ? "xl:col-span-5" : "xl:col-span-12"}>
             <h3 className="mb-2 text-small font-semibold text-text-muted">{t("location.address")}</h3>
             <p className="font-display text-h3">{addressText}</p>
           </div>
