@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { NavGroupCard } from "./dashboard-data";
 
 /** "Danh mục quản lý": cùng nhóm với sidebar; mục không đủ quyền/bị ẩn đã loại ở `buildNavGroupCards`. */
@@ -15,7 +16,7 @@ export function NavGroupCards({ groups }: { groups: NavGroupCard[] }) {
             <ul>
               {group.items.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href}>{item.label}</a>
+                  <Link href={item.href} prefetch={false}>{item.label}</Link>
                 </li>
               ))}
             </ul>

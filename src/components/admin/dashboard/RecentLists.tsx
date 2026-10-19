@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SOURCE_LABELS, STATUS_LABELS } from "../../../collections/Leads";
 import { CONTENT_STATUS_LABELS } from "../../../fields/status";
 import type { LeadSource } from "../../../lib/leads/lead-values";
@@ -25,7 +26,7 @@ export function RecentLeadsCard({ leads, now, isAdmin, adminRoute }: RecentListP
     <section className="tami-dash-card" aria-labelledby="tami-dash-leads">
       <h2 id="tami-dash-leads" className="tami-dash-card__title">
         {isAdmin ? "Lead mới nhất" : "Lead được giao gần đây"}
-        <a href={`${adminRoute}/collections/leads`}>Xem tất cả</a>
+        <Link href={`${adminRoute}/collections/leads`} prefetch={false}>Xem tất cả</Link>
       </h2>
       {leads.length === 0 ? (
         <p className="tami-dash-card__empty">Chưa có lead nào.</p>
@@ -34,9 +35,9 @@ export function RecentLeadsCard({ leads, now, isAdmin, adminRoute }: RecentListP
           {leads.map((lead) => (
             <li key={lead.id}>
               <div className="tami-dash-list__main">
-                <a className="tami-dash-list__title" href={`${adminRoute}/collections/leads/${lead.id}`}>
+                <Link className="tami-dash-list__title" href={`${adminRoute}/collections/leads/${lead.id}`} prefetch={false}>
                   {lead.fullName || lead.code}
-                </a>
+                </Link>
                 <span className="tami-dash-list__meta">{leadMeta(lead, now)}</span>
               </div>
               {isAdmin && !lead.isAssigned && lead.status === "new" && <StatusBadge value="unassigned" tone="warning" label="Chưa phân công" />}
@@ -63,9 +64,9 @@ export function RecentOwnDocsCard({ docs, now }: { docs: RecentOwnDoc[]; now: Da
           {docs.map((doc) => (
             <li key={doc.key}>
               <div className="tami-dash-list__main">
-                <a className="tami-dash-list__title" href={doc.href}>
+                <Link className="tami-dash-list__title" href={doc.href} prefetch={false}>
                   {doc.title}
-                </a>
+                </Link>
                 <span className="tami-dash-list__meta">{[doc.collectionLabel, relativeTimeVi(doc.updatedAt, now)].filter(Boolean).join(" · ")}</span>
               </div>
               <StatusBadge value={doc.status} label={STATUS_LABEL_BY_VALUE[doc.status]} />

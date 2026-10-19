@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "@payloadcms/ui";
 import { useEffect, useState } from "react";
 
@@ -74,9 +75,9 @@ export function TranslationFailedBanner() {
       <ul className="tami-admin-alert__list">
         {groups.map((group) => (
           <li key={group.slug}>
-            <a href={group.href}>
+            <Link href={group.href} prefetch={false}>
               {group.label}: {group.count} nội dung dịch lỗi
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

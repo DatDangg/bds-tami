@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatToday, greetingFor } from "./dashboard-format";
 import type { Shortcut } from "./dashboard-data";
 import { DashboardIcon } from "./DashboardIcons";
@@ -30,7 +31,7 @@ export function DashboardHeader({ name, now, shortcuts }: DashboardHeaderProps) 
           <ul className="tami-dash-create__menu" aria-label="Tạo nhanh">
             {shortcuts.map((shortcut) => (
               <li key={shortcut.slug}>
-                <a href={shortcut.href}>{shortcut.label}</a>
+                <Link href={shortcut.href} prefetch={false}>{shortcut.label}</Link>
               </li>
             ))}
           </ul>

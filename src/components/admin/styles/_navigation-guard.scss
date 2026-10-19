@@ -1,0 +1,4 @@
+// Ẩn toast Payload của trang đang rời đi (cờ do NavigationToastGuard gắn lên <html> từ beforeunload).
+html[data-admin-navigating-away] .payload-toast-container {
+  visibility: hidden;
+}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { StatCard } from "./dashboard-data";
 import { StatusBadge } from "../StatusBadge";
 import { DashboardIcon } from "./DashboardIcons";
@@ -28,9 +29,9 @@ export function StatCards({ cards }: { cards: StatCard[] }) {
       {cards.map((card) => (
         <li key={card.id}>
           {card.href ? (
-            <a className="tami-dash-stat" href={card.href}>
+            <Link className="tami-dash-stat" href={card.href} prefetch={false}>
               <StatCardBody card={card} />
-            </a>
+            </Link>
           ) : (
             <div className="tami-dash-stat">
               <StatCardBody card={card} />

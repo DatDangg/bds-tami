@@ -13,6 +13,7 @@
 @use "../../components/admin/styles/badges";
 @use "../../components/admin/styles/dashboard";
 @use "../../components/admin/styles/dashboard-lists";
+@use "../../components/admin/styles/navigation-guard";
 //
 // Tỉ lệ tương phản (WCAG 2.2, đã tính):
 //  - Nền sáng: chữ trắng / nút #8C6733 = 5.12:1 (AA 4.5), hover #7A5A2C = 6.31:1;
