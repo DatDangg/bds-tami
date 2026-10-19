@@ -1,11 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": {
-    "type": "bug",
-    "slug": "admin-misc-needs-repro",
-    "phaseTask": "phase-1-task-03",
-    "journal": ".context/runs/bug-admin-misc-needs-repro-phase-1-task-03.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -757,10 +752,10 @@
       "title": "Admin: vỡ dấu tiếng Việt Lexical (#05), form tràn ngang 375px (#10), toast \"Fetching user failed\" khi chuyển trang nhanh (#16) (BL-023)",
       "type": "BUG",
       "severity": "medium",
-      "status": "fixing",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-023",
-      "changeDoc": "spec/changes/2026-10-19-admin-misc-needs-repro.md",
+      "changeDoc": "spec/changes/archive/2026-10-19-admin-misc-needs-repro.md",
       "startedAt": "2026-10-20",
       "tasks": [
         {
@@ -796,9 +791,14 @@
           "reviewerResult": "PASS",
           "note": "#16 link <a> dashboard điều hướng toàn trang + toast Payload khi fetch /me bị huỷ",
           "reviewLevel": "STRICT",
-          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-03-round-2-review.md"
+          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-03-round-2-review.md",
+          "commit": "a8e98d8"
         }
-      ]
+      ],
+      "completedAt": "2026-10-20",
+      "specVersion": "1.17.0",
+      "scopeVersion": 21,
+      "residual": "#05 nội dung dán NFD chưa chuẩn hoá khi lưu (quyết định không thêm hook), diff Lexical chưa kiểm trình duyệt; #10 dashboard/danh sách 375px còn tràn (BL-024), viền focus breadcrumb có thể bị cắt dọc, vạch kẻ tài khoản desktop ngắn hơn 36px, chỉ kiểm Chrome; #16 F5/back khi /me treo chỉ unit test, chọn 'Rời trang' ở hộp thoại chưa lưu có thể chớp toast, Firefox có thể bỏ bfcache admin, dashboard next/link không có thanh tiến trình Payload"
     }
   ],
   "projectName": "tami-website",
