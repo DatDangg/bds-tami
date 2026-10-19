@@ -24,3 +24,7 @@ seed/scraped-cache/
 
 # parallel-dispatch worktree-per-task
 .worktrees/
+
+# task-dashboard runtime state (loop ghi, không commit)
+.context/agents-live.json
+.context/agents-live.json.lock

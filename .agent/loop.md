@@ -63,7 +63,17 @@
         task brief: "cd <worktree>; chạy FULL loop cho <task file>;
                      chỉ touch file trong scope; commit trong worktree;
                      KHÔNG ghi .context/progress.json; báo PASS/BLOCKED về."
+        ngay TRƯỚC khi spawn, đánh dấu agent đang sống (display-only):
+        node tools/task-dashboard/agent-live.mjs enter --agent builder-<n> --role builder \
+          --task <layer-N/task-NN> --title "<task title>" --phase building \
+          --worktree <worktree>
+        (n = số thứ tự builder trong wave; lỗi ở lệnh này KHÔNG được chặn build)
    c. Đợi TẤT CẢ builder trong wave xong (PASS hoặc BLOCKED).
+      • builder PASS → node tools/task-dashboard/agent-live.mjs leave --agent builder-<n>
+        rồi node tools/task-dashboard/agent-live.mjs enter --agent reviewer-<n> \
+          --role reviewer --task <layer-N/task-NN> --title "<task title>" --phase review
+        (gọi ngay trước khi spawn subagent reviewer; reviewer PASS → leave reviewer-<n>)
+      • builder BLOCKED → leave builder-<n> (task quay về TODO)
 3. Hết các wave → gọi MERGER (phần dưới).
 ```
 > ⚡ Mỗi builder chạy **Execution Steps bên dưới y hệt như loop đơn luồng**, chỉ khác: `git`/commit diễn ra trong worktree của nó, và bước **6 (Progress Update)** → **KHÔNG** tự ghi, chỉ báo kết quả cho merger.
@@ -71,6 +81,7 @@
 ### Merger steps (1 con, sau khi layer xong)
 ```
 1. node scripts/parallel-dispatch.mjs merge --layer N
+   → trước khi bắt đầu: node tools/task-dashboard/agent-live.mjs enter --agent merger --role merger --phase merging
    → gom mọi branch wt/layer-N__* về integration branch layer-N-integration.
    → NẾU CONFLICT: script DỪNG + in task gây conflict.
      → Xử lý: cho task đó chạy LẠI TUẦN TỰ trên integration branch (rebase/sửa tay),
@@ -82,8 +93,13 @@
    ghi blockedTasks nếu có, cập nhật currentLayer, lastUpdated (atomic).
 4. Merge integration branch về nhánh chính của project (theo DevOps/git policy).
 5. node scripts/parallel-dispatch.mjs cleanup --layer N  (xoá worktree + branch tạm)
+   → node tools/task-dashboard/agent-live.mjs clear   (resets agents-live.json về rỗng)
 6. → context-manager compact (bước 7 cũ) → HUMAN CHECKPOINT → layer N+1.
 ```
+
+> 📺 **`agents-live.json` là file DISPLAY, không phải state.** `progress.json` vẫn là source of truth.
+> Mất/hỏng `agents-live.json` KHÔNG ảnh hưởng loop — dashboard tự fallback suy luận từ worktree.
+> Builder **vẫn KHÔNG** ghi `progress.json`; chỉ gọi `agent-live.mjs` (ghi 1 file riêng trong `.context/`).
 
 > Một task tại một thời điểm **chỉ trong phạm vi 1 builder** (1 worktree). Song song xảy ra **giữa các builder** của các task độc lập — không phải trong 1 builder.
 
