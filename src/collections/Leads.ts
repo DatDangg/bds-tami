@@ -12,7 +12,7 @@ import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from 
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
-import { LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
+import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
 import { isUuid } from "../lib/uuid";
 import type { Lead } from "../payload-types";
 
@@ -198,7 +198,7 @@ export const Leads: CollectionConfig = {
   admin: {
     useAsTitle: "code",
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "createdAt"],
-    listSearchableFields: ["code", "fullName", "phone", "email"],
+    listSearchableFields: [...LEAD_LIST_SEARCHABLE_FIELDS],
     description: "Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.",
     // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
     components: { beforeList: ["/components/admin/LeadExportSlot#LeadExportSlot"] },

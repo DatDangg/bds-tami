@@ -1,7 +1,8 @@
-import type { Where } from "payload";
+import type { SanitizedCollectionConfig, Where } from "payload";
+import { mergeListSearchAndWhere } from "payload/shared";
 
 import { isUuid } from "../uuid";
-import { LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "./lead-values";
+import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "./lead-values";
 
 /** Bộ lọc xuất lead (API_SPEC §4): trạng thái, nguồn, sale phụ trách, khoảng thời điểm tạo (đúng giá trị `>=`/`<=` của danh sách). */
 export interface LeadExportFilters {
@@ -11,6 +12,8 @@ export interface LeadExportFilters {
   /** ISO 8601 có múi giờ (vd `2026-10-01T12:00:00.000Z`, giá trị DatePicker của Payload); chuẩn hoá về UTC. */
   createdFrom?: string;
   createdTo?: string;
+  /** Từ khoá ô tìm kiếm của danh sách, nguyên văn (không trim), ≤ `MAX_SEARCH_LENGTH`). Server tự dựng điều kiện tìm, không nhận where thô. */
+  search?: string;
 }
 
 export interface FilterIssue {
@@ -20,6 +23,8 @@ export interface FilterIssue {
 
 export type ParsedLeadExportFilters = { ok: true; filters: LeadExportFilters } | { ok: false; issues: FilterIssue[] };
 
+export const MAX_SEARCH_LENGTH = 100;
+export const SEARCH_TOO_LONG_MESSAGE = `Từ khoá tìm kiếm tối đa ${MAX_SEARCH_LENGTH} ký tự`;
 const MAX_TIMESTAMP_LENGTH = 40;
 // Bắt buộc có múi giờ: không có thì `Date.parse` hiểu theo giờ máy chủ, lệch so với danh sách.
 const TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/;
@@ -69,6 +74,12 @@ export function parseLeadExportFilters(params: URLSearchParams): ParsedLeadExpor
     if (timestamp) filters[name] = timestamp;
     else issues.push({ path: [name], message: "Thời điểm phải có dạng ISO 8601 kèm múi giờ, vd 2026-10-01T12:00:00.000Z" });
   }
+  // Không trim: danh sách Payload gửi từ khoá nguyên văn (chỉ drizzle tách theo U+0020), trim ở đây làm file xuất rộng hơn danh sách (vd chỉ có NBSP).
+  const search = params.get("search") ?? "";
+  if (search !== "") {
+    if (search.length <= MAX_SEARCH_LENGTH) filters.search = search;
+    else issues.push({ path: ["search"], message: SEARCH_TOO_LONG_MESSAGE });
+  }
   // So theo thời điểm, không so chuỗi ISO: năm > 9999 chuẩn hoá thành `+010000-…` đứng trước `9999-…` theo ký tự.
   if (filters.createdFrom && filters.createdTo && Date.parse(filters.createdFrom) > Date.parse(filters.createdTo)) {
     issues.push({ path: ["createdFrom"], message: "Thời điểm bắt đầu phải trước hoặc bằng thời điểm kết thúc" });
@@ -83,7 +94,14 @@ export function buildLeadExportWhere(filters: LeadExportFilters): Where {
   if (filters.assignedTo) conditions.push({ assignedTo: { equals: filters.assignedTo } });
   if (filters.createdFrom) conditions.push({ createdAt: { greater_than_equal: filters.createdFrom } });
   if (filters.createdTo) conditions.push({ createdAt: { less_than_equal: filters.createdTo } });
-  return conditions.length > 0 ? { and: conditions } : {};
+  const where: Where = conditions.length > 0 ? { and: conditions } : {};
+  if (!filters.search) return where;
+  // Cùng hàm Payload dùng để ghép ô tìm kiếm + bộ lọc của danh sách; hook `expandPhoneSearch` tự mở rộng nhánh SĐT khi find/count.
+  return mergeListSearchAndWhere({
+    collectionConfig: { admin: { listSearchableFields: [...LEAD_LIST_SEARCHABLE_FIELDS] } } as unknown as SanitizedCollectionConfig,
+    search: filters.search,
+    where,
+  });
 }
 
 type PlainRecord = Record<string, unknown>;
@@ -95,7 +113,7 @@ export type LeadExportQuery = { ok: true; query: string } | { ok: false; reason:
 // Tên toán tử lấy đúng nhãn tiếng Việt Payload hiển thị trong bộ lọc (`@payloadcms/translations` vi: equals / isGreaterThanOrEqualTo / isLessThanOrEqualTo).
 export const UNSUPPORTED_FILTER_MESSAGE =
   'Chỉ xuất được khi bộ lọc dùng: Trạng thái, Nguồn hoặc Sale phụ trách với "bằng"; Ngày tạo với "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" (mỗi phía một lần). ' +
-  'Không hỗ trợ ô tìm kiếm, nhiều nhóm điều kiện "hoặc" và các toán tử khác. Hãy đổi bộ lọc rồi xuất lại.';
+  'Không hỗ trợ nhiều nhóm điều kiện "hoặc" và các toán tử khác. Hãy đổi bộ lọc rồi xuất lại.';
 
 /**
  * Payload WhereBuilder luôn ghi `{ or: [ { and: [...] } ] }`; chấp nhận đúng 1 nhánh `or`, `and` lồng nhau, điều kiện đơn.
@@ -144,16 +162,21 @@ function applyCondition(condition: PlainRecord, params: URLSearchParams): boolea
 }
 
 /**
- * Bộ lọc đang áp trong danh sách lead của Payload (`where`) -> query string của endpoint xuất. Chỉ nhận điều kiện ánh xạ được
+ * Bộ lọc đang áp trong danh sách lead của Payload (`where`) + ô tìm kiếm (`search`, Payload giữ riêng khỏi `where`) -> query string của endpoint xuất. Chỉ nhận điều kiện ánh xạ được
  * 1-1 (equals của trạng thái/nguồn/sale, >=/<= thời điểm tạo, giữ nguyên giá trị); điều kiện khác -> `ok: false` để nút chặn, không xuất lặng lẽ toàn
  * bộ lead (over-export PII). Phía server vẫn kiểm lại mọi giá trị.
  */
-export function leadExportQueryFromWhere(where: unknown): LeadExportQuery {
+export function leadExportQueryFromWhere(where: unknown, search?: string): LeadExportQuery {
   const conditions: PlainRecord[] = [];
   if (!collectConditions(where, conditions)) return { ok: false, reason: UNSUPPORTED_FILTER_MESSAGE };
   const params = new URLSearchParams();
   for (const condition of conditions) {
     if (!applyCondition(condition, params)) return { ok: false, reason: UNSUPPORTED_FILTER_MESSAGE };
+  }
+  // Nguyên văn như Payload gửi cho danh sách (không trim) để file xuất khớp đúng tập danh sách.
+  if (search) {
+    if (search.length > MAX_SEARCH_LENGTH) return { ok: false, reason: SEARCH_TOO_LONG_MESSAGE };
+    params.set("search", search);
   }
   return { ok: true, query: params.toString() };
 }

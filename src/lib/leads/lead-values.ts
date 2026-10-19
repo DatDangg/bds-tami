@@ -12,6 +12,12 @@ export type LeadActivityType = (typeof LEAD_ACTIVITY_TYPES)[number];
 /** Loại hoạt động người dùng được thêm tay qua API/admin. Các loại còn lại chỉ hệ thống ghi (Local API), không ai giả mạo được lịch sử. */
 export const MANUAL_ACTIVITY_TYPES: readonly LeadActivityType[] = ["note", "call"];
 
+/**
+ * Trường ô tìm kiếm danh sách lead: một nguồn cho `Leads.admin.listSearchableFields` và endpoint xuất Excel, để file xuất luôn
+ * khớp tập lead danh sách đang thấy khi gõ từ khoá.
+ */
+export const LEAD_LIST_SEARCHABLE_FIELDS = ["code", "fullName", "phone", "email"] as const;
+
 export const LEAD_LOCALES = ["vi", "en"] as const;
 
 /**

@@ -1,7 +1,7 @@
 import type { EventEmitter } from "node:events";
 import { strFromU8, unzipSync } from "fflate";
 import pg from "pg";
-import { createLocalReq, handleEndpoints, type Payload } from "payload";
+import { createLocalReq, handleEndpoints, type Payload, type Where } from "payload";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ROLES } from "../../src/access/roles";
@@ -233,6 +233,96 @@ describe.skipIf(!baseUrl)("integration: xuất lead ra Excel (GET /api/admin/lea
     const token = await login("admin4");
     await payload.update({ collection: "staff", id: locked.id, data: { active: false }, overrideAccess: true });
     expect((await exportLeads("", token)).status).toBe(401);
+  });
+
+  describe("tìm kiếm (search): file khớp đúng tập danh sách đang thấy", () => {
+    let token: string;
+    // Admin riêng cho 2 case cuối: `token` đã dùng gần hết 10 lượt/giờ.
+    let lastToken: string;
+    // Admin riêng cho các case từ khoá nguyên văn.
+    let verbatimToken: string;
+    const SEARCH_PHONE = "0956 789 012";
+    let target: Lead;
+
+    beforeAll(async () => {
+      await createStaff("admin6", ROLES.admin);
+      token = await login("admin6");
+      await createStaff("admin7", ROLES.admin);
+      lastToken = await login("admin7");
+      await createStaff("admin8", ROLES.admin);
+      verbatimToken = await login("admin8");
+      await createLead({ fullName: "Nbsp\u00a0Giữa", phone: "0933 444 555" });
+      await createLead({ fullName: "Mã_giảm 100%", phone: "0933 444 556" });
+      target = await createLead({ fullName: "Trần Tìm Kiếm", phone: SEARCH_PHONE, email: "tim.kiem@example.test", status: "contacted" });
+      await createLead({ fullName: "Tìm Kiếm Khác", phone: "0956 111 222", email: "khac@example.test", status: "new" });
+      await createLead({ fullName: "Không Liên Quan", phone: "0911 000 333" });
+    }, 60_000);
+
+    /** Where danh sách admin dựng: `mergeListSearchAndWhere` của Payload; hook `expandPhoneSearch` tự áp trên find (như danh sách). */
+    async function listedCodes(search: string, where: Where = {}) {
+      const { mergeListSearchAndWhere } = await import("payload/shared");
+      const merged = mergeListSearchAndWhere({ collectionConfig: payload.collections.leads.config, search, where });
+      const found = await payload.find({ collection: "leads", where: merged, overrideAccess: true, depth: 0, pagination: false, limit: 0 });
+      return found.docs.map((lead) => lead.code).sort();
+    }
+    const exportedCodes = async (query: string) => {
+      const response = await exportLeads(query, token);
+      expect(response.status, query).toBe(200);
+      return (await readRows(response)).slice(1).map((row) => row[0]!).sort();
+    };
+
+    it("SĐT gõ có dấu cách / không dấu cách / +84 / email / mã / họ tên đều ra đúng tập danh sách", async () => {
+      for (const search of [SEARCH_PHONE, "0956789012", "+84956789012", "tim.kiem@example.test", target.code, "Trần Tìm"]) {
+        const expected = await listedCodes(search);
+        expect(expected, search).toContain(target.code);
+        expect(await exportedCodes(`?search=${encodeURIComponent(search)}`), search).toEqual(expected);
+      }
+    });
+
+    it("tìm + bộ lọc trạng thái: giao của hai điều kiện, bằng danh sách", async () => {
+      const expected = await listedCodes("Tìm Kiếm", { status: { equals: "contacted" } });
+      expect(expected).toEqual([target.code]);
+      expect(await exportedCodes("?search=T%C3%ACm%20Ki%E1%BA%BFm&status=contacted")).toEqual(expected);
+      const wider = await listedCodes("Tìm Kiếm");
+      expect(wider.length).toBeGreaterThan(1);
+      expect(await exportedCodes("?search=T%C3%ACm%20Ki%E1%BA%BFm")).toEqual(wider);
+    });
+
+    it("search toàn dấu cách bằng đúng danh sách (Payload không trim); không khớp gì -> file chỉ có tiêu đề", async () => {
+      expect(await exportedCodes("?search=%20%20")).toEqual(await listedCodes("  "));
+      expect(await exportedCodes("?search=khong-ton-tai-xyz")).toEqual([]);
+    });
+
+    it("search quá 100 ký tự -> 400 kèm details, không audit; ký tự đặc biệt không làm hỏng truy vấn", async () => {
+      const before = (await exportAudits()).length;
+      const response = await exportLeads(`?search=${"a".repeat(101)}`, token);
+      expect(response.status).toBe(400);
+      expect((await response.json()).details).toEqual([{ path: ["search"], message: expect.any(String) }]);
+      expect((await exportAudits()).length).toBe(before);
+      expect((await exportLeads("?search=%25%27%3B--%5C", lastToken)).status).toBe(200);
+    });
+
+    it("từ khoá nguyên văn như danh sách: NBSP/tab cuối, chỉ NBSP, `_` và `%` -> file = tập danh sách (không rộng hơn)", async () => {
+      const all = (await readRows(await exportLeads("", verbatimToken))).length - 1;
+      for (const search of ["Tìm Kiếm\u00a0", "Kiếm\t", "\u00a0", "Nbsp\u00a0Giữa", "_", "%", "giảm 100%", "Mã_giảm"]) {
+        const expected = await listedCodes(search);
+        const response = await exportLeads(`?search=${encodeURIComponent(search)}`, verbatimToken);
+        expect(response.status, JSON.stringify(search)).toBe(200);
+        const exported = (await readRows(response)).slice(1).map((row) => row[0]!).sort();
+        expect(exported, JSON.stringify(search)).toEqual(expected);
+        if (search === "\u00a0") expect(exported.length).toBeLessThan(all);
+      }
+    });
+
+    it("sale vẫn 403 với search; audit chỉ có cờ search, không có từ khoá", async () => {
+      expect((await exportLeads(`?search=${encodeURIComponent(SEARCH_PHONE)}`, tokens.saleA)).status).toBe(403);
+      const admin = (await payload.find({ collection: "staff", where: { email: { equals: `admin7-${runId}@example.test` } }, overrideAccess: true, depth: 0 })).docs[0]!;
+      await (await exportLeads(`?search=${encodeURIComponent(SEARCH_PHONE)}&status=contacted`, lastToken)).arrayBuffer();
+      const audit = (await exportAudits()).filter((entry) => entry.actor === admin.id).at(-1);
+      expect(audit?.meta).toMatchObject({ filters: { status: "contacted", search: true }, rowCount: 1 });
+      const text = JSON.stringify(audit);
+      for (const secret of [SEARCH_PHONE, target.phone, "tim.kiem@example.test", "Tìm Kiếm"]) expect(text).not.toContain(secret);
+    });
   });
 
   describe("khoảng ngày và keyset (lead có createdAt chỉ định, nằm ngoài các case trên)", () => {

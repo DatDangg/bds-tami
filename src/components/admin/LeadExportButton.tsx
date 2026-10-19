@@ -3,7 +3,7 @@
 import { useAuth, useListDrawerContext, useListQuery } from "@payloadcms/ui";
 import { useState } from "react";
 
-import { leadExportQueryFromWhere, UNSUPPORTED_FILTER_MESSAGE } from "@/lib/leads/export-filters";
+import { leadExportQueryFromWhere } from "@/lib/leads/export-filters";
 
 const DEFAULT_FILE_NAME = "tami-leads.xlsx";
 const REVOKE_DELAY_MS = 10_000;
@@ -27,7 +27,7 @@ function fileNameFrom(contentDisposition: string | null): string {
 
 /**
  * Nút "Xuất Excel" trên danh sách lead, chỉ hiện cho admin (sale không được xuất: PERMISSION §3.3). Xuất đúng bộ lọc đang áp
- * trong danh sách (trạng thái, nguồn, sale, khoảng ngày). Bộ lọc không chuyển được (ô tìm kiếm, nhiều nhóm điều kiện, toán tử lạ)
+ * trong danh sách (trạng thái, nguồn, sale, khoảng ngày, ô tìm kiếm: server tự dựng điều kiện tìm như danh sách). Bộ lọc không chuyển được (nhiều nhóm điều kiện, toán tử lạ)
  * thì nút bị khoá kèm thông báo, không xuất lặng lẽ toàn bộ lead. Dùng fetch thay vì liên kết tải thẳng để
  * lỗi 429/422 hiện thành thông báo thay vì tải về một file JSON lỗi. Thùng rác do `LeadExportSlot` (server) chặn; ở đây chỉ ẩn
  * trong list drawer (chọn lead từ collection khác): `filterOptions` của drawer không nằm trong `where` nên xuất sẽ rộng hơn danh sách đang thấy.
@@ -40,7 +40,7 @@ export function LeadExportButton() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   if (user?.role !== "admin" || isInDrawer) return null;
-  const converted = query?.search ? ({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE } as const) : leadExportQueryFromWhere(query?.where);
+  const converted = leadExportQueryFromWhere(query?.where, query?.search);
 
   async function exportLeads() {
     if (!converted.ok) return;

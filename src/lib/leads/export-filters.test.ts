@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildLeadExportWhere, leadExportQueryFromWhere, UNSUPPORTED_FILTER_MESSAGE, parseLeadExportFilters } from "./export-filters";
+import { buildLeadExportWhere, MAX_SEARCH_LENGTH, leadExportQueryFromWhere, UNSUPPORTED_FILTER_MESSAGE, parseLeadExportFilters } from "./export-filters";
 
 const SALE_ID = "0a1b2c3d-1111-4222-8333-444455556666";
 const parse = (query: string) => parseLeadExportFilters(new URLSearchParams(query));
@@ -53,6 +53,29 @@ describe("parseLeadExportFilters", () => {
     const result = parse(query);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.issues[0]?.path).toEqual([field]);
+  });
+});
+
+describe("tham số search", () => {
+  it("nguyên văn, không trim (như danh sách): SĐT có dấu cách, NBSP/tab giữ nguyên; chỉ chuỗi rỗng = không tìm", () => {
+    expect(parse("search=0956%20789%20012")).toEqual({ ok: true, filters: { search: "0956 789 012" } });
+    expect(parse("search=%20%200956%20")).toEqual({ ok: true, filters: { search: "  0956 " } });
+    expect(parse("search=%C2%A0")).toEqual({ ok: true, filters: { search: "\u00a0" } });
+    expect(parse("search=an%09")).toEqual({ ok: true, filters: { search: "an\t" } });
+    expect(parse("search=")).toEqual({ ok: true, filters: {} });
+    expect(parse("")).toEqual({ ok: true, filters: {} });
+  });
+  it("đúng độ dài tối đa thì nhận, vượt thì lỗi kèm path search", () => {
+    expect(parse(`search=${"a".repeat(MAX_SEARCH_LENGTH)}`).ok).toBe(true);
+    const result = parse(`search=${"a".repeat(MAX_SEARCH_LENGTH + 1)}`);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues).toEqual([{ path: ["search"], message: expect.stringContaining("100") }]);
+  });
+  it("where: chỉ tìm -> or trên 4 trường danh sách; tìm + lọc -> and (lọc, or) như danh sách ghép", () => {
+    const searchOnly = buildLeadExportWhere({ search: "an" });
+    expect(searchOnly).toEqual({ or: [{ code: { like: "an" } }, { fullName: { like: "an" } }, { phone: { like: "an" } }, { email: { like: "an" } }] });
+    const both = buildLeadExportWhere({ status: "new", search: "an" });
+    expect(both).toEqual({ and: [{ status: { equals: "new" } }, searchOnly] });
   });
 });
 
@@ -120,9 +143,23 @@ describe("leadExportQueryFromWhere", () => {
     expect(leadExportQueryFromWhere(where)).toEqual({ ok: false, reason: UNSUPPORTED_FILTER_MESSAGE });
   });
 
+  it("search gửi nguyên văn (không trim); chuỗi rỗng thì bỏ; ô tìm kiếm không còn làm khoá nút", () => {
+    expect(leadExportQueryFromWhere({ or: [{ and: [{ status: { equals: "new" } }] }] }, "0956 789 012")).toEqual({ ok: true, query: "status=new&search=0956+789+012" });
+    expect(leadExportQueryFromWhere(undefined, "an\u00a0")).toEqual({ ok: true, query: "search=an%C2%A0" });
+    expect(leadExportQueryFromWhere(undefined, "   ")).toEqual({ ok: true, query: "search=+++" });
+    expect(leadExportQueryFromWhere(undefined, "")).toEqual({ ok: true, query: "" });
+    expect(leadExportQueryFromWhere(undefined, undefined)).toEqual({ ok: true, query: "" });
+  });
+
+  it("search dài hơn tối đa -> khoá kèm thông báo riêng", () => {
+    expect(leadExportQueryFromWhere(undefined, "a".repeat(MAX_SEARCH_LENGTH))).toEqual({ ok: true, query: `search=${"a".repeat(MAX_SEARCH_LENGTH)}` });
+    expect(leadExportQueryFromWhere(undefined, "a".repeat(MAX_SEARCH_LENGTH + 1))).toEqual({ ok: false, reason: "Từ khoá tìm kiếm tối đa 100 ký tự" });
+  });
+
   it("thông báo khoá nút nêu rõ field + toán tử hỗ trợ (đúng nhãn tiếng Việt của Payload) và thứ không hỗ trợ", () => {
-    for (const expected of ["Trạng thái", "Nguồn", "Sale phụ trách", "Ngày tạo", '"bằng"', '"lớn hơn hoặc bằng"', '"nhỏ hơn hoặc bằng"', "ô tìm kiếm", '"hoặc"']) {
+    for (const expected of ["Trạng thái", "Nguồn", "Sale phụ trách", "Ngày tạo", '"bằng"', '"lớn hơn hoặc bằng"', '"nhỏ hơn hoặc bằng"', '"hoặc"']) {
       expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
     }
+    expect(UNSUPPORTED_FILTER_MESSAGE).not.toContain("tìm kiếm");
   });
 });

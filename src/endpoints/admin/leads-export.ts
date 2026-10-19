@@ -172,7 +172,7 @@ async function checkExportRateLimit(rateLimit: LeadsExportRateLimit, userId: str
 /**
  * Thứ tự (PERMISSION §5): đăng nhập + còn hoạt động (401) -> admin (403; sale không xuất, dù lead được giao) -> tham số hợp lệ (400)
  * -> rate limit 10 lần/giờ/user (429, Redis lỗi 503) TRƯỚC mọi truy vấn lead -> đếm dòng (quá trần: 422) -> audit `lead.export`
- * (bộ lọc + số dòng, không có dữ liệu khách; fail-closed: ghi lỗi thì 500, không có file nào ra mà không có dấu vết) -> stream.
+ * (bộ lọc + số dòng, không có dữ liệu khách, từ khoá tìm kiếm chỉ ghi cờ; fail-closed: ghi lỗi thì 500, không có file nào ra mà không có dấu vết) -> stream.
  * Lỗi giữa stream thì kết nối bị ngắt (file dở không hợp lệ), không bao giờ trả file thiếu mà báo thành công.
  */
 export async function handleLeadsExport(
@@ -191,6 +191,8 @@ export async function handleLeadsExport(
   if (blocked) return blocked;
 
   const where = buildLeadExportWhere(parsed.filters);
+  // Từ khoá có thể là SĐT/email khách: audit chỉ ghi cờ có tìm kiếm, không ghi nội dung.
+  const { search, ...auditFilters } = parsed.filters;
   const { totalDocs } = await req.payload.count({ collection: "leads", where, user: req.user, overrideAccess: false });
   if (totalDocs > maxRows) {
     return fail(422, `Quá nhiều lead (${totalDocs}); tối đa ${maxRows} dòng mỗi lần, hãy thu hẹp bộ lọc`);
@@ -202,7 +204,7 @@ export async function handleLeadsExport(
       action: "lead.export",
       collection: "leads",
       summary: "Xuất lead ra Excel",
-      meta: { filters: parsed.filters, rowCount: totalDocs },
+      meta: { filters: search ? { ...auditFilters, search: true } : auditFilters, rowCount: totalDocs },
       req,
     });
   } catch (error) {
