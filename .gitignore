@@ -21,3 +21,6 @@ public/vendor/maplibre/
 # Dữ liệu demo lấy từ site tham chiếu (chỉ staging/dev, không commit)
 seed/scraped/
 seed/scraped-cache/
+
+# parallel-dispatch worktree-per-task
+.worktrees/

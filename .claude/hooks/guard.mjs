@@ -10,6 +10,8 @@
  *  - Mọi agent: cấm git push trần / force / --all / --mirror / xoá remote branch / push forbidden_branch,
  *    cấm `git reset --hard`, `git checkout --`, lệnh DB destructive (db push, migrate reset, seed/reset).
  *  - builder, builder-strong, reviewer, spec-validator: cấm `git commit` / `git push` (chỉ primary commit).
+ *    Ngoại lệ: builder/builder-strong được `git commit` khi thư mục làm việc nằm trong `<project>/.worktrees/`
+ *    (chạy song song worktree-per-task, .agent/loop.md § Parallel Execution Model). Push vẫn cấm.
  *  - reviewer, spec-validator: chỉ được Write/Edit trong `.context/review-reports/**`.
  *  - Gọi subagent builder-strong → luôn hỏi user (permissionDecision: ask).
  * forbidden_branch đọc từ `.context/project-config.md` (mặc định `main`).
@@ -20,6 +22,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const NO_COMMIT_AGENTS = new Set(['builder', 'builder-strong', 'reviewer', 'spec-validator'])
+const WORKTREE_COMMIT_AGENTS = new Set(['builder', 'builder-strong'])
 const REPORT_ONLY_AGENTS = new Set(['reviewer', 'spec-validator'])
 const REPORT_DIR = '.context/review-reports/'
 
@@ -60,15 +63,35 @@ function pushViolation(args, forbidden) {
   return null
 }
 
-function bashViolation(command, agentType, forbidden) {
+// Git Bash path `/d/prj/x` → `d:/prj/x`; bỏ quote; so sánh lowercase dấu `/`.
+function normDir(dir) {
+  return dir.replace(/^["']|["']$/g, '').replace(/^\/([a-zA-Z])(\/|$)/, '$1:/').replace(/\\/g, '/')
+}
+
+function resolveDir(base, dir) {
+  return path.resolve(base, normDir(dir)).replace(/\\/g, '/').toLowerCase()
+}
+
+function insideWorktree(dir, projectDir) {
+  const root = resolveDir(projectDir, '.worktrees') + '/'
+  return dir.startsWith(root)
+}
+
+function bashViolation(command, agentType, forbidden, cwd, projectDir) {
+  let dir = resolveDir(projectDir, cwd)
   for (const sub of subcommands(command)) {
+    const cd = sub.match(/^cd\s+(\S+)$/)
+    if (cd) { dir = resolveDir(dir, cd[1]); continue }
     if (DB_DESTRUCTIVE.some((re) => re.test(sub))) return `lệnh DB destructive bị cấm: \`${sub}\` (dùng migration versioned)`
     const git = sub.match(/(?:^|\s)git(?:\s+-C\s+\S+|\s+-c\s+\S+)*\s+(\S+)(.*)$/)
     if (!git) continue
     const [, verb, rest] = git
+    const gitC = sub.match(/(?:^|\s)git\s+-C\s+(\S+)/)
+    const gitDir = gitC ? resolveDir(dir, gitC[1]) : dir
     if (verb === 'reset' && /--hard/.test(rest)) return '`git reset --hard` bị cấm (redo trên đĩa, không revert)'
     if (verb === 'checkout' && /(^|\s)--(\s|$)/.test(rest)) return '`git checkout --` bị cấm'
-    if (NO_COMMIT_AGENTS.has(agentType) && (verb === 'commit' || verb === 'push')) {
+    const worktreeCommit = verb === 'commit' && WORKTREE_COMMIT_AGENTS.has(agentType) && insideWorktree(gitDir, projectDir)
+    if (NO_COMMIT_AGENTS.has(agentType) && (verb === 'commit' || verb === 'push') && !worktreeCommit) {
       return `agent \`${agentType}\` KHÔNG được git ${verb} — chỉ primary commit sau Reviewer PASS`
     }
     if (verb === 'push') {
@@ -106,7 +129,7 @@ try {
     process.exit(0)
   }
   let reason = null
-  if (input.tool_name === 'Bash') reason = bashViolation(String(toolInput.command || ''), agentType, readForbiddenBranch(projectDir))
+  if (input.tool_name === 'Bash') reason = bashViolation(String(toolInput.command || ''), agentType, readForbiddenBranch(projectDir), input.cwd || projectDir, projectDir)
   else reason = writeViolation(toolInput.file_path || toolInput.notebook_path, agentType, projectDir)
   if (reason) deny(reason)
 } catch {

@@ -1,15 +1,93 @@
-# Loop Agent — Task Execution (ReAct Pattern)
+# Loop Agent — Task Execution (ReAct Pattern, Parallel per-worktree)
 
-> Engine thực thi từng task theo ReAct: Read → Plan → Act → Observe → Repeat.
+> Engine thực thi task theo ReAct: Read → Plan → Act → Observe → Repeat.
+> Trong 1 layer, các task độc lập chạy **SONG SONG** — mỗi task 1 **git worktree riêng**, mỗi builder agent chạy loop đầy đủ trong worktree của mình. 1 agent **merger** gom lại.
 > Điều phối: `AGENTS.md` + `.agent/FEATURE_WORKFLOW.md`. State: `.context/progress.json` (`features[]`/`bugs[]`).
 
 ## Role
-Execute từng task theo ReAct cycle: Read → Plan → Act → Observe → Repeat.
+- **Dispatcher** (loop chính): chia task độc lập trong layer thành các wave song song, setup worktree, spawn builder cho từng task, rồi gọi merger.
+- **Builder** (mỗi task 1 con, chạy song song): execute 1 task theo ReAct cycle đầy đủ (Read → Plan → Act → Observe → Review → Commit) **bên trong worktree riêng** của mình.
+- **Merger** (1 con, sau khi cả wave xong): gom branch các task về integration branch của layer, verify tổng thể, update `progress.json` 1 lần.
 
 ## Trigger
 - **`/start`** (project start): sau khi `graph` sinh layer plan + user duyệt plan → loop chạy layer 0 → …. (Đây là đường vào chính của initial build.)
 - `change-request` hoặc `/change` chia xong phase/task (feature/bug)
 - Hoặc resume từ `.context/progress.json`
+
+---
+
+## Parallel Execution Model (worktree-per-task)
+
+> Đọc trước khi chạy 1 layer. Khi layer chỉ có 1 task → bỏ qua fan-out, chạy trực tiếp như cũ (để khỏi tốn worktree).
+
+```
+            ┌─────────────────────────────────┐
+            │  DISPATCHER (loop chính)       │
+            │  plan --layer N → các wave     │
+            └──────────────┬─────────────┘
+                          │  với mỗi wave:
+        ┌───────────────┼──────────────┐   (spawn song song)
+        ▼               ▼               ▼
+  ┌────────┐    ┌────────┐    ┌────────┐
+  │BUILDER │    │BUILDER │    │BUILDER │   mỗi con 1 worktree riêng
+  │task-01 │    │task-02 │    │task-03 │   chạy FULL loop (Read→Plan→
+  │(.wt/..)│    │(.wt/..)│    │(.wt/..)│   Act→Observe→Review→Commit)
+  └────┬───┘    └────┬───┘    └────┬───┘
+       └───────────┴───────────┘
+                    ▼  (tất cả PASS + committed)
+            ┌─────────────────────────────────┐
+            │  MERGER (1 con)                │
+            │  merge --layer N → verify tổng  │
+            │  → update progress.json 1 lần  │
+            │  → cleanup worktree            │
+            └──────────────┬─────────────┘
+                          ▼
+                   HUMAN CHECKPOINT → layer N+1
+```
+
+### Đảm bảo độc lập — không giẫm chân nhau
+1. **Nguồn gốc**: graph đã đảm bảo *task trong cùng layer không phụ thuộc nhau* (graph Rule #3).
+2. **Check file trùng**: `plan --layer N` đọc trường **Files to Create/Modify** của mỗi task; 2 task khai trùng file → **không xếp cùng wave** (task sau đẩy sang wave kế). Mỗi wave = tập task chắc chắn không đụng file nhau.
+3. **Cô lập vật lý**: mỗi task 1 **git worktree + branch riêng** (`.worktrees/<...>`, branch `wt/<...>`). Builder chỉ thấy working tree của mình → không thể ghi đè file của builder khác trong lúc chạy.
+4. **State không tranh chấp**: builder con **KHÔNG** tự ghi `.context/progress.json`. Chỉ **merger** ghi tập trung 1 lần sau khi gom xong (chống race condition).
+
+### Dispatcher steps (loop chính, mỗi layer)
+```
+1. node scripts/parallel-dispatch.mjs plan --layer N
+   → nhận JSON { waves: [[task...], [task...]] }
+2. Với MỖI wave (tuần tự giữa các wave, song song TRONG wave):
+   a. Với mỗi task trong wave:
+        node scripts/parallel-dispatch.mjs setup --task <layer-N/task-NN>
+        → nhận { worktree, branch }
+   b. Spawn SONG SONG 1 builder/ task (sessions_spawn, context="isolated"):
+        task brief: "cd <worktree>; chạy FULL loop cho <task file>;
+                     chỉ touch file trong scope; commit trong worktree;
+                     KHÔNG ghi .context/progress.json; báo PASS/BLOCKED về."
+   c. Đợi TẤT CẢ builder trong wave xong (PASS hoặc BLOCKED).
+3. Hết các wave → gọi MERGER (phần dưới).
+```
+> ⚡ Mỗi builder chạy **Execution Steps bên dưới y hệt như loop đơn luồng**, chỉ khác: `git`/commit diễn ra trong worktree của nó, và bước **6 (Progress Update)** → **KHÔNG** tự ghi, chỉ báo kết quả cho merger.
+
+### Merger steps (1 con, sau khi layer xong)
+```
+1. node scripts/parallel-dispatch.mjs merge --layer N
+   → gom mọi branch wt/layer-N__* về integration branch layer-N-integration.
+   → NẾU CONFLICT: script DỪNG + in task gây conflict.
+     → Xử lý: cho task đó chạy LẠI TUẦN TỰ trên integration branch (rebase/sửa tay),
+       rồi merge tiếp các branch còn lại. (Conflict = dấu hiệu 2 task chưa thực sự độc lập → ghi `.context/error-memory.md` để graph lần sau tách kỹ hơn.)
+2. Verify TỔNG THỂ trên integration branch (build/test/lint/typecheck theo project-config):
+   từng task pass riêng KHÔNG đảm bảo ghép lại pass.
+   → FAIL: gọi error-analyzer, fix trên integration branch, commit, verify lại.
+3. Update `.context/progress.json` 1 LẦN: thêm mọi task PASS vào completedTasks,
+   ghi blockedTasks nếu có, cập nhật currentLayer, lastUpdated (atomic).
+4. Merge integration branch về nhánh chính của project (theo DevOps/git policy).
+5. node scripts/parallel-dispatch.mjs cleanup --layer N  (xoá worktree + branch tạm)
+6. → context-manager compact (bước 7 cũ) → HUMAN CHECKPOINT → layer N+1.
+```
+
+> Một task tại một thời điểm **chỉ trong phạm vi 1 builder** (1 worktree). Song song xảy ra **giữa các builder** của các task độc lập — không phải trong 1 builder.
+
+---
 
 ## Pattern
 
@@ -161,9 +239,11 @@ Task type checklist:
 Nếu command chưa cấu hình hoặc repo chưa có app code/API/web/test, ghi `skip, no app configured` thay vì tự đoán `npm`/`pnpm`.
 
 ### 5. Evaluate
-- **ALL PASS** → Commit → gọi subagent `reviewer` (`.opencode/agent/reviewer.md`) review độc lập
+- **ALL PASS** → Commit (trong worktree của builder) → gọi subagent `reviewer` (`.opencode/agent/reviewer.md`) review độc lập
 - **FAIL** → gọi `error-analyzer` (`.agent/error-analyzer.md`) → fix → Retry from ACT
-- **3 retries fail** → Mark task as BLOCKED → Move to next task → Notify human
+- **3 retries fail** → Mark task as BLOCKED → báo về dispatcher/merger → Notify human
+
+> ⚡ **Builder (chạy song song):** commit trong worktree của mình, review riêng task của mình, rồi **báo PASS/BLOCKED về** — **KHÔNG** tự ghi `.context/progress.json`, **KHÔNG** tự merge về nhánh chính. Merger lo gom.
 
 ### 6. Context Hygiene
 Sau mỗi task PASS:
@@ -173,8 +253,8 @@ Sau mỗi task PASS:
 - Error patterns đã ghi vào .context/error-memory.md → không cần nhớ máy móc
 ```
 
-### 7. Context Compact Check (`.agent/context-manager.md`)
-Sau mỗi task PASS (đọc `completedTasks` từ `.context/progress.json`):
+### 7. Context Compact Check (`.agent/context-manager.md`) — MERGER chạy
+Sau mỗi task PASS (đọc `completedTasks` từ `.context/progress.json`, do merger cập nhật):
 ```
 Nếu số task đã done % 3 == 0:
   → INVOKE .agent/context-manager.md (compact)
@@ -209,7 +289,7 @@ git commit -m "feat(<feature|bug>-<slug>): phase-<N>-task-<NN> {short descriptio
 
 ## Progress Update
 
-After each task completes (PASS or BLOCKED):
+**CHỈ MERGER ghi** `.context/progress.json` — 1 lần sau khi gom cả layer (chống race condition giữa các builder song song). Builder con **không tự ghi**, chỉ báo kết quả PASS/BLOCKED.
 ```json
 // .context/progress.json — schema: features[] / bugs[], activeWorkItem
 {
@@ -269,12 +349,13 @@ Trước khi mark task DONE:
 
 ## Rules
 
-1. **Một task tại một thời điểm** — không chạy song song
+1. **Song song theo worktree** — trong 1 wave, các task độc lập chạy SONG SONG, mỗi task 1 worktree riêng. Một builder chỉ làm 1 task tại 1 thời điểm. Task trùng file → khác wave (xem Parallel Execution Model).
 2. **Không skip tests** — mỗi task phải có test theo đúng loại (xem Test Strategy)
 3. **Đọc error-memory TRƯỚC khi code** — tránh lặp lỗi cũ
 4. **Max 3 retries** — sau đó đánh BLOCKED
 5. **Commit ngay khi PASS** — tạo rollback point
-6. **Không sửa code ngoài scope** — chỉ touch files trong task definition
+6. **Không sửa code ngoài scope** — chỉ touch files trong task definition (worktree cô lập đã chặn vật lý, nhưng vẫn phải tự giới hạn đúng scope để merge sạch)
+10. **Builder không ghi state/không merge** — chỉ merger ghi `progress.json` + gom branch. Conflict lúc merge → ghi `error-memory.md`, cho task đó chạy lại tuần tự.
 7. **Dùng response helper chung** — MỌI API response phải đi qua `ok()`/`fail()`. Không bao giờ viết tay `res.json({token, user})` hay format tùy ý.
 8. **Test theo contract của client** — import types từ `src/shared/types/api.ts`, không hardcode shape.
 9. **Auth endpoints: test-first** — viết contract test trước khi implement.

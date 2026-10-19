@@ -8,20 +8,21 @@
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| Language | TypeScript | 5.x |
+| Language | TypeScript | 7.0.2 (pin exact — Rust-based `tsc`, ~10x nhanh) |
 | Runtime | Node.js | 22 LTS |
-| Frontend | React | 19.3.0 (pin exact) |
-| Bundler | Vite | 8.3.1 (pin exact) |
+| Frontend | React | 19.3.1 (pin exact) |
+| Bundler | Vite | 8.3.4 (pin exact) |
 | React Compiler | oxc-transform-react (native Rust) | latest |
 | Backend | Express | 4.x |
 | ORM | From `PROJECT_PROFILE.db_tool` | `none` / `prisma` / `drizzle` / `other`; không giả định Prisma |
-| Validation | Zod | 4.x (4.6.5) |
+| Validation | Zod | 4.x (4.6.7) |
 
 ## Frontend Stack
 
 | Category | Library | Notes |
 |----------|---------|-------|
 | Routing | React Router | v8 (8.4.0) |
+| Server State | TanStack Query | v5 (5.104.4) |
 | State | Zustand | Simple, no boilerplate |
 | Server State | TanStack Query | Cache, refetch, mutations |
 | Forms | React Hook Form + Zod | Validation |
@@ -82,15 +83,16 @@
 Always pin exact versions in `package.json`:
 ```json
 "dependencies": {
-  "react": "19.3.0",          // ✅ exact
+  "react": "19.3.1",          // ✅ exact
   "react-router": "8.4.0",    // ✅ exact
-  "zod": "4.6.5",             // ✅ exact
-  "@tanstack/react-query": "5.104.0", // ✅ exact
+  "zod": "4.6.7",             // ✅ exact
+  "@tanstack/react-query": "5.104.4", // ✅ exact
   "express": "4.19.2"         // ✅ exact
 }
 "devDependencies": {
-  "vite": "8.3.1",            // ✅ exact
-  "vitest": "5.0.2",          // ✅ exact (5.x, không dùng 4.x)
+  "typescript": "7.0.2",      // ✅ exact — TS 7 (Rust tsc), không dùng 5.x/6.x
+  "vite": "8.3.4",            // ✅ exact
+  "vitest": "5.0.5",          // ✅ exact (5.x, không dùng 4.x)
   "@vitejs/plugin-react": "6.1.1",
   "oxc-transform-react": "1.0.0"
 }
