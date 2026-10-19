@@ -235,5 +235,5 @@ Chưa có container lẫn volume (server mới) ⇒ cho qua; `--dry-run` không 
 | Ngày | Môi trường | glibc trước → sau | DB (kích thước) | REINDEX | amcheck | Ghi chú |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | dev (máy local) | 2.31 → 2.36 | tami 186 MB (+ 36 DB tạm của integration test) | 37 DB, PASS | 2797 index btree sạch, 0 lỗi | dump + globals ở `~/tami-old-pg`; mismatch 0; PostGIS 3.5.2; integration 704/704 PASS |
-| _chưa thực hiện_ | staging | | | | | |
+| 2026-10-19 | staging | 2.31 → 2.36 | tami 32 MB (121 bảng) | 4 DB (postgres, tami, template1, template_postgis), PASS | tami 576 + template_postgis 69 index btree sạch, 0 lỗi | release `9cafe88`; dump + globals ở `/opt/tami/old-pg`; mismatch 0; PostGIS 3.5.2; catalog non-C 0; diễn tập `tami_drill` khớp 121 bảng, amcheck 576 sạch. Build image trước khi dừng app ⇒ downtime ~2 phút (02:53–02:55Z). §3.8 `deploy.sh` tay lỗi pull ghcr (server không có token) ⇒ bật tạm app/jobs release cũ `b936204` (`--no-deps --pull never`, postgres giữ bookworm); re-run job GitHub `Deploy staging` 02:56Z PASS: app/jobs `9cafe88` (digest `bb96e8eb…`), migration `rentals_reindex_job` + `leads_remind_scan_index` đã apply, health ok |
 | _chưa thực hiện_ | production | | | | | |
