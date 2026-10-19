@@ -498,11 +498,11 @@
       "title": "Website công khai theo market.vinhomes.vn: section + phong cách (bo góc, nút viên thuốc, header nổi kính mờ, serif viết thường), màu TAMI — 5 phase (BL-020)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 1,
+      "currentPhase": 2,
       "totalPhases": 5,
       "phaseStatus": {
         "1": "done",
-        "2": "pending",
+        "2": "done",
         "3": "pending",
         "4": "pending",
         "5": "pending"
@@ -532,6 +532,66 @@
           "reviewLevel": "STRICT",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-1-task-02-round-1-review.md",
           "commit": "ab3f95a"
+        },
+        {
+          "task": "phase-2-task-01",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-2-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-task-01-round-1-review.md",
+          "commit": "4f48764",
+          "note": "schema global Homepage + migration additive 20261019_144259_homepage_market_blocks"
+        },
+        {
+          "task": "phase-2-task-02",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-2-task-02.md",
+          "status": "done",
+          "attempt": 3,
+          "round": 3,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-task-02-round-3-review.md",
+          "commit": "b2fe4e4",
+          "note": "thanh thông báo, nút cuộn hero, ô tìm kiếm đè hero + chip dự án"
+        },
+        {
+          "task": "phase-2-task-03",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-2-task-03.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-task-03-round-2-review.md",
+          "commit": "4b7ab7e",
+          "note": "slider dự án kính mờ + số liệu, slider Ưu đãi"
+        },
+        {
+          "task": "phase-2-task-04",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-2-task-04.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-task-04-round-2-review.md",
+          "commit": "4058ae4",
+          "note": "khối Cho thuê + Tin tức, hook làm mới trang chủ"
+        },
+        {
+          "task": "phase-2-task-05",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-2-task-05.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-task-05-round-2-review.md",
+          "commit": "1be4209",
+          "note": "CTA ảnh + 2 nút, ServiceCard kính"
         }
       ],
       "phaseValidations": [
@@ -540,15 +600,31 @@
           "result": "PASS",
           "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-1-spec-validation.md",
           "commit": "f25afe1"
+        },
+        {
+          "phase": 2,
+          "result": "PASS",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-spec-validation.md",
+          "closeoutReport": ".context/review-reports/feature-public-ui-market-vinhomes-phase-2-closeout-round-1-review.md",
+          "commit": "2391bb6",
+          "checkpointCommit": "fb360ab",
+          "decisions": "Q1 slider banner ưu đãi = slider Ưu đãi (không khối mới); Q2 admin thêm Cho thuê/Tin tức vào Thứ tự khối sau deploy; Q3 tiêu đề hai khối tuỳ chọn, chỉ ẩn ở /en khi 0 tin/bài EN"
         }
       ],
       "startedAt": "2026-10-19",
       "completedAt": null,
-      "specVersion": "1.16.0",
-      "scopeVersion": 19,
-      "specUpdate": "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
-      "next": "Phase 2 (trang chủ: P2-T01 schema Homepage, STRICT) — chờ user duyệt checkpoint trước khi chạy",
-      "residual": "Chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; pnpm build chưa verify trong worktree (lỗi môi trường next/font); skip link #main trang không hero nằm dưới header (có từ trước); khe giữa thanh nổi và thanh dính (P4-T01)"
+      "specVersion": "1.17.0",
+      "scopeVersion": 20,
+      "specUpdate": "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md",
+      "next": "Phase 3 (trang danh sách: banner ~240px, băng tìm kiếm gọn, lưới 4 cột + Tin tức hàng theo danh mục + form tư vấn) — chờ user duyệt checkpoint trước khi chạy. Sau deploy P2: admin thêm Cho thuê, Tin tức vào Thứ tự khối trang chủ (Q2).",
+      "residual": "P1: chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; skip link #main trang không hero nằm dưới header; khe giữa thanh nổi và thanh dính (P4-T01). P2: chưa Lighthouse toàn trang chủ; thêm SQL mỗi lần tái tạo ISR; chưa thiết bị thật (vuốt slider, ServiceCard 21:9 md, CTA min 26rem); 768/1280/1440 chưa kiểm cho T04/T05; /en tin tức phụ thuộc hasEnglish danh mục; loadShell chưa unit test wiring; WARN không xếp được job dịch trong log integration chưa điều tra",
+      "specUpdates": [
+        "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
+        "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md"
+      ],
+      "migrations": [
+        "migrations/20261019_144259_homepage_market_blocks"
+      ]
     }
   ],
   "bugs": [
@@ -1318,7 +1394,7 @@
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
     }
   ],
-  "lastUpdated": "2026-10-19",
+  "lastUpdated": "2026-10-20",
   "approvalMilestones": [
     {
       "id": "M1",

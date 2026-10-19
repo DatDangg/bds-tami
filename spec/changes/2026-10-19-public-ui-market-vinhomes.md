@@ -61,17 +61,24 @@ Plan phase/task: `tasks/feature-public-ui-market-vinhomes/README.md`.
 | Phase | Nội dung | Trạng thái | Commit | Spec / scope |
 |---|---|---|---|---|
 | P1 | Tokens phong cách market (màu TAMI) + header nổi bo tròn kính mờ sáng | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, spec-validation PASS) | 3c1621d, ab3f95a, f25afe1 | 1.16.0 / v19 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md` |
-| P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | pending | — | — |
+| P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | **done** (T01 STRICT PASS r1, T02 PASS r3, T03/T04/T05 PASS r2, close-out NORMAL PASS, spec-validation PASS) | 4f48764, b2fe4e4, 4b7ab7e, 4058ae4, 1be4209, 2391bb6, fb360ab | 1.17.0 / v20 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md` |
 | P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | pending | — | — |
 | P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | pending | — | — |
 | P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | pending | — | — |
 
 Ghi chú P1: header **luôn** kính mờ sáng (kể cả trên hero) theo quyết định user — thay biến thể trong suốt và "logo trắng trên hero" của BL-018.
 
+Ghi chú P2 (quyết định user tại checkpoint 2026-10-20):
+- **Q1** #3 "slider banner ưu đãi" ánh xạ vào slider Ưu đãi (#5) — không dựng khối/schema mới.
+- **Q2** bản ghi trang chủ có sẵn không tự hiện Cho thuê/Tin tức: **sau deploy admin thêm "Cho thuê", "Tin tức" vào "Thứ tự khối"** (không auto-append, không data migration).
+- **Q3** tiêu đề khối Cho thuê/Tin tức tuỳ chọn (trống → mặc định i18n, kể cả EN); khối chỉ ẩn ở `/en` khi không có tin/bài có bản EN.
+- Migration `20261019_144259_homepage_market_blocks` (additive) — staging → verify → promote prod. Tab Dự án của ô tìm kiếm chỉ lọc `province`/`status` (không có từ khoá); số liệu thẻ dự án = diện tích đất / tổng số căn / bàn giao.
+- Phase 3 **chưa bắt đầu** — chờ user duyệt.
+
 ## Acceptance (bắt buộc)
 - [x] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
 - [x] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
-- [ ] Trang chủ có đủ các section #1–#11 ở bảng trên (các section quản lý qua global Homepage: bật/tắt + thứ tự như hiện có).
+- [x] Trang chủ có đủ các section #1–#11 ở bảng trên (các section quản lý qua global Homepage: bật/tắt + thứ tự như hiện có). — P2; #3 "slider banner ưu đãi" ánh xạ vào slider Ưu đãi (Q1); Cho thuê/Tin tức hiện sau khi admin thêm vào "Thứ tự khối" (Q2).
 - [ ] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
 - [ ] Tin tức: hàng theo danh mục + form tư vấn cuối trang.
 - [ ] Chi tiết dự án: thẻ tư vấn dính bên phải ≥ lg + tin liên quan; phần cần schema mới tách phase riêng sau khi user duyệt.

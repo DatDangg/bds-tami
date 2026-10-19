@@ -6,8 +6,8 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.16.0
-- **updated_at:** 2026-10-19
+- **spec_version:** 1.17.0
+- **updated_at:** 2026-10-20
 - **Trạng thái:** đã duyệt thiết kế, chưa có code
 
 ## Overview
@@ -49,6 +49,18 @@ Mã yêu cầu theo `docs/BRD.md`. Mức ưu tiên: mọi FR là **Must**, trừ
 
 ### F1. Trang chủ (giới thiệu TAMI): FR-PUB-01, FR-PUB-17
 Các khối Hero slide (1–8; ảnh bắt buộc, video tuỳ chọn từng slide), Về TAMI (kèm số liệu), Dự án nổi bật, Dịch vụ (thẻ ảnh), Ưu đãi nổi bật, Đối tác, banner CTA "Nhận tư vấn", Footer liên hệ. Admin bật/tắt và sắp xếp khối qua global `homepage`.
+
+**Bố cục kiểu market (BL-020 Phase 2):**
+- **Thanh thông báo** chỉ ở trang chủ (`/`, `/en`), trên cùng (trên header nổi, trong luồng), mặc định **tắt**; admin bật + chữ (localized) + link tuỳ chọn. Khách đóng được, nhớ theo hash chữ + link theo ngôn ngữ (đổi nội dung → hiện lại), tải lại không nháy.
+- **Hero** có nút cuộn xuống tới **ô tìm kiếm đè đáy hero**: tab Cho thuê gửi GET `/cho-thue?q=`; tab Dự án gửi GET `/du-an?province=&status=` (chỉ tham số lọc sẵn có, không có từ khoá); tablist ←/→/Home/End; gửi được khi không JS. Chip "Dự án được quan tâm": CMS ≤ 6 dự án công khai, trống → dự án nổi bật mới nhất; `/en` chỉ dự án có EN.
+- **Dự án nổi bật** = slider thẻ lớn ~464×600 bo 20px, khung kính mờ đè ảnh: tên, tỉnh, badge trạng thái, số liệu từ field sẵn có (diện tích đất, tổng số căn, bàn giao — thiếu thì ẩn).
+- **Ưu đãi nổi bật** = slider thẻ tin + "Xem thêm" → `/tin-bds`. Đây cũng là "slider banner ưu đãi" của bố cục market — không có khối riêng.
+- **Cho thuê** ("Thuê nhà ở & kinh doanh"): tab theo danh mục cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server; trống → các danh mục đang có tin), mỗi tab slider ≤ 8 tin còn trống + "Xem thêm" → `/cho-thue/danh-muc/<slug>`; không JS hiện tab đầu.
+- **Tin tức** (khối tối): intro + 3 bài (CMS ≤ 3, trống → 3 bài mới nhất) + "Xem tất cả".
+- **Banner CTA "Đăng ký tham quan"**: ảnh tràn viền tuỳ chọn (`ctaBanner.image`, thiếu → ảnh nền cũ) qua scrim, chữ trắng đạt AA; nút chính + nút phụ tuỳ chọn (chỉ hiện khi đủ nhãn + link hợp lệ).
+- Thẻ dịch vụ (trang chủ + "Dịch vụ khác") bo 20px, chữ trên khung kính.
+- `rentals`, `news` tham gia `blockOrder`; khối không nằm trong "Thứ tự khối" thì không hiện — bản ghi trang chủ có sẵn cần admin thêm hai khối này sau khi deploy (không tự thêm, không data migration). Thanh thông báo và ô tìm kiếm có bật/tắt, vị trí cố định.
+- Lưu / ẩn / xoá tin cho thuê hoặc tin tức đang/vừa công khai chỉ làm mới trang chủ `/vi` `/en` (không làm mới cache toàn site).
 
 ### F2. Dự án: FR-PUB-02, FR-PUB-03, FR-ADM-01
 Danh sách lọc theo loại hình / tỉnh / trạng thái mở bán, có phân trang, chỉ dự án đã xuất bản. Chi tiết: tổng quan, chủ đầu tư, bản đồ, tiện ích, mặt bằng, pháp lý, chính sách bán hàng, tài liệu, thư viện ảnh, form lead (tạo lead gắn dự án).
@@ -171,7 +183,7 @@ Các quy tắc dưới đây là ⚠️ giả định mặc định để build,
 - **Giờ hành chính** (BR-14): 08:00–17:30, thứ 2 – thứ 7, giờ Việt Nam; chưa trừ ngày lễ. Lead tới ngoài giờ thì đếm 30 phút từ đầu giờ làm kế tiếp.
 - **Sale bị khoá** (`active = false`): lead đang giao giữ nguyên người phụ trách và hiện cảnh báo "sale đã khoá" cho admin để giao lại; lead mới từ tin của sale đó chờ admin giao (BR-12). Trang tin công khai thay "Sale phụ trách" bằng hotline chung.
 - **Tin "Đã thuê"**: form vẫn nhận lead với tiêu đề "Nhận tư vấn căn tương tự"; lead gắn nguồn là tin đó.
-- **Globals chưa có bản tiếng Anh**: `header` / `footer` thiếu bản EN thì `/en` dùng menu cố định trong `en.json`; khối trang chủ chưa có bản EN thì ẩn khối đó ở `/en` (không lấy chữ tiếng Việt, BR-07).
+- **Globals chưa có bản tiếng Anh**: `header` / `footer` thiếu bản EN thì `/en` dùng menu cố định trong `en.json`; khối trang chủ chưa có bản EN thì ẩn khối đó ở `/en` (không lấy chữ tiếng Việt, BR-07). Ngoại lệ khối **Cho thuê** / **Tin tức** trang chủ (BL-020): tiêu đề khối tuỳ chọn — trống ở ngôn ngữ đang xem thì dùng tiêu đề mặc định i18n (kể cả EN); khối chỉ ẩn ở `/en` khi không có tin / bài nào có bản EN.
 - **Hẹn giờ xuất bản** (FR-ADM-16): bài `published` có `publishedAt` ở tương lai thì chưa hiện công khai; job Payload chạy mỗi phút revalidate các bài vừa tới giờ.
 - **Đổi tên tỉnh / phường (tên, tên cũ) / dự án**: `searchText` của các tin cho thuê thuộc phạm vi đó được dựng lại để tìm kiếm không dấu khớp tên mới. ≤ 500 tin → làm ngay trong lần lưu; > 500 tin → xếp 1 job nền Payload Jobs (`reindex-rentals-search`, xử lý theo lô, idempotent, thử lại theo cấu hình Jobs) và form admin của bản ghi đó hiện cảnh báo "đang dựng lại chỉ mục tìm kiếm ở chế độ nền" tới khi job xong. Lệnh tay `pnpm reindex:rentals-search` vẫn giữ để chạy bù toàn bộ.
 - **Hai người sửa cùng bài**: dùng document locking có sẵn của Payload 3.
