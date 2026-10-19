@@ -480,4 +480,54 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
       expect(joined.map((doc) => doc.content)).toContain("Có trong join");
     });
   });
+
+  describe("ô tìm kiếm danh sách (listSearchableFields + SĐT chuẩn hoá)", () => {
+    const searchOf = async (search: string, user: typeof admin) => {
+      const { mergeListSearchAndWhere } = await import("payload/shared");
+      // Đúng `where` mà danh sách admin tạo ra (Payload gọi find với where này).
+      const where = mergeListSearchAndWhere({ collectionConfig: payload.collections.leads!.config, search });
+      return (await payload.find({ collection: "leads", where, limit: 500, depth: 0, ...actingAs(user) })).docs.map((doc) => doc.id);
+    };
+
+    it("cấu hình tìm theo mã, họ tên, SĐT, email", () => {
+      expect(payload.collections.leads!.config.admin.listSearchableFields).toEqual(["code", "fullName", "phone", "email"]);
+    });
+
+    it("SĐT gõ dạng nào cũng ra lead, bất kể SĐT lưu dạng nào", async () => {
+      const spaced = await createLead({ phone: "0956 789 012", fullName: "Khách Dấu Cách" });
+      const international = await createLead({ phone: "+84 912 345 678", fullName: "Khách Quốc Tế" });
+      for (const search of ["0956789012", "0956 789 012", "+84956789012", "84956789012", "0956-789-012"]) {
+        expect(await searchOf(search, admin)).toContain(spaced.id);
+      }
+      for (const search of ["0912345678", "+84912345678", "+84 912 345 678"]) expect(await searchOf(search, admin)).toContain(international.id);
+      expect(await searchOf("0956789012", admin)).not.toContain(international.id);
+    });
+
+    it("email (một phần), mã và họ tên vẫn tìm được; like không phân biệt hoa thường và tách từ", async () => {
+      const lead = await createLead({ email: `Tim.Kiem-${runId}@Example.test`, fullName: "Trần Thị Tìm Kiếm" });
+      expect(await searchOf(`tim.kiem-${runId}`, admin)).toContain(lead.id);
+      expect(await searchOf(lead.code, admin)).toContain(lead.id);
+      expect(await searchOf("Trần Thị Tìm", admin)).toContain(lead.id);
+      expect(await searchOf("trần thị tìm", admin)).toContain(lead.id);
+      // Quan sát: `like` của Payload (db-postgres) tách từ, mọi từ phải có mặt nhưng không cần đúng thứ tự.
+      expect(await searchOf("Tìm Kiếm Trần", admin)).toContain(lead.id);
+      expect(await searchOf("Trần Thị Không Có", admin)).not.toContain(lead.id);
+    });
+
+    it("sale chỉ tìm ra lead được giao: SĐT/email của lead người khác hoặc chưa giao không ra", async () => {
+      const mine = await createLead({ phone: "0987 111 222", assignedTo: saleA.id });
+      const others = await createLead({ phone: "0987 333 444", email: `kin-${runId}@example.test`, assignedTo: saleB.id });
+      const unassigned = await createLead({ phone: "0987 555 666", assignedTo: null });
+      expect(await searchOf("0987111222", saleA)).toEqual([mine.id]);
+      for (const search of ["0987333444", "+84987333444", "0987 333 444", `kin-${runId}`, "0987555666"]) expect(await searchOf(search, saleA)).toEqual([]);
+      expect(await searchOf("0987333444", saleB)).toEqual([others.id]);
+      expect(await searchOf("0987555666", admin)).toEqual([unassigned.id]);
+    });
+
+    it("lead đã ẩn danh không còn khớp SĐT cũ", async () => {
+      const lead = await createLead({ phone: "0977 000 111" });
+      await payload.db.updateOne({ collection: "leads", id: lead.id, data: { anonymizedAt: new Date().toISOString(), phone: "Đã ẩn danh", phoneNormalized: "Đã ẩn danh" } });
+      expect(await searchOf("0977000111", admin)).toEqual([]);
+    });
+  });
 });

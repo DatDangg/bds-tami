@@ -3,6 +3,7 @@ import type { CollectionConfig, Field, FieldAccess, RelationshipFieldSingleValid
 import { denyAll, isAdmin, isAssignedOrAdmin, ROLES } from "../access";
 import { auditContentPurge, auditContentTrash } from "../hooks/audit-content-delete";
 import { guardTrashedEdit } from "../hooks/guard-trashed-edit";
+import { expandPhoneSearch } from "../hooks/leads/expand-phone-search";
 import { assignLeadCode } from "../hooks/leads/generate-code";
 import { purgeLeadActivities } from "../hooks/leads/lead-activity-hooks";
 import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/leads/on-assignment-change";
@@ -197,7 +198,7 @@ export const Leads: CollectionConfig = {
   admin: {
     useAsTitle: "code",
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "createdAt"],
-    listSearchableFields: ["code", "fullName"],
+    listSearchableFields: ["code", "fullName", "phone", "email"],
     description: "Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.",
     // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
     components: { beforeList: ["/components/admin/LeadExportSlot#LeadExportSlot"] },
@@ -210,6 +211,7 @@ export const Leads: CollectionConfig = {
   access: { read: isAssignedOrAdmin, create: denyAll, update: isAssignedOrAdmin, delete: isAdmin },
   disableDuplicate: true,
   hooks: {
+    beforeOperation: [expandPhoneSearch],
     beforeValidate: [guardTrashedEdit, assignLeadCode, guardAnonymizedCustomerData, syncPhoneNormalized],
     beforeChange: [stampLeadTimestamps, stampAssignedAt],
     afterChange: [auditContentTrash, recordStatusChange, recordAssignmentChange],

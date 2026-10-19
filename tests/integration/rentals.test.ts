@@ -727,4 +727,27 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
       expect(seeded.docs[0]?.code).toMatch(/^CT-\d{6}$/);
     });
   });
+
+  describe("ô tìm kiếm danh sách (listSearchableFields)", () => {
+    const searchOf = async (search: string, user: Actor = admin) => {
+      const { mergeListSearchAndWhere } = await import("payload/shared");
+      // Đúng `where` mà danh sách admin tạo ra.
+      const where = mergeListSearchAndWhere({ collectionConfig: payload.collections.rentals!.config, search });
+      const found = await payload.find({ collection: "rentals", where, limit: 500, depth: 0, locale: "vi", user: asUser(user), overrideAccess: false });
+      return found.docs.map((doc) => doc.id);
+    };
+
+    it("cấu hình tìm theo mã, tiêu đề, địa chỉ", () => {
+      expect(payload.collections.rentals!.config.admin.listSearchableFields).toEqual(["code", "title", "address"]);
+    });
+
+    it("mã CT-, tên đường (một phần, không phân biệt hoa thường) và tiêu đề đều ra tin", async () => {
+      const doc = await createRental({ title: "Căn hộ tìm kiếm Alpha", address: "88 Đường Nguyễn Văn Linh Test" });
+      const other = await createRental({ title: "Căn hộ khác Beta", address: "5 Đường Lê Lợi Test" });
+      expect(await searchOf(doc.code)).toEqual([doc.id]);
+      expect(await searchOf("nguyễn văn linh")).toEqual([doc.id]);
+      expect(await searchOf("Alpha")).toEqual([doc.id]);
+      expect(await searchOf("Lê Lợi Test", sale)).toEqual([other.id]);
+    });
+  });
 });
