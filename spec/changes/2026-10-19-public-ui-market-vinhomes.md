@@ -1,7 +1,7 @@
 ---
 id: public-ui-market-vinhomes
 type: feature
-status: pending
+status: in_progress
 created: 2026-10-19
 ---
 
@@ -55,9 +55,22 @@ market.vinhomes.vn**. User chốt:
 - TAMI: Tổng quan · Vị trí · Tiện ích · Thư viện ảnh · form · Dự án khác (đã có menu neo dính).
 - Không cần schema mới: thẻ tư vấn dính bên phải, tin liên quan, restyle. **Cần schema mới (hỏi user khi phase-plan):** điểm nổi bật, tiện ích quanh dự án, tài liệu pháp lý, bảng giá/quỹ căn, FAQ.
 
+## Tiến độ
+Plan phase/task: `tasks/feature-public-ui-market-vinhomes/README.md`.
+
+| Phase | Nội dung | Trạng thái | Commit | Spec / scope |
+|---|---|---|---|---|
+| P1 | Tokens phong cách market (màu TAMI) + header nổi bo tròn kính mờ sáng | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, spec-validation PASS) | 3c1621d, ab3f95a, f25afe1 | 1.16.0 / v19 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md` |
+| P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | pending | — | — |
+| P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | pending | — | — |
+| P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | pending | — | — |
+| P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | pending | — | — |
+
+Ghi chú P1: header **luôn** kính mờ sáng (kể cả trên hero) theo quyết định user — thay biến thể trong suốt và "logo trắng trên hero" của BL-018.
+
 ## Acceptance (bắt buộc)
-- [ ] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
-- [ ] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
+- [x] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
+- [x] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
 - [ ] Trang chủ có đủ các section #1–#11 ở bảng trên (các section quản lý qua global Homepage: bật/tắt + thứ tự như hiện có).
 - [ ] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
 - [ ] Tin tức: hàng theo danh mục + form tư vấn cuối trang.

@@ -492,6 +492,63 @@
       "scopeVersion": 16,
       "specUpdate": "spec/updates/2026-10-19-select-dropdown-styling.md",
       "residual": "Chưa kiểm trình duyệt thật (bàn phím/typeahead/375px, admin sáng/tối); chọn trước hydrate trên form GET bị bỏ; chưa có hydration test; SelectInput thật không render trong vitest (test mock); accessible name ô lọc dịch gộp giá trị đang chọn"
+    },
+    {
+      "slug": "public-ui-market-vinhomes",
+      "title": "Website công khai theo market.vinhomes.vn: section + phong cách (bo góc, nút viên thuốc, header nổi kính mờ, serif viết thường), màu TAMI — 5 phase (BL-020)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "totalPhases": 5,
+      "phaseStatus": {
+        "1": "done",
+        "2": "pending",
+        "3": "pending",
+        "4": "pending",
+        "5": "pending"
+      },
+      "backlog": "BL-020",
+      "changeDoc": "spec/changes/2026-10-19-public-ui-market-vinhomes.md",
+      "plan": "tasks/feature-public-ui-market-vinhomes/README.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-1-task-01-round-2-review.md",
+          "commit": "3c1621d"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-public-ui-market-vinhomes/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-1-task-02-round-1-review.md",
+          "commit": "ab3f95a"
+        }
+      ],
+      "phaseValidations": [
+        {
+          "phase": 1,
+          "result": "PASS",
+          "report": ".context/review-reports/feature-public-ui-market-vinhomes-phase-1-spec-validation.md",
+          "commit": "f25afe1"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": null,
+      "specVersion": "1.16.0",
+      "scopeVersion": 19,
+      "specUpdate": "spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md",
+      "next": "Phase 2 (trang chủ: P2-T01 schema Homepage, STRICT) — chờ user duyệt checkpoint trước khi chạy",
+      "residual": "Chưa đo Lighthouse LCP/CLS sau thêm EB Garamond 400; kính mờ Safari + cầu hover chưa thử thiết bị thật; pnpm build chưa verify trong worktree (lỗi môi trường next/font); skip link #main trang không hero nằm dưới header (có từ trước); khe giữa thanh nổi và thanh dính (P4-T01)"
     }
   ],
   "bugs": [
