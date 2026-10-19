@@ -1,0 +1,191 @@
+// Card, danh sách gần đây, badge tối giản, card nhóm của màn Tổng quan (BL-015 T04; tách từ _dashboard.scss để file <= 300 dòng).
+
+// ---- Card + danh sách gần đây ----
+.tami-dash-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &:has(> :only-child) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tami-dash-card {
+  min-width: 0;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-l);
+  box-shadow: var(--admin-shadow-sm);
+
+  &__title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--admin-border);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+
+    a {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--admin-accent);
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    padding: 20px;
+    color: var(--admin-text-subtle);
+  }
+}
+
+.tami-dash-list {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    min-height: 48px;
+    padding: 10px 20px;
+
+    & + li {
+      border-top: 1px solid var(--admin-border);
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex: 1 1 200px;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title {
+    overflow: hidden;
+    font-weight: 500;
+    color: var(--admin-text);
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--admin-accent);
+    }
+  }
+
+  &__meta {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--admin-text-subtle);
+  }
+}
+
+// ---- Badge tối giản (thay bằng StatusBadge của T05 sau) ----
+.tami-dash-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentcolor;
+  }
+
+  @each $tone in neutral, success, warning, danger, info, accent {
+    &--#{$tone} {
+      color: var(--admin-badge-#{$tone}-fg);
+      background: var(--admin-badge-#{$tone}-bg);
+    }
+  }
+}
+
+// ---- Danh mục quản lý ----
+.tami-dash-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tami-dash-group {
+  padding: 16px 20px;
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: var(--admin-text-subtle);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    color: var(--admin-text);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--admin-accent);
+    }
+  }
+}
+
+@media (max-width: 1023px) {
+  .tami-dash-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tami-dash-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .tami-dash-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  // Vùng bấm >= 44px trên màn cảm ứng.
+  .tami-dash-group a {
+    min-height: 44px;
+  }
+
+  // Link 'Xem tất cả' ở tiêu đề card.
+  .tami-dash-card__title a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+  }
+
+  // block + line-height 44px: đủ vùng bấm mà vẫn giữ text-overflow: ellipsis (inline-flex làm mất dấu "…").
+  .tami-dash-list__title {
+    display: block;
+    line-height: 44px;
+  }
+}

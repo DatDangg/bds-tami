@@ -35,8 +35,8 @@ import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e548
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
-import { TranslationFailedBanner as TranslationFailedBanner_050d0168f64ef9771ce7381aaf5804d0 } from '../../../components/admin/TranslationFailedBanner'
 import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 } from '../../../components/admin/SessionKeepAlive'
+import { DashboardView as DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f } from '../../../components/admin/dashboard/DashboardView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -79,8 +79,8 @@ export const importMap = {
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
-  "/components/admin/TranslationFailedBanner#TranslationFailedBanner": TranslationFailedBanner_050d0168f64ef9771ce7381aaf5804d0,
   "/components/admin/SessionKeepAlive#SessionKeepAlive": SessionKeepAlive_739be204eef6d8fda1df751cccf17193,
+  "/components/admin/dashboard/DashboardView#DashboardView": DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

@@ -1,0 +1,193 @@
+// Màn Tổng quan admin (BL-015 T04, design §3 + mock). Chỉ dùng token --admin-*; không !important.
+// Lưới thẻ: 4 cột >= 1024, 2 cột 768-1023, 1 cột < 768 (design §6).
+
+.tami-dash {
+  padding-bottom: 48px;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    > div {
+      min-width: 0;
+      flex: 1 1 240px;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    color: var(--admin-text);
+  }
+
+  &__date {
+    margin: 4px 0 0;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--admin-text-subtle);
+  }
+
+  &__section-title {
+    margin: 0 0 12px;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    color: var(--admin-text);
+  }
+}
+
+// ---- Nút "Tạo mới" + menu <details> ----
+.tami-dash-create {
+  position: relative;
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: var(--admin-radius-s);
+    background: var(--admin-accent);
+    color: var(--admin-on-accent);
+    font-weight: 500;
+    cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--admin-accent-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--admin-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    right: 0;
+    z-index: 5;
+    min-width: 220px;
+    margin: 6px 0 0;
+    padding: 6px;
+    list-style: none;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-m);
+    box-shadow: var(--admin-shadow-md);
+
+    a {
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: var(--admin-radius-s);
+      color: var(--admin-text);
+      text-decoration: none;
+
+      &:hover {
+        background: var(--admin-surface-hover);
+        color: var(--admin-accent);
+      }
+    }
+  }
+}
+
+// ---- Thẻ số liệu ----
+.tami-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.tami-dash-stat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 20px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-l);
+  box-shadow: var(--admin-shadow-sm);
+  color: var(--admin-text);
+  text-decoration: none;
+
+  &:is(a):hover {
+    border-color: var(--admin-border-strong);
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 500;
+    color: var(--admin-text-muted);
+  }
+
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--admin-radius-m);
+    background: var(--admin-accent-soft);
+    color: var(--admin-accent-soft-text);
+  }
+
+  &__value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__hint {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--admin-text-subtle);
+  }
+}
+
+@media (max-width: 1023px) {
+  .tami-dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .tami-dash-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  // Vùng bấm >= 44px trên màn cảm ứng.
+  .tami-dash-create__button,
+  .tami-dash-create__menu a {
+    min-height: 44px;
+  }
+
+  .tami-dash-create__menu {
+    right: auto;
+    left: 0;
+  }
+}

@@ -63,7 +63,8 @@ export default buildConfig({
     user: Staff.slug,
     components: {
       providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"],
-      beforeDashboard: ["/components/admin/TranslationFailedBanner#TranslationFailedBanner"],
+      // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
+      views: { dashboard: { Component: "/components/admin/dashboard/DashboardView#DashboardView" } },
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
     },
     meta: {
