@@ -3,8 +3,8 @@
   "activeWorkItem": {
     "type": "bug",
     "slug": "admin-misc-needs-repro",
-    "phaseTask": "phase-1-task-01",
-    "journal": ".context/runs/bug-admin-misc-needs-repro-phase-1-task-01.md"
+    "phaseTask": "phase-1-task-03",
+    "journal": ".context/runs/bug-admin-misc-needs-repro-phase-1-task-03.md"
   },
   "features": [
     {
@@ -772,16 +772,19 @@
           "reviewerResult": "PASS",
           "note": "#05 Lexical dùng --font-serif Georgia thiếu glyph tiếng Việt 2 dấu",
           "reviewLevel": "FAST",
-          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-01-round-1-review.md"
+          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-01-round-1-review.md",
+          "commit": "d3b62fb"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/bug-admin-misc-needs-repro/phase-1-task-02.md",
-          "status": "review",
+          "status": "done",
           "attempt": 1,
-          "round": 0,
-          "reviewerResult": null,
-          "note": "#10 breadcrumb header không co + vạch kẻ payload-settings rộng 100%+5base"
+          "round": 1,
+          "reviewerResult": "PASS",
+          "note": "#10 breadcrumb header không co + vạch kẻ payload-settings rộng 100%+5base",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/bug-admin-misc-needs-repro-phase-1-task-02-round-1-review.md"
         },
         {
           "task": "phase-1-task-03",

@@ -191,6 +191,23 @@ label.field-label .required {
   }
 }
 
+// ---- Chống tràn ngang ở 375px (BL-023 #10; KHÔNG dùng overflow-x: hidden trên html/body) ----
+// Payload 3.91 mặc định `.app-header__step-nav-wrapper{flex-grow:0;display:flex;width:100%}` không có min-width:0
+// → breadcrumb dài không co, đẩy nút ngôn ngữ + avatar ra ngoài viewport. Cho co + cuộn ngang nội bộ (ẩn thanh cuộn như Payload).
+.app-header__step-nav-wrapper {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+// Payload 3.91 mặc định `.payload-settings:before/:after{width:calc(100% + var(--base) * 5);left:-gutter}`
+// → vạch kẻ ở /admin/account rộng hơn viewport. Giữ mép trái, kéo mép phải đúng lề gutter.
+.payload-settings::before,
+.payload-settings::after {
+  width: auto;
+  right: calc(var(--gutter-h) * -1);
+}
+
 @media (max-width: 767px) {
   .template-minimal__wrap {
     padding: 20px;
