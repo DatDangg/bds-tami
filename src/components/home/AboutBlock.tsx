@@ -20,7 +20,7 @@ export function AboutBlock({ block }: { block: AboutView }) {
           {block.title}
         </h2>
         {block.image && (
-          <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted md:col-span-5 md:col-start-1 md:row-span-3 md:row-start-1 md:aspect-[4/5]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted md:col-span-5 md:col-start-1 md:row-span-3 md:row-start-1 md:aspect-[4/5]">
             <ResponsiveImage media={block.image} sizes="(min-width: 1280px) 520px, (min-width: 768px) 42vw, 100vw" />
           </div>
         )}

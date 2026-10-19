@@ -178,3 +178,33 @@ describe("kính mờ sáng của header (BL-020)", () => {
     expect(css).toMatch(/--radius-pill:\s*9999px;/);
   });
 });
+
+describe("banner CTA trang chủ: chữ + nút trên ảnh tràn viền (BL-020 #7)", () => {
+  // Trường hợp xấu nhất: ảnh trắng tinh dưới scrim `--color-banner-scrim`; chữ trắng của tiêu đề, mô tả và nút phụ (chip) đều nằm trên đó.
+  const match = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light("--color-banner-scrim"));
+  if (!match) throw new Error("--color-banner-scrim không phải rgb(r g b / a)");
+  const [, r, g, b, alpha] = match;
+  const blend = (channel: string) => Math.round(Number(alpha) * Number(channel) + (1 - Number(alpha)) * 255);
+  const overWhite = `#${[r, g, b].map((channel) => blend(channel!).toString(16).padStart(2, "0")).join("")}`;
+
+  it("tiêu đề, mô tả và chữ nút phụ (--color-on-dark) trên ảnh trắng đạt 4.5:1", () => {
+    expect(contrast(light("--color-on-dark"), overWhite)).toBeGreaterThanOrEqual(TEXT);
+  });
+
+  it("nút chính giữ nền primary + chữ primary-foreground (không phụ thuộc ảnh)", () => {
+    expect(contrast(light("--color-primary-foreground"), light("--color-primary"))).toBeGreaterThanOrEqual(TEXT);
+  });
+});
+
+describe("banner CTA có ảnh: vòng focus (BL-020 #7)", () => {
+  it("vòng focus mặc định chỉ ~3:1 trên scrim đè ảnh trắng nên khối có ảnh dùng outline-on-dark (trắng) đạt >= 3:1 (UI)", () => {
+    const [, r, g, b, alpha] = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light("--color-banner-scrim"))!;
+    const blend = (c: string) => Math.round(Number(alpha) * Number(c) + (1 - Number(alpha)) * 255);
+    const overWhite = `#${[r, g, b].map((c) => blend(c!).toString(16).padStart(2, "0")).join("")}`;
+    expect(contrast(light("--color-on-dark"), overWhite)).toBeGreaterThanOrEqual(3);
+    expect(contrast(light("--color-focus-ring"), overWhite)).toBeLessThan(TEXT);
+    const source = readFileSync("src/components/layout/CtaBanner.tsx", "utf8");
+    expect(source).toContain("outline-on-dark");
+    expect(source).toContain("min-h-[26rem]");
+  });
+});

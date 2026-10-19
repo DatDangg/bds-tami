@@ -360,3 +360,27 @@ describe("buildHomeView: khối Tin tức (BL-020 #11)", () => {
     expect(kinds(marketPage({ news: { enabled: false, title: "Tin tức" } }), d)).toEqual(["rentals"]);
   });
 });
+
+describe("buildHomeView: banner CTA ảnh + nút phụ (BL-020 #7)", () => {
+  const ctaOf = (cta: NonNullable<Homepage["ctaBanner"]>, locale: "vi" | "en" = "vi") => {
+    const block = buildHomeView(homepage({ ctaBanner: { enabled: true, title: "T", ...cta } }), docs(), locale, NOW).blocks.find((item) => item.kind === "ctaBanner");
+    return block?.kind === "ctaBanner" ? block : null;
+  };
+
+  it("ảnh tràn viền lấy `image` (ưu tiên) rồi `backgroundImage` cũ; ảnh chỉ còn id/không phải ảnh → null; chỉ lộ trường công khai", () => {
+    expect(ctaOf({ image: media("new"), backgroundImage: media("old") })?.image?.url).toBe("/api/media/file/new.jpg");
+    expect(ctaOf({ backgroundImage: media("old") })?.image?.url).toBe("/api/media/file/old.jpg");
+    expect(ctaOf({ image: "id-only" })?.image).toBeNull();
+    expect(ctaOf({ image: media("doc", { mimeType: "application/pdf" }) })?.image).toBeNull();
+    expect(ctaOf({ image: media("new") })?.image).not.toHaveProperty("uploadedBy");
+  });
+
+  it("nút phụ chỉ khi có cả nhãn lẫn link hợp lệ; link theo ngôn ngữ; link nguy hiểm → ẩn", () => {
+    expect(ctaOf({ secondaryLabel: " Xem dự án ", secondaryLink: "projects" })?.secondary).toEqual({ label: "Xem dự án", href: "/du-an" });
+    expect(ctaOf({})?.secondary).toBeNull();
+    expect(ctaOf({ secondaryLabel: "Xem dự án", secondaryLink: null })?.secondary).toBeNull();
+    expect(ctaOf({ secondaryLabel: "", secondaryLink: "projects" })?.secondary).toBeNull();
+    expect(ctaOf({ secondaryLabel: "X", secondaryLink: "javascript:alert(1)" })?.secondary).toBeNull();
+    expect(ctaOf({ secondaryLabel: "View", secondaryLink: "projects" }, "en")?.secondary).toEqual({ label: "View", href: "/en/projects" });
+  });
+});

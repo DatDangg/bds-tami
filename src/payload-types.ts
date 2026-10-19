@@ -2617,7 +2617,13 @@ export interface Homepage {
      * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
      */
     ctaLink?: string | null;
+    /**
+     * Chỉ dùng khi chưa đặt Ảnh minh hoạ.
+     */
     backgroundImage?: (string | null) | Media;
+    /**
+     * Ảnh tràn viền phía sau banner; nếu đặt sẽ thay Ảnh nền.
+     */
     image?: (string | null) | Media;
     secondaryLabel?: string | null;
     /**

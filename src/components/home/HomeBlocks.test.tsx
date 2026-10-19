@@ -249,3 +249,21 @@ describe("HomeBlocks: Cho thuê + Tin tức (BL-020)", () => {
     expect(blockHeadings()).toEqual(["Về TAMI"]);
   });
 });
+
+describe("HomeBlocks: banner CTA ảnh tràn viền + 2 nút (BL-020 #7)", () => {
+  it("có `ctaBanner.image` + nút phụ → ảnh lazy, scrim, nút phụ chip theo link; EN dùng link /en", () => {
+    const cta = { enabled: true, title: "Đăng ký tham quan", image: media("cta"), secondaryLabel: "Đặt lịch tham quan", secondaryLink: "projects" } as Homepage["ctaBanner"];
+    const { container } = renderHome(homepage({ ctaBanner: cta }));
+    expect(container.querySelector('img[src*="cta"]')).toHaveAttribute("loading", "lazy");
+    expect(screen.getByTestId("cta-scrim")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Đặt lịch tham quan" })).toHaveAttribute("href", "/du-an");
+    expect(screen.getByRole("link", { name: "Đặt lịch tham quan" })).toHaveAttribute("data-variant", "chip");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" })).toHaveAttribute("data-variant", "primary");
+  });
+
+  it("không ảnh, thiếu link nút phụ → khối tối chỉ một nút như cũ", () => {
+    renderHome(homepage({ ctaBanner: { enabled: true, title: "Cần tư vấn?", secondaryLabel: "Đặt lịch tham quan", secondaryLink: null } }));
+    expect(screen.queryByTestId("cta-scrim")).toBeNull();
+    expect(screen.queryByRole("link", { name: "Đặt lịch tham quan" })).toBeNull();
+  });
+});

@@ -226,15 +226,17 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 |---|---|---|---|---|
 | 0 | Thanh thông báo (1a) | Dải chữ trong luồng, TRÊN header | `--color-primary` | Không |
 | 1 | Hero (+ ô tìm kiếm + chip 1b) | Full-bleed media, chữ giữa; ô tìm kiếm đè đáy hero từ md | Ảnh/video | Không |
-| 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 + hàng số liệu | `--color-bg` | Không |
+| 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 (ảnh bo 20px) + hàng số liệu | `--color-bg` | Không |
 | 3 | Dự án nổi bật | Slider full-bleed | `--color-bg-alt` | Eyebrow = loại hình trên từng slide (1) |
-| 4 | Dịch vụ | Bento bất đối xứng | `--color-bg` | Không |
+| 4 | Dịch vụ | Bento bất đối xứng, thẻ ảnh bo 20px + khung kính | `--color-bg` | Không |
 | 5 | Ưu đãi nổi bật | Lưới thẻ | `--color-bg-alt` | Không |
-| 6 | Đối tác | Lưới logo | `--color-bg` | Không |
-| 7 | Banner CTA (đề xuất §6.1) | Khối tối full-width | `.theme-dark-block` `--color-dark-deep` + ảnh mờ | Không |
+| 6 | Đối tác (FR-PUB-17, Should; **chưa có giao diện**) | Lưới logo | `--color-bg` | Không |
+| 7 | Banner CTA (đề xuất §6.1; BL-020 #7 "Đăng ký tham quan") | Khối tối full-width; có ảnh → ảnh tràn viền + scrim, 2 nút | `.theme-dark-block` `--color-dark-deep`; ảnh `ctaBanner.image` + `--color-banner-scrim` | Không |
 | 8 | Cho thuê (`rentals`, BL-020 #8) | Tab danh mục + slider thẻ | `--color-bg` | Không |
 | 9 | Tin tức (`news`, BL-020 #11) | Split intro trái / 3 thẻ phải | `.theme-dark-block` (nền tối thương hiệu) | Không |
 | | Footer | | `--color-dark` | |
+
+**Đối chiếu #1–#11 của market (BL-020):** #1 thanh thông báo = khối 0 · #2 hero = 1 · #3 ô tìm kiếm + chip = 1 (1b) · #4 Giới thiệu = 2 · #5 "Mua từ chủ đầu tư" (slider thẻ) = 5 Ưu đãi · #6 slider dự án = 3 · #7 "Đăng ký tham quan" = 7 Banner CTA · #8 + #10 "Thuê nhà ở / kinh doanh" (gộp) = 8 Cho thuê · #9 "Đồng hành trọn hành trình" = 4 Dịch vụ · #11 Tin tức = 9. **GAP MỞ:** #3 còn một phần chưa dựng — "slider banner ưu đãi" dưới ô tìm kiếm (chip + ô tìm kiếm đã có ở 1b). Chưa task nào xây; chờ user quyết ở checkpoint Phase 2: (a) dựng slider banner ưu đãi (cần dữ liệu/schema CMS mới), (b) ánh xạ vào slider Ưu đãi (khối 5, tin ưu đãi) hoặc slide hero, (c) bỏ khỏi phạm vi. Các mục #1–#2, #4–#11 đã có khối tương ứng. Đối tác (6, Should) chưa dựng giao diện (ngoài #1–#11, không đổi schema).
 
 9 section → layout family khác nhau (Cho thuê = tab + slider, Tin tức = split intro/3 thẻ); eyebrow 1/3 cho phép; **2 khối tối nội dung (CTA + Tin tức)** + footer: ngoại lệ tokens §0 (user chốt 2026-10-19: nền "thương hiệu" của BL-020 #11 = khối tối đen/kem + vàng của TAMI). Khi Tin tức đứng ngay trên footer (blockOrder mặc định) có đường viền `--color-dark-border` dưới khối để tách khỏi footer.
 
@@ -260,6 +262,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Chip "Dự án được quan tâm": dự án admin chọn (đã xuất bản, `/en` chỉ bản có EN); không có thì `isFeatured` mới nhất; tối đa 6; link tới chi tiết dự án; viên thuốc cao 44px; mobile vuốt ngang, ≥ md xuống dòng. Không có chip thì bỏ cả hàng. Chữ gợi ý ô nhập: CMS, trống thì chuỗi mặc định theo ngôn ngữ.
 
 **2. Về TAMI** (`about`)
+- Ảnh bo `--radius-xl` 20px (market #4).
 - < md: tiêu đề → ảnh 4:3 → nội dung (richText, tối đa ~120 từ hiển thị, phần còn lại không cắt: admin chịu trách nhiệm độ dài) → số liệu.
 - ≥ md: lưới 12 cột: ảnh cột 1-5 (4:5), chữ cột 7-12.
 - Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h2` serif `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
@@ -274,7 +277,8 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - "Xem tất cả" → `/du-an`. 0 dự án: ẩn khối. 1 dự án: không điều khiển.
 
 **4. Dịch vụ** (`services.items`)
-- Heading căn trái.
+- Heading căn trái (sentence case serif `--text-h2`; market #9 "Đồng hành trọn hành trình" do admin đặt trong CMS).
+- **Thẻ dịch vụ** (`ServiceCard`, dùng chung với "Dịch vụ khác" ở S11): ảnh bìa phủ kín bo `--radius-xl` 20px, **khung kính `.glass-panel`** (bo 16px, cách mép 12/16px) đè đáy ảnh chứa tên `h3` + mô tả (≤ 2 dòng) + mũi tên, chỉ dùng `--color-text` (4.5:1 dù ảnh sau kính đen/trắng — `contrast.test`; không còn chữ trắng trên gradient vì ảnh sáng không đạt AA). Không ảnh bìa: nền `--color-dark-deep`. Hover phóng ảnh nhẹ.
 - Theo số mục: 1 → thẻ ngang full container 21:9; 2 → 2 thẻ 7/5 cột; **3 (mặc định) → bento: thẻ lớn cột 1-7 cao 2 hàng, 2 thẻ nhỏ cột 8-12 xếp chồng**; ≥ 4 → hàng cuộn ngang scroll-snap.
 - < md: 3 thẻ xếp dọc, thẻ 4:3, chữ đè đáy ảnh.
 - Thẻ link tới `/dich-vu/[slug]`.
@@ -283,11 +287,13 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Heading căn giữa. **Slider thẻ** (trong container): cuộn ngang scroll-snap, vuốt/phím mũi tên, không autoplay; thẻ = `PostCard` (bo 20px, ảnh 16:10 lazy, badge ưu đãi, loại, tiêu đề, giá). Rộng 80% < sm · 2 thẻ ≥ sm · 3 thẻ ≥ lg; tối đa 6 thẻ. Nút trước/sau tròn 44px từ md (≥ 2 thẻ), cuộn ~90% bề rộng. Bài hết hạn **không** xuất hiện (BR-06). 0 bài: ẩn khối.
 - Nút Outline **Xem thêm** dưới slider → `/tin-bds` (theo ngôn ngữ).
 
-**6. Đối tác** (`partners`, `developers.showAsPartner`)
+**6. Đối tác** (`partners`, `developers.showAsPartner`) — **chưa dựng giao diện** (FR-PUB-17 Should; `partners` nằm trong thứ tự/bật tắt nhưng bị bỏ qua khi render, không phải placeholder). Thiết kế dưới đây áp dụng khi làm.
 - Tiêu đề `--text-h2` căn giữa. Lưới logo **chỉ logo** (không chữ dưới logo), ô cao 80px, logo `max-height: 48px`, grayscale + opacity 0.7, hover/focus về màu gốc. Logo có link `website` (tab mới) nếu có, `alt` = tên chủ đầu tư.
 - < sm 2 cột · sm 3 · md 4 · lg 6. Không marquee. 0 đối tác: ẩn khối.
 
-**7. Banner CTA** (đề xuất §6.1): khối tối, ảnh nền mờ 20% (tuỳ chọn), tiêu đề `--text-h1` (≤ 8 từ), câu phụ ≤ 20 từ, nút Primary **Nhận tư vấn** → `/lien-he` (hoặc `ctaLink`). Căn giữa, padding `--space-section`.
+**7. Banner CTA** (đề xuất §6.1; BL-020 #7 "Đăng ký tham quan"): `.theme-dark-block`, tiêu đề `h2` (≤ 8 từ), câu phụ ≤ 20 từ, nút Primary **Nhận tư vấn** → `/lien-he` (hoặc `ctaLink`) + nút phụ tuỳ chọn (`secondaryLabel` + `secondaryLink`, biến thể `chip` viên thuốc viền trắng — chỉ hiện khi có CẢ nhãn lẫn link hợp lệ qua `resolveNavLink`). Căn giữa, padding `--space-section`.
+- **Có ảnh** (`ctaBanner.image`; chưa đặt thì dùng `backgroundImage` cũ): ảnh tràn viền phủ kín khung cao `clamp(26rem, 60svh, 40rem)` (cố định → không CLS), lazy, `sizes="100vw"`, ảnh trang trí (`alt=""`), phủ scrim `--color-banner-scrim` (đúng token của PageBanner, 0.6) → tiêu đề, câu phụ (`--color-on-dark`, KHÔNG dùng on-dark-muted) và chữ nút phụ trắng đạt 4.5:1 kể cả ảnh trắng tinh (`contrast.test`); khung cao có `min-h-[26rem]` dự phòng cho trình duyệt chưa hiểu `svh`; vòng focus của link trong khối có ảnh dùng `outline-on-dark` (trắng; vòng mặc định của khối tối `--color-on-dark-accent` #E0BF89 chỉ ~2.95:1 trên scrim đè ảnh trắng). Nút chính giữ nền vàng + chữ tối. **Không ảnh:** khối tối đặc như cũ, câu phụ `--color-text-secondary` của khối tối.
+- Component dùng chung `layout/CtaBanner` (cũng là CTA của S11 dịch vụ, không ảnh/nút phụ → giữ nguyên).
 
 **8. Cho thuê** (`rentals`: `enabled`, `title`, `categories` ≤ 4 danh mục scope Cho thuê; BL-020 #8 "Thuê nhà ở / kinh doanh")
 - Heading `h2` căn giữa (tiêu đề CMS; để trống thì dùng chữ mặc định theo ngôn ngữ, không ẩn khối); dưới là **tablist** danh mục (viên thuốc cao 44px, đang chọn nền `--color-dark`, chưa chọn có viền `--color-border` + viền đậm khi hover; ←/→ vòng, Home/End, roving tabindex, `aria-selected`/`aria-controls`). Mỗi tab một `tabpanel` chứa **slider** thẻ `RentalCard` dùng chung (cuộn ngang scroll-snap, vuốt/phím mũi tên, không autoplay; 80% < sm · 2 thẻ ≥ sm · 4 thẻ ≥ lg; nút trước/sau ≥ md khi > 1 thẻ — cơ chế `useSnapSlider`/`SliderArrow` dùng chung với Dự án/Ưu đãi). Nút Outline **Xem thêm** dưới slider → `/cho-thue/danh-muc/<slug>` · `/en/for-rent/category/<slug>` của tab đang xem.

@@ -75,13 +75,14 @@ const validateBlockOrder = (value: unknown): true | string => {
   return new Set(blocks).size === blocks.length ? true : "Mỗi khối chỉ xuất hiện một lần trong thứ tự.";
 };
 
-const imageUpload = (name: string, label: string, required = false): Field => ({
+const imageUpload = (name: string, label: string, required = false, description?: string): Field => ({
   name,
   type: "upload",
   label,
   relationTo: "media",
   required,
   filterOptions: { mimeType: { contains: "image/" } },
+  ...(description ? { admin: { description } } : {}),
 });
 
 const ctaLabelField: Field = { name: "ctaLabel", type: "text", label: "Chữ trên nút", localized: true };
@@ -202,8 +203,8 @@ const ctaBannerBlock: Field = {
     // Trống thì phía hiển thị dùng chuỗi "Nhận tư vấn".
     { ...ctaLabelField, admin: { description: 'Để trống thì dùng "Nhận tư vấn".' } },
     ctaLinkField(),
-    imageUpload("backgroundImage", "Ảnh nền"),
-    imageUpload("image", "Ảnh minh hoạ"),
+    imageUpload("backgroundImage", "Ảnh nền", false, "Chỉ dùng khi chưa đặt Ảnh minh hoạ."),
+    imageUpload("image", "Ảnh minh hoạ", false, "Ảnh tràn viền phía sau banner; nếu đặt sẽ thay Ảnh nền."),
     { name: "secondaryLabel", type: "text", label: "Chữ trên nút phụ", localized: true },
     navLinkField("secondaryLink", { label: "Liên kết của nút phụ" }),
   ],

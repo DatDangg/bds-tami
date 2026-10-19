@@ -71,7 +71,10 @@ export interface CtaBannerView {
   /** `null` → nơi hiển thị dùng chuỗi mặc định "Nhận tư vấn". */
   label: string | null;
   href: string;
+  /** Ảnh tràn viền (`ctaBanner.image`; chưa đặt thì dùng `backgroundImage` cũ để CTA đã cấu hình không mất ảnh). `null` → khối tối như cũ. */
   image: MediaImage | null;
+  /** Nút phụ: chỉ có khi CÓ CẢ chữ lẫn link hợp lệ (thiếu một trong hai thì ẩn nút). */
+  secondary: { label: string; href: string } | null;
 }
 
 /** Thanh thông báo đầu trang chủ; `null` khi tắt, trống chữ hoặc chưa có bản EN. */
@@ -220,13 +223,16 @@ function toProjectSlides(docs: readonly Project[], locale: Locale): ProjectSlide
 
 function toCta(homepage: Homepage, locale: Locale): CtaBannerView {
   const cta = homepage.ctaBanner;
+  const secondaryLabel = text(cta?.secondaryLabel);
+  const secondaryHref = secondaryLabel ? (resolveNavLink(cta?.secondaryLink, locale)?.href ?? null) : null;
   return {
     kind: "ctaBanner",
     title: titleOf(homepage, "ctaBanner"),
     description: text(cta?.description) || null,
     label: text(cta?.ctaLabel) || null,
     href: (resolveNavLink(cta?.ctaLink, locale) ?? resolveNavLink(CONTACT_FALLBACK, locale))?.href ?? "/",
-    image: toPublicImage(renderableImage(cta?.backgroundImage)),
+    image: toPublicImage(renderableImage(cta?.image) ?? renderableImage(cta?.backgroundImage)),
+    secondary: secondaryHref ? { label: secondaryLabel, href: secondaryHref } : null,
   };
 }
 
