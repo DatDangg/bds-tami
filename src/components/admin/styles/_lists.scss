@@ -190,6 +190,22 @@
   }
 }
 
+// Thanh chọn hàng loạt ≤ 768px (BL-024): Payload đặt `.collection-list__list-selection{position:fixed;bottom:0;padding:16px 0;width:100%}`
+// nhưng KHÔNG có `left` → left tĩnh = lề gutter, thanh lệch phải đúng 1 gutter và nút cuối ("Xóa") bị cắt ở 375px.
+// Ghim 2 mép + width auto để nền phủ đủ ngang, nội dung nằm trong gutter. Nằm ngoài @layer nên thắng @layer payload-default.
+.collection-list__list-selection {
+  left: 0;
+  right: 0;
+  width: auto;
+  padding-inline: var(--gutter-h);
+
+  // Khi danh sách nhiều trang có thêm nút "Chọn tất cả (N)", hàng flex nowrap của Payload rộng > 343px → cho xuống dòng thay vì tràn.
+  .list-selection {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+}
+
 // Mục thanh công cụ danh sách (BL-021 T6): các control trong slot `beforeListTable` (Xuất Excel, Trạng thái dịch) nằm trong lề trang,
 // ngay dưới hàng tìm kiếm/Cột/Bộ lọc. Mỗi slot là một khối riêng nên dùng inline-flex để các mục xếp CÙNG một hàng, căn đáy,
 // tự xuống dòng khi hẹp; max-width 100% để không tràn ngang ở 375px.

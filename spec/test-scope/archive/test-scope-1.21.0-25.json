@@ -1,0 +1,164 @@
+{
+  "specVersion": "1.21.0",
+  "scopeVersion": 25,
+  "generatedAt": "2026-10-20T23:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-020 Phase 5/5 (phase cuối) — schema dự án + khối nội dung mở rộng ở chi tiết dự án: Nổi bật, tiện ích xung quanh (tab + điểm bản đồ trong Vị trí), Bảng giá theo loại căn, Hỏi đáp + JSON-LD FAQPage; Tài liệu vào trong Pháp lý; thanh mục con 11 mục. Spec 1.20.0 → 1.21.0 (MINOR), BRD 1.7 → 1.8 (FR-PUB-03, FR-PUB-15). Migration additive 20261019_215847_project_detail_market_blocks. Đã build: T01 e7d0c81, T02 5b8ae10; close-out (MINOR fix + docs + spec delta) chưa commit.",
+  "workItem": "feature/public-ui-market-vinhomes",
+  "backlog": "BL-020",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-10-19-public-ui-market-vinhomes.md",
+  "task": [
+    "tasks/feature-public-ui-market-vinhomes/phase-5-task-01.md",
+    "tasks/feature-public-ui-market-vinhomes/phase-5-task-02.md"
+  ],
+  "commits": [
+    "e7d0c81",
+    "5b8ae10",
+    "close-out phase 5 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "e7d0c81": "P5-T01 — projects: highlights (≤ 8), nearbyAmenities (≤ 40), priceTable (≤ 30) + priceUpdatedAt, faqs (≤ 20), tab admin 'Nội dung mở rộng', mọi field tuỳ chọn, bắt buộc trong hàng; localized vào TRANSLATABLE_FIELDS.projects; migration additive 20261019_215847_project_detail_market_blocks; regen payload-types; ERD §4.5",
+    "5b8ae10": "P5-T02 — ProjectHighlights, NearbyTabs (ARIA tabs) + LazyMap markers, PriceTable (rút gọn, Liên hệ, Từ/Đến, cuộn ngang), ProjectFaq <details> + JSON-LD FAQPage theo locale; Pháp lý gộp legalInfo + Tài liệu PDF (giữ #documents); thanh mục con 11 mục; RentalCard imageSizes; design-spec S03, DESIGN.md",
+    "close-out phase 5 (commit chứa file này)": "MINOR-1 giá 0 = chưa nhập (project-detail-view numberOrNull > 0); MINOR-2 LegalPolicy #documents mở + cuộn khối Pháp lý thu gọn (cả bấm lại cùng hash, bỏ qua Ctrl/Cmd-click, reduced motion); MINOR-3 NearbyTabs panel tabIndex 0; test bổ sung; ERD/design-spec S03 as-built; SPECIFICATIONS 1.21.0 + BRD 1.8 + scope v25"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.20.0-24.json",
+  "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-5.md",
+  "specRefs": [
+    "F2",
+    "F11",
+    "F12",
+    "Ngoài phạm vi",
+    "BRD FR-PUB-03",
+    "BRD FR-PUB-15"
+  ],
+  "specRefNotes": {
+    "F2": "Chi tiết thêm 4 khối; Bố cục chi tiết (P4 + P5): thứ tự Tổng quan · Nổi bật · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Giá · Thư viện · Tin liên quan · Hỏi đáp (trống tự ẩn), < lg thẻ Tư vấn 1:1 cuối cột chính, Tài liệu trong Pháp lý (#documents mở khối thu gọn), Tin liên quan sau Thư viện. Khối nội dung mở rộng (P5): giới hạn ≤ 8/40/30/20, bắt buộc trong hàng, priceUpdatedAt dd/MM/yyyy, không giá hoặc 0 → 'Liên hệ', một đầu → Từ/Đến, FAQ details + FAQPage theo locale, /en bỏ hàng thiếu EN, tab admin 'Nội dung mở rộng', mọi field tuỳ chọn.",
+    "F11": "JSON-LD thêm FAQPage ở chi tiết dự án có hỏi đáp (inLanguage theo trang).",
+    "F12": "Hàng mới có chữ vi/en riêng, vào danh sách dịch AI; hàng thiếu EN ẩn ở /en; dự án enSource=manual không tự dịch hàng mới.",
+    "Ngoài phạm vi": "+ quỹ căn chi tiết từng căn; phân khu dự án.",
+    "BRD FR-PUB-03": "BRD 1.8 — thêm điểm nổi bật, tiện ích xung quanh (khoảng cách), bảng giá theo loại căn, câu hỏi thường gặp.",
+    "BRD FR-PUB-15": "BRD 1.8 — schema.org thêm FAQPage."
+  },
+  "migration": "20261019_215847_project_detail_market_blocks (ADDITIVE, không HIGH_RISK: 4 enum, 16 bảng mới gồm _locales + bản _projects_v, 2 cột price_updated_at nullable, FK ON DELETE CASCADE; DROP chỉ ở down; cần PostGIS; không backfill). Staging: payload migrate → kiểm trang + tab admin → promote đúng migration lên prod. Deploy gộp BL-020 cùng 20261019_144259_homepage_market_blocks (P2) + bước admin P2 (thêm Cho thuê/Tin tức vào Thứ tự khối).",
+  "changed": {
+    "files": [
+      "migrations/20261019_215847_project_detail_market_blocks.ts",
+      "migrations/20261019_215847_project_detail_market_blocks.json",
+      "migrations/index.ts",
+      "src/collections/Projects.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/collections/projects/market-blocks.test.ts",
+      "src/lib/translation/leaves.ts",
+      "src/payload-types.ts",
+      "src/components/media/LazyMap.tsx",
+      "src/components/media/LazyMap.test.tsx",
+      "src/components/projects/Documents.tsx",
+      "src/components/projects/LegalPolicy.tsx",
+      "src/components/projects/NearbyTabs.tsx",
+      "src/components/projects/PriceTable.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/components/projects/ProjectFaq.tsx",
+      "src/components/projects/ProjectHighlights.tsx",
+      "src/components/projects/ProjectListings.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/components/projects/project-market-blocks.test.tsx",
+      "src/components/rentals/RentalCard.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/lib/projects/project-detail-view.ts",
+      "src/lib/projects/project-detail-view.test.ts",
+      "src/lib/seo/json-ld.ts",
+      "tests/integration/projects.test.ts",
+      "docs/ERD.md",
+      "docs/DESIGN.md",
+      "docs/BRD.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Diff thật 2e2fe8f..5b8ae10 (bỏ progress/task/review report) + close-out chưa commit. Schema projects đổi (additive) + migration; không endpoint/quyền/nguồn lead mới. API_SPEC no doc impact.",
+    "modules": [
+      "Schema — src/collections/projects/market-blocks.ts (highlights, nearbyAmenities, priceTable + priceUpdatedAt, faqs; validate đến ≥ từ, min 0, maxRows), tab admin 'Nội dung mở rộng' trong Projects.ts",
+      "Dịch AI — TRANSLATABLE_FIELDS.projects thêm 4 mảng (leaves.ts)",
+      "View — project-detail-view.ts (lọc hàng thiếu chữ theo locale, numberOrNull > 0, visibleSections 11 mục)",
+      "UI — ProjectHighlights, NearbyTabs + LazyMap markers, PriceTable, ProjectFaq, LegalPolicy (Pháp lý + Tài liệu, neo #documents), ProjectDetail (thứ tự khối, aside cuối cột chính < lg)",
+      "SEO — json-ld.ts FAQPage theo locale",
+      "Thẻ — RentalCard prop imageSizes (Tin liên quan)",
+      "Docs as-built — ERD §4.5, DESIGN.md, design-spec S03; intent — BRD 1.8"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Admin dự án: tab 'Nội dung mở rộng' có Điểm nổi bật / Tiện ích xung quanh / Bảng giá + Ngày cập nhật giá / Câu hỏi thường gặp; thêm, sửa, xoá, kéo thứ tự hàng; lưu được",
+      "Validate admin: vượt maxRows (9 nổi bật / 41 tiện ích quanh / 31 hàng giá / 21 hỏi đáp) bị chặn; hàng thiếu field bắt buộc trong hàng (tiêu đề nổi bật, tên tiện ích quanh, loại căn, câu hỏi, trả lời) → lỗi; diện tích/giá âm → lỗi; 'đến' < 'từ' (diện tích hoặc giá) → lỗi; nhóm tiện ích mặc định 'Khác'",
+      "Dự án cũ không nhập gì: lưu, xuất bản, tự dịch EN như trước, không lỗi validate; trang công khai giống 1.20.0 trừ thứ tự khối mới",
+      "Trang /du-an/<slug> + /en/projects/<slug>: mỗi khối mới chỉ hiện khi có dữ liệu; khối trống ẩn cả mục trên thanh mục con",
+      "Thanh mục con đúng thứ tự Tổng quan · Nổi bật · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Giá · Thư viện · Tin liên quan · Hỏi đáp; không còn mục 'Tài liệu'; bấm từng mục nhảy đúng khối, aria-current đúng",
+      "Nổi bật: lưới thẻ (tiêu đề + mô tả), icon chung",
+      "Tiện ích xung quanh trong khối Vị trí: ≥ 2 nhóm → tablist (←/→ vòng, Home/End, Tab vào panel), 1 nhóm → chỉ danh sách; hàng có toạ độ → điểm trên bản đồ; dự án không có toạ độ → chỉ danh sách; khoảng cách hiện đúng chữ đã nhập",
+      "Bảng giá: '3 tỷ – 4 tỷ'; chỉ 'từ' → 'Từ …'; chỉ 'đến' → 'Đến …'; không giá hoặc 0 → 'Liên hệ'; diện tích trống/0 → '—'; badge tình trạng Còn hàng / Sắp hết / Hết hàng; ngày cập nhật dd/MM/yyyy khi có; bảng cuộn ngang trong khung ở 375, trang không cuộn ngang",
+      "Hỏi đáp: accordion <details>/<summary> mở/đóng bằng chuột + bàn phím; JSON-LD FAQPage có đúng các câu hỏi của trang, VI ở /du-an, EN ở /en (không lẫn tiếng Việt); không có hỏi đáp → không có FAQPage; Rich Results Test hợp lệ",
+      "/en: hàng nổi bật / tiện ích quanh / giá / hỏi đáp thiếu chữ EN bị ẩn (không hiện tiếng Việt, không ô trống); khối hết hàng → ẩn khối + mục menu",
+      "Pháp lý: legalInfo + danh sách Tài liệu PDF trong cùng khối; nút tài liệu ở hero (#documents) → mở khối Pháp lý (kể cả đang thu gọn ở mobile) và cuộn tới Tài liệu; bấm lại lần 2 vẫn mở + cuộn; Ctrl/Cmd-click không bị chặn",
+      "< lg (375/768): thẻ 'Tư vấn 1:1' nằm cuối cột chính sau Hỏi đáp (hoặc sau khối cuối cùng đang hiện); CTA dính đáy → #lead-form; ≥ lg thẻ sticky cột phải như 1.20.0",
+      "Tin liên quan nằm sau Thư viện, trước Hỏi đáp",
+      "Viewport 375/768/1024/1280: không tràn ngang, không CLS khi tải bản đồ/khối mới"
+    ],
+    "dependents": [
+      "Dịch AI dự án: xuất bản VI → bản EN của 4 mảng được dịch; dự án enSource=manual không tự dịch hàng mới (nhập tay EN hoặc 'Dịch lại bằng AI')",
+      "LazyMap dùng chung (chi tiết tin cho thuê, Liên hệ): không truyền markers vẫn hiển thị như cũ",
+      "RentalCard dùng chung (danh sách Cho thuê, trang chủ, tin tương tự): sizes mặc định không đổi khi không truyền imageSizes",
+      "JSON-LD RealEstateListing / Organization / breadcrumb của chi tiết dự án vẫn có, không trùng script",
+      "Version/draft dự án (_projects_v): lưu nháp, khôi phục phiên bản có 4 mảng không lỗi",
+      "REST /api/projects trả thêm field (chỉ thêm); không kèm locale → vi"
+    ],
+    "regression": [
+      "URL, metadata, canonical, hreflang, sitemap chi tiết dự án không đổi; dự án nháp/xoá mềm vẫn 404",
+      "Khối cũ (Tổng quan, Vị trí/bản đồ, Tiện ích, Mặt bằng, Pháp lý, Chính sách, Thư viện, Tin liên quan, CTA Đăng ký tham quan) còn đủ nội dung; một LeadForm duy nhất source=project",
+      "Lead dự án: rate limit, Turnstile, consent, chống trùng 7 ngày như cũ",
+      "Danh sách /du-an + slider dự án trang chủ không đổi",
+      "Admin dự án: các tab/field cũ, englishRequiredFields (title, slug, summary, overview) không đổi",
+      "Migration: migrate up trên DB có dữ liệu dự án cũ không mất dữ liệu; các migration trước không bị sửa"
+    ]
+  },
+  "acceptance": [
+    "Staging payload migrate up thành công (migration additive), dự án cũ còn nguyên, lưu + xuất bản EN không lỗi",
+    "Tab admin 'Nội dung mở rộng' lưu được; maxRows, bắt buộc trong hàng, số không âm, đến ≥ từ được validate",
+    "4 khối mới hiện đúng khi có dữ liệu, ẩn (cả mục menu) khi trống; thanh mục con đúng thứ tự 11 mục",
+    "Bảng giá: 'Liên hệ' khi không giá hoặc 0, 'Từ/Đến' một đầu, badge tình trạng, ngày cập nhật, cuộn ngang trong khung ở 375",
+    "Tiện ích xung quanh: tab bàn phím ARIA, điểm trên bản đồ khi có toạ độ",
+    "FAQ details + JSON-LD FAQPage đúng ngôn ngữ trang, hợp lệ Rich Results Test",
+    "/en ẩn hàng thiếu chữ EN, không fallback tiếng Việt",
+    "#documents từ hero mở Pháp lý (kể cả thu gọn mobile, bấm lại); < lg thẻ tư vấn cuối cột chính",
+    "VI/EN cùng bố cục, không tràn ngang 375/768/1024/1280; pnpm lint / typecheck / test / build PASS"
+  ],
+  "outOfScope": [
+    "Quỹ căn chi tiết từng căn; phân khu dự án",
+    "Map icon theo highlights.icon (đang dùng icon chung)",
+    "Marker bản đồ focus bàn phím (danh sách tab là đường thay thế)",
+    "Lọc danh sách dự án / tìm kiếm theo giá trong bảng giá",
+    "Đo Lighthouse/PSI LCP/CLS chính thức trên staging (residual)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "PATCH/POST /api/projects (staff đăng nhập) với highlights/nearbyAmenities/priceTable/faqs hợp lệ → 200 và đọc lại đúng; vượt maxRows → 400; thiếu field bắt buộc trong hàng → 400; priceTable areaTo/priceTo âm hoặc 'đến' < 'từ' → 400",
+    "PATCH dự án cũ không gửi field mới → 200 (không bắt buộc thêm); xuất bản EN không bị chặn bởi field mới",
+    "GET /api/projects/<id>?locale=en → chữ EN của 4 mảng (không fallback vi); không kèm locale → vi",
+    "Người không đăng nhập: không tạo/sửa được dự án (quyền không đổi)"
+  ],
+  "risk": "high",
+  "riskNote": "Đổi schema + migration (additive, không HIGH_RISK) trên collection dự án có versions + dịch AI + JSON-LD mới trên trang SEO quan trọng × VI/EN × 4 viewport. T01/T02 STRICT PASS r1, close-out NORMAL PASS r1. Ưu tiên: migrate up trên staging với dữ liệu thật, dự án cũ lưu/xuất bản EN, FAQPage đúng locale, /en ẩn hàng thiếu EN, #documents trên mobile. Residual: sửa dự án ở locale EN khi hàng chưa có chữ EN sẽ chặn lưu (như amenities); marker không focus bàn phím; LCP/CLS chưa đo trên staging; merge về staging có thể xung đột src/payload-types.ts (regen sau merge). Bên test cần seed dự án có đủ 4 khối (có/không bản EN, có/không toạ độ, giá thiếu/0/một đầu)."
+}

@@ -27,8 +27,25 @@ describe("admin mobile overflow (375px)", () => {
     expect(body).toMatch(/right:\s*calc\(var\(--gutter-h\)\s*\*\s*-1\)\s*;/);
   });
 
+  it("thanh chọn hàng loạt phủ đủ ngang viewport: left 0, width auto, padding-inline theo gutter (BL-024)", () => {
+    const body = ruleBody(listsSource(), /\.collection-list__list-selection\s*\{([^}]*)\}/);
+    expect(body).toMatch(/left:\s*0\s*;/);
+    expect(body).toMatch(/right:\s*0\s*;/);
+    expect(body).toMatch(/width:\s*auto\s*;/);
+    expect(body).toMatch(/padding-inline:\s*var\(--gutter-h\)\s*;/);
+  });
+
+  it("hàng nút trong thanh chọn hàng loạt được xuống dòng, không tràn khi có 'Chọn tất cả (N)' (BL-024)", () => {
+    const body = ruleBody(listsSource(), /\.collection-list__list-selection\s*\{[^}]*\.list-selection\s*\{([^}]*)\}/);
+    expect(body).toMatch(/flex-wrap:\s*wrap\s*;/);
+  });
+
   it("không đặt overflow-x: hidden trên html/body trong style admin", () => {
-    const all = [source(), readFileSync(join(__dirname, "../../app/(payload)/custom.scss"), "utf8")].join("\n");
+    const all = [
+      source(),
+      listsSource(),
+      readFileSync(join(__dirname, "../../app/(payload)/custom.scss"), "utf8"),
+    ].join("\n");
     expect(all).not.toMatch(/(?:^|[\s,}])(?:html|body)\s*[^{}]*\{[^}]*overflow-x:\s*hidden/);
   });
 });
@@ -36,4 +53,8 @@ describe("admin mobile overflow (375px)", () => {
 // Bỏ comment để regex không khớp nhầm đoạn trích rule Payload trong chú thích.
 function source() {
   return surfaces.replace(/\/\/.*$/gm, "");
+}
+
+function listsSource() {
+  return readFileSync(join(STYLES_DIR, "_lists.scss"), "utf8").replace(/\/\/.*$/gm, "");
 }

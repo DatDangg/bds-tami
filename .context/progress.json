@@ -955,6 +955,35 @@
       "specVersion": "1.17.0",
       "scopeVersion": 21,
       "residual": "#05 nội dung dán NFD chưa chuẩn hoá khi lưu (quyết định không thêm hook), diff Lexical chưa kiểm trình duyệt; #10 dashboard/danh sách 375px còn tràn (BL-024), viền focus breadcrumb có thể bị cắt dọc, vạch kẻ tài khoản desktop ngắn hơn 36px, chỉ kiểm Chrome; #16 F5/back khi /me treo chỉ unit test, chọn 'Rời trang' ở hộp thoại chưa lưu có thể chớp toast, Firefox có thể bỏ bfcache admin, dashboard next/link không có thanh tiến trình Payload"
+    },
+    {
+      "slug": "admin-dashboard-list-mobile-overflow",
+      "title": "Admin 375px: Tổng quan + danh sách cuộn ngang (BL-024) — thực chất transition nav bị đóng băng khi đo; sửa thanh chọn hàng loạt bị cắt",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-024",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-dashboard-list-mobile-overflow.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-dashboard-list-mobile-overflow/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "note": "506/576 = transition grid-template-columns Payload đóng băng ở trang không render; lỗi thật: .collection-list__list-selection fixed width 100% không có left + hàng nút nowrap",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/bug-admin-dashboard-list-mobile-overflow-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-024)"
+        }
+      ],
+      "completedAt": "2026-10-20",
+      "specVersion": "1.21.0",
+      "scopeVersion": 26,
+      "residual": "thanh chọn hàng loạt fixed che đáy danh sách khi chọn (hành vi Payload); --nav-width:100vw lệch ~15px ở cửa sổ hẹp có thanh cuộn cổ điển; chỉ kiểm Chrome emulate, test tĩnh CSS; 768px chưa kiểm riêng"
     }
   ],
   "projectName": "tami-website",
@@ -1601,9 +1630,14 @@
       "date": "2026-10-18",
       "scope": "layer-10-task-02",
       "decision": "Cho phép attempt 4 (vượt giới hạn 3) thay vì architecture_review_needed"
+    },
+    {
+      "date": "2026-10-20",
+      "scope": "bug-admin-dashboard-list-mobile-overflow",
+      "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T05:47:48+07:00",
+  "lastUpdated": "2026-10-20T23:59:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",
