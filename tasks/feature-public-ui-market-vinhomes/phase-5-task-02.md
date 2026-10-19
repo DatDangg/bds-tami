@@ -20,3 +20,7 @@ ADDITIVE UI + SEO (JSON-LD) → STRICT.
 
 ## Carry-over từ P4-T02 (reviewer r1)
 - MINOR-2: `ProjectListings.tsx:47` RentalCard dùng `sizes` của lưới 4 cột → thêm prop `imageSizes` cho RentalCard, truyền `(min-width:1280px) 390px, (min-width:640px) 45vw, 100vw`.
+
+## Carry-over từ P5-T01 (reviewer r1)
+- MINOR-2: `src/collections/projects/market-blocks.ts:108-111` `vndRange` gắn `Cell: VndCell` vô dụng cho field trong mảng → dùng `rangeNumber`, bỏ `vndRange`.
+- MINOR-4: thêm test `priceTable: [{ unitType: "A", areaTo: -1 }]` (và `priceTo: -1`) → 400.

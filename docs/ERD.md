@@ -221,6 +221,11 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `summary` | textarea | R | Đoạn ngắn cho thẻ danh sách + meta description |
 | `overview` | richText | | |
 | `amenities` | array | | `{ name, icon? }` |
+| `highlights` | array (≤ 8) | | `{ title R, description?, icon? }` — điểm nổi bật (BL-020 P5) |
+| `nearbyAmenities` | array (≤ 40) | | `{ category R, name R, distance?, location? }` — `category`: `education` · `healthcare` · `shopping` · `park` · `transport` · `other` |
+| `priceTable` | array (≤ 30) | | `{ unitType R, areaFrom?, areaTo?, priceFrom?, priceTo?, availability?, note? }` — bảng giá theo loại căn; `availability`: `available` · `few_left` · `sold_out` |
+| `priceUpdatedAt` | date | | Ngày cập nhật bảng giá (chỉ ngày) |
+| `faqs` | array (≤ 20) | | `{ question R, answer R }` |
 | `gallery` | upload hasMany `rel→media` | R khi `published` | Ảnh đầu tiên là ảnh đại diện |
 | `floorPlans` | array | | `{ title, image rel→media }` |
 | `documents` | upload hasMany `rel→media` | | Brochure, bảng giá công khai (PDF) |
@@ -233,6 +238,8 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `seo` | group | | §4.14 |
 
 > **As-built (layer-5-task-01):** `src/collections/Projects.ts`, migration `20261017_125429_projects`. Localized: `title`, `slug`, `summary`, `overview`, `legalInfo`, `salesPolicy`, `amenities[].name`, `floorPlans[].title`, `scale.handoverTime`. `location` = PostGIS `geometry(Point)` (migration có `CREATE EXTENSION IF NOT EXISTS postgis`; DB test phải bật PostGIS). `gallery` bắt buộc ≥ 1 ảnh khi `status=published` (draft được trống), ảnh đầu là ảnh đại diện; `floorPlans[].image` bắt buộc; `documents` chỉ PDF; giá/diện tích `min: 0`, không ràng buộc chéo (from ≤ to) vì spec không yêu cầu. `category` giới hạn scope `project`. Bộ field nội dung qua `withContentDefaults` (`englishRequiredFields`: title, slug, summary, overview). Dữ liệu mẫu (`pnpm seed --sample`): 2 dự án draft, chưa có ảnh.
+
+> **As-built (BL-020, feature-public-ui-market-vinhomes P5-T01) — khối nội dung dự án kiểu market:** thêm `highlights`, `nearbyAmenities`, `priceTable`, `priceUpdatedAt`, `faqs` (field ở `src/collections/projects/market-blocks.ts`, tab admin "Nội dung mở rộng"). Tất cả tuỳ chọn (mảng rỗng hợp lệ) và không thuộc `englishRequiredFields`, nên dự án cũ lưu/xuất bản EN không bị chặn thêm. Localized: `highlights[].title/description`, `nearbyAmenities[].name`, `priceTable[].unitType/note`, `faqs[].question/answer` (thêm 4 mảng vào `TRANSLATABLE_FIELDS.projects`); `icon`, `distance`, `location`, `category`, số và `availability` không localized. `priceTable`: `areaFrom/areaTo/priceFrom/priceTo` `min: 0`, "đến" ≥ "từ" khi cả hai có giá trị (validate ở server). `nearbyAmenities[].location` = PostGIS `geometry(Point)` (không có index GIST). Migration `20261019_215847_project_detail_market_blocks` (additive: 4 bảng mảng + 4 bảng `_locales` cho `projects` và 8 bảng tương ứng cho `_projects_v` (16 bảng) + 4 enum + cột `price_updated_at` nullable trên `projects` và `_projects_v`; FK `ON DELETE CASCADE`; không DROP/ALTER dữ liệu cũ; không HIGH_RISK). Chưa hiển thị ở giao diện công khai (P5-T02).
 
 ### 4.6. `rentals` (Cho thuê)
 

@@ -11,7 +11,7 @@ import { isLexicalRoot } from "./lexical";
  * `slug` được sinh riêng từ tiêu đề EN, không dịch trực tiếp. Không có `leads`, `job-applications`... vì đã bị `allowlist.ts` chặn.
  */
 export const TRANSLATABLE_FIELDS = {
-  projects: ["title", "summary", "overview", "legalInfo", "salesPolicy", "scale", "amenities", "floorPlans", "seo"],
+  projects: ["title", "summary", "overview", "legalInfo", "salesPolicy", "scale", "amenities", "floorPlans", "highlights", "nearbyAmenities", "priceTable", "faqs", "seo"],
   rentals: ["title", "description", "legalNote", "seo"],
   "property-posts": ["title", "excerpt", "content", "priceNote", "offer", "seo"],
   news: ["title", "excerpt", "content", "seo"],

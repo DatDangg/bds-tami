@@ -28,6 +28,7 @@ import * as migration_20261018_203017_rentals_reindex_job from './20261018_20301
 import * as migration_20261018_212611_leads_remind_scan_index from './20261018_212611_leads_remind_scan_index';
 import * as migration_20261019_082627_site_settings_page_banners from './20261019_082627_site_settings_page_banners';
 import * as migration_20261019_144259_homepage_market_blocks from './20261019_144259_homepage_market_blocks';
+import * as migration_20261019_215847_project_detail_market_blocks from './20261019_215847_project_detail_market_blocks';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261019_144259_homepage_market_blocks.up,
     down: migration_20261019_144259_homepage_market_blocks.down,
-    name: '20261019_144259_homepage_market_blocks'
+    name: '20261019_144259_homepage_market_blocks',
+  },
+  {
+    up: migration_20261019_215847_project_detail_market_blocks.up,
+    down: migration_20261019_215847_project_detail_market_blocks.down,
+    name: '20261019_215847_project_detail_market_blocks'
   },
 ];

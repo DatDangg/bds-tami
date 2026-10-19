@@ -21,6 +21,7 @@ import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFilters } from "../lib/admin/list-filter";
 import { textRowLabel } from "../lib/admin/row-label";
 import { withContentDefaults } from "./_shared/content-defaults";
+import { projectMarketBlockFields } from "./projects/market-blocks";
 
 export const SALES_STATUSES = ["upcoming", "selling", "handed_over"] as const;
 export type SalesStatus = (typeof SALES_STATUSES)[number];
@@ -162,6 +163,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               amenitiesField,
             ],
           },
+          { label: "Nội dung mở rộng", fields: projectMarketBlockFields },
           {
             label: "Hình ảnh",
             fields: [
@@ -184,8 +186,8 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
     },
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },
   );
-  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["address", "scale"]);
+  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale, priceUpdatedAt ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
+  return hideTechnicalListFilters(collection, ["address", "scale", "priceUpdatedAt"]);
 }
 
 export const Projects = createProjects();

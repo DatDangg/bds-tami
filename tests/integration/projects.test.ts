@@ -161,6 +161,7 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
         expect.arrayContaining([
           "title", "slug", "category", "developer", "salesStatus", "province", "ward", "address", "location",
           "priceFromVnd", "priceToVnd", "areaFromM2", "areaToM2", "scale", "summary", "overview", "amenities",
+          "highlights", "nearbyAmenities", "priceTable", "priceUpdatedAt", "faqs",
           "gallery", "floorPlans", "documents", "legalInfo", "salesPolicy", "isFeatured", "status", "publishedAt",
           "author", "hasEnglish", "translation", "seo",
         ]),
@@ -203,6 +204,45 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect(stored.gallery).toEqual([mediaIds[0], mediaIds[1]]);
       expect(stored.documents).toEqual([mediaIds[2]]);
       expect(stored.priceFromVnd).toBe(1_000_000_000);
+    });
+
+    it("khối nội dung mở rộng: dự án không có khối nào vẫn lưu; có khối thì lưu/đọc lại đủ, bỏ khối bằng mảng rỗng", async () => {
+      const bare = await createProject({ title: "Dự án chưa có khối mở rộng" });
+      const bareStored = await payload.findByID({ collection: "projects", id: bare.id, locale: "vi", depth: 0, overrideAccess: true });
+      expect(bareStored.highlights ?? []).toEqual([]);
+      expect(bareStored.priceTable ?? []).toEqual([]);
+      expect(bareStored.priceUpdatedAt ?? null).toBeNull();
+
+      const doc = await createProject({
+        title: "Dự án có khối mở rộng",
+        highlights: [{ title: "View sông", description: "Căn nhìn sông", icon: "river" }],
+        nearbyAmenities: [{ category: "education", name: "Trường Quốc tế", distance: "1,2 km", location: [105.8, 21.0] }],
+        priceTable: [{ unitType: "Căn 2PN", areaFrom: 60, areaTo: 75, priceFrom: 3_000_000_000, priceTo: 4_000_000_000, availability: "few_left", note: "Giá chưa VAT" }],
+        priceUpdatedAt: "2026-10-01T00:00:00.000Z",
+        faqs: [{ question: "Bàn giao khi nào?", answer: "Quý 4/2027" }],
+      });
+      const stored = await payload.findByID({ collection: "projects", id: doc.id, locale: "vi", depth: 0, overrideAccess: true });
+      expect(stored.highlights?.[0]).toMatchObject({ title: "View sông", description: "Căn nhìn sông", icon: "river" });
+      expect(stored.nearbyAmenities?.[0]).toMatchObject({ category: "education", name: "Trường Quốc tế", distance: "1,2 km", location: [105.8, 21.0] });
+      expect(stored.priceTable?.[0]).toMatchObject({ unitType: "Căn 2PN", areaFrom: 60, areaTo: 75, priceFrom: 3_000_000_000, priceTo: 4_000_000_000, availability: "few_left", note: "Giá chưa VAT" });
+      expect(stored.priceUpdatedAt).toBe("2026-10-01T00:00:00.000Z");
+      expect(stored.faqs?.[0]).toMatchObject({ question: "Bàn giao khi nào?", answer: "Quý 4/2027" });
+
+      const cleared = await updateProject(doc.id, { highlights: [], nearbyAmenities: [], priceTable: [], faqs: [] });
+      expect(cleared.highlights ?? []).toEqual([]);
+      expect(cleared.faqs ?? []).toEqual([]);
+    });
+
+    it("khối nội dung mở rộng: 'đến' nhỏ hơn 'từ', quá số dòng, nhóm/tình trạng lạ, thiếu tiêu đề → 400", async () => {
+      expect(await statusOf(createProject({ title: "Diện tích ngược", priceTable: [{ unitType: "A", areaFrom: 80, areaTo: 70 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Giá ngược", priceTable: [{ unitType: "A", priceFrom: 5, priceTo: 4 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Giá âm", priceTable: [{ unitType: "A", priceFrom: -1 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Tình trạng lạ", priceTable: [{ unitType: "A", availability: "xyz" }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Nhóm lạ", nearbyAmenities: [{ category: "xyz", name: "B" }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Thiếu tiêu đề", highlights: [{ description: "x" }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Thiếu câu trả lời", faqs: [{ question: "Q" }] }))).toBe(400);
+      const nine = Array.from({ length: 9 }, (_, index) => ({ title: "Điểm " + index }));
+      expect(await statusOf(createProject({ title: "Quá 8 điểm nổi bật", highlights: nine }))).toBe(400);
     });
 
     it("số âm, salesStatus lạ, thiếu province / salesStatus → 400", async () => {

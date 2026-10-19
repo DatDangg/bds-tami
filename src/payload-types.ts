@@ -579,6 +579,70 @@ export interface Project {
       }[]
     | null;
   /**
+   * Các điểm bán hàng chính của dự án (tối đa 8), hiển thị thành khối riêng trên trang chi tiết.
+   */
+  highlights?:
+    | {
+        title: string;
+        description?: string | null;
+        /**
+         * Tên icon hiển thị kèm điểm nổi bật (tuỳ chọn).
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Trường học, bệnh viện, trung tâm thương mại, công viên, giao thông... gần dự án (tối đa 40).
+   */
+  nearbyAmenities?:
+    | {
+        category: 'education' | 'healthcare' | 'shopping' | 'park' | 'transport' | 'other';
+        name: string;
+        /**
+         * Ví dụ: 1,2 km hoặc 5 phút. Không dịch.
+         */
+        distance?: string | null;
+        /**
+         * Tuỳ chọn, dùng để hiện điểm trên bản đồ.
+         *
+         * @minItems 2
+         * @maxItems 2
+         */
+        location?: [number, number] | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Giá tham khảo theo loại căn (không quản lý từng căn). Nhớ cập nhật ngày cập nhật giá bên dưới.
+   */
+  priceTable?:
+    | {
+        unitType: string;
+        areaFrom?: number | null;
+        areaTo?: number | null;
+        priceFrom?: number | null;
+        priceTo?: number | null;
+        availability?: ('available' | 'few_left' | 'sold_out') | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Hiển thị cạnh bảng giá để khách biết giá còn mới hay cũ.
+   */
+  priceUpdatedAt?: string | null;
+  /**
+   * Tối đa 20 câu hỏi.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Ảnh đầu tiên là ảnh đại diện của dự án.
    */
   gallery?: (string | Media)[] | null;
@@ -1684,6 +1748,43 @@ export interface ProjectsSelect<T extends boolean = true> {
     | {
         name?: T;
         icon?: T;
+        id?: T;
+      };
+  highlights?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
+      };
+  nearbyAmenities?:
+    | T
+    | {
+        category?: T;
+        name?: T;
+        distance?: T;
+        location?: T;
+        id?: T;
+      };
+  priceTable?:
+    | T
+    | {
+        unitType?: T;
+        areaFrom?: T;
+        areaTo?: T;
+        priceFrom?: T;
+        priceTo?: T;
+        availability?: T;
+        note?: T;
+        id?: T;
+      };
+  priceUpdatedAt?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
         id?: T;
       };
   gallery?: T;
