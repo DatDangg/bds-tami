@@ -39,6 +39,7 @@ export function scopedCategoryField(scope: CategoryScope, { required = true }: {
   return {
     name: "category",
     type: "relationship",
+    label: "Danh mục",
     relationTo: "categories",
     index: true,
     validate,

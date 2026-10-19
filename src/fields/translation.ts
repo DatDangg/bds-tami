@@ -4,13 +4,23 @@ import { denyAll } from "../access";
 
 const readOnlyForEveryone = { create: denyAll, update: denyAll };
 
-const options = (values: readonly string[]) => values.map((value) => ({ label: value, value }));
+const TRANSLATION_STATUS_LABELS: Record<string, string> = {
+  none: "Chưa dịch",
+  queued: "Đang chờ dịch",
+  done: "Đã dịch",
+  failed: "Dịch lỗi",
+  pending_review: "Chờ duyệt",
+};
+const EN_SOURCE_LABELS: Record<string, string> = { ai: "AI dịch", manual: "Sửa tay" };
+
+const options = (values: readonly string[], labels: Record<string, string>) => values.map((value) => ({ label: labels[value] ?? value, value }));
 
 /** Bật khi đủ trường EN bắt buộc (ERD §1.1); logic bật nằm ở task dịch. Hook chặn bật khi thiếu: `require-english-fields`. */
 function hasEnglishField(): CheckboxField {
   return {
     name: "hasEnglish",
     type: "checkbox",
+    label: "Có bản tiếng Anh",
     defaultValue: false,
     index: true,
     access: readOnlyForEveryone,
@@ -32,25 +42,27 @@ export function translationGroup(): GroupField {
   return {
     name: "translation",
     type: "group",
+    label: "Bản dịch tiếng Anh",
     access: readOnlyForEveryone,
-    admin: { readOnly: true },
+    admin: { readOnly: true, description: "Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc." },
     fields: [
       {
         name: "status",
         type: "select",
+        label: "Trạng thái dịch",
         index: true,
         defaultValue: "none",
-        options: options(["none", "queued", "done", "failed", "pending_review"]),
+        options: options(["none", "queued", "done", "failed", "pending_review"], TRANSLATION_STATUS_LABELS),
         hooks: { beforeDuplicate: [resetOnDuplicate("none")] },
       },
-      { name: "enSource", type: "select", options: options(["ai", "manual"]), hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "viChangedAfterManual", type: "checkbox", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },
-      { name: "sourceHash", type: "json", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "translatedAt", type: "date", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "model", type: "text", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "lastError", type: "text", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "viChangedAfterManual", type: "checkbox", label: "Bản Việt đã đổi sau khi sửa tay bản Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },
+      { name: "sourceHash", type: "json", label: "Dấu nội dung nguồn đã dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "translatedAt", type: "date", label: "Dịch lúc", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       // Trường ảo (không có cột DB): nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.
-      { name: "retranslateAction", type: "ui", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
+      { name: "retranslateAction", type: "ui", label: "Dịch lại bằng AI", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
     ],
   };
 }

@@ -13,6 +13,7 @@ export function authorField(): RelationshipField {
   return {
     name: "author",
     type: "relationship",
+    label: "Người tạo",
     relationTo: "staff",
     required: true,
     index: true,

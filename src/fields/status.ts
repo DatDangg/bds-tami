@@ -18,6 +18,7 @@ export function statusField(values: readonly ContentStatus[] = CONTENT_STATUSES)
   return {
     name: "status",
     type: "select",
+    label: "Trạng thái",
     required: true,
     index: true,
     defaultValue: "draft",

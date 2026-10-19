@@ -10,13 +10,14 @@ export function seoField(): GroupField {
   return {
     name: "seo",
     type: "group",
+    label: "SEO",
     localized: true,
     fields: [
-      { name: "metaTitle", type: "text" },
-      { name: "metaDescription", type: "textarea" },
-      { name: "ogImage", type: "upload", relationTo: "media", filterOptions: { mimeType: { contains: "image/" } } },
-      { name: "noindex", type: "checkbox", defaultValue: false },
-      { name: "canonical", type: "text" },
+      { name: "metaTitle", type: "text", label: "Tiêu đề SEO (meta title)", admin: { description: "Để trống thì dùng tiêu đề bài." } },
+      { name: "metaDescription", type: "textarea", label: "Mô tả SEO (meta description)" },
+      { name: "ogImage", type: "upload", label: "Ảnh chia sẻ mạng xã hội (OG image)", relationTo: "media", filterOptions: { mimeType: { contains: "image/" } } },
+      { name: "noindex", type: "checkbox", label: "Không cho máy tìm kiếm lập chỉ mục (noindex)", defaultValue: false },
+      { name: "canonical", type: "text", label: "URL chuẩn (canonical)" },
     ],
   };
 }

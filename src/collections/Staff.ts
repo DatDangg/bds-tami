@@ -8,15 +8,17 @@ import type {
   PayloadRequest,
 } from "payload";
 
-import { DEFAULT_ROLE, isAdmin, isStaff, ownedByUserOrAdmin, ROLE_VALUES } from "../access";
+import { DEFAULT_ROLE, isAdmin, isStaff, ownedByUserOrAdmin, ROLE_VALUES, type Role } from "../access";
 import { auditFailedLogin } from "../hooks/staff/audit-login-failed";
 import { auditStaffChanges, auditStaffDelete } from "../hooks/staff/audit-staff-changes";
 import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-reset";
 import { flagPasswordChange } from "../hooks/staff/flag-password-change";
 import { guardLastAdminOnDelete, guardLastAdminOnUpdate, rejectBulkChangeOfActiveAdmins } from "../hooks/staff/last-admin-guard";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { SESSION_TTL_SECONDS } from "../lib/session/keepalive";
 
 const MIN_PASSWORD_LENGTH = 10;
+const ROLE_LABELS: Record<Role, string> = { admin: "Quản trị viên", sale: "Nhân viên sale" };
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_MS = 10 * 60 * 1000;
 
@@ -103,7 +105,8 @@ const blockInactiveLogin: CollectionBeforeLoginHook = ({ user, req }) => {
 /** Tài khoản nội bộ đăng nhập /admin (PERMISSION §1, §3.4, §7; ERD §4.1). */
 export const Staff: CollectionConfig = {
   slug: "staff",
-  admin: { useAsTitle: "email", defaultColumns: ["fullName", "email", "role", "active"] },
+  labels: collectionLabels("staff"),
+  admin: { useAsTitle: "email", defaultColumns: ["fullName", "email", "role", "active"], description: "Tài khoản nội bộ đăng nhập trang quản trị (admin / sale)." },
   auth: {
     maxLoginAttempts: MAX_LOGIN_ATTEMPTS,
     lockTime: LOCK_TIME_MS,
@@ -134,22 +137,24 @@ export const Staff: CollectionConfig = {
   },
   fields: [
     // Khai báo lại để khoá quyền sửa: sale không tự đổi email đăng nhập (PERMISSION §3.4).
-    { name: "email", type: "email", required: true, unique: true, access: { update: isAdmin } },
-    { name: "fullName", type: "text", required: true },
-    { name: "phone", type: "text" },
+    { name: "email", type: "email", label: "Email đăng nhập", required: true, unique: true, access: { update: isAdmin } },
+    { name: "fullName", type: "text", label: "Họ tên", required: true },
+    { name: "phone", type: "text", label: "Số điện thoại" },
     {
       name: "role",
       type: "select",
+      label: "Vai trò",
       required: true,
       index: true,
       defaultValue: DEFAULT_ROLE,
-      options: ROLE_VALUES.map((value) => ({ label: value, value })),
+      options: ROLE_VALUES.map((value) => ({ label: ROLE_LABELS[value], value })),
       // Chỉ admin đổi vai trò (PERMISSION §4); sale không tự nâng quyền.
       access: { create: isAdmin, update: isAdmin },
     },
     {
       name: "active",
       type: "checkbox",
+      label: "Đang hoạt động",
       required: true,
       defaultValue: true,
       access: { create: isAdmin, update: isAdmin },
@@ -158,12 +163,14 @@ export const Staff: CollectionConfig = {
     {
       name: "avatar",
       type: "upload",
+      label: "Ảnh đại diện",
       relationTo: "media",
       filterOptions: { mimeType: { contains: "image/" } },
     },
     {
       name: "lastLoginAt",
       type: "date",
+      label: "Đăng nhập gần nhất",
       admin: { readOnly: true },
       access: { create: () => false, update: () => false },
     },

@@ -10,6 +10,8 @@ import { isFilled } from "../hooks/require-english-fields";
 import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { defaultLocale } from "../i18n/routing";
+import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
+import { textRowLabel } from "../lib/admin/row-label";
 
 const MB = 1024 * 1024;
 export const HERO_VIDEO_MAX_BYTES = 15 * MB;
@@ -69,41 +71,60 @@ const validateBlockOrder = (value: unknown): true | string => {
   return new Set(blocks).size === blocks.length ? true : "Mỗi khối chỉ xuất hiện một lần trong thứ tự.";
 };
 
-const imageUpload = (name: string, required = false): Field => ({
+const imageUpload = (name: string, label: string, required = false): Field => ({
   name,
   type: "upload",
+  label,
   relationTo: "media",
   required,
   filterOptions: { mimeType: { contains: "image/" } },
 });
 
-const enabledField: Field = { name: "enabled", type: "checkbox", defaultValue: true };
-const titleField: Field = { name: "title", type: "text", localized: true };
+const enabledField: Field = { name: "enabled", type: "checkbox", label: "Hiển thị khối này", defaultValue: true };
+const titleField: Field = { name: "title", type: "text", label: "Tiêu đề khối", localized: true };
+const ctaLabelField: Field = { name: "ctaLabel", type: "text", label: "Chữ trên nút", localized: true };
+const ctaLinkField = () => navLinkField("ctaLink", { label: "Liên kết của nút" });
+
+/** Nhãn tiếng Việt của từng khối trang chủ (option của `blockOrder` + nhãn hàng). */
+const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
+  about: "Giới thiệu",
+  featuredProjects: "Dự án nổi bật",
+  services: "Dịch vụ",
+  featuredOffers: "Ưu đãi nổi bật",
+  partners: "Đối tác",
+  ctaBanner: "Kêu gọi hành động",
+};
 
 const heroBlock: Field = {
   name: "hero",
   type: "group",
+  label: "Hero (băng đầu trang)",
   fields: [
     {
       name: "slides",
       type: "array",
+      label: "Slide",
+      labels: { singular: "Slide", plural: "Slide" },
       required: true,
       minRows: HERO_SLIDES_MIN,
       maxRows: HERO_SLIDES_MAX,
+      admin: { components: { RowLabel: textRowLabel({ field: "title", fallback: "Slide" }) } },
       fields: [
         // Poster + ảnh mobile; video chỉ phát ở ≥ 1024px.
-        imageUpload("image", true),
+        imageUpload("image", "Ảnh nền", true),
         {
           name: "video",
           type: "upload",
+          label: "Video nền (MP4/WebM ≤ 15MB)",
           relationTo: "media",
           filterOptions: { mimeType: { in: [...HERO_VIDEO_MIME_TYPES] } },
           validate: validateHeroVideo,
+          admin: { description: "Chỉ phát trên màn hình lớn; ảnh nền dùng làm poster và cho di động." },
         },
-        titleField,
-        { name: "subtitle", type: "text", localized: true },
-        { name: "ctaLabel", type: "text", localized: true },
-        navLinkField("ctaLink"),
+        { ...titleField, label: "Tiêu đề" },
+        { name: "subtitle", type: "text", label: "Phụ đề", localized: true },
+        ctaLabelField,
+        ctaLinkField(),
       ],
     },
   ],
@@ -112,17 +133,21 @@ const heroBlock: Field = {
 const aboutBlock: Field = {
   name: "about",
   type: "group",
+  label: BLOCK_LABELS.about,
   fields: [
     enabledField,
     titleField,
-    { name: "content", type: "richText", localized: true },
-    imageUpload("image"),
+    { name: "content", type: "richText", label: "Nội dung giới thiệu", localized: true },
+    imageUpload("image", "Ảnh minh hoạ"),
     {
       name: "stats",
       type: "array",
+      label: "Số liệu nổi bật",
+      labels: { singular: "Số liệu", plural: "Số liệu" },
+      admin: { components: { RowLabel: textRowLabel({ field: "label", fallback: "Số liệu" }) } },
       fields: [
-        { name: "value", type: "text", required: true },
-        { name: "label", type: "text", localized: true, required: true },
+        { name: "value", type: "text", label: "Giá trị", required: true, admin: { description: "Vd: 10+, 1.500" } },
+        { name: "label", type: "text", label: "Diễn giải", localized: true, required: true, admin: { description: "Vd: Năm kinh nghiệm" } },
       ],
     },
   ],
@@ -131,54 +156,61 @@ const aboutBlock: Field = {
 const featuredProjectsBlock: Field = {
   name: "featuredProjects",
   type: "group",
+  label: BLOCK_LABELS.featuredProjects,
   fields: [
     enabledField,
     titleField,
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
-    { name: "projects", type: "relationship", relationTo: "projects", hasMany: true, maxRows: FEATURED_PROJECTS_MAX },
+    { name: "projects", type: "relationship", label: "Dự án hiển thị", relationTo: "projects", hasMany: true, maxRows: FEATURED_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất." } },
   ],
 };
 
 const servicesBlock: Field = {
   name: "services",
   type: "group",
-  fields: [enabledField, titleField, { name: "items", type: "relationship", relationTo: "services", hasMany: true }],
+  label: BLOCK_LABELS.services,
+  fields: [enabledField, titleField, { name: "items", type: "relationship", label: "Dịch vụ hiển thị", relationTo: "services", hasMany: true }],
 };
 
 const featuredOffersBlock: Field = {
   name: "featuredOffers",
   type: "group",
+  label: BLOCK_LABELS.featuredOffers,
   fields: [
     enabledField,
     titleField,
     // Trống thì phía hiển thị lấy tin `isFeatured` còn hạn.
-    { name: "posts", type: "relationship", relationTo: "property-posts", hasMany: true },
+    { name: "posts", type: "relationship", label: "Tin ưu đãi hiển thị", relationTo: "property-posts", hasMany: true, admin: { description: "Để trống thì tự lấy tin nổi bật còn hạn ưu đãi." } },
   ],
 };
 
 // Danh sách đối tác lấy từ `developers.showAsPartner`.
-const partnersBlock: Field = { name: "partners", type: "group", fields: [enabledField, titleField] };
+const partnersBlock: Field = { name: "partners", type: "group", label: BLOCK_LABELS.partners, fields: [enabledField, titleField] };
 
 const ctaBannerBlock: Field = {
   name: "ctaBanner",
   type: "group",
+  label: BLOCK_LABELS.ctaBanner,
   fields: [
-    { name: "enabled", type: "checkbox", defaultValue: false },
-    { name: "title", type: "text", localized: true, validate: validateCtaTitle },
-    { name: "description", type: "textarea", localized: true },
+    { ...enabledField, defaultValue: false },
+    { ...titleField, validate: validateCtaTitle },
+    { name: "description", type: "textarea", label: "Mô tả", localized: true },
     // Trống thì phía hiển thị dùng chuỗi "Nhận tư vấn".
-    { name: "ctaLabel", type: "text", localized: true },
-    navLinkField("ctaLink"),
-    imageUpload("backgroundImage"),
+    { ...ctaLabelField, admin: { description: 'Để trống thì dùng "Nhận tư vấn".' } },
+    ctaLinkField(),
+    imageUpload("backgroundImage", "Ảnh nền"),
   ],
 };
 
 const blockOrderField: Field = {
   name: "blockOrder",
   type: "array",
+  label: "Thứ tự các khối",
+  labels: { singular: "Khối", plural: "Khối" },
   defaultValue: HOMEPAGE_BLOCKS.map((block) => ({ block })),
   validate: validateBlockOrder,
-  fields: [{ name: "block", type: "select", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: block, value: block })) }],
+  admin: { description: "Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại.", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
+  fields: [{ name: "block", type: "select", label: "Khối", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: BLOCK_LABELS[block], value: block })) }],
 };
 
 /**
@@ -189,8 +221,8 @@ const blockOrderField: Field = {
 export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfig {
   return {
     slug: "homepage",
-    label: "Trang chủ",
-    admin: { hidden: hideFromNonAdmin },
+    label: ADMIN_GLOBAL_LABELS.homepage,
+    admin: { hidden: hideFromNonAdmin, description: "Nội dung và thứ tự các khối trên trang chủ (chỉ admin sửa)." },
     access: { read: () => true, update: isAdmin },
     hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateHomepageGlobal(revalidators), enqueueTranslation.globalAfterChange] },
     fields: [

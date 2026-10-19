@@ -3,6 +3,7 @@ import { APIError, type CollectionBeforeDeleteHook, type CollectionConfig } from
 import { isAdmin } from "../access";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { reindexRentalsOnProvinceRename } from "../hooks/provinces/reindex-rentals";
+import { collectionLabels } from "../lib/admin/collection-labels";
 
 /** Bảng tham chiếu tỉnh bằng khoá ngoại NOT NULL: còn bản ghi (kể cả xoá mềm) thì chặn xoá bằng thông báo rõ ràng thay vì lỗi 500. */
 const REFERENCING_COLLECTIONS = [
@@ -37,16 +38,17 @@ const blockDeleteWhileReferenced: CollectionBeforeDeleteHook = async ({ id, req 
  */
 export const Provinces: CollectionConfig = {
   slug: "provinces",
-  admin: { useAsTitle: "name", defaultColumns: ["name", "code", "shortName", "sortOrder"] },
+  labels: collectionLabels("provinces"),
+  admin: { useAsTitle: "name", defaultColumns: ["name", "code", "shortName", "sortOrder"], description: "34 tỉnh/thành sau sáp nhập 01/07/2025 (danh mục nền)." },
   defaultSort: "sortOrder",
   access: { read: () => true, create: isAdmin, update: isAdmin, delete: isAdmin },
   hooks: { beforeDelete: [blockDeleteWhileReferenced], afterChange: [reindexRentalsOnProvinceRename] },
   fields: [
     searchReindexPendingField("province"),
-    { name: "code", type: "text", required: true, unique: true, index: true },
-    { name: "name", type: "text", required: true },
-    { name: "shortName", type: "text" },
-    { name: "slug", type: "text", required: true, unique: true, index: true },
-    { name: "sortOrder", type: "number", defaultValue: 0, index: true },
+    { name: "code", type: "text", label: "Mã tỉnh/thành", required: true, unique: true, index: true },
+    { name: "name", type: "text", label: "Tên", required: true },
+    { name: "shortName", type: "text", label: "Tên viết tắt", admin: { description: "Vd: TP.HCM" } },
+    { name: "slug", type: "text", label: "Đường dẫn (slug)", required: true, unique: true, index: true },
+    { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
   ],
 };

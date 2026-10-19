@@ -1,7 +1,8 @@
 import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
-import { CLICK_TYPES } from "../lib/click-stats/click-types";
+import { collectionLabels } from "../lib/admin/collection-labels";
+import { CLICK_TYPE_LABELS, CLICK_TYPES } from "../lib/click-stats/click-types";
 import { NO_REF } from "../lib/click-stats/aggregate";
 
 const denyAll = (): boolean => false;
@@ -13,24 +14,27 @@ const denyAll = (): boolean => false;
  */
 export const ClickStatsDaily: CollectionConfig = {
   slug: "click-stats-daily",
+  labels: collectionLabels("click-stats-daily"),
   admin: {
     useAsTitle: "type",
     defaultColumns: ["date", "type", "refCollection", "refId", "count"],
     hidden: ({ user }) => user?.role !== ROLES.admin,
+    description: "Số lượt bấm Hotline/Zalo/Fanpage gộp theo ngày (giờ Việt Nam), do hệ thống tổng hợp.",
   },
   access: { read: isAdmin, create: denyAll, update: denyAll, delete: denyAll },
   disableDuplicate: true,
   indexes: [{ fields: ["date", "type", "refCollection", "refId"], unique: true }],
   fields: [
-    { name: "date", type: "date", required: true, index: true, admin: { date: { pickerAppearance: "dayOnly" } } },
+    { name: "date", type: "date", label: "Ngày", required: true, index: true, admin: { date: { pickerAppearance: "dayOnly" } } },
     {
       name: "type",
       type: "select",
+      label: "Nút được bấm",
       required: true,
-      options: CLICK_TYPES.map((value) => ({ label: value, value })),
+      options: CLICK_TYPES.map((value) => ({ label: CLICK_TYPE_LABELS[value], value })),
     },
-    { name: "refCollection", type: "text", defaultValue: NO_REF },
-    { name: "refId", type: "text", defaultValue: NO_REF },
-    { name: "count", type: "number", required: true, min: 0, defaultValue: 0 },
+    { name: "refCollection", type: "text", label: "Loại nội dung gắn kèm", defaultValue: NO_REF },
+    { name: "refId", type: "text", label: "ID nội dung gắn kèm", defaultValue: NO_REF },
+    { name: "count", type: "number", label: "Số lượt bấm", required: true, min: 0, defaultValue: 0 },
   ],
 };

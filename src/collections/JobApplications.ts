@@ -3,6 +3,7 @@ import { email as validateEmail } from "payload/shared";
 
 import { denyAll, isAdmin, ROLES } from "../access";
 import { auditApplicationPurge, deleteApplicationCv } from "../hooks/job-applications/delete-cv-and-audit";
+import { collectionLabels } from "../lib/admin/collection-labels";
 
 export const APPLICATION_STATUSES = ["new", "reviewing", "interview", "hired", "rejected"] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
@@ -29,13 +30,14 @@ const validateApplicantEmail: EmailFieldValidation = (value, options) =>
   Boolean((options.data as { anonymizedAt?: unknown } | undefined)?.anonymizedAt) || validateEmail(value, options);
 
 const submittedFields: Field[] = [
-  { name: "fullName", type: "text", required: true, maxLength: 120, access: submittedFieldAccess, admin: readOnlyInAdmin },
-  { name: "phone", type: "text", required: true, maxLength: 20, access: submittedFieldAccess, admin: readOnlyInAdmin },
-  { name: "email", type: "email", required: true, validate: validateApplicantEmail, access: submittedFieldAccess, admin: readOnlyInAdmin },
-  { name: "message", type: "textarea", maxLength: 2000, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "fullName", type: "text", label: "Họ tên ứng viên", required: true, maxLength: 120, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "phone", type: "text", label: "Số điện thoại", required: true, maxLength: 20, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "email", type: "email", label: "Email", required: true, validate: validateApplicantEmail, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "message", type: "textarea", label: "Thư giới thiệu", maxLength: 2000, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {
     name: "cv",
     type: "upload",
+    label: "CV",
     relationTo: "private-files",
     // Bắt buộc cho tới khi hồ sơ bị ẩn danh (`data-retention` xoá CV rồi đặt `anonymizedAt`); vì vậy cột DB cho phép NULL.
     validate: (value: unknown, { data }: { data?: { anonymizedAt?: unknown } }) =>
@@ -46,13 +48,15 @@ const submittedFields: Field[] = [
   {
     name: "cvDownload",
     type: "ui",
+    label: "Tải CV",
     admin: { components: { Field: "/components/admin/CvDownloadButton#CvDownloadButton" } },
   },
-  { name: "consentAt", type: "date", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
-  { name: "consentVersion", type: "text", required: true, maxLength: 40, access: submittedFieldAccess, admin: readOnlyInAdmin },
+  { name: "consentAt", type: "date", label: "Đồng ý chính sách lúc", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
+  { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {
     name: "locale",
     type: "select",
+    label: "Ngôn ngữ ứng viên dùng",
     required: true,
     options: [
       { label: "Tiếng Việt", value: "vi" },
@@ -74,10 +78,12 @@ const submittedFields: Field[] = [
  */
 export const JobApplications: CollectionConfig = {
   slug: "job-applications",
+  labels: collectionLabels("job-applications"),
   admin: {
     useAsTitle: "fullName",
     defaultColumns: ["fullName", "jobPosting", "status", "createdAt"],
     hidden: ({ user }) => user?.role !== ROLES.admin,
+    description: "Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự ẩn danh sau 12 tháng.",
   },
   defaultSort: "-createdAt",
   access: { read: isAdmin, create: denyAll, update: isAdmin, delete: isAdmin },
@@ -86,19 +92,20 @@ export const JobApplications: CollectionConfig = {
   disableBulkDelete: true,
   hooks: { afterDelete: [auditApplicationPurge, deleteApplicationCv] },
   fields: [
-    { name: "jobPosting", type: "relationship", relationTo: "job-postings", required: true, index: true, access: submittedFieldAccess, admin: readOnlyInAdmin },
+    { name: "jobPosting", type: "relationship", label: "Vị trí ứng tuyển", relationTo: "job-postings", required: true, index: true, access: submittedFieldAccess, admin: readOnlyInAdmin },
     ...submittedFields,
     {
       name: "status",
       type: "select",
+      label: "Trạng thái",
       required: true,
       index: true,
       defaultValue: "new",
       options: APPLICATION_STATUSES.map((value) => ({ label: APPLICATION_STATUS_LABELS[value], value })),
       admin: { position: "sidebar" },
     },
-    { name: "note", type: "textarea", maxLength: 2000, admin: { description: "Ghi chú nội bộ, ứng viên không thấy." } },
+    { name: "note", type: "textarea", label: "Ghi chú nội bộ", maxLength: 2000, admin: { description: "Ghi chú nội bộ, ứng viên không thấy." } },
     { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
-    { name: "anonymizedAt", type: "date", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
+    { name: "anonymizedAt", type: "date", label: "Đã ẩn danh lúc", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
   ],
 };

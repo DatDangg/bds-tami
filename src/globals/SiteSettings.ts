@@ -6,6 +6,8 @@ import { createRevalidateGlobal, type RevalidateTags } from "../hooks/revalidate
 import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { trimText } from "../hooks/trim-text";
+import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
+import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
 
 const validateHttpUrl: TextFieldSingleValidation = (value) => {
@@ -19,6 +21,16 @@ const validateGaId: TextFieldSingleValidation = (value) => {
 };
 
 const SOCIAL_PLATFORMS = ["facebook", "zalo", "youtube", "tiktok", "instagram", "linkedin", "x", "other"] as const;
+const SOCIAL_PLATFORM_LABELS: Record<(typeof SOCIAL_PLATFORMS)[number], string> = {
+  facebook: "Facebook",
+  zalo: "Zalo",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  instagram: "Instagram",
+  linkedin: "LinkedIn",
+  x: "X (Twitter)",
+  other: "Khác",
+};
 
 const adminOnlyRead = { read: isAdmin };
 
@@ -36,9 +48,10 @@ export const stripInternalFields: GlobalAfterReadHook = ({ doc, overrideAccess, 
   return doc;
 };
 
-const imageUpload = (name: string): UploadField => ({
+const imageUpload = (name: string, label: string): UploadField => ({
   name,
   type: "upload",
+  label,
   relationTo: "media",
   filterOptions: { mimeType: { contains: "image/" } },
 });
@@ -52,8 +65,8 @@ const imageUpload = (name: string): UploadField => ({
 export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
   return {
     slug: "site-settings",
-    label: "Cấu hình chung",
-    admin: { hidden: hideFromNonAdmin },
+    label: ADMIN_GLOBAL_LABELS["site-settings"],
+    admin: { hidden: hideFromNonAdmin, description: "Thông tin công ty, liên hệ, mạng xã hội, email nhận thông báo và cài đặt dịch tự động." },
     access: { read: () => true, update: isAdmin },
     hooks: {
       afterRead: [stripInternalFields],
@@ -61,57 +74,67 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
       afterChange: [createRevalidateGlobal("site-settings", revalidate), enqueueTranslation.globalAfterChange],
     },
     fields: [
-      { name: "siteName", type: "text", localized: true, required: true },
-      imageUpload("logo"),
-      imageUpload("logoDark"),
-      imageUpload("favicon"),
-      { name: "hotline", type: "text", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },
-      { name: "zaloUrl", type: "text", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
-      { name: "fanpageUrl", type: "text", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
-      { name: "email", type: "email" },
-      { name: "address", type: "text", localized: true },
-      { name: "mapLocation", type: "point" },
+      { name: "siteName", type: "text", label: "Tên website", localized: true, required: true },
+      imageUpload("logo", "Logo"),
+      imageUpload("logoDark", "Logo trên nền tối"),
+      imageUpload("favicon", "Favicon"),
+      { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },
+      { name: "zaloUrl", type: "text", label: "Link Zalo", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+      { name: "fanpageUrl", type: "text", label: "Link Fanpage", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+      { name: "email", type: "email", label: "Email liên hệ" },
+      { name: "address", type: "text", label: "Địa chỉ công ty", localized: true },
+      { name: "mapLocation", type: "point", label: "Toạ độ bản đồ" },
       {
         name: "socialLinks",
         type: "array",
+        label: "Mạng xã hội",
+        labels: { singular: "Mạng xã hội", plural: "Mạng xã hội" },
+        admin: { components: { RowLabel: textRowLabel({ field: "platform", fallback: "Mạng xã hội", valueLabels: SOCIAL_PLATFORM_LABELS }) } },
         fields: [
           {
             name: "platform",
             type: "select",
+            label: "Nền tảng",
             required: true,
-            options: SOCIAL_PLATFORMS.map((value) => ({ label: value, value })),
+            options: SOCIAL_PLATFORMS.map((value) => ({ label: SOCIAL_PLATFORM_LABELS[value], value })),
           },
-          { name: "url", type: "text", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+          { name: "url", type: "text", label: "Đường dẫn", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
         ],
       },
       {
         name: "notificationEmails",
         type: "array",
+        label: "Email nhận thông báo",
+        labels: { singular: "Email", plural: "Email" },
         access: adminOnlyRead,
-        admin: { description: "Email nhận thông báo lead / hồ sơ ứng tuyển (chỉ admin thấy)" },
-        fields: [{ name: "email", type: "email", required: true }],
+        admin: { description: "Email nhận thông báo lead / hồ sơ ứng tuyển (chỉ admin thấy)", components: { RowLabel: textRowLabel({ field: "email", fallback: "Email" }) } },
+        fields: [{ name: "email", type: "email", label: "Email", required: true }],
       },
       {
         name: "privacyPolicyVersion",
         type: "text",
+        label: "Phiên bản chính sách bảo mật",
         access: { update: denyAll },
         admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)" },
       },
-      { name: "gaMeasurementId", type: "text", validate: validateGaId },
+      { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Dạng G-XXXXXXXXXX" } },
       {
         name: "translationGlossary",
         type: "array",
+        label: "Thuật ngữ dịch cố định",
+        labels: { singular: "Thuật ngữ", plural: "Thuật ngữ" },
         access: adminOnlyRead,
-        admin: { description: "Thuật ngữ cố định cho AI dịch (BR-08)" },
+        admin: { description: "Thuật ngữ cố định cho AI dịch (BR-08)", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
         fields: [
-          { name: "vi", type: "text", required: true },
-          { name: "en", type: "text", required: true },
-          { name: "note", type: "text" },
+          { name: "vi", type: "text", label: "Tiếng Việt", required: true },
+          { name: "en", type: "text", label: "Tiếng Anh", required: true },
+          { name: "note", type: "text", label: "Ghi chú" },
         ],
       },
       {
         name: "translationEnabled",
         type: "checkbox",
+        label: "Bật dịch tự động",
         defaultValue: true,
         access: adminOnlyRead,
         admin: { description: "Tắt nhanh dịch tự động (BR-08)" },

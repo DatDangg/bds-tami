@@ -16,6 +16,7 @@ import {
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
@@ -54,13 +55,14 @@ const SERVICE_LABELS: Record<(typeof INCLUDED_SERVICES)[number], string> = {
 const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) =>
   values.map((value) => ({ label: labels[value], value }));
 
-const directionField = (name: string): SelectField => ({ name, type: "select", options: selectOptions(DIRECTIONS, DIRECTION_LABELS) });
-const nonNegativeNumber = (name: string) => ({ name, type: "number", min: 0 }) as const;
+const directionField = (name: string, label: string): SelectField => ({ name, type: "select", label, options: selectOptions(DIRECTIONS, DIRECTION_LABELS) });
+const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 
 /** Mã `CT-000001` (ERD §4.6): chỉ đọc với mọi người (PERMISSION §4), do hook `assignRentalCode` sinh từ sequence. */
 const codeField: TextField = {
   name: "code",
   type: "text",
+  label: "Mã tin",
   required: true,
   unique: true,
   access: { create: denyAll, update: denyAll },
@@ -71,6 +73,7 @@ const codeField: TextField = {
 const rentedAtField: DateField = {
   name: "rentedAt",
   type: "date",
+  label: "Đã cho thuê lúc",
   access: { create: denyAll, update: denyAll },
   hooks: { beforeChange: [stampRentedAt] },
   admin: { position: "sidebar", readOnly: true, date: { pickerAppearance: "dayAndTime" } },
@@ -96,12 +99,13 @@ const searchTextField: TextField = {
 const rentalTermsGroup: GroupField = {
   name: "rentalTerms",
   type: "group",
+  label: "Điều kiện thuê",
   fields: [
-    nonNegativeNumber("minLeaseMonths"),
-    nonNegativeNumber("depositMonths"),
-    { name: "paymentCycle", type: "select", options: selectOptions(PAYMENT_CYCLES, PAYMENT_CYCLE_LABELS) },
-    { name: "includedServices", type: "select", hasMany: true, options: selectOptions(INCLUDED_SERVICES, SERVICE_LABELS) },
-    { name: "availableFrom", type: "date", admin: { date: { pickerAppearance: "dayOnly" } } },
+    nonNegativeNumber("minLeaseMonths", "Thời hạn thuê tối thiểu (tháng)"),
+    nonNegativeNumber("depositMonths", "Đặt cọc (số tháng)"),
+    { name: "paymentCycle", type: "select", label: "Chu kỳ thanh toán", options: selectOptions(PAYMENT_CYCLES, PAYMENT_CYCLE_LABELS) },
+    { name: "includedServices", type: "select", label: "Dịch vụ bao gồm", hasMany: true, options: selectOptions(INCLUDED_SERVICES, SERVICE_LABELS) },
+    { name: "availableFrom", type: "date", label: "Có thể dọn vào từ", admin: { date: { pickerAppearance: "dayOnly" } } },
   ],
 };
 
@@ -115,7 +119,12 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
   return withContentDefaults(
     {
       slug: "rentals",
-      admin: { useAsTitle: "title", defaultColumns: ["code", "title", "category", "priceMonthlyVnd", "status", "author"] },
+      labels: collectionLabels("rentals"),
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["code", "title", "category", "priceMonthlyVnd", "status", "author"],
+        description: "Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.",
+      },
       defaultSort: "-publishedAt",
       hooks: {
         beforeValidate: [assignRentalCode],
@@ -126,41 +135,44 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
         codeField,
         titleField(),
         scopedCategoryField("rental"),
-        { name: "project", type: "relationship", relationTo: "projects", index: true },
-        { name: "province", type: "relationship", relationTo: "provinces", required: true, index: true },
+        { name: "project", type: "relationship", label: "Thuộc dự án", relationTo: "projects", index: true },
+        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
         {
           name: "ward",
           type: "relationship",
+          label: "Phường/xã",
           relationTo: "wards",
           required: true,
           index: true,
           filterOptions: wardFilterOptions,
           validate: validateWardInProvince,
         },
-        { name: "address", type: "text", required: true, access: { read: readExactAddress } },
-        { name: "showExactAddress", type: "checkbox", defaultValue: false },
-        { name: "location", type: "point", access: { read: readExactAddress } },
-        { name: "priceMonthlyVnd", type: "number", min: 0, validate: validatePriceMonthly },
-        { name: "priceNegotiable", type: "checkbox", defaultValue: false },
-        { name: "areaM2", type: "number", required: true, min: 0, validate: validateAreaM2 },
-        nonNegativeNumber("bedrooms"),
-        nonNegativeNumber("bathrooms"),
-        { name: "floor", type: "text" },
-        directionField("houseDirection"),
-        directionField("balconyDirection"),
-        { name: "furnishing", type: "select", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },
+        { name: "address", type: "text", label: "Địa chỉ chính xác", required: true, access: { read: readExactAddress } },
+        { name: "showExactAddress", type: "checkbox", label: "Cho khách xem địa chỉ chính xác", defaultValue: false },
+        { name: "location", type: "point", label: "Toạ độ bản đồ", access: { read: readExactAddress } },
+        { name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly },
+        { name: "priceNegotiable", type: "checkbox", label: "Giá thương lượng", defaultValue: false },
+        { name: "areaM2", type: "number", label: "Diện tích (m²)", required: true, min: 0, validate: validateAreaM2 },
+        nonNegativeNumber("bedrooms", "Số phòng ngủ"),
+        nonNegativeNumber("bathrooms", "Số phòng tắm"),
+        { name: "floor", type: "text", label: "Tầng" },
+        directionField("houseDirection", "Hướng nhà"),
+        directionField("balconyDirection", "Hướng ban công"),
+        { name: "furnishing", type: "select", label: "Nội thất", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },
         rentalTermsGroup,
-        { name: "description", type: "richText", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
+        { name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
         {
           name: "gallery",
           type: "upload",
+          label: "Thư viện ảnh",
           relationTo: "media",
           hasMany: true,
           filterOptions: { mimeType: { contains: "image/" } },
           validate: validateGallery,
+          admin: { description: "Ảnh đầu tiên là ảnh đại diện của tin." },
         },
-        { name: "videoUrl", type: "text", validate: validateVideoUrl },
-        { name: "legalNote", type: "textarea", localized: true },
+        { name: "videoUrl", type: "text", label: "Link video (YouTube/TikTok)", validate: validateVideoUrl },
+        { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },
         rentedAtField,
         searchTextField,
       ],

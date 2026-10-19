@@ -2,6 +2,7 @@ import { redirectsPlugin } from "@payloadcms/plugin-redirects";
 import type { Field } from "payload";
 
 import { isAdmin, ROLES } from "../access";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { isSafeInternalPath } from "../lib/content/internal-path";
 
 const validateSitePath = (value: string | null | undefined): true | string =>
@@ -18,19 +19,27 @@ export function contentRedirectsPlugin() {
     redirectTypes: ["301"],
     redirectTypeFieldOverride: { defaultValue: "301" },
     overrides: {
-      admin: { useAsTitle: "from", defaultColumns: ["from", "to", "createdAt"], hidden: ({ user }) => user?.role !== ROLES.admin },
+      labels: collectionLabels("redirects"),
+      admin: {
+        useAsTitle: "from",
+        defaultColumns: ["from", "to", "createdAt"],
+        hidden: ({ user }) => user?.role !== ROLES.admin,
+        description: "Chuyển hướng 301 từ đường dẫn cũ sang mới (tự tạo khi đổi slug; sửa tay khi cần).",
+      },
       access: { read: isAdmin, create: isAdmin, update: isAdmin, delete: isAdmin },
       fields: ({ defaultFields }) =>
         defaultFields.map((field: Field): Field => {
           if (!("name" in field)) return field;
-          if (field.name === "from") return { ...field, validate: validateSitePath } as Field;
+          if (field.name === "from") return { ...field, label: "Đường dẫn cũ", validate: validateSitePath } as Field;
           if (field.name === "to") return {
               name: "to",
               type: "text",
+              label: "Chuyển đến",
               required: true,
               validate: (value: string | null | undefined, { siblingData }: { siblingData: { from?: string } }) =>
                 value !== undefined && value === siblingData?.from ? "Đích chuyển hướng không được trùng đường dẫn nguồn." : validateSitePath(value),
             };
+          if (field.name === "type") return { ...field, label: "Loại chuyển hướng", options: [{ label: "301 (vĩnh viễn)", value: "301" }] } as Field;
           return field;
         }),
     },

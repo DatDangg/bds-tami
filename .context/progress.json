@@ -318,12 +318,11 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-admin-ui-saas-refresh/phase-1-task-02.md",
-          "status": "review_passed",
+          "status": "done",
           "attempt": 1,
           "round": 1,
           "reviewerResult": "PASS",
-          "report": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-task-02-round-1-review.md",
-          "note": "chưa commit — chờ commit T01 trước"
+          "report": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-task-02-round-1-review.md"
         },
         {
           "task": "phase-1-task-03",

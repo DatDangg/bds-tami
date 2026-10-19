@@ -11,5 +11,5 @@ const validateName: TextFieldSingleValidation = (value, { req, data }) => {
 
 /** Trường `name` (localized) của danh mục nền / chủ đầu tư: nguồn sinh `slug`. */
 export function nameField(): TextField {
-  return { name: "name", type: "text", localized: true, validate: validateName };
+  return { name: "name", type: "text", label: "Tên", localized: true, validate: validateName };
 }

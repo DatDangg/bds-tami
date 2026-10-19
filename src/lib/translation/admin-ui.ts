@@ -1,5 +1,7 @@
 import type { Where } from "payload";
 
+import { ADMIN_COLLECTION_LABELS, ADMIN_GLOBAL_LABELS } from "../admin/collection-labels";
+
 /** Bộ lọc trạng thái dịch trên danh sách nội dung (FR-ADM-18): mỗi mục là một điều kiện trên trường có sẵn của nhóm `translation`, không cần cột mới. */
 export const TRANSLATION_FILTERS = {
   none: { label: "Chưa dịch", condition: { "translation.status": { equals: "none" } } },
@@ -33,19 +35,14 @@ export function withTranslationFilter(where: Where | undefined, key: Translation
   return { and: next };
 }
 
-export const COLLECTION_LABELS: Record<string, string> = {
-  projects: "Dự án",
-  rentals: "Cho thuê",
-  "property-posts": "Tin bất động sản",
-  news: "Tin tức",
-  services: "Dịch vụ",
-  "job-postings": "Tuyển dụng",
-  pages: "Trang pháp lý",
-  categories: "Danh mục",
-  developers: "Chủ đầu tư",
-};
+/** Collection CÓ bản dịch (banner dịch lỗi truy vấn theo tập khoá này — không thêm collection không có nhóm `translation`). Chuỗi lấy từ nguồn nhãn admin chung. */
+const TRANSLATED_COLLECTIONS = ["projects", "rentals", "property-posts", "news", "services", "job-postings", "pages", "categories", "developers"] as const;
 
-export const GLOBAL_LABELS: Record<string, string> = { "site-settings": "Cấu hình chung", homepage: "Trang chủ", header: "Đầu trang", footer: "Chân trang" };
+export const COLLECTION_LABELS: Record<string, string> = Object.fromEntries(
+  TRANSLATED_COLLECTIONS.map((slug) => [slug, ADMIN_COLLECTION_LABELS[slug].plural]),
+);
+
+export const GLOBAL_LABELS: Record<string, string> = { ...ADMIN_GLOBAL_LABELS };
 
 /** Sale chỉ được dịch lại bài của mình, và không với `services`/`pages`/globals (chỉ admin sửa): khớp quyền của endpoint, dùng để ẩn nút (endpoint vẫn kiểm lại). */
 export function canRetranslate(user: { id?: string | number; role?: string } | null | undefined, slug: string | undefined, authorId: unknown): boolean {

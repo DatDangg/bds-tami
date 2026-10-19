@@ -18,6 +18,7 @@ export function publishedAtField(): DateField {
   return {
     name: "publishedAt",
     type: "date",
+    label: "Ngày xuất bản",
     index: true,
     access: { create: denyAll, update: denyAll },
     hooks: { beforeChange: [stampFirstPublish] },

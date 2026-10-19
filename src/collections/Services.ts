@@ -7,11 +7,13 @@ import { titleField } from "../fields/title";
 import { createRevalidateHomepageOnService } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
-const imageUpload = (name: string, validate?: UploadFieldSingleValidation): UploadField => ({
+const imageUpload = (name: string, label: string, validate?: UploadFieldSingleValidation): UploadField => ({
   name,
   type: "upload",
+  label,
   relationTo: "media",
   filterOptions: { mimeType: { contains: "image/" } },
   validate,
@@ -27,18 +29,23 @@ export function createServices(revalidate?: RevalidatePaths, revalidateTags?: Re
   return withContentDefaults(
     {
       slug: "services",
-      admin: { useAsTitle: "title", defaultColumns: ["title", "status", "sortOrder", "updatedAt"] },
+      labels: collectionLabels("services"),
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "status", "sortOrder", "updatedAt"],
+        description: "Các dịch vụ công ty cung cấp (phân phối, môi giới, khai thác căn hộ dịch vụ); chỉ admin sửa.",
+      },
       defaultSort: "sortOrder",
       access: { create: isAdmin, update: isAdmin, delete: isAdmin },
       hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         titleField(),
-        imageUpload("icon"),
+        imageUpload("icon", "Icon"),
         // Ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ (ERD §4.9): bắt buộc khi xuất bản.
-        imageUpload("coverImage", validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản dịch vụ.")),
-        { name: "summary", type: "textarea", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
-        { name: "content", type: "richText", localized: true },
-        { name: "sortOrder", type: "number", defaultValue: 0, index: true },
+        imageUpload("coverImage", "Ảnh bìa", validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản dịch vụ.")),
+        { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
+        { name: "content", type: "richText", label: "Nội dung", localized: true },
+        { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
       ],
     },
     {

@@ -8,6 +8,7 @@ export function navLinkField(name = "link", overrides: Partial<TextField> = {}):
   return {
     name,
     type: "text",
+    label: "Liên kết",
     validate: validateNavLink,
     hooks: { beforeValidate: [trimText] },
     admin: { description: `Khoá trang (${PAGE_LINK_KEY_LIST.join(", ")}) hoặc địa chỉ https://...` },

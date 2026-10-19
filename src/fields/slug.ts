@@ -116,6 +116,7 @@ export function slugField({ sourceField = "title", scopeField }: SlugFieldOption
   return {
     name: "slug",
     type: "text",
+    label: "Đường dẫn (slug)",
     localized: true,
     unique: !scopeField,
     index: true,

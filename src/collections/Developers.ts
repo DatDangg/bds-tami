@@ -2,6 +2,7 @@ import type { CollectionConfig, TextFieldSingleValidation } from "payload";
 
 import { isAdmin, readUnlessTrashed } from "../access";
 import { nameField } from "../fields/name";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Chỉ nhận http(s): khối đối tác render giá trị này thành liên kết, nên chặn `javascript:` và tương tự. */
@@ -23,7 +24,12 @@ const validateWebsite: TextFieldSingleValidation = (value) => {
 export const Developers: CollectionConfig = withContentDefaults(
   {
     slug: "developers",
-    admin: { useAsTitle: "name", defaultColumns: ["name", "showAsPartner", "sortOrder"] },
+    labels: collectionLabels("developers"),
+    admin: {
+      useAsTitle: "name",
+      defaultColumns: ["name", "showAsPartner", "sortOrder"],
+      description: "Chủ đầu tư của dự án; bật \"Hiện ở khối đối tác\" để đưa logo lên trang chủ.",
+    },
     defaultSort: "sortOrder",
     access: { read: readUnlessTrashed, create: isAdmin, update: isAdmin, delete: isAdmin },
     versions: false,
@@ -32,13 +38,14 @@ export const Developers: CollectionConfig = withContentDefaults(
       {
         name: "logo",
         type: "upload",
+        label: "Logo",
         relationTo: "media",
         filterOptions: { mimeType: { contains: "image/" } },
       },
-      { name: "description", type: "richText", localized: true },
-      { name: "website", type: "text", validate: validateWebsite, admin: { description: "Địa chỉ trang web, bắt đầu bằng https://" } },
-      { name: "showAsPartner", type: "checkbox", defaultValue: false, index: true },
-      { name: "sortOrder", type: "number", defaultValue: 0, index: true },
+      { name: "description", type: "richText", label: "Giới thiệu", localized: true },
+      { name: "website", type: "text", label: "Trang web", validate: validateWebsite, admin: { description: "Địa chỉ trang web, bắt đầu bằng https://" } },
+      { name: "showAsPartner", type: "checkbox", label: "Hiện ở khối đối tác trang chủ", defaultValue: false, index: true },
+      { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
     ],
   },
   {

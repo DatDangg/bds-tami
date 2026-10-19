@@ -8,6 +8,7 @@ import { CATEGORY_SCOPE_LABELS, CATEGORY_SCOPES } from "../hooks/categories/scop
 import { lockCategoryScope } from "../hooks/categories/lock-scope";
 import { validateCategoryTree } from "../hooks/categories/validate-tree";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /**
@@ -20,7 +21,12 @@ export function createCategories(revalidate?: RevalidatePaths): CollectionConfig
   return withContentDefaults(
     {
       slug: "categories",
-      admin: { useAsTitle: "name", defaultColumns: ["name", "scope", "parent", "sortOrder"] },
+      labels: collectionLabels("categories"),
+      admin: {
+        useAsTitle: "name",
+        defaultColumns: ["name", "scope", "parent", "sortOrder"],
+        description: "Danh mục riêng cho từng loại nội dung (dự án, cho thuê, tin BĐS, tin tức, tuyển dụng), tối đa 2 cấp.",
+      },
       defaultSort: "sortOrder",
       access: { read: readUnlessTrashed, create: isAdmin, update: isAdmin, delete: isAdmin },
       versions: false,
@@ -38,6 +44,7 @@ export function createCategories(revalidate?: RevalidatePaths): CollectionConfig
         {
           name: "scope",
           type: "select",
+          label: "Loại nội dung",
           required: true,
           index: true,
           options: CATEGORY_SCOPES.map((value) => ({ label: CATEGORY_SCOPE_LABELS[value], value })),
@@ -48,14 +55,15 @@ export function createCategories(revalidate?: RevalidatePaths): CollectionConfig
         {
           name: "parent",
           type: "relationship",
+          label: "Danh mục cha",
           relationTo: "categories",
           index: true,
           // Gợi ý trong admin: cùng scope, chỉ danh mục gốc (cấp 1). Quy tắc thật nằm ở `validateCategoryTree`.
           filterOptions: ({ data }) => ({ scope: { equals: data?.scope }, parent: { exists: false } }),
           admin: { position: "sidebar" },
         },
-        { name: "description", type: "textarea", localized: true },
-        { name: "sortOrder", type: "number", defaultValue: 0, index: true, admin: { position: "sidebar" } },
+        { name: "description", type: "textarea", label: "Mô tả", localized: true },
+        { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true, admin: { position: "sidebar" } },
       ],
     },
     {

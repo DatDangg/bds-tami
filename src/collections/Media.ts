@@ -2,6 +2,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { isAdmin, isStaff, ownedByUserOrAdmin } from "../access";
 import { blockDeleteWhileUsedByHomepage } from "../hooks/media/guard-delete";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { MEDIA_FILE_CACHE_CONTROL } from "../lib/http/cache-policy";
 import { createUploadGuard, MEDIA_POLICY } from "../lib/upload/validate-file";
 
@@ -27,7 +28,12 @@ const WEBP = { format: "webp", options: { quality: 80 } } as const;
  */
 export const Media: CollectionConfig = {
   slug: "media",
-  admin: { useAsTitle: "alt", defaultColumns: ["filename", "alt", "mimeType", "uploadedBy"] },
+  labels: collectionLabels("media"),
+  admin: {
+    useAsTitle: "alt",
+    defaultColumns: ["filename", "alt", "mimeType", "uploadedBy"],
+    description: "Ảnh, PDF và video công khai dùng cho mọi nội dung; ảnh cần mô tả (alt).",
+  },
   access: {
     read: () => true,
     create: isStaff,
@@ -63,6 +69,7 @@ export const Media: CollectionConfig = {
     {
       name: "alt",
       type: "text",
+      label: "Mô tả ảnh (alt)",
       localized: true,
       // Bắt buộc với ảnh (a11y + SEO); PDF/video không cần. `mimeType` đã được Payload điền trước bước validate.
       validate: (value: string | null | undefined, { siblingData }: { siblingData: Partial<{ mimeType: string }> }) => {
@@ -70,10 +77,11 @@ export const Media: CollectionConfig = {
         return true;
       },
     },
-    { name: "caption", type: "text", localized: true },
+    { name: "caption", type: "text", label: "Chú thích", localized: true },
     {
       name: "uploadedBy",
       type: "relationship",
+      label: "Người tải lên",
       relationTo: "staff",
       // Khách đọc media nhưng không thấy ai upload.
       access: { read: isStaff },

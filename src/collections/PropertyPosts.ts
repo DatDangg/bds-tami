@@ -9,6 +9,7 @@ import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/w
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -29,11 +30,12 @@ const dayOnly = { date: { pickerAppearance: "dayOnly" } } as const;
 const offerGroup: GroupField = {
   name: "offer",
   type: "group",
+  label: "Ưu đãi / voucher",
   fields: [
-    { name: "startAt", type: "date", admin: dayOnly },
-    { name: "endAt", type: "date", index: true, admin: dayOnly, validate: validateOfferEnd },
-    { name: "voucherCode", type: "text", maxLength: 64 },
-    { name: "terms", type: "textarea", localized: true },
+    { name: "startAt", type: "date", label: "Bắt đầu ưu đãi", admin: dayOnly },
+    { name: "endAt", type: "date", label: "Kết thúc ưu đãi", index: true, admin: dayOnly, validate: validateOfferEnd },
+    { name: "voucherCode", type: "text", label: "Mã voucher", maxLength: 64 },
+    { name: "terms", type: "textarea", label: "Điều kiện áp dụng", localized: true },
   ],
 };
 
@@ -49,7 +51,12 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
   return withContentDefaults(
     {
       slug: "property-posts",
-      admin: { useAsTitle: "title", defaultColumns: ["title", "category", "status", "publishedAt", "author"] },
+      labels: collectionLabels("property-posts"),
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "category", "status", "publishedAt", "author"],
+        description: "Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.",
+      },
       defaultSort: "-publishedAt",
       hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
@@ -58,19 +65,20 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
         {
           name: "cover",
           type: "upload",
+          label: "Ảnh bìa",
           relationTo: "media",
           filterOptions: { mimeType: { contains: "image/" } },
           validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin đăng."),
         },
-        { name: "gallery", type: "upload", relationTo: "media", hasMany: true, filterOptions: { mimeType: { contains: "image/" } } },
-        { name: "excerpt", type: "textarea", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-        { name: "content", type: "richText", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
-        { name: "priceVnd", type: "number", min: 0 },
-        { name: "priceNote", type: "text", localized: true },
-        { name: "province", type: "relationship", relationTo: "provinces", index: true },
-        { name: "ward", type: "relationship", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardWithOptionalProvince },
-        { name: "relatedProject", type: "relationship", relationTo: "projects", index: true },
-        { name: "relatedRental", type: "relationship", relationTo: "rentals", index: true },
+        { name: "gallery", type: "upload", label: "Thư viện ảnh", relationTo: "media", hasMany: true, filterOptions: { mimeType: { contains: "image/" } } },
+        { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
+        { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+        { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0 },
+        { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
+        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
+        { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardWithOptionalProvince },
+        { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },
+        { name: "relatedRental", type: "relationship", label: "Tin cho thuê liên quan", relationTo: "rentals", index: true },
         offerGroup,
       ],
     },

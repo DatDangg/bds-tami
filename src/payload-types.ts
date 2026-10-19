@@ -189,6 +189,8 @@ export interface StaffAuthOperations {
   };
 }
 /**
+ * Tài khoản nội bộ đăng nhập trang quản trị (admin / sale).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "staff".
  */
@@ -221,6 +223,8 @@ export interface Staff {
   collection: 'staff';
 }
 /**
+ * Ảnh, PDF và video công khai dùng cho mọi nội dung; ảnh cần mô tả (alt).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -277,6 +281,8 @@ export interface Media {
   };
 }
 /**
+ * CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "private-files".
  */
@@ -296,6 +302,8 @@ export interface PrivateFile {
   focalY?: number | null;
 }
 /**
+ * Dấu vết các thao tác nhạy cảm (chỉ đọc, giữ 24 tháng).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-logs".
  */
@@ -336,6 +344,8 @@ export interface AuditLog {
   createdAt: string;
 }
 /**
+ * Từng lượt bấm nút Hotline/Zalo/Fanpage trên website (giữ 90 ngày rồi gộp thành thống kê ngày).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "click-events".
  */
@@ -350,6 +360,8 @@ export interface ClickEvent {
   createdAt: string;
 }
 /**
+ * Số lượt bấm Hotline/Zalo/Fanpage gộp theo ngày (giờ Việt Nam), do hệ thống tổng hợp.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "click-stats-daily".
  */
@@ -364,6 +376,8 @@ export interface ClickStatsDaily {
   createdAt: string;
 }
 /**
+ * Mức dùng AI dịch theo tháng (số lần gọi, token, chi phí ước tính) để theo dõi hạn mức.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "translation-usage".
  */
@@ -378,6 +392,8 @@ export interface TranslationUsage {
   createdAt: string;
 }
 /**
+ * Danh mục riêng cho từng loại nội dung (dự án, cho thuê, tin BĐS, tin tức, tuyển dụng), tối đa 2 cấp.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
@@ -394,6 +410,9 @@ export interface Category {
   slug?: string | null;
   scopeSlug?: string | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -412,6 +431,9 @@ export interface Category {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -423,6 +445,8 @@ export interface Category {
   deletedAt?: string | null;
 }
 /**
+ * Chủ đầu tư của dự án; bật "Hiện ở khối đối tác" để đưa logo lên trang chủ.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "developers".
  */
@@ -456,6 +480,9 @@ export interface Developer {
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -478,6 +505,8 @@ export interface Developer {
   deletedAt?: string | null;
 }
 /**
+ * 34 tỉnh/thành sau sáp nhập 01/07/2025 (danh mục nền).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "provinces".
  */
@@ -486,6 +515,9 @@ export interface Province {
   searchReindexPending?: boolean | null;
   code: string;
   name: string;
+  /**
+   * Vd: TP.HCM
+   */
   shortName?: string | null;
   slug: string;
   sortOrder?: number | null;
@@ -493,6 +525,8 @@ export interface Province {
   createdAt: string;
 }
 /**
+ * Phường/xã/đặc khu sau sáp nhập 01/07/2025; kèm tên cũ để tìm kiếm.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "wards".
  */
@@ -517,6 +551,8 @@ export interface Ward {
   createdAt: string;
 }
 /**
+ * Các dịch vụ công ty cung cấp (phân phối, môi giới, khai thác căn hộ dịch vụ); chỉ admin sửa.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
  */
@@ -548,6 +584,9 @@ export interface Service {
   slug?: string | null;
   status: 'draft' | 'published' | 'hidden';
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -566,6 +605,9 @@ export interface Service {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -577,6 +619,8 @@ export interface Service {
   deletedAt?: string | null;
 }
 /**
+ * Chính sách bảo mật và Điều khoản sử dụng; bản tiếng Anh phải được admin duyệt trước khi hiển thị.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -606,6 +650,9 @@ export interface Page {
   effectiveDate: string;
   status: 'draft' | 'published' | 'hidden';
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -624,6 +671,9 @@ export interface Page {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -635,6 +685,8 @@ export interface Page {
   deletedAt?: string | null;
 }
 /**
+ * Bài viết tin tức, kiến thức thị trường; không thu lead.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news".
  */
@@ -669,6 +721,9 @@ export interface News {
   author: string | Staff;
   isFeatured?: boolean | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -687,6 +742,9 @@ export interface News {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -698,6 +756,8 @@ export interface News {
   deletedAt?: string | null;
 }
 /**
+ * Dự án bất động sản giới thiệu trên website: thông tin, quy mô, tiện ích, mặt bằng và tài liệu.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
@@ -746,10 +806,16 @@ export interface Project {
   amenities?:
     | {
         name: string;
+        /**
+         * Tên icon hiển thị kèm tiện ích (tuỳ chọn).
+         */
         icon?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Ảnh đầu tiên là ảnh đại diện của dự án.
+   */
   gallery?: (string | Media)[] | null;
   floorPlans?:
     | {
@@ -798,6 +864,9 @@ export interface Project {
   author: string | Staff;
   isFeatured?: boolean | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -816,6 +885,9 @@ export interface Project {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -827,6 +899,8 @@ export interface Project {
   deletedAt?: string | null;
 }
 /**
+ * Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rentals".
  */
@@ -878,6 +952,9 @@ export interface Rental {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Ảnh đầu tiên là ảnh đại diện của tin.
+   */
   gallery?: (string | Media)[] | null;
   videoUrl?: string | null;
   legalNote?: string | null;
@@ -892,6 +969,9 @@ export interface Rental {
   author: string | Staff;
   isFeatured?: boolean | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -910,6 +990,9 @@ export interface Rental {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -921,6 +1004,8 @@ export interface Rental {
   deletedAt?: string | null;
 }
 /**
+ * Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "property-posts".
  */
@@ -947,6 +1032,9 @@ export interface PropertyPost {
     [k: string]: unknown;
   } | null;
   priceVnd?: number | null;
+  /**
+   * Vd: Giá thương lượng, Giá chưa gồm VAT.
+   */
   priceNote?: string | null;
   province?: (string | null) | Province;
   ward?: (string | null) | Ward;
@@ -967,6 +1055,9 @@ export interface PropertyPost {
   author: string | Staff;
   isFeatured?: boolean | null;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -985,6 +1076,9 @@ export interface PropertyPost {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -996,6 +1090,8 @@ export interface PropertyPost {
   deletedAt?: string | null;
 }
 /**
+ * Tin tuyển dụng của công ty; quá hạn nộp sẽ tự ẩn khỏi danh sách công khai.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-postings".
  */
@@ -1008,6 +1104,9 @@ export interface JobPosting {
   employmentType: 'full_time' | 'part_time' | 'internship' | 'contract';
   salaryMinVnd?: number | null;
   salaryMaxVnd?: number | null;
+  /**
+   * Vd: Thoả thuận, 15–20 triệu.
+   */
   salaryText?: string | null;
   quantity?: number | null;
   deadline: string;
@@ -1064,6 +1163,9 @@ export interface JobPosting {
   publishedAt?: string | null;
   author: string | Staff;
   hasEnglish?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -1082,6 +1184,9 @@ export interface JobPosting {
     lastError?: string | null;
   };
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
@@ -1093,6 +1198,8 @@ export interface JobPosting {
   deletedAt?: string | null;
 }
 /**
+ * Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự ẩn danh sau 12 tháng.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-applications".
  */
@@ -1118,6 +1225,8 @@ export interface JobApplication {
   createdAt: string;
 }
 /**
+ * Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
  */
@@ -1167,6 +1276,8 @@ export interface Lead {
   deletedAt?: string | null;
 }
 /**
+ * Ghi chú, cuộc gọi và các thay đổi của lead; chỉ thêm, không sửa/xoá.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lead-activities".
  */
@@ -1184,6 +1295,8 @@ export interface LeadActivity {
   createdAt: string;
 }
 /**
+ * Chuyển hướng 301 từ đường dẫn cũ sang mới (tự tạo khi đổi slug; sửa tay khi cần).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -2265,6 +2378,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Thông tin công ty, liên hệ, mạng xã hội, email nhận thông báo và cài đặt dịch tự động.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
@@ -2307,6 +2422,9 @@ export interface SiteSetting {
    * Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)
    */
   privacyPolicyVersion?: string | null;
+  /**
+   * Dạng G-XXXXXXXXXX
+   */
   gaMeasurementId?: string | null;
   /**
    * Thuật ngữ cố định cho AI dịch (BR-08)
@@ -2323,6 +2441,9 @@ export interface SiteSetting {
    * Tắt nhanh dịch tự động (BR-08)
    */
   translationEnabled?: boolean | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -2344,6 +2465,8 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Nội dung và thứ tự các khối trên trang chủ (chỉ admin sửa).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
  */
@@ -2352,6 +2475,9 @@ export interface Homepage {
   hero: {
     slides: {
       image: string | Media;
+      /**
+       * Chỉ phát trên màn hình lớn; ảnh nền dùng làm poster và cho di động.
+       */
       video?: (string | null) | Media;
       title?: string | null;
       subtitle?: string | null;
@@ -2384,7 +2510,13 @@ export interface Homepage {
     image?: (string | null) | Media;
     stats?:
       | {
+          /**
+           * Vd: 10+, 1.500
+           */
           value: string;
+          /**
+           * Vd: Năm kinh nghiệm
+           */
           label: string;
           id?: string | null;
         }[]
@@ -2393,6 +2525,9 @@ export interface Homepage {
   featuredProjects?: {
     enabled?: boolean | null;
     title?: string | null;
+    /**
+     * Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.
+     */
     projects?: (string | Project)[] | null;
   };
   services?: {
@@ -2403,6 +2538,9 @@ export interface Homepage {
   featuredOffers?: {
     enabled?: boolean | null;
     title?: string | null;
+    /**
+     * Để trống thì tự lấy tin nổi bật còn hạn ưu đãi.
+     */
     posts?: (string | PropertyPost)[] | null;
   };
   partners?: {
@@ -2413,6 +2551,9 @@ export interface Homepage {
     enabled?: boolean | null;
     title?: string | null;
     description?: string | null;
+    /**
+     * Để trống thì dùng "Nhận tư vấn".
+     */
     ctaLabel?: string | null;
     /**
      * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
@@ -2420,6 +2561,9 @@ export interface Homepage {
     ctaLink?: string | null;
     backgroundImage?: (string | null) | Media;
   };
+  /**
+   * Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại.
+   */
   blockOrder?:
     | {
         block: 'about' | 'featuredProjects' | 'services' | 'featuredOffers' | 'partners' | 'ctaBanner';
@@ -2427,12 +2571,18 @@ export interface Homepage {
       }[]
     | null;
   seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
     canonical?: string | null;
   };
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -2454,6 +2604,8 @@ export interface Homepage {
   createdAt?: string | null;
 }
 /**
+ * Menu chính (2 cấp) và nút kêu gọi hành động ở đầu trang.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
@@ -2486,6 +2638,9 @@ export interface Header {
      */
     link?: string | null;
   };
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;
@@ -2507,6 +2662,8 @@ export interface Header {
   createdAt?: string | null;
 }
 /**
+ * Các cột liên kết, khối liên hệ và dòng bản quyền ở chân trang.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
@@ -2528,8 +2685,14 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Địa chỉ, giờ làm việc... hiện ở chân trang.
+   */
   contactBlock?: string | null;
   copyright?: string | null;
+  /**
+   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
     enSource?: ('ai' | 'manual') | null;

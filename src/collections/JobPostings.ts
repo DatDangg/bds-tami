@@ -6,6 +6,7 @@ import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { guardJobPostingHardDelete } from "../hooks/job-postings/guard-delete";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 export const EMPLOYMENT_TYPES = ["full_time", "part_time", "internship", "contract"] as const;
@@ -21,6 +22,7 @@ const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
 const employmentTypeField: SelectField = {
   name: "employmentType",
   type: "select",
+  label: "Hình thức làm việc",
   required: true,
   options: EMPLOYMENT_TYPES.map((value) => ({ label: EMPLOYMENT_TYPE_LABELS[value], value })),
 };
@@ -50,32 +52,35 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
   return withContentDefaults(
     {
       slug: "job-postings",
+      labels: collectionLabels("job-postings"),
       admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "category", "employmentType", "deadline", "status", "author"],
+        description: "Tin tuyển dụng của công ty; quá hạn nộp sẽ tự ẩn khỏi danh sách công khai.",
       },
       defaultSort: "-publishedAt",
       hooks: { beforeDelete: [guardJobPostingHardDelete] },
       fields: [
         titleField(),
         scopedCategoryField("job", { required: false }),
-        { name: "province", type: "relationship", relationTo: "provinces", index: true },
-        { name: "workplace", type: "text" },
+        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
+        { name: "workplace", type: "text", label: "Nơi làm việc" },
         employmentTypeField,
-        { name: "salaryMinVnd", type: "number", min: 0 },
-        { name: "salaryMaxVnd", type: "number", min: 0, validate: validateSalaryMax },
-        { name: "salaryText", type: "text", localized: true },
-        { name: "quantity", type: "number", min: 1 },
+        { name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 },
+        { name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax },
+        { name: "salaryText", type: "text", label: "Mức lương hiển thị", localized: true, admin: { description: "Vd: Thoả thuận, 15–20 triệu." } },
+        { name: "quantity", type: "number", label: "Số lượng tuyển", min: 1 },
         {
           name: "deadline",
           type: "date",
+          label: "Hạn nộp hồ sơ",
           required: true,
           index: true,
           admin: { date: { pickerAppearance: "dayOnly" } },
         },
-        { name: "description", type: "richText", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
-        { name: "requirements", type: "richText", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
-        { name: "benefits", type: "richText", localized: true },
+        { name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
+        { name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
+        { name: "benefits", type: "richText", label: "Quyền lợi", localized: true },
       ],
     },
     { englishRequiredFields: ["title", "slug", "description", "requirements"], omit: ["isFeatured"], revalidate },

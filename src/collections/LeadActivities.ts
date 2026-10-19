@@ -2,7 +2,9 @@ import type { Access, CollectionConfig, Field } from "payload";
 
 import { denyAll, isStaff, ROLES } from "../access";
 import { guardManualActivity, isSystemActivity, stampActivityActor, touchLeadLastActivity } from "../hooks/leads/lead-activity-hooks";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { LEAD_ACTIVITY_TYPES, LEAD_STATUSES, MANUAL_ACTIVITY_TYPES, type LeadActivityType } from "../lib/leads/lead-values";
+import { STATUS_LABELS } from "./Leads";
 
 const TYPE_LABELS: Record<LeadActivityType, string> = {
   note: "Ghi chú",
@@ -29,11 +31,15 @@ const addManualActivity: Access = ({ req }) => isStaff({ req });
 const systemOnly = { create: denyAll, update: denyAll };
 const readOnlyInAdmin = { readOnly: true } as const;
 
+const STATUS_FIELD_LABELS = { fromStatus: "Trạng thái trước", toStatus: "Trạng thái sau" } as const;
+const ASSIGNEE_FIELD_LABELS = { fromAssignee: "Người phụ trách trước", toAssignee: "Người phụ trách sau" } as const;
+
 const fields: Field[] = [
-  { name: "lead", type: "relationship", relationTo: "leads", required: true, index: true },
+  { name: "lead", type: "relationship", label: "Lead", relationTo: "leads", required: true, index: true },
   {
     name: "type",
     type: "select",
+    label: "Loại hoạt động",
     required: true,
     options: LEAD_ACTIVITY_TYPES.map((value) => ({ label: TYPE_LABELS[value], value })),
     // Mặc định "Ghi chú" để form admin thêm nhanh; hệ thống ghi các loại khác.
@@ -45,6 +51,7 @@ const fields: Field[] = [
   {
     name: "content",
     type: "textarea",
+    label: "Nội dung",
     maxLength: 2000,
     validate: (value: unknown, { data }: { data?: { type?: unknown } }) =>
       !MANUAL_ACTIVITY_TYPES.includes(data?.type as LeadActivityType) || (typeof value === "string" && value.trim() !== "") || "Nội dung là bắt buộc",
@@ -53,16 +60,17 @@ const fields: Field[] = [
     (name): Field => ({
       name,
       type: "select",
-      options: LEAD_STATUSES.map((value) => ({ label: value, value })),
+      label: STATUS_FIELD_LABELS[name],
+      options: LEAD_STATUSES.map((value) => ({ label: STATUS_LABELS[value], value })),
       access: systemOnly,
       admin: readOnlyInAdmin,
     }),
   ),
   ...(["fromAssignee", "toAssignee"] as const).map(
-    (name): Field => ({ name, type: "relationship", relationTo: "staff", access: systemOnly, admin: readOnlyInAdmin }),
+    (name): Field => ({ name, type: "relationship", label: ASSIGNEE_FIELD_LABELS[name], relationTo: "staff", access: systemOnly, admin: readOnlyInAdmin }),
   ),
   // Luôn là người đang thao tác (hook `stampActivityActor`); trống = hệ thống.
-  { name: "actor", type: "relationship", relationTo: "staff", index: true, access: systemOnly, admin: readOnlyInAdmin },
+  { name: "actor", type: "relationship", label: "Người thực hiện", relationTo: "staff", index: true, access: systemOnly, admin: readOnlyInAdmin },
 ];
 
 /**
@@ -71,7 +79,13 @@ const fields: Field[] = [
  */
 export const LeadActivities: CollectionConfig = {
   slug: "lead-activities",
-  admin: { useAsTitle: "type", defaultColumns: ["lead", "type", "content", "actor", "createdAt"], hidden: ({ user }) => user?.active !== true },
+  labels: collectionLabels("lead-activities"),
+  admin: {
+    useAsTitle: "type",
+    defaultColumns: ["lead", "type", "content", "actor", "createdAt"],
+    hidden: ({ user }) => user?.active !== true,
+    description: "Ghi chú, cuộc gọi và các thay đổi của lead; chỉ thêm, không sửa/xoá.",
+  },
   defaultSort: "-createdAt",
   access: { read: readOwnLeadActivities, create: addManualActivity, update: denyAll, delete: denyAll },
   disableDuplicate: true,

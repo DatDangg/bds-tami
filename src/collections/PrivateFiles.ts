@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin, ROLES } from "../access";
 import { deleteObjectBeforeDelete } from "../hooks/private-files/delete-object-before-delete";
+import { collectionLabels } from "../lib/admin/collection-labels";
 import { createUploadGuard, PRIVATE_FILE_POLICY } from "../lib/upload/validate-file";
 
 /** Cả MIME nhận diện (vd `application/x-cfb`) lẫn MIME lưu (`application/msword`): guard ghi đè `mimetype` sang MIME lưu trước khi Payload kiểm `mimeType`. */
@@ -19,7 +20,12 @@ const ALLOWED_MIME_TYPES = Object.entries(PRIVATE_FILE_POLICY).flatMap(([detecte
  */
 export const PrivateFiles: CollectionConfig = {
   slug: "private-files",
-  admin: { hidden: ({ user }) => user?.role !== ROLES.admin, defaultColumns: ["filename", "mimeType", "createdAt"] },
+  labels: collectionLabels("private-files"),
+  admin: {
+    hidden: ({ user }) => user?.role !== ROLES.admin,
+    defaultColumns: ["filename", "mimeType", "createdAt"],
+    description: "CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).",
+  },
   access: {
     read: isAdmin,
     create: denyAll,

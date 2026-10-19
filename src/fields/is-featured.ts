@@ -7,6 +7,7 @@ export function isFeaturedField(): CheckboxField {
   return {
     name: "isFeatured",
     type: "checkbox",
+    label: "Nổi bật trên trang chủ",
     defaultValue: false,
     index: true,
     access: { create: isAdmin, update: isAdmin },
