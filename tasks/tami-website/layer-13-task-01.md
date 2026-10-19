@@ -83,6 +83,7 @@ Mở khoá cho: `layer-14-task-01`, `layer-14-task-02`, `layer-15-task-01`
 - src/components/admin/Dashboard.tsx (admin.components.views / beforeDashboard)
 
 ## Notes
+- **BL-015 (2026-10-19):** dashboard đã thay bằng view tuỳ biến `src/components/admin/dashboard/DashboardView.tsx` (`admin.components.views.dashboard`, `beforeDashboard` đã bỏ). FR-ADM-14 cắm vào `DashboardView` (thẻ/khối mới trong `dashboard-data.ts` + `StatCards`/`RecentLists`), không tạo `Dashboard.tsx`.
 - —
 - Đọc trước khi code: `SPECIFICATIONS.md` v1.2.2, design doc `docs/specs/2026-10-16-tami-website-design.md`, tài liệu ghi ở Requirements; UI: `.context/design-spec.md` + `skills/react-nodejs/design-tokens.md`.
 

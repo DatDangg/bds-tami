@@ -3,7 +3,7 @@
 ```yaml
 workItem: feature/admin-ui-saas-refresh
 phaseTask: phase-1-task-06
-step: commit
+step: close-out
 agent: change-request
 status: done
 attempt: 1
@@ -16,7 +16,7 @@ evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "spec-validator phase 1"
+next: "không — BL-015 đóng"
 loopSignal: none
 approvals: [{gate: bl015_design_plan, at: 2026-10-19, ok: true, note: "ok theo đề xuất; auto proceed; song song T01∥T02, T04∥T05"}]
 ```
@@ -28,3 +28,5 @@ approvals: [{gate: bl015_design_plan, at: 2026-10-19, ok: true, note: "ok theo �
 - 2026-10-19 ▶ START reviewer T06 round 1 STRICT (cancel sẽ redo bước này).
 - 2026-10-19 ✅ DONE reviewer T06 r1: PASS STRICT (MINOR 1 comment form-layout → primary sửa; MINOR 2–4 để lại). Verify 4 lệnh PASS 2658.
 - 2026-10-19 close-out + commit T06.
+- 2026-10-19 ▶ START spec-validator phase 1 BL-015 (cancel sẽ redo bước này).
+- 2026-10-19 ✅ DONE spec-validator phase 1: GAPS (G1 ảnh trước/sau, G2 trình duyệt, G3 doc). Primary reconcile G3 (ARCHITECTURE, design §3/§4 as-built, layer-13-task-01, decisions #8, test-scope files). G1/G2 residual chờ user. Đóng BL-015.

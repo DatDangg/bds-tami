@@ -1,6 +1,6 @@
 {
   "mode": "initial-build",
-  "activeWorkItem": "feature/admin-ui-saas-refresh",
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -298,7 +298,7 @@
       "slug": "admin-ui-saas-refresh",
       "title": "Làm lại UI admin (Payload) kiểu SaaS: tokens AA sáng/tối, sidebar nhóm, dashboard theo quyền, list badge/thumbnail, form tab, việt hoá nhãn (BL-015)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-015",
       "changeDoc": "spec/changes/2026-10-19-admin-ui-saas-refresh.md",
@@ -365,7 +365,10 @@
       "note": "User duyệt design + plan 2026-10-19 (ok theo đề xuất), auto proceed. T01∥T02 → T03 → T04∥T05 → T06. Ảnh trước: docs/specs/admin-ui-saas-screenshots/before/",
       "specVersion": "1.11.0",
       "scopeVersion": 12,
-      "specValidation": ".context/review-reports/feature-admin-ui-saas-refresh-spec-validation.md (PASS pre-plan)"
+      "specValidation": ".context/review-reports/feature-admin-ui-saas-refresh-spec-validation.md (PASS pre-plan)",
+      "completedAt": "2026-10-19",
+      "phaseValidation": ".context/review-reports/feature-admin-ui-saas-refresh-phase-1-validation.md (GAPS: G1 ảnh trước/sau, G2 kiểm trình duyệt — residual chờ user; G3 doc reconcile đã làm)",
+      "residual": "Ảnh trước/sau + kiểm trình duyệt 1440/768/390 sáng/tối (dashboard, list, form Projects/Leads/Cấu hình chung, lưu form, chọn bản ghi trong ListDrawer) — không có tài khoản test để đăng nhập admin"
     }
   ],
   "bugs": [

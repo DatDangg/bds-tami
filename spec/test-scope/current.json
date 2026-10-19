@@ -30,15 +30,22 @@
   "changed": {
     "files": [
       "src/app/(payload)/custom.scss",
-      "src/components/admin/**",
-      "src/collections/**",
-      "src/globals/**",
-      "src/fields/**",
-      "src/payload.config.ts",
       "src/app/(payload)/admin/importMap.js",
-      "tests (contrast token, quét nhãn config, dashboard theo quyền, cell badge/thumbnail, không migration)"
+      "src/components/admin/** (admin-tokens, admin-groups, styles/*, dashboard/*, StatusBadge, status-tones, ThumbnailCell, LinkedCell, TitleLinkCell, AssigneeCell, row-labels/*)",
+      "src/lib/admin/* (collection-labels, form-layout, row-label)",
+      "src/collections/* (nhãn, admin.group qua plugin, Cell, defaultColumns, tab không tên/row)",
+      "src/collections/_shared/content-defaults.ts",
+      "src/globals/* (nhãn, tab)",
+      "src/fields/* (nhãn, Cell trạng thái/tiêu đề, scoped-category vào tab)",
+      "src/lib/translation/admin-ui.ts",
+      "src/lib/click-stats/click-types.ts",
+      "src/payload.config.ts",
+      "src/payload-types.ts (chỉ thứ tự/JSDoc)",
+      "tests/unit/admin-labels.test.ts",
+      "tests/integration/admin-dashboard.test.ts",
+      "tests/integration/admin-form-layout.test.ts"
     ],
-    "filesNote": "dự kiến — chốt theo diff thật ở close-out",
+    "filesNote": "chốt theo diff thật 1c0554a..fb4d797 (close-out 2026-10-19)",
     "modules": [
       "Payload admin UI — style/tokens (custom.scss)",
       "Payload admin config — labels, admin.group, defaultColumns, tab/row/collapsible, sidebar fields",
@@ -50,7 +57,7 @@
       "Style chung /admin sáng + tối: nền/viền trung tính ấm, nhấn TAMI #8C6733 (tối #E0BF89) chỉ ở nút chính/link/focus/mục chọn; contrast chữ ≥ 4.5:1, biên điều khiển ≥ 3:1; select admin cùng style",
       "Sidebar 7 nhóm nghiệp vụ tiếng Việt (Khách hàng · Nội dung · Tuyển dụng · Thư viện · Danh mục · Website · Hệ thống), không icon, mọi mục giữ nguyên",
       "Nhãn tiếng Việt cho mọi collection/global/field hiển thị/option/hàng array (kể cả redirects, Media, PrivateFiles)",
-      "Tổng quan: thẻ đếm theo vai trò (admin vs sale), lối tắt tạo nội dung, lead mới nhất, bản sửa gần đây — đếm qua Local API overrideAccess: false; không quyền → không thẻ/lối tắt",
+      "Tổng quan: thẻ đếm theo vai trò (admin vs sale), lối tắt tạo nội dung, lead mới nhất, "Bài của bạn cập nhật gần đây" — đếm qua Local API overrideAccess: false; không quyền → không thẻ/lối tắt",
       "Danh sách: badge trạng thái có chữ, thumbnail 40px (projects/rentals = gallery[0], property-posts/news = cover), dòng 48px, defaultColumns",
       "Form: tab không tên / row / collapsible, trường phụ sidebar phải (projects, rentals, property-posts, news, job-postings, services, leads, homepage, site-settings)"
     ],

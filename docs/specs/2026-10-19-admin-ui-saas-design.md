@@ -211,6 +211,7 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 **Đề xuất:** BL-015 làm **khung dashboard + thẻ đếm nhanh + lối tắt + danh sách gần đây** (chỉ `count`/`find limit 5` qua Local API, không endpoint mới, không đổi API). L13-T01 sau đó **cắm thêm** khối thống kê (biểu đồ theo nguồn/sale, lượt bấm, chi phí dịch) vào khung này qua endpoint của nó. Ghi chú này vào L13-T01 khi user duyệt. Phương án khác: dời toàn bộ dashboard sang L13-T01 (BL-015 bỏ T04). → hỏi user §7.
 
 ---
+**As-built (T04):** card "Danh mục quản lý" không kèm số bản ghi (tránh ~25 count/lần tải); khối phải là "Bài của bạn cập nhật gần đây" (author = mình ở projects/rentals/property-posts/news, sort -updatedAt) vì không có field người sửa cuối.
 
 ## 4. Màn danh sách (list view)
 
@@ -219,6 +220,7 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 - **Thumbnail**: cột đầu 40×40 bo 6px `object-fit: cover` cho collection có ảnh đại diện: `projects` (ảnh đầu `gallery` hoặc `seo.ogImage` — chốt field), `rentals` (`gallery[0]`), `property-posts` / `news` (`cover`), `media` (sẵn của Payload). Làm bằng `admin.components.Cell` trên field ảnh, ảnh dùng size nhỏ nhất (`thumbnail`) của Media, `loading="lazy"`, alt rỗng (trang trí, tiêu đề đã ở cột kế).
 - **Badge trạng thái**: `admin.components.Cell` cho các field select trạng thái (`status`, `salesStatus`, lead `status`, application `status`, translation status) dùng chung component `StatusBadge` + `status-tones.ts`.
 - `defaultColumns` rà lại (đề xuất ở mock): bỏ cột kỹ thuật khỏi mặc định (vd `assigneeInactive` → gộp thành badge "Sale đã nghỉ" cạnh tên người phụ trách).
+- **As-built (T01/T05):** header cột **không dính** khi cuộn (`.table` của Payload có `overflow:auto` nên `position: sticky` vô tác dụng); thumbnail lấy size `thumb` của Media qua `useListRelationships` (1 request/trang); cột tiêu đề giữ link edit / nút chọn trong ListDrawer qua `LinkedCell`.
 - Phân trang + "Số dòng/trang" giữ Payload, chỉ restyle. Trạng thái rỗng: minh hoạ đơn giản + nút "Tạo &lt;tên&gt; đầu tiên".
 - Mobile < 768: bảng cuộn ngang trong card (Payload mặc định), cột tiêu đề dính trái; header trang xếp dọc.
 - `TranslationStatusFilter` (BL-016) nằm ở hàng bộ lọc này — xem §8.

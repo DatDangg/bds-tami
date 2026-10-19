@@ -71,3 +71,11 @@ _No decisions recorded yet. Decisions logged here khi dựng spec và trong impl
 - **Alternatives Considered:** Thêm trường `logo` + checkbox `enabled` vào global `header` (đổi schema + migration, trùng dữ liệu với `site-settings`).
 - **Rationale:** Không đổi schema/migration, một nguồn logo duy nhất.
 - **Consequences:** Admin cấu hình logo ở "Cấu hình chung"; tắt CTA = xoá nhãn hoặc link.
+
+### Decision 8: UI admin kiểu SaaS chỉ bằng cấu hình admin + CSS + component, không thay Nav (feature-admin-ui-saas-refresh, BL-015)
+- **Date:** 2026-10-19
+- **Context:** Cần làm lại admin Payload 3.91 (tokens AA sáng/tối, sidebar nhóm, dashboard, list badge/thumbnail, form tab) mà không đổi schema/access/hook/API.
+- **Decision:** (1) Token `--admin-*` + SCSS ngoài `@layer` ghi đè Payload, không `!important` mới. (2) Nhóm nav bằng `admin.group` + plugin chạy cuối sắp thứ tự (`admin-groups.ts`), không tự viết Nav (chấp nhận collection đứng trước global trong cùng nhóm, không icon menu). (3) Dashboard = `admin.components.views.dashboard` (Server Component, count/find `overrideAccess:false` + user). (4) Form: chỉ tab **không tên**/row/collapsible để không đổi path dữ liệu, không migration.
+- **Alternatives Considered:** Thay `admin.components.Nav` (icon, thứ tự tự do — rủi ro quyền/active/mobile, bảo trì khi nâng Payload); tab có tên (đổi path → migration).
+- **Rationale:** Giữ an toàn dữ liệu và quyền, nâng Payload không vỡ.
+- **Consequences:** FR-ADM-14 (L13-T01) cắm vào `DashboardView`; custom Cell phải đi qua `LinkedCell` để giữ chọn bản ghi trong ListDrawer.
