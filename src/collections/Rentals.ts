@@ -127,6 +127,8 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       admin: {
         useAsTitle: "title",
         listSearchableFields: ["code", "title", "address"],
+        // Chip lọc nhanh (BL-022) nằm trước ô "Trạng thái dịch" mà withContentDefaults nối thêm; slot server ẩn ở thùng rác.
+        components: { beforeListTable: ["/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot"] },
         defaultColumns: ["gallery", "code", "title", "category", "priceMonthlyVnd", "status", "author"],
         description: "Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.",
       },

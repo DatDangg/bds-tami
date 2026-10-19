@@ -1,106 +1,97 @@
 {
-  "specVersion": "1.17.0",
-  "scopeVersion": 21,
-  "generatedAt": "2026-10-20T15:00:00+07:00",
-  "trigger": "bug-fix",
-  "triggerNote": "BL-023 — 3 bug admin cần tái hiện (#05 Lexical vỡ dấu, #10 form tràn ngang 375px, #16 toast 'Fetching user failed' khi chuyển trang nhanh). Bug thuần, requirement không đổi → giữ spec 1.17.0, không spec/updates, không dòng CHANGELOG (theo tiền lệ scope v11).",
-  "workItem": "bug/admin-misc-needs-repro",
-  "backlog": "BL-023",
-  "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-19-admin-misc-needs-repro.md",
+  "specVersion": "1.18.0",
+  "scopeVersion": 22,
+  "generatedAt": "2026-10-20T16:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-022 — chip lọc nhanh danh sách admin (#11 #12): Tin cho thuê (Trạng thái / Số PN / Khoảng giá) + Lead (Trạng thái) + xuất Excel lead theo chip. Spec 1.17.0 → 1.18.0 (MINOR). Phát hành trước khi build (T01, T02 chưa code) — commits/files là kế hoạch, cập nhật ở close-out.",
+  "workItem": "feature/admin-list-quick-filter-chips",
+  "backlog": "BL-022",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/2026-10-19-admin-list-quick-filter-chips.md",
   "task": [
-    "tasks/bug-admin-misc-needs-repro/phase-1-task-01.md",
-    "tasks/bug-admin-misc-needs-repro/phase-1-task-02.md",
-    "tasks/bug-admin-misc-needs-repro/phase-1-task-03.md"
+    "tasks/feature-admin-list-quick-filter-chips/phase-1-task-01.md",
+    "tasks/feature-admin-list-quick-filter-chips/phase-1-task-02.md"
   ],
-  "commits": [
-    "d3b62fb",
-    "c961292",
-    "a8e98d8"
-  ],
-  "commitNotes": {
-    "d3b62fb": "T01 #05 — admin `--font-serif: var(--font-body)` (Montserrat) cho Lexical + diff phiên bản",
-    "c961292": "T02 #10 — breadcrumb header co/cuộn nội bộ + vạch kẻ khối Cài đặt màn tài khoản bám lề gutter",
-    "a8e98d8": "T03 #16 — link nội bộ dashboard + banner dịch lỗi dùng next/link; provider NavigationToastGuard ẩn toast khi trang đang rời đi"
-  },
-  "previousScope": "spec/test-scope/archive/test-scope-1.17.0-20.json",
-  "specUpdate": null,
+  "commits": [],
+  "commitNotes": {},
+  "previousScope": "spec/test-scope/archive/test-scope-1.17.0-21.json",
+  "specUpdate": "spec/updates/2026-10-20-admin-list-quick-filter-chips.md",
   "specRefs": [
-    "FR-ADM-19"
+    "FR-ADM-19",
+    "F9"
   ],
   "specRefNotes": {
-    "FR-ADM-19": "Giao diện quản trị — toàn bộ admin dùng font có glyph tiếng Việt (Montserrat) kể cả ô richText Lexical; 'responsive không vỡ ở 390px' (nay đo ở 375px cho form chi tiết + tài khoản); Tổng quan (dashboard) điều hướng client-side. Ngữ nghĩa requirement không đổi — code nay khớp."
+    "FR-ADM-19": "Giao diện quản trị — mục mới 'Chip lọc nhanh (BL-022)': thanh chip trên bảng Tin cho thuê (Trạng thái / Số phòng ngủ / Khoảng giá) và Lead (Trạng thái); mỗi nhóm chọn 1, AND theo từng nhánh or, where trên URL, chip sáng/bỏ sáng theo bộ lọc tay cùng trường; không nới quyền.",
+    "F9": "Lead — xuất Excel nhận thêm điều kiện chip: status 'nằm trong' tập trạng thái hợp lệ và assignedTo 'chưa có sale phụ trách'; toán tử khác vẫn khoá nút (FR-ADM-10 endpoint GET /api/admin/leads/export)."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/app/(payload)/admin/importMap.js",
-      "src/app/(payload)/custom.scss",
-      "src/components/admin/NavigationToastGuard.test.tsx",
-      "src/components/admin/NavigationToastGuard.tsx",
-      "src/components/admin/TranslationFailedBanner.tsx",
-      "src/components/admin/admin-fonts.test.ts",
-      "src/components/admin/admin-mobile-overflow.test.ts",
-      "src/components/admin/dashboard/DashboardHeader.tsx",
-      "src/components/admin/dashboard/DashboardLinks.test.tsx",
-      "src/components/admin/dashboard/NavGroupCards.tsx",
-      "src/components/admin/dashboard/RecentLists.tsx",
-      "src/components/admin/dashboard/StatCards.tsx",
-      "src/components/admin/styles/_navigation-guard.scss",
-      "src/components/admin/styles/_surfaces.scss",
-      "src/payload.config.ts"
+      "src/lib/admin/quick-filters.ts",
+      "src/lib/admin/quick-filters.test.ts",
+      "src/components/admin/QuickFilterChips.tsx",
+      "src/components/admin/QuickFilterChips.test.tsx",
+      "src/collections/Rentals.ts",
+      "src/collections/Leads.ts",
+      "src/lib/leads/export-filters.ts",
+      "src/lib/leads/export-filters.test.ts",
+      "src/endpoints/admin/leads-export.ts",
+      "src/components/admin/styles/_lists.scss",
+      "docs/API_SPEC.md"
     ],
-    "filesNote": "Theo diff thật d3b62fb~1..a8e98d8 (3 commit), bỏ tasks/, .context/. Không schema/migration/API/access control.",
+    "filesNote": "KẾ HOẠCH (task T01/T02, chưa code). Có thể thêm src/app/(payload)/admin/importMap.js, src/components/admin/LeadExportButton.tsx, src/lib/translation/admin-ui.ts (nếu tách toBranches dùng chung). Thay bằng diff thật ở close-out. Không schema/migration/access control.",
     "modules": [
-      "CSS admin — src/app/(payload)/custom.scss (`:root --font-serif` → `--font-body`; import _navigation-guard), src/components/admin/styles/_surfaces.scss (`.app-header__step-nav-wrapper` min-width:0 + overflow-x:auto + scrollbar ẩn; `.payload-settings::before/::after` width:auto + right theo gutter)",
-      "Provider admin — src/components/admin/NavigationToastGuard.tsx (beforeunload → `html[data-admin-navigating-away]`, gỡ ở pageshow/pointerdown/keydown/focus và khi `defaultPrevented`), _navigation-guard.scss (ẩn `.payload-toast-container` khi có cờ), đăng ký `admin.components.providers` trong src/payload.config.ts + importMap",
-      "Dashboard admin — DashboardHeader, NavGroupCards, RecentLists, StatCards: `<a href>` → `next/link` (`prefetch={false}`)",
-      "Banner dịch lỗi — src/components/admin/TranslationFailedBanner.tsx: link → `next/link`",
-      "Test — admin-fonts.test.ts, admin-mobile-overflow.test.ts, NavigationToastGuard.test.tsx, DashboardLinks.test.tsx"
+      "Helper where chip — src/lib/admin/quick-filters.ts (currentChip / withChip, ghép điều kiện vào từng nhánh or, thay điều kiện lá cùng trường, chuẩn hoá giá trị chuỗi từ URL)",
+      "Component client — src/components/admin/QuickFilterChips.tsx (useListQuery + refineListData, role=group, aria-pressed, cuộn ngang)",
+      "Đăng ký slot beforeListTable — src/collections/Rentals.ts (3 nhóm), src/collections/Leads.ts (nhóm Trạng thái, cạnh LeadExportSlot)",
+      "Xuất Excel lead — src/lib/leads/export-filters.ts (client leadExportQueryFromWhere + server parse/build: status in, assignedTo exists false), src/endpoints/admin/leads-export.ts",
+      "SCSS thanh công cụ — src/components/admin/styles/_lists.scss",
+      "Doc as-built — docs/API_SPEC.md mục GET /api/admin/leads/export"
     ]
   },
   "impact": {
     "direct": [
-      "#05 Lexical: ô richText trong admin (vd rentals 0e6b861d-b775-4d73-bf39-c22ab100a609, tab Nội dung, 'Mô tả — vi') hiển thị 'mặt bằng', 'tầng 1-2', 'Tây Hồ,', 'tiền lớn', 'Nội thất', 'tư vấn' liền dấu; computed font-family bắt đầu bằng Montserrat (không còn Georgia)",
-      "#05 Màn so sánh phiên bản (diff Lexical, `.lexical-diff .html-diff`) cũng dùng Montserrat, dấu tiếng Việt đúng",
-      "#10 Ở 375px: `documentElement.scrollWidth == 375` (không cuộn ngang) trên /admin/account, form sửa rentals / projects / leads, form tạo rentals/create + news/create",
-      "#10 Breadcrumb dài trong header cuộn ngang nội bộ (không đẩy nút ngôn ngữ + avatar ra ngoài); nút ngôn ngữ và avatar luôn thấy trong viewport",
-      "#10 Vạch kẻ khối 'Cài đặt' ở /admin/account nằm trong lề gutter, không vượt viewport",
-      "#16 Bấm nhanh liên tiếp từ dashboard (thẻ đếm, thẻ nhóm, danh sách lead mới / bản sửa gần đây, link header) → điều hướng client-side, không tải lại toàn trang, không toast 'Fetching user failed: Failed to fetch'",
-      "#16 Link trong banner 'dịch lỗi' (TranslationFailedBanner) điều hướng client-side",
-      "#16 F5 / back / gõ URL khi trang đang tải → toast của trang cũ bị ẩn (không toast giả)",
-      "#16 Lỗi mạng thật khi KHÔNG điều hướng (offline, server chết) vẫn hiện toast như cũ"
+      "Rentals /admin/collections/rentals: nhóm Trạng thái — Đang cho thuê = published, Đã thuê = rented, Nháp = draft; hidden chỉ thấy ở Tất cả",
+      "Rentals: nhóm Số phòng ngủ — Studio = 0, 1 PN = 1, 2 PN = 2, 3 PN+ = ≥ 3; tin không nhập bedrooms không lọt chip nào",
+      "Rentals: nhóm Khoảng giá priceMonthlyVnd — Dưới 10tr < 10.000.000; 10 – 20tr ≥ 10.000.000 và < 20.000.000; 20 – 50tr ≥ 20.000.000 và ≤ 50.000.000; Trên 50tr > 50.000.000 (biên 10tr/20tr/50tr đúng nhóm); tin không nhập giá không lọt chip nào; nhóm giá không có chip Tất cả",
+      "Leads /admin/collections/leads: nhóm Trạng thái — Mới (chưa giao) = new VÀ chưa có sale phụ trách (lead new đã giao không hiện); Đang tư vấn = contacted + consulting; Đã chốt = won; Không thành = lost; spam chỉ ở Tất cả",
+      "Mỗi nhóm chọn 1; bấm lại chip đang sáng hoặc Tất cả = bỏ lọc nhóm; các nhóm AND với nhau",
+      "Chip AND với bộ lọc tay + ô tìm kiếm + Lọc dịch (ghép vào từng nhánh or, không mất điều kiện khác); đổi Lọc dịch sau khi chọn chip vẫn giữ chip và ngược lại",
+      "Chip ghi where lên URL: F5 / mở link chia sẻ giữ chip sáng + đúng kết quả; tự sửa bộ lọc trên cùng trường khác chip → chip bỏ sáng; chọn chip thay bộ lọc tay cùng trường (vd Giá ≥ 5tr bị thay khi bấm chip giá)",
+      "Xuất Excel lead khi đang chọn bất kỳ chip Trạng thái nào (kể cả kèm tìm kiếm / bộ lọc khác) → file đúng tập lead đang thấy",
+      "API GET /api/admin/leads/export: tham số mới cho status 'nằm trong' + assignedTo 'chưa có'; giá trị ngoài whitelist / trùng / mâu thuẫn → 400 kèm details",
+      "A11y: chip là button aria-pressed, nhóm role=group có nhãn; Tab tới chip, Enter/Space bật/tắt; focus-visible rõ; AA sáng/tối; vùng bấm ≥ 44px",
+      "375px: thanh chip cuộn ngang nội bộ, documentElement.scrollWidth không tăng do thanh chip"
     ],
     "dependents": [
-      "Mọi ô richText Lexical trong admin (rentals, projects, posts, news, services, pages, jobs…) — font đổi sang Montserrat",
-      "Header admin (breadcrumb) trên mọi màn — rule `.app-header__step-nav-wrapper` dùng chung",
-      "Toast admin toàn cục (sonner `.payload-toast-container`) — bị ẩn trong lúc có cờ `data-admin-navigating-away`",
-      "Provider admin chạy cạnh SessionKeepAlive (thứ tự providers trong payload.config.ts)"
+      "Ô Lọc dịch (TranslationStatusFilter, withTranslationFilter) — cùng thanh công cụ beforeListTable; có thể dùng chung toBranches",
+      "Xuất Excel lead (LeadExportButton / LeadExportSlot, export-filters, leads-export endpoint) — ánh xạ where → query mở rộng",
+      "Thanh công cụ danh sách .list-toolbar-item (_lists.scss) dùng chung mọi collection",
+      "Access Leads isAssignedOrAdmin — chip chỉ thêm điều kiện where, không thay access"
     ],
     "regression": [
-      "Link dashboard tới đúng đích, kể cả bộ lọc trong query string (vd thẻ 'Lead mới' → /admin/collections/leads?where…status=new); lối tắt tạo nội dung mở đúng form create",
-      "Link trong banner dịch lỗi tới đúng danh sách/bản ghi lọc theo trạng thái dịch",
-      "Menu trái (sidebar) điều hướng bình thường, không toast",
-      "Hộp thoại 'thay đổi chưa lưu' khi rời form vẫn hiện; chọn ở lại → toast sau đó vẫn hiện bình thường (cờ được gỡ)",
-      "Toast lỗi thật khi lưu (validate, 4xx/5xx) và toast thành công vẫn hiện",
-      "Soạn/sửa nội dung Lexical (gõ tiếng Việt, định dạng, link, upload ảnh trong richText) không đổi hành vi",
-      "Desktop 1280: header admin + màn tài khoản không đổi giao diện (vạch kẻ Cài đặt có thể ngắn hơn ~36px mép phải — chấp nhận)",
-      "Nút tải CV (CvDownloadButton, `download`) không bị ẩn toast / không kẹt cờ; link mailto:/tel: không làm kẹt cờ ẩn toast",
-      "Phiên đăng nhập: SessionKeepAlive làm mới token như cũ; đăng xuất/hết phiên vẫn chuyển về đăng nhập"
+      "BL-021 #01: đổi Trạng thái dịch giữ bộ lọc khác (nay kèm chip) trên rentals",
+      "BL-021 T3: xuất Excel lead với bộ lọc cũ (status/source/assignedTo equals, createdAt >=/<=) + ô tìm kiếm vẫn đúng file; bộ lọc không hỗ trợ (nhiều nhánh or, toán tử khác) vẫn khoá nút kèm thông báo; audit lead.export chỉ cờ search, không PII; 401/403/429/422 như cũ",
+      "BL-021 T6: thanh công cụ — nút Xuất Excel / ô Lọc dịch vẫn trong lề, cùng hàng, tự xuống dòng, không tràn 375px, 0 kết quả vẫn thấy ô lọc dịch",
+      "Sale chỉ thấy lead được giao — mọi chip Lead không làm lộ thêm lead; sale không thấy nút Xuất Excel",
+      "Thùng rác và list drawer: nút Xuất Excel vẫn ẩn; chip không gây lỗi ở đó",
+      "Tìm kiếm Lead (mã/họ tên/SĐT mọi dạng/email) và Tin cho thuê (mã/tiêu đề/địa chỉ) vẫn đúng khi kèm chip",
+      "Phân trang: chọn chip quay về trang 1; sắp xếp cột giữ nguyên"
     ]
   },
   "acceptance": [
-    "#05 Mở rentals 0e6b861d-b775-4d73-bf39-c22ab100a609 → ô 'Mô tả — vi' hiển thị dấu tiếng Việt liền (nguyên âm 2 dấu ằ ầ ồ ề ấ), font Montserrat; màn so sánh phiên bản cũng vậy",
-    "#10 Viewport 375×812: /admin/account, rentals/projects/leads edit + rentals/create, news/create — không cuộn ngang trang; breadcrumb cuộn nội bộ; nút ngôn ngữ + avatar hiển thị",
-    "#16 Từ /admin bấm nhanh thẻ đếm → link khác → back: không tải lại toàn trang, 0 toast 'Fetching user failed'",
-    "#16 Ngắt mạng (DevTools offline) khi đứng yên ở một màn rồi thao tác cần fetch → vẫn có toast lỗi",
-    "#16 F5 / back khi trang đang tải → không có toast giả",
-    "Hồi quy: link dashboard + banner dịch lỗi đúng đích (giữ query lọc), sidebar, hộp thoại chưa lưu, toast lỗi lưu thật, soạn Lexical",
-    "pnpm lint / typecheck / test PASS (admin-fonts, admin-mobile-overflow, NavigationToastGuard, DashboardLinks, DashboardParts)"
+    "Chip áp/bỏ 1 chạm, kết hợp đúng với bộ lọc khác và Lọc dịch (không lặp lại bug #01)",
+    "Rentals: 3 nhóm chip đúng bảng (Trạng thái / Số phòng ngủ / Khoảng giá, biên giá đúng); Leads: nhóm Trạng thái đúng bảng",
+    "Chip đang chọn nằm trên URL (where) → F5 / chia sẻ link giữ nguyên; tự sửa bộ lọc trùng nhóm thì chip bỏ sáng tương ứng",
+    "Xuất Excel lead khi đang chọn chip xuất đúng tập đang lọc; toán tử không hỗ trợ khác vẫn khoá nút",
+    "Sale không thấy thêm lead nào ngoài lead được giao",
+    "Đạt AA sáng/tối, thao tác được bằng bàn phím, 375px không tràn ngang trang (thanh chip cuộn ngang)",
+    "pnpm lint / typecheck / test PASS (quick-filters, QuickFilterChips, export-filters)"
   ],
   "outOfScope": [
-    "Dashboard /admin (≈506px) và danh sách /admin/collections/rentals (≈576px) vẫn tràn ngang ở 375px — ngoài phạm vi #10 (form chi tiết), đề xuất backlog riêng; KHÔNG fail test vì hai màn này",
-    "Chuẩn hoá NFC khi lưu nội dung dán NFD — không thêm hook (dữ liệu hiện 0/32 dòng lệch)"
+    "Chip diện tích (areaM2)",
+    "Chip trên Dự án / Đăng tin BĐS / Tin tức",
+    "Dashboard /admin và danh sách rentals vẫn có thể tràn ngang ở 375px do bảng/khác (BL-024) — chỉ kiểm thanh chip không làm tăng tràn"
   ],
   "viewports": [
     1280,
@@ -110,11 +101,12 @@
     "vi"
   ],
   "browsers": [
-    "chrome",
-    "safari-ios (chưa kiểm thiết bị thật — ưu tiên nếu có)"
+    "chrome"
   ],
   "uiTests": true,
-  "apiTests": [],
-  "risk": "medium",
-  "riskNote": "T01 FAST PASS r1, T02 NORMAL PASS r1, T03 STRICT PASS r2 (provider admin dùng chung, gần auth/session). Không schema/API/quyền. Residual: diff Lexical chưa mở trình duyệt kiểm; viền focus breadcrumb có thể bị cắt dọc (overflow-x:auto) chưa kiểm Tab; chỉ kiểm Chrome; F5/back khi /me còn treo chỉ có unit test + cơ chế; chọn 'Rời trang' trong hộp thoại chưa lưu có thể chớp toast giả; gõ URL có thể gỡ cờ sớm; Firefox có thể bỏ bfcache do listener beforeunload; điều hướng dashboard bằng next/link không hiện thanh tiến trình route Payload."
+  "apiTests": [
+    "GET /api/admin/leads/export — tham số chip mới (status 'nằm trong', assignedTo 'chưa có'): hợp lệ → 200 đúng tập; giá trị lạ / trùng / mâu thuẫn → 400; sale → 403; không đăng nhập → 401"
+  ],
+  "risk": "high",
+  "riskNote": "Theo chỉ định phát hành: medium. Lưu ý T02 tự đánh giá HIGH → review STRICT (endpoint xuất PII, parse tham số server, audit); T01 MEDIUM (helper where dùng chung với Lọc dịch). Không schema/migration/quyền. Bên test nên ưu tiên ca xuất Excel + quyền sale."
 }

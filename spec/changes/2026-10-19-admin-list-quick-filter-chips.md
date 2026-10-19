@@ -1,7 +1,7 @@
 ---
 id: admin-list-quick-filter-chips
 type: feature
-status: pending
+status: in_progress
 created: 2026-10-19
 ---
 
@@ -42,3 +42,12 @@ Chip diện tích (`areaM2`), màn Dự án / Đăng tin BĐS.
 - [ ] Chip đang chọn nằm trên URL (`where`) → F5 / chia sẻ link giữ nguyên; tự sửa bộ lọc trùng nhóm thì chip bỏ sáng tương ứng.
 - [ ] Xuất Excel lead khi đang chọn chip xuất đúng tập đang lọc.
 - [ ] Đạt AA sáng/tối, thao tác được bằng bàn phím, 375px không tràn ngang trang (thanh chip cuộn ngang).
+
+## Quyết định agent (user ủy quyền 2026-10-20: "tự quyết định đừng hỏi lại")
+- D1 Chia 2 task tuần tự: T01 chip Tin cho thuê (helper chip dùng chung + component), T02 chip Lead + xuất Excel theo chip. Không song song vì T02 dùng lại helper/component của T01.
+- D2 Chip ghép điều kiện vào **từng** nhánh `or` của `where` (giống `withTranslationFilter`), không bọc cả cụm → không lặp bug #01.
+- D3 Chọn chip thay **mọi** điều kiện lá trên cùng trường của nhóm (vd bộ lọc tay `Giá >= 5tr` bị thay khi bấm chip giá); chip chỉ sáng khi mọi nhánh chứa đúng điều kiện của chip. Riêng Lead (spec-validation W1): chip luôn thay điều kiện `status`; chỉ `Mới (chưa giao)` thay thêm `assignedTo`; rời chip này chỉ bỏ `assignedTo exists false` — bộ lọc "Sale phụ trách = X" tay được giữ với chip khác.
+- D4 Mọi nhóm: bấm lại chip đang sáng = bỏ lọc nhóm; Trạng thái / Số PN có thêm chip `Tất cả` như bảng; nhóm giá không có `Tất cả` (theo bảng đã chốt).
+- D5 Điều kiện: `Đang tư vấn` = `status in [contacted, consulting]`; `Mới (chưa giao)` = `status equals new` + `assignedTo exists false`; `3 PN+` = `bedrooms >= 3`; giá theo bảng (`less_than` / `greater_than_equal` / `less_than_equal` / `greater_than`).
+- D6 Xuất Excel lead: mở rộng ánh xạ where → query (client) và parse/build (server) chỉ cho 2 dạng chip mới: `status` "nằm trong" (giá trị thuộc danh sách trạng thái hợp lệ) và `assignedTo` "chưa có" (`exists: false`). Toán tử khác vẫn khoá nút (không over-export PII). Cập nhật `docs/API_SPEC.md` (as-built).
+- D7 Không đổi schema/DB/quyền, không endpoint mới → không migration. Spec MINOR 1.17.0 → 1.18.0.

@@ -32,6 +32,7 @@ import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '.
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
+import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
@@ -78,6 +79,7 @@ export const importMap = {
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
+  "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,

@@ -32,13 +32,18 @@ const andEntries = (branch: Where): Where[] => onlyArrayKey(branch, "and") ?? [b
  * Chuẩn hoá `where` thành các nhánh OR, mỗi nhánh là danh sách điều kiện AND.
  * WhereBuilder của Payload ghi `{ or: [{ and: [...] }, ...] }`; dạng `{ and }` / phẳng là 1 nhánh.
  */
-function toBranches(where: Where | undefined): Where[][] {
+export function toBranches(where: Where | undefined): Where[][] {
   if (!where || Object.keys(where).length === 0) return [];
   const orBranches = onlyArrayKey(where, "or");
   return orBranches ? orBranches.map(andEntries) : [andEntries(where)];
 }
 
 const isOrForm = (where: Where | undefined): boolean => !!where && onlyArrayKey(where, "or") !== undefined;
+
+/** Dựng lại `where` từ các nhánh AND: đầu vào dạng `or` → `{ or: [{ and }] }` (WhereBuilder đọc lại được); các dạng khác → `{ and }` (nhánh đầu). */
+export function rebuildWhere(original: Where | undefined, branches: Where[][]): Where {
+  return isOrForm(original) ? { or: branches.map((and) => ({ and })) } : { and: branches[0] ?? [] };
+}
 
 /** Bộ lọc đang áp (mọi nhánh đều chứa đúng điều kiện của một mục), `""` khi không có. */
 export function currentTranslationFilter(where: Where | undefined): TranslationFilterKey | "" {
@@ -57,7 +62,7 @@ export function withTranslationFilter(where: Where | undefined, key: Translation
     const others = entries.filter((entry) => !isTranslationCondition(entry));
     return key ? [...others, TRANSLATION_FILTERS[key].condition] : others;
   });
-  return isOrForm(where) ? { or: rebuilt.map((and) => ({ and })) } : { and: rebuilt[0] ?? [] };
+  return rebuildWhere(where, rebuilt);
 }
 
 /** Collection CÓ bản dịch (banner dịch lỗi truy vấn theo tập khoá này — không thêm collection không có nhóm `translation`). Chuỗi lấy từ nguồn nhãn admin chung. */
