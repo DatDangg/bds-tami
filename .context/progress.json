@@ -265,6 +265,34 @@
       "round": 3,
       "report": ".context/review-reports/feature-backup-base-image-debian12-phase-1-task-01-round-3-review.md",
       "residual": "Chưa chạy staging/prod (runbook docs/runbooks/postgres-base-image.md, staging trước prod); CI image → BL-014"
+    },
+    {
+      "slug": "ci-postgis-image-bookworm",
+      "title": "CI test DB dùng cùng image Postgres với dev/staging/prod: build docker/backup/Dockerfile target postgis (bookworm, PG 17.11, PostGIS 3.5.2) + docker run thay service postgis/postgis:17-3.5 (BL-014)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-014",
+      "changeDoc": "spec/changes/archive/2026-10-19-ci-postgis-image-bookworm.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-ci-postgis-image-bookworm/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-ci-postgis-image-bookworm-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.10.0",
+      "scopeVersion": 11,
+      "completedAt": "2026-10-19",
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-ci-postgis-image-bookworm-phase-1-task-01-round-1-review.md",
+      "residual": "CI thật chưa chạy trên GitHub runner — cần push để xác nhận (build không cache, vòng chờ, assert phiên bản, pnpm test xanh)"
     }
   ],
   "bugs": [

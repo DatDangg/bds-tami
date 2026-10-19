@@ -17,20 +17,10 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Postgres KHÔNG nằm trong `services:`: DB test phải là CÙNG image với dev/staging/prod (docker/backup/Dockerfile target `postgis`,
+    # base postgres:17.11-bookworm ghim digest + PostGIS 3.5.2, glibc 2.36) mà `services:` chỉ kéo image có sẵn trên registry, không build
+    # được trong job → build + `docker run` ở bước "Build + khởi động Postgres" bên dưới (cùng kiểu SeaweedFS).
     services:
-      postgres:
-        image: postgis/postgis:17-3.5
-        env:
-          POSTGRES_USER: tami
-          POSTGRES_PASSWORD: ci_only_password
-          POSTGRES_DB: tami_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U tami -d tami_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
       redis:
         image: redis:7-alpine
         ports:
@@ -67,6 +57,22 @@ jobs:
         with:
           persist-credentials: false
 
+      # Không publish lên GHCR (image dùng-rồi-bỏ; job chỉ có `contents: read`), không thêm action cache: chấp nhận build không cache (~1–2 phút apt).
+      # Dockerfile đã assert bookworm/glibc 2.36 lúc build; phiên bản PG/PostGIS kiểm ở bước "Kiểm phiên bản DB test" sau khi có extension.
+      - name: Build + khởi động Postgres (cùng image dev/staging/prod)
+        run: |
+          docker build --target postgis -t tami-postgis:ci docker/backup
+          docker run -d --name tami-ci-postgres -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=tami -e POSTGRES_PASSWORD=ci_only_password -e POSTGRES_DB=tami_test \
+            tami-postgis:ci
+          # Entrypoint official chạy server tạm (chỉ socket, không TCP) lúc initdb rồi khởi động lại: chờ bằng kết nối TCP từ host
+          # (psql có sẵn trên ubuntu-latest), không chỉ pg_isready trong container.
+          for i in $(seq 1 60); do
+            psql "$DATABASE_URL_TEST" -Atc 'select 1' >/dev/null 2>&1 && break
+            sleep 2
+          done
+          psql "$DATABASE_URL_TEST" -v ON_ERROR_STOP=1 -Atc 'select 1' >/dev/null
+
       # Phiên bản pnpm lấy từ field `packageManager` trong package.json.
       - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
 
@@ -81,6 +87,19 @@ jobs:
       # Cùng script khởi tạo với Docker dev: postgis, unaccent, pg_trgm (psql có sẵn trên ubuntu-latest).
       - name: Tạo extension Postgres
         run: psql "$DATABASE_URL_TEST" -v ON_ERROR_STOP=1 -f docker/postgres/init.sql
+
+      # Fail-fast nếu DB test trôi về image khác: phiên bản mong đợi đọc từ ARG của Dockerfile (nguồn duy nhất), không lặp hằng số ở đây.
+      - name: Kiểm phiên bản DB test khớp Dockerfile
+        run: |
+          pg_expected="$(sed -nE 's/^ARG POSTGRES_IMAGE=postgres:([0-9]+\.[0-9]+)-.*/\1/p' docker/backup/Dockerfile)"
+          postgis_expected="$(sed -nE 's/^ARG POSTGIS_VERSION=([0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/p' docker/backup/Dockerfile)"
+          test -n "$pg_expected" && test -n "$postgis_expected"
+          pg_actual="$(psql "$DATABASE_URL_TEST" -Atc "select split_part(current_setting('server_version'), ' ', 1)")"
+          postgis_actual="$(psql "$DATABASE_URL_TEST" -Atc 'select postgis_lib_version()')"
+          docker exec tami-ci-postgres sh -c 'grep VERSION_CODENAME /etc/os-release; ldd --version | head -n1'
+          echo "postgres=$pg_actual (Dockerfile $pg_expected) postgis=$postgis_actual (Dockerfile $postgis_expected)"
+          [ "$pg_actual" = "$pg_expected" ] || { echo "PostgreSQL lệch Dockerfile"; exit 1; }
+          [ "$postgis_actual" = "$postgis_expected" ] || { echo "PostGIS lệch Dockerfile"; exit 1; }
 
       # G21: chạy TOÀN BỘ migration đã commit trên một DB PostGIS TRỐNG (DB riêng `tami_migrate`, không đụng `tami_test` của test)
       # để lỗi migration lộ ở CI thay vì lần deploy staging/prod đầu. Thành công = migration tạo schema từ số 0 mà không lỗi.
@@ -139,6 +158,10 @@ jobs:
 
       - name: Test (unit + integration)
         run: pnpm test
+
+      - name: Log Postgres khi lỗi
+        if: failure()
+        run: docker logs --tail 200 tami-ci-postgres || true
 
       - name: Log SeaweedFS khi test lỗi
         if: failure()

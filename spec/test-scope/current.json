@@ -1,80 +1,56 @@
 {
   "specVersion": "1.10.0",
-  "scopeVersion": 10,
-  "generatedAt": "2026-10-19T22:00:00+07:00",
+  "scopeVersion": 11,
+  "generatedAt": "2026-10-19T23:00:00+07:00",
   "trigger": "feature-update",
-  "workItem": "feature/backup-base-image-debian12",
-  "backlog": "BL-002",
+  "workItem": "feature/ci-postgis-image-bookworm",
+  "backlog": "BL-014",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-19-backup-base-image-debian12.md",
+  "changeDoc": "spec/changes/archive/2026-10-19-ci-postgis-image-bookworm.md",
   "task": [
-    "tasks/feature-backup-base-image-debian12/phase-1-task-01.md"
+    "tasks/feature-ci-postgis-image-bookworm/phase-1-task-01.md"
   ],
-  "specUpdate": "spec/updates/2026-10-19-backup-base-image-debian12.md",
+  "specUpdate": null,
   "specRefs": [
-    "NFR-05"
+    "NFR-10"
   ],
   "specRefNotes": {
-    "NFR-05": "Backup ngoài server (pgBackRest + restic), RPO <= 15 phút, RTO <= 4 giờ, diễn tập khôi phục — bổ sung ràng buộc §Hạ tầng: image PostgreSQL/backup chạy Debian 12 bookworm, giữ PG 17 + PostGIS 3.5; đổi base OS trên volume có dữ liệu chỉ theo runbook (REINDEX + REFRESH COLLATION VERSION), diễn tập staging trước prod; deploy không tự đổi image postgres"
+    "NFR-10": "Staging tách biệt production; CI/CD; tài liệu kiến trúc và dữ liệu — không đổi requirement (CI chỉ là công cụ kiểm; SPECIFICATIONS §Hạ tầng/NFR-10 giữ nguyên, spec_version giữ 1.10.0, không spec/updates/, không dòng CHANGELOG). Thay đổi: DB test của CI dùng cùng image Postgres với dev/staging/prod (bookworm, PG 17.11, PostGIS 3.5.2)"
   },
   "changed": {
     "files": [
-      "docker/backup/Dockerfile",
-      "docker/backup/postgis/10_postgis.sh",
-      "docker/backup/postgis/update-postgis.sh",
-      "docker/backup/pgbackrest-env.example",
-      "docker/docker-compose.dev.yml",
-      "docker/docker-compose.staging.yml",
-      "docker/docker-compose.prod.yml",
-      "docker/backup/test/e2e.sh",
-      "docker/backup/test/docker-compose.e2e.yml",
-      "scripts/deploy/deploy.sh",
-      "scripts/deploy/deploy.test.sh",
-      "docs/runbooks/postgres-base-image.md",
-      "docs/runbooks/restore.md",
-      "docs/runbooks/deploy.md",
-      "docs/ARCHITECTURE.md",
-      "SPECIFICATIONS.md"
+      ".github/workflows/ci.yml"
     ],
-    "filesNote": "Danh sách file thật (chốt sau reviewer round 1). Không đổi code app, không migration Payload.",
+    "filesNote": "Danh sách file thật (chốt sau reviewer round 1, NORMAL PASS). Không đổi code app, schema, migration Payload; no doc impact.",
     "modules": [
-      "Image PostgreSQL (target postgis/postgres) — Debian 12 bookworm, PG 17.11, PostGIS 3.5.2",
-      "Sidecar backup (pgBackRest 2.59.1 + restic 0.17.3 + rclone)",
-      "Docker compose dev / staging / prod",
-      "Deploy script (guard đổi image postgres)",
-      "Runbook restore / deploy (quy trình đổi base image)"
+      "CI GitHub Actions — job verify: DB test = image docker/backup/Dockerfile target postgis"
     ]
   },
   "impact": {
     "direct": [
-      "docker build --target postgis / postgres / backup PASS; trong image: VERSION_CODENAME=bookworm, glibc 2.36, postgres 17.x, pg_dump/pg_restore 17.x, pgbackrest 2.59.1, PostGIS 3.5.2, restic 0.17.3, rclone có mặt",
-      "Volume mới khởi tạo bằng image bookworm: extension postgis (+ postgis_topology, fuzzystrmatch, postgis_tiger_geocoder) như image gốc; app tạo được pg_trgm / unaccent",
-      "image_switch_test (e2e.sh): volume tạo bằng postgis/postgis:17-3.5 bullseye (ghim digest) có dữ liệu text tiếng Việt + index btree text + gist → bật image bookworm: số bản ghi + checksum dữ liệu giữ nguyên, có cảnh báo collation version mismatch; sau REINDEX + REFRESH COLLATION VERSION: datcollversion = 2.36, hết cảnh báo, amcheck bt_index_check mọi index btree sạch, postgis_full_version() 3.5.2, truy vấn gist đúng",
-      "deploy.sh: container postgres đang chạy image khác image khai trong compose → die trỏ runbook; không có container nhưng volume <project>_postgres-data đã có → die trừ PG_IMAGE_SWITCH_CONFIRMED=1; không container + không volume (lần đầu) → cho chạy; dry-run không gọi docker; deploy.test.sh PASS",
-      "Runbook có quy trình đổi image cho môi trường có dữ liệu (dừng app → backup → đổi image → REINDEX + REFRESH COLLATION VERSION → amcheck → bật app), thứ tự dev → staging (diễn tập backup/restore) → prod, có điểm rollback"
+      "CI job verify: bỏ service postgis/postgis:17-3.5 (bullseye); build docker/backup/Dockerfile target postgis (tami-postgis:ci) ngay trong job rồi docker run tami-ci-postgres bind 127.0.0.1:5432 với cùng env (tami / tami_test) — env DATABASE_URL* của job không đổi",
+      "Vòng chờ sẵn sàng qua TCP từ host (psql select 1, tối đa 60×2s) + kiểm lại 1 lần ngoài vòng; chịu được giai đoạn server tạm của initdb",
+      "Bước kiểm phiên bản: assert PostgreSQL 17.11 + postgis_lib_version() 3.5.2 đọc từ ARG của docker/backup/Dockerfile (test -n chặn so sánh rỗng); in VERSION_CODENAME=bookworm + glibc 2.36",
+      "init.sql + migrate trên tami_migrate (DB trống) và tami_test PASS; pnpm test xanh trên DB mới",
+      "Lỗi bất kỳ bước → bước 'Log Postgres khi lỗi' in docker logs --tail 200 tami-ci-postgres"
     ],
     "dependents": [
-      "docker compose -f docker/docker-compose.{dev,staging,prod}.yml config -q hợp lệ với tag image mới",
-      "Deploy staging/prod lần đầu sau change: base services redis / seaweedfs / backup vẫn khởi động bình thường"
+      "Deploy staging qua workflow_run phụ thuộc CI xanh — CI đỏ (build image / chờ DB / assert phiên bản) chặn deploy staging"
     ],
     "regression": [
-      "Backup/restore pgBackRest + restic chạy end-to-end trên image mới cho cả đích s3 và sftp (bash docker/backup/test/e2e.sh)",
-      "deploy.sh khởi động base services (postgres, redis, seaweedfs, backup) và các bước deploy khác không đổi",
-      "Dev DB khởi tạo mới: app chạy migrate + seed được, tìm kiếm không dấu (pg_trgm / unaccent) và truy vấn địa lý (PostGIS) hoạt động",
-      "Staging DB sau khi đổi image theo runbook: app đọc/ghi bình thường, sắp xếp/tìm kiếm text tiếng Việt đúng"
+      "Toàn bộ unit + integration test chạy trên PG 17.11 bookworm (glibc 2.36) thay vì PG 17.5 bullseye (glibc 2.31) — sắp xếp/tìm kiếm text tiếng Việt, pg_trgm / unaccent, truy vấn PostGIS phải giữ kết quả",
+      "Các bước CI khác không đổi: service redis, SeaweedFS S3, build, audit; thời gian job tăng ~1–2 phút vẫn trong timeout-minutes 20"
     ]
   },
   "acceptance": [
-    "Mọi Dockerfile/compose trong docker/ không còn base Debian 11; tag/digest/phiên bản gói ghim cụ thể; build assert bookworm/glibc 2.36",
-    "PG server 17 + PostGIS 3.5.2; pg_dump/pg_restore/pgbackrest trong image cùng major 17",
-    "docker build target postgis/postgres/backup PASS",
-    "bash docker/backup/test/e2e.sh (s3 + sftp) PASS trên image mới, gồm image_switch_test bullseye→bookworm có REINDEX/refresh collation/amcheck",
-    "Guard deploy chặn đổi image postgres tự động; bash scripts/deploy/deploy.test.sh PASS",
-    "Runbook: quy trình chuyển image cho môi trường có dữ liệu + bắt buộc diễn tập backup/restore trên staging trước prod; không deploy",
-    "Không đụng volume dev tami-postgres-data/container dev; dọn container/volume/image tạm của e2e"
+    "ci.yml không còn postgis/postgis / image bullseye; DB test CI = image build từ docker/backup/Dockerfile target postgis (PG 17.11, PostGIS 3.5.2, bookworm glibc 2.36)",
+    "Mọi bước sau (init.sql, migrate tami_migrate + tami_test, test, build) dùng DB đó qua 127.0.0.1:5432 không đổi env",
+    "YAML hợp lệ; không thêm action bên thứ ba (action mới nếu có phải ghim SHA)",
+    "Mô phỏng cục bộ build target postgis → docker run → vòng chờ → init.sql → kiểm phiên bản → payload migrate trên DB trống PASS; dọn container/image tạm",
+    "Không đụng container/volume dev (tami-postgres, tami-postgres-data) và không đổi DB thật"
   ],
   "viewports": [],
   "uiTests": false,
-  "risk": "high",
-  "riskNote": "Đổi glibc 2.31 → 2.36 đổi collation en_US.utf8: index btree text cũ có thể sai thứ tự nếu không REINDEX + REFRESH COLLATION VERSION. Không migration Payload, không đổi volume/dữ liệu thật; deploy staging/prod và kiểm thử thật trên staging là bước người vận hành, chỉ khi user yêu cầu rõ. Không có test UI."
+  "risk": "low",
+  "riskNote": "Chỉ đổi pipeline CI (DB test dùng rồi bỏ); không code app, không schema/migration, không dữ liệu thật. Residual: CI thật chưa chạy — cần push để xác nhận (build không cache trên ubuntu-latest cần mạng tới apt-archive.postgresql.org). Không có test UI."
 }
