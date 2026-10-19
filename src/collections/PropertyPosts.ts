@@ -54,7 +54,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
       labels: collectionLabels("property-posts"),
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "category", "status", "publishedAt", "author"],
+        defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
         description: "Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.",
       },
       defaultSort: "-publishedAt",
@@ -69,6 +69,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
           relationTo: "media",
           filterOptions: { mimeType: { contains: "image/" } },
           validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin đăng."),
+          admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
         },
         { name: "gallery", type: "upload", label: "Thư viện ảnh", relationTo: "media", hasMany: true, filterOptions: { mimeType: { contains: "image/" } } },
         { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },

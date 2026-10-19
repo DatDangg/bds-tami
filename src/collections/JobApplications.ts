@@ -102,7 +102,7 @@ export const JobApplications: CollectionConfig = {
       index: true,
       defaultValue: "new",
       options: APPLICATION_STATUSES.map((value) => ({ label: APPLICATION_STATUS_LABELS[value], value })),
-      admin: { position: "sidebar" },
+      admin: { position: "sidebar", components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
     },
     { name: "note", type: "textarea", label: "Ghi chú nội bộ", maxLength: 2000, admin: { description: "Ghi chú nội bộ, ứng viên không thấy." } },
     { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },

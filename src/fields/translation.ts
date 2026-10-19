@@ -4,6 +4,9 @@ import { denyAll } from "../access";
 
 const readOnlyForEveryone = { create: denyAll, update: denyAll };
 
+/** Giá trị `translation.status` (nguồn cho select và test status-tones). */
+export const TRANSLATION_STATUSES = ["none", "queued", "done", "failed", "pending_review"] as const;
+
 const TRANSLATION_STATUS_LABELS: Record<string, string> = {
   none: "Chưa dịch",
   queued: "Đang chờ dịch",
@@ -52,8 +55,9 @@ export function translationGroup(): GroupField {
         label: "Trạng thái dịch",
         index: true,
         defaultValue: "none",
-        options: options(["none", "queued", "done", "failed", "pending_review"], TRANSLATION_STATUS_LABELS),
+        options: options(TRANSLATION_STATUSES, TRANSLATION_STATUS_LABELS),
         hooks: { beforeDuplicate: [resetOnDuplicate("none")] },
+        admin: { components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
       },
       { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       { name: "viChangedAfterManual", type: "checkbox", label: "Bản Việt đã đổi sau khi sửa tay bản Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },

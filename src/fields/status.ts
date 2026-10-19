@@ -23,6 +23,6 @@ export function statusField(values: readonly ContentStatus[] = CONTENT_STATUSES)
     index: true,
     defaultValue: "draft",
     options: values.map((value) => ({ label: LABELS[value], value })),
-    admin: { position: "sidebar" },
+    admin: { position: "sidebar", components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
   };
 }

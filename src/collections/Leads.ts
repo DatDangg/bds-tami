@@ -92,7 +92,7 @@ const statusFields: Field[] = [
     index: true,
     defaultValue: "new",
     options: selectOptions(LEAD_STATUSES, STATUS_LABELS),
-    admin: { position: "sidebar" },
+    admin: { position: "sidebar", components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
   },
   {
     name: "lostReason",
@@ -130,7 +130,7 @@ const assignmentFields: Field[] = [
     access: { create: isAdmin, update: isAdmin },
     filterOptions: { role: { equals: ROLES.sale }, active: { equals: true } },
     validate: validateAssignee,
-    admin: { position: "sidebar" },
+    admin: { position: "sidebar", components: { Cell: "/components/admin/AssigneeCell#AssigneeCell" } },
   },
   { name: "assignedAt", type: "date", label: "Giao lúc", access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar", date: dateTimeInAdmin } },
   {
@@ -186,7 +186,7 @@ export const Leads: CollectionConfig = {
   labels: collectionLabels("leads"),
   admin: {
     useAsTitle: "code",
-    defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "assigneeInactive", "createdAt"],
+    defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "createdAt"],
     listSearchableFields: ["code", "fullName"],
     description: "Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.",
     // Nút xuất Excel theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.

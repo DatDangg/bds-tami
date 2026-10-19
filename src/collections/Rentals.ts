@@ -122,7 +122,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       labels: collectionLabels("rentals"),
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["code", "title", "category", "priceMonthlyVnd", "status", "author"],
+        defaultColumns: ["gallery", "code", "title", "category", "priceMonthlyVnd", "status", "author"],
         description: "Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.",
       },
       defaultSort: "-publishedAt",
@@ -169,7 +169,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
           hasMany: true,
           filterOptions: { mimeType: { contains: "image/" } },
           validate: validateGallery,
-          admin: { description: "Ảnh đầu tiên là ảnh đại diện của tin." },
+          admin: { description: "Ảnh đầu tiên là ảnh đại diện của tin.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
         },
         { name: "videoUrl", type: "text", label: "Link video (YouTube/TikTok)", validate: validateVideoUrl },
         { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },

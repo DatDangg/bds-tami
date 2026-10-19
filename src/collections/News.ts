@@ -20,7 +20,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
       labels: collectionLabels("news"),
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "category", "status", "publishedAt", "author"],
+        defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
         description: "Bài viết tin tức, kiến thức thị trường; không thu lead.",
       },
       defaultSort: "-publishedAt",
@@ -35,6 +35,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
           filterOptions: { mimeType: { contains: "image/" } },
           // Ảnh bìa là ảnh thẻ trong danh sách và hero bài viết (ERD §4.8): bắt buộc khi xuất bản.
           validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin tức."),
+          admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
         },
         { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
         { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
