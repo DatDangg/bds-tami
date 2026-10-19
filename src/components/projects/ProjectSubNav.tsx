@@ -10,8 +10,8 @@ export interface SubNavItem {
   label: string;
 }
 
-// Vạch "đang xem": khối đầu tiên (theo thứ tự trang) đang chiếm dải từ ngay dưới header + thanh mục con tới 55% chiều cao viewport.
-const OBSERVER_MARGIN = "-130px 0px -45% 0px";
+// Vạch "đang xem": khối đầu tiên (theo thứ tự trang) đang chiếm dải từ ngay dưới header nổi + thanh mục con tới 55% chiều cao viewport. rootMargin không dùng được var(): lấy mức lớn hơn vài px so với scroll-margin lớn nhất (≥ lg: 104 + 56 = 160px) để khối vừa cuộn tới neo luôn nằm trong dải.
+const OBSERVER_MARGIN = "-168px 0px -45% 0px";
 // Sau khi bấm một mục, cuộn mượt đi ngang nhiều khối: bỏ qua kết quả quan sát trong lúc cuộn để mục vừa bấm không bị khối ở giữa chiếm (và để
 // khối đứng cạnh nhau ở desktop như Pháp lý / Chính sách vẫn chọn được mục thứ hai: theo thứ tự trang, mục đầu luôn thắng khi cả hai cùng hiện).
 const SCROLL_LOCK_MS = 1000;
@@ -80,7 +80,7 @@ export function ProjectSubNav({ items }: { items: SubNavItem[] }) {
   }
 
   return (
-    <nav aria-label={t("subNavLabel")} className="sticky top-16 z-(--z-sticky) border-b border-border bg-surface lg:top-18 print:hidden">
+    <nav aria-label={t("subNavLabel")} className="sticky top-(--header-offset) z-(--z-sticky) border-b border-border bg-surface print:hidden">
       <ul ref={listRef} className="relative mx-auto flex w-full max-w-container overflow-x-auto px-gutter whitespace-nowrap [scrollbar-width:none]">
         {items.map((item) => {
           const current = item.id === activeId;

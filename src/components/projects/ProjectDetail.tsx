@@ -91,7 +91,7 @@ export function ProjectDetail({ doc, view, related, hotline, ownPath }: ProjectD
       <Documents documents={view.documents} />
       <div className="bg-bg py-section-tight">
         <div className="mx-auto w-full max-w-container px-gutter">
-          <LeadFormSlot title={t("leadForm.title")} className="scroll-mt-30 lg:scroll-mt-32">
+          <LeadFormSlot title={t("leadForm.title")} className="scroll-mt-[calc(var(--header-offset)+3.5rem)]">
             <div className="flex flex-col gap-4">
               <LeadForm source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
               {hotline && (

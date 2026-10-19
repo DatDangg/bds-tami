@@ -117,11 +117,11 @@ describe("HomeBlocks: nội dung khối", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("TAMI HOMES");
   });
 
-  it("hero là mốc để header trong suốt đè lên (data-header-hero) và kéo lên dưới header", () => {
+  it("hero kéo lên dưới header nổi bằng đúng khoảng header chiếm (--header-offset)", () => {
     renderHome(homepage());
     const hero = screen.getByRole("region", { name: "Nổi bật" });
-    expect(hero).toHaveAttribute("data-header-hero");
-    expect(hero).toHaveClass("-mt-16", "h-svh");
+    expect(hero).not.toHaveAttribute("data-header-hero");
+    expect(hero).toHaveClass("-mt-(--header-offset)", "h-svh");
   });
 });
 

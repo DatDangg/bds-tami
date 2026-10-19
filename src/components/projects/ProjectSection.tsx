@@ -20,13 +20,13 @@ interface ProjectSectionProps {
 }
 
 /**
- * Khung một khối của trang chi tiết dự án: `section[aria-labelledby]` + `h2` + nền theo nhịp xen kẽ. `scroll-mt` = header (64/72px) +
+ * Khung một khối của trang chi tiết dự án: `section[aria-labelledby]` + `h2` + nền theo nhịp xen kẽ. `scroll-mt` = `--header-offset` (header nổi, 80/104px) +
  * thanh mục con dính (~52px) để tiêu đề không bị che khi cuộn tới; `tabIndex={-1}` để thanh mục con chuyển focus vào khối được chọn.
  */
 export function ProjectSection({ id, title, tone = "default", children }: ProjectSectionProps) {
   const headingId = useId();
   return (
-    <section id={id} tabIndex={-1} aria-labelledby={headingId} className={cn("scroll-mt-30 py-section-tight focus:outline-none lg:scroll-mt-32", TONE_CLASS[tone])}>
+    <section id={id} tabIndex={-1} aria-labelledby={headingId} className={cn("scroll-mt-[calc(var(--header-offset)+3.5rem)] py-section-tight focus:outline-none", TONE_CLASS[tone])}>
       <div className="mx-auto w-full max-w-container px-gutter">
         <h2 id={headingId} className="mb-8 font-display text-h2">
           {title}

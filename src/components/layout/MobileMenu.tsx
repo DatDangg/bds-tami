@@ -42,7 +42,7 @@ export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-small font-semibold tracking-[0.08em] text-text uppercase xl:hidden">
+      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-full px-3 text-small font-semibold tracking-[0.08em] text-text uppercase xl:hidden">
         <List size={24} aria-hidden="true" />
         {/* Có CTA: ở md–lg cụm phải (VI|EN + CTA + Menu) phải ≤ nửa hàng để logo vẫn ở giữa → chỉ icon, nhãn sr-only. */}
         <span className={cn("hidden sm:inline", cta && "md:hidden lg:inline")}>{t("header.menu")}</span>

@@ -179,7 +179,7 @@ Nhịp: khoảng trên tiêu đề lớn hơn khoảng dưới (heading `mb-4`/`
 
 ## 4. Radius (Shape Lock)
 
-Hệ góc **vuông kiến trúc**, một quy tắc duy nhất cho toàn site:
+Thang bo góc (BL-020): vuông ở khối lớn (hero/section), **12/16/20px** cho dropdown/panel/thẻ, **viên thuốc** cho nút/badge/header nổi:
 
 | Token | Giá trị | Áp cho |
 |---|---|---|

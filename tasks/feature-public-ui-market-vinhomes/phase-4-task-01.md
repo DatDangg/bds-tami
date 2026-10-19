@@ -18,3 +18,6 @@ MODIFY UI · NORMAL.
 ## Acceptance
 - [ ] Thẻ tư vấn dính ≥ lg, không che nội dung; lead vẫn gửi `source=project`
 
+
+## Carry-over từ P1-T02 (reviewer r1)
+- m-4: khe trong suốt (8px / lg 16px) giữa header nổi và ProjectSubNav dính (`top: var(--header-offset)`) — khi restyle menu neo dạng viên thuốc, quyết định giữ khe (kiểu thanh nổi) hay đặt `top: calc(var(--header-offset) - <lề dưới>)` + chỉnh scroll-margin/OBSERVER_MARGIN.

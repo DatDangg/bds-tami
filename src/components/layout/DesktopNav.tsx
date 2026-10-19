@@ -62,7 +62,7 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
               <NavAnchor
                 link={item}
                 aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
-                className="inline-flex min-h-11 items-center border-b-2 border-transparent text-small font-semibold tracking-[0.08em] whitespace-nowrap text-text uppercase hover:text-accent-text aria-[current=page]:border-accent-text"
+                className="inline-flex min-h-11 items-center border-b-2 border-transparent text-small font-semibold tracking-[0.08em] whitespace-nowrap text-text uppercase hover:border-text/40 aria-[current=page]:border-text"
               />
               {hasChildren && (
                 <>
@@ -79,17 +79,17 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
                       lastPointerType.current = "";
                       setOpenKey(isOpen && !keepOpen ? null : key);
                     }}
-                    className="inline-flex size-11 cursor-pointer items-center justify-center rounded-sm text-text hover:text-accent-text"
+                    className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-text hover:bg-text/10"
                   >
                     <CaretDown size={16} aria-hidden="true" className={cn("transition-transform duration-(--duration-fast)", isOpen && "rotate-180")} />
                   </button>
-                  <ul id={submenuId} hidden={!isOpen} className="absolute top-full left-0 z-(--z-header) min-w-48 bg-surface py-2 shadow-md">
+                  <ul id={submenuId} hidden={!isOpen} className="absolute top-full left-0 z-(--z-header) mt-4 min-w-48 rounded-lg bg-surface py-2 shadow-md before:absolute before:inset-x-0 before:-top-4 before:h-4 before:content-['']">
                     {item.children.map((child) => (
                       <li key={child.href + child.label}>
                         <NavAnchor
                           link={child}
                           onClick={() => setOpenKey(null)}
-                          className="flex min-h-11 items-center px-4 text-small text-text hover:bg-surface-muted hover:text-accent-text"
+                          className="flex min-h-11 items-center px-4 text-small text-text hover:bg-surface-muted"
                         />
                       </li>
                     ))}

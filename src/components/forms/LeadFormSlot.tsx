@@ -22,7 +22,7 @@ interface LeadFormSlotProps {
 export function LeadFormSlot({ title, children, fallback, className, id = "lead-form" }: LeadFormSlotProps) {
   const headingId = useId();
   return (
-    <section id={id} aria-labelledby={headingId} className={cn("scroll-mt-24 rounded-sm bg-primary-subtle p-6 lg:p-8", className)}>
+    <section id={id} aria-labelledby={headingId} className={cn("scroll-mt-[calc(var(--header-offset)+1rem)] rounded-sm bg-primary-subtle p-6 lg:p-8", className)}>
       <h2 id={headingId} className="mb-4 font-display text-h2-sm">
         {title}
       </h2>

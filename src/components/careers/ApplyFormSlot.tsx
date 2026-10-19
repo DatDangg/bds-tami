@@ -22,7 +22,7 @@ export function ApplyFormSlot({ children, email, hotline }: ApplyFormSlotProps) 
   const tCareers = useTranslations("page.careers");
   const hasContact = Boolean(email || hotline);
   return (
-    <LeadFormSlot id={APPLY_FORM_DOM_ID} title={t("title")} className="scroll-mt-30 lg:scroll-mt-32">
+    <LeadFormSlot id={APPLY_FORM_DOM_ID} title={t("title")} className="scroll-mt-[calc(var(--header-offset)+1rem)]">
       <div className="flex flex-col gap-3">
         {children ?? <p className="max-w-[60ch] text-body text-text-secondary">{t("fallback")}</p>}
         {children && hasContact && <p className="mt-2 border-t border-border pt-4 text-small text-text-secondary">{t("orContact")}</p>}

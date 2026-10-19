@@ -154,6 +154,15 @@ describe("kính mờ sáng của header (BL-020)", () => {
     expect(contrast(light("--color-text"), glassOver(backdrop))).toBeGreaterThanOrEqual(TEXT);
   });
 
+  it("kính chỉ trong @supports backdrop-filter, giảm trong suốt/không hỗ trợ → nền đặc; vòng focus của header dùng màu chữ", () => {
+    const bar = css.slice(css.indexOf(".site-header-bar {"));
+    const flat = bar.replace(/\s+/g, " ");
+    expect(flat).toContain(".site-header-bar { background-color: var(--color-surface); }");
+    expect(flat).toContain("@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .site-header-bar { background-color: var(--color-glass);");
+    expect(flat).toContain("@media (prefers-reduced-transparency: reduce) { .site-header-bar { background-color: var(--color-surface);");
+    expect(flat).toContain(".site-header-bar :focus-visible { outline-color: var(--color-text); }");
+  });
+
   it("khai báo token kính và gradient", () => {
     expect(css).toMatch(/--blur-glass:\s*24px;/);
     expect(css).toMatch(/--gradient-gold:\s*linear-gradient\(/);

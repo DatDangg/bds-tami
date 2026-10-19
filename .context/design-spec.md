@@ -77,14 +77,14 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 | Thuộc tính | Spec |
 |---|---|
-| Biến thể | **Trong suốt** (trang có hero ảnh: trang chủ, chi tiết dự án, dịch vụ): nền trong suốt + gradient đen 40% → 0 phía trên, logo trắng, icon trắng. **Đặc**: nền `--color-surface`, `--shadow-sm`, logo vàng (BL-018). Chuyển sang Đặc khi hero ra khỏi viewport (IntersectionObserver trên sentinel), transition `--duration-base` |
-| Trang không có hero | Luôn Đặc |
-| Cao | 64px (< lg) · 72px (≥ lg) |
+| Biến thể | **Một biến thể duy nhất (BL-020)**: thanh **nổi** bo tròn `--radius-pill`, nền kính mờ SÁNG `--color-glass` (kem ~80%) + `backdrop-filter: blur(--blur-glass 24px)`, `--shadow-md`; cả trên hero (ảnh hiện xung quanh thanh) lẫn trang không hero — bỏ biến thể trong suốt/đặc-khi-cuộn cũ (không còn IntersectionObserver/`data-solid`). Logo vàng (BL-018) + chữ/icon `--color-text` luôn đạt ≥ 4.5:1 (10.83:1 khi nền sau kính là đen, 17.55:1 khi trắng). Fallback: trình duyệt không có `backdrop-filter` (`@supports`) hoặc `prefers-reduced-transparency: reduce` → nền đặc `--color-surface`. Vòng focus trong thanh dùng màu `--color-text` (focus-ring mặc định chỉ ~3.0:1 trên kính/nền đen) |
+| Trang không có hero | Cùng một thanh nổi; `<header>` nằm trong luồng chiếm `--header-offset` (lề + thanh: 8+64+8 = 80px; ≥ lg 16+72+16 = 104px) nên nội dung không bị che và không CLS. Hero kéo lên bằng `-mt-(--header-offset)` để ảnh nằm dưới thanh |
+| Cao / lề | Thanh 64px (< lg) · 72px (≥ lg); cách mép trên/hai bên 8px (< lg) · 16px (≥ lg); rộng tối đa 84rem, căn giữa; đệm ngang trong thanh 12/20/24px (< md / md / lg), xl 20px |
 | Bố cục < xl | Trái: nút Tìm kiếm (icon kính lúp). Giữa: logo. Phải: `VI \| EN` (ẩn < sm, khi đó nằm trong menu) + nút Menu (icon 3 gạch, nhãn "Menu") mở menu toàn màn hình §2.2. Nút Menu **chỉ có ở < xl** (BL-019) |
 | Bố cục ≥ xl | **Một hàng** (user quyết 2026-10-19, BL-001; bỏ nút Menu BL-019): logo trái · menu ngang giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ, chữ `--text-small` 600 in hoa `0.08em`) · phải: nút Tìm kiếm, `VI | EN`, nút CTA (nếu bật). **Không có nút Menu** (như vinhomes.vn desktop: menu ngang là điều hướng duy nhất, không trùng menu toàn màn hình). Cao 72px như ≥ lg, không còn hàng 2. Mục có con: dropdown khi hover/focus/Enter, `aria-expanded`. Menu ngang không xuống dòng, không tràn ở 1280px (VI và EN) |
-| Mục đang xem | Gạch chân 2px `--color-primary` (header trong suốt) / `--color-accent-text` (header đặc), `aria-current="page"` |
-| Sticky | Có, `position: sticky; top: 0; z: --z-header` |
-| Logo | Lấy từ `site-settings.logo` (bản cho nền sáng: header đặc) và `site-settings.logoDark` (bản cho nền tối: header trong suốt trên hero, menu toàn màn hình, footer). Thiếu bản nào → dùng logo tĩnh mặc định cho bản đó (`/brand/tami-logo-gold.png` / `/brand/tami-logo-white.png`; BL-018) |
+| Mục đang xem | Gạch chân 2px `--color-text`, `aria-current="page"` (không dùng màu accent: accent-text trên kính nền đen chỉ ~3:1). Hover mục: gạch chân `--color-text` 40%; hover icon: nền `--color-text` 10% (không đổi màu chữ) |
+| Sticky | Có, `position: sticky; top: 0; z: --z-header`; vùng lề trong suốt `pointer-events: none` (chỉ thanh nhận chuột). Thanh phụ dính dưới header (ProjectSubNav, bộ lọc Cho thuê mobile) dùng `top: var(--header-offset)`; mọi đích neo dùng `scroll-margin-top` = `--header-offset` + 1rem (+ 3.5rem nếu có thanh mục con dính) |
+| Logo | Chỉ bản cho nền sáng (`site-settings.logo`, mặc định `/brand/tami-logo-gold.png`; BL-018) vì kính luôn sáng; `site-settings.logoDark` vẫn dùng cho menu toàn màn hình + footer. Logo là nhãn hiệu nên miễn tỉ lệ 4.5:1 (WCAG 1.4.3) |
 | Nút CTA | Từ global `header.ctaButton`: "bật" = có cả `label` ở ngôn ngữ đang xem và `link` hợp lệ → hiện nút CTA (nút chính cỡ nhỏ) ở cụm phải header (≥ md) và trong menu toàn màn hình; thiếu nhãn ở ngôn ngữ đang xem (vd chưa có bản EN) hoặc thiếu link → ẩn, không mượn chữ ngôn ngữ kia (BR-07) |
 
 **Tìm kiếm (D7):** bấm icon mở thanh tìm (Sheet trên xuống, cao 160px desktop / toàn màn mobile): ô `q` (label ẩn trực quan "Tìm tin cho thuê / Search rentals"), gợi ý tĩnh 4 danh mục Cho thuê dạng chip. Enter → `/cho-thue?q=` · `/en/for-rent?q=`. Không autocomplete (ngoài phạm vi).
@@ -123,7 +123,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 ### 2.7. Page banner (đầu trang danh sách)
 - Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)`, ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
 - Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` (viết thường, không còn chữ chìm), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
-- Header trên trang có banner ảnh: biến thể Trong suốt.
+- Header trên trang có banner ảnh: vẫn là thanh nổi kính mờ sáng §2.1 (không còn biến thể trong suốt).
 
 ---
 
@@ -236,7 +236,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 7 section → 6 layout family khác nhau; eyebrow 1/3 cho phép; 1 khối tối nội dung (CTA) + footer: đúng ngoại lệ tokens §0.
 
 **1. Hero** (`homepage.hero.slides`, 1-8)
-- Cao `100svh` (tối thiểu 560px, tối đa 1080px), header Trong suốt đè lên.
+- Cao `100svh` (tối thiểu 560px, tối đa 1080px), thanh header nổi kính mờ sáng đè lên (hero kéo lên `-mt-(--header-offset)`, nội dung hero đệm trên `--header-offset`).
 - Ảnh `object-cover` + scrim (tokens §9); slide có video (đề xuất §6.1) phát `muted loop playsinline` chỉ khi ≥ lg, không reduced-motion, không Save-Data; còn lại hiện ảnh (= poster, cũng là ảnh LCP).
 - Chữ căn giữa, `max-width: 22ch` cho tiêu đề: `title` (`--text-display`, ≤ 2 dòng desktop), `subtitle` (`--text-lead`, ≤ 20 từ, `#FFFFFF` opacity 0.85 trên scrim), nút Primary `ctaLabel` → `ctaLink`. Tối đa 3 phần tử chữ.
 - Chữ slide hiện dần (trượt 24px + opacity, `--duration-reveal`) khi slide vào; ảnh chuyển crossfade 700ms.

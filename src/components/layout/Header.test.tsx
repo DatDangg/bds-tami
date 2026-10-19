@@ -42,6 +42,13 @@ describe("Header: khung và landmark", () => {
     expect(screen.getByRole("link", { name: "TAMI, về trang chủ" })).toHaveAttribute("href", "/");
   });
 
+  it("thanh nổi: vùng chứa bo viên thuốc, hàng cao 64px (72px từ lg), đệm ngang thu theo breakpoint", () => {
+    renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
+    const bar = screen.getByRole("banner").firstElementChild;
+    expect(bar).toHaveClass("site-header-bar", "rounded-pill");
+    expect(bar?.firstElementChild).toHaveClass("h-16", "lg:h-18");
+  });
+
   it("EN: tìm kiếm dẫn tới /en/for-rent?q=", () => {
     renderIntl(<Header items={fixedMenuItems("en", en.layout.nav.items)} contact={{}} logo={noLogo} />, "en");
     expect(screen.getByRole("link", { name: "Search rentals" })).toHaveAttribute("href", "/en/for-rent?q=");
@@ -58,21 +65,21 @@ describe("Header: khung và landmark", () => {
     expect(menuTrigger().innerHTML).not.toMatch(/\b2xl:/);
   });
 
-  it("logo: không có trong CMS thì dùng file tĩnh (vàng cho header đặc, trắng cho header trong suốt); có thì dùng URL từ site-settings", () => {
+  it("logo: không có trong CMS thì dùng file tĩnh (chỉ bản vàng cho nền sáng: kính luôn sáng, không còn logo trắng ở header); có thì dùng URL từ site-settings", () => {
     const { unmount } = renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
     const home = screen.getByRole("link", { name: "TAMI, về trang chủ" });
     // Logo tĩnh vẫn qua trình tối ưu ảnh của Next (`/_next/image?url=...`), như trước BL-001.
     const staticSources = within(home)
       .getAllByRole("presentation")
       .map((img) => new URLSearchParams(img.getAttribute("src")?.split("?")[1]).get("url"));
-    expect(staticSources).toEqual(["/brand/tami-logo-gold.png", "/brand/tami-logo-white.png"]);
+    expect(staticSources).toEqual(["/brand/tami-logo-gold.png"]);
     unmount();
 
     renderIntl(<Header items={viItems} contact={contact} logo={cmsLogo} />);
     const cmsSources = within(screen.getByRole("link", { name: "TAMI, về trang chủ" }))
       .getAllByRole("presentation")
       .map((img) => img.getAttribute("src"));
-    expect(cmsSources).toEqual(["/api/media/file/logo-dark.webp", "/api/media/file/logo-white.webp"]);
+    expect(cmsSources).toEqual(["/api/media/file/logo-dark.webp"]);
     // Logo CMS quá ngang bị chặn rộng (giữ tỉ lệ, neo trái) để không đè menu ở 1280.
     for (const img of within(screen.getByRole("link", { name: "TAMI, về trang chủ" })).getAllByRole("presentation")) {
       expect(img).toHaveClass("max-w-[7.5rem]", "xl:max-w-[6rem]", "object-contain", "object-left");

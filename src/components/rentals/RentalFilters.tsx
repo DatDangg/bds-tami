@@ -44,7 +44,7 @@ export function RentalFilters({ filters, options, focusSearch = false, fixedCate
 
   return (
     <>
-      <div role="group" aria-label={t("filtersLabel")} className="sticky top-16 z-(--z-sticky) -mx-gutter flex items-end gap-2 border-b border-border bg-surface px-gutter py-2 lg:hidden">
+      <div role="group" aria-label={t("filtersLabel")} className="sticky top-(--header-offset) z-(--z-sticky) -mx-gutter flex items-end gap-2 border-b border-border bg-surface px-gutter py-2 lg:hidden">
         <div className="flex min-w-0 flex-1 flex-col">
           <label htmlFor="rental-bar-q" className="sr-only">
             {t("fields.q")}

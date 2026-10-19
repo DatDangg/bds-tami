@@ -34,7 +34,7 @@ export function TableOfContents({ headings }: { headings: SectionHeading[] }) {
         </nav>
       </details>
       <aside className="hidden xl:block print:hidden">
-        <nav aria-label={t("tocTitle")} className="sticky top-24 flex flex-col gap-2">
+        <nav aria-label={t("tocTitle")} className="sticky top-[calc(var(--header-offset)+1rem)] flex flex-col gap-2">
           <p className="font-semibold">{t("tocTitle")}</p>
           <Links headings={headings} />
         </nav>

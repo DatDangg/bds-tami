@@ -155,7 +155,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 |---|---|---|
 | `assets/brand/source/tami-homes-logo.ai` | **Bản gốc vector** (Illustrator, tương thích PDF) | Nguồn để xuất SVG / mọi kích thước khác |
 | `assets/brand/tami-logo-gold.png` | Vàng gradient, nền trong suốt | **Logo chính**: header nền sáng, trang chủ, ảnh chia sẻ (OG), email |
-| `assets/brand/tami-logo-white.png` | Trắng, nền trong suốt | Header đè lên ảnh hero, section tối, footer (`--color-dark`) |
+| `assets/brand/tami-logo-white.png` | Trắng, nền trong suốt | Section tối, menu toàn màn hình, footer (không còn dùng ở header từ BL-020: header luôn kính sáng) (`--color-dark`) |
 | `assets/brand/tami-logo-dark.png` | Đen, nền trong suốt | Chỉ dùng cho in ấn / dự phòng (không dùng ở header web từ BL-018) |
 | `assets/brand/tami-logo-gray.png` | Xám, nền trong suốt | Dự phòng (văn bản, in ấn), hạn chế dùng trên web |
 
@@ -190,7 +190,8 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 | Display XL | EB Garamond | `clamp(32px, 1.3rem + 3.2vw, 60px)` (60px desktop) | 400 | Viết thường, letter-spacing 0 | Câu chính trên hero |
 | Heading 1 | EB Garamond | `clamp(30px, 1.2rem + 2.9vw, 56px)` (56px desktop) | 400 | Viết thường | Tiêu đề trang |
 | Heading 2 | EB Garamond | `clamp(26px, 1.15rem + 2vw, 44px)` (44px desktop) | 400 | Viết thường | Tiêu đề section/khối |
-| Heading 3 | EB Garamond | 22–25px | 400 | Thường | Tên thẻ (dự án, dịch vụ), tên dự án trên slider, heading phụ trong nội dung |
+| Heading 3 | EB Garamond | 22–25px | 400 | Thường | Tên thẻ (dự án, dịch vụ), tên dự án trên slider |
+| Heading 2 phụ (`--text-h2-sm`) | EB Garamond | 24 → 30px | 400 | Thường | Heading phụ trong nội dung/trang chi tiết (RichText, JobDetail, RentalDetail, form tư vấn, liên hệ) — nhỏ hơn Heading 2 (44px) để không phình |
 | Eyebrow | Montserrat | 12–13px | 600 | IN HOA, letter-spacing 0.12em, `--color-accent-text` | Nhãn nhỏ trên tiêu đề ("KHU ĐÔ THỊ", "DỰ ÁN") |
 | Body | Montserrat | 15–16px, line-height 1.7 | 400 | Thường | Nội dung |
 | Small | Montserrat | 14px | 400 | Thường | Nhãn, chú thích |
@@ -254,7 +255,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo vàng) | Theo vinhomes.vn. **Mobile/tablet < 1280px:** **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. **Desktop ≥ 1280px:** một hàng logo trái · menu ngang (mục con dạng dropdown) · tìm kiếm · VI / EN · nút CTA (nếu bật); **không có nút menu** (vinhomes.vn desktop cũng không có, BL-019) |
+| Header | **Một biến thể (BL-020):** thanh nổi bo viên thuốc, kính mờ sáng (`--color-glass` + blur 24px), logo vàng, chữ `--color-text` | Theo market (vinhomes.vn). Thanh cách mép 8px (16px ≥ lg), cao 64px (72px ≥ lg), dính đầu trang, luôn là thanh nổi kể cả trên hero (không còn biến thể trong suốt, không JS/observer). `<header>` chiếm `--header-offset` (80px; ≥ lg 104px) trong luồng → không che nội dung/CLS; thanh dính phụ và neo dùng biến này. Không hỗ trợ `backdrop-filter` / `prefers-reduced-transparency` → nền đặc. Trên kính chỉ dùng `--color-text` (accent-text ~3:1 trên nền đen): mục đang xem gạch chân, không đổi màu. Vòng focus trong thanh = màu chữ. **Mobile/tablet < 1280px:** **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. **Desktop ≥ 1280px:** một hàng logo trái · menu ngang (mục con dạng dropdown) · tìm kiếm · VI / EN · nút CTA (nếu bật); **không có nút menu** (vinhomes.vn desktop cũng không có, BL-019) |
 | Menu toàn màn hình | — | Chỉ ở < 1280px, mở từ nút menu: phủ toàn màn hình nền tối, mục menu chữ lớn, mục con xổ ra; cuối có hotline + mạng xã hội |
 | Language Switcher | Chữ `VI | EN` · trong menu toàn màn hình | Chuyển sang **đúng trang tương ứng** ở ngôn ngữ kia; nếu trang đó chưa có bản dịch thì về trang danh sách / trang chủ của ngôn ngữ kia. Có `hreflang`, `aria-label`, ghi nhớ lựa chọn bằng cookie `NEXT_LOCALE` |
 | Section Heading | Có/không chữ chìm · căn giữa/căn trái | Eyebrow + tiêu đề serif in hoa + mô tả ngắn; chữ chìm to mờ phía sau |

@@ -107,8 +107,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
     <section
       aria-roledescription="carousel"
       aria-label={t("region")}
-      data-header-hero=""
-      className="theme-dark-block relative isolate -mt-16 h-svh max-h-[1080px] min-h-[560px] overflow-hidden lg:-mt-18"
+      className="theme-dark-block relative isolate -mt-(--header-offset) h-svh max-h-[1080px] min-h-[560px] overflow-hidden"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -140,7 +139,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideView[] }) {
               <div aria-hidden="true" className="absolute inset-0 bg-overlay" />
               <div
                 className={cn(
-                  "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pt-16 pb-40 text-center sm:pb-24 lg:pt-18 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
+                  "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pt-(--header-offset) pb-40 text-center sm:pb-24 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
                   active ? "translate-y-0 opacity-100 delay-200" : "translate-y-6 opacity-0",
                 )}
               >

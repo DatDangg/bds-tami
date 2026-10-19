@@ -30,12 +30,12 @@ interface HeaderProps {
 }
 
 /**
- * Header dính đầu trang (đặc; trong suốt đè hero khi trang có `[data-header-hero]`, xem `HeaderFrame`) (design-spec §2.1). Thuần hiển thị:
+ * Header dính đầu trang: thanh nổi bo tròn kính mờ sáng, luôn một biến thể kể cả trên hero (BL-020, `HeaderFrame`, design-spec §2.1). Thuần hiển thị:
  * nhận view model đã lọc từ layout. Chỉ DesktopNav, MobileMenu, LanguageSwitcher là client. Thứ tự DOM = thứ tự Tab (logo, menu ngang,
  * tìm, ngôn ngữ, CTA, nút Menu). `order-*` chỉ đổi vị trí hiển thị ở < xl (tìm bên trái, logo giữa); từ xl là MỘT hàng: logo trái ·
  * menu ngang giữa · tìm + VI|EN + CTA phải, KHÔNG có nút Menu (BL-019; thứ tự Tab ≥ xl: logo, menu ngang, tìm, ngôn ngữ, CTA).
  * Nút Menu chỉ ở < xl và mở menu toàn màn hình.
- * Hai bản logo (sáng/tối) cùng có trong DOM, CSS `.logo-on-*` chọn bản theo biến thể header.
+ * Chỉ dùng logo bản nền sáng (vàng, BL-018): kính luôn sáng nên không còn bản logo trắng ở header. Trên kính chỉ dùng `text-text` (accent-text chỉ ~3:1 khi nền sau kính là đen); hover/focus không đổi màu chữ.
  */
 export function Header({ items, contact, logo, cta }: HeaderProps) {
   const t = useTranslations("layout.header");
@@ -43,11 +43,10 @@ export function Header({ items, contact, logo, cta }: HeaderProps) {
   const homeHref = resolveNavLink("home", locale)?.href ?? "/";
   return (
     <HeaderFrame>
-      <div className="mx-auto flex h-16 w-full max-w-container items-center gap-4 px-gutter lg:h-18 xl:gap-3 2xl:gap-6">
+      <div className="flex h-16 w-full items-center gap-4 px-3 md:px-5 lg:h-18 lg:px-6 xl:gap-3 xl:px-5 2xl:gap-6">
         <Link href={homeHref} aria-label={t("home")} className="order-2 inline-flex min-h-11 min-w-11 shrink-0 items-center xl:order-1">
           {/* xl: logo ≤ 6rem — đo ở 1265px, logo CMS 120px + CTA 160px + 7 mục EN đã đè menu lên logo/tìm 3px. */}
-          <BrandLogo image={logo.onLight} className="logo-on-light xl:max-w-[6rem]" />
-          <BrandLogo tone="on-dark" image={logo.onDark} className="logo-on-dark xl:max-w-[6rem]" />
+          <BrandLogo image={logo.onLight} className="xl:max-w-[6rem]" />
         </Link>
         <div className="order-2 hidden min-w-0 xl:flex xl:flex-1 xl:justify-center">
           <DesktopNav items={items} />
@@ -56,7 +55,7 @@ export function Header({ items, contact, logo, cta }: HeaderProps) {
           <Link
             href={searchHrefFor(locale)}
             aria-label={t("search")}
-            className="inline-flex size-11 items-center justify-center rounded-sm text-text hover:text-accent-text"
+            className="inline-flex size-11 items-center justify-center rounded-full text-text hover:bg-text/10"
           >
             <MagnifyingGlass size={24} aria-hidden="true" />
           </Link>

@@ -68,7 +68,7 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
       </div>
       <LeadFormSlot
         title={view.rented ? t("leadForm.titleRented") : t("leadForm.title")}
-        className="scroll-mt-30 bg-transparent p-0 lg:scroll-mt-32 lg:p-0"
+        className="bg-transparent p-0 lg:p-0 scroll-mt-[calc(var(--header-offset)+1rem)]"
       >
         <LeadForm source="rental" sourceId={rentalId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
       </LeadFormSlot>

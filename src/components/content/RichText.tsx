@@ -189,7 +189,7 @@ function renderNode(node: LexicalNode, key: number, depth: number, ctx: RenderCo
       const Tag = headingTag(node.tag);
       const id = ctx.sections && depth === 0 && isSectionHeading(node) ? sectionHeadingId(ctx.sections.count++) : undefined;
       return (
-        <Tag key={key} id={id} className={cn(TEXT_CLASS[Tag], id && "scroll-mt-24")}>
+        <Tag key={key} id={id} className={cn(TEXT_CLASS[Tag], id && "scroll-mt-[calc(var(--header-offset)+1rem)]")}>
           {renderChildren(node.children, depth + 1, ctx)}
         </Tag>
       );

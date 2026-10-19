@@ -140,7 +140,7 @@ export function PostShareRail({ url }: Pick<PostShareProps, "url">) {
       <div
         role="group"
         aria-label={t("label")}
-        className="pointer-events-auto sticky top-24 flex w-fit -translate-x-[calc(100%+1rem)] flex-col items-center gap-1 rounded-sm border border-border bg-surface p-1 shadow-sm"
+        className="pointer-events-auto sticky top-[calc(var(--header-offset)+1rem)] flex w-fit -translate-x-[calc(100%+1rem)] flex-col items-center gap-1 rounded-sm border border-border bg-surface p-1 shadow-sm"
       >
         {encoded && (
           <>

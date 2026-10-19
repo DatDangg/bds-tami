@@ -185,7 +185,6 @@
 
 /* 2. Biến ngữ nghĩa shadcn/ui trỏ về token TAMI. Khai trên cả hai selector để tính lại trong khối tối. */
 :root,
-:is(.site-header:has(~ main [data-header-hero]):not([data-solid="true"])),
 .theme-dark-block {
   --background: var(--color-bg);
   --foreground: var(--color-text);
@@ -209,7 +208,6 @@
 }
 
 /* Khối tối (footer, banner CTA, menu toàn màn hình): đổi giá trị token gốc, component tự đúng màu. */
-:is(.site-header:has(~ main [data-header-hero]):not([data-solid="true"])),
 .theme-dark-block {
   --color-bg: var(--color-dark);
   --color-surface: #1c1c1c;
@@ -224,21 +222,40 @@
   color: var(--color-text);
 }
 
-/* Header trong suốt đè hero (design-spec S01.1): dùng token khối tối nên chữ/icon tự sáng; nền thay bằng gradient đen 40% → 0 để chữ đọc được trên ảnh.
-   Điều kiện nằm ở CSS (`:has` trên `main`) để đúng từ HTML server; `HeaderFrame` chỉ đặt `data-solid="true"` khi hero cuộn khỏi màn hình. */
-.site-header {
-  transition: box-shadow var(--duration-base) var(--ease-out);
+/* Khoảng header chiếm trong luồng = lề trên + thanh cao + lề dưới (8+64+8 = 80px; ≥ lg 16+72+16 = 104px). Hero kéo lên bằng đúng giá trị này;
+   thanh mục con dính (`sticky top-*`) và `scroll-mt-*` dưới header đều dựa vào nó để nội dung không bị thanh nổi che. */
+:root {
+  --header-offset: 5rem;
 }
-:is(.site-header:has(~ main [data-header-hero]):not([data-solid="true"])) {
-  background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.4), transparent);
-  box-shadow: none;
+@media (min-width: 64rem) {
+  :root {
+    --header-offset: 6.5rem;
+  }
 }
-.site-header .logo-on-dark { display: none; }
-:is(.site-header:has(~ main [data-header-hero]):not([data-solid="true"])) .logo-on-dark { display: block; }
-:is(.site-header:has(~ main [data-header-hero]):not([data-solid="true"])) .logo-on-light { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .site-header { transition: none; }
+
+/* Header nổi bo tròn kính mờ SÁNG (BL-020, design-spec §2.1): luôn là một thanh viên thuốc nổi cách mép, cả khi đè lên hero (không còn biến thể
+   trong suốt), nên logo vàng + chữ --color-text luôn đạt 4.5:1 trên kính dù ảnh phía sau tối hay sáng. Mặc định nền ĐẶC (--color-surface);
+   chỉ trình duyệt có backdrop-filter mới dùng kính, và người chọn giảm trong suốt quay lại nền đặc. */
+.site-header-bar {
+  background-color: var(--color-surface);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header-bar {
+    background-color: var(--color-glass);
+    -webkit-backdrop-filter: blur(var(--blur-glass));
+    backdrop-filter: blur(var(--blur-glass));
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .site-header-bar {
+    background-color: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+/* Vòng focus mặc định (--color-focus-ring #8c6733) chỉ ~3.0:1 khi kính nằm trên nền đen; trong thanh header dùng màu chữ để luôn rõ. */
+.site-header-bar :focus-visible {
+  outline-color: var(--color-text);
 }
 
 /* 3. Tên shadcn chưa có ở lớp 1. */

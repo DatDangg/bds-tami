@@ -42,7 +42,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
               onClick={() => {
                 document.cookie = buildLocaleCookie(locale);
               }}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center text-text-secondary underline-offset-4 hover:text-text hover:underline"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center font-normal text-text underline-offset-4 hover:underline"
             >
               {locale}
             </a>

@@ -82,7 +82,7 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turns
         <h1 className="font-display text-h1 text-balance">{view.title}</h1>
       </header>
       <div className="mx-auto grid w-full max-w-container gap-8 px-gutter pb-section-tight lg:grid-cols-12 lg:gap-12">
-        <aside aria-labelledby="job-summary-title" className="lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:self-start lg:sticky lg:top-28">
+        <aside aria-labelledby="job-summary-title" className="lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:self-start lg:sticky lg:top-[calc(var(--header-offset)+1rem)]">
           <div className="flex flex-col gap-6 rounded-sm bg-bg-alt p-6">
             <h2 id="job-summary-title" className="font-display text-h2-sm">
               {t("summaryTitle")}
