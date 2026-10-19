@@ -1,6 +1,7 @@
 import type { Field, SanitizedConfig } from "payload";
 import { describe, expect, it } from "vitest";
 
+import { flattenLayoutFields } from "../admin/form-layout";
 import { TRANSLATABLE_COLLECTIONS, TRANSLATABLE_GLOBALS } from "./allowlist";
 import { collectLeaves, TRANSLATABLE_FIELDS, type TranslatableSlug } from "./leaves";
 
@@ -16,7 +17,7 @@ function localizedTextTopLevel(fields: readonly Field[]): string[] {
       }
       return false;
     });
-  for (const field of fields) {
+  for (const field of flattenLayoutFields(fields)) {
     if ("name" in field && typeof field.name === "string" && hasLocalizedText([field], false)) names.push(field.name);
   }
   return names;

@@ -1,14 +1,17 @@
-import { SOURCE_LABELS } from "../../../collections/Leads";
+import { SOURCE_LABELS, STATUS_LABELS } from "../../../collections/Leads";
+import { CONTENT_STATUS_LABELS } from "../../../fields/status";
 import type { LeadSource } from "../../../lib/leads/lead-values";
 import type { RecentLead, RecentOwnDoc } from "./dashboard-data";
 import { relativeTimeVi } from "./dashboard-format";
-import { DashboardBadge, DashboardTextBadge } from "./DashboardBadge";
+import { StatusBadge } from "../StatusBadge";
 
 interface RecentListProps {
   now: Date;
   isAdmin: boolean;
   adminRoute: string;
 }
+
+const STATUS_LABEL_BY_VALUE: Record<string, string> = { ...CONTENT_STATUS_LABELS, ...STATUS_LABELS };
 
 function leadMeta(lead: RecentLead, now: Date): string {
   const source = SOURCE_LABELS[lead.source as LeadSource] ?? "";
@@ -36,8 +39,8 @@ export function RecentLeadsCard({ leads, now, isAdmin, adminRoute }: RecentListP
                 </a>
                 <span className="tami-dash-list__meta">{leadMeta(lead, now)}</span>
               </div>
-              {isAdmin && !lead.isAssigned && lead.status === "new" && <DashboardTextBadge tone="warning">Chưa phân công</DashboardTextBadge>}
-              <DashboardBadge status={lead.status} />
+              {isAdmin && !lead.isAssigned && lead.status === "new" && <StatusBadge value="unassigned" tone="warning" label="Chưa phân công" />}
+              <StatusBadge value={lead.status} label={STATUS_LABEL_BY_VALUE[lead.status]} />
             </li>
           ))}
         </ul>
@@ -65,7 +68,7 @@ export function RecentOwnDocsCard({ docs, now }: { docs: RecentOwnDoc[]; now: Da
                 </a>
                 <span className="tami-dash-list__meta">{[doc.collectionLabel, relativeTimeVi(doc.updatedAt, now)].filter(Boolean).join(" · ")}</span>
               </div>
-              <DashboardBadge status={doc.status} />
+              <StatusBadge value={doc.status} label={STATUS_LABEL_BY_VALUE[doc.status]} />
             </li>
           ))}
         </ul>

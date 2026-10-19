@@ -1,5 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// StatusBadge (dùng ở dashboard) import LinkedCell → @payloadcms/ui kéo file .css mà Node không nạp được; dashboard chỉ dùng phần badge.
+vi.mock("@payloadcms/ui", () => ({ useListDrawerContext: () => ({}), useConfig: () => ({ config: { routes: { admin: "/admin" } } }), Link: () => null }));
 
 import type { NavGroupCard, RecentLead, RecentOwnDoc, Shortcut, StatCard } from "./dashboard-data";
 import { DashboardHeader } from "./DashboardHeader";

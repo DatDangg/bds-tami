@@ -197,26 +197,18 @@ export interface StaffAuthOperations {
 export interface Lead {
   id: string;
   code: string;
-  source: 'rental' | 'property_post' | 'project' | 'contact';
-  rental?: (string | null) | Rental;
-  propertyPost?: (string | null) | PropertyPost;
-  project?: (string | null) | Project;
   fullName: string;
   phone: string;
   phoneNormalized: string;
   email?: string | null;
   message?: string | null;
   locale: 'vi' | 'en';
-  status: 'new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam';
-  lostReason?: string | null;
-  assignedTo?: (string | null) | Staff;
-  assignedAt?: string | null;
-  assigneeInactive?: boolean | null;
-  firstContactedAt?: string | null;
-  lastActivityAt?: string | null;
-  mergedCount?: number | null;
   consentAt: string;
   consentVersion: string;
+  source: 'rental' | 'property_post' | 'project' | 'contact';
+  rental?: (string | null) | Rental;
+  propertyPost?: (string | null) | PropertyPost;
+  project?: (string | null) | Project;
   utm?: {
     source?: string | null;
     medium?: string | null;
@@ -228,13 +220,21 @@ export interface Lead {
   referrer?: string | null;
   ipHash?: string | null;
   userAgent?: string | null;
-  remindedAt?: string | null;
-  anonymizedAt?: string | null;
   activities?: {
     docs?: (string | LeadActivity)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  status: 'new' | 'contacted' | 'consulting' | 'won' | 'lost' | 'spam';
+  lostReason?: string | null;
+  assignedTo?: (string | null) | Staff;
+  assignedAt?: string | null;
+  assigneeInactive?: boolean | null;
+  firstContactedAt?: string | null;
+  lastActivityAt?: string | null;
+  mergedCount?: number | null;
+  remindedAt?: string | null;
+  anonymizedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -250,34 +250,6 @@ export interface Rental {
   code: string;
   title?: string | null;
   category?: (string | null) | Category;
-  project?: (string | null) | Project;
-  province: string | Province;
-  ward: string | Ward;
-  address: string;
-  showExactAddress?: boolean | null;
-  /**
-   * @minItems 2
-   * @maxItems 2
-   */
-  location?: [number, number] | null;
-  priceMonthlyVnd?: number | null;
-  priceNegotiable?: boolean | null;
-  areaM2: number;
-  bedrooms?: number | null;
-  bathrooms?: number | null;
-  floor?: string | null;
-  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
-  balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
-  furnishing?: ('none' | 'basic' | 'full') | null;
-  rentalTerms?: {
-    minLeaseMonths?: number | null;
-    depositMonths?: number | null;
-    paymentCycle?: ('monthly' | 'quarterly' | 'semiannual' | 'annual') | null;
-    includedServices?:
-      | ('electricity' | 'water' | 'internet' | 'cleaning' | 'laundry' | 'parking' | 'management_fee' | 'security')[]
-      | null;
-    availableFrom?: string | null;
-  };
   description?: {
     root: {
       type: string;
@@ -293,23 +265,50 @@ export interface Rental {
     };
     [k: string]: unknown;
   } | null;
+  legalNote?: string | null;
+  project?: (string | null) | Project;
+  province: string | Province;
+  ward: string | Ward;
+  address: string;
+  showExactAddress?: boolean | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
+  priceMonthlyVnd?: number | null;
+  priceNegotiable?: boolean | null;
+  areaM2: number;
+  floor?: string | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  furnishing?: ('none' | 'basic' | 'full') | null;
+  rentalTerms?: {
+    minLeaseMonths?: number | null;
+    depositMonths?: number | null;
+    paymentCycle?: ('monthly' | 'quarterly' | 'semiannual' | 'annual') | null;
+    includedServices?:
+      | ('electricity' | 'water' | 'internet' | 'cleaning' | 'laundry' | 'parking' | 'management_fee' | 'security')[]
+      | null;
+    availableFrom?: string | null;
+  };
   /**
    * Ảnh đầu tiên là ảnh đại diện của tin.
    */
   gallery?: (string | Media)[] | null;
   videoUrl?: string | null;
-  legalNote?: string | null;
-  rentedAt?: string | null;
-  searchText?: string | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden' | 'rented';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  hasEnglish?: boolean | null;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -330,16 +329,17 @@ export interface Rental {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  rentedAt?: string | null;
+  searchText?: string | null;
+  status: 'draft' | 'published' | 'hidden' | 'rented';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -500,27 +500,6 @@ export interface Project {
   searchReindexPending?: boolean | null;
   title?: string | null;
   category?: (string | null) | Category;
-  developer?: (string | null) | Developer;
-  salesStatus: 'upcoming' | 'selling' | 'handed_over';
-  province: string | Province;
-  ward?: (string | null) | Ward;
-  address?: string | null;
-  /**
-   * @minItems 2
-   * @maxItems 2
-   */
-  location?: [number, number] | null;
-  priceFromVnd?: number | null;
-  priceToVnd?: number | null;
-  areaFromM2?: number | null;
-  areaToM2?: number | null;
-  scale?: {
-    totalUnits?: number | null;
-    blocks?: number | null;
-    floors?: number | null;
-    landAreaM2?: number | null;
-    handoverTime?: string | null;
-  };
   summary?: string | null;
   overview?: {
     root: {
@@ -537,28 +516,6 @@ export interface Project {
     };
     [k: string]: unknown;
   } | null;
-  amenities?:
-    | {
-        name: string;
-        /**
-         * Tên icon hiển thị kèm tiện ích (tuỳ chọn).
-         */
-        icon?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Ảnh đầu tiên là ảnh đại diện của dự án.
-   */
-  gallery?: (string | Media)[] | null;
-  floorPlans?:
-    | {
-        title: string;
-        image: string | Media;
-        id?: string | null;
-      }[]
-    | null;
-  documents?: (string | Media)[] | null;
   legalInfo?: {
     root: {
       type: string;
@@ -589,15 +546,59 @@ export interface Project {
     };
     [k: string]: unknown;
   } | null;
+  developer?: (string | null) | Developer;
+  salesStatus: 'upcoming' | 'selling' | 'handed_over';
+  province: string | Province;
+  ward?: (string | null) | Ward;
+  address?: string | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * @minItems 2
+   * @maxItems 2
    */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  hasEnglish?: boolean | null;
+  location?: [number, number] | null;
+  priceFromVnd?: number | null;
+  priceToVnd?: number | null;
+  areaFromM2?: number | null;
+  areaToM2?: number | null;
+  scale?: {
+    totalUnits?: number | null;
+    blocks?: number | null;
+    floors?: number | null;
+    landAreaM2?: number | null;
+    handoverTime?: string | null;
+  };
+  amenities?:
+    | {
+        name: string;
+        /**
+         * Tên icon hiển thị kèm tiện ích (tuỳ chọn).
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Ảnh đầu tiên là ảnh đại diện của dự án.
+   */
+  gallery?: (string | Media)[] | null;
+  floorPlans?:
+    | {
+        title: string;
+        image: string | Media;
+        id?: string | null;
+      }[]
+    | null;
+  documents?: (string | Media)[] | null;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -618,16 +619,15 @@ export interface Project {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -748,8 +748,6 @@ export interface PropertyPost {
   id: string;
   title?: string | null;
   category?: (string | null) | Category;
-  cover?: (string | null) | Media;
-  gallery?: (string | Media)[] | null;
   excerpt?: string | null;
   content?: {
     root: {
@@ -781,15 +779,18 @@ export interface PropertyPost {
     voucherCode?: string | null;
     terms?: string | null;
   };
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  hasEnglish?: boolean | null;
+  cover?: (string | null) | Media;
+  gallery?: (string | Media)[] | null;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -810,16 +811,15 @@ export interface PropertyPost {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -853,7 +853,6 @@ export interface News {
   id: string;
   title?: string | null;
   category?: (string | null) | Category;
-  cover?: (string | null) | Media;
   excerpt?: string | null;
   content?: {
     root: {
@@ -871,15 +870,17 @@ export interface News {
     [k: string]: unknown;
   } | null;
   tags?: string[] | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  hasEnglish?: boolean | null;
+  cover?: (string | null) | Media;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -900,16 +901,15 @@ export interface News {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -923,8 +923,6 @@ export interface News {
 export interface Service {
   id: string;
   title?: string | null;
-  icon?: (string | null) | Media;
-  coverImage?: (string | null) | Media;
   summary?: string | null;
   content?: {
     root: {
@@ -942,12 +940,18 @@ export interface Service {
     [k: string]: unknown;
   } | null;
   sortOrder?: number | null;
-  /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
-   */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  hasEnglish?: boolean | null;
+  icon?: (string | null) | Media;
+  coverImage?: (string | null) | Media;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -968,16 +972,12 @@ export interface Service {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -1058,17 +1058,6 @@ export interface JobPosting {
   id: string;
   title?: string | null;
   category?: (string | null) | Category;
-  province?: (string | null) | Province;
-  workplace?: string | null;
-  employmentType: 'full_time' | 'part_time' | 'internship' | 'contract';
-  salaryMinVnd?: number | null;
-  salaryMaxVnd?: number | null;
-  /**
-   * Vd: Thoả thuận, 15–20 triệu.
-   */
-  salaryText?: string | null;
-  quantity?: number | null;
-  deadline: string;
   description?: {
     root: {
       type: string;
@@ -1114,14 +1103,27 @@ export interface JobPosting {
     };
     [k: string]: unknown;
   } | null;
+  province?: (string | null) | Province;
+  workplace?: string | null;
+  employmentType: 'full_time' | 'part_time' | 'internship' | 'contract';
+  quantity?: number | null;
+  salaryMinVnd?: number | null;
+  salaryMaxVnd?: number | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Vd: Thoả thuận, 15–20 triệu.
    */
-  slug?: string | null;
-  status: 'draft' | 'published' | 'hidden';
-  publishedAt?: string | null;
-  author: string | Staff;
-  hasEnglish?: boolean | null;
+  salaryText?: string | null;
+  deadline: string;
+  seo?: {
+    /**
+     * Để trống thì dùng tiêu đề bài.
+     */
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (string | null) | Media;
+    noindex?: boolean | null;
+    canonical?: string | null;
+  };
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -1142,16 +1144,14 @@ export interface JobPosting {
     model?: string | null;
     lastError?: string | null;
   };
-  seo?: {
-    /**
-     * Để trống thì dùng tiêu đề bài.
-     */
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (string | null) | Media;
-    noindex?: boolean | null;
-    canonical?: string | null;
-  };
+  status: 'draft' | 'published' | 'hidden';
+  publishedAt?: string | null;
+  author: string | Staff;
+  /**
+   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   */
+  slug?: string | null;
+  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -1590,26 +1590,18 @@ export interface PayloadMigration {
  */
 export interface LeadsSelect<T extends boolean = true> {
   code?: T;
-  source?: T;
-  rental?: T;
-  propertyPost?: T;
-  project?: T;
   fullName?: T;
   phone?: T;
   phoneNormalized?: T;
   email?: T;
   message?: T;
   locale?: T;
-  status?: T;
-  lostReason?: T;
-  assignedTo?: T;
-  assignedAt?: T;
-  assigneeInactive?: T;
-  firstContactedAt?: T;
-  lastActivityAt?: T;
-  mergedCount?: T;
   consentAt?: T;
   consentVersion?: T;
+  source?: T;
+  rental?: T;
+  propertyPost?: T;
+  project?: T;
   utm?:
     | T
     | {
@@ -1623,9 +1615,17 @@ export interface LeadsSelect<T extends boolean = true> {
   referrer?: T;
   ipHash?: T;
   userAgent?: T;
+  activities?: T;
+  status?: T;
+  lostReason?: T;
+  assignedTo?: T;
+  assignedAt?: T;
+  assigneeInactive?: T;
+  firstContactedAt?: T;
+  lastActivityAt?: T;
+  mergedCount?: T;
   remindedAt?: T;
   anonymizedAt?: T;
-  activities?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1654,6 +1654,10 @@ export interface ProjectsSelect<T extends boolean = true> {
   searchReindexPending?: T;
   title?: T;
   category?: T;
+  summary?: T;
+  overview?: T;
+  legalInfo?: T;
+  salesPolicy?: T;
   developer?: T;
   salesStatus?: T;
   province?: T;
@@ -1673,8 +1677,6 @@ export interface ProjectsSelect<T extends boolean = true> {
         landAreaM2?: T;
         handoverTime?: T;
       };
-  summary?: T;
-  overview?: T;
   amenities?:
     | T
     | {
@@ -1691,14 +1693,15 @@ export interface ProjectsSelect<T extends boolean = true> {
         id?: T;
       };
   documents?: T;
-  legalInfo?: T;
-  salesPolicy?: T;
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  hasEnglish?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1710,15 +1713,12 @@ export interface ProjectsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1731,6 +1731,8 @@ export interface RentalsSelect<T extends boolean = true> {
   code?: T;
   title?: T;
   category?: T;
+  description?: T;
+  legalNote?: T;
   project?: T;
   province?: T;
   ward?: T;
@@ -1740,9 +1742,9 @@ export interface RentalsSelect<T extends boolean = true> {
   priceMonthlyVnd?: T;
   priceNegotiable?: T;
   areaM2?: T;
+  floor?: T;
   bedrooms?: T;
   bathrooms?: T;
-  floor?: T;
   houseDirection?: T;
   balconyDirection?: T;
   furnishing?: T;
@@ -1755,18 +1757,17 @@ export interface RentalsSelect<T extends boolean = true> {
         includedServices?: T;
         availableFrom?: T;
       };
-  description?: T;
   gallery?: T;
   videoUrl?: T;
-  legalNote?: T;
-  rentedAt?: T;
-  searchText?: T;
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  hasEnglish?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1778,15 +1779,14 @@ export interface RentalsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  rentedAt?: T;
+  searchText?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1798,8 +1798,6 @@ export interface RentalsSelect<T extends boolean = true> {
 export interface PropertyPostsSelect<T extends boolean = true> {
   title?: T;
   category?: T;
-  cover?: T;
-  gallery?: T;
   excerpt?: T;
   content?: T;
   priceVnd?: T;
@@ -1816,12 +1814,17 @@ export interface PropertyPostsSelect<T extends boolean = true> {
         voucherCode?: T;
         terms?: T;
       };
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  hasEnglish?: T;
+  cover?: T;
+  gallery?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1833,15 +1836,12 @@ export interface PropertyPostsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1853,16 +1853,19 @@ export interface PropertyPostsSelect<T extends boolean = true> {
 export interface NewsSelect<T extends boolean = true> {
   title?: T;
   category?: T;
-  cover?: T;
   excerpt?: T;
   content?: T;
   tags?: T;
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  hasEnglish?: T;
+  cover?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1874,15 +1877,12 @@ export interface NewsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1893,14 +1893,20 @@ export interface NewsSelect<T extends boolean = true> {
  */
 export interface ServicesSelect<T extends boolean = true> {
   title?: T;
-  icon?: T;
-  coverImage?: T;
   summary?: T;
   content?: T;
   sortOrder?: T;
-  slug?: T;
-  status?: T;
-  hasEnglish?: T;
+  icon?: T;
+  coverImage?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1912,15 +1918,9 @@ export interface ServicesSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  status?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1968,22 +1968,26 @@ export interface PagesSelect<T extends boolean = true> {
 export interface JobPostingsSelect<T extends boolean = true> {
   title?: T;
   category?: T;
-  province?: T;
-  workplace?: T;
-  employmentType?: T;
-  salaryMinVnd?: T;
-  salaryMaxVnd?: T;
-  salaryText?: T;
-  quantity?: T;
-  deadline?: T;
   description?: T;
   requirements?: T;
   benefits?: T;
-  slug?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  hasEnglish?: T;
+  province?: T;
+  workplace?: T;
+  employmentType?: T;
+  quantity?: T;
+  salaryMinVnd?: T;
+  salaryMaxVnd?: T;
+  salaryText?: T;
+  deadline?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+        canonical?: T;
+      };
   translation?:
     | T
     | {
@@ -1995,15 +1999,11 @@ export interface JobPostingsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-        noindex?: T;
-        canonical?: T;
-      };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  slug?: T;
+  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2389,6 +2389,12 @@ export interface SiteSetting {
   logo?: (string | null) | Media;
   logoDark?: (string | null) | Media;
   favicon?: (string | null) | Media;
+  address?: string | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  mapLocation?: [number, number] | null;
   /**
    * Số hiển thị và gọi từ nút nổi (FR-PUB-12)
    */
@@ -2396,12 +2402,6 @@ export interface SiteSetting {
   zaloUrl?: string | null;
   fanpageUrl?: string | null;
   email?: string | null;
-  address?: string | null;
-  /**
-   * @minItems 2
-   * @maxItems 2
-   */
-  mapLocation?: [number, number] | null;
   socialLinks?:
     | {
         platform: 'facebook' | 'zalo' | 'youtube' | 'tiktok' | 'instagram' | 'linkedin' | 'x' | 'other';
@@ -2419,13 +2419,9 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)
+   * Tắt nhanh dịch tự động (BR-08)
    */
-  privacyPolicyVersion?: string | null;
-  /**
-   * Dạng G-XXXXXXXXXX
-   */
-  gaMeasurementId?: string | null;
+  translationEnabled?: boolean | null;
   /**
    * Thuật ngữ cố định cho AI dịch (BR-08)
    */
@@ -2437,10 +2433,6 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Tắt nhanh dịch tự động (BR-08)
-   */
-  translationEnabled?: boolean | null;
   /**
    * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
    */
@@ -2461,6 +2453,14 @@ export interface SiteSetting {
     model?: string | null;
     lastError?: string | null;
   };
+  /**
+   * Dạng G-XXXXXXXXXX
+   */
+  gaMeasurementId?: string | null;
+  /**
+   * Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)
+   */
+  privacyPolicyVersion?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2740,12 +2740,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   logo?: T;
   logoDark?: T;
   favicon?: T;
+  address?: T;
+  mapLocation?: T;
   hotline?: T;
   zaloUrl?: T;
   fanpageUrl?: T;
   email?: T;
-  address?: T;
-  mapLocation?: T;
   socialLinks?:
     | T
     | {
@@ -2759,8 +2759,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         email?: T;
         id?: T;
       };
-  privacyPolicyVersion?: T;
-  gaMeasurementId?: T;
+  translationEnabled?: T;
   translationGlossary?:
     | T
     | {
@@ -2769,7 +2768,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
-  translationEnabled?: T;
   translation?:
     | T
     | {
@@ -2781,6 +2779,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
+  gaMeasurementId?: T;
+  privacyPolicyVersion?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

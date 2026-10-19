@@ -9,6 +9,7 @@ import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/le
 import { computeAssigneeInactive, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formTabs } from "../lib/admin/form-layout";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
 import { isUuid } from "../lib/uuid";
@@ -58,7 +59,7 @@ const sourceFields: Field[] = [
     index: true,
     options: selectOptions(LEAD_SOURCES, SOURCE_LABELS),
     access: systemFieldAccess,
-    admin: { ...readOnlyInAdmin, position: "sidebar" },
+    admin: readOnlyInAdmin,
   },
   { name: "rental", type: "relationship", label: "Tin cho thuê quan tâm", relationTo: "rentals", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "propertyPost", type: "relationship", label: "Tin BĐS quan tâm", relationTo: "property-posts", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
@@ -102,7 +103,7 @@ const statusFields: Field[] = [
     // BR-11: chuyển `lost` bắt buộc có lý do (khoảng trắng không tính).
     validate: (value: unknown, { data }: { data?: { status?: unknown } }) =>
       data?.status !== "lost" || (typeof value === "string" && value.trim() !== "") || "Chuyển sang Không thành phải nhập lý do",
-    admin: { condition: (data) => data?.status === "lost" },
+    admin: { position: "sidebar", condition: (data) => data?.status === "lost" },
   },
 ];
 
@@ -140,19 +141,30 @@ const assignmentFields: Field[] = [
     virtual: true,
     hooks: { afterRead: [computeAssigneeInactive] },
     access: { read: adminOnlyRead, create: denyAll, update: denyAll },
-    admin: { ...readOnlyInAdmin, components: { Field: "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning" } },
+    admin: { ...readOnlyInAdmin, position: "sidebar", components: { Field: "/components/admin/LeadAssigneeWarning#LeadAssigneeWarning" } },
   },
 ];
 
 const UTM_LABELS: Record<string, string> = { source: "Nguồn (utm_source)", medium: "Kênh (utm_medium)", campaign: "Chiến dịch (utm_campaign)", term: "Từ khoá (utm_term)", content: "Nội dung (utm_content)" };
 
-const trackingFields: Field[] = [
+/** Mốc thời gian + dấu hệ thống ghi: cột phải của form (chỉ đọc). */
+const timelineFields: Field[] = [
   { name: "firstContactedAt", type: "date", label: "Liên hệ lần đầu lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   // Mốc tính hạn lưu 24 tháng (ERD §7); `stampLeadTimestamps` và hook của `lead-activities` ghi.
   { name: "lastActivityAt", type: "date", label: "Hoạt động gần nhất", index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   { name: "mergedCount", type: "number", label: "Số lần khách gửi lại (đã gộp)", min: 0, defaultValue: 0, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
+  // Dấu "đã nhắc admin lead chưa giao" (job `remind-unassigned-leads`, BR-14): nhắc đúng một lần mỗi lead.
+  { name: "remindedAt", type: "date", label: "Đã nhắc phân công lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "anonymizedAt", type: "date", label: "Đã ẩn danh lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+];
+
+const consentFields: Field[] = [
   { name: "consentAt", type: "date", label: "Đồng ý chính sách lúc", required: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, date: dateTimeInAdmin } },
   { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: systemFieldAccess, admin: readOnlyInAdmin },
+];
+
+/** Dấu vết nguồn khách đến (tab Nguồn); `ipHash`/`userAgent` ẩn khỏi form. */
+const trackingFields: Field[] = [
   {
     name: "utm",
     type: "group",
@@ -165,12 +177,10 @@ const trackingFields: Field[] = [
   { name: "referrer", type: "text", label: "Trang giới thiệu (referrer)", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
   { name: "userAgent", type: "text", maxLength: 500, access: { read: adminOnlyRead, create: denyAll, update: denyAll }, admin: { ...readOnlyInAdmin, hidden: true } },
-  // Dấu "đã nhắc admin lead chưa giao" (job `remind-unassigned-leads`, BR-14): nhắc đúng một lần mỗi lead.
-  { name: "remindedAt", type: "date", label: "Đã nhắc phân công lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
-  { name: "anonymizedAt", type: "date", label: "Đã ẩn danh lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
-  // Cột ảo (không có trong DB): lịch sử chăm sóc hiện ngay trong trang lead; quyền đọc theo `lead-activities`.
-  { name: "activities", type: "join", label: "Lịch sử chăm sóc", collection: "lead-activities", on: "lead", defaultSort: "-createdAt", defaultLimit: 50 },
 ];
+
+// Cột ảo (không có trong DB): lịch sử chăm sóc hiện ngay trong trang lead; quyền đọc theo `lead-activities`.
+const activitiesField: Field = { name: "activities", type: "join", label: "Lịch sử chăm sóc", collection: "lead-activities", on: "lead", defaultSort: "-createdAt", defaultLimit: 50 };
 
 /**
  * Lead khách để lại (ERD §4.11, FR-ADM-09, PERMISSION §3.3-§4, BR-11/BR-32):
@@ -206,5 +216,15 @@ export const Leads: CollectionConfig = {
     beforeDelete: [purgeLeadActivities],
     afterDelete: [auditContentPurge],
   },
-  fields: [codeField, ...sourceFields, ...customerFields, ...statusFields, ...assignmentFields, ...trackingFields],
+  fields: [
+    codeField,
+    formTabs([
+      { label: "Khách hàng", fields: [...customerFields, ...consentFields] },
+      { label: "Nguồn", fields: [...sourceFields, ...trackingFields] },
+      { label: "Lịch sử chăm sóc", fields: [activitiesField] },
+    ]),
+    ...statusFields,
+    ...assignmentFields,
+    ...timelineFields,
+  ],
 };

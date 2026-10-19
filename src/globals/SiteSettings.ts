@@ -7,6 +7,7 @@ import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { trimText } from "../hooks/trim-text";
 import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
+import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
 
@@ -74,72 +75,99 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
       afterChange: [createRevalidateGlobal("site-settings", revalidate), enqueueTranslation.globalAfterChange],
     },
     fields: [
-      { name: "siteName", type: "text", label: "Tên website", localized: true, required: true },
-      imageUpload("logo", "Logo"),
-      imageUpload("logoDark", "Logo trên nền tối"),
-      imageUpload("favicon", "Favicon"),
-      { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },
-      { name: "zaloUrl", type: "text", label: "Link Zalo", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
-      { name: "fanpageUrl", type: "text", label: "Link Fanpage", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
-      { name: "email", type: "email", label: "Email liên hệ" },
-      { name: "address", type: "text", label: "Địa chỉ công ty", localized: true },
-      { name: "mapLocation", type: "point", label: "Toạ độ bản đồ" },
-      {
-        name: "socialLinks",
-        type: "array",
-        label: "Mạng xã hội",
-        labels: { singular: "Mạng xã hội", plural: "Mạng xã hội" },
-        admin: { components: { RowLabel: textRowLabel({ field: "platform", fallback: "Mạng xã hội", valueLabels: SOCIAL_PLATFORM_LABELS }) } },
-        fields: [
-          {
-            name: "platform",
-            type: "select",
-            label: "Nền tảng",
-            required: true,
-            options: SOCIAL_PLATFORMS.map((value) => ({ label: SOCIAL_PLATFORM_LABELS[value], value })),
-          },
-          { name: "url", type: "text", label: "Đường dẫn", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
-        ],
-      },
-      {
-        name: "notificationEmails",
-        type: "array",
-        label: "Email nhận thông báo",
-        labels: { singular: "Email", plural: "Email" },
-        access: adminOnlyRead,
-        admin: { description: "Email nhận thông báo lead / hồ sơ ứng tuyển (chỉ admin thấy)", components: { RowLabel: textRowLabel({ field: "email", fallback: "Email" }) } },
-        fields: [{ name: "email", type: "email", label: "Email", required: true }],
-      },
-      {
-        name: "privacyPolicyVersion",
-        type: "text",
-        label: "Phiên bản chính sách bảo mật",
-        access: { update: denyAll },
-        admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)" },
-      },
-      { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Dạng G-XXXXXXXXXX" } },
-      {
-        name: "translationGlossary",
-        type: "array",
-        label: "Thuật ngữ dịch cố định",
-        labels: { singular: "Thuật ngữ", plural: "Thuật ngữ" },
-        access: adminOnlyRead,
-        admin: { description: "Thuật ngữ cố định cho AI dịch (BR-08)", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
-        fields: [
-          { name: "vi", type: "text", label: "Tiếng Việt", required: true },
-          { name: "en", type: "text", label: "Tiếng Anh", required: true },
-          { name: "note", type: "text", label: "Ghi chú" },
-        ],
-      },
-      {
-        name: "translationEnabled",
-        type: "checkbox",
-        label: "Bật dịch tự động",
-        defaultValue: true,
-        access: adminOnlyRead,
-        admin: { description: "Tắt nhanh dịch tự động (BR-08)" },
-      },
-      translationGroup(),
+      formTabs([
+        {
+          label: "Thông tin công ty",
+          fields: [
+            { name: "siteName", type: "text", label: "Tên website", localized: true, required: true },
+            imageUpload("logo", "Logo"),
+            imageUpload("logoDark", "Logo trên nền tối"),
+            imageUpload("favicon", "Favicon"),
+            { name: "address", type: "text", label: "Địa chỉ công ty", localized: true },
+            { name: "mapLocation", type: "point", label: "Toạ độ bản đồ" },
+          ],
+        },
+        {
+          label: "Liên hệ & mạng xã hội",
+          fields: [
+            { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },
+            { name: "zaloUrl", type: "text", label: "Link Zalo", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+            { name: "fanpageUrl", type: "text", label: "Link Fanpage", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+            { name: "email", type: "email", label: "Email liên hệ" },
+            {
+              name: "socialLinks",
+              type: "array",
+              label: "Mạng xã hội",
+              labels: { singular: "Mạng xã hội", plural: "Mạng xã hội" },
+              admin: { components: { RowLabel: textRowLabel({ field: "platform", fallback: "Mạng xã hội", valueLabels: SOCIAL_PLATFORM_LABELS }) } },
+              fields: [
+                {
+                  name: "platform",
+                  type: "select",
+                  label: "Nền tảng",
+                  required: true,
+                  options: SOCIAL_PLATFORMS.map((value) => ({ label: SOCIAL_PLATFORM_LABELS[value], value })),
+                },
+                { name: "url", type: "text", label: "Đường dẫn", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+              ],
+            },
+          ],
+        },
+        {
+          label: "Email nhận thông báo",
+          fields: [
+            {
+              name: "notificationEmails",
+              type: "array",
+              label: "Email nhận thông báo",
+              labels: { singular: "Email", plural: "Email" },
+              access: adminOnlyRead,
+              admin: { description: "Email nhận thông báo lead / hồ sơ ứng tuyển (chỉ admin thấy)", components: { RowLabel: textRowLabel({ field: "email", fallback: "Email" }) } },
+              fields: [{ name: "email", type: "email", label: "Email", required: true }],
+            },
+          ],
+        },
+        {
+          label: "Dịch tự động",
+          fields: [
+            {
+              name: "translationEnabled",
+              type: "checkbox",
+              label: "Bật dịch tự động",
+              defaultValue: true,
+              access: adminOnlyRead,
+              admin: { description: "Tắt nhanh dịch tự động (BR-08)" },
+            },
+            {
+              name: "translationGlossary",
+              type: "array",
+              label: "Thuật ngữ dịch cố định",
+              labels: { singular: "Thuật ngữ", plural: "Thuật ngữ" },
+              access: adminOnlyRead,
+              admin: { description: "Thuật ngữ cố định cho AI dịch (BR-08)", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
+              fields: [
+                { name: "vi", type: "text", label: "Tiếng Việt", required: true },
+                { name: "en", type: "text", label: "Tiếng Anh", required: true },
+                { name: "note", type: "text", label: "Ghi chú" },
+              ],
+            },
+            translationGroup(),
+          ],
+        },
+        {
+          label: "Kỹ thuật",
+          fields: [
+            { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Dạng G-XXXXXXXXXX" } },
+            {
+              name: "privacyPolicyVersion",
+              type: "text",
+              label: "Phiên bản chính sách bảo mật",
+              access: { update: denyAll },
+              admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)" },
+            },
+          ],
+        },
+      ]),
     ],
   };
 }

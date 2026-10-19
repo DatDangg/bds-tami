@@ -17,6 +17,7 @@ import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-pro
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formRow, formTabs } from "../lib/admin/form-layout";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
@@ -133,46 +134,67 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       },
       fields: [
         codeField,
-        titleField(),
-        scopedCategoryField("rental"),
-        { name: "project", type: "relationship", label: "Thuộc dự án", relationTo: "projects", index: true },
-        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
-        {
-          name: "ward",
-          type: "relationship",
-          label: "Phường/xã",
-          relationTo: "wards",
-          required: true,
-          index: true,
-          filterOptions: wardFilterOptions,
-          validate: validateWardInProvince,
-        },
-        { name: "address", type: "text", label: "Địa chỉ chính xác", required: true, access: { read: readExactAddress } },
-        { name: "showExactAddress", type: "checkbox", label: "Cho khách xem địa chỉ chính xác", defaultValue: false },
-        { name: "location", type: "point", label: "Toạ độ bản đồ", access: { read: readExactAddress } },
-        { name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly },
-        { name: "priceNegotiable", type: "checkbox", label: "Giá thương lượng", defaultValue: false },
-        { name: "areaM2", type: "number", label: "Diện tích (m²)", required: true, min: 0, validate: validateAreaM2 },
-        nonNegativeNumber("bedrooms", "Số phòng ngủ"),
-        nonNegativeNumber("bathrooms", "Số phòng tắm"),
-        { name: "floor", type: "text", label: "Tầng" },
-        directionField("houseDirection", "Hướng nhà"),
-        directionField("balconyDirection", "Hướng ban công"),
-        { name: "furnishing", type: "select", label: "Nội thất", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },
-        rentalTermsGroup,
-        { name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
-        {
-          name: "gallery",
-          type: "upload",
-          label: "Thư viện ảnh",
-          relationTo: "media",
-          hasMany: true,
-          filterOptions: { mimeType: { contains: "image/" } },
-          validate: validateGallery,
-          admin: { description: "Ảnh đầu tiên là ảnh đại diện của tin.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
-        },
-        { name: "videoUrl", type: "text", label: "Link video (YouTube/TikTok)", validate: validateVideoUrl },
-        { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              scopedCategoryField("rental"),
+              { name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
+              { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },
+            ],
+          },
+          {
+            label: "Thông tin căn",
+            fields: [
+              { name: "project", type: "relationship", label: "Thuộc dự án", relationTo: "projects", index: true },
+              formRow(
+                { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
+                {
+                  name: "ward",
+                  type: "relationship",
+                  label: "Phường/xã",
+                  relationTo: "wards",
+                  required: true,
+                  index: true,
+                  filterOptions: wardFilterOptions,
+                  validate: validateWardInProvince,
+                },
+              ),
+              { name: "address", type: "text", label: "Địa chỉ chính xác", required: true, access: { read: readExactAddress } },
+              { name: "showExactAddress", type: "checkbox", label: "Cho khách xem địa chỉ chính xác", defaultValue: false },
+              { name: "location", type: "point", label: "Toạ độ bản đồ", access: { read: readExactAddress } },
+              formRow(
+                { name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly },
+                { name: "priceNegotiable", type: "checkbox", label: "Giá thương lượng", defaultValue: false },
+              ),
+              formRow(
+                { name: "areaM2", type: "number", label: "Diện tích (m²)", required: true, min: 0, validate: validateAreaM2 },
+                { name: "floor", type: "text", label: "Tầng" },
+              ),
+              formRow(nonNegativeNumber("bedrooms", "Số phòng ngủ"), nonNegativeNumber("bathrooms", "Số phòng tắm")),
+              formRow(directionField("houseDirection", "Hướng nhà"), directionField("balconyDirection", "Hướng ban công")),
+              { name: "furnishing", type: "select", label: "Nội thất", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },
+              rentalTermsGroup,
+            ],
+          },
+          {
+            label: "Hình ảnh",
+            fields: [
+              {
+                name: "gallery",
+                type: "upload",
+                label: "Thư viện ảnh",
+                relationTo: "media",
+                hasMany: true,
+                filterOptions: { mimeType: { contains: "image/" } },
+                validate: validateGallery,
+                admin: { description: "Ảnh đầu tiên là ảnh đại diện của tin.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
+              },
+              { name: "videoUrl", type: "text", label: "Link video (YouTube/TikTok)", validate: validateVideoUrl },
+            ],
+          },
+        ]),
         rentedAtField,
         searchTextField,
       ],

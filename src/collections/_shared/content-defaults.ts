@@ -1,4 +1,4 @@
-import type { Access, CollectionConfig, CollectionSlug, Field, FieldAccess } from "payload";
+import type { Access, CollectionConfig, CollectionSlug, Field, FieldAccess, TabsField } from "payload";
 
 import { isAdmin, isAuthorOrAdmin, isStaff, makePublishedOnly, PUBLIC_STATUSES } from "../../access";
 import { authorField } from "../../fields/author";
@@ -81,16 +81,19 @@ const deleteAccess: Access = (args) => {
   return isSoftDelete ? isAuthorOrAdmin(args) : isAdmin(args);
 };
 
-/** Mỗi phần tử: tên trường dùng chung → các trường thật sinh ra (`slug` kèm `scopeSlug`, `hasEnglish`/`translation` tách riêng). */
+/**
+ * Mỗi phần tử: tên trường dùng chung → các trường thật sinh ra (`slug` kèm `scopeSlug`, `hasEnglish`/`translation` tách riêng).
+ * Thứ tự = thứ tự hiện ở cột phải của form sửa (BL-015 T06): trạng thái · ngày xuất bản · tác giả · nổi bật · slug · có bản EN.
+ */
 function buildSharedFields(options: ContentOptions): Array<[SharedFieldName, Field[]]> {
   const translation = translationFields();
   const part = (name: string) => translation.filter((field) => "name" in field && field.name === name);
   return [
-    ["slug", [slugField({ sourceField: options.slugSource, scopeField: options.scopeField }), ...(options.scopeField ? [scopeSlugField(options.scopeField)] : [])]],
     ["status", [statusField(options.statuses ?? CONTENT_STATUSES)]],
     ["publishedAt", [publishedAtField()]],
     ["author", [authorField()]],
     ["isFeatured", [isFeaturedField()]],
+    ["slug", [slugField({ sourceField: options.slugSource, scopeField: options.scopeField }), ...(options.scopeField ? [scopeSlugField(options.scopeField)] : [])]],
     ["hasEnglish", part("hasEnglish")],
     ["translation", part("translation")],
     ["seo", [seoField()]],
@@ -120,6 +123,28 @@ function resolveSharedFields(options: ContentOptions, collectionSlug: string): F
     );
   }
   return available.flatMap(([name, fields]) => (overrides[name] ? withFieldAccess(fields, overrides[name]) : fields));
+}
+
+const isNamed = (field: Field, name: string) => "name" in field && field.name === name;
+
+/**
+ * Collection có bộ tab không tên ở cấp gốc (`formTabs`) thì nhóm `seo` và `translation` (giữ nguyên tên, đường dẫn dữ liệu không đổi)
+ * thành tab "SEO" và "Bản dịch" nối vào bộ tab đó; các trường dùng chung còn lại (cột phải, `position: "sidebar"`) đứng sau bộ tab ở
+ * cấp gốc, vì Payload chỉ đặt vào cột phải field `sidebar` ở cấp gốc. Không có bộ tab thì giữ cách cũ: nối vào cuối.
+ */
+function placeSharedFields(own: Field[], shared: Field[]): Field[] {
+  const tabsIndex = own.findIndex((field) => field.type === "tabs");
+  if (tabsIndex === -1) return [...own, ...shared];
+  const seo = shared.find((field) => isNamed(field, "seo"));
+  const translation = shared.find((field) => isNamed(field, "translation"));
+  const tabs = own[tabsIndex] as TabsField;
+  const sharedTabs = [
+    ...(seo ? [{ label: "SEO", fields: [seo] }] : []),
+    ...(translation ? [{ label: "Bản dịch", fields: [translation] }] : []),
+  ];
+  const withSharedTabs: TabsField = { ...tabs, tabs: [...tabs.tabs, ...sharedTabs] };
+  const sidebar = shared.filter((field) => field !== seo && field !== translation);
+  return [...own.slice(0, tabsIndex), withSharedTabs, ...own.slice(tabsIndex + 1), ...sidebar];
 }
 
 /**
@@ -174,6 +199,6 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
       ],
       afterDelete: [auditContentPurge, ...(revalidate ? [revalidate.afterDelete] : []), ...(collection.hooks?.afterDelete ?? [])],
     },
-    fields: [...collection.fields, ...resolveSharedFields(options, collection.slug)],
+    fields: placeSharedFields(collection.fields, resolveSharedFields(options, collection.slug)),
   };
 }

@@ -8,6 +8,7 @@ import { createRevalidateHomepageOnService } from "../hooks/homepage/revalidate-
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formTabs } from "../lib/admin/form-layout";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 const imageUpload = (name: string, label: string, validate?: UploadFieldSingleValidation): UploadField => ({
@@ -39,13 +40,25 @@ export function createServices(revalidate?: RevalidatePaths, revalidateTags?: Re
       access: { create: isAdmin, update: isAdmin, delete: isAdmin },
       hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
-        titleField(),
-        imageUpload("icon", "Icon"),
-        // Ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ (ERD §4.9): bắt buộc khi xuất bản.
-        imageUpload("coverImage", "Ảnh bìa", validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản dịch vụ.")),
-        { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
-        { name: "content", type: "richText", label: "Nội dung", localized: true },
-        { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
+              { name: "content", type: "richText", label: "Nội dung", localized: true },
+              { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
+            ],
+          },
+          {
+            label: "Hình ảnh",
+            fields: [
+              imageUpload("icon", "Icon"),
+              // Ảnh thẻ Dịch vụ trên trang chủ (3:4) và hero trang dịch vụ (ERD §4.9): bắt buộc khi xuất bản.
+              imageUpload("coverImage", "Ảnh bìa", validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản dịch vụ.")),
+            ],
+          },
+        ]),
       ],
     },
     {

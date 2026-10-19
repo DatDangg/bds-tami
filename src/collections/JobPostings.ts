@@ -7,6 +7,7 @@ import { titleField } from "../fields/title";
 import { guardJobPostingHardDelete } from "../hooks/job-postings/guard-delete";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formRow, formTabs } from "../lib/admin/form-layout";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 export const EMPLOYMENT_TYPES = ["full_time", "part_time", "internship", "contract"] as const;
@@ -61,26 +62,41 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
       defaultSort: "-publishedAt",
       hooks: { beforeDelete: [guardJobPostingHardDelete] },
       fields: [
-        titleField(),
-        scopedCategoryField("job", { required: false }),
-        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
-        { name: "workplace", type: "text", label: "Nơi làm việc" },
-        employmentTypeField,
-        { name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 },
-        { name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax },
-        { name: "salaryText", type: "text", label: "Mức lương hiển thị", localized: true, admin: { description: "Vd: Thoả thuận, 15–20 triệu." } },
-        { name: "quantity", type: "number", label: "Số lượng tuyển", min: 1 },
-        {
-          name: "deadline",
-          type: "date",
-          label: "Hạn nộp hồ sơ",
-          required: true,
-          index: true,
-          admin: { date: { pickerAppearance: "dayOnly" } },
-        },
-        { name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
-        { name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
-        { name: "benefits", type: "richText", label: "Quyền lợi", localized: true },
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              scopedCategoryField("job", { required: false }),
+              { name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
+              { name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
+              { name: "benefits", type: "richText", label: "Quyền lợi", localized: true },
+            ],
+          },
+          {
+            label: "Thông tin tuyển dụng",
+            fields: [
+              formRow(
+                { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
+                { name: "workplace", type: "text", label: "Nơi làm việc" },
+              ),
+              formRow(employmentTypeField, { name: "quantity", type: "number", label: "Số lượng tuyển", min: 1 }),
+              formRow(
+                { name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 },
+                { name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax },
+              ),
+              { name: "salaryText", type: "text", label: "Mức lương hiển thị", localized: true, admin: { description: "Vd: Thoả thuận, 15–20 triệu." } },
+              {
+                name: "deadline",
+                type: "date",
+                label: "Hạn nộp hồ sơ",
+                required: true,
+                index: true,
+                admin: { date: { pickerAppearance: "dayOnly" } },
+              },
+            ],
+          },
+        ]),
       ],
     },
     { englishRequiredFields: ["title", "slug", "description", "requirements"], omit: ["isFeatured"], revalidate },

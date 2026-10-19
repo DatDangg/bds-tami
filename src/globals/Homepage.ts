@@ -11,6 +11,7 @@ import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { defaultLocale } from "../i18n/routing";
 import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
+import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 
 const MB = 1024 * 1024;
@@ -226,16 +227,18 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
     access: { read: () => true, update: isAdmin },
     hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateHomepageGlobal(revalidators), enqueueTranslation.globalAfterChange] },
     fields: [
-      heroBlock,
-      aboutBlock,
-      featuredProjectsBlock,
-      servicesBlock,
-      featuredOffersBlock,
-      partnersBlock,
-      ctaBannerBlock,
-      blockOrderField,
-      seoField(),
-      translationGroup(),
+      formTabs([
+        { label: "Hero", fields: [heroBlock] },
+        { label: "Giới thiệu", fields: [aboutBlock] },
+        { label: "Dự án nổi bật", fields: [featuredProjectsBlock] },
+        { label: "Dịch vụ", fields: [servicesBlock] },
+        { label: "Ưu đãi", fields: [featuredOffersBlock] },
+        { label: "Đối tác", fields: [partnersBlock] },
+        { label: "Kêu gọi", fields: [ctaBannerBlock] },
+        { label: "Thứ tự khối", fields: [blockOrderField] },
+        { label: "SEO", fields: [seoField()] },
+        { label: "Bản dịch", fields: [translationGroup()] },
+      ]),
     ],
   };
 }

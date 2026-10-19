@@ -6,7 +6,8 @@ export const RENTAL_STATUSES = [...CONTENT_STATUSES, "rented"] as const;
 
 export type ContentStatus = (typeof RENTAL_STATUSES)[number];
 
-const LABELS: Record<ContentStatus, string> = {
+/** Nhãn tiếng Việt của trạng thái nội dung (dùng cả ở dashboard admin). */
+export const CONTENT_STATUS_LABELS: Record<ContentStatus, string> = {
   draft: "Nháp",
   published: "Đã xuất bản",
   hidden: "Ẩn",
@@ -22,7 +23,7 @@ export function statusField(values: readonly ContentStatus[] = CONTENT_STATUSES)
     required: true,
     index: true,
     defaultValue: "draft",
-    options: values.map((value) => ({ label: LABELS[value], value })),
+    options: values.map((value) => ({ label: CONTENT_STATUS_LABELS[value], value })),
     admin: { position: "sidebar", components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
   };
 }

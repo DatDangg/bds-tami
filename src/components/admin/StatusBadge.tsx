@@ -2,13 +2,14 @@
 
 import type { DefaultCellComponentProps } from "payload";
 
+import type { BadgeTone } from "./admin-tokens";
 import { LinkedCell } from "./LinkedCell";
 import { toneForStatus } from "./status-tones";
 
-/** Badge trạng thái: chấm 6px + CHỮ (không chỉ màu), màu theo tone §1.3. Dùng lại ở dashboard. */
-export function StatusBadge({ value, label }: { value: string; label?: string }) {
+/** Badge trạng thái: chấm 6px + CHỮ (không chỉ màu), màu theo tone §1.3. Dùng lại ở dashboard; `tone` ghi đè khi nhãn không phải một giá trị trạng thái (vd "Chưa phân công"). */
+export function StatusBadge({ value, label, tone }: { value: string; label?: string; tone?: BadgeTone }) {
   return (
-    <span className={`admin-badge admin-badge--${toneForStatus(value)}`}>
+    <span className={`admin-badge admin-badge--${tone ?? toneForStatus(value)}`}>
       <span className="admin-badge__dot" aria-hidden="true" />
       {label ?? value}
     </span>

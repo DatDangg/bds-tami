@@ -6,6 +6,7 @@ import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formTabs } from "../lib/admin/form-layout";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /**
@@ -25,21 +26,33 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
       },
       defaultSort: "-publishedAt",
       fields: [
-        titleField(),
-        scopedCategoryField("news"),
-        {
-          name: "cover",
-          type: "upload",
-          label: "Ảnh bìa",
-          relationTo: "media",
-          filterOptions: { mimeType: { contains: "image/" } },
-          // Ảnh bìa là ảnh thẻ trong danh sách và hero bài viết (ERD §4.8): bắt buộc khi xuất bản.
-          validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin tức."),
-          admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
-        },
-        { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-        { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
-        { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              scopedCategoryField("news"),
+              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
+              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+              { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
+            ],
+          },
+          {
+            label: "Hình ảnh",
+            fields: [
+              {
+                name: "cover",
+                type: "upload",
+                label: "Ảnh bìa",
+                relationTo: "media",
+                filterOptions: { mimeType: { contains: "image/" } },
+                // Ảnh bìa là ảnh thẻ trong danh sách và hero bài viết (ERD §4.8): bắt buộc khi xuất bản.
+                validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin tức."),
+                admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
+              },
+            ],
+          },
+        ]),
       ],
     },
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },

@@ -139,6 +139,15 @@
   border-bottom-color: var(--admin-border);
 }
 
+// Mobile: vùng bấm tab >= 44px (Payload đã cuộn ngang bộ tab bằng .tabs-field__tabs-wrap + nowrap); gạch chân tab đang chọn vẫn nằm ở đáy nút.
+@media (max-width: 767px) {
+  .tabs-field__tab-button {
+    min-height: 44px;
+    align-items: center;
+    padding-bottom: 0;
+  }
+}
+
 // Tab tài liệu (Chỉnh sửa / Phiên bản / API): phần tử .btn mang luôn lớp doc-tab--active (+ btn--disabled).
 .doc-tab--active.btn--style-tab {
   --bg-color: var(--admin-accent-soft);

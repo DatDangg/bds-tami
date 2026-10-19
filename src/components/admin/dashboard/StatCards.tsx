@@ -1,5 +1,5 @@
 import type { StatCard } from "./dashboard-data";
-import { DashboardTextBadge } from "./DashboardBadge";
+import { StatusBadge } from "../StatusBadge";
 import { DashboardIcon } from "./DashboardIcons";
 
 function StatCardBody({ card }: { card: StatCard }) {
@@ -13,7 +13,7 @@ function StatCardBody({ card }: { card: StatCard }) {
       </span>
       <span className="tami-dash-stat__value">
         {card.count.toLocaleString("vi-VN")}
-        {card.warnWhenPositive && card.count > 0 && <DashboardTextBadge tone="warning">Cần giao</DashboardTextBadge>}
+        {card.warnWhenPositive && card.count > 0 && <StatusBadge value="needs-assignment" tone="warning" label="Cần giao" />}
       </span>
       <span className="tami-dash-stat__hint">{card.hint}</span>
     </>

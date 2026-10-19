@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { seedSamplePropertyPosts } from "../../seed/sample/property-posts";
 import { ROLES } from "../../src/access/roles";
+import { findLayoutField } from "../../src/lib/admin/form-layout";
 import { isOfferEnded, offerNotEndedWhere } from "../../src/lib/content/offer-status";
 
 const baseUrl = process.env.DATABASE_URL_TEST;
@@ -197,7 +198,7 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
           "relatedProject", "relatedRental", "offer", "isFeatured", "status", "publishedAt", "author", "seo", "hasEnglish", "translation",
         ]),
       );
-      const offer = config.fields.find((field) => "name" in field && field.name === "offer");
+      const offer = findLayoutField(config.fields, "offer");
       expect(offer && "fields" in offer ? offer.fields.map((field) => "name" in field && field.name) : []).toEqual([
         "startAt", "endAt", "voucherCode", "terms",
       ]);

@@ -17,6 +17,7 @@ import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidat
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formRow, formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { withContentDefaults } from "./_shared/content-defaults";
 
@@ -118,45 +119,64 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       hooks: { afterChange: [reindexRentalsOnProjectRename, revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         searchReindexPendingField("project"),
-        titleField(),
-        scopedCategoryField("project"),
-        { name: "developer", type: "relationship", label: "Chủ đầu tư", relationTo: "developers", index: true },
-        {
-          name: "salesStatus",
-          type: "select",
-          label: "Tình trạng mở bán",
-          required: true,
-          index: true,
-          admin: { components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
-          options: SALES_STATUSES.map((value) => ({ label: SALES_STATUS_LABELS[value], value })),
-        },
-        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
-        // Phường phải thuộc `province` đã chọn: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn).
-        { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
-        { name: "address", type: "text", label: "Địa chỉ" },
-        { name: "location", type: "point", label: "Toạ độ bản đồ" },
-        nonNegativeNumber("priceFromVnd", "Giá từ (VNĐ)"),
-        nonNegativeNumber("priceToVnd", "Giá đến (VNĐ)"),
-        nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"),
-        nonNegativeNumber("areaToM2", "Diện tích đến (m²)"),
-        scaleGroup,
-        { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
-        { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true },
-        amenitiesField,
-        {
-          name: "gallery",
-          type: "upload",
-          label: "Thư viện ảnh",
-          relationTo: "media",
-          hasMany: true,
-          filterOptions: imageFilter,
-          validate: validateGallery,
-          admin: { description: "Ảnh đầu tiên là ảnh đại diện của dự án.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
-        },
-        floorPlansField,
-        { ...mediaUpload("documents", "Tài liệu (PDF)", { equals: "application/pdf" }), hasMany: true },
-        { name: "legalInfo", type: "richText", label: "Pháp lý", localized: true },
-        { name: "salesPolicy", type: "richText", label: "Chính sách bán hàng", localized: true },
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              scopedCategoryField("project"),
+              { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
+              { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true },
+              { name: "legalInfo", type: "richText", label: "Pháp lý", localized: true },
+              { name: "salesPolicy", type: "richText", label: "Chính sách bán hàng", localized: true },
+            ],
+          },
+          {
+            label: "Thông tin dự án",
+            fields: [
+              formRow(
+                { name: "developer", type: "relationship", label: "Chủ đầu tư", relationTo: "developers", index: true },
+                {
+                  name: "salesStatus",
+                  type: "select",
+                  label: "Tình trạng mở bán",
+                  required: true,
+                  index: true,
+                  admin: { components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
+                  options: SALES_STATUSES.map((value) => ({ label: SALES_STATUS_LABELS[value], value })),
+                },
+              ),
+              // Phường phải thuộc `province` đã chọn: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn).
+              formRow(
+                { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
+                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
+              ),
+              { name: "address", type: "text", label: "Địa chỉ" },
+              { name: "location", type: "point", label: "Toạ độ bản đồ" },
+              formRow(nonNegativeNumber("priceFromVnd", "Giá từ (VNĐ)"), nonNegativeNumber("priceToVnd", "Giá đến (VNĐ)")),
+              formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),
+              scaleGroup,
+              amenitiesField,
+            ],
+          },
+          {
+            label: "Hình ảnh",
+            fields: [
+              {
+                name: "gallery",
+                type: "upload",
+                label: "Thư viện ảnh",
+                relationTo: "media",
+                hasMany: true,
+                filterOptions: imageFilter,
+                validate: validateGallery,
+                admin: { description: "Ảnh đầu tiên là ảnh đại diện của dự án.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
+              },
+              floorPlansField,
+              { ...mediaUpload("documents", "Tài liệu (PDF)", { equals: "application/pdf" }), hasMany: true },
+            ],
+          },
+        ]),
       ],
     },
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },

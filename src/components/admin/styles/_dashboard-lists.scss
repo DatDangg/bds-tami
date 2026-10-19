@@ -89,35 +89,6 @@
   }
 }
 
-// ---- Badge tối giản (thay bằng StatusBadge của T05 sau) ----
-.tami-dash-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 500;
-  white-space: nowrap;
-
-  &::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentcolor;
-  }
-
-  @each $tone in neutral, success, warning, danger, info, accent {
-    &--#{$tone} {
-      color: var(--admin-badge-#{$tone}-fg);
-      background: var(--admin-badge-#{$tone}-bg);
-    }
-  }
-}
-
 // ---- Danh mục quản lý ----
 .tami-dash-groups {
   display: grid;

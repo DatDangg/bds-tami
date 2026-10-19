@@ -10,6 +10,7 @@ import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidat
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { formRow, formTabs } from "../lib/admin/form-layout";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -60,27 +61,50 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
       defaultSort: "-publishedAt",
       hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
-        titleField(),
-        scopedCategoryField("property_post"),
-        {
-          name: "cover",
-          type: "upload",
-          label: "Ảnh bìa",
-          relationTo: "media",
-          filterOptions: { mimeType: { contains: "image/" } },
-          validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin đăng."),
-          admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
-        },
-        { name: "gallery", type: "upload", label: "Thư viện ảnh", relationTo: "media", hasMany: true, filterOptions: { mimeType: { contains: "image/" } } },
-        { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-        { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
-        { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0 },
-        { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
-        { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
-        { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardWithOptionalProvince },
-        { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },
-        { name: "relatedRental", type: "relationship", label: "Tin cho thuê liên quan", relationTo: "rentals", index: true },
-        offerGroup,
+        formTabs([
+          {
+            label: "Nội dung",
+            fields: [
+              titleField(),
+              scopedCategoryField("property_post"),
+              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
+              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+            ],
+          },
+          {
+            label: "Thông tin tin đăng",
+            fields: [
+              formRow(
+                { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0 },
+                { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
+              ),
+              formRow(
+                { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
+                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardWithOptionalProvince },
+              ),
+              formRow(
+                { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },
+                { name: "relatedRental", type: "relationship", label: "Tin cho thuê liên quan", relationTo: "rentals", index: true },
+              ),
+              offerGroup,
+            ],
+          },
+          {
+            label: "Hình ảnh",
+            fields: [
+              {
+                name: "cover",
+                type: "upload",
+                label: "Ảnh bìa",
+                relationTo: "media",
+                filterOptions: { mimeType: { contains: "image/" } },
+                validate: validateCoverWhenPublished("Cần ảnh bìa trước khi xuất bản tin đăng."),
+                admin: { components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
+              },
+              { name: "gallery", type: "upload", label: "Thư viện ảnh", relationTo: "media", hasMany: true, filterOptions: { mimeType: { contains: "image/" } } },
+            ],
+          },
+        ]),
       ],
     },
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },

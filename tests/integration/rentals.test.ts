@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { seedSampleRentals } from "../../seed/sample/rentals";
 import { ROLES } from "../../src/access/roles";
+import { findLayoutField } from "../../src/lib/admin/form-layout";
 
 const baseUrl = process.env.DATABASE_URL_TEST;
 
@@ -224,7 +225,7 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
           "status", "rentedAt", "publishedAt", "author", "searchText", "hasEnglish", "translation", "seo",
         ]),
       );
-      const terms = config.fields.find((field) => "name" in field && field.name === "rentalTerms");
+      const terms = findLayoutField(config.fields, "rentalTerms");
       expect(terms && "fields" in terms ? terms.fields.map((field) => "name" in field && field.name) : []).toEqual([
         "minLeaseMonths", "depositMonths", "paymentCycle", "includedServices", "availableFrom",
       ]);

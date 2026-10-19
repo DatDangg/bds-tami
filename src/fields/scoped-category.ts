@@ -44,6 +44,5 @@ export function scopedCategoryField(scope: CategoryScope, { required = true }: {
     index: true,
     validate,
     filterOptions: { scope: { equals: scope } },
-    admin: { position: "sidebar" },
   };
 }
