@@ -49,12 +49,13 @@ describe("Header: khung và landmark", () => {
     expect(searchHrefFor("en")).toBe("/en/for-rent?q=");
   });
 
-  it("menu ngang chỉ hiện từ xl; nút Menu có ở mọi breakpoint (header 1 hàng ở ≥ xl, BL-001)", () => {
+  it("menu ngang chỉ hiện từ xl; nút Menu chỉ ở < xl (xl:hidden, header 1 hàng không có nút Menu ở ≥ xl, BL-019)", () => {
     renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
     const desktopNav = screen.getByRole("navigation", { name: "Menu chính", hidden: true });
     expect(desktopNav).toHaveClass("hidden", "xl:block");
-    expect(menuTrigger()).not.toHaveClass("xl:hidden");
-    expect(menuTrigger().className).not.toMatch(/\bxl:hidden\b/);
+    expect(menuTrigger()).toHaveClass("xl:hidden");
+    // Nhãn xl/2xl riêng của nút đã thừa: nhãn "Menu" hiện từ sm như mọi breakpoint < xl.
+    expect(menuTrigger().innerHTML).not.toMatch(/\b2xl:/);
   });
 
   it("logo: không có trong CMS thì dùng file tĩnh (vàng cho header đặc, trắng cho header trong suốt); có thì dùng URL từ site-settings", () => {
@@ -221,23 +222,35 @@ describe("MobileMenu (< xl)", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("không tự đóng khi cửa sổ rộng lên xl (nút Menu vẫn có ở ≥ xl)", async () => {
+  it("đang mở mà cửa sổ rộng lên ≥ xl thì menu đóng và nhả khoá cuộn nền (BL-019)", async () => {
     const user = userEvent.setup();
-    const listeners: Array<(event: { matches: boolean }) => void> = [];
+    const original = Object.getOwnPropertyDescriptor(window, "matchMedia");
+    let matches = false;
+    const listeners: Array<() => void> = [];
     Object.defineProperty(window, "matchMedia", {
       configurable: true,
       value: () => ({
-        matches: false,
-        addEventListener: (_: string, listener: (event: { matches: boolean }) => void) => listeners.push(listener),
+        get matches() {
+          return matches;
+        },
+        addEventListener: (_: string, listener: () => void) => listeners.push(listener),
         removeEventListener: () => {},
       }),
     });
-    renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
-    await user.click(menuTrigger());
-    await screen.findByRole("dialog");
-    act(() => {
-      for (const listener of listeners) listener({ matches: true });
-    });
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    try {
+      renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
+      await user.click(menuTrigger());
+      await screen.findByRole("dialog");
+      expect(document.body).toHaveAttribute("data-scroll-locked");
+      act(() => {
+        matches = true;
+        for (const listener of listeners) listener();
+      });
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(document.body).not.toHaveAttribute("data-scroll-locked");
+    } finally {
+      if (original) Object.defineProperty(window, "matchMedia", original);
+      else Reflect.deleteProperty(window, "matchMedia");
+    }
   });
 });

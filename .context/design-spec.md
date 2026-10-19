@@ -79,8 +79,8 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | Biến thể | **Trong suốt** (trang có hero ảnh: trang chủ, chi tiết dự án, dịch vụ): nền trong suốt + gradient đen 40% → 0 phía trên, logo trắng, icon trắng. **Đặc**: nền `--color-surface`, `--shadow-sm`, logo vàng (BL-018). Chuyển sang Đặc khi hero ra khỏi viewport (IntersectionObserver trên sentinel), transition `--duration-base` |
 | Trang không có hero | Luôn Đặc |
 | Cao | 64px (< lg) · 72px (≥ lg) |
-| Bố cục < xl | Trái: nút Tìm kiếm (icon kính lúp). Giữa: logo. Phải: `VI \| EN` (ẩn < sm, khi đó nằm trong menu) + nút Menu (icon 3 gạch, nhãn "Menu") |
-| Bố cục ≥ xl | **Một hàng** (user quyết 2026-10-19, BL-001): logo trái · menu ngang giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ, chữ `--text-small` 600 in hoa `0.08em`) · phải: nút Tìm kiếm, `VI | EN`, nút CTA (nếu bật), nút Menu (mở menu toàn màn hình §2.2). Cao 72px như ≥ lg, không còn hàng 2. Mục có con: dropdown khi hover/focus/Enter, `aria-expanded`. Menu ngang không xuống dòng, không tràn ở 1280px |
+| Bố cục < xl | Trái: nút Tìm kiếm (icon kính lúp). Giữa: logo. Phải: `VI \| EN` (ẩn < sm, khi đó nằm trong menu) + nút Menu (icon 3 gạch, nhãn "Menu") mở menu toàn màn hình §2.2. Nút Menu **chỉ có ở < xl** (BL-019) |
+| Bố cục ≥ xl | **Một hàng** (user quyết 2026-10-19, BL-001; bỏ nút Menu BL-019): logo trái · menu ngang giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ, chữ `--text-small` 600 in hoa `0.08em`) · phải: nút Tìm kiếm, `VI | EN`, nút CTA (nếu bật). **Không có nút Menu** (như vinhomes.vn desktop: menu ngang là điều hướng duy nhất, không trùng menu toàn màn hình). Cao 72px như ≥ lg, không còn hàng 2. Mục có con: dropdown khi hover/focus/Enter, `aria-expanded`. Menu ngang không xuống dòng, không tràn ở 1280px (VI và EN) |
 | Mục đang xem | Gạch chân 2px `--color-primary` (header trong suốt) / `--color-accent-text` (header đặc), `aria-current="page"` |
 | Sticky | Có, `position: sticky; top: 0; z: --z-header` |
 | Logo | Lấy từ `site-settings.logo` (bản cho nền sáng: header đặc) và `site-settings.logoDark` (bản cho nền tối: header trong suốt trên hero, menu toàn màn hình, footer). Thiếu bản nào → dùng logo tĩnh mặc định cho bản đó (`/brand/tami-logo-gold.png` / `/brand/tami-logo-white.png`; BL-018) |
@@ -89,9 +89,9 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 **Tìm kiếm (D7):** bấm icon mở thanh tìm (Sheet trên xuống, cao 160px desktop / toàn màn mobile): ô `q` (label ẩn trực quan "Tìm tin cho thuê / Search rentals"), gợi ý tĩnh 4 danh mục Cho thuê dạng chip. Enter → `/cho-thue?q=` · `/en/for-rent?q=`. Không autocomplete (ngoài phạm vi).
 
 ### 2.2. Menu toàn màn hình
-- Mở từ nút Menu, phủ toàn màn hình, lớp `.theme-dark-block` nền `--color-dark-deep`, `z: --z-overlay`.
+- **Chỉ < xl** (BL-019): mở từ nút Menu, phủ toàn màn hình, lớp `.theme-dark-block` nền `--color-dark-deep`, `z: --z-overlay`.
 - Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h2` serif in hoa, mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
-- Accordion menu con: link cha giữ điều hướng, nút caret riêng cạnh link (≥ 44px, `aria-expanded`, `aria-controls`, nhãn "Mở menu con <mục>"), đóng mặc định, mở bằng Enter/Space/chạm; chuyển động mở/đóng `--duration-base`, tắt khi `prefers-reduced-motion`. Menu toàn màn hình dùng ở mọi breakpoint (≥ xl mở từ nút Menu trong header 1 hàng).
+- Accordion menu con: link cha giữ điều hướng, nút caret riêng cạnh link (≥ 44px, `aria-expanded`, `aria-controls`, nhãn "Mở menu con <mục>"), đóng mặc định, mở bằng Enter/Space/chạm; chuyển động mở/đóng `--duration-base`, tắt khi `prefers-reduced-motion`. ≥ xl không có menu toàn màn hình (điều hướng bằng menu ngang §2.1); đang mở mà cửa sổ rộng lên ≥ xl → menu tự đóng, nhả khoá cuộn nền.
 - Mở: menu trượt mờ dần `--duration-slow`, các mục stagger 40ms (tắt khi reduced motion).
 - Nút đóng ở đúng vị trí nút Menu (cùng toạ độ), `aria-label="Đóng menu / Close menu"`.
 

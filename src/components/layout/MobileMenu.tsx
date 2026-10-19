@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useCallback, useId, useState } from "react";
+import { useMediaQuery } from "@/components/home/use-environment";
 import { CaretDown, List, X } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,9 @@ import { BrandLogo } from "./BrandLogo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NavAnchor, isActivePath } from "./NavAnchor";
 import type { FooterContactView, LinkView, LogoView, NavItemView } from "./shell-data";
+
+/** Từ xl header là một hàng có menu ngang, không có nút Menu (BL-019). Phải khớp breakpoint `xl` của Tailwind. */
+const XL_QUERY = "(min-width: 1280px)";
 
 interface MobileMenuProps {
   items: NavItemView[];
@@ -20,25 +24,29 @@ interface MobileMenuProps {
 }
 
 /**
- * Menu toàn màn hình ở MỌI breakpoint, mở từ nút Menu trong header (design-spec §2.2; từ xl header một hàng vẫn có nút Menu, BL-001,
- * nên không còn tự đóng khi cửa sổ rộng lên). Radix Dialog lo bẫy focus, Esc đóng, khoá cuộn nền, trả focus về nút mở
- * và `aria-expanded`/`aria-controls` trên nút. Đóng thì nội dung không còn trong DOM (không có link ẩn bị focus).
- * Bấm một link thì đóng: layout không dựng lại khi điều hướng nên dialog sẽ kẹt nếu không tự đóng. Mục có con → accordion (`MenuItem`).
- * Nhãn "Menu" ẩn ở xl (chỉ icon + sr-only) để hàng header 1280px đủ chỗ cho 7 mục + CTA; hiện lại từ 2xl.
+ * Menu toàn màn hình CHỈ ở < xl, mở từ nút Menu trong header (design-spec §2.2). Từ xl nút Menu bị ẩn (`xl:hidden`, display:none nên
+ * không nhận focus) vì đã có menu ngang; đang mở mà cửa sổ rộng lên ≥ xl thì tự đóng để Radix nhả khoá cuộn nền (BL-019).
+ * Radix Dialog lo bẫy focus, Esc đóng, khoá cuộn nền, trả focus về nút mở và `aria-expanded`/`aria-controls` trên nút.
+ * Đóng thì nội dung không còn trong DOM (không có link ẩn bị focus). Bấm một link thì đóng: layout không dựng lại khi điều hướng
+ * nên dialog sẽ kẹt nếu không tự đóng. Mục có con → accordion (`MenuItem`).
  */
 export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
   const t = useTranslations("layout");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
+  const isDesktop = useMediaQuery(XL_QUERY);
+
+  // Điều chỉnh state ngay lúc render (không dùng effect): rộng lên ≥ xl thì đóng, quay lại < xl không tự mở lại.
+  if (isDesktop && open) setOpen(false);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-small font-semibold tracking-[0.08em] text-text uppercase">
+      <DialogPrimitive.Trigger className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-small font-semibold tracking-[0.08em] text-text uppercase xl:hidden">
         <List size={24} aria-hidden="true" />
         {/* Có CTA: ở md–lg cụm phải (VI|EN + CTA + Menu) phải ≤ nửa hàng để logo vẫn ở giữa → chỉ icon, nhãn sr-only. */}
-        <span className={cn("hidden sm:inline xl:hidden 2xl:inline", cta && "md:hidden lg:inline")}>{t("header.menu")}</span>
-        <span className={cn("sr-only sm:hidden xl:inline 2xl:hidden", cta && "md:inline lg:hidden")}>{t("header.openMenu")}</span>
+        <span className={cn("hidden sm:inline", cta && "md:hidden lg:inline")}>{t("header.menu")}</span>
+        <span className={cn("sr-only sm:hidden", cta && "md:inline lg:hidden")}>{t("header.openMenu")}</span>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         {/* Overlay là nơi Radix gắn khoá cuộn nền (react-remove-scroll): thiếu nó thì trang phía sau vẫn cuộn được. */}

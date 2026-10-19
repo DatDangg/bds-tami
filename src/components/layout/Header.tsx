@@ -33,7 +33,8 @@ interface HeaderProps {
  * Header dính đầu trang (đặc; trong suốt đè hero khi trang có `[data-header-hero]`, xem `HeaderFrame`) (design-spec §2.1). Thuần hiển thị:
  * nhận view model đã lọc từ layout. Chỉ DesktopNav, MobileMenu, LanguageSwitcher là client. Thứ tự DOM = thứ tự Tab (logo, menu ngang,
  * tìm, ngôn ngữ, CTA, nút Menu). `order-*` chỉ đổi vị trí hiển thị ở < xl (tìm bên trái, logo giữa); từ xl là MỘT hàng: logo trái ·
- * menu ngang giữa · tìm + VI|EN + CTA + nút Menu phải (BL-001). Nút Menu có ở mọi breakpoint và mở menu toàn màn hình.
+ * menu ngang giữa · tìm + VI|EN + CTA phải, KHÔNG có nút Menu (BL-019; thứ tự Tab ≥ xl: logo, menu ngang, tìm, ngôn ngữ, CTA).
+ * Nút Menu chỉ ở < xl và mở menu toàn màn hình.
  * Hai bản logo (sáng/tối) cùng có trong DOM, CSS `.logo-on-*` chọn bản theo biến thể header.
  */
 export function Header({ items, contact, logo, cta }: HeaderProps) {
@@ -63,8 +64,8 @@ export function Header({ items, contact, logo, cta }: HeaderProps) {
         <div className="order-3 flex flex-1 items-center justify-end gap-2 xl:order-4 xl:flex-none">
           <LanguageSwitcher className="hidden sm:flex" />
           {/* md–lg đệm hẹp hơn để cụm phải (VI|EN + CTA + Menu) ≤ nửa hàng, logo vẫn ở giữa; xl đệm 16px cho hàng 1280px.
-              Nhãn CMS dài bị cắt (`truncate`) thay vì đẩy menu đè logo ở 1280; `title` giữ nhãn đầy đủ, menu toàn màn hình vẫn
-              hiện trọn nhãn. */}
+              Nhãn CMS dài bị cắt (`truncate`) thay vì đẩy menu đè logo ở 1280; `title` giữ nhãn đầy đủ (< xl menu toàn màn hình
+              còn hiện trọn nhãn). */}
           {cta && (
             <NavAnchor link={cta} title={cta.label} className={cn(buttonVariants({ size: "sm" }), "hidden max-w-[10rem] min-h-11 md:inline-flex md:px-3 lg:px-5 xl:px-4")}>
               {/* `truncate` đặt trên span con: text-overflow không áp dụng cho chính flex container. */}

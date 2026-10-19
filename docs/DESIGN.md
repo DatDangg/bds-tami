@@ -232,8 +232,8 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo vàng) | Theo vinhomes.vn: **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. Desktop ≥ 1280px có thể hiện menu ngang dưới logo |
-| Menu toàn màn hình | — | Mở từ nút menu: phủ toàn màn hình nền tối, mục menu chữ lớn, mục con xổ ra; cuối có hotline + mạng xã hội |
+| Header | Trong suốt (đè lên hero, logo trắng) · Đặc (nền sáng khi cuộn, logo vàng) | Theo vinhomes.vn. **Mobile/tablet < 1280px:** **logo ở giữa**, trái là nút tìm kiếm (mở ô từ khoá → chuyển tới `/cho-thue?q=` · `/en/for-rent?q=`; giai đoạn 1 không có tìm kiếm toàn site), phải là **nút chuyển ngôn ngữ VI / EN** + nút menu. **Desktop ≥ 1280px:** một hàng logo trái · menu ngang (mục con dạng dropdown) · tìm kiếm · VI / EN · nút CTA (nếu bật); **không có nút menu** (vinhomes.vn desktop cũng không có, BL-019) |
+| Menu toàn màn hình | — | Chỉ ở < 1280px, mở từ nút menu: phủ toàn màn hình nền tối, mục menu chữ lớn, mục con xổ ra; cuối có hotline + mạng xã hội |
 | Language Switcher | Chữ `VI | EN` · trong menu toàn màn hình | Chuyển sang **đúng trang tương ứng** ở ngôn ngữ kia; nếu trang đó chưa có bản dịch thì về trang danh sách / trang chủ của ngôn ngữ kia. Có `hreflang`, `aria-label`, ghi nhớ lựa chọn bằng cookie `NEXT_LOCALE` |
 | Section Heading | Có/không chữ chìm · căn giữa/căn trái | Eyebrow + tiêu đề serif in hoa + mô tả ngắn; chữ chìm to mờ phía sau |
 | Hero Slider | Ảnh · Video | Full màn hình (`100svh`), chữ ở giữa, nút cuộn xuống |
