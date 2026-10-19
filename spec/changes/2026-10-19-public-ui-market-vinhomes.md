@@ -63,7 +63,7 @@ Plan phase/task: `tasks/feature-public-ui-market-vinhomes/README.md`.
 | P1 | Tokens phong cách market (màu TAMI) + header nổi bo tròn kính mờ sáng | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, spec-validation PASS) | 3c1621d, ab3f95a, f25afe1 | 1.16.0 / v19 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-1.md` |
 | P2 | Trang chủ: schema Homepage (thanh thông báo, ô tìm kiếm hero, khối tin cho thuê, tin tức, CTA ảnh + 2 nút) + UI | **done** (T01 STRICT PASS r1, T02 PASS r3, T03/T04/T05 PASS r2, close-out NORMAL PASS, spec-validation PASS) | 4f48764, b2fe4e4, 4b7ab7e, 4058ae4, 1be4209, 2391bb6, fb360ab | 1.17.0 / v20 — `spec/updates/2026-10-19-public-ui-market-vinhomes-phase-2.md` |
 | P3 | Trang danh sách (banner 240px, băng tìm kiếm, lưới 4 cột) + Tin tức | **done** (T01 STRICT PASS r2, T02 STRICT PASS r1, T03 STRICT PASS r3, close-out NORMAL PASS, spec-validation GAPS → xử lý ở close-out) | 16c5e81, 1511db5, 0b95083, close-out | 1.19.0 / v23 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md` |
-| P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | pending | — | — |
+| P4 | Chi tiết dự án: thẻ tư vấn dính, tin liên quan, CTA | **done** (T01 NORMAL PASS r2, T02 STRICT PASS r1, spec-validation GAPS → xử lý ở close-out) | 80ba71e, 27f5ddb, close-out | 1.20.0 / v24 — `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md` |
 | P5 | Schema dự án (highlights, nearbyAmenities, priceTable, faqs) + UI | pending | — | — |
 
 Ghi chú P1: header **luôn** kính mờ sáng (kể cả trên hero) theo quyết định user — thay biến thể trong suốt và "logo trắng trên hero" của BL-018.
@@ -82,13 +82,18 @@ Ghi chú P3 — **quyết định agent (user ủy quyền 2026-10-20)** (chi ti
 - Tin tức: pill danh mục (link) → Tin nổi bật 1+4 → hàng danh mục cấp 1 (≤ 6 hàng × ≤ 4 bài) → "Tin khác" (không bài nào mất khỏi phân trang) → phân trang → form "Tư vấn nhu cầu" (`source=contact`, mọi trang `/tin-tuc`, không trang danh mục). BRD 1.7 + BR-10 cập nhật theo change doc §Tin tức.
 - Thẻ trắng bo 20px (Rental/Project/Post/NewsCard) trên nền sáng; khối Tin tức tối trang chủ giữ thẻ trong suốt (`onDark`).
 
+Ghi chú P4 — **quyết định agent (user ủy quyền 2026-10-20)** (chi tiết trong task file + `spec/updates/2026-10-20-public-ui-market-vinhomes-phase-4.md`):
+- Thanh mục con viên thuốc trắng giữ khe dưới header nổi (kiểu thanh nổi thứ hai); ≥ lg 2 cột + thẻ "Tư vấn 1:1" sticky (hotline + LeadForm duy nhất, cuộn trong khi dài); < lg thẻ sau Tài liệu, giữ CTA dính đáy; bỏ nền section xen kẽ.
+- "Tin liên quan": ≤ 4 tin cho thuê `published` + ≤ 4 Tin BĐS chưa kết thúc, ẩn khi trống, **không "Xem thêm"** (không có param lọc theo dự án); CTA "Đăng ký tham quan" = CtaBanner tối (không ảnh, không field CMS mới); hook làm mới chi tiết dự án cũ + mới khi tin công khai đổi.
+- BRD FR-PUB-03 **không bump** (thuần hiển thị, không nguồn lead mới).
+
 ## Acceptance (bắt buộc)
 - [x] Design tokens + `docs/DESIGN.md` + `.context/design-spec.md` cập nhật phong cách mới (bo góc, nút viên thuốc, serif viết thường, header nổi kính mờ) với màu TAMI; đạt AA sáng/tối.
 - [x] Header: thanh nổi bo tròn kính mờ, menu ngang ≥ xl không nút Menu (BL-019), logo vàng trên nền sáng (BL-018); < xl giữ nút Menu.
 - [x] Trang chủ có đủ các section #1–#11 ở bảng trên (các section quản lý qua global Homepage: bật/tắt + thứ tự như hiện có). — P2; #3 "slider banner ưu đãi" ánh xạ vào slider Ưu đãi (Q1); Cho thuê/Tin tức hiện sau khi admin thêm vào "Thứ tự khối" (Q2).
 - [x] Trang danh sách: banner ~240px (BL-017) + băng tìm kiếm gọn + lưới 4 cột ≥ xl; bộ lọc hiện có không mất chức năng (URL params giữ nguyên).
 - [x] Tin tức: hàng theo danh mục + form tư vấn cuối trang. — P3; `/tin-bds` không có băng tìm kiếm (không có bộ lọc sẵn — quyết định agent).
-- [ ] Chi tiết dự án: thẻ tư vấn dính bên phải ≥ lg + tin liên quan; phần cần schema mới tách phase riêng sau khi user duyệt.
+- [x] Chi tiết dự án: thẻ tư vấn dính bên phải ≥ lg + tin liên quan; phần cần schema mới tách phase riêng sau khi user duyệt.
 - [ ] Responsive mobile (thanh/khối tìm kiếm, slider vuốt được), VI/EN cùng bố cục, không CLS, giữ NFR hiệu năng (LCP).
 
 ## Ghi chú

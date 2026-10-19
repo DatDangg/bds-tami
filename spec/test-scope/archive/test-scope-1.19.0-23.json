@@ -1,0 +1,193 @@
+{
+  "specVersion": "1.19.0",
+  "scopeVersion": 23,
+  "generatedAt": "2026-10-20T18:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-020 Phase 3/5 — trang danh sách kiểu market (banner gọn 240px, băng tìm kiếm gọn + Bộ lọc popover/sheet, lưới 4 cột, thẻ trắng 20px) + Tin tức (Tin nổi bật, hàng theo danh mục, Tin khác, form Tư vấn nhu cầu nguồn contact). Spec 1.18.0 → 1.19.0 (MINOR), BRD 1.6 → 1.7. Đã build: T01 16c5e81, T02 1511db5, T03 0b95083; close-out (NewsCard thẻ trắng/onDark + docs as-built) chưa commit.",
+  "workItem": "feature/public-ui-market-vinhomes",
+  "backlog": "BL-020",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-19-public-ui-market-vinhomes.md",
+  "task": [
+    "tasks/feature-public-ui-market-vinhomes/phase-3-task-01.md",
+    "tasks/feature-public-ui-market-vinhomes/phase-3-task-02.md",
+    "tasks/feature-public-ui-market-vinhomes/phase-3-task-03.md"
+  ],
+  "commits": [
+    "16c5e81",
+    "1511db5",
+    "0b95083",
+    "close-out phase 3 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "16c5e81": "P3-T01 — Cho thuê: ListSearchBar dùng chung, Bộ lọc Popover/Sheet + badge, sắp xếp ở hàng kết quả, PageBanner compact 240px, lưới 4 cột, RentalCard thẻ trắng, bỏ thanh lọc dính mobile",
+    "1511db5": "P3-T02 — /du-an băng Tỉnh + Trạng thái + Lọc; /tin-bds banner compact + Có N kết quả + 4 cột; /tuyen-dung banner compact; ProjectCard/PostCard thẻ trắng",
+    "0b95083": "P3-T03 — Tin tức: pill danh mục, Tin nổi bật 1+4, hàng danh mục, Tin khác (buildMoreNews), form Tư vấn nhu cầu source=contact, trang danh mục compact + 4 cột, PageBanner overlap",
+    "close-out phase 3 (commit chứa file này)": "NewsCard thẻ trắng bo 20px trên nền sáng + prop onDark (HomeNews giữ trong suốt); docs as-built DESIGN.md, design-spec; spec 1.19.0 / scope v23 + BRD 1.7"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.18.0-22.json",
+  "specUpdate": "spec/updates/2026-10-20-public-ui-market-vinhomes-phase-3.md",
+  "specRefs": [
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F9",
+    "FR-ADM-20",
+    "Giao diện",
+    "BR-10"
+  ],
+  "specRefNotes": {
+    "F2": "/du-an: băng tìm kiếm Tỉnh + Trạng thái + nút Lọc đè banner (GET, không JS, không tự gửi), Có N kết quả + Xoá bộ lọc, lưới 4 cột ≥ xl, ProjectCard thẻ trắng 20px.",
+    "F3": "Cho thuê: băng tìm kiếm gọn (từ khoá + Loại=category + Khoảng giá 4 mức <5tr/5–10/10–20/>20tr + Bộ lọc + Tìm kiếm); Bộ lọc Popover ≥ lg (nút Đóng) / Sheet < lg, badge đếm lọc phụ (tỉnh, phường, diện tích, PN, nội thất, khoảng giá tự nhập); sắp xếp ở hàng Có N kết quả; 4 cột ≥ xl; bỏ thanh lọc dính mobile; URL params/noindex không đổi.",
+    "F4": "/tin-bds (+ danh mục): banner compact, KHÔNG băng tìm kiếm, Có N kết quả (tính cả bài nổi bật), lưới 4 cột; PostCard thẻ trắng ở mọi nơi dùng.",
+    "F5": "Tin tức: pill danh mục là link (aria-current); trang 1 Tin nổi bật 1+4 → hàng danh mục cấp 1 ≤ 6 × ≤ 4 + Xem thêm → Tin khác → phân trang → form; trang ≥ 2 lưới + form; trang danh mục banner compact + 4 cột không form; chi tiết tin không form; NewsCard thẻ trắng trên nền sáng, trong suốt ở khối tối trang chủ.",
+    "F9": "Nguồn lead thêm form Tư vấn nhu cầu ở /tin-tuc (source=contact, không sourceId, admin giao).",
+    "FR-ADM-20": "Banner gọn 240px cố định ở trang danh sách + danh mục/khu vực; đệm đáy ~3rem chỉ khi có băng đè (Cho thuê, Dự án); pháp lý/liên hệ/dịch vụ/404 giữ cỡ mặc định.",
+    "Giao diện": "No-JS: thêm Cho thuê (từ khoá + Loại chạy không JS; Khoảng giá + Bộ lọc cần JS). Thẻ lưới trắng bo 20px, lưới 4 cột ≥ xl.",
+    "BR-10": "BRD 1.7 — form liên hệ chung gồm trang Liên hệ và form Tư vấn nhu cầu ở /tin-tuc (nguồn contact)."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/layout/PageBanner.tsx",
+      "src/components/layout/PageBanner.test.tsx",
+      "src/components/layout/PendingRegion.tsx",
+      "src/components/listing/ListSearchBar.tsx",
+      "src/components/listing/ListSearchBar.test.tsx",
+      "src/components/templates/CategoryListTemplate.tsx",
+      "src/components/templates/CategoryListTemplate.test.tsx",
+      "src/components/ui/popover.tsx",
+      "src/components/rentals/FilterFields.tsx",
+      "src/components/rentals/RentalCard.tsx",
+      "src/components/rentals/RentalFilterPopover.tsx",
+      "src/components/rentals/RentalFilterSheet.tsx",
+      "src/components/rentals/RentalFilters.tsx",
+      "src/components/rentals/RentalFilters.test.tsx",
+      "src/components/rentals/RentalListNavigation.tsx",
+      "src/components/rentals/RentalListPage.tsx",
+      "src/components/rentals/RentalListPage.test.tsx",
+      "src/components/rentals/RentalSortControl.tsx",
+      "src/components/rentals/SortSelect.tsx",
+      "src/components/rentals/rental-filter-params.test.tsx",
+      "src/components/rentals/use-rental-draft.ts",
+      "src/components/projects/ProjectCard.tsx",
+      "src/components/projects/ProjectFilters.tsx",
+      "src/components/projects/ProjectListPage.tsx",
+      "src/components/projects/ProjectListPage.test.tsx",
+      "src/components/projects/project-components.test.tsx",
+      "src/components/projects/project-filter-params.test.tsx",
+      "src/components/posts/PostCard.tsx",
+      "src/components/posts/PostListBody.tsx",
+      "src/components/posts/PostListPage.tsx",
+      "src/components/posts/PostListPage.test.tsx",
+      "src/components/posts/post-components.test.tsx",
+      "src/components/careers/JobCard.tsx",
+      "src/components/careers/JobListPage.tsx",
+      "src/components/news/NewsCard.tsx",
+      "src/components/news/NewsHomeBody.tsx",
+      "src/components/news/NewsListBody.tsx",
+      "src/components/news/NewsListPage.tsx",
+      "src/components/news/NewsListPage.test.tsx",
+      "src/components/news/news-components.test.tsx",
+      "src/components/home/HomeNews.tsx",
+      "src/lib/news/news-home.ts",
+      "src/lib/news/news-listing.ts",
+      "src/lib/news/news-queries.ts",
+      "src/lib/posts/post-listing.ts",
+      "src/lib/posts/post-queries.ts",
+      "src/lib/posts/post-queries.test.ts",
+      "src/lib/search/url-params.ts",
+      "src/lib/fonts.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "docs/DESIGN.md",
+      ".context/design-spec.md",
+      "docs/BRD.md"
+    ],
+    "filesNote": "Diff thật b2f430e..0b95083 + close-out chưa commit (NewsCard.tsx, HomeNews.tsx, news-components.test.tsx, docs/DESIGN.md, .context/design-spec.md) + BRD 1.7. Không schema/migration/endpoint/access control.",
+    "modules": [
+      "Banner trang danh sách — PageBanner size=compact (h-60, 240px) + overlap (đệm đáy chỉ khi có băng đè); CategoryListTemplate compactBanner/searchBar",
+      "Băng tìm kiếm dùng chung — src/components/listing/ListSearchBar.tsx (flex-col → lg:flex-row, đè mép dưới banner)",
+      "Cho thuê — RentalFilters + RentalFilterPopover (≥ lg) / RentalFilterSheet (< lg) + badge secondaryFilterCount, PRICE_HINT_RANGES (url-params.ts), RentalSortControl ở hàng kết quả, use-rental-draft",
+      "Dự án — ProjectFilters (Tỉnh + Trạng thái + Lọc, GET), ProjectListPage",
+      "Tin BĐS — PostListPage/PostListBody (Có N kết quả = totalDocs, 4 cột), post-queries",
+      "Tin tức — NewsListPage (form LeadForm source=contact), NewsHomeBody, news-home.ts (Tin nổi bật, hàng danh mục, buildMoreNews), news-queries",
+      "Thẻ — RentalCard / ProjectCard / PostCard / NewsCard (onDark) / JobCard",
+      "Docs as-built — docs/DESIGN.md, .context/design-spec.md (§2.7, §3.2, S02, S08, S10); intent docs/BRD.md 1.7"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/cho-thue, /cho-thue/danh-muc/[category], trang khu vực + /en tương ứng: banner 240px, băng tìm kiếm đè mép dưới banner (từ khoá, Loại, Khoảng giá, Bộ lọc, Tìm kiếm)",
+      "Cho thuê — Khoảng giá 4 mức: < 5tr → priceMax=5000000; 5–10tr; 10–20tr; > 20tr → priceMin=20000000; khoảng tự nhập trong Bộ lọc → ô hiện 'Khoảng giá tuỳ chọn' và badge +1",
+      "Cho thuê — Bộ lọc: ≥ lg (1280/1536) mở Popover có nút Đóng, Esc đóng, focus trả về nút; < lg (375/768) mở Sheet; badge = số lọc phụ đang bật (tỉnh, phường, diện tích, PN, nội thất, khoảng giá tự nhập); từ khoá/Loại/mốc giá gợi ý không tính",
+      "Cho thuê — sắp xếp ở hàng 'Có N kết quả'; đổi sắp xếp giữ bộ lọc đang soạn; không còn thanh lọc dính đáy mobile",
+      "Cho thuê — tắt JS: gõ từ khoá + chọn Loại + Tìm kiếm → GET /cho-thue?q=…&category=… lọc đúng",
+      "/du-an + /en/projects: băng Tỉnh + Trạng thái + Lọc (không từ khoá, không Bộ lọc); đổi ô chọn không tự gửi; tắt JS vẫn lọc được; hàng Có N kết quả + Xoá bộ lọc",
+      "/tin-bds (+ danh mục) + /en/property-news: banner 240px, không băng tìm kiếm, 'Có N kết quả' = tổng bài kể cả bài nổi bật, lưới 4 cột ≥ xl",
+      "/tuyen-dung + /en/careers: banner 240px không đệm đáy, thẻ việc có viền, bộ lọc cũ còn",
+      "/tin-tuc trang 1 (+ /en/news): pill danh mục là link (aria-current ở 'Tất cả'); Tin nổi bật 1 lớn + 4 (isFeatured trước); mỗi danh mục cấp 1 một hàng ≤ 4 bài (gồm danh mục con), ≤ 6 hàng, Xem thêm → trang danh mục; Tin khác; phân trang; form Tư vấn nhu cầu",
+      "/tin-tuc?page=2: lưới phân trang 4 cột + form; mọi bài truy cập được qua trang 1 (Tin nổi bật/Tin khác) hoặc trang ≥ 2 — không bài nào mất",
+      "/tin-tuc/danh-muc/[category]: banner compact + lưới 4 cột, KHÔNG form; /tin-tuc/[slug] chi tiết KHÔNG form",
+      "Form Tư vấn nhu cầu: gửi hợp lệ → lead mới nguồn contact (không sourceId, chưa giao sale), email thông báo; thiếu consent không gửi được; Turnstile; rate limit; gửi lại cùng SĐT trong 7 ngày → gộp",
+      "Thẻ trắng bo 20px viền ở RentalCard, ProjectCard, PostCard, NewsCard lưới; NewsCard ở khối Tin tức nền tối trang chủ vẫn trong suốt (không nền trắng)",
+      "Viewport 375/768/1280/1536: lưới 1/2/3/4 cột; không tràn ngang; h1 trong banner 240px không bị cắt"
+    ],
+    "dependents": [
+      "PageBanner dùng chung: pháp lý, liên hệ, dịch vụ, 404 — phải giữ cỡ mặc định",
+      "PostCard trong slider Ưu đãi trang chủ + bài liên quan chi tiết Tin BĐS",
+      "ProjectCard trong 'Dự án khác' chi tiết dự án + slider trang chủ (nếu dùng)",
+      "NewsCard trong khối Tin tức trang chủ (onDark), bài liên quan chi tiết tin tức",
+      "Ô tìm kiếm hero trang chủ → /cho-thue?q= và /du-an?province=&status= (đích phải lọc đúng với băng mới)",
+      "Nút tìm kiếm header → /cho-thue?q=",
+      "LeadForm + POST /api/leads (source=contact) dùng chung với trang Liên hệ"
+    ],
+    "regression": [
+      "Tham số URL Cho thuê (q, category, province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing, sort, page) và Dự án (category, province, status, page) giữ nguyên tên/giá trị — link cũ/bookmark vẫn lọc đúng",
+      "Phân trang, canonical, noindex (S04) và sitemap không đổi trên các trang danh sách",
+      "Trạng thái chờ (BL-011): đổi bộ lọc/trang giữ kết quả cũ mờ + aria-busy, không skeleton",
+      "Select TAMI (BL-016): không JS là <select> gốc đã style, sau hydrate Radix; vùng chạm ≥ 44px",
+      "Banner ảnh FR-ADM-20 (BL-017): ảnh riêng → mặc định → biến thể Chữ; scrim AA; không CLS",
+      "Header kính mờ (P1) trên banner 240px; trang chủ P2 (slider Ưu đãi PostCard, khối Tin tức NewsCard trong suốt)",
+      "Form liên hệ /lien-he vẫn tạo lead nguồn contact như cũ",
+      "Tin tức /en: chỉ bài có bản EN; hàng danh mục ẩn khi không có bài EN"
+    ]
+  },
+  "acceptance": [
+    "Trang danh sách (Cho thuê, Dự án, Tin BĐS, Tin tức, Tuyển dụng + danh mục/khu vực) banner cao 240px; pháp lý/liên hệ/dịch vụ/404 cỡ mặc định",
+    "Băng tìm kiếm gọn đè banner ở Cho thuê và Dự án; Tin BĐS/Tin tức/Tuyển dụng không có băng và không đệm đáy",
+    "Bộ lọc mở Popover ≥ lg / Sheet < lg; badge đúng số lọc phụ; áp lọc ra đúng URL params như trước (parity)",
+    "Form GET Cho thuê và Dự án lọc được khi tắt JS",
+    "Lưới 4 cột ≥ xl (1280/1536), 3 / 2 / 1 cột ở hẹp hơn; không tràn ngang ở 375",
+    "Tin tức trang 1 đúng thứ tự Tin nổi bật → hàng danh mục → Tin khác → phân trang → form; trang 2 lưới + form; trang danh mục không form; chi tiết tin không form",
+    "Gửi form Tư vấn nhu cầu ở /tin-tuc và /en/news tạo lead nguồn contact (thấy trong admin Lead, chưa giao)",
+    "Thẻ trắng bo 20px trên nền sáng; khối Tin tức trang chủ vẫn thẻ trong suốt trên nền tối",
+    "VI/EN cùng bố cục; pnpm lint / typecheck / test PASS"
+  ],
+  "outOfScope": [
+    "Băng tìm kiếm / bộ lọc / sắp xếp cho /tin-bds (không có tham số sẵn)",
+    "Ô từ khoá cho /du-an",
+    "Phase 4 (chi tiết dự án) và Phase 5 (schema dự án) của BL-020",
+    "Đo Lighthouse LCP/CLS chính thức (residual — nên ghi nhận nếu đo được)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1280,
+    1536
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "POST /api/leads source=contact (không sourceId) từ trang /tin-tuc — 200 { received: true }; thiếu consent/Turnstile sai → 400; quá rate limit → 429 (contract không đổi, chỉ thêm điểm gọi)"
+  ],
+  "risk": "medium",
+  "riskNote": "UI rộng (5 trang danh sách × VI/EN × 4 viewport) + component dùng chung (PageBanner, thẻ, ListSearchBar) + thêm điểm thu lead công khai (PII, dùng lại endpoint đã có). Không schema/migration/quyền/endpoint mới; URL params có golden test. Review STRICT cả 3 task (T01 r2, T03 r3 — lỗi mất bài khỏi phân trang đã sửa). Bên test ưu tiên: parity URL params + no-JS, Bộ lọc popover/sheet, Tin tức không mất bài giữa trang 1 và trang 2, form lead contact."
+}
