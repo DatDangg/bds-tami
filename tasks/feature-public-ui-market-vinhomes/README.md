@@ -39,3 +39,9 @@ Verify: `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm build` (theo `.c
 2. Thanh thông báo **chỉ trang chủ** (global Homepage).
 3. Số liệu thẻ dự án trang chủ dùng **field sẵn có** (landAreaM2, totalUnits, handoverTime).
 4. P5 schema duyệt 4 nhóm: highlights, nearbyAmenities, priceTable (theo loại căn), faqs. Quỹ căn chi tiết từng căn = **ngoài phạm vi**. Pháp lý dùng lại legalInfo + documents.
+
+## Quyết định user checkpoint Phase 2 (2026-10-20)
+- Duyệt Phase 2 (commit 1070257 → 8e9fd08). **Chưa làm Phase 3** — chờ user ra lệnh.
+- **Q1** "slider banner ưu đãi" (#3): ánh xạ vào slider Ưu đãi (khối 5), không dựng mới, không schema.
+- **Q2** homepage hiện có chưa có `rentals`/`news`: giữ bước triển khai — Admin → Trang chủ → Thứ tự khối thêm "Cho thuê", "Tin tức" (không auto-append, không data migration).
+- **Q3** `SPECIFICATIONS.md:174` cho Cho thuê/Tin tức: tiêu đề khối tuỳ chọn (trống → tiêu đề mặc định i18n, kể cả EN); khối chỉ ẩn ở `/en` khi không có tin/bài có bản EN.

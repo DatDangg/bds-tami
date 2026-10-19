@@ -86,3 +86,11 @@ LCP/CLS chưa đo lab toàn trang chủ; SQL mỗi lần tái tạo ISR tăng; c
 
 ## Danh sách việc cho builder (close-out)
 D1, D2, D3 (docs as-built); D4 (thu hẹp hook listing chỉ path hoặc ghi nhận). G1/G2/C3 chờ user Q1–Q3.
+
+## Quyết định user tại checkpoint Phase 2 (2026-10-20) — primary ghi
+- **Q1** GAP #3 "slider banner ưu đãi": (b) ánh xạ vào slider Ưu đãi (khối 5) — không dựng mới, không schema. G1 đóng theo ánh xạ; design-spec S01 cập nhật.
+- **Q2** giữ bước triển khai admin thêm "Cho thuê", "Tin tức" vào "Thứ tự khối" (không auto-append, không data migration).
+- **Q3** xác nhận: tiêu đề khối Cho thuê/Tin tức tuỳ chọn (trống → tiêu đề mặc định i18n, kể cả EN); khối chỉ ẩn ở `/en` khi không có tin/bài có bản EN → session chính ghi điều khoản này vào `SPECIFICATIONS.md:174` khi publish.
+- Phase 3 **chưa** bắt đầu theo yêu cầu user.
+
+## Verdict cuối Phase 2: PASS (G1 đóng theo Q1; G2 là bước triển khai; D1–D4 đã sửa ở 8e9fd08)
