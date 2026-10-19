@@ -1,0 +1,83 @@
+{
+  "specVersion": "1.13.0",
+  "scopeVersion": 15,
+  "generatedAt": "2026-10-19T23:59:00+07:00",
+  "trigger": "feature-update",
+  "workItem": "feature/desktop-header-no-menu-button",
+  "backlog": "BL-019",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-19-desktop-header-no-menu-button.md",
+  "task": [
+    "tasks/feature-desktop-header-no-menu-button/phase-1-task-01.md"
+  ],
+  "commits": [
+    "cdd9ef4"
+  ],
+  "specUpdate": "spec/updates/2026-10-19-desktop-header-no-menu-button.md",
+  "specRefs": [
+    "Khung trang",
+    "design-spec §2.1",
+    "design-spec §2.2",
+    "NFR-07"
+  ],
+  "specRefNotes": {
+    "Khung trang": "SPECIFICATIONS.md 'Khung trang': ≥ xl một hàng logo · menu ngang · tìm · VI|EN · CTA, KHÔNG có nút Menu; < xl có nút Menu mở menu toàn màn hình",
+    "design-spec §2.1": ".context/design-spec.md §2.1: tách bố cục < xl (nút Menu) và ≥ xl (không nút Menu, menu ngang là điều hướng duy nhất)",
+    "design-spec §2.2": ".context/design-spec.md §2.2: menu toàn màn hình chỉ < xl; mở rồi rộng lên ≥ xl thì tự đóng",
+    "NFR-07": "A11y: ≥ xl không còn nút ẩn nhận focus; thứ tự Tab logo → menu ngang → tìm → ngôn ngữ → CTA; resize đóng dialog nhả khoá cuộn + bẫy focus"
+  },
+  "changed": {
+    "files": [
+      "src/components/layout/MobileMenu.tsx",
+      "src/components/layout/Header.tsx",
+      "src/components/layout/Header.test.tsx",
+      "docs/DESIGN.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Theo diff thật commit cdd9ef4 (bỏ task/report/run journal); Header.tsx chỉ đổi JSDoc/comment",
+    "modules": [
+      "Public layout — Header công khai VI/EN",
+      "Public layout — MobileMenu (menu toàn màn hình)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "≥ 1280px (xl): header không hiện nút Menu ở mọi trang công khai VI/EN",
+      "≥ xl: Tab không dừng ở nút Menu ẩn; thứ tự logo → menu ngang (dropdown mục con) → tìm kiếm → VI|EN → CTA",
+      "Mở menu toàn màn hình ở < xl rồi resize lên ≥ xl → menu tự đóng, trang cuộn lại được (không kẹt data-scroll-locked)"
+    ],
+    "dependents": [
+      "MobileMenu dùng useMediaQuery của src/components/home/use-environment.ts",
+      "Header một hàng ≥ xl: logo ≤ 6rem, CTA truncate — không tràn ở 1280px VI và EN"
+    ],
+    "regression": [
+      "< xl (375, 768, 1024): nút Menu vẫn hiện, mở menu toàn màn hình với accordion menu con, hotline, mạng xã hội",
+      "Menu toàn màn hình: Esc đóng, bẫy focus, khoá cuộn nền khi mở",
+      "Dropdown mục con của menu ngang ≥ xl (hover/focus/Enter, aria-expanded)",
+      "Nút tìm kiếm header → /cho-thue?q=, chuyển VI|EN, nút CTA header.ctaButton (ẩn khi thiếu nhãn locale/link)",
+      "Logo header (BL-018): đặc = vàng, trên hero = trắng"
+    ]
+  },
+  "acceptance": [
+    "≥ xl: không có nút Menu; header gồm logo · menu ngang · tìm kiếm · VI|EN · CTA (nếu bật)",
+    "< xl: nút Menu mở menu toàn màn hình như trước",
+    "Menu đang mở rồi resize lên ≥ xl → đóng, không kẹt khoá cuộn",
+    "Thứ tự Tab ≥ xl hợp lệ; header 1 hàng không tràn ở 1280px VI và EN",
+    "pnpm lint / pnpm typecheck / pnpm test PASS"
+  ],
+  "outOfScope": [
+    "Bố cục header/hero theo market.vinhomes.vn (header nổi kính mờ…) — BL-020",
+    "Focus sau khi menu tự đóng do resize về body (MINOR review, chấp nhận)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "uiTests": true,
+  "migration": "none",
+  "risk": "low",
+  "riskNote": "Component layout dùng chung mọi trang public nhưng chỉ ẩn nút bằng CSS + đóng dialog khi media query ≥ xl; không đổi schema/API/quyền → reviewer NORMAL PASS round 1. Residual: chưa đo trực quan 1280px VI/EN."
+}

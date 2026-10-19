@@ -424,6 +424,74 @@
       "scopeVersion": 14,
       "decision": "Tương phản logo vàng trên nền sáng ~1.5:1 (1.04–2.01:1 trên #FFFFFF) không đạt 3:1 — user chọn phương án B 2026-10-19 (\"dùng vàng thử đi\"), logo được WCAG miễn trừ",
       "residual": "Chưa xem trình duyệt; pnpm build chưa chạy; MINOR: thiếu test footer/menu khi CMS có logoDark, comment BrandLogo.tsx:5 dài"
+    },
+    {
+      "slug": "desktop-header-no-menu-button",
+      "title": "Header ≥ xl bỏ nút Menu (chỉ menu ngang, như vinhomes.vn desktop); < xl giữ nút Menu + menu toàn màn hình (BL-019)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-019",
+      "changeDoc": "spec/changes/archive/2026-10-19-desktop-header-no-menu-button.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-desktop-header-no-menu-button/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/feature-desktop-header-no-menu-button-phase-1-task-01-round-1-review.md",
+          "commit": "cdd9ef4"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": "2026-10-19",
+      "specVersion": "1.13.0",
+      "scopeVersion": 15,
+      "specUpdate": "spec/updates/2026-10-19-desktop-header-no-menu-button.md",
+      "residual": "Chưa đo trực quan hàng header 1280px VI/EN; MINOR r1: resize lên ≥ xl khi menu mở → focus về body (chấp nhận); integration test không liên quan (không đụng server/DB)"
+    },
+    {
+      "slug": "select-dropdown-styling",
+      "title": "Ô chọn public dùng Select TAMI (Radix) + progressive enhancement form GET; admin ô lọc Trạng thái dịch dùng SelectInput Payload (BL-016)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-016",
+      "changeDoc": "spec/changes/archive/2026-10-19-select-dropdown-styling.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-select-dropdown-styling/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/feature-select-dropdown-styling-phase-1-task-01-round-2-review.md",
+          "commit": "325b9e5"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-select-dropdown-styling/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 3,
+          "round": 3,
+          "reviewerResult": "PASS",
+          "reviewLevel": "FAST",
+          "report": ".context/review-reports/feature-select-dropdown-styling-phase-1-task-02-round-3-review.md",
+          "commit": "e9e9a6b",
+          "note": "Round 3 hẹp (chỉ SCSS layout) vượt giới hạn 2 vòng theo tiền lệ 2cfe320"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "completedAt": "2026-10-19",
+      "specVersion": "1.14.0",
+      "scopeVersion": 16,
+      "specUpdate": "spec/updates/2026-10-19-select-dropdown-styling.md",
+      "residual": "Chưa kiểm trình duyệt thật (bàn phím/typeahead/375px, admin sáng/tối); chọn trước hydrate trên form GET bị bỏ; chưa có hydration test; SelectInput thật không render trong vitest (test mock); accessible name ô lọc dịch gộp giá trị đang chọn"
     }
   ],
   "bugs": [
@@ -451,6 +519,89 @@
       "review": "STRICT PASS",
       "round": 1,
       "report": ".context/review-reports/bug-isfilled-empty-richtext-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "slug": "admin-list-fixes",
+      "title": "Sửa màn danh sách admin: bộ lọc dịch, tìm kiếm, xuất Excel khi tìm, trường lọc, hiển thị cột (BL-021, T1–T6)",
+      "type": "BUG + MODIFY",
+      "severity": "medium",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-021",
+      "changeDoc": "spec/changes/2026-10-19-admin-list-fixes.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "NORMAL",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-01-round-1-review.md",
+          "commit": "044512c",
+          "note": "BUG #01 đổi Trạng thái dịch xoá bộ lọc khác"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-02-round-1-review.md",
+          "commit": "adccd72",
+          "note": "#03 #04 tìm Lead SĐT/email, Rentals mã/tiêu đề/địa chỉ"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-03.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-03-round-2-review.md",
+          "commit": "05e5767",
+          "note": "#02 xuất Excel lead khi đang tìm kiếm"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-04.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-04-round-1-review.md",
+          "commit": "6a654ee",
+          "note": "#06 #07 trường lọc nghiệp vụ + REST đọc không locale → vi"
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-05.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT",
+          "report": ".context/review-reports/bug-admin-list-fixes-phase-1-task-05-round-1-review.md",
+          "commit": "739b12a",
+          "note": "#09 #13 #14 #15 VNĐ, ô trống —, Sale phụ trách, dd/MM/yyyy HH:mm"
+        },
+        {
+          "task": "phase-1-task-06",
+          "file": "tasks/bug-admin-list-fixes/phase-1-task-06.md",
+          "status": "pending",
+          "note": "#08 Xuất Excel + Lọc dịch cùng hàng thanh công cụ danh sách (desktop + mobile) — chưa làm, task file chưa tạo"
+        }
+      ],
+      "startedAt": "2026-10-19",
+      "specVersion": "1.15.0",
+      "scopeVersion": 17,
+      "specUpdate": "spec/updates/2026-10-19-admin-list-fixes.md",
+      "residual": "dayOnly không khai displayFormat hiện kèm giờ; cột quan hệ khác vẫn có thể nháy 'Đang tải...'; id / 'Đã Xoá Lúc' còn trong menu lọc; tìm không dấu bộ lọc quan hệ chưa làm; tìm một phần SĐT có dấu cách chưa khớp; REST OR/AND chữ hoa không mở rộng SĐT; count hook SĐT chưa có integration test riêng"
     }
   ],
   "projectName": "tami-website",

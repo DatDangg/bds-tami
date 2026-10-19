@@ -1,0 +1,122 @@
+{
+  "specVersion": "1.14.0",
+  "scopeVersion": 16,
+  "generatedAt": "2026-10-19T23:59:00+07:00",
+  "trigger": "feature-update",
+  "workItem": "feature/select-dropdown-styling",
+  "backlog": "BL-016",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-19-select-dropdown-styling.md",
+  "task": [
+    "tasks/feature-select-dropdown-styling/phase-1-task-01.md",
+    "tasks/feature-select-dropdown-styling/phase-1-task-02.md"
+  ],
+  "commits": [
+    "325b9e5",
+    "e9e9a6b"
+  ],
+  "specUpdate": "spec/updates/2026-10-19-select-dropdown-styling.md",
+  "specRefs": [
+    "Overview — Giao diện",
+    "FR-ADM-18",
+    "FR-ADM-19",
+    "NFR-07",
+    "design-spec S02",
+    "design-spec S04",
+    "design-spec S12"
+  ],
+  "specRefNotes": {
+    "Overview — Giao diện": "SPECIFICATIONS.md: ô chọn công khai dùng Select TAMI (Radix); form GET dự án/tuyển dụng progressive enhancement; admin dùng react-select Payload",
+    "FR-ADM-18": "F12: ô lọc 'Trạng thái dịch' admin = SelectInput của @payloadcms/ui, isClearable, placeholder 'Tất cả'",
+    "FR-ADM-19": "Ô chọn admin cùng một style (ô lọc dịch không còn <select> gốc + inline style)",
+    "NFR-07": "A11y: bàn phím (mở/đóng, mũi tên, typeahead, Esc), label liên kết (htmlFor + id trên trigger; admin <label> bọc), vùng chạm ≥ 44px, AA sáng/tối",
+    "design-spec S02": "Lọc dự án: 2 select Tỉnh/thành + Trạng thái, form GET + nút Lọc, không tự gửi",
+    "design-spec S04": "Lọc cho thuê: áp dụng ngay khi đổi; tỉnh → phường",
+    "design-spec S12": "Lọc tuyển dụng: select nơi làm việc, form GET"
+  },
+  "changed": {
+    "files": [
+      "src/components/ui/option-select.tsx",
+      "src/components/ui/select.tsx",
+      "src/components/rentals/FilterFields.tsx",
+      "src/components/rentals/SortSelect.tsx",
+      "src/components/projects/ProjectFilters.tsx",
+      "src/components/projects/FloorPlans.tsx",
+      "src/components/careers/JobFilters.tsx",
+      "src/components/forms/FormField.tsx",
+      "src/components/admin/TranslationStatusFilter.tsx",
+      "src/components/admin/styles/_controls.scss",
+      "src/components/careers/JobFilters.test.tsx",
+      "src/components/careers/JobListPage.test.tsx",
+      "src/components/forms/FormField.test.tsx",
+      "src/components/media/test-utils.tsx",
+      "src/components/projects/ProjectListPage.test.tsx",
+      "src/components/projects/project-components.test.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/components/rentals/RentalFilters.test.tsx",
+      "src/components/rentals/RentalListPage.test.tsx",
+      "src/components/admin/TranslationStatusFilter.test.tsx",
+      "tests/setup-dom.ts"
+    ],
+    "filesNote": "Theo diff thật commit 325b9e5 + e9e9a6b (bỏ task/report/run journal); no as-built doc impact",
+    "modules": [
+      "UI dùng chung — Select TAMI (select.tsx) + OptionSelect (option-select.tsx)",
+      "Danh sách Cho thuê — bộ lọc + sắp xếp",
+      "Danh sách Dự án — bộ lọc form GET; chi tiết dự án — mặt bằng",
+      "Danh sách Tuyển dụng — bộ lọc form GET",
+      "Form công khai — FormField as:select",
+      "Admin — TranslationStatusFilter (danh sách nội dung có lọc dịch)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/cho-thue (VI/EN): ô Danh mục, Tỉnh/thành, Phường/xã, Sắp xếp là Select TAMI — chọn áp dụng ngay, URL giống trước (không có giá trị sentinel), chọn 'Tất cả' bỏ tham số",
+      "/cho-thue: đổi tỉnh reset phường; phường khoá khi chưa chọn tỉnh",
+      "/du-an, /tuyen-dung (VI/EN): có JS → Select TAMI, đổi không tự gửi, bấm 'Lọc' gửi GET đúng tham số; tắt JS → <select> gốc đã style vẫn lọc được",
+      "Chi tiết dự án < md với ≥ 6 mặt bằng: select mặt bằng đổi ảnh đúng",
+      "Danh sách mở không tràn màn hình ở 375px, cuộn được khi nhiều mục (tỉnh/thành); chữ dài cắt … không đè mũi tên",
+      "Bàn phím: Enter/Space/mũi tên mở, mũi tên chọn, gõ chữ nhảy mục, Esc đóng; label click focus đúng 1 ô",
+      "Admin danh sách có lọc 'Trạng thái dịch': ô react-select như ô lọc Payload, nhãn trên ô, rộng 280px (max 100%), cao ≥ 44px; chọn mục → lọc + về trang 1; xoá (x) → bỏ lọc dịch"
+    ],
+    "dependents": [
+      "FormField as:'select' (placeholder khi không có mục rỗng, required/aria-invalid/aria-describedby, submit qua input ẩn name)",
+      "Select TAMI select.tsx (dùng chung)",
+      "src/lib/translation/admin-ui.ts withTranslationFilter / currentTranslationFilter (không đổi ở BL-016)"
+    ],
+    "regression": [
+      "Sheet bộ lọc mobile /cho-thue đếm 'Xem n tin'",
+      "Phân trang + chip bộ lọc trên 3 trang danh sách giữ tham số",
+      "Trang danh mục con /du-an/danh-muc/*, /tuyen-dung có tham số sẵn trên URL hiển thị đúng giá trị đã chọn",
+      "Dark mode / AA: viền ô chọn ≥ 3:1, chữ ≥ 4.5:1 (public + admin sáng/tối)",
+      "Admin: các ô lọc/WhereBuilder khác của Payload không đổi style"
+    ]
+  },
+  "acceptance": [
+    "Mọi ô chọn public là Select TAMI theo token; không còn mũi tên/popup trình duyệt (trừ fallback không JS đã style)",
+    "Hành vi lọc + URL/searchParams giữ nguyên; 'Tất cả' = rỗng",
+    "Dự án/Tuyển dụng lọc được khi không JS; không tự gửi khi đổi",
+    "FormField select submit được, required + lỗi + aria-describedby giữ",
+    "A11y bàn phím + vùng chạm ≥ 44px; mobile danh sách không tràn",
+    "Admin TranslationStatusFilter dùng SelectInput Payload, đồng bộ style sáng/tối",
+    "pnpm lint / pnpm typecheck / pnpm test PASS"
+  ],
+  "outOfScope": [
+    "Vị trí Xuất Excel / Lọc dịch trên thanh công cụ admin — BL-021 T6",
+    "Style select field trong form admin (thuộc BL-015/FR-ADM-19)",
+    "Giữ lựa chọn người dùng làm trước khi hydrate (form GET) — residual chấp nhận"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280
+  ],
+  "uiTests": true,
+  "noJsTests": [
+    "/du-an",
+    "/tuyen-dung"
+  ],
+  "migration": "none",
+  "risk": "medium",
+  "riskNote": "Component dùng chung (select.tsx, FormField) + hành vi lọc 3 trang danh sách + no-JS fallback; không đổi API/schema/quyền. Reviewer T01 STRICT PASS r2, T02 FAST PASS r3. Residual: chưa kiểm trình duyệt thật (bàn phím/typeahead/375px, admin sáng/tối); SelectInput thật không render trong vitest."
+}

@@ -1,7 +1,7 @@
 ---
 id: desktop-header-no-menu-button
 type: feature
-status: pending
+status: done
 created: 2026-10-19
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: select-dropdown-styling
 type: feature
-status: pending
+status: done
 created: 2026-10-19
 backlog: BL-016
 ---
