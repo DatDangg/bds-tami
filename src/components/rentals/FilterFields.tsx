@@ -4,14 +4,13 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/components/ui/option-select";
-import type { CategoryOption, ProvinceOption, WardOption } from "@/lib/rentals/rental-list-queries";
+import type { ProvinceOption, WardOption } from "@/lib/rentals/rental-list-queries";
+import { PRICE_HINT_RANGES } from "@/lib/search/url-params";
 import { cn } from "@/lib/utils";
 import { RENTAL_FURNISHINGS } from "@/shared/types/api";
-import { SortSelect } from "./SortSelect";
 import type { FilterDraft } from "./use-rental-draft";
 
 export interface FieldOptions {
-  categories: CategoryOption[];
   provinces: ProvinceOption[];
   wards: WardOption[];
   /** Đang tải phường của tỉnh vừa chọn (Sheet đổi tỉnh khi chưa có danh sách). */
@@ -19,23 +18,15 @@ export interface FieldOptions {
 }
 
 interface FilterFieldsProps {
-  /** Tiền tố id để cùng một trường xuất hiện ở hai nơi (thanh desktop + Sheet) mà không trùng id. */
+  /** Tiền tố id để cùng một trường xuất hiện ở hai nơi (Popover desktop + Sheet mobile) mà không trùng id. */
   idPrefix: string;
   draft: FilterDraft;
   onChange: (patch: Partial<FilterDraft>, mode: "now" | "typing") => void;
   options: FieldOptions;
-  /** `panel`: lưới 2 hàng ≥ lg; `stack`: một cột trong Sheet. */
-  layout: "panel" | "stack";
-  showSort?: boolean;
 }
 
-/** Mốc giá gợi ý (VNĐ/tháng) theo design-spec §3.5: < 5tr, 5-10tr, 10-20tr, > 20tr. */
-const PRICE_HINTS = [
-  { key: "under5", min: "", max: "5000000" },
-  { key: "from5to10", min: "5000000", max: "10000000" },
-  { key: "from10to20", min: "10000000", max: "20000000" },
-  { key: "over20", min: "20000000", max: "" },
-] as const;
+/** Mốc giá gợi ý (VNĐ/tháng) theo design-spec §3.5: < 5tr, 5-10tr, 10-20tr, > 20tr. Cũng là các mục của ô "Khoảng giá" trên băng tìm kiếm. */
+export const PRICE_HINTS = PRICE_HINT_RANGES.map((hint) => ({ key: hint.key, min: hint.min === undefined ? "" : String(hint.min), max: hint.max === undefined ? "" : String(hint.max) }));
 
 const BEDROOM_VALUES = ["1", "2", "3", "4"] as const;
 
@@ -112,45 +103,18 @@ function RangeFields({ legend, fromLabel, toLabel, fromId, toId, fromValue, toVa
 }
 
 /**
- * Mọi ô của bộ lọc Cho thuê (design-spec §3.5), dùng chung cho thanh lọc desktop và Sheet mobile: chỉ khác `layout` và cách cha xử lý `onChange`.
- * Ô chọn TAMI (Radix) cho Danh mục/Tỉnh/Phường; giá/diện tích là hai ô số
- * (không slider); chip bấm lại để bỏ chọn. Phường bị khoá cho tới khi chọn tỉnh.
+ * Các ô LỌC PHỤ của Cho thuê (design-spec §3.5): Tỉnh/Phường, Giá/tháng tuỳ chọn + mốc gợi ý, Diện tích, Phòng ngủ, Nội thất — nằm trong Popover (≥ lg) hoặc Sheet (< lg)
+ * sau nút "Bộ lọc". Từ khoá, Danh mục, Khoảng giá nhanh và Sắp xếp ở nơi khác (băng tìm kiếm, hàng kết quả). Ô chọn TAMI (Radix) cho Tỉnh/Phường;
+ * giá/diện tích là hai ô số (không slider); chip bấm lại để bỏ chọn. Phường bị khoá cho tới khi chọn tỉnh.
  */
-export function FilterFields({ idPrefix, draft, onChange, options, layout, showSort = false }: FilterFieldsProps) {
+export function FilterFields({ idPrefix, draft, onChange, options }: FilterFieldsProps) {
   const t = useTranslations("page.rentals");
   const id = (name: string) => `${idPrefix}-${name}`;
-  const panel = layout === "panel";
-  const span = (columns: string) => (panel ? columns : undefined);
   const wardDisabled = draft.province === "" || options.wardsLoading === true;
 
   return (
-    <div className={cn(panel ? "grid gap-x-3 gap-y-4 lg:grid-cols-12" : "flex flex-col gap-5")}>
-      <Field label={t("fields.q")} htmlFor={id("q")} className={span("lg:col-span-3")}>
-        <Input
-          id={id("q")}
-          type="search"
-          maxLength={100}
-          autoComplete="off"
-          placeholder={t("fields.qPlaceholder")}
-          value={draft.q}
-          onChange={(event) => onChange({ q: event.target.value }, "typing")}
-        />
-      </Field>
-      {/* Trang danh mục (S05) truyền danh sách rỗng: danh mục đã khoá, đổi danh mục = sang trang khác bằng chip. */}
-      {options.categories.length > 0 && (
-        <Field label={t("fields.category")} htmlFor={id("category")} className={span("lg:col-span-2")}>
-          <OptionSelect
-            id={id("category")}
-            value={draft.category}
-            onValueChange={(category) => onChange({ category }, "now")}
-            options={[
-              { value: "", label: t("fields.allCategories") },
-              ...options.categories.map((category) => ({ value: category.slug, label: category.depth === 1 ? `– ${category.label}` : category.label })),
-            ]}
-          />
-        </Field>
-      )}
-      <Field label={t("fields.province")} htmlFor={id("province")} className={span("lg:col-span-2")}>
+    <div className="flex flex-col gap-5">
+      <Field label={t("fields.province")} htmlFor={id("province")}>
         <OptionSelect
           id={id("province")}
           value={draft.province}
@@ -158,7 +122,7 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
           options={[{ value: "", label: t("fields.allProvinces") }, ...options.provinces.map((province) => ({ value: province.slug, label: province.name }))]}
         />
       </Field>
-      <Field label={t("fields.ward")} htmlFor={id("ward")} className={span("lg:col-span-2")}>
+      <Field label={t("fields.ward")} htmlFor={id("ward")}>
         <OptionSelect
           id={id("ward")}
           value={draft.ward}
@@ -179,7 +143,6 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
         fromValue={draft.priceMin}
         toValue={draft.priceMax}
         onChange={(priceMin, priceMax) => onChange({ priceMin, priceMax }, "typing")}
-        className={span("lg:col-span-3")}
       >
         <div role="group" aria-label={t("fields.priceHintsLabel")} className="flex flex-wrap gap-2 pt-1">
           {PRICE_HINTS.map((hint) => {
@@ -201,9 +164,8 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
         fromValue={draft.areaMin}
         toValue={draft.areaMax}
         onChange={(areaMin, areaMax) => onChange({ areaMin, areaMax }, "typing")}
-        className={span("lg:col-span-3")}
       />
-      <fieldset className={cn("flex min-w-0 flex-col gap-1", span("lg:col-span-3"))}>
+      <fieldset className="flex min-w-0 flex-col gap-1">
         <legend className="mb-1 text-small font-semibold">{t("fields.bedrooms")}</legend>
         <div className="flex flex-wrap gap-2">
           {BEDROOM_VALUES.map((value) => (
@@ -213,7 +175,7 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
           ))}
         </div>
       </fieldset>
-      <fieldset className={cn("flex min-w-0 flex-col gap-1", span(showSort ? "lg:col-span-3" : "lg:col-span-6"))}>
+      <fieldset className="flex min-w-0 flex-col gap-1">
         <legend className="mb-1 text-small font-semibold">{t("fields.furnishing")}</legend>
         <div className="flex flex-wrap gap-2">
           {RENTAL_FURNISHINGS.map((value) => (
@@ -223,7 +185,6 @@ export function FilterFields({ idPrefix, draft, onChange, options, layout, showS
           ))}
         </div>
       </fieldset>
-      {showSort && <SortSelect id={id("sort")} value={draft.sort} onChange={(sort) => onChange({ sort }, "now")} className={span("lg:col-span-3")} />}
     </div>
   );
 }

@@ -17,3 +17,7 @@ MODIFY UI · bộ lọc + template dùng chung `CategoryListTemplate` → STRICT
 ## Acceptance
 - [ ] Như P3-T01 cho 2 trang; template dùng chung không làm vỡ Tin tức / Tuyển dụng
 
+
+## Carry-over từ P3-T01 (reviewer r2)
+- MINOR-1: `RentalFilterSheet` seed từ `filters` URL, không từ draft chung (`RentalFilters.tsx:193`, `RentalFilterSheet.tsx:52`) → seed từ `useRentalListNavigation().draft` + áp qua `update`/`submit` chung (xoá timer debounce trước điều hướng).
+- NIT-1: `useMemo` cho context value `RentalListNavigation.tsx:289`.

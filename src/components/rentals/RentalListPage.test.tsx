@@ -120,12 +120,36 @@ describe("S04 /cho-thue: render", () => {
     await render("vi");
     expect(screen.getByRole("heading", { level: 1, name: "Cho thuê" })).toBeInTheDocument();
     expect(cardTitles()).toEqual(["Studio Ba Đình", "Căn hộ 2PN", "Nhà phố rộng"]);
-    const count = screen.getByText("3 tin phù hợp");
+    const count = screen.getByText("Có 3 kết quả");
     expect(count).toHaveAttribute("role", "status");
     expect(count).toHaveAttribute("aria-live", "polite");
     expect(lastParams()).toMatchObject({ locale: "vi", limit: 12, page: 1, sort: "newest", available: true });
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/cho-thue/slug-1");
     expect(screen.queryByText(/Đang lọc/)).toBeNull();
+  });
+
+  it("bố cục market: banner compact 240px, băng tìm kiếm đè mép banner, breadcrumb rồi 'Có N kết quả' + Sắp xếp cùng hàng, lưới 1/2/3/4 cột", async () => {
+    loadPageBanner.mockResolvedValueOnce({ url: "/api/media/file/banner.jpg", width: 1600 });
+    const { container } = await render("vi");
+    expect(container.querySelector("section")?.className).toContain("h-60");
+    const form = screen.getByRole("search");
+    expect(form.parentElement?.className).toContain("-mt-12");
+    const breadcrumb = screen.getByRole("navigation", { name: /Breadcrumb|đường dẫn/i });
+    expect(form.compareDocumentPosition(breadcrumb) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const count = screen.getByRole("status", { name: "" });
+    expect(count.parentElement).toContainElement(screen.getByLabelText("Sắp xếp"));
+    expect(breadcrumb.compareDocumentPosition(count) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const grid = screen.getAllByRole("list").find((list) => list.className.includes("grid"))!;
+    expect(grid.className).toContain("grid-cols-1");
+    expect(grid.className).toContain("sm:grid-cols-2");
+    expect(grid.className).toContain("lg:grid-cols-3");
+    expect(grid.className).toContain("xl:grid-cols-4");
+  });
+
+  it("không có kết quả thì không hiện ô Sắp xếp", async () => {
+    search.mockResolvedValue(result([]));
+    await render("vi");
+    expect(screen.queryByLabelText("Sắp xếp")).toBeNull();
   });
 
   it("thẻ: giá rút gọn /tháng, 'Thoả thuận' khi không giá, diện tích + phòng ngủ", async () => {
@@ -170,9 +194,14 @@ describe("S04 /cho-thue: render", () => {
       sort: "price_asc",
     });
     expect(screen.getByRole("heading", { level: 2, name: "Kết quả cho “studio quan 1”" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Tỉnh/thành", { selector: "#rental-panel-province" })).toHaveTextContent("Hà Nội");
-    expect(screen.getByLabelText("Phường/xã", { selector: "#rental-panel-ward" })).toHaveTextContent("Ba Đình");
-    expect(screen.getByLabelText("Giá từ", { selector: "#rental-panel-priceMin" })).toHaveValue(5_000_000);
+    // Băng tìm kiếm phản ánh URL: từ khoá, Loại, Khoảng giá (5-15 triệu không trùng mốc nào → "tuỳ chọn"); lọc phụ nằm trong form dưới dạng tham số giữ lại + huy hiệu (gồm cả khoảng giá tự nhập).
+    expect(screen.getByLabelText("Từ khoá")).toHaveValue("studio quan 1");
+    expect(screen.getByLabelText("Danh mục")).toHaveTextContent("Căn hộ");
+    expect(screen.getByLabelText("Giá/tháng (VNĐ)")).toHaveTextContent("Khoảng giá tuỳ chọn");
+    expect(screen.getByRole("button", { name: "Bộ lọc (6)" })).toBeInTheDocument();
+    const form = screen.getByRole("search");
+    expect(form.querySelector("input[name=province]")).toHaveValue("ha-noi");
+    expect(form.querySelector("input[name=ward]")).toHaveValue("ba-dinh");
   });
 
   it("phường chỉ tải của tỉnh trên URL; phường không thuộc tỉnh, slug danh mục/tỉnh lạ bị bỏ (danh sách không lọc, không 404)", async () => {
@@ -191,10 +220,9 @@ describe("S04 /cho-thue: render", () => {
     expect(wardsFind).not.toHaveBeenCalled();
   });
 
-  it("lọc phường phụ thuộc tỉnh: chưa chọn tỉnh thì ô phường bị khoá; danh mục gồm danh mục con (thụt vào)", async () => {
+  it("ô Loại của băng gồm danh mục con (thụt vào)", async () => {
     await render("vi");
-    expect(screen.getByLabelText("Phường/xã", { selector: "#rental-panel-ward" })).toBeDisabled();
-    await userEvent.setup().click(screen.getByLabelText("Danh mục", { selector: "#rental-panel-category" }));
+    await userEvent.setup().click(screen.getByLabelText("Danh mục", { selector: "#rental-bar-category" }));
     const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
     expect(options).toEqual(["Tất cả danh mục", "Căn hộ", "– Căn hộ dịch vụ", "Nhà phố"]);
   });
@@ -245,7 +273,7 @@ describe("S04 /cho-thue: render", () => {
     await render("en", { category: "can-ho" });
     expect(lastParams()).toMatchObject({ locale: "en" });
     expect(screen.getByRole("heading", { level: 1, name: "For rent" })).toBeInTheDocument();
-    expect(screen.getByText("1 listing")).toBeInTheDocument();
+    expect(screen.getByText("1 result")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/en/for-rent/slug-1");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent/category/can-ho"]);
   });
@@ -262,8 +290,8 @@ describe("S04 /cho-thue: trạng thái", () => {
     const suggestions = within(screen.getByTestId("empty-suggestions")).getAllByRole("link");
     expect(suggestions).toHaveLength(3);
     expect(suggestions[0]).toHaveAttribute("href", "/cho-thue?province=ha-noi&priceMin=5000000&bedrooms=3&furnishing=full");
-    expect(screen.getByLabelText("Tỉnh/thành", { selector: "#rental-panel-province" })).toBeInTheDocument();
-    expect(screen.getByText("0 tin phù hợp")).toBeInTheDocument();
+    expect(screen.getByRole("search")).toBeInTheDocument();
+    expect(screen.getByText("Có 0 kết quả")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Studio Ba Đình/ })).toBeNull();
   });
 
@@ -289,7 +317,7 @@ describe("S04 /cho-thue: trạng thái", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Chưa tải được danh sách tin cho thuê.");
     expect(within(alert).getByRole("link", { name: "Thử lại" })).toHaveAttribute("href", "/cho-thue?province=ha-noi");
-    expect(screen.getByLabelText("Tỉnh/thành", { selector: "#rental-panel-province" })).toBeInTheDocument();
+    expect(screen.getByRole("search")).toBeInTheDocument();
   });
 });
 
@@ -357,7 +385,7 @@ describe("S05 /cho-thue/danh-muc/[category]", () => {
   it("danh mục khoá: không có ô lọc Danh mục, ?category= trên URL bị bỏ qua; bộ lọc khác giữ và trỏ về chính trang danh mục", async () => {
     await render("vi", { category: "nha-pho", province: "ha-noi", page: "1" }, "can-ho");
     expect(lastParams()).toMatchObject({ category: "can-ho", province: "ha-noi" });
-    expect(screen.queryByLabelText("Danh mục", { selector: "#rental-panel-category" })).toBeNull();
+    expect(screen.queryByLabelText("Danh mục")).toBeNull();
     expect(screen.getByRole("link", { name: "Bỏ lọc Hà Nội" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
     expect(screen.getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([

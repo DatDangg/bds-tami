@@ -83,7 +83,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 | Bố cục < xl | Trái: nút Tìm kiếm (icon kính lúp). Giữa: logo. Phải: `VI \| EN` (ẩn < sm, khi đó nằm trong menu) + nút Menu (icon 3 gạch, nhãn "Menu") mở menu toàn màn hình §2.2. Nút Menu **chỉ có ở < xl** (BL-019) |
 | Bố cục ≥ xl | **Một hàng** (user quyết 2026-10-19, BL-001; bỏ nút Menu BL-019): logo trái · menu ngang giữa (7 mục: Trang chủ · Dự án · Cho thuê · Đăng tin BĐS · Tin tức · Tuyển dụng · Liên hệ, chữ `--text-small` 600 in hoa `0.08em`) · phải: nút Tìm kiếm, `VI | EN`, nút CTA (nếu bật). **Không có nút Menu** (như vinhomes.vn desktop: menu ngang là điều hướng duy nhất, không trùng menu toàn màn hình). Cao 72px như ≥ lg, không còn hàng 2. Mục có con: dropdown khi hover/focus/Enter, `aria-expanded`. Menu ngang không xuống dòng, không tràn ở 1280px (VI và EN) |
 | Mục đang xem | Gạch chân 2px `--color-text`, `aria-current="page"` (không dùng màu accent: accent-text trên kính nền đen chỉ ~3:1). Hover mục: gạch chân `--color-text` 40%; hover icon: nền `--color-text` 10% (không đổi màu chữ) |
-| Sticky | Có, `position: sticky; top: 0; z: --z-header`; vùng lề trong suốt `pointer-events: none` (chỉ thanh nhận chuột). Thanh phụ dính dưới header (ProjectSubNav, bộ lọc Cho thuê mobile) dùng `top: var(--header-offset)`; mọi đích neo dùng `scroll-margin-top` = `--header-offset` + 1rem (+ 3.5rem nếu có thanh mục con dính) |
+| Sticky | Có, `position: sticky; top: 0; z: --z-header`; vùng lề trong suốt `pointer-events: none` (chỉ thanh nhận chuột). Thanh phụ dính dưới header (ProjectSubNav) dùng `top: var(--header-offset)`; mọi đích neo dùng `scroll-margin-top` = `--header-offset` + 1rem (+ 3.5rem nếu có thanh mục con dính) |
 | Logo | Chỉ bản cho nền sáng (`site-settings.logo`, mặc định `/brand/tami-logo-gold.png`; BL-018) vì kính luôn sáng; `site-settings.logoDark` vẫn dùng cho menu toàn màn hình + footer. Logo là nhãn hiệu nên miễn tỉ lệ 4.5:1 (WCAG 1.4.3) |
 | Nút CTA | Từ global `header.ctaButton`: "bật" = có cả `label` ở ngôn ngữ đang xem và `link` hợp lệ → hiện nút CTA (nút chính cỡ nhỏ) ở cụm phải header (≥ md) và trong menu toàn màn hình; thiếu nhãn ở ngôn ngữ đang xem (vd chưa có bản EN) hoặc thiếu link → ẩn, không mượn chữ ngôn ngữ kia (BR-07) |
 
@@ -121,7 +121,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Kèm JSON-LD `BreadcrumbList` theo ngôn ngữ.
 
 ### 2.7. Page banner (đầu trang danh sách)
-- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)`, ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
+- Biến thể **Ảnh**: cao `clamp(240px, 42svh, 440px)` (`size="default"`; trang danh sách dùng `size="compact"` — **cao cố định 240px** + chừa 3rem đáy cho băng tìm kiếm đè lên, mô tả tối đa 2 dòng; BL-020 P3), ảnh `object-cover` + scrim, tiêu đề `--text-h1` trắng căn giữa. Ảnh lấy từ `site-settings.pageBanners` (FR-ADM-20, BL-017): ảnh riêng của trang danh sách → ảnh mặc định (`pageBanners.default`) → không có thì biến thể Chữ. Trang danh mục (S05) dùng ảnh của danh sách cha. VI/EN cùng ảnh. Scrim của banner phải giữ chữ trắng (cả mô tả) ≥ 4.5:1 trên ảnh trắng tinh.
 - Biến thể **Chữ** (khi chưa cấu hình ảnh): nền `--color-bg-alt`, tiêu đề `--text-h1` (viết thường, không còn chữ chìm), mô tả danh mục nếu có (`categories.description`, `max-width: 60ch`). Padding `--space-section-tight`.
 - Header trên trang có banner ảnh: vẫn là thanh nổi kính mờ sáng §2.1 (không còn biến thể trong suốt).
 
@@ -174,9 +174,10 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 ### 3.5. Bộ lọc Cho thuê (FR-PUB-04)
 - Trường: Từ khoá (`q`) · Danh mục · Tỉnh/thành · Phường/xã (phụ thuộc tỉnh, disabled khi chưa chọn tỉnh) · Giá/tháng (2 ô min-max + gợi ý mốc: < 5tr, 5-10tr, 10-20tr, > 20tr) · Diện tích (min-max) · Phòng ngủ (chip 1, 2, 3, 4+) · Nội thất (chip Không, Cơ bản, Đầy đủ) · Sắp xếp (Mới nhất, Giá tăng dần, Giá giảm dần).
 - **Nguồn sự thật là URL** (query params như API_SPEC §3.3). Đổi bộ lọc → `router.replace` với `scroll: false`, debounce 300ms cho ô số và từ khoá; trang về `page=1`.
+- **Bố cục as-built (BL-020 P3-T01):** thay thanh lọc 2 hàng + thanh dính mobile bằng **băng tìm kiếm gọn** (`ListSearchBar`, thẻ trắng bo 20px, bóng `--shadow-lg`, đè 3rem lên mép dưới banner; một hàng ≥ lg, xếp dọc < lg): ô Từ khoá `q` · **Loại** (= Danh mục, tham số `category`) · **Khoảng giá** (mốc gợi ý + "Mọi mức giá"; ra đúng cặp `priceMin`/`priceMax` của chip mốc giá cũ; khoảng tự nhập không trùng mốc hiện "Khoảng giá tuỳ chọn") · nút "Tìm kiếm" · nút viên thuốc "Bộ lọc" kèm **huy hiệu số lọc phụ đang bật** (Tỉnh, Phường, Diện tích, Phòng ngủ, Nội thất, và **khoảng giá tự nhập** không trùng mốc nào của băng — tính 1 vì trường tự nhập nằm trong Sheet/Popover và "Xoá" dọn nó; mốc giá chọn ở băng, từ khoá, danh mục không tính). Lọc phụ: **Popover modal ≥ lg** (áp dụng ngay, Esc đóng + trả focus về nút) / **Sheet dưới < lg** (như trên). Sắp xếp chuyển xuống hàng kết quả: nhãn chỉ hiện từ `sm` (< sm chỉ còn nhãn cho trình đọc màn hình) để giá trị đọc được ở 375px; dùng chung **một bản nháp** với băng/Popover (context của `RentalListNavigationProvider`) nên đổi sắp xếp luôn kèm mọi lọc đang chờ và từ khoá chưa debounce. Trang danh mục (S05): không có ô Loại. **URL giữ nguyên** (cùng tên khoá/giá trị, "Tất cả" = vắng mặt, lọc mới về trang 1). Băng là **form GET thật** (ô có `name`, ô chọn là `<select>` gốc đã style trước hydrate, tham số khác giữ bằng input ẩn): không JS vẫn tìm theo từ khoá + Loại; riêng đổi Khoảng giá cần JS (một ô không gửi được hai tham số).
 - Hàng "Đang lọc": chip từng điều kiện có nút xoá (`aria-label="Bỏ lọc <tên>"`) + "Xoá tất cả / Clear all".
-- Số kết quả `aria-live="polite"`: "128 tin phù hợp / 128 listings".
-- Mobile (< lg): thanh dính dưới header gồm ô từ khoá + nút "Bộ lọc (n)" + nút Sắp xếp; bấm mở **Sheet từ dưới lên** (cao 90svh) chứa toàn bộ trường, chân Sheet dính: "Xoá / Clear" + "Xem <n> tin / Show <n> listings" (số cập nhật sống). ≥ lg: thanh ngang trên lưới (hàng 1: từ khoá, danh mục, tỉnh, phường, giá; hàng 2: diện tích, phòng ngủ, nội thất, sắp xếp) hoặc popover cho giá/diện tích.
+- Số kết quả `aria-live="polite"`: "Có 128 kết quả / 128 results" (EN số ít "1 result"), cùng hàng với ô Sắp xếp.
+- Mobile (< lg; **as-built: không còn thanh dính**, băng tìm kiếm cuộn cùng trang): nút "Bộ lọc" mở **Sheet từ dưới lên** (cao 90svh) chứa các lọc phụ, chân Sheet dính: "Xoá / Clear" + "Xem <n> tin / Show <n> listings" (số cập nhật sống). ≥ lg: lọc phụ trong Popover (có nút "Đóng" nhìn thấy, 44px).
 
 ### 3.6. Phân trang
 - Số trang có link thật (`?page=n`, SEO được), hiện tối đa: đầu, cuối, hiện tại ±1, dấu "…". Nút Trước/Sau có nhãn. `nav[aria-label="Phân trang / Pagination"]`, trang hiện tại `aria-current="page"`.
@@ -371,18 +372,18 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 ### S04. Danh sách Cho thuê · `/cho-thue` · `/en/for-rent` (FR-PUB-04) · density 5
 
 - Page banner §2.7: biến thể Ảnh nếu có `pageBanners.rentals` / `pageBanners.default` (FR-ADM-20), không thì **Chữ** gọn (padding `--space-section-tight` × 0.6): tiêu đề "Cho thuê / For rent" + dòng mô tả. Breadcrumb.
-- Bộ lọc §3.5 + hàng "Đang lọc" + số kết quả + sắp xếp.
+- **Bố cục (BL-020 P3-T01):** banner compact 240px (§2.7) → băng tìm kiếm đè mép banner (§3.5) → breadcrumb → chip danh mục → hàng "Đang lọc" → hàng "Có N kết quả" + Sắp xếp → lưới thẻ trắng bo 20px (viền `--color-border`).
 - Lưới thẻ Tin cho thuê, 12/trang (`limit=12`), phân trang §3.6.
 - Chip danh mục nhanh ngay trên lưới (link tới trang danh mục S05, không phải bộ lọc ẩn).
 - Chỉ tin `published` (tin `rented` **không** ở danh sách; chỉ còn truy cập bằng URL).
 
 | Mốc | Thay đổi |
 |---|---|
-| 375 | Thanh lọc dính (từ khoá + "Bộ lọc (n)" + Sắp xếp), Sheet lọc từ dưới; lưới 1 cột; thẻ ảnh 4:3 |
+| 375 | Băng tìm kiếm xếp dọc (từ khoá, Loại, Giá, "Bộ lọc" + "Tìm kiếm"), Sheet lọc phụ từ dưới; lưới 1 cột; thẻ ảnh 4:3 |
 | 640 | Lưới 2 cột |
-| 1024 | Thanh lọc ngang 2 hàng trên lưới (không dính); lưới 3 cột |
-| 1280 | Lưới 3 cột, thẻ rộng ~400px |
-| 1536 | Lưới 4 cột (container vẫn 1280 → thẻ ~300px; dùng `@container` để thẻ tự chuyển hàng thông số xuống 2 dòng khi < 320px) |
+| 1024 | Băng tìm kiếm một hàng, lọc phụ trong Popover; lưới 3 cột |
+| 1280 | **Lưới 4 cột** (thẻ ~290px) |
+| 1536 | Lưới 4 cột (container vẫn 1280, như 1280) |
 
 **States:**
 - Đổi bộ lọc/trang/chip: giữ kết quả cũ, mờ 50% + `aria-busy="true"` tới khi có kết quả (không nhảy layout), link đang chờ mờ nhẹ (`useLinkStatus`); không skeleton cấp route (`loading.tsx` gây soft-404, §3.2).

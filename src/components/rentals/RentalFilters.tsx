@@ -2,76 +2,114 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "@/components/home/use-environment";
+import { ListSearchBar, ListSearchField } from "@/components/listing/ListSearchBar";
+import { OptionSelect } from "@/components/ui/option-select";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
-import type { RentalFilters as RentalFilterValues } from "@/lib/search/url-params";
-import { FilterFields } from "./FilterFields";
+import { type RentalFilters as RentalFilterValues, rentalListQueryString, secondaryFilterCount } from "@/lib/search/url-params";
+import { PRICE_HINTS } from "./FilterFields";
+import { RentalFilterPopover } from "./RentalFilterPopover";
 import { RentalFilterSheet } from "./RentalFilterSheet";
 import { useRentalListNavigation } from "./RentalListNavigation";
-import { SortSelect } from "./SortSelect";
-import { useLiveDraft } from "./use-rental-draft";
+import type { FilterDraft } from "./use-rental-draft";
 
 interface RentalFiltersProps {
   /** Bộ lọc đang trên URL (đã bỏ slug lạ): nguồn sự thật. */
   filters: RentalFilterValues;
   options: RentalFilterOptions;
-  /** Vào từ nút tìm kiếm của header (`?q=` rỗng): đưa con trỏ vào ô từ khoá đang hiện để gõ ngay. */
+  /** Vào từ nút tìm kiếm của header (`?q=` rỗng): đưa con trỏ vào ô từ khoá để gõ ngay. */
   focusSearch?: boolean;
-  /** Trang danh mục (S05): slug danh mục bị khoá. `options.categories` rỗng nên không có ô danh mục; số đếm "Xem n tin" của Sheet vẫn phải tính theo danh mục này. */
+  /** Trang danh mục (S05): slug danh mục bị khoá. `options.categories` rỗng nên không có ô Loại; số đếm "Xem n tin" của Sheet vẫn phải tính theo danh mục này. */
   fixedCategory?: string | undefined;
 }
 
-/** Hai ô từ khoá (thanh dính mobile, bảng desktop) cùng tồn tại trong DOM; chỉ một ô đang hiện theo breakpoint. */
-const SEARCH_INPUT_IDS = ["rental-bar-q", "rental-panel-q"] as const;
+const KEYWORD_INPUT_ID = "rental-bar-q";
+/** ≥ lg: Popover; ít hơn: Sheet. Trước hydrate `useMediaQuery` = false nên server/lượt đầu luôn là Sheet. */
+const DESKTOP_QUERY = "(min-width: 1024px)";
+
+const rangeValue = (min: string, max: string) => (min === "" && max === "" ? "" : `${min}-${max}`);
+
+/** Mục "Khoảng giá": mốc gợi ý + (nếu URL đang có khoảng tự nhập không trùng mốc nào) một mục hiện khoảng đó để ô không nói sai. */
+function priceOptions(draft: FilterDraft, t: ReturnType<typeof useTranslations>) {
+  const hints = PRICE_HINTS.map((hint) => ({ value: rangeValue(hint.min, hint.max), label: t(`priceHints.${hint.key}`) }));
+  const current = rangeValue(draft.priceMin, draft.priceMax);
+  const custom = current !== "" && !hints.some((hint) => hint.value === current) ? [{ value: current, label: t("fields.priceCustom") }] : [];
+  return { current, options: [{ value: "", label: t("fields.priceAny") }, ...hints, ...custom] };
+}
+
+/** Tham số trên URL mà băng không có ô (lọc phụ, giá, sắp xếp): giữ lại khi form GET gửi không JS. */
+function preservedParams(filters: RentalFilterValues): Record<string, string> {
+  const query = rentalListQueryString({ ...filters, page: 1 }).slice(1);
+  const params = Object.fromEntries(new URLSearchParams(query));
+  delete params.q;
+  delete params.category;
+  return params;
+}
 
 /**
- * Bộ lọc `/cho-thue` (design-spec §3.5), Client Component: URL là nguồn sự thật, mỗi lần đổi ô là `router.replace` (`scroll: false`, về trang 1).
- * ≥ lg: bảng lọc 2 hàng áp dụng ngay (gõ chữ/số chờ 300ms). < lg: thanh dính dưới header (từ khoá + "Bộ lọc (n)" + Sắp xếp), bấm "Bộ lọc" mở Sheet.
- * Hai bố cục dùng chung một bản nháp nên ô từ khoá/sắp xếp luôn khớp nhau; phần nào bị ẩn bằng CSS thì không vào cây truy cập.
+ * Băng tìm kiếm + lọc phụ của `/cho-thue` (design-spec S04), Client Component: URL là nguồn sự thật, mỗi lần đổi ô là `router.replace` (`scroll: false`, về trang 1).
+ * Băng (ListSearchBar): từ khoá + Loại (danh mục) + Khoảng giá + "Tìm kiếm" + "Bộ lọc (n)". Chọn ô áp dụng ngay, gõ chữ chờ 300ms, "Tìm kiếm" áp dụng tức thì;
+ * không JS thì form GET thật gửi cùng tên tham số. "Bộ lọc" mở Popover (≥ lg, áp dụng ngay) hoặc Sheet (< lg, áp dụng khi bấm "Xem n tin").
  */
 export function RentalFilters({ filters, options, focusSearch = false, fixedCategory }: RentalFiltersProps) {
   const t = useTranslations("page.rentals");
-  const { navigate } = useRentalListNavigation();
-  const { draft, update } = useLiveDraft(filters, navigate);
-
-  useEffect(() => {
-    if (!focusSearch) return;
-    const inputs = SEARCH_INPUT_IDS.flatMap((id) => document.getElementById(id) ?? []);
-    (inputs.find((input) => input.getClientRects().length > 0) ?? inputs[0])?.focus();
-  }, [focusSearch]);
-  // Đổi tỉnh ở thanh desktop là đổi URL ngay: phường của tỉnh mới do server trả về (khoá ô phường trong lúc chờ), không cần gọi REST như trong Sheet.
+  const { actionPath, draft, update, submit } = useRentalListNavigation();
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const activeCount = secondaryFilterCount(filters);
+  const price = priceOptions(draft, t);
+  // Đổi tỉnh ở Popover là đổi URL ngay: phường của tỉnh mới do server trả về (khoá ô phường trong lúc chờ), không cần gọi REST như trong Sheet.
   const wardsLoading = draft.province !== (options.wardsProvince ?? "");
 
+  useEffect(() => {
+    if (focusSearch) document.getElementById(KEYWORD_INPUT_ID)?.focus();
+  }, [focusSearch]);
+
   return (
-    <>
-      <div role="group" aria-label={t("filtersLabel")} className="sticky top-(--header-offset) z-(--z-sticky) -mx-gutter flex items-end gap-2 border-b border-border bg-surface px-gutter py-2 lg:hidden">
-        <div className="flex min-w-0 flex-1 flex-col">
-          <label htmlFor="rental-bar-q" className="sr-only">
-            {t("fields.q")}
-          </label>
-          <Input
-            id="rental-bar-q"
-            type="search"
-            maxLength={100}
-            autoComplete="off"
-            placeholder={t("fields.qPlaceholder")}
-            value={draft.q}
-            onChange={(event) => update({ q: event.target.value }, "typing")}
+    <ListSearchBar
+      action={actionPath}
+      label={t("searchBarLabel")}
+      keyword={{ id: KEYWORD_INPUT_ID, name: "q", label: t("fields.q"), placeholder: t("fields.qPlaceholder"), value: draft.q, onChange: (q) => update({ q }, "typing") }}
+      submitLabel={t("search")}
+      onSubmit={submit}
+      preservedParams={preservedParams(filters)}
+      filtersSlot={
+        isDesktop ? (
+          <RentalFilterPopover draft={draft} onChange={update} options={{ provinces: options.provinces, wards: options.wards, wardsLoading }} activeCount={activeCount} />
+        ) : (
+          <RentalFilterSheet filters={filters} sort={draft.sort} options={options} fixedCategory={fixedCategory} />
+        )
+      }
+    >
+      {/* Trang danh mục (S05) truyền danh sách rỗng: danh mục đã khoá, đổi danh mục = sang trang khác bằng chip. */}
+      {options.categories.length > 0 && (
+        <ListSearchField label={t("fields.category")} htmlFor="rental-bar-category">
+          <OptionSelect
+            progressive
+            id="rental-bar-category"
+            name="category"
+            value={draft.category}
+            onValueChange={(category) => update({ category }, "now")}
+            options={[
+              { value: "", label: t("fields.allCategories") },
+              ...options.categories.map((category) => ({ value: category.slug, label: category.depth === 1 ? `– ${category.label}` : category.label })),
+            ]}
+            className="rounded-md"
           />
-        </div>
-        <RentalFilterSheet filters={filters} sort={draft.sort} options={options} fixedCategory={fixedCategory} />
-        <SortSelect id="rental-bar-sort" value={draft.sort} onChange={(sort) => update({ sort }, "now")} showLabel={false} className="w-32 shrink-0" />
-      </div>
-      <section aria-label={t("filtersLabel")} className="hidden lg:block">
-        <FilterFields
-          idPrefix="rental-panel"
-          layout="panel"
-          showSort
-          draft={draft}
-          options={{ categories: options.categories, provinces: options.provinces, wards: options.wards, wardsLoading }}
-          onChange={update}
+        </ListSearchField>
+      )}
+      <ListSearchField label={t("fields.price")} htmlFor="rental-bar-price">
+        <OptionSelect
+          progressive
+          id="rental-bar-price"
+          value={price.current}
+          onValueChange={(range) => {
+            const [priceMin = "", priceMax = ""] = range.split("-");
+            update({ priceMin, priceMax }, "now");
+          }}
+          options={price.options}
+          className="rounded-md"
         />
-      </section>
-    </>
+      </ListSearchField>
+    </ListSearchBar>
   );
 }

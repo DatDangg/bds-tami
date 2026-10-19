@@ -11,6 +11,7 @@ import { PendingLink } from "@/components/layout/PendingRegion";
 import { ActiveFilters, useActiveFilterChips } from "@/components/rentals/ActiveFilters";
 import { RentalCard } from "@/components/rentals/RentalCard";
 import { RentalFilters } from "@/components/rentals/RentalFilters";
+import { RentalSortControl } from "@/components/rentals/RentalSortControl";
 import { RentalPendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
 import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
 import { publicPath } from "@/lib/content/content-paths";
@@ -118,13 +119,18 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
   return (
     <>
       <PageBanner
+        size="compact"
         title={category?.name ?? t("title")}
         description={category ? (category.description ?? undefined) : t("description")}
         image={bannerImage}
       />
-      <Breadcrumb items={breadcrumb} className="py-2" />
-      <RentalListNavigationProvider actionPath={listPath}>
-        <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter pt-4 pb-section-tight">
+      <RentalListNavigationProvider actionPath={listPath} filters={filters}>
+        {/* Băng tìm kiếm đè 3rem lên mép dưới banner (PageBanner compact chừa đúng 3rem). */}
+        <div className="relative z-10 mx-auto -mt-12 w-full max-w-container px-gutter">
+          <RentalFilters filters={filters} options={filterOptions} fixedCategory={categorySlug} focusSearch={isSearchEntry(searchParams)} />
+        </div>
+        <Breadcrumb items={breadcrumb} className="py-2" />
+        <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter pt-2 pb-section-tight">
           <nav aria-label={t("categoriesLabel")}>
             <ul className="-my-1 flex snap-x snap-mandatory gap-2 overflow-x-auto py-1 pr-8 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:pr-0">
               {categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all")).map((chip) => (
@@ -140,7 +146,6 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
               ))}
             </ul>
           </nav>
-          <RentalFilters filters={filters} options={filterOptions} fixedCategory={categorySlug} focusSearch={isSearchEntry(searchParams)} />
           <ActiveFilters filters={filters} options={filterOptions} listPath={listPath} />
           <RentalPendingRegion className="flex flex-col gap-6">
             {result ? (
@@ -188,9 +193,12 @@ function ResultList({ result, cards, filters, options, listPath, locale, query, 
     <>
       <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
         {query && <h2 className="font-display text-h3">{t("resultsFor", { query })}</h2>}
-        <p role="status" aria-live="polite" className="text-small text-text-secondary">
-          {t("resultCount", { count: result.total })}
-        </p>
+        <div className="flex items-center justify-between gap-4">
+          <p role="status" aria-live="polite" className="text-small text-text-secondary">
+            {t("resultCount", { count: result.total })}
+          </p>
+          {result.total > 0 && <RentalSortControl />}
+        </div>
         {result.total === 0 ? (
           filtering ? (
             <FilteredEmpty filters={filters} options={options} listPath={listPath} locale={locale} title={t("empty.title")} />
@@ -198,7 +206,7 @@ function ResultList({ result, cards, filters, options, listPath, locale, query, 
             <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />
           )
         ) : (
-          <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cards.map((card, index) => (
               <li key={card.id}>
                 <RentalCard data={card} headingLevel={2} priority={index === 0} />

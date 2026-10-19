@@ -287,11 +287,12 @@
     "rentals": {
       "title": "For rent",
       "description": "Apartments, townhouses and offices for rent advised by TAMI: filter by area, price, floor area and furnishing.",
-      "filtersLabel": "Rental filters",
       "categoriesLabel": "Property type",
       "all": "All",
       "gridLabel": "Rental listings",
-      "resultCount": "{count, plural, one {# listing} other {# listings}}",
+      "resultCount": "{count, plural, one {# result} other {# results}}",
+      "search": "Search",
+      "searchBarLabel": "Search rental listings",
       "resultsFor": "Results for “{query}”",
       "fields": {
         "q": "Keyword",
@@ -315,7 +316,9 @@
         "bedrooms": "Bedrooms",
         "furnishing": "Furnishing",
         "sort": "Sort by",
-        "anyOption": "Any"
+        "anyOption": "Any",
+        "priceAny": "Any price",
+        "priceCustom": "Custom price range"
       },
       "priceHints": {
         "under5": "< 5 million",

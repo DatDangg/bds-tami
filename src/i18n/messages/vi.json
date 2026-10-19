@@ -287,11 +287,12 @@
     "rentals": {
       "title": "Cho thuê",
       "description": "Căn hộ, nhà phố, văn phòng cho thuê do TAMI tư vấn: lọc theo khu vực, mức giá, diện tích và nội thất.",
-      "filtersLabel": "Bộ lọc tin cho thuê",
       "categoriesLabel": "Loại hình",
       "all": "Tất cả",
       "gridLabel": "Danh sách tin cho thuê",
-      "resultCount": "{count} tin phù hợp",
+      "resultCount": "Có {count, number} kết quả",
+      "search": "Tìm kiếm",
+      "searchBarLabel": "Tìm tin cho thuê",
       "resultsFor": "Kết quả cho “{query}”",
       "fields": {
         "q": "Từ khoá",
@@ -315,7 +316,9 @@
         "bedrooms": "Phòng ngủ",
         "furnishing": "Nội thất",
         "sort": "Sắp xếp",
-        "anyOption": "Bất kỳ"
+        "anyOption": "Bất kỳ",
+        "priceAny": "Mọi mức giá",
+        "priceCustom": "Khoảng giá tuỳ chọn"
       },
       "priceHints": {
         "under5": "< 5 triệu",

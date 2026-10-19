@@ -2,11 +2,11 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { SlidersHorizontal } from "@/components/icons";
+import { ListFiltersButton } from "@/components/listing/ListSearchBar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
-import { activeFilterCount, parseRentalFilters, type RentalFilters, rentalCountApiPath } from "@/lib/search/url-params";
+import { parseRentalFilters, type RentalFilters, rentalCountApiPath, secondaryFilterCount } from "@/lib/search/url-params";
 import { FilterFields } from "./FilterFields";
 import { useRentalListNavigation } from "./RentalListNavigation";
 import { useApiJson } from "./use-api-json";
@@ -20,17 +20,18 @@ interface CountResponse {
 interface RentalFilterSheetProps {
   /** Bộ lọc đang trên URL (nạp vào Sheet mỗi lần mở; số trên nút "Bộ lọc (n)"). */
   filters: RentalFilters;
-  /** Sắp xếp đang chọn ở thanh dính (Sheet không có ô sắp xếp nhưng khi áp dụng phải giữ nó). */
+  /** Sắp xếp đang chọn (Sheet không có ô sắp xếp nhưng khi áp dụng phải giữ nó). */
   sort: string;
   options: RentalFilterOptions;
   /** Trang danh mục (S05): danh mục khoá, không nằm trong bản nháp nhưng phải có trong truy vấn đếm. */
   fixedCategory?: string | undefined;
 }
 
-const CLEARED: Omit<FilterDraft, "sort"> = { q: "", category: "", province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "" };
+/** "Xoá" chỉ dọn các lọc PHỤ trong Sheet; từ khoá và danh mục nằm ở băng tìm kiếm nên giữ nguyên. */
+const CLEARED: Pick<FilterDraft, "province" | "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax" | "bedrooms" | "furnishing"> = { province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "" };
 
 /**
- * Nút "Bộ lọc (n)" + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg). Khác thanh desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
+ * Nút "Bộ lọc" (+ huy hiệu n) + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg) chứa các lọc phụ. Khác Popover desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
  * dính có "Xoá" và "Xem n tin" (n lấy sống từ `GET /api/public/rentals?limit=1` theo bản nháp). Áp dụng mới đổi URL.
  */
 export function RentalFilterSheet({ filters, sort, options, fixedCategory }: RentalFilterSheetProps) {
@@ -43,7 +44,7 @@ export function RentalFilterSheet({ filters, sort, options, fixedCategory }: Ren
   const draftFilters = parseRentalFilters(fixedCategory ? { ...draft, category: fixedCategory } : draft);
   const count = useApiJson<CountResponse>(open ? rentalCountApiPath(draftFilters, locale) : null, 300);
   const total = count.data?.data?.total;
-  const activeCount = activeFilterCount(filters);
+  const activeCount = secondaryFilterCount(filters);
 
   function handleOpenChange(next: boolean) {
     if (next) setDraft(draftOf(filters));
@@ -58,12 +59,7 @@ export function RentalFilterSheet({ filters, sort, options, fixedCategory }: Ren
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="shrink-0 px-3 sm:px-4" aria-label={activeCount > 0 ? `${t("filters")} (${activeCount})` : t("filters")}>
-          <SlidersHorizontal size={18} aria-hidden="true" />
-          {/* < sm chỉ chừa icon + số điều kiện cho ô từ khoá đủ rộng; `aria-label` luôn là tên đầy đủ. */}
-          <span className="max-sm:hidden">{t("filters")}</span>
-          {activeCount > 0 && <span>({activeCount})</span>}
-        </Button>
+        <ListFiltersButton label={t("filters")} count={activeCount} />
       </SheetTrigger>
       <SheetContent side="bottom" closeLabel={t("close")} className="h-[90svh] gap-0 rounded-t-md p-0">
         <div className="flex flex-col gap-1 border-b border-border px-6 py-4 pr-14">
@@ -73,9 +69,8 @@ export function RentalFilterSheet({ filters, sort, options, fixedCategory }: Ren
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <FilterFields
             idPrefix="rental-sheet"
-            layout="stack"
             draft={draft}
-            options={{ categories: options.categories, provinces: options.provinces, wards, wardsLoading }}
+            options={{ provinces: options.provinces, wards, wardsLoading }}
             onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
           />
         </div>

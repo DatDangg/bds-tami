@@ -16,5 +16,9 @@ MODIFY UI · bộ lọc + URL params → STRICT.
 - **URL params giữ nguyên** (test so khớp params trước/sau); không JS vẫn submit được form GET.
 
 ## Acceptance
-- [ ] Mọi bộ lọc cũ còn dùng được; URL không đổi; 4 cột ≥ xl, 1–2 cột mobile; không CLS
+- [x] Mọi bộ lọc cũ còn dùng được; URL không đổi; 4 cột ≥ xl, 1–2 cột mobile; không CLS (STRICT PASS r2)
 
+
+## Kết quả (2026-10-20)
+- Reviewer STRICT r1 FAIL (sort 375px, sort tách live draft) → r2 PASS. Report r1/r2 trong `.context/review-reports/`.
+- Quyết định agent (user ủy quyền 2026-10-20): "Loại" = `category`, "Khoảng giá" = select 4 mức gợi ý (đặt cặp `priceMin`/`priceMax` như chip cũ; khoảng tuỳ chọn hiện "Khoảng giá tuỳ chọn"); "Bộ lọc" mở Popover ≥ lg (có nút Đóng) / Sheet < lg; badge đếm Tỉnh, Phường, Diện tích, PN, Nội thất + khoảng giá tuỳ chọn; sắp xếp ra hàng "Có N kết quả" dùng chung live draft; bỏ thanh lọc dính mobile (thay bằng băng tìm kiếm đầu trang); banner compact 240px chỉ trang danh sách.

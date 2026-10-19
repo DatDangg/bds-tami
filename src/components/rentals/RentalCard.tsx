@@ -25,15 +25,15 @@ export function RentalCard({ data, headingLevel = 3, priority = false }: RentalC
   const facts = [formatArea(data.areaM2, locale), ...(data.bedrooms !== null ? [t("bedrooms", { count: data.bedrooms })] : [])];
   return (
     <article className="h-full">
-      <Link href={data.href} className="group flex min-h-11 flex-col gap-3 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted">
+      <Link href={data.href} className="group flex h-full min-h-11 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
           {data.cover ? (
-            <ResponsiveImage media={data.cover} sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 80vw" priority={priority} decorative />
+            <ResponsiveImage media={data.cover} sizes="(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" priority={priority} decorative />
           ) : (
             <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
           )}
         </div>
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 p-4">
           <Heading className="line-clamp-2 font-display text-h4 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
           {data.areaLabel && <p className="text-small text-text-muted">{data.areaLabel}</p>}
           <p className="text-small font-semibold">

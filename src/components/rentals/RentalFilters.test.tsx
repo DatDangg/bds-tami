@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import en from "@/i18n/messages/en.json";
 import vi_ from "@/i18n/messages/vi.json";
@@ -13,6 +14,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ replace }) }));
 
 import { RentalFilters } from "./RentalFilters";
 import { RentalPendingRegion, RentalListNavigationProvider } from "./RentalListNavigation";
+import { RentalSortControl } from "./RentalSortControl";
 
 const options: RentalFilterOptions = {
   categories: [
@@ -39,8 +41,9 @@ const none: RentalFilterValues = { sort: "newest", page: 1 };
 function ui(filters: RentalFilterValues, opts: RentalFilterOptions = options, locale: "vi" | "en" = "vi", fixedCategory?: string, actionPath?: string) {
   return (
     <NextIntlClientProvider locale={locale} messages={locale === "vi" ? vi_ : en}>
-      <RentalListNavigationProvider actionPath={actionPath ?? (locale === "vi" ? "/cho-thue" : "/en/for-rent")}>
+      <RentalListNavigationProvider actionPath={actionPath ?? (locale === "vi" ? "/cho-thue" : "/en/for-rent")} filters={filters}>
         <RentalFilters filters={filters} options={opts} fixedCategory={fixedCategory} />
+        <RentalSortControl />
         <RentalPendingRegion>
           <p>Kết quả</p>
         </RentalPendingRegion>
@@ -49,8 +52,11 @@ function ui(filters: RentalFilterValues, opts: RentalFilterOptions = options, lo
   );
 }
 
-const panel = () => within(screen.getByRole("region", { name: "Bộ lọc tin cho thuê" }));
+const bar = () => within(screen.getByRole("search", { name: /Tìm tin cho thuê|Search rental listings/ }));
 const lastUrl = () => replace.mock.calls.at(-1)?.[0];
+/** jsdom không có matchMedia: mặc định < lg (Sheet); `desktop(true)` giả lập ≥ lg (Popover). */
+const desktop = (matches: boolean) =>
+  vi.stubGlobal("matchMedia", (query: string) => ({ matches, media: query, addEventListener: () => undefined, removeEventListener: () => undefined }));
 
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -61,97 +67,97 @@ afterEach(() => {
   replace.mockReset();
 });
 
-describe("RentalFilters: thanh lọc desktop (áp dụng ngay, URL là nguồn sự thật)", () => {
+describe("RentalFilters: băng tìm kiếm (áp dụng ngay, URL là nguồn sự thật)", () => {
   it("gõ từ khoá: chờ 300ms mới đổi URL, một lần duy nhất, scroll=false", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none));
-    await user.type(panel().getByLabelText("Từ khoá"), "studio");
+    await user.type(bar().getByLabelText("Từ khoá"), "studio");
     expect(replace).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(300));
     expect(replace).toHaveBeenCalledTimes(1);
     expect(replace).toHaveBeenCalledWith("/cho-thue?q=studio", { scroll: false });
   });
 
-  it("chọn tỉnh: đổi ngay, bỏ phường đang chọn và về trang 1 (không có page)", async () => {
+  it("nút Tìm kiếm áp dụng ngay (không đợi debounce), không tải lại trang", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ province: "ha-noi", ward: "ba-dinh", sort: "newest", page: 3 }, withHanoiWards));
-    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
-    expect(lastUrl()).toBe("/cho-thue?province=ho-chi-minh");
+    render(ui(none));
+    await user.type(bar().getByLabelText("Từ khoá"), "studio");
+    await user.click(bar().getByRole("button", { name: "Tìm kiếm" }));
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(lastUrl()).toBe("/cho-thue?q=studio");
+    act(() => vi.advanceTimersByTime(300));
+    expect(replace).toHaveBeenCalledTimes(1);
   });
 
-  it("chọn 'Tất cả tỉnh' bỏ province khỏi URL (không lộ sentinel) và bỏ luôn phường", async () => {
+  it("Enter trong ô từ khoá submit form và áp dụng ngay", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ province: "ha-noi", ward: "ba-dinh", sort: "newest", page: 1 }, withHanoiWards));
-    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), /^Tất cả/);
+    render(ui(none));
+    await user.type(bar().getByLabelText("Từ khoá"), "a{Enter}");
+    expect(lastUrl()).toBe("/cho-thue?q=a");
+  });
+
+  it("ô Loại là danh mục (tham số category): đổi ngay; 'Tất cả danh mục' bỏ khỏi URL, không lộ sentinel", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui({ category: "can-ho", sort: "newest", page: 3 }));
+    await chooseOption(user, bar().getByLabelText("Danh mục"), "– Căn hộ dịch vụ");
+    expect(lastUrl()).toBe("/cho-thue?category=can-ho-dich-vu");
+    await chooseOption(user, bar().getByLabelText("Danh mục"), /^Tất cả/);
     expect(lastUrl()).toBe("/cho-thue");
     expect(String(lastUrl())).not.toContain("__");
   });
 
-  it("phường bị khoá khi chưa chọn tỉnh; có tỉnh thì chọn được và URL có ward", async () => {
+  it("ô Khoảng giá đặt priceMin/priceMax như chip mốc giá cũ; 'Mọi mức giá' bỏ cả hai; mốc đang chọn hiện đúng", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const { rerender } = render(ui(none));
-    expect(panel().getByLabelText("Phường/xã")).toBeDisabled();
-    rerender(ui({ province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
-    const ward = panel().getByLabelText("Phường/xã");
-    expect(ward).toBeEnabled();
-    await chooseOption(user, ward, "Phường Cầu Giấy");
-    expect(lastUrl()).toBe("/cho-thue?province=ha-noi&ward=cau-giay");
-  });
-
-  it("đổi tỉnh khi server chưa trả phường mới: ô phường khoá cho tới khi props đổi", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
-    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
-    expect(panel().getByLabelText("Phường/xã")).toBeDisabled();
-  });
-
-  it("chip mốc giá đặt cả hai đầu, bấm lại bỏ chọn; ô số debounce", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui(none));
-    const hint = panel().getByRole("button", { name: "5-10 triệu" });
-    await user.click(hint);
+    await chooseOption(user, bar().getByLabelText("Giá/tháng (VNĐ)"), "5-10 triệu");
     expect(lastUrl()).toBe("/cho-thue?priceMin=5000000&priceMax=10000000");
-    expect(hint).toHaveAttribute("aria-pressed", "true");
-    await user.click(hint);
+    await chooseOption(user, bar().getByLabelText("Giá/tháng (VNĐ)"), "< 5 triệu");
+    expect(lastUrl()).toBe("/cho-thue?priceMax=5000000");
+    await chooseOption(user, bar().getByLabelText("Giá/tháng (VNĐ)"), "> 20 triệu");
+    expect(lastUrl()).toBe("/cho-thue?priceMin=20000000");
+    await chooseOption(user, bar().getByLabelText("Giá/tháng (VNĐ)"), "Mọi mức giá");
     expect(lastUrl()).toBe("/cho-thue");
-    await user.type(panel().getByLabelText("Diện tích đến"), "60");
-    act(() => vi.advanceTimersByTime(300));
-    expect(lastUrl()).toBe("/cho-thue?areaMax=60");
-  });
-
-  it("phòng ngủ và nội thất là chip bật/tắt; 4+ gửi bedrooms=4", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui(none));
-    await user.click(panel().getByRole("button", { name: "4+" }));
-    expect(lastUrl()).toBe("/cho-thue?bedrooms=4");
-    await user.click(panel().getByRole("button", { name: "Đầy đủ" }));
-    expect(lastUrl()).toBe("/cho-thue?bedrooms=4&furnishing=full");
-    await user.click(panel().getByRole("button", { name: "4+" }));
-    expect(lastUrl()).toBe("/cho-thue?furnishing=full");
-  });
-
-  it("sắp xếp đổi ngay và đặt sort vào URL; về mặc định thì bỏ khỏi URL", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui(none));
-    await chooseOption(user, panel().getByLabelText("Sắp xếp"), "Giá giảm dần");
-    expect(lastUrl()).toBe("/cho-thue?sort=price_desc");
-    await chooseOption(user, panel().getByLabelText("Sắp xếp"), "Mới nhất");
-    expect(lastUrl()).toBe("/cho-thue");
+    rerender(ui({ priceMin: 5_000_000, priceMax: 10_000_000, sort: "newest", page: 1 }));
+    expect(bar().getByLabelText("Giá/tháng (VNĐ)")).toHaveTextContent("5-10 triệu");
+    rerender(ui({ priceMin: 7_000_000, priceMax: 9_000_000, sort: "newest", page: 1 }));
+    expect(bar().getByLabelText("Giá/tháng (VNĐ)")).toHaveTextContent("Khoảng giá tuỳ chọn");
   });
 
   it("/en: đường dẫn công khai /en/for-rent", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none, options, "en"));
-    await user.click(within(screen.getByRole("region", { name: "Rental filters" })).getByRole("button", { name: "2" }));
-    expect(lastUrl()).toBe("/en/for-rent?bedrooms=2");
+    await chooseOption(user, within(screen.getByRole("search", { name: "Search rental listings" })).getByLabelText("Category"), "Căn hộ");
+    expect(lastUrl()).toBe("/en/for-rent?category=can-ho");
+  });
+});
+
+describe("RentalFilters: form GET (không JS) + huy hiệu", () => {
+  it("SSR (trước hydrate): form GET tới trang, ô có name đúng tên tham số URL, ô chọn là <select> gốc đã chọn sẵn, tham số khác được giữ", () => {
+    const html = renderToString(ui({ category: "can-ho", province: "ha-noi", priceMin: 5_000_000, priceMax: 10_000_000, bedrooms: 2, sort: "price_asc", page: 4 }, withHanoiWards));
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const form = doc.querySelector("form[role=search]")!;
+    expect(form.getAttribute("method")).toBe("get");
+    expect(form.getAttribute("action")).toBe("/cho-thue");
+    expect(form.querySelector("input[name=q]")).not.toBeNull();
+    const category = form.querySelector("select[name=category]") as HTMLSelectElement;
+    expect(Array.from(category.options).map((option) => option.value)).toEqual(["", "can-ho", "can-ho-dich-vu"]);
+    expect(category.querySelector("option[selected]")?.getAttribute("value")).toBe("can-ho");
+    const hidden = Object.fromEntries(Array.from(form.querySelectorAll("input[type=hidden]")).map((input) => [input.getAttribute("name"), input.getAttribute("value")]));
+    // page không được giữ (lọc mới về trang 1); q/category do ô tự gửi.
+    expect(hidden).toEqual({ province: "ha-noi", priceMin: "5000000", priceMax: "10000000", bedrooms: "2", sort: "price_asc" });
+    expect(form.querySelector("button[type=submit]")).not.toBeNull();
   });
 
-  it("giá min > max được đảo lại trong URL (cùng bộ phân tích với server)", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ priceMax: 3_000_000, sort: "newest", page: 1 }));
-    await user.type(panel().getByLabelText("Giá từ"), "9000000");
-    act(() => vi.advanceTimersByTime(300));
-    expect(lastUrl()).toBe("/cho-thue?priceMin=3000000&priceMax=9000000");
+  it("huy hiệu trên 'Bộ lọc' đếm lọc PHỤ (tỉnh, phường, diện tích, phòng ngủ, nội thất, giá tự nhập); từ khoá/danh mục/mốc giá của băng không tính", () => {
+    const { rerender } = render(ui({ q: "a", category: "can-ho", priceMin: 5_000_000, priceMax: 10_000_000, sort: "newest", page: 1 }));
+    expect(bar().getByRole("button", { name: "Bộ lọc" })).toBeInTheDocument();
+    expect(bar().queryByTestId("filters-count")).toBeNull();
+    rerender(ui({ province: "ha-noi", ward: "ba-dinh", areaMin: 20, areaMax: 40, bedrooms: 2, sort: "newest", page: 1 }, withHanoiWards));
+    expect(bar().getByRole("button", { name: "Bộ lọc (4)" })).toBeInTheDocument();
+    expect(bar().getByTestId("filters-count")).toHaveTextContent("4");
+    // Khoảng giá tự nhập (không trùng mốc nào) nằm trong Sheet/Popover và bị "Xoá" dọn → tính 1.
+    rerender(ui({ priceMin: 7_000_000, priceMax: 9_000_000, sort: "newest", page: 1 }));
+    expect(bar().getByRole("button", { name: "Bộ lọc (1)" })).toBeInTheDocument();
   });
 });
 
@@ -162,29 +168,30 @@ describe("RentalFilters: vào từ nút tìm kiếm của header", () => {
     unmount();
     render(
       <NextIntlClientProvider locale="vi" messages={vi_}>
-        <RentalListNavigationProvider actionPath="/cho-thue">
+        <RentalListNavigationProvider actionPath="/cho-thue" filters={none}>
           <RentalFilters filters={none} options={options} focusSearch />
         </RentalListNavigationProvider>
       </NextIntlClientProvider>,
     );
-    expect(document.activeElement?.tagName).toBe("INPUT");
+    expect(document.activeElement).toBe(screen.getByLabelText("Từ khoá"));
     expect(document.activeElement).toHaveAttribute("type", "search");
   });
 });
 
 describe("RentalFilters: đồng bộ với URL", () => {
-  it("URL đổi từ ngoài (bỏ chip, nút Xoá, back) thì ô lọc nạp lại", () => {
-    const { rerender } = render(ui({ q: "studio", province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
-    expect(panel().getByLabelText("Từ khoá")).toHaveValue("studio");
+  it("URL đổi từ ngoài (bỏ chip, nút Xoá, back) thì ô nạp lại", () => {
+    const { rerender } = render(ui({ q: "studio", category: "can-ho", sort: "newest", page: 1 }, withHanoiWards));
+    expect(bar().getByLabelText("Từ khoá")).toHaveValue("studio");
+    expect(bar().getByLabelText("Danh mục")).toHaveTextContent("Căn hộ");
     rerender(ui(none));
-    expect(panel().getByLabelText("Từ khoá")).toHaveValue("");
-    expect(panel().getByLabelText("Tỉnh/thành")).toHaveValue("");
+    expect(bar().getByLabelText("Từ khoá")).toHaveValue("");
+    expect(bar().getByLabelText("Danh mục")).toHaveTextContent("Tất cả danh mục");
   });
 
   it("URL đổi do chính lần gõ của người dùng thì KHÔNG nuốt chữ gõ thêm trong lúc chờ server", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const { rerender } = render(ui(none));
-    const input = panel().getByLabelText("Từ khoá");
+    const input = bar().getByLabelText("Từ khoá");
     await user.type(input, "ab");
     act(() => vi.advanceTimersByTime(300));
     expect(lastUrl()).toBe("/cho-thue?q=ab");
@@ -202,13 +209,48 @@ describe("RentalFilters: đồng bộ với URL", () => {
   });
 });
 
+describe("RentalFilters: sắp xếp ở hàng kết quả", () => {
+  it("đổi ngay, giữ bộ lọc đang trên URL, về trang 1; về mặc định thì bỏ sort", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { rerender } = render(ui({ province: "ha-noi", bedrooms: 2, sort: "newest", page: 3 }));
+    await chooseOption(user, screen.getByLabelText("Sắp xếp"), "Giá giảm dần");
+    expect(lastUrl()).toBe("/cho-thue?province=ha-noi&bedrooms=2&sort=price_desc");
+    rerender(ui({ province: "ha-noi", bedrooms: 2, sort: "price_desc", page: 1 }));
+    await chooseOption(user, screen.getByLabelText("Sắp xếp"), "Mới nhất");
+    expect(lastUrl()).toBe("/cho-thue?province=ha-noi&bedrooms=2");
+  });
+
+  it("đổi Loại khi server chưa trả về rồi đổi sắp xếp → URL cuối có cả category và sort", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui(none));
+    await chooseOption(user, bar().getByLabelText("Danh mục"), "Căn hộ");
+    expect(lastUrl()).toBe("/cho-thue?category=can-ho");
+    // props `filters` vẫn là URL cũ (đang pending): ô Sắp xếp phải dựa trên bản nháp chung.
+    await chooseOption(user, screen.getByLabelText("Sắp xếp"), "Giá giảm dần");
+    expect(lastUrl()).toBe("/cho-thue?category=can-ho&sort=price_desc");
+    expect(screen.getByLabelText("Sắp xếp")).toHaveTextContent("Giá giảm dần");
+  });
+
+  it("từ khoá đang chờ debounce + đổi sắp xếp → một URL có cả q và sort, và không bắn thêm lần nào sau đó", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(ui(none));
+    await user.type(bar().getByLabelText("Từ khoá"), "studio");
+    expect(replace).not.toHaveBeenCalled();
+    await chooseOption(user, screen.getByLabelText("Sắp xếp"), "Giá giảm dần");
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(lastUrl()).toBe("/cho-thue?q=studio&sort=price_desc");
+    act(() => vi.advanceTimersByTime(1000));
+    expect(replace).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("RentalFilters: trang danh mục (danh mục khoá)", () => {
-  it("không có ô Danh mục (options.categories rỗng); đổi ô khác đổi URL của trang danh mục, không thêm category", async () => {
+  it("không có ô Loại (options.categories rỗng); đổi giá đổi URL của trang danh mục, không thêm category", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none, { ...options, categories: [] }, "vi", "can-ho", "/cho-thue/danh-muc/can-ho"));
-    expect(panel().queryByLabelText("Danh mục")).toBeNull();
-    await chooseOption(user, panel().getByLabelText("Tỉnh/thành"), "Hà Nội");
-    expect(lastUrl()).toBe("/cho-thue/danh-muc/can-ho?province=ha-noi");
+    expect(bar().queryByLabelText("Danh mục")).toBeNull();
+    await chooseOption(user, bar().getByLabelText("Giá/tháng (VNĐ)"), "< 5 triệu");
+    expect(lastUrl()).toBe("/cho-thue/danh-muc/can-ho?priceMax=5000000");
   });
 
   it("Sheet: số 'Xem n tin' đếm theo danh mục khoá dù bản nháp không có category", async () => {
@@ -216,7 +258,7 @@ describe("RentalFilters: trang danh mục (danh mục khoá)", () => {
     vi.stubGlobal("fetch", fetchSpy);
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui(none, { ...options, categories: [] }, "vi", "can-ho", "/cho-thue/danh-muc/can-ho"));
-    await user.click(within(screen.getByRole("group", { name: "Bộ lọc tin cho thuê" })).getByRole("button", { name: "Bộ lọc" }));
+    await user.click(bar().getByRole("button", { name: "Bộ lọc" }));
     const dialog = await screen.findByRole("dialog", { name: "Bộ lọc tin cho thuê" });
     await within(dialog).findByRole("button", { name: "Xem 4 tin" });
     const url = new URL(String(fetchSpy.mock.calls.map((call) => call[0] as string).find((u) => u.startsWith("/api/public/rentals"))), "http://x");
@@ -225,24 +267,84 @@ describe("RentalFilters: trang danh mục (danh mục khoá)", () => {
   });
 });
 
-describe("RentalFilters: thanh dính + Sheet mobile", () => {
+describe("RentalFilters: Popover lọc phụ (≥ lg, áp dụng ngay)", () => {
+  async function openPopover(user: ReturnType<typeof userEvent.setup>) {
+    desktop(true);
+    await user.click(bar().getByRole("button", { name: /^Bộ lọc/ }));
+    return screen.findByRole("dialog", { name: "Bộ lọc tin cho thuê" });
+  }
+
+  it("chứa lọc phụ (không có từ khoá/danh mục/sắp xếp); chip và ô đổi URL ngay", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    render(ui(none));
+    const popover = within(await openPopover(user));
+    expect(popover.queryByLabelText("Từ khoá")).toBeNull();
+    expect(popover.queryByLabelText("Danh mục")).toBeNull();
+    expect(popover.queryByLabelText("Sắp xếp")).toBeNull();
+    await user.click(popover.getByRole("button", { name: "4+" }));
+    expect(lastUrl()).toBe("/cho-thue?bedrooms=4");
+    await user.click(popover.getByRole("button", { name: "Đầy đủ" }));
+    expect(lastUrl()).toBe("/cho-thue?bedrooms=4&furnishing=full");
+    await user.click(popover.getByRole("button", { name: "4+" }));
+    expect(lastUrl()).toBe("/cho-thue?furnishing=full");
+    await user.type(popover.getByLabelText("Diện tích đến"), "60");
+    act(() => vi.advanceTimersByTime(300));
+    expect(lastUrl()).toBe("/cho-thue?areaMax=60&furnishing=full");
+  });
+
+  it("đổi tỉnh: bỏ phường, ô phường khoá cho tới khi server trả phường mới; phường chọn được khi đã có", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    const { rerender } = render(ui({ province: "ha-noi", ward: "ba-dinh", sort: "newest", page: 3 }, withHanoiWards));
+    const popover = within(await openPopover(user));
+    await chooseOption(user, popover.getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
+    expect(lastUrl()).toBe("/cho-thue?province=ho-chi-minh");
+    expect(popover.getByLabelText("Phường/xã")).toBeDisabled();
+    rerender(ui({ province: "ha-noi", sort: "newest", page: 1 }, withHanoiWards));
+    await chooseOption(user, popover.getByLabelText("Phường/xã"), "Phường Cầu Giấy");
+    expect(lastUrl()).toBe("/cho-thue?province=ha-noi&ward=cau-giay");
+  });
+
+  it("giá min > max được đảo lại trong URL (cùng bộ phân tích với server)", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    render(ui({ priceMax: 3_000_000, sort: "newest", page: 1 }));
+    const popover = within(await openPopover(user));
+    await user.type(popover.getByLabelText("Giá từ"), "9000000");
+    act(() => vi.advanceTimersByTime(300));
+    expect(lastUrl()).toBe("/cho-thue?priceMin=3000000&priceMax=9000000");
+  });
+
+  it("nút Đóng nhìn thấy (tên truy cập, ≥ 44px) đóng Popover và trả focus về nút 'Bộ lọc'", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    render(ui(none));
+    const popover = within(await openPopover(user));
+    const close = popover.getByRole("button", { name: "Đóng bộ lọc" });
+    expect(close.className).toContain("size-11");
+    await user.click(close);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(bar().getByRole("button", { name: /^Bộ lọc/ })).toHaveFocus();
+  });
+
+  it("Esc đóng và trả focus về nút 'Bộ lọc'", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    render(ui(none));
+    await openPopover(user);
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(bar().getByRole("button", { name: /^Bộ lọc/ })).toHaveFocus();
+  });
+});
+
+describe("RentalFilters: Sheet lọc phụ (< lg)", () => {
   const fetchMock = () => {
     const mock = vi.fn(async (url: string) => (url.startsWith("/api/wards") ? Response.json({ docs: [{ id: "w9", name: "Phường Bến Nghé", slug: "ben-nghe" }] }) : Response.json({ success: true, data: { total: 7 } })));
     vi.stubGlobal("fetch", mock);
     return mock;
   };
-  const bar = () => within(screen.getByRole("group", { name: "Bộ lọc tin cho thuê" }));
-
-  it("thanh dính có từ khoá + nút 'Bộ lọc (n)' đếm điều kiện + Sắp xếp; từ khoá debounce", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ province: "ha-noi", priceMin: 1, bedrooms: 2, sort: "newest", page: 1 }, withHanoiWards));
-    expect(bar().getByRole("button", { name: "Bộ lọc (3)" })).toBeInTheDocument();
-    await user.type(bar().getByLabelText("Từ khoá"), "q");
-    act(() => vi.advanceTimersByTime(300));
-    expect(lastUrl()).toBe("/cho-thue?q=q&province=ha-noi&priceMin=1&bedrooms=2");
-    await chooseOption(user, bar().getByLabelText("Sắp xếp"), "Giá tăng dần");
-    expect(lastUrl()).toContain("sort=price_asc");
-  });
 
   it("Sheet là dialog, ô lọc đổi KHÔNG đổi URL; 'Xem n tin' lấy số sống từ API và chỉ áp dụng khi bấm", async () => {
     const fetchSpy = fetchMock();
@@ -263,15 +365,15 @@ describe("RentalFilters: thanh dính + Sheet mobile", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
 
-  it("Sheet giữ sắp xếp đang chọn khi áp dụng; 'Xoá' dọn bản nháp; đổi tỉnh trong Sheet tải phường qua REST", async () => {
+  it("Sheet giữ từ khoá/danh mục/giá/sắp xếp khi áp dụng; 'Xoá' chỉ dọn lọc phụ; đổi tỉnh tải phường qua REST", async () => {
     const fetchSpy = fetchMock();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(ui({ q: "cũ", sort: "price_asc", page: 1 }));
-    await user.click(bar().getByRole("button", { name: "Bộ lọc (1)" }));
+    render(ui({ q: "cũ", category: "can-ho", priceMin: 5_000_000, bedrooms: 2, sort: "price_asc", page: 1 }));
+    await user.click(bar().getByRole("button", { name: "Bộ lọc (2)" }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByLabelText("Từ khoá")).toHaveValue("cũ");
+    expect(within(dialog).queryByLabelText("Từ khoá")).toBeNull();
     await user.click(within(dialog).getByRole("button", { name: "Xoá" }));
-    expect(within(dialog).getByLabelText("Từ khoá")).toHaveValue("");
+    expect(within(dialog).getByRole("button", { name: "2" })).toHaveAttribute("aria-pressed", "false");
 
     expect(within(dialog).getByLabelText("Phường/xã")).toBeDisabled();
     await chooseOption(user, within(dialog).getByLabelText("Tỉnh/thành"), "Hồ Chí Minh");
@@ -281,7 +383,8 @@ describe("RentalFilters: thanh dính + Sheet mobile", () => {
     await chooseOption(user, within(dialog).getByLabelText("Phường/xã"), "Phường Bến Nghé");
 
     await user.click(within(dialog).getByRole("button", { name: /^Xem/ }));
-    expect(replace).toHaveBeenLastCalledWith("/cho-thue?province=ho-chi-minh&ward=ben-nghe&sort=price_asc", { scroll: false });
+    // "Xoá" dọn cả khoảng giá tuỳ chọn nằm trong Sheet; từ khoá + danh mục + sắp xếp còn nguyên.
+    expect(replace).toHaveBeenLastCalledWith("/cho-thue?q=c%C5%A9&category=can-ho&province=ho-chi-minh&ward=ben-nghe&sort=price_asc", { scroll: false });
   });
 
   it("đếm lỗi: nút vẫn bấm được với nhãn không kèm số", async () => {

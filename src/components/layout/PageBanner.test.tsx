@@ -23,3 +23,19 @@ describe("PageBanner", () => {
     expect(screen.getByText("Danh sách dự án")).toHaveClass("text-text-secondary");
   });
 });
+
+describe("PageBanner size", () => {
+  it("compact: ảnh cao cố định 240px + chừa 3rem đáy cho băng tìm kiếm, mô tả tối đa 2 dòng", () => {
+    const { container } = render(<PageBanner title="Cho thuê" description="Mô tả" image={image} size="compact" />);
+    const section = container.querySelector("section")!;
+    expect(section).toHaveClass("h-60", "pb-12");
+    expect(section.className).not.toContain("clamp");
+    expect(screen.getByText("Mô tả")).toHaveClass("line-clamp-2");
+  });
+
+  it("mặc định: giữ chiều cao theo viewport như trước (pháp lý, liên hệ, dịch vụ, 404)", () => {
+    const { container } = render(<PageBanner title="Liên hệ" description="Mô tả" image={image} />);
+    expect(container.querySelector("section")?.className).toContain("h-[clamp(240px,42svh,440px)]");
+    expect(screen.getByText("Mô tả")).not.toHaveClass("line-clamp-2");
+  });
+});

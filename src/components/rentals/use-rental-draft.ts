@@ -73,5 +73,11 @@ export function useLiveDraft(filters: RentalFilters, navigate: (query: string) =
     else timer.current = setTimeout(() => commit(next), TYPING_DEBOUNCE_MS);
   }
 
-  return { draft, update };
+  /** Nút "Tìm kiếm" của băng: áp dụng ngay bản nháp hiện tại (kể cả chữ đang chờ debounce). */
+  function submit() {
+    clearTimeout(timer.current);
+    commit(draft);
+  }
+
+  return { draft, update, submit };
 }

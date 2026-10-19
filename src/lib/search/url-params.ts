@@ -100,6 +100,30 @@ export function activeFilterCount(filters: RentalFilters): number {
   return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0);
 }
 
+/** Mốc giá gợi ý (VNĐ/tháng) của ô "Khoảng giá" trên băng tìm kiếm: < 5tr, 5-10tr, 10-20tr, > 20tr. */
+export const PRICE_HINT_RANGES = [
+  { key: "under5", min: undefined, max: 5_000_000 },
+  { key: "from5to10", min: 5_000_000, max: 10_000_000 },
+  { key: "from10to20", min: 10_000_000, max: 20_000_000 },
+  { key: "over20", min: 20_000_000, max: undefined },
+] as const;
+
+/** Khoảng giá tự nhập: có min/max nhưng cặp đó không trùng mốc nào của băng (ô giá ở băng chỉ hiện "Khoảng giá tuỳ chọn"; trường tự nhập nằm trong Sheet/Popover). */
+function hasCustomPriceRange(filters: RentalFilters): boolean {
+  if (filters.priceMin === undefined && filters.priceMax === undefined) return false;
+  return !PRICE_HINT_RANGES.some((hint) => hint.min === filters.priceMin && hint.max === filters.priceMax);
+}
+
+/**
+ * Số lọc PHỤ đang bật (huy hiệu trên nút "Bộ lọc"): Tỉnh, Phường, Diện tích (một), Phòng ngủ, Nội thất, và Khoảng giá TỰ NHẬP (một; mốc giá chọn ở băng không tính).
+ * Từ khoá, Danh mục nằm ngay trên băng tìm kiếm nên không tính.
+ */
+export function secondaryFilterCount(filters: RentalFilters): number {
+  const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
+  const singles = [filters.province, filters.ward, filters.bedrooms, filters.furnishing];
+  return singles.filter((value) => value !== undefined).length + (sized ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0);
+}
+
 /**
  * Trang này có nên `noindex, follow` không (design-spec S04, tránh trùng lặp): trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh
  * (kèm `page`) vẫn index; mọi tổ hợp sâu hơn (từ khoá, phường, giá, diện tích, phòng ngủ, nội thất, danh mục + tỉnh) hoặc đổi sắp xếp thì không.
