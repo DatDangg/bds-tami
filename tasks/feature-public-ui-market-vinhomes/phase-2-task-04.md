@@ -18,3 +18,7 @@ ADDITIVE UI · NORMAL (đọc dữ liệu công khai sẵn có, cache tag hiện
 ## Acceptance
 - [ ] Hai khối bật/tắt + sắp xếp được; không có dữ liệu thì ẩn khối; ở `/en` theo luật ẩn tin chưa có bản EN hiện có
 
+
+## Carry-over từ P2-T01 (reviewer r1 — quyết định cho checkpoint)
+- Khối không có trong `blockOrder` thì không hiện (as-built ERD L9-T01); `defaultValue` 8 khối chỉ áp cho bản ghi mới → homepage đang có trên staging/prod (6 dòng) **không hiện `rentals`/`news`** cho tới khi admin thêm ở "Thứ tự khối".
+- Hướng làm (an toàn, không data migration): (a) cập nhật `seed/sample/homepage.ts` có đủ 8 khối + dữ liệu mẫu cho khối mới; (b) thêm cảnh báo trong admin (description của `blockOrder`/tab Cho thuê, Tin tức: "khối chỉ hiện khi có trong Thứ tự khối") ; (c) ghi bước triển khai "Admin → Trang chủ → Thứ tự khối: thêm Cho thuê, Tin tức" vào Decision log để session chính đưa vào spec/updates. **Không** tự động thêm khối thiếu lúc render (đổi luật as-built, cần user duyệt).

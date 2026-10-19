@@ -209,7 +209,81 @@ describe.skipIf(!baseUrl)("integration: global homepage (DB tạm)", () => {
       expect(await statusOf(updateHomepage({ featuredProjects: { projects: ids(7) } }))).toBe(400);
     });
 
-    it("blockOrder gồm ctaBanner, mặc định đủ 6 khối; trùng khối → 400", async () => {
+    const FAKE_ID = "00000000-0000-4000-8000-000000000000";
+
+    it("khối mới: mặc định bật/tắt đúng, lưu và đọc lại announcementBar, heroSearch, rentals, news, ctaBanner mở rộng", async () => {
+      const saved = await updateHomepage({
+        announcementBar: { text: "Mở bán đợt 1", link: "projects" },
+        heroSearch: { placeholder: "Tìm dự án" },
+        rentals: { title: "Cho thuê" },
+        news: { title: "Tin tức", intro: "Cập nhật mới nhất" },
+        ctaBanner: { enabled: false, image: imageId, secondaryLabel: "Gọi ngay", secondaryLink: "https://example.com/lien-he" },
+      });
+      expect(saved.announcementBar).toMatchObject({ enabled: false, text: "Mở bán đợt 1", link: "projects" });
+      expect(saved.heroSearch).toMatchObject({ enabled: true, placeholder: "Tìm dự án" });
+      expect(saved.rentals).toMatchObject({ enabled: true, title: "Cho thuê" });
+      expect(saved.news).toMatchObject({ enabled: true, title: "Tin tức", intro: "Cập nhật mới nhất" });
+      expect(saved.ctaBanner).toMatchObject({ image: imageId, secondaryLabel: "Gọi ngay", secondaryLink: "https://example.com/lien-he" });
+    });
+
+    it("EN lưu riêng chữ localized mới, link/ảnh dùng chung; chưa có bản EN thì đọc không fallback là trống", async () => {
+      await updateHomepage({ announcementBar: { text: "Mở bán", link: "projects" }, ctaBanner: { enabled: false, secondaryLabel: "Gọi ngay", secondaryLink: "projects" } });
+      const before = await payload.findGlobal({ slug: "homepage", locale: "en", fallbackLocale: false, depth: 0, overrideAccess: true });
+      expect(before.announcementBar?.text ?? "").toBe("");
+      await updateHomepage({ announcementBar: { text: "On sale now" }, ctaBanner: { enabled: false, secondaryLabel: "Call now" } }, admin, "en");
+      const vi = await payload.findGlobal({ slug: "homepage", locale: "vi", fallbackLocale: false, depth: 0, overrideAccess: true });
+      const en = await payload.findGlobal({ slug: "homepage", locale: "en", fallbackLocale: false, depth: 0, overrideAccess: true });
+      expect(vi.announcementBar?.text).toBe("Mở bán");
+      expect(en.announcementBar?.text).toBe("On sale now");
+      expect(en.announcementBar?.link).toBe("projects");
+      expect(en.ctaBanner?.secondaryLabel).toBe("Call now");
+      expect(vi.ctaBanner?.secondaryLabel).toBe("Gọi ngay");
+    });
+
+    it("link không hợp lệ ở announcementBar / secondaryLink → 400", async () => {
+      expect(await statusOf(updateHomepage({ announcementBar: { link: "javascript:alert(1)" } }))).toBe(400);
+      expect(await statusOf(updateHomepage({ ctaBanner: { enabled: false, secondaryLink: "ftp://x" } }))).toBe(400);
+    });
+
+    it("giới hạn: chipProjects ≤ 6, rentals.categories ≤ 4, news.posts ≤ 3", async () => {
+      const ids = (count: number) => Array.from({ length: count }, () => FAKE_ID);
+      const rentals = await Promise.all(Array.from({ length: 5 }, (_, index) => payload.create({ collection: "categories", data: { name: `Cho thuê ${index}`, scope: "rental" } as never, locale: "vi", overrideAccess: true, depth: 0 })));
+      const rentalIds = rentals.map((category) => category.id);
+      // 4 danh mục thật lưu được => 5 thật bị 400 là do giới hạn maxRows, không phải do id giả.
+      expect((await updateHomepage({ rentals: { categories: rentalIds.slice(0, 4) } })).rentals?.categories).toHaveLength(4);
+      expect(await statusOf(updateHomepage({ heroSearch: { chipProjects: ids(7) } }))).toBe(400);
+      expect(await statusOf(updateHomepage({ rentals: { categories: rentalIds } }))).toBe(400);
+      expect(await statusOf(updateHomepage({ news: { posts: ids(4) } }))).toBe(400);
+      await updateHomepage({ rentals: { categories: [] } });
+    });
+
+    it("rentals.categories chỉ nhận danh mục scope rental; news.posts lưu được bài có thật", async () => {
+      const rental = await payload.create({ collection: "categories", data: { name: "Văn phòng", scope: "rental" } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      const newsScope = await payload.create({ collection: "categories", data: { name: "Thị trường", scope: "news" } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      expect(await statusOf(updateHomepage({ rentals: { categories: [newsScope.id] } }))).toBe(400);
+      expect(await statusOf(updateHomepage({ rentals: { categories: [rental.id, newsScope.id] } }))).toBe(400);
+      const saved = await updateHomepage({ rentals: { categories: [rental.id] } });
+      expect(saved.rentals?.categories).toEqual([rental.id]);
+      const article = await withDatabase((client) => client.query(`INSERT INTO "news" (author_id) VALUES ($1) RETURNING id`, [admin.id]));
+      const newsId = article.rows[0].id as string;
+      const withNews = await updateHomepage({ news: { posts: [newsId] } });
+      expect(withNews.news?.posts).toEqual([newsId]);
+      await updateHomepage({ rentals: { categories: [] }, news: { posts: [] } });
+    });
+
+    it("blockOrder nhận rentals và news; dữ liệu cũ (6 khối) vẫn hợp lệ", async () => {
+      const legacy = await updateHomepage({ blockOrder: ["about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner"].map((block) => ({ block })) });
+      expect(legacy.blockOrder).toHaveLength(6);
+      const next = await updateHomepage({ blockOrder: ["rentals", "about", "news"].map((block) => ({ block })) });
+      expect(next.blockOrder?.map((row) => row.block)).toEqual(["rentals", "about", "news"]);
+      expect(await statusOf(updateHomepage({ blockOrder: [{ block: "news" }, { block: "news" }] }))).toBe(400);
+    });
+
+    it("blockOrder gồm ctaBanner; cấu hình mặc định là đủ HOMEPAGE_BLOCKS (8 khối); trùng khối → 400", async () => {
+      const { HOMEPAGE_BLOCKS } = await import("../../src/globals/Homepage");
+      const blockOrder = payload.globals.config.find((global) => global.slug === "homepage")!.flattenedFields.find((field) => field.name === "blockOrder");
+      expect(HOMEPAGE_BLOCKS).toHaveLength(8);
+      expect((blockOrder as { defaultValue?: { block: string }[] }).defaultValue?.map((row) => row.block)).toEqual([...HOMEPAGE_BLOCKS]);
       const saved = await updateHomepage({ blockOrder: [{ block: "ctaBanner" }, { block: "about" }] });
       expect(saved.blockOrder?.map((row) => row.block)).toEqual(["ctaBanner", "about"]);
       expect(await statusOf(updateHomepage({ blockOrder: [{ block: "about" }, { block: "about" }] }))).toBe(400);
@@ -259,18 +333,19 @@ describe.skipIf(!baseUrl)("integration: global homepage (DB tạm)", () => {
       const video = await insertMedia("video/mp4", MB);
       const about = await insertMedia("image/jpeg");
       const cta = await insertMedia("image/jpeg");
+      const ctaImage = await insertMedia("image/jpeg");
       const og = await insertMedia("image/jpeg");
       await updateHomepage({
         hero: { slides: [{ image: imageId, video }] },
         about: { image: about },
-        ctaBanner: { enabled: false, backgroundImage: cta },
+        ctaBanner: { enabled: false, backgroundImage: cta, image: ctaImage },
         seo: { ogImage: og },
       });
-      for (const id of [video, about, cta]) expect(await statusOf(deleteMedia(id))).toBe(409);
+      for (const id of [video, about, cta, ctaImage]) expect(await statusOf(deleteMedia(id))).toBe(409);
       // Request en xoá media đang dùng: vẫn 409 (guard luôn đọc bản vi, không đổi locale của request).
       expect(await statusOf(deleteMedia(about, "en"))).toBe(409);
       expect(await statusOf(deleteMedia(og))).toBeUndefined();
-      await updateHomepage({ hero: { slides: slides(1) }, about: { image: null }, ctaBanner: { enabled: false, backgroundImage: null } });
+      await updateHomepage({ hero: { slides: slides(1) }, about: { image: null }, ctaBanner: { enabled: false, backgroundImage: null, image: null } });
     });
 
     it("xoá hàng loạt: media đang dùng nằm trong errors và còn nguyên, media không dùng bị xoá", async () => {

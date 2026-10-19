@@ -17,6 +17,7 @@ export const blockDeleteWhileUsedByHomepage: CollectionBeforeDeleteHook = async 
     ...slides.flatMap((slide) => [slide.image, slide.video]),
     homepage.about?.image,
     homepage.ctaBanner?.backgroundImage,
+    homepage.ctaBanner?.image,
   ];
   if (usedIds.some((usedId) => usedId === id)) {
     throw new APIError("Không xoá được ảnh/video đang dùng ở trang chủ. Hãy thay ảnh/video đó ở Trang chủ trước.", 409, undefined, true);

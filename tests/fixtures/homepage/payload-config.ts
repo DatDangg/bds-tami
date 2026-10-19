@@ -7,6 +7,7 @@ import { AuditLogs } from "../../../src/collections/AuditLogs";
 import { Categories } from "../../../src/collections/Categories";
 import { Developers } from "../../../src/collections/Developers";
 import { Media } from "../../../src/collections/Media";
+import { News } from "../../../src/collections/News";
 import { createProjects } from "../../../src/collections/Projects";
 import { createPropertyPosts } from "../../../src/collections/PropertyPosts";
 import { Provinces } from "../../../src/collections/Provinces";
@@ -20,7 +21,7 @@ import type { HomepageRevalidators } from "../../../src/hooks/homepage/revalidat
 
 /**
  * Config test cho global `homepage`: global THẬT (nhận bản ghi nhận revalidate) + các collection nó tham chiếu
- * (`projects`, `services`, `property-posts`, `media`); `push: true` chỉ trên DB tạm (cần PostGIS, test tự bật).
+ * (`projects`, `services`, `property-posts`, `news`, `categories`, `media`); `push: true` chỉ trên DB tạm (cần PostGIS, test tự bật).
  */
 export function buildHomepageTestConfig(databaseUrl: string, revalidators: HomepageRevalidators) {
   return buildConfig({
@@ -33,6 +34,7 @@ export function buildHomepageTestConfig(databaseUrl: string, revalidators: Homep
       Developers,
       Provinces,
       Wards,
+      News,
       createProjects(),
       createRentals(),
       createPropertyPosts(),

@@ -67,6 +67,13 @@ describe("buildHomeView: thứ tự và bật/tắt khối", () => {
   it("visibleBlockKeys: chỉ khối bật, có giao diện và có tiêu đề (quyết định truy vấn nào cần chạy)", () => {
     expect(visibleBlockKeys(homepage({ services: { enabled: false, title: "Dịch vụ" } }))).toEqual(["about", "featuredProjects", "featuredOffers", "ctaBanner"]);
   });
+
+  it("visibleBlockKeys: rentals/news có trong blockOrder và đã bật vẫn chưa hiện (giao diện làm ở P2-T03/T04); homepage cũ thiếu khối mới vẫn render như cũ", () => {
+    const order = ["rentals", "about", "news"].map((block) => ({ block })) as Homepage["blockOrder"];
+    const page = homepage({ blockOrder: order, rentals: { enabled: true, title: "Cho thuê" }, news: { enabled: true, title: "Tin tức" } });
+    expect(visibleBlockKeys(page)).toEqual(["about"]);
+    expect(visibleBlockKeys(homepage()).length).toBeGreaterThan(0);
+  });
 });
 
 describe("buildHomeView: /en không lấy chữ Việt", () => {

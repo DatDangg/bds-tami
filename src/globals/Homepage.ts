@@ -11,6 +11,7 @@ import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { defaultLocale } from "../i18n/routing";
 import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
+import { announcementBarBlock, enabledField, heroSearchBlock, NEWS_BLOCK_LABEL, newsBlock, RENTALS_BLOCK_LABEL, rentalsBlock, titleField } from "./homepage/blocks";
 import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 
@@ -22,7 +23,9 @@ export const HERO_SLIDES_MAX = 8;
 export const FEATURED_PROJECTS_MAX = 6;
 
 /** Khối của trang chủ sắp xếp được (hero luôn đứng đầu, không nằm trong `blockOrder`). */
-export const HOMEPAGE_BLOCKS = ["about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner"] as const;
+export { HERO_CHIP_PROJECTS_MAX, HOME_NEWS_POSTS_MAX, RENTAL_CATEGORIES_MAX } from "./homepage/blocks";
+
+export const HOMEPAGE_BLOCKS = ["about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news"] as const;
 
 /**
  * Video hero: chỉ MP4/WebM ≤ 15MB. Upload vào `media` đã chặn theo magic bytes + dung lượng (ERD §4.12); đây là lớp kiểm lại
@@ -81,8 +84,6 @@ const imageUpload = (name: string, label: string, required = false): Field => ({
   filterOptions: { mimeType: { contains: "image/" } },
 });
 
-const enabledField: Field = { name: "enabled", type: "checkbox", label: "Hiển thị khối này", defaultValue: true };
-const titleField: Field = { name: "title", type: "text", label: "Tiêu đề khối", localized: true };
 const ctaLabelField: Field = { name: "ctaLabel", type: "text", label: "Chữ trên nút", localized: true };
 const ctaLinkField = () => navLinkField("ctaLink", { label: "Liên kết của nút" });
 
@@ -94,6 +95,8 @@ const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
   featuredOffers: "Ưu đãi nổi bật",
   partners: "Đối tác",
   ctaBanner: "Kêu gọi hành động",
+  rentals: RENTALS_BLOCK_LABEL,
+  news: NEWS_BLOCK_LABEL,
 };
 
 const heroBlock: Field = {
@@ -200,6 +203,9 @@ const ctaBannerBlock: Field = {
     { ...ctaLabelField, admin: { description: 'Để trống thì dùng "Nhận tư vấn".' } },
     ctaLinkField(),
     imageUpload("backgroundImage", "Ảnh nền"),
+    imageUpload("image", "Ảnh minh hoạ"),
+    { name: "secondaryLabel", type: "text", label: "Chữ trên nút phụ", localized: true },
+    navLinkField("secondaryLink", { label: "Liên kết của nút phụ" }),
   ],
 };
 
@@ -228,11 +234,14 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
     hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateHomepageGlobal(revalidators), enqueueTranslation.globalAfterChange] },
     fields: [
       formTabs([
-        { label: "Hero", fields: [heroBlock] },
+        { label: "Thanh thông báo", fields: [announcementBarBlock] },
+        { label: "Hero", fields: [heroBlock, heroSearchBlock] },
         { label: "Giới thiệu", fields: [aboutBlock] },
         { label: "Dự án nổi bật", fields: [featuredProjectsBlock] },
         { label: "Dịch vụ", fields: [servicesBlock] },
         { label: "Ưu đãi", fields: [featuredOffersBlock] },
+        { label: "Cho thuê", fields: [rentalsBlock] },
+        { label: "Tin tức", fields: [newsBlock] },
         { label: "Đối tác", fields: [partnersBlock] },
         { label: "Kêu gọi", fields: [ctaBannerBlock] },
         { label: "Thứ tự khối", fields: [blockOrderField] },

@@ -2488,6 +2488,14 @@ export interface SiteSetting {
  */
 export interface Homepage {
   id: string;
+  announcementBar?: {
+    enabled?: boolean | null;
+    text?: string | null;
+    /**
+     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     */
+    link?: string | null;
+  };
   hero: {
     slides: {
       image: string | Media;
@@ -2504,6 +2512,17 @@ export interface Homepage {
       ctaLink?: string | null;
       id?: string | null;
     }[];
+  };
+  heroSearch?: {
+    enabled?: boolean | null;
+    /**
+     * Để trống thì dùng chữ mặc định của website.
+     */
+    placeholder?: string | null;
+    /**
+     * Để trống thì tự lấy các dự án nổi bật mới nhất.
+     */
+    chipProjects?: (string | Project)[] | null;
   };
   about?: {
     enabled?: boolean | null;
@@ -2559,6 +2578,23 @@ export interface Homepage {
      */
     posts?: (string | PropertyPost)[] | null;
   };
+  rentals?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    /**
+     * Tối đa 4. Để trống thì tự lấy các danh mục cho thuê đang có tin.
+     */
+    categories?: (string | Category)[] | null;
+  };
+  news?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    intro?: string | null;
+    /**
+     * Tối đa 3. Để trống thì tự lấy 3 bài mới nhất.
+     */
+    posts?: (string | News)[] | null;
+  };
   partners?: {
     enabled?: boolean | null;
     title?: string | null;
@@ -2576,13 +2612,20 @@ export interface Homepage {
      */
     ctaLink?: string | null;
     backgroundImage?: (string | null) | Media;
+    image?: (string | null) | Media;
+    secondaryLabel?: string | null;
+    /**
+     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     */
+    secondaryLink?: string | null;
   };
   /**
    * Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại.
    */
   blockOrder?:
     | {
-        block: 'about' | 'featuredProjects' | 'services' | 'featuredOffers' | 'partners' | 'ctaBanner';
+        block:
+          'about' | 'featuredProjects' | 'services' | 'featuredOffers' | 'partners' | 'ctaBanner' | 'rentals' | 'news';
         id?: string | null;
       }[]
     | null;
@@ -2816,6 +2859,13 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
+  announcementBar?:
+    | T
+    | {
+        enabled?: T;
+        text?: T;
+        link?: T;
+      };
   hero?:
     | T
     | {
@@ -2830,6 +2880,13 @@ export interface HomepageSelect<T extends boolean = true> {
               ctaLink?: T;
               id?: T;
             };
+      };
+  heroSearch?:
+    | T
+    | {
+        enabled?: T;
+        placeholder?: T;
+        chipProjects?: T;
       };
   about?:
     | T
@@ -2867,6 +2924,21 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         posts?: T;
       };
+  rentals?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        categories?: T;
+      };
+  news?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        intro?: T;
+        posts?: T;
+      };
   partners?:
     | T
     | {
@@ -2882,6 +2954,9 @@ export interface HomepageSelect<T extends boolean = true> {
         ctaLabel?: T;
         ctaLink?: T;
         backgroundImage?: T;
+        image?: T;
+        secondaryLabel?: T;
+        secondaryLink?: T;
       };
   blockOrder?:
     | T

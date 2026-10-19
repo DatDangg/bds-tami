@@ -195,7 +195,10 @@ function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale
     }
     case "ctaBanner":
       return toCta(homepage, locale);
+    // Chưa có giao diện (P2-T02..T05): không nằm trong RENDERED_BLOCKS nên không bao giờ tới đây.
     case "partners":
+    case "rentals":
+    case "news":
       return null;
   }
 }
