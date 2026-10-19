@@ -1,13 +1,13 @@
 # Design Tokens: Website TAMI
 
 > Sinh bởi bước `/design` (`.agent/design.md` Phase 2), 16/10/2026. **Trạng thái: chờ user confirm.**
-> Nguồn: `docs/DESIGN.md` (bảng màu đo từ mockup, logo, typography), phong cách tham chiếu vinhomes.vn (bố cục, nhịp section), `.agent/references/taste-skill-v2.md`, `skills/ui-ux-pro-max`, `skills/responsive-web`.
+> Nguồn: `docs/DESIGN.md` (bảng màu đo từ mockup, logo, typography), phong cách tham chiếu market.vinhomes.vn (bố cục, nhịp section; màu TAMI), `.agent/references/taste-skill-v2.md`, `skills/ui-ux-pro-max`, `skills/responsive-web`.
 > Screen specs dùng các token này: `.context/design-spec.md`.
 > **Builder phải đọc file này trước khi viết bất kỳ component UI nào.** Component chỉ dùng token (class Tailwind sinh từ token hoặc `var(--…)`), **không** viết mã hex thô.
 
 ## 0. Design Read và Dials
 
-**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo vinhomes.vn (ảnh lớn, tiêu đề serif viết thường, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
+**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (ảnh lớn, tiêu đề serif viết thường, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
 
 | Dial | Giá trị | Lý do |
 |---|---|---|
@@ -23,7 +23,7 @@
 | §4.2 cấm nền kem + vàng đồng mặc định | Giữ vàng champagne `#E0BF89` + nền kem | Màu đo từ bộ nhận diện TAMI, không phải chọn mặc định |
 | §4.11 khoá một theme | Section tối xen kẽ (footer, banner CTA, menu toàn màn hình, tối đa **1** section nội dung tối mỗi trang) | DESIGN.md "Color scheme: Light, có section tối xen kẽ" |
 | §6.C bắt buộc dark mode | **Không** làm dark mode toàn trang giai đoạn 1 | User chốt trong DESIGN.md ("Không làm dark mode toàn trang") |
-| impeccable: cấm eyebrow | Eyebrow được dùng nhưng **tối đa 1 trên 3 section** (taste-skill §4.7) | Nhịp vinhomes.vn; giới hạn để không thành template |
+| impeccable: cấm eyebrow | Eyebrow được dùng nhưng **tối đa 1 trên 3 section** (taste-skill §4.7) | Nhịp market.vinhomes.vn; giới hạn để không thành template |
 
 ## 1. Colors
 
@@ -199,7 +199,7 @@ Card **không** đổ bóng (phân lớp bằng viền `--color-border` hoặc k
 
 | Token | Giá trị | Dùng cho |
 |---|---|---|
-| `--shadow-sm` | `0 1px 2px rgba(40, 30, 15, 0.06)` | Header đặc khi cuộn, thanh mục con dính |
+| `--shadow-sm` | `0 1px 2px rgba(40, 30, 15, 0.06)` | Thanh mục con dính (header nổi dùng `--shadow-md`) |
 | `--shadow-md` | `0 6px 16px -4px rgba(40, 30, 15, 0.12)` | Dropdown, popover, khung giá dính (desktop) |
 | `--shadow-lg` | `0 16px 40px -8px rgba(40, 30, 15, 0.18)` | Dialog, cookie banner, nút nổi |
 
@@ -304,12 +304,12 @@ Chiều rộng kiểm tra bắt buộc ở review: **375 / 768 / 1280** (gate `s
 
 | Component | Quy định |
 |---|---|
-| Button | Cao: sm 36px (chỉ desktop), md 44px, lg 52px. Padding ngang 20/24/32px. Chữ `--text-button` (sm: `--text-button-sm`). Primary: nền `--color-primary`, chữ `--color-primary-foreground`. Outline: viền 1px `--color-text`, nền trong suốt, hover nền `--color-text` chữ `--color-surface`. Dark: nền `--color-dark`, chữ `--color-on-dark`. Ghost: chỉ chữ + gạch chân khi hover. `:active` `translateY(1px)`. Disabled: opacity 0.5 + `cursor: not-allowed`. Nhãn 1 dòng ở desktop, không đặt `max-width` |
+| Button | Cao: sm 36px (chỉ desktop), md 44px, lg 52px. Bo viên thuốc `--radius-pill` (BL-020). Padding ngang 20/24/32px. Chữ `--text-button` (sm: `--text-button-sm`). Primary: nền `--color-primary`, chữ `--color-primary-foreground`. Secondary: nền `--color-surface`, viền `--color-border`, chữ `--color-accent-text`. Outline: viền 1px `--color-text`, nền trong suốt, hover nền `--color-text` chữ `--color-surface`. Dark: nền `--color-dark`, chữ `--color-on-dark`. Ghost: chỉ chữ + gạch chân khi hover. Chip: viền `--color-on-dark` 30%, nền trong suốt — CHỈ dùng trong `.theme-dark-block` hoặc trên scrim ≥ `--color-overlay`. `:active` `translateY(1px)`. Disabled: opacity 0.5 + `cursor: not-allowed`. Nhãn 1 dòng ở desktop, không đặt `max-width` |
 | Input/Select/Textarea | Cao 48px (textarea ≥ 120px). Viền 1px `--color-input-border`, nền `--color-surface`, focus: viền `--color-focus-ring` + ring. Lỗi: viền `--color-error` + icon + chữ lỗi dưới ô. Label luôn hiện phía trên (không dùng placeholder làm label) |
 | Checkbox | Ô 20px, vùng chạm 44px (label bấm được) |
 | Chip/Tab lọc | Cao 40px (mobile 44px). Mặc định viền `--color-border` chữ `--color-text-secondary`; đang chọn nền `--color-primary-soft` chữ `--color-text`, `aria-pressed`/`aria-selected` |
 | Card ảnh | Tỉ lệ ảnh cố định: dự án 4:5 (mobile) / 4:3 (≥ md); tin cho thuê 4:3; tin/ưu đãi 16:10; dịch vụ 3:4. `object-fit: cover`, `sizes` khai đúng cột |
-| Header | Cao 64px mobile, 72px ≥ lg (≤ 80px). Logo 32px mobile, 40px desktop |
+| Header | Thanh nổi bo viên thuốc kính mờ sáng (BL-020): cao 64px mobile, 72px ≥ lg, cách mép 8/16px; chiếm `--header-offset` trong luồng. Logo 32px mobile, 40px desktop |
 | Touch target | ≥ 44×44px cho mọi nút/link điều khiển trên mobile; khoảng cách giữa 2 target ≥ 8px |
 | Icon | Bộ **Phosphor Icons** (`@phosphor-icons/react`, weight `light`/`regular`), 20px/24px, `aria-hidden` khi đi kèm chữ. Không emoji, không vẽ SVG tay (trừ logo) |
 
@@ -464,7 +464,7 @@ export const ebGaramond = EB_Garamond({ subsets: ['latin', 'vietnamese'], weight
 export const montserrat = Montserrat({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600'], variable: '--font-montserrat', display: 'swap' })
 ```
 
-**Tuỳ biến shadcn bắt buộc** (taste-skill §9.E, không để mặc định): radius 2px/4px, font Montserrat, nút chữ in hoa, focus ring vàng đậm, Dialog/Sheet dùng `--color-overlay`, bỏ shadow mặc định của Card.
+**Tuỳ biến shadcn bắt buộc** (taste-skill §9.E, không để mặc định): thang radius BL-020 (2/12/16/20px, nút/badge pill), font Montserrat, nút chữ in hoa, focus ring vàng đậm, Dialog/Sheet dùng `--color-overlay`, bỏ shadow mặc định của Card.
 
 ## 12. Thay đổi so với `docs/DESIGN.md`
 

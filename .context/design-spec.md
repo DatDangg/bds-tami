@@ -3,10 +3,10 @@
 - **Sinh bởi:** bước `/design` (`/start` bước 3), 16/10/2026 · **Trạng thái:** chờ user confirm tokens + các quyết định ở §6, §9
 - **Tokens:** `skills/react-nodejs/design-tokens.md` (nguồn đúng cho màu/chữ/khoảng cách; ghi đè 4 giá trị của `docs/DESIGN.md`, xem §12 file đó)
 - **Nguồn:** `SPECIFICATIONS.md` v1.2.1 · `docs/DESIGN.md` (màn, component, logo) · `docs/BRD.md` §2, §2.1, §3.1 · `docs/ERD.md` §4 · `docs/API_SPEC.md` §3 · `docs/ARCHITECTURE.md` §5 · design doc `docs/specs/2026-10-16-tami-website-design.md`
-- **Tham chiếu phong cách:** vinhomes.vn (bố cục, nhịp section, kiểu chữ). **Không** dùng nội dung, ảnh, icon, chữ của Vinhomes (LGL-04).
+- **Tham chiếu phong cách:** market.vinhomes.vn (chỉ bố cục, nhịp section, cảm giác; màu là của TAMI). **Không** dùng nội dung, ảnh, icon, chữ của Vinhomes (LGL-04).
 - **Phạm vi file:** website công khai VI + EN. Trang quản trị `/admin` dùng giao diện Payload mặc định (chỉ đổi logo, màu nhấn `#8C6733`, font Montserrat qua `admin.components`/CSS), không có screen spec riêng.
 
-**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo vinhomes.vn; Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
+**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (màu TAMI); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
 **Dials:** `DESIGN_VARIANCE 5` · `MOTION_INTENSITY 4` · `VISUAL_DENSITY 3` (trang thương hiệu) / `5` (danh sách Cho thuê). Lý do + ngoại lệ có chủ đích: tokens §0.
 
 ---
@@ -38,7 +38,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 ### 1.3. Ảnh (taste-skill §4.8, NFR-01)
 - Mọi ảnh qua `next/image` từ cỡ đã sinh (`thumb` 400w · `card` 800w · `large` 1600w · `og`, ERD §4.12), khai `sizes` đúng cột, tỉ lệ cố định (tokens §10) để CLS = 0.
 - Ảnh LCP (ảnh hero slide 1, ảnh bìa chi tiết) `priority` + `fetchPriority="high"`; mọi ảnh khác `loading="lazy"`.
-- `alt` lấy từ `media.alt` (localized). Ảnh trang trí (watermark, nền banner) `alt=""`.
+- `alt` lấy từ `media.alt` (localized). Ảnh trang trí (nền banner) `alt=""`.
 - Không chèn chữ vào ảnh (để dịch được). Không đặt nhãn/pill lên ảnh, **trừ** badge trạng thái (Đã thuê, Đã kết thúc, Đang mở bán) vì mang thông tin thật; badge đặt góc trên trái, cách mép 12px.
 - Dữ liệu mẫu khi chưa có ảnh thật (Q4): `https://picsum.photos/seed/tami-<khối>-<n>/<w>/<h>` chỉ ở seed dev/staging, không vào production.
 
@@ -91,7 +91,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### 2.2. Menu toàn màn hình
 - **Chỉ < xl** (BL-019): mở từ nút Menu, phủ toàn màn hình, lớp `.theme-dark-block` nền `--color-dark-deep`, `z: --z-overlay`.
-- Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h2` serif in hoa, mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
+- Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h3` serif in hoa (giữ in hoa trong menu, như `MobileMenu`), mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
 - Accordion menu con: link cha giữ điều hướng, nút caret riêng cạnh link (≥ 44px, `aria-expanded`, `aria-controls`, nhãn "Mở menu con <mục>"), đóng mặc định, mở bằng Enter/Space/chạm; chuyển động mở/đóng `--duration-base`, tắt khi `prefers-reduced-motion`. ≥ xl không có menu toàn màn hình (điều hướng bằng menu ngang §2.1); đang mở mà cửa sổ rộng lên ≥ xl → menu tự đóng, nhả khoá cuộn nền.
 - Mở: menu trượt mờ dần `--duration-slow`, các mục stagger 40ms (tắt khi reduced motion).
 - Nút đóng ở đúng vị trí nút Menu (cùng toạ độ), `aria-label="Đóng menu / Close menu"`.
@@ -222,7 +222,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 **Thứ tự khối** theo `homepage.blockOrder` (admin đổi được); mặc định và bố cục:
 
-| # | Khối | Layout family | Nền | Eyebrow / watermark |
+| # | Khối | Layout family | Nền | Eyebrow |
 |---|---|---|---|---|
 | 1 | Hero | Full-bleed media, chữ giữa | Ảnh/video | Không |
 | 2 | Về TAMI (`about`) | Split ảnh-chữ 5/7 + hàng số liệu | `--color-bg` | Không |
@@ -282,7 +282,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 |---|---|
 | 375 | Mọi khối 1 cột; hero chữ `--text-display` 32px, nút full-width tối đa 320px; slider dự án slide 88% + khung chữ dưới ảnh; dịch vụ xếp dọc; ưu đãi 1 cột; đối tác 2 cột |
 | 640 | Ưu đãi 2 cột; đối tác 3 cột |
-| 768 | Về TAMI split 5/7; watermark hiện; dịch vụ 2 thẻ đầu 50/50 + thẻ 3 full; đối tác 4 cột; mũi tên slider dự án |
+| 768 | Về TAMI split 5/7; dịch vụ 2 thẻ đầu 50/50 + thẻ 3 full; đối tác 4 cột; mũi tên slider dự án |
 | 1024 | Hero mũi tên; video hero bật (nếu có); slider dự án khung chữ đè ảnh; dịch vụ bento 7/5; ưu đãi 3 cột; đối tác 6 cột |
 | 1280 | Menu ngang; nội dung đạt container 1280 |
 | 1536 | Chỉ nới khoảng trắng; hero/slider vẫn tràn viền, hero tối đa 1080px cao |
@@ -557,7 +557,7 @@ Responsive: theo màn cha.
 ### S17. 404 (Not found, theo ngôn ngữ)
 
 - Dùng `not-found.tsx` trong từng nhánh locale để đúng ngôn ngữ (VI dưới `/`, EN dưới `/en`), có header + footer đầy đủ.
-- Bố cục: banner Chữ, watermark "404", tiêu đề "Không tìm thấy trang" / "Page not found", câu "Trang có thể đã đổi địa chỉ hoặc không còn." / "This page may have moved or no longer exists." Hai nút: **Về trang chủ / Back to home** (Dark) · **Xem tin cho thuê / Browse rentals** (Outline). Dưới: link nhanh Dự án, Tin tức, Liên hệ.
+- Bố cục: banner Chữ (không chữ chìm "404" — đã bỏ ở BL-020), tiêu đề "Không tìm thấy trang" / "Page not found", câu "Trang có thể đã đổi địa chỉ hoặc không còn." / "This page may have moved or no longer exists." Hai nút: **Về trang chủ / Back to home** (Dark) · **Xem tin cho thuê / Browse rentals** (Outline). Dưới: link nhanh Dự án, Tin tức, Liên hệ.
 - EN 404 do **chưa có bản dịch** (nội dung có bản VI): thêm dòng "This content is available in Vietnamese." + link sang bản VI (chỉ khi xác định được bản VI tương ứng; nếu không thì bỏ).
 - Trả status 404, `noindex`.
 
@@ -590,7 +590,7 @@ Responsive: theo màn cha.
 
 | Khối | Quyết định đề xuất | Lý do |
 |---|---|---|
-| **Hero video** | **Giữ, tuỳ chọn theo slide**, chỉ phát ≥ lg + không reduced-motion + không Save-Data; ảnh của slide là poster và là ảnh LCP | Đúng cảm giác vinhomes.vn nhưng không hại LCP mobile (NFR-01); admin không bắt buộc dùng |
+| **Hero video** | **Giữ, tuỳ chọn theo slide**, chỉ phát ≥ lg + không reduced-motion + không Save-Data; ảnh của slide là poster và là ảnh LCP | Đúng cảm giác market.vinhomes.vn nhưng không hại LCP mobile (NFR-01); admin không bắt buộc dùng |
 | **Dải 4 lối tắt** (Dự án · Cho thuê · Ưu đãi · Liên hệ) | **Bỏ** | Lặp đúng menu chính + 3 khối ngay bên dưới (Dự án nổi bật, Ưu đãi, CTA); thêm một dải icon 4 ô là mẫu "AI template", trùng ý định CTA "Liên hệ" (taste §4.5). Phương án thay (không làm giai đoạn 1 trừ khi user muốn): thanh tìm nhanh Cho thuê dưới hero (danh mục + tỉnh + giá → `/cho-thue?…`) |
 | **Banner CTA** | **Giữ** (khối 7 trang chủ, dùng lại ở S14) | Trang chủ không có form; đây là điểm chuyển đổi lead duy nhất ngoài nút nổi (BO-2). Khối tối tạo nhịp kết trang như vinhomes.vn |
 
@@ -649,7 +649,7 @@ Code dùng ảnh mẫu (picsum seed) ở dev/staging cho tới khi có Q4. Ảnh
 | Không em-dash/en-dash trong chuỗi UI | ✅ mọi chuỗi UI trong file này dùng `-`; builder giữ luật trong `vi.json`/`en.json` |
 | Theme lock | ✅ light; khối tối có chủ đích (footer, CTA, menu, ≤ 1 section nội dung/trang): ngoại lệ ghi ở tokens §0 |
 | Color lock (1 accent) | ✅ chỉ vàng TAMI; trạng thái dùng màu riêng có lý do |
-| Shape lock | ✅ 0 / 2px / 4px / full theo quy tắc tokens §4 |
+| Shape lock | ✅ 0 / 2px / 12 / 16 / 20px / pill / full theo thang BL-020 (tokens §4) |
 | Button + form contrast | ✅ tokens §9 (đã sửa 4 giá trị) |
 | CTA không xuống dòng, không trùng ý định | ✅ §1.2 |
 | Serif | ✅ EB Garamond do brand nêu, không Fraunces/Instrument Serif |

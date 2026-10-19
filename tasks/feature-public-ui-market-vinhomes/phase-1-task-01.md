@@ -19,8 +19,8 @@ MODIFY UI · Risk MEDIUM (token dùng chung mọi trang) → Reviewer STRICT.
 - Docs: `.context/design-spec.md` §1.7 (in hoa → viết thường), §3.1–3.2 (heading, thẻ, nút); `docs/DESIGN.md` bảng token.
 
 ## Acceptance
-- [ ] Token + nút + heading theo phong cách mới, màu TAMI; AA khối sáng & khối tối (test)
-- [ ] Không màu raw ngoài token; không CLS do đổi cỡ chữ (font đã preload)
+- [x] Token + nút + heading theo phong cách mới, màu TAMI; AA khối sáng & khối tối (test)
+- [x] Không màu raw ngoài token (test no-raw-colors); không CLS do đổi cỡ chữ (font preload giữ; kiểm bằng suy luận layout, chưa đo Lighthouse)
 
 
 ## Decision log (builder)

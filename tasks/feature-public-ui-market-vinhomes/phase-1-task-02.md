@@ -19,8 +19,8 @@ MODIFY UI · layout dùng chung mọi trang → STRICT.
 - Docs: design-spec §2.1, DESIGN.md Header.
 
 ## Acceptance
-- [ ] Thanh nổi bo tròn kính mờ, sticky, VI/EN cùng bố cục; < xl giữ nút Menu
-- [ ] Chữ/icon header ≥ 4.5:1 cả trên hero lẫn nền sáng; không CLS
+- [x] Thanh nổi bo tròn kính mờ, sticky, VI/EN cùng bố cục; < xl giữ nút Menu
+- [x] Chữ/icon header ≥ 4.5:1 cả trên hero lẫn nền sáng (test contrast); không CLS (header trong luồng, không đổi kích thước theo cuộn — suy luận layout + browser check của primary, chưa đo Lighthouse)
 
 
 ## Carry-over từ P1-T01 (reviewer r2)
