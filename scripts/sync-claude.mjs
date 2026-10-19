@@ -130,7 +130,7 @@ function buildAgent(name, text) {
       '> `.context/project-config.md` + `git status/diff/log/show/branch`. KHÔNG `git commit`/`push`, KHÔNG sửa source.', '')
   }
   if (name === 'builder' || name === 'builder-strong') {
-    extra.push('> **Claude Code gate:** KHÔNG `git commit` / `git push` / `git reset --hard` / `git checkout --` (primary mới được commit).', '')
+    extra.push('> **Claude Code gate:** KHÔNG `git push` / `git reset --hard` / `git checkout --`. `git commit` CHỈ được khi đang ở trong worktree `.worktrees/<...>` do dispatcher giao (hook guard chặn commit ở chỗ khác).', '')
   }
   return `${lines.join('\n')}${extra.join('\n')}${applyTerms(body)}`
 }

@@ -49,6 +49,14 @@ ci_cd: github-actions          # staging → duyệt tay → production (ARCHITE
 monitor_enabled: true          # Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma
 otel_service_name: tami-web
 otel_env: staging              # production đặt qua env khi deploy prod
+
+# ── Worktree hooks (optional — dùng cho parallel loop) ──
+# Chạy bởi scripts/parallel-dispatch.mjs. Mục đích: mỗi worktree có DB/ENV RIÊNG để
+# test song song không nối chung 1 DB (và không đè .env.local của nhau).
+# Có sẵn env: $WORKTREE_PATH, $TASK_ID (vd layer-1/task-02), $WORKTREE_SLUG (vd layer-1__task-02). cwd = worktree.
+# Rỗng = bỏ qua hook (chưa cấu hình cho project này).
+worktree_setup_cmd: ""         # chạy SAU khi tạo worktree (tạo DB riêng + ghi .env.local riêng)
+worktree_teardown_cmd: ""      # chạy TRƯỚC khi xoá worktree (drop DB tạm, dọn file runtime)
 ```
 
 ### DB / migration
@@ -65,6 +73,12 @@ otel_env: staging              # production đặt qua env khi deploy prod
 - `staging_db` phải khác `prod_db`; data độc lập; không sync data staging→prod.
 
 ## Check commands (chạy trước khi báo xong)
+
+### Worktree hooks (parallel loop)
+
+`scripts/parallel-dispatch.mjs setup` và `cleanup` gọi 2 hook optional ở trên. Không khai = bỏ qua.
+Hook chạy bằng `sh -c` với `cwd = worktree`, env `WORKTREE_PATH`, `TASK_ID`, `WORKTREE_SLUG`.
+Hook fail → **cảnh báo rõ nhưng KHÔNG chặn** luồng build/merge (và KHÔNG xoá nhầm worktree).
 
 > Mọi người (builder/reviewer) PHẢI dùng đúng lệnh đã cấu hình ở đây, filter theo package bị đụng nếu monorepo.
 > Nếu command là `null`/placeholder hoặc repo chưa có app code (`source_roots: []`) → ghi `skip, no app configured`.

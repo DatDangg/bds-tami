@@ -25,6 +25,9 @@
  *       worktree: .worktrees/<layer-N__task-NN>
  *       branch:   wt/<layer-N__task-NN>
  *     --base mặc định = HEAD của integration branch của layer (hoặc nhánh hiện tại).
+ *     Sau khi tạo worktree: nếu project-config khai `worktree_setup_cmd` → chạy hook đó
+ *     với cwd = worktree và env WORKTREE_PATH / TASK_ID / WORKTREE_SLUG
+ *     (project tự tạo DB riêng + .env.local riêng cho từng worktree).
  *
  *   merge --layer <N> [--no-verify]
  *     Gom TẤT CẢ branch wt/<layer-N__*> (đã commit) vào integration branch của layer.
@@ -33,6 +36,7 @@
  *
  *   cleanup --layer <N>
  *     Xoá worktree + branch tạm của layer sau khi merge xong & progress.json đã cập nhật.
+ *     Trước khi xoá mỗi worktree: chạy `worktree_teardown_cmd` (nếu khai) để drop DB tạm.
  *
  *   status
  *     Liệt kê worktree hiện có + branch wt/* + trạng thái commit.
@@ -65,6 +69,125 @@ function shTry(cmd, args, opts = {}) {
   catch (e) { return { ok: false, out: (e.stdout || '').toString().trim(), err: (e.stderr || e.message || '').toString().trim() } }
 }
 function die(msg) { console.error(`✖ ${msg}`); process.exit(1) }
+
+// ── project-config: hook worktree (optional) ────────────────────────────────
+// Đọc `.context/project-config.json` nếu có (ưu tiên), sau đó tới key trong
+// `.context/project-config.md` (key đầu tiên thắng). Hỗ trợ cả:
+//   key: "lệnh một dòng"
+//   key: |
+//     lệnh dòng 1
+//     lệnh dòng 2
+// Giá trị placeholder `<...>` / null / rỗng = coi như chưa cấu hình.
+const HOOK_KEYS = ['worktree_setup_cmd', 'worktree_teardown_cmd']
+
+function indentWidth(s) {
+  return String(s).replace(/\t/g, '  ').length
+}
+
+function cleanScalar(raw) {
+  let v = String(raw).trim()
+  if (/^['"]/.test(v)) {
+    // chuỗi có quote: lấy đúng cặp quote đầu tiên, phần sau (kể cả `# comment`) bỏ
+    const q = v[0]
+    const end = v.indexOf(q, 1)
+    v = end > 0 ? v.slice(1, end).trim() : ''
+  } else {
+    v = v.replace(/\s+#.*$/, '').trim()
+  }
+  if (!v || /^<.*>$/.test(v) || /^(null|none|~)$/i.test(v)) return ''
+  return v
+}
+
+/** Parse 2 hook key từ markdown (hỗ trợ block scalar `|` / `>`). */
+function parseHookKeysFromMarkdown(txt) {
+  const lines = String(txt).split('\n')
+  const out = {}
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^([ \t]*)(worktree_setup_cmd|worktree_teardown_cmd)[ \t]*:[ \t]*(.*)$/)
+    if (!m) continue
+    const key = m[2]
+    // key đầu tiên CÓ GIÁ TRỊ thắng; khai báo rỗng/placeholder không giữ chỗ
+    if (out[key]) continue
+    const keyIndent = indentWidth(m[1])
+    const rest = m[3].trim()
+
+    // block scalar: "|" / "|-" / ">" / ">-" (kèm comment phía sau)
+    if (/^[|>][+-]?\s*(#.*)?$/.test(rest)) {
+      const buf = []
+      let j = i + 1
+      for (; j < lines.length; j++) {
+        const ln = lines[j]
+        if (!ln.trim()) { buf.push(''); continue }
+        if (indentWidth(ln.match(/^[ \t]*/)[0]) <= keyIndent) break
+        buf.push(ln)
+      }
+      while (buf.length && !buf[buf.length - 1].trim()) buf.pop()
+      const minIndent = buf.filter((l) => l.trim()).reduce(
+        (min, l) => Math.min(min, indentWidth(l.match(/^[ \t]*/)[0])), Infinity,
+      )
+      const body = buf
+        .map((l) => (l.trim() ? l.replace(new RegExp(`^[ \\t]{0,${minIndent === Infinity ? 0 : minIndent}}`), '') : ''))
+        .join('\n')
+        .replace(/\s+$/, '')
+      if (body.trim()) out[key] = body
+      i = j - 1
+      continue
+    }
+
+    const scalar = cleanScalar(rest)
+    if (scalar) out[key] = scalar
+  }
+  return out
+}
+
+function readProjectConfig() {
+  const cfg = {}
+  const jsonPath = path.join(ROOT, '.context', 'project-config.json')
+  if (fs.existsSync(jsonPath)) {
+    try {
+      const raw = JSON.parse(fs.readFileSync(jsonPath, 'utf8')) || {}
+      for (const k of HOOK_KEYS) {
+        if (typeof raw[k] === 'string' && raw[k].trim()) cfg[k] = raw[k].trim()
+      }
+    } catch (e) {
+      console.error(`⚠ project-config.json không parse được: ${e.message} — bỏ qua hook`)
+    }
+  }
+
+  const mdPath = path.join(ROOT, '.context', 'project-config.md')
+  if (fs.existsSync(mdPath)) {
+    let txt = ''
+    try { txt = fs.readFileSync(mdPath, 'utf8') } catch { txt = '' }
+    const fromMd = parseHookKeysFromMarkdown(txt)
+    for (const k of HOOK_KEYS) {
+      if (cfg[k]) continue
+      if (fromMd[k]) cfg[k] = fromMd[k]
+    }
+  }
+  return cfg
+}
+
+// Chạy hook qua shell (hook là chuỗi lệnh của project). Fail → cảnh báo, KHÔNG chặn luồng chính.
+function runHook(cmd, { cwd, task, slug, label }) {
+  if (!cmd) return { ran: false, skipped: true }
+  const env = {
+    ...process.env,
+    WORKTREE_PATH: cwd,
+    TASK_ID: task,
+    WORKTREE_SLUG: slug,
+  }
+  try {
+    const out = execFileSync('sh', ['-c', cmd], {
+      cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 120000,
+    })
+    if (out && out.trim()) console.error(out.trim())
+    console.error(`✓ ${label} hook ok`)
+    return { ran: true, ok: true }
+  } catch (e) {
+    console.error(`⚠ ${label} hook FAIL (bỏ qua, không chặn luồng): ${(e.stderr || e.message || '').toString().trim()}`)
+    return { ran: true, ok: false, error: (e.stderr || e.message || '').toString().trim() }
+  }
+}
 
 function parseArgs(argv) {
   const out = { _: [] }
@@ -195,7 +318,21 @@ function cmdSetup(args) {
   fs.mkdirSync(path.join(ROOT, '.worktrees'), { recursive: true })
   const r = shTry('git', ['worktree', 'add', '-b', br, wt, integrationBranch(unit)])
   if (!r.ok) die(`tạo worktree lỗi: ${r.err}`)
-  console.log(JSON.stringify({ task: taskId, unit, worktree: path.relative(ROOT, wt), branch: br, base: integrationBranch(unit) }, null, 2))
+
+  // hook riêng của project: tạo DB riêng + .env.local riêng cho worktree này
+  const cfg = readProjectConfig()
+  const hook = runHook(cfg.worktree_setup_cmd, {
+    cwd: wt, task: taskId, slug: taskSlug(taskId), label: 'worktree_setup',
+  })
+
+  console.log(JSON.stringify({
+    task: taskId,
+    unit,
+    worktree: path.relative(ROOT, wt),
+    branch: br,
+    base: integrationBranch(unit),
+    setupHook: hook.ran ? (hook.ok ? 'ok' : 'FAILED (xem stderr)') : 'skipped (chưa khai worktree_setup_cmd)',
+  }, null, 2))
 }
 
 function currentOrIntegration() {
@@ -252,11 +389,21 @@ function cmdCleanup(args) {
   const u = resolveUnit(args)
   const wtDirPart = `.worktrees/${u.unit.replace(/[\/]/g, '__')}__`
   const removed = []
+  const cfg = readProjectConfig()
   // xoá worktree
   const list = shTry('git', ['worktree', 'list', '--porcelain']).out
   for (const block of list.split('\n\n')) {
     const p = block.split('\n').find(l => l.startsWith('worktree '))?.slice(9)
     if (p && p.includes(wtDirPart)) {
+      // teardown hook TRƯỚC khi xoá (drop DB tạm, dọn .env.local riêng…)
+      const slug = path.basename(p)
+      const taskId = slug.replace(/__/g, '/')
+      const hook = runHook(cfg.worktree_teardown_cmd, {
+        cwd: p, task: taskId, slug, label: 'worktree_teardown',
+      })
+      if (hook.ran && !hook.ok) {
+        console.error(`⚠ bỏ qua teardown lỗi cho ${path.relative(ROOT, p)} — vẫn xoá worktree`)
+      }
       shTry('git', ['worktree', 'remove', '--force', p]); removed.push(path.relative(ROOT, p))
     }
   }
@@ -265,7 +412,11 @@ function cmdCleanup(args) {
   const branches = shTry('git', ['for-each-ref', '--format=%(refname:short)', 'refs/heads/wt/'])
     .out.split('\n').map(s => s.trim()).filter(b => b.startsWith(prefix))
   for (const b of branches) { shTry('git', ['branch', '-D', b]); removed.push(b) }
-  console.log(JSON.stringify({ unit: u.unit, removed }, null, 2))
+  console.log(JSON.stringify({
+    unit: u.unit,
+    removed,
+    teardownHook: cfg.worktree_teardown_cmd ? 'ran (xem stderr nếu lỗi)' : 'skipped (chưa khai worktree_teardown_cmd)',
+  }, null, 2))
 }
 
 function cmdStatus() {

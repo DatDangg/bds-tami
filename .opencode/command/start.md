@@ -48,7 +48,7 @@ Chạy **Project Start** — chuỗi khởi tạo **chạy liên tục** cho rep
      → mỗi task 1 **git worktree riêng** → spawn N subagent `builder` song song, mỗi con chạy FULL loop
        → PASS → gọi subagent `reviewer` review độc lập → commit trong worktree
        → FAIL → gọi `error-analyzer` → fix → retry (max 3)
-     → cả layer xong → 1 **merger**: `merge --layer N` → verify tổng thể → ghi progress.json 1 lần → cleanup
+     → cả layer xong → **dispatcher tự merge** (không spawn agent con): `merge --layer N` → verify tổng thể → ghi progress.json 1 lần (qua `progress-write.mjs`) → cleanup
    → DevOps (.agent/devops.md) lo git init/CI-CD/deploy ở layer 0 + sau mỗi layer
    → hết layer/phase → `spec-validator` cross-check; hết phase → context-manager compact
    → hết LAYER CUỐI (initial build) → `spec-publisher` (.agent/spec-publish.md): sinh/cập nhật

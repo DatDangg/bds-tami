@@ -29,7 +29,7 @@
 | "deploy", "CI/CD", "git init", "build/release" | **DevOps** → `.agent/devops.md` — git init + CI/CD files + deploy staging→prod + health check |
 | "rollback", "revert", "checkpoint" | **Rollback** → `.agent/rollback.md` — tag `layer-N-done` + revert strategy |
 | "design", "thiết kế UI", "design tokens", "screen spec", "làm đẹp" | **Design** → `/design` — sinh design tokens + screen specs (`design-spec.md`) trước khi chia layer |
-| thực thi task đã có | **Loop** → `.agent/loop.md` (ReAct: Read → Plan → Act → Observe; task độc lập chạy **song song** theo worktree, 1 `merger` gom lại) |
+| thực thi task đã có | **Loop** → `.agent/loop.md` (ReAct: Read → Plan → Act → Observe; task độc lập chạy **song song** theo worktree, **dispatcher tự merge** bằng `scripts/parallel-dispatch.mjs`) |
 | "implement feature" (spec/task đã có sẵn) | **Builder theo task** → subagent `builder` (`.opencode/agent/builder.md` · `.claude/agents/builder.md`) |
 | "review", "check", "soát" (một diff/task cụ thể) | **Reviewer** → subagent `reviewer` (`.opencode/agent/reviewer.md` · `.claude/agents/reviewer.md`) — KHÔNG tự sửa code |
 | "thêm skill", "add skill", "tạo skill", "register skill" | **Customize runtime** — tạo/cập nhật skill đúng format (§Local skills) |
@@ -76,7 +76,7 @@ Không rõ intent → hỏi 1 câu ngắn để phân loại, đừng đoán.
 | **5c** | Root cause + fix | (`error-analyzer`) | `.agent/error-analyzer.md` | `superpowers/systematic-debugging` | `.context/error-memory.md` | retry max 3 → `BLOCKED` |
 | **5d** | Review độc lập | **`reviewer`** | `.agent/reviewer.md` | `aislop`, `anti-slop`, `open-code-review`, `impeccable`(+`frontend-checklist` web) | `.context/review-reports/<feature\|bug>-<slug>-phase-<N>-task-<NN>-round-<R>-review.md` | PASS → 5e · FAIL → về 5a (max 2 vòng) |
 | **5e** | Close-out task | — | `.agent/loop.md`, `.agent/FEATURE_WORKFLOW.md` §6 + `.agent/workflows/state-commit.md` §2.8/§5 | — | Doc Impact/Reconcile → `progress.json` → **commit** (1 task = 1 commit) | — |
-| **5e-merge** | Gom các task song song → merge về integration branch + verify tổng thể + ghi `progress.json` 1 lần + cleanup worktree | **`merger`** (1 con) | `.agent/loop.md` (Merger steps) + `scripts/parallel-dispatch.mjs merge/cleanup` | — | integration branch layer-N + `progress.json` cập nhật | conflict → task đó chạy lại tuần tự |
+| **5e-merge** | Gom các task song song → merge về integration branch + verify tổng thể + ghi `progress.json` 1 lần + cleanup worktree | **Dispatcher tự làm** (không spawn agent con) | `.agent/loop.md` (Merge steps) + `scripts/parallel-dispatch.mjs merge/cleanup` + `tools/task-dashboard/progress-write.mjs` | — | integration branch layer-N + `progress.json` cập nhật | conflict → task đó chạy lại tuần tự |
 | **5f** | Compact context | — | `.agent/context-manager.md` | — | `.context/compressed-summary.md` | mỗi 3 task + hết layer |
 | **5g** | Hết layer → review phase | **`spec-validator`** | `.agent/spec-validator.md` | — | phase report | ⏸ **checkpoint sau mỗi layer** — Layer N+1 chỉ unlock khi Layer N PASS + user duyệt |
 | **5h** | Hết layer cuối (initial build) → bàn giao test-scope | **`spec-publisher`** | `.agent/spec-publish.md` | — | `spec/test-scope/current.json` (trigger: initial-build, scopeVersion +1) + `spec/CHANGELOG.md` | commit kèm close-out |
