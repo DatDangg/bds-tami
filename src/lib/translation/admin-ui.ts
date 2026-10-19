@@ -14,25 +14,50 @@ export const TRANSLATION_FILTERS = {
 export type TranslationFilterKey = keyof typeof TRANSLATION_FILTERS;
 export const TRANSLATION_FILTER_KEYS = Object.keys(TRANSLATION_FILTERS) as TranslationFilterKey[];
 
-const isTranslationCondition = (entry: unknown): boolean => JSON.stringify(entry).includes('"translation.');
+/** Điều kiện lá trên trường `translation.*` (cụm lồng `and`/`or` không bị coi là điều kiện dịch). */
+const isTranslationCondition = (entry: Where): boolean => {
+  const keys = Object.keys(entry);
+  return keys.length > 0 && keys.every((key) => key.startsWith("translation."));
+};
 
-function andEntries(where: Where | undefined): Where[] {
+function onlyArrayKey(where: Where, name: "and" | "or"): Where[] | undefined {
+  const clauses = (where as Record<string, unknown>)[name];
+  return Array.isArray(clauses) && Object.keys(where).length === 1 ? (clauses as Where[]) : undefined;
+}
+
+/** Điều kiện AND của một nhánh: `{ and: [...] }` → các phần tử, còn lại → chính nó. */
+const andEntries = (branch: Where): Where[] => onlyArrayKey(branch, "and") ?? [branch];
+
+/**
+ * Chuẩn hoá `where` thành các nhánh OR, mỗi nhánh là danh sách điều kiện AND.
+ * WhereBuilder của Payload ghi `{ or: [{ and: [...] }, ...] }`; dạng `{ and }` / phẳng là 1 nhánh.
+ */
+function toBranches(where: Where | undefined): Where[][] {
   if (!where || Object.keys(where).length === 0) return [];
-  const clauses = (where as { and?: Where[] }).and;
-  return Array.isArray(clauses) && Object.keys(where).length === 1 ? clauses : [where];
+  const orBranches = onlyArrayKey(where, "or");
+  return orBranches ? orBranches.map(andEntries) : [andEntries(where)];
 }
 
-/** Bộ lọc đang áp (khớp đúng điều kiện của một mục), `""` khi không có. */
+const isOrForm = (where: Where | undefined): boolean => !!where && onlyArrayKey(where, "or") !== undefined;
+
+/** Bộ lọc đang áp (mọi nhánh đều chứa đúng điều kiện của một mục), `""` khi không có. */
 export function currentTranslationFilter(where: Where | undefined): TranslationFilterKey | "" {
-  const present = andEntries(where).map((entry) => JSON.stringify(entry));
-  return TRANSLATION_FILTER_KEYS.find((key) => present.includes(JSON.stringify(TRANSLATION_FILTERS[key].condition))) ?? "";
+  const branches = toBranches(where).map((entries) => entries.map((entry) => JSON.stringify(entry)));
+  if (branches.length === 0) return "";
+  return TRANSLATION_FILTER_KEYS.find((key) => branches.every((present) => present.includes(JSON.stringify(TRANSLATION_FILTERS[key].condition)))) ?? "";
 }
 
-/** `where` mới: giữ nguyên các điều kiện khác của danh sách, thay điều kiện dịch cũ bằng điều kiện của `key` (hoặc bỏ nếu rỗng). */
+/**
+ * `where` mới: trong từng nhánh giữ nguyên các điều kiện khác, thay điều kiện dịch cũ bằng điều kiện của `key` (hoặc bỏ nếu rỗng).
+ * Đầu vào dạng `or` → đầu ra `{ or: [{ and }] }` (WhereBuilder đọc lại được); các dạng khác → `{ and }`.
+ */
 export function withTranslationFilter(where: Where | undefined, key: TranslationFilterKey | ""): Where {
-  const others = andEntries(where).filter((entry) => !isTranslationCondition(entry));
-  const next = key ? [...others, TRANSLATION_FILTERS[key].condition] : others;
-  return { and: next };
+  const branches = toBranches(where);
+  const rebuilt = (branches.length ? branches : [[]]).map((entries) => {
+    const others = entries.filter((entry) => !isTranslationCondition(entry));
+    return key ? [...others, TRANSLATION_FILTERS[key].condition] : others;
+  });
+  return isOrForm(where) ? { or: rebuilt.map((and) => ({ and })) } : { and: rebuilt[0] ?? [] };
 }
 
 /** Collection CÓ bản dịch (banner dịch lỗi truy vấn theo tập khoá này — không thêm collection không có nhóm `translation`). Chuỗi lấy từ nguồn nhãn admin chung. */
