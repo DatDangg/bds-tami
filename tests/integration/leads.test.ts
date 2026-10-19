@@ -472,6 +472,17 @@ describe.skipIf(!baseUrl)("integration: leads + lead-activities (DB tạm, migra
       expect(asSale).not.toHaveProperty("assigneeInactive");
     });
 
+    it("assigneeName: danh sách trả sẵn tên sale phụ trách (cả admin và sale), chưa giao → null; không kèm email/SĐT (#14)", async () => {
+      const assigned = await createLead({ assignedTo: saleA.id });
+      const unassigned = await createLead({ assignedTo: null });
+      for (const user of [admin, saleA]) {
+        const row = await payload.findByID({ collection: "leads", id: assigned.id, depth: 0, ...actingAs(user) });
+        expect(row.assigneeName).toBe("Test salea");
+        expect(JSON.stringify(row)).not.toContain(saleA.email);
+      }
+      expect((await payload.findByID({ collection: "leads", id: unassigned.id, depth: 0, ...actingAs(admin) })).assigneeName).toBeNull();
+    });
+
     it("trang lead có sẵn lịch sử (join activities), sale phụ trách thấy được", async () => {
       const lead = await createLead({ assignedTo: saleA.id });
       await payload.create({ collection: "lead-activities", data: { lead: lead.id, type: "note", content: "Có trong join" }, ...actingAs(saleA) });

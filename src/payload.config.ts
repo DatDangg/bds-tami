@@ -61,6 +61,8 @@ const s3ClientConfig = getS3ClientConfig();
 export default buildConfig({
   admin: {
     user: Staff.slug,
+    // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
+    dateFormat: "dd/MM/yyyy HH:mm",
     components: {
       providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive"],
       // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
@@ -90,6 +92,8 @@ export default buildConfig({
   graphQL: { disable: true },
   i18n: {
     supportedLanguages: { vi },
+    // Ô trống ở danh sách admin hiện `—` thay vì `<Không có …>` (chuỗi mặc định `general:noLabel`); chỉ ghi đè đúng khoá này.
+    translations: { vi: { general: { noLabel: "—" } } },
     fallbackLanguage: "vi",
   },
   localization: {

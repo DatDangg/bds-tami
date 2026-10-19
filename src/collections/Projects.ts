@@ -60,6 +60,8 @@ const mediaUpload = (name: string, label: string, mimeType: Record<string, strin
 });
 
 const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
+/** Cột tiền: ô danh sách hiện `110.000.000 ₫` (chỉ đổi hiển thị). */
+const vndNumber = (name: string, label: string) => ({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }) as const;
 
 const scaleGroup: GroupField = {
   name: "scale",
@@ -154,7 +156,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               ),
               { name: "address", type: "text", label: "Địa chỉ" },
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
-              formRow(nonNegativeNumber("priceFromVnd", "Giá từ (VNĐ)"), nonNegativeNumber("priceToVnd", "Giá đến (VNĐ)")),
+              formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),
               scaleGroup,
               amenitiesField,

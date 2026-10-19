@@ -229,6 +229,7 @@ export interface Lead {
   lostReason?: string | null;
   assignedTo?: (string | null) | Staff;
   assignedAt?: string | null;
+  assigneeName?: string | null;
   assigneeInactive?: boolean | null;
   firstContactedAt?: string | null;
   lastActivityAt?: string | null;
@@ -1620,6 +1621,7 @@ export interface LeadsSelect<T extends boolean = true> {
   lostReason?: T;
   assignedTo?: T;
   assignedAt?: T;
+  assigneeName?: T;
   assigneeInactive?: T;
   firstContactedAt?: T;
   lastActivityAt?: T;

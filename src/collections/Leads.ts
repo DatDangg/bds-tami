@@ -7,7 +7,7 @@ import { expandPhoneSearch } from "../hooks/leads/expand-phone-search";
 import { assignLeadCode } from "../hooks/leads/generate-code";
 import { purgeLeadActivities } from "../hooks/leads/lead-activity-hooks";
 import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/leads/on-assignment-change";
-import { computeAssigneeInactive, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
+import { computeAssigneeInactive, computeAssigneeName, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
@@ -136,6 +136,16 @@ const assignmentFields: Field[] = [
     admin: { position: "sidebar", components: { Cell: "/components/admin/AssigneeCell#AssigneeCell" } },
   },
   { name: "assignedAt", type: "date", label: "Giao lúc", access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar", date: dateTimeInAdmin } },
+  // Tên sale cho cột danh sách (AssigneeCell): trả sẵn trong dữ liệu dòng để khỏi request client-side "Đang tải..." mỗi dòng.
+  {
+    name: "assigneeName",
+    type: "text",
+    label: "Tên sale phụ trách",
+    virtual: true,
+    hooks: { afterRead: [computeAssigneeName] },
+    access: { create: denyAll, update: denyAll },
+    admin: { ...readOnlyInAdmin, hidden: true, disableListColumn: true, disableListFilter: true, disableBulkEdit: true },
+  },
   {
     name: "assigneeInactive",
     type: "checkbox",

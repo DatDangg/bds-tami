@@ -76,7 +76,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
             label: "Thông tin tin đăng",
             fields: [
               formRow(
-                { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0 },
+                { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } },
                 { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
               ),
               formRow(

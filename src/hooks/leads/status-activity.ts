@@ -58,3 +58,21 @@ export const computeAssigneeInactive: FieldHook<Lead> = async ({ data, originalD
   }
   return cache.get(assignee) === false;
 };
+
+/**
+ * Tên hiển thị của sale phụ trách cho cột danh sách (cột ảo `assigneeName`). Cell mặc định của Payload nạp tên bằng một request
+ * client-side sau khi dòng đã vẽ nên mỗi dòng nháy "Đang tải..."; trả sẵn tên trong dữ liệu dòng thì không cần request đó.
+ * Chỉ lộ tên (không email/SĐT) và chỉ cho người đã đọc được lead; tra cứu `overrideAccess` vì sale không đọc được hồ sơ staff khác.
+ * Kết quả nhớ trong `req.context` để danh sách nhiều lead cùng sale chỉ tốn 1 truy vấn.
+ */
+export const computeAssigneeName: FieldHook<Lead> = async ({ data, originalDoc, req }) => {
+  const assignee = (data ?? originalDoc)?.assignedTo;
+  if (!assignee) return null;
+  if (typeof assignee === "object") return assignee.fullName || null;
+  const cache = (req.context.assigneeName ??= new Map<string, string | null>()) as Map<string, string | null>;
+  if (!cache.has(assignee)) {
+    const staff = await req.payload.findByID({ collection: "staff", id: assignee, depth: 0, overrideAccess: true, req, disableErrors: true });
+    cache.set(assignee, staff?.fullName || null);
+  }
+  return cache.get(assignee) ?? null;
+};
