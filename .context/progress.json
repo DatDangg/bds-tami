@@ -1474,10 +1474,16 @@
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-04.md",
-          "status": "in_progress",
-          "attempt": 0,
-          "round": 0,
-          "note": "Cột nghiệp vụ Dự án/Cho thuê"
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "ui unitsSummary/priceRange (Dự án), roomsArea + project (Cho thuê); list-summary.ts; m2/m3 sửa sau r1; m1 nháy Đang tải cột dự án = residual",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md"
+          ]
         }
       ]
     }
@@ -2396,7 +2402,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T20:33:26.315Z",
+  "lastUpdated": "2026-10-20T20:43:03.513Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -145,7 +145,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
         listSearchableFields: ["code", "title", "address"],
         // Chip lọc nhanh (BL-022) nằm trước ô "Trạng thái dịch" mà withContentDefaults nối thêm; slot server ẩn ở thùng rác.
         components: { beforeListTable: ["/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot"] },
-        defaultColumns: ["gallery", "code", "title", "category", "priceMonthlyVnd", "status", "author"],
+        defaultColumns: ["gallery", "code", "title", "category", "roomsArea", "project", "priceMonthlyVnd", "status", "author"],
         description: "Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.",
       },
       defaultSort: "-publishedAt",
@@ -157,6 +157,8 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       },
       fields: [
         codeField,
+        // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
+        { name: "roomsArea", type: "ui", label: "Phòng · diện tích", admin: { components: { Cell: "/components/admin/ListSummaryCells#RoomsAreaCell" } } },
         formTabs([
           {
             label: "Nội dung",

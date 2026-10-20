@@ -64,6 +64,9 @@ const nonNegativeNumber = (name: string, label: string) => ({ name, type: "numbe
 /** Cột tiền: ô danh sách hiện `110.000.000 ₫` (chỉ đổi hiển thị). */
 const vndNumber = (name: string, label: string) => ({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }) as const;
 
+const listColumnField = (name: string, label: string, cell: string) =>
+  ({ name, type: "ui", label, admin: { components: { Cell: `/components/admin/ListSummaryCells#${cell}` } } }) as const;
+
 const scaleGroup: GroupField = {
   name: "scale",
   type: "group",
@@ -116,7 +119,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       labels: collectionLabels("projects"),
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["gallery", "title", "category", "salesStatus", "status", "publishedAt", "author"],
+        defaultColumns: ["gallery", "title", "category", "salesStatus", "unitsSummary", "priceRange", "status", "publishedAt", "author"],
         components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Dự án bất động sản giới thiệu trên website: thông tin, quy mô, tiện ích, mặt bằng và tài liệu.",
       },
@@ -124,6 +127,9 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       hooks: { afterChange: [reindexRentalsOnProjectRename, revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         searchReindexPendingField("project"),
+        // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
+        listColumnField("unitsSummary", "Quy mô", "UnitsSummaryCell"),
+        listColumnField("priceRange", "Khoảng giá", "PriceRangeCell"),
         formTabs([
           {
             label: "Nội dung",

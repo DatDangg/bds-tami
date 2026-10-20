@@ -4,6 +4,8 @@ import { LeadAssigneeWarning as LeadAssigneeWarning_15d7f65d762e8ce96536ab714e76
 import { LeadQuickFilterSlot as LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507 } from '../../../components/admin/LeadQuickFilterSlot'
 import { LeadExportSlot as LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b } from '../../../components/admin/LeadExportSlot'
 import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd } from '../../../components/admin/SearchReindexPendingWarning'
+import { UnitsSummaryCell as UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
+import { PriceRangeCell as PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { TitleLinkCell as TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc } from '../../../components/admin/TitleLinkCell'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -34,6 +36,7 @@ import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from 
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
+import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
@@ -57,6 +60,8 @@ export const importMap = {
   "/components/admin/LeadQuickFilterSlot#LeadQuickFilterSlot": LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507,
   "/components/admin/LeadExportSlot#LeadExportSlot": LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b,
   "/components/admin/SearchReindexPendingWarning#SearchReindexPendingWarning": SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd,
+  "/components/admin/ListSummaryCells#UnitsSummaryCell": UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1,
+  "/components/admin/ListSummaryCells#PriceRangeCell": PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/TitleLinkCell#TitleLinkCell": TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -87,6 +92,7 @@ export const importMap = {
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
+  "/components/admin/ListSummaryCells#RoomsAreaCell": RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
