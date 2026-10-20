@@ -347,7 +347,7 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
 
       const parentOnly = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id] });
       expect(parentOnly.items).toHaveLength(12);
-      expect(parentOnly.featured).toEqual([]);
+      expect(parentOnly.featured).toBeNull();
       const withChildren = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
       const page2 = await listing.loadNewsListing(payload, "vi", { page: 2, categoryIds: [parent.id, child.id] });
       expect(withChildren.totalPages).toBe(2);
@@ -360,25 +360,25 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(beyond.outOfRange).toBe(true);
       const emptyCategory = await createCategory("Mục trống", "news");
       const empty = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [emptyCategory.id] });
-      expect(empty).toMatchObject({ isEmpty: true, outOfRange: false, items: [], featured: [] });
+      expect(empty).toMatchObject({ isEmpty: true, outOfRange: false, items: [], featured: null });
     });
 
-    it("/tin-tuc trang 1: 4 bài nổi bật + lưới 12 bài; trang 2 không lặp bài nổi bật; đủ mọi bài, không trùng", async () => {
+    it("/tin-tuc trang 1: 1 bài nổi bật + lưới 12 bài; trang 2 không lặp bài nổi bật; đủ mọi bài, không trùng", async () => {
       const loadAll = async () => {
         const first = await listing.loadNewsListing(payload, "vi", { page: 1 });
-        const seen = [...first.featured, ...first.items];
+        const seen = [...(first.featured ? [first.featured] : []), ...first.items];
         for (let page = 2; page <= first.totalPages; page += 1) seen.push(...(await listing.loadNewsListing(payload, "vi", { page })).items);
         return { first, seen };
       };
       const { first, seen } = await loadAll();
-      expect(first.featured).toHaveLength(4);
+      expect(first.featured).not.toBeNull();
       expect(first.items.length).toBeLessThanOrEqual(12);
       expect(new Set(seen.map((card) => card.id)).size).toBe(seen.length);
       const total = (await publicQueries.findPublicList(payload, "news", "vi", { limit: 50 })).totalDocs;
       expect(seen).toHaveLength(total);
       const page2 = await listing.loadNewsListing(payload, "vi", { page: 2 });
-      expect(page2.featured).toEqual([]);
-      expect(page2.items.map((card) => card.id)).not.toEqual(expect.arrayContaining(first.featured.map((card) => card.id)));
+      expect(page2.featured).toBeNull();
+      expect(page2.items.map((card) => card.id)).not.toContain(first.featured?.id);
     });
 
     it("/en: lưới và danh mục chỉ gồm nội dung đã có bản EN", async () => {

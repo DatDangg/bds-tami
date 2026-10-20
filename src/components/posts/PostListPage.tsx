@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { EmptyState } from "@/components/layout/EmptyState";
 import { PostListBody } from "@/components/posts/PostListBody";
 import { CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
-import { loadPageBanner } from "@/lib/content/load-page-banner";
+import { loadPageHero } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { parsePagination, type RawPageParam } from "@/lib/content/pagination";
 import { findLocalizedSlugs } from "@/lib/news/news-queries";
@@ -29,7 +30,7 @@ function withPage(path: string, page: number): string {
 }
 
 /**
- * Dữ liệu + bố cục S08 (`/tin-bds`) và S05 (`/tin-bds/danh-muc/[category]`): cùng `CategoryListTemplate`. Danh mục không tồn tại (hoặc chưa có
+ * Dữ liệu + bố cục S08 (`/tin-bds`) và S05 (`/tin-bds/danh-muc/[category]`) theo bố cục Tin tức (BL-045, Q4): hero thấp + chip + bài nổi bật ngang + lưới 3 cột + phân trang + banner tư vấn, không form lead. Danh mục không tồn tại (hoặc chưa có
  * bản EN ở `/en`) và trang vượt số trang → `notFound()`. Trang đọc `searchParams` nên render theo request (không ISR); CDN giữ theo `Cache-Control`.
  * "Bây giờ" là lúc render: nhãn "Đã kết thúc" đúng theo `isOfferEnded`, và job `expire-offers` 00:05 làm mới cache CDN/ISR của chi tiết.
  */
@@ -39,11 +40,11 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
   const context = categorySlug ? await loadPostCategoryContext(payload, locale, categorySlug) : null;
   if (categorySlug && !context) notFound();
 
-  const [listing, t, tNav, bannerImage] = await Promise.all([
+  const [listing, t, tNav, hero] = await Promise.all([
     loadPostListing(payload, locale, { page, now: new Date(), ...(context ? { categoryIds: postCategoryFilterIds(context) } : {}) }),
     getTranslations({ locale, namespace: "page.posts" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
-    loadPageBanner(locale, "propertyPosts"),
+    loadPageHero(locale, "propertyPosts"),
   ]);
   if (listing.outOfRange) notFound();
   const chips = await buildPostChips(payload, locale, t("all"), context);
@@ -56,12 +57,18 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
     ...(context ? [{ label: context.category.name ?? "", href: ownPath }] : []),
   ];
 
+  // Trang danh mục: tiêu đề/mô tả của danh mục, eyebrow = tên trang; `/tin-bds`: chữ hero admin nhập.
+  const heroText = context
+    ? { title: context.category.name ?? hero.title, eyebrow: t("title"), description: context.category.description ?? undefined, titleAccent: undefined }
+    : hero;
+
   return (
     <CategoryListTemplate
-      title={context?.category.name ?? t("title")}
-      description={context ? (context.category.description ?? undefined) : t("description")}
-      bannerImage={bannerImage}
-      compactBanner
+      title={heroText.title}
+      {...(heroText.titleAccent ? { titleAccent: heroText.titleAccent } : {})}
+      {...(heroText.eyebrow ? { eyebrow: heroText.eyebrow } : {})}
+      {...(heroText.description ? { description: heroText.description } : {})}
+      {...(hero.image ? { bannerImage: hero.image } : {})}
       breadcrumb={breadcrumb}
       chips={chips.length > 0 ? chips : undefined}
       chipsLabel={t("tabsLabel")}
@@ -70,8 +77,9 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
       emptyState={<EmptyState variant="empty" title={t(context ? "empty.noPostsInCategory" : "empty.noPosts")} {...(context ? { backHref: listPath } : {})} />}
       isEmpty={listing.isEmpty}
       pagination={{ page, totalPages: listing.totalPages, buildHref: (n) => withPage(ownPath, n) }}
+      consultBanner={<ConsultBanner locale={locale} />}
     >
-      <PostListBody featured={listing.featured} items={listing.items} totalDocs={listing.totalDocs} />
+      <PostListBody featured={listing.featured} items={listing.items} />
     </CategoryListTemplate>
   );
 }

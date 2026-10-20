@@ -208,10 +208,7 @@
       "tabsLabel": "News categories",
       "all": "All",
       "readTime": "{minutes} min read",
-      "moreNews": "More news",
-      "featuredLabel": "Featured news",
-      "viewMore": "View more",
-      "viewMoreIn": "View more {name} news",
+      "readArticle": "Read article",
       "consultTitle": "Get a consultation",
       "relatedTitle": "Related articles",
       "tagsLabel": "Tags",
@@ -225,8 +222,20 @@
         "copyFailed": "Could not copy"
       }
     },
+    "newsDetail": {
+      "latestEyebrow": "Just updated",
+      "latestTitle": "Latest articles",
+      "consultEyebrow": "Consultation",
+      "consultTitle": "Looking for the right property?",
+      "consultText": "Leave your details and TAMI HOMES will get in touch.",
+      "consultCta": "Get advice",
+      "relatedEyebrow": "Keep reading",
+      "relatedTitle": "Related",
+      "relatedAccent": "articles"
+    },
     "posts": {
       "title": "Property news",
+      "viewDetail": "View details",
       "description": "The latest property news, vouchers and offers from TAMI.",
       "tabsLabel": "Listing categories",
       "resultCount": "{count, plural, one {# result} other {# results}}",

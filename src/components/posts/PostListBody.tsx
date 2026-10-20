@@ -3,24 +3,27 @@ import type { PostCardData } from "@/lib/posts/post-view";
 import { PostCard } from "./PostCard";
 
 /**
- * Thân danh sách Đăng tin BĐS (design-spec S08), cùng khối kết quả như `/du-an`, `/cho-thue`: MỘT `section` có nhãn chứa dòng "Có N kết quả" (aria-live)
- * và lưới thẻ 1/2/3/4 cột (4 ≥ xl). Bài nổi bật chỉ là thẻ ĐẦU lưới (ảnh LCP), không còn thẻ ngang riêng. Mọi tiêu đề thẻ là `h2` ngay dưới `h1` của banner.
+ * Thân danh sách Đăng tin BĐS (design-spec S08, bố cục như Tin tức, BL-045): bài nổi bật ngang (chỉ trang 1 `/tin-bds`, ảnh LCP) rồi lưới thẻ 1/2/3 cột (3 ≥ lg).
+ * MỘT `section` có nhãn; mọi tiêu đề thẻ là `h2` ngay dưới `h1` của hero.
  */
-export function PostListBody({ featured, items, totalDocs }: { featured: PostCardData | null; items: PostCardData[]; totalDocs: number }) {
+export function PostListBody({ featured, items }: { featured: PostCardData | null; items: PostCardData[] }) {
   const t = useTranslations("page.posts");
-  const cards = featured ? [featured, ...items] : items;
   return (
-    <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-      <p role="status" aria-live="polite" className="text-small text-text-secondary">
-        {t("resultCount", { count: totalDocs })}
-      </p>
-      <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {cards.map((card, index) => (
-          <li key={card.id}>
-            <PostCard data={card} headingLevel="h2" priority={index === 0} />
-          </li>
-        ))}
-      </ul>
+    <section aria-label={t("gridLabel")} className="flex flex-col gap-8">
+      {featured && (
+        <div data-post-featured="true">
+          <PostCard data={featured} variant="feature" headingLevel="h2" priority />
+        </div>
+      )}
+      {items.length > 0 && (
+        <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((card, index) => (
+            <li key={card.id}>
+              <PostCard data={card} headingLevel="h2" priority={!featured && index === 0} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

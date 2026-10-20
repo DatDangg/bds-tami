@@ -14,7 +14,16 @@ vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
 vi.mock("next/navigation", () => ({ notFound }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
-vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner: async () => ({ url: "/api/media/file/banner.jpg", width: 1600, alt: "" }) }));
+vi.mock("@/lib/content/load-page-banner", () => ({
+  loadPageHero: async () => ({
+    image: { url: "/api/media/file/banner.jpg", width: 1600, alt: "" },
+    eyebrow: "Đăng tin BĐS",
+    title: "Tin bất động sản",
+    titleAccent: "mới nhất",
+    description: "Voucher và ưu đãi từ TAMI.",
+  }),
+}));
+vi.mock("@/components/layout/ConsultBanner", () => ({ ConsultBanner: () => <aside data-consult-banner="true" /> }));
 vi.mock("@/lib/posts/post-listing", () => ({
   loadPostListing,
   loadPostCategoryContext,
@@ -60,14 +69,22 @@ afterEach(() => {
   notFound.mockClear();
 });
 
-describe("/tin-bds (BL-020 P3-T02): banner gọn, đếm kết quả, lưới 4 cột, tham số URL không đổi", () => {
-  it("banner gọn 240px, 'Có N kết quả', lưới 1/2/3/4 cột, không có băng tìm kiếm (trang chưa có bộ lọc)", async () => {
+describe("/tin-bds (BL-045, Q4): bố cục như Tin tức, tham số URL không đổi", () => {
+  it("hero thấp (chữ admin), lưới 1/2/3 cột, không băng tìm kiếm, không form lead, có banner tư vấn", async () => {
     loadPostListing.mockResolvedValue(listing());
     const { container } = renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
     expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("Có 25 kết quả");
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tin bất động sản");
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3");
     expect(screen.queryByRole("search")).toBeNull();
+    expect(screen.queryByRole("form")).toBeNull();
+    expect(container.querySelector("[data-consult-banner]")).not.toBeNull();
+  });
+
+  it("bài nổi bật ngang đứng trước lưới (trang 1)", async () => {
+    loadPostListing.mockResolvedValue(listing({ featured: card("9") }));
+    const { container } = renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
+    expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-9");
   });
 
   it("golden: chip danh mục là link đường dẫn (không thêm tham số); phân trang chỉ dùng ?page= (trang 1 sạch)", async () => {

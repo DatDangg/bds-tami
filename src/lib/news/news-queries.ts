@@ -4,11 +4,11 @@ import type { Locale } from "../../i18n/routing";
 import type { Category, News } from "../../payload-types";
 import { findPublicBySlug, findPublicList, type PublicListResult } from "../content/public-queries";
 
-/** 12 bài/trang (design-spec S10); khối nổi bật ở trang 1 của `/tin-tuc` không tính vào 12 bài này. */
+/** 12 bài/trang (design-spec S10). */
 export const NEWS_PAGE_SIZE = 12;
-/** 1 bài lớn + 3 bài dạng hàng (design-spec S10). */
-export const NEWS_FEATURED_COUNT = 4;
 export const RELATED_NEWS_COUNT = 3;
+/** Số bài trong thẻ "Bài viết mới" ở cột phải trang bài viết. */
+export const LATEST_NEWS_COUNT = 3;
 
 const NEWS_SORT = ["-publishedAt", "-createdAt"];
 const CATEGORY_SORT = ["sortOrder", "createdAt"];
@@ -35,16 +35,6 @@ export function listChildNewsCategories(payload: Payload, locale: Locale, parent
   });
 }
 
-/** Danh mục con (cấp 2) của NHIỀU danh mục cấp 1 trong một truy vấn (hàng theo danh mục của `/tin-tuc`, tránh N+1). */
-export function listChildNewsCategoriesOf(payload: Payload, locale: Locale, parentIds: readonly string[]): Promise<PublicListResult<Category>> {
-  return findPublicList<Category>(payload, "categories", locale, {
-    where: { and: [{ scope: { equals: "news" } }, { parent: { in: [...parentIds] } }] },
-    sort: CATEGORY_SORT,
-    limit: CATEGORY_LIMIT,
-    depth: 0,
-  });
-}
-
 /** Danh mục `news` theo slug của ngôn ngữ đang xem (slug chỉ duy nhất trong cùng scope). `parent` đã populate. */
 export function findNewsCategoryBySlug(payload: Payload, locale: Locale, slug: string): Promise<Category | null> {
   return findPublicBySlug<Category>(payload, "categories", locale, slug, { where: { scope: { equals: "news" } }, depth: 1 });
@@ -54,9 +44,9 @@ export interface NewsPageQuery {
   page: number;
   /** Lọc theo các danh mục này (danh mục + con của nó). Bỏ trống = mọi danh mục. */
   categoryIds?: readonly string[];
-  /** Bài đã hiện ở khối nổi bật, loại khỏi lưới để không trùng. */
+  /** Bài nổi bật đầu trang, loại khỏi lưới để không trùng. */
   excludeIds?: readonly string[];
-  /** Chỉ bài đánh dấu `isFeatured` (khối "Tin nổi bật" của trang 1 `/tin-tuc`). */
+  /** Chỉ bài đánh dấu `isFeatured` (bài nổi bật đầu trang 1 `/tin-tuc`). */
   featuredOnly?: boolean;
   limit?: number;
 }
