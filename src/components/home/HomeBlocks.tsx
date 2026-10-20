@@ -9,9 +9,12 @@ import { HeroSlider } from "./HeroSlider";
 import { HomeNews } from "./HomeNews";
 import { HomeRentals } from "./HomeRentals";
 import { ServicesBento } from "./ServicesBento";
+import { StrengthsBlock } from "./StrengthsBlock";
 
 function renderBlock(block: HomeBlockView) {
   switch (block.kind) {
+    case "strengths":
+      return <StrengthsBlock block={block} />;
     case "about":
       return <AboutBlock block={block} />;
     case "featuredProjects":
@@ -31,14 +34,17 @@ function renderBlock(block: HomeBlockView) {
 
 /**
  * Thân trang chủ: hero rồi các khối theo thứ tự của view model (đã lọc bật/tắt/EN ở `buildHomeView`). Trang luôn có đúng một `h1`,
- * ẩn (`sr-only`) mang tiêu đề slide 1 theo ngôn ngữ, không có thì tên site (design-spec S01), và nằm NGOÀI carousel: nếu nằm trong slide 1 thì `aria-hidden`/`inert` của slide giấu nó khỏi trình đọc màn hình khi slide khác hiện.
+ * ẩn (`sr-only`) mang tiêu đề slide 1 (cả hai dòng: `title` + `titleAccent`, BL-044) theo ngôn ngữ, không có thì tên site (design-spec S01), và nằm NGOÀI carousel:
+ * nếu nằm trong slide 1 thì `aria-hidden`/`inert` của slide giấu nó khỏi trình đọc màn hình khi slide khác hiện.
  */
 export function HomeBlocks({ view, siteName }: { view: HomeView; siteName: string }) {
+  const first = view.hero[0];
+  const heading = [first?.title, first?.titleAccent].filter(Boolean).join(" ");
   return (
     <>
-      <h1 className="sr-only">{view.hero[0]?.title || siteName}</h1>
+      <h1 className="sr-only">{heading || siteName}</h1>
       {view.hero.length > 0 && (
-        <HeroSlider slides={view.hero} overlapsSearch={view.heroSearch !== null} />
+        <HeroSlider slides={view.hero} eyebrow={view.heroEyebrow} caption={view.heroCaption} overlapsSearch={view.heroSearch !== null} />
       )}
       {view.hero.length > 0 && view.heroSearch && <HeroSearch {...view.heroSearch} />}
       {view.blocks.map((block) => (

@@ -8,6 +8,35 @@ export const RENTAL_CATEGORIES_MAX = 4;
 export const HOME_NEWS_POSTS_MAX = 3;
 export const RENTALS_BLOCK_LABEL = "Cho thuê";
 export const NEWS_BLOCK_LABEL = "Tin tức";
+export const STRENGTHS_BLOCK_LABEL = "Điểm mạnh";
+export const STRENGTH_ITEMS_MIN = 2;
+export const STRENGTH_ITEMS_MAX = 6;
+
+/**
+ * Icon cho mục Điểm mạnh và số liệu Về TAMI (BL-044): giá trị lưu là tên kebab, map sang component Phosphor ở `components/home/strength-icons.ts`.
+ * `file-check` giữ tên theo spec dù Phosphor không có `FileCheck` (hiển thị bằng `ClipboardText`).
+ */
+export const STRENGTH_ICONS = ["map-pin", "buildings", "headset", "file-check", "shield-check", "clock", "users", "star"] as const;
+export type StrengthIcon = (typeof STRENGTH_ICONS)[number];
+
+const STRENGTH_ICON_LABELS: Record<StrengthIcon, string> = {
+  "map-pin": "Ghim vị trí",
+  buildings: "Toà nhà",
+  headset: "Tai nghe (hỗ trợ)",
+  "file-check": "Giấy tờ",
+  "shield-check": "Khiên bảo vệ",
+  clock: "Đồng hồ",
+  users: "Khách hàng",
+  star: "Ngôi sao",
+};
+
+export const strengthIconField = (required: boolean): Field => ({
+  name: "icon",
+  type: "select",
+  label: "Biểu tượng",
+  required,
+  options: STRENGTH_ICONS.map((icon) => ({ label: STRENGTH_ICON_LABELS[icon], value: icon })),
+});
 /** Khối không có trong "Thứ tự khối" thì không hiện (bản ghi trang chủ có từ trước chưa có hai khối này): nhắc ở admin thay vì tự thêm lúc render. */
 export const BLOCK_ORDER_NOTE = "Khối chỉ hiện khi có trong mục Thứ tự khối.";
 
@@ -55,6 +84,31 @@ export const heroSearchBlock: Field = {
     { name: "placeholder", type: "text", label: "Chữ gợi ý trong ô tìm kiếm", localized: true, admin: { description: "Để trống thì dùng chữ mặc định của website." } },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
     { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án nổi bật mới nhất." } },
+  ],
+};
+
+/** Dải 4 điểm mạnh dưới ô tìm kiếm (BL-044). Không có tiêu đề khối; `/en` bỏ mục thiếu `title` EN, < 2 mục thì ẩn khối. */
+export const strengthsBlock: Field = {
+  name: "strengths",
+  type: "group",
+  label: STRENGTHS_BLOCK_LABEL,
+  admin: { description: BLOCK_ORDER_NOTE },
+  fields: [
+    enabledField,
+    {
+      name: "items",
+      type: "array",
+      label: "Mục",
+      labels: { singular: "Mục", plural: "Mục" },
+      minRows: STRENGTH_ITEMS_MIN,
+      maxRows: STRENGTH_ITEMS_MAX,
+      admin: { description: "2–6 mục; mỗi mục gồm biểu tượng, tiêu đề ngắn và một dòng mô tả." },
+      fields: [
+        strengthIconField(true),
+        { name: "title", type: "text", label: "Tiêu đề", localized: true, required: true },
+        { name: "description", type: "text", label: "Mô tả ngắn", localized: true },
+      ],
+    },
   ],
 };
 

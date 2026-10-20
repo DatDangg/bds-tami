@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { type KeyboardEvent, type MouseEvent, type TouchEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, CaretLeft, CaretRight, Pause, Play } from "@/components/icons";
+import { ArrowDown, ArrowRight, CaretLeft, CaretRight, Pause, Play } from "@/components/icons";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 import type { HeroSlideView } from "@/lib/home/home-view";
@@ -20,6 +20,11 @@ const CONTROL_SELECTOR = "[data-carousel-control]";
 
 const CONTROL_BUTTON =
   "inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-on-dark transition-colors duration-(--duration-fast) hover:bg-dark/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
+/** Nút tròn viền mảnh (mũi tên Trước/Sau, cuộn xuống) như mockup BL-044. */
+const RING_BUTTON = "border border-on-dark/40";
+
+/** Số thứ tự slide 2 chữ số (`01 / 03`) như mockup. */
+const twoDigits = (value: number) => String(value).padStart(2, "0");
 
 function HeroVideo({ src, paused }: { src: string; paused: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -35,18 +40,23 @@ function HeroVideo({ src, paused }: { src: string; paused: boolean }) {
 
 interface HeroSliderProps {
   slides: HeroSlideView[];
+  /** Chữ nhỏ trên tiêu đề (viết hoa giãn chữ) và chú thích góc dưới phải — CHUNG mọi slide (BL-044 Q4). */
+  eyebrow?: string | null;
+  caption?: string | null;
   /** Ô tìm kiếm đè đáy hero từ md: chừa chỗ dưới nội dung và nâng nhóm điều khiển/nút cuộn lên trên ô. */
   overlapsSearch?: boolean;
 }
 
 /**
- * Hero trang chủ (design-spec S01.1, §1.4): carousel 1-8 slide, ảnh slide 1 là ảnh LCP (`priority`), các slide sau chỉ tải sau khi trang tải xong.
+ * Hero trang chủ (SPECIFICATIONS F1 "Bố cục theo mockup mới" BL-044; cơ chế carousel BL-020): 1-8 slide, ảnh slide 1 là ảnh LCP (`priority`), các slide sau chỉ tải sau khi trang tải xong.
+ * Bố cục: chữ canh TRÁI trong khung container (eyebrow → tiêu đề + dòng vàng → phụ đề → nút); góc dưới trái: nút Dừng/Phát + bộ đếm `01 / 03` + thanh tiến trình
+ * (mỗi đoạn là nút chuyển slide, thay chấm giữa); góc dưới phải: chú thích + nút cuộn xuống; mũi tên tròn hai mép giữa (≥ lg).
  * Video (tuỳ chọn) chỉ dựng ở client khi ≥ 1024px, không reduced-motion, không Save-Data nên HTML server không kèm video.
  * A11y: `region` + `aria-roledescription`, nút Dừng/Phát (cả khi 1 slide có video tự chạy, WCAG 2.2.2), autoplay dừng khi hover/focus/tab ẩn/reduced-motion,
  * phím mũi tên chỉ khi focus ở điều khiển carousel (không cướp phím của nút CTA trong slide), vuốt ngang trên cảm ứng.
  * Tiêu đề slide là `p`: `h1` của trang nằm ngoài carousel (HomeBlocks) để không bị `aria-hidden`/`inert` theo slide.
  */
-export function HeroSlider({ slides, overlapsSearch = false }: HeroSliderProps) {
+export function HeroSlider({ slides, eyebrow = null, caption = null, overlapsSearch = false }: HeroSliderProps) {
   const t = useTranslations("page.home.hero");
   const count = slides.length;
   const multiple = count > 1;
@@ -162,16 +172,30 @@ export function HeroSlider({ slides, overlapsSearch = false }: HeroSliderProps) 
               <div aria-hidden="true" className="absolute inset-0 bg-overlay" />
               <div
                 className={cn(
-                  "relative mx-auto flex h-full w-full max-w-container flex-col items-center justify-center gap-6 px-gutter pt-(--header-offset) pb-40 text-center sm:pb-24 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
+                  "relative mx-auto flex h-full w-full max-w-container flex-col items-start justify-center gap-4 px-gutter pt-(--header-offset) pb-40 text-left sm:pb-28 transition duration-(--duration-reveal) ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none lg:px-20",
                   overlapsSearch && "md:pb-52",
                   active ? "translate-y-0 opacity-100 delay-200" : "translate-y-6 opacity-0",
                 )}
               >
-                {slide.title && <p className="max-w-[22ch] font-display text-display text-balance text-on-dark">{slide.title}</p>}
+                {eyebrow && <p className="text-eyebrow font-semibold uppercase text-on-dark">{eyebrow}</p>}
+                {(slide.title || slide.titleAccent) && (
+                  <p className="max-w-[22ch] font-display text-display text-balance text-on-dark">
+                    {slide.title}
+                    {slide.titleAccent && (
+                      <>
+                        {slide.title && <br />}
+                        <span className="text-primary">{slide.titleAccent}</span>
+                      </>
+                    )}
+                  </p>
+                )}
                 {slide.subtitle && <p className="max-w-[48ch] text-lead text-on-dark-muted">{slide.subtitle}</p>}
                 {slide.ctaHref && slide.ctaLabel && (
-                  <Button asChild size="lg" className="w-full max-w-xs sm:w-auto">
-                    <Link href={slide.ctaHref}>{slide.ctaLabel}</Link>
+                  <Button asChild className="mt-2">
+                    <Link href={slide.ctaHref}>
+                      {slide.ctaLabel}
+                      <ArrowRight size={18} aria-hidden="true" />
+                    </Link>
                   </Button>
                 )}
               </div>
@@ -180,51 +204,62 @@ export function HeroSlider({ slides, overlapsSearch = false }: HeroSliderProps) 
         })}
       </div>
 
-      {/* Dừng/Phát đứng ĐẦU thứ tự tab (WAI-ARIA carousel) và cùng nhóm với chấm: 375px xếp dọc, từ sm xếp ngang → không đè nhau (8 chấm × 44px = 352px). */}
-      {(multiple || showPauseButton) && (
-        <div className={cn("absolute inset-x-0 bottom-4 flex flex-col items-center sm:flex-row sm:justify-center", overlapsSearch && "md:bottom-28")}>
-          {showPauseButton && (
-            <button type="button" data-carousel-control="" aria-label={userPaused ? t("play") : t("pause")} onClick={() => setUserPaused((paused) => !paused)} className={CONTROL_BUTTON}>
-              {userPaused ? <Play size={20} weight="fill" aria-hidden="true" /> : <Pause size={20} weight="fill" aria-hidden="true" />}
+      {/* Cụm đáy: trái = Dừng/Phát (ĐẦU thứ tự tab, WAI-ARIA carousel) + bộ đếm + thanh tiến trình; phải = chú thích + nút cuộn (từ sm). Cùng khung container với chữ. */}
+      <div className={cn("pointer-events-none absolute inset-x-0 bottom-4 sm:bottom-6", overlapsSearch && "md:bottom-28")}>
+        <div className="mx-auto flex w-full max-w-container items-end justify-between gap-4 px-gutter lg:px-20">
+          {/* DOM: Dừng/Phát trước (đầu thứ tự tab); hiển thị: bộ đếm sát mép trái chữ như mockup → thanh tiến trình → nút Dừng/Phát (`order`). Khi dồn dòng ở màn hẹp thanh xuống hàng riêng. */}
+          <div className="pointer-events-auto flex min-w-0 flex-wrap items-center gap-x-3">
+            {showPauseButton && (
+              <button type="button" data-carousel-control="" aria-label={userPaused ? t("play") : t("pause")} onClick={() => setUserPaused((paused) => !paused)} className={cn(CONTROL_BUTTON, "order-3")}>
+                {userPaused ? <Play size={20} weight="fill" aria-hidden="true" /> : <Pause size={20} weight="fill" aria-hidden="true" />}
+              </button>
+            )}
+            {/* Bộ đếm chỉ để nhìn: slide đang hiện đã được `aria-label` "Slide i / n" của nhóm slide nêu. Chỉ khi có > 1 slide. */}
+            {multiple && (
+              <span aria-hidden="true" className="order-1 shrink-0 text-small text-on-dark tabular-nums">
+                <span className="font-semibold">{twoDigits(index + 1)}</span>
+                <span className="text-on-dark-muted"> / {twoDigits(count)}</span>
+              </span>
+            )}
+            {multiple && (
+              // Mỗi đoạn tối thiểu 44px bề ngang (vùng chạm); vạch vẽ vẫn mảnh `h-0.5`. `minWidth` theo số slide để không bao giờ nhỏ hơn 44px/đoạn.
+              <div role="group" aria-label={t("dots")} style={{ minWidth: `${count * 2.75}rem` }} className="order-2 flex w-40 max-w-full items-center overflow-x-auto sm:w-56">
+                {slides.map((slide, position) => (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    data-carousel-control=""
+                    aria-label={t("goTo", { index: position + 1 })}
+                    aria-current={position === index ? "true" : undefined}
+                    onClick={() => goTo(position)}
+                    className="group inline-flex h-11 min-w-11 flex-1 cursor-pointer items-center px-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-focus-ring"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn("h-0.5 w-full rounded-full transition-colors duration-(--duration-base) motion-reduce:transition-none", position === index ? "bg-primary" : "bg-on-dark/40 group-hover:bg-on-dark")}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="pointer-events-auto hidden items-center gap-4 sm:flex">
+            {caption && <p className="max-w-[28ch] text-right text-small text-on-dark line-clamp-2">{caption}</p>}
+            <button type="button" aria-label={t("scrollDown")} onClick={scrollToContent} className={cn(CONTROL_BUTTON, RING_BUTTON)}>
+              <ArrowDown size={20} aria-hidden="true" />
             </button>
-          )}
-          {multiple && (
-            <div role="group" aria-label={t("dots")} className="flex flex-wrap items-center justify-center px-2">
-              {slides.map((slide, position) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  data-carousel-control=""
-                  aria-label={t("goTo", { index: position + 1 })}
-                  aria-current={position === index ? "true" : undefined}
-                  onClick={() => goTo(position)}
-                  className="group inline-flex size-11 cursor-pointer items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-focus-ring"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={cn("h-2 rounded-full transition-all duration-(--duration-base) motion-reduce:transition-none", position === index ? "w-6 bg-primary" : "w-2 bg-on-dark/60 group-hover:bg-on-dark")}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+            {/* Vạch dọc trang trí sát mép phải như mockup: viền dùng màu `on-dark` có sẵn. */}
+            <span aria-hidden="true" className="h-12 border-l border-on-dark/40" />
+          </div>
         </div>
-      )}
-      <button
-        type="button"
-        aria-label={t("scrollDown")}
-        onClick={scrollToContent}
-        className={cn(CONTROL_BUTTON, "absolute right-4 bottom-4 hidden border border-on-dark/40 sm:inline-flex lg:right-6", overlapsSearch && "md:bottom-28")}
-      >
-        <ArrowDown size={20} aria-hidden="true" />
-      </button>
+      </div>
       {multiple && (
         <>
-          <button type="button" data-carousel-control="" aria-label={t("previous")} onClick={() => goTo(index - 1)} className={cn(CONTROL_BUTTON, "absolute top-1/2 left-6 hidden size-12 -translate-y-1/2 lg:inline-flex")}>
-            <CaretLeft size={28} aria-hidden="true" />
+          <button type="button" data-carousel-control="" aria-label={t("previous")} onClick={() => goTo(index - 1)} className={cn(CONTROL_BUTTON, RING_BUTTON, "absolute top-1/2 left-6 hidden size-12 -translate-y-1/2 lg:inline-flex")}>
+            <CaretLeft size={24} aria-hidden="true" />
           </button>
-          <button type="button" data-carousel-control="" aria-label={t("next")} onClick={() => goTo(index + 1)} className={cn(CONTROL_BUTTON, "absolute top-1/2 right-6 hidden size-12 -translate-y-1/2 lg:inline-flex")}>
-            <CaretRight size={28} aria-hidden="true" />
+          <button type="button" data-carousel-control="" aria-label={t("next")} onClick={() => goTo(index + 1)} className={cn(CONTROL_BUTTON, RING_BUTTON, "absolute top-1/2 right-6 hidden size-12 -translate-y-1/2 lg:inline-flex")}>
+            <CaretRight size={24} aria-hidden="true" />
           </button>
         </>
       )}

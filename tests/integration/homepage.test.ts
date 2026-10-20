@@ -279,11 +279,13 @@ describe.skipIf(!baseUrl)("integration: global homepage (DB tạm)", () => {
       expect(await statusOf(updateHomepage({ blockOrder: [{ block: "news" }, { block: "news" }] }))).toBe(400);
     });
 
-    it("blockOrder gồm ctaBanner; cấu hình mặc định là đủ HOMEPAGE_BLOCKS (8 khối); trùng khối → 400", async () => {
-      const { HOMEPAGE_BLOCKS } = await import("../../src/globals/Homepage");
+    it("blockOrder gồm ctaBanner + strengths; mặc định bản ghi mới = 4 khối mockup BL-044 (không phải đủ 9 HOMEPAGE_BLOCKS); trùng khối → 400", async () => {
+      const { HOMEPAGE_BLOCKS, HOMEPAGE_DEFAULT_BLOCK_ORDER } = await import("../../src/globals/Homepage");
       const blockOrder = payload.globals.config.find((global) => global.slug === "homepage")!.flattenedFields.find((field) => field.name === "blockOrder");
-      expect(HOMEPAGE_BLOCKS).toHaveLength(8);
-      expect((blockOrder as { defaultValue?: { block: string }[] }).defaultValue?.map((row) => row.block)).toEqual([...HOMEPAGE_BLOCKS]);
+      expect(HOMEPAGE_BLOCKS).toHaveLength(9);
+      expect(HOMEPAGE_BLOCKS).toContain("strengths");
+      expect((blockOrder as { defaultValue?: { block: string }[] }).defaultValue?.map((row) => row.block)).toEqual([...HOMEPAGE_DEFAULT_BLOCK_ORDER]);
+      expect(HOMEPAGE_DEFAULT_BLOCK_ORDER).toEqual(["strengths", "about", "featuredProjects", "ctaBanner"]);
       const saved = await updateHomepage({ blockOrder: [{ block: "ctaBanner" }, { block: "about" }] });
       expect(saved.blockOrder?.map((row) => row.block)).toEqual(["ctaBanner", "about"]);
       expect(await statusOf(updateHomepage({ blockOrder: [{ block: "about" }, { block: "about" }] }))).toBe(400);

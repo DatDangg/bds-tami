@@ -30,6 +30,7 @@ import * as migration_20261019_082627_site_settings_page_banners from './2026101
 import * as migration_20261019_144259_homepage_market_blocks from './20261019_144259_homepage_market_blocks';
 import * as migration_20261019_215847_project_detail_market_blocks from './20261019_215847_project_detail_market_blocks';
 import * as migration_20261020_095907_rentals_amenities from './20261020_095907_rentals_amenities';
+import * as migration_20261020_103248_homepage_redesign from './20261020_103248_homepage_redesign';
 
 export const migrations = [
   {
@@ -190,6 +191,11 @@ export const migrations = [
   {
     up: migration_20261020_095907_rentals_amenities.up,
     down: migration_20261020_095907_rentals_amenities.down,
-    name: '20261020_095907_rentals_amenities'
+    name: '20261020_095907_rentals_amenities',
+  },
+  {
+    up: migration_20261020_103248_homepage_redesign.up,
+    down: migration_20261020_103248_homepage_redesign.down,
+    name: '20261020_103248_homepage_redesign'
   },
 ];

@@ -1,6 +1,8 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 import { buildHomeView, type HomeDocs } from "@/lib/home/home-view";
 import type { Category, Homepage, Media, News, Project, PropertyPost, Service } from "@/payload-types";
 import { HomeBlocks } from "./HomeBlocks";
@@ -18,6 +20,7 @@ const docs: HomeDocs = {
   offers: [{ id: "o1", title: "Voucher 1", slug: "voucher-1", excerpt: "Ưu đãi", cover: media("oc1") } as PropertyPost],
   chipProjects: [],
   provinces: [],
+  rentalCategories: [],
   rentalTabs: [],
   news: [],
 };
@@ -247,6 +250,60 @@ describe("HomeBlocks: Cho thuê + Tin tức (BL-020)", () => {
   it("tắt khối hoặc không có dữ liệu → ẩn khối", () => {
     renderHome(marketPage(["about", "rentals", "news"], { rentals: { enabled: false, title: "Thuê nhà" } }), "vi", { ...marketDocs, news: [] });
     expect(blockHeadings()).toEqual(["Về TAMI"]);
+  });
+});
+
+describe("HomeBlocks: Điểm mạnh + hero hai dòng (BL-044)", () => {
+  const strengthsPage = (overrides: Partial<Homepage> = {}) =>
+    homepage({
+      hero: { eyebrow: "TAMI HOMES", caption: "Kết nối mọi hành trình", slides: [{ id: "s1", image: media("hero"), title: "Căn hộ cho thuê", titleAccent: "sẵn sàng vào ở" }] },
+      strengths: {
+        enabled: true,
+        items: [
+          { icon: "map-pin", title: "Vị trí đắc địa", description: "Kết nối thuận tiện" },
+          { icon: "buildings", title: "Căn hộ đa dạng", description: "Phù hợp mọi nhu cầu" },
+          { icon: "headset", title: "Hỗ trợ chuyên nghiệp", description: null },
+          { icon: "file-check", title: "Thủ tục nhanh gọn", description: "Sẵn sàng vào ở" },
+        ],
+      },
+      blockOrder: ["strengths", "about", "featuredProjects", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"],
+      ...overrides,
+    });
+
+  it("khối Điểm mạnh ngay sau ô tìm kiếm: vùng có aria-label, 4 mục h3 + mô tả, không h2; h1 duy nhất = tiêu đề + dòng vàng slide 1", () => {
+    const { container } = renderHome(strengthsPage());
+    const region = screen.getByRole("region", { name: "Điểm mạnh" });
+    expect(container.children[3]).toBe(region);
+    expect(within(region).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(["Vị trí đắc địa", "Căn hộ đa dạng", "Hỗ trợ chuyên nghiệp", "Thủ tục nhanh gọn"]);
+    expect(within(region).queryByRole("heading", { level: 2 })).toBeNull();
+    expect(within(region).getByText("Kết nối thuận tiện").tagName).toBe("P");
+    expect(region.querySelectorAll("svg")).toHaveLength(4);
+    expect(blockHeadings()).toEqual(["Về TAMI", "Dự án nổi bật", "Cần tư vấn?"]);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Căn hộ cho thuê sẵn sàng vào ở");
+    expect(screen.getByText("Kết nối mọi hành trình")).toBeInTheDocument();
+  });
+
+  it("/en: mục chưa dịch bị bỏ, còn ≥ 2 mục vẫn hiện; tắt khối → không render", () => {
+    const en = renderHome(
+      strengthsPage({
+        hero: { slides: [{ id: "s1", image: media("hero"), title: "Ready to move in" }] },
+        about: { enabled: true, title: "About" },
+        strengths: {
+          enabled: true,
+          items: [
+            { icon: "map-pin", title: "Prime location" },
+            { icon: "buildings", title: null as never },
+            { icon: "headset", title: "Expert support" },
+          ],
+        },
+      }),
+      "en",
+    );
+    expect(within(screen.getByRole("region", { name: "Why TAMI" })).getAllByRole("heading", { level: 3 })).toHaveLength(2);
+    en.unmount();
+    renderHome(strengthsPage({ strengths: { enabled: false, items: [] } }));
+    expect(screen.queryByRole("region", { name: "Điểm mạnh" })).toBeNull();
   });
 });
 

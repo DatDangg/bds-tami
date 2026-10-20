@@ -11,7 +11,8 @@ import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
 import { defaultLocale } from "../i18n/routing";
 import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
-import { announcementBarBlock, enabledField, heroSearchBlock, NEWS_BLOCK_LABEL, newsBlock, RENTALS_BLOCK_LABEL, rentalsBlock, titleField } from "./homepage/blocks";
+import { parseVideoUrl } from "../components/media/video-url";
+import { announcementBarBlock, enabledField, heroSearchBlock, NEWS_BLOCK_LABEL, newsBlock, RENTALS_BLOCK_LABEL, rentalsBlock, STRENGTHS_BLOCK_LABEL, strengthIconField, strengthsBlock, titleField } from "./homepage/blocks";
 import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 
@@ -25,7 +26,12 @@ export const FEATURED_PROJECTS_MAX = 6;
 /** Khối của trang chủ sắp xếp được (hero luôn đứng đầu, không nằm trong `blockOrder`). */
 export { HERO_CHIP_PROJECTS_MAX, HOME_NEWS_POSTS_MAX, RENTAL_CATEGORIES_MAX } from "./homepage/blocks";
 
-export const HOMEPAGE_BLOCKS = ["about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news"] as const;
+export { STRENGTH_ICONS, type StrengthIcon } from "./homepage/blocks";
+
+export const HOMEPAGE_BLOCKS = ["strengths", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news"] as const;
+
+/** Thứ tự khối mặc định cho bản ghi mới (và khi `blockOrder` trống): chỉ các khối trong mockup BL-044; khối khác admin thêm lại để bật (D4). */
+export const HOMEPAGE_DEFAULT_BLOCK_ORDER = ["strengths", "about", "featuredProjects", "ctaBanner"] as const satisfies readonly (typeof HOMEPAGE_BLOCKS)[number][];
 
 /**
  * Video hero: chỉ MP4/WebM ≤ 15MB. Upload vào `media` đã chặn theo magic bytes + dung lượng (ERD §4.12); đây là lớp kiểm lại
@@ -70,6 +76,12 @@ const validateCtaTitle: TextFieldSingleValidation = async (value, { siblingData,
   return isFilled(saved.ctaBanner?.title) ? true : CTA_TITLE_REQUIRED_MESSAGE;
 };
 
+/** Video "Khám phá TAMI HOMES" (BL-044 D3) chỉ nhúng YouTube: kiểm ở server bằng cùng parser của trang hiển thị (link khác → ẩn nút). */
+const validateYoutubeUrl: TextFieldSingleValidation = (value) => {
+  if (typeof value !== "string" || value.trim() === "") return true;
+  return parseVideoUrl(value)?.provider === "youtube" ? true : "Chỉ nhận liên kết YouTube (youtube.com/watch?v=, youtu.be/ hoặc youtube.com/embed/).";
+};
+
 const validateBlockOrder = (value: unknown): true | string => {
   const blocks = ((value as { block?: string }[] | null | undefined) ?? []).map((row) => row.block);
   return new Set(blocks).size === blocks.length ? true : "Mỗi khối chỉ xuất hiện một lần trong thứ tự.";
@@ -90,6 +102,7 @@ const ctaLinkField = () => navLinkField("ctaLink", { label: "Liên kết của n
 
 /** Nhãn tiếng Việt của từng khối trang chủ (option của `blockOrder` + nhãn hàng). */
 const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
+  strengths: STRENGTHS_BLOCK_LABEL,
   about: "Giới thiệu",
   featuredProjects: "Dự án nổi bật",
   services: "Dịch vụ",
@@ -105,6 +118,8 @@ const heroBlock: Field = {
   type: "group",
   label: "Banner đầu trang",
   fields: [
+    // Eyebrow + chú thích là chữ CHUNG cho mọi slide (BL-044 Q4).
+    { name: "eyebrow", type: "text", label: "Dòng chữ nhỏ trên tiêu đề", localized: true, admin: { description: 'Vd: "TAMI HOMES". Hiện trên mọi slide, viết hoa giãn chữ.' } },
     {
       name: "slides",
       type: "array",
@@ -127,11 +142,13 @@ const heroBlock: Field = {
           admin: { description: "Chỉ phát trên màn hình lớn; ảnh nền dùng làm poster và cho di động." },
         },
         { ...titleField, label: "Tiêu đề" },
+        { name: "titleAccent", type: "text", label: "Dòng 2 của tiêu đề (màu vàng)", localized: true },
         { name: "subtitle", type: "text", label: "Phụ đề", localized: true },
         ctaLabelField,
         ctaLinkField(),
       ],
     },
+    { name: "caption", type: "textarea", label: "Chú thích góc dưới phải", localized: true, admin: { description: "≤ 2 dòng, hiện ở góc dưới phải banner trên mọi slide." } },
   ],
 };
 
@@ -141,9 +158,16 @@ const aboutBlock: Field = {
   label: BLOCK_LABELS.about,
   fields: [
     enabledField,
+    // Bố cục mockup BL-044 (render ở task T02): eyebrow → tiêu đề + dòng vàng → nội dung → số liệu có icon → nút; cụm ảnh chồng bên trái.
+    { name: "eyebrow", type: "text", label: "Dòng chữ nhỏ trên tiêu đề", localized: true, admin: { description: 'Để trống thì dùng "Về chúng tôi".' } },
     titleField,
+    { name: "titleAccent", type: "text", label: "Phần tiêu đề màu vàng", localized: true, admin: { description: 'Vd: tiêu đề "Về" + phần vàng "TAMI HOMES".' } },
     { name: "content", type: "richText", label: "Nội dung giới thiệu", localized: true },
     imageUpload("image", "Ảnh minh hoạ"),
+    imageUpload("secondaryImage", "Ảnh phụ (đè góc trên trái ảnh minh hoạ)"),
+    { name: "imageCaption", type: "textarea", label: "Chú thích trên ảnh", localized: true, admin: { description: "Thẻ trắng nhỏ đè góc dưới trái ảnh; vài dòng ngắn." } },
+    { name: "videoUrl", type: "text", label: "Liên kết video YouTube", validate: validateYoutubeUrl, admin: { description: "Nút play mở video trong hộp thoại. Để trống thì ẩn nút." } },
+    { name: "videoLabel", type: "text", label: "Chữ cạnh nút play", localized: true, admin: { description: 'Để trống thì dùng "Khám phá TAMI HOMES".' } },
     {
       name: "stats",
       type: "array",
@@ -151,10 +175,14 @@ const aboutBlock: Field = {
       labels: { singular: "Số liệu", plural: "Số liệu" },
       admin: { components: { RowLabel: textRowLabel({ field: "label", fallback: "Số liệu" }) } },
       fields: [
+        strengthIconField(false),
         { name: "value", type: "text", label: "Giá trị", required: true, admin: { description: "Vd: 10+, 1.500" } },
         { name: "label", type: "text", label: "Diễn giải", localized: true, required: true, admin: { description: "Vd: Năm kinh nghiệm" } },
       ],
     },
+    ctaLabelField,
+    ctaLinkField(),
+    imageUpload("decorImage", "Ảnh trang trí mép phải", false, "Chỉ hiện trên màn hình rất rộng (≥ 1280px), không mang nội dung."),
   ],
 };
 
@@ -164,7 +192,9 @@ const featuredProjectsBlock: Field = {
   label: BLOCK_LABELS.featuredProjects,
   fields: [
     enabledField,
+    { name: "eyebrow", type: "text", label: "Dòng chữ nhỏ trên tiêu đề", localized: true },
     titleField,
+    { name: "description", type: "textarea", label: "Mô tả dưới tiêu đề", localized: true },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
     { name: "projects", type: "relationship", label: "Dự án hiển thị", relationTo: "projects", hasMany: true, maxRows: FEATURED_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất." } },
   ],
@@ -215,9 +245,13 @@ const blockOrderField: Field = {
   type: "array",
   label: "Thứ tự các khối",
   labels: { singular: "Khối", plural: "Khối" },
-  defaultValue: HOMEPAGE_BLOCKS.map((block) => ({ block })),
+  defaultValue: HOMEPAGE_DEFAULT_BLOCK_ORDER.map((block) => ({ block })),
   validate: validateBlockOrder,
-  admin: { description: "Banner đầu trang luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
+  admin: {
+    description:
+      "Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích Hiển thị) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.",
+    components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) },
+  },
   fields: [{ name: "block", type: "select", label: "Khối", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: BLOCK_LABELS[block], value: block })) }],
 };
 
@@ -237,6 +271,7 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
       formTabs([
         { label: "Thanh thông báo", fields: [announcementBarBlock] },
         { label: "Banner đầu trang", fields: [heroBlock, heroSearchBlock] },
+        { label: STRENGTHS_BLOCK_LABEL, fields: [strengthsBlock] },
         { label: "Giới thiệu", fields: [aboutBlock] },
         { label: "Dự án nổi bật", fields: [featuredProjectsBlock] },
         { label: "Dịch vụ", fields: [servicesBlock] },

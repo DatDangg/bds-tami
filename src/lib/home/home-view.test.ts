@@ -38,6 +38,7 @@ const docs = (overrides: Partial<HomeDocs> = {}): HomeDocs => ({
   offers: [post("1")],
   chipProjects: [],
   provinces: [],
+  rentalCategories: [],
   rentalTabs: [],
   news: [],
   ...overrides,
@@ -52,9 +53,10 @@ describe("buildHomeView: thứ tự và bật/tắt khối", () => {
     expect(kinds(reordered)).toEqual(["ctaBanner", "services", "about"]);
   });
 
-  it("khối không nằm trong blockOrder thì không hiện; thiếu blockOrder (cài mới) thì thứ tự mặc định; trùng chỉ tính một lần", () => {
+  it("khối không nằm trong blockOrder thì không hiện; thiếu blockOrder (cài mới) thì thứ tự mặc định BL-044 (4 khối mockup, không phải mọi khối); trùng chỉ tính một lần", () => {
     expect(kinds(homepage({ blockOrder: [{ block: "about" }, { block: "about" }] }))).toEqual(["about"]);
-    expect(kinds(homepage({ blockOrder: null }))).toEqual(["about", "featuredProjects", "services", "featuredOffers", "ctaBanner"]);
+    expect(kinds(homepage({ blockOrder: null }))).toEqual(["about", "featuredProjects", "ctaBanner"]);
+    expect(kinds(homepage({ blockOrder: [] }))).toEqual(["about", "featuredProjects", "ctaBanner"]);
   });
 
   it("tắt khối (enabled=false) thì không render; ctaBanner mặc định tắt khi chưa đặt", () => {
@@ -260,6 +262,106 @@ describe("buildHomeView: ô tìm kiếm hero (BL-020)", () => {
       { id: "1", title: "Dự án 1", href: "/du-an/du-an-1" },
     ]);
     expect(view(homepage(), [project("1")], "en")?.chips[0]?.href).toBe("/en/projects/du-an-1");
+  });
+});
+
+describe("buildHomeView: hero chữ trái + eyebrow/caption chung (BL-044)", () => {
+  it("titleAccent theo slide; eyebrow/caption chung mọi slide, cắt khoảng trắng, trống → null", () => {
+    const page = homepage({
+      hero: { eyebrow: "  TAMI HOMES ", caption: " Không gian sống đẳng cấp ", slides: [{ id: "s1", image: media("h"), title: "Căn hộ cho thuê", titleAccent: " sẵn sàng vào ở " }] },
+    });
+    const view = buildHomeView(page, docs(), "vi", NOW);
+    expect(view.heroEyebrow).toBe("TAMI HOMES");
+    expect(view.heroCaption).toBe("Không gian sống đẳng cấp");
+    expect(view.hero[0]).toMatchObject({ title: "Căn hộ cho thuê", titleAccent: "sẵn sàng vào ở" });
+    const bare = buildHomeView(homepage(), docs(), "vi", NOW);
+    expect([bare.heroEyebrow, bare.heroCaption, bare.hero[0]?.titleAccent]).toEqual([null, null, ""]);
+  });
+
+  it("/en đọc fallbackLocale=false: eyebrow/caption chưa dịch là null (không lấy chữ Việt)", () => {
+    const page = homepage({ hero: { eyebrow: null, caption: "", slides: [{ id: "s1", image: media("h"), title: "Title" }] } });
+    const view = buildHomeView(page, docs(), "en", NOW);
+    expect([view.heroEyebrow, view.heroCaption]).toEqual([null, null]);
+  });
+
+  it("ô tìm kiếm: danh mục cho thuê cấp 1 truyền thẳng từ docs (server đã lọc EN)", () => {
+    const rentalCategories = [{ slug: "can-ho", name: "Căn hộ" }];
+    expect(buildHomeView(homepage(), docs({ rentalCategories }), "vi", NOW).heroSearch?.rentalCategories).toEqual(rentalCategories);
+    expect(buildHomeView(homepage(), docs(), "vi", NOW).heroSearch?.rentalCategories).toEqual([]);
+  });
+});
+
+describe("buildHomeView: khối Điểm mạnh (BL-044)", () => {
+  const item = (title: string | null, icon: "map-pin" | "star" = "star", description: string | null = null) => ({ icon, title: title as string, description });
+  const strengthsPage = (items: ReturnType<typeof item>[], extra: Partial<NonNullable<Homepage["strengths"]>> = {}) =>
+    homepage({ blockOrder: [{ block: "strengths" }, { block: "about" }] as Homepage["blockOrder"], strengths: { enabled: true, items, ...extra } });
+  const strengthsOf = (page: Homepage, locale: "vi" | "en" = "vi") => {
+    const block = buildHomeView(page, docs(), locale, NOW).blocks.find((entry) => entry.kind === "strengths");
+    return block?.kind === "strengths" ? block : null;
+  };
+
+  it("không cần tiêu đề khối; mục có icon/tiêu đề/mô tả (mô tả trống → null), giữ thứ tự", () => {
+    const block = strengthsOf(strengthsPage([item("Vị trí đắc địa", "map-pin", " Kết nối thuận tiện "), item("Căn hộ đa dạng")]));
+    expect(block?.items).toEqual([
+      { icon: "map-pin", title: "Vị trí đắc địa", description: "Kết nối thuận tiện" },
+      { icon: "star", title: "Căn hộ đa dạng", description: null },
+    ]);
+    expect(visibleBlockKeys(strengthsPage([item("A"), item("B")]))).toEqual(["strengths", "about"]);
+  });
+
+  it("/en bỏ mục thiếu title EN; còn < 2 mục → ẩn khối; tắt khối hoặc không có trong blockOrder → ẩn", () => {
+    expect(strengthsOf(strengthsPage([item("Prime location"), item(null), item("  ")]), "en")).toBeNull();
+    expect(strengthsOf(strengthsPage([item("Prime location"), item(null), item("Fast paperwork")]), "en")?.items.map((entry) => entry.title)).toEqual(["Prime location", "Fast paperwork"]);
+    expect(strengthsOf(strengthsPage([item("A")]))).toBeNull();
+    expect(strengthsOf(strengthsPage([item("A"), item("B")], { enabled: false }))).toBeNull();
+    expect(strengthsOf(homepage({ strengths: { enabled: true, items: [item("A"), item("B")] } }))).toBeNull();
+  });
+});
+
+describe("buildHomeView: field mới của Về TAMI + Dự án nổi bật (BL-044, render ở T02)", () => {
+  it("about: eyebrow/titleAccent/imageCaption/videoLabel cắt khoảng trắng, trống → null; video chỉ nhận YouTube; nút chỉ khi có nhãn + link; icon số liệu tuỳ chọn", () => {
+    const page = homepage({
+      about: {
+        enabled: true,
+        title: "Về",
+        eyebrow: " Về chúng tôi ",
+        titleAccent: "TAMI HOMES",
+        secondaryImage: media("second"),
+        imageCaption: " Không gian sống ",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        videoLabel: "Khám phá",
+        ctaLabel: "Tìm hiểu thêm",
+        ctaLink: "contact",
+        decorImage: media("decor"),
+        stats: [
+          { value: "10+", label: "năm", icon: "clock" },
+          { value: "500+", label: "khách" },
+        ],
+      },
+    });
+    const about = buildHomeView(page, docs(), "vi", NOW).blocks.find((entry) => entry.kind === "about");
+    expect(about).toMatchObject({
+      eyebrow: "Về chúng tôi",
+      titleAccent: "TAMI HOMES",
+      imageCaption: "Không gian sống",
+      videoEmbedUrl: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&playsinline=1",
+      videoLabel: "Khám phá",
+      cta: { label: "Tìm hiểu thêm", href: "/lien-he" },
+      stats: [
+        { value: "10+", label: "năm", icon: "clock" },
+        { value: "500+", label: "khách", icon: null },
+      ],
+    });
+    expect(about && "secondaryImage" in about ? [about.secondaryImage?.url, about.decorImage?.url] : null).toEqual(["/api/media/file/second.jpg", "/api/media/file/decor.jpg"]);
+
+    const plain = buildHomeView(homepage({ about: { enabled: true, title: "Về", videoUrl: "https://www.tiktok.com/@a/video/12345678", ctaLabel: "Xem", ctaLink: null } }), docs(), "vi", NOW).blocks.find((entry) => entry.kind === "about");
+    expect(plain).toMatchObject({ eyebrow: null, titleAccent: null, secondaryImage: null, imageCaption: null, videoEmbedUrl: null, videoLabel: null, cta: null, decorImage: null });
+  });
+
+  it("featuredProjects: eyebrow + description, trống → null", () => {
+    const find = (page: Homepage) => buildHomeView(page, docs(), "vi", NOW).blocks.find((entry) => entry.kind === "featuredProjects");
+    expect(find(homepage({ featuredProjects: { enabled: true, title: "Dự án nổi bật", eyebrow: " DỰ ÁN ", description: " Danh sách " } }))).toMatchObject({ eyebrow: "DỰ ÁN", description: "Danh sách" });
+    expect(find(homepage())).toMatchObject({ eyebrow: null, description: null });
   });
 });
 

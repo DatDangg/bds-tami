@@ -32,7 +32,7 @@ const callFor = (collection: string) => findPublicList.mock.calls.find((call) =>
 beforeEach(() => {
   findPublicList.mockReset();
   listProvinces.mockReset().mockResolvedValue([{ id: "pv1", slug: "ha-noi", name: "Hà Nội" }]);
-  listRentalCategoryOptions.mockReset();
+  listRentalCategoryOptions.mockReset().mockResolvedValue([]);
   searchRentals.mockReset();
 });
 
@@ -105,6 +105,24 @@ describe("loadHomeDocs: chip dự án ở ô tìm kiếm hero (BL-020)", () => {
     const docs = await loadHomeDocs(payload, "vi", withHero(), [], NOW);
     expect(listProvinces).toHaveBeenCalledTimes(1);
     expect(docs.provinces.map((province) => province.slug)).toEqual(["ha-noi"]);
+  });
+
+  it("có ô tìm kiếm: nạp danh mục cho thuê CẤP 1 cho ô Loại căn hộ (BL-044), theo ngôn ngữ, bỏ danh mục con; tắt ô → không nạp", async () => {
+    findPublicList.mockResolvedValue(list([]));
+    listRentalCategoryOptions.mockResolvedValue([
+      { slug: "can-ho", label: "Căn hộ", depth: 0 },
+      { slug: "studio", label: "Studio", depth: 1 },
+      { slug: "nha-pho", label: "Nhà phố", depth: 0 },
+    ]);
+    const docs = await loadHomeDocs(payload, "en", withHero(), [], NOW);
+    expect(listRentalCategoryOptions).toHaveBeenCalledWith(payload, "en");
+    expect(docs.rentalCategories).toEqual([
+      { slug: "can-ho", name: "Căn hộ" },
+      { slug: "nha-pho", name: "Nhà phố" },
+    ]);
+    listRentalCategoryOptions.mockClear();
+    await loadHomeDocs(payload, "vi", withHero({ heroSearch: { enabled: false } }), [], NOW);
+    expect(listRentalCategoryOptions).not.toHaveBeenCalled();
   });
 
   it("chọn tay: đọc như khách theo id, giữ thứ tự admin, tối đa 6, chỉ tên + slug", async () => {

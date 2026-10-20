@@ -132,6 +132,12 @@ async function loadRentalTab(payload: Payload, locale: Locale, category: RentalT
 
 const toTabCategory = (category: Pick<Category, "id" | "name" | "slug">): RentalTabCategory => ({ id: category.id, name: category.name, slug: category.slug });
 
+/** Ô "Loại căn hộ" của hàng "Tùy chọn khác" (BL-044): danh mục cho thuê CẤP 1, cùng nguồn/thứ tự với ô "Loại" của `/cho-thue` (`/en` chỉ danh mục có EN). */
+async function loadRentalCategoryChoices(payload: Payload, locale: Locale): Promise<HomeDocs["rentalCategories"]> {
+  const options = await listRentalCategoryOptions(payload, locale);
+  return options.filter((option) => option.depth === 0).map((option) => ({ slug: option.slug, name: option.label }));
+}
+
 /** Danh mục `rental` admin chọn (đọc như khách: `/en` chỉ danh mục có EN), theo thứ tự admin. */
 async function findSelectedRentalCategories(payload: Payload, locale: Locale, ids: readonly string[]): Promise<RentalTabCategory[]> {
   const docs = await findSelected<Category>(payload, "categories", locale, ids, { where: { scope: { equals: "rental" } }, select: { name: true, slug: true } });
@@ -171,14 +177,15 @@ async function loadRentalTabs(payload: Payload, locale: Locale, homepage: Homepa
 export async function loadHomeDocs(payload: Payload, locale: Locale, homepage: Homepage, visible: readonly HomeBlockKey[], now: Date): Promise<HomeDocs> {
   const has = (block: HomeBlockKey) => visible.includes(block);
   const heroSearch = needsHeroSearchData(homepage);
-  const [projects, services, offers, chipProjects, provinces, rentalTabs, news] = await Promise.all([
+  const [projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news] = await Promise.all([
     has("featuredProjects") ? loadProjects(payload, locale, homepage) : [],
     has("services") ? loadServices(payload, locale, homepage) : [],
     has("featuredOffers") ? loadOffers(payload, locale, homepage, now) : [],
     heroSearch ? loadChipProjects(payload, locale, homepage) : [],
     heroSearch ? listProvinces(payload) : [],
+    heroSearch ? loadRentalCategoryChoices(payload, locale) : [],
     has("rentals") ? loadRentalTabs(payload, locale, homepage) : [],
     has("news") ? loadNews(payload, locale, homepage) : [],
   ]);
-  return { projects, services, offers, chipProjects, provinces, rentalTabs, news };
+  return { projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news };
 }

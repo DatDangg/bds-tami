@@ -6,6 +6,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const baseUrl = process.env.DATABASE_URL_TEST;
 const MIGRATION_NAME = "20261018_091949_homepage_global";
+/** Migration additive BL-044 (T01) thêm bảng/enum cho khối Điểm mạnh + icon số liệu: phải down trước rồi mới down migration gốc. */
+const REDESIGN_MIGRATION_NAME = "20261020_103248_homepage_redesign";
 const HOMEPAGE_TABLES = [
   "homepage",
   "homepage_locales",
@@ -15,7 +17,11 @@ const HOMEPAGE_TABLES = [
   "homepage_about_stats",
   "homepage_about_stats_locales",
   "homepage_block_order",
+  "homepage_strengths_items",
+  "homepage_strengths_items_locales",
 ];
+/** enum_homepage_*: block_order + about_stats_icon + strengths_items_icon (+ 3 enum của migration gốc không có tiền tố này ngoài block_order). */
+const HOMEPAGE_ENUM_COUNT = 5;
 
 /** Chạy thật toàn bộ migration trên DB tạm, rồi `down` -> `down` (IF EXISTS) -> `up` (mẫu `property-posts-migration.test.ts`). */
 describe.skipIf(!baseUrl)("integration: migration homepage_global up/down/up (DB tạm)", () => {
@@ -58,7 +64,9 @@ describe.skipIf(!baseUrl)("integration: migration homepage_global up/down/up (DB
     const { migrations } = await import("../../migrations");
     const { createLocalReq } = await import("payload");
     const migration = migrations.find((item) => item.name === MIGRATION_NAME);
+    const redesign = migrations.find((item) => item.name === REDESIGN_MIGRATION_NAME);
     expect(migration).toBeDefined();
+    expect(redesign).toBeDefined();
     const db = payload.db.drizzle as unknown as { execute: (query: unknown) => Promise<{ rows: Record<string, unknown>[] }> };
     const req = await createLocalReq({}, payload);
     const args = { db: payload.db.drizzle, payload, req } as never;
@@ -74,14 +82,24 @@ describe.skipIf(!baseUrl)("integration: migration homepage_global up/down/up (DB
     };
 
     expect(await existing()).toEqual([...HOMEPAGE_TABLES].sort());
+    expect(await enumCount()).toBe(HOMEPAGE_ENUM_COUNT);
 
+    // M1 round 1: `strengths` là phần tử đầu defaultValue của blockOrder nên DB thật gần như chắc chắn có hàng này; down phải xoá nó trước khi ép kiểu enum về bản cũ.
+    const parentId = "00000000-0000-4000-8000-000000000001";
+    await db.execute(sql`INSERT INTO "homepage" ("id") VALUES (${parentId})`);
+    await db.execute(sql`INSERT INTO "homepage_block_order" ("_order", "_parent_id", "id", "block") VALUES (1, ${parentId}, 'row-strengths', 'strengths'), (2, ${parentId}, 'row-about', 'about')`);
+
+    await redesign!.down(args);
+    const remaining = await db.execute(sql`SELECT "block" FROM "homepage_block_order" ORDER BY "_order"`);
+    expect(remaining.rows.map((row) => row.block)).toEqual(["about"]);
     await migration!.down(args);
     expect(await existing()).toEqual([]);
     expect(await enumCount()).toBe(0);
     await migration!.down(args);
 
     await migration!.up(args);
+    await redesign!.up(args);
     expect(await existing()).toEqual([...HOMEPAGE_TABLES].sort());
-    expect(await enumCount()).toBe(3);
+    expect(await enumCount()).toBe(HOMEPAGE_ENUM_COUNT);
   }, 180_000);
 });

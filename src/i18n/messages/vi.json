@@ -761,7 +761,27 @@
         "keywordLabel": "Từ khoá tìm căn hộ cho thuê",
         "placeholder": "Nhập khu vực, tên toà nhà hoặc loại căn hộ",
         "submit": "Tìm kiếm",
-        "chips": "Dự án được quan tâm"
+        "chips": "Dự án được quan tâm",
+        "expandChips": "Xem thêm dự án",
+        "collapseChips": "Thu gọn dự án",
+        "moreOptions": {
+          "label": "Tùy chọn khác",
+          "price": "Mức giá",
+          "area": "Diện tích",
+          "category": "Loại căn hộ",
+          "furnishing": "Nội thất",
+          "amenities": "Tiện ích"
+        },
+        "areaHints": {
+          "under30": "< 30 m²",
+          "from30to50": "30-50 m²",
+          "from50to80": "50-80 m²",
+          "from80to120": "80-120 m²",
+          "over120": "> 120 m²"
+        }
+      },
+      "strengths": {
+        "region": "Điểm mạnh"
       },
       "projects": {
         "viewAll": "Xem tất cả",

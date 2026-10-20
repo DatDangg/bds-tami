@@ -53,8 +53,39 @@
 ## Retry / Escalation
 Attempt 1 fail → `.agent/error-analyzer.md`, root cause lại, fix tối thiểu. Attempt 2 fail → so pattern đang chạy (BL-020 P2 HeroSearch/HeroSlider), kiểm assumption. Attempt 3 fail → **không fix #4**, status `architecture_review_needed`, ghi blocker/residual/evidence, hỏi human. Mỗi fail append `.context/error-memory.md`.
 
-## Verification summary (builder điền)
-- Acceptance criteria: …
-- Verify commands + result: …
-- Lệch so với mockup + lý do: …
+## Verification summary (builder điền — 2026-10-20)
+- Acceptance criteria:
+  - [x] Admin: tab "Banner đầu trang" có `hero.eyebrow` / `hero.caption` / `slides[].titleAccent`; tab "Điểm mạnh" (`strengths.enabled` + `items` 2–6: icon/title/description); tab "Thứ tự khối" có "Điểm mạnh" (+ mô tả bố cục mới, default 4 khối). Lưu không lỗi: **PASS** qua Local API (`updateGlobal` vi + en, bản EN nhập được) + REST `POST /api/globals/homepage?locale=vi` sau đăng nhập staff dev (200, "Cập nhật thành công", chạy đủ validate + hook revalidate). *Chưa bấm tay từng tab trong UI admin (tab sinh từ `formTabs`, cùng cơ chế các tab cũ) — residual nhỏ.*
+  - [x] Migration `migrations/20261020_103248_homepage_redesign.{ts,json}` additive: CREATE TYPE ×2, `ALTER TYPE enum_homepage_block_order_block ADD VALUE 'strengths'`, CREATE TABLE `homepage_strengths_items(+_locales)`, ADD COLUMN ×16, FK/INDEX; **không DROP/đổi type/SET NOT NULL cột cũ** (DOWN mới DROP — chuẩn rollback). `pnpm payload migrate` dev: PASS (22ms). Không `HIGH_RISK_MIGRATION`.
+  - [x] 1440 (`.context/review-reports/assets/homepage-redesign-t01-1440.png`): hero chữ trái (eyebrow → tiêu đề + dòng vàng → phụ đề → nút Primary + mũi tên), bộ đếm `01 / 03` + thanh tiến trình + Dừng/Phát đáy trái, mũi tên tròn viền hai mép giữa, caption + nút cuộn đáy phải; ô tìm kiếm 3 hàng (tab → ô nhập kính lúp + nút "Tìm kiếm →" → chip 1 hàng + nút mở → "Tùy chọn khác" 5 chip, không mũi tên xổ); dải 4 điểm mạnh ngay dưới ô tìm kiếm. Đối chiếu mockup: khớp bố cục/vị trí.
+  - [x] "Tùy chọn khác" có JS (Browser thật): chọn Mức giá "< 5 triệu" + Nội thất "Đầy đủ" → Tìm kiếm → `/cho-thue?priceMax=5000000&furnishing=full`, trang đích hiện `ActiveFilters` "Giá: đến 5 triệu" + "Nội thất: Đầy đủ", chip mốc giá được chọn. Unit test: `/cho-thue?q=Vinhomes&category=can-ho&priceMin=5000000&priceMax=10000000&furnishing=full`; "Tất cả"/ô trống không lên URL. curl `/cho-thue?q=…&category=…&priceMin=…&priceMax=…&furnishing=full&amenities=pool` → ActiveFilters đủ 5 chip.
+  - [x] Không JS: HTML server (`renderToString` test) form `action=/cho-thue method=get` có `q` + select gốc `category`/`furnishing`/`amenities` đúng giá trị của `/cho-thue`; `priceRange`/`areaRange` là tên lạ → trang đích bỏ qua.
+  - [x] 390 (`…-390.png`, chụp qua iframe 390px vì Edge headless không hạ cửa sổ < ~500px): hero chữ trái, cụm đếm/thanh ở đáy không đè chữ (caption + nút cuộn chỉ từ sm), ô tìm kiếm xếp dọc, "Tùy chọn khác" 2 cột, điểm mạnh 1 cột, không tràn ngang (chip dự án vuốt ngang trong `overflow-x-auto`).
+  - [x] 1 `h1` (= `title + " " + titleAccent` slide 1, test HomeBlocks); nút Dừng/Phát còn, đứng đầu thứ tự tab; mọi nút có `aria-label` (đoạn thanh = "Chuyển tới slide n", chip mở = "Xem thêm/Thu gọn dự án"); bộ đếm `aria-hidden`; màu chỉ token (`text-on-dark`, `bg-primary`, `bg-on-dark/40`, `text-accent-display`, `bg-primary-subtle`, `bg-primary-soft`…), `contrast.test` + `no-raw-colors.test` nằm trong `pnpm test`.
+  - [x] Không hex/kiểu nút mới (OptionSelect `variant="chip"` ghép từ token §10; Button variant sẵn có); `pnpm test` / `pnpm typecheck` / `pnpm lint` — xem dưới.
+- Verify commands + result:
+  - `pnpm vitest run src/components/home src/lib/home src/components/ui src/globals` → 15 files / 193 tests PASS (+ 1 file mới `option-select.test.tsx`; `src/globals` không có test).
+  - `pnpm test` → lần 1: 3 fail do schema đổi (`translatable-fields.test` thiếu `strengths` trong allowlist dịch; `tests/integration/homepage.test` kỳ vọng default = 8 khối; `tests/integration/homepage-migration.test` chưa biết migration mới) → sửa `src/lib/translation/leaves.ts` (+`strengths`) và 2 test integration (down/up cả 2 migration, 10 bảng, 5 enum); chạy lại 3 file + `src/lib/translation` → 9 files / 114 tests PASS; phần còn lại 299 files / 3184 tests PASS ở lần 1 (không đổi source liên quan sau đó).
+  - `pnpm typecheck` → PASS. `pnpm lint` → 0 error (2 warning có sẵn ở `tools/task-dashboard/server.mjs`, ngoài scope). oxlint: repo không có config → skip.
+  - `pnpm payload migrate:create homepage_redesign` → inspect additive; `pnpm payload migrate` → PASS; `pnpm generate:types` → `src/payload-types.ts` chỉ thêm field mới.
+- Lệch so với mockup + lý do:
+  - Hero cao `100svh` (tối đa 1080px) theo spec BL-020 giữ; mockup vẽ hero thấp hơn (~750px). Không đổi vì spec F1 ghi rõ "`100svh` … như BL-020".
+  - Chip "Tùy chọn khác" trước khi hydrate là `<select>` gốc nên rộng bằng option dài nhất (có thể xuống 2 hàng vài trăm ms ở desktop); sau hydrate (Select TAMI) 5 chip nằm đúng 1 hàng như mockup. Chấp nhận để giữ form dùng được khi không JS (yêu cầu spec).
+  - Chip chưa chọn hiện TÊN ô ("Mức giá ⌄") như mockup; mục đầu trong dropdown cũng là tên ô (= không lọc) thay vì chữ "Tất cả" (bỏ key `moreOptions.all`).
+  - Icon mục 4 "Thủ tục nhanh gọn": Phosphor không có `FileCheck` → dùng `ClipboardText` (giá trị lưu vẫn `file-check` theo spec). (Vạch dọc trang trí cạnh caption: round 1 bỏ, round 2 đã thêm lại bằng border token.)
+  - Không thêm key `page.home.hero.counter` (task §7): bộ đếm `aria-hidden`, slide đã có `aria-label` "Slide i / n" nên chuỗi này không có chỗ dùng (YAGNI).
 - Reviewer verdict: …
+
+## Round 2 — sửa theo review round 1 (builder — 2026-10-20)
+- M1 (down migration): `migrations/20261020_103248_homepage_redesign.ts` `down` thêm `DELETE FROM "homepage_block_order" WHERE "block" = 'strengths'` trước khi đổi enum (mẫu `20261019_144259`). `homepage-migration.test.ts` insert 1 dòng `strengths` + 1 `about` trước `redesign.down`, assert chỉ còn `about`. Không sửa migration đã apply khác.
+- M2: hàng "Tùy chọn khác" ≥ md là lưới `grid-cols-5` đều (nhãn hàng cố định `md:w-40`, chip `w-full min-w-0`, trigger đã `truncate`) → luôn 1 hàng cả khi `<select>` gốc lẫn sau hydrate. Đo thật sau hydrate (Browser, 1440): 5 chip cùng `top`, mỗi chip 131px. Ảnh chụp lại sau hydrate: `.context/review-reports/assets/homepage-redesign-t01-r2-1440.png` (và `-390.png`, qua iframe 390px).
+- M3: mỗi đoạn thanh tiến trình `h-11 min-w-11` (vùng chạm ≥ 44px), vạch vẽ vẫn `h-0.5`; nhóm `style.minWidth = số đoạn × 2.75rem`, cụm đáy `flex-wrap` nên màn hẹp thanh xuống hàng riêng. Test: mọi đoạn có `min-w-11`/`h-11`, 8 slide → `minWidth 22rem`.
+- m1: chip dự án ≥ md `flex-wrap` + `h-10 overflow-hidden` (chip không vừa rớt xuống hàng ẩn, không cắt giữa chữ); chip có `title` + `truncate` + `max-w-full`; `focus-within` mở hàng khi chip ẩn nhận focus bàn phím.
+- m2: 1 slide → ẩn bộ đếm (và thanh tiến trình đã ẩn từ trước).
+- m3: bỏ `display: contents` ở tabpanel + `form role=search`; hàng chip dựng bằng `renderChips(scope)` ở cả 2 panel (id duy nhất theo scope, panel ẩn không vào a11y tree) thay cho `order`. Test khẳng định không còn class `contents`.
+- m5: bộ đếm hiển thị đầu cụm, sát mép trái chữ (DOM vẫn để Dừng/Phát đầu thứ tự tab, đổi vị trí hiển thị bằng `order`); thêm vạch dọc `border-l border-on-dark/40` (token sẵn có) cạnh caption/nút cuộn phía phải như mockup. Hero `100svh` GIỮ (spec F1) — chỉ ghi lệch ở dưới. Chưa hỏi user về các lệch này: ghi nhận để dispatcher/user xác nhận.
+- m6: vòng icon `bg-primary-soft` + icon `text-accent-text` (≈3,5:1 trên `primary-soft`, ≥ 3:1) — token sẵn có.
+- m7: viền chip control `border-input-border` (≥ 3:1); nút tròn mở chip cũng `border-input-border`.
+- m4: KHÔNG làm data migration ở T01 — để T03 (seed/hướng dẫn admin cho `blockOrder` cũ không có `strengths`).
+- Verify (round 2): `pnpm typecheck` PASS; `pnpm lint` 0 error (2 warning có sẵn `tools/task-dashboard/server.mjs`); `pnpm test` → `Test Files 302 passed (302) / Tests 3187 passed (3187)` (gồm integration trên DB thật, kể cả migration down với dòng `strengths`). `pnpm build` không chạy (dev server dùng chung `.next`).
+- Lệch mockup còn lại: hero `100svh` (mockup thấp hơn ~750px, spec F1 chốt `100svh`); chip hiện tên ô như mockup; chip "Loại căn hộ" có thể ellipsis ở các tên danh mục dài (dropdown hiện đủ); trước hydrate/không JS ô là `<select>` gốc nhưng cùng lưới 5 cột nên không còn xuống 2 hàng; vạch dọc trang trí đặt cạnh nút cuộn (mockup tương tự). Đã bỏ dòng "bỏ vạch dọc" ở round 1.

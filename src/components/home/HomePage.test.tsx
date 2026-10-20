@@ -12,7 +12,7 @@ import { HomePage } from "./HomePage";
 describe("HomePage", () => {
   it("nhúng JSON-LD Organization + WebSite; trang chủ rỗng (global lỗi) vẫn có đúng một h1", async () => {
     loadHomePage.mockResolvedValue({
-      view: { hero: [], heroSearch: null, blocks: [] },
+      view: { hero: [], heroEyebrow: null, heroCaption: null, heroSearch: null, blocks: [] },
       siteName: "TAMI HOMES",
       structuredData: [
         buildOrganizationJsonLd({ name: "TAMI HOMES", siteUrl: "https://tami.test" }),
@@ -26,7 +26,7 @@ describe("HomePage", () => {
   });
 
   it("chưa có URL gốc (structuredData rỗng) thì không có script JSON-LD", async () => {
-    loadHomePage.mockResolvedValue({ view: { hero: [], heroSearch: null, blocks: [] }, siteName: "TAMI", structuredData: [] });
+    loadHomePage.mockResolvedValue({ view: { hero: [], heroEyebrow: null, heroCaption: null, heroSearch: null, blocks: [] }, siteName: "TAMI", structuredData: [] });
     const { container } = renderWithIntl(await HomePage({ locale: "en" }), "en");
     expect(container.querySelector('script[type="application/ld+json"]')).toBeNull();
   });

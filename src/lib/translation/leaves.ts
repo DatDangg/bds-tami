@@ -21,7 +21,7 @@ export const TRANSLATABLE_FIELDS = {
   categories: ["name", "description", "seo"],
   developers: ["name", "description"],
   "site-settings": ["siteName", "address"],
-  homepage: ["announcementBar", "hero", "heroSearch", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news", "seo"],
+  homepage: ["announcementBar", "hero", "heroSearch", "strengths", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news", "seo"],
   header: ["navItems", "ctaButton"],
   footer: ["columns", "contactBlock", "copyright"],
 } as const satisfies Record<string, readonly string[]>;

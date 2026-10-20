@@ -2637,6 +2637,10 @@ export interface Homepage {
     link?: string | null;
   };
   hero: {
+    /**
+     * Vd: "TAMI HOMES". Hiện trên mọi slide, viết hoa giãn chữ.
+     */
+    eyebrow?: string | null;
     slides: {
       image: string | Media;
       /**
@@ -2644,6 +2648,7 @@ export interface Homepage {
        */
       video?: (string | null) | Media;
       title?: string | null;
+      titleAccent?: string | null;
       subtitle?: string | null;
       ctaLabel?: string | null;
       /**
@@ -2652,6 +2657,10 @@ export interface Homepage {
       ctaLink?: string | null;
       id?: string | null;
     }[];
+    /**
+     * ≤ 2 dòng, hiện ở góc dưới phải banner trên mọi slide.
+     */
+    caption?: string | null;
   };
   heroSearch?: {
     enabled?: boolean | null;
@@ -2664,9 +2673,34 @@ export interface Homepage {
      */
     chipProjects?: (string | Project)[] | null;
   };
+  /**
+   * Khối chỉ hiện khi có trong mục Thứ tự khối.
+   */
+  strengths?: {
+    enabled?: boolean | null;
+    /**
+     * 2–6 mục; mỗi mục gồm biểu tượng, tiêu đề ngắn và một dòng mô tả.
+     */
+    items?:
+      | {
+          icon: 'map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star';
+          title: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
   about?: {
     enabled?: boolean | null;
+    /**
+     * Để trống thì dùng "Về chúng tôi".
+     */
+    eyebrow?: string | null;
     title?: string | null;
+    /**
+     * Vd: tiêu đề "Về" + phần vàng "TAMI HOMES".
+     */
+    titleAccent?: string | null;
     content?: {
       root: {
         type: string;
@@ -2683,8 +2717,23 @@ export interface Homepage {
       [k: string]: unknown;
     } | null;
     image?: (string | null) | Media;
+    secondaryImage?: (string | null) | Media;
+    /**
+     * Thẻ trắng nhỏ đè góc dưới trái ảnh; vài dòng ngắn.
+     */
+    imageCaption?: string | null;
+    /**
+     * Nút play mở video trong hộp thoại. Để trống thì ẩn nút.
+     */
+    videoUrl?: string | null;
+    /**
+     * Để trống thì dùng "Khám phá TAMI HOMES".
+     */
+    videoLabel?: string | null;
     stats?:
       | {
+          icon?:
+            ('map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star') | null;
           /**
            * Vd: 10+, 1.500
            */
@@ -2696,10 +2745,21 @@ export interface Homepage {
           id?: string | null;
         }[]
       | null;
+    ctaLabel?: string | null;
+    /**
+     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     */
+    ctaLink?: string | null;
+    /**
+     * Chỉ hiện trên màn hình rất rộng (≥ 1280px), không mang nội dung.
+     */
+    decorImage?: (string | null) | Media;
   };
   featuredProjects?: {
     enabled?: boolean | null;
+    eyebrow?: string | null;
     title?: string | null;
+    description?: string | null;
     /**
      * Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.
      */
@@ -2772,12 +2832,20 @@ export interface Homepage {
     secondaryLink?: string | null;
   };
   /**
-   * Banner đầu trang luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).
+   * Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích Hiển thị) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.
    */
   blockOrder?:
     | {
         block:
-          'about' | 'featuredProjects' | 'services' | 'featuredOffers' | 'partners' | 'ctaBanner' | 'rentals' | 'news';
+          | 'strengths'
+          | 'about'
+          | 'featuredProjects'
+          | 'services'
+          | 'featuredOffers'
+          | 'partners'
+          | 'ctaBanner'
+          | 'rentals'
+          | 'news';
         id?: string | null;
       }[]
     | null;
@@ -3024,17 +3092,20 @@ export interface HomepageSelect<T extends boolean = true> {
   hero?:
     | T
     | {
+        eyebrow?: T;
         slides?:
           | T
           | {
               image?: T;
               video?: T;
               title?: T;
+              titleAccent?: T;
               subtitle?: T;
               ctaLabel?: T;
               ctaLink?: T;
               id?: T;
             };
+        caption?: T;
       };
   heroSearch?:
     | T
@@ -3043,26 +3114,51 @@ export interface HomepageSelect<T extends boolean = true> {
         placeholder?: T;
         chipProjects?: T;
       };
+  strengths?:
+    | T
+    | {
+        enabled?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
   about?:
     | T
     | {
         enabled?: T;
+        eyebrow?: T;
         title?: T;
+        titleAccent?: T;
         content?: T;
         image?: T;
+        secondaryImage?: T;
+        imageCaption?: T;
+        videoUrl?: T;
+        videoLabel?: T;
         stats?:
           | T
           | {
+              icon?: T;
               value?: T;
               label?: T;
               id?: T;
             };
+        ctaLabel?: T;
+        ctaLink?: T;
+        decorImage?: T;
       };
   featuredProjects?:
     | T
     | {
         enabled?: T;
+        eyebrow?: T;
         title?: T;
+        description?: T;
         projects?: T;
       };
   services?:

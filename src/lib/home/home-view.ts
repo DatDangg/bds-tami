@@ -1,5 +1,6 @@
 import type { MediaImage } from "../../components/media/ResponsiveImage";
-import { HOMEPAGE_BLOCKS } from "../../globals/Homepage";
+import { parseVideoUrl } from "../../components/media/video-url";
+import { HOMEPAGE_BLOCKS, HOMEPAGE_DEFAULT_BLOCK_ORDER, type StrengthIcon } from "../../globals/Homepage";
 import type { Locale } from "../../i18n/routing";
 import type { Homepage, News, Project, PropertyPost, Province, Service } from "../../payload-types";
 import { announcementHash } from "./announcement-hash";
@@ -17,12 +18,14 @@ import { type ServiceCardData, toServiceCards } from "../services/service-view";
 export type HomeBlockKey = (typeof HOMEPAGE_BLOCKS)[number];
 
 /** Khối ĐÃ có giao diện. `partners` (FR-PUB-17, Should) làm ở task riêng: tới lúc đó thứ tự/bật tắt của nó được bỏ qua. */
-/** Khối có chữ mặc định theo ngôn ngữ nên KHÔNG bị ẩn khi CMS chưa đặt tiêu đề (global mới chưa có tiêu đề cho hai khối này). */
-const TITLE_OPTIONAL_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["rentals", "news"]);
+/** Khối có chữ mặc định theo ngôn ngữ (rentals/news) hoặc không có tiêu đề khối (strengths) nên KHÔNG bị ẩn khi CMS chưa đặt tiêu đề. */
+const TITLE_OPTIONAL_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "rentals", "news"]);
 
-const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["about", "featuredProjects", "services", "featuredOffers", "ctaBanner", "rentals", "news"]);
+const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "about", "featuredProjects", "services", "featuredOffers", "ctaBanner", "rentals", "news"]);
 
 export const FEATURED_OFFERS_MAX = 6;
+/** Khối Điểm mạnh cần ≥ 2 mục hiển thị được (BL-044). */
+const STRENGTHS_MIN_ITEMS = 2;
 
 const VIDEO_MIME_TYPES: readonly string[] = ["video/mp4", "video/webm"];
 const CONTACT_FALLBACK = "contact";
@@ -34,6 +37,8 @@ export interface HeroSlideView {
   /** URL video (tuỳ chọn); chỉ phát ở ≥ 1024px, không reduced-motion, không Save-Data. */
   videoUrl: string | null;
   title: string;
+  /** Dòng 2 của tiêu đề, màu vàng (BL-044); trống → "". */
+  titleAccent: string;
   subtitle: string;
   ctaLabel: string;
   /** `null` khi thiếu nhãn hoặc link không hợp lệ: không dựng nút. */
@@ -57,11 +62,30 @@ export interface ProjectSlideView {
 
 export interface AboutView {
   kind: "about";
+  /** `null` → nơi hiển thị dùng i18n "Về chúng tôi". */
+  eyebrow: string | null;
   title: string;
+  /** Phần tiêu đề màu vàng đứng sau `title` (BL-044). */
+  titleAccent: string | null;
   /** Lexical (richText) của `about.content`. */
   content: unknown;
   image: MediaImage | null;
-  stats: { value: string; label: string }[];
+  /** Ảnh phụ đè góc trên trái ảnh minh hoạ. */
+  secondaryImage: MediaImage | null;
+  imageCaption: string | null;
+  /** URL nhúng YouTube dựng từ ID đã kiểm (`parseVideoUrl`); link khác/không hợp lệ → `null` (ẩn nút play, D3). */
+  videoEmbedUrl: string | null;
+  videoLabel: string | null;
+  stats: { value: string; label: string; icon: StrengthIcon | null }[];
+  /** Nút cuối khối: chỉ khi có cả nhãn lẫn link hợp lệ. */
+  cta: { label: string; href: string } | null;
+  /** Ảnh trang trí mép phải (chỉ ≥ xl, `aria-hidden`). */
+  decorImage: MediaImage | null;
+}
+
+export interface StrengthsView {
+  kind: "strengths";
+  items: { icon: StrengthIcon; title: string; description: string | null }[];
 }
 
 export interface CtaBannerView {
@@ -101,12 +125,15 @@ export interface HeroSearchView {
   projectsHref: string;
   /** Tỉnh/thành cho ô lọc của tab Dự án (cùng nguồn `listProvinces` với `/du-an`). */
   provinces: { slug: string; name: string }[];
+  /** Danh mục cho thuê cấp 1 cho ô "Loại căn hộ" của hàng "Tùy chọn khác" (cùng nguồn với `/cho-thue`; `/en` chỉ bản có EN). */
+  rentalCategories: { slug: string; name: string }[];
   chips: HeroSearchChipView[];
 }
 
 export type HomeBlockView =
+  | StrengthsView
   | AboutView
-  | { kind: "featuredProjects"; title: string; slides: ProjectSlideView[] }
+  | { kind: "featuredProjects"; title: string; eyebrow: string | null; description: string | null; slides: ProjectSlideView[] }
   | { kind: "services"; title: string; items: ServiceCardData[] }
   | { kind: "featuredOffers"; title: string; cards: PostCardData[] }
   | RentalsBlockView
@@ -115,6 +142,9 @@ export type HomeBlockView =
 
 export interface HomeView {
   hero: HeroSlideView[];
+  /** Chữ nhỏ trên tiêu đề / chú thích góc dưới phải, CHUNG mọi slide (BL-044 Q4); trống → null. */
+  heroEyebrow: string | null;
+  heroCaption: string | null;
   /** `null` khi tắt ô tìm kiếm. */
   heroSearch: HeroSearchView | null;
   blocks: HomeBlockView[];
@@ -129,6 +159,8 @@ export interface HomeDocs {
   chipProjects: Project[];
   /** Tỉnh/thành cho ô lọc của tab Dự án (rỗng khi ô tìm kiếm không hiển thị). */
   provinces: Province[];
+  /** Danh mục cho thuê cấp 1 (đã đọc như khách theo ngôn ngữ) cho hàng "Tùy chọn khác"; rỗng khi ô tìm kiếm không hiển thị. */
+  rentalCategories: { slug: string; name: string }[];
   /** Tab của khối Cho thuê, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
   rentalTabs: HomeRentalTabDocs[];
   /** Bài của khối Tin tức, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
@@ -137,15 +169,17 @@ export interface HomeDocs {
 
 const text = (value: string | null | undefined): string => value?.trim() ?? "";
 
-/** Thứ tự khối theo `blockOrder` (mỗi khối một lần); chưa có `blockOrder` (cài mới) thì thứ tự mặc định. Khối không nằm trong mảng thì không hiện. */
+/** Thứ tự khối theo `blockOrder` (mỗi khối một lần); chưa có `blockOrder` (cài mới) thì thứ tự mặc định BL-044 (4 khối mockup). Khối không nằm trong mảng thì không hiện. */
 function orderedBlocks(homepage: Homepage): HomeBlockKey[] {
   const rows = homepage.blockOrder?.map((row) => row.block) ?? [];
-  const order = rows.length > 0 ? rows : [...HOMEPAGE_BLOCKS];
+  const order: HomeBlockKey[] = rows.length > 0 ? rows : [...HOMEPAGE_DEFAULT_BLOCK_ORDER];
   return order.filter((block, index) => order.indexOf(block) === index);
 }
 
 function titleOf(homepage: Homepage, block: HomeBlockKey): string {
-  return text(homepage[block]?.title);
+  // `strengths` không có tiêu đề khối (nằm trong TITLE_OPTIONAL_BLOCKS).
+  const group = homepage[block];
+  return group && "title" in group ? text(group.title) : "";
 }
 
 function isEnabled(homepage: Homepage, block: HomeBlockKey): boolean {
@@ -176,6 +210,7 @@ function toHeroSlides(homepage: Homepage, locale: Locale): HeroSlideView[] {
         image,
         videoUrl: video?.url && VIDEO_MIME_TYPES.includes(video.mimeType ?? "") ? video.url : null,
         title,
+        titleAccent: text(slide.titleAccent),
         subtitle: text(slide.subtitle),
         ctaLabel,
         ctaHref: ctaLabel ? (resolveNavLink(slide.ctaLink, locale)?.href ?? null) : null,
@@ -184,15 +219,41 @@ function toHeroSlides(homepage: Homepage, locale: Locale): HeroSlideView[] {
   });
 }
 
-function toAbout(homepage: Homepage): AboutView {
+/** Nhãn + link: chỉ có nút khi có CẢ hai và link hợp lệ (cùng luật với nút phụ của CTA). */
+function toButton(label: string | null | undefined, link: string | null | undefined, locale: Locale): { label: string; href: string } | null {
+  const trimmed = text(label);
+  const href = trimmed ? (resolveNavLink(link, locale)?.href ?? null) : null;
+  return href ? { label: trimmed, href } : null;
+}
+
+function toAbout(homepage: Homepage, locale: Locale): AboutView {
   const about = homepage.about;
+  const video = parseVideoUrl(about?.videoUrl);
   return {
     kind: "about",
+    eyebrow: text(about?.eyebrow) || null,
     title: titleOf(homepage, "about"),
+    titleAccent: text(about?.titleAccent) || null,
     content: about?.content ?? null,
     image: toPublicImage(renderableImage(about?.image)),
-    stats: (about?.stats ?? []).flatMap((stat) => (text(stat.value) && text(stat.label) ? [{ value: text(stat.value), label: text(stat.label) }] : [])),
+    secondaryImage: toPublicImage(renderableImage(about?.secondaryImage)),
+    imageCaption: text(about?.imageCaption) || null,
+    // Schema đã chặn link ngoài YouTube; kiểm lại để dữ liệu cũ/API không dựng iframe lạ.
+    videoEmbedUrl: video?.provider === "youtube" ? video.embedUrl : null,
+    videoLabel: text(about?.videoLabel) || null,
+    stats: (about?.stats ?? []).flatMap((stat) => (text(stat.value) && text(stat.label) ? [{ value: text(stat.value), label: text(stat.label), icon: stat.icon ?? null }] : [])),
+    cta: toButton(about?.ctaLabel, about?.ctaLink, locale),
+    decorImage: toPublicImage(renderableImage(about?.decorImage)),
   };
+}
+
+/** Điểm mạnh: mục thiếu tiêu đề (ở `/en` = chưa dịch) bị bỏ; còn < 2 mục thì ẩn khối. */
+function toStrengths(homepage: Homepage): StrengthsView | null {
+  const items = (homepage.strengths?.items ?? []).flatMap((item) => {
+    const title = text(item.title);
+    return title ? [{ icon: item.icon, title, description: text(item.description) || null }] : [];
+  });
+  return items.length >= STRENGTHS_MIN_ITEMS ? { kind: "strengths", items } : null;
 }
 
 const positiveOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && value > 0 ? value : null);
@@ -256,6 +317,7 @@ function toHeroSearch(homepage: Homepage, docs: HomeDocs, locale: Locale): HeroS
     rentalsHref: resolveNavLink("rentals", locale)?.href ?? "/",
     projectsHref: resolveNavLink("projects", locale)?.href ?? "/",
     provinces: docs.provinces.map((province) => ({ slug: province.slug, name: province.shortName || province.name })),
+    rentalCategories: docs.rentalCategories,
     chips,
   };
 }
@@ -264,11 +326,14 @@ function toHeroSearch(homepage: Homepage, docs: HomeDocs, locale: Locale): HeroS
 function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale: Locale, now: Date): HomeBlockView | null {
   const title = titleOf(homepage, block);
   switch (block) {
+    case "strengths":
+      return toStrengths(homepage);
     case "about":
-      return toAbout(homepage);
+      return toAbout(homepage, locale);
     case "featuredProjects": {
       const slides = toProjectSlides(docs.projects, locale);
-      return slides.length > 0 ? { kind: "featuredProjects", title, slides } : null;
+      const featured = homepage.featuredProjects;
+      return slides.length > 0 ? { kind: "featuredProjects", title, eyebrow: text(featured?.eyebrow) || null, description: text(featured?.description) || null, slides } : null;
     }
     case "services": {
       const items = toServiceCards(docs.services, locale).map((item) => ({ ...item, cover: toPublicImage(item.cover) }));
@@ -298,5 +363,11 @@ export function buildHomeView(homepage: Homepage, docs: HomeDocs, locale: Locale
     const block = toBlock(key, homepage, docs, locale, now);
     return block ? [block] : [];
   });
-  return { hero: toHeroSlides(homepage, locale), heroSearch: toHeroSearch(homepage, docs, locale), blocks };
+  return {
+    hero: toHeroSlides(homepage, locale),
+    heroEyebrow: text(homepage.hero?.eyebrow) || null,
+    heroCaption: text(homepage.hero?.caption) || null,
+    heroSearch: toHeroSearch(homepage, docs, locale),
+    blocks,
+  };
 }

@@ -1239,13 +1239,19 @@
         {
           "task": "phase-1-task-01",
           "file": "tasks/feature-homepage-redesign/phase-1-task-01.md",
-          "status": "in_progress",
-          "attempt": 0,
-          "round": 0,
-          "note": "schema global homepage + migration additive + view model + hero chữ trái/bộ đếm + ô tìm kiếm Tùy chọn khác + khối Điểm mạnh",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "schema global homepage + migration additive + view model + hero chữ trái/bộ đếm + ô tìm kiếm Tùy chọn khác + khối Điểm mạnh | r1 STRICT FAIL: M1 down migration không xoá block strengths; M2 hàng Tùy chọn khác 2 dòng ở 1440; M3 segment thanh tiến trình < 44px mobile; m1–m7 → builder sửa round 2 → r2 STRICT PASS (n1 lệch mockup hero 100svh/vị trí bộ đếm → hỏi user; n2 8 slide <368px đoạn cuối bị cắt; n3 thiếu test 1 slide; n5 key trùng). Migration 20261020_103248_homepage_redesign additive; pnpm test 302/3187 PASS; docImpact dời T03 (ERD §4.15, design-spec S01)",
           "reviewLevel": "STRICT",
-          "reviewerResult": null,
-          "report": null
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-homepage-redesign-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-01-round-2-review.md"
+          ],
+          "completedAt": "2026-10-20",
+          "commit": "(commit close-out T01)"
         },
         {
           "task": "phase-1-task-02",

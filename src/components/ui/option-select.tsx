@@ -37,7 +37,15 @@ interface OptionSelectProps {
    * Dùng cho form GET ở Server Component (ProjectFilters, JobFilters).
    */
   progressive?: boolean;
+  /**
+   * `chip`: viên thuốc nhỏ theo tokens §10 Chip/Tab lọc (cao 40px, < md 44px, viền `input-border` ≥ 3:1 (WCAG 1.4.11), đang chọn nền `primary-soft`) cho hàng
+   * "Tùy chọn khác" của ô tìm kiếm trang chủ (BL-044); dropdown vẫn là Select TAMI. Mặc định: ô chọn 48px của form.
+   */
+  variant?: "default" | "chip";
 }
+
+/** Lớp chip ghép từ token (không kiểu mới): bo viên thuốc, viền `border`, chữ nhỏ; chọn rồi thì nền `primary-soft`. */
+const chipClass = (selected: boolean) => cn("h-11 gap-1.5 rounded-pill border-input-border pr-2.5 pl-3.5 text-small md:h-10", selected ? "bg-primary-soft" : "hover:border-accent-text");
 
 const nativeClass =
   "block h-12 w-full min-w-0 cursor-pointer appearance-none truncate rounded-md border border-input bg-surface py-0 pr-10 pl-4 font-sans text-body text-text focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 aria-invalid:border-error";
@@ -54,6 +62,7 @@ export function OptionSelect({
   disabled,
   className,
   progressive = false,
+  variant = "default",
   ...aria
 }: OptionSelectProps) {
   const [inner, setInner] = useState(defaultValue);
@@ -70,11 +79,12 @@ export function OptionSelect({
     setInner(next);
     onValueChange?.(next);
   };
+  const variantClass = variant === "chip" ? chipClass(current !== "") : undefined;
 
   if (!mounted) {
     return (
       <div className="relative">
-        <select id={id} name={name} {...(isControlled ? { value: rawCurrent } : { defaultValue })} disabled={disabled} onChange={(event) => change(event.target.value)} className={cn(nativeClass, className)} {...aria}>
+        <select id={id} name={name} {...(isControlled ? { value: rawCurrent } : { defaultValue })} disabled={disabled} onChange={(event) => change(event.target.value)} className={cn(nativeClass, variantClass, className)} {...aria}>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -89,7 +99,7 @@ export function OptionSelect({
   return (
     <>
       <Select value={radixValue} onValueChange={(next) => change(fromRadix(next))} disabled={disabled}>
-        <SelectTrigger id={id} className={className} {...aria}>
+        <SelectTrigger id={id} className={cn(variantClass, className)} {...aria}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

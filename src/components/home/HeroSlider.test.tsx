@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { HeroSlideView } from "@/lib/home/home-view";
@@ -9,6 +9,7 @@ const slide = (n: number, overrides: Partial<HeroSlideView> = {}): HeroSlideView
   image: fakeMedia(`hero-${n}`),
   videoUrl: null,
   title: `Tiêu đề ${n}`,
+  titleAccent: "",
   subtitle: `Phụ đề ${n}`,
   ctaLabel: `Nút ${n}`,
   ctaHref: `/du-an?s=${n}`,
@@ -158,14 +159,49 @@ describe("HeroSlider", () => {
     expect(labels.slice(0, 3)).toEqual(["Dừng trình chiếu", "Chuyển tới slide 1", "Chuyển tới slide 2"]);
   });
 
-  it("8 slide: Dừng/Phát và chấm cùng một nhóm điều khiển (xếp dọc ở mobile, ngang từ sm), không đặt absolute riêng để đè chấm", () => {
+  it("8 slide: Dừng/Phát, bộ đếm và thanh tiến trình cùng một cụm góc dưới trái; mỗi đoạn co giãn (flex-1) trong bề rộng cố định nên không tràn ở 390px", () => {
     renderWithIntl(<HeroSlider slides={Array.from({ length: 8 }, (_, n) => slide(n + 1))} />);
     const pause = screen.getByRole("button", { name: "Dừng trình chiếu" });
-    const dots = screen.getByRole("group", { name: "Chọn slide" });
-    expect(pause.parentElement).toBe(dots.parentElement);
+    const bar = screen.getByRole("group", { name: "Chọn slide" });
+    expect(pause.parentElement).toBe(bar.parentElement);
     expect(pause.className).not.toContain("absolute");
     expect(pause.className).toContain("size-11");
-    expect(dots.parentElement?.className).toMatch(/flex-col.*sm:flex-row/);
+    expect(within(bar).getAllByRole("button")).toHaveLength(8);
+    // Vùng chạm ≥ 44px (M3 round 1): mỗi đoạn `min-w-11 h-11`, nhóm có minWidth = số đoạn × 2.75rem; vạch vẽ vẫn mảnh.
+    for (const segment of within(bar).getAllByRole("button")) {
+      expect(segment.className).toContain("min-w-11");
+      expect(segment.className).toContain("h-11");
+    }
+    expect(bar.style.minWidth).toBe("22rem");
+  });
+
+  it("BL-044: bộ đếm `01 / 03` (aria-hidden, đổi theo slide) + thanh tiến trình = số slide, đoạn đang xem vàng; eyebrow/caption chung mọi slide; chữ canh trái; không còn chấm tròn", () => {
+    renderWithIntl(<HeroSlider slides={[slide(1, { titleAccent: "sẵn sàng vào ở" }), slide(2), slide(3)]} eyebrow="TAMI HOMES" caption="Không gian sống đẳng cấp" />);
+    const counter = document.querySelector("[aria-hidden='true'].tabular-nums") as HTMLElement;
+    expect(counter).toHaveTextContent("01 / 03");
+    const bar = screen.getByRole("group", { name: "Chọn slide" });
+    const segments = within(bar).getAllByRole("button");
+    expect(segments).toHaveLength(3);
+    expect(segments[0]?.querySelector("span")?.className).toContain("bg-primary");
+    expect(segments[1]?.querySelector("span")?.className).not.toContain("bg-primary");
+    expect(bar.querySelector(".rounded-full")?.className).toContain("h-0.5");
+    expect(screen.getByRole("link", { name: "Nút 1" }).querySelector("svg")).not.toBeNull();
+    fireEvent.click(segments[2] as HTMLElement);
+    expect(counter).toHaveTextContent("03 / 03");
+    expect(segments[2]).toHaveAttribute("aria-current", "true");
+    expect(screen.getByText("sẵn sàng vào ở").className).toContain("text-primary");
+    expect(screen.getAllByText("TAMI HOMES")).toHaveLength(3);
+    expect(screen.getByText("Không gian sống đẳng cấp").className).toContain("line-clamp-2");
+    expect(screen.getByText("Tiêu đề 1").parentElement?.className).toMatch(/items-start.*text-left/);
+  });
+
+  it("1 slide: ẩn bộ đếm và thanh tiến trình; mũi tên Trước/Sau là nút tròn viền khi có ≥ 2 slide", () => {
+    renderWithIntl(<HeroSlider slides={[slide(1)]} />);
+    expect(document.querySelector("[aria-hidden='true'].tabular-nums")).toBeNull();
+    expect(screen.queryByRole("group", { name: "Chọn slide" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Slide sau" })).toBeNull();
+    renderWithIntl(<HeroSlider slides={[slide(1), slide(2)]} />);
+    expect(screen.getByRole("button", { name: "Slide sau" }).className).toContain("border-on-dark/40");
   });
 
   it("prefers-reduced-motion: không autoplay, không hiện nút Dừng", () => {

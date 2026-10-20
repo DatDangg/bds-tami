@@ -761,7 +761,27 @@
         "keywordLabel": "Keyword to find apartments for rent",
         "placeholder": "Enter an area, building name or apartment type",
         "submit": "Search",
-        "chips": "Popular projects"
+        "chips": "Popular projects",
+        "expandChips": "Show more projects",
+        "collapseChips": "Show fewer projects",
+        "moreOptions": {
+          "label": "More options",
+          "price": "Price",
+          "area": "Area",
+          "category": "Apartment type",
+          "furnishing": "Furnishing",
+          "amenities": "Amenities"
+        },
+        "areaHints": {
+          "under30": "< 30 m²",
+          "from30to50": "30-50 m²",
+          "from50to80": "50-80 m²",
+          "from80to120": "80-120 m²",
+          "over120": "> 120 m²"
+        }
+      },
+      "strengths": {
+        "region": "Why TAMI"
       },
       "projects": {
         "viewAll": "View all",
