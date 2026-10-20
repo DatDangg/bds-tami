@@ -7,6 +7,7 @@ import {
   rentalCountApiPath,
   rentalListQueryString,
   RENTAL_LIST_PAGE_SIZE,
+  secondaryFilterCount,
   toRentalSearchParams,
   type RentalFilters,
 } from "./url-params";
@@ -82,6 +83,13 @@ describe("parseRentalFilters", () => {
   it("trang vượt trần bị bỏ về 1", () => {
     expect(parseRentalFilters({ page: "501" }).page).toBe(1);
   });
+
+  it("amenities: chuỗi phẩy hoặc mảng (form GET lặp khoá); giá trị lạ/trùng bị bỏ; thứ tự ổn định theo RENTAL_AMENITIES; rỗng thì không có khoá", () => {
+    expect(parseRentalFilters({ amenities: "gym,pool,foo,gym" }).amenities).toEqual(["pool", "gym"]);
+    expect(parseRentalFilters({ amenities: ["gym", "pool,elevator"] }).amenities).toEqual(["pool", "gym", "elevator"]);
+    expect(parseRentalFilters({ amenities: "foo" })).toEqual({ sort: "newest", page: 1 });
+    expect(parseRentalFilters({ amenities: "" })).toEqual({ sort: "newest", page: 1 });
+  });
 });
 
 describe("rentalListQueryString", () => {
@@ -96,6 +104,7 @@ describe("rentalListQueryString", () => {
     areaMax: 60,
     bedrooms: 2,
     furnishing: "basic",
+    amenities: ["pool", "gym"],
     sort: "price_asc",
     page: 2,
   };
@@ -111,6 +120,11 @@ describe("rentalListQueryString", () => {
     expect(rentalListQueryString({ province: "ha-noi", q: "a", sort: "newest", page: 1 })).toBe("?q=a&province=ha-noi");
   });
 
+  it("amenities ghi một khoá `a,b` sau furnishing; mảng rỗng không xuất hiện", () => {
+    expect(rentalListQueryString({ furnishing: "full", amenities: ["pool", "gym"], sort: "newest", page: 1 })).toBe("?furnishing=full&amenities=pool%2Cgym");
+    expect(rentalListQueryString({ amenities: [], sort: "newest", page: 1 })).toBe("");
+  });
+
   it("mã hoá ký tự đặc biệt của q", () => {
     expect(rentalListQueryString({ q: "a&b=c", sort: "newest", page: 1 })).toBe("?q=a%26b%3Dc");
   });
@@ -124,6 +138,12 @@ describe("activeFilterCount / hasNarrowingParams", () => {
   it("đếm điều kiện lọc (khoảng giá/diện tích tính 1), không đếm sort/page; phường tính", () => {
     expect(activeFilterCount({ sort: "price_asc", page: 4 })).toBe(0);
     expect(activeFilterCount({ q: "x", province: "ha-noi", ward: "w", priceMin: 1, priceMax: 2, areaMin: 1, bedrooms: 3, furnishing: "none", category: "c", sort: "newest", page: 1 })).toBe(8);
+  });
+
+  it("mỗi tiện ích đếm 1 (khớp số chip Đang lọc), cả tổng lẫn lọc phụ", () => {
+    expect(activeFilterCount({ amenities: ["pool", "gym"], sort: "newest", page: 1 })).toBe(2);
+    expect(secondaryFilterCount({ amenities: ["pool", "gym"], furnishing: "full", sort: "newest", page: 1 })).toBe(3);
+    expect(hasNarrowingParams({ amenities: ["pool"], sort: "newest", page: 1 })).toBe(true);
   });
 
   it("hasNarrowingParams: chỉ page/sort không làm trang noindex, bộ lọc thì có; lọc gốc theo danh mục hoặc tỉnh vẫn index", () => {
@@ -150,5 +170,10 @@ describe("toRentalSearchParams", () => {
     const url = new URL(path, "http://x");
     expect(url.pathname).toBe("/api/public/rentals");
     expect(Object.fromEntries(url.searchParams)).toEqual({ q: "studio", province: "ha-noi", locale: "vi", limit: "1", available: "true" });
+  });
+
+  it("amenities đi qua schema API nguyên mảng và vào đường dẫn đếm dạng `a,b`", () => {
+    expect(toRentalSearchParams({ amenities: ["pool", "gym"], sort: "newest", page: 1 }, "vi").amenities).toEqual(["pool", "gym"]);
+    expect(new URL(rentalCountApiPath({ amenities: ["pool", "gym"], sort: "newest", page: 1 }, "vi"), "http://x").searchParams.get("amenities")).toBe("pool,gym");
   });
 });

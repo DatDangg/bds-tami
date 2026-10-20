@@ -12,10 +12,16 @@ export interface RentalsRequest {
   headers: Headers;
 }
 
-/** Đọc query string -> tham số đã kiểm. Khoá lặp (`?q=a&q=b`) lấy giá trị đầu; khoá lạ bị bỏ qua. */
+/**
+ * Đọc query string -> tham số đã kiểm. Khoá lặp (`?q=a&q=b`) lấy giá trị đầu; khoá lạ bị bỏ qua.
+ * Riêng `amenities` (danh sách, API_SPEC §3.3) gộp mọi lần xuất hiện: `?amenities=pool&amenities=gym` ≡ `?amenities=pool,gym`
+ * (form không JS của trang `/cho-thue` cũng gửi dạng lặp) — schema tách phẩy, bỏ trùng và lọc theo danh sách.
+ */
 export function parseRentalSearchParams(url: string): ValidationOutcome<RentalSearchParams> {
-  const raw: Record<string, string> = {};
-  for (const [key, value] of new URL(url).searchParams) if (!(key in raw)) raw[key] = value;
+  const { searchParams } = new URL(url);
+  const raw: Record<string, string | string[]> = {};
+  for (const [key, value] of searchParams) if (!(key in raw)) raw[key] = value;
+  if ("amenities" in raw) raw.amenities = searchParams.getAll("amenities");
   const parsed = rentalSearchParamsSchema.safeParse(raw);
   if (parsed.success) return { ok: true, value: parsed.data };
   return { ok: false, details: parsed.error.issues.map((issue) => ({ path: issue.path, message: issue.message })) };

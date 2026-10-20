@@ -26,11 +26,11 @@ interface RentalFilterSheetProps {
 }
 
 /** "Xoá" chỉ dọn các lọc PHỤ trong Sheet; từ khoá và danh mục nằm ở băng tìm kiếm nên giữ nguyên. */
-const CLEARED: Pick<FilterDraft, "province" | "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax" | "bedrooms" | "furnishing"> = { province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "" };
+const CLEARED: Pick<FilterDraft, "province" | "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax" | "bedrooms" | "furnishing" | "amenities"> = { province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "", amenities: [] };
 
 function secondaryPatch(draft: FilterDraft): typeof CLEARED {
-  const { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing } = draft;
-  return { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing };
+  const { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing, amenities } = draft;
+  return { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing, amenities };
 }
 
 /**

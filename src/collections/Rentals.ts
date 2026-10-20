@@ -22,6 +22,7 @@ import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFilters } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
+import { RENTAL_AMENITIES } from "../shared/types/api";
 
 export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
 export const FURNISHINGS = ["none", "basic", "full"] as const;
@@ -44,6 +45,19 @@ const PAYMENT_CYCLE_LABELS: Record<(typeof PAYMENT_CYCLES)[number], string> = {
   quarterly: "Hàng quý",
   semiannual: "6 tháng",
   annual: "Hàng năm",
+};
+/** Nhãn admin (VI) của `amenities` — nhãn công khai VI/EN nằm ở i18n `page.rentals.amenityOption`. */
+const AMENITY_LABELS: Record<(typeof RENTAL_AMENITIES)[number], string> = {
+  pool: "Hồ bơi",
+  gym: "Phòng gym",
+  elevator: "Thang máy",
+  parking: "Chỗ đậu xe",
+  security: "Bảo vệ 24/7",
+  balcony: "Ban công",
+  washing_machine: "Máy giặt",
+  air_conditioner: "Điều hoà",
+  pet_friendly: "Cho nuôi thú cưng",
+  kitchen: "Bếp riêng",
 };
 const SERVICE_LABELS: Record<(typeof INCLUDED_SERVICES)[number], string> = {
   electricity: "Điện",
@@ -184,6 +198,8 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
               formRow(nonNegativeNumber("bedrooms", "Số phòng ngủ"), nonNegativeNumber("bathrooms", "Số phòng tắm")),
               formRow(directionField("houseDirection", "Hướng nhà"), directionField("balconyDirection", "Hướng ban công")),
               { name: "furnishing", type: "select", label: "Nội thất", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },
+              // Tiện ích của căn (BL-044): khác `rentalTerms.includedServices` (dịch vụ nằm trong giá thuê). Bộ lọc `/cho-thue` lọc AND theo bảng `rentals_amenities`.
+              { name: "amenities", type: "select", label: "Tiện ích", hasMany: true, index: true, options: selectOptions(RENTAL_AMENITIES, AMENITY_LABELS) },
               rentalTermsGroup,
             ],
           },

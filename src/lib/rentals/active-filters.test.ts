@@ -13,6 +13,7 @@ const all: RentalFilters = {
   areaMin: 3,
   bedrooms: 2,
   furnishing: "full",
+  amenities: ["pool", "gym"],
   sort: "price_asc",
   page: 4,
 };
@@ -23,7 +24,7 @@ describe("activeFilterKinds", () => {
   });
 
   it("theo thứ tự ô lọc; khoảng giá/diện tích là một chip", () => {
-    expect(activeFilterKinds(all)).toEqual(["q", "category", "province", "ward", "price", "area", "bedrooms", "furnishing"]);
+    expect(activeFilterKinds(all)).toEqual(["q", "category", "province", "ward", "price", "area", "bedrooms", "furnishing", "amenity:pool", "amenity:gym"]);
   });
 });
 
@@ -45,6 +46,11 @@ describe("filtersWithout", () => {
 
   it("bỏ phường giữ tỉnh", () => {
     expect(filtersWithout(all, "ward")).toMatchObject({ province: "ha-noi" });
+  });
+
+  it("bỏ một tiện ích giữ tiện ích còn lại; bỏ tiện ích cuối thì bỏ luôn khoá", () => {
+    expect(filtersWithout(all, "amenity:pool").amenities).toEqual(["gym"]);
+    expect(filtersWithout({ amenities: ["gym"], sort: "newest", page: 1 }, "amenity:gym")).not.toHaveProperty("amenities");
   });
 
   it("không đổi bộ lọc gốc", () => {

@@ -28,6 +28,14 @@ describe("rentalSearchParamsSchema (API_SPEC §3.3)", () => {
     });
   });
 
+  it("amenities: `a,b` hoặc mảng → mảng theo thứ tự RENTAL_AMENITIES, bỏ trùng; giá trị lạ BỊ BỎ (khác furnishing: tham số danh sách, phần hợp lệ còn lại vẫn có nghĩa); toàn lạ/rỗng → không có khoá", () => {
+    expect(rentalSearchParamsSchema.parse({ amenities: "gym,pool,foo,gym" }).amenities).toEqual(["pool", "gym"]);
+    expect(rentalSearchParamsSchema.parse({ amenities: ["gym", "pool"] }).amenities).toEqual(["pool", "gym"]);
+    expect(rentalSearchParamsSchema.parse({ amenities: "foo" }).amenities).toBeUndefined();
+    expect(rentalSearchParamsSchema.parse({ amenities: "" }).amenities).toBeUndefined();
+    expect(rentalSearchParamsSchema.safeParse({ amenities: 42 }).success).toBe(false);
+  });
+
   it.each([
     { limit: "49" }, { limit: "0" }, { page: "0" }, { page: "501" }, { locale: "fr" }, { sort: "random" }, { furnishing: "luxury" },
     { bedrooms: "5" }, { bedrooms: "-1" }, { bedrooms: "1.5" }, { priceMin: "abc" }, { priceMin: "-1" }, { areaMin: "NaN" },

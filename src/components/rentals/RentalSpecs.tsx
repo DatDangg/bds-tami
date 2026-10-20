@@ -41,15 +41,18 @@ export function RentalSpecs({ view }: { view: RentalDetailView }) {
   );
 }
 
-/** Khối "Chi tiết" `<dl>` 2 cột: tầng, hướng nhà, hướng ban công, nội thất, danh mục, dự án. Không có mục nào thì không render khối. */
+/** Khối "Chi tiết" `<dl>` 2 cột: tầng, hướng nhà, hướng ban công, nội thất, tiện ích (BL-044, trống → ẩn), danh mục, dự án. Không có mục nào thì không render khối. */
 export function RentalDetails({ view }: { view: RentalDetailView }) {
   const t = useTranslations("page.rentalDetail");
+  // Nhãn tiện ích dùng chung với bộ lọc `/cho-thue` (một nguồn, không chép hai nơi).
+  const tAmenity = useTranslations("page.rentals.amenityOption");
   const linkClass = "inline-flex min-h-11 items-center underline underline-offset-4";
   const items: { label: string; value: ReactNode }[] = [
     ...(view.floor ? [{ label: t("details.floor"), value: view.floor }] : []),
     ...(view.houseDirection ? [{ label: t("details.houseDirection"), value: t(`direction.${view.houseDirection}`) }] : []),
     ...(view.balconyDirection ? [{ label: t("details.balconyDirection"), value: t(`direction.${view.balconyDirection}`) }] : []),
     ...(view.furnishing ? [{ label: t("details.furnishing"), value: t(`furnishing.${view.furnishing}`) }] : []),
+    ...(view.amenities.length > 0 ? [{ label: t("details.amenities"), value: view.amenities.map((amenity) => tAmenity(amenity)).join(", ") }] : []),
     ...(view.category
       ? [{ label: t("details.category"), value: <Link href={view.category.href} className={linkClass}>{view.category.label}</Link> }]
       : []),

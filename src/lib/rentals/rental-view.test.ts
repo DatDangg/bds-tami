@@ -47,6 +47,12 @@ describe("toRentalDetailView", () => {
     expect(toRentalDetailView(rental({ priceMonthlyVnd: 0 }), "vi").priceMonthlyVnd).toBeNull();
   });
 
+  it("amenities (BL-044): giữ nguyên danh sách của doc; thiếu/null → mảng rỗng (hàng Tiện ích ẩn)", () => {
+    expect(toRentalDetailView(rental({ amenities: ["pool", "gym"] }), "vi").amenities).toEqual(["pool", "gym"]);
+    expect(toRentalDetailView(rental(), "vi").amenities).toEqual([]);
+    expect(toRentalDetailView(rental({ amenities: null }), "vi").amenities).toEqual([]);
+  });
+
   it("rented chỉ khi status = rented", () => {
     expect(toRentalDetailView(rental({ status: "rented" }), "vi").rented).toBe(true);
     expect(toRentalDetailView(rental(), "vi").rented).toBe(false);

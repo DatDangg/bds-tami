@@ -7,7 +7,7 @@ import { OptionSelect } from "@/components/ui/option-select";
 import type { ProvinceOption, WardOption } from "@/lib/rentals/rental-list-queries";
 import { PRICE_HINT_RANGES } from "@/lib/search/url-params";
 import { cn } from "@/lib/utils";
-import { RENTAL_FURNISHINGS } from "@/shared/types/api";
+import { RENTAL_AMENITIES, RENTAL_FURNISHINGS } from "@/shared/types/api";
 import type { FilterDraft } from "./use-rental-draft";
 
 export interface FieldOptions {
@@ -103,14 +103,16 @@ function RangeFields({ legend, fromLabel, toLabel, fromId, toId, fromValue, toVa
 }
 
 /**
- * Các ô LỌC PHỤ của Cho thuê (design-spec §3.5): Tỉnh/Phường, Giá/tháng tuỳ chọn + mốc gợi ý, Diện tích, Phòng ngủ, Nội thất — nằm trong Popover (≥ lg) hoặc Sheet (< lg)
- * sau nút "Bộ lọc". Từ khoá, Danh mục, Khoảng giá nhanh và Sắp xếp ở nơi khác (băng tìm kiếm, hàng kết quả). Ô chọn TAMI (Radix) cho Tỉnh/Phường;
+ * Các ô LỌC PHỤ của Cho thuê (design-spec §3.5): Tỉnh/Phường, Giá/tháng tuỳ chọn + mốc gợi ý, Diện tích, Phòng ngủ, Nội thất, Tiện ích (chọn nhiều, BL-044) — nằm trong Popover (≥ lg)
+ * hoặc Sheet (< lg) sau nút "Bộ lọc". Từ khoá, Danh mục, Khoảng giá nhanh và Sắp xếp ở nơi khác (băng tìm kiếm, hàng kết quả). Ô chọn TAMI (Radix) cho Tỉnh/Phường;
  * giá/diện tích là hai ô số (không slider); chip bấm lại để bỏ chọn. Phường bị khoá cho tới khi chọn tỉnh.
  */
 export function FilterFields({ idPrefix, draft, onChange, options }: FilterFieldsProps) {
   const t = useTranslations("page.rentals");
   const id = (name: string) => `${idPrefix}-${name}`;
   const wardDisabled = draft.province === "" || options.wardsLoading === true;
+  const toggleAmenity = (value: string) =>
+    onChange({ amenities: draft.amenities.includes(value) ? draft.amenities.filter((item) => item !== value) : [...draft.amenities, value] }, "now");
 
   return (
     <div className="flex flex-col gap-5">
@@ -181,6 +183,16 @@ export function FilterFields({ idPrefix, draft, onChange, options }: FilterField
           {RENTAL_FURNISHINGS.map((value) => (
             <Chip key={value} pressed={draft.furnishing === value} onClick={() => onChange({ furnishing: draft.furnishing === value ? "" : value }, "now")}>
               {t(`furnishingOption.${value}`)}
+            </Chip>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="flex min-w-0 flex-col gap-1">
+        <legend className="mb-1 text-small font-semibold">{t("fields.amenities")}</legend>
+        <div className="flex flex-wrap gap-2">
+          {RENTAL_AMENITIES.map((value) => (
+            <Chip key={value} pressed={draft.amenities.includes(value)} onClick={() => toggleAmenity(value)}>
+              {t(`amenityOption.${value}`)}
             </Chip>
           ))}
         </div>

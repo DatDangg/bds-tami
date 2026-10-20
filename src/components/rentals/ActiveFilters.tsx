@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { X } from "@/components/icons";
 import { PendingLink } from "@/components/layout/PendingRegion";
 import { formatNumber, formatVndCompact } from "@/lib/format";
-import { type ActiveFilterKind, activeFilterKinds, filtersWithout } from "@/lib/rentals/active-filters";
+import { type ActiveFilterKind, type AmenityFilterKind, activeFilterKinds, amenityOfKind, filtersWithout } from "@/lib/rentals/active-filters";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
 import { type RentalFilters, rentalListQueryString } from "@/lib/search/url-params";
 import type { Locale } from "@/i18n/routing";
@@ -25,7 +25,8 @@ export function useActiveFilterChips({ filters, options, listPath, limit }: Acti
     if (min !== undefined && max !== undefined) return t("active.range", { from: format(min), to: format(max) });
     return min !== undefined ? t("active.from", { value: format(min) }) : t("active.to", { value: format(max ?? 0) });
   };
-  const nameOf = (kind: ActiveFilterKind): string => {
+  // Nhóm không phải tiện ích: `switch` kín (TS báo lỗi khi thêm loại mới mà quên nhãn).
+  const groupName = (kind: Exclude<ActiveFilterKind, AmenityFilterKind>): string => {
     switch (kind) {
       case "q":
         return t("active.query", { value: `“${filters.q}”` });
@@ -44,6 +45,11 @@ export function useActiveFilterChips({ filters, options, listPath, limit }: Acti
       case "furnishing":
         return t("active.furnishing", { value: t(`furnishingOption.${filters.furnishing ?? "none"}`) });
     }
+  };
+  const nameOf = (kind: ActiveFilterKind): string => {
+    const amenity = amenityOfKind(kind);
+    if (amenity !== null) return t("active.amenity", { value: t(`amenityOption.${amenity}`) });
+    return groupName(kind as Exclude<ActiveFilterKind, AmenityFilterKind>);
   };
   const kinds = activeFilterKinds(filters).slice(0, limit);
   return kinds.map((kind) => ({

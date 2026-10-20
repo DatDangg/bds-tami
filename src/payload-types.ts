@@ -286,6 +286,20 @@ export interface Rental {
   houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
   balconyDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
   furnishing?: ('none' | 'basic' | 'full') | null;
+  amenities?:
+    | (
+        | 'pool'
+        | 'gym'
+        | 'elevator'
+        | 'parking'
+        | 'security'
+        | 'balcony'
+        | 'washing_machine'
+        | 'air_conditioner'
+        | 'pet_friendly'
+        | 'kitchen'
+      )[]
+    | null;
   rentalTerms?: {
     minLeaseMonths?: number | null;
     depositMonths?: number | null;
@@ -308,10 +322,13 @@ export interface Rental {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -337,7 +354,7 @@ export interface Rental {
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -359,13 +376,13 @@ export interface Category {
   description?: string | null;
   sortOrder?: number | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   scopeSlug?: string | null;
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -392,6 +409,9 @@ export interface Category {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   updatedAt: string;
@@ -457,7 +477,7 @@ export interface Media {
   };
 }
 /**
- * Tài khoản nội bộ đăng nhập trang quản trị (admin / sale).
+ * Tài khoản nội bộ đăng nhập trang quản trị (quản trị viên / nhân viên sale).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "staff".
@@ -572,7 +592,7 @@ export interface Project {
     | {
         name: string;
         /**
-         * Tên icon hiển thị kèm tiện ích (tuỳ chọn).
+         * Tên biểu tượng hiển thị kèm tiện ích.
          */
         icon?: string | null;
         id?: string | null;
@@ -586,7 +606,7 @@ export interface Project {
         title: string;
         description?: string | null;
         /**
-         * Tên icon hiển thị kèm điểm nổi bật (tuỳ chọn).
+         * Tên biểu tượng hiển thị kèm điểm nổi bật.
          */
         icon?: string | null;
         id?: string | null;
@@ -662,10 +682,13 @@ export interface Project {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -689,7 +712,7 @@ export interface Project {
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -729,12 +752,12 @@ export interface Developer {
   showAsPartner?: boolean | null;
   sortOrder?: number | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -854,10 +877,13 @@ export interface PropertyPost {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -881,7 +907,7 @@ export interface PropertyPost {
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -944,10 +970,13 @@ export interface News {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -971,7 +1000,7 @@ export interface News {
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -1015,10 +1044,13 @@ export interface Service {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1039,7 +1071,7 @@ export interface Service {
   };
   status: 'draft' | 'published' | 'hidden';
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -1073,14 +1105,14 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30).
+   * Phiên bản văn bản, vd 1.0. Phiên bản chính sách bảo mật đang xuất bản được lưu kèm mỗi lần khách đồng ý trên form.
    */
   version: string;
   effectiveDate: string;
   status: 'draft' | 'published' | 'hidden';
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1107,6 +1139,9 @@ export interface Page {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   updatedAt: string;
@@ -1187,10 +1222,13 @@ export interface JobPosting {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1213,7 +1251,7 @@ export interface JobPosting {
   publishedAt?: string | null;
   author: string | Staff;
   /**
-   * Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3...
+   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
    */
   slug?: string | null;
   hasEnglish?: boolean | null;
@@ -1222,7 +1260,7 @@ export interface JobPosting {
   deletedAt?: string | null;
 }
 /**
- * Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự ẩn danh sau 12 tháng.
+ * Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự xoá thông tin cá nhân và CV sau 12 tháng.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "job-applications".
@@ -1249,7 +1287,7 @@ export interface JobApplication {
   createdAt: string;
 }
 /**
- * CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).
+ * CV ứng viên gửi qua website, lưu riêng tư; chỉ admin tải được bằng nút "Tải CV" trong hồ sơ ứng tuyển.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "private-files".
@@ -1270,7 +1308,7 @@ export interface PrivateFile {
   focalY?: number | null;
 }
 /**
- * Chuyển hướng 301 từ đường dẫn cũ sang mới (tự tạo khi đổi slug; sửa tay khi cần).
+ * Tự chuyển khách từ đường dẫn cũ sang đường dẫn mới (tạo tự động khi đổi đường dẫn trang; có thể sửa tay).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
@@ -1358,7 +1396,7 @@ export interface ClickStatsDaily {
   createdAt: string;
 }
 /**
- * Mức dùng AI dịch theo tháng (số lần gọi, token, chi phí ước tính) để theo dõi hạn mức.
+ * Mức dùng dịch tự động theo tháng (số lần dịch, lượng chữ, chi phí ước tính) để theo dõi hạn mức.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "translation-usage".
@@ -1851,6 +1889,7 @@ export interface RentalsSelect<T extends boolean = true> {
   houseDirection?: T;
   balconyDirection?: T;
   furnishing?: T;
+  amenities?: T;
   rentalTerms?:
     | T
     | {
@@ -2513,7 +2552,7 @@ export interface SiteSetting {
     careers?: (string | null) | Media;
   };
   /**
-   * Số hiển thị và gọi từ nút nổi (FR-PUB-12)
+   * Số hiển thị và gọi từ nút liên hệ nổi trên website
    */
   hotline?: string | null;
   zaloUrl?: string | null;
@@ -2536,11 +2575,11 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Tắt nhanh dịch tự động (BR-08)
+   * Tắt nhanh dịch tự động khi cần
    */
   translationEnabled?: boolean | null;
   /**
-   * Thuật ngữ cố định cho AI dịch (BR-08)
+   * Thuật ngữ AI luôn dịch cố định như bảng này
    */
   translationGlossary?:
     | {
@@ -2551,7 +2590,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2575,7 +2614,7 @@ export interface SiteSetting {
    */
   gaMeasurementId?: string | null;
   /**
-   * Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)
+   * Tự cập nhật khi xuất bản chính sách bảo mật
    */
   privacyPolicyVersion?: string | null;
   updatedAt?: string | null;
@@ -2593,7 +2632,7 @@ export interface Homepage {
     enabled?: boolean | null;
     text?: string | null;
     /**
-     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
      */
     link?: string | null;
   };
@@ -2608,7 +2647,7 @@ export interface Homepage {
       subtitle?: string | null;
       ctaLabel?: string | null;
       /**
-       * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+       * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
        */
       ctaLink?: string | null;
       id?: string | null;
@@ -2715,7 +2754,7 @@ export interface Homepage {
      */
     ctaLabel?: string | null;
     /**
-     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
      */
     ctaLink?: string | null;
     /**
@@ -2728,12 +2767,12 @@ export interface Homepage {
     image?: (string | null) | Media;
     secondaryLabel?: string | null;
     /**
-     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
      */
     secondaryLink?: string | null;
   };
   /**
-   * Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).
+   * Banner đầu trang luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).
    */
   blockOrder?:
     | {
@@ -2750,10 +2789,13 @@ export interface Homepage {
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
+    /**
+     * Thường để trống.
+     */
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2776,7 +2818,7 @@ export interface Homepage {
   createdAt?: string | null;
 }
 /**
- * Menu chính (2 cấp) và nút kêu gọi hành động ở đầu trang.
+ * Menu chính (2 cấp) và nút nổi bật ở đầu trang.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
@@ -2787,14 +2829,14 @@ export interface Header {
     | {
         label: string;
         /**
-         * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+         * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
          */
         link: string;
         children?:
           | {
               label: string;
               /**
-               * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+               * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
                */
               link: string;
               id?: string | null;
@@ -2806,12 +2848,12 @@ export interface Header {
   ctaButton?: {
     label?: string | null;
     /**
-     * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
      */
     link?: string | null;
   };
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2848,7 +2890,7 @@ export interface Footer {
           | {
               label: string;
               /**
-               * Khoá trang (home, projects, rentals, property-posts, news, careers, contact, privacy-policy, terms-of-use) hoặc địa chỉ https://...
+               * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
                */
               link: string;
               id?: string | null;
@@ -2863,7 +2905,7 @@ export interface Footer {
   contactBlock?: string | null;
   copyright?: string | null;
   /**
-   * Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;

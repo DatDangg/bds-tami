@@ -336,10 +336,23 @@
         "areaTo": "Floor area to",
         "bedrooms": "Bedrooms",
         "furnishing": "Furnishing",
+        "amenities": "Amenities",
         "sort": "Sort by",
         "anyOption": "Any",
         "priceAny": "Any price",
         "priceCustom": "Custom price range"
+      },
+      "amenityOption": {
+        "pool": "Swimming pool",
+        "gym": "Gym",
+        "elevator": "Elevator",
+        "parking": "Parking",
+        "security": "24/7 security",
+        "balcony": "Balcony",
+        "washing_machine": "Washing machine",
+        "air_conditioner": "Air conditioning",
+        "pet_friendly": "Pet friendly",
+        "kitchen": "Private kitchen"
       },
       "priceHints": {
         "under5": "< 5 million",
@@ -373,6 +386,7 @@
         "area": "Floor area: {value}",
         "bedrooms": "Bedrooms: {value}",
         "furnishing": "Furnishing: {value}",
+        "amenity": "Amenity: {value}",
         "from": "from {value}",
         "to": "to {value}",
         "range": "{from} - {to}"
@@ -546,6 +560,7 @@
         "houseDirection": "House direction",
         "balconyDirection": "Balcony direction",
         "furnishing": "Furnishing",
+        "amenities": "Amenities",
         "category": "Category",
         "project": "Project"
       },

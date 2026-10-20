@@ -336,10 +336,23 @@
         "areaTo": "Diện tích đến",
         "bedrooms": "Phòng ngủ",
         "furnishing": "Nội thất",
+        "amenities": "Tiện ích",
         "sort": "Sắp xếp",
         "anyOption": "Bất kỳ",
         "priceAny": "Mọi mức giá",
         "priceCustom": "Khoảng giá tuỳ chọn"
+      },
+      "amenityOption": {
+        "pool": "Hồ bơi",
+        "gym": "Phòng gym",
+        "elevator": "Thang máy",
+        "parking": "Chỗ đậu xe",
+        "security": "Bảo vệ 24/7",
+        "balcony": "Ban công",
+        "washing_machine": "Máy giặt",
+        "air_conditioner": "Điều hoà",
+        "pet_friendly": "Cho nuôi thú cưng",
+        "kitchen": "Bếp riêng"
       },
       "priceHints": {
         "under5": "< 5 triệu",
@@ -373,6 +386,7 @@
         "area": "Diện tích: {value}",
         "bedrooms": "Phòng ngủ: {value}",
         "furnishing": "Nội thất: {value}",
+        "amenity": "Tiện ích: {value}",
         "from": "từ {value}",
         "to": "đến {value}",
         "range": "{from} - {to}"
@@ -546,6 +560,7 @@
         "houseDirection": "Hướng nhà",
         "balconyDirection": "Hướng ban công",
         "furnishing": "Nội thất",
+        "amenities": "Tiện ích",
         "category": "Danh mục",
         "project": "Dự án"
       },

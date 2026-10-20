@@ -1,6 +1,6 @@
 {
-  "mode": "initial-build",
-  "activeWorkItem": null,
+  "mode": "maintenance",
+  "activeWorkItem": "feature/homepage-redesign",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1208,6 +1208,76 @@
       "specUpdate": "spec/updates/2026-10-20-admin-vietnamese-wording.md",
       "specValidation": ".context/review-reports/spec-validation-feature-admin-vietnamese-wording-phase-1.md",
       "residual": "chưa xem admin thật trên trình duyệt (cụm chữ ghép Payload \"mục\"/\"Có-Không\" có thể đọc gượng); nhãn job src/jobs/* còn \"VI → EN\"/\"Đăng tin BĐS\" (ngoài phạm vi); giá trị \"Đã ẩn danh\" trong dữ liệu/Excel giữ; cột slug thô → BL-043; media-upload.test \"khách đọc được danh sách\" fail 1 lần khi chạy cả bộ (đua DB, chạy riêng 20/20 PASS); Payload chuỗi không ghi đè vẫn \"xóa/khóa\" (Q10)"
+    },
+    {
+      "slug": "homepage-redesign",
+      "title": "Trang chủ làm lại theo mockup mới: hero chữ trái + bộ đếm, ô tìm kiếm \"Tùy chọn khác\", khối Điểm mạnh, Về TAMI cụm ảnh + video, thẻ dự án nền trắng + tim, banner chữ trái, footer tối dùng chung (BL-044)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-044",
+      "changeDoc": "spec/changes/2026-10-20-homepage-redesign.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-00",
+          "file": "tasks/feature-homepage-redesign/phase-1-task-00.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "r1 FAIL (M1 endpoint khoá lặp amenities chỉ lấy giá trị đầu) → r2 PASS: endpoint gộp getAll, m2–m5 sửa; migration 20261020_095907_rentals_amenities additive; Decision 10 (amenities lạ bị bỏ); pnpm test 3166 PASS; docImpact: docs/API_SPEC.md §3.3 + docs/ERD.md rentals reconciled; residual: chưa chụp browser, m6 cast ActiveFilters tuỳ chọn",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-homepage-redesign-phase-1-task-00-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-00-round-1-review.md",
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-00-round-2-review.md"
+          ],
+          "commit": "(commit close-out T00)",
+          "completedAt": "2026-10-20"
+        },
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-homepage-redesign/phase-1-task-01.md",
+          "status": "in_progress",
+          "attempt": 0,
+          "round": 0,
+          "note": "schema global homepage + migration additive + view model + hero chữ trái/bộ đếm + ô tìm kiếm Tùy chọn khác + khối Điểm mạnh",
+          "reviewLevel": "STRICT",
+          "reviewerResult": null,
+          "report": null
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-homepage-redesign/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "note": "Về TAMI cụm ảnh + video YouTube Dialog + số liệu icon + nút; thẻ Dự án nổi bật nền trắng + tim trang trí; banner tư vấn chữ trái (CtaBanner align)",
+          "reviewLevel": "STRICT",
+          "reviewerResult": null,
+          "report": null
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-homepage-redesign/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "note": "footer dùng chung theo mockup + tắt khối ngoài mockup (admin) + mobile 390 + so khớp mockup 1440 + doc reconcile",
+          "reviewLevel": "STRICT",
+          "reviewerResult": null,
+          "report": null
+        }
+      ],
+      "note": "Lần chạy 1 ngắt do rate limit trước khi ghi đĩa (interrupted, attempt 0). Lần 2: classify MODIFY → spec delta F1 + Khung trang footer → spec-publisher 1.34.0 / scope v42 → spec-validator pre-plan → 3 task tuần tự. Chờ user duyệt plan + Q1 (ô thứ 5 Tùy chọn khác: /cho-thue không có bộ lọc Tiện ích → Phòng ngủ hay bỏ) + Q2 (cột Liên hệ footer giữ/bỏ). | Plan duyệt: tuần tự T00→T01→T02→T03, chỉ dừng khi FAIL 2 vòng / HIGH_RISK_MIGRATION / blocked.",
+      "planApprovedAt": "2026-10-20 (user \"OK, chạy hết 3 task\"; Q1 Tiện ích lọc thật → thêm T00 rentals amenities; Q2 footer không cột Liên hệ; Q3 bỏ mũi tên xổ; Q4 eyebrow/caption chung)",
+      "specVersion": "1.34.0",
+      "scopeVersion": 43,
+      "specUpdate": "spec/updates/2026-10-20-homepage-redesign.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-homepage-redesign-pre-plan.md",
+      "migration": "additive — global homepage (tạo ở T01)",
+      "journal": ".context/runs/change-homepage-redesign.md"
     }
   ],
   "bugs": [
@@ -1953,7 +2023,7 @@
       "completedAt": "2026-10-18T15:10:17.332Z"
     }
   ],
-  "inProgressTask": null,
+  "inProgressTask": "feature-homepage-redesign/phase-1-task-01",
   "blockedTasks": [
     {
       "task": "layer-4/task-06",

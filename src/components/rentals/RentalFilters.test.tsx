@@ -293,6 +293,25 @@ describe("RentalFilters: Popover lọc phụ (≥ lg, áp dụng ngay)", () => {
     expect(lastUrl()).toBe("/cho-thue?areaMax=60&furnishing=full");
   });
 
+  it("Tiện ích (BL-044): chip chọn NHIỀU (aria-pressed), URL `amenities=a,b` theo thứ tự danh sách; bấm lại bỏ từng cái; chip ≥ 44px", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    desktop(true);
+    render(ui({ amenities: ["gym"], sort: "newest", page: 1 }));
+    const popover = within(await openPopover(user));
+    const group = within(popover.getByRole("group", { name: "Tiện ích" }));
+    expect(group.getAllByRole("button")).toHaveLength(10);
+    expect(group.getByRole("button", { name: "Phòng gym" })).toHaveAttribute("aria-pressed", "true");
+    expect(group.getByRole("button", { name: "Hồ bơi" })).toHaveAttribute("aria-pressed", "false");
+    expect(group.getByRole("button", { name: "Hồ bơi" }).className).toContain("min-h-11");
+    await user.click(group.getByRole("button", { name: "Hồ bơi" }));
+    expect(lastUrl()).toBe("/cho-thue?amenities=pool%2Cgym");
+    expect(group.getByRole("button", { name: "Hồ bơi" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(group.getByRole("button", { name: "Phòng gym" }));
+    expect(lastUrl()).toBe("/cho-thue?amenities=pool");
+    await user.click(group.getByRole("button", { name: "Hồ bơi" }));
+    expect(lastUrl()).toBe("/cho-thue");
+  });
+
   it("đổi tỉnh: bỏ phường, ô phường khoá cho tới khi server trả phường mới; phường chọn được khi đã có", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     desktop(true);

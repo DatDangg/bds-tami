@@ -110,6 +110,7 @@ Query params (đồng bộ với URL trang `/cho-thue` để chia sẻ được)
 | `areaMin`, `areaMax` | `25`, `60` | m² |
 | `bedrooms` | `2` | `4` nghĩa là 4+ |
 | `furnishing` | `full` | |
+| `amenities` | `pool,gym` | BL-044. Nhiều giá trị phân cách dấu phẩy; khoá lặp `amenities=pool&amenities=gym` được gộp tương đương (riêng tham số này — các khoá khác lặp chỉ lấy giá trị đầu), trong `RENTAL_AMENITIES`; tin phải có **đủ** mọi tiện ích (AND). Giá trị ngoài danh sách **bị bỏ** (không 400, khác `furnishing` — tham số danh sách nên phần hợp lệ còn lại vẫn có nghĩa); không còn giá trị nào = không lọc |
 | `available` | `true` | Chỉ tin còn trống (`published`), bỏ tin `rented`. Mặc định (hoặc `false`) trả cả `published` lẫn `rented`. Trang `/cho-thue` dùng `true` (design-spec S04) |
 | `sort` | `newest` \| `price_asc` \| `price_desc` | Mặc định `newest` |
 | `page`, `limit` | `1`, `12` | `limit` tối đa 48 |

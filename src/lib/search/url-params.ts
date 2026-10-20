@@ -1,4 +1,5 @@
 import {
+  type RentalAmenity,
   type RentalSearchParams,
   type RentalSort,
   rentalSearchParamsSchema,
@@ -22,6 +23,8 @@ export interface RentalFilters {
   areaMax?: number;
   bedrooms?: number;
   furnishing?: NonNullable<RentalSearchParams["furnishing"]>;
+  /** Tiện ích phải có đủ (AND); thứ tự theo `RENTAL_AMENITIES`. */
+  amenities?: RentalAmenity[];
   sort: RentalSort;
   page: number;
 }
@@ -30,14 +33,17 @@ export interface RentalFilters {
 export type RawRentalParams = Record<string, string | string[] | undefined>;
 
 /** Thứ tự khoá khi dựng query string (cố định để URL ổn định, dễ cache/so sánh). */
-const QUERY_KEYS = ["q", "category", "province", "ward", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "sort", "page"] as const;
+const QUERY_KEYS = ["q", "category", "province", "ward", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "sort", "page"] as const;
 type QueryKey = (typeof QUERY_KEYS)[number];
 
 const DEFAULT_SORT: RentalSort = "newest";
 
-/** Giá trị của một khoá đã qua đúng schema của API: sai kiểu/ngoài khoảng/rỗng -> `undefined` (bị bỏ, không làm vỡ trang). */
+/**
+ * Giá trị của một khoá đã qua đúng schema của API: sai kiểu/ngoài khoảng/rỗng -> `undefined` (bị bỏ, không làm vỡ trang).
+ * Khoá lặp lấy giá trị đầu, trừ `amenities` nhận cả mảng (form không JS gửi `amenities=a&amenities=b`; schema gộp với dạng `a,b`).
+ */
 function readParam(raw: RawRentalParams, key: QueryKey): unknown {
-  const value = Array.isArray(raw[key]) ? raw[key][0] : raw[key];
+  const value = key === "amenities" || !Array.isArray(raw[key]) ? raw[key] : raw[key][0];
   if (value === undefined) return undefined;
   const parsed = rentalSearchParamsSchema.shape[key].safeParse(value);
   return parsed.success ? parsed.data : undefined;
@@ -68,6 +74,7 @@ export function parseRentalFilters(raw: RawRentalParams): RentalFilters {
     areaMax,
     bedrooms: read("bedrooms") as number | undefined,
     furnishing: read("furnishing") as RentalFilters["furnishing"],
+    amenities: read("amenities") as RentalFilters["amenities"],
   };
   const present = Object.entries(optionals).filter(([, value]) => value !== undefined && value !== "");
   return {
@@ -77,7 +84,7 @@ export function parseRentalFilters(raw: RawRentalParams): RentalFilters {
   };
 }
 
-/** Query string (`?q=...&province=...`) theo thứ tự cố định; giá trị mặc định (sort `newest`, trang 1) và ô trống không xuất hiện; không có gì thì `""`. */
+/** Query string (`?q=...&province=...`) theo thứ tự cố định; giá trị mặc định (sort `newest`, trang 1), ô trống và mảng rỗng không xuất hiện; `amenities` ghi `a,b`; không có gì thì `""`. */
 export function rentalListQueryString(filters: RentalFilters, override: Partial<RentalFilters> = {}): string {
   const merged = { ...filters, ...override };
   const search = new URLSearchParams();
@@ -86,18 +93,25 @@ export function rentalListQueryString(filters: RentalFilters, override: Partial<
     if (value === undefined || value === "") continue;
     if (key === "sort" && value === DEFAULT_SORT) continue;
     if (key === "page" && value === 1) continue;
+    if (Array.isArray(value)) {
+      if (value.length > 0) search.set(key, value.join(","));
+      continue;
+    }
     search.set(key, String(value));
   }
   const query = search.toString();
   return query ? `?${query}` : "";
 }
 
-/** Số điều kiện lọc đang bật (nút "Bộ lọc (n)"): khoảng giá/diện tích tính một, sắp xếp và trang không tính. */
+/** Mỗi tiện ích đếm 1 để huy hiệu khớp số chip "Đang lọc" (mỗi tiện ích một chip bỏ riêng). */
+const amenityCount = (filters: RentalFilters): number => filters.amenities?.length ?? 0;
+
+/** Số điều kiện lọc đang bật (nút "Bộ lọc (n)"): khoảng giá/diện tích tính một, mỗi tiện ích tính một, sắp xếp và trang không tính. */
 export function activeFilterCount(filters: RentalFilters): number {
   const priced = filters.priceMin !== undefined || filters.priceMax !== undefined;
   const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
   const singles = [filters.q, filters.category, filters.province, filters.ward, filters.bedrooms, filters.furnishing];
-  return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0);
+  return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0) + amenityCount(filters);
 }
 
 /** Mốc giá gợi ý (VNĐ/tháng) của ô "Khoảng giá" trên băng tìm kiếm: < 5tr, 5-10tr, 10-20tr, > 20tr. */
@@ -115,13 +129,13 @@ function hasCustomPriceRange(filters: RentalFilters): boolean {
 }
 
 /**
- * Số lọc PHỤ đang bật (huy hiệu trên nút "Bộ lọc"): Tỉnh, Phường, Diện tích (một), Phòng ngủ, Nội thất, và Khoảng giá TỰ NHẬP (một; mốc giá chọn ở băng không tính).
+ * Số lọc PHỤ đang bật (huy hiệu trên nút "Bộ lọc"): Tỉnh, Phường, Diện tích (một), Phòng ngủ, Nội thất, mỗi Tiện ích (một), và Khoảng giá TỰ NHẬP (một; mốc giá chọn ở băng không tính).
  * Từ khoá, Danh mục nằm ngay trên băng tìm kiếm nên không tính.
  */
 export function secondaryFilterCount(filters: RentalFilters): number {
   const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
   const singles = [filters.province, filters.ward, filters.bedrooms, filters.furnishing];
-  return singles.filter((value) => value !== undefined).length + (sized ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0);
+  return singles.filter((value) => value !== undefined).length + (sized ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0) + amenityCount(filters);
 }
 
 /**

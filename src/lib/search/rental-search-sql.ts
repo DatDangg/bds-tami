@@ -65,6 +65,10 @@ export function rentalWhere(params: RentalSearchParams): SqlFragment {
     conditions.push(params.bedrooms >= 4 ? sql`r."bedrooms" >= 4` : sql`r."bedrooms" = ${params.bedrooms}`);
   }
   if (params.furnishing) conditions.push(sql`r."furnishing" = ${params.furnishing}`);
+  // Tin phải có ĐỦ mọi tiện ích (AND): mỗi tiện ích một EXISTS trên bảng hasMany `rentals_amenities` (cột `parent_id`/`value`, index `parent_id` do Payload tạo).
+  for (const amenity of params.amenities ?? []) {
+    conditions.push(sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${amenity})`);
+  }
   return sql`WHERE ${sql.join(conditions, sql` AND `)}`;
 }
 

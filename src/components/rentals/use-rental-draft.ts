@@ -15,6 +15,8 @@ export type FilterDraft = {
   areaMax: string;
   bedrooms: string;
   furnishing: string;
+  /** Tiện ích đang chọn (chip chọn nhiều); `[]` = không lọc. */
+  amenities: string[];
   sort: string;
 };
 
@@ -32,6 +34,7 @@ export const draftOf = (filters: RentalFilters): FilterDraft => ({
   areaMax: filters.areaMax === undefined ? "" : String(filters.areaMax),
   bedrooms: filters.bedrooms === undefined ? "" : String(filters.bedrooms),
   furnishing: filters.furnishing ?? "",
+  amenities: filters.amenities ?? [],
   sort: filters.sort,
 });
 

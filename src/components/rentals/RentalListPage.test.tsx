@@ -258,6 +258,14 @@ describe("S04 /cho-thue: render", () => {
     expect(screen.getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue");
   });
 
+  it("Tiện ích (BL-044): ?amenities=pool,gym → SearchService nhận mảng; 'Đang lọc' một chip mỗi tiện ích bỏ riêng; huy hiệu Bộ lọc đếm 2", async () => {
+    await render("vi", { amenities: "pool,gym,foo" });
+    expect(search.mock.calls.at(-1)?.[0].amenities).toEqual(["pool", "gym"]);
+    expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Hồ bơi" })).toHaveAttribute("href", "/cho-thue?amenities=gym");
+    expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Phòng gym" })).toHaveAttribute("href", "/cho-thue?amenities=pool");
+    expect(screen.getByRole("button", { name: "Bộ lọc (2)" })).toBeInTheDocument();
+  });
+
   it("phân trang giữ bộ lọc và sắp xếp, trang ≥ 2 có ?page=", async () => {
     search.mockResolvedValue(result(cards, { total: 30, page: 2, totalPages: 3 }));
     await render("vi", { category: "can-ho", sort: "price_desc", page: "2" });

@@ -29,6 +29,12 @@ describe("tham số URL của /cho-thue không đổi sau khi thay băng tìm ki
     expect(queryOfDraft(draftOf(full))).toBe(`?${golden}`);
   });
 
+  it("amenities (BL-044) là khoá MỚI nối sau furnishing, dạng `a,b`; bản nháp rỗng không lên URL — các khoá cũ giữ nguyên", () => {
+    expect(rentalListQueryString({ ...full, amenities: ["pool", "gym"] })).toBe(`?${rentalListQueryString(full).slice(1).replace("&sort=", "&amenities=pool%2Cgym&sort=")}`);
+    expect(queryOfDraft({ ...draftOf(full), amenities: ["gym", "pool", "foo"] })).toContain("amenities=pool%2Cgym");
+    expect(draftOf({ sort: "newest", page: 1 }).amenities).toEqual([]);
+  });
+
   it("'Tất cả' (ô trống) = vắng mặt; sắp xếp mặc định không xuất hiện", () => {
     expect(queryOfDraft({ ...draftOf({ sort: "newest", page: 1 }) })).toBe("");
     expect(queryOfDraft({ ...draftOf(full), category: "", province: "", ward: "", priceMin: "", priceMax: "", sort: "newest" })).toBe(

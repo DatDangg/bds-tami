@@ -115,6 +115,29 @@ export const MAX_RENTAL_SEARCH_LIMIT = 48;
 
 export const RENTAL_SORTS = ["newest", "price_asc", "price_desc"] as const;
 export const RENTAL_FURNISHINGS = ["none", "basic", "full"] as const;
+/** Tiện ích của tin cho thuê (SPEC F3, BL-044): cùng danh sách cho field `rentals.amenities`, bộ lọc `/cho-thue` và API; nhãn qua i18n. */
+export const RENTAL_AMENITIES = ["pool", "gym", "elevator", "parking", "security", "balcony", "washing_machine", "air_conditioner", "pet_friendly", "kitchen"] as const;
+export type RentalAmenity = (typeof RENTAL_AMENITIES)[number];
+
+const isRentalAmenity = (value: string): value is RentalAmenity => (RENTAL_AMENITIES as readonly string[]).includes(value);
+
+/**
+ * `?amenities=a,b` (hoặc khoá lặp → mảng): tách, bỏ giá trị ngoài danh sách và trùng, xếp theo thứ tự `RENTAL_AMENITIES` để URL ổn định.
+ * Khác `furnishing` (enum đơn, sai → 400): đây là tham số danh sách nên phần hợp lệ còn lại vẫn có nghĩa — link cũ không vỡ khi danh sách đổi.
+ * Không còn giá trị nào → `undefined` (không lọc). Kiểu khác chuỗi/mảng chuỗi giữ nguyên để zod từ chối.
+ */
+function parseAmenityList(value: unknown): unknown {
+  const parts = Array.isArray(value) ? value : [value];
+  if (!parts.every((part) => typeof part === "string")) return value;
+  const wanted = new Set(parts.flatMap((part) => part.split(",")).map((part) => part.trim()));
+  const amenities = RENTAL_AMENITIES.filter((amenity) => wanted.has(amenity));
+  return amenities.length > 0 ? amenities : undefined;
+}
+
+export const rentalAmenitiesParam = z.preprocess(parseAmenityList, z.array(z.enum(RENTAL_AMENITIES)).optional());
+
+/** Hàm thuần (không zod) cho nơi chỉ cần lọc danh sách, vd bản nháp ô lọc. */
+export const normalizeAmenities = (values: readonly string[]): RentalAmenity[] => values.filter(isRentalAmenity);
 
 const slugParam = optional(z.string().trim().min(1).max(MAX_SLUG_CHARS));
 /** `?available=true` hoặc boolean từ code gọi thẳng; chuỗi khác (`yes`, `1`...) là sai (400). */
@@ -138,6 +161,8 @@ export const rentalSearchParamsSchema = z
     areaMax: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
     bedrooms: wholeNumber(4),
     furnishing: optional(z.enum(RENTAL_FURNISHINGS)),
+    /** Tin phải có ĐỦ mọi tiện ích (AND); giá trị lạ bị bỏ (xem `parseAmenityList`). */
+    amenities: rentalAmenitiesParam,
     /** `true` = chỉ tin còn trống (`published`), bỏ tin đã thuê: trang danh sách S04 dùng; mặc định trả cả `published` lẫn `rented`. */
     available: flag,
     sort: z.preprocess(blankToUndefined, z.enum(RENTAL_SORTS).default("newest")),

@@ -45,6 +45,13 @@ describe("rentalWhere", () => {
     expect(render(rentalWhere(parse({ locale: "en" }))).sql).toContain(`r."has_english" = true`);
   });
 
+  it("amenities: mỗi tiện ích một EXISTS trên rentals_amenities (AND), giá trị đi qua tham số; không truyền thì không có", () => {
+    const { sql: text, params } = render(rentalWhere(parse({ amenities: "pool,gym" })));
+    expect(text.match(/EXISTS \(SELECT 1 FROM "rentals_amenities" ra WHERE ra\."parent_id" = r\."id" AND ra\."value" = \$\d+\)/g)).toHaveLength(2);
+    expect(params).toEqual(expect.arrayContaining(["pool", "gym"]));
+    expect(render(rentalWhere(parse({}))).sql).not.toContain("rentals_amenities");
+  });
+
   it("bedrooms 4 là >= 4, số khác là bằng", () => {
     expect(render(rentalWhere(parse({ bedrooms: 4 }))).sql).toContain(`r."bedrooms" >= 4`);
     expect(render(rentalWhere(parse({ bedrooms: 2 }))).sql).toContain(`r."bedrooms" = $`);

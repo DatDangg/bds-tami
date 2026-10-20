@@ -161,8 +161,8 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     ).id;
 
     // Dữ liệu: 6 tin công khai khác nhau + các tin khách không được thấy.
-    await createRental("a", "Căn hộ dịch vụ Bến Nghé", { category: childCategoryId, priceMonthlyVnd: 12_000_000, areaM2: 45, bedrooms: 1, furnishing: "full" });
-    await createRental("b", "Studio gần chợ", { priceMonthlyVnd: 6_000_000, areaM2: 25, bedrooms: 0, furnishing: "none", address: "5 Phố Bí Mật", showExactAddress: true });
+    await createRental("a", "Căn hộ dịch vụ Bến Nghé", { category: childCategoryId, priceMonthlyVnd: 12_000_000, areaM2: 45, bedrooms: 1, furnishing: "full", amenities: ["pool", "gym", "elevator"] });
+    await createRental("b", "Studio gần chợ", { priceMonthlyVnd: 6_000_000, areaM2: 25, bedrooms: 0, furnishing: "none", address: "5 Phố Bí Mật", showExactAddress: true, amenities: ["gym"] });
     await createRental("c", "Nhà phố Ba Đình rộng", { category: houseCategoryId, province: hnId, ward: baDinhWardId, priceMonthlyVnd: 30_000_000, areaM2: 120, bedrooms: 4, furnishing: "basic" });
     await createRental("d", "Biệt thự năm phòng ngủ", { category: houseCategoryId, priceMonthlyVnd: 55_000_000, areaM2: 300, bedrooms: 5, furnishing: "full" });
     await createRental("e", "Căn hộ thương lượng", { priceMonthlyVnd: undefined, priceNegotiable: true, areaM2: 60, bedrooms: 2 });
@@ -326,6 +326,16 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(await titlesOf({ furnishing: "full", category: "nha-pho", province: "ho-chi-minh", bedrooms: 4, priceMin: 50_000_000, q: "biet thu" })).toEqual(["Biệt thự năm phòng ngủ"]);
       expect(await titlesOf({ furnishing: "full", q: "studio" })).toEqual([]);
     });
+
+    it("amenities (BL-044): tin phải có ĐỦ mọi tiện ích (AND); giá trị lạ bị bỏ (không 400); tin không có tiện ích không khớp", async () => {
+      expect((await titlesOf({ amenities: "gym", sort: "price_asc" }))).toEqual(["Studio gần chợ", "Căn hộ dịch vụ Bến Nghé"]);
+      expect(await titlesOf({ amenities: "pool,gym" })).toEqual(["Căn hộ dịch vụ Bến Nghé"]);
+      expect(await titlesOf({ amenities: ["gym", "pool"] })).toEqual(["Căn hộ dịch vụ Bến Nghé"]);
+      expect(await titlesOf({ amenities: "pool,kitchen" })).toEqual([]);
+      expect((await titlesOf({ amenities: "gym,khong-co", sort: "price_asc" }))).toEqual(["Studio gần chợ", "Căn hộ dịch vụ Bến Nghé"]);
+      expect((await search({ amenities: "khong-co", limit: 48 })).total).toBe(6);
+      expect(await titlesOf({ amenities: "pool", q: "studio" })).toEqual([]);
+    });
   });
 
   /** Trang danh mục Cho thuê (layer-9-task-08): `findRentalCategory` quyết định 404 (slug lạ / xoá mềm / chưa có EN) và cấp tin theo danh mục + con. */
@@ -478,6 +488,21 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
         expect(((await response.json()) as { success: boolean }).success).toBe(false);
       }
       expect((await getHandler("q=&category=&foo=bar", newIp())).status).toBe(200);
+    });
+
+    it("GET ?amenities=pool,gym đếm đúng (AND); tiện ích lạ bị bỏ → 200 (khác furnishing sai → 400)", async () => {
+      const both = (await (await getHandler("amenities=pool,gym&limit=1", newIp())).json()) as { data: { total: number } };
+      expect(both.data.total).toBe(1);
+      const unknown = await getHandler("amenities=pool,khong-co&limit=1", newIp());
+      expect(unknown.status).toBe(200);
+      expect(((await unknown.json()) as { data: { total: number } }).data.total).toBe(1);
+    });
+
+    it("GET ?amenities=pool&amenities=gym (khoá lặp) cho cùng kết quả với ?amenities=pool,gym", async () => {
+      const repeated = (await (await getHandler("amenities=pool&amenities=gym&limit=48", newIp())).json()) as { data: { total: number } };
+      const comma = (await (await getHandler("amenities=pool,gym&limit=48", newIp())).json()) as { data: { total: number } };
+      expect(repeated.data.total).toBe(1);
+      expect(repeated.data.total).toBe(comma.data.total);
     });
 
     it("vượt 60 lần/phút/IP -> 429 kèm Retry-After", async () => {

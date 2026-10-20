@@ -87,3 +87,11 @@ _No decisions recorded yet. Decisions logged here khi dựng spec và trong impl
 - **Alternatives Considered:** Prop/context từ page xuống layout header (cần client state xuyên layout); JS đặt data-attribute lên `<html>` khi mount (phụ thuộc hydrate); chỉ đổi `--sticky-top` khi header đã `data-scrolled` (round 2 — làm neo nhảy từ đầu trang thừa ~88px vì scroll-margin tính lúc còn 104px); `:focus-within` (focus chuột sau khi đóng menu giữ header che thanh mục con); `visibility:hidden` (link header không còn focus được bằng Tab).
 - **Rationale:** Không đổi JS/DOM header, không prop xuyên layout; trang khác giữ nguyên vì `:has()` không khớp; trình duyệt thiếu `:has()` rơi về hành vi cũ nhất quán.
 - **Consequences:** Trước hydrate / không JS header đầy đủ có thể che thanh mục con (user chấp nhận 2026-10-20); `OBSERVER_MARGIN` -88px xấp xỉ; trình đọc màn hình vẫn đọc link header khi đã ẩn. Component mới dùng neo trong khung chi tiết phải dùng `--sticky-top` + 4.5rem.
+
+### Decision 10: Tham số `amenities` của `GET /api/public/rentals` bỏ giá trị lạ thay vì 400 (feature-homepage-redesign T00, BL-044)
+- **Date:** 2026-10-20
+- **Context:** Tham số lọc mới `amenities=a,b` (AND). `furnishing` hiện tại là enum đơn: giá trị sai → zod fail → 400. SPECIFICATIONS F3 ghi "giá trị ngoài danh sách bị bỏ".
+- **Decision:** `rentalSearchParamsSchema.amenities` = `z.preprocess` tách chuỗi/mảng, lọc theo `RENTAL_AMENITIES`, bỏ trùng, xếp theo thứ tự danh sách; toàn giá trị lạ → `undefined` (không lọc), không 400. Trang `/cho-thue` và API dùng cùng schema nên hiểu URL giống nhau.
+- **Alternatives Considered:** 400 như `furnishing` (nhất quán kiểu enum, nhưng link chia sẻ/trang chủ T01 vỡ khi danh sách tiện ích đổi, và trang công khai vốn đã bỏ tham số sai thay vì 400).
+- **Rationale:** Tham số danh sách: phần hợp lệ còn lại vẫn có nghĩa; theo đúng spec F3.
+- **Consequences:** Khác biệt hành vi giữa `furnishing` (400) và `amenities` (bỏ) được ghi ở `docs/API_SPEC.md` §3.3; kiểu khác chuỗi (vd số) vẫn 400. Endpoint HTTP gộp khoá lặp `amenities=a&amenities=b` thành mảng (≡ `a,b`) để API, parser trang `/cho-thue` và count path hiểu URL như nhau; các khoá khác vẫn "khoá lặp lấy giá trị đầu".

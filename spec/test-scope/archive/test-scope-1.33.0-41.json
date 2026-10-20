@@ -1,0 +1,258 @@
+{
+  "specVersion": "1.33.0",
+  "scopeVersion": 41,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-040 — rà ngữ nghĩa toàn bộ chữ tiếng Việt trong admin: ghi đè chữ mặc định Payload ở một nơi (i18n.translations.vi), sửa nhãn collection/global/field/mô tả, toán tử bộ lọc đọc tự nhiên (thông báo lỗi xuất Excel lead trích đúng chữ mới), cột Excel \"Sale phụ trách\". Spec 1.32.0 → 1.33.0 (MINOR, MODIFY).",
+  "workItem": "feature-admin-vietnamese-wording",
+  "backlog": "BL-040",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-admin-vietnamese-wording.md",
+  "task": [
+    "tasks/feature-admin-vietnamese-wording/phase-1-task-01.md",
+    "tasks/feature-admin-vietnamese-wording/phase-1-task-02.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-2-review.md",
+    ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-2-review.md",
+    ".context/review-reports/spec-validation-feature-admin-vietnamese-wording-phase-1.md"
+  ],
+  "commits": [
+    "(commit close-out BL-040)"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.32.0-40.json",
+  "specUpdate": "spec/updates/2026-10-20-admin-vietnamese-wording.md",
+  "specRefs": [
+    "FR-ADM-19"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Câu \"Ngữ nghĩa chữ admin (BL-040)\": chữ đúng nghĩa nghiệp vụ, viết hoa chữ đầu, một khái niệm một tên, không lộ thuật ngữ dev; chữ Payload ghi đè một nơi (i18n.translations.vi) có test khoá; toán tử lọc là / không phải / là một trong / có giá trị + Có/Không, thông báo lỗi xuất Excel trích đúng chữ này; nhãn collection/global chỉ ở collection-labels.ts; nhóm menu \"Dữ liệu nền\" (thay \"Danh mục\"); \"Tin bất động sản\" (thay \"Đăng tin BĐS\") trong câu BL-021/BL-022."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/lib/admin/payload-vi-overrides.ts",
+      "src/lib/admin/payload-vi-overrides.test.ts",
+      "src/payload.config.ts",
+      "src/lib/leads/export-filters.ts",
+      "src/lib/leads/export-filters.test.ts",
+      "tests/integration/access.test.ts",
+      "src/lib/admin/collection-labels.ts",
+      "src/lib/admin/collection-labels.test.ts",
+      "src/lib/admin/admin-label-scan.test.ts",
+      "src/components/admin/admin-groups.ts",
+      "src/components/admin/admin-groups.test.ts",
+      "src/components/admin/dashboard/NavGroupCards.tsx",
+      "src/components/admin/dashboard/dashboard-queries.ts",
+      "src/components/admin/dashboard/DashboardLinks.test.tsx",
+      "src/components/admin/dashboard/DashboardParts.test.tsx",
+      "src/components/admin/ApproveEnglishButton.tsx",
+      "src/components/admin/CvDownloadButton.tsx",
+      "src/components/admin/SearchReindexPendingWarning.tsx",
+      "src/components/admin/SearchReindexPendingWarning.test.tsx",
+      "src/lib/translation/admin-ui.ts",
+      "src/lib/translation/admin-ui.test.ts",
+      "src/collections/AuditLogs.ts",
+      "src/collections/ClickEvents.ts",
+      "src/collections/ClickStatsDaily.ts",
+      "src/collections/JobApplications.ts",
+      "src/collections/LeadActivities.ts",
+      "src/collections/Leads.ts",
+      "src/collections/Media.ts",
+      "src/collections/Pages.ts",
+      "src/collections/PrivateFiles.ts",
+      "src/collections/Projects.ts",
+      "src/collections/Provinces.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/Staff.ts",
+      "src/collections/TranslationUsage.ts",
+      "src/collections/Wards.ts",
+      "src/collections/redirects-plugin.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/globals/Header.ts",
+      "src/globals/Homepage.ts",
+      "src/globals/SiteSettings.ts",
+      "src/globals/homepage/blocks.ts",
+      "src/fields/nav-link.ts",
+      "src/fields/search-reindex-pending.ts",
+      "src/fields/seo.ts",
+      "src/fields/slug.ts",
+      "src/fields/translation.ts",
+      "src/fields/mime-type-label.ts",
+      "src/hooks/audit-content-delete.ts",
+      "src/hooks/categories/scope-collections.ts",
+      "src/hooks/pages/sync-privacy-version.ts",
+      "src/hooks/wards/guard-delete.ts",
+      "src/hooks/leads/sync-phone-normalized.ts",
+      "src/hooks/job-applications/delete-cv-and-audit.ts",
+      "src/endpoints/admin/leads-export.ts",
+      "src/endpoints/admin/retranslate.ts",
+      "tests/integration/admin-dashboard.test.ts",
+      "SPECIFICATIONS.md",
+      "docs/API_SPEC.md",
+      "docs/specs/2026-10-19-admin-ui-saas-design.md"
+    ],
+    "filesNote": "Chỉ chữ hiển thị (label, labels, admin.description, i18n override, thông báo hook/endpoint, cột Excel). Không đổi slug/schema/migration/URL/access control/endpoint. Không gồm sửa dở chưa commit ngoài phạm vi BL-040 (next.config.ts, src/components/projects/*).",
+    "modules": [
+      "Admin — chữ mặc định Payload (i18n.translations.vi)",
+      "Admin — nhãn collection/global + sidebar nhóm",
+      "Admin — Tổng quan (dashboard)",
+      "Admin — form mọi collection/global (field label, mô tả)",
+      "Admin — bộ lọc danh sách + Lead export (thông báo lỗi, cột Excel)",
+      "Admin — banner/bộ lọc dịch, nút duyệt tiếng Anh, tải CV",
+      "Hooks — thông báo lỗi (xoá phường, xoá CV, đồng bộ SĐT, phiên bản chính sách)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Chữ Payload: Thùng rác, Ngày xoá, thông báo danh sách rỗng, Tìm theo …, toán tử lọc là / không phải / là một trong / có giá trị + giá trị Có/Không",
+      "Xác nhận chuyển vào thùng rác có \"có thể khôi phục\"; thông báo khoá chỉnh sửa dùng \"mục\"; lỗi đăng nhập không có \"Lỗi -\"; \"Đặt lại mật khẩu\"; breadcrumb \"Tổng quan\"; tab phiên bản \"Lịch sử chỉnh sửa\"; upload dùng \"tệp\"",
+      "Sidebar: nhóm \"Dữ liệu nền\"; mục \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\" (không \"Lead khách hàng\")",
+      "Tổng quan: tiêu đề thẻ \"Mục quản lý\"",
+      "Danh sách Media / CV: cột \"Loại tệp\" thay \"MIME Type\"",
+      "SEO: \"Tiêu đề hiện trên Google\", \"Ẩn trang khỏi Google\"; trường slug \"Đường dẫn trang\"",
+      "Homepage: \"Banner đầu trang\", \"Khối mời tư vấn\"; nhãn ngày dạng \"Ngày …\" (không \"… lúc\"); bảng giá \"Còn căn / Sắp hết căn / Hết căn\"",
+      "Xuất Excel Lead: lọc theo toán tử không hỗ trợ → thông báo dùng chữ toán tử mới; file Excel có cột \"Sale phụ trách\""
+    ],
+    "dependents": [
+      "Bộ lọc danh sách mọi collection (menu toán tử + giá trị boolean)",
+      "Banner dịch lỗi + ô \"Trạng thái dịch\" (lib/translation/admin-ui.ts)",
+      "Chip lọc nhanh BL-022 + ô tìm kiếm BL-021 (cùng thanh công cụ)",
+      "Thông báo lỗi hook: xoá phường đang dùng, xoá CV, đồng bộ SĐT lead, phiên bản chính sách"
+    ],
+    "regression": [
+      "Admin list filters hoạt động như cũ (where trên URL không đổi)",
+      "Lead export: bộ lọc hỗ trợ xuất được file; bộ lọc không hỗ trợ báo lỗi đúng chữ mới",
+      "Banner/bộ lọc dịch hiển thị đúng nhãn",
+      "Tổng quan: thẻ đếm + lối tắt theo quyền (admin/sale) không đổi",
+      "Upload media + tải CV hoạt động",
+      "Đăng nhập sai nhiều lần → thông báo khoá tài khoản đúng, không \"Lỗi -\"",
+      "Quyền xem từng mục sidebar giữ nguyên (sale không thấy mục chỉ admin)",
+      "Không lỗi console"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL040-01",
+      "viewport": 1280,
+      "steps": "Đăng nhập admin, mở danh sách Tin cho thuê; nhìn nút góc phải, mở thùng rác.",
+      "expected": "Nút \"Thùng rác\"; cột/nhãn \"Ngày xoá\" (viết hoa chữ đầu)."
+    },
+    {
+      "id": "BL040-02",
+      "viewport": 1280,
+      "steps": "Danh sách Lead → Bộ lọc → thêm điều kiện; mở menu toán tử, chọn một trường có/không.",
+      "expected": "Toán tử \"là / không phải / là một trong / có giá trị\"; giá trị \"Có / Không\"; ô tìm kiếm ghi \"Tìm theo …\"."
+    },
+    {
+      "id": "BL040-03",
+      "viewport": 1280,
+      "steps": "Lọc danh sách ra 0 kết quả.",
+      "expected": "Thông báo danh sách rỗng tiếng Việt tự nhiên, không \"dữ kiện\"."
+    },
+    {
+      "id": "BL040-04",
+      "viewport": 1280,
+      "steps": "Chọn một tin → xoá (chuyển thùng rác).",
+      "expected": "Hộp xác nhận nói rõ \"có thể khôi phục\"."
+    },
+    {
+      "id": "BL040-05",
+      "viewport": 1280,
+      "steps": "Mở cùng một tin ở 2 tab/2 tài khoản để kích hoạt khoá chỉnh sửa.",
+      "expected": "Thông báo khoá dùng chữ \"mục\" (không \"tài liệu\")."
+    },
+    {
+      "id": "BL040-06",
+      "viewport": 1280,
+      "steps": "Đăng xuất; đăng nhập sai mật khẩu; bấm quên mật khẩu.",
+      "expected": "Lỗi không có tiền tố \"Lỗi -\"; nút/tiêu đề \"Đặt lại mật khẩu\"."
+    },
+    {
+      "id": "BL040-07",
+      "viewport": 1280,
+      "steps": "Nhìn sidebar admin (tài khoản admin) và trang Tổng quan.",
+      "expected": "Nhóm \"Dữ liệu nền\"; mục \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\"; breadcrumb \"Tổng quan\"; thẻ \"Mục quản lý\"."
+    },
+    {
+      "id": "BL040-08",
+      "viewport": 1280,
+      "steps": "Mở một tin đã sửa nhiều lần → tab phiên bản.",
+      "expected": "Tab \"Lịch sử chỉnh sửa\"."
+    },
+    {
+      "id": "BL040-09",
+      "viewport": 1280,
+      "steps": "Thư viện ảnh & tệp: tải lên 1 ảnh; xem danh sách + danh sách Tệp CV ứng viên.",
+      "expected": "Chữ upload dùng \"tệp\"; cột \"Loại tệp\" (không \"MIME Type\"); tải lên thành công."
+    },
+    {
+      "id": "BL040-10",
+      "viewport": 1280,
+      "steps": "Mở form một Dự án: nhóm SEO, trường đường dẫn, ngày, bảng giá.",
+      "expected": "\"Tiêu đề hiện trên Google\", \"Ẩn trang khỏi Google\", \"Đường dẫn trang\"; nhãn ngày \"Ngày …\"; trạng thái bảng giá \"Còn căn / Sắp hết căn / Hết căn\"."
+    },
+    {
+      "id": "BL040-11",
+      "viewport": 1280,
+      "steps": "Mở global Trang chủ (Homepage).",
+      "expected": "Khối \"Banner đầu trang\", \"Khối mời tư vấn\"."
+    },
+    {
+      "id": "BL040-12",
+      "viewport": 1280,
+      "steps": "Danh sách Lead: thêm bộ lọc không chuyển được sang xuất Excel (vd trường/toán tử ngoài danh sách hỗ trợ) → nhìn nút Xuất Excel; rồi bỏ lọc đó, bấm Xuất Excel.",
+      "expected": "Lần 1: nút bị khoá, thông báo liệt kê field + toán tử hỗ trợ bằng chữ mới (là, là một trong, có giá trị = Không, lớn hơn hoặc bằng, nhỏ hơn hoặc bằng); lần 2: tải file Excel, có cột \"Sale phụ trách\"."
+    },
+    {
+      "id": "BL040-13",
+      "viewport": 1280,
+      "steps": "Regression: danh sách Tin tức — ô \"Trạng thái dịch\" + banner dịch lỗi (nếu có); chip lọc nhanh Lead/Tin cho thuê.",
+      "expected": "Nhãn dịch đúng, chip lọc hoạt động như BL-022."
+    },
+    {
+      "id": "BL040-14",
+      "viewport": 1280,
+      "steps": "Regression: đăng nhập tài khoản sale, xem sidebar + Tổng quan.",
+      "expected": "Chỉ thấy mục được phép như trước; thẻ đếm theo quyền sale."
+    },
+    {
+      "id": "BL040-15",
+      "viewport": 390,
+      "steps": "Lặp BL040-07 và BL040-02 ở 390px.",
+      "expected": "Chữ mới không tràn ngang, không vỡ bố cục."
+    }
+  ],
+  "acceptance": [
+    "Chữ Payload: Thùng rác, Ngày xoá, danh sách rỗng, Tìm theo, toán tử là / không phải / là một trong / có giá trị + Có/Không, xác nhận thùng rác có \"có thể khôi phục\", khoá chỉnh sửa dùng \"mục\", lỗi đăng nhập không \"Lỗi -\", Đặt lại mật khẩu, breadcrumb \"Tổng quan\", tab \"Lịch sử chỉnh sửa\", upload \"tệp\"",
+    "Xuất Excel Lead với bộ lọc không hỗ trợ: nút khoá, thông báo dùng chữ toán tử mới; cột Excel \"Sale phụ trách\"",
+    "Sidebar: nhóm \"Dữ liệu nền\"; \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\" (số nhiều, không \"Lead khách hàng\")",
+    "Tổng quan: tiêu đề thẻ \"Mục quản lý\"",
+    "Danh sách Media / CV: cột \"Loại tệp\" thay \"MIME Type\"",
+    "SEO: \"Tiêu đề hiện trên Google\" / \"Ẩn trang khỏi Google\"; \"Đường dẫn trang\"",
+    "Homepage: \"Banner đầu trang\", \"Khối mời tư vấn\"",
+    "Nhãn ngày \"Ngày …\" (không \"… lúc\"); bảng giá \"Còn căn / Sắp hết căn / Hết căn\"",
+    "Không đổi slug / schema / URL / quyền"
+  ],
+  "outOfScope": [
+    "Ô \"Ngôn ngữ\" vi/en (BL-039, xử lý riêng)",
+    "Site công khai, email, trang lỗi toàn cục",
+    "Sửa dở chưa commit ngoài BL-040 (next.config.ts, src/components/projects/*)"
+  ],
+  "viewports": [
+    390,
+    1280
+  ],
+  "locales": [
+    "vi"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "GET /api/admin/leads/export (admin, bộ lọc hợp lệ) → 200 xlsx, hàng tiêu đề có cột \"Sale phụ trách\"; sale → 403 như cũ"
+  ],
+  "risk": "medium",
+  "riskNote": "Chữ admin dùng chung (override i18n Payload áp mọi màn) + nhãn toán tử lọc gắn với thông báo lỗi xuất Excel lead. Không schema/migration/URL/quyền/endpoint. Verify reviewer round 2 PASS (T01 NORMAL, T02 STRICT): pnpm vitest (64 files, 583 tests, integration chạy DB), typecheck 0 lỗi, lint 0 lỗi. Spec validation: gap không chặn. Chưa kiểm trình duyệt thật."
+}

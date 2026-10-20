@@ -15,6 +15,7 @@ import type { SaleContact } from "./rental-queries";
 
 export type RentalDirection = NonNullable<Rental["houseDirection"]>;
 export type RentalFurnishing = NonNullable<Rental["furnishing"]>;
+export type RentalAmenity = NonNullable<Rental["amenities"]>[number];
 export type RentalPaymentCycle = NonNullable<NonNullable<Rental["rentalTerms"]>["paymentCycle"]>;
 export type RentalService = NonNullable<NonNullable<Rental["rentalTerms"]>["includedServices"]>[number];
 
@@ -46,6 +47,8 @@ export interface RentalDetailView {
   houseDirection: RentalDirection | null;
   balconyDirection: RentalDirection | null;
   furnishing: RentalFurnishing | null;
+  /** Tiện ích của căn (BL-044), rỗng thì khối Chi tiết không có hàng này. */
+  amenities: RentalAmenity[];
   category: RentalLink | null;
   project: RentalLink | null;
   postedAtIso: string | null;
@@ -161,6 +164,7 @@ export function toRentalDetailView(doc: Rental, locale: Locale, hiddenLocation?:
     houseDirection: doc.houseDirection ?? null,
     balconyDirection: doc.balconyDirection ?? null,
     furnishing: doc.furnishing ?? null,
+    amenities: doc.amenities ?? [],
     category: categoryLink(visibleCategory(doc.category, locale), locale),
     project: projectLink(doc.project, locale),
     postedAtIso: doc.publishedAt ?? null,

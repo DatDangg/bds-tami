@@ -264,6 +264,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `houseDirection` | select | | `N` · `NE` · `E` · `SE` · `S` · `SW` · `W` · `NW` |
 | `balconyDirection` | select | | Như trên |
 | `furnishing` | select | I | `none` (không nội thất) · `basic` (cơ bản) · `full` (đầy đủ) |
+| `amenities` | select hasMany | I | BL-044. `pool` · `gym` · `elevator` · `parking` · `security` · `balcony` · `washing_machine` · `air_conditioner` · `pet_friendly` · `kitchen` (`RENTAL_AMENITIES`, `src/shared/types/api.ts`). Bảng `rentals_amenities` (`parent_id`, `value`, index cả hai; migration `20261020_095907_rentals_amenities`). Tiện ích của căn, khác `rentalTerms.includedServices` (dịch vụ trong giá thuê). Bộ lọc `/cho-thue` lọc AND bằng `EXISTS` |
 | `rentalTerms` | group | | Xem bên dưới |
 | `description` | richText | R | |
 | `gallery` | upload hasMany `rel→media` | R khi `published`, tối thiểu 3 ảnh | |

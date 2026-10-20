@@ -1,0 +1,224 @@
+{
+  "specVersion": "1.34.0",
+  "scopeVersion": 42,
+  "generatedAt": "2026-10-20T17:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-044 — trang chủ làm lại bố cục theo mockup mới (hero chữ trái + bộ đếm/thanh tiến trình, ô tìm kiếm hàng \"Tùy chọn khác\" lọc thật, khối Điểm mạnh mới, Về TAMI cụm ảnh + video Dialog + số liệu icon, thẻ Dự án nổi bật nền trắng + tim trang trí, banner chữ trái) + footer dùng chung toàn site theo mockup; giữ màu/token/font/element sẵn có. Spec 1.33.0 → 1.34.0 (MINOR, MODIFY). PLANNED — phát hành pre-build; scope này sẽ được cập nhật lại (scopeVersion +1) ở close-out với commit, review report, verify thật.",
+  "workItem": "feature-homepage-redesign",
+  "backlog": "BL-044",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-20-homepage-redesign.md",
+  "task": [
+    "tasks/feature-homepage-redesign/phase-1-task-01.md",
+    "tasks/feature-homepage-redesign/phase-1-task-02.md",
+    "tasks/feature-homepage-redesign/phase-1-task-03.md"
+  ],
+  "reviewReport": [],
+  "commits": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.33.0-41.json",
+  "specUpdate": "spec/updates/2026-10-20-homepage-redesign.md",
+  "specRefs": [
+    "FR-PUB-01",
+    "Khung trang"
+  ],
+  "specRefNotes": {
+    "FR-PUB-01": "F1 Trang chủ — khối \"Bố cục theo mockup mới (BL-044)\": thứ tự Hero → ô tìm kiếm → Điểm mạnh (MỚI `strengths`) → Về TAMI → Dự án nổi bật → Banner tư vấn → Footer; hero chữ trái + eyebrow + titleAccent + bộ đếm 01 / 03 + thanh tiến trình + caption; ô tìm kiếm kính lúp trong ô + nút Tìm kiếm + chip 1 hàng + hàng \"Tùy chọn khác\" lọc bằng tham số sẵn có /cho-thue (ô 5 chờ Q1); Về TAMI cụm ảnh chồng + thẻ chú thích + nút play YouTube Dialog + số liệu icon + CTA + ảnh trang trí; thẻ dự án trắng ảnh 4:3 + tim trang trí + ghim + mũi tên, bỏ kính mờ/số liệu, điều khiển giữa dưới; banner chữ trái (prop align); khối ngoài mockup tắt bằng admin; mobile xếp dọc.",
+    "Khung trang": "Footer theo mockup trang chủ (BL-044, dùng chung toàn site): cột trái logo trắng + footer.contactBlock + icon mạng xã hội site-settings.socialLinks (ô tròn viền, 20px, vùng chạm 44px); cột link footer.columns tiêu đề eyebrow vàng; cột Liên hệ theo Q2; hàng cuối bản quyền + VI | EN + Cài đặt cookie; nút lên đầu trang = BackToTop (BL-035); < md accordion như cũ. Không đổi schema footer/site-settings."
+  },
+  "migration": "additive — global homepage (versioned, tên do builder tạo ở T01): hero.eyebrow, hero.caption, hero.slides[].titleAccent, strengths{enabled,items[]{icon,title,description}}, about.{eyebrow,titleAccent,secondaryImage,imageCaption,videoUrl,videoLabel,ctaLabel,ctaLink,decorImage}, about.stats[].icon, featuredProjects.{eyebrow,description}; HOMEPAGE_BLOCKS + strengths. footer/site-settings không đổi.",
+  "changed": {
+    "files": [
+      "src/globals/Homepage.ts",
+      "src/globals/homepage/blocks.ts",
+      "src/lib/home/home-view.ts",
+      "src/lib/home/home-queries.ts",
+      "src/lib/home/load-home.ts",
+      "src/components/home/HeroSlider.tsx",
+      "src/components/home/HeroSearch.tsx",
+      "src/components/home/StrengthsBlock.tsx",
+      "src/components/home/AboutBlock.tsx",
+      "src/components/home/ProjectsSlider.tsx",
+      "src/components/home/CtaBanner.tsx",
+      "src/components/layout/CtaBanner.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "migrations/*homepage_redesign*",
+      "src/payload-types.ts"
+    ],
+    "filesNote": "DỰ KIẾN (pre-build) — danh sách thật ghi lại ở close-out. StrengthsBlock.tsx là file mới; tên migration do builder đặt ở T01. Test đi kèm (*.test.tsx / home-view.test.ts / home-queries.test.ts) + SPECIFICATIONS.md / .context/design-spec.md / docs/ERD.md (doc reconcile T03) chưa liệt kê.",
+    "modules": [
+      "Trang chủ — Hero slider (chữ trái, bộ đếm, thanh tiến trình, chú thích)",
+      "Trang chủ — Ô tìm kiếm (kính lúp, chip 1 hàng, hàng \"Tùy chọn khác\" → /cho-thue)",
+      "Trang chủ — Điểm mạnh (khối mới `strengths`)",
+      "Trang chủ — Về TAMI (cụm ảnh, video Dialog YouTube, số liệu icon, CTA, ảnh trang trí)",
+      "Trang chủ — Dự án nổi bật (thẻ trắng, tim trang trí, điều khiển giữa dưới, eyebrow + mô tả)",
+      "Trang chủ — Banner tư vấn (chữ trái; layout/CtaBanner prop align)",
+      "Khung trang — Footer dùng chung toàn site",
+      "CMS — global homepage (field mới, HOMEPAGE_BLOCKS, migration additive) + view model / loader",
+      "i18n — chuỗi giao diện mới vi/en"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Trang chủ `/` và `/en`: hero chữ trái, eyebrow / titleAccent / caption, bộ đếm 01 / 03 + thanh tiến trình bấm được + nút Dừng/Phát, mũi tên tròn, nút cuộn xuống; 1 slide → 01 / 01 không thanh không autoplay",
+      "Ô tìm kiếm: icon kính lúp trong ô, nút \"Tìm kiếm\" mũi tên, chip \"Dự án được quan tâm\" 1 hàng + nút mở (aria-expanded); tab Cho thuê hàng \"Tùy chọn khác\" (Mức giá / Diện tích / Loại căn hộ / Nội thất [+ ô 5 theo Q1]) → GET /cho-thue với priceMin/priceMax/areaMin/areaMax/category/furnishing[/bedrooms]; \"Tất cả\" không lên URL",
+      "Khối Điểm mạnh: 4 cột ≥ lg / 2×2 md / 1 cột < md, icon tròn + tiêu đề + mô tả; admin strengths.enabled + items 2–6; /en bỏ mục thiếu title EN, < 2 mục ẩn khối; bản ghi có sẵn admin thêm `strengths` vào Thứ tự khối",
+      "Về TAMI: cụm ảnh lớn 4:5 + ảnh nhỏ + thẻ chú thích + nút play (chỉ khi videoUrl YouTube hợp lệ) mở Dialog youtube-nocookie autoplay, Esc/nút đóng, iframe tải khi mở; eyebrow → h2 title + titleAccent vàng → content → số liệu có icon 2 cột → nút CTA (thiếu nhãn/link ẩn); decorImage chỉ ≥ xl aria-hidden",
+      "Dự án nổi bật: eyebrow + h2 gạch ngắn + mô tả; thẻ trắng ảnh 4:3 + badge + tim trang trí (aria-hidden, không click) + tên 2 dòng giữ chỗ + ghim tỉnh + nút tròn mũi tên; ≈ 5 thẻ/khung 1440; mũi tên + chấm giữa phía dưới; nút ghost \"Xem tất cả dự án\"",
+      "Banner tư vấn trang chủ chữ canh trái trong khung 84rem",
+      "Footer mọi trang công khai: cột trái logo trắng + mô tả + icon mạng xã hội ô tròn; cột link eyebrow vàng; cột Liên hệ theo Q2; hàng cuối bản quyền + VI | EN + Cài đặt cookie; không nút lên đầu trang thứ hai",
+      "Admin global Trang chủ: field mới có bản vi/en, validate videoUrl YouTube, danh sách icon cố định; mô tả tab \"Thứ tự khối\" hướng dẫn tắt khối ngoài mockup"
+    ],
+    "dependents": [
+      "Footer trên mọi trang công khai (danh sách, chi tiết, tin tức, tuyển dụng, liên hệ, pháp lý) vi/en — accordion < md, cột Liên hệ luôn mở (nếu giữ)",
+      "`layout/CtaBanner` ở S14 trang dịch vụ phải giữ căn giữa (prop align mặc định center)",
+      "`useSnapSlider` (BL-038): chấm = số vị trí cuộn thật, mũi tên đi 1 vị trí với thẻ mới ~272px",
+      "`BackToTop` (BL-035) vẫn là nút nổi duy nhất, không chồng footer",
+      "Hover tiêu đề thẻ dự án (BL-034) + giữ chỗ tên 2 dòng (BL-037) trên thẻ mới",
+      "Khối Dịch vụ / Ưu đãi / Cho thuê / Tin tức / Đối tác: tắt → không render; bật lại trong admin → render như cũ"
+    ],
+    "regression": [
+      "/cho-thue nhận đúng query từ ô tìm kiếm trang chủ (có JS: đủ cặp giá/diện tích; không JS: q + category + furnishing[+ bedrooms] gửi được qua form GET)",
+      "Tab Dự án gửi GET /du-an?province=&status= như cũ; tablist ←/→/Home/End",
+      "Thanh thông báo trang chủ (bật/tắt/đóng/nhớ theo hash) không đổi",
+      "Đúng 1 h1 trên trang chủ; heading h2 các khối theo thứ tự",
+      "AA tương phản chữ trên hero/scrim, badge, footer tối, eyebrow vàng; không hex/kiểu mới ngoài token (no-raw-colors.test)",
+      "/en: phần tử thiếu chữ EN ẩn (eyebrow, caption, titleAccent, strengths item, imageCaption, CTA), không lộ chữ vi",
+      "Migration additive chạy sạch trên DB có dữ liệu; bản ghi homepage cũ render không lỗi khi field mới trống",
+      "Hero autoplay / Dừng-Phát / vuốt / phím / prefers-reduced-motion như BL-020",
+      "Không lỗi console; typecheck / lint / build PASS"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL044-01",
+      "viewport": 1440,
+      "steps": "Mở `/`; đặt screenshot cạnh `docs/specs/homepage-redesign-mockup/homepage-mockup-desktop.webp`; so 7 phần (hero, ô tìm kiếm, Điểm mạnh, Về TAMI, Dự án nổi bật, banner, footer).",
+      "expected": "Thứ tự khối, bố cục, vị trí thành phần, tỉ lệ khớp mockup; chỉ các khối trong mockup hiện."
+    },
+    {
+      "id": "BL044-02",
+      "viewport": 1440,
+      "steps": "Hero: đọc eyebrow / tiêu đề 2 dòng (dòng 2 vàng) / mô tả / nút; nhìn góc dưới trái; bấm đoạn thanh tiến trình thứ 2; bấm mũi tên phải; bấm Dừng.",
+      "expected": "Chữ canh trái; bộ đếm `01 / 0N` đổi theo slide; đoạn đang xem màu vàng; mũi tên đi 1 slide; autoplay dừng; góc dưới phải có chú thích + nút cuộn."
+    },
+    {
+      "id": "BL044-03",
+      "viewport": 1440,
+      "steps": "Ô tìm kiếm tab Cho thuê: nhập từ khoá, chọn Mức giá + Diện tích + Loại căn hộ + Nội thất ở hàng \"Tùy chọn khác\", bấm Tìm kiếm.",
+      "expected": "Chuyển `/cho-thue?q=…&category=…&priceMin=…&priceMax=…&areaMin=…&areaMax=…&furnishing=…`; trang danh sách lọc đúng; ô \"Tất cả\" không lên URL."
+    },
+    {
+      "id": "BL044-04",
+      "viewport": 1440,
+      "steps": "Tắt JS; lặp BL044-03 với từ khoá + Loại căn hộ + Nội thất.",
+      "expected": "Form GET gửi được `q`, `category`, `furnishing`; không lỗi."
+    },
+    {
+      "id": "BL044-05",
+      "viewport": 1440,
+      "steps": "Chip \"Dự án được quan tâm\" với > 1 hàng chip: nhìn hàng; bấm nút tròn mũi tên xuống.",
+      "expected": "Mặc định 1 hàng (tràn ẩn); bấm mở hết, `aria-expanded` đổi."
+    },
+    {
+      "id": "BL044-06",
+      "viewport": 1440,
+      "steps": "Admin → Trang chủ: bật Điểm mạnh, thêm `strengths` vào Thứ tự khối, nhập 4 mục (icon + tiêu đề vi/en + mô tả); lưu; mở `/` và `/en`.",
+      "expected": "Dải 4 mục icon tròn + tiêu đề + mô tả ngay dưới ô tìm kiếm; `/en` hiện mục có title EN; xoá còn 1 mục → khối ẩn."
+    },
+    {
+      "id": "BL044-07",
+      "viewport": 1440,
+      "steps": "Admin → Trang chủ → Về TAMI: nhập videoUrl YouTube hợp lệ, ảnh phụ, chú thích, icon số liệu, nút CTA; mở `/`; bấm nút play; Esc.",
+      "expected": "Cụm ảnh chồng + thẻ chú thích; nút play mở Dialog video autoplay, Esc đóng; số liệu có icon tròn; nút CTA đúng link. Xoá videoUrl → nút play ẩn; nhập URL không phải YouTube → admin báo lỗi."
+    },
+    {
+      "id": "BL044-08",
+      "viewport": 1440,
+      "steps": "Dự án nổi bật: đếm thẻ trong khung; nhìn thẻ; bấm icon tim; bấm mũi tên phải; bấm chấm; bấm thẻ.",
+      "expected": "≈ 5 thẻ; thẻ trắng ảnh 4:3 + badge + tim (không phản ứng, không focus) + tên + ghim tỉnh + nút tròn mũi tên; mũi tên/chấm giữa phía dưới, đi 1 vị trí (BL-038); thẻ dẫn tới chi tiết dự án."
+    },
+    {
+      "id": "BL044-09",
+      "viewport": 1440,
+      "steps": "Banner tư vấn trang chủ; rồi mở trang Dịch vụ (S14) xem CtaBanner.",
+      "expected": "Trang chủ chữ canh trái; S14 vẫn căn giữa."
+    },
+    {
+      "id": "BL044-10",
+      "viewport": 1440,
+      "steps": "Footer ở `/`, `/du-an`, `/en/tin-tuc`: nhìn cột trái, cột link, hàng cuối; Tab tới icon mạng xã hội; cuộn xuống tìm nút lên đầu trang.",
+      "expected": "Cột trái logo trắng + mô tả + icon mạng xã hội ô tròn (focus thấy); cột link tiêu đề vàng viết hoa; hàng cuối bản quyền + VI | EN (+ Cài đặt cookie); chỉ nút nổi BackToTop, không nút trong footer."
+    },
+    {
+      "id": "BL044-11",
+      "viewport": 1440,
+      "steps": "Admin tắt khối Dịch vụ / Ưu đãi / Cho thuê / Tin tức (hoặc bỏ khỏi Thứ tự khối); mở `/`; bật lại một khối.",
+      "expected": "Khối tắt không render; bật lại render như trước BL-044, dữ liệu còn nguyên."
+    },
+    {
+      "id": "BL044-12",
+      "viewport": 390,
+      "steps": "Mở `/`: hero, ô tìm kiếm (hàng Tùy chọn khác), Điểm mạnh, Về TAMI, Dự án nổi bật, banner, footer.",
+      "expected": "Xếp dọc giữ phong cách desktop: hero chữ trái + bộ đếm đáy trái; Tùy chọn khác 2 cột; Điểm mạnh 1 cột; Về TAMI 1 cột (ảnh 4:3); thẻ dự án vuốt ngang; banner chữ trái; footer cột trái dọc + accordion cột link; không tràn ngang."
+    },
+    {
+      "id": "BL044-13",
+      "viewport": 1440,
+      "steps": "Mở `/en` với bản ghi thiếu eyebrow/caption/titleAccent/imageCaption EN.",
+      "expected": "Phần tử thiếu EN ẩn, không lộ chữ tiếng Việt; trang vẫn đủ khối còn lại."
+    },
+    {
+      "id": "BL044-14",
+      "viewport": 1440,
+      "steps": "Kiểm tra accessibility: đếm h1; kiểm tra tương phản chữ hero/scrim, eyebrow vàng trên nền tối footer, nút trên ảnh; Tab qua hero (thanh tiến trình, Dừng/Phát, mũi tên), ô tìm kiếm, nút play, thẻ dự án.",
+      "expected": "Đúng 1 h1; AA; mọi control có tên truy cập; tim + nút mũi tên trang trí không nhận focus."
+    },
+    {
+      "id": "BL044-15",
+      "viewport": 1440,
+      "steps": "Regression: thanh thông báo trang chủ bật/đóng/tải lại; tab Dự án ô tìm kiếm chọn Tỉnh + Trạng thái → Tìm kiếm.",
+      "expected": "Thanh thông báo như BL-020 P2; chuyển `/du-an?province=&status=` đúng."
+    }
+  ],
+  "acceptance": [
+    "Trang chủ desktop (1440) khớp bố cục mockup: chụp màn hình đặt cạnh ảnh so từng phần (1→7); lệch bố cục/thứ tự/vị trí thành phần thấy được bằng mắt → FAIL",
+    "Không có màu hay kiểu element mới ngoài design tokens/component hiện có; có hex hay kiểu nút/chip tự chế → FAIL",
+    "Trang chỉ có các khối trong ảnh, đúng thứ tự; khối không có trong ảnh tắt trên trang chủ (không xoá code/dữ liệu, bật lại được trong admin)",
+    "Mobile (390): bản xếp dọc giữ đúng phong cách của ảnh",
+    "Mọi chữ/ảnh/số liệu mới sửa được trong admin (global homepage / footer), có bản EN",
+    "Đạt AA tương phản, giữ đúng 1 h1, tests/typecheck/build PASS"
+  ],
+  "outOfScope": [
+    "Chi tiết dự án / cho thuê / tin đăng / tin tức (không đổi)",
+    "Thêm tham số lọc mới cho /cho-thue (chỉ dùng tham số sẵn có)",
+    "Icon tim có state yêu thích (chỉ trang trí)",
+    "Schema footer / site-settings (không đổi)",
+    "Admin UI ngoài global homepage",
+    "Sửa dở chưa commit ngoài BL-044 (next.config.ts, src/components/projects/*)"
+  ],
+  "openQuestions": [
+    "Q1: /cho-thue không có bộ lọc Tiện ích → ô thứ 5 \"Tùy chọn khác\" dùng Phòng ngủ (bedrooms) hay bỏ (chờ user)",
+    "Q2: cột Liên hệ footer giữ sau cột link (khi có hotline/email/địa chỉ) hay bỏ (chờ user)"
+  ],
+  "viewports": [
+    390,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "Không có endpoint mới. GET /cho-thue?… (SSR) với query từ ô tìm kiếm trang chủ → 200, lọc đúng theo priceMin/priceMax/areaMin/areaMax/category/furnishing[/bedrooms]",
+    "Admin REST global homepage: lưu videoUrl không phải YouTube → 400 validate; field mới tuỳ chọn lưu được rỗng"
+  ],
+  "risk": "medium",
+  "riskNote": "Trang chủ là trang có lưu lượng cao nhất + footer dùng chung mọi trang công khai + migration additive global homepage + ô tìm kiếm tạo query cho /cho-thue (không JS phải vẫn gửi được). Không đổi API/quyền/URL/cache tag; schema footer/site-settings không đổi. PLANNED — chưa có verify/review; risk và evidence ghi lại ở close-out. Q1/Q2 chưa chốt.",
+  "status": "planned"
+}

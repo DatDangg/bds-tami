@@ -78,4 +78,11 @@ describe("parseRentalSearchParams", () => {
     expect(outcome).toEqual({ ok: true, value: expect.objectContaining({ q: "a" }) });
     expect(outcome.ok && "foo" in outcome.value).toBe(false);
   });
+
+  it("amenities: khoá lặp gộp như dạng phẩy (bỏ trùng, lọc danh sách)", () => {
+    const repeated = parseRentalSearchParams("https://tami.test/x?amenities=gym&amenities=pool&amenities=gym&amenities=khong-co");
+    const comma = parseRentalSearchParams("https://tami.test/x?amenities=pool,gym");
+    expect(repeated).toEqual({ ok: true, value: expect.objectContaining({ amenities: ["pool", "gym"] }) });
+    expect(repeated).toEqual(comma);
+  });
 });
