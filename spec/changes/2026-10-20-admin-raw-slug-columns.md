@@ -18,3 +18,4 @@ Phát hiện khi rà chữ BL-040 (2026-10-20), user duyệt ghi BL: ở danh s�
 
 ## Ghi chú
 - Làm sau BL-040 (dùng nhãn mới). Liên quan BL-021 T5 (định dạng cột).
+- 2026-10-21: BL-041 dồn Nhật ký thao tác / Lượt bấm liên hệ vào nhóm "Nâng cao" (không ẩn) → phạm vi BL này không đổi. Diff Trước/Sau cho metadata nhật ký: hoãn (`docs/reviews/2026-10-21-admin-audit.md` §9.2).
