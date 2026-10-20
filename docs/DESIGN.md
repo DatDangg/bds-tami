@@ -91,7 +91,7 @@
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--radius-sm` | 2px | Ô nhập nhỏ |
+| `--radius-sm` | 2px | Chi tiết nhỏ (không dùng cho ô nhập: input/textarea/select dùng `--radius-md`, checkbox = md/2) |
 | `--radius-md` / `--radius-lg` | 12px / 16px | Panel, hộp thông báo |
 | `--radius-xl` | 20px | Thẻ (dự án, cho thuê, tin, việc làm) và ảnh trong thẻ |
 | `--radius-pill` | 9999px | Mọi nút (Button), badge |

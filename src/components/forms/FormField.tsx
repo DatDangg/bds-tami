@@ -41,9 +41,9 @@ type Shared = {
 
 // Cùng kích thước/viền với <Input> (cao 48px, viền 3:1) để các loại ô đồng nhất.
 const controlBase =
-  "w-full min-w-0 rounded-sm border border-input bg-surface font-sans text-body text-text transition-colors duration-(--duration-fast) focus-visible:border-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 read-only:bg-surface-muted aria-invalid:border-error";
+  "w-full min-w-0 rounded-md border border-input bg-surface font-sans text-body text-text transition-colors duration-(--duration-fast) focus-visible:border-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 read-only:bg-surface-muted aria-invalid:border-error";
 const fileClasses =
-  "h-12 cursor-pointer py-2.5 pr-4 pl-2 file:mr-3 file:h-8 file:cursor-pointer file:rounded-sm file:border-0 file:bg-surface-muted file:px-3 file:font-sans file:text-small file:font-semibold file:text-text";
+  "h-12 cursor-pointer py-2.5 pr-4 pl-2 file:mr-3 file:h-8 file:cursor-pointer file:rounded-pill file:border-0 file:bg-surface-muted file:px-3 file:font-sans file:text-small file:font-semibold file:text-text";
 
 function withoutKind<T extends { as?: unknown }>(control: T): Omit<T, "as"> {
   const copy = { ...control };

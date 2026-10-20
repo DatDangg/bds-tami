@@ -184,7 +184,7 @@ Thang bo góc (BL-020): vuông ở khối lớn (hero/section), **12/16/20px** c
 | Token | Giá trị | Áp cho |
 |---|---|---|
 | `--radius-none` | 0 | Hero, slider, section |
-| `--radius-sm` | 2px | Input, select, checkbox, cookie banner |
+| `--radius-sm` | 2px | Chi tiết nhỏ, cookie banner (ô nhập dùng `--radius-md`, checkbox = md/2 — BL-030) |
 | `--radius-md` | 12px | Dropdown, popover, dialog, toast, hộp thông báo |
 | `--radius-lg` | 16px | Panel |
 | `--radius-xl` | 20px | Thẻ (dự án, cho thuê, tin, việc làm) và ảnh trong thẻ |

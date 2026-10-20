@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { chooseOption, renderWithIntl } from "../media/test-utils";
 import { FormField } from "./FormField";
+import { LeadFormSlot } from "./LeadFormSlot";
+import { Checkbox } from "../ui/checkbox";
 
 describe("FormField", () => {
   it("label thật gắn với ô, dấu * có chữ ẩn, không cần placeholder", () => {
@@ -98,6 +100,41 @@ describe("FormField", () => {
     it("disabled: trigger khoá", () => {
       renderWithIntl(<FormField as="select" name="source" label="Nguồn" disabled options={sourceOptions} />);
       expect(screen.getByLabelText("Nguồn")).toBeDisabled();
+    });
+  });
+
+  describe("bo góc đồng bộ (BL-030)", () => {
+    it("input, textarea, select, file bo --radius-md, không còn rounded-sm", () => {
+      renderWithIntl(
+        <>
+          <FormField name="a" label="Ô A" />
+          <FormField as="textarea" name="b" label="Ô B" />
+          <FormField as="select" name="c" label="Ô C" options={[{ value: "x", label: "X" }]} />
+          <FormField as="file" name="d" label="Ô D" />
+        </>,
+      );
+      for (const label of ["Ô A", "Ô B", "Ô C", "Ô D"]) {
+        const el = screen.getByLabelText(label);
+        expect(el).toHaveClass("rounded-md");
+        expect(el).not.toHaveClass("rounded-sm");
+      }
+      expect(screen.getByLabelText("Ô D")).toHaveClass("file:rounded-pill");
+    });
+
+    it("checkbox bo 6px dẫn xuất từ token md", () => {
+      renderWithIntl(<Checkbox aria-label="Đồng ý" />);
+      const box = screen.getByRole("checkbox", { name: "Đồng ý" });
+      expect(box).toHaveClass("rounded-[calc(var(--radius-md)/2)]");
+      expect(box).not.toHaveClass("rounded-sm");
+    });
+
+    it("LeadFormSlot mặc định rounded-lg, className của nơi gọi vẫn thắng", () => {
+      const { rerender } = renderWithIntl(<LeadFormSlot title="Tư vấn">nội dung</LeadFormSlot>);
+      const section = () => document.querySelector("section") as HTMLElement;
+      expect(section()).toHaveClass("rounded-lg");
+      rerender(<LeadFormSlot title="Tư vấn" className="rounded-xl">nội dung</LeadFormSlot>);
+      expect(section()).toHaveClass("rounded-xl");
+      expect(section()).not.toHaveClass("rounded-lg");
     });
   });
 });

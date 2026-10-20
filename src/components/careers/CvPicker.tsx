@@ -85,7 +85,7 @@ export function CvPicker({ name, accept, file, disabled, error, labels, onPick, 
         onDrop={handleDrop}
         data-dragging={dragging || undefined}
         className={cn(
-          "flex flex-col gap-3 md:items-center md:rounded-sm md:border md:border-dashed md:border-input md:px-4 md:py-5 md:text-center",
+          "flex flex-col gap-3 md:items-center md:rounded-md md:border md:border-dashed md:border-input md:px-4 md:py-5 md:text-center",
           "transition-colors duration-(--duration-fast) motion-reduce:transition-none",
           error && "md:border-error",
           // Đứng sau `error` để lúc kéo vào ô đang lỗi vẫn thấy highlight (tailwind-merge giữ class sau).
@@ -134,7 +134,7 @@ export function CvPicker({ name, accept, file, disabled, error, labels, onPick, 
         </p>
       )}
       {file && (
-        <div className="flex min-h-11 items-center justify-between gap-3 rounded-sm bg-surface px-3 text-small text-text">
+        <div className="flex min-h-11 items-center justify-between gap-3 rounded-md bg-surface px-3 text-small text-text">
           <span className="min-w-0 truncate font-semibold">{file.name}</span>
           <span className="shrink-0 text-text-muted">{formatFileSize(file.size)}</span>
           <button

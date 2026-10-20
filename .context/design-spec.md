@@ -136,7 +136,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### 3.2. Thẻ (Card)
 
-Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--radius-pill`; panel/hộp thông báo `--radius-md`/`--radius-lg` (12/16px); ô nhập nhỏ `--radius-sm`. Badge bo viên thuốc: Sắp mở bán = `--gradient-gold`, Đang bán = `--gradient-success` (chữ trắng), Đã bàn giao = trung tính.
+Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--radius-pill`; panel/hộp thông báo `--radius-md`/`--radius-lg` (12/16px); ô nhập (input/textarea/select) `--radius-md` (BL-030), checkbox 6px (= md/2), khung form lead `--radius-lg`. Badge bo viên thuốc: Sắp mở bán = `--gradient-gold`, Đang bán = `--gradient-success` (chữ trắng), Đã bàn giao = trung tính.
 
 | Thẻ | Ảnh | Nội dung | Hover/focus |
 |---|---|---|---|

@@ -1,0 +1,93 @@
+{
+  "specVersion": "1.24.1",
+  "scopeVersion": 31,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-029 — thanh mục con trang chi tiết (dự án + cho thuê, DetailSubNav): cuộn qua hết mục cuối (dải quan sát rỗng, đáy mục cuối ≤ 88px) → không nút nào active / aria-current; cuộn ngược vào mục → active lại; đầu trang/trên mục đầu giữ mục đầu active; khoá cuộn 1s sau khi bấm nút không bị xoá active. Root cause: callback IntersectionObserver không xử lý tập visible rỗng. Spec 1.24.0 → 1.24.1 (PATCH làm rõ hành vi).",
+  "workItem": "bug/detail-subnav-clear-active-past-sections",
+  "backlog": "BL-029",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-20-detail-subnav-clear-active-past-sections.md",
+  "task": [
+    "tasks/bug-detail-subnav-clear-active-past-sections/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/bug-detail-subnav-clear-active-past-sections-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "close-out BL-029 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-029 (commit chứa file này)": "T01 — DetailSubNav: hằng OBSERVER_TOP_PX=88, nhánh tập rỗng + !scrollLocked + đáy mục cuối ≤ 88px → setActiveId(\"\"); test mới DetailSubNav.test.tsx 6 case. Review NORMAL PASS r1. Close-out kèm SPECIFICATIONS (F2) + design-spec S03 mục 3."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.24.0-30.json",
+  "specUpdate": "spec/updates/2026-10-20-detail-subnav-clear-active-past-sections.md",
+  "specRefs": [
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)",
+    "design-spec S03 mục 3 / S07"
+  ],
+  "specRefNotes": {
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)": "Mục đang xem: qua hết mục cuối → không nút active/aria-current; cuộn ngược → active lại; đầu trang → mục đầu active; khoá cuộn sau khi bấm không xoá active.",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)": "Cùng component DetailSubNav — cùng hành vi.",
+    "design-spec S03 mục 3 / S07": "Reconcile ở close-out: dải quan sát 88px → 55% viewport, quy tắc bỏ active khi qua mục cuối."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/detail/DetailSubNav.test.tsx"
+    ],
+    "filesNote": "Chỉ logic callback IntersectionObserver + hằng OBSERVER_TOP_PX + JSDoc; markup/class/CSS không đổi. Không schema/migration/API/access control/i18n. Doc impact: SPECIFICATIONS (F2), design-spec S03 mục 3.",
+    "modules": [
+      "Detail — DetailSubNav (trạng thái mục đang xem / aria-current)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Chi tiết dự án `/du-an/<slug>` + `/en/projects/<slug>`: cuộn qua hết mục cuối (vd Thư viện / Tin liên quan / Hỏi đáp) xuống Dự án liên quan / CTA \"Đăng ký tham quan\" / footer → không nút mục con nào nền `--color-primary` / `aria-current`",
+      "Chi tiết cho thuê `/cho-thue/<slug>` + `/en/for-rent/<slug>`: cuộn qua mục cuối (vd Pháp lý / Vị trí) xuống tin tương tự / footer → không nút active",
+      "Cuộn ngược lên vào một mục → nút đó active lại",
+      "Đầu trang / phía trên mục đầu → mục đầu (Tổng quan) active"
+    ],
+    "dependents": [
+      "DetailSubNav dùng ở cả 2 trang chi tiết (DetailLayout)",
+      "Effect tự cuộn ngang < lg đưa mục đang xem vào giữa — phải không lỗi khi không có mục active"
+    ],
+    "regression": [
+      "Bấm nút mục con: cuộn mượt tới section, nút vừa bấm active suốt lúc cuộn (khoá ~1s), không nhấp nháy mục ở giữa; tiêu đề không bị thanh che (scroll-margin, BL-027)",
+      "Khối đứng cạnh nhau ≥ lg (Pháp lý / Chính sách): mục đầu theo thứ tự trang thắng, mục thứ hai vẫn chọn được",
+      "Bề rộng thanh = khung nội dung (BL-028), kiểu nút active, focus-visible",
+      "Header ẩn khi cuộn trên trang chi tiết (BL-027)"
+    ]
+  },
+  "acceptance": [
+    "Cuộn qua hết mục cuối (mục cuối nằm hẳn phía trên thanh, không mục nào trong dải) → `document.querySelectorAll(\"nav [aria-current]\").length === 0` và không nút nào nền vàng",
+    "Cuộn ngược vào một mục → đúng nút đó `aria-current=\"location\"` + nền `--color-primary`",
+    "Mở trang / ở đầu trang → mục đầu active",
+    "Bấm một nút mục con → nút đó active trong lúc cuộn và sau khi tới nơi",
+    "< lg: không có lỗi console khi không có mục active; thanh vẫn cuộn ngang bình thường",
+    "VI + EN, dự án + cho thuê như nhau"
+  ],
+  "outOfScope": [
+    "Hết khoá cuộn 1s không đánh giá lại (hành vi có từ trước)",
+    "Trước hydrate header có thể che thanh mục con (đã chấp nhận ở BL-027)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1280,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "Diff nhỏ logic client (1 nhánh callback + 1 hằng), component chung 2 trang. NORMAL PASS r1; vitest detail + project-detail 41 PASS (builder: detail/projects/rentals 162 PASS), typecheck PASS, lint 0 error. Residual: chỉ kiểm jsdom + fake observer, chưa xem trình duyệt thật; ngưỡng 88px xấp xỉ ≥ lg (< lg lệch ~8px); mục cuối ngắn có thể thoáng mất active ở khe cuối trang."
+}

@@ -25,7 +25,7 @@ export function LeadFormSlot({ title, children, fallback, className, id = "lead-
   const generatedHeadingId = useId();
   const titleId = headingId ?? generatedHeadingId;
   return (
-    <section id={id} aria-labelledby={titleId} className={cn("scroll-mt-[calc(var(--sticky-top)+1rem)] rounded-sm bg-primary-subtle p-6 lg:p-8", className)}>
+    <section id={id} aria-labelledby={titleId} className={cn("scroll-mt-[calc(var(--sticky-top)+1rem)] rounded-lg bg-primary-subtle p-6 lg:p-8", className)}>
       <h2 id={titleId} className="mb-4 font-display text-h2-sm">
         {title}
       </h2>

@@ -915,6 +915,36 @@
       "scopeVersion": 30,
       "specUpdate": "spec/updates/2026-10-20-detail-subnav-full-width.md",
       "residual": "768px chưa kiểm bằng mắt; bản /en chưa đo riêng (cùng component)"
+    },
+    {
+      "slug": "form-fields-rounded",
+      "title": "Ô nhập form công khai bo góc đồng bộ thẻ/nút (BL-030)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-030",
+      "changeDoc": "spec/changes/archive/2026-10-20-form-fields-rounded.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-form-fields-rounded/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "note": "input/select trigger/option-select/FormField base rounded-md; checkbox rounded-[calc(var(--radius-md)/2)] 6px; file: rounded-pill; LeadFormSlot mặc định rounded-lg; CvPicker rounded-md; token --radius-sm giữ",
+          "report": ".context/review-reports/feature-form-fields-rounded-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-030)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.25.0",
+      "scopeVersion": 32,
+      "specUpdate": "spec/updates/2026-10-20-form-fields-rounded.md",
+      "residual": "chưa xem bằng mắt 375/768/1280; ProjectFilters (user đang sửa) giữ override rounded-md riêng; RentalFilters override rounded-md thừa vô hại; item dropdown Radix giữ rounded-sm"
     }
   ],
   "bugs": [
@@ -1801,7 +1831,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T04:39:16.166Z",
+  "lastUpdated": "2026-10-20",
   "approvalMilestones": [
     {
       "id": "M1",

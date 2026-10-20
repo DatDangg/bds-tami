@@ -40,7 +40,7 @@ interface OptionSelectProps {
 }
 
 const nativeClass =
-  "block h-12 w-full min-w-0 cursor-pointer appearance-none truncate rounded-sm border border-input bg-surface py-0 pr-10 pl-4 font-sans text-body text-text focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 aria-invalid:border-error";
+  "block h-12 w-full min-w-0 cursor-pointer appearance-none truncate rounded-md border border-input bg-surface py-0 pr-10 pl-4 font-sans text-body text-text focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-50 aria-invalid:border-error";
 
 /** Ô chọn theo token TAMI với API giống `<select>` (value là chuỗi, "" = rỗng). Controlled (`value`) hoặc uncontrolled (`defaultValue`). */
 export function OptionSelect({
