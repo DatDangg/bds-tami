@@ -6,10 +6,10 @@ import { STRENGTH_ICON_COMPONENTS } from "./strength-icons";
  * Điểm mạnh (SPECIFICATIONS F1 BL-044): dải 2–6 mục ngay dưới ô tìm kiếm, nền `bg`; ≥ lg 4 cột, md 2 cột, < md 1 cột. Mỗi mục: ô tròn 56px `primary-soft`
  * chứa icon Phosphor (`accent-text` ≈ 3,5:1 trên `primary-soft`, 24px; ô tròn đủ tách khỏi nền `bg` để nhận ra như mockup) + tiêu đề `h3` + mô tả muted. Không có `h2`: vùng mang `aria-label` i18n. Server Component.
  */
-export function StrengthsBlock({ block }: { block: StrengthsView }) {
+export function StrengthsBlock({ block, label }: { block: StrengthsView; /** Nhãn vùng thay nhãn trang chủ (vd dải ý trang Tuyển dụng). */ label?: string }) {
   const t = useTranslations("page.home.strengths");
   return (
-    <section aria-label={t("region")} className="bg-bg py-8 md:py-10">
+    <section aria-label={label ?? t("region")} className="bg-bg py-8 md:py-10">
       <ul className="mx-auto grid w-full max-w-container grid-cols-1 gap-6 px-gutter md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         {block.items.map((item, index) => {
           const Icon = STRENGTH_ICON_COMPONENTS[item.icon];

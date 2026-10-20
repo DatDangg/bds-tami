@@ -6,6 +6,8 @@ import type { Page } from "@/payload-types";
 const loadLegalPage = vi.hoisted(() => vi.fn<(locale: string, kind: string) => Promise<Partial<Page> | null>>());
 vi.mock("@/lib/legal/legal-page", () => ({ loadLegalPage }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
   const { default: vi } = await import("@/i18n/messages/vi.json");
@@ -43,7 +45,10 @@ const page = (overrides: Partial<Page> = {}): Partial<Page> => ({
   ...overrides,
 });
 
-afterEach(() => loadLegalPage.mockReset());
+afterEach(() => {
+  loadLegalPage.mockReset();
+  loadPageBanner.mockReset();
+});
 
 describe("trang pháp lý (S16)", () => {
   it("hiện phiên bản + ngày hiệu lực, một h1, mục lục trỏ đúng id h2", async () => {
@@ -56,6 +61,19 @@ describe("trang pháp lý (S16)", () => {
     expect(links.map((link) => link.getAttribute("href"))).toEqual(["#muc-1", "#muc-2"]);
     for (const link of links) expect(container.querySelector(link.getAttribute("href") as string)).not.toBeNull();
     expect(container.querySelector("h2#muc-1")).toHaveTextContent("1. Phạm vi");
+  });
+
+  it("hero thấp: ảnh pageBanners.legal, eyebrow \"Pháp lý\", mô tả = dòng phiên bản; mục lục dính + nội dung trong thẻ trắng", async () => {
+    loadLegalPage.mockResolvedValue(page());
+    loadPageBanner.mockResolvedValue({ url: "/api/media/file/legal.jpg", width: 1600 });
+    const { container } = renderWithIntl(await LegalPage({ locale: "vi", kind: "privacy" }));
+    expect(loadPageBanner).toHaveBeenCalledWith("vi", "legal");
+    const hero = container.querySelector("section[data-hero-size=short]") as HTMLElement;
+    expect(hero.querySelector("img")).not.toBeNull();
+    expect(within(hero).getByText("Pháp lý")).toBeInTheDocument();
+    expect(within(hero).getByText("Phiên bản 1.2 · Hiệu lực từ 05/03/2026")).toBeInTheDocument();
+    expect(container.querySelector("aside nav[class*='sticky']")).not.toBeNull();
+    expect(container.querySelector("h2#muc-1")?.closest(".bg-surface")).not.toBeNull();
   });
 
   it("/en: nhãn tiếng Anh", async () => {

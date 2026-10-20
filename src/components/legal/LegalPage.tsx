@@ -3,8 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { RichText } from "@/components/content/RichText";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
-import { PageBanner } from "@/components/layout/PageBanner";
+import { PageHero } from "@/components/layout/PageHero";
 import { LEGAL_PAGE_ROUTES, type LegalPageKind, publicPath } from "@/lib/content/content-paths";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { collectSectionHeadings } from "@/lib/content/section-headings";
 import { formatDate } from "@/lib/format";
@@ -38,19 +39,30 @@ export async function buildLegalMetadata(locale: Locale, kind: LegalPageKind): P
 export async function LegalPage({ locale, kind }: { locale: Locale; kind: LegalPageKind }) {
   const doc = await loadLegalPage(locale, kind);
   if (!doc) notFound();
-  const [t, tRich] = await Promise.all([getTranslations({ locale, namespace: "page.legal" }), getTranslations({ locale, namespace: "page.richText" })]);
+  const [t, tRich, bannerImage] = await Promise.all([
+    getTranslations({ locale, namespace: "page.legal" }),
+    getTranslations({ locale, namespace: "page.richText" }),
+    loadPageBanner(locale, "legal"),
+  ]);
   const title = doc.title ?? "";
   const headings = collectSectionHeadings(doc.content);
   const versionLine = t("version", { version: doc.version, date: formatDate(doc.effectiveDate, locale) });
 
   return (
     <article>
-      <PageBanner title={title} description={versionLine} />
-      <Breadcrumb className="py-2" items={[{ label: title, href: publicPath(LEGAL_PAGE_ROUTES[kind], locale) }]} />
-      <div className="mx-auto w-full max-w-container px-gutter py-10 xl:grid xl:grid-cols-[15rem_minmax(0,48rem)] xl:justify-center xl:gap-12">
+      <PageHero
+        size="short"
+        eyebrow={t("eyebrow")}
+        title={title}
+        description={versionLine}
+        {...(bannerImage ? { image: bannerImage } : {})}
+        breadcrumb={<Breadcrumb variant="overlay" items={[{ label: title, href: publicPath(LEGAL_PAGE_ROUTES[kind], locale) }]} />}
+      />
+      {/* Mockup `.legal`: mục lục dính trái (≥ lg) + MỘT thẻ trắng nội dung; < lg mục lục thu gọn nằm trên thẻ nội dung. */}
+      <div className="mx-auto w-full max-w-container px-gutter py-section-tight lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-10">
         <TableOfContents headings={headings} />
-        <div className="min-w-0">
-          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} anchorSections />
+        <div className="min-w-0 rounded-xl bg-surface p-5 md:p-8">
+          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} anchorSections className="max-w-[72ch]" />
         </div>
       </div>
     </article>

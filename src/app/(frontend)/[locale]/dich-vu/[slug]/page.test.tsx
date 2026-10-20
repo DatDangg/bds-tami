@@ -10,6 +10,13 @@ vi.mock("payload", () => ({ getPayload: vi.fn().mockResolvedValue({}) }));
 vi.mock("@/lib/services/service-queries", () => ({ findPublicServiceBySlug, findOtherServices }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "moi-gioi", en: "brokerage" }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+const getSiteSettings = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
+vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner: async () => undefined }));
+vi.mock("@/components/layout/ConsultBanner", async () => {
+  const { createElement } = await import("react");
+  return { ConsultBanner: ({ actionHref }: { actionHref?: string }) => createElement("div", { "data-testid": "consult-banner", "data-href": actionHref }) };
+});
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
   const { default: vi } = await import("@/i18n/messages/vi.json");
@@ -42,7 +49,10 @@ async function renderService(locale: "vi" | "en" = "vi", slug = "moi-gioi") {
   return renderWithIntl(ui, locale);
 }
 
-beforeEach(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example"));
+beforeEach(() => {
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
+  getSiteSettings.mockResolvedValue({ hotline: "0900 123 456" });
+});
 afterEach(() => {
   vi.unstubAllEnvs();
   findPublicServiceBySlug.mockReset();
@@ -63,8 +73,14 @@ describe("trang Dịch vụ (S14)", () => {
     expect(within(others).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/dich-vu/phan-phoi", "/dich-vu/khai-thac"]);
     expect(within(others).getByRole("heading", { level: 3, name: "Phân phối" })).toBeInTheDocument();
 
-    const cta = screen.getByRole("heading", { level: 2, name: "Bạn quan tâm Môi giới?" }).closest("section") as HTMLElement;
-    expect(within(cta).getByRole("link", { name: "Nhận tư vấn" })).toHaveAttribute("href", "/lien-he?service=moi-gioi");
+    // Thẻ tư vấn dính cột phải (không có form lead mới): hotline gọi được + nút → /lien-he?service=<slug>; banner tư vấn dùng chung ở cuối trang.
+    const advice = screen.getByRole("heading", { level: 2, name: "Tư vấn dịch vụ" }).closest("aside") as HTMLElement;
+    expect(advice.querySelector("[class*='lg:sticky']")).not.toBeNull();
+    expect(within(advice).getByRole("link", { name: "0900 123 456" })).toHaveAttribute("href", "tel:0900123456");
+    expect(within(advice).getByRole("link", { name: "Nhận tư vấn" })).toHaveAttribute("href", "/lien-he?service=moi-gioi");
+    expect(advice.querySelector("form")).toBeNull();
+    expect(screen.getByTestId("consult-banner")).toHaveAttribute("data-href", "/lien-he?service=moi-gioi");
+    expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
   });
 
   it("không có dịch vụ khác → ẩn khối; chưa có ảnh bìa → banner chữ (vẫn một h1)", async () => {

@@ -6,6 +6,9 @@ import type { SiteSetting } from "@/payload-types";
 const getSiteSettings = vi.hoisted(() => vi.fn<(locale: string) => Promise<Partial<SiteSetting>>>());
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+vi.mock("@/lib/content/load-page-banner", () => ({
+  loadPageHero: async (locale: string) => ({ title: locale === "en" ? "Contact" : "Liên hệ", eyebrow: locale === "en" ? "Contact" : "Liên hệ" }),
+}));
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
   const { default: vi } = await import("@/i18n/messages/vi.json");
@@ -52,6 +55,15 @@ describe("trang Liên hệ (S15)", () => {
     const slot = document.getElementById("lead-form");
     expect(slot).toHaveAccessibleName("Gửi yêu cầu tư vấn");
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+
+  it("bố cục mockup: hero thấp, đầu khối canh trái \"Văn phòng TAMI\", form trong thẻ trắng nổi, không banner tư vấn", async () => {
+    getSiteSettings.mockResolvedValue(settings);
+    const { container } = await renderContact("vi");
+    expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: /Văn phòng\s+TAMI/ })).toBeInTheDocument();
+    expect(document.getElementById("lead-form")).toHaveClass("bg-surface", "shadow-md");
+    expect(container.querySelector("[data-testid=consult-banner]")).toBeNull();
   });
 
   it("có mapLocation ([kinh độ, vĩ độ]) → bản đồ lười có nhãn, chưa tải cho tới khi vào viewport/bấm", async () => {

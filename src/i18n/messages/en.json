@@ -658,7 +658,15 @@
         "part_time": "Part-time",
         "internship": "Internship",
         "contract": "Contract"
-      }
+      },
+      "perksRegion": "Working at TAMI",
+      "perksEyebrow": "Why TAMI",
+      "perksTitle": "Working",
+      "perksTitleAccent": "environment",
+      "jobsEyebrow": "Open positions",
+      "jobsTitle": "Career",
+      "jobsTitleAccent": "opportunities",
+      "applyCta": "Apply"
     },
     "careerDetail": {
       "summaryTitle": "Job summary",
@@ -706,7 +714,8 @@
           "cvTooLarge": "The CV must be 5MB or less, please choose a smaller file."
         },
         "orContact": "Or contact us directly:"
-      }
+      },
+      "sectionLabel": "Section {number}"
     },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
@@ -726,8 +735,11 @@
     "services": {
       "otherTitle": "Other services",
       "learnMore": "View service",
-      "ctaTitle": "Interested in {name}?",
-      "ctaDescription": "Leave your details and a TAMI advisor will get back to you shortly."
+      "eyebrow": "Services",
+      "detailTitle": "Service details",
+      "adviceTitle": "Service advice",
+      "adviceDescription": "Call our hotline or leave your details and a TAMI specialist will get in touch.",
+      "adviceCta": "Get advice"
     },
     "contact": {
       "title": "Contact",
@@ -739,11 +751,15 @@
       "hours": "Working hours",
       "hoursValue": "8:00 AM - 5:30 PM, Mon - Sat",
       "mapLabel": "TAMI office on the map",
-      "formTitle": "Send an enquiry"
+      "formTitle": "Send an enquiry",
+      "officeEyebrow": "Information",
+      "officeTitle": "TAMI",
+      "officeTitleAccent": "office"
     },
     "legal": {
       "version": "Version {version} · Effective {date}",
-      "tocTitle": "Contents"
+      "tocTitle": "Contents",
+      "eyebrow": "Legal"
     },
     "home": {
       "title": "Curated real estate and apartments for rent",

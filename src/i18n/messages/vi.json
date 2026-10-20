@@ -658,7 +658,15 @@
         "part_time": "Bán thời gian",
         "internship": "Thực tập",
         "contract": "Hợp đồng"
-      }
+      },
+      "perksRegion": "Môi trường làm việc",
+      "perksEyebrow": "Vì sao chọn TAMI",
+      "perksTitle": "Môi trường",
+      "perksTitleAccent": "làm việc",
+      "jobsEyebrow": "Vị trí đang tuyển",
+      "jobsTitle": "Cơ hội",
+      "jobsTitleAccent": "nghề nghiệp",
+      "applyCta": "Ứng tuyển"
     },
     "careerDetail": {
       "summaryTitle": "Thông tin tuyển dụng",
@@ -706,7 +714,8 @@
           "cvTooLarge": "CV tối đa 5MB, vui lòng chọn tệp nhỏ hơn."
         },
         "orContact": "Hoặc liên hệ trực tiếp với chúng tôi:"
-      }
+      },
+      "sectionLabel": "Mục {number}"
     },
     "richText": {
       "table": "Bảng nội dung, cuộn ngang để xem đủ"
@@ -726,8 +735,11 @@
     "services": {
       "otherTitle": "Dịch vụ khác",
       "learnMore": "Xem dịch vụ",
-      "ctaTitle": "Bạn quan tâm {name}?",
-      "ctaDescription": "Để lại thông tin, chuyên viên TAMI sẽ liên hệ tư vấn trong thời gian sớm nhất."
+      "eyebrow": "Dịch vụ",
+      "detailTitle": "Chi tiết dịch vụ",
+      "adviceTitle": "Tư vấn dịch vụ",
+      "adviceDescription": "Gọi hotline hoặc để lại thông tin, chuyên viên TAMI sẽ liên hệ.",
+      "adviceCta": "Nhận tư vấn"
     },
     "contact": {
       "title": "Liên hệ",
@@ -739,11 +751,15 @@
       "hours": "Giờ làm việc",
       "hoursValue": "08:00 - 17:30, thứ 2 - thứ 7",
       "mapLabel": "Văn phòng TAMI trên bản đồ",
-      "formTitle": "Gửi yêu cầu tư vấn"
+      "formTitle": "Gửi yêu cầu tư vấn",
+      "officeEyebrow": "Thông tin",
+      "officeTitle": "Văn phòng",
+      "officeTitleAccent": "TAMI"
     },
     "legal": {
       "version": "Phiên bản {version} · Hiệu lực từ {date}",
-      "tocTitle": "Mục lục"
+      "tocTitle": "Mục lục",
+      "eyebrow": "Pháp lý"
     },
     "home": {
       "title": "Bất động sản chọn lọc, căn hộ cho thuê",

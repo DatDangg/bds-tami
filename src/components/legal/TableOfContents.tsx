@@ -18,7 +18,7 @@ function Links({ headings }: { headings: SectionHeading[] }) {
 }
 
 /**
- * Mục lục trang pháp lý (design-spec S16), sinh từ `h2` (`collectSectionHeadings`): từ xl là cột trái dính, dưới xl là accordion
+ * Mục lục trang pháp lý (design-spec S16, mockup `.toc` BL-045), sinh từ `h2` (`collectSectionHeadings`): từ lg là thẻ trắng cột trái dính, dưới lg là accordion
  * "Mục lục" đầu bài (`<details>` gốc, không cần JS). Hai bản cùng danh sách link; bản không hiển thị bị `display: none` nên không
  * lặp trong cây trợ năng. Ẩn khi in. Server Component.
  */
@@ -27,14 +27,14 @@ export function TableOfContents({ headings }: { headings: SectionHeading[] }) {
   if (headings.length === 0) return null;
   return (
     <>
-      <details className="mb-8 rounded-sm border border-border xl:hidden print:hidden">
-        <summary className="flex min-h-11 cursor-pointer items-center px-4 font-semibold">{t("tocTitle")}</summary>
-        <nav aria-label={t("tocTitle")} className="px-4 pb-3">
+      <details className="mb-6 rounded-xl bg-surface lg:hidden print:hidden">
+        <summary className="flex min-h-11 cursor-pointer items-center px-5 font-semibold">{t("tocTitle")}</summary>
+        <nav aria-label={t("tocTitle")} className="px-5 pb-3">
           <Links headings={headings} />
         </nav>
       </details>
-      <aside className="hidden xl:block print:hidden">
-        <nav aria-label={t("tocTitle")} className="sticky top-[calc(var(--header-offset)+1rem)] flex flex-col gap-2">
+      <aside className="hidden lg:block print:hidden">
+        <nav aria-label={t("tocTitle")} className="sticky top-[calc(var(--header-offset)+1rem)] flex flex-col gap-2 rounded-xl bg-surface p-6">
           <p className="font-semibold">{t("tocTitle")}</p>
           <Links headings={headings} />
         </nav>

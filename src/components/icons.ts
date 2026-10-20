@@ -15,6 +15,7 @@ export {
   CheckCircle,
   ClipboardText,
   Clock,
+  EnvelopeSimple,
   FacebookLogo,
   Globe,
   Headset,
