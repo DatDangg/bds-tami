@@ -32,3 +32,4 @@ batchQueue: [phase-1-task-01, phase-1-task-02, phase-1-task-03, phase-1-task-04]
 - 2026-10-21 T01 reviewer r1 FAIL (M1 44px) → builder r2 → reviewer r2 STRICT PASS; commit T01
 - 2026-10-21 T02 builder → reviewer STRICT r1 PASS (5 MINOR residual); commit T02
 - 2026-10-21 T03 builder → reviewer STRICT r1 PASS (4 MINOR residual); commit T03
+- 2026-10-21 T04 builder → reviewer STRICT r1 PASS (4 MINOR residual); commit T04; next phase spec-validator + spec-publisher + close-out

@@ -164,10 +164,10 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
               label: "Thuật ngữ dịch cố định",
               labels: { singular: "Thuật ngữ", plural: "Thuật ngữ" },
               access: adminOnlyRead,
-              admin: { description: "Thuật ngữ AI luôn dịch cố định như bảng này", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
+              admin: { description: "Thuật ngữ AI luôn dịch cố định như bảng này. VD: \"Căn hộ dịch vụ\" → \"Serviced Apartment\". AI luôn dịch đúng từ này.", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
               fields: [
-                { name: "vi", type: "text", label: "Tiếng Việt", required: true },
-                { name: "en", type: "text", label: "Tiếng Anh", required: true },
+                { name: "vi", type: "text", label: "Tiếng Việt", required: true, admin: { placeholder: "VD: Căn hộ dịch vụ" } },
+                { name: "en", type: "text", label: "Tiếng Anh", required: true, admin: { placeholder: "VD: Serviced Apartment" } },
                 { name: "note", type: "text", label: "Ghi chú" },
               ],
             },
@@ -177,13 +177,14 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
         {
           label: "Thống kê & chính sách",
           fields: [
-            { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Dạng G-XXXXXXXXXX" } },
+            { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Lấy ở Google Analytics → Quản trị → Luồng dữ liệu → chọn luồng web → Mã đo lường (dạng G-XXXXXXXXXX).", placeholder: "G-XXXXXXXXXX" } },
             {
               name: "privacyPolicyVersion",
               type: "text",
               label: "Phiên bản chính sách bảo mật",
               access: { update: denyAll },
-              admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật" },
+              // Chữ nhỏ chỉ đọc thay ô nhập bị khoá (BL-042 #15); access/dữ liệu giữ nguyên.
+              admin: { readOnly: true, components: { Field: "/components/admin/SiteSettingsDisplay#PrivacyPolicyVersionField" } },
             },
           ],
         },

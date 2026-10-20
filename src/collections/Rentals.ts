@@ -85,7 +85,8 @@ const codeField: TextField = {
   required: true,
   unique: true,
   access: { create: denyAll, update: denyAll },
-  admin: { readOnly: true, position: "sidebar" },
+  // Mã hiện to ở đầu form (`codeBanner`); field giữ dữ liệu + cột + tìm kiếm nhưng không vẽ ô nhập riêng ở sidebar (BL-042 #13).
+  admin: { readOnly: true, position: "sidebar", components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeHiddenField" } },
 };
 
 /** Thời điểm chuyển sang `rented`, hệ thống ghi (hook `stampRentedAt`). */
@@ -160,6 +161,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
         codeField,
         // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
         { name: "roomsArea", type: "ui", label: "Phòng · diện tích", admin: { components: { Cell: "/components/admin/ListSummaryCells#RoomsAreaCell" } } },
+        { name: "codeBanner", type: "ui", admin: { components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeBanner" } } },
         formTabs([
           {
             label: "Nội dung",

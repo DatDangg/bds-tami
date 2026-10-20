@@ -2621,7 +2621,7 @@ export interface SiteSetting {
    */
   translationEnabled?: boolean | null;
   /**
-   * Thuật ngữ AI luôn dịch cố định như bảng này
+   * Thuật ngữ AI luôn dịch cố định như bảng này. VD: "Căn hộ dịch vụ" → "Serviced Apartment". AI luôn dịch đúng từ này.
    */
   translationGlossary?:
     | {
@@ -2652,12 +2652,9 @@ export interface SiteSetting {
     lastError?: string | null;
   };
   /**
-   * Dạng G-XXXXXXXXXX
+   * Lấy ở Google Analytics → Quản trị → Luồng dữ liệu → chọn luồng web → Mã đo lường (dạng G-XXXXXXXXXX).
    */
   gaMeasurementId?: string | null;
-  /**
-   * Tự cập nhật khi xuất bản chính sách bảo mật
-   */
   privacyPolicyVersion?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;

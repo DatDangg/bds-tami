@@ -195,3 +195,59 @@
     }
   }
 }
+
+// ---- Mã tin Cho thuê to ở đầu form + badge quá hạn tuyển dụng (BL-042 T04) ----
+.tami-rental-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 1rem;
+
+  &__label {
+    font-size: 0.9375rem;
+    color: var(--admin-text-subtle);
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--admin-text);
+    user-select: all;
+  }
+
+  &__status {
+    flex-basis: 100%;
+    font-size: 0.8125rem;
+    color: var(--admin-text-subtle);
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .tami-contact-action {
+    @media (max-width: 767px) {
+      min-height: 44px;
+    }
+  }
+}
+
+.tami-rental-code__pending {
+  margin-bottom: 1rem;
+}
+
+.tami-deadline-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tami-deadline-cell {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

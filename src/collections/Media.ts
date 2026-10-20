@@ -1,6 +1,7 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { isAdmin, isStaff, ownedByUserOrAdmin } from "../access";
+import { fillImageAlt } from "../hooks/media/default-alt";
 import { blockDeleteWhileUsedByHomepage } from "../hooks/media/guard-delete";
 import { mimeTypeLabelField } from "../fields/mime-type-label";
 import { collectionLabels } from "../lib/admin/collection-labels";
@@ -47,6 +48,8 @@ export const Media: CollectionConfig = {
   disableDuplicate: true,
   hooks: {
     beforeOperation: [createUploadGuard(MEDIA_POLICY)],
+    // Ảnh trống alt được điền từ tên file gốc (BL-042 #16); validator `alt` bên dưới vẫn là lưới an toàn.
+    beforeValidate: [fillImageAlt],
     beforeChange: [stampUploader],
     beforeDelete: [blockDeleteWhileUsedByHomepage],
   },

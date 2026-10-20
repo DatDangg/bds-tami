@@ -48,12 +48,17 @@ import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
+import { RentalCodeHiddenField as RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
+import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
+import { JobDeadlineCell as JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
+import { JobDeadlineNotice as JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
 import { CollectionNameCell as CollectionNameCell_ebbbd7848e3521f42b6c144797a789c2 } from '../../../components/admin/CollectionNameCell'
 import { CollectionNameHint as CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d } from '../../../components/admin/CollectionNameHint'
+import { PrivacyPolicyVersionField as PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2 } from '../../../components/admin/SiteSettingsDisplay'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { SiteLink as SiteLink_a231a25015c6e0b284665d827f035a95 } from '../../../components/admin/SiteLink'
@@ -116,12 +121,17 @@ export const importMap = {
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
+  "/components/admin/RentalCodeDisplay#RentalCodeHiddenField": RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2,
+  "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/ListSummaryCells#RoomsAreaCell": RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
+  "/components/admin/JobDeadlineDisplay#JobDeadlineCell": JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
+  "/components/admin/JobDeadlineDisplay#JobDeadlineNotice": JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
   "/components/admin/CollectionNameCell#CollectionNameCell": CollectionNameCell_ebbbd7848e3521f42b6c144797a789c2,
   "/components/admin/CollectionNameHint#CollectionNameHint": CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d,
+  "/components/admin/SiteSettingsDisplay#PrivacyPolicyVersionField": PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/SiteLink#SiteLink": SiteLink_a231a25015c6e0b284665d827f035a95,

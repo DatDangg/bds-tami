@@ -94,7 +94,11 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
                 label: "Hạn nộp hồ sơ",
                 required: true,
                 index: true,
-                admin: { date: { pickerAppearance: "dayOnly" } },
+                admin: {
+                  date: { pickerAppearance: "dayOnly" },
+                  // BL-042 #14: badge "Đã quá hạn" ở form và danh sách (cùng mốc giờ VN với chip "Hết hạn"); dữ liệu/lọc không đổi.
+                  components: { Cell: "/components/admin/JobDeadlineDisplay#JobDeadlineCell", afterInput: ["/components/admin/JobDeadlineDisplay#JobDeadlineNotice"] },
+                },
               },
             ],
           },
