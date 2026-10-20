@@ -12,6 +12,11 @@ vi.mock("@/lib/careers/job-queries", () => ({ findPublicJobBySlug, findOtherOpen
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "chuyen-vien-tu-van", en: "real-estate-consultant" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner: async () => ({ url: "/api/media/file/careers.jpg", width: 1600 }) }));
+vi.mock("@/components/layout/ConsultBanner", async () => {
+  const { createElement } = await import("react");
+  return { ConsultBanner: () => createElement("div", { "data-testid": "consult-banner" }) };
+});
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
   const { default: vi } = await import("@/i18n/messages/vi.json");
@@ -121,12 +126,24 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
   it("tóm tắt hiện nơi làm, hình thức, số lượng, lương và hạn nộp theo ngày", async () => {
     findPublicJobBySlug.mockResolvedValue(job());
     await renderJob();
-    const summary = screen.getByRole("heading", { level: 2, name: "Thông tin tuyển dụng" }).closest("aside") as HTMLElement;
+    const summary = screen.getByRole("heading", { level: 2, name: "Thông tin tuyển dụng" }).closest("section") as HTMLElement;
     expect(within(summary).getByText("Văn phòng TAMI, Quận 1, Hà Nội")).toBeInTheDocument();
     expect(within(summary).getByText("Toàn thời gian")).toBeInTheDocument();
     expect(within(summary).getByText("5 người")).toBeInTheDocument();
     expect(within(summary).getByText("15 triệu – 30 triệu")).toBeInTheDocument();
     expect(within(summary).getByText("20/10/2026")).toBeInTheDocument();
+  });
+
+  it("hero thấp có ảnh banner + eyebrow, mô tả = nơi làm · hạn nộp; form ứng tuyển nằm trong thẻ phải dính; banner tư vấn cuối trang (BL-045 Q5)", async () => {
+    findPublicJobBySlug.mockResolvedValue(job());
+    const { container } = await renderJob();
+    const hero = container.querySelector("section[data-hero-size=short]") as HTMLElement;
+    expect(hero.querySelector("img")).not.toBeNull();
+    expect(within(hero).getByText("Tuyển dụng", { selector: "p" })).toBeInTheDocument();
+    expect(within(hero).getByText("Văn phòng TAMI, Quận 1, Hà Nội · Hạn nộp: 20/10/2026")).toBeInTheDocument();
+    expect(container.querySelector("aside #apply-form")).not.toBeNull();
+    expect(container.querySelector("aside [class*='lg:sticky']")).not.toBeNull();
+    expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
   });
 
   it("JSON-LD JobPosting: validThrough cuối ngày hạn giờ VN, baseSalary min/max theo tháng, inLanguage, URL tuyệt đối, mô tả HTML; kèm BreadcrumbList", async () => {

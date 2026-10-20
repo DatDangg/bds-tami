@@ -6,12 +6,14 @@ import { ContactDetails } from "@/components/contact/ContactDetails";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
-import { PageBanner } from "@/components/layout/PageBanner";
+import { PageHero } from "@/components/layout/PageHero";
+import { SectionHeading } from "@/components/layout/SectionHeading";
 import { LazyMap } from "@/components/media/LazyMap";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { publicPath } from "@/lib/content/content-paths";
 import { buildContactPageView } from "@/lib/content/contact-view";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadPageHero } from "@/lib/content/load-page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import { logger } from "@/lib/logger";
@@ -59,11 +61,12 @@ export default async function ContactPage({ params }: PageProps) {
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  const [t, tNav, settings, identity] = await Promise.all([
+  const [t, tNav, settings, identity, hero] = await Promise.all([
     getTranslations({ locale, namespace: "page.contact" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     readSettings(locale),
     loadSiteIdentity(locale),
+    loadPageHero(locale, "contact"),
   ]);
   const { contact, socials, mapLocation } = buildContactPageView(settings);
   const siteUrl = getSiteUrl();
@@ -72,23 +75,27 @@ export default async function ContactPage({ params }: PageProps) {
 
   return (
     <>
-      <PageBanner title={t("title")} description={t("description")} />
-      <Breadcrumb className="py-2" items={[{ label: tNav("contact"), href: publicPath("/lien-he", locale) }]} />
-      {/* Thứ tự DOM = thứ tự đọc/Tab ở 375: thông tin → form → bản đồ; từ lg 2 cột 5/7 (form cao qua 2 hàng bên phải). */}
-      <div className="mx-auto grid w-full max-w-container gap-10 px-gutter pt-6 pb-section-tight lg:grid-cols-12 lg:gap-x-12">
-        <div className="lg:col-span-5 lg:row-start-1">
-          <ContactDetails contact={contact} socials={socials} />
-        </div>
-        <div className="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
-          <LeadFormSlot title={t("formTitle")}>
+      <PageHero
+        size="short"
+        title={hero.title}
+        {...(hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
+        {...(hero.eyebrow ? { eyebrow: hero.eyebrow } : {})}
+        {...(hero.description ? { description: hero.description } : {})}
+        {...(hero.image ? { image: hero.image } : {})}
+        breadcrumb={<Breadcrumb variant="overlay" items={[{ label: tNav("contact"), href: publicPath("/lien-he", locale) }]} />}
+      />
+      {/* Mockup `.contact`: thông tin trái, thẻ form trắng nổi phải (1 : 1,2); bản đồ bo 20px dưới cả hai. Thứ tự DOM = thứ tự đọc/Tab: thông tin → form → bản đồ. */}
+      <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter py-section-tight">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.2fr]">
+          <div className="flex flex-col gap-8">
+            <SectionHeading eyebrow={t("officeEyebrow")} title={t("officeTitle")} titleAccent={t("officeTitleAccent")} />
+            <ContactDetails contact={contact} socials={socials} />
+          </div>
+          <LeadFormSlot title={t("formTitle")} className="rounded-xl bg-surface p-6 shadow-md md:p-8 lg:p-8">
             <LeadForm source="contact" {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
           </LeadFormSlot>
         </div>
-        {mapLocation && (
-          <div className="lg:col-span-5 lg:row-start-2">
-            <LazyMap location={mapLocation} label={t("mapLabel")} />
-          </div>
-        )}
+        {mapLocation && <LazyMap location={mapLocation} label={t("mapLabel")} aspectRatio="16/7" className="[&>[role=region]]:rounded-xl" />}
       </div>
       {siteUrl && (
         <JsonLd

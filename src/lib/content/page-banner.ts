@@ -2,8 +2,8 @@ import type { MediaImage } from "../../components/media/ResponsiveImage";
 import type { PageHeroTextKey } from "../../globals/site-settings/page-heroes";
 import type { SiteSetting } from "../../payload-types";
 
-/** Trang con có ảnh banner riêng (khớp tên trường của `site-settings.pageBanners`, FR-ADM-20 + BL-045). */
-export type PageBannerKey = PageHeroTextKey | "legal";
+/** Trang con có ảnh banner riêng (khớp tên trường của `site-settings.pageBanners`, FR-ADM-20 + BL-045); `default` = chỉ ảnh mặc định (trang chi tiết dịch vụ không có ảnh riêng). */
+export type PageBannerKey = PageHeroTextKey | "legal" | "default";
 
 type PageBanners = NonNullable<SiteSetting["pageBanners"]>;
 

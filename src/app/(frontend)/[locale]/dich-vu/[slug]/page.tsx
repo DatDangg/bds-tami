@@ -2,25 +2,34 @@ import config from "@payload-config";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
 import { RichText } from "@/components/content/RichText";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
-import { CtaBanner } from "@/components/layout/CtaBanner";
-import { PageBanner } from "@/components/layout/PageBanner";
-import { ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { DETAIL_ASIDE_CARD_CLASS, DetailLayout } from "@/components/detail/DetailLayout";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
+import { PageHero } from "@/components/layout/PageHero";
+import { SectionHeading } from "@/components/layout/SectionHeading";
+import { buildContact } from "@/components/layout/shell-data";
+import { Phone } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { CONTENT_ROUTES, publicPath } from "@/lib/content/content-paths";
+import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
+import { logger } from "@/lib/logger";
 import { findLocalizedSlugs } from "@/lib/news/news-queries";
 import { findOtherServices, findPublicServiceBySlug } from "@/lib/services/service-queries";
 import { populatedCover, toServiceCards } from "@/lib/services/service-view";
 import { buildServiceJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata, toOgImage } from "@/lib/seo/metadata";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
+import { cn } from "@/lib/utils";
 import { routing, type Locale } from "@/i18n/routing";
 
 interface PageProps {
@@ -30,6 +39,16 @@ interface PageProps {
 // Không prerender lúc build (dữ liệu + env đọc lúc chạy); `[]` bật ISR theo yêu cầu cho slug bất kỳ để `revalidatePath` của hook lưu dịch vụ có tác dụng.
 export function generateStaticParams() {
   return [];
+}
+
+/** Hotline cho thẻ tư vấn. Global lỗi (DB tắt lúc `next build`) thì không có hotline, trang vẫn dựng (cùng cách `load-shell`). */
+async function loadHotline(locale: Locale) {
+  try {
+    return buildContact(await getSiteSettings(locale)).hotline;
+  } catch (error) {
+    logger.warn({ err: error }, "Không đọc được site-settings cho thẻ tư vấn dịch vụ");
+    return undefined;
+  }
 }
 
 /** Một lần đọc cho cả `generateMetadata` lẫn trang (React `cache` theo request). */
@@ -74,12 +93,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [t, tCta, tRich, identity, otherDocs] = await Promise.all([
+  const [t, tRich, identity, otherDocs, defaultBanner, hotline] = await Promise.all([
     getTranslations({ locale, namespace: "page.services" }),
-    getTranslations({ locale, namespace: "page.cta" }),
     getTranslations({ locale, namespace: "page.richText" }),
     loadSiteIdentity(locale),
     findOtherServices(payload, locale, doc.id),
+    loadPageBanner(locale, "default"),
+    loadHotline(locale),
   ]);
   const title = doc.title ?? "";
   const cover = populatedCover(doc.coverImage);
@@ -90,32 +110,50 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   const coverSrc = cover?.sizes?.large?.url ?? cover?.url;
   const coverUrl = coverSrc ? absoluteUrl(coverSrc, siteUrl) : undefined;
   const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
+  const heroImage = cover ?? defaultBanner;
   const adviceHref = `${publicPath("/lien-he", locale)}?service=${encodeURIComponent(doc.slug ?? slug)}`;
 
   return (
     <article>
-      {cover ? (
-        <section className="relative isolate flex h-[60svh] items-end overflow-hidden bg-dark-deep lg:h-[70svh]">
-          <ResponsiveImage media={cover} sizes="100vw" priority decorative className="absolute inset-0 -z-10" />
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-dark-deep/80 via-dark-deep/30 to-transparent" />
-          <div className="mx-auto flex w-full max-w-container flex-col gap-4 px-gutter pb-10 text-on-dark lg:pb-16">
-            <h1 className="font-display text-display text-balance">{title}</h1>
-            {doc.summary && <p className="max-w-[60ch] text-lead text-on-dark-muted">{doc.summary}</p>}
-          </div>
-        </section>
-      ) : (
-        <PageBanner title={title} description={doc.summary ?? undefined} />
-      )}
-      <Breadcrumb className="py-2" items={[{ label: title, href: ownPath }]} />
-      <div className="mx-auto w-full max-w-text px-gutter py-10">
-        <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} />
-      </div>
-      {others.length > 0 && (
-        <section aria-labelledby="other-services" className="bg-bg-alt py-section-tight">
-          <div className="mx-auto w-full max-w-container px-gutter">
-            <h2 id="other-services" className="mb-8 font-display text-h2">
-              {t("otherTitle")}
+      <DetailLayout
+        before={
+          <PageHero
+            size="short"
+            eyebrow={t("eyebrow")}
+            title={title}
+            {...(doc.summary ? { description: doc.summary } : {})}
+            {...(heroImage ? { image: heroImage } : {})}
+            breadcrumb={<Breadcrumb variant="overlay" items={[{ label: title, href: ownPath }]} />}
+          />
+        }
+        asideLabelledBy="service-advice-title"
+        aside={
+          <div className={cn("flex flex-col gap-4", DETAIL_ASIDE_CARD_CLASS)}>
+            <h2 id="service-advice-title" className="font-display text-h3">
+              {t("adviceTitle")}
             </h2>
+            <p className="text-text-secondary">{t("adviceDescription")}</p>
+            {hotline && (
+              <a href={hotline.telHref} className="inline-flex min-h-11 w-fit items-center gap-2 font-display text-h3 text-accent-text transition-colors hover:text-text">
+                <Phone size={22} weight="fill" aria-hidden="true" />
+                {hotline.label}
+              </a>
+            )}
+            <Button asChild size="lg" className="w-full">
+              <Link href={adviceHref}>{t("adviceCta")}</Link>
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-8">
+          <SectionHeading eyebrow={t("eyebrow")} title={t("detailTitle")} />
+          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
+        </div>
+      </DetailLayout>
+      {others.length > 0 && (
+        <section aria-labelledby="other-services" className="bg-surface py-section-tight">
+          <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter">
+            <SectionHeading id="other-services" title={t("otherTitle")} />
             <ul className="grid gap-6 md:grid-cols-2">
               {others.map((service) => (
                 <li key={service.id}>
@@ -126,7 +164,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
-      <CtaBanner title={t("ctaTitle", { name: title })} description={t("ctaDescription")} actionLabel={tCta("getAdvice")} actionHref={adviceHref} />
+      <ConsultBanner locale={locale} actionHref={adviceHref} />
       {serviceUrl && (
         <JsonLd
           data={buildServiceJsonLd({

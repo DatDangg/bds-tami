@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
 import { JobDetail } from "@/components/careers/JobDetail";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { buildContact } from "@/components/layout/shell-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { toJobPostingJsonLdInput } from "@/lib/careers/job-json-ld";
@@ -13,6 +14,7 @@ import { findOtherOpenJobs, findPublicJobBySlug } from "@/lib/careers/job-querie
 import { toJobCards, toJobDetailView } from "@/lib/careers/job-view";
 import { CONTENT_ROUTES } from "@/lib/content/content-paths";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadPageBanner } from "@/lib/content/load-page-banner";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
@@ -105,11 +107,12 @@ export default async function JobDetailPage({ params }: PageProps) {
 
   const now = new Date();
   const view = toJobDetailView(doc, locale, now);
-  const [contact, t, identity, otherDocs] = await Promise.all([
+  const [contact, t, identity, otherDocs, heroImage] = await Promise.all([
     loadContact(locale),
     getTranslations({ locale, namespace: "page.careerDetail.sections" }),
     loadSiteIdentity(locale),
     view.expired ? findOtherOpenJobs(payload, locale, doc.id, now) : [],
+    loadPageBanner(locale, "careers"),
   ]);
   const ownPath = publicDetailPath(CONTENT_ROUTES["job-postings"], locale, doc.slug ?? slug);
   // Site key là giá trị công khai nhưng đặt qua env lúc chạy (không NEXT_PUBLIC_ để không nhúng lúc build); trang ISR đọc nó khi render. Không dùng `getEnv()`: nó validate cả bộ env (kể cả secret) và ném lỗi làm sập trang công khai chỉ vì thiếu một biến không liên quan.
@@ -132,12 +135,14 @@ export default async function JobDetailPage({ params }: PageProps) {
       <JobDetail
         doc={doc}
         view={view}
+        {...(heroImage ? { heroImage } : {})}
         others={toJobCards(otherDocs, locale, now)}
         contact={{ ...(contact.email ? { email: contact.email } : {}), ...(contact.hotline ? { hotline: contact.hotline } : {}) }}
         ownPath={ownPath}
         {...(pageUrl ? { shareUrl: pageUrl } : {})}
         {...(turnstileSiteKey ? { turnstileSiteKey } : {})}
       />
+      <ConsultBanner locale={locale} />
       {jsonLdInput && <JsonLd data={buildJobPostingJsonLd(jsonLdInput)} />}
     </>
   );
