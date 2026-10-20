@@ -30,7 +30,7 @@ Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented
 
 ### 1.1. Song ngữ (Payload localization)
 
-Cấu hình: `localization: { locales: ['vi', 'en'], defaultLocale: 'vi', fallback: false }` (BRD FR-PUB-18, BR-07).
+Cấu hình: `localization: { locales: [{ code: 'vi', label: 'Tiếng Việt' }, { code: 'en', label: 'English' }], defaultLocale: 'vi', fallback: false }` (mã locale `vi`/`en`; `label` chỉ là nhãn ô chọn ngôn ngữ ở admin — BL-039) (BRD FR-PUB-18, BR-07).
 
 - Trường `localized: true` lưu riêng bản `vi` và `en`. Payload đặt các cột này ở bảng `<collection>_locales` (cột `_locale`, `_parent_id`), không nằm ở bảng chính.
 - **Localized** (áp cho mọi collection/global ở §4, không ghi lại từng bảng): `title`, `name`, `slug`, `summary`, `excerpt`, `description`, `overview`, `content`, các trường richText/textarea hiển thị cho khách, nhãn trong array (vd `amenities.name`, `floorPlans.title`), nhóm `seo`, chữ trong globals `homepage` / `header` / `footer`, `media.alt` / `caption`.

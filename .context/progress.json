@@ -1,11 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "admin-list-columns-filters-locale",
-    "phaseTask": "phase-1-task-04",
-    "journal": ".context/runs/feature-admin-list-columns-filters-locale-phase-1-task-01.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1420,10 +1415,10 @@
       "slug": "admin-list-columns-filters-locale",
       "title": "Admin danh sách gọn: cột/bộ lọc chỉ trường nghiệp vụ mọi màn + ô ngôn ngữ Tiếng Việt/English + Lọc nâng cao + gợi ý tìm kiếm + chip lọc nhanh 5 màn + cột Quy mô/Khoảng giá/Phòng·diện tích/Dự án (BL-039)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-039",
-      "changeDoc": "spec/changes/2026-10-20-admin-list-columns-filters-locale.md",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-list-columns-filters-locale.md",
       "startedAt": "2026-10-21",
       "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
       "note": "Auto proceed (user chỉ thị 2026-10-21): D1–D12 trong task file",
@@ -1441,7 +1436,8 @@
           "reports": [
             ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-1-review.md",
             ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md"
-          ]
+          ],
+          "commit": "35f4517"
         },
         {
           "task": "phase-1-task-02",
@@ -1455,7 +1451,8 @@
           "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md",
           "reports": [
             ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md"
-          ]
+          ],
+          "commit": "38d33c9"
         },
         {
           "task": "phase-1-task-03",
@@ -1469,7 +1466,8 @@
           "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-03-round-1-review.md",
           "reports": [
             ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-03-round-1-review.md"
-          ]
+          ],
+          "commit": "e6aee3a"
         },
         {
           "task": "phase-1-task-04",
@@ -1483,9 +1481,18 @@
           "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md",
           "reports": [
             ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md"
-          ]
+          ],
+          "commit": "0d4a1f4"
         }
-      ]
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.37.0",
+      "scopeVersion": 47,
+      "specUpdate": "spec/updates/2026-10-21-admin-list-columns-filters-locale.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-list-columns-filters-locale-phase-1.md",
+      "docReconcile": "docs/specs/2026-10-19-admin-ui-saas-design.md §4, docs/ERD.md §1.1",
+      "gap": "ID / Ngày xoá vẫn trong menu cột (Payload 3.91, cần schema)",
+      "residual": "chưa xem 375px (popup ngôn ngữ, hàng chip); cột Thuộc dự án nháy Đang tải; preferences cột cũ; chip Tuyển dụng qua nửa đêm cần tải lại; MINOR T02 (3), T03 MINOR-2"
     }
   ],
   "bugs": [
@@ -2402,7 +2409,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T20:43:03.513Z",
+  "lastUpdated": "2026-10-20T20:48:50.019Z",
   "approvalMilestones": [
     {
       "id": "M1",

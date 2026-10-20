@@ -1,7 +1,7 @@
 ---
 id: admin-list-columns-filters-locale
 type: feature
-status: in_progress
+status: done
 created: 2026-10-20
 ---
 
@@ -40,3 +40,4 @@ User 2026-10-20 (ảnh màn `/admin/collections/job-postings`):
 - Checkpoint "chụp ảnh + user duyệt danh sách trường giữ" → **tự quyết** (user: auto proceed): quy tắc ẩn chung (D1) + danh sách ẩn thêm từng collection do builder đề xuất, ghi trong task T01; ảnh chụp chỉ làm nếu dựng được app local, không thì residual.
 - Chia 4 task (mỗi task 1 commit): T01 cột/bộ lọc mọi collection · T02 ô ngôn ngữ + "Lọc nâng cao" + gợi ý tìm kiếm · T03 chip lọc nhanh 5 màn · T04 cột nghiệp vụ Dự án/Cho thuê. Quyết định D1–D12 ở `tasks/feature-admin-list-columns-filters-locale/phase-1-task-0{1..4}.md`.
 - Vượt UI-only → không làm, ghi gap: cột `ID`/`deletedAt` nếu Payload 3.91 không cho tắt bằng config (không thêm trường `id` vào schema); sắp xếp/lọc theo cột ghép (cần cột DB).
+- **Kết quả (2026-10-21):** done — T01 `35f4517` (STRICT PASS r2) · T02 `38d33c9` (STRICT PASS r1) · T03 `e6aee3a` (STRICT PASS r1) · T04 `0d4a1f4` (NORMAL PASS r1) + close-out; phase spec-validation GAPS nhẹ (doc) → đã reconcile `docs/specs/2026-10-19-admin-ui-saas-design.md` §4 + `docs/ERD.md` §1.1; spec **1.37.0 / scope v47**. Quyết định tự xử lý: D1–D12 (task files), giá 0 = chưa có giá, vị trí nút "Lọc nâng cao" giữ theo Payload, danh mục chip ≤ 12 không gồm danh mục con. Gap: cột ID / Ngày xoá vẫn hiện (Payload 3.91, không đổi schema). Residual: chưa xem 375px (popup ngôn ngữ, hàng chip), cột "Thuộc dự án" nháy "Đang tải…", cột đã lưu trong preferences không tự hiện cột mới, chip Tuyển dụng qua nửa đêm cần tải lại.

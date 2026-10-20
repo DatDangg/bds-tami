@@ -1,225 +1,275 @@
 {
-  "specVersion": "1.36.0",
-  "scopeVersion": 46,
-  "generatedAt": "2026-10-21T14:00:00+07:00",
+  "specVersion": "1.37.0",
+  "scopeVersion": 47,
+  "generatedAt": "2026-10-21T18:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-041 — điều hướng admin rõ: sidebar phân cấp nhóm/mục, mục chọn nổi rõ, nhóm \"Nâng cao\" (thu gọn mặc định), ẩn Tệp CV ứng viên + Lịch sử chăm sóc khỏi menu, nút \"Xem website\"; Tổng quan: thẻ thao tác nhanh thay \"＋ Tạo mới ▾\", hàng \"Sửa website\" (chỉ admin), bỏ khối \"Mục quản lý\", banner dịch lỗi thành cảnh báo nhẹ. Không đổi schema/access/endpoint.",
-  "workItem": "feature-admin-nav-clarity",
-  "backlog": "BL-041",
+  "triggerNote": "BL-039 — danh sách admin gọn: \"Hiển thị cột\" + \"Thêm bộ lọc\" chỉ còn trường nghiệp vụ ở mọi collection; ô ngôn ngữ \"Tiếng Việt\"/\"English\" không bị đè; nút \"Lọc nâng cao\"; gợi ý ô tìm kiếm theo listSearchableFields; chip lọc nhanh cho Dự án / Tin tức / Tin BĐS / Tuyển dụng / Hồ sơ ứng tuyển; cột Quy mô + Khoảng giá (Dự án), Phòng · diện tích + Thuộc dự án (Cho thuê). Không đổi schema/access/endpoint.",
+  "workItem": "feature-admin-list-columns-filters-locale",
+  "backlog": "BL-039",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-admin-nav-clarity.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-admin-list-columns-filters-locale.md",
   "task": [
-    "tasks/feature-admin-nav-clarity/phase-1-task-01.md",
-    "tasks/feature-admin-nav-clarity/phase-1-task-02.md"
+    "tasks/feature-admin-list-columns-filters-locale/phase-1-task-01.md",
+    "tasks/feature-admin-list-columns-filters-locale/phase-1-task-02.md",
+    "tasks/feature-admin-list-columns-filters-locale/phase-1-task-03.md",
+    "tasks/feature-admin-list-columns-filters-locale/phase-1-task-04.md"
   ],
-  "reviewReport": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-02-round-1-review.md",
+  "reviewReport": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md",
   "reviewResults": [
     {
       "task": "phase-1-task-01",
       "round": 1,
       "result": "FAIL",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-1-review.md"
+      "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-1-review.md"
     },
     {
       "task": "phase-1-task-01",
       "round": 2,
       "result": "PASS",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-2-review.md"
+      "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md"
     },
     {
       "task": "phase-1-task-02",
       "round": 1,
       "result": "PASS",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-02-round-1-review.md"
+      "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-03",
+      "round": 1,
+      "result": "PASS",
+      "level": "STRICT",
+      "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-03-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-04",
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md"
     },
     {
       "task": "phase-1",
       "round": 1,
       "result": "GAPS FOUND (doc only)",
       "level": "spec-validator",
-      "report": ".context/review-reports/spec-validation-feature-admin-nav-clarity-phase-1.md"
+      "report": ".context/review-reports/spec-validation-feature-admin-list-columns-filters-locale-phase-1.md"
     }
   ],
   "commits": [
-    "f3d5291"
+    "35f4517",
+    "38d33c9",
+    "e6aee3a",
+    "0d4a1f4"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.35.0-45.json",
-  "specUpdate": "spec/updates/2026-10-21-admin-nav-clarity.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.36.0-46.json",
+  "specUpdate": "spec/updates/2026-10-21-admin-list-columns-filters-locale.md",
   "specRefs": [
     "FR-ADM-19"
   ],
   "specRefNotes": {
-    "FR-ADM-19": "Menu trái thêm nhóm \"Nâng cao\". Câu \"Điều hướng rõ (BL-041)\": phân cấp nhóm/mục, vạch ngăn, mục chọn nền nhấn nhạt + vạch TAMI trái + chữ đậm, hover/focus rõ, AA sáng/tối, 375px; `private-files` + `lead-activities` `admin.hidden`; \"Nâng cao\" cuối menu thu gọn mặc định; nút \"Xem website\" theo `NEXT_PUBLIC_SITE_URL`. Câu \"Tổng quan (BL-041)\": thẻ thao tác nhanh + \"Tạo loại khác\", \"Sửa website\" chỉ admin, bỏ \"Mục quản lý\", cảnh báo dịch lỗi nhẹ (không `role=alert`)."
+    "FR-ADM-19": "Câu \"Danh sách gọn (BL-039)\": menu cột/bộ lọc mọi collection chỉ trường nghiệp vụ (helper `hideTechnicalListFields`), ID/Ngày xoá giữ (gap), ô ngôn ngữ Tiếng Việt/English không bị đè, nút \"Lọc nâng cao\", gợi ý tìm kiếm theo `listSearchableFields`. Câu \"Chip lọc nhanh mở rộng (BL-039)\": Dự án, Tin tức, Tin BĐS, Tin tuyển dụng, Hồ sơ ứng tuyển. Câu \"Cột nghiệp vụ (BL-039)\": Quy mô, Khoảng giá, Phòng · diện tích, Thuộc dự án (ui chỉ hiển thị, giá 0 = chưa nhập). Mục Localization: `locales` có `label`."
   },
-  "migration": "none — không đổi schema/DB (payload-types.ts chỉ sinh lại kiểu)",
+  "migration": "none — không đổi schema/DB (payload generate:types không đổi payload-types.ts; trường ui không có cột DB)",
   "changed": {
     "files": [
-      "src/components/admin/admin-groups.ts",
-      "src/components/admin/admin-groups.test.ts",
-      "src/components/admin/NavAdvancedCollapse.tsx",
-      "src/components/admin/NavAdvancedCollapse.test.tsx",
-      "src/components/admin/SiteLink.tsx",
-      "src/components/admin/SiteLink.test.tsx",
-      "src/collections/LeadActivities.ts",
-      "src/collections/PrivateFiles.ts",
-      "src/collections/admin-hidden.test.ts",
-      "src/components/admin/styles/_surfaces.scss",
-      "src/components/admin/styles/_controls.scss",
+      "src/lib/admin/list-filter.ts",
+      "src/lib/admin/list-filter.test.ts",
+      "src/lib/admin/list-filter-sanitized.test.ts",
+      "src/collections/admin-collections.ts",
+      "src/collections/admin-list-search.test.ts",
+      "src/collections/admin-list-columns.test.ts",
+      "src/collections/Leads.ts",
+      "src/collections/Media.ts",
+      "src/collections/News.ts",
+      "src/collections/Projects.ts",
+      "src/collections/PropertyPosts.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/JobPostings.ts",
+      "src/collections/JobApplications.ts",
       "src/payload.config.ts",
+      "src/lib/admin/payload-vi-overrides.ts",
+      "src/lib/admin/payload-vi-overrides.test.ts",
+      "src/components/admin/styles/_surfaces.scss",
+      "src/lib/admin/collection-quick-filters.ts",
+      "src/lib/admin/collection-quick-filters.test.ts",
+      "src/lib/admin/quick-filters.ts",
+      "src/components/admin/CollectionQuickFilterSlot.tsx",
+      "src/components/admin/CollectionQuickFilterSlot.test.tsx",
+      "src/lib/admin/list-summary.ts",
+      "src/lib/admin/list-summary.test.ts",
+      "src/components/admin/ListSummaryCells.tsx",
+      "src/components/admin/ListSummaryCells.test.tsx",
       "src/app/(payload)/admin/importMap.js",
-      "docs/ARCHITECTURE.md",
-      "src/components/admin/dashboard/QuickActions.tsx",
-      "src/components/admin/dashboard/WebsiteShortcuts.tsx",
-      "src/components/admin/dashboard/DashboardHeader.tsx",
-      "src/components/admin/dashboard/DashboardView.tsx",
-      "src/components/admin/dashboard/dashboard-data.ts",
-      "src/components/admin/dashboard/dashboard-actions.test.ts",
-      "src/components/admin/dashboard/DashboardLinks.test.tsx",
-      "src/components/admin/dashboard/DashboardParts.test.tsx",
-      "src/components/admin/dashboard/NavGroupCards.tsx (deleted)",
-      "src/components/admin/TranslationFailedBanner.tsx",
-      "src/components/admin/TranslationFailedBanner.test.tsx",
-      "src/components/admin/styles/_dashboard.scss",
-      "src/components/admin/styles/_dashboard-lists.scss",
-      "src/payload-types.ts",
-      "tests/integration/admin-dashboard.test.ts",
+      "docs/ERD.md",
       "docs/specs/2026-10-19-admin-ui-saas-design.md"
     ],
-    "filesNote": "T01 = commit f3d5291; T02 = commit close-out BL-041 trên branch claude/admin-bl039-043 (xem git log, \"feature-admin-nav-clarity\").",
+    "filesNote": "T01 = 35f4517; T02 = 38d33c9; T03 = e6aee3a; T04 = 0d4a1f4; doc reconcile (ERD locale label, design doc as-built BL-039) ở commit close-out.",
     "modules": [
-      "Admin — nhóm menu (admin-groups.ts) + nhóm \"Nâng cao\" thu gọn mặc định (NavAdvancedCollapse provider)",
-      "Admin — style sidebar (_surfaces.scss, _controls.scss)",
-      "Admin — nút \"Xem website\" (SiteLink, header action)",
-      "Admin — collection LeadActivities, PrivateFiles (`admin.hidden`)",
-      "Admin — Tổng quan: QuickActions, WebsiteShortcuts, DashboardHeader, DashboardView, dashboard-data (bỏ NavGroupCards)",
-      "Admin — TranslationFailedBanner (cảnh báo nhẹ)"
+      "Admin — menu \"Hiển thị cột\"/\"Thêm bộ lọc\" mọi collection (list-filter.ts hideTechnicalListFields, admin-collections.ts ADMIN_COLLECTIONS)",
+      "Admin — ô chọn ngôn ngữ (localization.locales label + _surfaces.scss)",
+      "Admin — chữ nút \"Lọc nâng cao\" (payload-vi-overrides general.filters)",
+      "Admin — gợi ý ô tìm kiếm (LIST_SEARCHABLE_FIELDS)",
+      "Admin — chip lọc nhanh 5 màn (collection-quick-filters.ts, CollectionQuickFilterSlot)",
+      "Admin — cột ghép Dự án/Cho thuê (list-summary.ts, ListSummaryCells)"
     ]
   },
   "impact": {
     "direct": [
-      "Sidebar mọi màn admin: tiêu đề nhóm đậm/viết hoa, mục con thụt lề, vạch ngăn nhóm, mục đang chọn nền nhấn nhạt + vạch TAMI trái + chữ đậm, hover/focus rõ",
-      "Nhóm \"Nâng cao\" cuối menu, thu gọn mặc định (lần đầu): Tỉnh/thành, Phường/xã, Nhật ký thao tác, Lượt bấm liên hệ, Thống kê liên hệ theo ngày, Chi phí dịch tự động",
-      "Tệp CV ứng viên + Lịch sử chăm sóc không còn trong menu",
-      "Thanh đầu admin: nút \"Xem website\" mở trang chủ công khai ở tab mới",
-      "Tổng quan: hàng thẻ thao tác nhanh (Đăng tin cho thuê mới · Phân công lead (N chưa giao) chỉ admin · Viết tin tức) + menu phụ \"Tạo loại khác\"",
-      "Tổng quan: hàng \"Sửa website\" (Trang chủ · Menu đầu trang · Chân trang · Cấu hình chung) chỉ admin; không còn khối \"Mục quản lý\"",
-      "Cảnh báo dịch lỗi (admin, N > 0): vàng/viền, câu trấn an + link xem danh sách"
+      "Menu \"Hiển thị cột\" mọi collection: không còn SEO >…, Bản dịch tiếng Anh >…, Đường dẫn (slug), Có bản tiếng Anh, richText/textarea dài (Mô tả công việc, Yêu cầu ứng viên, Quyền lợi…), trường kỹ thuật (hash, searchText, cờ job); ID + Ngày xoá vẫn hiện (gap)",
+      "Menu \"Thêm bộ lọc\" mọi collection (cả Tuyển dụng, Hồ sơ ứng tuyển, Trang, Dịch vụ, Chủ đầu tư, Danh mục, Tỉnh/Phường, Media, Staff, Nhật ký…): chỉ trường nghiệp vụ",
+      "Ô ngôn ngữ (danh sách + form): \"Tiếng Việt\" / \"English\" ở nút và danh sách xổ (không còn \"(vi)\"); popup nằm trên cùng, nền đặc, không bị \"Thùng rác\"/\"Tạo mới\" đè (desktop + 375px)",
+      "Nút trình dựng bộ lọc đổi chữ \"Lọc nâng cao\" (vị trí giữ như Payload)",
+      "Ô tìm kiếm mỗi danh sách: placeholder \"Tìm theo …\" đúng trường tìm kiếm của màn",
+      "Chip lọc nhanh: Dự án (Tình trạng mở bán; Nháp/Xuất bản), Tin tức + Tin BĐS (Trạng thái; Danh mục ≤ 12), Tin tuyển dụng (Đang tuyển/Hết hạn), Hồ sơ ứng tuyển (trạng thái)",
+      "Cột mặc định mới: Dự án \"Quy mô\" (\"1.200 căn\") + \"Khoảng giá\" (\"2,1 – 3,5 tỷ\" / \"Từ …\" / \"Đến …\"); Cho thuê \"Phòng · diện tích\" (\"2 PN · 75 m²\", \"Studio\") + \"Thuộc dự án\"; rỗng → —"
     ],
     "dependents": [
-      "Form Lead: ô \"Lịch sử chăm sóc\" (join `lead-activities`) xem + \"Thêm\" qua drawer vẫn chạy dù collection ẩn",
-      "Hồ sơ ứng tuyển: nút Tải CV (`private-files`) vẫn tải được",
-      "Route /admin/collections/lead-activities và /admin/collections/private-files (list/doc) nay 404 — link cũ/bookmark",
-      "Thẻ \"Phân công lead\" mở danh sách Lead đúng chip `Mới (chưa giao)` (BL-022)"
+      "Chip ghép AND với bộ lọc Lọc nâng cao, Lọc dịch (Trạng thái dịch) và ô tìm kiếm — không mất điều kiện; F5 giữ chip đang sáng",
+      "Thùng rác và list drawer (chọn quan hệ) không hiện chip",
+      "Người đã lưu cột riêng (payload-preferences) không tự thấy cột mới — phải bật trong \"Hiển thị cột\"",
+      "Cột ghép không sắp xếp/lọc được; \"Thuộc dự án\" có thể nháy \"Đang tải…\" một nhịp",
+      "Chip Tuyển dụng tính mốc hôm nay lúc tải trang (qua nửa đêm giờ VN cần tải lại)"
     ],
     "regression": [
-      "Tổng quan role sale vs admin: sale không thấy \"Phân công lead\", \"Sửa website\", cảnh báo dịch lỗi; thẻ/lối tắt theo quyền tạo",
-      "Preference nav: mở/đóng nhóm được lưu, \"Nâng cao\" không tự thu lại sau khi user đã mở",
-      "375px: menu thu gọn dùng được, vùng bấm toggle ≥ 44px, vạch mục chọn hiện ở 375/768/1024",
-      "Quyền xem từng mục giữ nguyên (bảng chỉ-admin vẫn chỉ admin thấy)",
-      "Các khối Tổng quan còn lại (thẻ đếm nhanh, lead mới nhất, bản sửa gần đây) như trước"
+      "Chip lọc nhanh Lead + Cho thuê (BL-022) như trước",
+      "Xuất Excel lead (BL-021) theo bộ lọc hiện tại vẫn chạy",
+      "Lọc dịch / ô Trạng thái dịch (BL-016) vẫn chạy ở các màn nội dung",
+      "Frontend /en và job dịch không đổi (mã locale vi/en giữ nguyên)",
+      "Sidebar BL-041 (nhóm Nâng cao, mục chọn, Xem website) không bị ảnh hưởng",
+      "Form sửa các collection không đổi (trường ẩn khỏi menu cột/lọc vẫn sửa được ở form)",
+      "Cột mặc định khác đang hiện giữ nguyên"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL041-01",
+      "id": "BL039-01",
       "viewport": 1440,
-      "steps": "Đăng nhập admin, mở /admin; xem sidebar (sáng và tối).",
-      "expected": "Tiêu đề nhóm đậm, viết hoa, phân biệt rõ với mục con thụt lề; có vạch ngăn giữa các nhóm; mục đang chọn có nền nhấn nhạt + vạch màu nhấn bên trái + chữ đậm; đạt tương phản AA."
+      "steps": "Admin, mở /admin/collections/job-postings; bấm \"Hiển thị cột\".",
+      "expected": "Không có SEO >…, Bản dịch tiếng Anh >…, Đường dẫn (slug), Có bản tiếng Anh, Mô tả công việc/Yêu cầu ứng viên/Quyền lợi; còn trường nghiệp vụ (Tiêu đề, Hạn nộp, Trạng thái, Danh mục…). ID và Ngày xoá vẫn có (known gap, không tính là lỗi)."
     },
     {
-      "id": "BL041-02",
+      "id": "BL039-02",
       "viewport": 1440,
-      "steps": "Dùng Tab qua các mục sidebar; rê chuột lên tiêu đề nhóm và mục con.",
-      "expected": "Focus bàn phím có outline rõ; hover thấy rõ; mở/đóng nhóm bằng Enter/Space."
+      "steps": "Lặp \"Hiển thị cột\" ở Dự án, Tin tức, Trang, Media, Lead.",
+      "expected": "Cùng quy tắc: không SEO/Bản dịch/slug/richText/textarea/trường kỹ thuật (Media không url/thumbnailURL/filesize/width/height/sizes; Lead không consentVersion/mergedCount/remindedAt…); cột mặc định đang hiện không đổi."
     },
     {
-      "id": "BL041-03",
+      "id": "BL039-03",
       "viewport": 1440,
-      "steps": "Lần đầu đăng nhập (chưa có preference nav), xem cuối sidebar; mở nhóm \"Nâng cao\" rồi tải lại trang.",
-      "expected": "Nhóm \"Nâng cao\" cuối menu, mặc định thu gọn, chứa Tỉnh/thành, Phường/xã, Nhật ký thao tác, Lượt bấm liên hệ, Thống kê liên hệ theo ngày, Chi phí dịch tự động; sau khi mở và F5 vẫn mở."
+      "steps": "Ở Tuyển dụng, Hồ sơ ứng tuyển, Danh mục, Dịch vụ: bấm \"Lọc nâng cao\" → \"Thêm bộ lọc\", mở danh sách trường.",
+      "expected": "Chỉ trường nghiệp vụ (vd Tuyển dụng: Hạn nộp, Trạng thái, Danh mục; Hồ sơ: Trạng thái, Tin tuyển dụng; Danh mục: Loại nội dung); không SEO/Bản dịch/slug/richText/ảnh; lọc chạy đúng."
     },
     {
-      "id": "BL041-04",
+      "id": "BL039-04",
       "viewport": 1440,
-      "steps": "Tìm \"Tệp CV ứng viên\" và \"Lịch sử chăm sóc\" trong sidebar; truy cập trực tiếp /admin/collections/lead-activities và /admin/collections/private-files.",
-      "expected": "Hai mục không có trong menu; route list/doc trả 404 (không lỗi trắng trang)."
+      "steps": "Mở danh sách Tin tức và form sửa 1 tin; xem ô ngôn ngữ góc phải, mở danh sách xổ.",
+      "expected": "Nút hiện \"Tiếng Việt\" (không \"vi\"/\"(vi)\"); danh sách xổ \"Tiếng Việt\", \"English\"; popup nền đặc, nằm trên cùng, không bị chữ/nút \"Thùng rác\"/\"Tạo mới\" xuyên qua; chọn English chuyển nội dung EN."
     },
     {
-      "id": "BL041-05",
-      "viewport": 1440,
-      "steps": "Mở 1 Lead; ở ô \"Lịch sử chăm sóc\" xem danh sách và bấm \"Thêm\" một ghi chú, lưu.",
-      "expected": "Danh sách hiện, drawer thêm mở và lưu được, bản ghi mới hiện trong ô (join vẫn chạy dù collection ẩn)."
-    },
-    {
-      "id": "BL041-06",
-      "viewport": 1440,
-      "steps": "Mở 1 Hồ sơ ứng tuyển có CV; bấm Tải CV.",
-      "expected": "Tải được file CV như trước."
-    },
-    {
-      "id": "BL041-07",
-      "viewport": 1440,
-      "steps": "Bấm nút \"Xem website\" trên thanh đầu admin.",
-      "expected": "Mở trang chủ công khai (theo NEXT_PUBLIC_SITE_URL của môi trường) ở tab mới."
-    },
-    {
-      "id": "BL041-08",
-      "viewport": 1440,
-      "steps": "Đăng nhập admin, xem đầu màn Tổng quan.",
-      "expected": "Hàng thẻ lớn: Đăng tin cho thuê mới, Phân công lead (N chưa giao), Viết tin tức; có menu phụ \"Tạo loại khác\" (Dự án, Tin bất động sản, Tin tuyển dụng…); hàng \"Sửa website\" 4 lối tắt; không còn khối \"Mục quản lý\" và nút \"＋ Tạo mới ▾\"."
-    },
-    {
-      "id": "BL041-09",
-      "viewport": 1440,
-      "steps": "Bấm thẻ \"Phân công lead (N chưa giao)\".",
-      "expected": "Mở danh sách Lead với chip \"Mới (chưa giao)\" đang sáng; số bản ghi khớp N."
-    },
-    {
-      "id": "BL041-10",
-      "viewport": 1440,
-      "steps": "Đăng nhập role sale, mở Tổng quan.",
-      "expected": "Không thấy \"Phân công lead\", không thấy hàng \"Sửa website\", không thấy cảnh báo dịch lỗi; thẻ tạo chỉ theo quyền tạo của sale; thẻ đếm nhanh của sale như trước."
-    },
-    {
-      "id": "BL041-11",
-      "viewport": 1440,
-      "steps": "Admin, có ≥ 1 nội dung dịch lỗi; mở Tổng quan.",
-      "expected": "Cảnh báo nền vàng/viền (không đỏ), câu \"N bài chưa dịch được sang tiếng Anh — bản tiếng Việt vẫn hiển thị bình thường\" + link xem danh sách; N = 0 thì không hiện."
-    },
-    {
-      "id": "BL041-12",
+      "id": "BL039-05",
       "viewport": 375,
-      "steps": "Mở /admin ở 375px; mở menu, mở/đóng nhóm, chọn 1 mục; xem Tổng quan.",
-      "expected": "Menu thu gọn dùng được, toggle nhóm vùng bấm ≥ 44px, vạch mục chọn hiện; thẻ thao tác nhanh và \"Sửa website\" xuống dòng, không tràn ngang trang."
+      "steps": "Ở 375px mở danh sách Tin tức, mở ô ngôn ngữ.",
+      "expected": "Popup không tràn ngang màn, không bị nút khác đè, chọn được cả hai ngôn ngữ."
+    },
+    {
+      "id": "BL039-06",
+      "viewport": 1440,
+      "steps": "Xem thanh công cụ danh sách bất kỳ (Dự án, Lead).",
+      "expected": "Nút mở bộ lọc ghi \"Lọc nâng cao\" (không còn \"Bộ lọc\"); bấm mở trình dựng bộ lọc như trước."
+    },
+    {
+      "id": "BL039-07",
+      "viewport": 1440,
+      "steps": "Xem placeholder ô tìm kiếm ở Dự án, Hồ sơ ứng tuyển, Media, Chủ đầu tư, Lead, Cho thuê; gõ thử 1 giá trị của trường được nêu.",
+      "expected": "Placeholder \"Tìm theo …\" nêu đúng trường (vd Hồ sơ: họ tên, email, SĐT; Media: tên tệp, alt; Chủ đầu tư: tên); Lead/Cho thuê như trước; tìm ra bản ghi khớp."
+    },
+    {
+      "id": "BL039-08",
+      "viewport": 1440,
+      "steps": "Dự án: bấm chip Tình trạng mở bán (một giá trị) rồi chip \"Xuất bản\"; F5.",
+      "expected": "Danh sách chỉ dự án đúng tình trạng + đã xuất bản; chip sáng đúng; F5 vẫn giữ chip và kết quả; \"Tất cả\" bỏ lọc nhóm đó."
+    },
+    {
+      "id": "BL039-09",
+      "viewport": 1440,
+      "steps": "Tin tức và Tin BĐS: bấm chip Danh mục một danh mục cha có danh mục con; kết hợp chip \"Nháp\".",
+      "expected": "Chỉ tin đúng danh mục đó (không gồm con) và trạng thái Nháp; tối đa 12 chip danh mục theo thứ tự sắp xếp."
+    },
+    {
+      "id": "BL039-10",
+      "viewport": 1440,
+      "steps": "Tin tuyển dụng: có tin hạn nộp hôm nay, tin hạn hôm qua, tin nháp hạn tương lai; bấm \"Đang tuyển\" rồi \"Hết hạn\".",
+      "expected": "\"Đang tuyển\" = đã xuất bản và hạn từ hôm nay (giờ VN) trở đi — có tin hạn hôm nay, không có tin nháp; \"Hết hạn\" = hạn trước hôm nay."
+    },
+    {
+      "id": "BL039-11",
+      "viewport": 1440,
+      "steps": "Hồ sơ ứng tuyển: bấm lần lượt chip từng trạng thái.",
+      "expected": "Mỗi chip lọc đúng trạng thái hồ sơ; nhãn tiếng Việt khớp ô Trạng thái."
+    },
+    {
+      "id": "BL039-12",
+      "viewport": 1440,
+      "steps": "Tin tức: bật chip \"Xuất bản\", thêm điều kiện qua \"Lọc nâng cao\", chọn Lọc dịch (Trạng thái dịch) và gõ tìm kiếm.",
+      "expected": "Mọi điều kiện ghép cùng lúc (AND), không điều kiện nào bị mất khi bấm chip khác."
+    },
+    {
+      "id": "BL039-13",
+      "viewport": 1440,
+      "steps": "Mở Thùng rác của Dự án; mở form Cho thuê, bấm chọn quan hệ Dự án (list drawer).",
+      "expected": "Không hiện hàng chip ở thùng rác và trong list drawer."
+    },
+    {
+      "id": "BL039-14",
+      "viewport": 375,
+      "steps": "Ở 375px mở Dự án và Tin tức.",
+      "expected": "Hàng chip xuống dòng/cuộn gọn, không tràn ngang trang; bấm chip được."
+    },
+    {
+      "id": "BL039-15",
+      "viewport": 1440,
+      "steps": "Dự án (tài khoản chưa lưu cột riêng): xem cột Quy mô và Khoảng giá với dự án đủ giá, chỉ giá từ, chỉ giá đến, giá 0–0, không quy mô.",
+      "expected": "\"1.200 căn\"; \"2,1 – 3,5 tỷ\" / \"Từ 2,1 tỷ\" / \"Đến 3,5 tỷ\"; 0–0 → —; thiếu quy mô → —; tiêu đề cột không bấm sắp xếp được."
+    },
+    {
+      "id": "BL039-16",
+      "viewport": 1440,
+      "steps": "Cho thuê: xem cột Phòng · diện tích và Thuộc dự án với tin 2 PN 75 m², tin 0 PN 30 m², tin không dự án.",
+      "expected": "\"2 PN · 75 m²\", \"Studio · 30 m²\"; Thuộc dự án hiện tên dự án (có thể nháy \"Đang tải…\" ngắn); không dự án → —."
+    },
+    {
+      "id": "BL039-17",
+      "viewport": 1440,
+      "steps": "Regression: Lead và Cho thuê bấm chip cũ; xuất Excel lead theo bộ lọc; mở trang công khai /en/...; xem sidebar.",
+      "expected": "Chip Lead/Cho thuê như trước; file Excel đúng bộ lọc; frontend /en bình thường; sidebar BL-041 (Nâng cao, mục chọn, Xem website) không đổi."
     }
   ],
   "acceptance": [
-    "Sidebar: tiêu đề nhóm và mục con phân cấp rõ; có khoảng/vạch ngăn nhóm; trạng thái mở/đóng nhóm dễ nhận; mục đang chọn nổi rõ (nền + vạch màu nhấn TAMI), AA sáng và tối",
-    "Hover/focus bàn phím mục sidebar thấy rõ; 375px menu thu gọn vẫn dùng được",
-    "Tổng quan: hàng lối tắt \"Sửa website\" đầu trang gồm Trang chủ · Menu đầu trang · Chân trang · Cấu hình chung — chỉ role admin (cùng quy tắc hideFromNonAdmin)",
-    "Bỏ khối \"Mục quản lý\" (NavGroupCards) khỏi Tổng quan; test dashboard cập nhật",
-    "Ẩn Tệp CV ứng viên (private-files) và Lịch sử chăm sóc (lead-activities) khỏi menu; ô Lịch sử chăm sóc trong form Lead (xem/thêm) vẫn chạy; không xoá collection, không đổi access/API",
-    "Tỉnh/thành, Phường/xã, Nhật ký thao tác, Lượt bấm liên hệ, Thống kê liên hệ theo ngày, Chi phí dịch tự động trong nhóm \"Nâng cao\" cuối sidebar, mặc định thu gọn; quyền xem giữ nguyên",
-    "Header admin có nút \"Xem website\" (mở tab mới) trỏ trang chủ công khai theo cấu hình (không hardcode domain)",
-    "Banner dịch lỗi mức cảnh báo nhẹ (vàng/viền), câu trấn an + link xem danh sách; chỉ hiện khi N > 0",
-    "Hàng thẻ thao tác nhanh lớn đầu Tổng quan: Đăng tin cho thuê mới, Phân công lead (N chưa giao) → danh sách lead lọc chưa giao, Viết tin tức — theo quyền role; vẫn còn đường tạo các loại khác",
-    "Không đổi schema/access; chỉ config admin.group/admin.hidden + CSS + component admin"
+    "\"Hiển thị cột\" ở mọi collection admin chỉ còn trường nghiệp vụ; không SEO, Bản dịch tiếng Anh, slug, hasEnglish, richText/textarea, trường kỹ thuật; cột mặc định không đổi (ID/Ngày xoá = gap ghi nhận)",
+    "\"Thêm bộ lọc\" ở mọi collection admin chỉ còn trường nghiệp vụ; test duyệt config thật 21 collection",
+    "Ô chọn ngôn ngữ hiện \"Tiếng Việt\"/\"English\" (nút + danh sách xổ); danh sách xổ không bị đè; desktop + 375px",
+    "Chip lọc nhanh cho Dự án, Tin tức, Tin BĐS, Tuyển dụng, Hồ sơ ứng tuyển; Lead/Cho thuê giữ nguyên; ghép bộ lọc/Lọc dịch/tìm kiếm; ẩn ở thùng rác + list drawer",
+    "Nút bộ lọc chữ \"Lọc nâng cao\"",
+    "Ô tìm kiếm mỗi màn có gợi ý khớp listSearchableFields",
+    "Cột Dự án Quy mô + Khoảng giá; Cho thuê Phòng · diện tích + Thuộc dự án; rỗng —",
+    "Không đổi schema/DB/access/endpoint, không migration; Lọc dịch, chip cũ, xuất Excel vẫn chạy"
   ],
   "verify": {
-    "test": "pnpm vitest run src/components/admin src/lib/admin — T01 37 files / 257 PASS (reviewer r2), T02 35 files / 242 PASS (reviewer r1)",
+    "test": "pnpm vitest run — T01 PASS (reviewer r2); T02 src/lib src/collections src/components/admin 133 files / 1322 PASS; T03 src/lib/admin src/components/admin src/collections 43 files / 303 PASS; T04 src/components/admin src/collections src/lib 138 files / 1354 PASS",
     "typecheck": "PASS",
-    "lint": "0 error (2 warning có sẵn ngoài diff)",
-    "integration": "tests/integration/admin-dashboard.test.ts cập nhật, chưa chạy (cần DB) — residual",
+    "lint": "0 error (2 warning có sẵn ở tools/task-dashboard)",
+    "generateTypes": "payload generate:types không đổi src/payload-types.ts",
+    "runtime": "T02 chạy next dev local: /admin/collections/news hiện \"Ngôn ngữ: Tiếng Việt\", \"Lọc nâng cao\", \"Tìm theo Tiêu đề\"; popup z-index 60 (computed style)",
     "build": "không chạy (residual)"
   },
   "outOfScope": [
-    "Ctrl+K tìm nhanh, phễu lead / biểu đồ lượt bấm / chi phí dịch trên Tổng quan (hoãn, docs/reviews/2026-10-21-admin-audit.md)",
-    "Icon cho mục sidebar",
-    "Xoá collection private-files / lead-activities hoặc đổi access/API",
-    "Đổi tên nhóm/mục ngoài phạm vi BL-040"
+    "Ẩn cột ID / Ngày xoá khỏi \"Hiển thị cột\" (Payload 3.91 không cho tắt bằng config — cần thêm trường vào schema)",
+    "Sắp xếp/lọc theo cột ghép Quy mô / Khoảng giá / Phòng · diện tích (cần cột DB)",
+    "Đổi vị trí nút \"Lọc nâng cao\" xuống sau hàng chip (phải thay ListControls của Payload)"
   ],
   "openQuestions": [],
   "viewports": [
@@ -227,17 +277,19 @@
     1440
   ],
   "locales": [
-    "vi"
+    "vi",
+    "en"
   ],
   "browsers": [
     "chrome"
   ],
   "uiTests": true,
   "apiTests": [
-    "GET /api/lead-activities?where[lead][equals]=<id> và GET /api/private-files (admin) → vẫn trả dữ liệu như trước (admin.hidden không đổi API/access)",
-    "GET /admin/collections/lead-activities, /admin/collections/private-files → 404"
+    "GET /api/projects?where[salesStatus][equals]=<giá trị>&where[status][equals]=published → khớp kết quả chip Dự án",
+    "GET /api/job-postings?where[status][equals]=published&where[deadline][greater_than_equal]=<đầu ngày VN ISO> → khớp chip \"Đang tuyển\"",
+    "GET /api/projects, /api/rentals → response shape không đổi (trường ui không có trong dữ liệu)"
   ],
   "risk": "medium",
-  "riskNote": "Đụng điều hướng dùng chung mọi màn admin và `admin.hidden` trên 2 collection mà form Lead (join) + Hồ sơ ứng tuyển (Tải CV) phụ thuộc. T01 STRICT r1 FAIL (vạch active ẩn ở 375/768/1024, toggle 36px) → r2 PASS; T02 STRICT r1 PASS (4 MINOR: QUICK_ACTION_SLUGS lặp slug, assert vô nghĩa trong test, chữ \"bài\" cho global trong banner, menu \"Tạo loại khác\" có thể tràn trái khi không có thẻ). Đã thử runtime local 2026-10-21 (next dev + tài khoản dev admin): form Lead tab Lịch sử chăm sóc hiện danh sách, Thêm mới mở drawer, lưu ghi chú OK; /admin/collections/lead-activities trả 404; Nâng cao thu gọn; Tổng quan đúng bố cục (3 thẻ, Tạo loại khác, Sửa website, không Mục quản lý). Residual: nhóm Nâng cao có thể mở thoáng qua lần đầu (phụ thuộc DOM Payload 3.91); integration test + ảnh trước/sau 1440/375 sáng/tối chưa chạy/chụp.",
+  "riskNote": "Đụng config danh sách dùng chung mọi collection admin (helper hideTechnicalListFields áp 21 collection) + localization label + 5 slot chip mới. T01 STRICT r1 FAIL → r2 PASS; T02/T03 STRICT r1 PASS (MINOR không chặn; T03 bọc try/catch query danh mục sau r1); T04 NORMAL r1 PASS (m2 làm tròn đơn vị + m3 giá 0 sửa sau r1; m1 nháy \"Đang tải…\" cột Thuộc dự án = residual). Phase review GAPS FOUND chỉ doc/làm rõ spec (đã xử lý). Residual: popup ngôn ngữ + hàng chip ở 375px chưa xem trên trình duyệt; T03/T04 chưa soi trên app chạy thật; ID/Ngày xoá vẫn hiện trong menu cột; preference cột đã lưu không tự thấy cột mới.",
   "status": "published"
 }
