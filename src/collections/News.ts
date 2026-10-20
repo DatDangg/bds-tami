@@ -8,7 +8,7 @@ import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /**
@@ -62,7 +62,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): tags ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["tags"]);
+  return hideTechnicalListFields(collection, ["tags"]);
 }
 
 export const News = createNews();

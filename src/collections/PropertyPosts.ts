@@ -13,7 +13,7 @@ import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -114,7 +114,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): priceNote, offer.voucherCode ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["priceNote", "offer.voucherCode"]);
+  return hideTechnicalListFields(collection, ["priceNote", "offer.voucherCode"]);
 }
 
 export const PropertyPosts = createPropertyPosts();

@@ -1,7 +1,7 @@
 ---
 id: admin-list-columns-filters-locale
 type: feature
-status: pending
+status: in_progress
 created: 2026-10-20
 ---
 
@@ -34,3 +34,9 @@ User 2026-10-20 (ảnh màn `/admin/collections/job-postings`):
 - Mặc định đề xuất (cần user xác nhận khi `/change`): danh sách trường được giữ cho từng collection do agent đề xuất theo nghiệp vụ, user duyệt ở checkpoint.
 - Liên quan: BL-015 (UI admin), BL-021 T4/T6, BL-016 T02 (`TranslationStatusFilter`).
 - Nguồn bổ sung: `docs/reviews/2026-10-21-admin-audit.md` §4.1, §5.1 (+ trao đổi user 2026-10-21 về bộ lọc).
+
+## Xử lý (change-request 2026-10-21 — auto proceed theo chỉ thị user)
+- Classify: **MODIFY** (FR-ADM-19 danh sách admin; không đổi schema/DB/access/endpoint). Spec delta: câu "**Danh sách gọn (BL-039)**", "**Chip lọc nhanh mở rộng (BL-039)**", "**Cột nghiệp vụ (BL-039)**" trong FR-ADM-19; bỏ câu cũ "không áp chip cho Dự án / Tin bất động sản".
+- Checkpoint "chụp ảnh + user duyệt danh sách trường giữ" → **tự quyết** (user: auto proceed): quy tắc ẩn chung (D1) + danh sách ẩn thêm từng collection do builder đề xuất, ghi trong task T01; ảnh chụp chỉ làm nếu dựng được app local, không thì residual.
+- Chia 4 task (mỗi task 1 commit): T01 cột/bộ lọc mọi collection · T02 ô ngôn ngữ + "Lọc nâng cao" + gợi ý tìm kiếm · T03 chip lọc nhanh 5 màn · T04 cột nghiệp vụ Dự án/Cho thuê. Quyết định D1–D12 ở `tasks/feature-admin-list-columns-filters-locale/phase-1-task-0{1..4}.md`.
+- Vượt UI-only → không làm, ghi gap: cột `ID`/`deletedAt` nếu Payload 3.91 không cho tắt bằng config (không thêm trường `id` vào schema); sắp xếp/lọc theo cột ghép (cần cột DB).

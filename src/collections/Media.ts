@@ -22,6 +22,8 @@ const stampUploader: CollectionBeforeChangeHook = ({ data, operation, originalDo
 const isImageMime = (mimeType: unknown): boolean => typeof mimeType === "string" && mimeType.startsWith("image/");
 
 const WEBP = { format: "webp", options: { quality: 80 } } as const;
+/** Cỡ ảnh phụ không có giá trị trong "Hiển thị cột"/"Thêm bộ lọc" (Payload lan cờ xuống nhóm size + trường lá; plugin S3 dựng lại nhóm `sizes` nên không đặt cờ ở nhóm `sizes` được). */
+const HIDDEN_FROM_LIST = { disableListColumn: true, disableListFilter: true } as const;
 
 /**
  * Ảnh/PDF/video công khai (bucket `public`, ERD §4.12). Ai cũng đọc; staff upload; sale chỉ sửa file mình
@@ -60,10 +62,10 @@ export const Media: CollectionConfig = {
     constructorOptions: { limitInputPixels: 80_000_000 },
     // Ảnh nhỏ hơn cỡ đích không bị phóng to nên thiếu cỡ đó: nơi hiển thị phải rơi về ảnh gốc.
     imageSizes: [
-      { name: "thumb", width: 400, formatOptions: WEBP },
-      { name: "card", width: 800, formatOptions: WEBP },
-      { name: "large", width: 1600, formatOptions: WEBP },
-      { name: "og", width: 1200, height: 630, formatOptions: WEBP },
+      { name: "thumb", width: 400, formatOptions: WEBP, admin: HIDDEN_FROM_LIST },
+      { name: "card", width: 800, formatOptions: WEBP, admin: HIDDEN_FROM_LIST },
+      { name: "large", width: 1600, formatOptions: WEBP, admin: HIDDEN_FROM_LIST },
+      { name: "og", width: 1200, height: 630, formatOptions: WEBP, admin: HIDDEN_FROM_LIST },
     ],
   },
   fields: [

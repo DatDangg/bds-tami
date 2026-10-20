@@ -20,7 +20,7 @@ import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 import { RENTAL_AMENITIES } from "../shared/types/api";
 
@@ -232,7 +232,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
     },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, showExactAddress, videoUrl, rentalTerms.includedServices, searchText ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["address", "showExactAddress", "videoUrl", "rentalTerms.includedServices", "searchText"]);
+  return hideTechnicalListFields(collection, ["address", "showExactAddress", "videoUrl", "rentalTerms.includedServices", "searchText"]);
 }
 
 export const Rentals = createRentals();

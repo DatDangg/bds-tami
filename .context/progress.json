@@ -1,6 +1,11 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "admin-list-columns-filters-locale",
+    "phaseTask": "phase-1-task-02",
+    "journal": ".context/runs/feature-admin-list-columns-filters-locale-phase-1-task-01.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1410,6 +1415,59 @@
       "specValidation": ".context/review-reports/spec-validation-feature-admin-nav-clarity-phase-1.md",
       "runtimeCheck": "local 2026-10-21: drawer Lịch sử chăm sóc OK, lead-activities route 404, Nâng cao thu gọn, Tổng quan đúng bố cục",
       "residual": "chưa chụp 375px/tối; integration test dashboard chưa chạy; sale chưa kiểm runtime; Nâng cao có thể mở thoáng qua lần đầu (DOM Payload 3.91); MINOR reviewer T01 n1/n2, T02 4 mục"
+    },
+    {
+      "slug": "admin-list-columns-filters-locale",
+      "title": "Admin danh sách gọn: cột/bộ lọc chỉ trường nghiệp vụ mọi màn + ô ngôn ngữ Tiếng Việt/English + Lọc nâng cao + gợi ý tìm kiếm + chip lọc nhanh 5 màn + cột Quy mô/Khoảng giá/Phòng·diện tích/Dự án (BL-039)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-039",
+      "changeDoc": "spec/changes/2026-10-20-admin-list-columns-filters-locale.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1–D12 trong task file",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "note": "hideTechnicalListFields (cột+lọc) áp 21 collection qua ADMIN_COLLECTIONS; Media imageSizes cờ ẩn; gap: ID/Đã xoá lúc không ẩn được bằng config (Payload 3.91)",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md"
+          ]
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-02.md",
+          "status": "in_progress",
+          "attempt": 0,
+          "round": 0,
+          "note": "Ô ngôn ngữ nhãn + Lọc nâng cao + gợi ý tìm kiếm"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "note": "Chip lọc nhanh Dự án/Tin tức/Tin BĐS/Tuyển dụng/Hồ sơ"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-04.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "note": "Cột nghiệp vụ Dự án/Cho thuê"
+        }
+      ]
     }
   ],
   "bugs": [
@@ -2326,7 +2384,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T19:35:42.860Z",
+  "lastUpdated": "2026-10-20T20:07:41.205Z",
   "approvalMilestones": [
     {
       "id": "M1",

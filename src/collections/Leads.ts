@@ -11,7 +11,7 @@ import { computeAssigneeInactive, computeAssigneeName, recordStatusChange, stamp
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
 import { isUuid } from "../lib/uuid";
@@ -206,7 +206,7 @@ const LEAD_HIDDEN_FILTER_PATHS = ["fullName", "phone", "phoneNormalized", "email
  * - SĐT/email thuộc lead nên chỉ admin và sale phụ trách thấy (BR-32); lead chưa giao: chỉ admin.
  * - Admin xoá mềm/khôi phục/xoá hẳn có audit (PERMISSION §6); bản đã xoá mềm chỉ admin sửa. Xuất Excel không thuộc collection này.
  */
-export const Leads: CollectionConfig = hideTechnicalListFilters({
+export const Leads: CollectionConfig = hideTechnicalListFields({
   slug: "leads",
   labels: collectionLabels("leads"),
   admin: {

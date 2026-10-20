@@ -7,27 +7,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-import { AuditLogs } from "./collections/AuditLogs";
-import { Categories } from "./collections/Categories";
-import { ClickEvents } from "./collections/ClickEvents";
-import { ClickStatsDaily } from "./collections/ClickStatsDaily";
-import { TranslationUsage } from "./collections/TranslationUsage";
-import { Developers } from "./collections/Developers";
-import { Provinces } from "./collections/Provinces";
-import { Wards } from "./collections/Wards";
 import { contentRedirectsPlugin } from "./collections/redirects-plugin";
-import { JobApplications } from "./collections/JobApplications";
-import { JobPostings } from "./collections/JobPostings";
-import { Media } from "./collections/Media";
-import { Pages } from "./collections/Pages";
-import { PrivateFiles } from "./collections/PrivateFiles";
-import { News } from "./collections/News";
-import { Projects } from "./collections/Projects";
-import { LeadActivities } from "./collections/LeadActivities";
-import { Leads } from "./collections/Leads";
-import { PropertyPosts } from "./collections/PropertyPosts";
-import { Rentals } from "./collections/Rentals";
-import { Services } from "./collections/Services";
+import { ADMIN_COLLECTIONS } from "./collections/admin-collections";
 import { Staff } from "./collections/Staff";
 import { adminNavGroupsPlugin } from "./components/admin/admin-groups";
 import { Footer } from "./globals/Footer";
@@ -79,7 +60,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities],
+  collections: ADMIN_COLLECTIONS,
   globals: [SiteSettings, Homepage, Header, Footer],
   editor: lexicalEditor(),
   email: createEmailAdapter(env),
