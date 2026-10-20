@@ -1,80 +1,134 @@
 {
-  "specVersion": "1.22.0",
-  "scopeVersion": 28,
-  "generatedAt": "2026-10-20T23:59:30+07:00",
+  "specVersion": "1.23.0",
+  "scopeVersion": 29,
+  "generatedAt": "2026-10-20T23:59:50+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-026 — header công khai: chuyển đổi phẳng ↔ nổi mượt hơn. Góc bo dùng bán kính thật (32px < lg / 36px ≥ lg = nửa chiều cao thanh) thay `--radius-pill` 9999px (nội suy 0 ↔ 9999px làm góc giữ tròn gần hết quãng rồi bật vuông); padding header + max-width/radius/shadow thanh cùng nhịp `--duration-slow` 450ms + `--ease-standard` cubic-bezier(0.2,0,0,1). MODIFY thuần thẩm mỹ: requirement không đổi (SPECIFICATIONS 'Khung trang' đã ghi 'chuyển đổi mượt, tức thì khi prefers-reduced-motion') → giữ spec 1.22.0, không spec/updates, không dòng CHANGELOG (theo tiền lệ scope v11/v21/v26).",
-  "workItem": "feature/header-scroll-transition-smooth",
-  "backlog": "BL-026",
+  "triggerNote": "BL-027 — chi tiết dự án + chi tiết cho thuê dùng chung một bố cục (khung `src/components/detail/`): nền vàng nhạt `--color-primary-subtle`, nội dung trong một thẻ trắng bo ~28px, thẻ tư vấn/liên hệ trắng dính ≥ lg (< lg sau thẻ nội dung), thanh mục con dính sát đỉnh 8/16px với mục đang xem nền vàng chữ đen; trên 2 trang chi tiết header cuộn xuống thì trượt ẩn hẳn, cuộn lên không hiện lại (chỉ ở đầu trang / khi Tab focus). MODIFY UI, không đổi schema/API/quyền/nguồn lead. Spec 1.22.0 → 1.23.0.",
+  "workItem": "feature/detail-pages-unified-layout",
+  "backlog": "BL-027",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-header-scroll-transition-smooth.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-detail-pages-unified-layout.md",
   "task": [
-    "tasks/feature-header-scroll-transition-smooth/phase-1-task-01.md"
+    "tasks/feature-detail-pages-unified-layout/phase-1-task-01.md",
+    "tasks/feature-detail-pages-unified-layout/phase-1-task-02.md"
   ],
-  "reviewReport": ".context/review-reports/feature-header-scroll-transition-smooth-phase-1-task-01-round-1-review.md",
+  "reviewReport": [
+    ".context/review-reports/feature-detail-pages-unified-layout-phase-1-task-01-round-3-review.md",
+    ".context/review-reports/feature-detail-pages-unified-layout-phase-1-task-02-round-2-review.md",
+    ".context/review-reports/feature-detail-pages-unified-layout-phase-1-spec-validation.md"
+  ],
   "commits": [
-    "close-out BL-026 (commit chứa file này)"
+    "046d891",
+    "close-out BL-027 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-026 (commit chứa file này)": "T01 — HeaderFrame.tsx: thanh `rounded-none` → `group-data-[scrolled]:rounded-[2rem]` / `lg:group-data-[scrolled]:rounded-[2.25rem]` (bỏ rounded-pill), transition header (padding) + thanh (max-width, border-radius, box-shadow) cùng `duration-(--duration-slow)` + `ease-standard`, `motion-reduce:transition-none`; test HeaderFrame.test.tsx + Header.test.tsx; design-spec §2.1 dòng Biến thể. Review NORMAL PASS r1."
+    "046d891": "T01 — khung chi tiết dùng chung `src/components/detail/` (DetailLayout, DetailSubNav ← ProjectSubNav, DetailSection ← projects/ProjectSection); globals.css `--sticky-top` + header `translateY(-100%)` khi `[data-scrolled]:not(:has(:focus-visible))` trên `html:has([data-detail-page])`, `--duration-slow` + `--ease-standard`, reduced-motion none; ProjectDetail dựng bằng DetailLayout, các khối dự án `scroll-mt` theo `--sticky-top`; LeadFormSlot mặc định `scroll-mt` `--sticky-top + 1rem`. Review STRICT PASS r3.",
+    "close-out BL-027 (commit chứa file này)": "T02 — RentalDetail dựng bằng DetailLayout + DetailSection; visibleRentalSections + DOM id; RentalSpecs/RentalTerms/SaleContactBox theo khung chung (thẻ liên hệ trắng bo 20px shadow-md, `#lead-form` `scroll-mt` `--sticky-top + 4.5rem`); i18n `page.rentalDetail.subNav.*` + `subNavLabel`; test mới rental-detail.test.tsx + rental-detail-sections.test.ts. Review FAST PASS r2. Close-out kèm doc as-built (design-spec §1/§2.1/S03/S07, docs/DESIGN.md, docs/ARCHITECTURE.md, decisions.md)."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.22.0-27.json",
-  "specUpdate": null,
+  "previousScope": "spec/test-scope/archive/test-scope-1.22.0-28.json",
+  "specUpdate": "spec/updates/2026-10-20-detail-pages-unified-layout.md",
   "specRefs": [
-    "Overview — Khung trang (header)",
-    "design-spec §2.1 Header"
+    "Overview — Khung trang (header, ngoại lệ trang chi tiết)",
+    "Overview — Giao diện (bố cục chi tiết dùng chung)",
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)",
+    "design-spec §2.1 Header / S03 / S07"
   ],
   "specRefNotes": {
-    "Overview — Khung trang (header)": "SPECIFICATIONS.md mục Tổng quan 'Khung trang': hai hình dạng theo cuộn, chuyển đổi mượt, tức thì khi prefers-reduced-motion — không đổi câu chữ, BL-026 chỉ làm đúng 'mượt'.",
-    "design-spec §2.1 Header": ".context/design-spec.md §2.1 dòng Biến thể (đã cập nhật BL-026): bán kính thật 32/36px, không `--radius-pill`; transition cùng nhịp `--duration-slow` (450ms) + `--ease-standard`; tắt khi prefers-reduced-motion."
+    "Overview — Khung trang (header, ngoại lệ trang chi tiết)": "Trên chi tiết dự án / cho thuê: đầu trang header phẳng; cuộn xuống trượt ẩn hẳn, cuộn lên không hiện lại — chỉ hiện ở đầu trang hoặc khi focus bàn phím vào header; thanh mục con dính sát đỉnh 8/16px; scroll-margin bù theo; trước hydrate header có thể che thanh mục con (user chấp nhận). Trang khác giữ BL-025/026.",
+    "Overview — Giao diện (bố cục chi tiết dùng chung)": "Hai trang chi tiết chung một bố cục: nền `--color-primary-subtle`, thanh mục con viên thuốc trắng (active `--color-primary` / `--color-primary-foreground`), một thẻ trắng bo ~28px chứa các khối ngăn bằng đường kẻ, ≥ lg 2 cột + thẻ tư vấn/liên hệ dính tách riêng, < lg thẻ đó sau thẻ nội dung.",
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)": "Thanh mục con 11 mục dính sát đỉnh 8/16px, mục đang xem nền vàng chữ đen, `aria-current`; < lg thẻ 'Tư vấn 1:1' sau thẻ nội dung (ngoài thẻ trắng); LeadForm duy nhất `source=project`, ProjectStickyCta giữ nguyên.",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)": "Breadcrumb → băng 'Đã thuê' → thư viện ảnh (LCP; rented: 'Căn tương tự đang trống' ngay sau) → thanh mục con Tổng quan · Điều khoản · Mô tả · Video · Vị trí · Pháp lý (khối trống ẩn mục) → thẻ trắng → thẻ liên hệ (giá, sale/hotline, form `source=rental` duy nhất) dính ≥ lg, < lg sau thẻ nội dung → Tin tương tự.",
+    "design-spec §2.1 Header / S03 / S07": ".context/design-spec.md reconcile ở close-out: §2.1 ngoại lệ header + `--sticky-top`; S03 thanh mục con/thẻ trắng/aside; S07 bố cục chi tiết cho thuê."
   },
   "migration": "none",
   "changed": {
     "files": [
+      "src/app/(frontend)/globals.css",
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailLayout.test.tsx",
+      "src/components/detail/DetailSection.tsx",
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/detail/detail-header-css.test.ts",
+      "src/components/forms/LeadFormSlot.tsx",
       "src/components/layout/HeaderFrame.tsx",
-      "src/components/layout/HeaderFrame.test.tsx",
-      "src/components/layout/Header.test.tsx"
+      "src/components/projects/Documents.tsx",
+      "src/components/projects/LegalPolicy.tsx",
+      "src/components/projects/PriceTable.tsx",
+      "src/components/projects/ProjectAmenities.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/components/projects/ProjectFaq.tsx",
+      "src/components/projects/ProjectHighlights.tsx",
+      "src/components/projects/ProjectListings.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/ProjectOverview.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/components/rentals/RentalDetail.tsx",
+      "src/components/rentals/RentalSpecs.tsx",
+      "src/components/rentals/RentalTerms.tsx",
+      "src/components/rentals/SaleContactBox.tsx",
+      "src/components/rentals/rental-detail.test.tsx",
+      "src/lib/rentals/rental-detail-sections.ts",
+      "src/lib/rentals/rental-detail-sections.test.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json"
     ],
-    "filesNote": "Chỉ chuỗi class Tailwind + test. Không schema/migration/API/access control. Doc impact: design-spec §2.1 (đã sửa); không ERD/API_SPEC.",
+    "filesNote": "Đổi tên: src/components/projects/ProjectSubNav.tsx → src/components/detail/DetailSubNav.tsx, src/components/projects/ProjectSection.tsx → src/components/detail/DetailSection.tsx (046d891). Không schema/migration/API/access control/JSON-LD. Doc impact: SPECIFICATIONS (Khung trang, Giao diện, F2, F3), design-spec §1/§2.1/S03/S07, docs/DESIGN.md, docs/ARCHITECTURE.md, .context/decisions.md.",
     "modules": [
-      "Layout — HeaderFrame (bán kính bo + transition phẳng ↔ nổi)",
-      "Test — HeaderFrame.test.tsx, Header.test.tsx"
+      "Detail — DetailLayout (nền vàng nhạt, `data-detail-page`, thẻ trắng nội dung, aside dính / < lg sau thẻ)",
+      "Detail — DetailSubNav (dính `top: --sticky-top`, active nền primary chữ primary-foreground, `aria-current`, OBSERVER_MARGIN)",
+      "Detail — DetailSection (tiêu đề `text-h2`, `scroll-mt` `--sticky-top + 4.5rem`)",
+      "Layout — globals.css (`--sticky-top`, header trượt ẩn trên trang chi tiết, ra lại khi `:focus-visible`)",
+      "Projects — ProjectDetail + các khối (scroll-mt theo `--sticky-top`)",
+      "Rentals — RentalDetail / RentalSpecs / RentalTerms / SaleContactBox + visibleRentalSections",
+      "Forms — LeadFormSlot (scroll-mt mặc định `--sticky-top + 1rem`)",
+      "i18n — page.rentalDetail.subNav.* + subNavLabel (vi/en)"
     ]
   },
   "impact": {
     "direct": [
-      "Header công khai cuộn qua ngưỡng 4px (xuống và lên) ở 375 / 768 / 1280 / 1920: góc bo đổi DẦN 0 ↔ 32px (< lg) / 36px (≥ lg) — không giữ tròn rồi bật vuông khi cuộn về đầu, không bật tròn tức thì khi cuộn xuống",
-      "Transition 450ms `--ease-standard` (cubic-bezier(0.2,0,0,1)) cùng nhịp cho padding header + max-width/border-radius/box-shadow thanh — các thuộc tính bắt đầu và kết thúc cùng lúc",
-      "Ở trạng thái nổi: góc là nửa hình tròn đúng (bán kính = nửa chiều cao 64/72px)"
+      "Chi tiết dự án `/du-an/<slug>` + `/en/projects/<slug>`: nền `--color-primary-subtle`, khối trong thẻ trắng bo 28px, thanh mục con dính 8 (< lg) / 16px (≥ lg), mục đang xem nền vàng chữ đen, thẻ 'Tư vấn 1:1' dính ≥ lg, < lg sau thẻ nội dung",
+      "Chi tiết cho thuê `/cho-thue/<slug>` + `/en/for-rent/<slug>`: cùng khung; thanh mục con Tổng quan · Điều khoản · Mô tả · Video · Vị trí · Pháp lý chỉ gồm khối có dữ liệu; thẻ liên hệ trắng (giá, sale/hotline, form `source=rental`) dính ≥ lg, < lg sau thẻ nội dung",
+      "Header trên 2 trang chi tiết: đầu trang phẳng; cuộn xuống trượt ẩn hẳn (`translateY(-100%)`, 450ms `--ease-standard`); cuộn lên KHÔNG hiện lại; về đầu trang hoặc Tab focus vào header → hiện lại"
     ],
     "dependents": [
-      "Chiều cao `.site-header` 80 (< lg) / 104 (≥ lg) không đổi trong và sau transition — không CLS",
-      "Logo / menu / CTA / VI|EN không nhảy ngang khi chuyển (nội dung trong khung 84rem căn giữa)",
-      "Hero trang chủ `-mt-(--header-offset)` + HeroSlider đo `.site-header`",
-      "ProjectSubNav `top` ở chi tiết dự án (dính dưới header)",
-      "`scroll-margin-top` neo `#...` (#lead-form, #documents, các mục chi tiết dự án)"
+      "`.site-header` / HeaderFrame dùng chung mọi trang công khai — chỉ trang có `[data-detail-page]` mới ẩn header",
+      "`--sticky-top` (= `--header-offset` ngoài trang chi tiết): sticky top + mọi `scroll-margin` neo trên trang chi tiết",
+      "LeadFormSlot dùng ở nhiều trang (liên hệ, Tin BĐS, tuyển dụng…): `scroll-mt` mặc định đổi sang `--sticky-top + 1rem` — ngoài trang chi tiết giá trị bằng cũ",
+      "ProjectStickyCta (thanh dính đáy < lg) → `#lead-form` trên cả 2 trang",
+      "Tin đã thuê (`rented`): băng 'Đã thuê', badge, 'Căn tương tự đang trống' sau thư viện, 'Giá tham khảo', Điều khoản thu gọn, tiêu đề form 'Nhận tư vấn căn tương tự', noindex/không JSON-LD"
     ],
     "regression": [
-      "Hero trang chủ `/`, `/en`: thanh phẳng kính mờ đè ảnh, chữ/logo AA",
-      "ProjectSubNav chi tiết dự án: không bị header che khi cuộn, `aria-current` đúng",
-      "Bấm neo `#...` (menu mục con, CTA 'Đăng ký tham quan' → #lead-form, #documents): mục không bị header che",
-      "`prefers-reduced-motion: reduce` → đổi trạng thái tức thì, không animation",
-      "`prefers-reduced-transparency: reduce` / không `backdrop-filter` → nền đặc ở cả hai trạng thái",
-      "Menu toàn màn hình < xl, dropdown DesktopNav ≥ xl, focus ring trong thanh"
+      "Các trang khác (`/`, `/cho-thue`, `/du-an`, `/tin-bds`, `/tin-tuc`, `/tuyen-dung`, `/lien-he`, chi tiết tin tức / Tin BĐS / tuyển dụng): header vẫn phẳng → thanh nổi bo tròn khi cuộn (BL-025/026), không trượt ẩn",
+      "Chi tiết tin tức / Tin BĐS / tuyển dụng / liên hệ: neo + aside dính vẫn theo `--header-offset` (JobDetail, ApplyFormSlot, PostShare cụm chia sẻ dính, TableOfContents, RichText), không bị header che",
+      "Form lead ở các trang khác (`#lead-form` qua LeadFormSlot): nhảy neo không bị header che",
+      "Chi tiết dự án: hero `priority` LCP, `#documents` mở Pháp lý thu gọn + cuộn (kể cả bấm lại), Mặt bằng tab, Thư viện thẻ tối, Bảng giá, Hỏi đáp + JSON-LD FAQPage, Tin liên quan, CTA 'Đăng ký tham quan' → `#lead-form`",
+      "Chi tiết cho thuê: thư viện ảnh LCP, JSON-LD `RealEstateListing` + breadcrumb chỉ khi chưa thuê, `h1` duy nhất, LeadForm một bản trong DOM, ClickRefMarker, Tin tương tự",
+      "Menu toàn màn hình < xl, dropdown DesktopNav ≥ xl, VI|EN trên trang chi tiết (khi header đang hiện)"
     ]
   },
   "acceptance": [
-    "Cuộn chậm qua 4px ở 375 / 768 / 1280 / 1920: góc bo nội suy liên tục 0 ↔ 32px (< lg) / 36px (≥ lg); computed `border-radius` của `.site-header-bar` ở trạng thái nổi = 32px / 36px (không 9999px)",
-    "Computed `transition` của `.site-header` (padding) và `.site-header-bar` (max-width, border-radius, box-shadow) cùng duration 450ms + timing cubic-bezier(0.2, 0, 0, 1)",
-    "`.site-header` getBoundingClientRect().height = 80 (< lg) / 104 (≥ lg) trước, trong và sau chuyển trạng thái",
-    "Logo và nút trong header không dịch ngang khi chuyển phẳng ↔ nổi (đo `left` trước/sau, đặc biệt ở 1920)",
-    "`prefers-reduced-motion: reduce`: đổi trạng thái tức thì (transition none)",
-    "Regression hero trang chủ, ProjectSubNav, neo `#...` như scope v27",
-    "pnpm test / lint / typecheck PASS (HeaderFrame.test.tsx, Header.test.tsx)"
+    "Hai trang chi tiết dùng chung DetailLayout/DetailSubNav/DetailSection: thanh mục con viên thuốc trắng + một thẻ trắng nội dung bo 28px (computed `border-radius` 28px) + thẻ tư vấn/liên hệ tách riêng dính ≥ lg",
+    "Nền trang chi tiết = `--color-primary-subtle` (rgb(248, 243, 235)), không hex mới",
+    "Cuộn xuống trên 2 trang chi tiết: header trượt ẩn hẳn (không còn thanh nổi); thanh mục con dính `top` 8px (< lg) / 16px (≥ lg); chuyển động mượt, `.site-header` vẫn chiếm 80/104px trong luồng — không CLS",
+    "Cuộn lên (chưa về đầu trang): header KHÔNG hiện lại; về đầu trang (scrollY ≤ 4): header phẳng hiện lại",
+    "Đang cuộn giữa trang, nhấn Tab focus vào link/nút trong header: header hiện lại để thấy focus; rời focus → ẩn lại",
+    "Nút mục con đang xem: nền `--color-primary`, chữ `--color-primary-foreground` (#141414), tương phản ≥ 4.5:1; nút thường + focus-visible rõ; `aria-current` đúng khi cuộn và khi bấm",
+    "Bấm từng mục con / neo (#overview, #terms, #description, #video, #location, #legal, các mục dự án, #documents, #lead-form): tiêu đề mục hạ cánh dưới thanh mục con (~88px ≥ lg), không bị che",
+    "Chi tiết cho thuê: thanh mục con chỉ gồm khối có dữ liệu, đúng thứ tự Tổng quan · Điều khoản · Mô tả · Video · Vị trí · Pháp lý; nhãn EN ở `/en/for-rent/<slug>`",
+    "< lg (375 / 768): thẻ liên hệ cho thuê và thẻ 'Tư vấn 1:1' dự án nằm SAU thẻ nội dung (ngoài thẻ trắng); thanh dính đáy vẫn nhảy tới `#lead-form`",
+    "Tin `rented`: băng + badge 'Đã thuê', 'Căn tương tự đang trống' ngay sau thư viện (trước thanh mục con), 'Giá tham khảo', Điều khoản thu gọn, tiêu đề form 'Nhận tư vấn căn tương tự', `noindex, follow`, không JSON-LD — không đổi",
+    "375 / 768 / 1280 / 1920: không tràn ngang (`scrollWidth = clientWidth`)",
+    "`prefers-reduced-motion: reduce`: header ẩn/hiện tức thì (transition none), cuộn neo `behavior: auto`",
+    "Các trang không phải chi tiết dự án / cho thuê: header giữ hành vi BL-025/026 (cuộn → thanh nổi bo tròn, không ẩn); neo/aside dính không bị che",
+    "Form lead gửi được trên 2 trang (`source=project` gắn dự án / `source=rental` gắn tin) — một form duy nhất mỗi trang"
   ],
   "outOfScope": [
-    "Rule CSS chết `group-data-[scrolled]:rounded-pill` do Tailwind quét chuỗi trong HeaderFrame.test.tsx (review r1 MINOR, vô hại, tách task riêng nếu cần) — không fail test vì điểm này",
-    "Gom `max-w-[84rem]` lặp 2 chỗ thành 1 token (MINOR từ BL-025)"
+    "Trước hydrate (chưa JS) header đầy đủ có thể che thanh mục con — rủi ro user chấp nhận 2026-10-20, không fail test vì điểm này",
+    "Header che thoáng thanh mục con trong ~450ms ngay sau khi bấm neo hero từ đầu trang (T01 m-7) — trạng thái cuối đúng, không fail",
+    "Tin đã thuê: neo 'Điều khoản' tới accordion đang đóng, không tự mở (T02 m-2, chấp nhận)",
+    "Trình duyệt không hỗ trợ `:has()`: header không ẩn trên trang chi tiết, `OBSERVER_MARGIN` lệch — chấp nhận",
+    "Gom literal offset sticky lặp + `max-w-[84rem]` lặp thành token (MINOR, tuỳ chọn)"
   ],
   "viewports": [
     375,
@@ -88,10 +142,10 @@
   ],
   "browsers": [
     "chrome",
-    "safari-ios (backdrop-filter + sticky + transition border-radius — ưu tiên nếu có thiết bị)"
+    "safari-ios (sticky + `:has()` + transform header — ưu tiên nếu có thiết bị)"
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "low",
-  "riskNote": "Chỉ đổi class Tailwind của component dùng chung mọi trang công khai; NORMAL PASS r1, không CRITICAL/MAJOR. Residual: reviewer không có trình duyệt — chuyển động ở 4 viewport chưa xem thật, chỉ kiểm bằng phép tính CSS (32 = 64/2, 36 = 72/2, breakpoint 64rem); unit test chỉ khẳng định chuỗi class."
+  "risk": "medium",
+  "riskNote": "Đổi CSS header toàn cục (gate bằng `html:has([data-detail-page])`), biến `--sticky-top` dùng cho sticky + scroll-margin, LeadFormSlot dùng chung, bố cục 2 trang có form lead + trạng thái 'Đã thuê'. T01 STRICT PASS r3 (r2 FAIL do hồi quy neo, đã sửa), T02 FAST PASS r2, spec-validator phase PASS; không CRITICAL/MAJOR còn mở. Residual: chưa kiểm bằng mắt 768px, reduced-motion, tin rented, trình duyệt không `:has()`, focus ring mục con trên nền vàng; unit test chủ yếu khẳng định DOM/chuỗi class; đo dev server chỉ ở 375/1280."
 }

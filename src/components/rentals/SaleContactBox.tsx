@@ -3,11 +3,16 @@ import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { Phone } from "@/components/icons";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { DETAIL_ASIDE_CARD_CLASS } from "@/components/detail/DetailLayout";
 import { Button } from "@/components/ui/button";
 import { formatVndCompact } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import type { RentalDetailView, SaleContactView } from "@/lib/rentals/rental-view";
 import type { Locale } from "@/i18n/routing";
+
+/** Id tiêu đề form trong thẻ liên hệ: nhãn cho `<aside>` của `DetailLayout`. */
+export const RENTAL_CONTACT_HEADING_ID = "rental-consult-heading";
 
 interface SaleContactBoxProps {
   view: Pick<RentalDetailView, "rented" | "priceMonthlyVnd">;
@@ -19,7 +24,7 @@ interface SaleContactBoxProps {
 }
 
 /**
- * Khung phải của S07 (`--color-primary-subtle`, dính ≥ lg): giá + "/tháng" (tin đã thuê: chữ mờ + "Giá tham khảo") → người phụ trách
+ * Thẻ liên hệ của S07: thẻ trắng viền + bóng như thẻ Tư vấn của chi tiết dự án (`DETAIL_ASIDE_CARD_CLASS`, dính ≥ lg theo `--sticky-top`; nền vàng nhạt sẽ chìm vào nền trang): giá + "/tháng" (tin đã thuê: chữ mờ + "Giá tham khảo") → người phụ trách
  * (avatar, tên, nút gọi) hoặc hotline chung → vùng form lead (`LeadFormSlot` + `LeadForm source=rental`; tin đã thuê đổi tiêu đề
  * thành "Nhận tư vấn căn tương tự", nguồn vẫn là tin đó). Server Component, không đọc DB.
  */
@@ -29,7 +34,7 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
   const turnstileSiteKey = readTurnstileSiteKey();
   const contact = sale ? { href: sale.telHref, label: t("contact.callSale", { phone: sale.phoneLabel }) } : hotline ? { href: hotline.telHref, label: t("contact.callHotline", { phone: hotline.label }) } : null;
   return (
-    <div className="flex flex-col gap-6 rounded-sm bg-primary-subtle p-6">
+    <div className={cn("flex flex-col gap-6", DETAIL_ASIDE_CARD_CLASS)}>
       <div className="flex flex-col gap-1">
         <p className="text-small text-text-muted">{view.rented ? t("rented.referencePrice") : t("specs.price")}</p>
         <p className={view.rented ? "font-display text-price text-text-muted" : "font-display text-price"}>
@@ -68,7 +73,8 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
       </div>
       <LeadFormSlot
         title={view.rented ? t("leadForm.titleRented") : t("leadForm.title")}
-        className="bg-transparent p-0 lg:p-0 scroll-mt-[calc(var(--header-offset)+1rem)]"
+        headingId={RENTAL_CONTACT_HEADING_ID}
+        className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] bg-transparent p-0 lg:p-0"
       >
         <LeadForm source="rental" sourceId={rentalId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
       </LeadFormSlot>

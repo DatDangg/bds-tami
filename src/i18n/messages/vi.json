@@ -501,6 +501,15 @@
     "rentalDetail": {
       "code": "Mã tin",
       "postedAt": "Đăng ngày",
+      "subNavLabel": "Mục lục tin cho thuê",
+      "subNav": {
+        "overview": "Tổng quan",
+        "terms": "Điều khoản",
+        "description": "Mô tả",
+        "video": "Video",
+        "location": "Vị trí",
+        "legal": "Pháp lý"
+      },
       "rented": {
         "badge": "Đã thuê",
         "bannerTitle": "Căn này đã được cho thuê",

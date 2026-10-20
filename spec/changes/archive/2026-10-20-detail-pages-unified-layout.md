@@ -1,7 +1,8 @@
 ---
 id: detail-pages-unified-layout
 type: feature
-status: pending
+status: done
+completed: 2026-10-20
 created: 2026-10-20
 ---
 
@@ -22,13 +23,13 @@ User 2026-10-20 (kèm 3 ảnh: header + thanh mục con hiện tại của chi t
 - File liên quan: `src/app/(frontend)/[locale]/du-an/[slug]/page.tsx`, `src/app/(frontend)/[locale]/cho-thue/[slug]/page.tsx`, `src/components/projects/ProjectDetail.tsx`, `src/components/projects/ProjectOverview.tsx`, header `HeaderFrame`.
 
 ## Acceptance (bắt buộc)
-- [ ] Hai trang chi tiết dùng chung bố cục (thanh mục con + cột nội dung + thẻ tư vấn dính ≥ lg); ưu tiên tái sử dụng component chung thay vì copy.
-- [ ] Trên 2 trang chi tiết: cuộn xuống thì header ẩn hẳn (không còn thanh nổi), chỉ thanh mục con dính sát đỉnh trang (lề trên như header nổi đang có, không chừa chỗ cho header); chuyển động lên đỉnh mượt, không giật/CLS; các trang khác giữ header nổi như BL-025/026.
-- [ ] Nền trang chi tiết = vàng nhạt từ token (không hardcode hex mới).
-- [ ] Nội dung các section nằm trong thẻ trắng bo góc; thẻ tư vấn bên phải giữ nguyên tách riêng.
-- [ ] Nút mục con active: nền `--color-primary`, chữ `--color-primary-foreground`, tương phản ≥ 4.5:1; nút thường + focus-visible vẫn rõ trên nền vàng nhạt.
-- [ ] Neo cuộn tới section không bị thanh mục con che (scroll-margin đúng sau khi bỏ header bám).
-- [ ] 375 / 768 / 1280px không tràn ngang; reduced-motion giữ nguyên.
+- [x] Hai trang chi tiết dùng chung bố cục (thanh mục con + cột nội dung + thẻ tư vấn dính ≥ lg); ưu tiên tái sử dụng component chung thay vì copy.
+- [x] Trên 2 trang chi tiết: cuộn xuống thì header ẩn hẳn (không còn thanh nổi), chỉ thanh mục con dính sát đỉnh trang (lề trên như header nổi đang có, không chừa chỗ cho header); chuyển động lên đỉnh mượt, không giật/CLS; các trang khác giữ header nổi như BL-025/026.
+- [x] Nền trang chi tiết = vàng nhạt từ token (không hardcode hex mới).
+- [x] Nội dung các section nằm trong thẻ trắng bo góc; thẻ tư vấn bên phải giữ nguyên tách riêng.
+- [x] Nút mục con active: nền `--color-primary`, chữ `--color-primary-foreground`, tương phản ≥ 4.5:1; nút thường + focus-visible vẫn rõ trên nền vàng nhạt.
+- [x] Neo cuộn tới section không bị thanh mục con che (scroll-margin đúng sau khi bỏ header bám).
+- [x] 375 / 768 / 1280px không tràn ngang; reduced-motion giữ nguyên.
 
 ## Ghi chú
 - Classify dự kiến: MODIFY (UI, không đổi schema). Liên quan BL-020 P4 (thanh mục con, thẻ tư vấn), BL-025/026 (header).

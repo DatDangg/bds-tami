@@ -501,6 +501,15 @@
     "rentalDetail": {
       "code": "Listing ID",
       "postedAt": "Posted",
+      "subNavLabel": "Listing contents",
+      "subNav": {
+        "overview": "Overview",
+        "terms": "Terms",
+        "description": "Description",
+        "video": "Video",
+        "location": "Location",
+        "legal": "Legal"
+      },
       "rented": {
         "badge": "Rented",
         "bannerTitle": "This unit has been rented",

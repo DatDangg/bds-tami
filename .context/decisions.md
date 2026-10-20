@@ -79,3 +79,11 @@ _No decisions recorded yet. Decisions logged here khi dựng spec và trong impl
 - **Alternatives Considered:** Thay `admin.components.Nav` (icon, thứ tự tự do — rủi ro quyền/active/mobile, bảo trì khi nâng Payload); tab có tên (đổi path → migration).
 - **Rationale:** Giữ an toàn dữ liệu và quyền, nâng Payload không vỡ.
 - **Consequences:** FR-ADM-14 (L13-T01) cắm vào `DashboardView`; custom Cell phải đi qua `LinkedCell` để giữ chọn bản ghi trong ListDrawer.
+
+### Decision 9: Trang chi tiết ẩn header khi cuộn bằng CSS `:has([data-detail-page])` + biến `--sticky-top` cố định (feature-detail-pages-unified-layout, BL-027)
+- **Date:** 2026-10-20
+- **Context:** User yêu cầu trên chi tiết dự án / cho thuê cuộn xuống thì không còn header, chỉ thanh mục con dính sát đỉnh (lề như header nổi). BL-025 quyết định header sticky ở mọi trang và mọi `scroll-margin`/thanh dính bù theo `--header-offset`. `HeaderFrame` nằm ở layout, không biết route.
+- **Decision:** Khung chung `DetailLayout` gắn `data-detail-page`; `globals.css` dùng `html:has([data-detail-page])` để (1) `.site-header[data-scrolled]:not(:has(:focus-visible))` trượt ẩn bằng `transform` (không hiện lại khi cuộn lên; hiện khi focus bàn phím), (2) biến `--sticky-top` (`:root` = `--header-offset`) cố định 0.5rem / ≥ lg 1rem — dùng cho sticky thanh mục con, thẻ tư vấn/liên hệ và `scroll-margin` neo trong khung chi tiết. Sửa quyết định BL-025 cho riêng trang chi tiết.
+- **Alternatives Considered:** Prop/context từ page xuống layout header (cần client state xuyên layout); JS đặt data-attribute lên `<html>` khi mount (phụ thuộc hydrate); chỉ đổi `--sticky-top` khi header đã `data-scrolled` (round 2 — làm neo nhảy từ đầu trang thừa ~88px vì scroll-margin tính lúc còn 104px); `:focus-within` (focus chuột sau khi đóng menu giữ header che thanh mục con); `visibility:hidden` (link header không còn focus được bằng Tab).
+- **Rationale:** Không đổi JS/DOM header, không prop xuyên layout; trang khác giữ nguyên vì `:has()` không khớp; trình duyệt thiếu `:has()` rơi về hành vi cũ nhất quán.
+- **Consequences:** Trước hydrate / không JS header đầy đủ có thể che thanh mục con (user chấp nhận 2026-10-20); `OBSERVER_MARGIN` -88px xấp xỉ; trình đọc màn hình vẫn đọc link header khi đã ẩn. Component mới dùng neo trong khung chi tiết phải dùng `--sticky-top` + 4.5rem.

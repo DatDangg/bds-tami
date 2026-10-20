@@ -844,10 +844,10 @@
       "slug": "detail-pages-unified-layout",
       "title": "Chi tiết dự án + chi tiết cho thuê cùng bố cục: header ẩn khi cuộn, thanh mục con dính đỉnh, nền vàng nhạt, nội dung trong thẻ trắng, mục con active vàng (BL-027)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-027",
-      "changeDoc": "spec/changes/2026-10-20-detail-pages-unified-layout.md",
+      "changeDoc": "spec/changes/archive/2026-10-20-detail-pages-unified-layout.md",
       "startedAt": "2026-10-20",
       "tasks": [
         {
@@ -860,22 +860,31 @@
           "note": "r1 FAIL M-1 focus-within; r2 FAIL M-2 sticky-top phụ thuộc data-scrolled; user cho round 3 → --sticky-top cố định 0.5/1rem; r3 STRICT PASS (MINOR m-7/m-8)",
           "reviewerResult": "PASS",
           "report": ".context/review-reports/feature-detail-pages-unified-layout-phase-1-task-01-round-3-review.md",
-          "commit": "(commit phase-1-task-01)"
+          "commit": "046d891"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-detail-pages-unified-layout/phase-1-task-02.md",
-          "status": "in_progress",
-          "attempt": 0,
-          "round": 0,
-          "reviewLevel": "NORMAL",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "FAST",
           "dependsOn": [
             "phase-1-task-01"
           ],
-          "note": "chi tiết cho thuê dùng khung chung"
+          "note": "r1 NORMAL FAIL M-1 (#lead-form scroll-mt +1rem); r2 FAST PASS",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-detail-pages-unified-layout-phase-1-task-02-round-2-review.md",
+          "commit": "(commit close-out BL-027)"
         }
       ],
-      "planApprovedAt": "2026-10-20"
+      "planApprovedAt": "2026-10-20",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.23.0",
+      "scopeVersion": 29,
+      "specUpdate": "spec/updates/2026-10-20-detail-pages-unified-layout.md",
+      "specValidation": ".context/review-reports/feature-detail-pages-unified-layout-phase-1-spec-validation.md",
+      "residual": "trước hydrate/không JS header che thanh mục con (user chấp nhận 2026-10-20); chưa kiểm bằng mắt 768 / reduced-motion / tin rented / trình duyệt không :has(); OBSERVER_MARGIN -88px xấp xỉ; Điều khoản tin rented không tự mở khi bấm mục con; hằng 4.5rem lặp nhiều chỗ"
     }
   ],
   "bugs": [
@@ -1732,7 +1741,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T03:37:49.960Z",
+  "lastUpdated": "2026-10-20T03:58:25.735Z",
   "approvalMilestones": [
     {
       "id": "M1",

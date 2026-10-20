@@ -1,15 +1,21 @@
 import { useTranslations } from "next-intl";
+import { DetailSection } from "@/components/detail/DetailSection";
 import { CaretDown } from "@/components/icons";
 import type { RentalTermsView } from "@/lib/rentals/rental-view";
 
 interface RentalTermsProps {
+  /** `id` khối: đích của mục "Điều khoản" trên thanh mục con. */
+  id: string;
   terms: RentalTermsView;
   /** Tin đã thuê: điều khoản thu gọn thành accordion đóng (design-spec S07) — khách chỉ tham khảo. */
   collapsed?: boolean;
 }
 
-/** Khối "Điều khoản thuê" `<dl>`: thời hạn tối thiểu, đặt cọc, kỳ thanh toán, ngày trống, dịch vụ bao gồm (chip trung tính). Server Component (accordion dùng `<details>` gốc). */
-export function RentalTerms({ terms, collapsed = false }: RentalTermsProps) {
+/**
+ * Khối "Điều khoản thuê" `<dl>`: thời hạn tối thiểu, đặt cọc, kỳ thanh toán, ngày trống, dịch vụ bao gồm (chip trung tính). Dùng khung `DetailSection` chung;
+ * tin đã thuê thu gọn thành accordion `<details>` (tiêu đề nằm ở summary). Server Component.
+ */
+export function RentalTerms({ id, terms, collapsed = false }: RentalTermsProps) {
   const t = useTranslations("page.rentalDetail");
   const items = [
     ...(terms.minLeaseMonths !== null ? [{ label: t("terms.minLease"), value: t("terms.months", { count: terms.minLeaseMonths }) }] : []),
@@ -43,22 +49,22 @@ export function RentalTerms({ terms, collapsed = false }: RentalTermsProps) {
   );
 
   if (collapsed) {
+    // Không dùng DetailSection (sẽ thêm h2 thứ hai): tiêu đề là summary. Lớp khung/scroll-mt giữ giống DetailSection để neo và đường kẻ đồng nhất.
     return (
-      <details className="group border-b border-border">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 font-display text-h3 [&::-webkit-details-marker]:hidden">
-          {t("terms.title")}
-          <CaretDown size={20} aria-hidden="true" className="transition-transform group-open:rotate-180 motion-reduce:transition-none" />
-        </summary>
-        <div className="pb-4">{body}</div>
-      </details>
+      <div id={id} tabIndex={-1} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] border-t border-border py-section-tight first:border-t-0 focus:outline-none">
+        <details className="group border-b border-border">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 font-display text-h3 [&::-webkit-details-marker]:hidden">
+            {t("terms.title")}
+            <CaretDown size={20} aria-hidden="true" className="transition-transform group-open:rotate-180 motion-reduce:transition-none" />
+          </summary>
+          <div className="pb-4">{body}</div>
+        </details>
+      </div>
     );
   }
   return (
-    <section aria-labelledby="rental-terms-title">
-      <h2 id="rental-terms-title" className="mb-4 font-display text-h2-sm">
-        {t("terms.title")}
-      </h2>
+    <DetailSection id={id} title={t("terms.title")}>
       {body}
-    </section>
+    </DetailSection>
   );
 }
