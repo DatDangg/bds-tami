@@ -252,6 +252,6 @@ describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
     loadPageBanner.mockResolvedValue(undefined);
     const { container } = await render("vi");
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
-    expect(container.querySelector("section.bg-bg-alt")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size].bg-dark-deep")).not.toBeNull();
   });
 });

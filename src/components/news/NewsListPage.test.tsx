@@ -131,8 +131,8 @@ afterEach(() => {
 describe("S10 /tin-tuc trang 1 (BL-020 P3-T03)", () => {
   it("banner gọn không đệm đáy; tab danh mục là link, 'Tất cả' đang chọn", async () => {
     const { container } = await render("vi");
-    expect(container.querySelector("[data-banner-size=compact]")).not.toBeNull();
-    expect(container.querySelector("[data-banner-overlap]")).toBeNull();
+    expect(container.querySelector("[data-hero-size=short]")).not.toBeNull();
+    expect(container.querySelector("[data-search-overlay], [data-filter-card]")).toBeNull();
     const tabs = screen.getByRole("navigation", { name: "Danh mục tin tức" });
     expect(within(tabs).getAllByRole("link").map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
       ["Tất cả", "/tin-tuc"],
@@ -255,7 +255,7 @@ describe("S10 /tin-tuc trang 2+ và S05 danh mục", () => {
 
   it("trang danh mục: banner gọn + lưới 4 cột, không form tư vấn, không hàng danh mục", async () => {
     const { container } = await render("vi", undefined, "thi-truong");
-    expect(container.querySelector("[data-banner-size=compact]")).not.toBeNull();
+    expect(container.querySelector("[data-hero-size=short]")).not.toBeNull();
     expect(container.querySelector("[data-grid-max-cols='4']")).not.toBeNull();
     expect(screen.queryByRole("form", { name: "Form lead" })).toBeNull();
     expect(screen.queryByRole("region", { name: "Tin nổi bật" })).toBeNull();

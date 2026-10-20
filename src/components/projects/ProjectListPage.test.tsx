@@ -127,10 +127,11 @@ describe("S02 /du-an: render", () => {
   it("bố cục market: banner gọn 240px, băng tìm kiếm đè banner (trước breadcrumb), lưới 1/2/3/4 cột, không có ô từ khoá / nút Bộ lọc", async () => {
     loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
     const { container } = await render("vi");
-    expect(container.querySelector("[data-banner-size=compact][data-banner-overlap=true]")).not.toBeNull();
+    expect(container.querySelector("[data-hero-size=list]")).not.toBeNull();
     const bar = screen.getByRole("search", { name: "Bộ lọc dự án" });
     expect(bar.parentElement).toHaveAttribute("data-search-overlay", "true");
-    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // BL-045: breadcrumb nằm trong hero nên đứng TRƯỚC băng tìm kiếm đè đáy hero.
+    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
     expect(container.querySelector("[data-grid-max-cols]")).toHaveAttribute("data-grid-max-cols", "4");
     expect(within(bar).queryByRole("searchbox")).toBeNull();
     expect(within(bar).queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
@@ -261,6 +262,6 @@ describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
     loadPageBanner.mockResolvedValue(undefined);
     const { container } = await render("vi");
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
-    expect(container.querySelector("section.bg-bg-alt")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size].bg-dark-deep")).not.toBeNull();
   });
 });

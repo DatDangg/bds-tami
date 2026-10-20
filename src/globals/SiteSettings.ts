@@ -10,6 +10,7 @@ import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
+import { careersPerksField, pageHeroesField, showProjectStrengthsField } from "./site-settings/page-heroes";
 
 const validateHttpUrl: TextFieldSingleValidation = (value) => {
   if (typeof value !== "string" || value.trim() === "") return true;
@@ -94,8 +95,8 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
               // Không localized: VI và EN dùng chung ảnh (ảnh banner là trang trí, `alt` rỗng). FR-ADM-20.
               name: "pageBanners",
               type: "group",
-              label: "Ảnh banner trang danh sách",
-              admin: { description: "Ảnh nền đầu trang danh sách. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ." },
+              label: "Ảnh banner trang con",
+              admin: { description: "Ảnh nền đầu trang con. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ." },
               fields: [
                 { ...imageUpload("default", "Ảnh mặc định"), admin: { description: "Dùng cho trang danh sách chưa có ảnh riêng." } },
                 imageUpload("projects", "Dự án"),
@@ -103,8 +104,13 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
                 imageUpload("propertyPosts", "Tin bất động sản"),
                 imageUpload("news", "Tin tức"),
                 imageUpload("careers", "Tuyển dụng"),
+                imageUpload("contact", "Liên hệ"),
+                imageUpload("legal", "Pháp lý (Chính sách, Điều khoản)"),
               ],
             },
+            pageHeroesField,
+            showProjectStrengthsField,
+            careersPerksField,
           ],
         },
         {

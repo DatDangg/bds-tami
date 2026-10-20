@@ -32,22 +32,28 @@ describe("Pagination", () => {
     expect(nav.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
   });
 
-  it("Trước/Sau là link rel prev/next; mọi link >= 44px; mobile có 'Trang 6/12'", () => {
+  it("mũi tên tròn Trước/Sau là link có aria-label, rel prev/next; mọi ô tròn 44px; mobile có 'Trang 6/12'", () => {
     renderWithIntl(<Pagination page={6} totalPages={12} buildHref={buildHref} />);
-    const previous = screen.getByRole("link", { name: /Trước/ });
-    const next = screen.getByRole("link", { name: /Sau/ });
+    const previous = screen.getByRole("link", { name: "Trước" });
+    const next = screen.getByRole("link", { name: "Sau" });
     expect(previous).toHaveAttribute("href", "/du-an?page=5");
     expect(previous).toHaveAttribute("rel", "prev");
     expect(next).toHaveAttribute("href", "/du-an?page=7");
     expect(next).toHaveAttribute("rel", "next");
+    expect(previous).toHaveClass("rounded-full", "size-11");
     expect(screen.getByText("Trang 6/12")).toBeInTheDocument();
-    for (const link of screen.getAllByRole("link")) expect(link).toHaveClass("min-h-11", "min-w-11");
+    for (const link of screen.getAllByRole("link")) expect(link).toHaveClass("size-11", "rounded-full");
+  });
+
+  it("trang hiện tại là ô tròn nền --color-primary", () => {
+    renderWithIntl(<Pagination page={2} totalPages={3} buildHref={buildHref} />);
+    expect(screen.getByText("2", { selector: '[aria-current="page"]' })).toHaveClass("rounded-full", "bg-primary");
   });
 
   it("trang đầu: Trước không là link; trang cuối: Sau không là link", () => {
     const first = renderWithIntl(<Pagination page={1} totalPages={3} buildHref={buildHref} />);
     expect(screen.queryByRole("link", { name: /Trước/ })).toBeNull();
-    expect(screen.getByText("Trước").closest("[aria-disabled]")).not.toBeNull();
+    expect(screen.getByLabelText("Trước")).toHaveAttribute("aria-disabled", "true");
     first.unmount();
     renderWithIntl(<Pagination page={3} totalPages={3} buildHref={buildHref} />);
     expect(screen.queryByRole("link", { name: /Sau/ })).toBeNull();

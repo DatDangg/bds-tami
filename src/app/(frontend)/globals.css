@@ -112,6 +112,8 @@
   --radius-pill: 9999px;
 
   --blur-glass: 24px;
+  /* Breadcrumb trên ảnh hero (BL-045 #1): gần trong suốt nên blur rất nhẹ, khác kính header. */
+  --blur-breadcrumb: 4px;
   /* Vàng champagne → vàng đậm cho badge/nhấn; "Đang bán" dùng xanh từ --color-success. */
   --gradient-gold: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-deep) 100%);
   --gradient-success: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-text) 100%);
@@ -315,6 +317,25 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
 @media (prefers-reduced-transparency: reduce) {
   .glass-panel {
     background-color: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Breadcrumb trên ảnh hero (BL-045 #1): khung viên thuốc chỉ bao chữ, nền vàng đậm 13% + blur 4px, chữ trắng có bóng nhẹ.
+   Không có backdrop-filter thì nền 13% giữ nguyên (scrim đầu ảnh của hero lo độ đọc); giảm trong suốt → bỏ blur. */
+.crumb-glass {
+  background-color: color-mix(in srgb, var(--color-primary-deep) 13%, transparent);
+  text-shadow: 0 1px 3px rgb(10 12 16 / 0.6);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .crumb-glass {
+    -webkit-backdrop-filter: blur(var(--blur-breadcrumb));
+    backdrop-filter: blur(var(--blur-breadcrumb));
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .crumb-glass {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

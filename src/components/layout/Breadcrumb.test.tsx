@@ -67,6 +67,47 @@ describe("Breadcrumb", () => {
     expect(screen.getByRole("list")).toHaveClass("hidden", "md:flex");
   });
 
+  it("overlay (BL-045): khung viên thuốc chỉ bao chữ (crumb-glass), chữ trắng, ngăn ›, mục hiện tại aria-current", () => {
+    renderWithIntl(<Breadcrumb variant="overlay" items={[{ label: "Dự án", href: "/du-an" }, { label: "Tami Riverside", href: "/du-an/tami-riverside" }]} />);
+    const nav = screen.getByRole("navigation", { name: /Breadcrumb/ });
+    expect(nav).toHaveClass("w-fit");
+    const list = within(nav).getByRole("list");
+    expect(list).toHaveClass("crumb-glass", "rounded-full", "text-on-dark", "w-fit");
+    expect(list.textContent).toBe("Trang chủ›Dự án›Tami Riverside");
+    for (const separator of list.querySelectorAll("li > span[aria-hidden]")) expect(separator).toHaveTextContent("›");
+    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent("Tami Riverside");
+    expect(within(nav).getByRole("link", { name: "Dự án" })).toHaveClass("min-h-11", "hover:text-primary");
+  });
+
+  it("plain (BL-045): chữ muted trong container, ngăn ›, không khung kính", () => {
+    renderWithIntl(<Breadcrumb variant="plain" items={[{ label: "Tin tức", href: "/tin-tuc" }, { label: "Bài", href: "/tin-tuc/bai" }]} />);
+    const nav = screen.getByRole("navigation", { name: /Breadcrumb/ });
+    expect(nav).toHaveClass("max-w-container", "text-text-muted");
+    expect(within(nav).getByRole("list")).not.toHaveClass("crumb-glass");
+    expect(within(nav).getByRole("list").textContent).toBe("Trang chủ›Tin tức›Bài");
+  });
+
+  it("overlay + quá 3 mục: link '← mục cha' < md cũng nằm trong khung kính; JSON-LD giữ nguyên", () => {
+    const { container } = renderWithIntl(
+      <Breadcrumb
+        variant="overlay"
+        items={[
+          { label: "Cho thuê", href: "/cho-thue" },
+          { label: "Căn hộ", href: "/cho-thue/danh-muc/can-ho" },
+          { label: "Studio", href: "/cho-thue/danh-muc/studio" },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("link", { name: /Quay lại Căn hộ/ })).toHaveClass("crumb-glass", "md:hidden");
+    expect(jsonLd(container).itemListElement).toHaveLength(4);
+  });
+
+  it("mặc định (trang chưa chuyển) giữ kiểu cũ: caret icon, không crumb-glass", () => {
+    renderWithIntl(<Breadcrumb items={[{ label: "Dự án", href: "/du-an" }]} />);
+    expect(screen.getByRole("list")).not.toHaveClass("crumb-glass");
+    expect(screen.getByRole("list").textContent).not.toContain("›");
+  });
+
   it("không có NEXT_PUBLIC_SITE_URL thì bỏ JSON-LD", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
     const { container } = renderWithIntl(<Breadcrumb items={[{ label: "Dự án", href: "/du-an" }]} />);

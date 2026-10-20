@@ -713,6 +713,15 @@
     "cta": {
       "getAdvice": "Nhận tư vấn"
     },
+    "consult": {
+      "title": "Cần tư vấn bất động sản?",
+      "description": "Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất."
+    },
+    "listing": {
+      "resultCount": "{count} kết quả",
+      "sortLabel": "Sắp xếp",
+      "moreOptions": "Tuỳ chọn khác"
+    },
     "services": {
       "otherTitle": "Dịch vụ khác",
       "learnMore": "Xem dịch vụ",

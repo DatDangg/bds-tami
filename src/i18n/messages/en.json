@@ -713,6 +713,15 @@
     "cta": {
       "getAdvice": "Get advice"
     },
+    "consult": {
+      "title": "Need real estate advice?",
+      "description": "Leave your details and we will get back to you as soon as possible."
+    },
+    "listing": {
+      "resultCount": "{count, plural, one {# result} other {# results}}",
+      "sortLabel": "Sort by",
+      "moreOptions": "More options"
+    },
     "services": {
       "otherTitle": "Other services",
       "learnMore": "View service",
