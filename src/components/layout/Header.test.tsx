@@ -45,7 +45,7 @@ describe("Header: khung và landmark", () => {
   it("thanh: đầu trang phẳng, khi cuộn mới bo viên thuốc; hàng cao 64px (72px từ lg), đệm ngang thu theo breakpoint", () => {
     renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
     const bar = screen.getByRole("banner").firstElementChild;
-    expect(bar).toHaveClass("site-header-bar", "rounded-none", "group-data-[scrolled]:rounded-pill");
+    expect(bar).toHaveClass("site-header-bar", "rounded-none", "group-data-[scrolled]:rounded-[2rem]");
     const frame = bar?.firstElementChild; // khung nội dung 84rem
     expect(frame).toHaveClass("max-w-[84rem]");
     expect(frame?.firstElementChild).toHaveClass("h-16", "lg:h-18");

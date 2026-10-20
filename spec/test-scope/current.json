@@ -1,85 +1,80 @@
 {
   "specVersion": "1.22.0",
-  "scopeVersion": 27,
-  "generatedAt": "2026-10-20T23:59:00+07:00",
+  "scopeVersion": 28,
+  "generatedAt": "2026-10-20T23:59:30+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-025 — header công khai: đầu trang là thanh phẳng full-width (kính mờ sáng, góc vuông, không bóng, cao = --header-offset), cuộn > 4px mới thành thanh nổi bo tròn. Sửa quyết định 'một biến thể, không cần JS' của BL-020 P1-T02 (ab3f95a). MODIFY behavior → spec 1.21.0 → 1.22.0 (MINOR).",
-  "workItem": "feature/header-full-width-at-top",
-  "backlog": "BL-025",
+  "triggerNote": "BL-026 — header công khai: chuyển đổi phẳng ↔ nổi mượt hơn. Góc bo dùng bán kính thật (32px < lg / 36px ≥ lg = nửa chiều cao thanh) thay `--radius-pill` 9999px (nội suy 0 ↔ 9999px làm góc giữ tròn gần hết quãng rồi bật vuông); padding header + max-width/radius/shadow thanh cùng nhịp `--duration-slow` 450ms + `--ease-standard` cubic-bezier(0.2,0,0,1). MODIFY thuần thẩm mỹ: requirement không đổi (SPECIFICATIONS 'Khung trang' đã ghi 'chuyển đổi mượt, tức thì khi prefers-reduced-motion') → giữ spec 1.22.0, không spec/updates, không dòng CHANGELOG (theo tiền lệ scope v11/v21/v26).",
+  "workItem": "feature/header-scroll-transition-smooth",
+  "backlog": "BL-026",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-header-full-width-at-top.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-header-scroll-transition-smooth.md",
   "task": [
-    "tasks/feature-header-full-width-at-top/phase-1-task-01.md"
+    "tasks/feature-header-scroll-transition-smooth/phase-1-task-01.md"
   ],
+  "reviewReport": ".context/review-reports/feature-header-scroll-transition-smooth-phase-1-task-01-round-1-review.md",
   "commits": [
-    "close-out BL-025 (commit chứa file này)"
+    "close-out BL-026 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-025 (commit chứa file này)": "T01 — HeaderFrame client component (scroll passive + rAF, ngưỡng scrollY > 4 → data-scrolled trên <header>), class Tailwind group-data-[scrolled]: / lg:data-[scrolled]: đổi padding header + max-width/radius/shadow thanh; Header.tsx bọc nội dung khung max-w-[84rem] (review r2); globals.css chỉ comment; test HeaderFrame.test.tsx + Header.test.tsx; SPECIFICATIONS 'Khung trang' + design-spec §2.1; spec delta 1.22.0"
+    "close-out BL-026 (commit chứa file này)": "T01 — HeaderFrame.tsx: thanh `rounded-none` → `group-data-[scrolled]:rounded-[2rem]` / `lg:group-data-[scrolled]:rounded-[2.25rem]` (bỏ rounded-pill), transition header (padding) + thanh (max-width, border-radius, box-shadow) cùng `duration-(--duration-slow)` + `ease-standard`, `motion-reduce:transition-none`; test HeaderFrame.test.tsx + Header.test.tsx; design-spec §2.1 dòng Biến thể. Review NORMAL PASS r1."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.21.0-26.json",
-  "specUpdate": "spec/updates/2026-10-20-header-full-width-at-top.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.22.0-27.json",
+  "specUpdate": null,
   "specRefs": [
     "Overview — Khung trang (header)",
     "design-spec §2.1 Header"
   ],
   "specRefNotes": {
-    "Overview — Khung trang (header)": "SPECIFICATIONS.md mục Tổng quan 'Khung trang': header kính mờ sáng, hai hình dạng theo cuộn — đầu trang phẳng full-width cao --header-offset (80 / ≥ lg 104), cuộn → thanh nổi bo tròn lề 8/16 cao 64/72 max 84rem có bóng; SSR phẳng; không CLS.",
-    "design-spec §2.1 Header": ".context/design-spec.md §2.1 dòng Biến thể / Trang không có hero / Cao – lề: ngưỡng scrollY ≤ 4px, data-scrolled, transition --duration-base ease-out tắt khi prefers-reduced-motion, nội dung trong khung 84rem ở cả hai trạng thái."
+    "Overview — Khung trang (header)": "SPECIFICATIONS.md mục Tổng quan 'Khung trang': hai hình dạng theo cuộn, chuyển đổi mượt, tức thì khi prefers-reduced-motion — không đổi câu chữ, BL-026 chỉ làm đúng 'mượt'.",
+    "design-spec §2.1 Header": ".context/design-spec.md §2.1 dòng Biến thể (đã cập nhật BL-026): bán kính thật 32/36px, không `--radius-pill`; transition cùng nhịp `--duration-slow` (450ms) + `--ease-standard`; tắt khi prefers-reduced-motion."
   },
   "migration": "none",
   "changed": {
     "files": [
       "src/components/layout/HeaderFrame.tsx",
       "src/components/layout/HeaderFrame.test.tsx",
-      "src/components/layout/Header.tsx",
-      "src/components/layout/Header.test.tsx",
-      "src/app/(frontend)/globals.css"
+      "src/components/layout/Header.test.tsx"
     ],
-    "filesNote": "globals.css chỉ sửa comment. Không schema/migration/API/access control. Doc impact: design-spec §2.1 (đã sửa); không ERD/API_SPEC.",
+    "filesNote": "Chỉ chuỗi class Tailwind + test. Không schema/migration/API/access control. Doc impact: design-spec §2.1 (đã sửa); không ERD/API_SPEC.",
     "modules": [
-      "Layout — HeaderFrame (client component: trạng thái cuộn → data-scrolled, hai hình dạng thanh)",
-      "Layout — Header (nội dung trong khung max-w-[84rem] căn giữa ở cả hai trạng thái)",
+      "Layout — HeaderFrame (bán kính bo + transition phẳng ↔ nổi)",
       "Test — HeaderFrame.test.tsx, Header.test.tsx"
     ]
   },
   "impact": {
     "direct": [
-      "Header hai trạng thái ở 375 / 768 / 1280 / 1920: đầu trang phẳng full-width (radius 0, không shadow, không khe lề, cao 80 < lg / 104 ≥ lg); cuộn > 4px → thanh nổi pill lề 8/16, cao 64/72, max 84rem, shadow-md; cuộn về đầu → phẳng",
-      "Trang có hero (`/`, `/en`): thanh phẳng kính mờ sáng đè ảnh hero, chữ/logo AA",
-      "Trang không hero (`/cho-thue`, `/du-an/<slug>`, `/tin-tuc`): header trong luồng cao --header-offset, nội dung không bị che"
+      "Header công khai cuộn qua ngưỡng 4px (xuống và lên) ở 375 / 768 / 1280 / 1920: góc bo đổi DẦN 0 ↔ 32px (< lg) / 36px (≥ lg) — không giữ tròn rồi bật vuông khi cuộn về đầu, không bật tròn tức thì khi cuộn xuống",
+      "Transition 450ms `--ease-standard` (cubic-bezier(0.2,0,0,1)) cùng nhịp cho padding header + max-width/border-radius/box-shadow thanh — các thuộc tính bắt đầu và kết thúc cùng lúc",
+      "Ở trạng thái nổi: góc là nửa hình tròn đúng (bán kính = nửa chiều cao 64/72px)"
     ],
     "dependents": [
-      "Hero `-mt-(--header-offset)` + HeroSlider đo `.site-header`",
-      "ProjectSubNav `top` (thanh mục con dính dưới header ở chi tiết dự án)",
-      "`scroll-margin-top` neo: #lead-form, #documents, các mục chi tiết dự án",
-      "Aside dính: RentalDetail, JobDetail, ProjectDetail (thẻ Tư vấn 1:1)",
-      "Thanh thông báo trang chủ phía trên header"
+      "Chiều cao `.site-header` 80 (< lg) / 104 (≥ lg) không đổi trong và sau transition — không CLS",
+      "Logo / menu / CTA / VI|EN không nhảy ngang khi chuyển (nội dung trong khung 84rem căn giữa)",
+      "Hero trang chủ `-mt-(--header-offset)` + HeroSlider đo `.site-header`",
+      "ProjectSubNav `top` ở chi tiết dự án (dính dưới header)",
+      "`scroll-margin-top` neo `#...` (#lead-form, #documents, các mục chi tiết dự án)"
     ],
     "regression": [
-      "Menu toàn màn hình < xl (mở/đóng, khoá cuộn nền, tự đóng khi ≥ xl)",
-      "Dropdown DesktopNav ≥ xl (hover/focus/Enter, aria-expanded)",
-      "VI | EN chuyển ngôn ngữ",
-      "Nút CTA header (hiện khi có nhãn + link)",
-      "Focus ring màu chữ `--color-text` trong thanh ở cả hai trạng thái",
-      "`prefers-reduced-transparency: reduce` / không `backdrop-filter` → nền đặc `--color-surface` ở cả hai trạng thái",
-      "`prefers-reduced-motion: reduce` → đổi trạng thái tức thì, không transition",
-      "In ấn: header `print:hidden`",
-      "Tải lại giữa trang: SSR phẳng → sau hydrate thành nổi, không CLS (chiều cao `.site-header` không đổi)"
+      "Hero trang chủ `/`, `/en`: thanh phẳng kính mờ đè ảnh, chữ/logo AA",
+      "ProjectSubNav chi tiết dự án: không bị header che khi cuộn, `aria-current` đúng",
+      "Bấm neo `#...` (menu mục con, CTA 'Đăng ký tham quan' → #lead-form, #documents): mục không bị header che",
+      "`prefers-reduced-motion: reduce` → đổi trạng thái tức thì, không animation",
+      "`prefers-reduced-transparency: reduce` / không `backdrop-filter` → nền đặc ở cả hai trạng thái",
+      "Menu toàn màn hình < xl, dropdown DesktopNav ≥ xl, focus ring trong thanh"
     ]
   },
   "acceptance": [
-    "Chưa cuộn: header full-width, góc vuông, không shadow/khe lề — ở 375 / 768 / 1280px, trang có hero và không có hero",
-    "Cuộn xuống (> 4px): thành thanh nổi bo tròn (lề 8/16, cao 64/72, max 84rem, shadow); cuộn về đầu thì trở lại phẳng",
-    "Đo `.site-header` getBoundingClientRect().height = 80 (< lg) / 104 (≥ lg) ở CẢ HAI trạng thái — không CLS; hero kéo lên, ProjectSubNav `top`, scroll-margin neo, aside dính vẫn đúng",
-    "Viewport 1920: logo/menu/CTA không nhảy ngang khi chuyển phẳng ↔ nổi (nội dung trong khung 84rem căn giữa ở cả hai)",
-    "Chữ/logo đạt AA trên nền header ở cả hai trạng thái (kể cả đè hero); `prefers-reduced-transparency` vẫn nền đặc",
-    "`prefers-reduced-motion`: đổi trạng thái tức thì, không animation",
+    "Cuộn chậm qua 4px ở 375 / 768 / 1280 / 1920: góc bo nội suy liên tục 0 ↔ 32px (< lg) / 36px (≥ lg); computed `border-radius` của `.site-header-bar` ở trạng thái nổi = 32px / 36px (không 9999px)",
+    "Computed `transition` của `.site-header` (padding) và `.site-header-bar` (max-width, border-radius, box-shadow) cùng duration 450ms + timing cubic-bezier(0.2, 0, 0, 1)",
+    "`.site-header` getBoundingClientRect().height = 80 (< lg) / 104 (≥ lg) trước, trong và sau chuyển trạng thái",
+    "Logo và nút trong header không dịch ngang khi chuyển phẳng ↔ nổi (đo `left` trước/sau, đặc biệt ở 1920)",
+    "`prefers-reduced-motion: reduce`: đổi trạng thái tức thì (transition none)",
+    "Regression hero trang chủ, ProjectSubNav, neo `#...` như scope v27",
     "pnpm test / lint / typecheck PASS (HeaderFrame.test.tsx, Header.test.tsx)"
   ],
   "outOfScope": [
-    "Biến thể header trong suốt trên hero — user đã chốt giữ kính mờ sáng (2026-10-20)",
-    "Gom `max-w-[84rem]` lặp 2 chỗ thành 1 token (review r2 MINOR, tuỳ chọn) — không fail test vì điểm này"
+    "Rule CSS chết `group-data-[scrolled]:rounded-pill` do Tailwind quét chuỗi trong HeaderFrame.test.tsx (review r1 MINOR, vô hại, tách task riêng nếu cần) — không fail test vì điểm này",
+    "Gom `max-w-[84rem]` lặp 2 chỗ thành 1 token (MINOR từ BL-025)"
   ],
   "viewports": [
     375,
@@ -93,10 +88,10 @@
   ],
   "browsers": [
     "chrome",
-    "safari-ios (backdrop-filter + sticky — ưu tiên nếu có thiết bị)"
+    "safari-ios (backdrop-filter + sticky + transition border-radius — ưu tiên nếu có thiết bị)"
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "medium",
-  "riskNote": "Component dùng chung mọi trang công khai. T01 STRICT PASS r1 + NORMAL PASS r2, không CRITICAL/MAJOR. Residual: chưa kiểm trình duyệt thật — unit test chỉ khẳng định chuỗi class (Tailwind v4 sinh đúng biến thể data-[scrolled] chưa đo CSS); chưa đo .site-header 80/104 và bounding thanh trước/sau cuộn; `max-w-[84rem]` lặp ở thanh + khung nội dung phải luôn bằng nhau."
+  "risk": "low",
+  "riskNote": "Chỉ đổi class Tailwind của component dùng chung mọi trang công khai; NORMAL PASS r1, không CRITICAL/MAJOR. Residual: reviewer không có trình duyệt — chuyển động ở 4 viewport chưa xem thật, chỉ kiểm bằng phép tính CSS (32 = 64/2, 36 = 72/2, breakpoint 64rem); unit test chỉ khẳng định chuỗi class."
 }

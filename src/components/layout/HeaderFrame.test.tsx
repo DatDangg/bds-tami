@@ -47,8 +47,25 @@ describe("HeaderFrame", () => {
     // lớp nổi chỉ nằm sau variant data-scrolled, không có bản vô điều kiện
     expect(bar).not.toHaveClass("rounded-pill");
     expect(bar).not.toHaveClass("shadow-md");
-    expect(bar).toHaveClass("group-data-[scrolled]:rounded-pill", "group-data-[scrolled]:shadow-md", "group-data-[scrolled]:max-w-[84rem]");
+    // radius thật (nửa chiều cao thanh nổi 64/72px), không còn 9999px
+    expect(bar).not.toHaveClass("group-data-[scrolled]:rounded-pill");
+    expect(bar).toHaveClass(
+      "group-data-[scrolled]:rounded-[2rem]",
+      "lg:group-data-[scrolled]:rounded-[2.25rem]",
+      "group-data-[scrolled]:shadow-md",
+      "group-data-[scrolled]:max-w-[84rem]",
+    );
     expect(header).toHaveClass("data-[scrolled]:px-2", "data-[scrolled]:py-2", "lg:data-[scrolled]:px-4", "lg:data-[scrolled]:py-4");
+  });
+
+  it("header và thanh cùng thời lượng/easing chuyển; tôn trọng prefers-reduced-motion", () => {
+    render(<HeaderFrame>nội dung header</HeaderFrame>);
+    const header = screen.getByRole("banner");
+    const bar = screen.getByText("nội dung header").parentElement;
+    for (const el of [header, bar]) {
+      expect(el).toHaveClass("duration-(--duration-slow)", "ease-standard", "motion-reduce:transition-none");
+      expect(el).not.toHaveClass("duration-(--duration-base)");
+    }
   });
 
   it("cuộn xuống → data-scrolled; cuộn về đầu → phẳng lại", () => {

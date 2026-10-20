@@ -1,0 +1,102 @@
+{
+  "specVersion": "1.22.0",
+  "scopeVersion": 27,
+  "generatedAt": "2026-10-20T23:59:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-025 — header công khai: đầu trang là thanh phẳng full-width (kính mờ sáng, góc vuông, không bóng, cao = --header-offset), cuộn > 4px mới thành thanh nổi bo tròn. Sửa quyết định 'một biến thể, không cần JS' của BL-020 P1-T02 (ab3f95a). MODIFY behavior → spec 1.21.0 → 1.22.0 (MINOR).",
+  "workItem": "feature/header-full-width-at-top",
+  "backlog": "BL-025",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-header-full-width-at-top.md",
+  "task": [
+    "tasks/feature-header-full-width-at-top/phase-1-task-01.md"
+  ],
+  "commits": [
+    "close-out BL-025 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-025 (commit chứa file này)": "T01 — HeaderFrame client component (scroll passive + rAF, ngưỡng scrollY > 4 → data-scrolled trên <header>), class Tailwind group-data-[scrolled]: / lg:data-[scrolled]: đổi padding header + max-width/radius/shadow thanh; Header.tsx bọc nội dung khung max-w-[84rem] (review r2); globals.css chỉ comment; test HeaderFrame.test.tsx + Header.test.tsx; SPECIFICATIONS 'Khung trang' + design-spec §2.1; spec delta 1.22.0"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.21.0-26.json",
+  "specUpdate": "spec/updates/2026-10-20-header-full-width-at-top.md",
+  "specRefs": [
+    "Overview — Khung trang (header)",
+    "design-spec §2.1 Header"
+  ],
+  "specRefNotes": {
+    "Overview — Khung trang (header)": "SPECIFICATIONS.md mục Tổng quan 'Khung trang': header kính mờ sáng, hai hình dạng theo cuộn — đầu trang phẳng full-width cao --header-offset (80 / ≥ lg 104), cuộn → thanh nổi bo tròn lề 8/16 cao 64/72 max 84rem có bóng; SSR phẳng; không CLS.",
+    "design-spec §2.1 Header": ".context/design-spec.md §2.1 dòng Biến thể / Trang không có hero / Cao – lề: ngưỡng scrollY ≤ 4px, data-scrolled, transition --duration-base ease-out tắt khi prefers-reduced-motion, nội dung trong khung 84rem ở cả hai trạng thái."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/layout/HeaderFrame.tsx",
+      "src/components/layout/HeaderFrame.test.tsx",
+      "src/components/layout/Header.tsx",
+      "src/components/layout/Header.test.tsx",
+      "src/app/(frontend)/globals.css"
+    ],
+    "filesNote": "globals.css chỉ sửa comment. Không schema/migration/API/access control. Doc impact: design-spec §2.1 (đã sửa); không ERD/API_SPEC.",
+    "modules": [
+      "Layout — HeaderFrame (client component: trạng thái cuộn → data-scrolled, hai hình dạng thanh)",
+      "Layout — Header (nội dung trong khung max-w-[84rem] căn giữa ở cả hai trạng thái)",
+      "Test — HeaderFrame.test.tsx, Header.test.tsx"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Header hai trạng thái ở 375 / 768 / 1280 / 1920: đầu trang phẳng full-width (radius 0, không shadow, không khe lề, cao 80 < lg / 104 ≥ lg); cuộn > 4px → thanh nổi pill lề 8/16, cao 64/72, max 84rem, shadow-md; cuộn về đầu → phẳng",
+      "Trang có hero (`/`, `/en`): thanh phẳng kính mờ sáng đè ảnh hero, chữ/logo AA",
+      "Trang không hero (`/cho-thue`, `/du-an/<slug>`, `/tin-tuc`): header trong luồng cao --header-offset, nội dung không bị che"
+    ],
+    "dependents": [
+      "Hero `-mt-(--header-offset)` + HeroSlider đo `.site-header`",
+      "ProjectSubNav `top` (thanh mục con dính dưới header ở chi tiết dự án)",
+      "`scroll-margin-top` neo: #lead-form, #documents, các mục chi tiết dự án",
+      "Aside dính: RentalDetail, JobDetail, ProjectDetail (thẻ Tư vấn 1:1)",
+      "Thanh thông báo trang chủ phía trên header"
+    ],
+    "regression": [
+      "Menu toàn màn hình < xl (mở/đóng, khoá cuộn nền, tự đóng khi ≥ xl)",
+      "Dropdown DesktopNav ≥ xl (hover/focus/Enter, aria-expanded)",
+      "VI | EN chuyển ngôn ngữ",
+      "Nút CTA header (hiện khi có nhãn + link)",
+      "Focus ring màu chữ `--color-text` trong thanh ở cả hai trạng thái",
+      "`prefers-reduced-transparency: reduce` / không `backdrop-filter` → nền đặc `--color-surface` ở cả hai trạng thái",
+      "`prefers-reduced-motion: reduce` → đổi trạng thái tức thì, không transition",
+      "In ấn: header `print:hidden`",
+      "Tải lại giữa trang: SSR phẳng → sau hydrate thành nổi, không CLS (chiều cao `.site-header` không đổi)"
+    ]
+  },
+  "acceptance": [
+    "Chưa cuộn: header full-width, góc vuông, không shadow/khe lề — ở 375 / 768 / 1280px, trang có hero và không có hero",
+    "Cuộn xuống (> 4px): thành thanh nổi bo tròn (lề 8/16, cao 64/72, max 84rem, shadow); cuộn về đầu thì trở lại phẳng",
+    "Đo `.site-header` getBoundingClientRect().height = 80 (< lg) / 104 (≥ lg) ở CẢ HAI trạng thái — không CLS; hero kéo lên, ProjectSubNav `top`, scroll-margin neo, aside dính vẫn đúng",
+    "Viewport 1920: logo/menu/CTA không nhảy ngang khi chuyển phẳng ↔ nổi (nội dung trong khung 84rem căn giữa ở cả hai)",
+    "Chữ/logo đạt AA trên nền header ở cả hai trạng thái (kể cả đè hero); `prefers-reduced-transparency` vẫn nền đặc",
+    "`prefers-reduced-motion`: đổi trạng thái tức thì, không animation",
+    "pnpm test / lint / typecheck PASS (HeaderFrame.test.tsx, Header.test.tsx)"
+  ],
+  "outOfScope": [
+    "Biến thể header trong suốt trên hero — user đã chốt giữ kính mờ sáng (2026-10-20)",
+    "Gom `max-w-[84rem]` lặp 2 chỗ thành 1 token (review r2 MINOR, tuỳ chọn) — không fail test vì điểm này"
+  ],
+  "viewports": [
+    375,
+    768,
+    1280,
+    1920
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome",
+    "safari-ios (backdrop-filter + sticky — ưu tiên nếu có thiết bị)"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "medium",
+  "riskNote": "Component dùng chung mọi trang công khai. T01 STRICT PASS r1 + NORMAL PASS r2, không CRITICAL/MAJOR. Residual: chưa kiểm trình duyệt thật — unit test chỉ khẳng định chuỗi class (Tailwind v4 sinh đúng biến thể data-[scrolled] chưa đo CSS); chưa đo .site-header 80/104 và bounding thanh trước/sau cuộn; `max-w-[84rem]` lặp ở thanh + khung nội dung phải luôn bằng nhau."
+}
