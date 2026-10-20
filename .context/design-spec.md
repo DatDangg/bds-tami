@@ -278,7 +278,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
   - Badge trạng thái mở bán góc trên trái ảnh: Đang mở bán = gradient xanh (`success`), Sắp mở bán = gradient vàng (`primary`), Đã bàn giao = trung tính.
   - **Khung kính mờ** `.glass-panel` đè đáy ảnh (cách mép 12/16px, bo 16px, padding 16/20px): tên dự án `--text-h3` (viết thường, tối đa 2 dòng), địa điểm (tỉnh/thành, icon pin), hàng **số liệu** `<dl>` từ field sẵn có `scale.landAreaM2` (Diện tích đất, m²), `scale.totalUnits` (Tổng số căn), `scale.handoverTime` (Bàn giao). Ô thiếu dữ liệu **ẩn**; không còn ô nào thì không dựng hàng. Không còn eyebrow/summary/nút "Khám phá dự án".
   - Kính theo quy tắc header: nền `--color-surface` đặc mặc định → `--color-glass` + blur chỉ trong `@supports (backdrop-filter)`, đặc lại khi `prefers-reduced-transparency`. **Chỉ `--color-text`** trên kính (4.5:1 dù ảnh sau kính đen/trắng — `contrast.test`); không dùng muted/accent trên kính.
-- Điều khiển: mũi tên ≥ md (44px) + chấm phân trang dưới (cơ chế dùng chung `useSnapSlider`). 
+- Điều khiển: mũi tên ≥ md (44px) + chấm phân trang dưới (cơ chế dùng chung `useSnapSlider`). **Chấm = số vị trí cuộn được thật** (các thẻ cuối không cuộn tới mép trái được gộp thành vị trí cuối; ở 1280px 6 dự án → 5 chấm); chấm active = vị trí gần `scrollLeft` nhất (thẻ đầu đang hiện), cuộn hết → chấm cuối; mũi tên đi đúng 1 vị trí, ở cuối/đầu **vòng** về đầu/cuối; chỉ hiện điều khiển khi > 1 vị trí (BL-038).
 - "Xem tất cả" → `/du-an`. 0 dự án: ẩn khối. 1 dự án: không điều khiển.
 
 **4. Dịch vụ** (`services.items`)

@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.31.0
+- **spec_version:** 1.31.1
 - **updated_at:** 2026-10-20
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -53,7 +53,7 @@ Các khối Hero slide (1–8; ảnh bắt buộc, video tuỳ chọn từng sli
 **Bố cục kiểu market (BL-020 Phase 2):**
 - **Thanh thông báo** chỉ ở trang chủ (`/`, `/en`), trên cùng (trên header nổi, trong luồng), mặc định **tắt**; admin bật + chữ (localized) + link tuỳ chọn. Khách đóng được, nhớ theo hash chữ + link theo ngôn ngữ (đổi nội dung → hiện lại), tải lại không nháy.
 - **Hero** có nút cuộn xuống tới **ô tìm kiếm đè đáy hero**: tab Cho thuê gửi GET `/cho-thue?q=`; tab Dự án gửi GET `/du-an?province=&status=` (chỉ tham số lọc sẵn có, không có từ khoá); tablist ←/→/Home/End; gửi được khi không JS. Chip "Dự án được quan tâm": CMS ≤ 6 dự án công khai, trống → dự án nổi bật mới nhất; `/en` chỉ dự án có EN.
-- **Dự án nổi bật** = slider thẻ lớn ~464×600 bo 20px, khung kính mờ đè ảnh: tên, tỉnh, badge trạng thái, số liệu từ field sẵn có (diện tích đất, tổng số căn, bàn giao — thiếu thì ẩn).
+- **Dự án nổi bật** = slider thẻ lớn ~464×600 bo 20px, khung kính mờ đè ảnh: tên, tỉnh, badge trạng thái, số liệu từ field sẵn có (diện tích đất, tổng số căn, bàn giao — thiếu thì ẩn). Điều khiển (mũi tên ≥ md + chấm): chấm = số vị trí cuộn được thật (các thẻ cuối không cuộn tới mép trái được gộp vào vị trí cuối), chấm active = vị trí gần `scrollLeft` nhất, cuộn hết → chấm cuối; mũi tên đi đúng 1 vị trí, ở đầu/cuối vòng; chỉ hiện điều khiển khi > 1 vị trí (BL-038).
 - **Ưu đãi nổi bật** = slider thẻ tin + "Xem thêm" → `/tin-bds`. Đây cũng là "slider banner ưu đãi" của bố cục market — không có khối riêng.
 - **Cho thuê** ("Thuê nhà ở & kinh doanh"): tab theo danh mục cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server; trống → các danh mục đang có tin), mỗi tab slider ≤ 8 tin còn trống + "Xem thêm" → `/cho-thue/danh-muc/<slug>`; không JS hiện tab đầu.
 - **Tin tức** (khối tối): intro + 3 bài (CMS ≤ 3, trống → 3 bài mới nhất) + "Xem tất cả".

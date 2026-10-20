@@ -1359,6 +1359,36 @@
       "scopeVersion": 31,
       "specUpdate": "spec/updates/2026-10-20-detail-subnav-clear-active-past-sections.md",
       "residual": "chỉ kiểm jsdom + fake observer, chưa xem trình duyệt thật; hết khoá cuộn 1s không tính lại (có từ trước); mục cuối ngắn có thể thoáng mất active ở khe cuối trang; OBSERVER_TOP_PX 88 xấp xỉ"
+    },
+    {
+      "slug": "projects-slider-pagination",
+      "title": "Slider Dự án nổi bật trang chủ: mũi tên/chấm phân trang nhảy cóc, chấm không khớp (BL-038)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-038",
+      "changeDoc": "spec/changes/archive/2026-10-20-projects-slider-pagination-bug.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-projects-slider-pagination/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "note": "IntersectionObserver lấy entry giao cắt CUỐI (thẻ phải nhất) khi nhiều thẻ cùng hiện → current lệch, › nhảy 2 thẻ; fix: current từ scrollLeft (offset gần nhất, cuộn hết = cuối), pageCount = số vị trí cuộn được, scrollTo offset, vòng đầu/cuối",
+          "report": ".context/review-reports/bug-projects-slider-pagination-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-038)"
+        }
+      ],
+      "completedAt": "2026-10-20",
+      "specVersion": "1.31.1",
+      "scopeVersion": 39,
+      "specUpdate": "spec/updates/2026-10-20-projects-slider-pagination-bug.md",
+      "residual": "chưa kiểm trình duyệt thật; bấm liên tiếp khi đang cuộn mượt có thể mất 1 bước; MINOR: hook dài, scrollTo stub test không khôi phục, ResizeObserver chưa test"
     }
   ],
   "projectName": "tami-website",

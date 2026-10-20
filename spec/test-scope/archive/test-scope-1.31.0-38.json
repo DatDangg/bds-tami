@@ -1,0 +1,123 @@
+{
+  "specVersion": "1.31.0",
+  "scopeVersion": 38,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-036 — toàn website công khai dùng một font Montserrat: bỏ EB Garamond (fonts.ts chỉ Montserrat latin+vietnamese 400/500/600, --font-display trỏ Montserrat), phân cấp tiêu đề bằng cỡ + độ đậm (thang display 28 / h1 26 / h2 24 / h2-sm 22 / h3 20 / h4 18px; weight 500/600). Spec 1.30.0 → 1.31.0 (MINOR, MODIFY).",
+  "workItem": "feature-single-font-montserrat",
+  "backlog": "BL-036",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-single-font-montserrat.md",
+  "task": [
+    "tasks/feature-single-font-montserrat/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-single-font-montserrat-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-single-font-montserrat-phase-1-task-01-round-2-review.md"
+  ],
+  "commits": [
+    "close-out BL-036 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-036 (commit chứa file này)": "T01 — fonts.ts chỉ Montserrat 400/500/600 (latin+vietnamese); PublicDocument bỏ biến font Garamond; globals.css --font-display → Montserrat + thang chữ mới (cỡ, --text-*--font-weight 500/600, line-height, letter-spacing -0.01em display/h1/h2); ProjectHero h1 bỏ font-normal. Test: fonts.test.ts, project-detail.test.tsx. Doc: SPECIFICATIONS (Giao diện, stack UI, S03 h1, PostCard), design-spec, docs/DESIGN.md, design-tokens."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.30.0-37.json",
+  "specUpdate": "spec/updates/2026-10-20-single-font-montserrat.md",
+  "specRefs": [
+    "Giao diện — một font Montserrat (BL-036)",
+    "Bảng stack — UI: font Montserrat duy nhất",
+    "F2 / S03 Bố cục chi tiết dự án — h1 hero",
+    "F4 Tin đăng BĐS — PostCard tiêu đề h4",
+    "design-spec § typography"
+  ],
+  "specRefNotes": {
+    "Giao diện — một font Montserrat (BL-036)": "Mọi chữ site công khai dùng Montserrat; phân cấp bằng cỡ + độ đậm 500/600; bỏ EB Garamond; sentence case giữ.",
+    "Bảng stack — UI: font Montserrat duy nhất": "next/font, subset vietnamese; bỏ EB Garamond.",
+    "F2 / S03 Bố cục chi tiết dự án — h1 hero": "h1 viết thường Montserrat, nhận weight token 500 (bỏ serif weight 400 / font-normal).",
+    "F4 Tin đăng BĐS — PostCard tiêu đề h4": "Tiêu đề h4 2 dòng Montserrat thay serif.",
+    "design-spec § typography": "Thang display 28 / h1 26 / h2 24 / h2-sm 22 / h3 20 / h4 18px; weight 500 (display→h3), 600 (h4, price); line-height 1.15/1.15/1.2/1.25/1.3; letter-spacing -0.01em display/h1/h2."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/lib/fonts.ts",
+      "src/lib/fonts.test.ts",
+      "src/components/layout/PublicDocument.tsx",
+      "src/app/(frontend)/globals.css",
+      "src/components/projects/ProjectHero.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md",
+      "docs/DESIGN.md",
+      "skills/react-nodejs/design-tokens.md"
+    ],
+    "filesNote": "Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, các file src/components/projects/* khác ngoài ProjectHero.tsx + project-detail.test.tsx).",
+    "modules": [
+      "Typography — fonts (next/font)",
+      "Design tokens — globals.css (--font-display, --text-*)",
+      "Layout — PublicDocument",
+      "Projects — ProjectHero"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Mọi heading / giá / thông số / địa chỉ / hotline / menu mobile / '+N' gallery / tiêu đề accordion trang công khai hiển thị Montserrat (không còn serif)",
+      "Không còn request tải font EB Garamond; chỉ Montserrat 400/500/600",
+      "Cỡ chữ: display 28px, h1 26px, h2 24px, h2-sm 22px, h3 20px, h4 18px",
+      "Độ đậm: display/h1/h2/h2-sm/h3 = 500; h4 + giá (price) = 600; không bold giả",
+      "h1 hero chi tiết dự án weight 500 (không còn 400)",
+      "Tiếng Việt đủ dấu ở mọi heading (subset vietnamese)"
+    ],
+    "dependents": [
+      "Trang chủ (hero, slider dự án, khối tin tức, ưu đãi)",
+      "Danh sách + chi tiết dự án",
+      "Danh sách + chi tiết cho thuê",
+      "Danh sách + chi tiết tin đăng BĐS (PostCard, OfferBox)",
+      "Danh sách + chi tiết tin tức (mục lục, bài liên quan)",
+      "Tuyển dụng, liên hệ, pháp lý (accordion điều khoản)",
+      "Header, menu mobile, footer",
+      "Tất cả trên cả VI và /en/..."
+    ],
+    "regression": [
+      "Không tràn ngang / không xuống dòng bất thường ở 390 và 1280 (sans rộng hơn serif)",
+      "Dấu chồng tiếng Việt (Ầ/Ỗ/Ẫ) không bị xén ở tiêu đề thẻ line-clamp-2",
+      "Sentence case giữ nguyên, không có heading uppercase",
+      "Hover tiêu đề thẻ đổi vàng thương hiệu (BL-034) vẫn đúng",
+      "Admin /admin, email, trang lỗi toàn cục không đổi",
+      "Không CLS do đổi font"
+    ]
+  },
+  "acceptance": [
+    "Không còn EB Garamond: không tải font, --font-display trỏ Montserrat",
+    "Phân cấp tiêu đề giữ được bằng cỡ + độ đậm Montserrat (500/600, chỉ weight đã nạp)",
+    "Sentence case giữ nguyên (BL-020), không thêm uppercase cho heading",
+    "Tiếng Việt đủ dấu ở mọi heading",
+    "Không đổi admin, email, trang lỗi toàn cục",
+    "design-spec + docs/DESIGN.md + design tokens cập nhật; test font sửa theo",
+    "Trang chủ, danh sách, chi tiết dự án/cho thuê/tin tức ở 390/1280 không vỡ dòng/tràn"
+  ],
+  "outOfScope": [
+    "Đổi màu / spacing / bố cục",
+    "Admin Payload",
+    "Email template, trang lỗi toàn cục",
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/* khác)"
+  ],
+  "viewports": [
+    390,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "medium",
+  "riskNote": "Đổi typography toàn site công khai (font + cỡ + độ đậm mọi heading). Không schema/API/quyền/dữ liệu/URL. Verify reviewer STRICT round 2 PASS: pnpm vitest run src/lib src/components 1919/1919, typecheck PASS, lint 0 error. Residual: chưa kiểm trực quan trình duyệt thật (tràn chữ 390/1280, dấu chồng ở line-clamp-2)."
+}

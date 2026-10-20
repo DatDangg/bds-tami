@@ -16,23 +16,76 @@ const slide = (n: number): ProjectSlideView => ({
   stats: { landAreaM2: null, totalUnits: null, handoverTime: null },
 });
 
-type ObserverCallback = (entries: { isIntersecting: boolean; target: Element }[]) => void;
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
-afterEach(() => vi.unstubAllGlobals());
+/** Giả lập layout 1280px: 6 thẻ 464px gap 24px, vùng nhìn 1265px, cuộn tối đa 1702px → 5 vị trí cuộn được. */
+function mockLayout1280() {
+  const proto = HTMLElement.prototype;
+  vi.spyOn(proto, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.tagName === "UL" ? 1265 : 0;
+  });
+  vi.spyOn(proto, "scrollWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.tagName === "UL" ? 2967 : 0;
+  });
+  vi.spyOn(proto, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    const left = this.tagName === "LI" ? 31 + 488 * Number(this.dataset.index) : 0;
+    return { left, right: left, top: 0, bottom: 0, width: 0, height: 0, x: left, y: 0, toJSON: () => ({}) };
+  });
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+    callback(0);
+    return 0; // chạy đồng bộ nên id 0 để cờ "đang chờ frame" không kẹt
+  });
+  vi.stubGlobal("cancelAnimationFrame", () => undefined);
+
+}
 
 describe("ProjectsSlider", () => {
-  it("chấm phân trang theo slide đang hiện (IntersectionObserver) và nút Sau cuộn tới slide kế", () => {
-    let notify: ObserverCallback = () => undefined;
-    vi.stubGlobal(
-      "IntersectionObserver",
-      class {
-        constructor(callback: ObserverCallback) {
-          notify = callback;
-        }
-        observe() {}
-        disconnect() {}
-      },
+  it("BL-038: chấm = số vị trí cuộn được, chấm theo scrollLeft, mũi tên/chấm cuộn tới offset thẻ (vòng ở đầu/cuối)", () => {
+    mockLayout1280();
+    const scrollTo = vi.fn();
+    Element.prototype.scrollTo = scrollTo as unknown as Element["scrollTo"];
+    renderWithIntl(
+      <>
+        <h2 id="h">Dự án nổi bật</h2>
+        <ProjectsSlider slides={[1, 2, 3, 4, 5, 6].map(slide)} labelledBy="h" />
+      </>,
     );
+    const list = screen.getByRole("list", { name: "Dự án nổi bật" });
+    let scrollLeft = 0;
+    Object.defineProperty(list, "scrollLeft", { get: () => scrollLeft, configurable: true });
+    const scrollListTo = (left: number) => {
+      scrollLeft = left;
+      act(() => {
+        fireEvent.scroll(list);
+      });
+    };
+    const dot = (n: number) => screen.getByRole("button", { name: `Chuyển tới dự án ${n}` });
+
+    expect(screen.getAllByRole("button", { name: /Chuyển tới dự án/ })).toHaveLength(5);
+    expect(dot(1)).toHaveAttribute("aria-current", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Dự án sau" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 488 }));
+    scrollListTo(488);
+    expect(dot(2)).toHaveAttribute("aria-current", "true");
+
+    fireEvent.click(dot(3));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 976 }));
+
+    scrollListTo(1702);
+    expect(dot(5)).toHaveAttribute("aria-current", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Dự án sau" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 0 }));
+
+    scrollListTo(0);
+    fireEvent.click(screen.getByRole("button", { name: "Dự án trước" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 1702 }));
+  });
+
+  it("chưa có layout (clientWidth 0): chấm = số thẻ, nút Sau dùng scrollIntoView, không lỗi", () => {
     const scrollIntoView = vi.fn();
     Element.prototype.scrollIntoView = scrollIntoView;
     renderWithIntl(
@@ -41,16 +94,10 @@ describe("ProjectsSlider", () => {
         <ProjectsSlider slides={[slide(1), slide(2), slide(3)]} labelledBy="h" />
       </>,
     );
-    expect(screen.getByRole("region", { name: "Dự án nổi bật" })).toHaveAttribute("aria-roledescription", "carousel");
+    expect(screen.getAllByRole("button", { name: /Chuyển tới dự án/ })).toHaveLength(3);
     expect(screen.getByRole("button", { name: "Chuyển tới dự án 1" })).toHaveAttribute("aria-current", "true");
-
-    const second = screen.getByRole("group", { name: "Dự án 2 / 3" });
-    act(() => notify([{ isIntersecting: true, target: second }]));
-    expect(screen.getByRole("button", { name: "Chuyển tới dự án 2" })).toHaveAttribute("aria-current", "true");
-
     fireEvent.click(screen.getByRole("button", { name: "Dự án sau" }));
-    expect(scrollIntoView).toHaveBeenCalledTimes(1);
-    expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByRole("group", { name: "Dự án 3 / 3" }));
+    expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByRole("group", { name: "Dự án 2 / 3" }));
   });
 
   it("không autoplay: slide không tự đổi; vùng cuộn có tabIndex để dùng bằng bàn phím", () => {

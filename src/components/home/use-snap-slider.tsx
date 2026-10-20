@@ -7,36 +7,89 @@ import { useMediaQuery } from "./use-environment";
 
 /**
  * Cơ chế chung của các slider trang chủ (dự án, ưu đãi): vùng cuộn ngang CSS scroll-snap (vuốt/phím mũi tên/cuộn gốc), KHÔNG autoplay.
- * `current` (slide đang hiện, cho chấm phân trang) chỉ theo dõi khi `trackCurrent` và có ≥ 2 slide; lấy bằng IntersectionObserver, không dùng scroll listener.
+ * Khi `trackCurrent` và có ≥ 2 slide, hook đo vị trí cuộn của từng thẻ (offset mép trái so với thẻ đầu) rồi suy ra:
+ * - `pageCount`: số vị trí cuộn thực sự đến được (thẻ cuối không thể cuộn tới mép trái nên các thẻ cuối gộp thành một vị trí);
+ * - `current`: vị trí gần `scrollLeft` nhất (cuộn hết = vị trí cuối). Theo dõi bằng scroll listener passive gộp bằng rAF.
+ * Chưa có layout (jsdom, chưa đo) → `pageCount = count`, `current = 0`, cuộn bằng scrollIntoView.
  */
 export function useSnapSlider(count: number, trackCurrent: boolean) {
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const listRef = useRef<HTMLUListElement>(null);
+  const offsetsRef = useRef<number[]>([]);
+  const maxScrollRef = useRef(0);
+  const pagesRef = useRef(0);
   const [current, setCurrent] = useState(0);
+  const [measuredPages, setMeasuredPages] = useState<number | null>(null);
   const behavior = reducedMotion ? "auto" : "smooth";
   const observe = trackCurrent && count > 1;
+  const pageCount = observe && measuredPages !== null ? measuredPages : count;
 
   useEffect(() => {
     const list = listRef.current;
-    if (!observe || !list || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setCurrent(Number((entry.target as HTMLElement).dataset.index));
-        }
-      },
-      { root: list, threshold: 0.6 },
-    );
-    for (const item of list.children) observer.observe(item);
-    return () => observer.disconnect();
+    if (!observe || !list) return;
+    let frame = 0;
+
+    const updateCurrent = () => {
+      const offsets = offsetsRef.current;
+      if (offsets.length === 0) return;
+      const max = maxScrollRef.current;
+      const pages = pagesRef.current;
+      const scrolled = list.scrollLeft;
+      if (scrolled >= max - 1) return setCurrent(pages - 1);
+      let nearest = 0;
+      for (let index = 1; index < pages; index++) {
+        if (Math.abs(Math.min(offsets[index] ?? 0, max) - scrolled) < Math.abs(Math.min(offsets[nearest] ?? 0, max) - scrolled)) nearest = index;
+      }
+      setCurrent(nearest);
+    };
+
+    const measure = () => {
+      if (list.clientWidth === 0 || list.children.length === 0) {
+        offsetsRef.current = [];
+        setMeasuredPages(null);
+        return;
+      }
+      const firstLeft = list.children[0]?.getBoundingClientRect().left ?? 0;
+      offsetsRef.current = Array.from(list.children, (child) => child.getBoundingClientRect().left - firstLeft);
+      maxScrollRef.current = list.scrollWidth - list.clientWidth;
+      const firstReachingEnd = offsetsRef.current.findIndex((offset) => offset >= maxScrollRef.current - 1);
+      pagesRef.current = firstReachingEnd === -1 ? offsetsRef.current.length : firstReachingEnd + 1;
+      setMeasuredPages(pagesRef.current);
+      updateCurrent();
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        updateCurrent();
+      });
+    };
+
+    measure();
+    list.addEventListener("scroll", onScroll, { passive: true });
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    resizeObserver?.observe(list);
+    return () => {
+      list.removeEventListener("scroll", onScroll);
+      resizeObserver?.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, [observe, count]);
 
   const scrollToSlide = useCallback(
     (target: number) => {
-      const slide = listRef.current?.children[(target + count) % count];
-      slide?.scrollIntoView?.({ behavior, inline: "start", block: "nearest" });
+      const list = listRef.current;
+      if (!list) return;
+      const index = ((target % pageCount) + pageCount) % pageCount;
+      const offsets = offsetsRef.current;
+      if (offsets.length > 0 && list.scrollTo) {
+        list.scrollTo({ left: Math.min(offsets[index] ?? 0, maxScrollRef.current), behavior });
+        return;
+      }
+      list.children[index]?.scrollIntoView?.({ behavior, inline: "start", block: "nearest" });
     },
-    [count, behavior],
+    [pageCount, behavior],
   );
 
   /** Cuộn một "trang" (≈ 90% bề rộng vùng nhìn thấy): dùng khi nhiều thẻ cùng hiện nên "slide hiện tại" không rõ. */
@@ -48,7 +101,7 @@ export function useSnapSlider(count: number, trackCurrent: boolean) {
     [behavior],
   );
 
-  return { listRef, current, scrollToSlide, scrollByPage };
+  return { listRef, current, pageCount, scrollToSlide, scrollByPage };
 }
 
 const ARROW_BUTTON =

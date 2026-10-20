@@ -46,8 +46,8 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
   const t = useTranslations("page.home.projects");
   const tStatus = useTranslations("page.projects.salesStatus");
   const count = slides.length;
-  const multiple = count > 1;
-  const { listRef, current, scrollToSlide } = useSnapSlider(count, true);
+  const { listRef, current, pageCount, scrollToSlide } = useSnapSlider(count, true);
+  const multiple = pageCount > 1;
 
   return (
     <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy}>
@@ -107,9 +107,9 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
         <div className="mx-auto mt-6 flex w-full max-w-container items-center justify-center gap-4 px-gutter">
           <SliderArrow direction="previous" label={t("previous")} onClick={() => scrollToSlide(current - 1)} />
           <div role="group" aria-label={t("dots")} className="flex items-center">
-            {slides.map((slide, position) => (
+            {Array.from({ length: pageCount }, (_, position) => (
               <button
-                key={slide.id}
+                key={position}
                 type="button"
                 aria-label={t("goTo", { index: position + 1 })}
                 aria-current={position === current ? "true" : undefined}
