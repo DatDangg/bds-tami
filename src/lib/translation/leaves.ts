@@ -20,7 +20,7 @@ export const TRANSLATABLE_FIELDS = {
   pages: ["title", "content", "seo"],
   categories: ["name", "description", "seo"],
   developers: ["name", "description"],
-  "site-settings": ["siteName", "address"],
+  "site-settings": ["siteName", "address", "pageHeroes", "careersPerks"],
   homepage: ["announcementBar", "hero", "heroSearch", "strengths", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news", "seo"],
   header: ["navItems", "ctaButton"],
   footer: ["columns", "contactBlock", "copyright"],

@@ -32,40 +32,83 @@ function chipLinks(container: HTMLElement) {
   return list ? [...list.querySelectorAll("a")] : [];
 }
 
-describe("CategoryListTemplate: banner gọn + băng tìm kiếm (BL-020 P3-T02)", () => {
+describe("CategoryListTemplate: hero + thẻ lọc nổi (BL-045)", () => {
   const bannerImage = { url: "/api/media/file/b.jpg", alt: "", width: 1600 };
 
-  it("mặc định (Tin tức) giữ banner cũ, không có băng đè", () => {
+  it("không có thẻ lọc: hero ngắn 340px, breadcrumb kính nằm TRONG hero (trước h1), không có khối đè", () => {
     const { container } = renderWithIntl(
       <CategoryListTemplate {...baseProps} bannerImage={bannerImage} isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("[data-banner-size=compact]")).toBeNull();
-    expect(container.querySelector("[data-search-overlay]")).toBeNull();
+    const hero = container.querySelector("[data-hero-size]")!;
+    expect(hero).toHaveAttribute("data-hero-size", "short");
+    const crumb = screen.getByRole("navigation", { name: /Breadcrumb/ });
+    expect(hero.contains(crumb)).toBe(true);
+    expect(crumb.querySelector("ol")).toHaveClass("crumb-glass");
+    expect(container.querySelector("[data-search-overlay], [data-filter-card]")).toBeNull();
   });
 
-  it("compactBanner + searchBar: banner gọn chừa đáy cho băng, băng đè mép dưới và đứng trước breadcrumb", () => {
+  it("filterCard: hero list 440px, thẻ lọc trắng nổi đè đáy hero (sau hero) và hàng chip nằm TRONG thẻ", () => {
+    const { container } = renderWithIntl(
+      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} chips={chips} filterCard={<form aria-label="lọc" />} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(container.querySelector("[data-hero-size]")).toHaveAttribute("data-hero-size", "list");
+    const card = container.querySelector("[data-filter-card]")!;
+    expect(card.compareDocumentPosition(container.querySelector("[data-hero-size]")!) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(card.querySelector("form[aria-label='lọc']")).not.toBeNull();
+    expect(chipLinks(container).every((link) => card.contains(link))).toBe(true);
+    expect(chipLinks(container)).toHaveLength(chips.length);
+  });
+
+  it("searchBar cũ (trang chưa chuyển): hero list + băng đè mép dưới, vẫn hiển thị", () => {
     const { container } = renderWithIntl(
       <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner searchBar={<form aria-label="băng" />} isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("[data-banner-size=compact][data-banner-overlap=true]")).not.toBeNull();
-    const bar = screen.getByRole("form", { name: "băng" });
-    expect(bar.parentElement).toHaveAttribute("data-search-overlay", "true");
-    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelector("[data-hero-size]")).toHaveAttribute("data-hero-size", "list");
+    expect(screen.getByRole("form", { name: "băng" }).parentElement).toHaveAttribute("data-search-overlay", "true");
   });
 
-  it("compactBanner không có searchBar (Tuyển dụng/Tin tức): banner gọn KHÔNG đệm đáy, không khối băng", () => {
-    const { container } = renderWithIntl(
-      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner isEmpty={false}>
+  it("resultCount + sort: hàng kết quả trái 'N kết quả', phải ô sắp xếp; vi và en", () => {
+    const vi_ = renderWithIntl(
+      <CategoryListTemplate {...baseProps} resultCount={12} sort={<button type="button">Sắp xếp</button>} isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("[data-banner-size=compact]")).not.toBeNull();
-    expect(container.querySelector("[data-banner-overlap]")).toBeNull();
-    expect(container.querySelector("[data-search-overlay]")).toBeNull();
+    expect(screen.getByText("12 kết quả")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sắp xếp" })).toBeInTheDocument();
+    vi_.unmount();
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} resultCount={1} isEmpty={false}>
+        <p>x</p>
+      </CategoryListTemplate>,
+      "en",
+    );
+    expect(screen.getByText("1 result")).toBeInTheDocument();
+  });
+
+  it("consultBanner hiện sau belowContent", () => {
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} isEmpty belowContent={<p>dưới</p>} consultBanner={<p>tư vấn</p>}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.getByText("dưới").compareDocumentPosition(screen.getByText("tư vấn")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("eyebrow + titleAccent của hero hiện ra; vẫn đúng một h1", () => {
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} eyebrow="Tin tức" titleAccent="mỗi ngày" isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thị trườngmỗi ngày");
+    expect(screen.getByText("Tin tức", { selector: "p" })).toBeInTheDocument();
   });
 
   it("belowContent hiện sau vùng danh sách, cả khi danh sách trống", () => {

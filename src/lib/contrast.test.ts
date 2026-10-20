@@ -208,3 +208,25 @@ describe("banner CTA có ảnh: vòng focus (BL-020 #7)", () => {
     expect(source).toContain("min-h-[26rem]");
   });
 });
+
+describe("hero trang con: breadcrumb kính + eyebrow trên ảnh sáng (BL-045)", () => {
+  const [, r, g, b, alpha] = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light("--color-banner-scrim"))!;
+  const scrim = [r, g, b].map(Number);
+  const scrimAlpha = Number(alpha);
+  const toHex = (channels: number[]) => `#${channels.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+  const parseHex = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const over = (top: number[], topAlpha: number, below: number[]) => top.map((c, i) => topAlpha * c + (1 - topAlpha) * below[i]!);
+
+  // Trường hợp xấu nhất: ảnh trắng tinh dưới scrim phẳng `--color-banner-scrim`; khung breadcrumb = primary-deep 13% (đúng `.crumb-glass`).
+  const scrimOnWhite = over(scrim, scrimAlpha, [255, 255, 255]);
+  const crumbBg = toHex(over(parseHex(light("--color-primary-deep")), 0.13, scrimOnWhite));
+
+  it("chữ trắng của breadcrumb trên khung kính (nền 13% vàng đậm) đè ảnh trắng đạt 4.5:1", () => {
+    expect(contrast(light("--color-on-dark"), crumbBg)).toBeGreaterThanOrEqual(TEXT);
+  });
+
+  it("eyebrow vàng (--color-primary) ở phía chữ (scrim phẳng + gradient trái chồng nhau) trên ảnh trắng đạt 4.5:1", () => {
+    const leftSide = toHex(over(scrim, scrimAlpha, scrimOnWhite));
+    expect(contrast(light("--color-primary"), leftSide)).toBeGreaterThanOrEqual(TEXT);
+  });
+});

@@ -64,7 +64,7 @@ describe("/tin-bds (BL-020 P3-T02): banner gọn, đếm kết quả, lưới 4 
   it("banner gọn 240px, 'Có N kết quả', lưới 1/2/3/4 cột, không có băng tìm kiếm (trang chưa có bộ lọc)", async () => {
     loadPostListing.mockResolvedValue(listing());
     const { container } = renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
-    expect(container.querySelector("section.h-60")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
     expect(screen.getByRole("status")).toHaveTextContent("Có 25 kết quả");
     expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
     expect(screen.queryByRole("search")).toBeNull();

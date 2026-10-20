@@ -331,4 +331,29 @@ describe.skipIf(!baseUrl)("integration: globals site-settings / header / footer 
       expect(doc.zaloUrl).toBe("https://zalo.me/tami");
     });
   });
+
+  describe("chữ hero trang con + dải ý Tuyển dụng (BL-045)", () => {
+    it("admin lưu chữ hero vi + en riêng; /en không rơi về tiếng Việt; khách đọc được", async () => {
+      await updateSettings({ pageHeroes: { projects: { eyebrow: "Dự án", title: "Dự án", titleAccent: "đáng sống", description: "Mô tả vi" } } }, admin);
+      await updateSettings({ pageHeroes: { projects: { title: "Projects", titleAccent: "worth living" } } }, admin, "en");
+      const vi = await readPublicGlobal(payload, "site-settings", "vi");
+      expect(vi.pageHeroes?.projects).toMatchObject({ eyebrow: "Dự án", title: "Dự án", titleAccent: "đáng sống", description: "Mô tả vi" });
+      const en = await readPublicGlobal(payload, "site-settings", "en");
+      expect(en.pageHeroes?.projects?.title).toBe("Projects");
+      expect(en.pageHeroes?.projects?.description).toBeFalsy();
+    });
+
+    it("cờ Điểm mạnh mặc định bật; ảnh Liên hệ/Pháp lý nhận null; careersPerks lưu 2 ngôn ngữ, tối thiểu 2 mục", async () => {
+      expect((await readPublicGlobal(payload, "site-settings", "vi")).showProjectStrengths).not.toBe(false);
+      const doc = await updateSettings(
+        { showProjectStrengths: false, pageBanners: { contact: null, legal: null }, careersPerks: [{ icon: "star", title: "Lương thưởng" }, { icon: "users", title: "Đội ngũ", description: "Trẻ" }] },
+        admin,
+      );
+      expect(doc.showProjectStrengths).toBe(false);
+      expect(doc.careersPerks).toHaveLength(2);
+      await updateSettings({ careersPerks: [{ id: doc.careersPerks?.[0]?.id, icon: "star", title: "Pay" }, { id: doc.careersPerks?.[1]?.id, icon: "users", title: "Team" }] }, admin, "en");
+      expect((await readPublicGlobal(payload, "site-settings", "en")).careersPerks?.map((perk) => perk.title)).toEqual(["Pay", "Team"]);
+      expect(await statusOf(updateSettings({ careersPerks: [{ icon: "star", title: "Một mục" }] }, admin))).toBe(400);
+    });
+  });
 });

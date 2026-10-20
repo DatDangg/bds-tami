@@ -3,7 +3,9 @@ import { CaretLeft, CaretRight } from "@/components/icons";
 import { PendingLink } from "@/components/layout/PendingRegion";
 import { cn } from "@/lib/utils";
 
-const CELL = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm px-3 text-small font-semibold";
+/** Ô tròn 44px (chạm ≥ 44px) cho số trang và mũi tên, như mockup `.pager`. */
+const CELL = "inline-flex size-11 items-center justify-center rounded-full text-small font-semibold";
+const ARROW_BORDER = "border border-text text-text";
 
 /**
  * Các mục hiển thị: trang đầu, trang cuối, trang hiện tại ±1; khoảng trống giữa hai mục cách nhau > 1 thành `"gap"`
@@ -30,32 +32,33 @@ interface PaginationProps {
 }
 
 /**
- * Phân trang (design-spec §3.6): mọi số trang là `<a href>` thật; trang hiện tại `aria-current="page"`. Mobile chỉ
- * "Trước · Trang 2/12 · Sau". Link là `PendingLink` (báo chờ cho `PendingRegion`); không cần JS để đổi trang. Không render khi chỉ có 1 trang.
+ * Phân trang (design-spec §3.6, mockup BL-045 `.pager`): mũi tên tròn hai bên + số trang tròn ở giữa; mọi số trang là `<a href>` thật;
+ * trang hiện tại `aria-current="page"` nền `--color-primary`. Mobile chỉ "‹ Trang 2/12 ›". Link là `PendingLink` (báo chờ cho `PendingRegion`);
+ * không cần JS để đổi trang. Không render khi chỉ có 1 trang.
  */
 export function Pagination({ page, totalPages, buildHref }: PaginationProps) {
   const t = useTranslations("page.pagination");
   if (totalPages <= 1) return null;
   const current = Math.min(Math.max(page, 1), totalPages);
   return (
-    <nav aria-label={t("nav")} className="flex items-center justify-center gap-2">
+    <nav aria-label={t("nav")} className="flex items-center justify-center gap-3.5">
       <StepLink label={t("previous")} target={current > 1 ? current - 1 : null} buildHref={buildHref} rel="prev" direction="previous" />
       <p aria-live="polite" className="px-2 text-small text-text-secondary md:hidden">
         {t("status", { page: current, total: totalPages })}
       </p>
-      <ul className="hidden items-center gap-2 md:flex">
+      <ul className="hidden items-center gap-1.5 md:flex">
         {getPageItems(current, totalPages).map((item, index) => (
           <li key={item === "gap" ? `gap-${index}` : item}>
             {item === "gap" ? (
-              <span aria-hidden="true" className="inline-flex min-h-11 min-w-11 items-center justify-center text-text-muted">
+              <span aria-hidden="true" className={cn(CELL, "text-text-muted")}>
                 …
               </span>
             ) : item === current ? (
-              <span aria-current="page" className={cn(CELL, "bg-dark text-on-dark")}>
+              <span aria-current="page" className={cn(CELL, "bg-primary text-primary-foreground")}>
                 {item}
               </span>
             ) : (
-              <PendingLink href={buildHref(item)} aria-label={t("goToPage", { page: item })} className={cn(CELL, "text-text hover:bg-surface-muted")}>
+              <PendingLink href={buildHref(item)} aria-label={t("goToPage", { page: item })} className={cn(CELL, "text-text transition-colors hover:bg-surface-muted")}>
                 {item}
               </PendingLink>
             )}
@@ -81,23 +84,16 @@ function StepLink({
   direction: "previous" | "next";
 }) {
   const Icon = direction === "previous" ? CaretLeft : CaretRight;
-  const content = (
-    <>
-      {direction === "previous" && <Icon size={16} aria-hidden="true" />}
-      <span>{label}</span>
-      {direction === "next" && <Icon size={16} aria-hidden="true" />}
-    </>
-  );
   if (target === null) {
     return (
-      <span aria-disabled="true" className={cn(CELL, "gap-1 text-text-muted opacity-60")}>
-        {content}
+      <span aria-disabled="true" aria-label={label} className={cn(CELL, ARROW_BORDER, "opacity-40")}>
+        <Icon size={20} aria-hidden="true" />
       </span>
     );
   }
   return (
-    <PendingLink href={buildHref(target)} rel={rel} className={cn(CELL, "gap-1 text-text hover:bg-surface-muted")}>
-      {content}
+    <PendingLink href={buildHref(target)} rel={rel} aria-label={label} className={cn(CELL, ARROW_BORDER, "transition-colors hover:bg-text hover:text-surface")}>
+      <Icon size={20} aria-hidden="true" />
     </PendingLink>
   );
 }

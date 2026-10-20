@@ -2538,7 +2538,7 @@ export interface SiteSetting {
    */
   mapLocation?: [number, number] | null;
   /**
-   * Ảnh nền đầu trang danh sách. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ.
+   * Ảnh nền đầu trang con. Trang chưa có ảnh riêng dùng ảnh mặc định; chưa có cả hai thì hiện banner chữ.
    */
   pageBanners?: {
     /**
@@ -2550,7 +2550,98 @@ export interface SiteSetting {
     propertyPosts?: (string | null) | Media;
     news?: (string | null) | Media;
     careers?: (string | null) | Media;
+    contact?: (string | null) | Media;
+    legal?: (string | null) | Media;
   };
+  /**
+   * Tiêu đề, dòng vàng và mô tả hiện trên ảnh banner của từng trang. Chữ nhập riêng cho tiếng Việt và tiếng Anh.
+   */
+  pageHeroes?: {
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    projects?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    rentals?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    news?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    propertyPosts?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    careers?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+    /**
+     * Để trống thì dùng chữ mặc định của trang.
+     */
+    contact?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      titleAccent?: string | null;
+      /**
+       * Tối đa 2 dòng.
+       */
+      description?: string | null;
+    };
+  };
+  showProjectStrengths?: boolean | null;
+  /**
+   * 2–6 mục; chưa đủ 2 mục (có chữ ở ngôn ngữ đang xem) thì ẩn dải.
+   */
+  careersPerks?:
+    | {
+        icon: 'map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star';
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Số hiển thị và gọi từ nút liên hệ nổi trên website
    */
@@ -3033,6 +3124,69 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         propertyPosts?: T;
         news?: T;
         careers?: T;
+        contact?: T;
+        legal?: T;
+      };
+  pageHeroes?:
+    | T
+    | {
+        projects?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+        rentals?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+        news?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+        propertyPosts?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+        careers?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+        contact?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              titleAccent?: T;
+              description?: T;
+            };
+      };
+  showProjectStrengths?: T;
+  careersPerks?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
       };
   hotline?: T;
   zaloUrl?: T;

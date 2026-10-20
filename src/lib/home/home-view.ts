@@ -282,13 +282,14 @@ function toProjectSlides(docs: readonly Project[], locale: Locale): ProjectSlide
   });
 }
 
-function toCta(homepage: Homepage, locale: Locale): CtaBannerView {
+/** Khối CTA của trang chủ; export để `ConsultBanner` (mọi trang con, BL-045) dùng lại đúng nội dung mà không xét `enabled`/`blockOrder`. */
+export function buildCtaBannerView(homepage: Pick<Homepage, "ctaBanner">, locale: Locale): CtaBannerView {
   const cta = homepage.ctaBanner;
   const secondaryLabel = text(cta?.secondaryLabel);
   const secondaryHref = secondaryLabel ? (resolveNavLink(cta?.secondaryLink, locale)?.href ?? null) : null;
   return {
     kind: "ctaBanner",
-    title: titleOf(homepage, "ctaBanner"),
+    title: text(cta?.title),
     description: text(cta?.description) || null,
     label: text(cta?.ctaLabel) || null,
     href: (resolveNavLink(cta?.ctaLink, locale) ?? resolveNavLink(CONTACT_FALLBACK, locale))?.href ?? "/",
@@ -346,7 +347,7 @@ function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale
       return cards.length > 0 ? { kind: "featuredOffers", title, cards } : null;
     }
     case "ctaBanner":
-      return toCta(homepage, locale);
+      return buildCtaBannerView(homepage, locale);
     case "rentals":
       return toRentalsBlock(title, docs.rentalTabs, locale);
     case "news":
