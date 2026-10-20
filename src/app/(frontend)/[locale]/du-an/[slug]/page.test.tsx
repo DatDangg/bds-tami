@@ -13,6 +13,14 @@ vi.mock("@/lib/projects/project-queries", () => ({ findPublicProjectBySlug, find
 vi.mock("@/lib/projects/project-listings", () => ({ findProjectListings }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "song-sai-gon", en: "saigon-riverside" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
+// ConsultBanner là Server Component async (đọc homepage CMS): jsdom không dựng được; chỉ kiểm tra trang truyền đúng props.
+const consultBannerProps = vi.hoisted(() => vi.fn());
+vi.mock("@/components/layout/ConsultBanner", () => ({
+  ConsultBanner: (props: unknown) => {
+    consultBannerProps(props);
+    return <section data-testid="consult-banner" />;
+  },
+}));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
@@ -76,10 +84,13 @@ describe("trang chi tiết dự án (S03)", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
     expect(container.querySelector("#lead-form")).not.toBeNull();
     expect(screen.getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    const related = screen.getByRole("heading", { level: 2, name: "Dự án khác" }).closest("section") as HTMLElement;
+    const related = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
     expect(within(related).getByRole("heading", { level: 3, name: "Dự án B" })).toBeInTheDocument();
     expect(within(related).getByRole("link")).toHaveAttribute("href", "/du-an/du-an-b");
     expect(findOtherProjects).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ id: "d1" }));
+    // Banner tư vấn cuối trang: nút chính cuộn tới form tại chỗ, nút phụ gọi hotline.
+    expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
+    expect(consultBannerProps).toHaveBeenCalledWith({ locale: "vi", actionHref: "#lead-form", secondary: { label: "Gọi hotline: 0901 234 567", href: "tel:0901234567" } });
   });
 
   it("Tin liên quan: đọc đúng dự án + locale, thẻ cho thuê/tin BĐS hiện trong khối có neo; trống → không có khối", async () => {
@@ -108,11 +119,12 @@ describe("trang chi tiết dự án (S03)", () => {
     findPublicProjectBySlug.mockResolvedValue(project());
     getSiteSettings.mockRejectedValue(new Error("db down"));
     await renderProject();
+    expect(consultBannerProps).toHaveBeenCalledWith({ locale: "vi", actionHref: "#lead-form" });
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "0901 234 567" })).toBeNull();
   });
 
-  it("dự án đã xuất bản nhưng mọi ảnh gallery bị xoá → hero nền tối, không ảnh, không vỡ", async () => {
+  it("dự án đã xuất bản nhưng mọi ảnh gallery bị xoá → ảnh lớn nền tối, không ảnh, không vỡ", async () => {
     findPublicProjectBySlug.mockResolvedValue(project({ gallery: [null as never, "id-con"] }));
     const { container } = await renderProject();
     expect(container.querySelector("img")).toBeNull();

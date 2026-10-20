@@ -419,6 +419,35 @@
         "perMonth": "/month"
       }
     },
+    "detail": {
+      "gallery": {
+        "region": "Photo gallery",
+        "slide": "Photo {index} / {total}",
+        "previous": "Previous photo",
+        "next": "Next photo",
+        "thumb": "View photo {index}",
+        "thumbs": "Thumbnails",
+        "viewAll": "View all photos",
+        "empty": "No photos yet"
+      },
+      "share": {
+        "button": "Share",
+        "menu": "Share this page"
+      },
+      "priceFrom": "From",
+      "eyebrow": {
+        "overview": "Introduction",
+        "highlights": "Value",
+        "location": "Connectivity",
+        "amenities": "Lifestyle",
+        "floorPlans": "Design",
+        "legal": "Transparency",
+        "policy": "Offers",
+        "pricing": "Pricing",
+        "listings": "Opportunities",
+        "faq": "Answers"
+      }
+    },
     "projectDetail": {
       "heroConsult": "Get advice",
       "heroDocuments": "Download documents",
@@ -524,6 +553,25 @@
         "description": "Leave your details and TAMI will arrange a visit that suits you.",
         "button": "Book a site visit",
         "hotline": "Call hotline"
+      },
+      "facts": {
+        "label": "Key facts",
+        "scale": "Scale",
+        "units": "Units",
+        "developer": "Developer",
+        "handover": "Handover",
+        "unitsValue": "{count} units"
+      },
+      "similar": {
+        "eyebrow": "You may also like",
+        "title": "Similar",
+        "titleAccent": "projects",
+        "description": "Projects in the same area or of the same type.",
+        "slide": "Project {index} / {total}",
+        "previous": "Previous projects",
+        "next": "Next projects",
+        "dots": "Choose slide position",
+        "goTo": "Go to project group {index}"
       },
       "relatedTitle": "Other projects",
       "stickyConsult": "Get advice"

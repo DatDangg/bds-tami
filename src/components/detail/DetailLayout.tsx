@@ -28,6 +28,11 @@ interface DetailLayoutProps {
    * và không dùng `aside`; không truyền thì DOM/class giữ nguyên như các trang chi tiết khác.
    */
   leading?: ReactNode;
+  /**
+   * `single` (mặc định: Tin BĐS, tin tức): cột chính là MỘT thẻ trắng bo 28px. `cards` (chi tiết Dự án / Cho thuê, BL-045): không thẻ bao ngoài, mỗi `DetailSection` tự là một thẻ
+   * trắng bo 20px cách nhau 24px (mockup `.block`); nền trang vẫn `bg-primary-subtle`.
+   */
+  sectionStyle?: "single" | "cards";
 }
 
 const GRID_WITH_ASIDE =
@@ -40,14 +45,21 @@ const GRID_WITH_LEADING =
  * `--sticky-top` = lề trên header nổi (8/16px) cho thanh mục con, thẻ dính và mọi `scroll-mt`. Nền `bg-primary-subtle`; cột chính là một thẻ trắng,
  * thẻ phụ tách riêng. Server Component; chỉ thanh mục con và vỏ `aside` đo chiều cao (`DetailAsideFit`) là client.
  */
-export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after, leading }: DetailLayoutProps) {
+export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after, leading, sectionStyle = "single" }: DetailLayoutProps) {
   return (
     <div data-detail-page="" className="bg-primary-subtle">
       {before}
       {subNav && <DetailSubNav items={subNav.items} label={subNav.label} />}
       <div className={leading ? GRID_WITH_LEADING : GRID_WITH_ASIDE}>
         {leading && <div className="hidden min-w-0 lg:block print:hidden">{leading}</div>}
-        <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
+        {sectionStyle === "cards" ? (
+          // `group/detail` + `data-section-style`: `DetailSection` (lồng sâu trong các khối dự án) đổi sang thẻ bằng biến thể group, không cần truyền prop qua từng khối.
+          <div data-section-style="cards" className="group/detail flex min-w-0 flex-col gap-6">
+            {children}
+          </div>
+        ) : (
+          <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
+        )}
         {aside && (
           <DetailAsideFit {...(asideLabelledBy ? { "aria-labelledby": asideLabelledBy } : {})} className="pt-6 lg:pt-0">
             {aside}

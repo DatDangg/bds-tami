@@ -10,6 +10,8 @@ export interface PolicyBlock {
   /** Neo phụ cũng mở khối này (vd `#documents` nằm trong khối Pháp lý). */
   anchorIds?: string[];
   title: string;
+  /** Dòng nhỏ vàng trên tiêu đề (kiểu thẻ BL-045); thiếu thì không dựng. */
+  eyebrow?: string;
   /** Nội dung richText đã render ở server. */
   content: ReactNode;
 }
@@ -41,6 +43,7 @@ function PolicyBlockView({ block, open, onToggle, isLg }: { block: PolicyBlock; 
   const panelId = useId();
   return (
     <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] min-w-0 focus:outline-none">
+      {block.eyebrow && <p className="mb-1.5 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{block.eyebrow}</p>}
       <h2 id={headingId} className="font-display text-h2">
         {isLg ? (
           block.title

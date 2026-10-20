@@ -21,11 +21,12 @@ interface ProjectLocationProps {
  */
 export function ProjectLocation({ projectName, location, address, areaLabel, nearby = [] }: ProjectLocationProps) {
   const t = useTranslations("page.projectDetail");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   const addressText = [address, areaLabel].filter(Boolean).join(", ");
   // Tiện ích có toạ độ hiện thành điểm phụ trên bản đồ (mọi nhóm, không theo tab: bản đồ dựng một lần).
   const markers: MapMarker[] = nearby.flatMap((group) => group.items.flatMap((item) => (item.location ? [{ ...item.location, label: item.name }] : [])));
   return (
-    <DetailSection id={SECTION_DOM_ID.location} title={t("sections.location")}>
+    <DetailSection id={SECTION_DOM_ID.location} eyebrow={tEyebrow("location")} title={t("sections.location")}>
       <div className="grid gap-8 xl:grid-cols-12 xl:gap-12">
         {location && (
           <div className="xl:col-span-7">

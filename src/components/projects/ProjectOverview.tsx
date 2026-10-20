@@ -19,8 +19,9 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail");
   const tRich = useTranslations("page.richText");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   return (
-    <DetailSection id={SECTION_DOM_ID.overview} title={t("sections.overview")}>
+    <DetailSection id={SECTION_DOM_ID.overview} eyebrow={tEyebrow("overview")} title={t("sections.overview")}>
       <div className="flex flex-col gap-10">
         <ProjectSpecs {...view} />
         {view.hasOverview ? (

@@ -1,30 +1,33 @@
 import { useLocale, useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { RichText } from "@/components/content/RichText";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
-import { CtaBanner } from "@/components/layout/CtaBanner";
-import { Gallery } from "@/components/media/Gallery";
+import { DetailGalleryHero } from "@/components/detail/DetailGalleryHero";
 import { DetailLayout, DETAIL_ASIDE_CARD_CLASS } from "@/components/detail/DetailLayout";
 import { DetailSection } from "@/components/detail/DetailSection";
+import { DetailTitleCard } from "@/components/detail/DetailTitleCard";
+import { Badge } from "@/components/ui/badge";
 import { Documents } from "@/components/projects/Documents";
 import { FloorPlans } from "@/components/projects/FloorPlans";
 import { LegalPolicy, type PolicyBlock } from "@/components/projects/LegalPolicy";
 import { PriceTable } from "@/components/projects/PriceTable";
 import { ProjectAmenities } from "@/components/projects/ProjectAmenities";
-import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFaq } from "@/components/projects/ProjectFaq";
 import { ProjectHighlights } from "@/components/projects/ProjectHighlights";
 import { ProjectListings, type ProjectListingCards } from "@/components/projects/ProjectListings";
-import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectLocation } from "@/components/projects/ProjectLocation";
 import { ProjectOverview } from "@/components/projects/ProjectOverview";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
+import { SimilarProjects } from "@/components/projects/SimilarProjects";
+import { useProjectFacts } from "@/components/projects/use-project-facts";
 import { publicPath } from "@/lib/content/content-paths";
+import { formatVndCompact } from "@/lib/format";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
-import { DOCUMENTS_DOM_ID, LEAD_FORM_DOM_ID, SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
-import type { ProjectCardData } from "@/lib/projects/project-view";
+import { DOCUMENTS_DOM_ID, SECTION_DOM_ID, visibleSections, type ProjectDetailView } from "@/lib/projects/project-detail-view";
+import { SALES_STATUS_BADGE_VARIANT, type ProjectCardData } from "@/lib/projects/project-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
 
@@ -41,19 +44,28 @@ interface ProjectDetailProps {
   hotline?: { label: string; telHref: string };
   /** Đường dẫn công khai của chính trang (mục cuối breadcrumb). */
   ownPath: string;
+  /** URL tuyệt đối canonical cho nút chia sẻ; thiếu thì menu chỉ còn sao chép liên kết trang hiện tại. */
+  shareUrl?: string;
+  /** Banner tư vấn cuối trang: `<ConsultBanner />` là Server Component async nên trang dựng rồi truyền vào (như `CategoryListTemplate`). */
+  consultBanner?: ReactNode;
 }
 
 /**
- * Bố cục S03 qua `DetailLayout` dùng chung: hero → breadcrumb → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính là MỘT thẻ trắng bo lớn: Tổng quan → Điểm nổi bật → Vị trí (bản đồ + tiện ích quanh) → Tiện ích →
- * Mặt bằng → Pháp lý (richText + tài liệu PDF) + Chính sách → Bảng giá → Thư viện (thẻ tối duy nhất) → Tin liên quan → FAQ; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → Dự án khác → CTA "Đăng ký tham quan" (banner tối). Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện
- * với thanh mục con: `visibleSections`). `h1` chỉ ở hero. Server Component; phần tương tác (thanh mục con, mặt bằng, accordion, thanh dính đáy) là client.
+ * Bố cục S03 theo mockup BL-045 qua `DetailLayout sectionStyle="cards"`: ảnh lớn kiểu hero (`DetailGalleryHero`, breadcrumb kính trên ảnh) → khối tiêu đề nổi có dải thông số
+ * (`DetailTitleCard`, chứa `h1`) → thanh mục con viên thuốc dính → lưới 2 cột ≥ lg (cột chính: các mục là thẻ trắng bo 20px riêng — Tổng quan, Nổi bật, Vị trí (bản đồ + tiện ích quanh), Tiện ích, Mặt bằng,
+ * Pháp lý (richText + tài liệu PDF) + Chính sách, Bảng giá, Tin liên quan, Hỏi đáp; cột phải: thẻ Tư vấn 1:1 dính chứa form lead) → "Dự án tương tự" (slider, nền trắng) → banner tư vấn.
+ * KHÔNG còn mục "Thư viện" (Q7): ảnh xem ở ảnh lớn + lightbox. Khối nào thiếu dữ liệu thì ẩn hẳn (cùng điều kiện với thanh mục con: `visibleSections`). Server Component;
+ * phần tương tác (ảnh lớn, thanh mục con, mặt bằng, accordion, thanh dính đáy) là client.
  */
-export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath }: ProjectDetailProps) {
+export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath, shareUrl, consultBanner }: ProjectDetailProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail");
+  const tDetail = useTranslations("page.detail");
+  const tStatus = useTranslations("page.projects.salesStatus");
   const tNav = useTranslations("layout.nav.items");
   const tRich = useTranslations("page.richText");
   const turnstileSiteKey = readTurnstileSiteKey();
+  const facts = useProjectFacts(view);
   const hasListings = listings.rentals.length > 0 || listings.posts.length > 0;
   const sections = visibleSections(view, { hasListings });
   const shown = new Set(sections);
@@ -64,6 +76,7 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
           {
             id: SECTION_DOM_ID.legal,
             anchorIds: [DOCUMENTS_DOM_ID],
+            eyebrow: tDetail("eyebrow.legal"),
             title: t("sections.legal"),
             // Pháp lý gộp richText + danh sách PDF; một trong hai có là đủ dựng khối.
             content: (
@@ -76,22 +89,39 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
         ]
       : []),
     ...(view.hasPolicy
-      ? [{ id: SECTION_DOM_ID.policy, title: t("sections.policy"), content: <RichText data={doc.salesPolicy} locale={locale} tableLabel={tRich("table")} /> }]
+      ? [{ id: SECTION_DOM_ID.policy, eyebrow: tDetail("eyebrow.policy"), title: t("sections.policy"), content: <RichText data={doc.salesPolicy} locale={locale} tableLabel={tRich("table")} /> }]
       : []),
   ];
 
   return (
     <article className="pb-16 lg:pb-0">
       <DetailLayout
+        sectionStyle="cards"
         before={
           <>
-            <ProjectHero title={view.title} salesStatus={view.salesStatus} areaLabel={view.areaLabel} image={view.hero} hasDocuments={view.documents.length > 0} />
-            <Breadcrumb
-              className="py-2"
-              items={[
-                { label: tNav("projects"), href: publicPath("/du-an", locale) },
-                { label: view.title, href: ownPath },
-              ]}
+            <DetailGalleryHero
+              images={view.gallery}
+              breadcrumb={
+                <Breadcrumb
+                  variant="overlay"
+                  items={[
+                    { label: tNav("projects"), href: publicPath("/du-an", locale) },
+                    { label: view.title, href: ownPath },
+                  ]}
+                />
+              }
+            />
+            <DetailTitleCard
+              eyebrow={view.categoryName}
+              badge={<Badge variant={SALES_STATUS_BADGE_VARIANT[view.salesStatus]}>{tStatus(view.salesStatus)}</Badge>}
+              title={view.title}
+              location={view.areaLabel}
+              {...(view.priceFromVnd ? { priceLabel: tDetail("priceFrom") } : {})}
+              price={view.priceFromVnd ? formatVndCompact(view.priceFromVnd, locale) : t("price.contact")}
+              facts={facts}
+              factsLabel={t("facts.label")}
+              shareTitle={view.title}
+              {...(shareUrl ? { shareUrl } : {})}
             />
           </>
         }
@@ -114,30 +144,9 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
         }
         after={
           <>
-            {related.length > 0 && (
-              <section aria-labelledby="related-projects" className="bg-bg-alt py-section-tight">
-                <div className="mx-auto w-full max-w-container px-gutter">
-                  <h2 id="related-projects" className="mb-8 font-display text-h2">
-                    {t("relatedTitle")}
-                  </h2>
-                  <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                    {related.map((card) => (
-                      <li key={card.id}>
-                        <ProjectCard data={card} headingLevel="h3" />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </section>
-            )}
-            {/* CTA cuối trang: cuộn tới thẻ Tư vấn (form lead duy nhất), không nhân đôi form. */}
-            <CtaBanner
-              title={t("visitCta.title")}
-              description={t("visitCta.description")}
-              actionLabel={t("visitCta.button")}
-              actionHref={`#${LEAD_FORM_DOM_ID}`}
-              {...(hotline ? { secondaryLabel: `${t("visitCta.hotline")}: ${hotline.label}`, secondaryHref: hotline.telHref } : {})}
-            />
+            <SimilarProjects projects={related} />
+            {/* Banner cuối trang: nút chính cuộn tới thẻ Tư vấn (form lead duy nhất), không nhân đôi form. */}
+            {consultBanner}
           </>
         }
       >
@@ -146,22 +155,16 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
         {shown.has("location") && <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />}
         {shown.has("amenities") && <ProjectAmenities amenities={view.amenities} />}
         {shown.has("floorPlans") && (
-          <DetailSection id={SECTION_DOM_ID.floorPlans} title={t("sections.floorPlans")}>
+          <DetailSection id={SECTION_DOM_ID.floorPlans} eyebrow={tDetail("eyebrow.floorPlans")} title={t("sections.floorPlans")}>
             <FloorPlans plans={view.floorPlans} />
           </DetailSection>
         )}
         {policyBlocks.length > 0 && (
-          <div className="border-t border-border py-section-tight">
+          <div className="rounded-[20px] bg-surface p-5 md:p-8">
             <LegalPolicy blocks={policyBlocks} />
           </div>
         )}
         {shown.has("pricing") && <PriceTable rows={view.priceRows} updatedAt={view.priceUpdatedAt} />}
-        {shown.has("gallery") && (
-          <DetailSection id={SECTION_DOM_ID.gallery} title={t("sections.gallery")} tone="dark">
-            {/* Ảnh LCP của trang là ảnh hero (cùng ảnh đầu thư viện): thư viện ở đây lazy. */}
-            <Gallery images={view.gallery} />
-          </DetailSection>
-        )}
         <ProjectListings {...listings} />
         {shown.has("faq") && <ProjectFaq faqs={view.faqs} />}
       </DetailLayout>

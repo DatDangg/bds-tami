@@ -120,3 +120,44 @@ describe("DetailLayout", () => {
     );
   });
 });
+
+describe('DetailLayout sectionStyle="cards" (BL-045)', () => {
+  it("mặc định (single): cột chính là MỘT thẻ trắng, DetailSection không đổi (không eyebrow, h2 cỡ cũ)", () => {
+    const { container } = renderLayout();
+    const card = container.querySelector("section#a")?.parentElement as HTMLElement;
+    expect(card.getAttribute("data-section-style")).toBeNull();
+    expect(card.className).toContain("rounded-[28px]");
+    expect(card.className).not.toContain("group/detail");
+    expect(container.querySelector("section#a h2")?.className).toContain("text-h2");
+    expect(container.querySelector("section#a p")).toBeNull();
+  });
+
+  it("cards: không thẻ bao ngoài; gốc group/detail + data-section-style; mỗi mục là thẻ trắng bo 20px; aside vẫn là phần tử kế sau", () => {
+    const { container } = renderWithIntl(
+      <DetailLayout sectionStyle="cards" aside={<div id="card">Thẻ phụ</div>} asideLabelledBy="card">
+        <DetailSection id="a" eyebrow="Giới thiệu" title="Khối A">
+          Nội dung A
+        </DetailSection>
+        <DetailSection id="b" title="Khối B">
+          Nội dung B
+        </DetailSection>
+      </DetailLayout>,
+    );
+    const column = container.querySelector("section#a")?.parentElement as HTMLElement;
+    expect(column.getAttribute("data-section-style")).toBe("cards");
+    expect(column.className).toContain("group/detail");
+    expect(column.className).not.toContain("rounded-[28px]");
+    expect(column.className).not.toContain("bg-surface");
+    expect(column.nextElementSibling?.tagName).toBe("ASIDE");
+    const section = container.querySelector("section#a") as HTMLElement;
+    expect(section.className).toContain("group-data-[section-style=cards]/detail:rounded-[20px]");
+    expect(section.className).toContain("group-data-[section-style=cards]/detail:bg-surface");
+    expect(section.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
+    // Eyebrow vàng đứng trước h2.
+    const eyebrow = section.querySelector("p") as HTMLElement;
+    expect(eyebrow).toHaveTextContent("Giới thiệu");
+    expect(eyebrow.className).toContain("text-accent-text");
+    expect(eyebrow.nextElementSibling?.tagName).toBe("H2");
+    expect(screen.getByRole("heading", { level: 2, name: "Khối A" })).toBeInTheDocument();
+  });
+});
