@@ -208,10 +208,7 @@
       "tabsLabel": "Danh mục tin tức",
       "all": "Tất cả",
       "readTime": "{minutes} phút đọc",
-      "moreNews": "Tin khác",
-      "featuredLabel": "Tin nổi bật",
-      "viewMore": "Xem thêm",
-      "viewMoreIn": "Xem thêm tin {name}",
+      "readArticle": "Đọc bài",
       "consultTitle": "Tư vấn nhu cầu",
       "relatedTitle": "Bài liên quan",
       "tagsLabel": "Từ khoá",
@@ -225,8 +222,20 @@
         "copyFailed": "Không sao chép được"
       }
     },
+    "newsDetail": {
+      "latestEyebrow": "Mới cập nhật",
+      "latestTitle": "Bài viết mới",
+      "consultEyebrow": "Tư vấn",
+      "consultTitle": "Đang tìm bất động sản phù hợp?",
+      "consultText": "Để lại thông tin, TAMI HOMES sẽ liên hệ tư vấn cho bạn.",
+      "consultCta": "Nhận tư vấn",
+      "relatedEyebrow": "Đọc tiếp",
+      "relatedTitle": "Bài viết",
+      "relatedAccent": "liên quan"
+    },
     "posts": {
       "title": "Đăng tin BĐS",
+      "viewDetail": "Xem chi tiết",
       "description": "Tin bất động sản, voucher và ưu đãi mới nhất từ TAMI.",
       "tabsLabel": "Danh mục đăng tin",
       "resultCount": "Có {count, number} kết quả",

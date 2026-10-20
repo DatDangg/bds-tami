@@ -83,22 +83,37 @@ describe("PostCard", () => {
   });
 });
 
+describe("PostCard feature (bài nổi bật ngang)", () => {
+  it("MỘT link, ảnh trái + chữ phải ≥ lg, giá, nút 'Xem chi tiết'; không canh giữa", () => {
+    const { container } = renderWithIntl(<PostCard data={card("1", { priceLabel: "Từ 5 triệu" })} variant="feature" headingLevel="h2" priority />);
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    const link = screen.getByRole("link");
+    expect(link).toHaveClass("lg:grid-cols-[1.3fr_1fr]", "rounded-xl", "bg-surface");
+    expect(within(link).getByRole("heading", { level: 2, name: "Tin 1" })).toBeInTheDocument();
+    expect(link).toHaveTextContent("Từ 5 triệu");
+    expect(link).toHaveTextContent("Xem chi tiết");
+    expect(container.querySelector("button")).toBeNull();
+    expect(container.innerHTML).not.toContain("text-center");
+  });
+});
+
 describe("PostListBody", () => {
-  it("bài nổi bật là thẻ đầu lưới (priority), MỘT vùng có tên, mọi tiêu đề h2", () => {
-    const { container } = renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} totalDocs={3} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Có 3 kết quả");
+  it("bài nổi bật là thẻ ngang riêng (priority) trước lưới, MỘT vùng có tên, mọi tiêu đề h2, lưới 1/2/3 cột", () => {
+    const { container } = renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 1", "Tin 2", "Tin 3"]);
     expect(screen.getAllByRole("region")).toHaveLength(1);
     expect(screen.getByRole("region", { name: "Danh sách tin đăng" })).toBeInTheDocument();
-    expect(container.querySelectorAll("ul.grid > li")).toHaveLength(3);
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
-    // Không còn thẻ ngang riêng cho bài nổi bật.
-    expect(container.querySelector(".lg\:grid-cols-12")).toBeNull();
+    expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-1");
+    expect(container.querySelectorAll("ul.grid > li")).toHaveLength(2);
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3");
+    expect(container.querySelector("ul.grid")?.className).not.toContain("xl:grid-cols-4");
+    expect(screen.queryByRole("status")).toBeNull();
   });
 
   it("không có bài nổi bật: chỉ lưới các thẻ còn lại", () => {
-    renderWithIntl(<PostListBody featured={null} items={[card("2")]} totalDocs={1} />);
+    const { container } = renderWithIntl(<PostListBody featured={null} items={[card("2")]} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 2"]);
+    expect(container.querySelector("[data-post-featured]")).toBeNull();
   });
 });
 

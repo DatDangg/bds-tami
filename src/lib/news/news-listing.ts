@@ -3,18 +3,12 @@ import type { Payload } from "payload";
 import type { Locale } from "../../i18n/routing";
 import type { Category } from "../../payload-types";
 import { publicPath } from "../content/content-paths";
-import {
-  findNewsCategoryBySlug,
-  listChildNewsCategories,
-  listPublicNews,
-  listRootNewsCategories,
-  NEWS_FEATURED_COUNT,
-} from "./news-queries";
-import { categoryHref, type NewsCardData, toNewsCards, visibleCategory } from "./news-view";
+import { findNewsCategoryBySlug, listChildNewsCategories, listPublicNews, listRootNewsCategories } from "./news-queries";
+import { categoryHref, type NewsCardData, toNewsCardData, toNewsCards, visibleCategory } from "./news-view";
 
 export interface NewsListing {
-  /** Chỉ có ở trang 1 của `/tin-tuc` (không lọc danh mục): {@link NEWS_FEATURED_COUNT} bài mới nhất bị loại khỏi lưới ở mọi trang. Trang 1 đưa các bài này (trừ bài đã hiện ở "Tin nổi bật" hoặc hàng danh mục) lên đầu mục "Tin khác" qua `buildMoreNews` để không bài nào mất chỗ; `tests/integration/news.test.ts` kiểm hợp đồng không trùng/không mất bài. */
-  featured: NewsCardData[];
+  /** Bài nổi bật ngang đầu danh sách (BL-045): chỉ ở trang 1 của `/tin-tuc` (không lọc danh mục). `isFeatured` mới nhất, không có thì bài mới nhất; bị loại khỏi lưới ở MỌI trang để không trùng. */
+  featured: NewsCardData | null;
   items: NewsCardData[];
   totalPages: number;
   /** Trang yêu cầu vượt số trang có dữ liệu (trang 1 luôn hợp lệ, kể cả khi trống). */
@@ -23,10 +17,9 @@ export interface NewsListing {
 }
 
 /**
- * Dữ liệu một trang danh sách tin. `/tin-tuc` (không danh mục): khối nổi bật = {@link NEWS_FEATURED_COUNT} bài mới nhất, lưới là
- * phần còn lại (loại các bài nổi bật ở MỌI trang để không trùng khi sang trang 2) nên khối nổi bật không tính vào 12 bài/trang.
- * (BL-020 P3-T03: trang 1 hiển thị `loadNewsHome` rồi mục "Tin khác" = `buildMoreNews(home, featured, items)`; phân trang/offset không đổi.)
- * Trang danh mục: chỉ lưới. `categoryIds` gồm danh mục + con của nó (chip "Tất cả" của danh mục cha gồm cả bài của con).
+ * Dữ liệu một trang danh sách tin. `/tin-tuc` (không danh mục): bài nổi bật = `isFeatured` mới nhất (bù bằng bài mới nhất), hai truy vấn limit 1 chạy song song;
+ * lưới là phần còn lại, loại bài nổi bật ở MỌI trang nên không bài nào trùng hay mất khi sang trang 2. Trang danh mục: chỉ lưới.
+ * `categoryIds` gồm danh mục + con của nó (chip "Tất cả" của danh mục cha gồm cả bài của con).
  */
 export async function loadNewsListing(
   payload: Payload,
@@ -37,22 +30,25 @@ export async function loadNewsListing(
   if (categoryIds) {
     const grid = await listPublicNews(payload, locale, { page, categoryIds });
     return {
-      featured: [],
+      featured: null,
       items: toNewsCards(grid.docs, locale),
       totalPages: grid.totalPages,
       outOfRange: page > 1 && page > grid.totalPages,
       isEmpty: grid.totalDocs === 0,
     };
   }
-  const head = await listPublicNews(payload, locale, { page: 1, limit: NEWS_FEATURED_COUNT });
-  const featuredDocs = head.docs;
-  const grid = await listPublicNews(payload, locale, { page, excludeIds: featuredDocs.map((doc) => doc.id) });
+  const [flagged, newest] = await Promise.all([
+    listPublicNews(payload, locale, { page: 1, limit: 1, featuredOnly: true }),
+    listPublicNews(payload, locale, { page: 1, limit: 1 }),
+  ]);
+  const leadDoc = flagged.docs[0] ?? newest.docs[0];
+  const grid = await listPublicNews(payload, locale, { page, ...(leadDoc ? { excludeIds: [leadDoc.id] } : {}) });
   return {
-    featured: page === 1 ? toNewsCards(featuredDocs, locale) : [],
+    featured: page === 1 && leadDoc ? toNewsCardData(leadDoc, locale) : null,
     items: toNewsCards(grid.docs, locale),
     totalPages: grid.totalPages,
     outOfRange: page > 1 && page > grid.totalPages,
-    isEmpty: head.totalDocs === 0,
+    isEmpty: newest.totalDocs === 0,
   };
 }
 
