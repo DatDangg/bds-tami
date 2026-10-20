@@ -88,7 +88,7 @@ describe("HomeBlocks: nội dung khối", () => {
     expect(within(region).getAllByText("Đang mở bán")).toHaveLength(3);
     expect(within(region).getAllByRole("link", { name: /Dự án 1/ })[0]).toHaveAttribute("href", "/du-an/du-an-1");
     expect(within(region).getByRole("button", { name: "Chuyển tới dự án 3" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Xem tất cả" })).toHaveAttribute("href", "/du-an");
+    expect(screen.getByRole("link", { name: "Xem tất cả dự án" })).toHaveAttribute("href", "/du-an");
     expect(screen.getByRole("link", { name: "Xem thêm" })).toHaveAttribute("href", "/tin-bds");
   });
 

@@ -39,4 +39,16 @@ describe("CtaBanner dùng chung", () => {
     render(<CtaBanner {...base} secondaryHref="/du-an" />);
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
+
+  it("align: mặc định center (S14 không đổi); start → chữ + nút canh trái", () => {
+    const centered = render(<CtaBanner {...base} />);
+    expect(screen.getByRole("heading", { level: 2 }).parentElement).toHaveClass("items-center", "text-center");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" }).parentElement).toHaveClass("justify-center");
+    centered.unmount();
+    render(<CtaBanner {...base} align="start" />);
+    const wrapper = screen.getByRole("heading", { level: 2 }).parentElement;
+    expect(wrapper).toHaveClass("items-start", "text-left");
+    expect(wrapper).not.toHaveClass("text-center");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" }).parentElement).toHaveClass("justify-start");
+  });
 });

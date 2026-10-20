@@ -12,6 +12,7 @@ export function CtaBanner({ block }: { block: CtaBannerView }) {
       actionLabel={block.label ?? t("getAdvice")}
       actionHref={block.href}
       backgroundImage={block.image}
+      align="start"
       {...(block.secondary ? { secondaryLabel: block.secondary.label, secondaryHref: block.secondary.href } : {})}
     />
   );

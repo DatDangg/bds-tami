@@ -1256,13 +1256,18 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-homepage-redesign/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0,
-          "round": 0,
-          "note": "Về TAMI cụm ảnh + video YouTube Dialog + số liệu icon + nút; thẻ Dự án nổi bật nền trắng + tim trang trí; banner tư vấn chữ trái (CtaBanner align)",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "Về TAMI cụm ảnh + video YouTube Dialog + số liệu icon + nút; thẻ Dự án nổi bật nền trắng + tim trang trí; banner tư vấn chữ trái (CtaBanner align) → r1 STRICT PASS; MINOR m1 mảng nền be sau ảnh phụ (bg-primary-soft), m2 focus outline thẻ bị cắt, m3 số liệu dài 375px → gộp sửa ở T03; m4 thiếu ảnh lớn ẩn cụm ảnh (ghi docs T03); m5 youtube.ts → tái dùng parseVideoUrl (reconcile T03)",
           "reviewLevel": "STRICT",
-          "reviewerResult": null,
-          "report": null
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-homepage-redesign-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-02-round-1-review.md"
+          ],
+          "completedAt": "2026-10-20",
+          "commit": "(commit close-out T02)"
         },
         {
           "task": "phase-1-task-03",

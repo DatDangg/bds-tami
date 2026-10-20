@@ -783,19 +783,17 @@
       "strengths": {
         "region": "Điểm mạnh"
       },
+      "about": {
+        "closeVideo": "Đóng video"
+      },
       "projects": {
-        "viewAll": "Xem tất cả",
+        "viewAll": "Xem tất cả dự án",
         "region": "Dự án nổi bật",
         "slide": "Dự án {index} / {total}",
         "previous": "Dự án trước",
         "next": "Dự án sau",
         "dots": "Chọn dự án",
-        "goTo": "Chuyển tới dự án {index}",
-        "stats": {
-          "landArea": "Diện tích đất",
-          "units": "Tổng số căn",
-          "handover": "Bàn giao"
-        }
+        "goTo": "Chuyển tới dự án {index}"
       },
       "offers": {
         "viewMore": "Xem thêm",

@@ -18,7 +18,7 @@ function renderBlock(block: HomeBlockView) {
     case "about":
       return <AboutBlock block={block} />;
     case "featuredProjects":
-      return <FeaturedProjects title={block.title} slides={block.slides} />;
+      return <FeaturedProjects title={block.title} eyebrow={block.eyebrow} description={block.description} slides={block.slides} />;
     case "services":
       return <ServicesBento title={block.title} items={block.items} />;
     case "featuredOffers":

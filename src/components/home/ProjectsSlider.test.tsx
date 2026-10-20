@@ -118,55 +118,48 @@ describe("ProjectsSlider", () => {
   });
 });
 
-describe("ProjectsSlider: thẻ lớn kính mờ + số liệu", () => {
-  const renderOne = (view: ProjectSlideView, locale: "vi" | "en" = "vi") =>
+describe("ProjectsSlider: thẻ trắng theo mockup BL-044", () => {
+  const renderOne = (view: ProjectSlideView) =>
     renderWithIntl(
       <>
         <h2 id="h">Dự án nổi bật</h2>
         <ProjectsSlider slides={[view]} labelledBy="h" />
       </>,
-      locale,
     );
 
-  it("hiện đủ 3 số liệu từ field sẵn có, tên + địa điểm + badge trạng thái, cả thẻ là một link", () => {
-    renderOne({ ...slide(1), salesStatus: "upcoming", stats: { landAreaM2: 12000, totalUnits: 350, handoverTime: "Q4/2027" } });
-    const link = screen.getByRole("link", { name: "Dự án 1" }); // tên truy cập chỉ là tên dự án, không đọc cả số liệu
+  it("cả thẻ là MỘT link, tên truy cập = tên dự án; có tên, tỉnh, badge; không còn khung kính mờ / số liệu", () => {
+    const { container } = renderOne({ ...slide(1), salesStatus: "upcoming", stats: { landAreaM2: 12000, totalUnits: 350, handoverTime: "Q4/2027" } });
+    const link = screen.getByRole("link", { name: "Dự án 1" });
+    expect(screen.getAllByRole("link")).toHaveLength(1);
     expect(link).toHaveAttribute("href", "/du-an/du-an-1");
+    expect(link).toHaveClass("bg-surface", "rounded-xl", "border-border");
     expect(within(link).getByRole("heading", { level: 3, name: "Dự án 1" })).toBeInTheDocument();
     expect(within(link).getByText("Hà Nội")).toBeInTheDocument();
     expect(within(link).getByText("Sắp mở bán")).toHaveAttribute("data-variant", "primary");
-    expect(within(link).getByText("Diện tích đất").tagName).toBe("DT");
-    expect(within(link).getByText(/12\.000\s?m²/).tagName).toBe("DD");
-    expect(within(link).getByText("Tổng số căn")).toBeInTheDocument();
-    expect(within(link).getByText("350")).toBeInTheDocument();
-    expect(within(link).getByText("Bàn giao")).toBeInTheDocument();
-    expect(within(link).getByText("Q4/2027")).toBeInTheDocument();
+    expect(container.querySelector(".glass-panel")).toBeNull();
+    expect(container.querySelector("dl")).toBeNull();
+    expect(screen.queryByText("Diện tích đất")).toBeNull();
   });
 
-  it("thiếu trạng thái (dữ liệu cũ/select thiếu) → không badge, không lỗi i18n", () => {
-    renderOne({ ...slide(1), salesStatus: null });
+  it("tim chỉ trang trí: aria-hidden, không phải button, không nhận focus; chỉ có link thẻ là phần tử tương tác", () => {
+    const { container } = renderOne(slide(1));
+    const heart = screen.getByTestId("project-heart");
+    expect(heart).toHaveAttribute("aria-hidden", "true");
+    expect(heart.tagName).toBe("SPAN");
+    expect(heart.closest("button")).toBeNull();
+    expect(heart).not.toHaveAttribute("tabindex");
+    expect(container.querySelectorAll("a, button")).toHaveLength(1); // 1 dự án → không có mũi tên/chấm
+  });
+
+  it("thiếu trạng thái (dữ liệu cũ) → không badge, không lỗi i18n; thiếu tỉnh → không dòng ghim", () => {
+    renderOne({ ...slide(1), salesStatus: null, provinceName: null });
     expect(screen.getByRole("link", { name: "Dự án 1" })).toBeInTheDocument();
     expect(screen.queryByText(/mở bán|bàn giao/i)).toBeNull();
+    expect(screen.queryByText("Hà Nội")).toBeNull();
   });
 
-  it("Đang mở bán dùng badge success; số liệu thiếu thì ẩn từng ô, không còn ô nào thì không có <dl>", () => {
-    renderOne({ ...slide(1), stats: { landAreaM2: null, totalUnits: 120, handoverTime: null } });
+  it("Đang mở bán dùng badge success", () => {
+    renderOne({ ...slide(1), salesStatus: "selling" });
     expect(screen.getByText("Đang mở bán")).toHaveAttribute("data-variant", "success");
-    expect(screen.getByText("Tổng số căn")).toBeInTheDocument();
-    expect(screen.queryByText("Diện tích đất")).toBeNull();
-    expect(screen.queryByText("Bàn giao")).toBeNull();
-  });
-
-  it("không có số liệu nào: không dựng khung số liệu rỗng", () => {
-    const { container } = renderOne(slide(1));
-    expect(container.querySelector("dl")).toBeNull();
-  });
-
-  it("EN: nhãn và định dạng theo ngôn ngữ", () => {
-    renderOne({ ...slide(1), stats: { landAreaM2: 12000, totalUnits: 350, handoverTime: "Q4/2027" } }, "en");
-    expect(screen.getByText("Land area")).toBeInTheDocument();
-    expect(screen.getByText("Total units")).toBeInTheDocument();
-    expect(screen.getByText("Handover")).toBeInTheDocument();
-    expect(screen.getByText(/12,000\s?m²/)).toBeInTheDocument();
   });
 });

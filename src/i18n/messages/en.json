@@ -783,19 +783,17 @@
       "strengths": {
         "region": "Why TAMI"
       },
+      "about": {
+        "closeVideo": "Close video"
+      },
       "projects": {
-        "viewAll": "View all",
+        "viewAll": "View all projects",
         "region": "Featured projects",
         "slide": "Project {index} of {total}",
         "previous": "Previous project",
         "next": "Next project",
         "dots": "Choose a project",
-        "goTo": "Go to project {index}",
-        "stats": {
-          "landArea": "Land area",
-          "units": "Total units",
-          "handover": "Handover"
-        }
+        "goTo": "Go to project {index}"
       },
       "offers": {
         "viewMore": "See more",
