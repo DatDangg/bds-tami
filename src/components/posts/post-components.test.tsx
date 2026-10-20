@@ -63,13 +63,16 @@ describe("PostCard", () => {
     expect(container.querySelector(".opacity-70")).toBeNull();
   });
 
-  it("kiểu thẻ như RentalCard: ảnh 4:3, tiêu đề 2 dòng font-display, thân gap-1", () => {
+  it("kiểu thẻ như ProjectCard: ảnh 11:10, tiêu đề 2 dòng font-display, mũi tên tròn, không tóm tắt", () => {
     const { container } = renderWithIntl(<PostCard data={card("1")} headingLevel="h2" />);
-    expect(container.querySelector('[class*="aspect-[4/3]"]')).not.toBeNull();
+    expect(container.querySelector('[class*="aspect-[11/10]"]')).not.toBeNull();
     expect(container.querySelector('[class*="aspect-[16/10]"]')).toBeNull();
     const heading = screen.getByRole("heading", { level: 2 });
-    expect(heading.className).toContain("line-clamp-2 font-display text-h4");
-    expect(heading.parentElement?.className).toContain("gap-1");
+    expect(heading.className).toContain("line-clamp-2");
+    expect(heading.className).toContain("font-display text-h4");
+    expect(heading.className).toContain("min-h-[2lh]");
+    expect(container.querySelector("[aria-hidden=true].rounded-full")).not.toBeNull();
+    expect(screen.queryByText("Tóm tắt 1")).toBeNull();
     expect(heading).toHaveClass("group-hover:text-accent-text", "group-focus-visible:text-accent-text");
     expect(heading).not.toHaveClass("group-hover:underline");
   });

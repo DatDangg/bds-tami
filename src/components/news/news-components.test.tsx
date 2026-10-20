@@ -33,6 +33,18 @@ describe("NewsCard", () => {
     expect(link).toHaveTextContent("Thị trường");
   });
 
+  it("thẻ lưới (card): khung như thẻ Dự án — tên 2 dòng, ngày + mũi tên tròn, không tóm tắt; feature/row/onDark giữ phẳng", () => {
+    const { container, unmount } = renderWithIntl(<NewsCard data={card("1")} headingLevel="h2" />);
+    expect(screen.getByRole("link").className).toContain("rounded-xl border border-border bg-surface");
+    expect(screen.getByRole("heading", { level: 2 }).className).toContain("min-h-[2lh]");
+    expect(container.querySelector("[aria-hidden=true].rounded-full")).not.toBeNull();
+    expect(screen.queryByText("Tóm tắt 1")).toBeNull();
+    unmount();
+    const flat = renderWithIntl(<NewsCard data={card("1")} headingLevel="h3" onDark />);
+    expect(flat.container.querySelector("[aria-hidden=true].rounded-full")).toBeNull();
+    expect(screen.getByText("Tóm tắt 1")).toBeInTheDocument();
+  });
+
   it("hover tiêu đề: đổi sang màu thương hiệu, không gạch chân", () => {
     renderWithIntl(<NewsCard data={card("1")} headingLevel="h2" />);
     const heading = screen.getByRole("heading", { level: 2 });

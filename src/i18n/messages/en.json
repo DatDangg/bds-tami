@@ -413,6 +413,7 @@
         "retry": "Try again"
       },
       "card": {
+        "available": "Available",
         "bedrooms": "{count} BR",
         "negotiable": "Negotiable",
         "perMonth": "/month"

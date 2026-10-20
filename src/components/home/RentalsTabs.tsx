@@ -7,7 +7,7 @@ import { RentalCard } from "@/components/rentals/RentalCard";
 import { Button } from "@/components/ui/button";
 import type { RentalTabView } from "@/lib/home/home-view-listings";
 import { cn } from "@/lib/utils";
-import { SliderArrow, useSnapSlider } from "./use-snap-slider";
+import { SliderArrow, useSnapSlider } from "@/components/layout/use-snap-slider";
 
 /** 80% < sm (lộ thẻ kế), 2 thẻ ≥ sm, 4 thẻ ≥ lg (gap 16/24px). */
 const SLIDE_WIDTH = "w-[80%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-4.5rem)/4)]";

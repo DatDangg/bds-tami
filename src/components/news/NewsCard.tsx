@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Clock } from "@/components/icons";
+import { CARD_IMAGE_ZOOM, CARD_LINK_CLASS, CardFooter } from "@/components/layout/card-parts";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import type { NewsCardData } from "@/lib/news/news-view";
 import { cn } from "@/lib/utils";
@@ -19,8 +21,6 @@ interface NewsCardProps {
   /** Thẻ `card` nằm trên nền tối (khối Tin tức trang chủ): giữ thẻ phẳng trong suốt như chợ; mặc định thẻ trắng bo 20px ở trang danh sách. */
   onDark?: boolean;
 }
-
-const IMAGE_ZOOM = "[&_img]:transition-transform [&_img]:duration-(--duration-slow) group-hover:[&_img]:scale-105 motion-reduce:[&_img]:transition-none motion-reduce:group-hover:[&_img]:scale-100";
 
 /** `sizes` theo cột thật của từng biến thể (design-spec §1.3): ảnh nhỏ không tải bản lớn. */
 const IMAGE_SIZES: Record<NewsCardVariant, string> = {
@@ -46,34 +46,49 @@ export function NewsCard({ data, variant = "card", headingLevel, priority = fals
       <Link
         href={data.href}
         className={cn(
-          "group flex min-h-11 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
-          isBoxed ? "h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md" : "gap-4 rounded-xl",
+          isBoxed ? CARD_LINK_CLASS : "group flex min-h-11 gap-4 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring",
           isRow ? "flex-row items-start" : "flex-col",
         )}
       >
-        <div className={cn("shrink-0 overflow-hidden bg-surface-muted", !isBoxed && "rounded-xl", isRow ? "w-24 sm:w-[120px]" : "w-full", IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
+        <div className={cn("shrink-0 overflow-hidden bg-surface-muted", !isBoxed && "rounded-xl", isRow ? "w-24 sm:w-[120px]" : "w-full", CARD_IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO[variant] }}>
           {data.cover && (
             <ResponsiveImage media={data.cover} sizes={sizes ?? IMAGE_SIZES[variant]} aspectRatio={IMAGE_RATIO[variant]} priority={priority} decorative />
           )}
         </div>
-        <div className={cn("flex min-w-0 flex-1 flex-col gap-2", isBoxed && "p-4")}>
+        <div className={cn("flex min-w-0 flex-1 flex-col gap-2", isBoxed && "p-4 sm:p-5")}>
           {data.categoryName && <p className="text-xsmall font-semibold text-accent-text">{data.categoryName}</p>}
           <Heading
             className={cn(
               "transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text",
               // Chỉ nạp font-display 400/500 (fonts.ts): 600 sẽ bị tổng hợp thành bold giả.
               isFeature ? "font-display font-medium text-h3 lg:text-h2-sm" : "text-h4 font-semibold",
+              isBoxed && "line-clamp-2 min-h-[2lh]",
             )}
           >
             {data.title}
           </Heading>
-          {!isRow && data.excerpt && (
+          {/* Thẻ boxed (BL-045): ảnh, danh mục, tên 2 dòng, ngày + mũi tên tròn — không tóm tắt, như thẻ Dự án. */}
+          {!isRow && !isBoxed && data.excerpt && (
             <p className={cn("text-body text-text-secondary", isFeature ? "line-clamp-3" : "line-clamp-2")}>{data.excerpt}</p>
           )}
-          {data.dateLabel && data.publishedAt && (
-            <time dateTime={data.publishedAt} className="text-xsmall text-text-muted">
-              {data.dateLabel}
-            </time>
+          {isBoxed ? (
+            <CardFooter>
+              {data.dateLabel && data.publishedAt && (
+                <>
+                  <Clock size={16} aria-hidden="true" className="shrink-0" />
+                  <time dateTime={data.publishedAt} className="text-xsmall">
+                    {data.dateLabel}
+                  </time>
+                </>
+              )}
+            </CardFooter>
+          ) : (
+            data.dateLabel &&
+            data.publishedAt && (
+              <time dateTime={data.publishedAt} className="text-xsmall text-text-muted">
+                {data.dateLabel}
+              </time>
+            )
           )}
         </div>
       </Link>

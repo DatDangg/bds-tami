@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { MapPin } from "@/components/icons";
+import { Bed, MapPin, Ruler } from "@/components/icons";
+import { CARD_IMAGE_ZOOM, CARD_LINK_CLASS, CARD_TITLE_CLASS, CardFooter, CardPin } from "@/components/layout/card-parts";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { Badge } from "@/components/ui/badge";
 import { formatArea, formatVndCompact } from "@/lib/format";
 import type { RentalCardData } from "@/lib/rentals/rental-view";
 import type { Locale } from "@/i18n/routing";
@@ -17,28 +19,46 @@ interface RentalCardProps {
 }
 
 /**
- * Thẻ tin cho thuê DÙNG CHUNG cho danh sách S04 và "tin tương tự" S07: ảnh 4:3, tên (2 dòng), khu vực, giá/tháng + diện tích + phòng ngủ.
+ * Thẻ tin cho thuê DÙNG CHUNG cho danh sách S04, "tin tương tự" S07 và trang chủ (BL-045): cùng khung thẻ Dự án (ảnh 11:10, badge "Còn trống", tên 2 dòng),
+ * thân: tên → ghim khu vực → thông số nhanh (diện tích, phòng ngủ) → chân thẻ giá/tháng vàng đậm + mũi tên tròn (đúng mockup). Danh sách chỉ có tin còn trống nên badge luôn "Còn trống".
  * Cả thẻ là MỘT link. Dữ liệu từ `RentalCardData` (dựng từ doc Payload hoặc từ DTO của `SearchService`).
  */
 export function RentalCard({ data, headingLevel = 3, priority = false, imageSizes }: RentalCardProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentals.card");
   const Heading = headingLevel === 2 ? "h2" : "h3";
-  const facts = [formatArea(data.areaM2, locale), ...(data.bedrooms !== null ? [t("bedrooms", { count: data.bedrooms })] : [])];
   return (
     <article className="h-full">
-      <Link href={data.href} className="group flex h-full min-h-11 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+      <Link href={data.href} className={CARD_LINK_CLASS}>
+        <div className={`relative aspect-[11/10] w-full shrink-0 overflow-hidden bg-surface-muted ${CARD_IMAGE_ZOOM}`}>
           {data.cover ? (
             <ResponsiveImage media={data.cover} sizes={imageSizes ?? "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"} priority={priority} decorative />
           ) : (
             <MapPin size={40} weight="light" aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-muted" />
           )}
+          <Badge className="absolute top-3 left-3">{t("available")}</Badge>
         </div>
-        <div className="flex min-w-0 flex-col gap-1 p-4">
-          <Heading className="line-clamp-2 font-display text-h4 transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
-          {data.areaLabel && <p className="text-small text-text-muted">{data.areaLabel}</p>}
-          <p className="text-small font-semibold">
+        <div className="flex min-w-0 flex-1 flex-col gap-2 p-4 sm:p-5">
+          <Heading className={CARD_TITLE_CLASS}>{data.title}</Heading>
+          {data.areaLabel && (
+            <p className="flex min-w-0 items-center gap-1.5 text-small text-text-muted">
+              <CardPin label={data.areaLabel} />
+            </p>
+          )}
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-small text-text-secondary">
+            <span className="inline-flex items-center gap-1.5">
+              <Ruler size={16} aria-hidden="true" className="shrink-0" />
+              {formatArea(data.areaM2, locale)}
+            </span>
+            {data.bedrooms !== null && (
+              <span className="inline-flex items-center gap-1.5">
+                <Bed size={16} aria-hidden="true" className="shrink-0" />
+                {t("bedrooms", { count: data.bedrooms })}
+              </span>
+            )}
+          </p>
+          {/* Thứ tự theo mockup data-cards=rent: tên → ghim → thông số → chân thẻ (giá + mũi tên). */}
+          <CardFooter labelClassName="text-body font-semibold text-accent-text">
             {data.priceMonthlyVnd === null ? (
               t("negotiable")
             ) : (
@@ -47,8 +67,7 @@ export function RentalCard({ data, headingLevel = 3, priority = false, imageSize
                 {t("perMonth")}
               </>
             )}
-          </p>
-          <p className="text-small text-text-secondary">{facts.join(" · ")}</p>
+          </CardFooter>
         </div>
       </Link>
     </article>

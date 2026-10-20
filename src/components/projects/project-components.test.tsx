@@ -27,7 +27,7 @@ const card = (overrides: Partial<ProjectCardData> = {}): ProjectCardData => ({
 });
 
 describe("ProjectCard", () => {
-  it("cả thẻ là MỘT link phủ ảnh + chữ (không lồng link); tiêu đề h2 tối đa 2 dòng; badge, tỉnh, giá", () => {
+  it("cả thẻ là MỘT link phủ ảnh + chữ (không lồng link); tiêu đề h2 tối đa 2 dòng; badge, tỉnh, mũi tên tròn; không icon tim", () => {
     const { container } = renderWithIntl(<ProjectCard data={card()} />);
     expect(container.querySelectorAll("a")).toHaveLength(1);
     const link = screen.getByRole("link");
@@ -36,7 +36,9 @@ describe("ProjectCard", () => {
     expect(heading.className).toContain("line-clamp-2");
     expect(link).toHaveTextContent("Đang mở bán");
     expect(link).toHaveTextContent("TP. Hồ Chí Minh");
-    expect(link).toHaveTextContent("Từ 3,5 tỷ");
+    expect(link.querySelector("[aria-hidden=true].rounded-full")).not.toBeNull();
+    expect(container.querySelector("[data-testid*=heart i], [class*=heart i]")).toBeNull();
+    expect(heading.className).toContain("min-h-[2lh]");
     expect(link.querySelector("img")).toHaveAttribute("alt", "");
   });
 
@@ -49,16 +51,15 @@ describe("ProjectCard", () => {
   });
 
   it("EN: nhãn tiếng Anh", () => {
-    renderWithIntl(<ProjectCard data={card({ priceFrom: "3.5 billion VND" })} />, "en");
+    renderWithIntl(<ProjectCard data={card()} />, "en");
     expect(screen.getByText("Now selling")).toBeInTheDocument();
-    expect(screen.getByText("From 3.5 billion VND")).toBeInTheDocument();
   });
 
-  it("thiếu ảnh / tỉnh / giá: vẫn giữ khung ảnh, không render phần thiếu", () => {
-    const { container } = renderWithIntl(<ProjectCard data={card({ cover: null, provinceName: null, priceFrom: null })} />);
+  it("thiếu ảnh / tỉnh: vẫn giữ khung ảnh, không render phần thiếu", () => {
+    const { container } = renderWithIntl(<ProjectCard data={card({ cover: null, provinceName: null })} />);
     expect(container.querySelector("img")).toBeNull();
-    expect(container.querySelector("[class~=\"aspect-[4/5]\"]")).not.toBeNull();
-    expect(screen.queryByText(/Từ /)).toBeNull();
+    expect(container.querySelector("[class~=\"aspect-[11/10]\"]")).not.toBeNull();
+    expect(screen.queryByText("TP. Hồ Chí Minh")).toBeNull();
   });
 
   it("thẻ đầu (priority) tải ảnh ngay, thẻ khác lazy", () => {
