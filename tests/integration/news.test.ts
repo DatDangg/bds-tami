@@ -345,17 +345,23 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       await publish("Tin mục con", { category: child.id });
       await publish("Tin ngoài mục", { category: categoryId });
 
+      // Trang 1 danh mục có bài nổi bật (không cờ isFeatured → bài mới nhất của danh mục), bị loại khỏi lưới nên 13 bài = 1 + 12.
       const parentOnly = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id] });
       expect(parentOnly.items).toHaveLength(12);
-      expect(parentOnly.featured).toBeNull();
+      expect(parentOnly.featured?.title).toMatch(/^Tin mục cha /);
+      expect(parentOnly.items.map((item) => item.id)).not.toContain(parentOnly.featured?.id);
       const withChildren = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
       const page2 = await listing.loadNewsListing(payload, "vi", { page: 2, categoryIds: [parent.id, child.id] });
       expect(withChildren.totalPages).toBe(2);
-      expect(page2.items).toHaveLength(2);
-      const titles = [...withChildren.items, ...page2.items].map((item) => item.title);
+      expect(page2.items).toHaveLength(1);
+      expect(page2.featured).toBeNull();
+      const titles = [...(withChildren.featured ? [withChildren.featured] : []), ...withChildren.items, ...page2.items].map((item) => item.title);
       expect(new Set(titles).size).toBe(14);
       expect(titles).toContain("Tin mục con");
       expect(titles).not.toContain("Tin ngoài mục");
+      const flaggedChild = await publish("Tin mục con nổi bật", { category: child.id, isFeatured: true });
+      const flaggedListing = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
+      expect(flaggedListing.featured?.id).toBe(flaggedChild.id);
       const beyond = await listing.loadNewsListing(payload, "vi", { page: 3, categoryIds: [parent.id, child.id] });
       expect(beyond.outOfRange).toBe(true);
       const emptyCategory = await createCategory("Mục trống", "news");

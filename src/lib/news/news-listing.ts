@@ -7,7 +7,7 @@ import { findNewsCategoryBySlug, listChildNewsCategories, listPublicNews, listRo
 import { categoryHref, type NewsCardData, toNewsCardData, toNewsCards, visibleCategory } from "./news-view";
 
 export interface NewsListing {
-  /** Bài nổi bật ngang đầu danh sách (BL-045): chỉ ở trang 1 của `/tin-tuc` (không lọc danh mục). `isFeatured` mới nhất, không có thì bài mới nhất; bị loại khỏi lưới ở MỌI trang để không trùng. */
+  /** Bài nổi bật ngang đầu danh sách (BL-045): chỉ ở trang 1 của `/tin-tuc` và của trang danh mục (phạm vi danh mục + con). `isFeatured` mới nhất, không có thì bài mới nhất; bị loại khỏi lưới ở MỌI trang để không trùng. */
   featured: NewsCardData | null;
   items: NewsCardData[];
   totalPages: number;
@@ -17,8 +17,8 @@ export interface NewsListing {
 }
 
 /**
- * Dữ liệu một trang danh sách tin. `/tin-tuc` (không danh mục): bài nổi bật = `isFeatured` mới nhất (bù bằng bài mới nhất), hai truy vấn limit 1 chạy song song;
- * lưới là phần còn lại, loại bài nổi bật ở MỌI trang nên không bài nào trùng hay mất khi sang trang 2. Trang danh mục: chỉ lưới.
+ * Dữ liệu một trang danh sách tin. `/tin-tuc` và trang danh mục (cùng quy tắc): bài nổi bật = `isFeatured` mới nhất (bù bằng bài mới nhất), hai truy vấn limit 1 chạy song song;
+ * lưới là phần còn lại, loại bài nổi bật ở MỌI trang nên không bài nào trùng hay mất khi sang trang 2.
  * `categoryIds` gồm danh mục + con của nó (chip "Tất cả" của danh mục cha gồm cả bài của con).
  */
 export async function loadNewsListing(
@@ -27,22 +27,13 @@ export async function loadNewsListing(
   options: { page: number; categoryIds?: readonly string[] },
 ): Promise<NewsListing> {
   const { page, categoryIds } = options;
-  if (categoryIds) {
-    const grid = await listPublicNews(payload, locale, { page, categoryIds });
-    return {
-      featured: null,
-      items: toNewsCards(grid.docs, locale),
-      totalPages: grid.totalPages,
-      outOfRange: page > 1 && page > grid.totalPages,
-      isEmpty: grid.totalDocs === 0,
-    };
-  }
+  const scope = categoryIds ? { categoryIds } : {};
   const [flagged, newest] = await Promise.all([
-    listPublicNews(payload, locale, { page: 1, limit: 1, featuredOnly: true }),
-    listPublicNews(payload, locale, { page: 1, limit: 1 }),
+    listPublicNews(payload, locale, { page: 1, limit: 1, featuredOnly: true, ...scope }),
+    listPublicNews(payload, locale, { page: 1, limit: 1, ...scope }),
   ]);
   const leadDoc = flagged.docs[0] ?? newest.docs[0];
-  const grid = await listPublicNews(payload, locale, { page, ...(leadDoc ? { excludeIds: [leadDoc.id] } : {}) });
+  const grid = await listPublicNews(payload, locale, { page, ...scope, ...(leadDoc ? { excludeIds: [leadDoc.id] } : {}) });
   return {
     featured: page === 1 && leadDoc ? toNewsCardData(leadDoc, locale) : null,
     items: toNewsCards(grid.docs, locale),

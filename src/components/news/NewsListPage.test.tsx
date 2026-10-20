@@ -153,7 +153,7 @@ describe("S10 /tin-tuc trang 1 (BL-045)", () => {
     const featured = container.querySelector("[data-news-featured]") as HTMLElement;
     expect(within(featured).getByRole("heading", { level: 2 })).toHaveTextContent("Bài n2");
     expect(within(featured).getByRole("link")).toHaveTextContent("Đọc bài");
-    const grid = container.querySelector("ul[data-grid-max-cols='3']") as HTMLElement;
+    const grid = container.querySelector("ul[data-grid-max-cols='4']") as HTMLElement;
     expect(within(grid).getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(
       docs.filter((doc) => doc.id !== "n2").slice(0, 12).map((doc) => doc.title),
     );
@@ -232,7 +232,7 @@ describe("S10 /tin-tuc trang 2+ và S05 danh mục", () => {
     const { container } = await render("vi", "2");
     expect(container.querySelector("[data-news-featured]")).toBeNull();
     expect(headingTexts(2)).toEqual([...docs.slice(13, 20).map((doc) => doc.title), "Tư vấn nhu cầu"]);
-    expect(container.querySelector("[data-grid-max-cols='3']")).not.toBeNull();
+    expect(container.querySelector("[data-grid-max-cols='4']")).not.toBeNull();
     expect(listPublicNews).toHaveBeenCalledWith({}, "vi", { page: 2, excludeIds: ["n2"] });
     const pagination = screen.getByRole("navigation", { name: "Phân trang" });
     expect(pagination.querySelector("a[rel=prev]")).toHaveAttribute("href", "/tin-tuc");
@@ -243,12 +243,13 @@ describe("S10 /tin-tuc trang 2+ và S05 danh mục", () => {
     await expect(render("vi", "9")).rejects.toThrow("NEXT_NOT_FOUND");
   });
 
-  it("trang danh mục: hero thấp (tên danh mục) + lưới 3 cột, không bài nổi bật, không form tư vấn; vẫn có banner tư vấn", async () => {
+  it("trang danh mục: hero thấp (tên danh mục) + bài nổi bật ngang + lưới 4 cột, không form tư vấn; vẫn có banner tư vấn", async () => {
     const { container } = await render("vi", undefined, "thi-truong");
     expect(container.querySelector("[data-hero-size=short]")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Thị trường");
-    expect(container.querySelector("[data-grid-max-cols='3']")).not.toBeNull();
-    expect(container.querySelector("[data-news-featured]")).toBeNull();
+    expect(container.querySelector("[data-grid-max-cols='4']")).not.toBeNull();
+    const featured = container.querySelector("[data-news-featured]") as HTMLElement;
+    expect(within(featured).getByRole("heading", { level: 2 })).toHaveTextContent("Bài n2");
     expect(screen.queryByRole("form", { name: "Form lead" })).toBeNull();
     expect(container.querySelector("[data-consult-banner]")).not.toBeNull();
     expect(headingTexts(2)).toEqual(["Bài n2", "Bài n4", "Bài n6", "Bài n8", "Bài n10", "Bài n12", "Bài n14", "Bài n16", "Bài n18", "Bài n20"]);

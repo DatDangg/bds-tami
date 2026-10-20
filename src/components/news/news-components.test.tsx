@@ -114,7 +114,7 @@ describe("NewsListBody", () => {
     const { container } = renderWithIntl(<NewsListBody items={[card("5"), card("6")]} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Bài 5", "Bài 6"]);
     expect(screen.getByRole("region", { name: "Tin tức" })).toBeInTheDocument();
-    expect(container.querySelector("ul")).toHaveAttribute("data-grid-max-cols", "3");
+    expect(container.querySelector("ul")).toHaveAttribute("data-grid-max-cols", "4");
     expect(container.querySelector("[data-news-featured]")).toBeNull();
   });
 

@@ -572,6 +572,10 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
       // Nổi bật = isFeatured còn hạn mới nhất: bài isFeatured đã kết thúc không được chọn.
       const featured = await findFeaturedPost(payload, "vi", now);
       expect(featured?.id).toBe(ids["active-future"]);
+      // Trang danh mục dùng cùng quy tắc, chỉ xét bài trong danh mục: danh mục khác (trống) không có bài nổi bật.
+      expect((await findFeaturedPost(payload, "vi", now, [listCategoryId]))?.id).toBe(ids["active-future"]);
+      const otherCategory = await createCategory("Danh mục không nổi bật", "property_post");
+      expect(await findFeaturedPost(payload, "vi", now, [otherCategory.id])).toBeNull();
     });
 
     it("/en chỉ gồm bài có bản EN; bài nháp không bao giờ xuất hiện", async () => {

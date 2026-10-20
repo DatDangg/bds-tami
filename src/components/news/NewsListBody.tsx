@@ -16,7 +16,7 @@ export function NewsListBody({ featured = null, items }: { featured?: NewsCardDa
         </div>
       )}
       {items.length > 0 && (
-        <ul data-grid-max-cols="3" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul data-grid-max-cols="4" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
             <li key={item.id}>
               <NewsCard data={item} headingLevel="h2" />

@@ -14,7 +14,7 @@ import {
 import { type PostCardData, postCategoryHref, toPostCards } from "./post-view";
 
 export interface PostListing {
-  /** Chỉ ở trang 1 của `/tin-bds` (không lọc danh mục): `isFeatured` mới nhất còn hạn (S08). */
+  /** Chỉ ở trang 1 của `/tin-bds` và trang danh mục (phạm vi danh mục + con): `isFeatured` mới nhất còn hạn (S08). */
   featured: PostCardData | null;
   items: PostCardData[];
   totalPages: number;
@@ -26,9 +26,8 @@ export interface PostListing {
 }
 
 /**
- * Dữ liệu một trang danh sách Đăng tin BĐS. `/tin-bds` (không danh mục): bài nổi bật (nếu có) tách riêng và bị loại khỏi lưới ở MỌI trang để
- * không trùng khi sang trang 2; lưới xếp bài còn hạn trước, bài đã kết thúc sau (`listPublicPosts`). Trang danh mục: chỉ lưới, `categoryIds`
- * gồm danh mục + con của nó.
+ * Dữ liệu một trang danh sách Đăng tin BĐS. `/tin-bds` và trang danh mục (cùng quy tắc, phạm vi danh mục + con): bài nổi bật (nếu có) tách riêng và bị loại khỏi lưới ở MỌI trang để
+ * không trùng khi sang trang 2; lưới xếp bài còn hạn trước, bài đã kết thúc sau (`listPublicPosts`). `categoryIds` gồm danh mục + con của nó.
  */
 export async function loadPostListing(
   payload: Payload,
@@ -36,7 +35,7 @@ export async function loadPostListing(
   options: { page: number; now: Date; categoryIds?: readonly string[] },
 ): Promise<PostListing> {
   const { page, now, categoryIds } = options;
-  const featuredDoc = categoryIds ? null : await findFeaturedPost(payload, locale, now);
+  const featuredDoc = await findFeaturedPost(payload, locale, now, categoryIds);
   const grid = await listPublicPosts(payload, locale, {
     page,
     now,

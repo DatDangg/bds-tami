@@ -16,7 +16,7 @@ export function PostListBody({ featured, items }: { featured: PostCardData | nul
         </div>
       )}
       {items.length > 0 && (
-        <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul data-grid-max-cols="4" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((card, index) => (
             <li key={card.id}>
               <PostCard data={card} headingLevel="h2" priority={!featured && index === 0} />

@@ -110,9 +110,16 @@ export async function listPublicPosts(payload: Payload, locale: Locale, query: P
 }
 
 /** Bài nổi bật đầu danh sách: `isFeatured` mới nhất còn hạn (S08). */
-export async function findFeaturedPost(payload: Payload, locale: Locale, now: Date): Promise<PropertyPost | null> {
+export async function findFeaturedPost(
+  payload: Payload,
+  locale: Locale,
+  now: Date,
+  categoryIds?: readonly string[],
+): Promise<PropertyPost | null> {
   const { docs } = await findPublicList<PropertyPost>(payload, "property-posts", locale, {
-    where: { and: [{ isFeatured: { equals: true } }, offerNotEndedWhere(now)] },
+    where: {
+      and: [{ isFeatured: { equals: true } }, offerNotEndedWhere(now), ...(categoryIds ? [{ category: { in: [...categoryIds] } }] : [])],
+    },
     sort: POST_SORT,
     limit: 1,
     depth: 1,

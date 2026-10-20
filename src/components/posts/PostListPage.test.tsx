@@ -75,7 +75,7 @@ describe("/tin-bds (BL-045, Q4): bố cục như Tin tức, tham số URL không
     const { container } = renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
     expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tin bất động sản");
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3");
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
     expect(screen.queryByRole("search")).toBeNull();
     expect(screen.queryByRole("form")).toBeNull();
     expect(container.querySelector("[data-consult-banner]")).not.toBeNull();

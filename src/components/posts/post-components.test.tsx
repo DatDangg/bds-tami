@@ -105,8 +105,7 @@ describe("PostListBody", () => {
     expect(screen.getByRole("region", { name: "Danh sách tin đăng" })).toBeInTheDocument();
     expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-1");
     expect(container.querySelectorAll("ul.grid > li")).toHaveLength(2);
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3");
-    expect(container.querySelector("ul.grid")?.className).not.toContain("xl:grid-cols-4");
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
     expect(screen.queryByRole("status")).toBeNull();
   });
 
