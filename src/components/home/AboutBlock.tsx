@@ -10,7 +10,7 @@ import type { Locale } from "@/i18n/routing";
 import { AboutVideoButton } from "./AboutVideoButton";
 import { STRENGTH_ICON_COMPONENTS } from "./strength-icons";
 
-/** Cụm ảnh (mockup BL-044): ảnh lớn bên phải, ảnh phụ đè lệch ra mép trái, thẻ chú thích dưới ảnh phụ, nút play trên dải scrim đáy ảnh lớn. */
+/** Cụm ảnh (mockup BL-044; thiếu ảnh lớn thì ẩn cả cụm gồm nút video, ghi ở design-spec S01.2): ảnh lớn bên phải, ảnh phụ đè lệch ra mép trái, thẻ chú thích dưới ảnh phụ, nút play trên dải scrim đáy ảnh lớn. */
 function ImageCluster({ block }: { block: AboutView }) {
   const { image, secondaryImage, imageCaption, videoEmbedUrl, videoLabel } = block;
   if (!image) return null;
@@ -24,6 +24,10 @@ function ImageCluster({ block }: { block: AboutView }) {
           </div>
         )}
       </div>
+      {secondaryImage && (
+        // Mảng nền be `primary-soft` lệch sau ảnh phụ (mockup BL-044); chỉ trang trí.
+        <div aria-hidden="true" data-testid="about-backdrop" className="absolute top-[3%] left-[5%] hidden aspect-square w-[34%] rounded-xl bg-primary-soft lg:block" />
+      )}
       {secondaryImage && (
         <div className="absolute top-[7%] left-0 hidden aspect-square w-[36%] overflow-hidden rounded-xl bg-surface-muted shadow-md lg:block">
           <ResponsiveImage media={secondaryImage} sizes="(min-width: 1280px) 230px, 20vw" decorative />
@@ -48,15 +52,15 @@ function StatsList({ stats }: { stats: AboutView["stats"] }) {
       {stats.map((stat) => {
         const Icon = stat.icon ? STRENGTH_ICON_COMPONENTS[stat.icon] : null;
         return (
-          <div key={`${stat.value}-${stat.label}`} className="flex items-center gap-4">
+          <div key={`${stat.value}-${stat.label}`} className="flex items-center gap-3 sm:gap-4">
             {Icon && (
-              <span aria-hidden="true" className="inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-soft text-accent-text">
+              <span aria-hidden="true" className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-accent-text sm:size-14">
                 <Icon size={24} />
               </span>
             )}
             <div className="flex min-w-0 flex-col-reverse">
               <dt className="text-small text-text-muted">{stat.label}</dt>
-              <dd className="font-display text-h2">{stat.value}</dd>
+              <dd className="font-display text-h2 break-words">{stat.value}</dd>
             </div>
           </div>
         );
@@ -74,7 +78,7 @@ export function AboutBlock({ block }: { block: AboutView }) {
   const locale = useLocale() as Locale;
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className="relative isolate overflow-hidden bg-bg py-section">
+    <section aria-labelledby={headingId} className="relative isolate overflow-hidden bg-primary-subtle py-section">
       {block.decorImage && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[9%] xl:block">
           <ResponsiveImage media={block.decorImage} sizes="9vw" decorative className="absolute inset-0" />

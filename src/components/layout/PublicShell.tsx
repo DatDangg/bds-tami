@@ -30,7 +30,6 @@ export function PublicShell({ shell, children }: { shell: ShellView; children: R
       <Footer
         {...shell.footer}
         logo={shell.logo}
-        contact={shell.contact}
         showCookieSettings={isValidGaMeasurementId(shell.consent.gaMeasurementId)}
       />
       <FloatingDock>

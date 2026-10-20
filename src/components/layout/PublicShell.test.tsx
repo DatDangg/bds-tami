@@ -132,12 +132,12 @@ describe("PublicShell", () => {
     expect(within(screen.getByRole("contentinfo")).queryByRole("button", { name: "Cài đặt cookie" })).toBeNull();
   });
 
-  it("footer EN: nhãn tiếng Anh, liên hệ và mạng xã hội an toàn", () => {
+  it("footer EN: nhãn tiếng Anh, không cột Liên hệ (Q2 BL-044), mạng xã hội an toàn", () => {
     renderShell("en");
     const footer = screen.getByRole("contentinfo");
     expect(within(footer).getByRole("button", { name: "Cookie settings" })).toBeInTheDocument();
-    expect(within(footer).getByRole("link", { name: "Hotline: 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    expect(within(footer).getByRole("link", { name: "info@tami.vn" })).toHaveAttribute("href", "mailto:info@tami.vn");
+    expect(within(footer).queryByRole("link", { name: "Hotline: 0901 234 567" })).toBeNull();
+    expect(within(footer).queryByRole("link", { name: "info@tami.vn" })).toBeNull();
     const facebook = within(footer).getByRole("link", { name: "Facebook" });
     expect(facebook).toHaveAttribute("rel", "noopener noreferrer");
     expect(facebook).toHaveAttribute("target", "_blank");

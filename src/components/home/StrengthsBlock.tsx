@@ -11,10 +11,11 @@ export function StrengthsBlock({ block }: { block: StrengthsView }) {
   return (
     <section aria-label={t("region")} className="bg-bg py-8 md:py-10">
       <ul className="mx-auto grid w-full max-w-container grid-cols-1 gap-6 px-gutter md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-        {block.items.map((item) => {
+        {block.items.map((item, index) => {
           const Icon = STRENGTH_ICON_COMPONENTS[item.icon];
           return (
-            <li key={`${item.icon}-${item.title}`} className="flex items-center gap-4">
+            // Index trong key: admin có thể nhập hai mục giống hệt nhau (danh sách tĩnh, không sắp xếp lại ở client).
+            <li key={`${index}-${item.icon}`} className="flex items-center gap-4">
               <span aria-hidden="true" className="inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-soft text-accent-text">
                 <Icon size={24} />
               </span>

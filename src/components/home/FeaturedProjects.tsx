@@ -22,7 +22,7 @@ export function FeaturedProjects({ title, eyebrow, description, slides }: Featur
   const locale = useLocale() as Locale;
   const headingId = useId();
   return (
-    <section className="relative isolate overflow-hidden bg-bg-alt py-section">
+    <section className="relative isolate overflow-hidden bg-bg-alt pt-section pb-10">
       <div className="mx-auto mb-10 flex w-full max-w-container flex-col items-center gap-3 px-gutter text-center">
         {eyebrow && <p className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{eyebrow}</p>}
         <h2 id={headingId} className="font-display text-h2">

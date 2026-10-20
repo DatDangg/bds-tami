@@ -104,10 +104,11 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### 2.4. Footer
 - `.theme-dark-block` nền `--color-dark`, padding `--space-section-tight`.
-- Hàng 1: logo trắng + mô tả ngắn công ty (≤ 25 từ, `footer.contactBlock`).
-- Hàng 2: các cột `footer.columns` (lưới `auto-fit minmax(160px, 1fr)`): Dự án, Cho thuê, Dịch vụ (3 link dịch vụ), Về TAMI (Tuyển dụng, Liên hệ, Chính sách bảo mật, Điều khoản). Cột "Liên hệ": hotline (`tel:`), email (`mailto:`), địa chỉ.
-- Hàng 3 (đường kẻ `--color-dark-border` phía trên): copyright, mạng xã hội (icon 24px, vùng chạm 44px), `VI | EN`, link "Cài đặt cookie / Cookie settings" (mở lại banner §3.10).
-- Responsive: < md xếp dọc, mỗi cột link thành accordion (tiêu đề cột là heading chứa nút, đóng mặc định, `aria-expanded` + `aria-controls`); cột Liên hệ luôn mở; ≥ md lưới (không accordion, mọi link hiện); ≥ xl 5 cột.
+- **As-built BL-044 (theo mockup trang chủ, đổi toàn site; user chốt Q2 2026-10-20: không cột Liên hệ).**
+- Lưới ≥ md `minmax(0,1.4fr)` + N cột link `minmax(0,1fr)` (N = số cột `footer.columns`, truyền qua biến CSS `--footer-cols`; `auto-fit` không đi chung với track `fr`): **cột trái** logo trắng → mô tả ngắn (≤ 25 từ, `footer.contactBlock`) → mạng xã hội (`site-settings.socialLinks`) dạng **ô tròn 40px viền `--color-dark-border`**, icon 20px, vùng chạm 44px, `aria-label` theo nền tảng; **cột link** `footer.columns` (vd "Khám phá", "Về TAMI"; chữ do CMS) tiêu đề `--text-eyebrow` hoa giãn chữ `--color-accent-text`, link `--text-small` `--color-text-secondary`. **Không cột Liên hệ**: hotline/email/địa chỉ nằm ở nút nổi §2.5, menu di động và trang Liên hệ.
+- Hàng cuối (đường kẻ `--color-dark-border` phía trên): bản quyền bên trái; `VI | EN` + "Cài đặt cookie" (khi có GA) bên phải. Mạng xã hội KHÔNG nằm ở hàng cuối nữa.
+- Nút tròn "lên đầu trang" góc dưới phải trong mockup = `BackToTop` nổi (§2.5, BL-035), không dựng nút thứ hai trong footer.
+- Responsive: < md cột trái xếp dọc, mỗi cột link là accordion (tiêu đề là heading chứa nút, đóng mặc định, `aria-expanded` + `aria-controls`); ≥ md lưới (không accordion, mọi link hiện).
 
 ### 2.5. Nút liên hệ nổi (FR-PUB-12)
 - Góc dưới phải, cách mép `max(16px, env(safe-area-inset-right))` và đáy `max(16px, env(safe-area-inset-bottom))`, `z: --z-floating`.
@@ -226,6 +227,15 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 > "EN" ghi điểm khác riêng của bản tiếng Anh (ngoài §1.1).
 
 ### S01. Trang chủ · `/` · `/en` (FR-PUB-01, 17)
+
+> **As-built BL-044 (feature-homepage-redesign T00–T03, mockup `docs/specs/homepage-redesign-mockup/homepage-mockup-desktop.webp`) — GHI ĐÈ bảng/mục bên dưới khi mâu thuẫn.** Bố cục theo ảnh; màu, font Montserrat, token và element giữ nguyên.
+> - **Thứ tự mặc định:** Hero + ô tìm kiếm → **Điểm mạnh** (`strengths`, khối mới) → Về TAMI → Dự án nổi bật → Banner tư vấn → Footer (§2.4). Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác **tắt mặc định** (không nằm trong `blockOrder` mặc định/seed; code và dữ liệu còn nguyên, admin thêm lại vào tab "Thứ tự khối" để bật). Bản ghi có từ trước trên staging/prod KHÔNG tự migrate: admin vào Trang chủ → "Thứ tự khối" xoá 4 khối ngoài mockup, thêm Điểm mạnh lên đầu, rồi nhập 2–6 mục ở tab "Điểm mạnh".
+> - **1 Hero:** chữ canh trái (`hero.eyebrow` chung mọi slide, `title` + `titleAccent` dòng 2 màu vàng, `subtitle`, nút); góc dưới trái bộ đếm `01 / 03` + thanh tiến trình (thay chấm; 1 slide ẩn cả hai); mũi tên tròn viền ở hai mép; góc dưới phải `hero.caption` + nút cuộn xuống; nút Dừng/Phát giữ (WCAG 2.2.2). **1b Ô tìm kiếm:** icon kính lúp trong ô, nút "Tìm kiếm →", chip "Dự án được quan tâm" 1 hàng + nút mở thêm, hàng mới "Tùy chọn khác" (Mức giá / Diện tích / Loại căn hộ / Nội thất / Tiện ích) — lọc thật, chuyển `/cho-thue` kèm query của bộ lọc sẵn có.
+> - **Điểm mạnh:** dải 2–6 mục, mỗi mục ô tròn 56px `--color-primary-soft` chứa icon Phosphor (`strengths.items[].icon`) + tiêu đề `h3` + mô tả muted; ≥ lg 4 cột, md 2 cột, < md 1 cột. Không có `h2` (vùng `aria-label`).
+> - **2 Về TAMI:** `eyebrow` + tiêu đề "Về" + `titleAccent` vàng; ≥ lg cụm ảnh chồng bên trái (ảnh lớn vuông ~66% bề rộng cột, nền khối kem ấm `--color-primary-subtle` (chữ muted/accent-text trên nền này ≥ 4.6:1, bảng tokens §AA), ảnh phụ lệch ra mép trái đè trên **mảng nền be `--color-primary-soft`** (vẫn phân biệt được với nền kem), thẻ chú thích `imageCaption` + mũi tên tròn dưới ảnh phụ), chữ cột 7–12, ảnh toà nhà `decorImage` hé ở mép phải từ xl. Nút play "Khám phá…" trên dải scrim đáy ảnh lớn mở hộp thoại YouTube-nocookie (`about.videoUrl`; dùng `parseVideoUrl` có sẵn, không có `youtube.ts` riêng; không có link thì ẩn nút). **Thiếu ảnh lớn thì ẩn cả cụm ảnh, gồm nút video** (ảnh lớn là điều kiện của cụm). Số liệu: ô tròn icon + giá trị `--text-h2` (cho phép xuống dòng, ô tròn 48px < sm) + nhãn muted, 2 cột; nút "Tìm hiểu thêm →".
+> - **3 Dự án nổi bật:** `eyebrow` + tiêu đề + mô tả; thẻ nền trắng bo 20px: ảnh 11:10 + badge trạng thái + **tim trang trí** (`aria-hidden`, không tương tác — user chốt Q1), thân thẻ: tên (2 dòng cố định), ghim tỉnh, nút mũi tên tròn; ~5 thẻ/khung 1440 (272px ≥ lg); mũi tên + chấm giữa phía dưới; "Xem tất cả dự án →". Khung cuộn có `pt-1` để vòng focus thẻ không bị cắt. Bỏ khung kính và hàng số liệu cũ.
+> - **7 Banner tư vấn:** chữ canh trái trên ảnh nền, **dải thấp** như mockup (~290px ở 1440: `min-h-[18rem]` + `py-10`) và nút chính "Nhận tư vấn" có mũi tên →. `CtaBanner` có prop `align` (`start` ở trang chủ) + `size` (`compact` ở trang chủ); mặc định `center`/`default` (khung cao `clamp(26rem,60svh,40rem)`, nút không mũi tên) cho `/dich-vu/[slug]` và chi tiết dự án — không đổi. Khoảng cách Dự án nổi bật → banner ~65px (`pb-10` của khối dự án).
+> - **375/390:** mọi khối 1 cột, giữ phong cách ảnh; không tràn ngang (`scrollWidth` = 390), vùng chạm ≥ 44px. Ảnh/thẻ phụ `absolute` chỉ từ lg.
 
 **Thứ tự khối** theo `homepage.blockOrder` (admin đổi được); mặc định và bố cục:
 

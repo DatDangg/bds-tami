@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import type { ReactElement } from "react";
+import type { ComponentType, CSSProperties } from "react";
 import {
   ChatCircleDots,
   FacebookLogo,
@@ -14,51 +14,56 @@ import { BrandLogo } from "./BrandLogo";
 import { CookieSettingsButton } from "./CookieSettingsButton";
 import { FooterLinkColumn } from "./FooterLinkColumn";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import type { FooterColumnView, FooterContactView, LogoView, SocialLinkView } from "./shell-data";
+import type { FooterColumnView, LogoView, SocialLinkView } from "./shell-data";
 
 interface FooterProps {
   logo: LogoView;
   columns: FooterColumnView[];
   tagline: string;
   copyright: string;
-  contact: FooterContactView;
   socials: SocialLinkView[];
   /** Có cookie tuỳ chọn (GA4) để quản lý; không có thì ẩn nút, tránh control không làm gì. */
   showCookieSettings: boolean;
 }
 
 /** Tên thương hiệu không dịch. `other` dùng nhãn i18n chung. */
-const SOCIAL_PLATFORMS: Record<string, { name: string; icon: ReactElement }> = {
-  facebook: { name: "Facebook", icon: <FacebookLogo size={24} aria-hidden="true" /> },
-  zalo: { name: "Zalo", icon: <ChatCircleDots size={24} aria-hidden="true" /> },
-  youtube: { name: "YouTube", icon: <YoutubeLogo size={24} aria-hidden="true" /> },
-  tiktok: { name: "TikTok", icon: <TiktokLogo size={24} aria-hidden="true" /> },
-  instagram: { name: "Instagram", icon: <InstagramLogo size={24} aria-hidden="true" /> },
-  linkedin: { name: "LinkedIn", icon: <LinkedinLogo size={24} aria-hidden="true" /> },
-  x: { name: "X", icon: <XLogo size={24} aria-hidden="true" /> },
+const SOCIAL_PLATFORMS: Record<string, { name: string; Icon: ComponentType<{ size?: number; "aria-hidden"?: "true" }> }> = {
+  facebook: { name: "Facebook", Icon: FacebookLogo },
+  zalo: { name: "Zalo", Icon: ChatCircleDots },
+  youtube: { name: "YouTube", Icon: YoutubeLogo },
+  tiktok: { name: "TikTok", Icon: TiktokLogo },
+  instagram: { name: "Instagram", Icon: InstagramLogo },
+  linkedin: { name: "LinkedIn", Icon: LinkedinLogo },
+  x: { name: "X", Icon: XLogo },
 };
 
-/** Chân trang tối (design-spec §2.4): logo + giới thiệu, các cột liên kết + liên hệ, dòng cuối (bản quyền, mạng xã hội, ngôn ngữ, cookie). */
-export function Footer({ logo, columns, tagline, copyright, contact, socials, showCookieSettings }: FooterProps) {
-  const hasContact = Boolean(contact.hotline ?? contact.email ?? contact.address);
+/**
+ * Chân trang tối dùng chung mọi trang công khai (design-spec §2.4, mockup BL-044): cột trái logo + giới thiệu + mạng xã hội (ô tròn),
+ * các cột liên kết (accordion < md), dòng cuối bản quyền trái, ngôn ngữ + cookie phải. Không có cột Liên hệ (Q2): hotline/email/địa chỉ
+ * nằm ở nút nổi, menu di động và trang Liên hệ. Nút "lên đầu trang" là `BackToTop` nổi của khung trang, không dựng lại ở đây.
+ */
+export function Footer({ logo, columns, tagline, copyright, socials, showCookieSettings }: FooterProps) {
   return (
     <footer className="theme-dark-block py-section-tight print:hidden">
       <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter">
-        <div className="flex flex-col gap-4">
-          <BrandLogo tone="on-dark" image={logo.onDark} className="self-start" />
-          <p className="max-w-text text-small whitespace-pre-line text-text-secondary">{tagline}</p>
-        </div>
-        {/* < md: cột link là accordion (FooterLinkColumn), cột Liên hệ luôn mở; ≥ md lưới auto-fit như spec §2.4. */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] md:gap-8">
+        {/* auto-fit không đi chung với track fr (CSS không hợp lệ) nên số cột link truyền qua biến CSS. */}
+        <div
+          style={{ "--footer-cols": Math.max(columns.length, 1) } as CSSProperties}
+          className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1.4fr)_repeat(var(--footer-cols),minmax(0,1fr))] md:gap-10"
+        >
+          <div className="flex flex-col gap-4">
+            <BrandLogo tone="on-dark" image={logo.onDark} className="self-start" />
+            <p className="max-w-text text-small whitespace-pre-line text-text-secondary">{tagline}</p>
+            <SocialLinks socials={socials} variant="circle" />
+          </div>
+          {/* < md: cột link là accordion (FooterLinkColumn); ≥ md lưới như spec §2.4. */}
           {columns.map((column) => (
             <FooterLinkColumn key={column.title} column={column} />
           ))}
-          {hasContact && <FooterContact contact={contact} />}
         </div>
-        <div className="flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 border-t border-dark-border pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xsmall text-text-muted">{copyright}</p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <SocialLinks socials={socials} />
             <LanguageSwitcher />
             {showCookieSettings && (
               <CookieSettingsButton className="inline-flex min-h-11 cursor-pointer items-center text-small text-text-secondary underline-offset-4 hover:text-text hover:underline" />
@@ -70,40 +75,17 @@ export function Footer({ logo, columns, tagline, copyright, contact, socials, sh
   );
 }
 
-function FooterContact({ contact }: { contact: FooterContactView }) {
-  const t = useTranslations("layout.footer");
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Cột Liên hệ luôn mở ở mọi breakpoint (spec §2.4); < md canh hàng với nút tiêu đề 44px của các cột accordion. */}
-      <h2 className="flex min-h-11 items-center text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase md:min-h-0">{t("contact")}</h2>
-      <ul className="flex flex-col gap-1 text-small text-text-secondary">
-        {contact.hotline && (
-          <li>
-            <a href={contact.hotline.telHref} className="inline-flex min-h-11 items-center hover:text-text hover:underline">
-              {t("hotline")}: {contact.hotline.label}
-            </a>
-          </li>
-        )}
-        {contact.email && (
-          <li>
-            <a href={`mailto:${contact.email}`} className="inline-flex min-h-11 items-center break-all hover:text-text hover:underline">
-              {contact.email}
-            </a>
-          </li>
-        )}
-        {contact.address && <li className="py-2">{contact.address}</li>}
-      </ul>
-    </div>
-  );
-}
-
-export function SocialLinks({ socials }: { socials: SocialLinkView[] }) {
+/** `circle`: ô tròn 40px viền khối tối (footer, mockup BL-044) trong vùng chạm 44px; `plain`: biểu tượng trần (trang Liên hệ). */
+export function SocialLinks({ socials, variant = "plain" }: { socials: SocialLinkView[]; variant?: "plain" | "circle" }) {
   const t = useTranslations("layout.footer");
   if (socials.length === 0) return null;
+  const isCircle = variant === "circle";
   return (
-    <ul aria-label={t("social")} className="flex items-center gap-2">
+    <ul aria-label={t("social")} className={isCircle ? "flex items-center gap-1" : "flex items-center gap-2"}>
       {socials.map((social) => {
         const known = SOCIAL_PLATFORMS[social.platform];
+        const Icon = known?.Icon ?? Globe;
+        const iconSize = isCircle ? 20 : 24;
         return (
           <li key={social.platform + social.url}>
             <a
@@ -111,9 +93,15 @@ export function SocialLinks({ socials }: { socials: SocialLinkView[] }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={known?.name ?? t("socialOther")}
-              className="inline-flex size-11 items-center justify-center text-text-secondary hover:text-text"
+              className="group inline-flex size-11 items-center justify-center text-text-secondary hover:text-text"
             >
-              {known?.icon ?? <Globe size={24} aria-hidden="true" />}
+              {isCircle ? (
+                <span className="inline-flex size-10 items-center justify-center rounded-full border border-dark-border group-hover:border-text-secondary">
+                  <Icon size={iconSize} aria-hidden="true" />
+                </span>
+              ) : (
+                <Icon size={iconSize} aria-hidden="true" />
+              )}
             </a>
           </li>
         );

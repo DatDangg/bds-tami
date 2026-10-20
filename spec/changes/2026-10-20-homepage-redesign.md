@@ -29,12 +29,12 @@ So với trang chủ hiện tại (localhost, 2026-10-20), các điểm khác:
 > - Không tự "cải tiến". Chỗ nào phải lệch khỏi ảnh thì ghi rõ lý do và hỏi user trước.
 
 ## Acceptance (bắt buộc)
-- [ ] Trang chủ desktop (1440) **khớp bố cục mockup**: chụp màn hình đặt cạnh ảnh để so từng phần (1→7). Reviewer FAIL nếu lệch bố cục/thứ tự/vị trí thành phần thấy được bằng mắt.
-- [ ] Không có màu hay kiểu element mới ngoài design tokens/component hiện có. Reviewer FAIL nếu có hex hay kiểu nút/chip tự chế.
-- [ ] Trang chỉ có các khối trong ảnh, đúng thứ tự trong ảnh. Khối không có trong ảnh thì tắt trên trang chủ (không xoá code/dữ liệu, bật lại được trong admin).
-- [ ] Mobile (390): bản xếp dọc giữ đúng phong cách của ảnh.
-- [ ] Mọi chữ/ảnh/số liệu mới sửa được trong admin (global `homepage` / footer), có bản EN.
-- [ ] Đạt AA tương phản, giữ đúng 1 `h1`, tests/typecheck/build PASS.
+- [x] Trang chủ desktop (1440) **khớp bố cục mockup**: chụp màn hình đặt cạnh ảnh để so từng phần (1→7). Reviewer FAIL nếu lệch bố cục/thứ tự/vị trí thành phần thấy được bằng mắt.
+- [x] Không có màu hay kiểu element mới ngoài design tokens/component hiện có. Reviewer FAIL nếu có hex hay kiểu nút/chip tự chế.
+- [x] Trang chỉ có các khối trong ảnh, đúng thứ tự trong ảnh. Khối không có trong ảnh thì tắt trên trang chủ (không xoá code/dữ liệu, bật lại được trong admin).
+- [x] Mobile (390): bản xếp dọc giữ đúng phong cách của ảnh.
+- [x] Mọi chữ/ảnh/số liệu mới sửa được trong admin (global `homepage` / footer), có bản EN.
+- [x] Đạt AA tương phản, giữ đúng 1 `h1`, tests/typecheck/build PASS.
 
 ## Quyết định đã chốt với user (2026-10-20)
 1. **Icon tim** trên thẻ dự án: **chỉ trang trí** — vẽ như ảnh, bấm không làm gì (không state, `aria-hidden`).

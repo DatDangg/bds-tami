@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useId } from "react";
+import { ArrowRight } from "@/components/icons";
 import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,8 @@ interface CtaBannerProps {
   secondaryHref?: string;
   /** `start`: chữ + nút canh trái (banner trang chủ theo mockup BL-044); mặc định `center` (S14 dịch vụ không đổi). */
   align?: "center" | "start";
+  /** `compact`: dải thấp (~290px ở 1440) + nút chính có mũi tên, như mockup trang chủ (BL-044); mặc định `default` (dịch vụ, chi tiết dự án) không đổi. */
+  size?: "default" | "compact";
 }
 
 /**
@@ -23,12 +26,18 @@ interface CtaBannerProps {
  * Không ảnh: khối tối (tokens §0) như cũ. Có ảnh: ảnh phủ kín khung cao cố định (không CLS, lazy, `sizes="100vw"`) + scrim; khối vẫn là
  * `.theme-dark-block` nên nút `chip` (chỉ dùng trên nền tối/scrim) đúng màu. Server Component; nút là link thật nên chạy không cần JS.
  */
-export function CtaBanner({ title, description, actionLabel, actionHref, backgroundImage, secondaryLabel, secondaryHref, align = "center" }: CtaBannerProps) {
+export function CtaBanner({ title, description, actionLabel, actionHref, backgroundImage, secondaryLabel, secondaryHref, align = "center", size = "default" }: CtaBannerProps) {
   const headingId = useId();
+  const isCompact = size === "compact";
   return (
     <section
       aria-labelledby={headingId}
-      className={cn("theme-dark-block relative isolate flex flex-col justify-center overflow-hidden py-section print:hidden", backgroundImage && "min-h-[26rem] supports-[height:1svh]:min-h-[clamp(26rem,60svh,40rem)] [&_a:focus-visible]:outline-on-dark")}
+      className={cn(
+        "theme-dark-block relative isolate flex flex-col justify-center overflow-hidden print:hidden",
+        isCompact ? "min-h-[18rem] py-10" : "py-section",
+        backgroundImage && "[&_a:focus-visible]:outline-on-dark",
+        backgroundImage && !isCompact && "min-h-[26rem] supports-[height:1svh]:min-h-[clamp(26rem,60svh,40rem)]",
+      )}
     >
       {backgroundImage && (
         <>
@@ -44,7 +53,10 @@ export function CtaBanner({ title, description, actionLabel, actionHref, backgro
         {description && <p className={cn("max-w-[60ch] text-lead", backgroundImage ? "text-on-dark" : "text-text-secondary")}>{description}</p>}
         <div className={cn("flex w-full flex-col gap-3 sm:w-auto sm:flex-row", align === "start" ? "items-start justify-start" : "items-center justify-center")}>
           <Button asChild size="lg" className="w-full max-w-xs sm:w-auto">
-            <Link href={actionHref}>{actionLabel}</Link>
+            <Link href={actionHref}>
+              {actionLabel}
+              {isCompact && <ArrowRight size={16} aria-hidden="true" />}
+            </Link>
           </Button>
           {secondaryLabel && secondaryHref && (
             <Button asChild size="lg" variant="chip" className="w-full max-w-xs sm:w-auto">

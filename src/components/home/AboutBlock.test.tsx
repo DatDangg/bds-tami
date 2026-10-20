@@ -30,6 +30,22 @@ const view = (overrides: Partial<AboutView> = {}): AboutView => ({
 });
 
 describe("AboutBlock (BL-044)", () => {
+  it("mảng nền be (primary-soft) đứng sau ảnh phụ, chỉ trang trí; không ảnh phụ thì không dựng", () => {
+    const { unmount } = renderWithIntl(<AboutBlock block={view()} />);
+    const backdrop = screen.getByTestId("about-backdrop");
+    expect(backdrop).toHaveAttribute("aria-hidden", "true");
+    expect(backdrop).toHaveClass("bg-primary-soft", "hidden", "lg:block");
+    unmount();
+    renderWithIntl(<AboutBlock block={view({ secondaryImage: null })} />);
+    expect(screen.queryByTestId("about-backdrop")).toBeNull();
+  });
+
+  it("thiếu ảnh lớn thì ẩn cả cụm ảnh (kể cả nút video); số liệu dài được phép xuống dòng", () => {
+    renderWithIntl(<AboutBlock block={view({ image: null, stats: [{ value: "10.000.000+", label: "khách", icon: "shield-check" }] })} />);
+    expect(screen.queryByRole("button", { name: "Khám phá TAMI HOMES" })).toBeNull();
+    expect(screen.getByText("10.000.000+")).toHaveClass("break-words");
+  });
+
   it("eyebrow + tiêu đề hai màu (accent là span) + mô tả + nút cuối khối", () => {
     renderWithIntl(<AboutBlock block={view()} />);
     expect(screen.getByText("Về chúng tôi")).toHaveClass("text-accent-text");
@@ -56,6 +72,12 @@ describe("AboutBlock (BL-044)", () => {
     const decor = container.querySelector("section > div[aria-hidden='true']");
     expect(decor).toHaveClass("pointer-events-none", "hidden", "xl:block");
     expect(decor?.querySelector("img")).toHaveAttribute("alt", "");
+  });
+
+  it("nền khối kem ấm (primary-subtle) để mảng be primary-soft sau ảnh phụ vẫn phân biệt được", () => {
+    const { container } = renderWithIntl(<AboutBlock block={view()} />);
+    expect(container.querySelector("section")).toHaveClass("bg-primary-subtle");
+    expect(screen.getByTestId("about-backdrop")).toHaveClass("bg-primary-soft");
   });
 
   it("nút play mở Dialog với iframe youtube-nocookie (chỉ khi mở), đóng bằng nút Đóng", async () => {

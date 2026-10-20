@@ -26,12 +26,14 @@ const SLIDES: Record<"vi" | "en", readonly SlideText[]> = {
     { title: "Dedicated advice", subtitle: "The TAMI HOMES team is with you.", ctaLabel: "Contact us" },
   ],
 };
+const STRENGTH_ICONS = ["map-pin", "buildings", "headset", "file-check"] as const;
 const SLIDE_LINKS = ["projects", "rentals", "contact"] as const;
 
 interface LocaleText {
   aboutTitle: string;
   about: string;
   stats: { value: string; label: string }[];
+  strengths: { title: string; description: string }[];
   projectsTitle: string;
   servicesTitle: string;
   offersTitle: string;
@@ -52,6 +54,12 @@ const TEXT: Record<"vi" | "en", LocaleText> = {
       { value: "10+", label: "năm kinh nghiệm" },
       { value: "500+", label: "khách hàng" },
     ],
+    strengths: [
+      { title: "Vị trí đắc địa", description: "Kết nối thuận tiện" },
+      { title: "Căn hộ đa dạng", description: "Phù hợp mọi nhu cầu" },
+      { title: "Hỗ trợ chuyên nghiệp", description: "Tư vấn tận tâm" },
+      { title: "Thủ tục nhanh gọn", description: "Sẵn sàng vào ở" },
+    ],
     projectsTitle: "Dự án nổi bật",
     servicesTitle: "Dịch vụ",
     offersTitle: "Ưu đãi nổi bật",
@@ -70,6 +78,12 @@ const TEXT: Record<"vi" | "en", LocaleText> = {
       { value: "10+", label: "years of experience" },
       { value: "500+", label: "customers" },
     ],
+    strengths: [
+      { title: "Prime locations", description: "Easy connections" },
+      { title: "Diverse apartments", description: "For every need" },
+      { title: "Professional support", description: "Dedicated advice" },
+      { title: "Fast procedures", description: "Ready to move in" },
+    ],
     projectsTitle: "Featured projects",
     servicesTitle: "Services",
     offersTitle: "Featured offers",
@@ -83,8 +97,8 @@ const TEXT: Record<"vi" | "en", LocaleText> = {
   },
 };
 
-/** Khối chỉ hiện khi có trong `blockOrder`: mẫu liệt kê đủ 8 khối (gồm Cho thuê, Tin tức) theo thứ tự trang market. */
-const SAMPLE_BLOCK_ORDER = ["about", "featuredProjects", "services", "featuredOffers", "rentals", "news", "partners", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"];
+/** Khối chỉ hiện khi có trong `blockOrder`: mẫu theo bố cục mockup BL-044 (Điểm mạnh → Giới thiệu → Dự án nổi bật → Mời tư vấn); nội dung các khối khác vẫn được nạp để admin thêm lại vào danh sách thì bật. */
+const SAMPLE_BLOCK_ORDER = ["strengths", "about", "featuredProjects", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"];
 
 type Row = { id?: string | null };
 const withIds = <T extends object>(rows: readonly T[], saved: Row[] | null | undefined) =>
@@ -114,6 +128,7 @@ export async function seedSampleHomepage(payload: Payload): Promise<{ created: b
   const contentFor = (locale: "vi" | "en") => {
     const text = TEXT[locale];
     return {
+      strengths: { enabled: true, items: text.strengths.map((item, index) => ({ ...item, icon: STRENGTH_ICONS[index]! })) },
       about: { enabled: true, title: text.aboutTitle, content: paragraphsToLexical([text.about]) as never, image: imageAt(0), stats: text.stats },
       featuredProjects: { enabled: true, title: text.projectsTitle, projects },
       services: { enabled: true, title: text.servicesTitle, items },
@@ -142,6 +157,7 @@ export async function seedSampleHomepage(payload: Payload): Promise<{ created: b
       hero: { slides: withIds(slidesFor("en"), saved.hero?.slides) },
       ...en,
       about: { ...en.about, stats: withIds(en.about.stats, saved.about?.stats) },
+      strengths: { ...en.strengths, items: withIds(en.strengths.items, saved.strengths?.items) },
     },
     ...options,
   });

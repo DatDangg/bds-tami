@@ -40,6 +40,21 @@ describe("CtaBanner dùng chung", () => {
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
+  it("size: mặc định không mũi tên + khung cao như cũ; compact → dải thấp + nút chính có mũi tên", () => {
+    const standard = render(<CtaBanner {...base} backgroundImage={image} />);
+    expect(standard.container.querySelector("section")).toHaveClass("py-section");
+    expect(standard.container.querySelector("section")?.className).toContain("min-h-[26rem]");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" }).querySelector("svg")).toBeNull();
+    standard.unmount();
+    const compact = render(<CtaBanner {...base} backgroundImage={image} size="compact" />);
+    const section = compact.container.querySelector("section");
+    expect(section).toHaveClass("min-h-[18rem]", "py-10");
+    expect(section).not.toHaveClass("py-section");
+    expect(section?.className).not.toContain("min-h-[26rem]");
+    expect(section?.className).toContain("outline-on-dark");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn" }).querySelector("svg[aria-hidden='true']")).not.toBeNull();
+  });
+
   it("align: mặc định center (S14 không đổi); start → chữ + nút canh trái", () => {
     const centered = render(<CtaBanner {...base} />);
     expect(screen.getByRole("heading", { level: 2 }).parentElement).toHaveClass("items-center", "text-center");

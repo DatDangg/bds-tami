@@ -1272,13 +1272,19 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-homepage-redesign/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0,
-          "round": 0,
-          "note": "footer dùng chung theo mockup + tắt khối ngoài mockup (admin) + mobile 390 + so khớp mockup 1440 + doc reconcile",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "footer dùng chung theo mockup + tắt khối ngoài mockup (admin) + mobile 390 + so khớp mockup 1440 + doc reconcile → r1 STRICT FAIL (M1 banner tư vấn quá cao + thiếu →) → r2 STRICT PASS; acceptance 1 khớp mockup đạt; n1 khoảng About→Dự án ~128px vs ~42px; n2 integration flaky timeout (media-upload/jobs-email) không liên quan; chờ user: hoa văn sóng footer, hero 100svh, vị trí bộ đếm; pnpm build PASS (builder)",
           "reviewLevel": "STRICT",
-          "reviewerResult": null,
-          "report": null
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-homepage-redesign-phase-1-task-03-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-03-round-1-review.md",
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-03-round-2-review.md"
+          ],
+          "completedAt": "2026-10-20",
+          "commit": "(commit close-out T03)"
         }
       ],
       "note": "Lần chạy 1 ngắt do rate limit trước khi ghi đĩa (interrupted, attempt 0). Lần 2: classify MODIFY → spec delta F1 + Khung trang footer → spec-publisher 1.34.0 / scope v42 → spec-validator pre-plan → 3 task tuần tự. Chờ user duyệt plan + Q1 (ô thứ 5 Tùy chọn khác: /cho-thue không có bộ lọc Tiện ích → Phòng ngủ hay bỏ) + Q2 (cột Liên hệ footer giữ/bỏ). | Plan duyệt: tuần tự T00→T01→T02→T03, chỉ dừng khi FAIL 2 vòng / HIGH_RISK_MIGRATION / blocked.",
