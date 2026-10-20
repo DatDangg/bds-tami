@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "admin-form-non-tech-friendly",
-    "phaseTask": "phase-1-task-03",
+    "phaseTask": "phase-1-task-04",
     "journal": ".context/runs/feature-admin-form-non-tech-friendly-phase-1.md"
   },
   "features": [
@@ -1546,9 +1546,16 @@
           "task": "phase-1-task-03",
           "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-03.md",
           "title": "Form Lead",
-          "status": "pending",
-          "attempt": 0,
-          "round": 0
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-03-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-03-round-1-review.md"
+          ],
+          "note": "Lead: khối Dữ liệu chiến dịch marketing, consent cuối tab Nguồn, tóm tắt mốc thời gian, ẩn anonymizedAt (Field null giữ cột BL-039), Gọi/Zalo/Gửi email, locale nhãn; 4 MINOR residual (mailto ?/&, +84 0…)"
         },
         {
           "task": "phase-1-task-04",
@@ -2475,7 +2482,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T21:39:39.727Z",
+  "lastUpdated": "2026-10-20T21:46:48.364Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -203,8 +203,6 @@ export interface Lead {
   email?: string | null;
   message?: string | null;
   locale: 'vi' | 'en';
-  consentAt: string;
-  consentVersion: string;
   source: 'rental' | 'property_post' | 'project' | 'contact';
   rental?: (string | null) | Rental;
   propertyPost?: (string | null) | PropertyPost;
@@ -220,6 +218,8 @@ export interface Lead {
   referrer?: string | null;
   ipHash?: string | null;
   userAgent?: string | null;
+  consentAt: string;
+  consentVersion: string;
   activities?: {
     docs?: (string | LeadActivity)[];
     hasNextPage?: boolean;
@@ -1741,8 +1741,6 @@ export interface LeadsSelect<T extends boolean = true> {
   email?: T;
   message?: T;
   locale?: T;
-  consentAt?: T;
-  consentVersion?: T;
   source?: T;
   rental?: T;
   propertyPost?: T;
@@ -1760,6 +1758,8 @@ export interface LeadsSelect<T extends boolean = true> {
   referrer?: T;
   ipHash?: T;
   userAgent?: T;
+  consentAt?: T;
+  consentVersion?: T;
   activities?: T;
   status?: T;
   lostReason?: T;

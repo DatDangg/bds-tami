@@ -27,7 +27,9 @@
 `pnpm vitest run src/lib/admin src/collections src/components/admin src/lib/leads` (+ test leads khác nếu có), `pnpm typecheck`, `pnpm lint`, importmap + generate:types không đổi trường.
 
 ## Verification summary
-(builder điền)
+- Builder: vitest (src/lib/admin src/collections src/components/admin src/fields src/lib/leads src/hooks/leads src/endpoints src/jobs src/lib/retention) 78 file / 663 test PASS (gồm lead-contact.test, LeadFormDisplay.test, leads-form.test mới); typecheck PASS; lint 0 error (2 warning cũ tools/); generate:importmap thêm 7 component; generate:types KHÔNG đổi payload-types (không schema/access/endpoint/migration).
+- Lệch D3 có chủ đích: 5 mốc (firstContactedAt/lastActivityAt/mergedCount/remindedAt/anonymizedAt) dùng `admin.components.Field` trả null thay `admin.hidden` để `hideTechnicalListFields` KHÔNG bỏ cột/lọc đang dùng (BL-039). `locale` theo G7 (nhãn chữ chỉ đọc, bỏ readOnly).
+- Nút liên hệ/link chỉ đọc từ form state, không fetch; `pageUrl`/`referrer` chỉ http(s) bấm được. Chưa kiểm tay trên trình duyệt (residual).
 
 ## Bổ sung sau spec-validation plan r1
 - G7 → D6: `locale` dùng component Field chỉ đọc hiện nhãn chữ ("Tiếng Việt"/"Tiếng Anh") thay ô chọn bị khoá (dữ liệu/access/required giữ).

@@ -133,3 +133,65 @@
     min-height: 44px;
   }
 }
+
+// ---- Form Lead: nút liên hệ + trường chỉ đọc dạng chữ (BL-042 T03) ----
+.tami-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tami-contact-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--theme-input-bg);
+  color: var(--admin-text);
+  font-size: 0.875rem;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--admin-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 767px) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+.tami-readonly-field {
+  margin-bottom: 1rem;
+
+  &__value {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 0.9375rem;
+    color: var(--admin-text);
+    overflow-wrap: anywhere;
+  }
+
+  a.tami-readonly-field__value {
+    color: var(--admin-accent);
+    text-decoration: underline;
+    min-height: 24px;
+  }
+
+  @media (max-width: 767px) {
+    a.tami-readonly-field__value {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+}
