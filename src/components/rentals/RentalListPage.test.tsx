@@ -156,7 +156,8 @@ describe("S04 /cho-thue: render", () => {
     await render("vi");
     const first = screen.getByRole("link", { name: /Studio Ba Đình/ });
     expect(first).toHaveTextContent("8,5 triệu/tháng");
-    expect(first).toHaveTextContent("45 m² · 1 PN");
+    expect(first).toHaveTextContent("45 m²");
+    expect(first).toHaveTextContent("1 PN");
     expect(screen.getByRole("link", { name: /Căn hộ 2PN/ })).toHaveTextContent("Thoả thuận");
     expect(screen.getByRole("link", { name: /Nhà phố rộng/ })).toHaveTextContent("45 m²");
     expect(screen.getByRole("link", { name: /Nhà phố rộng/ })).not.toHaveTextContent("PN");

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { PostCard } from "@/components/posts/PostCard";
 import type { PostCardData } from "@/lib/posts/post-view";
-import { SliderArrow, useSnapSlider } from "./use-snap-slider";
+import { SliderArrow, useSnapSlider } from "@/components/layout/use-snap-slider";
 
 /** Rộng 80% < sm (lộ thẻ kế), 2 thẻ ≥ sm, 3 thẻ ≥ lg (gap 16/24px); khớp `sizes` của ảnh bên dưới. */
 const SLIDE_WIDTH = "w-[80%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/3)]";

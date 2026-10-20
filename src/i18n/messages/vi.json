@@ -413,6 +413,7 @@
         "retry": "Thử lại"
       },
       "card": {
+        "available": "Còn trống",
         "bedrooms": "{count} PN",
         "negotiable": "Thoả thuận",
         "perMonth": "/tháng"

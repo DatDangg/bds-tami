@@ -39,11 +39,15 @@ describe("RentalCard (dùng chung danh sách S04 + tin tương tự S07)", () =>
     expect(link).toHaveAttribute("href", "/cho-thue/studio-ba-dinh");
     expect(link).toHaveTextContent("Phường Ba Đình, Hà Nội");
     expect(link).toHaveTextContent("8,5 triệu/tháng");
-    expect(link).toHaveTextContent("32,5 m² · 1 PN");
+    expect(link).toHaveTextContent("Còn trống");
+    expect(link).toHaveTextContent("32,5 m²");
+    expect(link).toHaveTextContent("1 PN");
     unmount();
     renderWithIntl(<RentalCard data={data} />, "en");
     expect(screen.getByRole("link")).toHaveTextContent("8.5 million VND/month");
-    expect(screen.getByRole("link")).toHaveTextContent("32.5 m² · 1 BR");
+    expect(screen.getByRole("link")).toHaveTextContent("32.5 m²");
+    expect(screen.getByRole("link")).toHaveTextContent("1 BR");
+    expect(screen.getByRole("link")).toHaveTextContent("Available");
   });
 
   it("không giá -> Thoả thuận; không phòng ngủ -> chỉ diện tích; không ảnh -> icon thay thế, không <img>", () => {
@@ -52,6 +56,15 @@ describe("RentalCard (dùng chung danh sách S04 + tin tương tự S07)", () =>
     expect(link).toHaveTextContent("Thoả thuận");
     expect(link).not.toHaveTextContent("PN");
     expect(link.querySelector("img")).toBeNull();
+  });
+
+  it("khung thẻ như ProjectCard: ảnh 11:10, giá vàng, mũi tên tròn, KHÔNG icon tim", () => {
+    const { container } = renderWithIntl(<RentalCard data={data} />);
+    expect(container.querySelector('[class*="aspect-[11/10]"]')).not.toBeNull();
+    expect(screen.getByText(/8,5 triệu/)).toHaveClass("text-accent-text");
+    expect(screen.getByRole("heading", { level: 3 }).className).toContain("min-h-[2lh]");
+    expect(container.querySelector("[aria-hidden=true].rounded-full")).not.toBeNull();
+    expect(container.querySelector("[data-testid*=heart i], [class*=heart i]")).toBeNull();
   });
 
   it("ảnh bìa trang trí (alt rỗng): tên tin đã là nhãn của link", () => {
