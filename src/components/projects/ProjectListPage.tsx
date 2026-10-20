@@ -17,6 +17,7 @@ import { hasFilterParams, parseProjectFilters, projectQueryString, type RawProje
 import {
   findProjectCategoryBySlug,
   listChildProjectCategories,
+  listDevelopersWithPublicProjects,
   listProvinces,
   listPublicProjects,
   listRootProjectCategories,
@@ -48,7 +49,7 @@ async function loadCategoryContext(payload: Payload, locale: Locale, slug: strin
 }
 
 /** Chip Loại hình (design-spec S02): "Tất cả" + danh mục cấp 1, link `?category=` giữ tỉnh/trạng thái đang lọc và về trang 1. */
-function buildChips(roots: Category[], listPath: string, allLabel: string, carry: { province?: string; status?: string }, currentRootId?: string): CategoryChip[] {
+function buildChips(roots: Category[], listPath: string, allLabel: string, carry: { province?: string; status?: string; q?: string; developer?: string; sort?: string }, currentRootId?: string): CategoryChip[] {
   const named = roots.filter((root) => root.slug && root.name);
   if (named.length === 0) return [];
   return [
@@ -70,26 +71,38 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
   const { page } = parsePagination(searchParams.page, undefined);
   const filters = parseProjectFilters(searchParams);
   const payload = await getPayload({ config });
-  const [context, provinces, t, tNav, roots, bannerImage] = await Promise.all([
+  const [context, provinces, developers, t, tNav, roots, bannerImage] = await Promise.all([
     filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
     listProvinces(payload),
+    // Chỉ cần khi URL có `?developer=` để đối chiếu id (id lạ bị bỏ qua, không 500).
+    filters.developerId ? listDevelopersWithPublicProjects(payload, locale) : [],
     getTranslations({ locale, namespace: "page.projects" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     listRootProjectCategories(payload, locale),
     loadPageBanner(locale, "projects"),
   ]);
   const province = provinces.find((item) => item.slug === filters.provinceSlug);
+  const developer = developers.find((item) => item.id === filters.developerId);
   const listing = await listPublicProjects(payload, locale, {
     page,
     ...(context ? { categoryIds: context.filterIds } : {}),
     ...(province ? { provinceId: province.id } : {}),
     ...(filters.status ? { salesStatus: filters.status } : {}),
+    ...(filters.q ? { q: filters.q } : {}),
+    ...(developer ? { developerId: developer.id } : {}),
+    ...(filters.sort ? { sort: filters.sort } : {}),
   });
   if (page > 1 && page > listing.totalPages) notFound();
 
   const listPath = publicPath("/du-an", locale);
-  const carry = { ...(province ? { province: province.slug } : {}), ...(filters.status ? { status: filters.status } : {}) };
-  const filtersActive = Boolean(province || filters.status || context);
+  const carry = {
+    ...(province ? { province: province.slug } : {}),
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.q ? { q: filters.q } : {}),
+    ...(developer ? { developer: developer.id } : {}),
+    ...(filters.sort ? { sort: filters.sort } : {}),
+  };
+  const filtersActive = Boolean(province || filters.status || context || filters.q || developer || filters.sort);
   const buildHref = (target: number) => `${listPath}${projectQueryString({ ...(context ? { category: context.slug } : {}), ...carry, page: target })}`;
 
   return (
@@ -149,7 +162,7 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
 }
 
 /**
- * `generateMetadata` của `/du-an`. Có tham số lọc (`?category=`, `province`, `status`) → `noindex, follow` và canonical về trang
+ * `generateMetadata` của `/du-an`. Có tham số lọc (`?category=`, `province`, `status`, `q`, `developer`, `sort` khác mặc định) → `noindex, follow` và canonical về trang
  * sạch `/du-an` (design-spec S04); không lọc: canonical là chính nó (kèm `?page=n` ở trang ≥ 2, như danh sách tin). Không tra
  * danh mục nên không lặp truy vấn của trang.
  */
