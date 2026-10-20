@@ -1096,6 +1096,36 @@
       "scopeVersion": 37,
       "specUpdate": "spec/updates/2026-10-20-back-to-top-button.md",
       "residual": "chưa xem trình duyệt thật (cookie banner < md + CTA dính đáy, safe-area iOS); hover có thể dính trên cảm ứng; 2 MINOR test (parentElement, so handler listener)"
+    },
+    {
+      "slug": "single-font-montserrat",
+      "title": "Toàn site công khai dùng 1 font Montserrat, bỏ EB Garamond (BL-036)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-036",
+      "changeDoc": "spec/changes/archive/2026-10-20-single-font-montserrat.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-single-font-montserrat/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "note": "fonts.ts chỉ Montserrat (latin+vietnamese 400/500/600); --font-display trỏ Montserrat; thang chữ display 52/28, h1 48/26, h2 38/24, h2-sm 26/22, h3 22/20 + --text-*--font-weight (500 heading, 600 h4/price), line-height 1.15–1.3, -0.01em; ProjectHero h1 bỏ font-normal; docs design-spec/DESIGN/design-tokens. r1 FAIL (MAJOR doc design-spec:70 thang cũ) → r2 PASS",
+          "report": ".context/review-reports/feature-single-font-montserrat-phase-1-task-01-round-2-review.md",
+          "commit": "(commit close-out BL-036)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.31.0",
+      "scopeVersion": 38,
+      "specUpdate": "spec/updates/2026-10-20-single-font-montserrat.md",
+      "residual": "chưa xem trình duyệt thật (tràn chữ 390/1280, dấu chồng Ầ/Ỗ/Ẫ dưới line-clamp-2 tiêu đề thẻ); font-bold LanguageSwitcher + <strong> RichText cần 700 chưa nạp (có từ trước, ngoài scope)"
     }
   ],
   "bugs": [

@@ -1,106 +1,109 @@
 {
-  "specVersion": "1.30.0",
-  "scopeVersion": 37,
+  "specVersion": "1.31.0",
+  "scopeVersion": 38,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-035 — nút nổi 'Lên đầu trang' (BackToTop) cùng cụm nổi góc dưới phải với FloatingContact (khung fixed chung mang offset --floating-bottom-offset + --sticky-cta-height + --z-floating + print:hidden), mọi trang công khai qua PublicShell, hiện khi scrollY > innerHeight, bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main. Spec 1.29.0 → 1.30.0 (MINOR, ADDITIVE).",
-  "workItem": "feature/back-to-top-button",
-  "backlog": "BL-035",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/archive/2026-10-20-back-to-top-button.md",
+  "triggerNote": "BL-036 — toàn website công khai dùng một font Montserrat: bỏ EB Garamond (fonts.ts chỉ Montserrat latin+vietnamese 400/500/600, --font-display trỏ Montserrat), phân cấp tiêu đề bằng cỡ + độ đậm (thang display 28 / h1 26 / h2 24 / h2-sm 22 / h3 20 / h4 18px; weight 500/600). Spec 1.30.0 → 1.31.0 (MINOR, MODIFY).",
+  "workItem": "feature-single-font-montserrat",
+  "backlog": "BL-036",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-single-font-montserrat.md",
   "task": [
-    "tasks/feature-back-to-top-button/phase-1-task-01.md"
+    "tasks/feature-single-font-montserrat/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-back-to-top-button-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-single-font-montserrat-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-single-font-montserrat-phase-1-task-01-round-2-review.md"
   ],
   "commits": [
-    "close-out BL-035 (commit chứa file này)"
+    "close-out BL-036 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-035 (commit chứa file này)": "T01 — thêm BackToTop (client) + khung cụm nổi chung trong PublicShell (BackToTop trên, FloatingContact dưới); chuyển class định vị từ FloatingContact lên khung chung (giữ role=group, sendBeacon, toggle mobile, trả null khi không có link); thêm icon ArrowUp vào barrel, key i18n page.floating.backToTop (vi/en). Doc: SPECIFICATIONS F8, design-spec §2.5 bullet 'Lên đầu trang (BL-035)'."
+    "close-out BL-036 (commit chứa file này)": "T01 — fonts.ts chỉ Montserrat 400/500/600 (latin+vietnamese); PublicDocument bỏ biến font Garamond; globals.css --font-display → Montserrat + thang chữ mới (cỡ, --text-*--font-weight 500/600, line-height, letter-spacing -0.01em display/h1/h2); ProjectHero h1 bỏ font-normal. Test: fonts.test.ts, project-detail.test.tsx. Doc: SPECIFICATIONS (Giao diện, stack UI, S03 h1, PostCard), design-spec, docs/DESIGN.md, design-tokens."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.29.0-36.json",
-  "specUpdate": "spec/updates/2026-10-20-back-to-top-button.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.30.0-37.json",
+  "specUpdate": "spec/updates/2026-10-20-single-font-montserrat.md",
   "specRefs": [
-    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)",
-    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'"
+    "Giao diện — một font Montserrat (BL-036)",
+    "Bảng stack — UI: font Montserrat duy nhất",
+    "F2 / S03 Bố cục chi tiết dự án — h1 hero",
+    "F4 Tin đăng BĐS — PostCard tiêu đề h4",
+    "design-spec § typography"
   ],
   "specRefNotes": {
-    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)": "Cùng cụm nổi góc dưới phải, đứng trên nút liên hệ, cùng đẩy lên trên cookie banner < md và thanh 'Nhận tư vấn' dính đáy; mọi trang công khai (không admin), hiện cả khi không cấu hình hotline/Zalo/fanpage; hiện khi scrollY > innerHeight, fade (tức thì khi reduced-motion), ẩn không nhận focus/không được đọc; bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main; button tròn 48px, aria-label 'Lên đầu trang' / 'Back to top', focus ring token, nền trắng viền + icon mũi tên lên, ẩn khi in; không ghi nhận lượt bấm.",
-    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'": "Khung fixed chung mang vị trí + offset var + --z-floating + print:hidden; nền --color-surface + viền --color-border + ArrowUp 24px + --shadow-lg; ẩn = invisible + opacity-0 (không chặn click); scrollTo + #main.focus({preventScroll: true}); nhãn page.floating.backToTop."
+    "Giao diện — một font Montserrat (BL-036)": "Mọi chữ site công khai dùng Montserrat; phân cấp bằng cỡ + độ đậm 500/600; bỏ EB Garamond; sentence case giữ.",
+    "Bảng stack — UI: font Montserrat duy nhất": "next/font, subset vietnamese; bỏ EB Garamond.",
+    "F2 / S03 Bố cục chi tiết dự án — h1 hero": "h1 viết thường Montserrat, nhận weight token 500 (bỏ serif weight 400 / font-normal).",
+    "F4 Tin đăng BĐS — PostCard tiêu đề h4": "Tiêu đề h4 2 dòng Montserrat thay serif.",
+    "design-spec § typography": "Thang display 28 / h1 26 / h2 24 / h2-sm 22 / h3 20 / h4 18px; weight 500 (display→h3), 600 (h4, price); line-height 1.15/1.15/1.2/1.25/1.3; letter-spacing -0.01em display/h1/h2."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/layout/BackToTop.tsx",
-      "src/components/layout/BackToTop.test.tsx",
-      "src/components/layout/FloatingContact.tsx",
-      "src/components/layout/FloatingContact.test.tsx",
-      "src/components/layout/PublicShell.tsx",
-      "src/components/layout/PublicShell.test.tsx",
-      "src/components/layout/FloatingDock.tsx",
-      "src/components/icons.ts",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
+      "src/lib/fonts.ts",
+      "src/lib/fonts.test.ts",
+      "src/components/layout/PublicDocument.tsx",
+      "src/app/(frontend)/globals.css",
+      "src/components/projects/ProjectHero.tsx",
+      "src/components/projects/project-detail.test.tsx",
       "SPECIFICATIONS.md",
-      ".context/design-spec.md"
+      ".context/design-spec.md",
+      "docs/DESIGN.md",
+      "skills/react-nodejs/design-tokens.md"
     ],
-    "filesNote": "Đã đối chiếu diff thật: thêm khung chung src/components/layout/FloatingDock.tsx (fixed + offset var + print:hidden + pointer-events-none) và PublicShell.test.tsx. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD. Không đụng sửa dở của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "filesNote": "Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, các file src/components/projects/* khác ngoài ProjectHero.tsx + project-detail.test.tsx).",
     "modules": [
-      "Layout — PublicShell (khung trang công khai)",
-      "Layout — BackToTop (mới)",
-      "Layout — FloatingContact (nút liên hệ nổi + ghi lượt bấm)",
-      "i18n — page.floating.backToTop"
+      "Typography — fonts (next/font)",
+      "Design tokens — globals.css (--font-display, --text-*)",
+      "Layout — PublicDocument",
+      "Projects — ProjectHero"
     ]
   },
   "impact": {
     "direct": [
-      "Mọi trang công khai VI/EN: ở đầu trang không thấy nút 'Lên đầu trang'",
-      "Cuộn quá 1 màn hình (scrollY > innerHeight) → nút tròn 48px hiện (fade) ở góc dưới phải, nằm TRÊN nút liên hệ nổi",
-      "Cuộn về gần đầu trang → nút ẩn (fade); khi ẩn Tab không vào được, trình đọc màn hình không đọc, không chặn click vùng đó",
-      "Bấm nút → cuộn mượt về đầu trang; focus chuyển vào #main (không cuộn thêm)",
-      "prefers-reduced-motion → cuộn về đầu tức thì (behavior instant), ẩn/hiện không fade",
-      "aria-label 'Lên đầu trang' (vi) / 'Back to top' (/en/...); focus-visible có ring theo token; vùng chạm ≥ 44px",
-      "Nền trắng + viền + icon mũi tên lên + bóng; in trang (print) → nút ẩn",
-      "Site không cấu hình hotline/Zalo/fanpage → không có nút liên hệ nhưng nút lên đầu trang vẫn hiện khi cuộn",
-      "Admin /admin không có nút"
+      "Mọi heading / giá / thông số / địa chỉ / hotline / menu mobile / '+N' gallery / tiêu đề accordion trang công khai hiển thị Montserrat (không còn serif)",
+      "Không còn request tải font EB Garamond; chỉ Montserrat 400/500/600",
+      "Cỡ chữ: display 28px, h1 26px, h2 24px, h2-sm 22px, h3 20px, h4 18px",
+      "Độ đậm: display/h1/h2/h2-sm/h3 = 500; h4 + giá (price) = 600; không bold giả",
+      "h1 hero chi tiết dự án weight 500 (không còn 400)",
+      "Tiếng Việt đủ dấu ở mọi heading (subset vietnamese)"
     ],
     "dependents": [
-      "FloatingContact (hotline / Zalo / fanpage, toggle mobile, ghi lượt bấm sendBeacon) nay nằm trong khung cụm nổi chung — hành vi + thống kê giữ nguyên",
-      "Cookie banner < md (--floating-bottom-offset): cả cụm (nút lên đầu trang + nút liên hệ) đẩy lên trên banner, không chồng",
-      "Thanh 'Nhận tư vấn' dính đáy trang chi tiết dự án / cho thuê / tin đăng (--sticky-cta-height) < lg: cả cụm đẩy lên trên CTA",
-      "Header ẩn khi cuộn ở DetailLayout (chi tiết dự án / cho thuê / tin đăng / tin tức): bấm lên đầu trang → header hiện lại theo logic sẵn có",
-      "Mọi trang (frontend) qua PublicShell, cả /en/..."
+      "Trang chủ (hero, slider dự án, khối tin tức, ưu đãi)",
+      "Danh sách + chi tiết dự án",
+      "Danh sách + chi tiết cho thuê",
+      "Danh sách + chi tiết tin đăng BĐS (PostCard, OfferBox)",
+      "Danh sách + chi tiết tin tức (mục lục, bài liên quan)",
+      "Tuyển dụng, liên hệ, pháp lý (accordion điều khoản)",
+      "Header, menu mobile, footer",
+      "Tất cả trên cả VI và /en/..."
     ],
     "regression": [
-      "Nút liên hệ không xê dịch khi nút lên đầu trang ẩn/hiện (cột bottom-anchored)",
-      "Bấm hotline / Zalo / fanpage vẫn mở đúng link và vẫn ghi lượt bấm (click stats)",
-      "Toggle mở/đóng cụm liên hệ trên mobile vẫn hoạt động",
-      "Không chồng cookie banner < md, CTA dính đáy chi tiết, hay nút nào khác",
-      "Vùng trống của khung cụm nổi không chặn click nội dung phía sau",
-      "Skip link → #main vẫn hoạt động",
-      "Không tràn ngang / không CLS 375 / 768 / 1024 / 1280; safe-area iOS giữ khoảng cách"
+      "Không tràn ngang / không xuống dòng bất thường ở 390 và 1280 (sans rộng hơn serif)",
+      "Dấu chồng tiếng Việt (Ầ/Ỗ/Ẫ) không bị xén ở tiêu đề thẻ line-clamp-2",
+      "Sentence case giữ nguyên, không có heading uppercase",
+      "Hover tiêu đề thẻ đổi vàng thương hiệu (BL-034) vẫn đúng",
+      "Admin /admin, email, trang lỗi toàn cục không đổi",
+      "Không CLS do đổi font"
     ]
   },
   "acceptance": [
-    "Nút tròn nổi góc phải dưới, nằm chung cụm với FloatingContact — không chồng lên nút liên hệ, CTA dính đáy (--sticky-cta-height) hay cookie banner",
-    "Chỉ hiện khi đã cuộn quá ~1 màn hình; ẩn khi ở gần đầu trang (ẩn/hiện có fade, tắt khi prefers-reduced-motion)",
-    "Bấm → cuộn mượt về đầu trang (behavior instant nếu reduced-motion); focus chuyển về #main",
-    "A11y: <button> có aria-label ('Lên đầu trang' / 'Back to top' theo locale), vùng chạm ≥ 44px, focus-visible ring theo token",
-    "Style theo token thương hiệu (nền trắng + viền đồng bộ nút nổi hiện có), ẩn khi in (print:hidden)",
-    "Áp dụng mọi trang công khai (frontend layout), không áp dụng admin",
-    "FloatingContact trả null (không hotline/Zalo/fanpage) → nút lên đầu trang vẫn hiện độc lập"
+    "Không còn EB Garamond: không tải font, --font-display trỏ Montserrat",
+    "Phân cấp tiêu đề giữ được bằng cỡ + độ đậm Montserrat (500/600, chỉ weight đã nạp)",
+    "Sentence case giữ nguyên (BL-020), không thêm uppercase cho heading",
+    "Tiếng Việt đủ dấu ở mọi heading",
+    "Không đổi admin, email, trang lỗi toàn cục",
+    "design-spec + docs/DESIGN.md + design tokens cập nhật; test font sửa theo",
+    "Trang chủ, danh sách, chi tiết dự án/cho thuê/tin tức ở 390/1280 không vỡ dòng/tràn"
   ],
   "outOfScope": [
-    "Ghi nhận lượt bấm nút lên đầu trang",
-    "Sửa logic header ẩn khi cuộn",
-    "Đổi token / thêm token mới",
+    "Đổi màu / spacing / bố cục",
     "Admin Payload",
-    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
+    "Email template, trang lỗi toàn cục",
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/* khác)"
   ],
   "viewports": [
-    375,
+    390,
     768,
     1024,
     1280,
@@ -115,6 +118,6 @@
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "low-medium",
-  "riskNote": "Component client mới trong shell công khai (mọi trang) + chuyển định vị FloatingContact lên khung chung (shared layout; thống kê lượt bấm phải giữ nguyên). Không schema/API/quyền/dữ liệu/URL. Residual: chưa kiểm trực quan trên thiết bị thật (safe-area iOS, cookie banner + CTA dính đáy cùng lúc); verify builder/reviewer điền sau ở task + report round-1."
+  "risk": "medium",
+  "riskNote": "Đổi typography toàn site công khai (font + cỡ + độ đậm mọi heading). Không schema/API/quyền/dữ liệu/URL. Verify reviewer STRICT round 2 PASS: pnpm vitest run src/lib src/components 1919/1919, typecheck PASS, lint 0 error. Residual: chưa kiểm trực quan trình duyệt thật (tràn chữ 390/1280, dấu chồng ở line-clamp-2)."
 }

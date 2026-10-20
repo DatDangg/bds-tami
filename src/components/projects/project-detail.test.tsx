@@ -125,7 +125,7 @@ describe("ProjectDetail (S03)", () => {
     expect(container.querySelectorAll("#lead-form")).toHaveLength(1);
     expect(container.querySelectorAll("form")).toHaveLength(1);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.className).toContain("font-normal");
+    expect(h1.className).not.toContain("font-normal"); // BL-036: weight 500 mặc định từ token text-display
     expect(h1.className).not.toContain("uppercase");
     const aside = container.querySelector("aside") as HTMLElement;
     expect(aside).not.toBeNull();

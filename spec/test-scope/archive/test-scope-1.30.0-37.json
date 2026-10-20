@@ -1,0 +1,120 @@
+{
+  "specVersion": "1.30.0",
+  "scopeVersion": 37,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-035 — nút nổi 'Lên đầu trang' (BackToTop) cùng cụm nổi góc dưới phải với FloatingContact (khung fixed chung mang offset --floating-bottom-offset + --sticky-cta-height + --z-floating + print:hidden), mọi trang công khai qua PublicShell, hiện khi scrollY > innerHeight, bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main. Spec 1.29.0 → 1.30.0 (MINOR, ADDITIVE).",
+  "workItem": "feature/back-to-top-button",
+  "backlog": "BL-035",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-10-20-back-to-top-button.md",
+  "task": [
+    "tasks/feature-back-to-top-button/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-back-to-top-button-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "close-out BL-035 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-035 (commit chứa file này)": "T01 — thêm BackToTop (client) + khung cụm nổi chung trong PublicShell (BackToTop trên, FloatingContact dưới); chuyển class định vị từ FloatingContact lên khung chung (giữ role=group, sendBeacon, toggle mobile, trả null khi không có link); thêm icon ArrowUp vào barrel, key i18n page.floating.backToTop (vi/en). Doc: SPECIFICATIONS F8, design-spec §2.5 bullet 'Lên đầu trang (BL-035)'."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.29.0-36.json",
+  "specUpdate": "spec/updates/2026-10-20-back-to-top-button.md",
+  "specRefs": [
+    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)",
+    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'"
+  ],
+  "specRefNotes": {
+    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)": "Cùng cụm nổi góc dưới phải, đứng trên nút liên hệ, cùng đẩy lên trên cookie banner < md và thanh 'Nhận tư vấn' dính đáy; mọi trang công khai (không admin), hiện cả khi không cấu hình hotline/Zalo/fanpage; hiện khi scrollY > innerHeight, fade (tức thì khi reduced-motion), ẩn không nhận focus/không được đọc; bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main; button tròn 48px, aria-label 'Lên đầu trang' / 'Back to top', focus ring token, nền trắng viền + icon mũi tên lên, ẩn khi in; không ghi nhận lượt bấm.",
+    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'": "Khung fixed chung mang vị trí + offset var + --z-floating + print:hidden; nền --color-surface + viền --color-border + ArrowUp 24px + --shadow-lg; ẩn = invisible + opacity-0 (không chặn click); scrollTo + #main.focus({preventScroll: true}); nhãn page.floating.backToTop."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/layout/BackToTop.tsx",
+      "src/components/layout/BackToTop.test.tsx",
+      "src/components/layout/FloatingContact.tsx",
+      "src/components/layout/FloatingContact.test.tsx",
+      "src/components/layout/PublicShell.tsx",
+      "src/components/layout/PublicShell.test.tsx",
+      "src/components/layout/FloatingDock.tsx",
+      "src/components/icons.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Đã đối chiếu diff thật: thêm khung chung src/components/layout/FloatingDock.tsx (fixed + offset var + print:hidden + pointer-events-none) và PublicShell.test.tsx. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD. Không đụng sửa dở của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "modules": [
+      "Layout — PublicShell (khung trang công khai)",
+      "Layout — BackToTop (mới)",
+      "Layout — FloatingContact (nút liên hệ nổi + ghi lượt bấm)",
+      "i18n — page.floating.backToTop"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Mọi trang công khai VI/EN: ở đầu trang không thấy nút 'Lên đầu trang'",
+      "Cuộn quá 1 màn hình (scrollY > innerHeight) → nút tròn 48px hiện (fade) ở góc dưới phải, nằm TRÊN nút liên hệ nổi",
+      "Cuộn về gần đầu trang → nút ẩn (fade); khi ẩn Tab không vào được, trình đọc màn hình không đọc, không chặn click vùng đó",
+      "Bấm nút → cuộn mượt về đầu trang; focus chuyển vào #main (không cuộn thêm)",
+      "prefers-reduced-motion → cuộn về đầu tức thì (behavior instant), ẩn/hiện không fade",
+      "aria-label 'Lên đầu trang' (vi) / 'Back to top' (/en/...); focus-visible có ring theo token; vùng chạm ≥ 44px",
+      "Nền trắng + viền + icon mũi tên lên + bóng; in trang (print) → nút ẩn",
+      "Site không cấu hình hotline/Zalo/fanpage → không có nút liên hệ nhưng nút lên đầu trang vẫn hiện khi cuộn",
+      "Admin /admin không có nút"
+    ],
+    "dependents": [
+      "FloatingContact (hotline / Zalo / fanpage, toggle mobile, ghi lượt bấm sendBeacon) nay nằm trong khung cụm nổi chung — hành vi + thống kê giữ nguyên",
+      "Cookie banner < md (--floating-bottom-offset): cả cụm (nút lên đầu trang + nút liên hệ) đẩy lên trên banner, không chồng",
+      "Thanh 'Nhận tư vấn' dính đáy trang chi tiết dự án / cho thuê / tin đăng (--sticky-cta-height) < lg: cả cụm đẩy lên trên CTA",
+      "Header ẩn khi cuộn ở DetailLayout (chi tiết dự án / cho thuê / tin đăng / tin tức): bấm lên đầu trang → header hiện lại theo logic sẵn có",
+      "Mọi trang (frontend) qua PublicShell, cả /en/..."
+    ],
+    "regression": [
+      "Nút liên hệ không xê dịch khi nút lên đầu trang ẩn/hiện (cột bottom-anchored)",
+      "Bấm hotline / Zalo / fanpage vẫn mở đúng link và vẫn ghi lượt bấm (click stats)",
+      "Toggle mở/đóng cụm liên hệ trên mobile vẫn hoạt động",
+      "Không chồng cookie banner < md, CTA dính đáy chi tiết, hay nút nào khác",
+      "Vùng trống của khung cụm nổi không chặn click nội dung phía sau",
+      "Skip link → #main vẫn hoạt động",
+      "Không tràn ngang / không CLS 375 / 768 / 1024 / 1280; safe-area iOS giữ khoảng cách"
+    ]
+  },
+  "acceptance": [
+    "Nút tròn nổi góc phải dưới, nằm chung cụm với FloatingContact — không chồng lên nút liên hệ, CTA dính đáy (--sticky-cta-height) hay cookie banner",
+    "Chỉ hiện khi đã cuộn quá ~1 màn hình; ẩn khi ở gần đầu trang (ẩn/hiện có fade, tắt khi prefers-reduced-motion)",
+    "Bấm → cuộn mượt về đầu trang (behavior instant nếu reduced-motion); focus chuyển về #main",
+    "A11y: <button> có aria-label ('Lên đầu trang' / 'Back to top' theo locale), vùng chạm ≥ 44px, focus-visible ring theo token",
+    "Style theo token thương hiệu (nền trắng + viền đồng bộ nút nổi hiện có), ẩn khi in (print:hidden)",
+    "Áp dụng mọi trang công khai (frontend layout), không áp dụng admin",
+    "FloatingContact trả null (không hotline/Zalo/fanpage) → nút lên đầu trang vẫn hiện độc lập"
+  ],
+  "outOfScope": [
+    "Ghi nhận lượt bấm nút lên đầu trang",
+    "Sửa logic header ẩn khi cuộn",
+    "Đổi token / thêm token mới",
+    "Admin Payload",
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low-medium",
+  "riskNote": "Component client mới trong shell công khai (mọi trang) + chuyển định vị FloatingContact lên khung chung (shared layout; thống kê lượt bấm phải giữ nguyên). Không schema/API/quyền/dữ liệu/URL. Residual: chưa kiểm trực quan trên thiết bị thật (safe-area iOS, cookie banner + CTA dính đáy cùng lúc); verify builder/reviewer điền sau ở task + report round-1."
+}

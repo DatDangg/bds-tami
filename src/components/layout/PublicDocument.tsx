@@ -2,7 +2,7 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { loadShell } from "@/components/layout/load-shell";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { ebGaramond, montserrat } from "@/lib/fonts";
+import { montserrat } from "@/lib/fonts";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -12,7 +12,7 @@ import type { Locale } from "@/i18n/routing";
 export async function PublicDocument({ locale, children }: { locale: Locale; children: ReactNode }) {
   const shell = await loadShell(locale);
   return (
-    <html lang={locale} className={`${ebGaramond.variable} ${montserrat.variable}`}>
+    <html lang={locale} className={montserrat.variable}>
       <body>
         <NextIntlClientProvider>
           <PublicShell shell={shell}>{children}</PublicShell>

@@ -30,7 +30,7 @@ export function ProjectHero({ title, salesStatus, areaLabel, image, hasDocuments
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-dark-deep/85 via-dark-deep/35 to-dark-deep/10" />
       <div className="mx-auto flex w-full max-w-container flex-col items-start gap-4 px-gutter pt-24 pb-10 lg:pb-16">
         <Badge variant={SALES_STATUS_BADGE_VARIANT[salesStatus]}>{tStatus(salesStatus)}</Badge>
-        <h1 className="max-w-[24ch] font-display text-display font-normal text-balance">{title}</h1>
+        <h1 className="max-w-[24ch] font-display text-display text-balance">{title}</h1>
         {areaLabel && <p className="text-lead text-on-dark-muted">{areaLabel}</p>}
         <div className="mt-2 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Button asChild size="lg" className="w-full sm:w-auto">

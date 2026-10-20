@@ -6,7 +6,7 @@
 - **Tham chiếu phong cách:** market.vinhomes.vn (chỉ bố cục, nhịp section, cảm giác; màu là của TAMI). **Không** dùng nội dung, ảnh, icon, chữ của Vinhomes (LGL-04).
 - **Phạm vi file:** website công khai VI + EN. Trang quản trị `/admin` dùng giao diện Payload mặc định (chỉ đổi logo, màu nhấn `#8C6733`, font Montserrat qua `admin.components`/CSS), không có screen spec riêng.
 
-**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (màu TAMI); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
+**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (màu TAMI); Tailwind + shadcn/ui tuỳ biến, một font Montserrat (BL-036), chuyển động tiết chế.
 **Dials:** `DESIGN_VARIANCE 5` · `MOTION_INTENSITY 4` · `VISUAL_DENSITY 3` (trang thương hiệu) / `5` (danh sách Cho thuê). Lý do + ngoại lệ có chủ đích: tokens §0.
 
 ---
@@ -65,9 +65,9 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - **Chữ chìm (watermark) đã bỏ** (BL-020, user duyệt 2026-10-19): không còn token `--text-watermark`, prop `watermark` của PageBanner, hay chữ chìm ở trang chủ/404. Mọi chỗ dưới đây ghi "watermark" là lịch sử, không còn áp dụng.
 
 ### 1.7. Kiểu chữ: viết thường (sentence case)
-- **Viết thường (sentence case)**, weight 400, EB Garamond: mọi heading h1/h2/display (tiêu đề trang, tiêu đề section, câu chính hero, tên dự án trên hero/slider, tiêu đề CTA, bài viết, tin cho thuê, việc làm, tên trên thẻ). Không dùng CSS `uppercase` cho heading (BL-020; trước đây in hoa).
+- **Viết thường (sentence case)**, Montserrat weight 500 (h4/giá 600; BL-036 as-built: một font duy nhất, thang `display/h1/h2/h2-sm/h3` mang weight 500 mặc định qua token `--text-*--font-weight`, `--font-display` trỏ về Montserrat, phân cấp bằng cỡ + độ đậm): mọi heading h1/h2/display (tiêu đề trang, tiêu đề section, câu chính hero, tên dự án trên hero/slider, tiêu đề CTA, bài viết, tin cho thuê, việc làm, tên trên thẻ). Không dùng CSS `uppercase` cho heading (BL-020; trước đây in hoa).
 - **In hoa (CSS `uppercase`) chỉ còn**: nút (Button), eyebrow, menu.
-- Cỡ (desktop → mobile, token `--text-*`): display 60px → ~32px, h1 56px → ~30px, h2 44px → ~26px; h3 và nhỏ hơn không đổi. Heading phụ trong nội dung/trang chi tiết (RichText h2, mục việc làm, tiêu đề form (kể cả form trong thẻ liên hệ / tư vấn), "tin tương tự") dùng `--text-h2-sm`; mục trong khung chi tiết chung (chi tiết dự án + chi tiết cho thuê, `DetailSection`, BL-027) dùng `--text-h2` (30px, cỡ h2 cũ) để h1 ≥ h2 ≥ h3; tiêu đề tin cho thuê (h1) dùng `--text-h2`.
+- Cỡ (desktop → mobile, token `--text-*`, BL-036): display 52px → ~28px, h1 48px → ~26px, h2 38px → ~24px, h2-sm 26px → ~22px, h3 22px → ~20px, h4 18px; weight display/h1/h2/h2-sm/h3 = 500, h4/giá = 600; line-height display/h1 1.15, h2 1.2, h2-sm 1.25, h3 1.3; letter-spacing display/h1/h2 -0.01em. Heading phụ trong nội dung/trang chi tiết (RichText h2, mục việc làm, tiêu đề form (kể cả form trong thẻ liên hệ / tư vấn), "tin tương tự") dùng `--text-h2-sm`; mục trong khung chi tiết chung (chi tiết dự án + chi tiết cho thuê, `DetailSection`, BL-027) dùng `--text-h2` để h1 ≥ h2 ≥ h3; tiêu đề tin cho thuê (h1) dùng `--text-h2`.
 
 ---
 
@@ -92,7 +92,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 
 ### 2.2. Menu toàn màn hình
 - **Chỉ < xl** (BL-019): mở từ nút Menu, phủ toàn màn hình, lớp `.theme-dark-block` nền `--color-dark-deep`, `z: --z-overlay`.
-- Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h3` serif in hoa (giữ in hoa trong menu, như `MobileMenu`), mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
+- Cột trái (≥ lg) / toàn bộ (< lg): 7 mục chữ `--text-h3` in hoa (giữ in hoa trong menu, như `MobileMenu`), mục có con xổ accordion (chữ `--text-body`). Cột phải (≥ lg): hotline, email, địa chỉ, mạng xã hội, `VI | EN`.
 - Accordion menu con: link cha giữ điều hướng, nút caret riêng cạnh link (≥ 44px, `aria-expanded`, `aria-controls`, nhãn "Mở menu con <mục>"), đóng mặc định, mở bằng Enter/Space/chạm; chuyển động mở/đóng `--duration-base`, tắt khi `prefers-reduced-motion`. ≥ xl không có menu toàn màn hình (điều hướng bằng menu ngang §2.1); đang mở mà cửa sổ rộng lên ≥ xl → menu tự đóng, nhả khoá cuộn nền.
 - Mở: menu trượt mờ dần `--duration-slow`, các mục stagger 40ms (tắt khi reduced motion).
 - Nút đóng ở đúng vị trí nút Menu (cùng toạ độ), `aria-label="Đóng menu / Close menu"`.
@@ -270,19 +270,19 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Ảnh bo `--radius-xl` 20px (market #4).
 - < md: tiêu đề → ảnh 4:3 → nội dung (richText, tối đa ~120 từ hiển thị, phần còn lại không cắt: admin chịu trách nhiệm độ dài) → số liệu.
 - ≥ md: lưới 12 cột: ảnh cột 1-5 (4:5), chữ cột 7-12.
-- Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h2` serif `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
+- Số liệu `stats` (2-4 mục): **một hàng chữ**, không thẻ, không icon: số `--text-h2` `--color-text`, nhãn `--text-small` muted; phân cách bằng khoảng trắng (≥ md: `gap: 48px`; < md: lưới 2 cột). Không có hiệu ứng đếm số.
 
 **3. Dự án nổi bật** (`featuredProjects`, tối đa 6; trống thì lấy `isFeatured` mới nhất) — BL-020
 - Heading căn giữa. Slider tràn viền (cuộn ngang scroll-snap, vuốt/phím mũi tên, **không autoplay**).
 - Mỗi slide là **thẻ lớn ~464×600** (`aspect 464/600`, rộng 464px ≥ sm, 82% < sm để lộ thẻ kế), bo `--radius-xl` 20px, ảnh đại diện phủ kín (`object-cover`, lazy, `sizes` 464px/82vw, khung tỉ lệ cố định → không CLS). Cả thẻ là MỘT link tới chi tiết dự án; hover phóng ảnh nhẹ + tên đổi màu `--color-accent-text` (BL-034).
   - Badge trạng thái mở bán góc trên trái ảnh: Đang mở bán = gradient xanh (`success`), Sắp mở bán = gradient vàng (`primary`), Đã bàn giao = trung tính.
-  - **Khung kính mờ** `.glass-panel` đè đáy ảnh (cách mép 12/16px, bo 16px, padding 16/20px): tên dự án serif `--text-h3` (viết thường, tối đa 2 dòng), địa điểm (tỉnh/thành, icon pin), hàng **số liệu** `<dl>` từ field sẵn có `scale.landAreaM2` (Diện tích đất, m²), `scale.totalUnits` (Tổng số căn), `scale.handoverTime` (Bàn giao). Ô thiếu dữ liệu **ẩn**; không còn ô nào thì không dựng hàng. Không còn eyebrow/summary/nút "Khám phá dự án".
+  - **Khung kính mờ** `.glass-panel` đè đáy ảnh (cách mép 12/16px, bo 16px, padding 16/20px): tên dự án `--text-h3` (viết thường, tối đa 2 dòng), địa điểm (tỉnh/thành, icon pin), hàng **số liệu** `<dl>` từ field sẵn có `scale.landAreaM2` (Diện tích đất, m²), `scale.totalUnits` (Tổng số căn), `scale.handoverTime` (Bàn giao). Ô thiếu dữ liệu **ẩn**; không còn ô nào thì không dựng hàng. Không còn eyebrow/summary/nút "Khám phá dự án".
   - Kính theo quy tắc header: nền `--color-surface` đặc mặc định → `--color-glass` + blur chỉ trong `@supports (backdrop-filter)`, đặc lại khi `prefers-reduced-transparency`. **Chỉ `--color-text`** trên kính (4.5:1 dù ảnh sau kính đen/trắng — `contrast.test`); không dùng muted/accent trên kính.
 - Điều khiển: mũi tên ≥ md (44px) + chấm phân trang dưới (cơ chế dùng chung `useSnapSlider`). 
 - "Xem tất cả" → `/du-an`. 0 dự án: ẩn khối. 1 dự án: không điều khiển.
 
 **4. Dịch vụ** (`services.items`)
-- Heading căn trái (sentence case serif `--text-h2`; market #9 "Đồng hành trọn hành trình" do admin đặt trong CMS).
+- Heading căn trái (sentence case `--text-h2`; market #9 "Đồng hành trọn hành trình" do admin đặt trong CMS).
 - **Thẻ dịch vụ** (`ServiceCard`, dùng chung với "Dịch vụ khác" ở S11): ảnh bìa phủ kín bo `--radius-xl` 20px, **khung kính `.glass-panel`** (bo 16px, cách mép 12/16px) đè đáy ảnh chứa tên `h3` + mô tả (≤ 2 dòng) + mũi tên, chỉ dùng `--color-text` (4.5:1 dù ảnh sau kính đen/trắng — `contrast.test`; không còn chữ trắng trên gradient vì ảnh sáng không đạt AA). Không ảnh bìa: nền `--color-dark-deep`. Hover phóng ảnh nhẹ.
 - Theo số mục: 1 → thẻ ngang full container 21:9; 2 → 2 thẻ 7/5 cột; **3 (mặc định) → bento: thẻ lớn cột 1-7 cao 2 hàng, 2 thẻ nhỏ cột 8-12 xếp chồng**; ≥ 4 → hàng cuộn ngang scroll-snap.
 - < md: 3 thẻ xếp dọc, thẻ 4:3, chữ đè đáy ảnh.
@@ -349,12 +349,12 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 ### S03. Chi tiết dự án · `/du-an/[slug]` · `/en/projects/[slug]` (FR-PUB-03)
 
 **Cấu trúc:**
-1. **Hero** full màn hình (`100svh`, tối đa 900px) ảnh đại diện + scrim; đáy bo 32px (BL-020 P4-T01); đáy trái: badge `salesStatus` (gradient xanh / vàng), tên `--text-display` serif độ đậm 400 (không viết hoa), địa chỉ ngắn (phường, tỉnh). Nút Primary **Nhận tư vấn** (cuộn tới form) + nút Outline sáng **Tải tài liệu** (nếu có `documents`).
+1. **Hero** full màn hình (`100svh`, tối đa 900px) ảnh đại diện + scrim; đáy bo 32px (BL-020 P4-T01); đáy trái: badge `salesStatus` (gradient xanh / vàng), tên `--text-display` độ đậm 500 (không viết hoa), địa chỉ ngắn (phường, tỉnh). Nút Primary **Nhận tư vấn** (cuộn tới form) + nút Outline sáng **Tải tài liệu** (nếu có `documents`).
 2. Breadcrumb.
 3. **Thanh mục con dạng viên thuốc dính** (`z: --z-sticky`; `top: var(--sticky-top)` = 8px / ≥ lg 16px sát đỉnh trang vì header ẩn khi cuộn trên trang chi tiết (BL-027); viên thuốc trắng bo tròn + viền + `--shadow-md`, **rộng bằng khung nội dung** (`nav` `mx-auto max-w-container px-gutter` như lưới `DetailLayout`, `ul` `w-full`): mép trái = mép thẻ trắng, mép phải = mép thẻ Tư vấn ≥ lg (< lg = mép thẻ nội dung), nằm trên/ngoài lưới 2 cột, nút căn trái, cao ~54px không đổi (BL-028; trước là `w-fit` ôm vừa nút), mục đang xem nền `--color-primary` chữ `--color-primary-foreground` (~10:1, BL-027), mục thường `--color-text-secondary`, focus-visible outline `--color-focus-ring`; nav trong suốt `pointer-events-none`): Tổng quan · Nổi bật · Vị trí · Tiện ích · Mặt bằng · Pháp lý · Chính sách · Giá · Thư viện · Tin liên quan · Hỏi đáp (BL-020 P5-T02: thứ tự theo trang). Chỉ hiện mục có dữ liệu (cùng điều kiện với khối): "Tin liên quan" khi dự án có tin (mục 10b), "Pháp lý" khi có richText HOẶC tài liệu PDF, "Vị trí" khi có toạ độ/địa chỉ/tiện ích quanh. Mục đang xem tự đánh dấu (IntersectionObserver; dải quan sát từ 88px dưới đỉnh tới 55% viewport, mục đầu theo thứ tự trang thắng; cuộn qua hết mục cuối — dải rỗng và đáy mục cuối ≤ 88px — thì bỏ active, không nút nào `aria-current`; cuộn ngược vào mục thì active lại; ở đầu trang / trên mục đầu giữ mục đầu active; trong ~1s khoá sau khi bấm nút không đổi/bỏ active — BL-029; áp dụng cả S07), bấm cuộn mượt (tắt khi reduced motion), `scroll-margin-top` = `--sticky-top` + 4.5rem (thanh ~54px + khe 18px). < lg: cuộn ngang, mục đang xem tự cuộn vào giữa.
 **Bố cục (BL-020 P4-T01, BL-027 — khung chung `DetailLayout`, dùng cả S07):** nền trang `--color-primary-subtle`; từ mục 4 tới 11 nằm trong lưới 2 cột ≥ lg (`minmax(0,1fr)` + 22rem, xl 24rem; khe 8 / xl 10) trong container; **cột chính là MỘT thẻ trắng** `--color-surface` bo 28px (`p-5` / md `p-8` / xl `p-10`) chứa các khối; cột chính KHÔNG còn nền full-bleed xen kẽ — các khối ngăn bằng đường kẻ trên, Thư viện là thẻ tối bo 20px; cột phải = `aside` thẻ **Tư vấn 1:1** (trắng, bo 20px, viền, `--shadow-md`): tiêu đề "Nhận thông tin dự án", hotline (link `tel:`), form lead (`source=project`). Thẻ (tách riêng, ngoài thẻ trắng) `position: sticky`, **không `max-height` / không thanh cuộn riêng** (BL-031): `top = min(--sticky-top + 4.5rem, 100dvh − --detail-aside-h − 1rem)`; `--detail-aside-h` = chiều cao thẻ do `DetailAsideFit` (client, vỏ `aside`, ResizeObserver) ghi lên `aside`. Thẻ vừa viewport → dính dưới thanh mục con (`--sticky-top + 4.5rem`, như BL-027); thẻ cao hơn → cuộn theo trang tới khi đáy thẻ cách đáy viewport 1rem rồi dính (không cắt, checkbox đồng ý + nút gửi tới được; phần đầu thẻ có thể nằm dưới thanh mục con dính). Chưa hydrate / không JS: biến = 0 → dính trên như cũ. Form chỉ có MỘT bản trong DOM: < lg `aside` nằm sau thẻ nội dung (sau Hỏi đáp) và `ProjectStickyCta` dẫn tới `#lead-form`.
 4. **Tổng quan**: lưới thông số dạng `<dl>` 2 cột (< md) / 4 cột (≥ md): Chủ đầu tư (link), Loại hình, Quy mô (`scale`), Diện tích, Giá từ, Bàn giao. Không kẻ dòng từng hàng. Dưới: `overview` richText `max-width: 68ch`.
-4b. **Điểm nổi bật** (BL-020 P5-T02; `section#highlights`, ngay sau Tổng quan): lưới thẻ trắng bo 20px (viền, padding 20px) — 1 cột < sm, 2 cột ≥ sm, 3 cột ≥ xl (trong cột chính); mỗi thẻ icon chung (`CheckCircle`, trường `icon` chưa có bảng ánh xạ nên không đoán icon), tiêu đề `h3` serif, mô tả (tuỳ chọn, giữ xuống dòng). Tối đa 8 thẻ. Ẩn khi trống.
+4b. **Điểm nổi bật** (BL-020 P5-T02; `section#highlights`, ngay sau Tổng quan): lưới thẻ trắng bo 20px (viền, padding 20px) — 1 cột < sm, 2 cột ≥ sm, 3 cột ≥ xl (trong cột chính); mỗi thẻ icon chung (`CheckCircle`, trường `icon` chưa có bảng ánh xạ nên không đoán icon), tiêu đề `h3`, mô tả (tuỳ chọn, giữ xuống dòng). Tối đa 8 thẻ. Ẩn khi trống.
 5. **Vị trí**: split bản đồ 7 cột + địa chỉ 5 cột (≥ xl; < xl bản đồ trên, địa chỉ dưới, vì cột chính ở lg chỉ ~568px). Bản đồ §3.8. **Tiện ích xung quanh** (BL-020 P5-T02; `h3` trong cùng `section#location`, dưới bản đồ + địa chỉ): tab viên thuốc theo nhóm (Giáo dục · Y tế · Mua sắm · Công viên · Giao thông · Khác — chỉ nhóm có dòng; tab chọn nền `--color-dark`, còn lại viền; ≥ 44px); mỗi dòng tên + khoảng cách (chữ, căn phải), lưới 1 cột < sm / 2 cột ≥ sm. Tablist ARIA (←/→ vòng, Home/End, roving tabindex); HTML đầu có đủ panel (panel không chọn `hidden`) nên chưa có JS vẫn đọc được tab đầu; một nhóm duy nhất không dựng tablist. Dòng có toạ độ hiện thành ghim nhỏ (chấm `--color-dark` 14px) + popup tên trên bản đồ dự án, bản đồ tự khung vừa tất cả điểm (zoom tối đa 15); không có toạ độ dự án thì không dựng bản đồ (chỉ danh sách).
 6. **Tiện ích**: lưới icon + tên (`amenities`), 2 cột mobile, 3 cột ≥ lg (cột chính hẹp hơn). Không có icon → chỉ tên dạng danh sách 2 cột.
 7. **Mặt bằng**: tab theo `floorPlans.title`, ảnh mặt bằng 4:3 nền trắng, bấm mở lightbox. ≥ 6 mặt bằng → select thay tab trên mobile.
@@ -476,7 +476,7 @@ Responsive: theo màn cha.
 
 ### S08. Danh sách Đăng tin BĐS · `/tin-bds` · `/en/property-news` (FR-PUB-06)
 
-- **Bố cục as-built (BL-020 P3-T02):** banner gọn 240px; **chưa có băng tìm kiếm** (trang hiện không có từ khoá/lọc/sắp xếp — không thêm); dòng "Có N kết quả" (aria-live, gồm cả bài nổi bật) trên bài nổi bật; lưới 1/2/3/4 cột (4 ≥ xl); thẻ `PostCard` trắng bo 20px viền nhạt, tiêu đề thẻ nổi bật `font-display font-medium lg:text-h2-sm` (EB Garamond chỉ nạp 400/500). Áp cho cả trang danh mục `/tin-bds/danh-muc/[category]`.
+- **Bố cục as-built (BL-020 P3-T02):** banner gọn 240px; **chưa có băng tìm kiếm** (trang hiện không có từ khoá/lọc/sắp xếp — không thêm); dòng "Có N kết quả" (aria-live, gồm cả bài nổi bật) trên bài nổi bật; lưới 1/2/3/4 cột (4 ≥ xl); thẻ `PostCard` trắng bo 20px viền nhạt, tiêu đề thẻ nổi bật `font-display font-medium lg:text-h2-sm` (Montserrat nạp 400/500/600). Áp cho cả trang danh mục `/tin-bds/danh-muc/[category]`.
 - **BL-032 (thay mục bài nổi bật bên dưới):** đồng bộ `/du-an` + `/cho-thue` — bài nổi bật là **thẻ đầu lưới** (ảnh `priority`), không còn thẻ ngang 7/5; hàng "Có N kết quả" + lưới trong `section[aria-label]`; `PostCard` ảnh 4:3, tiêu đề `font-display text-h4` `line-clamp-2`, thân `gap-1` như RentalCard/ProjectCard; trống: tiêu đề riêng ("Chưa có tin đăng." / "Chưa có tin đăng trong mục này." + về `/tin-bds`).
 - Page banner + breadcrumb. Tab danh mục (link tới S05): "Tất cả" · Tin BĐS · Voucher / Ưu đãi · … (tab cuộn ngang < md).
 - Trang 1, tab Tất cả: **bài nổi bật** đầu tiên (`isFeatured` mới nhất còn hạn) thẻ ngang lớn: ảnh 16:10 7 cột + chữ 5 cột (tiêu đề `--text-h2`, excerpt 3 dòng, hạn ưu đãi) (≥ lg); dưới là lưới thẻ Tin/ưu đãi.
@@ -540,9 +540,9 @@ Responsive: theo màn cha.
 
 > **As-built BL-033 (thay bố cục "như S09 bước 1-3 và 5"; nội dung từng phần giữ nguyên):** khung chi tiết chung (`DetailLayout`, nền `--color-primary-subtle`, gốc `data-detail-page` → header ẩn khi cuộn, `--sticky-top` 8/16px; **không** thanh mục con viên thuốc, **không** thẻ phụ cột phải): breadcrumb → lưới ≥ lg `[mục lục 15rem (xl 16rem)] [thẻ trắng bo 28px]` → Bài liên quan ngoài thẻ (nền `--color-bg-alt`). Thẻ trắng: danh mục (link) · h1 `font-display` · ngày + thời gian đọc · ảnh bìa 16:9 bo 20px `priority` · nội dung RichText (cột chữ ≤ 68ch) · tags · chia sẻ. **Mục lục** (`nav[aria-label="Mục lục" / "Contents"]`): sinh từ `h2`/`h3` cấp gốc (Lexical `h1`/`h2` → `h2`, `h3`+ → `h3`; `h3` thụt lề), id = slug bỏ dấu của chữ heading, trùng thêm `-2`/`-3`, slug rỗng → `muc-N`, không trùng id sẵn có của trang; ≥ lg thẻ trắng bo 20px dính `top: var(--sticky-top)`, `max-h` = viewport − `--sticky-top` − 1rem, cuộn riêng trong khung (`overscroll-contain`), mục đang đọc nền/chữ nhấn + `aria-current="location"` (heading cuối cùng đã qua vạch dưới đỉnh; phía trên heading đầu → không mục nào), mục active tự cuộn vào khung mục lục (chỉ khung, không cuộn trang); bấm → cuộn mượt (tức thì khi giảm chuyển động) tới heading, heading có `scroll-mt` = `--sticky-top` + 1rem, focus chuyển vào heading; link là neo `#id` thật (chạy khi không JS). < lg: `<details>` "Mục lục / Contents" đóng mặc định trong thẻ trắng, sau ảnh bìa, trước nội dung (cùng danh sách link). Không heading → không mục lục, lưới 1 cột, thẻ trắng không lệch. Ẩn khi in.
 
-- Như S09 bước 1-3 và 5 (không khối ưu đãi, không form). Tiêu đề serif chữ thường, meta: danh mục, ngày, thời gian đọc ước tính ("5 phút đọc / 5 min read").
+- Như S09 bước 1-3 và 5 (không khối ưu đãi, không form). Tiêu đề chữ thường, meta: danh mục, ngày, thời gian đọc ước tính ("5 phút đọc / 5 min read").
 - Cuối bài: tags (chip trung tính, không link ở giai đoạn 1 vì chưa có trang tag), chia sẻ, **Bài liên quan** 3 thẻ (cùng danh mục/tag).
-- RichText: `h2/h3` serif, trích dẫn (blockquote) viền trái 2px `--color-primary` (đây là typographic quote, không phải card) chữ `--text-lead` italic, ảnh trong bài full cột + chú thích `--text-small` muted, bảng cuộn ngang trong khung khi tràn.
+- RichText: `h2/h3`, trích dẫn (blockquote) viền trái 2px `--color-primary` (đây là typographic quote, không phải card) chữ `--text-lead` italic, ảnh trong bài full cột + chú thích `--text-small` muted, bảng cuộn ngang trong khung khi tràn.
 - Responsive theo blockquote As-built BL-033 (mục lục cột trái ≥ lg, khối gập < lg). **SEO:** `Article`. **Eyebrow:** 0.
 
 ### S12. Tuyển dụng · `/tuyen-dung` · `/en/careers` (FR-PUB-09)
@@ -708,7 +708,7 @@ Code dùng ảnh mẫu (picsum seed) ở dev/staging cho tới khi có Q4. Ảnh
 | Shape lock | ✅ 0 / 2px / 12 / 16 / 20px / pill / full theo thang BL-020 (tokens §4) |
 | Button + form contrast | ✅ tokens §9 (đã sửa 4 giá trị) |
 | CTA không xuống dòng, không trùng ý định | ✅ §1.2 |
-| Serif | ✅ EB Garamond do brand nêu, không Fraunces/Instrument Serif |
+| Font | ✅ Một font Montserrat, không serif (BL-036) |
 | Palette premium | ⚠️ ngoại lệ có chủ đích (màu thương hiệu đo từ nhận diện TAMI) |
 | Hero ≤ 4 phần tử chữ, không strip trang trí; nút cuộn xuống chỉ icon (BL-020 ghi đè "không scroll cue") | ✅ S01.1 |
 | Eyebrow ≤ ceil(n/3) | ✅ ghi từng màn (trang chủ 1/3) |

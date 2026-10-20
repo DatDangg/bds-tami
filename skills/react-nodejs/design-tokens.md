@@ -7,7 +7,7 @@
 
 ## 0. Design Read và Dials
 
-**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (ảnh lớn, tiêu đề serif viết thường, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, EB Garamond + Montserrat, chuyển động tiết chế.
+**Design read:** website thương hiệu bất động sản cao cấp cho khách mua/thuê Việt Nam và người nước ngoài; ngôn ngữ biên tập sang trọng theo market.vinhomes.vn (ảnh lớn, tiêu đề viết thường, nhiều khoảng trắng); Tailwind + shadcn/ui tuỳ biến, một font Montserrat (BL-036), chuyển động tiết chế.
 
 | Dial | Giá trị | Lý do |
 |---|---|---|
@@ -19,7 +19,7 @@
 
 | Luật taste-skill | Ngoại lệ | Căn cứ |
 |---|---|---|
-| §4.1 hạn chế serif | Dùng EB Garamond cho tiêu đề | Brand brief nêu đích danh font; phong cách luxury/editorial |
+| §4.1 hạn chế serif | Không dùng serif; một font Montserrat cho toàn site công khai (BL-036) | User chốt một font; phân cấp bằng cỡ + độ đậm |
 | §4.2 cấm nền kem + vàng đồng mặc định | Giữ vàng champagne `#E0BF89` + nền kem | Màu đo từ bộ nhận diện TAMI, không phải chọn mặc định |
 | §4.11 khoá một theme | Section tối xen kẽ (footer, banner CTA, menu toàn màn hình, tối đa **2** section nội dung tối mỗi trang: banner CTA + Tin tức trang chủ, BL-020 #11 user chốt 2026-10-19) | DESIGN.md "Color scheme: Light, có section tối xen kẽ" |
 | §6.C bắt buộc dark mode | **Không** làm dark mode toàn trang giai đoạn 1 | User chốt trong DESIGN.md ("Không làm dark mode toàn trang") |
@@ -124,7 +124,7 @@ Lớp `.theme-dark-block` đặt trên section tối, đổi giá trị biến �
 
 | Token | Font | Weight tải | Fallback |
 |---|---|---|---|
-| `--font-display` | EB Garamond | 400 (heading) + 500 (tiêu đề thẻ tin nổi bật `font-semibold`) | `Georgia, 'Times New Roman', serif` |
+| `--font-display` | Montserrat (vai trò tiêu đề, cùng font `--font-sans`) | 400, 500, 600 | `system-ui, -apple-system, 'Segoe UI', Arial, sans-serif` |
 | `--font-sans` | Montserrat | 400, 500, 600 | `system-ui, -apple-system, 'Segoe UI', Arial, sans-serif` |
 
 Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) nếu cần căn số: dùng `font-variant-numeric: tabular-nums` của Montserrat thay vì đổi font.
@@ -135,12 +135,12 @@ Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) n�
 
 | Token | Font | Size | Line-height | Weight | Kiểu | Dùng cho |
 |---|---|---|---|---|---|---|
-| `--text-display` | display | `clamp(2rem, 1.3rem + 3.2vw, 3.75rem)` (32→60px) | 1.08 | 400 | Viết thường, `letter-spacing: 0` | Câu chính hero |
-| `--text-h1` | display | `clamp(1.875rem, 1.2rem + 2.9vw, 3.5rem)` (30→56px) | 1.1 | 400 | Viết thường | Tiêu đề trang |
-| `--text-h2` | display | `clamp(1.625rem, 1.15rem + 2vw, 2.75rem)` (26→44px) | 1.15 | 400 | Viết thường | Tiêu đề section/khối |
-| `--text-h2-sm` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` (24→30px) | 1.2 | 400 | Viết thường | Heading phụ trong nội dung/trang chi tiết (RichText h2, mục chi tiết, form) |
-| `--text-h3` | display | `clamp(1.375rem, 1.32rem + 0.25vw, 1.5625rem)` (22→25px) | 1.25 | 400 | Thường | Tên trên thẻ dự án/dịch vụ, tiêu đề bài trên thẻ lớn |
-| `--text-h4` | sans | `1.125rem` (18px) | 1.4 | 600 | Thường | Tiêu đề thẻ tin cho thuê, tiêu đề nhóm thông số |
+| `--text-display` | display | `clamp(1.75rem, 1.2rem + 2.6vw, 3.25rem)` (28→52px) | 1.15 | 500 | Viết thường, `letter-spacing: -0.01em` | Câu chính hero |
+| `--text-h1` | display | `clamp(1.625rem, 1.15rem + 2.3vw, 3rem)` (26→48px) | 1.15 | 500 | Viết thường, `letter-spacing: -0.01em` | Tiêu đề trang |
+| `--text-h2` | display | `clamp(1.5rem, 1.15rem + 1.5vw, 2.375rem)` (24→38px) | 1.2 | 500 | Viết thường, `letter-spacing: -0.01em` | Tiêu đề section/khối |
+| `--text-h2-sm` | display | `clamp(1.375rem, 1.3rem + 0.4vw, 1.625rem)` (22→26px) | 1.25 | 500 | Viết thường | Heading phụ trong nội dung/trang chi tiết (RichText h2, mục chi tiết, form) |
+| `--text-h3` | display | `clamp(1.25rem, 1.2rem + 0.25vw, 1.375rem)` (20→22px) | 1.3 | 500 | Thường | Tên trên thẻ dự án/dịch vụ, tiêu đề bài trên thẻ lớn |
+| `--text-h4` | sans | `1.125rem` (18px) | 1.4 | 600 (mặc định theo token) | Thường | Tiêu đề thẻ tin cho thuê, tiêu đề nhóm thông số |
 | `--text-lead` | sans | `clamp(1rem, 0.95rem + 0.2vw, 1.125rem)` (16→18px) | 1.6 | 400 | Thường | Câu phụ hero, đoạn mở đầu |
 | `--text-body` | sans | `1rem` (16px) | 1.7 | 400 | Thường | Nội dung |
 | `--text-small` | sans | `0.875rem` (14px) | 1.5 | 400 | Thường | Nhãn, chú thích, helper, lỗi form |
@@ -148,7 +148,7 @@ Không dùng font thứ 3. Không dùng monospace trừ mã tin (`CT-000123`) n�
 | `--text-eyebrow` | sans | `0.75rem` → `0.8125rem` | 1.4 | 600 | IN HOA, `0.12em`, `--color-accent-text` | Nhãn trên tiêu đề (theo hạn mức §0) |
 | `--text-button` | sans | `0.875rem` (14px) | 1 | 600 | IN HOA, `0.08em` | Nút (md, lg) |
 | `--text-button-sm` | sans | `0.8125rem` (13px) | 1 | 600 | IN HOA, `0.08em` | Nút size sm |
-| `--text-price` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` | 1.2 | 500 | `tabular-nums`, `--color-accent-display` hoặc `--color-text` | Giá ở trang chi tiết |
+| `--text-price` | display | `clamp(1.5rem, 1.35rem + 0.62vw, 1.875rem)` | 1.2 | 600 | `tabular-nums`, `--color-accent-display` hoặc `--color-text` | Giá ở trang chi tiết |
 
 **Quy tắc chữ:**
 - Heading viết thường (BL-020); chỉ nút, eyebrow, menu in hoa bằng `text-transform: uppercase`, **không** gõ in hoa trong CMS. Tiếng Việt in hoa bằng CSS vẫn giữ dấu đúng khi có `lang` đúng.
@@ -362,7 +362,7 @@ Ba lớp, **không** khai cùng một tên biến ở hai nơi (tránh vòng tha
   --color-info: #2B6CB0;     --color-info-subtle: #E8F0F9;    --color-info-text: #245A94;
   --color-focus-ring: #8C6733;
 
-  --font-display: var(--font-eb-garamond), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --font-sans: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 
   --radius-sm: 2px;
@@ -459,8 +459,7 @@ Biến font sinh bởi `next/font`:
 
 ```ts
 // src/app/(frontend)/fonts.ts
-import { EB_Garamond, Montserrat } from 'next/font/google'
-export const ebGaramond = EB_Garamond({ subsets: ['latin', 'vietnamese'], weight: ['400', '500'], variable: '--font-eb-garamond', display: 'swap' })
+import { Montserrat } from 'next/font/google'
 export const montserrat = Montserrat({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600'], variable: '--font-montserrat', display: 'swap' })
 ```
 
