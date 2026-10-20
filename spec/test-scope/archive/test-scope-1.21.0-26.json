@@ -1,0 +1,85 @@
+{
+  "specVersion": "1.21.0",
+  "scopeVersion": 26,
+  "generatedAt": "2026-10-20T23:55:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-024 — admin 375px: Tổng quan + danh sách 'cuộn ngang' (tách từ BL-023 #10). Đo lại: 506/576px là transition `grid-template-columns` của nav Payload bị đóng băng khi đo ở trang không render, không phải tràn thật (sau transition = 375). Lỗi thật duy nhất: thanh chọn hàng loạt `.collection-list__list-selection` (≤768px) lệch phải 1 gutter + hàng nút nowrap → nút 'Xóa' bị cắt. Bug thuần, requirement không đổi → giữ spec 1.21.0, không spec/updates, không dòng CHANGELOG (theo tiền lệ scope v11/v21).",
+  "workItem": "bug/admin-dashboard-list-mobile-overflow",
+  "backlog": "BL-024",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-20-admin-dashboard-list-mobile-overflow.md",
+  "task": [
+    "tasks/bug-admin-dashboard-list-mobile-overflow/phase-1-task-01.md"
+  ],
+  "commits": [
+    "close-out BL-024 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-024 (commit chứa file này)": "T01 — `_lists.scss`: `.collection-list__list-selection { left:0; right:0; width:auto; padding-inline:var(--gutter-h) }` + `.list-selection { flex-wrap:wrap; row-gap:4px }`; test tĩnh `admin-mobile-overflow.test.ts` khẳng định rule + vẫn cấm `overflow-x:hidden` trên html/body (mở rộng sang _lists.scss)"
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.21.0-25.json",
+  "specUpdate": null,
+  "specRefs": [
+    "FR-ADM-19"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Giao diện quản trị — danh sách admin 'không tràn ngang ở 375px' / 'responsive không vỡ ở 390px'. Ngữ nghĩa requirement không đổi — code nay khớp ở thanh chọn hàng loạt (mobile)."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/admin/styles/_lists.scss",
+      "src/components/admin/admin-mobile-overflow.test.ts"
+    ],
+    "filesNote": "Chỉ CSS admin + test tĩnh. Không schema/migration/API/access control. Doc impact: no doc impact.",
+    "modules": [
+      "CSS admin — src/components/admin/styles/_lists.scss (ngoài @layer, thắng @layer payload-default): thanh chọn hàng loạt full-bleed, nội dung trong gutter, nút tự xuống dòng",
+      "Test — src/components/admin/admin-mobile-overflow.test.ts"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Thanh chọn hàng loạt `.collection-list__list-selection` ở ≤ 768px (Payload chỉ render khi smallBreak): chọn ≥ 1 hàng → nền thanh phủ 0–375, mọi nút nằm trong gutter (right ≤ 359), không nút nào bị cắt",
+      "Danh sách nhiều trang (rentals 32 bản ghi) hiện nút 'Chọn tất cả (N)' → các nút xuống dòng thay vì tràn; 'Xóa' không còn ở right = 390"
+    ],
+    "dependents": [
+      "Mọi màn danh sách admin ở ≤ 768px dùng thanh chọn hàng loạt: rentals, leads, projects, news, property-posts, media, lead-activities, services, jobs, pages…",
+      "List drawer (ListDrawer, vd chọn quan hệ/ảnh) ở ≤ 768px dùng lại thanh này — chưa đo"
+    ],
+    "regression": [
+      "Desktop/tablet (> 768px): danh sách không đổi (thanh không render)",
+      "Bảng danh sách vẫn cuộn ngang trong khung `.table`, không làm cả trang cuộn",
+      "Chip lọc nhanh (BL-022) vẫn cuộn nội bộ trong `.quick-filter-chips__scroller`",
+      "/admin (Tổng quan) và các danh sách chính: `documentElement.scrollWidth == 375` ở 375px — ĐO SAU KHI TRANSITION XONG: ở trình duyệt ẩn/không render, transition `grid-template-columns` của nav Payload bị đóng băng cho số giả 506–604px → gọi `document.getAnimations().forEach(a => a.finish())` trước khi đo (hoặc đo khi trang đang hiển thị)",
+      "Không có `overflow-x: hidden` toàn cục mới trên html/body/.template-default; transition mở/đóng nav Payload không đổi",
+      "Nút trong thanh (Chỉnh sửa, Xóa, Chọn tất cả, Xuất bản/Huỷ xuất bản nếu có) vẫn bấm được và chạy đúng hành động; bỏ chọn → thanh biến mất"
+    ]
+  },
+  "acceptance": [
+    "Viewport 375×812, rentals (nhiều trang, hiện 'Chọn tất cả (N)'): chọn hàng bằng checkbox → thanh chọn spans 0–375, mọi nút right ≤ 359, nút xuống dòng thay vì tràn",
+    "Viewport 375×812, leads: chọn hàng → thanh 0–375, 'Chỉnh sửa' + 'Xóa' trong viewport (right ≤ 359)",
+    "/admin + danh sách rentals/leads/projects/news/property-posts/media/lead-activities/services ở 375px: không cuộn ngang toàn trang (scrollWidth == 375 sau khi transition xong)",
+    "Không có `overflow-x: hidden` toàn cục; desktop 1280 danh sách không đổi",
+    "pnpm test / lint / typecheck PASS (admin-mobile-overflow.test.ts)"
+  ],
+  "outOfScope": [
+    "Thanh chọn (fixed, cao hơn khi nút xuống dòng) che bớt đáy danh sách (phân trang/hàng cuối) — hành vi Payload có sẵn, reviewer MINOR-1, đề xuất task riêng; KHÔNG fail test vì điểm này",
+    "`--nav-width: 100vw` với thanh cuộn cổ điển ở cửa sổ desktop hẹp (nav đóng rộng hơn clientWidth ~15px) — hành vi Payload gốc, ghi residual (D3)",
+    "Số 506/576px khi đo ở trang không render — không phải lỗi (D1)"
+  ],
+  "viewports": [
+    1280,
+    375
+  ],
+  "locales": [
+    "vi"
+  ],
+  "browsers": [
+    "chrome",
+    "safari-ios (chưa kiểm thiết bị thật — ưu tiên nếu có)"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "T01 NORMAL PASS r1 (1 rule CSS admin cho phần tử chỉ render ≤ 768px). Không schema/API/quyền. Residual: reviewer không đo lại trình duyệt (dựa số DOM của builder); test tĩnh chỉ khẳng định khai báo CSS, không đo hình học; list drawer ≤ 768px chưa đo; chỉ kiểm Chrome."
+}

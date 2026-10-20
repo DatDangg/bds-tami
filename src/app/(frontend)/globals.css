@@ -222,8 +222,9 @@
   color: var(--color-text);
 }
 
-/* Khoảng header chiếm trong luồng = lề trên + thanh cao + lề dưới (8+64+8 = 80px; ≥ lg 16+72+16 = 104px). Hero kéo lên bằng đúng giá trị này;
-   thanh mục con dính (`sticky top-*`) và `scroll-mt-*` dưới header đều dựa vào nó để nội dung không bị thanh nổi che. */
+/* Chiều cao `<header>` cố định ở CẢ HAI trạng thái (BL-025): đầu trang = thanh phẳng cao 80px (≥ lg 104px); đã cuộn = lề trên + thanh + lề dưới
+   (8+64+8 = 80px; ≥ lg 16+72+16 = 104px). Hero kéo lên bằng đúng giá trị này;
+   thanh mục con dính (`sticky top-*`) và `scroll-mt-*` dưới header đều dựa vào nó để nội dung không bị header che. */
 :root {
   --header-offset: 5rem;
 }
@@ -233,8 +234,8 @@
   }
 }
 
-/* Header nổi bo tròn kính mờ SÁNG (BL-020, design-spec §2.1): luôn là một thanh viên thuốc nổi cách mép, cả khi đè lên hero (không còn biến thể
-   trong suốt), nên logo vàng + chữ --color-text luôn đạt 4.5:1 trên kính dù ảnh phía sau tối hay sáng. Mặc định nền ĐẶC (--color-surface);
+/* Header kính mờ SÁNG (BL-020/BL-025, design-spec §2.1): đầu trang là thanh phẳng full-width, đã cuộn là viên thuốc nổi cách mép (hình dạng do
+   HeaderFrame); nền luôn cùng một kiểu, cả khi đè lên hero (không có biến thể trong suốt), nên logo vàng + chữ --color-text luôn đạt 4.5:1 trên kính dù ảnh phía sau tối hay sáng. Mặc định nền ĐẶC (--color-surface);
    chỉ trình duyệt có backdrop-filter mới dùng kính, và người chọn giảm trong suốt quay lại nền đặc. */
 .site-header-bar {
   background-color: var(--color-surface);

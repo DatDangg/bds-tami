@@ -781,6 +781,35 @@
       "round": 2,
       "report": ".context/review-reports/feature-admin-list-quick-filter-chips-phase-1-task-02-round-2-review.md",
       "residual": "Dark mode + bàn phím chưa kiểm tay trên trình duyệt; 768/1280 chưa kiểm; chip chưa test với DB thật (unit + handler); chưa có tin Studio để kiểm kết quả; entry where nhiều trường trong 1 điều kiện (chỉ URL viết tay) bị bỏ cả cụm khi chọn chip."
+    },
+    {
+      "slug": "header-full-width-at-top",
+      "title": "Header công khai: đầu trang thanh phẳng full-width kính mờ sáng, cuộn xuống thành thanh nổi bo tròn (BL-025)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-025",
+      "changeDoc": "spec/changes/archive/2026-10-20-header-full-width-at-top.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-header-full-width-at-top/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewerResult": "PASS",
+          "reviewLevel": "STRICT (r1) / NORMAL (r2)",
+          "report": ".context/review-reports/feature-header-full-width-at-top-phase-1-task-01-round-2-review.md",
+          "note": "r1 STRICT PASS + MINOR nội dung nhảy ngang ở 1920 → khung 84rem; r2 NORMAL PASS",
+          "commit": "(commit close-out BL-025)"
+        }
+      ],
+      "completedAt": "2026-10-20",
+      "specVersion": "1.22.0",
+      "scopeVersion": 27,
+      "specUpdate": "spec/updates/2026-10-20-header-full-width-at-top.md",
+      "residual": "chưa kiểm trình duyệt thật (dev/DB tắt) — chỉ unit test class; max-w-[84rem] lặp 2 chỗ; tải lại giữa trang phẳng → nổi sau hydrate"
     }
   ],
   "bugs": [
@@ -1637,7 +1666,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T23:59:00+07:00",
+  "lastUpdated": "2026-10-20T02:31:14.806Z",
   "approvalMilestones": [
     {
       "id": "M1",

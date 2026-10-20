@@ -30,7 +30,7 @@ interface HeaderProps {
 }
 
 /**
- * Header dính đầu trang: thanh nổi bo tròn kính mờ sáng, luôn một biến thể kể cả trên hero (BL-020, `HeaderFrame`, design-spec §2.1). Thuần hiển thị:
+ * Header dính đầu trang: kính mờ sáng, đầu trang là thanh phẳng full-width, đã cuộn mới thành thanh nổi bo tròn (BL-025, `HeaderFrame`, design-spec §2.1). Thuần hiển thị:
  * nhận view model đã lọc từ layout. Chỉ DesktopNav, MobileMenu, LanguageSwitcher là client. Thứ tự DOM = thứ tự Tab (logo, menu ngang,
  * tìm, ngôn ngữ, CTA, nút Menu). `order-*` chỉ đổi vị trí hiển thị ở < xl (tìm bên trái, logo giữa); từ xl là MỘT hàng: logo trái ·
  * menu ngang giữa · tìm + VI|EN + CTA phải, KHÔNG có nút Menu (BL-019; thứ tự Tab ≥ xl: logo, menu ngang, tìm, ngôn ngữ, CTA).
