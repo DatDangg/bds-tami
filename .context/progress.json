@@ -885,6 +885,36 @@
       "specUpdate": "spec/updates/2026-10-20-detail-pages-unified-layout.md",
       "specValidation": ".context/review-reports/feature-detail-pages-unified-layout-phase-1-spec-validation.md",
       "residual": "trước hydrate/không JS header che thanh mục con (user chấp nhận 2026-10-20); chưa kiểm bằng mắt 768 / reduced-motion / tin rented / trình duyệt không :has(); OBSERVER_MARGIN -88px xấp xỉ; Điều khoản tin rented không tự mở khi bấm mục con; hằng 4.5rem lặp nhiều chỗ"
+    },
+    {
+      "slug": "detail-subnav-full-width",
+      "title": "Thanh mục con trang chi tiết (dự án + cho thuê) rộng bằng khung nội dung bên dưới (BL-028)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-028",
+      "changeDoc": "spec/changes/archive/2026-10-20-detail-subnav-full-width.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-detail-subnav-full-width/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 1,
+          "reviewLevel": "FAST",
+          "note": "attempt 1 (84rem = header nổi) user loại; attempt 2 ul w-full trong khung max-w-container + px-gutter; r1 FAST PASS",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-detail-subnav-full-width-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-028)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.24.0",
+      "scopeVersion": 30,
+      "specUpdate": "spec/updates/2026-10-20-detail-subnav-full-width.md",
+      "residual": "768px chưa kiểm bằng mắt; bản /en chưa đo riêng (cùng component)"
     }
   ],
   "bugs": [

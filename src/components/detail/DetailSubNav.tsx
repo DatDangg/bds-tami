@@ -23,6 +23,7 @@ function prefersReducedMotion(): boolean {
 /**
  * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề trên của header nổi (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`);
  * bấm cuộn mượt tới khối (tắt khi giảm chuyển động) rồi chuyển focus vào khối để người dùng bàn phím/đọc màn hình đi tiếp từ đó.
+ * Bề rộng thanh = khung nội dung bên dưới (BL-028): cùng `max-w-container` + `px-gutter` với lưới thẻ nội dung + thẻ phụ nên hai mép thẳng hàng; thanh `w-full`, nút căn trái, cả lúc chưa dính lẫn dính đỉnh.
  * Link là neo `#id` thật nên chạy cả khi chưa có JS. < lg cuộn ngang và mục đang xem tự cuộn vào giữa.
  */
 export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: string }) {
@@ -82,7 +83,7 @@ export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: str
     <nav aria-label={label} className="pointer-events-none sticky top-(--sticky-top) z-(--z-sticky) mx-auto w-full max-w-container px-gutter print:hidden">
       <ul
         ref={listRef}
-        className="pointer-events-auto relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-pill border border-border bg-surface p-1 whitespace-nowrap shadow-md [scrollbar-width:none]"
+        className="pointer-events-auto relative flex w-full gap-1 overflow-x-auto rounded-pill border border-border bg-surface p-1 whitespace-nowrap shadow-md [scrollbar-width:none]"
       >
         {items.map((item) => {
           const current = item.id === activeId;

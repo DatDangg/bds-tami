@@ -346,6 +346,12 @@ describe("DetailSubNav", () => {
     expect(nav.className).toContain("top-(--sticky-top)");
     expect(nav.className).toContain("pointer-events-none");
     expect(within(nav).getByRole("list").className).toContain("rounded-pill");
+    // BL-028: bề rộng thanh = khung nội dung bên dưới (cùng max-w-container + px-gutter với lưới), không ôm vừa nút.
+    expect(nav.className).toContain("max-w-container");
+    expect(nav.className).toContain("px-gutter");
+    const list = within(nav).getByRole("list");
+    expect(list.className).toContain("w-full");
+    expect(list.className).not.toContain("w-fit");
     expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute("aria-current", "location");
   });
 
