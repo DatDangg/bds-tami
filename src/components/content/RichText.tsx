@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { resolveInternalDocHref } from "@/lib/content/doc-link";
-import { isSectionHeading, sectionHeadingId } from "@/lib/content/section-headings";
+import { isSectionHeading, isTocHeading, sectionHeadingId } from "@/lib/content/section-headings";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
 
@@ -187,6 +187,15 @@ function renderNode(node: LexicalNode, key: number, depth: number, ctx: RenderCo
     }
     case "heading": {
       const Tag = headingTag(node.tag);
+      const tocId = ctx.toc && depth === 0 && isTocHeading(node) ? ctx.toc.ids[ctx.toc.count++] : undefined;
+      if (tocId) {
+        // Trang chi tiết dùng `--sticky-top` (BL-027) chứ không phải `--header-offset`; `tabIndex=-1` để mục lục chuyển focus vào heading.
+        return (
+          <Tag key={key} id={tocId} tabIndex={-1} className={cn(TEXT_CLASS[Tag], "scroll-mt-[calc(var(--sticky-top)+1rem)] focus:outline-none")}>
+            {renderChildren(node.children, depth + 1, ctx)}
+          </Tag>
+        );
+      }
       const id = ctx.sections && depth === 0 && isSectionHeading(node) ? sectionHeadingId(ctx.sections.count++) : undefined;
       return (
         <Tag key={key} id={id} className={cn(TEXT_CLASS[Tag], id && "scroll-mt-[calc(var(--header-offset)+1rem)]")}>
@@ -230,6 +239,8 @@ interface RenderContext {
   tableLabel: string | undefined;
   /** Có giá trị khi bật `anchorSections`: đếm `h2` cấp gốc đã gắn `id` (khớp `collectSectionHeadings`). */
   sections: { count: number } | undefined;
+  /** Có giá trị khi truyền `headingIds`: `id` gắn lần lượt lên heading cấp gốc có chữ (khớp `collectTocHeadings`). */
+  toc: { ids: readonly string[]; count: number } | undefined;
 }
 
 interface RichTextProps {
@@ -242,11 +253,13 @@ interface RichTextProps {
   tableLabel?: string;
   /** Gắn `id` (`muc-1`, `muc-2`...) lên các `h2` cấp gốc để mục lục (`collectSectionHeadings`) trỏ tới. */
   anchorSections?: boolean;
+  /** Gắn `id` lên heading cấp gốc có chữ (h2 + h3) theo thứ tự, từ `collectTocHeadings` (mục lục chi tiết tin tức); thiếu thì không gắn. */
+  headingIds?: readonly string[];
 }
 
-export function RichText({ data, className, locale, tableLabel, anchorSections = false }: RichTextProps) {
+export function RichText({ data, className, locale, tableLabel, anchorSections = false, headingIds }: RichTextProps) {
   const root = typeof data === "object" && data !== null ? (data as { root?: LexicalNode }).root : undefined;
   if (!root || typeof root !== "object") return null;
   // `break-words` + `overflow-wrap:anywhere`: URL/chuỗi dài không đẩy trang cuộn ngang ở 375px.
-  return <div className={cn("break-words [overflow-wrap:anywhere]", className)}>{renderChildren(root.children, 0, { locale, tableLabel, sections: anchorSections ? { count: 0 } : undefined })}</div>;
+  return <div className={cn("break-words [overflow-wrap:anywhere]", className)}>{renderChildren(root.children, 0, { locale, tableLabel, sections: anchorSections ? { count: 0 } : undefined, toc: headingIds ? { ids: headingIds, count: 0 } : undefined })}</div>;
 }

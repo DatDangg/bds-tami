@@ -23,19 +23,30 @@ interface DetailLayoutProps {
   asideLabelledBy?: string;
   /** Khối ngoài thẻ và ngoài lưới (Dự án khác, Tin tương tự, CTA). */
   after?: ReactNode;
+  /**
+   * Cột trái tuỳ chọn (mục lục chi tiết tin tức, BL-033), chỉ hiện ≥ lg và đứng TRƯỚC thẻ trắng trong DOM. Có giá trị thì lưới là `[cột trái][thẻ]`
+   * và không dùng `aside`; không truyền thì DOM/class giữ nguyên như các trang chi tiết khác.
+   */
+  leading?: ReactNode;
 }
+
+const GRID_WITH_ASIDE =
+  "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10";
+const GRID_WITH_LEADING =
+  "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-8 lg:py-8 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-x-10";
 
 /**
  * Khung chi tiết dùng chung (BL-027, design-spec S03): gốc đánh dấu `data-detail-page` để `globals.css` (a) ẩn hẳn header khi cuộn và (b) đặt
  * `--sticky-top` = lề trên header nổi (8/16px) cho thanh mục con, thẻ dính và mọi `scroll-mt`. Nền `bg-primary-subtle`; cột chính là một thẻ trắng,
  * thẻ phụ tách riêng. Server Component; chỉ thanh mục con và vỏ `aside` đo chiều cao (`DetailAsideFit`) là client.
  */
-export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after }: DetailLayoutProps) {
+export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after, leading }: DetailLayoutProps) {
   return (
     <div data-detail-page="" className="bg-primary-subtle">
       {before}
       {subNav && <DetailSubNav items={subNav.items} label={subNav.label} />}
-      <div className="mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10">
+      <div className={leading ? GRID_WITH_LEADING : GRID_WITH_ASIDE}>
+        {leading && <div className="hidden min-w-0 lg:block print:hidden">{leading}</div>}
         <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
         {aside && (
           <DetailAsideFit {...(asideLabelledBy ? { "aria-labelledby": asideLabelledBy } : {})} className="pt-6 lg:pt-0">

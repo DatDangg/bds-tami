@@ -229,4 +229,27 @@ describe("RichText: tiếp nối review L6-T06", () => {
     const off = render(<RichText data={data} />);
     expect(off.container.querySelector("h2")?.id).toBe("");
   });
+
+  it("headingIds: gắn đúng id lên heading cấp gốc có chữ theo thứ tự (h2 + h3), bỏ qua heading rỗng; tắt thì output không đổi", () => {
+    const heading = (tag: string, label: string) => ({ type: "heading", tag, children: [text(label)] });
+    const data = doc(heading("h2", "Một"), heading("h3", "con"), heading("h2", "  "), heading("h1", "Hai"), paragraph(text("x")));
+    const on = render(<RichText data={data} headingIds={["mot", "con", "hai"]} />);
+    const headings = [...on.container.querySelectorAll("h2, h3")];
+    expect(headings.map((node) => node.id)).toEqual(["mot", "con", "", "hai"]);
+    expect(headings[0]).toHaveAttribute("tabindex", "-1");
+    expect(headings[0]?.className).toContain("scroll-mt-[calc(var(--sticky-top)+1rem)]");
+    on.unmount();
+    const off = render(<RichText data={data} />);
+    expect(off.container.querySelector("[id]")).toBeNull();
+    expect(off.container.querySelector("[tabindex]")).toBeNull();
+  });
+
+  it("headingIds thiếu so với số heading: heading dư không có id; anchorSections vẫn dùng muc-N", () => {
+    const data = doc({ type: "heading", tag: "h2", children: [text("Một")] }, { type: "heading", tag: "h2", children: [text("Hai")] });
+    const short = render(<RichText data={data} headingIds={["mot"]} />);
+    expect([...short.container.querySelectorAll("h2")].map((node) => node.id)).toEqual(["mot", ""]);
+    short.unmount();
+    const legal = render(<RichText data={data} anchorSections />);
+    expect([...legal.container.querySelectorAll("h2")].map((node) => node.id)).toEqual(["muc-1", "muc-2"]);
+  });
 });

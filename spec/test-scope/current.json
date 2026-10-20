@@ -1,118 +1,115 @@
 {
-  "specVersion": "1.27.0",
-  "scopeVersion": 34,
+  "specVersion": "1.28.0",
+  "scopeVersion": 35,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-032 — tin đăng BĐS đồng bộ UI với dự án / cho thuê: chi tiết /tin-bds/[slug] dùng DetailLayout (nền primary-subtle, header ẩn khi cuộn, breadcrumb → ảnh bìa 16:9 bo 20px pb-8 → thanh mục con overview/offer/content/gallery → một thẻ trắng; PostContactBox dính ≥ lg; Tin liên quan nền bg-alt; bỏ PostShareRail). Danh sách: bài nổi bật = thẻ đầu lưới, PostCard ảnh 4:3 + tiêu đề serif 2 dòng, trạng thái trống có tiêu đề. Spec 1.26.0 → 1.27.0 (MINOR, đổi yêu cầu trình bày).",
-  "workItem": "feature/post-detail-unified-layout",
-  "backlog": "BL-032",
+  "triggerNote": "BL-033 — chi tiết tin tức /tin-tuc/[slug] dùng DetailLayout (nền primary-subtle, header ẩn khi cuộn, không subNav/aside phải): breadcrumb → một thẻ trắng (danh mục, h1, ngày + phút đọc, ảnh bìa 16:9 bo 20px, RichText, tags, chia sẻ) → Tin liên quan bg-alt. Mục lục tự sinh từ h2/h3 cấp gốc (id slug bỏ dấu, trùng -2, rỗng muc-N): ≥ lg cột trái dính (slot leading mới của DetailLayout) + scroll-spy aria-current; < lg <details> gập. Spec 1.27.0 → 1.28.0 (MINOR, đổi yêu cầu trình bày + thêm mục lục).",
+  "workItem": "feature/news-detail-card-toc",
+  "backlog": "BL-033",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-post-detail-unified-layout.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-news-detail-card-toc.md",
   "task": [
-    "tasks/feature-post-detail-unified-layout/phase-1-task-01.md"
+    "tasks/feature-news-detail-card-toc/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-post-detail-unified-layout-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-news-detail-card-toc-spec-validation.md",
+    ".context/review-reports/feature-news-detail-card-toc-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-news-detail-card-toc-phase-1-task-01-round-2-review.md"
   ],
   "commits": [
-    "close-out BL-032 (commit chứa file này)"
+    "close-out BL-033 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-032 (commit chứa file này)": "T01 — PostDetail → DetailLayout (section Tổng quan/Ưu đãi/Nội dung/Hình ảnh, ProjectStickyCta, article pb-16 lg:pb-0), PostContactBox.tsx mới, post-detail-sections.ts mới, PostShare (xoá PostShareRail, bỏ xl:hidden), PostCard (xoá biến thể feature; 4:3, line-clamp-2 font-display text-h4, gap-1), PostListBody (section gridLabel + thẻ đầu priority), PostListPage (EmptyState tiêu đề + backHref), vi/en.json. Review NORMAL PASS r1 (4 MINOR tuỳ chọn). Doc: SPECIFICATIONS (Giao diện, F4), design-spec S08 + S09."
+    "close-out BL-033 (commit chứa file này)": "T01 — tin-tuc/[slug]/page.tsx → DetailLayout (before breadcrumb, leading NewsTocSidebar, thẻ trắng với NewsTocDisclosure < lg, after Tin liên quan), DetailLayout prop leading (không dùng → class lưới y hệt cũ), RichText prop headingIds (id + tabIndex=-1 + scroll-mt), section-headings collectTocHeadings/isTocHeading, NewsToc.tsx mới (NewsTocSidebar scroll-spy rAF vạch 48px + khoá 1s; NewsTocDisclosure), vi/en.json page.news.tocTitle. DetailSubNav không sửa. Doc: SPECIFICATIONS F5, design-spec §2.1 header table + S11."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.26.0-33.json",
-  "specUpdate": "spec/updates/2026-10-20-post-detail-unified-layout.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.27.0-34.json",
+  "specUpdate": "spec/updates/2026-10-20-news-detail-card-toc.md",
   "specRefs": [
-    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)",
-    "F4 — Đăng tin BĐS: chi tiết (BL-032)",
-    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)",
-    "design-spec S08 Danh sách tin đăng",
-    "design-spec S09 Chi tiết tin đăng"
+    "F5 — Tin tức: chi tiết /tin-tuc/[slug] (BL-033)",
+    "F5 — Tin tức: mục lục chi tiết (BL-033)",
+    "design-spec §2.1 bảng header — Trang chi tiết (BL-027) gồm tin tức BL-033",
+    "design-spec S11 Chi tiết tin tức (As-built BL-033 + Responsive)",
+    "design-spec S16 Pháp lý (regression mục lục muc-N)"
   ],
   "specRefNotes": {
-    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)": "Chi tiết tin đăng BĐS thuộc nhóm trang dùng DetailLayout; header cuộn xuống ẩn hẳn, chỉ hiện ở đầu trang / khi Tab focus.",
-    "F4 — Đăng tin BĐS: chi tiết (BL-032)": "Breadcrumb → ảnh bìa 16:9 bo 20px → thanh mục con dính Tổng quan · Ưu đãi · Nội dung · Hình ảnh (mục trống ẩn) → thẻ trắng; thẻ liên hệ 'Nhận tư vấn' (nút gọi hotline + LeadForm property_post) dính ≥ lg không cuộn riêng; < lg sau thẻ + CTA dính đáy; một cụm chia sẻ ở Tổng quan, bỏ rail ≥ xl (thay BL-007).",
-    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)": "Bài nổi bật = thẻ đầu lưới; dòng kết quả + lưới trong section có nhãn; PostCard ảnh 4:3 tiêu đề serif 2 dòng; trạng thái trống có tiêu đề riêng (+ quay lại ở danh mục). URL/phân trang/canonical không đổi.",
-    "design-spec S08 Danh sách tin đăng": "As-built BL-032 thay mục bài nổi bật ngang.",
-    "design-spec S09 Chi tiết tin đăng": "As-built BL-032 thay bố cục bước 1–7 bằng khung chi tiết chung S03/S07; nội dung từng khối giữ nguyên."
+    "F5 — Tin tức: chi tiết /tin-tuc/[slug] (BL-033)": "Khung chi tiết chung (nền primary-subtle, header ẩn khi cuộn, không thanh mục con viên thuốc): breadcrumb → một thẻ trắng bo 28px (danh mục, h1, ngày + thời gian đọc, ảnh bìa bo 20px, nội dung, tags, chia sẻ) → Bài liên quan ngoài thẻ. URL, metadata, canonical, JSON-LD Article không đổi; không form lead.",
+    "F5 — Tin tức: mục lục chi tiết (BL-033)": "Tự sinh từ h2/h3 cấp gốc; id = slug tiếng Việt bỏ dấu, trùng -2/-3, rỗng muc-N; ≥ lg cột trái dính top var(--sticky-top), aria-current mục đang đọc, bấm cuộn bù scroll-margin, danh sách dài cuộn riêng; < lg khối gập 'Mục lục / Contents' đóng mặc định đầu thẻ trước nội dung; không heading → không mục lục, không cột trống.",
+    "design-spec §2.1 bảng header — Trang chi tiết (BL-027) gồm tin tức BL-033": "Chi tiết tin tức thuộc nhóm trang DetailLayout có data-detail-page → header ẩn khi cuộn xuống, chỉ hiện ở đầu trang / khi Tab focus.",
+    "design-spec S11 Chi tiết tin tức (As-built BL-033 + Responsive)": "Thay bố cục 'như S09 bước 1-3 và 5'; nội dung từng phần giữ nguyên; mục lục cột trái ≥ lg, khối gập < lg.",
+    "design-spec S16 Pháp lý (regression mục lục muc-N)": "RichText anchorSections + TableOfContents pháp lý không đổi."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/posts/PostDetail.tsx",
-      "src/components/posts/PostContactBox.tsx",
-      "src/components/posts/PostCard.tsx",
-      "src/components/posts/PostListBody.tsx",
-      "src/components/posts/PostListPage.tsx",
-      "src/components/posts/PostShare.tsx",
-      "src/lib/posts/post-detail-sections.ts",
-      "src/lib/posts/post-detail-sections.test.ts",
+      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailLayout.test.tsx",
+      "src/components/content/RichText.tsx",
+      "src/components/content/RichText.test.tsx",
+      "src/lib/content/section-headings.ts",
+      "src/lib/content/section-headings.test.ts",
+      "src/components/news/NewsToc.tsx",
+      "src/components/news/NewsToc.test.tsx",
       "src/i18n/messages/vi.json",
       "src/i18n/messages/en.json",
-      "src/components/posts/post-components.test.tsx",
-      "src/components/posts/PostShare.test.tsx",
-      "src/components/posts/PostListPage.test.tsx",
-      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.test.tsx",
       "SPECIFICATIONS.md",
       ".context/design-spec.md"
     ],
-    "filesNote": "Trang tin đăng BĐS chuyển sang khung chi tiết chung src/components/detail/* (không sửa khung); PostCard dùng chung đổi kiểu thẻ; i18n thêm gridLabel, empty.*, subNavLabel, subNav.*, sections.content, leadForm.callHotline; xoá page.posts.featuredLabel/moreLabel, leadForm.hotline. Route page.tsx không đổi. Không schema/migration/API/access control/nguồn lead/JSON-LD.",
+    "filesNote": "DetailLayout thêm slot leading tuỳ chọn (cột trái ≥ lg, hidden lg:block print:hidden); RichText thêm headingIds tuỳ chọn; section-headings thêm collectTocHeadings/isTocHeading (anchorSections muc-N giữ nguyên); NewsToc.tsx mới; i18n thêm page.news.tocTitle. DetailSubNav không sửa. Không schema/migration/API/access control/dữ liệu CMS/metadata/JSON-LD.",
     "modules": [
-      "Posts — PostDetail / PostContactBox / PostShare (chi tiết tin đăng)",
-      "Posts — PostListPage / PostListBody / PostCard (danh sách + thẻ dùng chung)",
-      "Detail — DetailLayout / DetailSubNav / DetailAsideFit (dùng lại, không sửa)",
-      "Home — slider Ưu đãi (PostCard)",
-      "Projects — khối Tin liên quan chi tiết dự án (PostCard)"
+      "News — trang chi tiết tin tức + NewsToc (NewsTocSidebar / NewsTocDisclosure)",
+      "Detail — DetailLayout (slot leading mới)",
+      "Content — RichText (headingIds) + section-headings (collectTocHeadings)",
+      "Legal — TableOfContents / anchorSections (dùng lại, không sửa)"
     ]
   },
   "impact": {
     "direct": [
-      "/tin-bds/[slug] + /en/property-news/[slug]: nền --color-primary-subtle (data-detail-page), header ẩn khi cuộn xuống; breadcrumb → ảnh bìa 16:9 bo 20px, khoảng 32px (pb-8) tới thanh mục con; không ảnh bìa → chỉ breadcrumb",
-      "Thanh mục con dính: Tổng quan (#overview, luôn có) · Ưu đãi (#offer, chỉ khi có ưu đãi) · Nội dung (#content, chỉ khi có nội dung) · Hình ảnh (#gallery, chỉ khi có ảnh); bấm nút cuộn tới đúng mục, mục đang xem active",
-      "Nội dung trong một thẻ trắng bo ~28px; một h1 (tiêu đề tin) trong Tổng quan cùng danh mục (link), ngày đăng, cụm chia sẻ",
-      "Chia sẻ: < sm một nút Web Share (navigator.share, không hỗ trợ → menu Facebook/Zalo/sao chép link); ≥ sm hàng ngang; ≥ xl KHÔNG còn cụm dọc lề trái",
-      "≥ lg thẻ liên hệ 'Nhận tư vấn' cột phải dính, không thanh cuộn riêng: nút 'Gọi hotline {phone}' (tel:, chỉ khi có hotline) + một LeadForm source=property_post",
-      "< lg: thẻ liên hệ nằm sau thẻ nội dung; CTA dính đáy dẫn tới #lead-form, ẩn khi form trong viewport; nội dung không bị CTA che (pb-16)",
-      "Tin liên quan nằm ngoài thẻ trắng, nền bg-alt, lưới sm 2 / lg 3 cột, tiêu đề thẻ h3",
-      "/tin-bds + /tin-bds/danh-muc/[category] (+ EN): bài nổi bật là thẻ đầu lưới (ảnh priority), không còn thẻ ngang 7/5; dòng 'Có N kết quả' + lưới 1/2/3/4 cột trong section có aria-label",
-      "PostCard: ảnh 4:3, tiêu đề serif h4 tối đa 2 dòng; giữ danh mục, tóm tắt 2 dòng, giá, ngày/hạn, badge, ảnh mờ khi kết thúc",
-      "Trạng thái trống: '/tin-bds' → 'Chưa có tin đăng.'; danh mục → 'Chưa có tin đăng trong mục này.' + link quay lại /tin-bds (EN tương ứng)"
+      "/tin-tuc/[slug] + /en/news/[slug]: nền --color-primary-subtle (data-detail-page), header ẩn khi cuộn xuống, hiện lại ở đầu trang / khi Tab focus; không thanh mục con viên thuốc, không thẻ tư vấn cột phải",
+      "Breadcrumb → một thẻ trắng bo ~28px chứa: danh mục (link, vùng chạm ≥ 44px) · h1 (font-display text-h2) · ngày + phút đọc · ảnh bìa 16:9 bo 20px · nội dung (RichText ≤ 68ch) · tags · ShareButtons, đúng thứ tự cũ",
+      "≥ lg có heading: cột trái 15rem (xl 16rem) chứa thẻ 'Mục lục' bo 20px, dính top var(--sticky-top), cao tối đa viewport, danh sách dài cuộn riêng trong khung (không cuộn trang)",
+      "Mục lục: ol theo thứ tự heading; h3 thụt lề; link #id thật (chạy không cần JS); bấm → cuộn mượt tới heading (tức thì khi prefers-reduced-motion), heading nằm dưới mép trên viewport không bị che, URL hash cập nhật, focus vào heading",
+      "Highlight: heading cuối đã qua vạch (~48px dưới đỉnh) là mục active (aria-current=location + nền/chữ nhấn); trên heading đầu → không mục nào active; cuộn quá heading cuối vẫn giữ mục cuối; mục active tự cuộn vào khung mục lục",
+      "< lg có heading: không có cột trái; khối <details> 'Mục lục' đóng mặc định trong thẻ, sau ảnh bìa, trước nội dung; mở → danh sách link; bấm mục → khối gập lại + cuộn tới heading",
+      "Bài không có h2/h3 cấp gốc: không mục lục (cả hai bản), không cột trái trống, thẻ trắng chiếm toàn khung",
+      "Heading trong bài có id slug tiếng Việt bỏ dấu (vd 'Tổng quan dự án' → tong-quan-du-an), trùng → -2, -3; heading không chữ → muc-N; không trùng id 'related-news'",
+      "Tin liên quan ngoài thẻ trắng, nền bg-alt, như cũ",
+      "EN: nhãn 'Contents'; VI: 'Mục lục'; không lộ khoá i18n"
     ],
     "dependents": [
-      "Trang chủ slider Ưu đãi dùng PostCard — thẻ đổi tỉ lệ ảnh 4:3 + tiêu đề serif, slider không vỡ / không tràn",
-      "Chi tiết dự án khối Tin liên quan (nhóm tin đăng) dùng PostCard — kiểu thẻ mới",
-      "DetailLayout / DetailSubNav / DetailAsideFit nay có thêm trang thứ 3 dùng chung"
+      "Mọi trang dùng RichText (chi tiết dự án, dịch vụ, tin đăng BĐS, tuyển dụng, pháp lý) — không truyền headingIds → output HTML không đổi (heading không có id mới)",
+      "Trang pháp lý S16 — RichText anchorSections giữ id muc-N cho h2 cấp gốc; TableOfContents pháp lý (<details> < xl + aside dính ≥ xl) hoạt động như cũ",
+      "DetailLayout ở chi tiết dự án / cho thuê / tin đăng BĐS — không leading → lưới [1fr][22rem] + thẻ tư vấn cột phải, DOM/class không đổi",
+      "section-headings.ts — hàm cũ cho pháp lý không đổi hành vi"
     ],
     "regression": [
-      "Chi tiết dự án + chi tiết cho thuê không đổi (khung chung chỉ dùng lại)",
-      "Một h1 trên trang chi tiết tin; JSON-LD Article + BreadcrumbList giữ nguyên",
-      "Lead form chỉ một bản trong DOM (#lead-form), gửi lead source=property_post, sourceId = id tin, UTM + Turnstile như cũ",
-      "OfferBox (giá, hạn, mã voucher) hiển thị như cũ trong mục Ưu đãi, không lặp tiêu đề",
-      "Tin hết hạn / kết thúc: badge + ảnh mờ trên thẻ; trang chi tiết vẫn truy cập được",
-      "Danh sách: URL, phân trang, canonical, tham số danh mục không đổi; trang 2+ không nhân đôi bài nổi bật",
-      "Thanh mục con: cuộn qua mục cuối không nút active (BL-029), rộng bằng khung nội dung (BL-028)",
-      "Không CLS, không tràn ngang 375 / 768 / 1280"
+      "Header ẩn khi cuộn trên chi tiết dự án / cho thuê / tin đăng / tin tức; trang khác vẫn header nổi",
+      "Thanh mục con chi tiết dự án / cho thuê / tin đăng (DetailSubNav) không đổi: active theo cuộn, cuộn qua mục cuối không active (BL-029), rộng bằng khung (BL-028)",
+      "Thẻ tư vấn cột phải dính không cuộn riêng (BL-031) trên chi tiết dự án / cho thuê / tin đăng",
+      "Mục lục pháp lý: id muc-N, link cuộn đúng mục",
+      "Chi tiết tin tức: đúng một h1; JSON-LD Article + BreadcrumbList; metadata/canonical/hreflang không đổi; không form lead",
+      "Ảnh bìa priority, không CLS; không tràn ngang 375 / 768 / 1024 / 1280",
+      "In trang: mục lục ẩn"
     ]
   },
   "acceptance": [
-    "Chi tiết tin: [data-detail-page] nền primary-subtle; nội dung trong một thẻ trắng; thanh mục con chỉ có mục có nội dung (tin không ưu đãi → không nút Ưu đãi; không ảnh → không Hình ảnh)",
-    "Ảnh bìa 16:9 bo 20px, khoảng 32px tới thanh mục con",
-    "Đúng một h1; JSON-LD Article + breadcrumb có trong HTML",
-    "≥ lg thẻ liên hệ dính, overflow-y visible, không thanh cuộn riêng; nút gọi hotline href tel:; form lead source=property_post duy nhất",
-    "< lg CTA dính đáy tới #lead-form, ẩn khi form trong viewport",
-    "Chia sẻ ở Tổng quan mọi breakpoint; ≥ xl không có rail dọc lề trái",
-    "Header ẩn khi cuộn xuống trên chi tiết tin, hiện lại ở đầu trang / khi Tab focus",
-    "Danh sách + danh mục: bài nổi bật là thẻ đầu lưới, không thẻ ngang; thẻ ảnh 4:3, tiêu đề cắt 2 dòng",
-    "Trạng thái trống đúng tiêu đề (+ link quay lại ở danh mục)",
-    "Slider Ưu đãi trang chủ + Tin liên quan chi tiết dự án hiển thị thẻ mới không vỡ",
-    "VI + EN đủ nhãn (thanh mục con, nút gọi hotline, kết quả, trống), không lộ khoá i18n"
+    "Chi tiết tin tức: [data-detail-page] nền primary-subtle; tiêu đề, ảnh bìa, nội dung, tags, chia sẻ nằm trong một thẻ trắng bo góc; Tin liên quan dưới thẻ",
+    "≥ lg có heading: mục lục cột trái sinh từ h2/h3 cấp gốc, dính khi cuộn, không cuộn ra khỏi màn",
+    "Mục đang đọc có aria-current; bấm mục → cuộn tới heading, không bị header/đỉnh viewport che",
+    "Mục lục dài hơn viewport: khung giới hạn cao, cuộn riêng, mục active tự hiện trong khung",
+    "Bài không heading → không mục lục, thẻ nội dung không lệch / không cột trống",
+    "< lg: không cột trái; khối gập 'Mục lục' đóng mặc định phía trên nội dung, bấm mục → gập + cuộn",
+    "Heading có id ổn định slug tiếng Việt bỏ dấu, trùng thêm -2; reload / mở link #id trực tiếp cuộn đúng heading",
+    "Dữ liệu CMS, URL, SEO metadata, JSON-LD Article giữ nguyên; /en/news/[slug] hoạt động với nhãn 'Contents'",
+    "Header ẩn khi cuộn xuống trên chi tiết tin tức, hiện lại ở đầu trang / khi Tab focus",
+    "RichText ở các trang khác không phát sinh id heading mới; mục lục pháp lý vẫn dùng muc-N"
   ],
   "outOfScope": [
-    "Băng tìm kiếm / bộ lọc trên /tin-bds (F4 không có tham số lọc — đổi URL/dữ liệu)",
-    "Sửa khung chi tiết chung src/components/detail/*",
-    "Chi tiết dự án / cho thuê, tin tức, tuyển dụng (ShareButtons)",
-    "4 MINOR review tuỳ chọn",
-    "Admin Payload"
+    "Highlight mục đang đọc trong bản gập < lg (chủ ý không làm)",
+    "Sửa DetailSubNav / tách hook active-section dùng chung",
+    "Form lead trên chi tiết tin tức (F5: không form)",
+    "Danh sách /tin-tuc, trang danh mục tin tức",
+    "Dữ liệu CMS / schema / admin Payload"
   ],
   "viewports": [
     375,
@@ -131,5 +128,5 @@
   "uiTests": true,
   "apiTests": [],
   "risk": "medium",
-  "riskNote": "PostCard dùng chung (trang chủ slider Ưu đãi, Tin liên quan chi tiết dự án) + trang chi tiết tin chuyển sang khung chung + đổi khoá i18n. Review NORMAL PASS r1 (4 MINOR tuỳ chọn); vitest 19 file / 154 test PASS, typecheck PASS, lint 0 error. Residual: chưa đo trực quan trên trình duyệt thật 375 / 768 / 1280."
+  "riskNote": "Đụng component dùng chung: RichText (dự án, dịch vụ, tin đăng, tuyển dụng, pháp lý), section-headings (mục lục pháp lý S16), DetailLayout (3 trang chi tiết) — đều thêm prop tuỳ chọn, không dùng thì output không đổi (có test). Builder: vitest full 296 file / 3114 test PASS, typecheck PASS, lint 0 error. Residual: chưa đo trực quan trên trình duyệt thật 375 / 768 / 1280 (cần CMS có bài nhiều heading)."
 }

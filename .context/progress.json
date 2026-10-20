@@ -1005,6 +1005,37 @@
       "scopeVersion": 34,
       "specUpdate": "spec/updates/2026-10-20-post-detail-unified-layout.md",
       "residual": "chưa xem trình duyệt thật 375/768/1280; MINOR-2/3/4 hoãn (PostDetail dài, hasRichText từ careers, thiếu test CTA); PostCard 4:3 ảnh hưởng slider trang chủ + Tin liên quan dự án; bỏ rail chia sẻ xl"
+    },
+    {
+      "slug": "news-detail-card-toc",
+      "title": "Chi tiết tin tức: nền màu + thẻ trắng + mục lục dính cột trái (BL-033)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-033",
+      "changeDoc": "spec/changes/archive/2026-10-20-news-detail-card-toc.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-news-detail-card-toc/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "NORMAL (r1) / FAST (r2 delta)",
+          "reviewerResult": "PASS",
+          "note": "tin-tuc/[slug] dùng DetailLayout (prop leading mới cho cột trái); NewsTocSidebar (≥ lg dính, scroll-spy rAF, aria-current, cuộn trong khung) + NewsTocDisclosure (< lg details); collectTocHeadings (slug bỏ dấu, chống trùng + reserved ids, rỗng → muc-N) + RichText headingIds; DetailSubNav không đổi",
+          "report": ".context/review-reports/feature-news-detail-card-toc-phase-1-task-01-round-2-review.md",
+          "commit": "(commit close-out BL-033)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.28.0",
+      "scopeVersion": 35,
+      "specUpdate": "spec/updates/2026-10-20-news-detail-card-toc.md",
+      "specValidation": ".context/review-reports/feature-news-detail-card-toc-spec-validation.md",
+      "residual": "chưa xem trình duyệt thật 375/768/1024/1280; ACTIVE_LINE_PX=48 xấp xỉ; header còn hiện có thể che tạm heading; bài không heading thẻ rộng chữ 68ch căn trái; bản gập < lg không highlight; đổi chữ heading đổi id"
     }
   ],
   "bugs": [
@@ -1891,7 +1922,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T15:00:00+07:00",
+  "lastUpdated": "2026-10-20T16:00:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

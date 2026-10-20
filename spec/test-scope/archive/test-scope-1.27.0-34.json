@@ -1,0 +1,135 @@
+{
+  "specVersion": "1.27.0",
+  "scopeVersion": 34,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-032 — tin đăng BĐS đồng bộ UI với dự án / cho thuê: chi tiết /tin-bds/[slug] dùng DetailLayout (nền primary-subtle, header ẩn khi cuộn, breadcrumb → ảnh bìa 16:9 bo 20px pb-8 → thanh mục con overview/offer/content/gallery → một thẻ trắng; PostContactBox dính ≥ lg; Tin liên quan nền bg-alt; bỏ PostShareRail). Danh sách: bài nổi bật = thẻ đầu lưới, PostCard ảnh 4:3 + tiêu đề serif 2 dòng, trạng thái trống có tiêu đề. Spec 1.26.0 → 1.27.0 (MINOR, đổi yêu cầu trình bày).",
+  "workItem": "feature/post-detail-unified-layout",
+  "backlog": "BL-032",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-post-detail-unified-layout.md",
+  "task": [
+    "tasks/feature-post-detail-unified-layout/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-post-detail-unified-layout-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "close-out BL-032 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-032 (commit chứa file này)": "T01 — PostDetail → DetailLayout (section Tổng quan/Ưu đãi/Nội dung/Hình ảnh, ProjectStickyCta, article pb-16 lg:pb-0), PostContactBox.tsx mới, post-detail-sections.ts mới, PostShare (xoá PostShareRail, bỏ xl:hidden), PostCard (xoá biến thể feature; 4:3, line-clamp-2 font-display text-h4, gap-1), PostListBody (section gridLabel + thẻ đầu priority), PostListPage (EmptyState tiêu đề + backHref), vi/en.json. Review NORMAL PASS r1 (4 MINOR tuỳ chọn). Doc: SPECIFICATIONS (Giao diện, F4), design-spec S08 + S09."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.26.0-33.json",
+  "specUpdate": "spec/updates/2026-10-20-post-detail-unified-layout.md",
+  "specRefs": [
+    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)",
+    "F4 — Đăng tin BĐS: chi tiết (BL-032)",
+    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)",
+    "design-spec S08 Danh sách tin đăng",
+    "design-spec S09 Chi tiết tin đăng"
+  ],
+  "specRefNotes": {
+    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)": "Chi tiết tin đăng BĐS thuộc nhóm trang dùng DetailLayout; header cuộn xuống ẩn hẳn, chỉ hiện ở đầu trang / khi Tab focus.",
+    "F4 — Đăng tin BĐS: chi tiết (BL-032)": "Breadcrumb → ảnh bìa 16:9 bo 20px → thanh mục con dính Tổng quan · Ưu đãi · Nội dung · Hình ảnh (mục trống ẩn) → thẻ trắng; thẻ liên hệ 'Nhận tư vấn' (nút gọi hotline + LeadForm property_post) dính ≥ lg không cuộn riêng; < lg sau thẻ + CTA dính đáy; một cụm chia sẻ ở Tổng quan, bỏ rail ≥ xl (thay BL-007).",
+    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)": "Bài nổi bật = thẻ đầu lưới; dòng kết quả + lưới trong section có nhãn; PostCard ảnh 4:3 tiêu đề serif 2 dòng; trạng thái trống có tiêu đề riêng (+ quay lại ở danh mục). URL/phân trang/canonical không đổi.",
+    "design-spec S08 Danh sách tin đăng": "As-built BL-032 thay mục bài nổi bật ngang.",
+    "design-spec S09 Chi tiết tin đăng": "As-built BL-032 thay bố cục bước 1–7 bằng khung chi tiết chung S03/S07; nội dung từng khối giữ nguyên."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/posts/PostDetail.tsx",
+      "src/components/posts/PostContactBox.tsx",
+      "src/components/posts/PostCard.tsx",
+      "src/components/posts/PostListBody.tsx",
+      "src/components/posts/PostListPage.tsx",
+      "src/components/posts/PostShare.tsx",
+      "src/lib/posts/post-detail-sections.ts",
+      "src/lib/posts/post-detail-sections.test.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/components/posts/post-components.test.tsx",
+      "src/components/posts/PostShare.test.tsx",
+      "src/components/posts/PostListPage.test.tsx",
+      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Trang tin đăng BĐS chuyển sang khung chi tiết chung src/components/detail/* (không sửa khung); PostCard dùng chung đổi kiểu thẻ; i18n thêm gridLabel, empty.*, subNavLabel, subNav.*, sections.content, leadForm.callHotline; xoá page.posts.featuredLabel/moreLabel, leadForm.hotline. Route page.tsx không đổi. Không schema/migration/API/access control/nguồn lead/JSON-LD.",
+    "modules": [
+      "Posts — PostDetail / PostContactBox / PostShare (chi tiết tin đăng)",
+      "Posts — PostListPage / PostListBody / PostCard (danh sách + thẻ dùng chung)",
+      "Detail — DetailLayout / DetailSubNav / DetailAsideFit (dùng lại, không sửa)",
+      "Home — slider Ưu đãi (PostCard)",
+      "Projects — khối Tin liên quan chi tiết dự án (PostCard)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/tin-bds/[slug] + /en/property-news/[slug]: nền --color-primary-subtle (data-detail-page), header ẩn khi cuộn xuống; breadcrumb → ảnh bìa 16:9 bo 20px, khoảng 32px (pb-8) tới thanh mục con; không ảnh bìa → chỉ breadcrumb",
+      "Thanh mục con dính: Tổng quan (#overview, luôn có) · Ưu đãi (#offer, chỉ khi có ưu đãi) · Nội dung (#content, chỉ khi có nội dung) · Hình ảnh (#gallery, chỉ khi có ảnh); bấm nút cuộn tới đúng mục, mục đang xem active",
+      "Nội dung trong một thẻ trắng bo ~28px; một h1 (tiêu đề tin) trong Tổng quan cùng danh mục (link), ngày đăng, cụm chia sẻ",
+      "Chia sẻ: < sm một nút Web Share (navigator.share, không hỗ trợ → menu Facebook/Zalo/sao chép link); ≥ sm hàng ngang; ≥ xl KHÔNG còn cụm dọc lề trái",
+      "≥ lg thẻ liên hệ 'Nhận tư vấn' cột phải dính, không thanh cuộn riêng: nút 'Gọi hotline {phone}' (tel:, chỉ khi có hotline) + một LeadForm source=property_post",
+      "< lg: thẻ liên hệ nằm sau thẻ nội dung; CTA dính đáy dẫn tới #lead-form, ẩn khi form trong viewport; nội dung không bị CTA che (pb-16)",
+      "Tin liên quan nằm ngoài thẻ trắng, nền bg-alt, lưới sm 2 / lg 3 cột, tiêu đề thẻ h3",
+      "/tin-bds + /tin-bds/danh-muc/[category] (+ EN): bài nổi bật là thẻ đầu lưới (ảnh priority), không còn thẻ ngang 7/5; dòng 'Có N kết quả' + lưới 1/2/3/4 cột trong section có aria-label",
+      "PostCard: ảnh 4:3, tiêu đề serif h4 tối đa 2 dòng; giữ danh mục, tóm tắt 2 dòng, giá, ngày/hạn, badge, ảnh mờ khi kết thúc",
+      "Trạng thái trống: '/tin-bds' → 'Chưa có tin đăng.'; danh mục → 'Chưa có tin đăng trong mục này.' + link quay lại /tin-bds (EN tương ứng)"
+    ],
+    "dependents": [
+      "Trang chủ slider Ưu đãi dùng PostCard — thẻ đổi tỉ lệ ảnh 4:3 + tiêu đề serif, slider không vỡ / không tràn",
+      "Chi tiết dự án khối Tin liên quan (nhóm tin đăng) dùng PostCard — kiểu thẻ mới",
+      "DetailLayout / DetailSubNav / DetailAsideFit nay có thêm trang thứ 3 dùng chung"
+    ],
+    "regression": [
+      "Chi tiết dự án + chi tiết cho thuê không đổi (khung chung chỉ dùng lại)",
+      "Một h1 trên trang chi tiết tin; JSON-LD Article + BreadcrumbList giữ nguyên",
+      "Lead form chỉ một bản trong DOM (#lead-form), gửi lead source=property_post, sourceId = id tin, UTM + Turnstile như cũ",
+      "OfferBox (giá, hạn, mã voucher) hiển thị như cũ trong mục Ưu đãi, không lặp tiêu đề",
+      "Tin hết hạn / kết thúc: badge + ảnh mờ trên thẻ; trang chi tiết vẫn truy cập được",
+      "Danh sách: URL, phân trang, canonical, tham số danh mục không đổi; trang 2+ không nhân đôi bài nổi bật",
+      "Thanh mục con: cuộn qua mục cuối không nút active (BL-029), rộng bằng khung nội dung (BL-028)",
+      "Không CLS, không tràn ngang 375 / 768 / 1280"
+    ]
+  },
+  "acceptance": [
+    "Chi tiết tin: [data-detail-page] nền primary-subtle; nội dung trong một thẻ trắng; thanh mục con chỉ có mục có nội dung (tin không ưu đãi → không nút Ưu đãi; không ảnh → không Hình ảnh)",
+    "Ảnh bìa 16:9 bo 20px, khoảng 32px tới thanh mục con",
+    "Đúng một h1; JSON-LD Article + breadcrumb có trong HTML",
+    "≥ lg thẻ liên hệ dính, overflow-y visible, không thanh cuộn riêng; nút gọi hotline href tel:; form lead source=property_post duy nhất",
+    "< lg CTA dính đáy tới #lead-form, ẩn khi form trong viewport",
+    "Chia sẻ ở Tổng quan mọi breakpoint; ≥ xl không có rail dọc lề trái",
+    "Header ẩn khi cuộn xuống trên chi tiết tin, hiện lại ở đầu trang / khi Tab focus",
+    "Danh sách + danh mục: bài nổi bật là thẻ đầu lưới, không thẻ ngang; thẻ ảnh 4:3, tiêu đề cắt 2 dòng",
+    "Trạng thái trống đúng tiêu đề (+ link quay lại ở danh mục)",
+    "Slider Ưu đãi trang chủ + Tin liên quan chi tiết dự án hiển thị thẻ mới không vỡ",
+    "VI + EN đủ nhãn (thanh mục con, nút gọi hotline, kết quả, trống), không lộ khoá i18n"
+  ],
+  "outOfScope": [
+    "Băng tìm kiếm / bộ lọc trên /tin-bds (F4 không có tham số lọc — đổi URL/dữ liệu)",
+    "Sửa khung chi tiết chung src/components/detail/*",
+    "Chi tiết dự án / cho thuê, tin tức, tuyển dụng (ShareButtons)",
+    "4 MINOR review tuỳ chọn",
+    "Admin Payload"
+  ],
+  "viewports": [
+    375,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "medium",
+  "riskNote": "PostCard dùng chung (trang chủ slider Ưu đãi, Tin liên quan chi tiết dự án) + trang chi tiết tin chuyển sang khung chung + đổi khoá i18n. Review NORMAL PASS r1 (4 MINOR tuỳ chọn); vitest 19 file / 154 test PASS, typecheck PASS, lint 0 error. Residual: chưa đo trực quan trên trình duyệt thật 375 / 768 / 1280."
+}

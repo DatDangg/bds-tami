@@ -97,4 +97,26 @@ describe("DetailLayout", () => {
     expect(section.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     expect(section).toHaveAttribute("tabindex", "-1");
   });
+
+  it("leading: cột trái nằm TRƯỚC thẻ trắng, chỉ hiện ≥ lg, lưới [cột trái][thẻ]; không dùng aside", () => {
+    const { container } = renderLayout({ subNav: undefined, aside: undefined, leading: <nav aria-label="Mục lục tin">TOC</nav> });
+    const card = container.querySelector("section#a")?.parentElement as HTMLElement;
+    const grid = card.parentElement as HTMLElement;
+    expect(grid.firstElementChild?.className).toContain("hidden");
+    expect(grid.firstElementChild?.className).toContain("lg:block");
+    expect(grid.firstElementChild?.textContent).toBe("TOC");
+    expect(grid.firstElementChild?.nextElementSibling).toBe(card);
+    expect(grid.className).toContain("lg:grid-cols-[15rem_minmax(0,1fr)]");
+    expect(grid.className).not.toContain("22rem");
+  });
+
+  it("không có leading: lưới và DOM giữ nguyên như cũ (thẻ là con đầu, cột phải 22rem/24rem)", () => {
+    const { container } = renderLayout();
+    const card = container.querySelector("section#a")?.parentElement as HTMLElement;
+    const grid = card.parentElement as HTMLElement;
+    expect(grid.firstElementChild).toBe(card);
+    expect(grid.className).toBe(
+      "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10",
+    );
+  });
 });
