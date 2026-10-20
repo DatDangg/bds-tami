@@ -1285,6 +1285,22 @@
           ],
           "completedAt": "2026-10-20",
           "commit": "(commit close-out T03)"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-homepage-redesign/phase-1-task-04.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "phase review G-M1: chữ mặc định eyebrow/videoLabel About + khoảng About→Dự án (n1) + ERD §4.15 đủ field (D1) → r1 NORMAL PASS (MINOR: tên test home-view.test.ts:322 cũ; khoảng nền kem→eyebrow ~23px vs ~44px; thiếu test class spacing); pnpm test 305/3205 PASS, build PASS",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-homepage-redesign-phase-1-task-04-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-homepage-redesign-phase-1-task-04-round-1-review.md"
+          ],
+          "completedAt": "2026-10-20",
+          "commit": "(commit close-out T04)"
         }
       ],
       "note": "Lần chạy 1 ngắt do rate limit trước khi ghi đĩa (interrupted, attempt 0). Lần 2: classify MODIFY → spec delta F1 + Khung trang footer → spec-publisher 1.34.0 / scope v42 → spec-validator pre-plan → 3 task tuần tự. Chờ user duyệt plan + Q1 (ô thứ 5 Tùy chọn khác: /cho-thue không có bộ lọc Tiện ích → Phòng ngủ hay bỏ) + Q2 (cột Liên hệ footer giữ/bỏ). | Plan duyệt: tuần tự T00→T01→T02→T03, chỉ dừng khi FAIL 2 vòng / HIGH_RISK_MIGRATION / blocked.",
@@ -1294,7 +1310,13 @@
       "specUpdate": "spec/updates/2026-10-20-homepage-redesign.md",
       "specValidation": ".context/review-reports/spec-validation-feature-homepage-redesign-pre-plan.md",
       "migration": "additive — global homepage (tạo ở T01)",
-      "journal": ".context/runs/change-homepage-redesign.md"
+      "journal": ".context/runs/change-homepage-redesign.md",
+      "phaseReview": {
+        "round": 1,
+        "verdict": "FAIL",
+        "report": ".context/review-reports/spec-validation-feature-homepage-redesign-phase-1.md",
+        "note": "G-M1 eyebrow/videoLabel trống phải dùng i18n mặc định (spec F1) → T04"
+      }
     }
   ],
   "bugs": [

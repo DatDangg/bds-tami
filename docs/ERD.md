@@ -562,10 +562,10 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Khối | Trường |
 |---|---|
 | `announcementBar` | `enabled` (mặc định **tắt**), `text` (localized), `link` (khoá trang hoặc URL). Khoá "khách đã đóng" tính từ hash nội dung ở phía hiển thị, không có cột phiên bản |
-| `hero` | `slides` (array 1–8: `image` (R, poster + mobile), `video` (tuỳ chọn, `rel→media` MP4/WebM ≤ 15MB, chỉ phát ≥ 1024px), `title`, `subtitle`, `ctaLabel`, `ctaLink`) |
+| `hero` | `slides` (array 1–8: `image` (R, poster + mobile), `video` (tuỳ chọn, `rel→media` MP4/WebM ≤ 15MB, chỉ phát ≥ 1024px), `title`, `subtitle`, `ctaLabel`, `ctaLink`; BL-044 thêm `titleAccent` (localized, đoạn chữ vàng cuối tiêu đề)); BL-044 thêm `eyebrow`, `caption` (localized, chung mọi slide) |
 | `heroSearch` | `enabled` (mặc định bật), `placeholder` (localized), `chipProjects` (`rel→projects` hasMany, tối đa 6; trống thì lấy `isFeatured` mới nhất) |
-| `about` | `enabled`, `title`, `content` (richText), `image`, `stats` (array `{value, label, icon?}`, vd "10+ năm"); BL-044 thêm `eyebrow`, `titleAccent` (localized), `secondaryImage`, `imageCaption` (localized), `videoUrl` (link YouTube, validate), `videoLabel` (localized), `decorImage` |
-| `featuredProjects` | `enabled`, `title`, `projects` (`rel→projects` hasMany, tối đa 6; trống thì lấy `isFeatured` mới nhất) |
+| `about` | `enabled`, `title`, `content` (richText), `image`, `stats` (array `{value, label, icon?}`, vd "10+ năm"); BL-044 thêm `eyebrow`, `titleAccent` (localized), `secondaryImage`, `imageCaption` (localized), `videoUrl` (link YouTube, validate), `videoLabel` (localized), `decorImage`, `ctaLabel` (localized), `ctaLink` (khoá trang hoặc URL; nút chỉ hiện khi có cả hai). `eyebrow` trống → chữ mặc định "Về chúng tôi"/"About us"; `videoLabel` trống → "Khám phá TAMI HOMES"/"Discover TAMI HOMES" (i18n, áp ở component) |
+| `featuredProjects` | `enabled`, `title`, BL-044 `eyebrow`, `description` (localized), `projects` (`rel→projects` hasMany, tối đa 6; trống thì lấy `isFeatured` mới nhất) |
 | `services` | `enabled`, `title`, `items` (`rel→services` hasMany) |
 | `featuredOffers` | `enabled`, `title`, `posts` (`rel→property-posts` hasMany; trống thì lấy `isFeatured` còn hạn) |
 | `rentals` | `enabled` (mặc định bật), `title`, `categories` (`rel→categories` hasMany, tối đa 4, chỉ `scope = rental` — `filterOptions` + `validate` ở server; trống thì lấy danh mục đang có tin) |
@@ -578,6 +578,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 **`header`**: `navItems` (array `{label, link, children?}`), `ctaButton`.
 **`footer`**: `columns` (array `{title, links[]}`), `contactBlock`, `copyright`.
+
+> **As-built (BL-044):** các cột mới của `homepage` (`hero.eyebrow`, `hero.caption`, `hero.slides[].titleAccent`, `about.*` mới, `featuredProjects.eyebrow/description`, `strengths`) nằm ở migration `20261020_103248_homepage_redesign`.
 
 > **As-built (L4-T02):** khoá trang hợp lệ (`src/lib/content/nav-link.ts`): `home`, `projects`, `rentals`, `property-posts`, `news`, `careers`, `contact`, `privacy-policy`, `terms-of-use`; giá trị khác phải là URL `http(s)://` (chặn `javascript:`...). `header.ctaButton` = group `{label (localized), link}`; `footer.contactBlock` = textarea localized; `footer.columns[].links[]` = `{label (localized), link}`; `socialLinks[].platform` = select (`facebook`, `zalo`, `youtube`, `tiktok`, `instagram`, `linkedin`, `x`, `other`). `notificationEmails`, `translationGlossary`, `translationEnabled` chỉ admin đọc (field access + hook `afterRead` xoá hẳn khoá vì Payload vẫn trả `[]` cho array bị chặn); `privacyPolicyVersion` ai cũng đọc, không ai sửa tay. Lưu global làm mới tag `global:<slug>` (cả vi và en). Cả ba global (`site-settings`, `header`, `footer`) có group `translation` (dùng chung `translationGroup()` ở `src/fields/translation.ts`, chỉ đọc với mọi người, hệ thống ghi; migration `20261017_034248_globals_translation_group`), KHÔNG có `hasEnglish` (layout luôn render cả vi và en, không cần cổng bật EN như collection). Global chỉ admin thấy trong menu admin (`admin.hidden`); URL/link lưu bản đã trim.
 

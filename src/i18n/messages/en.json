@@ -784,7 +784,9 @@
         "region": "Why TAMI"
       },
       "about": {
-        "closeVideo": "Close video"
+        "closeVideo": "Close video",
+        "defaultEyebrow": "About us",
+        "defaultVideoLabel": "Discover TAMI HOMES"
       },
       "projects": {
         "viewAll": "View all projects",

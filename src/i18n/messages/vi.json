@@ -784,7 +784,9 @@
         "region": "Điểm mạnh"
       },
       "about": {
-        "closeVideo": "Đóng video"
+        "closeVideo": "Đóng video",
+        "defaultEyebrow": "Về chúng tôi",
+        "defaultVideoLabel": "Khám phá TAMI HOMES"
       },
       "projects": {
         "viewAll": "Xem tất cả dự án",

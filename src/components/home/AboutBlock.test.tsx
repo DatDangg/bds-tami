@@ -77,6 +77,9 @@ describe("AboutBlock (BL-044)", () => {
   it("nền khối kem ấm (primary-subtle) để mảng be primary-soft sau ảnh phụ vẫn phân biệt được", () => {
     const { container } = renderWithIntl(<AboutBlock block={view()} />);
     expect(container.querySelector("section")).toHaveClass("bg-primary-subtle");
+    // Đệm dưới nhỏ + đánh dấu để Dự án nổi bật liền sau thu pt (khoảng ~42px như mockup).
+    expect(container.querySelector("section")).toHaveClass("pb-6");
+    expect(container.querySelector("section")).toHaveAttribute("data-block", "about");
     expect(screen.getByTestId("about-backdrop")).toHaveClass("bg-primary-soft");
   });
 
@@ -92,15 +95,32 @@ describe("AboutBlock (BL-044)", () => {
     expect(document.querySelector("iframe")).toBeNull();
   });
 
-  it("không có link video (hoặc thiếu nhãn) → không có nút play", () => {
-    const { unmount } = renderWithIntl(<AboutBlock block={view({ videoEmbedUrl: null })} />);
-    expect(screen.queryByRole("button")).toBeNull();
-    unmount();
-    renderWithIntl(<AboutBlock block={view({ videoLabel: null })} />);
+  it("không có link video → không có nút play", () => {
+    renderWithIntl(<AboutBlock block={view({ videoEmbedUrl: null })} />);
     expect(screen.queryByRole("button")).toBeNull();
   });
 
-  it("thiếu chữ (vd chưa có bản EN) → ẩn eyebrow/accent/chú thích/nút, không lấy chữ Việt; không ảnh → không cụm ảnh", () => {
+  it("có link video, nhãn trống → nút play dùng nhãn mặc định đúng ngôn ngữ (vi và /en)", () => {
+    const { unmount } = renderWithIntl(<AboutBlock block={view({ videoLabel: null })} />);
+    expect(screen.getByRole("button", { name: "Khám phá TAMI HOMES" })).toBeInTheDocument();
+    unmount();
+    renderWithIntl(<AboutBlock block={view({ videoLabel: null })} />, "en");
+    expect(screen.getByRole("button", { name: "Discover TAMI HOMES" })).toBeInTheDocument();
+  });
+
+  it("eyebrow trống → chữ mặc định 'Về chúng tôi' / 'About us'; có giá trị → dùng giá trị admin", () => {
+    const { unmount } = renderWithIntl(<AboutBlock block={view({ eyebrow: null })} />);
+    expect(screen.getByText("Về chúng tôi")).toHaveClass("text-accent-text");
+    unmount();
+    const second = renderWithIntl(<AboutBlock block={view({ eyebrow: null })} />, "en");
+    expect(screen.getByText("About us")).toBeInTheDocument();
+    second.unmount();
+    renderWithIntl(<AboutBlock block={view({ eyebrow: "Giới thiệu" })} />);
+    expect(screen.getByText("Giới thiệu")).toBeInTheDocument();
+    expect(screen.queryByText("Về chúng tôi")).toBeNull();
+  });
+
+  it("thiếu chữ (vd chưa có bản EN) → ẩn accent/chú thích/nút, không lấy chữ Việt; không ảnh → không cụm ảnh", () => {
     const { container } = renderWithIntl(
       <AboutBlock block={view({ eyebrow: null, titleAccent: null, imageCaption: null, cta: null, image: null, secondaryImage: null, decorImage: null, videoEmbedUrl: null })} />,
       "en",

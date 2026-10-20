@@ -13,14 +13,15 @@ import { STRENGTH_ICON_COMPONENTS } from "./strength-icons";
 /** Cụm ảnh (mockup BL-044; thiếu ảnh lớn thì ẩn cả cụm gồm nút video, ghi ở design-spec S01.2): ảnh lớn bên phải, ảnh phụ đè lệch ra mép trái, thẻ chú thích dưới ảnh phụ, nút play trên dải scrim đáy ảnh lớn. */
 function ImageCluster({ block }: { block: AboutView }) {
   const { image, secondaryImage, imageCaption, videoEmbedUrl, videoLabel } = block;
+  const t = useTranslations("page.home.about");
   if (!image) return null;
   return (
     <div className="relative lg:col-span-6 lg:row-span-2 lg:row-start-1 lg:self-center">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted lg:ml-auto lg:aspect-square lg:w-[66%]">
         <ResponsiveImage media={image} sizes="(min-width: 1280px) 430px, (min-width: 1024px) 34vw, 100vw" />
-        {videoEmbedUrl && videoLabel && (
+        {videoEmbedUrl && (
           <div className="absolute inset-x-0 bottom-0 bg-banner-scrim p-4">
-            <AboutVideoButton embedUrl={videoEmbedUrl} label={videoLabel} />
+            <AboutVideoButton embedUrl={videoEmbedUrl} label={videoLabel ?? t("defaultVideoLabel")} />
           </div>
         )}
       </div>
@@ -75,10 +76,11 @@ function StatsList({ stats }: { stats: AboutView["stats"] }) {
  */
 export function AboutBlock({ block }: { block: AboutView }) {
   const tRich = useTranslations("page.richText");
+  const tAbout = useTranslations("page.home.about");
   const locale = useLocale() as Locale;
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className="relative isolate overflow-hidden bg-primary-subtle py-section">
+    <section aria-labelledby={headingId} data-block="about" className="relative isolate overflow-hidden bg-primary-subtle pt-section pb-6">
       {block.decorImage && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[9%] xl:block">
           <ResponsiveImage media={block.decorImage} sizes="9vw" decorative className="absolute inset-0" />
@@ -86,7 +88,7 @@ export function AboutBlock({ block }: { block: AboutView }) {
       )}
       <div className="mx-auto grid w-full max-w-container gap-y-6 px-gutter lg:grid-cols-12 lg:gap-x-10">
         <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:max-w-[30rem] lg:self-end">
-          {block.eyebrow && <p className="mb-3 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{block.eyebrow}</p>}
+          <p className="mb-3 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{block.eyebrow ?? tAbout("defaultEyebrow")}</p>
           <h2 id={headingId} className="font-display text-h2">
             {block.title}
             {block.titleAccent && <> <span className="text-accent-text">{block.titleAccent}</span></>}
