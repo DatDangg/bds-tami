@@ -68,6 +68,7 @@ vi.mock("@/lib/projects/project-queries", () => ({
     docs: [apartments, urban].filter((item) => locale === "vi" || item.hasEnglish),
   }),
   listChildProjectCategories: async () => ({ docs: [] }),
+  listDevelopersWithPublicProjects: async () => [],
   findProjectCategoryBySlug: async (_payload: unknown, locale: string, slug: string) => {
     const found = [apartments, urban, luxury].find((item) => item.slug === slug);
     return found && (locale === "vi" || found.hasEnglish) ? found : null;
@@ -243,6 +244,23 @@ describe("generateMetadata", () => {
     }
     const en = await buildProjectListMetadata({ locale: "en", searchParams: { category: "can-ho" } });
     expect(en.alternates?.canonical).toBe("https://tami.example/en/projects");
+  });
+});
+
+describe("S02 /du-an: metadata tham số BL-045", () => {
+  beforeEach(() => vi.stubEnv("APP_ENV", "production"));
+  it("q / developer / sort khác mặc định: noindex, follow + canonical /du-an; sort=newest thì index", async () => {
+    for (const searchParams of [{ q: "crown" }, { developer: "d1" }, { sort: "price_asc" }]) {
+      const meta = await buildProjectListMetadata({ locale: "vi", searchParams });
+      expect(meta.robots).toEqual({ index: false, follow: true });
+      expect(meta.alternates?.canonical).toBe("https://tami.example/du-an");
+    }
+    expect((await buildProjectListMetadata({ locale: "vi", searchParams: { sort: "newest" } })).robots).toEqual({ index: true, follow: true });
+  });
+
+  it("q và sort được chuyển xuống truy vấn; developer lạ bị bỏ qua (không gọi truy vấn lọc)", async () => {
+    await render("vi", { q: "Sài Gòn", sort: "price_desc", developer: "khong-co" });
+    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, q: "Sài Gòn", sort: "price_desc" });
   });
 });
 

@@ -2,8 +2,11 @@ import type { Payload, Where } from "payload";
 
 import type { SalesStatus } from "../../collections/Projects";
 import type { Locale } from "../../i18n/routing";
-import type { Category, Project, Province } from "../../payload-types";
+import type { Category, Developer, Project, Province } from "../../payload-types";
+import { MAX_PAGE_SIZE } from "../content/pagination";
 import { relationId } from "../payload/relation-id";
+import { normalizeSearchText } from "../search/normalize";
+import type { ProjectSortKey } from "./project-filters";
 import { findPublicBySlug, findPublicList, type PublicListResult } from "../content/public-queries";
 
 /** 12 dự án/trang (design-spec S02). */
@@ -68,26 +71,150 @@ export interface ProjectPageQuery {
   categoryIds?: readonly string[];
   provinceId?: string;
   salesStatus?: SalesStatus;
+  /** Từ khoá (BL-045): khớp không dấu tên dự án + địa chỉ / tỉnh / phường. Rỗng = không lọc. */
+  q?: string;
+  /** Id chủ đầu tư ĐÃ đối chiếu với danh sách chủ đầu tư công khai. */
+  developerId?: string;
+  /** `newest` (mặc định) | `price_asc` | `price_desc` (theo `priceFromVnd`, trống xếp cuối). */
+  sort?: ProjectSortKey;
+}
+
+/** Trường tối thiểu để khớp từ khoá / xếp theo giá; tỉnh + phường populate ở depth 1. */
+const PROJECT_SCAN_FIELDS = { title: true, address: true, province: true, ward: true, priceFromVnd: true } as const;
+/** Quét tối đa 20 trang x 50 = 1000 dự án; vượt thì phần sau không được tìm/sắp (dự án công khai thực tế chỉ vài chục). */
+const SCAN_MAX_PAGES = 20;
+const SCAN_PAGE_SIZE = MAX_PAGE_SIZE;
+
+function emptyPage(page: number): PublicListResult<Project> {
+  return { docs: [], page, limit: PROJECT_PAGE_SIZE, totalDocs: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false };
+}
+
+function relationName(value: unknown): string {
+  if (typeof value !== "object" || value === null) return "";
+  const { name } = value as { name?: unknown };
+  return typeof name === "string" ? name : "";
+}
+
+/** Chuỗi tìm kiếm không dấu của một dự án: tên + địa chỉ + phường + tỉnh (cùng `normalizeSearchText` với từ khoá). */
+function projectSearchText(project: Project): string {
+  return normalizeSearchText([project.title, project.address, relationName(project.ward), relationName(project.province)].filter(Boolean).join(" "));
+}
+
+/** Giá tăng/giảm, dự án chưa có giá luôn cuối; hoà thì giữ thứ tự mới nhất sẵn có (`Array.sort` ổn định). */
+function compareByPrice(direction: "price_asc" | "price_desc") {
+  return (a: Project, b: Project): number => {
+    const left = a.priceFromVnd ?? null;
+    const right = b.priceFromVnd ?? null;
+    if (left === null || right === null) return left === right ? 0 : left === null ? 1 : -1;
+    return direction === "price_asc" ? left - right : right - left;
+  };
+}
+
+/** Quét mọi dự án công khai khớp `where` (đã mới nhất trước) để lọc từ khoá / xếp theo giá ở bộ nhớ: không thêm cột `searchText`, và Postgres đặt NULL đầu khi DESC nên không xếp "trống cuối" bằng SQL được. */
+async function scanPublicProjects(payload: Payload, locale: Locale, where: Where | undefined): Promise<Project[]> {
+  const all: Project[] = [];
+  for (let page = 1; page <= SCAN_MAX_PAGES; page += 1) {
+    const result = await findPublicList<Project>(payload, "projects", locale, {
+      ...(where ? { where } : {}),
+      sort: PROJECT_SORT,
+      page,
+      limit: SCAN_PAGE_SIZE,
+      depth: 1,
+      select: PROJECT_SCAN_FIELDS,
+    });
+    all.push(...result.docs);
+    if (!result.hasNextPage) break;
+  }
+  return all;
+}
+
+/** Trang `page` của danh sách id đã lọc/sắp: lấy đủ trường thẻ rồi xếp lại đúng thứ tự id. */
+async function pageOfScannedProjects(payload: Payload, locale: Locale, ids: string[], page: number): Promise<PublicListResult<Project>> {
+  const totalDocs = ids.length;
+  const totalPages = Math.ceil(totalDocs / PROJECT_PAGE_SIZE);
+  const pageIds = ids.slice((page - 1) * PROJECT_PAGE_SIZE, page * PROJECT_PAGE_SIZE);
+  if (pageIds.length === 0) return { ...emptyPage(page), totalDocs, totalPages };
+  const { docs } = await findPublicList<Project>(payload, "projects", locale, {
+    where: { id: { in: pageIds } },
+    limit: PROJECT_PAGE_SIZE,
+    depth: 1,
+    select: PROJECT_CARD_FIELDS,
+  });
+  const byId = new Map(docs.map((doc) => [doc.id, doc]));
+  return {
+    docs: pageIds.flatMap((id) => byId.get(id) ?? []),
+    page,
+    limit: PROJECT_PAGE_SIZE,
+    totalDocs,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
 }
 
 /**
  * Một trang dự án công khai (mới xuất bản trước). Mọi điều kiện đi qua `findPublicList` nên luôn kèm `publicWhere`
  * (đã xuất bản, chưa xoá mềm, `/en` chỉ dự án `hasEnglish`). `depth: 1` populate ảnh `gallery`, tỉnh và danh mục cho thẻ; `select` chỉ lấy trường thẻ cần.
+ * Có từ khoá hoặc sắp theo giá thì đi đường quét bộ nhớ (`scanPublicProjects`); còn lại một truy vấn SQL phân trang như cũ.
  */
-export function listPublicProjects(payload: Payload, locale: Locale, query: ProjectPageQuery): Promise<PublicListResult<Project>> {
+export async function listPublicProjects(payload: Payload, locale: Locale, query: ProjectPageQuery): Promise<PublicListResult<Project>> {
   const conditions: Where[] = [
     ...(query.categoryIds ? [{ category: { in: [...query.categoryIds] } }] : []),
     ...(query.provinceId ? [{ province: { equals: query.provinceId } }] : []),
     ...(query.salesStatus ? [{ salesStatus: { equals: query.salesStatus } }] : []),
+    ...(query.developerId ? [{ developer: { equals: query.developerId } }] : []),
   ];
-  return findPublicList<Project>(payload, "projects", locale, {
-    ...(conditions.length > 0 ? { where: { and: conditions } } : {}),
-    sort: PROJECT_SORT,
-    page: query.page,
-    limit: PROJECT_PAGE_SIZE,
-    depth: 1,
-    select: PROJECT_CARD_FIELDS,
+  const where: Where | undefined = conditions.length > 0 ? { and: conditions } : undefined;
+  const keyword = query.q ? normalizeSearchText(query.q) : "";
+  const priceSort = query.sort === "price_asc" || query.sort === "price_desc" ? query.sort : undefined;
+
+  if (!keyword && !priceSort) {
+    return findPublicList<Project>(payload, "projects", locale, {
+      ...(where ? { where } : {}),
+      sort: PROJECT_SORT,
+      page: query.page,
+      limit: PROJECT_PAGE_SIZE,
+      depth: 1,
+      select: PROJECT_CARD_FIELDS,
+    });
+  }
+  const scanned = await scanPublicProjects(payload, locale, where);
+  const matched = keyword ? scanned.filter((project) => projectSearchText(project).includes(keyword)) : scanned;
+  const ordered = priceSort ? [...matched].sort(compareByPrice(priceSort)) : matched;
+  return pageOfScannedProjects(payload, locale, ordered.map((project) => project.id), query.page);
+}
+
+/** Số chủ đầu tư tối đa ở ô lọc (danh mục tra cứu nhỏ). */
+const DEVELOPER_LIMIT = 50;
+
+/**
+ * Chủ đầu tư CÓ dự án công khai (ô "Chủ đầu tư" của `/du-an`), theo `sortOrder`. Id lấy từ dự án công khai của ngôn ngữ đang xem rồi
+ * đi qua `findPublicList` của `developers` (`/en` chỉ chủ đầu tư có bản EN).
+ */
+export async function listDevelopersWithPublicProjects(payload: Payload, locale: Locale): Promise<Developer[]> {
+  const ids = new Set<string>();
+  for (let page = 1; page <= SCAN_MAX_PAGES; page += 1) {
+    const result = await findPublicList<Project>(payload, "projects", locale, {
+      where: { developer: { exists: true } },
+      page,
+      limit: SCAN_PAGE_SIZE,
+      depth: 0,
+      select: { developer: true },
+    });
+    for (const project of result.docs) {
+      const id = relationId(project.developer);
+      if (id) ids.add(id);
+    }
+    if (!result.hasNextPage) break;
+  }
+  if (ids.size === 0) return [];
+  const { docs } = await findPublicList<Developer>(payload, "developers", locale, {
+    where: { id: { in: [...ids] } },
+    sort: ["sortOrder", "createdAt"],
+    limit: DEVELOPER_LIMIT,
+    depth: 0,
   });
+  return docs;
 }
 
 /** Dự án công khai theo slug của ngôn ngữ đang xem; `depth: 1` populate ảnh (gallery, mặt bằng, tài liệu), tỉnh, phường, chủ đầu tư, danh mục. */
