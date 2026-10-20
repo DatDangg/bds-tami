@@ -1,8 +1,8 @@
 import type { Payload, SanitizedPermissions, Where } from "payload";
 
+import { hideFromNonAdmin } from "../../../access/hideFromNonAdmin";
 import { ADMIN_COLLECTION_LABELS, ADMIN_GLOBAL_LABELS, type AdminCollectionSlug, type AdminGlobalSlug } from "../../../lib/admin/collection-labels";
-import { ADMIN_NAV_GROUPS } from "../admin-groups";
-import { COUNTED_CONTENT_SLUGS, CREATE_SHORTCUT_SLUGS, statCardSpecsFor, type StatCardSpec } from "./dashboard-queries";
+import { COUNTED_CONTENT_SLUGS, CREATE_SHORTCUT_SLUGS, statCardSpecsFor, type StatCardSpec, type StatIconName } from "./dashboard-queries";
 
 /** Người dùng admin đang xem trang; `collection` bắt buộc để Local API áp quyền như request thật. */
 export interface DashboardUser {
@@ -17,8 +17,6 @@ export interface DashboardContext {
   payload: Payload;
   user: DashboardUser;
   permissions: SanitizedPermissions;
-  /** Mục không bị `admin.hidden` (từ Payload); card nhóm chỉ liệt kê mục có trong đây VÀ có quyền `read`. */
-  visibleEntities: { collections?: string[]; globals?: string[] };
 }
 
 export interface StatCard extends Omit<StatCardSpec, "queries"> {
@@ -27,6 +25,20 @@ export interface StatCard extends Omit<StatCardSpec, "queries"> {
 
 export interface Shortcut {
   slug: string;
+  label: string;
+  href: string;
+}
+
+/** Thẻ thao tác nhanh lớn ở đầu Tổng quan (BL-041). */
+export interface QuickAction {
+  id: "new-rental" | "assign-leads" | "new-news";
+  label: string;
+  href: string;
+  icon: StatIconName | "plus";
+}
+
+export interface WebsiteShortcut {
+  slug: AdminGlobalSlug;
   label: string;
   href: string;
 }
@@ -52,17 +64,16 @@ export interface RecentOwnDoc {
   href: string;
 }
 
-export interface NavGroupCard {
-  label: string;
-  items: Array<{ label: string; href: string }>;
-}
-
 export interface DashboardData {
   stats: StatCard[];
-  shortcuts: Shortcut[];
+  /** Ba thẻ thao tác nhanh (đã lọc theo quyền/vai trò). */
+  quickActions: QuickAction[];
+  /** "Tạo loại khác": các lối tắt tạo mới còn lại, ngoài các thẻ ở `quickActions`. */
+  moreShortcuts: Shortcut[];
+  /** Hàng "Sửa website": chỉ admin (rỗng với sale). */
+  websiteShortcuts: WebsiteShortcut[];
   recentLeads: RecentLead[] | null;
   recentOwnDocs: RecentOwnDoc[] | null;
-  navGroups: NavGroupCard[];
 }
 
 const RECENT_LIMIT = 5;
@@ -77,7 +88,6 @@ function granted(permission: unknown): boolean {
 }
 
 const canRead = (permissions: SanitizedPermissions, slug: string): boolean => granted(permissions.collections?.[slug]?.read);
-const labelOf = (slug: string): string => ADMIN_COLLECTION_LABELS[slug as AdminCollectionSlug]?.plural ?? slug;
 const singularOf = (slug: string): string => ADMIN_COLLECTION_LABELS[slug as AdminCollectionSlug]?.singular ?? slug;
 const adminRouteOf = (payload: Payload): string => payload.config.routes.admin;
 
@@ -182,25 +192,49 @@ export async function loadRecentOwnDocs(ctx: DashboardContext): Promise<RecentOw
   return perCollection.flat().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, RECENT_LIMIT);
 }
 
-/** Card nhóm giống sidebar: chỉ mục có quyền `read` VÀ không `admin.hidden` (global `read` luôn true nhưng ẩn bằng hideFromNonAdmin). */
-export function buildNavGroupCards(ctx: DashboardContext): NavGroupCard[] {
+/** Thứ tự hàng "Sửa website" (nhãn lấy từ `ADMIN_GLOBAL_LABELS`). */
+const WEBSITE_GLOBAL_SLUGS = ["homepage", "header", "footer", "site-settings"] as const satisfies readonly AdminGlobalSlug[];
+
+/** Globals chỉ admin dùng: cùng quy tắc `admin.hidden` của Payload (`hideFromNonAdmin`), không tự viết quy tắc khác. */
+export function buildWebsiteShortcuts(ctx: DashboardContext): WebsiteShortcut[] {
+  if (hideFromNonAdmin({ user: ctx.user })) return [];
   const adminRoute = adminRouteOf(ctx.payload);
-  const visibleCollections = new Set(ctx.visibleEntities.collections ?? []);
-  const visibleGlobals = new Set(ctx.visibleEntities.globals ?? []);
-  return ADMIN_NAV_GROUPS.map((group) => ({
-    label: group.label,
-    items: [
-      ...group.collections
-        .filter((slug) => visibleCollections.has(slug) && canRead(ctx.permissions, slug))
-        .map((slug) => ({ label: labelOf(slug), href: `${adminRoute}/collections/${slug}` })),
-      ...group.globals
-        .filter((slug) => visibleGlobals.has(slug) && granted(ctx.permissions.globals?.[slug]?.read))
-        .map((slug) => ({ label: ADMIN_GLOBAL_LABELS[slug as AdminGlobalSlug], href: `${adminRoute}/globals/${slug}` })),
-    ],
-  })).filter((group) => group.items.length > 0);
+  return WEBSITE_GLOBAL_SLUGS.map((slug) => ({ slug, label: ADMIN_GLOBAL_LABELS[slug], href: `${adminRoute}/globals/${slug}` }));
 }
+
+const canCreate = (permissions: SanitizedPermissions, slug: string): boolean => granted(permissions.collections?.[slug]?.create);
+
+/**
+ * Thẻ thao tác nhanh: "Phân công lead" chỉ admin (chỉ admin gán `assignedTo`) và lấy số + link từ thẻ đếm "Lead chưa phân công"
+ * có sẵn (`stats`) để dùng đúng một điều kiện "mới, chưa giao". Số 0 vẫn hiện thẻ ("0 chưa giao").
+ */
+export function buildQuickActions(ctx: DashboardContext, stats: StatCard[]): QuickAction[] {
+  const adminRoute = adminRouteOf(ctx.payload);
+  const unassigned = stats.find((card) => card.id === "leads-unassigned");
+  const actions: Array<QuickAction | null> = [
+    canCreate(ctx.permissions, "rentals")
+      ? { id: "new-rental", label: "Đăng tin cho thuê mới", href: `${adminRoute}/collections/rentals/create`, icon: "plus" }
+      : null,
+    !hideFromNonAdmin({ user: ctx.user }) && unassigned?.href
+      ? { id: "assign-leads", label: `Phân công lead (${unassigned.count} chưa giao)`, href: unassigned.href, icon: "lead" }
+      : null,
+    canCreate(ctx.permissions, "news")
+      ? { id: "new-news", label: "Viết tin tức", href: `${adminRoute}/collections/news/create`, icon: "draft" }
+      : null,
+  ];
+  return actions.filter((action): action is QuickAction => action !== null);
+}
+
+const QUICK_ACTION_SLUGS: readonly string[] = ["rentals", "news"];
 
 export async function loadDashboardData(ctx: DashboardContext): Promise<DashboardData> {
   const [stats, recentLeads, recentOwnDocs] = await Promise.all([loadStatCards(ctx), loadRecentLeads(ctx), loadRecentOwnDocs(ctx)]);
-  return { stats, shortcuts: buildShortcuts(ctx), recentLeads, recentOwnDocs, navGroups: buildNavGroupCards(ctx) };
+  return {
+    stats,
+    quickActions: buildQuickActions(ctx, stats),
+    moreShortcuts: buildShortcuts(ctx).filter((shortcut) => !QUICK_ACTION_SLUGS.includes(shortcut.slug)),
+    websiteShortcuts: buildWebsiteShortcuts(ctx),
+    recentLeads,
+    recentOwnDocs,
+  };
 }

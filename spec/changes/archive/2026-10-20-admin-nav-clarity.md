@@ -1,7 +1,7 @@
 ---
 id: admin-nav-clarity
 type: feature
-status: in_progress
+status: done
 created: 2026-10-20
 ---
 
@@ -46,3 +46,4 @@ User 2026-10-20 (ảnh sidebar, đăng nhập admin):
 - Classification: **MODIFY** (FR-ADM-19). Spec delta: câu "Điều hướng rõ (BL-041)" + "Tổng quan (BL-041)".
 - Task: `tasks/feature-admin-nav-clarity/phase-1-task-01.md` (sidebar + Nâng cao + ẩn mục + Xem website) · `phase-1-task-02.md` (Tổng quan + banner).
 - Quyết định tự xử lý (chi tiết + lý do trong task file): D1 ẩn `private-files`/`lead-activities` bằng `admin.hidden: true` (Payload 3.91 chặn route list/doc nhưng drawer mặc định `overrideEntityVisibility=true` → join Lịch sử chăm sóc trong form Lead vẫn chạy; thử thực tế, hỏng thì chuyển "Nâng cao"); D2 thành phần nhóm "Nâng cao"; D3 thu gọn mặc định bằng ghi preference nav một lần; D4 phân cấp thị giác do agent chốt (không chờ duyệt ảnh); D5 "Xem website" theo `NEXT_PUBLIC_SITE_URL`; D6–D7 thẻ thao tác nhanh (phân công lead chỉ admin) + "Tạo loại khác"; D8 Sửa website chỉ admin; D9 bỏ "Mục quản lý"; D10 banner warning `role=status`; D11 bố cục.
+- Kết quả (2026-10-21): T01 `f3d5291` (STRICT PASS r2) · T02 commit close-out (STRICT PASS r1) · spec 1.36.0 / scope v46 · runtime local: drawer Lịch sử chăm sóc trong form Lead xem/thêm OK → giữ ẩn `lead-activities` (D1). Residual: chưa chụp 375px/tối, integration test dashboard chưa chạy.

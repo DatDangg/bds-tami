@@ -5,16 +5,7 @@
   padding-bottom: 48px;
 
   &__header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 24px;
-
-    > div {
-      min-width: 0;
-      flex: 1 1 240px;
-    }
+    margin-bottom: 16px;
   }
 
   &__title {
@@ -41,9 +32,99 @@
   }
 }
 
-// ---- Nút "Tạo mới" + menu <details> ----
+// ---- Thẻ thao tác nhanh (BL-041) ----
+.tami-dash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tami-dash-action {
+  display: flex;
+  flex: 1 1 240px;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 20px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-l);
+  box-shadow: var(--admin-shadow-sm);
+  color: var(--admin-text);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--admin-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--admin-radius-m);
+    background: var(--admin-accent-soft);
+    color: var(--admin-accent-soft-text);
+  }
+}
+
+// ---- Hàng "Sửa website" (admin) ----
+.tami-dash-site {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 24px;
+
+  &__title {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 600;
+    color: var(--admin-text-subtle);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-s);
+    background: var(--admin-surface);
+    color: var(--admin-text);
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--admin-accent);
+      color: var(--admin-accent);
+    }
+  }
+}
+
+// ---- "Tạo loại khác": menu <details> phụ ----
 .tami-dash-create {
   position: relative;
+  align-self: center;
 
   &__button {
     display: inline-flex;
@@ -51,9 +132,10 @@
     gap: 6px;
     height: 40px;
     padding: 0 16px;
+    border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius-s);
-    background: var(--admin-accent);
-    color: var(--admin-on-accent);
+    background: var(--admin-surface);
+    color: var(--admin-text);
     font-weight: 500;
     cursor: pointer;
     list-style: none;
@@ -64,7 +146,8 @@
     }
 
     &:hover {
-      background: var(--admin-accent-hover);
+      border-color: var(--admin-accent);
+      color: var(--admin-accent);
     }
 
     &:focus-visible {
@@ -182,8 +265,13 @@
 
   // Vùng bấm >= 44px trên màn cảm ứng.
   .tami-dash-create__button,
-  .tami-dash-create__menu a {
+  .tami-dash-create__menu a,
+  .tami-dash-site a {
     min-height: 44px;
+  }
+
+  .tami-dash-action {
+    flex-basis: 100%;
   }
 
   .tami-dash-create__menu {

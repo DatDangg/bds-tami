@@ -3,7 +3,7 @@
 - Change doc: `spec/changes/2026-10-20-admin-nav-clarity.md` (BACKLOG BL-041). Tham khảo `docs/reviews/2026-10-21-admin-audit.md` §2 (chỉ phần đã ghép vào change doc).
 - Spec delta: FR-ADM-19 câu "**Tổng quan (BL-041)**" (SPECIFICATIONS.md).
 - Phụ thuộc: phase-1-task-01 (đã commit — `ADMIN_NAV_GROUPS` có nhóm "Nâng cao").
-- Trạng thái: `pending`
+- Trạng thái: `done` — Reviewer STRICT r1 PASS (`.context/review-reports/feature-admin-nav-clarity-phase-1-task-02-round-1-review.md`); spec-validator phase 1 (`.context/review-reports/spec-validation-feature-admin-nav-clarity-phase-1.md`, gap doc → đã reconcile); spec 1.36.0 / scope v46.
 
 ## Classification / Risk
 - Type: **MODIFY** (component dashboard admin + banner; không đổi schema/access/API/endpoint).
@@ -39,4 +39,25 @@
 `pnpm test` (src/components/admin, src/lib/admin), `pnpm typecheck`, `pnpm lint`.
 
 ## Verification summary
-(builder ghi)
+### Acceptance
+- [x] Hàng "Sửa website" (Trang chủ · Menu đầu trang · Chân trang · Cấu hình chung), chỉ admin — `WebsiteShortcuts.tsx` + `buildWebsiteShortcuts` (dùng `hideFromNonAdmin`), đặt ngay dưới hàng thẻ thao tác.
+- [x] Bỏ khối "Mục quản lý": xoá `NavGroupCards.tsx`, `buildNavGroupCards`, `navGroups`, `visibleEntities` (không còn dùng), CSS `.tami-dash-groups/.tami-dash-group*`; test cập nhật.
+- [x] Banner dịch lỗi: `role="status"`, `tami-admin-alert--warning` (token badge-warning + viền), câu "N bài chưa dịch được sang tiếng Anh — bản tiếng Việt vẫn hiển thị bình thường." / câu hết hạn mức + link "<Loại>: n bài — xem danh sách" (nhãn loại giữ nguyên `COLLECTION_LABELS`, vd "Cho thuê").
+- [x] Thẻ thao tác nhanh `QuickActions.tsx`: "Đăng tin cho thuê mới", "Phân công lead (N chưa giao)" (admin; N + href lấy từ thẻ đếm `leads-unassigned` có sẵn → đúng điều kiện chip "Mới (chưa giao)", không viết điều kiện thứ 2), "Viết tin tức"; "Tạo loại khác" = `<details>` các slug còn lại của `CREATE_SHORTCUT_SLUGS`.
+- [x] Không đổi schema/access/API.
+
+### Lựa chọn của builder
+- N = 0: vẫn hiện thẻ "Phân công lead (0 chưa giao)".
+- Thẻ phân công không hiện nếu admin không có thẻ `leads-unassigned` (không đủ quyền read leads).
+- `loadDashboardData` trả `quickActions`, `moreShortcuts`, `websiteShortcuts` (thay `shortcuts`, `navGroups`); `buildShortcuts` giữ nguyên.
+
+### Files
+Sửa: `dashboard/dashboard-data.ts`, `DashboardHeader.tsx` (chỉ lời chào), `DashboardView.tsx`, `TranslationFailedBanner.tsx`, `styles/_dashboard.scss`, `_dashboard-lists.scss`, `_surfaces.scss`, `DashboardParts.test.tsx`, `DashboardLinks.test.tsx`, `tests/integration/admin-dashboard.test.ts`. Thêm: `QuickActions.tsx`, `WebsiteShortcuts.tsx`, `dashboard-actions.test.ts`, `TranslationFailedBanner.test.tsx`. Xoá: `NavGroupCards.tsx`.
+
+### Verify
+- `pnpm vitest run src/components/admin src/lib/admin`: 35 file / 242 test PASS. `pnpm typecheck`: PASS. `pnpm lint`: 0 error (2 warning cũ ở tools/task-dashboard/server.mjs).
+- Doc impact: `docs/DESIGN.md` không nhắc dashboard "Mục quản lý"/"Tạo mới" → no doc impact thêm.
+
+### Residual risk
+- Chưa chạy được: integration `tests/integration/admin-dashboard.test.ts` (cần DB; đã sửa test card nhóm → thao tác nhanh/Sửa website), app thật + ảnh 1440/375 sáng/tối (không dựng dev server vì chung DB). Cần reviewer/QA xem bằng mắt: thẻ 375px không tràn, tương phản warning.
+

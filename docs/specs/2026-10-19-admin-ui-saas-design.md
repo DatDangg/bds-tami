@@ -169,7 +169,9 @@ Dùng `admin.group` (chuỗi tiếng Việt) + **sắp xếp lại mảng `colle
 
 **As-built (BL-040, 2026-10-20):** tên hiển thị đã đổi — nhóm 5 "Danh mục" → **"Dữ liệu nền"**; `leads` = "Lead" (giữ từ đội sale quen dùng), `lead-activities` = "Lịch sử chăm sóc"; `private-files` = "Tệp CV ứng viên"; `media` = "Thư viện ảnh & tệp"; `click-stats-daily` = "Thống kê liên hệ theo ngày"; `translation-usage` = "Chi phí dịch tự động"; `redirects` = "Chuyển hướng đường dẫn". Nguồn: `src/lib/admin/collection-labels.ts`, `src/components/admin/admin-groups.ts`.
 
-Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
+**As-built (BL-041, 2026-10-21):** thêm nhóm 8 **"Nâng cao"** cuối menu, mặc định thu gọn (`NavAdvancedCollapse`, ghi preference nav một lần) — gom Tỉnh/thành · Phường/xã · Nhật ký thao tác · Lượt bấm liên hệ · Thống kê liên hệ theo ngày · Chi phí dịch tự động; "Dữ liệu nền" còn Danh mục · Chủ đầu tư, "Hệ thống" còn Nhân viên. `private-files` + `lead-activities` **ẩn khỏi menu** (`admin.hidden: true`; lịch sử chăm sóc xem/thêm trong form Lead qua drawer, CV tải ở Hồ sơ ứng tuyển). Style sidebar thay dòng "Style sidebar" dưới: nhãn nhóm VIẾT HOA 700 màu chữ mạnh + vạch ngăn `--admin-border-strong`, mục con thụt lề có vạch dọc, mục đang chọn nền `accent-soft` + vạch 3px accent + chữ 600, toggle 44px ở mobile. Header có nút "Xem website" (`SiteLink`, `NEXT_PUBLIC_SITE_URL`).
+
+*(Superseded by BL-041 — xem As-built BL-041 ở trên.)* Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
 
 **Icon:** Payload 3.91 không hỗ trợ icon cho mục nav qua config; muốn có phải thay cả `admin.components.Nav` (component tự viết, phải tự xử lý quyền/ẩn/active/collapse/mobile) → rủi ro cao, bảo trì khi nâng Payload. **Đề xuất: không icon ở menu** (nhóm + khoảng trắng đã đủ phân cấp); icon chỉ dùng ở card dashboard + lối tắt (component của mình). → hỏi user §7.
 
@@ -216,6 +218,8 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 **As-built (T04):** card "Danh mục quản lý" không kèm số bản ghi (tránh ~25 count/lần tải); khối phải là "Bài của bạn cập nhật gần đây" (author = mình ở projects/rentals/property-posts/news, sort -updatedAt) vì không có field người sửa cuối.
 
 **As-built (BL-040):** tiêu đề card đổi "Danh mục quản lý" → **"Mục quản lý"**; gợi ý thẻ lead chưa phân công: "Mới, chưa giao sale" (thống nhất "Sale phụ trách").
+
+**As-built (BL-041, 2026-10-21):** bố cục §3.1 thay bằng: lời chào/ngày → **thẻ thao tác nhanh** (Đăng tin cho thuê mới · Phân công lead (N chưa giao) — chỉ admin · Viết tin tức) + menu phụ "Tạo loại khác" (thay `[＋ Tạo mới ▾]` và dòng "Lối tắt tạo nội dung") → hàng **"Sửa website"** (Trang chủ · Menu đầu trang · Chân trang · Cấu hình chung, chỉ admin) → banner dịch lỗi mức **cảnh báo nhẹ** (warning, `role=status`, câu trấn an — thay "alert danger") → thẻ số liệu → lead mới nhất + bài của bạn. Khối **"Mục quản lý" đã bỏ** (trùng sidebar).
 
 ## 4. Màn danh sách (list view)
 
@@ -279,7 +283,7 @@ Q1 Thẻ số liệu dashboard · Q2 Dashboard: khung ở BL-015 + số liệu s
 **Đã chốt (user 2026-10-19: "ok theo đề xuất"):**
 - Q1: thẻ số liệu như §3.2 (admin: lead mới, lead chưa phân công, hồ sơ ứng tuyển mới, nội dung đang hiển thị; sale: lead mới giao cho mình, lead đang xử lý, bản nháp của mình, tin đang đăng). **Không** có số "so với hôm qua".
 - Q2: (a) BL-015 T04 làm khung dashboard + thẻ đếm nhanh; L13-T01 sau này cắm biểu đồ/lượt bấm/chi phí dịch vào khung.
-- Q3: duyệt 7 nhóm §2 như thiết kế, không ẩn mục nào (giữ `lead-activities`, `click-events` — quyền xem giữ nguyên như hiện tại). *(Không có đề xuất riêng → giữ nguyên thiết kế, thay đổi tối thiểu.)*
+- Q3 *(superseded by BL-041, 2026-10-21: thêm nhóm "Nâng cao", ẩn `lead-activities`/`private-files`)*: duyệt 7 nhóm §2 như thiết kế, không ẩn mục nào (giữ `lead-activities`, `click-events` — quyền xem giữ nguyên như hiện tại). *(Không có đề xuất riêng → giữ nguyên thiết kế, thay đổi tối thiểu.)*
 - Q4: không icon menu; icon chỉ trên dashboard.
 - Q5: thumbnail `projects` = ảnh đầu `gallery` (nhất quán với `rentals`). *(Không có đề xuất riêng → chọn theo nhất quán.)*
 - Q6: dòng bảng 48px.

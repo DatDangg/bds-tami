@@ -81,10 +81,10 @@ export interface Config {
     'private-files': PrivateFile;
     categories: Category;
     developers: Developer;
-    provinces: Province;
-    wards: Ward;
     redirects: Redirect;
     staff: Staff;
+    provinces: Province;
+    wards: Ward;
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
@@ -115,10 +115,10 @@ export interface Config {
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
-    provinces: ProvincesSelect<false> | ProvincesSelect<true>;
-    wards: WardsSelect<false> | WardsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     staff: StaffSelect<false> | StaffSelect<true>;
+    provinces: ProvincesSelect<false> | ProvincesSelect<true>;
+    wards: WardsSelect<false> | WardsSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
@@ -1614,20 +1614,20 @@ export interface PayloadLockedDocument {
         value: string | Developer;
       } | null)
     | ({
-        relationTo: 'provinces';
-        value: string | Province;
-      } | null)
-    | ({
-        relationTo: 'wards';
-        value: string | Ward;
-      } | null)
-    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
     | ({
         relationTo: 'staff';
         value: string | Staff;
+      } | null)
+    | ({
+        relationTo: 'provinces';
+        value: string | Province;
+      } | null)
+    | ({
+        relationTo: 'wards';
+        value: string | Ward;
       } | null)
     | ({
         relationTo: 'audit-logs';
@@ -2321,40 +2321,6 @@ export interface DevelopersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "provinces_select".
- */
-export interface ProvincesSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  code?: T;
-  name?: T;
-  shortName?: T;
-  slug?: T;
-  sortOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wards_select".
- */
-export interface WardsSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  province?: T;
-  code?: T;
-  name?: T;
-  type?: T;
-  slug?: T;
-  legacyNames?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -2392,6 +2358,40 @@ export interface StaffSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces_select".
+ */
+export interface ProvincesSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  code?: T;
+  name?: T;
+  shortName?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards_select".
+ */
+export interface WardsSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  province?: T;
+  code?: T;
+  name?: T;
+  type?: T;
+  slug?: T;
+  legacyNames?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

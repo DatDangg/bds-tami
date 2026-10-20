@@ -199,6 +199,13 @@ $group-indent: $group-indent-margin + $group-indent-padding + $group-indent-bord
     color: var(--admin-badge-danger-fg);
   }
 
+  // Cảnh báo nhẹ: viền cùng màu chữ để không chỉ dựa vào màu nền (AA sáng/tối nhờ token badge-warning).
+  &--warning {
+    background: var(--admin-badge-warning-bg);
+    color: var(--admin-badge-warning-fg);
+    border: 1px solid var(--admin-badge-warning-fg);
+  }
+
   &__list {
     margin: 8px 0 0;
     padding-left: 20px;

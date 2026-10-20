@@ -12,11 +12,11 @@ vi.mock("next/link", () => ({
 }));
 vi.mock("@payloadcms/ui", () => ({ useListDrawerContext: () => ({}), useConfig: () => ({ config: { routes: { admin: "/admin" } } }), Link: () => null }));
 
-import type { NavGroupCard, RecentLead, StatCard } from "./dashboard-data";
-import { DashboardHeader } from "./DashboardHeader";
-import { NavGroupCards } from "./NavGroupCards";
+import type { QuickAction, RecentLead, StatCard, WebsiteShortcut } from "./dashboard-data";
+import { QuickActions } from "./QuickActions";
 import { RecentLeadsCard } from "./RecentLists";
 import { StatCards } from "./StatCards";
+import { WebsiteShortcuts } from "./WebsiteShortcuts";
 
 const NOW = new Date("2026-10-19T03:00:00Z");
 
@@ -27,15 +27,17 @@ describe("link nội bộ dashboard dùng next/link (không tải lại toàn tr
     expect(screen.getByRole("link", { name: /^Lead mới/ }).getAttribute("data-next-link")).toBe("true");
   });
 
-  it("NavGroupCards", () => {
-    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead", href: "/admin/collections/leads" }] }];
-    render(<NavGroupCards groups={groups} />);
-    expect(screen.getByRole("link", { name: "Lead" }).getAttribute("data-next-link")).toBe("true");
+  it("QuickActions (thẻ + Tạo loại khác)", () => {
+    const actions: QuickAction[] = [{ id: "new-news", label: "Viết tin tức", href: "/admin/collections/news/create", icon: "draft" }];
+    render(<QuickActions actions={actions} moreShortcuts={[{ slug: "projects", label: "Dự án", href: "/admin/collections/projects/create" }]} />);
+    expect(screen.getByRole("link", { name: "Viết tin tức" }).getAttribute("data-next-link")).toBe("true");
+    expect(screen.getByRole("link", { name: "Dự án", hidden: true }).getAttribute("data-next-link")).toBe("true");
   });
 
-  it("DashboardHeader shortcuts", () => {
-    render(<DashboardHeader name="Minh" now={NOW} shortcuts={[{ slug: "news", label: "Tin tức", href: "/admin/collections/news/create" }]} />);
-    expect(screen.getByRole("link", { name: "Tin tức", hidden: true }).getAttribute("data-next-link")).toBe("true");
+  it("WebsiteShortcuts", () => {
+    const shortcuts: WebsiteShortcut[] = [{ slug: "footer", label: "Chân trang", href: "/admin/globals/footer" }];
+    render(<WebsiteShortcuts shortcuts={shortcuts} />);
+    expect(screen.getByRole("link", { name: "Chân trang" }).getAttribute("data-next-link")).toBe("true");
   });
 
   it("RecentLeadsCard", () => {

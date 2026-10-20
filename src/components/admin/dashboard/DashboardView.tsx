@@ -3,14 +3,16 @@ import { Gutter } from "@payloadcms/ui";
 import { TranslationFailedBanner } from "../TranslationFailedBanner";
 import { type DashboardContext, loadDashboardData } from "./dashboard-data";
 import { DashboardHeader } from "./DashboardHeader";
-import { NavGroupCards } from "./NavGroupCards";
+import { QuickActions } from "./QuickActions";
 import { RecentLeadsCard, RecentOwnDocsCard } from "./RecentLists";
 import { StatCards } from "./StatCards";
+import { WebsiteShortcuts } from "./WebsiteShortcuts";
 
 /**
  * Màn Tổng quan (`admin.components.views.dashboard`, BL-015 T04, FR-ADM-19). Server Component: số liệu lấy bằng Local API
  * `overrideAccess:false` theo người đăng nhập, chỉ truy vấn/hiển thị phần user có quyền (không ẩn bằng CSS).
  * Thay view mặc định nên `beforeDashboard` không còn chạy: banner dịch lỗi được render trực tiếp ở đây.
+ * Bố cục (BL-041): chào → thao tác nhanh → Sửa website (admin) → banner dịch lỗi → thẻ đếm → lead/bài gần đây.
  * Khối thống kê sâu của FR-ADM-14 (L13-T01) cắm thêm vào đây, không đổi khung.
  */
 export async function DashboardView(props: DashboardContext) {
@@ -22,7 +24,9 @@ export async function DashboardView(props: DashboardContext) {
 
   return (
     <Gutter className="tami-dash">
-      <DashboardHeader name={name} now={now} shortcuts={data.shortcuts} />
+      <DashboardHeader name={name} now={now} />
+      <QuickActions actions={data.quickActions} moreShortcuts={data.moreShortcuts} />
+      <WebsiteShortcuts shortcuts={data.websiteShortcuts} />
       <TranslationFailedBanner />
       <StatCards cards={data.stats} />
       {(data.recentLeads || data.recentOwnDocs) && (
@@ -31,7 +35,6 @@ export async function DashboardView(props: DashboardContext) {
           {data.recentOwnDocs && <RecentOwnDocsCard docs={data.recentOwnDocs} now={now} />}
         </div>
       )}
-      <NavGroupCards groups={data.navGroups} />
     </Gutter>
   );
 }

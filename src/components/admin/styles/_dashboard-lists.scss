@@ -89,63 +89,13 @@
   }
 }
 
-// ---- Danh mục quản lý ----
-.tami-dash-groups {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.tami-dash-group {
-  padding: 16px 20px;
-
-  &__title {
-    margin: 0 0 8px;
-    font-size: 12px;
-    line-height: 16px;
-    font-weight: 600;
-    color: var(--admin-text-subtle);
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  a {
-    display: flex;
-    align-items: center;
-    min-height: 36px;
-    color: var(--admin-text);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--admin-accent);
-    }
-  }
-}
-
 @media (max-width: 1023px) {
   .tami-dash-two {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .tami-dash-groups {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 767px) {
-  .tami-dash-groups {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  // Vùng bấm >= 44px trên màn cảm ứng.
-  .tami-dash-group a {
-    min-height: 44px;
-  }
-
   // Link 'Xem tất cả' ở tiêu đề card.
   .tami-dash-card__title a {
     display: inline-flex;
