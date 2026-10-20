@@ -13,11 +13,11 @@ export function seoField(): GroupField {
     label: "SEO",
     localized: true,
     fields: [
-      { name: "metaTitle", type: "text", label: "Tiêu đề SEO (meta title)", admin: { description: "Để trống thì dùng tiêu đề bài." } },
-      { name: "metaDescription", type: "textarea", label: "Mô tả SEO (meta description)" },
-      { name: "ogImage", type: "upload", label: "Ảnh chia sẻ mạng xã hội (OG image)", relationTo: "media", filterOptions: { mimeType: { contains: "image/" } } },
-      { name: "noindex", type: "checkbox", label: "Không cho máy tìm kiếm lập chỉ mục (noindex)", defaultValue: false },
-      { name: "canonical", type: "text", label: "URL chuẩn (canonical)" },
+      { name: "metaTitle", type: "text", label: "Tiêu đề hiện trên Google", admin: { description: "Để trống thì dùng tiêu đề bài." } },
+      { name: "metaDescription", type: "textarea", label: "Mô tả hiện trên Google" },
+      { name: "ogImage", type: "upload", label: "Ảnh khi chia sẻ lên mạng xã hội", relationTo: "media", filterOptions: { mimeType: { contains: "image/" } } },
+      { name: "noindex", type: "checkbox", label: "Ẩn trang khỏi Google", defaultValue: false },
+      { name: "canonical", type: "text", label: "Đường dẫn gốc (khi trang trùng nội dung)", admin: { description: "Thường để trống." } },
     ],
   };
 }

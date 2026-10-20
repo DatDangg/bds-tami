@@ -38,7 +38,7 @@ async function checkRetranslateRateLimit(rateLimit: RetranslateRateLimit, userId
 
 /** Dịch tắt (site-settings) hoặc hạn mức tháng = 0 thì job sẽ bỏ qua êm: báo rõ thay vì "đã xếp hàng". Thiếu cấu hình dịch: 503. */
 async function translationUnavailable(req: PayloadRequest): Promise<Response | null> {
-  if (!(await isTranslationEnabled(req))) return fail(409, "Dịch tự động đang tắt trong Cài đặt chung");
+  if (!(await isTranslationEnabled(req))) return fail(409, "Dịch tự động đang tắt trong Cấu hình chung");
   let budget: number;
   try {
     budget = parseTranslationEnv(process.env).TRANSLATION_MONTHLY_BUDGET_USD;

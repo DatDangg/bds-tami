@@ -1,188 +1,258 @@
 {
-  "specVersion": "1.32.0",
-  "scopeVersion": 40,
+  "specVersion": "1.33.0",
+  "scopeVersion": 41,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-037 — link điều hướng (breadcrumb, Button ghost \"Xem tất cả\", \"Xem thêm\" /tin-tuc, link danh mục tin tức / tin đăng, \"Xem tất cả vị trí\" tin tuyển dụng hết hạn) hover không gạch chân, đổi màu thương hiệu như BL-034; slider Dự án nổi bật: tên dự án giữ chỗ 2 dòng (min-h-[2lh]) để khung kính mọi thẻ cùng chiều cao. Spec 1.31.1 → 1.32.0 (MINOR, MODIFY).",
-  "workItem": "feature-link-hover-and-slider-title-height",
-  "backlog": "BL-037",
+  "triggerNote": "BL-040 — rà ngữ nghĩa toàn bộ chữ tiếng Việt trong admin: ghi đè chữ mặc định Payload ở một nơi (i18n.translations.vi), sửa nhãn collection/global/field/mô tả, toán tử bộ lọc đọc tự nhiên (thông báo lỗi xuất Excel lead trích đúng chữ mới), cột Excel \"Sale phụ trách\". Spec 1.32.0 → 1.33.0 (MINOR, MODIFY).",
+  "workItem": "feature-admin-vietnamese-wording",
+  "backlog": "BL-040",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-link-hover-and-slider-title-height.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-admin-vietnamese-wording.md",
   "task": [
-    "tasks/feature-link-hover-and-slider-title-height/phase-1-task-01.md"
+    "tasks/feature-admin-vietnamese-wording/phase-1-task-01.md",
+    "tasks/feature-admin-vietnamese-wording/phase-1-task-02.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-link-hover-and-slider-title-height-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-2-review.md",
+    ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-2-review.md",
+    ".context/review-reports/spec-validation-feature-admin-vietnamese-wording-phase-1.md"
   ],
   "commits": [
-    "(commit close-out BL-037)"
+    "(commit close-out BL-040)"
   ],
-  "commitNotes": {
-    "(commit close-out BL-037)": "T01 — Breadcrumb.tsx LINK_CLASS bỏ hover:underline → transition-colors hover:text-accent-text; button.tsx variant ghost bỏ underline-offset-4 hover:underline → hover:text-accent-text; NewsHomeBody \"Xem thêm\", tin-tuc/[slug]/page.tsx + PostDetail.tsx link danh mục (đã accent) bỏ hover:underline → transition-colors hover:text-text; JobDetail.tsx \"Xem tất cả vị trí\" giữ underline lúc thường, hover:no-underline hover:text-accent-text; ProjectsSlider.tsx h3 thêm min-h-[2lh] (giữ line-clamp-2). Test: Breadcrumb.test, button.test (ghost), ProjectsSlider.test. Doc: SPECIFICATIONS (Giao diện, F1 Dự án nổi bật), design-spec (đoạn Hover link điều hướng BL-037 + S01 khối 3)."
-  },
-  "previousScope": "spec/test-scope/archive/test-scope-1.31.1-39.json",
-  "specUpdate": "spec/updates/2026-10-20-link-hover-and-slider-title-height.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.32.0-40.json",
+  "specUpdate": "spec/updates/2026-10-20-admin-vietnamese-wording.md",
   "specRefs": [
-    "Giao diện — hover link điều hướng (BL-037)",
-    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)",
-    "design-spec — Hover link điều hướng (BL-037)",
-    "design-spec S01 khối 3 — khung kính tên dự án"
+    "FR-ADM-19"
   ],
   "specRefNotes": {
-    "Giao diện — hover link điều hướng (BL-037)": "Breadcrumb, Button ghost, \"Xem thêm\" /tin-tuc, link danh mục chi tiết tin tức + tin đăng, \"Xem tất cả vị trí\": hover không gạch chân, transition-colors; chữ thường → --color-accent-text (khối tối #E0BF89), link vốn vàng → --color-text; \"Xem tất cả vị trí\" giữ gạch chân lúc thường; focus-visible giữ outline chung; RichText giữ gạch chân.",
-    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)": "Tên tối đa 2 dòng, luôn giữ chỗ 2 dòng → khung kính mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng.",
-    "design-spec — Hover link điều hướng (BL-037)": "Đoạn sau quy tắc hover thẻ BL-034; liệt kê link đổi, link chưa đổi (footer / mục lục / LanguageSwitcher / 404).",
-    "design-spec S01 khối 3 — khung kính tên dự án": "h3 --text-h3, line-clamp-2 + min-h-[2lh]."
+    "FR-ADM-19": "Câu \"Ngữ nghĩa chữ admin (BL-040)\": chữ đúng nghĩa nghiệp vụ, viết hoa chữ đầu, một khái niệm một tên, không lộ thuật ngữ dev; chữ Payload ghi đè một nơi (i18n.translations.vi) có test khoá; toán tử lọc là / không phải / là một trong / có giá trị + Có/Không, thông báo lỗi xuất Excel trích đúng chữ này; nhãn collection/global chỉ ở collection-labels.ts; nhóm menu \"Dữ liệu nền\" (thay \"Danh mục\"); \"Tin bất động sản\" (thay \"Đăng tin BĐS\") trong câu BL-021/BL-022."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/layout/Breadcrumb.tsx",
-      "src/components/layout/Breadcrumb.test.tsx",
-      "src/components/ui/button.tsx",
-      "src/components/ui/button.test.tsx",
-      "src/components/news/NewsHomeBody.tsx",
-      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
-      "src/components/posts/PostDetail.tsx",
-      "src/components/careers/JobDetail.tsx",
-      "src/components/home/ProjectsSlider.tsx",
-      "src/components/home/ProjectsSlider.test.tsx",
+      "src/lib/admin/payload-vi-overrides.ts",
+      "src/lib/admin/payload-vi-overrides.test.ts",
+      "src/payload.config.ts",
+      "src/lib/leads/export-filters.ts",
+      "src/lib/leads/export-filters.test.ts",
+      "tests/integration/access.test.ts",
+      "src/lib/admin/collection-labels.ts",
+      "src/lib/admin/collection-labels.test.ts",
+      "src/lib/admin/admin-label-scan.test.ts",
+      "src/components/admin/admin-groups.ts",
+      "src/components/admin/admin-groups.test.ts",
+      "src/components/admin/dashboard/NavGroupCards.tsx",
+      "src/components/admin/dashboard/dashboard-queries.ts",
+      "src/components/admin/dashboard/DashboardLinks.test.tsx",
+      "src/components/admin/dashboard/DashboardParts.test.tsx",
+      "src/components/admin/ApproveEnglishButton.tsx",
+      "src/components/admin/CvDownloadButton.tsx",
+      "src/components/admin/SearchReindexPendingWarning.tsx",
+      "src/components/admin/SearchReindexPendingWarning.test.tsx",
+      "src/lib/translation/admin-ui.ts",
+      "src/lib/translation/admin-ui.test.ts",
+      "src/collections/AuditLogs.ts",
+      "src/collections/ClickEvents.ts",
+      "src/collections/ClickStatsDaily.ts",
+      "src/collections/JobApplications.ts",
+      "src/collections/LeadActivities.ts",
+      "src/collections/Leads.ts",
+      "src/collections/Media.ts",
+      "src/collections/Pages.ts",
+      "src/collections/PrivateFiles.ts",
+      "src/collections/Projects.ts",
+      "src/collections/Provinces.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/Staff.ts",
+      "src/collections/TranslationUsage.ts",
+      "src/collections/Wards.ts",
+      "src/collections/redirects-plugin.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/globals/Header.ts",
+      "src/globals/Homepage.ts",
+      "src/globals/SiteSettings.ts",
+      "src/globals/homepage/blocks.ts",
+      "src/fields/nav-link.ts",
+      "src/fields/search-reindex-pending.ts",
+      "src/fields/seo.ts",
+      "src/fields/slug.ts",
+      "src/fields/translation.ts",
+      "src/fields/mime-type-label.ts",
+      "src/hooks/audit-content-delete.ts",
+      "src/hooks/categories/scope-collections.ts",
+      "src/hooks/pages/sync-privacy-version.ts",
+      "src/hooks/wards/guard-delete.ts",
+      "src/hooks/leads/sync-phone-normalized.ts",
+      "src/hooks/job-applications/delete-cv-and-audit.ts",
+      "src/endpoints/admin/leads-export.ts",
+      "src/endpoints/admin/retranslate.ts",
+      "tests/integration/admin-dashboard.test.ts",
       "SPECIFICATIONS.md",
-      ".context/design-spec.md"
+      "docs/API_SPEC.md",
+      "docs/specs/2026-10-19-admin-ui-saas-design.md"
     ],
-    "filesNote": "Chỉ class Tailwind. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "filesNote": "Chỉ chữ hiển thị (label, labels, admin.description, i18n override, thông báo hook/endpoint, cột Excel). Không đổi slug/schema/migration/URL/access control/endpoint. Không gồm sửa dở chưa commit ngoài phạm vi BL-040 (next.config.ts, src/components/projects/*).",
     "modules": [
-      "Layout — Breadcrumb (mọi trang công khai)",
-      "UI — Button variant ghost (dùng chung)",
-      "News — NewsHomeBody, chi tiết tin tức",
-      "Posts — PostDetail",
-      "Careers — JobDetail",
-      "Home — ProjectsSlider (Dự án nổi bật)"
+      "Admin — chữ mặc định Payload (i18n.translations.vi)",
+      "Admin — nhãn collection/global + sidebar nhóm",
+      "Admin — Tổng quan (dashboard)",
+      "Admin — form mọi collection/global (field label, mô tả)",
+      "Admin — bộ lọc danh sách + Lead export (thông báo lỗi, cột Excel)",
+      "Admin — banner/bộ lọc dịch, nút duyệt tiếng Anh, tải CV",
+      "Hooks — thông báo lỗi (xoá phường, xoá CV, đồng bộ SĐT, phiên bản chính sách)"
     ]
   },
   "impact": {
     "direct": [
-      "Breadcrumb hover: không gạch chân, chữ đổi vàng thương hiệu --color-accent-text; Tab focus còn vòng focus rõ",
-      "Trang chủ \"Xem tất cả\" khối Dự án nổi bật (Button ghost) hover: không gạch chân, đổi vàng thương hiệu",
-      "/tin-tuc \"Xem thêm\" hàng danh mục hover: không gạch chân, chữ đổi --color-text",
-      "Chi tiết tin tức + chi tiết tin đăng BĐS: link danh mục hover không gạch chân, chữ đổi --color-text",
-      "Tin tuyển dụng hết hạn: \"Xem tất cả vị trí\" gạch chân lúc thường, hover bỏ gạch chân",
-      "Slider Dự án nổi bật: khung kính tên mọi thẻ cùng chiều cao dù tên 1 hay 2 dòng"
+      "Chữ Payload: Thùng rác, Ngày xoá, thông báo danh sách rỗng, Tìm theo …, toán tử lọc là / không phải / là một trong / có giá trị + giá trị Có/Không",
+      "Xác nhận chuyển vào thùng rác có \"có thể khôi phục\"; thông báo khoá chỉnh sửa dùng \"mục\"; lỗi đăng nhập không có \"Lỗi -\"; \"Đặt lại mật khẩu\"; breadcrumb \"Tổng quan\"; tab phiên bản \"Lịch sử chỉnh sửa\"; upload dùng \"tệp\"",
+      "Sidebar: nhóm \"Dữ liệu nền\"; mục \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\" (không \"Lead khách hàng\")",
+      "Tổng quan: tiêu đề thẻ \"Mục quản lý\"",
+      "Danh sách Media / CV: cột \"Loại tệp\" thay \"MIME Type\"",
+      "SEO: \"Tiêu đề hiện trên Google\", \"Ẩn trang khỏi Google\"; trường slug \"Đường dẫn trang\"",
+      "Homepage: \"Banner đầu trang\", \"Khối mời tư vấn\"; nhãn ngày dạng \"Ngày …\" (không \"… lúc\"); bảng giá \"Còn căn / Sắp hết căn / Hết căn\"",
+      "Xuất Excel Lead: lọc theo toán tử không hỗ trợ → thông báo dùng chữ toán tử mới; file Excel có cột \"Sale phụ trách\""
     ],
     "dependents": [
-      "EmptyState \"Nhận tư vấn\" (Button ghost) — hover không gạch chân, đổi vàng thương hiệu",
-      "Breadcrumb trên mọi trang danh sách / chi tiết / tĩnh (vi + en)"
+      "Bộ lọc danh sách mọi collection (menu toán tử + giá trị boolean)",
+      "Banner dịch lỗi + ô \"Trạng thái dịch\" (lib/translation/admin-ui.ts)",
+      "Chip lọc nhanh BL-022 + ô tìm kiếm BL-021 (cùng thanh công cụ)",
+      "Thông báo lỗi hook: xoá phường đang dùng, xoá CV, đồng bộ SĐT lead, phiên bản chính sách"
     ],
     "regression": [
-      "Link trong nội dung bài (RichText) vẫn gạch chân",
-      "Hover tiêu đề thẻ (BL-034) giữ: không gạch chân, đổi vàng",
-      "Điều khiển slider Dự án nổi bật (BL-038): mũi tên 1 vị trí, chấm = số vị trí cuộn được, vòng đầu/cuối",
-      "Nút outline \"Xem thêm\" (Ưu đãi nổi bật, Tin tức, Cho thuê trang chủ) không đổi",
-      "Footer / mục lục / LanguageSwitcher / 404 vẫn hover gạch chân như cũ",
-      "Không lỗi console, không CLS"
+      "Admin list filters hoạt động như cũ (where trên URL không đổi)",
+      "Lead export: bộ lọc hỗ trợ xuất được file; bộ lọc không hỗ trợ báo lỗi đúng chữ mới",
+      "Banner/bộ lọc dịch hiển thị đúng nhãn",
+      "Tổng quan: thẻ đếm + lối tắt theo quyền (admin/sale) không đổi",
+      "Upload media + tải CV hoạt động",
+      "Đăng nhập sai nhiều lần → thông báo khoá tài khoản đúng, không \"Lỗi -\"",
+      "Quyền xem từng mục sidebar giữ nguyên (sale không thấy mục chỉ admin)",
+      "Không lỗi console"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL037-01",
+      "id": "BL040-01",
       "viewport": 1280,
-      "steps": "Mở /du-an (vi) và /en/... một trang có breadcrumb; hover từng link breadcrumb.",
-      "expected": "Không gạch chân; chữ đổi vàng thương hiệu (#8C6733), chuyển màu mượt."
+      "steps": "Đăng nhập admin, mở danh sách Tin cho thuê; nhìn nút góc phải, mở thùng rác.",
+      "expected": "Nút \"Thùng rác\"; cột/nhãn \"Ngày xoá\" (viết hoa chữ đầu)."
     },
     {
-      "id": "BL037-02",
+      "id": "BL040-02",
       "viewport": 1280,
-      "steps": "Trên trang có breadcrumb, Tab tới các link breadcrumb.",
-      "expected": "Vòng focus (outline --color-focus-ring) thấy rõ trên từng link."
+      "steps": "Danh sách Lead → Bộ lọc → thêm điều kiện; mở menu toán tử, chọn một trường có/không.",
+      "expected": "Toán tử \"là / không phải / là một trong / có giá trị\"; giá trị \"Có / Không\"; ô tìm kiếm ghi \"Tìm theo …\"."
     },
     {
-      "id": "BL037-03",
+      "id": "BL040-03",
       "viewport": 1280,
-      "steps": "Mở / (vi), khối Dự án nổi bật: hover link \"Xem tất cả\".",
-      "expected": "Không gạch chân, chữ đổi vàng thương hiệu."
+      "steps": "Lọc danh sách ra 0 kết quả.",
+      "expected": "Thông báo danh sách rỗng tiếng Việt tự nhiên, không \"dữ kiện\"."
     },
     {
-      "id": "BL037-04",
+      "id": "BL040-04",
       "viewport": 1280,
-      "steps": "Mở /tin-tuc, hover \"Xem thêm\" ở hàng danh mục.",
-      "expected": "Không gạch chân, chữ đổi từ vàng sang màu chữ thường (--color-text)."
+      "steps": "Chọn một tin → xoá (chuyển thùng rác).",
+      "expected": "Hộp xác nhận nói rõ \"có thể khôi phục\"."
     },
     {
-      "id": "BL037-05",
+      "id": "BL040-05",
       "viewport": 1280,
-      "steps": "Mở một chi tiết tin tức /tin-tuc/[slug] và một chi tiết tin đăng BĐS; hover link danh mục.",
-      "expected": "Không gạch chân, chữ đổi sang --color-text."
+      "steps": "Mở cùng một tin ở 2 tab/2 tài khoản để kích hoạt khoá chỉnh sửa.",
+      "expected": "Thông báo khoá dùng chữ \"mục\" (không \"tài liệu\")."
     },
     {
-      "id": "BL037-06",
+      "id": "BL040-06",
       "viewport": 1280,
-      "steps": "Mở một tin tuyển dụng đã hết hạn; nhìn rồi hover \"Xem tất cả vị trí\" trong hộp cảnh báo.",
-      "expected": "Lúc thường có gạch chân; hover bỏ gạch chân, chữ màu vàng thương hiệu; bấm đi tới /tuyen-dung."
+      "steps": "Đăng xuất; đăng nhập sai mật khẩu; bấm quên mật khẩu.",
+      "expected": "Lỗi không có tiền tố \"Lỗi -\"; nút/tiêu đề \"Đặt lại mật khẩu\"."
     },
     {
-      "id": "BL037-07",
+      "id": "BL040-07",
       "viewport": 1280,
-      "steps": "Mở một chi tiết tin tức có link trong nội dung bài; nhìn và hover link đó.",
-      "expected": "Link trong nội dung vẫn gạch chân (không đổi)."
+      "steps": "Nhìn sidebar admin (tài khoản admin) và trang Tổng quan.",
+      "expected": "Nhóm \"Dữ liệu nền\"; mục \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\"; breadcrumb \"Tổng quan\"; thẻ \"Mục quản lý\"."
     },
     {
-      "id": "BL037-08",
+      "id": "BL040-08",
       "viewport": 1280,
-      "steps": "Mở / (vi), khối Dự án nổi bật có cả dự án tên 1 dòng (vd \"Căn hộ Trung Tâm Hà Nội\") và tên 2 dòng; so khung kính đáy ảnh.",
-      "expected": "Khung kính mọi thẻ (cùng có địa điểm + số liệu) cao bằng nhau; địa điểm + hàng số liệu thẳng hàng; tên dài vẫn cắt tối đa 2 dòng."
+      "steps": "Mở một tin đã sửa nhiều lần → tab phiên bản.",
+      "expected": "Tab \"Lịch sử chỉnh sửa\"."
     },
     {
-      "id": "BL037-09",
-      "viewport": 768,
-      "steps": "Lặp BL037-08 ở 768.",
-      "expected": "Khung kính các thẻ cùng chiều cao, không tràn ảnh."
+      "id": "BL040-09",
+      "viewport": 1280,
+      "steps": "Thư viện ảnh & tệp: tải lên 1 ảnh; xem danh sách + danh sách Tệp CV ứng viên.",
+      "expected": "Chữ upload dùng \"tệp\"; cột \"Loại tệp\" (không \"MIME Type\"); tải lên thành công."
     },
     {
-      "id": "BL037-10",
+      "id": "BL040-10",
+      "viewport": 1280,
+      "steps": "Mở form một Dự án: nhóm SEO, trường đường dẫn, ngày, bảng giá.",
+      "expected": "\"Tiêu đề hiện trên Google\", \"Ẩn trang khỏi Google\", \"Đường dẫn trang\"; nhãn ngày \"Ngày …\"; trạng thái bảng giá \"Còn căn / Sắp hết căn / Hết căn\"."
+    },
+    {
+      "id": "BL040-11",
+      "viewport": 1280,
+      "steps": "Mở global Trang chủ (Homepage).",
+      "expected": "Khối \"Banner đầu trang\", \"Khối mời tư vấn\"."
+    },
+    {
+      "id": "BL040-12",
+      "viewport": 1280,
+      "steps": "Danh sách Lead: thêm bộ lọc không chuyển được sang xuất Excel (vd trường/toán tử ngoài danh sách hỗ trợ) → nhìn nút Xuất Excel; rồi bỏ lọc đó, bấm Xuất Excel.",
+      "expected": "Lần 1: nút bị khoá, thông báo liệt kê field + toán tử hỗ trợ bằng chữ mới (là, là một trong, có giá trị = Không, lớn hơn hoặc bằng, nhỏ hơn hoặc bằng); lần 2: tải file Excel, có cột \"Sale phụ trách\"."
+    },
+    {
+      "id": "BL040-13",
+      "viewport": 1280,
+      "steps": "Regression: danh sách Tin tức — ô \"Trạng thái dịch\" + banner dịch lỗi (nếu có); chip lọc nhanh Lead/Tin cho thuê.",
+      "expected": "Nhãn dịch đúng, chip lọc hoạt động như BL-022."
+    },
+    {
+      "id": "BL040-14",
+      "viewport": 1280,
+      "steps": "Regression: đăng nhập tài khoản sale, xem sidebar + Tổng quan.",
+      "expected": "Chỉ thấy mục được phép như trước; thẻ đếm theo quyền sale."
+    },
+    {
+      "id": "BL040-15",
       "viewport": 390,
-      "steps": "Lặp BL037-08 ở 390 (vuốt qua các thẻ).",
-      "expected": "Khung kính các thẻ cùng chiều cao; tên 2 dòng không đè địa điểm."
-    },
-    {
-      "id": "BL037-11",
-      "viewport": 1280,
-      "steps": "Regression BL-038: khối Dự án nổi bật bấm › liên tiếp, bấm chấm, › ở cuối / ‹ ở đầu.",
-      "expected": "Mũi tên đi đúng 1 vị trí, chấm active khớp, vòng đầu/cuối như BL-038."
-    },
-    {
-      "id": "BL037-12",
-      "viewport": 1280,
-      "steps": "Regression: hover tiêu đề thẻ dự án / tin tức (BL-034); hover link footer.",
-      "expected": "Tiêu đề thẻ không gạch chân, đổi vàng (BL-034); footer vẫn hover gạch chân như cũ."
+      "steps": "Lặp BL040-07 và BL040-02 ở 390px.",
+      "expected": "Chữ mới không tràn ngang, không vỡ bố cục."
     }
   ],
   "acceptance": [
-    "Breadcrumb hover không gạch chân, chữ --color-accent-text; focus-visible còn thấy",
-    "Ghost \"Xem tất cả\" / \"Xem thêm\" /tin-tuc / link danh mục tin tức + tin đăng / \"Xem tất cả vị trí\" hover không gạch chân, đổi màu đúng quy tắc; nền tối dùng biến thể sáng",
-    "Link RichText không đổi (vẫn gạch chân)",
-    "Slider Dự án nổi bật: khung tên mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng",
-    "Kiểm 390 / 768 / 1280"
+    "Chữ Payload: Thùng rác, Ngày xoá, danh sách rỗng, Tìm theo, toán tử là / không phải / là một trong / có giá trị + Có/Không, xác nhận thùng rác có \"có thể khôi phục\", khoá chỉnh sửa dùng \"mục\", lỗi đăng nhập không \"Lỗi -\", Đặt lại mật khẩu, breadcrumb \"Tổng quan\", tab \"Lịch sử chỉnh sửa\", upload \"tệp\"",
+    "Xuất Excel Lead với bộ lọc không hỗ trợ: nút khoá, thông báo dùng chữ toán tử mới; cột Excel \"Sale phụ trách\"",
+    "Sidebar: nhóm \"Dữ liệu nền\"; \"Tệp CV ứng viên\", \"Thư viện ảnh & tệp\", \"Thống kê liên hệ theo ngày\", \"Chi phí dịch tự động\", \"Lead\" (số nhiều, không \"Lead khách hàng\")",
+    "Tổng quan: tiêu đề thẻ \"Mục quản lý\"",
+    "Danh sách Media / CV: cột \"Loại tệp\" thay \"MIME Type\"",
+    "SEO: \"Tiêu đề hiện trên Google\" / \"Ẩn trang khỏi Google\"; \"Đường dẫn trang\"",
+    "Homepage: \"Banner đầu trang\", \"Khối mời tư vấn\"",
+    "Nhãn ngày \"Ngày …\" (không \"… lúc\"); bảng giá \"Còn căn / Sắp hết căn / Hết căn\"",
+    "Không đổi slug / schema / URL / quyền"
   ],
   "outOfScope": [
-    "Footer / FooterLinkColumn / LanguageSwitcher / TableOfContents / NewsToc / not-found (còn hover:underline — task riêng nếu user muốn)",
-    "Link gạch chân cố định trong form / thông báo (ApplyForm, ConsentCheckbox, FormStatus, CookieBanner, ...)",
-    "Thẻ slider thiếu địa điểm / số liệu vẫn thấp hơn (không thêm placeholder)",
-    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
+    "Ô \"Ngôn ngữ\" vi/en (BL-039, xử lý riêng)",
+    "Site công khai, email, trang lỗi toàn cục",
+    "Sửa dở chưa commit ngoài BL-040 (next.config.ts, src/components/projects/*)"
   ],
   "viewports": [
     390,
-    768,
     1280
   ],
   "locales": [
-    "vi",
-    "en"
+    "vi"
   ],
   "browsers": [
     "chrome"
   ],
   "uiTests": true,
-  "apiTests": [],
-  "risk": "low",
-  "riskNote": "Chỉ class Tailwind; Breadcrumb + Button ghost là component dùng chung (blast radius mọi trang công khai). Không schema/API/quyền/dữ liệu/URL/i18n. Verify reviewer STRICT round 1 PASS: pnpm vitest run src/components src/app 972/972, typecheck PASS, lint 0 error. Residual (MINOR): \"Xem tất cả vị trí\" màu thường #8A5A0A gần accent #8C6733 → tín hiệu hover chủ yếu là bỏ gạch chân; thẻ slider thiếu địa điểm/số liệu thấp hơn; chưa kiểm trình duyệt thật."
+  "apiTests": [
+    "GET /api/admin/leads/export (admin, bộ lọc hợp lệ) → 200 xlsx, hàng tiêu đề có cột \"Sale phụ trách\"; sale → 403 như cũ"
+  ],
+  "risk": "medium",
+  "riskNote": "Chữ admin dùng chung (override i18n Payload áp mọi màn) + nhãn toán tử lọc gắn với thông báo lỗi xuất Excel lead. Không schema/migration/URL/quyền/endpoint. Verify reviewer round 2 PASS (T01 NORMAL, T02 STRICT): pnpm vitest (64 files, 583 tests, integration chạy DB), typecheck 0 lỗi, lint 0 lỗi. Spec validation: gap không chặn. Chưa kiểm trình duyệt thật."
 }

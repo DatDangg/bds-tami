@@ -30,7 +30,7 @@ export const auditApplicationPurge: CollectionAfterDeleteHook = async ({ doc, re
     action: "content.purge",
     collection: "job-applications",
     docId: doc.id,
-    summary: `Xoá hẳn job-applications ${doc.id}`,
+    summary: `Xoá vĩnh viễn job-applications ${doc.id}`,
     req,
   });
   return doc;

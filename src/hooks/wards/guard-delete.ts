@@ -3,7 +3,7 @@ import { APIError, type CollectionBeforeDeleteHook } from "payload";
 /** Collection nội dung có trường `ward` trỏ tới phường/xã. */
 const WARD_REFERENCING_COLLECTIONS = [
   { slug: "rentals", label: "tin cho thuê" },
-  { slug: "property-posts", label: "tin đăng BĐS" },
+  { slug: "property-posts", label: "tin bất động sản" },
 ] as const;
 
 /**

@@ -51,7 +51,7 @@ const submittedFields: Field[] = [
     label: "Tải CV",
     admin: { components: { Field: "/components/admin/CvDownloadButton#CvDownloadButton" } },
   },
-  { name: "consentAt", type: "date", label: "Đồng ý chính sách lúc", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
+  { name: "consentAt", type: "date", label: "Ngày đồng ý chính sách", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
   { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {
     name: "locale",
@@ -60,7 +60,7 @@ const submittedFields: Field[] = [
     required: true,
     options: [
       { label: "Tiếng Việt", value: "vi" },
-      { label: "English", value: "en" },
+      { label: "Tiếng Anh", value: "en" },
     ],
     access: submittedFieldAccess,
     admin: readOnlyInAdmin,
@@ -83,7 +83,7 @@ export const JobApplications: CollectionConfig = {
     useAsTitle: "fullName",
     defaultColumns: ["fullName", "jobPosting", "status", "createdAt"],
     hidden: ({ user }) => user?.role !== ROLES.admin,
-    description: "Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự ẩn danh sau 12 tháng.",
+    description: "Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự xoá thông tin cá nhân và CV sau 12 tháng.",
   },
   defaultSort: "-createdAt",
   access: { read: isAdmin, create: denyAll, update: isAdmin, delete: isAdmin },
@@ -106,6 +106,6 @@ export const JobApplications: CollectionConfig = {
     },
     { name: "note", type: "textarea", label: "Ghi chú nội bộ", maxLength: 2000, admin: { description: "Ghi chú nội bộ, ứng viên không thấy." } },
     { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
-    { name: "anonymizedAt", type: "date", label: "Đã ẩn danh lúc", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
+    { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
   ],
 };

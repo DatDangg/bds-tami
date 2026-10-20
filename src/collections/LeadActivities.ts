@@ -11,7 +11,7 @@ const TYPE_LABELS: Record<LeadActivityType, string> = {
   call: "Cuộc gọi",
   status_change: "Đổi trạng thái",
   assignment: "Phân công",
-  merged: "Gộp lead",
+  merged: "Khách gửi lại (đã gộp)",
   email_sent: "Đã gửi email",
 };
 
@@ -32,7 +32,7 @@ const systemOnly = { create: denyAll, update: denyAll };
 const readOnlyInAdmin = { readOnly: true } as const;
 
 const STATUS_FIELD_LABELS = { fromStatus: "Trạng thái trước", toStatus: "Trạng thái sau" } as const;
-const ASSIGNEE_FIELD_LABELS = { fromAssignee: "Người phụ trách trước", toAssignee: "Người phụ trách sau" } as const;
+const ASSIGNEE_FIELD_LABELS = { fromAssignee: "Sale phụ trách trước", toAssignee: "Sale phụ trách sau" } as const;
 
 const fields: Field[] = [
   { name: "lead", type: "relationship", label: "Lead", relationTo: "leads", required: true, index: true },

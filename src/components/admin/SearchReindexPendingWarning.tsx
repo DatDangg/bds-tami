@@ -11,7 +11,7 @@ export function SearchReindexPendingWarning({ path }: { path: string }) {
   if (value !== true) return null;
   return (
     <p role="status" className="field-description" style={{ color: "var(--theme-warning-600)", fontWeight: 600 }}>
-      Nhiều tin cho thuê đang được dựng lại chỉ mục tìm kiếm ở chế độ nền; kết quả tìm kiếm theo tên mới sẽ đầy đủ sau ít phút.
+      Đang cập nhật dữ liệu tìm kiếm cho nhiều tin cho thuê; tìm theo tên mới sẽ đầy đủ sau ít phút.
     </p>
   );
 }

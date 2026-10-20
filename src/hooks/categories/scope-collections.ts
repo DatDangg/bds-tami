@@ -6,7 +6,7 @@ export type CategoryScope = (typeof CATEGORY_SCOPES)[number];
 /** Nhãn hiển thị của scope trong admin. */
 export const CATEGORY_SCOPE_LABELS: Record<CategoryScope, string> = {
   rental: "Cho thuê",
-  property_post: "Đăng tin BĐS",
+  property_post: "Tin bất động sản",
   news: "Tin tức",
   project: "Dự án",
   job: "Tuyển dụng",

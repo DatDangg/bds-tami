@@ -167,6 +167,8 @@ Dùng `admin.group` (chuỗi tiếng Việt) + **sắp xếp lại mảng `colle
 
 **As-built (T03):** nhóm + thứ tự ở `src/components/admin/admin-groups.ts` (`ADMIN_NAV_GROUPS`, plugin chạy cuối). Payload 3.91 luôn xếp collection trước global trong cùng nhóm → nhóm Website thực tế: Chuyển hướng 301 · Cấu hình chung · Trang chủ · Đầu trang · Chân trang.
 
+**As-built (BL-040, 2026-10-20):** tên hiển thị đã đổi — nhóm 5 "Danh mục" → **"Dữ liệu nền"**; `leads` = "Lead" (giữ từ đội sale quen dùng), `lead-activities` = "Lịch sử chăm sóc"; `private-files` = "Tệp CV ứng viên"; `media` = "Thư viện ảnh & tệp"; `click-stats-daily` = "Thống kê liên hệ theo ngày"; `translation-usage` = "Chi phí dịch tự động"; `redirects` = "Chuyển hướng đường dẫn". Nguồn: `src/lib/admin/collection-labels.ts`, `src/components/admin/admin-groups.ts`.
+
 Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
 
 **Icon:** Payload 3.91 không hỗ trợ icon cho mục nav qua config; muốn có phải thay cả `admin.components.Nav` (component tự viết, phải tự xử lý quyền/ẩn/active/collapse/mobile) → rủi ro cao, bảo trì khi nâng Payload. **Đề xuất: không icon ở menu** (nhóm + khoảng trắng đã đủ phân cấp); icon chỉ dùng ở card dashboard + lối tắt (component của mình). → hỏi user §7.
@@ -212,6 +214,8 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 
 ---
 **As-built (T04):** card "Danh mục quản lý" không kèm số bản ghi (tránh ~25 count/lần tải); khối phải là "Bài của bạn cập nhật gần đây" (author = mình ở projects/rentals/property-posts/news, sort -updatedAt) vì không có field người sửa cuối.
+
+**As-built (BL-040):** tiêu đề card đổi "Danh mục quản lý" → **"Mục quản lý"**; gợi ý thẻ lead chưa phân công: "Mới, chưa giao sale" (thống nhất "Sale phụ trách").
 
 ## 4. Màn danh sách (list view)
 

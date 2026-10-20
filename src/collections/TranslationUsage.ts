@@ -15,7 +15,7 @@ export const TranslationUsage: CollectionConfig = {
     useAsTitle: "month",
     defaultColumns: ["month", "requests", "inputTokens", "outputTokens", "estimatedCostUsd"],
     hidden: ({ user }) => user?.role !== ROLES.admin,
-    description: "Mức dùng AI dịch theo tháng (số lần gọi, token, chi phí ước tính) để theo dõi hạn mức.",
+    description: "Mức dùng dịch tự động theo tháng (số lần dịch, lượng chữ, chi phí ước tính) để theo dõi hạn mức.",
   },
   access: { read: isAdmin, create: denyAll, update: denyAll, delete: denyAll },
   disableDuplicate: true,
@@ -23,15 +23,15 @@ export const TranslationUsage: CollectionConfig = {
     {
       name: "month",
       type: "text",
-      label: "Tháng (YYYY-MM)",
+      label: "Tháng (vd 2026-10)",
       required: true,
       unique: true,
       validate: (value: string | null | undefined) =>
         typeof value === "string" && MONTH_PATTERN.test(value) ? true : "Tháng phải có dạng YYYY-MM",
     },
-    { name: "inputTokens", type: "number", label: "Token đầu vào", required: true, min: 0, defaultValue: 0 },
-    { name: "outputTokens", type: "number", label: "Token đầu ra", required: true, min: 0, defaultValue: 0 },
-    { name: "requests", type: "number", label: "Số lần gọi AI", required: true, min: 0, defaultValue: 0 },
+    { name: "inputTokens", type: "number", label: "Lượng chữ gửi dịch (token)", required: true, min: 0, defaultValue: 0 },
+    { name: "outputTokens", type: "number", label: "Lượng chữ nhận về (token)", required: true, min: 0, defaultValue: 0 },
+    { name: "requests", type: "number", label: "Số lần dịch", required: true, min: 0, defaultValue: 0 },
     { name: "estimatedCostUsd", type: "number", label: "Chi phí ước tính (USD)", required: true, min: 0, defaultValue: 0 },
   ],
 };

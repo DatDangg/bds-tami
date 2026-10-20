@@ -100,7 +100,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
                 { ...imageUpload("default", "Ảnh mặc định"), admin: { description: "Dùng cho trang danh sách chưa có ảnh riêng." } },
                 imageUpload("projects", "Dự án"),
                 imageUpload("rentals", "Cho thuê"),
-                imageUpload("propertyPosts", "Đăng tin BĐS"),
+                imageUpload("propertyPosts", "Tin bất động sản"),
                 imageUpload("news", "Tin tức"),
                 imageUpload("careers", "Tuyển dụng"),
               ],
@@ -110,7 +110,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
         {
           label: "Liên hệ & mạng xã hội",
           fields: [
-            { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút nổi (FR-PUB-12)" } },
+            { name: "hotline", type: "text", label: "Hotline", admin: { description: "Số hiển thị và gọi từ nút liên hệ nổi trên website" } },
             { name: "zaloUrl", type: "text", label: "Link Zalo", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
             { name: "fanpageUrl", type: "text", label: "Link Fanpage", validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
             { name: "email", type: "email", label: "Email liên hệ" },
@@ -128,7 +128,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
                   required: true,
                   options: SOCIAL_PLATFORMS.map((value) => ({ label: SOCIAL_PLATFORM_LABELS[value], value })),
                 },
-                { name: "url", type: "text", label: "Đường dẫn", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+                { name: "url", type: "text", label: "Link trang", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
               ],
             },
           ],
@@ -156,7 +156,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
               label: "Bật dịch tự động",
               defaultValue: true,
               access: adminOnlyRead,
-              admin: { description: "Tắt nhanh dịch tự động (BR-08)" },
+              admin: { description: "Tắt nhanh dịch tự động khi cần" },
             },
             {
               name: "translationGlossary",
@@ -164,7 +164,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
               label: "Thuật ngữ dịch cố định",
               labels: { singular: "Thuật ngữ", plural: "Thuật ngữ" },
               access: adminOnlyRead,
-              admin: { description: "Thuật ngữ cố định cho AI dịch (BR-08)", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
+              admin: { description: "Thuật ngữ AI luôn dịch cố định như bảng này", components: { RowLabel: textRowLabel({ field: "vi", fallback: "Thuật ngữ" }) } },
               fields: [
                 { name: "vi", type: "text", label: "Tiếng Việt", required: true },
                 { name: "en", type: "text", label: "Tiếng Anh", required: true },
@@ -175,7 +175,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
           ],
         },
         {
-          label: "Kỹ thuật",
+          label: "Thống kê & chính sách",
           fields: [
             { name: "gaMeasurementId", type: "text", label: "Mã đo lường Google Analytics (GA4)", validate: validateGaId, admin: { description: "Dạng G-XXXXXXXXXX" } },
             {
@@ -183,7 +183,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
               type: "text",
               label: "Phiên bản chính sách bảo mật",
               access: { update: denyAll },
-              admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật (BR-30)" },
+              admin: { readOnly: true, description: "Tự cập nhật khi xuất bản chính sách bảo mật" },
             },
           ],
         },

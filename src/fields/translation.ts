@@ -14,7 +14,7 @@ const TRANSLATION_STATUS_LABELS: Record<string, string> = {
   failed: "Dịch lỗi",
   pending_review: "Chờ duyệt",
 };
-const EN_SOURCE_LABELS: Record<string, string> = { ai: "AI dịch", manual: "Sửa tay" };
+const EN_SOURCE_LABELS: Record<string, string> = { ai: "Dịch tự động (AI)", manual: "Sửa tay" };
 
 const options = (values: readonly string[], labels: Record<string, string>) => values.map((value) => ({ label: labels[value] ?? value, value }));
 
@@ -47,7 +47,7 @@ export function translationGroup(): GroupField {
     type: "group",
     label: "Bản dịch tiếng Anh",
     access: readOnlyForEveryone,
-    admin: { readOnly: true, description: "Hệ thống tự dịch VI → EN khi xuất bản; các mục dưới đây chỉ đọc." },
+    admin: { readOnly: true, description: "Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc." },
     fields: [
       {
         name: "status",
@@ -60,9 +60,9 @@ export function translationGroup(): GroupField {
         admin: { components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
       },
       { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "viChangedAfterManual", type: "checkbox", label: "Bản Việt đã đổi sau khi sửa tay bản Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },
-      { name: "sourceHash", type: "json", label: "Dấu nội dung nguồn đã dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "translatedAt", type: "date", label: "Dịch lúc", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "viChangedAfterManual", type: "checkbox", label: "Bản tiếng Việt đã sửa sau khi sửa tay bản tiếng Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },
+      { name: "sourceHash", type: "json", label: "Mã kiểm tra bản đã dịch (hệ thống)", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
+      { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
       // Trường ảo (không có cột DB): nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.

@@ -106,7 +106,7 @@ const blockInactiveLogin: CollectionBeforeLoginHook = ({ user, req }) => {
 export const Staff: CollectionConfig = {
   slug: "staff",
   labels: collectionLabels("staff"),
-  admin: { useAsTitle: "email", defaultColumns: ["fullName", "email", "role", "active"], description: "Tài khoản nội bộ đăng nhập trang quản trị (admin / sale)." },
+  admin: { useAsTitle: "email", defaultColumns: ["fullName", "email", "role", "active"], description: "Tài khoản nội bộ đăng nhập trang quản trị (quản trị viên / nhân viên sale)." },
   auth: {
     maxLoginAttempts: MAX_LOGIN_ATTEMPTS,
     lockTime: LOCK_TIME_MS,

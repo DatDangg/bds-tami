@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin, ROLES } from "../access";
 import { deleteObjectBeforeDelete } from "../hooks/private-files/delete-object-before-delete";
+import { mimeTypeLabelField } from "../fields/mime-type-label";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { createUploadGuard, PRIVATE_FILE_POLICY } from "../lib/upload/validate-file";
 
@@ -24,7 +25,7 @@ export const PrivateFiles: CollectionConfig = {
   admin: {
     hidden: ({ user }) => user?.role !== ROLES.admin,
     defaultColumns: ["filename", "mimeType", "createdAt"],
-    description: "CV ứng viên (bucket riêng, chỉ admin tải qua nút trong hồ sơ ứng tuyển).",
+    description: "CV ứng viên gửi qua website, lưu riêng tư; chỉ admin tải được bằng nút \"Tải CV\" trong hồ sơ ứng tuyển.",
   },
   access: {
     read: isAdmin,
@@ -39,5 +40,5 @@ export const PrivateFiles: CollectionConfig = {
     // Không phục vụ file qua route /api/private-files/file/*: nếu không, Payload rơi về đọc đĩa local.
     handlers: [() => new Response("Not found", { status: 404 })],
   },
-  fields: [],
+  fields: [mimeTypeLabelField],
 };

@@ -41,6 +41,12 @@ describe("nhóm menu admin (BL-015 T03)", async () => {
     expect(actual).toEqual(declared);
   });
 
+  it("nhóm danh mục nền tên \"Dữ liệu nền\" (không trùng collection \"Danh mục\")", () => {
+    const labels = ADMIN_NAV_GROUPS.map((group) => group.label) as string[];
+    expect(labels).toContain("Dữ liệu nền");
+    expect(labels).not.toContain("Danh mục");
+  });
+
   it("slug chưa khai báo -> throw (không rơi vào nhóm mặc định)", () => {
     expect(() => adminNavGroupsPlugin({ collections: [{ slug: "la-hoac", fields: [] }] } as never)).toThrow(/ADMIN_NAV_GROUPS/);
   });

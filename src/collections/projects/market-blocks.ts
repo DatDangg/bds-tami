@@ -26,9 +26,9 @@ export const PRICE_AVAILABILITIES = ["available", "few_left", "sold_out"] as con
 export type PriceAvailability = (typeof PRICE_AVAILABILITIES)[number];
 
 const PRICE_AVAILABILITY_LABELS: Record<PriceAvailability, string> = {
-  available: "Còn hàng",
-  few_left: "Sắp hết",
-  sold_out: "Hết hàng",
+  available: "Còn căn",
+  few_left: "Sắp hết căn",
+  sold_out: "Hết căn",
 };
 
 export const MAX_HIGHLIGHTS = 8;
@@ -59,7 +59,7 @@ const highlightsField: ArrayField = {
   fields: [
     { name: "title", type: "text", label: "Tiêu đề", localized: true, required: true },
     { name: "description", type: "textarea", label: "Mô tả", localized: true },
-    { name: "icon", type: "text", label: "Mã icon", admin: { description: "Tên icon hiển thị kèm điểm nổi bật (tuỳ chọn)." } },
+    { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm điểm nổi bật." } },
   ],
 };
 

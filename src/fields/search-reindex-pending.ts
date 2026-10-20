@@ -58,7 +58,7 @@ export function searchReindexPendingField(scope: ReindexScopeKind): CheckboxFiel
   return {
     name: "searchReindexPending",
     type: "checkbox",
-    label: "Đang dựng lại chỉ mục tìm kiếm",
+    label: "Đang cập nhật dữ liệu tìm kiếm",
     virtual: true,
     hooks: { afterRead: [computeSearchReindexPending(scope)] },
     access: { read: ({ req }) => isAdmin({ req }), create: denyAll, update: denyAll },

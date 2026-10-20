@@ -16,7 +16,7 @@ export function cvDownloadPath(cvId: unknown): string | null {
 export function CvDownloadButton() {
   const cvId = useFormFields(([fields]) => fields.cv?.value);
   const href = cvDownloadPath(cvId);
-  if (!href) return <p className="field-description">CV đã được xoá (hồ sơ đã ẩn danh).</p>;
+  if (!href) return <p className="field-description">CV đã được xoá (hồ sơ quá thời hạn lưu).</p>;
   return (
     <a className="btn btn--style-secondary btn--size-medium" href={href} download style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>
       Tải CV

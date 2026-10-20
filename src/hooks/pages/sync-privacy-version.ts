@@ -3,7 +3,7 @@ import { APIError, type CollectionAfterChangeHook } from "payload";
 import { preserveRequestLocale } from "../../lib/payload/preserve-request-locale";
 
 export const MISSING_SITE_NAME_MESSAGE =
-  "Chưa điền \"Tên website\" (siteName, bản tiếng Việt) ở Cài đặt chung (site-settings). Điền và lưu mục đó trước khi xuất bản Chính sách bảo mật.";
+  "Chưa điền \"Tên website\" (siteName, bản tiếng Việt) ở Cấu hình chung (site-settings). Điền và lưu mục đó trước khi xuất bản Chính sách bảo mật.";
 
 /**
  * Bản `privacy` đang `published` là nguồn của `site-settings.privacyPolicyVersion` = `consentVersion` của form (BR-30):

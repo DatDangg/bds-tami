@@ -37,6 +37,6 @@ export const guardAnonymizedCustomerData: CollectionBeforeValidateHook = ({ data
   if (changed.length === 0) return data;
   throw new ValidationError({
     collection: "leads",
-    errors: changed.map((path) => ({ path, message: "Lead đã ẩn danh, không thể sửa thông tin khách" })),
+    errors: changed.map((path) => ({ path, message: "Lead đã xoá thông tin cá nhân, không thể sửa thông tin khách" })),
   });
 };

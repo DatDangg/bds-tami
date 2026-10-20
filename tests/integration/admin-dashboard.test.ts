@@ -210,7 +210,7 @@ describe.skipIf(!databaseUrl)("integration: dashboard admin theo quyền (BL-015
       expect(titles.some((title) => title.includes("người khác") || title.includes("đã xoá"))).toBe(false);
     });
 
-    it("card nhóm: sale không thấy Hồ sơ ứng tuyển / Tệp riêng tư / globals ẩn / Nhật ký; admin thấy cả globals", async () => {
+    it("card nhóm: sale không thấy Hồ sơ ứng tuyển / Tệp CV / globals ẩn / Nhật ký; admin thấy cả globals", async () => {
       const saleItems = dashboard.buildNavGroupCards(await contextFor(sale)).flatMap((group) => group.items.map((item) => item.href));
       expect(saleItems).toContain("/admin/collections/leads");
       for (const hidden of ["job-applications", "private-files", "audit-logs", "click-events", "translation-usage"]) {
@@ -218,7 +218,7 @@ describe.skipIf(!databaseUrl)("integration: dashboard admin theo quyền (BL-015
       }
       expect(saleItems.some((href) => href.startsWith("/admin/globals/"))).toBe(false);
       const adminGroups = dashboard.buildNavGroupCards(await contextFor(admin));
-      expect(adminGroups.map((group) => group.label)).toEqual(["Khách hàng", "Nội dung", "Tuyển dụng", "Thư viện", "Danh mục", "Website", "Hệ thống"]);
+      expect(adminGroups.map((group) => group.label)).toEqual(["Khách hàng", "Nội dung", "Tuyển dụng", "Thư viện", "Dữ liệu nền", "Website", "Hệ thống"]);
       expect(adminGroups.flatMap((group) => group.items.map((item) => item.href))).toContain("/admin/globals/site-settings");
     });
   });

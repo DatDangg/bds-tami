@@ -10,7 +10,7 @@ export const ADMIN_NAV_GROUPS = [
   { label: "Nội dung", collections: ["projects", "rentals", "property-posts", "news", "services", "pages"], globals: [] },
   { label: "Tuyển dụng", collections: ["job-postings", "job-applications"], globals: [] },
   { label: "Thư viện", collections: ["media", "private-files"], globals: [] },
-  { label: "Danh mục", collections: ["categories", "developers", "provinces", "wards"], globals: [] },
+  { label: "Dữ liệu nền", collections: ["categories", "developers", "provinces", "wards"], globals: [] },
   { label: "Website", collections: ["redirects"], globals: ["site-settings", "homepage", "header", "footer"] },
   { label: "Hệ thống", collections: ["staff", "audit-logs", "click-events", "click-stats-daily", "translation-usage"], globals: [] },
 ] as const satisfies readonly { label: string; collections: readonly string[]; globals: readonly string[] }[];

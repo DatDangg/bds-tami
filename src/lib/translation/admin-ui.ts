@@ -5,10 +5,10 @@ import { ADMIN_COLLECTION_LABELS, ADMIN_GLOBAL_LABELS } from "../admin/collectio
 /** Bộ lọc trạng thái dịch trên danh sách nội dung (FR-ADM-18): mỗi mục là một điều kiện trên trường có sẵn của nhóm `translation`, không cần cột mới. */
 export const TRANSLATION_FILTERS = {
   none: { label: "Chưa dịch", condition: { "translation.status": { equals: "none" } } },
-  ai: { label: "AI dịch", condition: { "translation.enSource": { equals: "ai" } } },
-  manual: { label: "Đã sửa tay", condition: { "translation.enSource": { equals: "manual" } } },
+  ai: { label: "Dịch tự động (AI)", condition: { "translation.enSource": { equals: "ai" } } },
+  manual: { label: "Sửa tay", condition: { "translation.enSource": { equals: "manual" } } },
   failed: { label: "Dịch lỗi", condition: { "translation.status": { equals: "failed" } } },
-  viChanged: { label: "Bản Việt đổi sau khi sửa tay", condition: { "translation.viChangedAfterManual": { equals: true } } },
+  viChanged: { label: "Bản tiếng Việt đã sửa sau khi sửa tay bản tiếng Anh", condition: { "translation.viChangedAfterManual": { equals: true } } },
 } as const satisfies Record<string, { label: string; condition: Where }>;
 
 export type TranslationFilterKey = keyof typeof TRANSLATION_FILTERS;
@@ -84,12 +84,12 @@ export function canRetranslate(user: { id?: string | number; role?: string } | n
 
 /** Thông báo cho người dùng theo mã lỗi của `POST /api/admin/translations/:collection/:id`. */
 export function retranslateMessage(status: number, retryAfter: string | null): string {
-  if (status === 202) return "Đã xếp hàng dịch lại. Bản tiếng Anh sẽ được cập nhật sau ít phút.";
+  if (status === 202) return "Đã gửi yêu cầu dịch lại. Bản tiếng Anh sẽ được cập nhật sau ít phút.";
   if (status === 429) {
     const minutes = Math.max(1, Math.ceil(Number(retryAfter) / 60) || 1);
     return `Bạn đã yêu cầu dịch lại quá nhiều lần (tối đa 30 lần mỗi giờ). Thử lại sau khoảng ${minutes} phút.`;
   }
-  if (status === 409) return "Dịch tự động đang tắt (Cài đặt chung hoặc hạn mức dịch tháng bằng 0). Bật lại rồi thử lại.";
+  if (status === 409) return "Dịch tự động đang tắt (Cấu hình chung hoặc hạn mức dịch tháng bằng 0). Bật lại rồi thử lại.";
   if (status === 503) return "Dịch tự động chưa được cấu hình hoặc hệ thống đang tạm thời lỗi. Thử lại sau.";
   if (status === 401 || status === 403 || status === 404) return "Bạn không có quyền dịch lại nội dung này.";
   return "Không thể dịch lại lúc này. Thử lại sau.";

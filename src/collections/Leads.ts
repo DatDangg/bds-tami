@@ -17,7 +17,7 @@ import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES,
 import { isUuid } from "../lib/uuid";
 import type { Lead } from "../payload-types";
 
-export const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Đăng tin BĐS", project: "Dự án", contact: "Liên hệ" };
+export const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Tin bất động sản", project: "Dự án", contact: "Liên hệ" };
 export const STATUS_LABELS: Record<LeadStatus, string> = {
   new: "Mới",
   contacted: "Đã liên hệ",
@@ -64,7 +64,7 @@ const sourceFields: Field[] = [
     admin: readOnlyInAdmin,
   },
   { name: "rental", type: "relationship", label: "Tin cho thuê quan tâm", relationTo: "rentals", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
-  { name: "propertyPost", type: "relationship", label: "Tin BĐS quan tâm", relationTo: "property-posts", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
+  { name: "propertyPost", type: "relationship", label: "Tin bất động sản quan tâm", relationTo: "property-posts", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "project", type: "relationship", label: "Dự án quan tâm", relationTo: "projects", index: true, access: systemFieldAccess, admin: readOnlyInAdmin },
 ];
 
@@ -81,7 +81,7 @@ const customerFields: Field[] = [
     label: "Ngôn ngữ khách dùng",
     required: true,
     index: true,
-    options: LEAD_LOCALES.map((value) => ({ label: value === "vi" ? "Tiếng Việt" : "English", value })),
+    options: LEAD_LOCALES.map((value) => ({ label: value === "vi" ? "Tiếng Việt" : "Tiếng Anh", value })),
     access: customerFieldAccess,
   },
 ];
@@ -135,7 +135,7 @@ const assignmentFields: Field[] = [
     validate: validateAssignee,
     admin: { position: "sidebar", components: { Cell: "/components/admin/AssigneeCell#AssigneeCell" } },
   },
-  { name: "assignedAt", type: "date", label: "Giao lúc", access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar", date: dateTimeInAdmin } },
+  { name: "assignedAt", type: "date", label: "Ngày giao", access: { create: isAdmin, update: isAdmin }, admin: { position: "sidebar", date: dateTimeInAdmin } },
   // Tên sale cho cột danh sách (AssigneeCell): trả sẵn trong dữ liệu dòng để khỏi request client-side "Đang tải..." mỗi dòng.
   {
     name: "assigneeName",
@@ -161,17 +161,17 @@ const UTM_LABELS: Record<string, string> = { source: "Nguồn (utm_source)", med
 
 /** Mốc thời gian + dấu hệ thống ghi: cột phải của form (chỉ đọc). */
 const timelineFields: Field[] = [
-  { name: "firstContactedAt", type: "date", label: "Liên hệ lần đầu lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "firstContactedAt", type: "date", label: "Ngày liên hệ đầu tiên", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   // Mốc tính hạn lưu 24 tháng (ERD §7); `stampLeadTimestamps` và hook của `lead-activities` ghi.
   { name: "lastActivityAt", type: "date", label: "Hoạt động gần nhất", index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
   { name: "mergedCount", type: "number", label: "Số lần khách gửi lại (đã gộp)", min: 0, defaultValue: 0, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
   // Dấu "đã nhắc admin lead chưa giao" (job `remind-unassigned-leads`, BR-14): nhắc đúng một lần mỗi lead.
-  { name: "remindedAt", type: "date", label: "Đã nhắc phân công lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
-  { name: "anonymizedAt", type: "date", label: "Đã ẩn danh lúc", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "remindedAt", type: "date", label: "Ngày nhắc phân công", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
 ];
 
 const consentFields: Field[] = [
-  { name: "consentAt", type: "date", label: "Đồng ý chính sách lúc", required: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, date: dateTimeInAdmin } },
+  { name: "consentAt", type: "date", label: "Ngày đồng ý chính sách", required: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, date: dateTimeInAdmin } },
   { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: systemFieldAccess, admin: readOnlyInAdmin },
 ];
 
@@ -180,13 +180,13 @@ const trackingFields: Field[] = [
   {
     name: "utm",
     type: "group",
-    label: "Tham số UTM",
+    label: "Nguồn quảng cáo (UTM)",
     access: systemFieldAccess,
     admin: readOnlyInAdmin,
     fields: ["source", "medium", "campaign", "term", "content"].map((name): Field => ({ name, type: "text", label: UTM_LABELS[name], maxLength: 200 })),
   },
   { name: "pageUrl", type: "text", label: "Trang khách gửi form", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
-  { name: "referrer", type: "text", label: "Trang giới thiệu (referrer)", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
+  { name: "referrer", type: "text", label: "Trang khách đến từ", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
   { name: "userAgent", type: "text", maxLength: 500, access: { read: adminOnlyRead, create: denyAll, update: denyAll }, admin: { ...readOnlyInAdmin, hidden: true } },
 ];

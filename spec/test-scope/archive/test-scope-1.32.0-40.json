@@ -1,0 +1,188 @@
+{
+  "specVersion": "1.32.0",
+  "scopeVersion": 40,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-037 — link điều hướng (breadcrumb, Button ghost \"Xem tất cả\", \"Xem thêm\" /tin-tuc, link danh mục tin tức / tin đăng, \"Xem tất cả vị trí\" tin tuyển dụng hết hạn) hover không gạch chân, đổi màu thương hiệu như BL-034; slider Dự án nổi bật: tên dự án giữ chỗ 2 dòng (min-h-[2lh]) để khung kính mọi thẻ cùng chiều cao. Spec 1.31.1 → 1.32.0 (MINOR, MODIFY).",
+  "workItem": "feature-link-hover-and-slider-title-height",
+  "backlog": "BL-037",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-link-hover-and-slider-title-height.md",
+  "task": [
+    "tasks/feature-link-hover-and-slider-title-height/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-link-hover-and-slider-title-height-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "(commit close-out BL-037)"
+  ],
+  "commitNotes": {
+    "(commit close-out BL-037)": "T01 — Breadcrumb.tsx LINK_CLASS bỏ hover:underline → transition-colors hover:text-accent-text; button.tsx variant ghost bỏ underline-offset-4 hover:underline → hover:text-accent-text; NewsHomeBody \"Xem thêm\", tin-tuc/[slug]/page.tsx + PostDetail.tsx link danh mục (đã accent) bỏ hover:underline → transition-colors hover:text-text; JobDetail.tsx \"Xem tất cả vị trí\" giữ underline lúc thường, hover:no-underline hover:text-accent-text; ProjectsSlider.tsx h3 thêm min-h-[2lh] (giữ line-clamp-2). Test: Breadcrumb.test, button.test (ghost), ProjectsSlider.test. Doc: SPECIFICATIONS (Giao diện, F1 Dự án nổi bật), design-spec (đoạn Hover link điều hướng BL-037 + S01 khối 3)."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.31.1-39.json",
+  "specUpdate": "spec/updates/2026-10-20-link-hover-and-slider-title-height.md",
+  "specRefs": [
+    "Giao diện — hover link điều hướng (BL-037)",
+    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)",
+    "design-spec — Hover link điều hướng (BL-037)",
+    "design-spec S01 khối 3 — khung kính tên dự án"
+  ],
+  "specRefNotes": {
+    "Giao diện — hover link điều hướng (BL-037)": "Breadcrumb, Button ghost, \"Xem thêm\" /tin-tuc, link danh mục chi tiết tin tức + tin đăng, \"Xem tất cả vị trí\": hover không gạch chân, transition-colors; chữ thường → --color-accent-text (khối tối #E0BF89), link vốn vàng → --color-text; \"Xem tất cả vị trí\" giữ gạch chân lúc thường; focus-visible giữ outline chung; RichText giữ gạch chân.",
+    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)": "Tên tối đa 2 dòng, luôn giữ chỗ 2 dòng → khung kính mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng.",
+    "design-spec — Hover link điều hướng (BL-037)": "Đoạn sau quy tắc hover thẻ BL-034; liệt kê link đổi, link chưa đổi (footer / mục lục / LanguageSwitcher / 404).",
+    "design-spec S01 khối 3 — khung kính tên dự án": "h3 --text-h3, line-clamp-2 + min-h-[2lh]."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/layout/Breadcrumb.tsx",
+      "src/components/layout/Breadcrumb.test.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/button.test.tsx",
+      "src/components/news/NewsHomeBody.tsx",
+      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
+      "src/components/posts/PostDetail.tsx",
+      "src/components/careers/JobDetail.tsx",
+      "src/components/home/ProjectsSlider.tsx",
+      "src/components/home/ProjectsSlider.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Chỉ class Tailwind. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "modules": [
+      "Layout — Breadcrumb (mọi trang công khai)",
+      "UI — Button variant ghost (dùng chung)",
+      "News — NewsHomeBody, chi tiết tin tức",
+      "Posts — PostDetail",
+      "Careers — JobDetail",
+      "Home — ProjectsSlider (Dự án nổi bật)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Breadcrumb hover: không gạch chân, chữ đổi vàng thương hiệu --color-accent-text; Tab focus còn vòng focus rõ",
+      "Trang chủ \"Xem tất cả\" khối Dự án nổi bật (Button ghost) hover: không gạch chân, đổi vàng thương hiệu",
+      "/tin-tuc \"Xem thêm\" hàng danh mục hover: không gạch chân, chữ đổi --color-text",
+      "Chi tiết tin tức + chi tiết tin đăng BĐS: link danh mục hover không gạch chân, chữ đổi --color-text",
+      "Tin tuyển dụng hết hạn: \"Xem tất cả vị trí\" gạch chân lúc thường, hover bỏ gạch chân",
+      "Slider Dự án nổi bật: khung kính tên mọi thẻ cùng chiều cao dù tên 1 hay 2 dòng"
+    ],
+    "dependents": [
+      "EmptyState \"Nhận tư vấn\" (Button ghost) — hover không gạch chân, đổi vàng thương hiệu",
+      "Breadcrumb trên mọi trang danh sách / chi tiết / tĩnh (vi + en)"
+    ],
+    "regression": [
+      "Link trong nội dung bài (RichText) vẫn gạch chân",
+      "Hover tiêu đề thẻ (BL-034) giữ: không gạch chân, đổi vàng",
+      "Điều khiển slider Dự án nổi bật (BL-038): mũi tên 1 vị trí, chấm = số vị trí cuộn được, vòng đầu/cuối",
+      "Nút outline \"Xem thêm\" (Ưu đãi nổi bật, Tin tức, Cho thuê trang chủ) không đổi",
+      "Footer / mục lục / LanguageSwitcher / 404 vẫn hover gạch chân như cũ",
+      "Không lỗi console, không CLS"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL037-01",
+      "viewport": 1280,
+      "steps": "Mở /du-an (vi) và /en/... một trang có breadcrumb; hover từng link breadcrumb.",
+      "expected": "Không gạch chân; chữ đổi vàng thương hiệu (#8C6733), chuyển màu mượt."
+    },
+    {
+      "id": "BL037-02",
+      "viewport": 1280,
+      "steps": "Trên trang có breadcrumb, Tab tới các link breadcrumb.",
+      "expected": "Vòng focus (outline --color-focus-ring) thấy rõ trên từng link."
+    },
+    {
+      "id": "BL037-03",
+      "viewport": 1280,
+      "steps": "Mở / (vi), khối Dự án nổi bật: hover link \"Xem tất cả\".",
+      "expected": "Không gạch chân, chữ đổi vàng thương hiệu."
+    },
+    {
+      "id": "BL037-04",
+      "viewport": 1280,
+      "steps": "Mở /tin-tuc, hover \"Xem thêm\" ở hàng danh mục.",
+      "expected": "Không gạch chân, chữ đổi từ vàng sang màu chữ thường (--color-text)."
+    },
+    {
+      "id": "BL037-05",
+      "viewport": 1280,
+      "steps": "Mở một chi tiết tin tức /tin-tuc/[slug] và một chi tiết tin đăng BĐS; hover link danh mục.",
+      "expected": "Không gạch chân, chữ đổi sang --color-text."
+    },
+    {
+      "id": "BL037-06",
+      "viewport": 1280,
+      "steps": "Mở một tin tuyển dụng đã hết hạn; nhìn rồi hover \"Xem tất cả vị trí\" trong hộp cảnh báo.",
+      "expected": "Lúc thường có gạch chân; hover bỏ gạch chân, chữ màu vàng thương hiệu; bấm đi tới /tuyen-dung."
+    },
+    {
+      "id": "BL037-07",
+      "viewport": 1280,
+      "steps": "Mở một chi tiết tin tức có link trong nội dung bài; nhìn và hover link đó.",
+      "expected": "Link trong nội dung vẫn gạch chân (không đổi)."
+    },
+    {
+      "id": "BL037-08",
+      "viewport": 1280,
+      "steps": "Mở / (vi), khối Dự án nổi bật có cả dự án tên 1 dòng (vd \"Căn hộ Trung Tâm Hà Nội\") và tên 2 dòng; so khung kính đáy ảnh.",
+      "expected": "Khung kính mọi thẻ (cùng có địa điểm + số liệu) cao bằng nhau; địa điểm + hàng số liệu thẳng hàng; tên dài vẫn cắt tối đa 2 dòng."
+    },
+    {
+      "id": "BL037-09",
+      "viewport": 768,
+      "steps": "Lặp BL037-08 ở 768.",
+      "expected": "Khung kính các thẻ cùng chiều cao, không tràn ảnh."
+    },
+    {
+      "id": "BL037-10",
+      "viewport": 390,
+      "steps": "Lặp BL037-08 ở 390 (vuốt qua các thẻ).",
+      "expected": "Khung kính các thẻ cùng chiều cao; tên 2 dòng không đè địa điểm."
+    },
+    {
+      "id": "BL037-11",
+      "viewport": 1280,
+      "steps": "Regression BL-038: khối Dự án nổi bật bấm › liên tiếp, bấm chấm, › ở cuối / ‹ ở đầu.",
+      "expected": "Mũi tên đi đúng 1 vị trí, chấm active khớp, vòng đầu/cuối như BL-038."
+    },
+    {
+      "id": "BL037-12",
+      "viewport": 1280,
+      "steps": "Regression: hover tiêu đề thẻ dự án / tin tức (BL-034); hover link footer.",
+      "expected": "Tiêu đề thẻ không gạch chân, đổi vàng (BL-034); footer vẫn hover gạch chân như cũ."
+    }
+  ],
+  "acceptance": [
+    "Breadcrumb hover không gạch chân, chữ --color-accent-text; focus-visible còn thấy",
+    "Ghost \"Xem tất cả\" / \"Xem thêm\" /tin-tuc / link danh mục tin tức + tin đăng / \"Xem tất cả vị trí\" hover không gạch chân, đổi màu đúng quy tắc; nền tối dùng biến thể sáng",
+    "Link RichText không đổi (vẫn gạch chân)",
+    "Slider Dự án nổi bật: khung tên mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng",
+    "Kiểm 390 / 768 / 1280"
+  ],
+  "outOfScope": [
+    "Footer / FooterLinkColumn / LanguageSwitcher / TableOfContents / NewsToc / not-found (còn hover:underline — task riêng nếu user muốn)",
+    "Link gạch chân cố định trong form / thông báo (ApplyForm, ConsentCheckbox, FormStatus, CookieBanner, ...)",
+    "Thẻ slider thiếu địa điểm / số liệu vẫn thấp hơn (không thêm placeholder)",
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
+  ],
+  "viewports": [
+    390,
+    768,
+    1280
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "Chỉ class Tailwind; Breadcrumb + Button ghost là component dùng chung (blast radius mọi trang công khai). Không schema/API/quyền/dữ liệu/URL/i18n. Verify reviewer STRICT round 1 PASS: pnpm vitest run src/components src/app 972/972, typecheck PASS, lint 0 error. Residual (MINOR): \"Xem tất cả vị trí\" màu thường #8A5A0A gần accent #8C6733 → tín hiệu hover chủ yếu là bỏ gạch chân; thẻ slider thiếu địa điểm/số liệu thấp hơn; chưa kiểm trình duyệt thật."
+}

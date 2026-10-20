@@ -38,7 +38,7 @@ export const Wards: CollectionConfig = {
       required: true,
       options: WARD_TYPES.map((value) => ({ label: WARD_TYPE_LABELS[value], value })),
     },
-    { name: "slug", type: "text", label: "Đường dẫn (slug)", required: true },
+    { name: "slug", type: "text", label: "Đường dẫn", required: true },
     {
       name: "legacyNames",
       type: "array",

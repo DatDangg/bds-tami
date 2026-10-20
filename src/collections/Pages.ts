@@ -61,7 +61,7 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
         // Trường ảo: nút "Duyệt bản EN" (chỉ admin, chỉ khi bản dịch AI đang chờ duyệt).
         { name: "approveEnglishAction", type: "ui", label: "Duyệt bản tiếng Anh", admin: { position: "sidebar", components: { Field: "/components/admin/ApproveEnglishButton#ApproveEnglishButton" } } },
         { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
-        { name: "version", type: "text", label: "Phiên bản", required: true, admin: { description: "Phiên bản văn bản, vd 1.0. Bản chính sách bảo mật đã xuất bản là consentVersion của form (BR-30)." } },
+        { name: "version", type: "text", label: "Phiên bản", required: true, admin: { description: "Phiên bản văn bản, vd 1.0. Phiên bản chính sách bảo mật đang xuất bản được lưu kèm mỗi lần khách đồng ý trên form." } },
         { name: "effectiveDate", type: "date", label: "Ngày hiệu lực", required: true, admin: { date: { pickerAppearance: "dayOnly" } } },
       ],
     },

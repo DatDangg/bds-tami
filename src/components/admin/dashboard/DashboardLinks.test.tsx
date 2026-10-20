@@ -28,9 +28,9 @@ describe("link nội bộ dashboard dùng next/link (không tải lại toàn tr
   });
 
   it("NavGroupCards", () => {
-    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead khách hàng", href: "/admin/collections/leads" }] }];
+    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead", href: "/admin/collections/leads" }] }];
     render(<NavGroupCards groups={groups} />);
-    expect(screen.getByRole("link", { name: "Lead khách hàng" }).getAttribute("data-next-link")).toBe("true");
+    expect(screen.getByRole("link", { name: "Lead" }).getAttribute("data-next-link")).toBe("true");
   });
 
   it("DashboardHeader shortcuts", () => {

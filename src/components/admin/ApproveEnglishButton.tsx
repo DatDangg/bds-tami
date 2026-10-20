@@ -8,7 +8,7 @@ const FALLBACK_ERROR = "Không duyệt được bản tiếng Anh. Thử lại s
 
 /** Thông báo theo mã của `POST /api/admin/translations/pages/:id/approve`; 422 nêu trường EN còn thiếu. */
 export function approveErrorMessage(status: number, missing: string[] = []): string {
-  if (status === 422) return `Bản tiếng Anh chưa đủ để duyệt, còn thiếu: ${missing.join(", ") || "tiêu đề, nội dung"}. Nhập ở bản EN rồi duyệt lại.`;
+  if (status === 422) return `Bản tiếng Anh chưa đủ để duyệt, còn thiếu: ${missing.join(", ") || "tiêu đề, nội dung"}. Nhập ở bản tiếng Anh rồi duyệt lại.`;
   if (status === 409) return "Bản tiếng Anh đã được duyệt. Tải lại trang.";
   if (status === 401 || status === 403) return "Chỉ admin được duyệt bản tiếng Anh.";
   if (status === 404) return "Không tìm thấy trang này.";
@@ -60,7 +60,7 @@ export function ApproveEnglishButton() {
         Bản tiếng Anh (AI dịch hoặc nhập tay) chưa được duyệt nên chưa hiển thị cho khách. Kiểm tra rồi bấm duyệt.
       </p>
       <button type="button" className="btn btn--style-primary btn--size-medium" style={{ minHeight: 44, alignSelf: "flex-start" }} disabled={busy} aria-busy={busy} onClick={approve}>
-        {busy ? "Đang duyệt…" : "Duyệt bản EN"}
+        {busy ? "Đang duyệt…" : "Duyệt bản tiếng Anh"}
       </button>
       {error ? (
         <p role="alert" className="field-description" style={{ margin: 0 }}>

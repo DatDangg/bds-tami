@@ -24,7 +24,7 @@ export function contentRedirectsPlugin() {
         useAsTitle: "from",
         defaultColumns: ["from", "to", "createdAt"],
         hidden: ({ user }) => user?.role !== ROLES.admin,
-        description: "Chuyển hướng 301 từ đường dẫn cũ sang mới (tự tạo khi đổi slug; sửa tay khi cần).",
+        description: "Tự chuyển khách từ đường dẫn cũ sang đường dẫn mới (tạo tự động khi đổi đường dẫn trang; có thể sửa tay).",
       },
       access: { read: isAdmin, create: isAdmin, update: isAdmin, delete: isAdmin },
       fields: ({ defaultFields }) =>

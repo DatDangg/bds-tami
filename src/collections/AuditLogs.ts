@@ -9,9 +9,9 @@ const denyAll = (): boolean => false;
 const ACTION_LABELS: Record<AuditAction, string> = {
   "lead.assign": "Phân công lead",
   "lead.export": "Xuất Excel lead",
-  "content.delete": "Xoá nội dung (thùng rác)",
+  "content.delete": "Chuyển nội dung vào thùng rác",
   "content.restore": "Khôi phục nội dung",
-  "content.purge": "Xoá hẳn nội dung",
+  "content.purge": "Xoá vĩnh viễn nội dung",
   "staff.create": "Tạo tài khoản",
   "staff.reset_password": "Đặt lại mật khẩu",
   "staff.update_role": "Đổi vai trò",
@@ -59,10 +59,10 @@ export const AuditLogs: CollectionConfig = {
       options: AUDIT_ACTIONS.map((value) => ({ label: ACTION_LABELS[value], value })),
     },
     { name: "collection", type: "text", label: "Loại dữ liệu" },
-    { name: "docId", type: "text", label: "ID bản ghi" },
+    { name: "docId", type: "text", label: "Mã bản ghi" },
     { name: "summary", type: "text", label: "Tóm tắt", required: true },
     // Dữ liệu trước/sau; `writeAuditLog` đã lọc khoá nhạy cảm (mật khẩu, token...).
-    { name: "meta", type: "json", label: "Chi tiết (JSON)" },
-    { name: "ipHash", type: "text", label: "Mã băm IP" },
+    { name: "meta", type: "json", label: "Chi tiết kỹ thuật" },
+    { name: "ipHash", type: "text", label: "IP (đã ẩn danh)" },
   ],
 };

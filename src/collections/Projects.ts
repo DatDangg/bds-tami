@@ -85,7 +85,7 @@ const amenitiesField: ArrayField = {
   admin: { components: { RowLabel: textRowLabel({ field: "name", fallback: "Tiện ích" }) } },
   fields: [
     { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true },
-    { name: "icon", type: "text", label: "Mã icon", admin: { description: "Tên icon hiển thị kèm tiện ích (tuỳ chọn)." } },
+    { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm tiện ích." } },
   ],
 };
 
@@ -163,7 +163,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               amenitiesField,
             ],
           },
-          { label: "Nội dung mở rộng", fields: projectMarketBlockFields },
+          { label: "Bảng giá & thông tin thêm", fields: projectMarketBlockFields },
           {
             label: "Hình ảnh",
             fields: [

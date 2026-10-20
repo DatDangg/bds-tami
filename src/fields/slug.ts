@@ -102,7 +102,7 @@ const validateSlug: TextFieldSingleValidation = (value, { req, data }) => {
   if (typeof value === "string" && value !== "") return true;
   const hasEnglish = (data as { hasEnglish?: boolean } | undefined)?.hasEnglish === true;
   const required = req.locale === defaultLocale || hasEnglish;
-  return required ? "Slug không được để trống (nhập tiêu đề hoặc nhập slug)." : true;
+  return required ? "Đường dẫn trang không được để trống (nhập tiêu đề hoặc đường dẫn)." : true;
 };
 
 /**
@@ -116,12 +116,12 @@ export function slugField({ sourceField = "title", scopeField }: SlugFieldOption
   return {
     name: "slug",
     type: "text",
-    label: "Đường dẫn (slug)",
+    label: "Đường dẫn trang",
     localized: true,
     unique: !scopeField,
     index: true,
     validate: validateSlug,
     hooks: { beforeValidate: [makeSlugHook(sourceField, scopeField)], beforeDuplicate: [dropSlugOnDuplicate] },
-    admin: { position: "sidebar", description: "Để trống để tự sinh từ tiêu đề. Trùng sẽ tự thêm -2, -3..." },
+    admin: { position: "sidebar", description: "Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…" },
   };
 }

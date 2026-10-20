@@ -99,10 +99,10 @@ describe("RecentLists", () => {
 
 describe("NavGroupCards", () => {
   it("mỗi nhóm một card liệt kê mục", () => {
-    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead khách hàng", href: "/admin/collections/leads" }] }];
+    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead", href: "/admin/collections/leads" }] }];
     render(<NavGroupCards groups={groups} />);
     const nav = screen.getByRole("navigation", { name: "Khách hàng" });
-    expect(within(nav).getByRole("link", { name: "Lead khách hàng" }).getAttribute("href")).toBe("/admin/collections/leads");
+    expect(within(nav).getByRole("link", { name: "Lead" }).getAttribute("href")).toBe("/admin/collections/leads");
   });
 
   it("rỗng -> không render", () => {

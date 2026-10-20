@@ -28,7 +28,7 @@ const COLUMNS = [
   "Nguồn",
   "Trạng thái",
   "Lý do không thành",
-  "Người phụ trách",
+  "Sale phụ trách",
   "Ngày tạo",
   "Ngày giao",
   "Hoạt động gần nhất",

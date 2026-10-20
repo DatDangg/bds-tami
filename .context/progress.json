@@ -1161,10 +1161,10 @@
       "slug": "admin-vietnamese-wording",
       "title": "Admin: rà ngữ nghĩa toàn bộ chữ tiếng Việt (ghi đè bản dịch Payload + nhãn dự án) (BL-040)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-040",
-      "changeDoc": "spec/changes/2026-10-20-admin-vietnamese-wording.md",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-vietnamese-wording.md",
       "startedAt": "2026-10-20",
       "tasks": [
         {
@@ -1181,12 +1181,12 @@
             ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-1-review.md",
             ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-2-review.md"
           ],
-          "commit": "(commit T01)"
+          "commit": "e85362b"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-admin-vietnamese-wording/phase-1-task-02.md",
-          "status": "in_review_passed",
+          "status": "done",
           "attempt": 2,
           "round": 2,
           "note": "r1 FAIL (MAJOR-1 Q5 Rentals/ClickEvents \"… lúc\") → r2 PASS; nhãn dự án theo bảng §1–§7 + mimeType \"Loại tệp\"",
@@ -1196,11 +1196,18 @@
           "reports": [
             ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-1-review.md",
             ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-2-review.md"
-          ]
+          ],
+          "commit": "(commit T02 close-out)"
         }
       ],
-      "note": "T01 PASS → commit; T02 PASS chờ close-out",
-      "planApprovedAt": "2026-10-20 (user \"ok theo đề xuất\", Q1–Q10 theo khuyến nghị)"
+      "note": "Spec-validator: A1–A5 + delta FR-ADM-19 đạt; G1 (audit \"Xoá hẳn\" CV) + G2 (as-built note design doc) + G4 (FR-ADM-19 \"Đăng tin BĐS\" → \"Tin bất động sản\") đã xử lý trong close-out",
+      "planApprovedAt": "2026-10-20 (user \"ok theo đề xuất\", Q1–Q10 theo khuyến nghị)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.33.0",
+      "scopeVersion": 41,
+      "specUpdate": "spec/updates/2026-10-20-admin-vietnamese-wording.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-vietnamese-wording-phase-1.md",
+      "residual": "chưa xem admin thật trên trình duyệt (cụm chữ ghép Payload \"mục\"/\"Có-Không\" có thể đọc gượng); nhãn job src/jobs/* còn \"VI → EN\"/\"Đăng tin BĐS\" (ngoài phạm vi); giá trị \"Đã ẩn danh\" trong dữ liệu/Excel giữ; cột slug thô → BL-043; media-upload.test \"khách đọc được danh sách\" fail 1 lần khi chạy cả bộ (đua DB, chạy riêng 20/20 PASS); Payload chuỗi không ghi đè vẫn \"xóa/khóa\" (Q10)"
     }
   ],
   "bugs": [

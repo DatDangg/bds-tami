@@ -49,12 +49,12 @@ export const announcementBarBlock: Field = {
 export const heroSearchBlock: Field = {
   name: "heroSearch",
   type: "group",
-  label: "Ô tìm kiếm ở hero",
+  label: "Ô tìm kiếm trên banner",
   fields: [
     enabledField,
     { name: "placeholder", type: "text", label: "Chữ gợi ý trong ô tìm kiếm", localized: true, admin: { description: "Để trống thì dùng chữ mặc định của website." } },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
-    { name: "chipProjects", type: "relationship", label: "Dự án gợi ý (chip)", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án nổi bật mới nhất." } },
+    { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án nổi bật mới nhất." } },
   ],
 };
 

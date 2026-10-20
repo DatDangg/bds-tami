@@ -10,7 +10,7 @@ const REFERENCING_COLLECTIONS = [
   { slug: "wards", label: "phường/xã" },
   { slug: "rentals", label: "tin cho thuê" },
   { slug: "projects", label: "dự án" },
-  { slug: "property-posts", label: "tin đăng BĐS" },
+  { slug: "property-posts", label: "tin bất động sản" },
 ] as const;
 
 const blockDeleteWhileReferenced: CollectionBeforeDeleteHook = async ({ id, req }) => {
@@ -48,7 +48,7 @@ export const Provinces: CollectionConfig = {
     { name: "code", type: "text", label: "Mã tỉnh/thành", required: true, unique: true, index: true },
     { name: "name", type: "text", label: "Tên", required: true },
     { name: "shortName", type: "text", label: "Tên viết tắt", admin: { description: "Vd: TP.HCM" } },
-    { name: "slug", type: "text", label: "Đường dẫn (slug)", required: true, unique: true, index: true },
+    { name: "slug", type: "text", label: "Đường dẫn", required: true, unique: true, index: true },
     { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
   ],
 };

@@ -77,7 +77,7 @@ const codeField: TextField = {
 const rentedAtField: DateField = {
   name: "rentedAt",
   type: "date",
-  label: "Đã cho thuê lúc",
+  label: "Ngày cho thuê",
   access: { create: denyAll, update: denyAll },
   hooks: { beforeChange: [stampRentedAt] },
   admin: { position: "sidebar", readOnly: true, date: { pickerAppearance: "dayAndTime" } },

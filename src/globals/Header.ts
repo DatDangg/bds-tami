@@ -17,7 +17,7 @@ export function createHeader(revalidate?: RevalidateTags): GlobalConfig {
   return {
     slug: "header",
     label: ADMIN_GLOBAL_LABELS.header,
-    admin: { hidden: hideFromNonAdmin, description: "Menu chính (2 cấp) và nút kêu gọi hành động ở đầu trang." },
+    admin: { hidden: hideFromNonAdmin, description: "Menu chính (2 cấp) và nút nổi bật ở đầu trang." },
     access: { read: () => true, update: isAdmin },
     hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateGlobal("header", revalidate), enqueueTranslation.globalAfterChange] },
     fields: [
@@ -43,7 +43,7 @@ export function createHeader(revalidate?: RevalidateTags): GlobalConfig {
       {
         name: "ctaButton",
         type: "group",
-        label: "Nút kêu gọi hành động",
+        label: "Nút nổi bật (vd Nhận tư vấn)",
         fields: [{ name: "label", type: "text", label: "Chữ trên nút", localized: true }, navLinkField("link")],
       },
       translationGroup(),

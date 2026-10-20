@@ -96,7 +96,7 @@ describe("canRetranslate", () => {
 
 describe("retranslateMessage", () => {
   it("thông báo theo mã", () => {
-    expect(retranslateMessage(202, null)).toContain("xếp hàng");
+    expect(retranslateMessage(202, null)).toContain("gửi yêu cầu dịch lại");
     expect(retranslateMessage(429, "3600")).toContain("60 phút");
     expect(retranslateMessage(409, null)).toContain("đang tắt");
     expect(retranslateMessage(503, null)).toContain("chưa được cấu hình");

@@ -95,7 +95,7 @@ const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
   services: "Dịch vụ",
   featuredOffers: "Ưu đãi nổi bật",
   partners: "Đối tác",
-  ctaBanner: "Kêu gọi hành động",
+  ctaBanner: "Khối mời tư vấn",
   rentals: RENTALS_BLOCK_LABEL,
   news: NEWS_BLOCK_LABEL,
 };
@@ -103,7 +103,7 @@ const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
 const heroBlock: Field = {
   name: "hero",
   type: "group",
-  label: "Hero (băng đầu trang)",
+  label: "Banner đầu trang",
   fields: [
     {
       name: "slides",
@@ -217,7 +217,7 @@ const blockOrderField: Field = {
   labels: { singular: "Khối", plural: "Khối" },
   defaultValue: HOMEPAGE_BLOCKS.map((block) => ({ block })),
   validate: validateBlockOrder,
-  admin: { description: "Hero luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
+  admin: { description: "Banner đầu trang luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Khối chỉ hiện khi có trong danh sách này (thêm Cho thuê, Tin tức nếu chưa có).", components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) } },
   fields: [{ name: "block", type: "select", label: "Khối", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: BLOCK_LABELS[block], value: block })) }],
 };
 
@@ -236,7 +236,7 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
     fields: [
       formTabs([
         { label: "Thanh thông báo", fields: [announcementBarBlock] },
-        { label: "Hero", fields: [heroBlock, heroSearchBlock] },
+        { label: "Banner đầu trang", fields: [heroBlock, heroSearchBlock] },
         { label: "Giới thiệu", fields: [aboutBlock] },
         { label: "Dự án nổi bật", fields: [featuredProjectsBlock] },
         { label: "Dịch vụ", fields: [servicesBlock] },
@@ -244,7 +244,7 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
         { label: "Cho thuê", fields: [rentalsBlock] },
         { label: "Tin tức", fields: [newsBlock] },
         { label: "Đối tác", fields: [partnersBlock] },
-        { label: "Kêu gọi", fields: [ctaBannerBlock] },
+        { label: "Mời tư vấn", fields: [ctaBannerBlock] },
         { label: "Thứ tự khối", fields: [blockOrderField] },
         { label: "SEO", fields: [seoField()] },
         { label: "Bản dịch", fields: [translationGroup()] },

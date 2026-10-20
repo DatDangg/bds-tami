@@ -11,7 +11,7 @@ describe("SearchReindexPendingWarning", () => {
   it("đang có job reindex chờ/chạy -> thông báo tìm kiếm theo tên mới sẽ đầy đủ sau ít phút", () => {
     field.value = true;
     render(<SearchReindexPendingWarning path="searchReindexPending" />);
-    expect(screen.getByRole("status").textContent).toContain("chế độ nền");
+    expect(screen.getByRole("status").textContent).toContain("dữ liệu tìm kiếm");
     expect(screen.getByRole("status").textContent).toContain("sau ít phút");
   });
 

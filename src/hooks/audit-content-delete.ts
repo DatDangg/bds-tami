@@ -34,13 +34,13 @@ export const auditContentTrash: CollectionAfterChangeHook = async ({
   if (operation !== "update") return doc;
   const wasTrashed = Boolean(previousDoc?.deletedAt);
   const isTrashed = Boolean(doc.deletedAt);
-  if (!wasTrashed && isTrashed) await record(req, "content.delete", collection.slug, doc, "Xoá mềm");
+  if (!wasTrashed && isTrashed) await record(req, "content.delete", collection.slug, doc, "Chuyển vào thùng rác");
   if (wasTrashed && !isTrashed) await record(req, "content.restore", collection.slug, doc, "Khôi phục");
   return doc;
 };
 
 /** Xoá hẳn khỏi DB (chỉ admin qua access `delete`), ghi `content.purge`. */
 export const auditContentPurge: CollectionAfterDeleteHook = async ({ doc, req, collection }) => {
-  await record(req, "content.purge", collection.slug, doc, "Xoá hẳn");
+  await record(req, "content.purge", collection.slug, doc, "Xoá vĩnh viễn");
   return doc;
 };

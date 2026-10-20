@@ -7,12 +7,12 @@ import type { CollectionConfig, GlobalConfig } from "payload";
  */
 export const ADMIN_COLLECTION_LABELS = {
   staff: { singular: "Nhân viên", plural: "Nhân viên" },
-  media: { singular: "Tệp media", plural: "Thư viện media" },
-  "private-files": { singular: "Tệp riêng tư", plural: "Tệp riêng tư (CV)" },
+  media: { singular: "Ảnh, tệp", plural: "Thư viện ảnh & tệp" },
+  "private-files": { singular: "Tệp CV", plural: "Tệp CV ứng viên" },
   "audit-logs": { singular: "Nhật ký thao tác", plural: "Nhật ký thao tác" },
   "click-events": { singular: "Lượt bấm liên hệ", plural: "Lượt bấm liên hệ" },
-  "click-stats-daily": { singular: "Thống kê lượt bấm theo ngày", plural: "Thống kê lượt bấm theo ngày" },
-  "translation-usage": { singular: "Chi phí dịch theo tháng", plural: "Chi phí dịch theo tháng" },
+  "click-stats-daily": { singular: "Thống kê liên hệ theo ngày", plural: "Thống kê liên hệ theo ngày" },
+  "translation-usage": { singular: "Chi phí dịch tự động", plural: "Chi phí dịch tự động" },
   categories: { singular: "Danh mục", plural: "Danh mục" },
   developers: { singular: "Chủ đầu tư", plural: "Chủ đầu tư" },
   provinces: { singular: "Tỉnh/thành", plural: "Tỉnh/thành" },
@@ -25,9 +25,9 @@ export const ADMIN_COLLECTION_LABELS = {
   "property-posts": { singular: "Tin bất động sản", plural: "Tin bất động sản" },
   "job-postings": { singular: "Tin tuyển dụng", plural: "Tuyển dụng" },
   "job-applications": { singular: "Hồ sơ ứng tuyển", plural: "Hồ sơ ứng tuyển" },
-  leads: { singular: "Lead", plural: "Lead khách hàng" },
-  "lead-activities": { singular: "Hoạt động chăm sóc lead", plural: "Lịch sử chăm sóc lead" },
-  redirects: { singular: "Chuyển hướng", plural: "Chuyển hướng URL" },
+  leads: { singular: "Lead", plural: "Lead" },
+  "lead-activities": { singular: "Hoạt động chăm sóc", plural: "Lịch sử chăm sóc" },
+  redirects: { singular: "Chuyển hướng", plural: "Chuyển hướng đường dẫn" },
 } as const satisfies Record<string, NonNullable<CollectionConfig["labels"]>>;
 
 export type AdminCollectionSlug = keyof typeof ADMIN_COLLECTION_LABELS;

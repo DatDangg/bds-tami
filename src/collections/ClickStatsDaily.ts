@@ -33,8 +33,8 @@ export const ClickStatsDaily: CollectionConfig = {
       required: true,
       options: CLICK_TYPES.map((value) => ({ label: CLICK_TYPE_LABELS[value], value })),
     },
-    { name: "refCollection", type: "text", label: "Loại nội dung gắn kèm", defaultValue: NO_REF },
-    { name: "refId", type: "text", label: "ID nội dung gắn kèm", defaultValue: NO_REF },
+    { name: "refCollection", type: "text", label: "Loại nội dung", defaultValue: NO_REF },
+    { name: "refId", type: "text", label: "Mã nội dung", defaultValue: NO_REF },
     { name: "count", type: "number", label: "Số lượt bấm", required: true, min: 0, defaultValue: 0 },
   ],
 };

@@ -78,7 +78,7 @@ function adminCards(adminRoute: string): StatCardSpec[] {
     {
       id: "leads-unassigned",
       label: "Lead chưa phân công",
-      hint: "Mới, chưa có người phụ trách",
+      hint: "Mới, chưa giao sale",
       icon: "alert",
       queries: [{ collection: "leads", where: { and: [{ status: { equals: "new" } }, { assignedTo: { exists: false } }] } }],
       href: buildFilteredListHref(adminRoute, "leads", [newLead, { field: "assignedTo", operator: "exists", value: false }]),
