@@ -31,9 +31,35 @@ const EXTRA_HIDDEN_COLUMNS: Readonly<Record<string, readonly string[]>> = {
 };
 
 /**
+ * Trường tìm kiếm nghiệp vụ của ô "Tìm theo …" (BL-039). Payload ghép nhãn các trường này vào gợi ý; Lead/Cho thuê đã tự khai báo trong file riêng.
+ * Chỉ trường text/email có thật (không relationship); `filename` của Media do Payload tự thêm cho collection upload.
+ */
+export const LIST_SEARCHABLE_FIELDS: Readonly<Record<string, readonly string[]>> = {
+  projects: ["title"],
+  news: ["title"],
+  "property-posts": ["title"],
+  "job-postings": ["title"],
+  "job-applications": ["fullName", "email", "phone"],
+  pages: ["title"],
+  services: ["title"],
+  developers: ["name"],
+  categories: ["name"],
+  media: ["filename", "alt"],
+  staff: ["fullName", "email"],
+  provinces: ["name"],
+  wards: ["name"],
+};
+
+/**
  * Mọi collection admin, đã lọc "Hiển thị cột" + "Thêm bộ lọc" còn trường nghiệp vụ (BL-039): một chỗ áp cho tất cả thay vì gọi từng file.
  * Collection có trường ẩn thêm riêng (Rentals, Projects…) đã gọi `hideTechnicalListFields` kèm tham số trong file của nó; lần gọi này chỉ thêm quy tắc chung.
  */
 export const ADMIN_COLLECTIONS: CollectionConfig[] = [
   Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities,
-].map((collection) => hideTechnicalListFields(collection, [], EXTRA_HIDDEN_COLUMNS[collection.slug]));
+].map((collection) => withListSearchableFields(hideTechnicalListFields(collection, [], EXTRA_HIDDEN_COLUMNS[collection.slug])));
+
+function withListSearchableFields(collection: CollectionConfig): CollectionConfig {
+  const fields = LIST_SEARCHABLE_FIELDS[collection.slug];
+  if (!fields || collection.admin?.listSearchableFields) return collection;
+  return { ...collection, admin: { ...collection.admin, listSearchableFields: [...fields] } };
+}

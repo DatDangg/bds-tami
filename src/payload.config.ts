@@ -81,7 +81,11 @@ export default buildConfig({
     fallbackLanguage: "vi",
   },
   localization: {
-    locales: ["vi", "en"],
+    // Có `label` để ô chọn ngôn ngữ nội dung hiện "Tiếng Việt"/"English" thay vì mã vi/en (BL-039); `code` giữ nguyên.
+    locales: [
+      { code: "vi", label: "Tiếng Việt" },
+      { code: "en", label: "English" },
+    ],
     defaultLocale: "vi",
     // Không tự rơi về tiếng Việt khi thiếu bản en (BRD BR-07).
     fallback: false,

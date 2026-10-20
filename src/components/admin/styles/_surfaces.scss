@@ -150,6 +150,18 @@ $group-indent: $group-indent-margin + $group-indent-padding + $group-indent-bord
   box-shadow: var(--admin-shadow-md);
 }
 
+// Popup (cả danh sách xổ ngôn ngữ, BL-039) được Payload render vào <body> bằng portal: nền đặc + z-index trên mọi thanh công cụ danh sách
+// (nút "Thùng rác"/"Tạo mới") để chữ bên dưới không xuyên qua; không vượt viewport hẹp.
+.popup__content {
+  z-index: var(--z-popup);
+  max-width: calc(100vw - 16px);
+}
+
+// Nhãn ngôn ngữ đã là tên đầy đủ ("Tiếng Việt", `localization.locales[].label`) nên bỏ phần mã "(vi)" Payload ghép thêm sau nhãn.
+.localizer__locale-code {
+  display: none;
+}
+
 .popup-button-list__button--selected {
   background-color: var(--admin-accent-soft);
   color: var(--admin-accent-soft-text);

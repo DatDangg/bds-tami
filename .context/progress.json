@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "admin-list-columns-filters-locale",
-    "phaseTask": "phase-1-task-02",
+    "phaseTask": "phase-1-task-03",
     "journal": ".context/runs/feature-admin-list-columns-filters-locale-phase-1-task-01.md"
   },
   "features": [
@@ -1446,15 +1446,21 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-02.md",
-          "status": "in_progress",
-          "attempt": 0,
-          "round": 0,
-          "note": "Ô ngôn ngữ nhãn + Lọc nâng cao + gợi ý tìm kiếm"
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "locales label Tiếng Việt/English + ẩn mã (vi); general.filters = Lọc nâng cao (vị trí giữ — D7); LIST_SEARCHABLE_FIELDS 13 collection; 3 MINOR",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md"
+          ]
         },
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-03.md",
-          "status": "pending",
+          "status": "in_progress",
           "attempt": 0,
           "round": 0,
           "note": "Chip lọc nhanh Dự án/Tin tức/Tin BĐS/Tuyển dụng/Hồ sơ"
@@ -2384,7 +2390,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T20:07:41.205Z",
+  "lastUpdated": "2026-10-20T20:21:29.226Z",
   "approvalMilestones": [
     {
       "id": "M1",

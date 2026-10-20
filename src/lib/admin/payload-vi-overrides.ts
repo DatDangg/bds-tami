@@ -58,6 +58,8 @@ export const PAYLOAD_VI_OVERRIDES: DeepPartial<typeof viTranslations> = {
     noResults: "Chưa có {{label}} nào, hoặc không có mục nào khớp bộ lọc hiện tại.",
     noResultsDescription: "Chưa có dữ liệu, hoặc không có mục nào khớp bộ lọc ở trên.",
     searchBy: "Tìm theo {{label}}",
+    // Nút mở trình dựng bộ lọc (khoá này chỉ dùng ở ListControls của Payload).
+    filters: "Lọc nâng cao",
     filterWhere: "Lọc {{label}} theo điều kiện:",
     descending: "Giảm dần",
     and: "và",

@@ -26,6 +26,7 @@ const EXPECTED: Record<string, string> = {
   "general.noResults": "Chưa có {{label}} nào, hoặc không có mục nào khớp bộ lọc hiện tại.",
   "general.noResultsDescription": "Chưa có dữ liệu, hoặc không có mục nào khớp bộ lọc ở trên.",
   "general.searchBy": "Tìm theo {{label}}",
+  "general.filters": "Lọc nâng cao",
   "general.filterWhere": "Lọc {{label}} theo điều kiện:",
   "general.descending": "Giảm dần",
   "general.and": "và",
