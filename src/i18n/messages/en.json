@@ -236,7 +236,6 @@
         "noPosts": "No listings yet.",
         "noPostsInCategory": "No listings in this category yet."
       },
-      "relatedTitle": "Related listings",
       "subNavLabel": "Listing contents",
       "subNav": {
         "overview": "Overview",
@@ -271,10 +270,6 @@
         "relatedRental": "Rental listing"
       },
       "gallery": "Photos",
-      "share": {
-        "button": "Share",
-        "menu": "Share options"
-      },
       "leadForm": {
         "title": "Get advice",
         "callHotline": "Call hotline {phone}"
@@ -582,8 +577,9 @@
       "subNavLabel": "Listing contents",
       "subNav": {
         "overview": "Overview",
+        "details": "Details",
+        "amenities": "Amenities",
         "terms": "Terms",
-        "description": "Description",
         "video": "Video",
         "location": "Location",
         "legal": "Legal"
@@ -595,7 +591,6 @@
         "referencePrice": "Reference price"
       },
       "specs": {
-        "label": "Key facts",
         "price": "Rent",
         "perMonth": "/month",
         "negotiable": "Negotiable",
@@ -604,12 +599,10 @@
         "bathrooms": "Bathrooms"
       },
       "details": {
-        "title": "Details",
         "floor": "Floor",
         "houseDirection": "House direction",
         "balconyDirection": "Balcony direction",
         "furnishing": "Furnishing",
-        "amenities": "Amenities",
         "category": "Category",
         "project": "Project"
       },
@@ -654,7 +647,9 @@
         }
       },
       "sections": {
-        "description": "Description",
+        "overview": "About this home",
+        "details": "Details",
+        "amenities": "Included amenities",
         "video": "Video",
         "location": "Location",
         "legal": "Legal information"
@@ -674,11 +669,40 @@
         "titleRented": "Find similar units"
       },
       "similar": {
-        "title": "Similar listings",
-        "titleRented": "Similar available units"
+        "eyebrow": "You may also like",
+        "title": "Similar",
+        "titleAccent": "listings",
+        "titleRented": "Similar",
+        "titleRentedAccent": "available units",
+        "description": "Same area, similar price.",
+        "slide": "Listing {index} / {total}",
+        "previous": "Previous listings",
+        "next": "Next listings",
+        "dots": "Choose slide position",
+        "goTo": "Go to listing group {index}"
       },
       "stickyConsult": "Get advice",
-      "stickyConsultRented": "Find similar units"
+      "stickyConsultRented": "Find similar units",
+      "eyebrow": {
+        "overview": "Overview",
+        "details": "Details",
+        "amenities": "Amenities",
+        "terms": "Terms",
+        "video": "Video"
+      },
+      "facts": {
+        "label": "Key facts",
+        "bedroomsValue": "{count, plural, one {# bedroom} other {# bedrooms}}",
+        "bathroomsValue": "{count, plural, one {# bath} other {# baths}}",
+        "sanitary": "Bathrooms",
+        "direction": "Facing"
+      },
+      "amenitiesLabel": "Amenities of this home",
+      "video": {
+        "button": "Video",
+        "title": "Property video",
+        "close": "Close"
+      }
     },
     "careers": {
       "title": "Careers",
@@ -872,6 +896,30 @@
       "news": {
         "defaultTitle": "News",
         "viewAll": "View all"
+      }
+    },
+    "postDetail": {
+      "eyebrow": {
+        "overview": "Overview",
+        "offer": "Offer",
+        "content": "Content",
+        "gallery": "Photos"
+      },
+      "overview": {
+        "title": "Overview",
+        "category": "Category",
+        "publishedAt": "Posted on"
+      },
+      "related": {
+        "eyebrow": "You may also like",
+        "title": "Related",
+        "titleAccent": "listings",
+        "description": "Listings in the same category.",
+        "slide": "Listing {index} / {total}",
+        "previous": "Previous listings",
+        "next": "Next listings",
+        "dots": "Choose slide position",
+        "goTo": "Go to listing group {index}"
       }
     }
   }

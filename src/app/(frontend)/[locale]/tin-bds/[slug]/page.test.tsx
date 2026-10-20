@@ -15,7 +15,25 @@ vi.mock("@/lib/posts/post-queries", () => ({ findPublicPostBySlug, findRelatedPo
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "uu-dai-mua-thu", en: "autumn-offer" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
-vi.mock("next-intl/server", () => ({ setRequestLocale: () => undefined }));
+// ConsultBanner là Server Component async (đọc homepage CMS): jsdom không dựng được; chỉ kiểm tra trang truyền đúng props.
+const consultBannerProps = vi.hoisted(() => vi.fn());
+vi.mock("@/components/layout/ConsultBanner", () => ({
+  ConsultBanner: (props: unknown) => {
+    consultBannerProps(props);
+    return <section data-testid="consult-banner" />;
+  },
+}));
+vi.mock("next-intl/server", async () => {
+  const { createTranslator } = await import("next-intl");
+  const { default: vi } = await import("@/i18n/messages/vi.json");
+  const { default: en } = await import("@/i18n/messages/en.json");
+  const messages = { vi, en };
+  return {
+    setRequestLocale: () => undefined,
+    getTranslations: async ({ locale, namespace }: { locale: "vi" | "en"; namespace: string }) =>
+      createTranslator({ locale, messages: messages[locale], namespace: namespace as never }),
+  };
+});
 
 import PostDetailPage, { generateMetadata } from "./page";
 
@@ -73,7 +91,7 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     expect(screen.queryByRole("heading", { name: "Thông tin ưu đãi" })).toBeNull();
   });
 
-  it("khung chi tiết chung: nền data-detail-page, thanh mục con, thẻ liên hệ (aside) có form lead; KHÔNG còn rail chia sẻ", async () => {
+  it("khung chi tiết mới: ảnh lớn 1 ảnh (không bộ đếm), khối tiêu đề chứa h1 + chia sẻ, thanh mục con, thẻ liên hệ (aside) có form lead", async () => {
     findPublicPostBySlug.mockResolvedValue(post());
     const { container } = await renderPost();
     expect(container.querySelector("[data-detail-page]")).not.toBeNull();
@@ -83,11 +101,23 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     const aside = screen.getByRole("complementary");
     expect(within(aside).getByRole("heading", { level: 2, name: "Nhận tư vấn" })).toBeInTheDocument();
     expect(within(aside).getByRole("link", { name: "Gọi hotline 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    // Chia sẻ một cụm trong Tổng quan (sau ngày đăng), trước form lead.
+    // Ảnh bìa là ảnh lớn kiểu hero, 1 ảnh: không bộ đếm / carousel; breadcrumb kính nằm trên ảnh.
+    const hero = container.querySelector("[data-detail-gallery]") as HTMLElement;
+    expect(hero).not.toBeNull();
+    expect(hero).not.toHaveAttribute("aria-roledescription");
+    expect(hero.textContent).not.toMatch(/01 \/ 01/);
+    expect(hero).toContainElement(screen.getByRole("navigation", { name: "Đường dẫn trang (Breadcrumb)" }));
+    // h1 + chia sẻ trong khối tiêu đề (dưới ảnh); Tổng quan là thẻ riêng có ngày đăng và danh mục.
+    const h1 = screen.getByRole("heading", { level: 1 });
+    const titleCard = h1.closest("div[class*='rounded-[28px]']") as HTMLElement;
+    expect(titleCard).not.toBeNull();
+    expect(titleCard).toHaveTextContent("Voucher");
+    expect(within(titleCard).getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
     const overview = container.querySelector("#overview") as HTMLElement;
-    expect(overview).toContainElement(screen.getByRole("heading", { level: 1 }));
+    expect(overview).not.toContainElement(h1);
+    expect(overview).toHaveTextContent("Giảm giá sâu cho khách mua sớm");
     expect(overview.querySelector("time")).not.toBeNull();
-    expect(overview).toContainElement(screen.getByRole("button", { name: "Chia sẻ" }));
+    expect(container.querySelector("[data-section-style='cards']")).toContainElement(overview);
     expect(container.querySelector("article > footer")).toBeNull();
   });
 
@@ -144,6 +174,23 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     await renderPost();
     expect(screen.getByRole("heading", { level: 2, name: "Tin liên quan" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Tin khác" })).toBeInTheDocument();
+  });
+
+  it("banner tư vấn cuối trang: nút chính cuộn tới #lead-form, nút phụ gọi hotline; sau Tin liên quan", async () => {
+    findPublicPostBySlug.mockResolvedValue(post());
+    findRelatedPosts.mockResolvedValue([post({ id: "p2", title: "Tin khác", slug: "tin-khac" })]);
+    await renderPost();
+    expect(consultBannerProps).toHaveBeenCalledWith(expect.objectContaining({ locale: "vi", actionHref: "#lead-form", secondary: { label: "Gọi hotline 0901 234 567", href: "tel:0901234567" } }));
+    const related = screen.getByRole("heading", { level: 2, name: "Tin liên quan" });
+    expect(related.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("ưu đãi: badge trạng thái, giá và khu vực hiện ở khối tiêu đề", async () => {
+    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-20T12:00:00.000Z" }, priceVnd: 5_500_000 }));
+    await renderPost();
+    const titleCard = screen.getByRole("heading", { level: 1 }).closest("div[class*='rounded-[28px]']") as HTMLElement;
+    expect(titleCard).toHaveTextContent("5.500.000 ₫");
+    expect(titleCard).toHaveTextContent(/Còn \d+ ngày/);
   });
 
   it("không có bài (không tồn tại / chưa công khai / thiếu bản EN) → notFound", async () => {

@@ -6,10 +6,9 @@ import { CaretLeft, CaretRight, List } from "@/components/icons";
 import { Lightbox } from "@/components/media/Lightbox";
 import { ResponsiveImage, type MediaImage } from "@/components/media/ResponsiveImage";
 import { cn } from "@/lib/utils";
+import { GalleryCounter, GalleryThumbs } from "./DetailGalleryParts";
 
 const SWIPE_MIN_PX = 50;
-/** Số ảnh nhỏ tối đa ở đáy phải (≥ lg). */
-const MAX_THUMBS = 4;
 /** Điều khiển carousel: chỉ phím mũi tên từ các phần tử này mới đổi ảnh (không cướp phím của link trong breadcrumb). */
 const CONTROL_SELECTOR = "[data-carousel-control]";
 
@@ -18,15 +17,6 @@ const ROUND_BUTTON =
 /** Nút chữ viền mảnh trên ảnh ("Xem tất cả ảnh", slot Video của T05); `actions` truyền vào dùng đúng class này. */
 export const GALLERY_ACTION_CLASS =
   "inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-on-dark/50 bg-dark-deep/30 px-4 text-xsmall font-semibold text-on-dark backdrop-blur-sm transition-colors duration-(--duration-fast) hover:bg-dark-deep/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring md:px-5 md:text-small";
-
-const twoDigits = (value: number) => String(value).padStart(2, "0");
-
-/** Cửa sổ ≤ 4 ảnh nhỏ bao quanh ảnh đang xem (ảnh đang xem không bị trượt ra ngoài). */
-function thumbWindow(index: number, total: number): number[] {
-  const size = Math.min(MAX_THUMBS, total);
-  const start = Math.min(Math.max(index - 1, 0), total - size);
-  return Array.from({ length: size }, (_, offset) => start + offset);
-}
 
 interface DetailGalleryHeroProps {
   images: MediaImage[];
@@ -75,7 +65,7 @@ export function DetailGalleryHero({ images, breadcrumb, actions }: DetailGallery
 
   return (
     <section
-      aria-roledescription="carousel"
+      {...(multiple ? { "aria-roledescription": "carousel" } : {})}
       aria-label={t("region")}
       data-detail-gallery=""
       className="theme-dark-block relative isolate h-[480px] overflow-hidden bg-dark-deep text-on-dark md:h-[min(78vh,640px)]"
@@ -111,47 +101,9 @@ export function DetailGalleryHero({ images, breadcrumb, actions }: DetailGallery
       {/* Chừa đáy cho khối tiêu đề đè lên (48px ≥ md, 32px < md) + khe. */}
       <div className="absolute inset-x-0 bottom-14 z-10 md:bottom-[76px]">
         <div className="mx-auto flex w-full max-w-container flex-wrap items-center justify-between gap-x-6 gap-y-3 px-gutter md:flex-nowrap md:items-end">
-          {multiple ? (
-            // Bộ đếm chỉ để nhìn: nhóm slide đã có `aria-label` "Ảnh i / n".
-            <div aria-hidden="true" className="flex items-center gap-3.5 text-small font-semibold tabular-nums">
-              <span>
-                {twoDigits(index + 1)} <span className="font-normal text-on-dark-muted">/ {twoDigits(total)}</span>
-              </span>
-              <span className="relative h-0.5 w-24 bg-on-dark/35 md:w-[120px]">
-                <span className="absolute inset-y-0 left-0 bg-primary transition-[width] duration-(--duration-base) motion-reduce:transition-none" style={{ width: `${((index + 1) / total) * 100}%` }} />
-              </span>
-            </div>
-          ) : (
-            <span />
-          )}
+          {multiple ? <GalleryCounter index={index} total={total} /> : <span />}
           <div className="flex items-center gap-3">
-            {multiple && (
-              <ul aria-label={t("thumbs")} className="hidden gap-2 lg:flex">
-                {thumbWindow(index, total).map((position) => {
-                  const image = images[position];
-                  if (!image) return null;
-                  return (
-                    <li key={position}>
-                      <button
-                        type="button"
-                        data-carousel-control=""
-                        aria-label={t("thumb", { index: position + 1 })}
-                        aria-current={position === index ? "true" : undefined}
-                        onClick={() => setIndex(position)}
-                        className={cn(
-                          "block h-[52px] w-[72px] cursor-pointer overflow-hidden rounded-[8px] border-2 opacity-70 transition-opacity duration-(--duration-fast) hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
-                          position === index ? "border-primary opacity-100" : "border-transparent",
-                        )}
-                      >
-                        <span className="relative block size-full">
-                          <ResponsiveImage media={image} sizes="72px" decorative className="absolute inset-0" />
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+            {multiple && <GalleryThumbs images={images} index={index} onSelect={setIndex} />}
             {actions}
             {total > 0 && (
               <button ref={viewAllRef} type="button" onClick={() => setLightboxOpen(true)} className={GALLERY_ACTION_CLASS}>

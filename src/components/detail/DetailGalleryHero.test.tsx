@@ -72,6 +72,8 @@ describe("DetailGalleryHero", () => {
 
   it("1 ảnh: không mũi tên, không bộ đếm, không ảnh nhỏ nhưng vẫn có Xem tất cả ảnh", () => {
     renderWithIntl(<DetailGalleryHero images={images(1)} />);
+    // 1 ảnh không phải carousel: không gắn aria-roledescription (người đọc màn hình không nghe "carousel" vô nghĩa).
+    expect(screen.getByRole("region", { name: "Thư viện ảnh" })).not.toHaveAttribute("aria-roledescription");
     expect(screen.queryByRole("button", { name: "Ảnh sau" })).toBeNull();
     expect(screen.queryByRole("list", { name: "Ảnh thu nhỏ" })).toBeNull();
     expect(screen.getByRole("region", { name: "Thư viện ảnh" }).textContent).not.toMatch(/\d\d \/ \d\d/);

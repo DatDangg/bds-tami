@@ -14,6 +14,9 @@ import type { Locale } from "@/i18n/routing";
 /** Id tiêu đề form trong thẻ liên hệ: nhãn cho `<aside>` của `DetailLayout`. */
 export const RENTAL_CONTACT_HEADING_ID = "rental-consult-heading";
 
+/** Khối người phụ trách / hotline kiểu mockup `.agent`: nền `primary-subtle` bo 16px, avatar bên trái. */
+const AGENT_CLASS = "flex items-center gap-3 rounded-lg bg-primary-subtle p-3.5";
+
 interface SaleContactBoxProps {
   view: Pick<RentalDetailView, "rented" | "priceMonthlyVnd">;
   /** Id tin cho thuê: nguồn của lead (tin đã thuê vẫn là nguồn). */
@@ -24,8 +27,8 @@ interface SaleContactBoxProps {
 }
 
 /**
- * Thẻ liên hệ của S07: thẻ trắng viền + bóng như thẻ Tư vấn của chi tiết dự án (`DETAIL_ASIDE_CARD_CLASS`, dính ≥ lg theo `--sticky-top`; nền vàng nhạt sẽ chìm vào nền trang): giá + "/tháng" (tin đã thuê: chữ mờ + "Giá tham khảo") → người phụ trách
- * (avatar, tên, nút gọi) hoặc hotline chung → vùng form lead (`LeadFormSlot` + `LeadForm source=rental`; tin đã thuê đổi tiêu đề
+ * Thẻ liên hệ của S07 (mockup `.aside`): thẻ trắng viền + bóng như thẻ Tư vấn của chi tiết dự án (`DETAIL_ASIDE_CARD_CLASS`, dính ≥ lg theo `--sticky-top`; nền vàng nhạt sẽ chìm vào nền trang): giá + "/tháng" (tin đã thuê: chữ mờ + "Giá tham khảo") → người phụ trách
+ * (khối `.agent` nền vàng nhạt: avatar, tên, nút gọi) hoặc hotline chung → vùng form lead (`LeadFormSlot` + `LeadForm source=rental`; tin đã thuê đổi tiêu đề
  * thành "Nhận tư vấn căn tương tự", nguồn vẫn là tin đó). Server Component, không đọc DB.
  */
 export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBoxProps) {
@@ -50,8 +53,8 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
       </div>
       <div className="flex flex-col gap-3">
         {sale ? (
-          <div className="flex items-center gap-3">
-            <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-surface-muted">
+          <div className={AGENT_CLASS}>
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-primary-soft">
               {sale.avatar && <ResponsiveImage media={sale.avatar} alt={t("contact.avatarAlt", { name: sale.name })} sizes="48px" />}
             </div>
             <div className="min-w-0">
@@ -60,7 +63,7 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
             </div>
           </div>
         ) : (
-          <p className="font-semibold">{t("contact.hotlineTitle")}</p>
+          <p className={cn(AGENT_CLASS, "font-semibold")}>{t("contact.hotlineTitle")}</p>
         )}
         {contact && (
           <Button asChild size="lg" variant="dark" className="w-full normal-case">

@@ -4,11 +4,16 @@ import { cn } from "@/lib/utils";
 
 type SectionTone = "default" | "dark";
 
+/**
+ * Khung khối trong cột chính (không còn nền full-bleed): ngăn bằng đường kẻ trên, khối đầu không kẻ.
+ * Trong `DetailLayout sectionStyle="cards"` (gốc `group/detail` + `data-section-style`): thẻ trắng bo 20px, bỏ đường kẻ trên.
+ * Xuất ra để khối tự dựng khung (accordion "Điều khoản" tin đã thuê) cùng kiểu với `DetailSection`.
+ */
+export const DETAIL_SECTION_FRAME_CLASS =
+  "border-t border-border py-section-tight first:border-t-0 group-data-[section-style=cards]/detail:rounded-[20px] group-data-[section-style=cards]/detail:border-t-0 group-data-[section-style=cards]/detail:bg-surface group-data-[section-style=cards]/detail:p-5 group-data-[section-style=cards]/detail:md:p-8";
+
 const TONE_CLASS: Record<SectionTone, string> = {
-  // Khối trong cột chính (không còn nền full-bleed): ngăn bằng đường kẻ trên, khối đầu không kẻ.
-  // Trong `DetailLayout sectionStyle="cards"` (gốc `group/detail` + `data-section-style`): thẻ trắng bo 20px, bỏ đường kẻ trên.
-  default:
-    "border-t border-border py-section-tight first:border-t-0 group-data-[section-style=cards]/detail:rounded-[20px] group-data-[section-style=cards]/detail:border-t-0 group-data-[section-style=cards]/detail:bg-surface group-data-[section-style=cards]/detail:p-5 group-data-[section-style=cards]/detail:md:p-8",
+  default: DETAIL_SECTION_FRAME_CLASS,
   // Section nội dung tối duy nhất của trang (design-spec S03 khối 9): thẻ tối bo 20px trong cột chính.
   dark: "theme-dark-block my-section-tight rounded-[20px] p-6 xl:p-10",
 };

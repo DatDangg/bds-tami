@@ -25,7 +25,25 @@ vi.mock("@/components/media/LazyMap", () => ({
     return <div data-testid="lazy-map" />;
   },
 }));
-vi.mock("next-intl/server", () => ({ setRequestLocale: () => undefined }));
+// ConsultBanner là Server Component async (đọc homepage CMS): jsdom không dựng được; chỉ kiểm tra trang truyền đúng props.
+const consultBannerProps = vi.hoisted(() => vi.fn());
+vi.mock("@/components/layout/ConsultBanner", () => ({
+  ConsultBanner: (props: unknown) => {
+    consultBannerProps(props);
+    return <section data-testid="consult-banner" />;
+  },
+}));
+vi.mock("next-intl/server", async () => {
+  const { createTranslator } = await import("next-intl");
+  const { default: vi } = await import("@/i18n/messages/vi.json");
+  const { default: en } = await import("@/i18n/messages/en.json");
+  const messages = { vi, en };
+  return {
+    setRequestLocale: () => undefined,
+    getTranslations: async ({ locale, namespace }: { locale: "vi" | "en"; namespace: string }) =>
+      createTranslator({ locale, messages: messages[locale], namespace: namespace as never }),
+  };
+});
 
 import RentalDetailPage, { generateMetadata } from "./page";
 
@@ -91,10 +109,11 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Căn hộ 2PN Quận 1" })).toBeInTheDocument();
     expect(container.textContent).toContain("CT-000001");
     expect(container.textContent).toContain("Phường Sài Gòn, TP.HCM");
-    const specs = within(screen.getByRole("heading", { level: 2, name: "Thông số chính" }).closest("section") as HTMLElement);
-    expect(specs.getByText("12 triệu")).toBeInTheDocument();
-    expect(specs.getByText("55 m²")).toBeInTheDocument();
-    const details = within(screen.getByRole("heading", { level: 2, name: "Chi tiết" }).closest("section") as HTMLElement);
+    const titleCard = screen.getByRole("heading", { level: 1 }).closest("div[class*='rounded-[28px]']") as HTMLElement;
+    expect(titleCard).toHaveTextContent("12 triệu/tháng");
+    const facts = within(screen.getByRole("list", { name: "Thông số chính" }));
+    expect(facts.getByText("55 m²")).toBeInTheDocument();
+    const details = within(screen.getByRole("heading", { level: 2, name: "Thông tin chi tiết" }).closest("section") as HTMLElement);
     expect(details.getByText("Tầng 12")).toBeInTheDocument();
     expect(details.getByText("Đông Nam")).toBeInTheDocument();
     expect(details.getByText("Đầy đủ")).toBeInTheDocument();
@@ -104,6 +123,7 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     expect(terms.getByText("Internet")).toBeInTheDocument();
     expect(screen.getByText("Căn hộ thoáng, đầy đủ nội thất.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Phát video/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Video" })).toBeInTheDocument();
     expect(screen.getByText("Sổ hồng riêng")).toBeInTheDocument();
     expect(screen.getByText("Nguyễn Văn Sale")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gọi 0901 111 222" })).toHaveAttribute("href", "tel:0901111222");
@@ -127,12 +147,12 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     expect(screen.getByRole("link", { name: "Gọi hotline 0901 234 567" })).toBeInTheDocument();
   });
 
-  it("tin tương tự: gọi truy vấn với tin hiện tại, hiện thẻ link h3 trong khối 'Tin tương tự' sau nội dung", async () => {
+  it("tin tương tự: gọi truy vấn với tin hiện tại, hiện thẻ link h3 trong khối 'Căn tương tự' sau nội dung", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental());
     findSimilarRentals.mockResolvedValue([rental({ id: "r2", title: "Căn hộ 1PN", slug: "can-ho-1pn", code: "CT-000002", priceMonthlyVnd: 8_500_000 })]);
     const { container } = await renderRental();
     expect(findSimilarRentals).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ id: "r1" }));
-    const section = screen.getByRole("heading", { level: 2, name: "Tin tương tự" }).closest("section") as HTMLElement;
+    const section = screen.getByRole("heading", { level: 2, name: "Căn tương tự" }).closest("section") as HTMLElement;
     expect(within(section).getByRole("heading", { level: 3, name: "Căn hộ 1PN" })).toBeInTheDocument();
     expect(within(section).getByRole("link")).toHaveAttribute("href", "/cho-thue/can-ho-1pn");
     expect(section.textContent).toContain("8,5 triệu/tháng");
@@ -163,10 +183,20 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
   it("/en: nhãn tiếng Anh, breadcrumb về /en/for-rent, JSON-LD inLanguage en", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental({ title: "Two bedroom", slug: "two-bedroom", hasEnglish: true }));
     const { container } = await renderRental("en", "two-bedroom");
-    expect(screen.getByRole("heading", { level: 2, name: "Key facts" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Key facts" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "For rent" })).toHaveAttribute("href", "/en/for-rent");
     expect(jsonLdItems(container).find((item) => item["@type"] === "RealEstateListing")).toMatchObject({ inLanguage: "en", url: "https://tami.example/en/for-rent/two-bedroom" });
     expect(container.textContent).not.toMatch(/Thông số|Điều khoản|Gọi/);
+  });
+});
+
+describe("khung chi tiết mới: chia sẻ + banner tư vấn", () => {
+  it("nút chia sẻ trong khối tiêu đề; banner tư vấn nhận nút chính cuộn tới #lead-form và nút phụ gọi hotline", async () => {
+    findPublicRentalBySlug.mockResolvedValue(rental());
+    await renderRental();
+    expect(screen.getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
+    expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
+    expect(consultBannerProps).toHaveBeenCalledWith(expect.objectContaining({ locale: "vi", actionHref: "#lead-form", secondary: { label: "Gọi hotline 0901 234 567", href: "tel:0901234567" } }));
   });
 });
 
@@ -201,13 +231,14 @@ describe("tin đã thuê (BR-01)", () => {
     expect(container.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(0);
   });
 
-  it("tin tương tự nổi bật: ngay sau thư viện ảnh, TRƯỚC h1 và nội dung, tiêu đề 'Căn tương tự đang trống'", async () => {
+  it("tin tương tự nổi bật: ngay sau khối tiêu đề (h1), TRƯỚC nội dung, tiêu đề 'Căn tương tự đang trống'", async () => {
     findPublicRentalBySlug.mockResolvedValue(rented());
     findSimilarRentals.mockResolvedValue([rental({ id: "r2", title: "Căn hộ 1PN", slug: "can-ho-1pn" })]);
     const { container } = await renderRental();
     const section = screen.getByRole("heading", { level: 2, name: "Căn tương tự đang trống" }).closest("section") as HTMLElement;
     const h1 = container.querySelector("h1") as HTMLElement;
-    expect(section.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(h1.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(section.compareDocumentPosition(container.querySelector("#details") as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(findSimilarRentals).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ status: "rented" }));
   });
 });

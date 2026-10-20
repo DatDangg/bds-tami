@@ -1,12 +1,15 @@
 import { useTranslations } from "next-intl";
-import { DetailSection } from "@/components/detail/DetailSection";
+import { DETAIL_SECTION_FRAME_CLASS, DetailSection } from "@/components/detail/DetailSection";
 import { CaretDown } from "@/components/icons";
 import type { RentalTermsView } from "@/lib/rentals/rental-view";
+import { cn } from "@/lib/utils";
 
 interface RentalTermsProps {
   /** `id` khối: đích của mục "Điều khoản" trên thanh mục con. */
   id: string;
   terms: RentalTermsView;
+  /** Dòng nhỏ vàng trên tiêu đề (kiểu thẻ của khung chi tiết mới). */
+  eyebrow?: string;
   /** Tin đã thuê: điều khoản thu gọn thành accordion đóng (design-spec S07) — khách chỉ tham khảo. */
   collapsed?: boolean;
 }
@@ -15,7 +18,7 @@ interface RentalTermsProps {
  * Khối "Điều khoản thuê" `<dl>`: thời hạn tối thiểu, đặt cọc, kỳ thanh toán, ngày trống, dịch vụ bao gồm (chip trung tính). Dùng khung `DetailSection` chung;
  * tin đã thuê thu gọn thành accordion `<details>` (tiêu đề nằm ở summary). Server Component.
  */
-export function RentalTerms({ id, terms, collapsed = false }: RentalTermsProps) {
+export function RentalTerms({ id, terms, eyebrow, collapsed = false }: RentalTermsProps) {
   const t = useTranslations("page.rentalDetail");
   const items = [
     ...(terms.minLeaseMonths !== null ? [{ label: t("terms.minLease"), value: t("terms.months", { count: terms.minLeaseMonths }) }] : []),
@@ -49,9 +52,10 @@ export function RentalTerms({ id, terms, collapsed = false }: RentalTermsProps) 
   );
 
   if (collapsed) {
-    // Không dùng DetailSection (sẽ thêm h2 thứ hai): tiêu đề là summary. Lớp khung/scroll-mt giữ giống DetailSection để neo và đường kẻ đồng nhất.
+    // Không dùng DetailSection (sẽ thêm h2 thứ hai): tiêu đề là summary. Khung/scroll-mt dùng chung với DetailSection để thẻ và neo đồng nhất.
     return (
-      <div id={id} tabIndex={-1} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] border-t border-border py-section-tight first:border-t-0 focus:outline-none">
+      <div id={id} tabIndex={-1} className={cn("scroll-mt-[calc(var(--sticky-top)+4.5rem)] focus:outline-none", DETAIL_SECTION_FRAME_CLASS)}>
+        {eyebrow && <p className="mb-1.5 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{eyebrow}</p>}
         <details className="group border-b border-border">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 font-display text-h3 [&::-webkit-details-marker]:hidden">
             {t("terms.title")}
@@ -63,7 +67,7 @@ export function RentalTerms({ id, terms, collapsed = false }: RentalTermsProps) 
     );
   }
   return (
-    <DetailSection id={id} title={t("terms.title")}>
+    <DetailSection id={id} title={t("terms.title")} {...(eyebrow ? { eyebrow } : {})}>
       {body}
     </DetailSection>
   );
