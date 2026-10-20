@@ -4,7 +4,7 @@
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` view `detail-rent`.
 - Phụ thuộc: **T04** (DetailGalleryHero, DetailTitleCard, `sectionStyle="cards"`), T02 (`RentalCard`, `CardSlider`), T01.
 - Song song: chạy ở **wave C** (sau T04). Có thể song song với T03/T06/T07 nếu chúng còn chạy.
-- Trạng thái: `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `0f7a025` (close-out BL-045 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01. Giữ: SaleContactBox (giá, sale/hotline, LeadForm `source=rental`), tin đã thuê (băng "Đã thuê", badge, "Căn tương tự đang trống", `noindex`), video (`VideoFacade`), bản đồ gần đúng, pháp lý, thanh dính đáy < lg, header ẩn khi cuộn, BL-031.
@@ -55,4 +55,4 @@ Như T01.
 - Verify commands + result: `pnpm typecheck` PASS · `pnpm lint` 0 lỗi (2 warning cũ ở tools/task-dashboard) · `pnpm vitest run src` 251 file / 2463 test PASS. Không chạy integration (không đổi query/schema).
 - Lệch so với mockup + lý do: không có ô "Ngày muốn xem" (Q6, không đổi schema lead); tiêu đề aside giữ "Nhận tư vấn" (giữ form hiện tại).
 - Ảnh: `.context/review-reports/assets/site-redesign-t05-*.jpg`.
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-05-round-1-review.md`; commit `0f7a025` trên `staging`.

@@ -3,7 +3,7 @@
 - Change doc: `spec/changes/2026-10-21-site-redesign-homepage-style.md` (BL-045). Spec delta: khối BL-045 mục "Thẻ dùng chung" + F1 thẻ Dự án nổi bật ("không có icon tim").
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` (`data-cards="project|rent|news"`, script dựng thẻ, CSS `.card`, `.slider`), DECISIONS #2, #6.
 - Phụ thuộc: không. **Song song được với T01** (và T00) — không trùng file.
-- Trạng thái: `built-awaiting-review` (builder xong 2026-10-21; chưa commit) — trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 2, commit `8f586a5` (close-out BL-045 2026-10-21); trước đó `built-awaiting-review` (builder xong 2026-10-21; chưa commit) — trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01: bố cục đúng mockup, giữ token/element; không hex mới; lệch → ghi lý do.
@@ -57,4 +57,4 @@ Như T01 (error-analyzer → so pattern `ProjectsSlider` BL-044/BL-038 → attem
 - Verify commands + result: `pnpm vitest run src` 235 files / 2325 tests PASS; `pnpm typecheck` PASS; `pnpm lint` 0 error (2 warning cũ ở tools/task-dashboard/server.mjs).
 - (Round 1, đã thay) Ảnh chụp: `.context/review-reports/assets/site-redesign-t02-{home-projects-1440,home-projects-390,projects-list-1440,rentals-1440,news-1440}.jpg` (định dạng jpg do công cụ chụp).
 - Lệch so với mockup + lý do: mockup tin có badge danh mục trên ảnh; giữ eyebrow danh mục dưới ảnh theo spec task. Mockup giá thẻ 15px; dùng `text-body` token.
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 2) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-02-round-2-review.md`; commit `8f586a5` trên `staging`.

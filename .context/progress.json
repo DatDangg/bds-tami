@@ -1322,6 +1322,194 @@
       },
       "completedAt": "2026-10-20",
       "residual": "staging/prod blockOrder admin tự chỉnh (task T03 hướng dẫn); chờ user: hero 100svh, vị trí bộ đếm, hoa văn sóng footer/hoạ tiết nền Về TAMI, khoảng nền kem→eyebrow ~23px vs ~44px; 768/1280 chưa xem trình duyệt; integration test chập chờn chạy cả bộ"
+    },
+    {
+      "slug": "site-redesign-homepage-style",
+      "title": "Các trang còn lại làm lại theo phong cách trang chủ mới (mockup docs/specs/site-redesign-mockup + DECISIONS #1-#6): hero ảnh admin chữ trái, thẻ lọc nổi, thẻ kiểu Dự án nổi bật, chi tiết ảnh lớn + khối tiêu đề, breadcrumb khung mờ, bỏ tim mọi màn (BL-045)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-045",
+      "changeDoc": "spec/changes/archive/2026-10-21-site-redesign-homepage-style.md",
+      "startedAt": "2026-10-21",
+      "note": "done 2026-10-21 — T00–T09 commit trên staging, phase review r2 COMPLETE (.context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1-round-2.md), pnpm build PASS sau T09; spec 1.35.0 / scope v45 published; seed dev: pnpm seed:page-heroes + seed:galleries (ảnh bdstanlong, gitignore)",
+      "specValidation": [
+        ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-pre-plan.md",
+        ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-pre-plan-round-2.md",
+        ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1.md",
+        ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1-round-2.md"
+      ],
+      "tasks": [
+        {
+          "task": "phase-1-task-00",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-00.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "lọc /du-an q+developer+sort; wave A",
+          "dependsOn": [],
+          "wave": "A",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-00-round-1-review.md",
+          "commit": "389a816"
+        },
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "nền tảng A schema+hero+breadcrumb+khung danh sách; wave A",
+          "dependsOn": [],
+          "wave": "A",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-01-round-1-review.md",
+          "commit": "72623dc"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 2,
+          "note": "nền tảng B thẻ + bỏ tim; wave A",
+          "dependsOn": [],
+          "wave": "A",
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-02-round-2-review.md",
+          "commit": "8f586a5"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-03.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "danh sách Dự án/Cho thuê; wave B, deps T01 T02 T00",
+          "dependsOn": [
+            "phase-1-task-00",
+            "phase-1-task-01",
+            "phase-1-task-02"
+          ],
+          "wave": "B",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-03-round-1-review.md",
+          "commit": "a3d51de"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-04.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "khung chi tiết + Dự án; wave B, deps T01 T02",
+          "dependsOn": [
+            "phase-1-task-01",
+            "phase-1-task-02"
+          ],
+          "wave": "B",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-04-round-1-review.md",
+          "commit": "6953d10"
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-05.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "chi tiết Cho thuê + chi tiết Tin BĐS; wave C, deps T04",
+          "dependsOn": [
+            "phase-1-task-04"
+          ],
+          "wave": "C",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-05-round-1-review.md",
+          "commit": "0f7a025"
+        },
+        {
+          "task": "phase-1-task-06",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-06.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "Tin tức + Bài viết + danh sách Tin BĐS; wave B, deps T01 T02",
+          "dependsOn": [
+            "phase-1-task-01",
+            "phase-1-task-02"
+          ],
+          "wave": "B",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-06-round-1-review.md",
+          "commit": "adfff04"
+        },
+        {
+          "task": "phase-1-task-07",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-07.md",
+          "status": "done",
+          "attempt": 2,
+          "note": "Tuyển dụng/Liên hệ/Pháp lý/Dịch vụ; wave B, deps T01",
+          "dependsOn": [
+            "phase-1-task-01"
+          ],
+          "wave": "B",
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-07-round-2-review.md",
+          "commit": "b77840d"
+        },
+        {
+          "task": "phase-1-task-08",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-08.md",
+          "status": "done",
+          "attempt": 2,
+          "note": "close-out so khớp + doc reconcile; wave D, deps all",
+          "dependsOn": [
+            "phase-1-task-00",
+            "phase-1-task-01",
+            "phase-1-task-02",
+            "phase-1-task-03",
+            "phase-1-task-04",
+            "phase-1-task-05",
+            "phase-1-task-06",
+            "phase-1-task-07"
+          ],
+          "wave": "D",
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-08-round-2-review.md",
+          "commit": "6a747fe"
+        },
+        {
+          "task": "phase-1-task-09",
+          "file": "tasks/feature-site-redesign-homepage-style/phase-1-task-09.md",
+          "status": "done",
+          "attempt": 1,
+          "note": "fix GAP-1/2 phase review (featured danh mục tin, lưới 4 cột)",
+          "dependsOn": [
+            "phase-1-task-06",
+            "phase-1-task-08"
+          ],
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-09-round-1-review.md",
+          "commit": "2c63564"
+        }
+      ],
+      "specVersion": "1.35.0",
+      "scopeVersion": 45,
+      "approvals": [
+        {
+          "gate": "plan",
+          "at": "2026-10-21",
+          "ok": "user duyệt plan + Q1–Q9 theo đề xuất"
+        }
+      ],
+      "specUpdate": "spec/updates/2026-10-21-site-redesign-homepage-style.md",
+      "scopeStatus": "published",
+      "completedAt": "2026-10-21",
+      "review": "STRICT PASS",
+      "report": ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1-round-2.md"
     }
   ],
   "bugs": [
@@ -2238,7 +2426,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20",
+  "lastUpdated": "2026-10-20T18:30:01.818Z",
   "approvalMilestones": [
     {
       "id": "M1",

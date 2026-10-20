@@ -3,7 +3,7 @@
 - Change doc: `spec/changes/2026-10-21-site-redesign-homepage-style.md` (BL-045) — toàn bộ Acceptance.
 - Mockup: `docs/specs/site-redesign-mockup/index.html` (9 view) + DECISIONS #1–#6.
 - Phụ thuộc: **T01–T07** (+ T00 nếu có). Chạy **cuối**, tuần tự.
-- Trạng thái: `pending`.
+- Trạng thái: `done` — STRICT PASS round 2, commit `6a747fe` (close-out BL-045 2026-10-21); trước đó `pending`.
 
 ## Classification / Risk
 - Type: **MODIFY** (doc reconcile, seed dev, sửa lệch nhỏ phát hiện khi so khớp).
@@ -43,4 +43,4 @@ Như T01.
 - Lệch so với mockup + lý do: hero dùng min-h thay chiều cao cố định (đã ghi doc); /tin-bds bỏ "Có N kết quả"; Bài viết có thêm mắt xích tiêu đề trong breadcrumb (giữ BreadcrumbList); "Dự án tương tự" là lưới 3 thẻ khi chỉ có 3 dự án cùng tỉnh/loại (mockup là slider 4 thẻ); bản đồ/mặt bằng/tiện ích dự án dev trống nên khối ngắn hơn mockup; Liên hệ dev chưa có địa chỉ/hotline/email trong site-settings (dữ liệu, không phải bố cục); news dev có nhiều thẻ hơn mockup nên trang dài hơn. Không có lệch lớn.
 - Doc reconcile: .context/design-spec.md (§1.6, §2.6, §2.7, S01 tim, khối As-built BL-045 đầu §4), docs/DESIGN.md, docs/ERD.md, docs/API_SPEC.md §3.9, skills/react-nodejs/design-tokens.md.
 - Round 2 (sau reviewer round 1 FAIL): MAJOR-1 seed-page-heroes/seed-galleries dùng `checkSeedEnvironment` (từ chối NODE_ENV=production hoặc DATABASE_URL trùng staging/prod; đã chạy lại 2 seed trên DB dev, guard cho phép), chỉ xuất bản `pages` kind privacy/terms và 3 dịch vụ mẫu theo slug, comment đã sửa. MINOR-1 fetch-scraped-extra.mjs: timeout 20s, cap 8MB (content-length + đếm stream), try/catch decodeURI, `redirect: manual`, chỉ host bdstanlong.vn. MINOR-3 chi tiết cho thuê: Thông tin chi tiết + Điều khoản nhãn trái/giá trị phải (1 cột < md, 2 cột ≥ md), Tiện ích 2 cột ở 390; "Hướng" đã có trong dải thông số khi có dữ liệu (căn dev không có houseDirection); ảnh detail-rent 1440/390 chụp lại. MINOR-4 docs/DESIGN.md các hàng danh sách/chi tiết/tin tức/tuyển dụng/liên hệ/List Search Bar thêm "As-built BL-045". MINOR-5 hoàn nguyên 2 dòng chỉ-khoảng-trắng của docs/API_SPEC.md. MINOR-6 thêm 2 test ConsultBanner (có tiêu đề không mô tả; tiêu đề trống có mô tả). MINOR-2/7 giữ nguyên. Verify: typecheck PASS, lint 0 error, vitest run src 2496 PASS, integration projects PASS.
-- Reviewer verdict: (chờ round 2)
+- Reviewer verdict: **STRICT PASS** (round 2) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-08-round-2-review.md`; commit `6a747fe` trên `staging`.

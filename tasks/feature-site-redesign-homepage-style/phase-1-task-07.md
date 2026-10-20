@@ -4,7 +4,7 @@
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` view `careers` (`.strengths`, `.jobs`, `.job`), `contact` (`.contact`, `.cinfo`, `.form`, `.map`), `legal` (`.legal`, `.toc`, `.block`).
 - Phụ thuộc: **T01** (PageHero short, breadcrumb overlay, SectionHeading, ConsultBanner, chữ hero careers/contact, ảnh contact/legal, `careersPerks` + `loadCareersPerks`). Không cần T02.
 - Song song: **được** với T03, T04, T06 (wave B). Trùng `vi/en.json` (namespace `page.careers.*`, `page.contact.*`, `page.legal.*`, `page.services.*`).
-- Trạng thái: `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 2, commit `b77840d` (close-out BL-045 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01. Không đầu khối canh giữa ở Tuyển dụng.
@@ -46,7 +46,7 @@ Như T01.
   - Pháp lý: mục lục thẻ trắng dính từ lg (trước xl); KHÔNG có eyebrow "Mục n" trên từng h2 trong nội dung (RichText lexical, ngoài scope); không thêm banner tư vấn (spec không nêu). Key i18n legal.sectionLabel dư/không dùng.
   - Dịch vụ: ảnh = coverImage → pageBanners.default (mở rộng PageBannerKey thêm "default" trong page-banner.ts); thẻ tư vấn dính: hotline tel: + nút → /lien-he?service=<slug>; ConsultBanner nhận actionHref cùng đích. i18n services.ctaTitle/ctaDescription không còn dùng.
   - Không sửa PageHero/CategoryListTemplate. Phát hiện cần T03/PageHero xử lý: breadcrumb overlay 3 mục dài ở 390 xuống 2 dòng, đè eyebrow (chi tiết tuyển dụng tên dài).
-- Reviewer verdict: (chưa)
+- Reviewer verdict: **STRICT PASS** (round 2) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-07-round-2-review.md`; commit `b77840d` trên `staging`.
 
 ### Round 2 (review round 1 FAIL)
 - MAJOR-1: StrengthsBlock render ngoài khung container (chỉ SectionHeading trong khung) → hết lề kép; test cấu trúc khẳng định ul và khung tiêu đề cùng max-w-container px-gutter, không bọc kép. Chưa chụp ảnh với perks vì dev DB không có careersPerks (không ghi DB).

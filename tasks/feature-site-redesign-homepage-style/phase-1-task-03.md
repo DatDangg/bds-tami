@@ -4,7 +4,7 @@
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` view `list-project`, `list-rent` (`.phero`, `.fcard`, `.search`, `.frow`, `.toolbar`, `.grid`, `.pager`, `.strengths`, `.cta`).
 - Phụ thuộc: **T01** (PageHero, breadcrumb overlay, `CategoryListTemplate` slot `filterCard`, Pagination, ConsultBanner, chữ hero), **T02** (thẻ), **T00** (tham số `q` / `developer` / `sort` + danh sách chủ đầu tư).
 - Song song: **được** với T04, T06, T07 (wave B) — file riêng; chỉ trùng `src/i18n/messages/{vi,en}.json` (thêm key namespace `page.projects.*` / `page.rentals.*` của mình).
-- Trạng thái: `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `a3d51de` (close-out BL-045 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01. **Giữ nguyên hành vi lọc/query/phân trang/canonical/noindex hiện tại** (F2, F3) — chỉ đổi bố cục.
@@ -39,7 +39,7 @@ Như T01; attempt 2 so pattern `HeroSearch` (BL-044 T01 "Tùy chọn khác") + `
 - Acceptance criteria: PASS|FAIL|BLOCKED
 - Verify commands + result:
 - Lệch so với mockup + lý do:
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-03-round-1-review.md`; commit `a3d51de` trên `staging`.
 
 ## Builder note (T03)
 - Acceptance: PASS (tu kiem, 1440/390 xem truc tiep, khong h-scroll 390; chua luu anh vao assets vi pane an).

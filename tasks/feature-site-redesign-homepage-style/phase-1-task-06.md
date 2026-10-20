@@ -4,7 +4,7 @@
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` view `news` (`.phero.short`, chip, `.feat`, `.grid.news`) và `article` (`.crumb.plain`, `.artgrid`, `.art-hd`, `.art-img`, `.art-side`, `.mini`, `.shead.left`), DECISIONS #3.
 - Phụ thuộc: **T01** (PageHero short, breadcrumb overlay/plain, CategoryListTemplate, Pagination, SectionHeading, ConsultBanner), **T02** (NewsCard/PostCard).
 - Song song: **được** với T03, T04, T07 (wave B). Không đụng `src/components/detail/*` (bài viết rời `DetailLayout` bằng cách đổi page, không sửa DetailLayout). Trùng `vi/en.json` (namespace `page.news.*`, `page.newsDetail.*`, `page.posts.*`).
-- Trạng thái: `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `adfff04` (close-out BL-045 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01. **Không đầu khối canh giữa** ở Tin tức / Bài viết / "Bài viết liên quan".
@@ -39,7 +39,7 @@ Như T01.
 - Acceptance criteria: PASS|FAIL|BLOCKED
 - Verify commands + result:
 - Lệch so với mockup + lý do:
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-06-round-1-review.md`; commit `adfff04` trên `staging`.
 
 ## Builder notes (T06, 2026-10-21)
 - Worktree `D:/prj/bds/.claude/worktrees/agent-aa1112564d81afb34` (branch `worktree-agent-aa1112564d81afb34`), base `ffc31b8` (ff từ staging). Chưa commit.

@@ -3,7 +3,7 @@
 - Change doc: `spec/changes/2026-10-21-site-redesign-homepage-style.md` (BACKLOG BL-045). Spec delta: `SPECIFICATIONS.md` khối "Giao diện toàn site theo phong cách trang chủ mới (BL-045…)".
 - **Mockup bắt buộc Read trước khi code:** `docs/specs/site-redesign-mockup/index.html` (CSS `.phero`, `.phero.short`, `.crumb.glass`, `.crumb.plain`, `.fcard`, `.toolbar`, `.pager`, `.cta`, `.shead.left`) + `docs/specs/site-redesign-mockup/DECISIONS.md` #1. Chạy mockup: `site-mockup` trong `.claude/launch.json` (port 4600).
 - Phụ thuộc: không. **Song song được với T02** (và T00 nếu có) — không trùng file.
-- Trạng thái: `built, cho review` (builder xong 2026-10-21; truoc do `pending`) — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `72623dc` (close-out BL-045 2026-10-21); trước đó `built, cho review` (builder xong 2026-10-21; truoc do `pending`) — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user (không thương lượng)
 - Bố cục đúng mockup; màu/token/font Montserrat/element giữ nguyên (`skills/react-nodejs/design-tokens.md`, `src/app/(frontend)/globals.css`). Không hex mới (`src/components/ui/no-raw-colors.test.ts` là gate). Ngoại lệ duy nhất: token breadcrumb (DECISIONS #1).
@@ -48,7 +48,7 @@ Attempt 1 fail → `.agent/error-analyzer.md`, root cause lại, fix tối thi�
 - Acceptance criteria: PASS|FAIL|BLOCKED
 - Verify commands + result:
 - Lệch so với mockup + lý do:
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-01-round-1-review.md`; commit `72623dc` trên `staging`.
 
 ## Builder notes (2026-10-21) - quyet dinh tu chon
 - Worktree D:/prj/bds/.claude/worktrees/agent-a9d080d1055325786 (branch worktree-agent-a9d080d1055325786; da ff-merge len staging 9e96cbf vi cat tu commit cu hon). DB rieng tami_wt_bl045_t01. Migration migrations/20261020_183923_site_redesign_page_heroes.ts: up chi ADD COLUMN / CREATE TABLE / CREATE TYPE / FK / INDEX (DROP chi o down) - khong HIGH_RISK_MIGRATION.
@@ -68,4 +68,4 @@ Attempt 1 fail → `.agent/error-analyzer.md`, root cause lại, fix tối thi�
 - Acceptance criteria: PASS (schema/migration/integration; hero + breadcrumb + pager tren trang dung CategoryListTemplate; JSON-LD giu nguyen; token) - the loc / the bai cho T03/T06.
 - Verify: pnpm typecheck PASS; pnpm lint 0 error (2 warning cu tools/task-dashboard); pnpm test PASS tru 3 file integration (access, jobs-email, media-upload) timeout beforeAll khi chay song song toan bo - chay rieng 3 file: 50/50 PASS; pnpm payload migrate tren DB rieng PASS; integration globals.test.ts 30/30 (them 2 test chu hero vi/en, careersPerks, co, anh Lien he/Phap ly).
 - Evidence: .context/review-reports/assets/site-redesign-t01-{news-category-1440.png,news-category-390.jpg,projects-hero-1440.png,pager-1440.png}; khong h-scroll o 390.
-- Reviewer verdict: (cho review)
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-01-round-1-review.md`; commit `72623dc` trên `staging`.

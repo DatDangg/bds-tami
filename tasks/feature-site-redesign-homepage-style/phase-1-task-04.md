@@ -4,7 +4,7 @@
 - **Mockup bắt buộc Read:** `docs/specs/site-redesign-mockup/index.html` view `detail-project` (`.gal`, `.counter`, `.thumbs`, `.dhead`, `.facts`, `.subnav`, `.block`, `.aside`, `.sec.white .shead.left`, `.slider`), DECISIONS #4, #5, #6.
 - Phụ thuộc: **T01** (breadcrumb overlay, SectionHeading, ConsultBanner), **T02** (`ProjectCard`, `CardSlider`). T05 phụ thuộc task này.
 - Song song: **được** với T03, T06, T07 (wave B). Trùng duy nhất `vi/en.json` (namespace `page.projectDetail.*`, `page.detail.*`).
-- Trạng thái: `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `6953d10` (close-out BL-045 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Ràng buộc user
 Như T01. Giữ nguyên component chức năng (bản đồ, lân cận tab, mặt bằng, bảng giá, hỏi đáp + JSON-LD FAQPage, pháp lý/tài liệu, LeadForm `source=project`, scroll-spy BL-027/028/029, aside dính BL-031, header ẩn khi cuộn trên trang chi tiết).
@@ -41,4 +41,4 @@ Như T01; attempt 2 so pattern `HeroSlider` (bộ đếm), `DetailLayout` BL-027
 - Verify commands + result: pnpm typecheck OK · pnpm lint 0 error · pnpm vitest run src → 250 file / 2457 test PASS
 - Quyết định (tự chốt): (1) kiểu thẻ qua biến thể Tailwind group (`group/detail` + `data-section-style="cards"`) thay vì truyền prop xuống từng khối; Tin BĐS/tin tức/Cho thuê giữ nguyên "một thẻ" (mặc định single). (2) eyebrow mục = nhãn ngắn riêng (Giới thiệu, Giá trị, Kết nối, Cuộc sống, Thiết kế, Minh bạch, Ưu đãi, Giá bán, Cơ hội, Giải đáp) ở `page.detail.eyebrow.*`. (3) Dải thông số dùng `ul` (không `dl`) vì có icon; quy mô = diện tích đất, chủ đầu tư là tên (link website vẫn ở Tổng quan khi có). (4) Nút phụ banner: thêm prop `secondary` cho `ConsultBanner` (tel: hotline thắng nút CMS). (5) Banner dựng ở page.tsx rồi truyền qua prop `consultBanner` (ConsultBanner là async). (6) Pháp lý + Chính sách gói trong MỘT thẻ 2 cột (giữ LegalPolicy accordion). (7) Bỏ mục "Thư viện" khỏi `SECTION_IDS`. (8) Slider "tương tự" bọc container để thẻ đầu thẳng hàng tiêu đề. (9) Header vẫn trong luồng (không overlay) như các trang con T01. (10) Nút chia sẻ: Web Share, không có thì menu `ShareButtons`.
 - Lệch so với mockup + lý do: tiêu đề thẻ/giá dùng token `text-h2-sm`/`text-price`; arrows nền tối mờ thay vì glass sáng (độ đọc trên ảnh sáng); không có "Tiến độ"/"Lân cận" chip riêng (Lân cận nằm trong Vị trí theo spec).
-- Reviewer verdict: (chờ)
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-04-round-1-review.md`; commit `6953d10` trên `staging`.

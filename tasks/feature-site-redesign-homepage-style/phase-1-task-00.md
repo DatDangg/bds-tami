@@ -3,7 +3,7 @@
 - Change doc: `spec/changes/2026-10-21-site-redesign-homepage-style.md` (BL-045). Spec: khối BL-045 mục "Trang danh sách" (đoạn **Dự án (Q1 — lọc thật, ADDITIVE)**) — thay câu "không ô từ khoá" của F2.
 - Mockup: `docs/specs/site-redesign-mockup/index.html` view `list-project` (ô "Nhập tên dự án, khu vực…", "Chủ đầu tư", "Sắp xếp: Mới nhất").
 - Phụ thuộc: không. **Song song được với T01 + T02** (wave A; chỉ đụng lib/query/url-params/metadata, không đụng UI). T03 phụ thuộc task này.
-- Trạng thái: `built — chờ review` (builder xong 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
+- Trạng thái: `done` — STRICT PASS round 1, commit `389a816` (close-out BL-045 2026-10-21); trước đó `built — chờ review` (builder xong 2026-10-21); trước đó `pending` — **plan đã duyệt 2026-10-21** (user chốt Q1–Q9 theo đề xuất; xem khối BL-045 trong `SPECIFICATIONS.md`).
 
 ## Classification / Risk
 - Type: **ADDITIVE** (tham số URL mới cho `/du-an`) — sửa câu F2.
@@ -33,7 +33,7 @@ Như T01.
 ## Verification summary (builder điền)
 - Acceptance criteria: PASS (q / developer / sort lọc + sắp đúng ở tầng truy vấn, kết hợp tham số cũ, page giữ, id/sort lạ bỏ qua; noindex+canonical /du-an; không migration)
 - Verify commands + result: `pnpm vitest run src/lib/projects src/components/projects` 122/122 PASS; `pnpm typecheck` PASS; `pnpm lint` 0 error (2 warning cũ ở tools/task-dashboard/server.mjs); `pnpm test` toàn bộ: 3101 pass, 3 file integration fail (access / jobs-email / media-upload — cần DB+SMTP+S3 thật, không liên quan task, beforeAll hỏng nên skip toàn bộ)
-- Reviewer verdict:
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-00-round-1-review.md`; commit `389a816` trên `staging`.
 
 ## Quyết định builder tự chọn
 - File tham số thật là `src/lib/projects/project-filters.ts` (không phải `project-filter-params.ts`); test params ở `src/components/projects/project-filter-params.test.tsx`.

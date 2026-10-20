@@ -2,7 +2,7 @@
 
 - Nguồn: `.context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1.md` GAP-1, GAP-2 (+ GAP-4 xem `/en`).
 - Quyết định dispatcher (user dặn tự quyết 2026-10-21): sửa code theo spec/mockup đã duyệt, không đổi spec.
-- Phụ thuộc: T00–T08 (đã commit). Trạng thái: `pending`.
+- Phụ thuộc: T00–T08 (đã commit). Trạng thái: `done` — STRICT PASS round 1, commit `2c63564` (close-out BL-045 2026-10-21).
 
 ## Classification / Risk
 - Type: **BUG** (lệch spec). Risk: **MEDIUM** — query danh sách tin công khai. Expected review: **STRICT**.
@@ -23,3 +23,4 @@
 - Verify: typecheck PASS; lint 0 error (2 warning cũ); `vitest run src` 253 file/2496 test PASS; integration news + property-posts 53/53 PASS.
 - Ảnh 1440: `assets/site-redesign-t09-{news,news-category,posts,posts-category}-1440.png` + `site-redesign-t09-en-{projects,rentals,news,careers,contact,project-detail}-1440.png`.
 - GAP-4 `/en`: xem 6 trang, hero/breadcrumb/chữ EN đúng, không vỡ; `/en/news` rỗng do DB dev không có bài có bản EN (empty state đúng). Chưa chạy `pnpm build` (không thuộc task này).
+- Reviewer verdict: **STRICT PASS** (round 1) — report `.context/review-reports/feature-site-redesign-homepage-style-phase-1-task-09-round-1-review.md`; commit `2c63564` trên `staging`.
