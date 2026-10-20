@@ -45,3 +45,14 @@ export type AdminGlobalSlug = keyof typeof ADMIN_GLOBAL_LABELS;
 export function collectionLabels(slug: AdminCollectionSlug): NonNullable<CollectionConfig["labels"]> {
   return ADMIN_COLLECTION_LABELS[slug];
 }
+
+/**
+ * Tên tiếng Việt của một slug để hiện trong ô/mô tả admin (BL-043): collection → nhãn số ít, rồi global (nhật ký dịch lại
+ * của global ghi mã global); slug lạ giữ nguyên, rỗng/không phải chuỗi → `—`.
+ */
+export function collectionDisplayName(slug: unknown): string {
+  if (typeof slug !== "string" || slug === "") return "—";
+  if (Object.hasOwn(ADMIN_COLLECTION_LABELS, slug)) return ADMIN_COLLECTION_LABELS[slug as AdminCollectionSlug].singular;
+  if (Object.hasOwn(ADMIN_GLOBAL_LABELS, slug)) return ADMIN_GLOBAL_LABELS[slug as AdminGlobalSlug];
+  return slug;
+}

@@ -1322,6 +1322,42 @@
       },
       "completedAt": "2026-10-20",
       "residual": "staging/prod blockOrder admin tự chỉnh (task T03 hướng dẫn); chờ user: hero 100svh, vị trí bộ đếm, hoa văn sóng footer/hoạ tiết nền Về TAMI, khoảng nền kem→eyebrow ~23px vs ~44px; 768/1280 chưa xem trình duyệt; integration test chập chờn chạy cả bộ"
+    },
+    {
+      "slug": "admin-raw-slug-columns",
+      "title": "Admin: cột Loại dữ liệu/Loại nội dung hiện tên tiếng Việt thay slug thô (BL-043)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-043",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-raw-slug-columns.md",
+      "startedAt": "2026-10-21",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-raw-slug-columns/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "collectionDisplayName (collection số ít → global → giữ nguyên, rỗng —) + CollectionNameCell + CollectionNameHint trên AuditLogs.collection / ClickEvents.refCollection / ClickStatsDaily.refCollection; r2 thêm nhãn global (D5) + MINOR r1",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md"
+          ],
+          "commit": "(commit close-out BL-043)"
+        }
+      ],
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1 số ít, D2 lọc ô chữ (select N/A), D3 gợi ý Description, D4 spec-validator gộp ở phase review, D5 nhãn global",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "completedAt": "2026-10-21",
+      "specVersion": "1.35.0",
+      "scopeVersion": 45,
+      "specUpdate": "spec/updates/2026-10-21-admin-raw-slug-columns.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-raw-slug-columns-phase-1.md",
+      "residual": "chưa xem trên trình duyệt; collection-name-admin.ts nên chuyển sang src/lib/admin; chưa test khoá collection/global không trùng; build chưa chạy"
     }
   ],
   "bugs": [
@@ -2238,7 +2274,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20",
+  "lastUpdated": "2026-10-20T18:42:04.265Z",
   "approvalMilestones": [
     {
       "id": "M1",

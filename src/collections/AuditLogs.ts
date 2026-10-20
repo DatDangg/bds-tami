@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { COLLECTION_NAME_ADMIN } from "../components/admin/collection-name-admin";
 import { AUDIT_ACTIONS, type AuditAction } from "../lib/audit/actions";
 
 const denyAll = (): boolean => false;
@@ -58,7 +59,7 @@ export const AuditLogs: CollectionConfig = {
       index: true,
       options: AUDIT_ACTIONS.map((value) => ({ label: ACTION_LABELS[value], value })),
     },
-    { name: "collection", type: "text", label: "Loại dữ liệu" },
+    { name: "collection", type: "text", label: "Loại dữ liệu", admin: COLLECTION_NAME_ADMIN },
     { name: "docId", type: "text", label: "Mã bản ghi" },
     { name: "summary", type: "text", label: "Tóm tắt", required: true },
     // Dữ liệu trước/sau; `writeAuditLog` đã lọc khoá nhạy cảm (mật khẩu, token...).
