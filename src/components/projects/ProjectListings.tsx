@@ -35,9 +35,10 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
  */
 export function ProjectListings({ rentals, posts }: ProjectListingCards) {
   const t = useTranslations("page.projectDetail.listings");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   if (rentals.length === 0 && posts.length === 0) return null;
   return (
-    <DetailSection id={SECTION_DOM_ID.listings} title={t("title")}>
+    <DetailSection id={SECTION_DOM_ID.listings} eyebrow={tEyebrow("listings")} title={t("title")}>
       <div className="flex flex-col gap-10">
         {rentals.length > 0 && (
           <Group label={t("rentals")}>

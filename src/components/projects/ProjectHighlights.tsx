@@ -9,8 +9,9 @@ import { DetailSection } from "@/components/detail/DetailSection";
  */
 export function ProjectHighlights({ highlights }: { highlights: HighlightView[] }) {
   const t = useTranslations("page.projectDetail");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   return (
-    <DetailSection id={SECTION_DOM_ID.highlights} title={t("sections.highlights")}>
+    <DetailSection id={SECTION_DOM_ID.highlights} eyebrow={tEyebrow("highlights")} title={t("sections.highlights")}>
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {highlights.map((item) => (
           <li key={item.id} className="flex flex-col gap-3 rounded-[20px] border border-border bg-surface p-5">

@@ -275,8 +275,8 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
   };
 }
 
-/** Mã mục của thanh mục con, theo thứ tự hiển thị (design-spec S03 khối 3). */
-export const SECTION_IDS = ["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "gallery", "listings", "faq"] as const;
+/** Mã mục của thanh mục con, theo thứ tự hiển thị (design-spec S03 khối 3). Không còn "Thư viện": ảnh nằm ở ảnh lớn đầu trang + lightbox (BL-045 Q7). */
+export const SECTION_IDS = ["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "listings", "faq"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 /**
@@ -294,7 +294,6 @@ export function visibleSections(view: ProjectDetailView, { hasListings = false }
     legal: view.hasLegal || view.documents.length > 0,
     policy: view.hasPolicy,
     pricing: view.priceRows.length > 0,
-    gallery: view.gallery.length > 0,
     listings: hasListings,
     faq: view.faqs.length > 0,
   };
@@ -311,7 +310,6 @@ export const SECTION_DOM_ID: Record<SectionId, string> = {
   legal: "legal",
   policy: "sales-policy",
   pricing: "pricing",
-  gallery: "gallery",
   listings: "related-listings",
   faq: "faq",
 };

@@ -1,10 +1,11 @@
 import config from "@payload-config";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { buildContact } from "@/components/layout/shell-data";
 import { ProjectDetail } from "@/components/projects/ProjectDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -107,6 +108,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     loadHotline(locale),
     loadSiteIdentity(locale),
   ]);
+  const tVisit = await getTranslations({ locale, namespace: "page.projectDetail.visitCta" });
   const view = toProjectDetailView(doc, locale);
   const ownPath = publicDetailPath(CONTENT_ROUTES.projects, locale, doc.slug ?? slug);
   const siteUrl = getSiteUrl();
@@ -121,7 +123,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     <>
       <ProjectDetail doc={doc} view={view} related={toProjectCards(relatedDocs, locale)}
         listings={{ rentals: toRentalCards(listingDocs.rentals, locale), posts: toPostCards(listingDocs.posts, locale, now) }}
-        {...(hotline ? { hotline } : {})} ownPath={ownPath} />
+        {...(hotline ? { hotline } : {})} ownPath={ownPath} {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: `${tVisit("hotline")}: ${hotline.label}`, href: hotline.telHref } } : {})} />} />
       {pageUrl && siteUrl && (
         <JsonLd
           data={buildRealEstateListingJsonLd({

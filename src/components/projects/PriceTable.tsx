@@ -47,10 +47,11 @@ function AvailabilityBadge({ availability }: { availability: PriceAvailability |
 export function PriceTable({ rows, updatedAt }: { rows: PriceRowView[]; updatedAt: string | null }) {
   const locale = useLocale() as Locale;
   const tSection = useTranslations("page.projectDetail.sections");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   const t = useTranslations("page.projectDetail.price");
   const rangeLabels: RangeLabels = { from: (value) => t("from", { value }), to: (value) => t("to", { value }) };
   return (
-    <DetailSection id={SECTION_DOM_ID.pricing} title={tSection("pricing")}>
+    <DetailSection id={SECTION_DOM_ID.pricing} eyebrow={tEyebrow("pricing")} title={tSection("pricing")}>
       {updatedAt && <p className="mb-4 text-small text-text-muted">{t("updated", { date: formatDate(updatedAt, locale) })}</p>}
       <div
         role="region"

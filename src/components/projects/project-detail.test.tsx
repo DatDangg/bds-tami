@@ -69,6 +69,7 @@ function renderDetail(doc: Project, locale: Locale = "vi", related = [] as never
       {...(listings ? { listings: listings as never } : {})}
       {...(withHotline ? { hotline: { label: "0901 234 567", telHref: "tel:0901234567" } } : {})}
       ownPath={locale === "vi" ? "/du-an/song-sai-gon" : "/en/projects/saigon-riverside"}
+      consultBanner={<section aria-label="Banner tư vấn" data-testid="consult-banner" />}
     />,
     locale,
   );
@@ -102,14 +103,17 @@ describe("ProjectDetail (S03)", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách", "Thư viện"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách"]);
     expect(within(nav).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
-      "#overview", "#location", "#amenities", "#floor-plans", "#legal", "#sales-policy", "#gallery",
+      "#overview", "#location", "#amenities", "#floor-plans", "#legal", "#sales-policy",
     ]);
-    for (const name of ["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách bán hàng", "Thư viện ảnh", "Nhận thông tin dự án"]) {
+    for (const name of ["Tổng quan", "Vị trí", "Tiện ích", "Mặt bằng", "Pháp lý", "Chính sách bán hàng", "Nhận thông tin dự án"]) {
       expect(screen.getByRole("heading", { level: 2, name: new RegExp(name) }), name).toBeInTheDocument();
     }
-    // Tài liệu nằm TRONG khối Pháp lý (h3 dưới h2 Pháp lý), neo #documents cho nút hero vẫn có thật.
+    // Không còn mục "Thư viện" (BL-045 Q7): ảnh xem ở ảnh lớn đầu trang.
+    expect(screen.queryByRole("heading", { name: "Thư viện ảnh" })).toBeNull();
+    expect(container.querySelector("#gallery")).toBeNull();
+    // Tài liệu nằm TRONG khối Pháp lý (h3 dưới h2 Pháp lý), neo #documents vẫn có thật.
     const legal = container.querySelector("#legal") as HTMLElement;
     expect(within(legal).getByRole("heading", { level: 3, name: "Tài liệu" })).toBeInTheDocument();
     expect(legal.querySelector("#documents")).not.toBeNull();
@@ -125,7 +129,7 @@ describe("ProjectDetail (S03)", () => {
     expect(container.querySelectorAll("#lead-form")).toHaveLength(1);
     expect(container.querySelectorAll("form")).toHaveLength(1);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.className).not.toContain("font-normal"); // BL-036: weight 500 mặc định từ token text-display
+    expect(h1.className).not.toContain("font-normal"); // BL-036: weight 500 mặc định từ token
     expect(h1.className).not.toContain("uppercase");
     const aside = container.querySelector("aside") as HTMLElement;
     expect(aside).not.toBeNull();
@@ -142,28 +146,60 @@ describe("ProjectDetail (S03)", () => {
     expect(grid.firstElementChild?.contains(aside)).toBe(false);
     // Khung dùng chung (BL-027): gốc đánh dấu trang chi tiết; cột chính là MỘT thẻ trắng bo lớn chứa các khối; thẻ Tư vấn dính theo --sticky-top.
     expect(container.querySelector("[data-detail-page]")).not.toBeNull();
-    expect(grid.firstElementChild?.className).toContain("bg-surface");
-    expect(grid.firstElementChild?.className).toContain("rounded-[28px]");
+    // BL-045: cột chính KHÔNG còn thẻ trắng bao ngoài; mỗi mục là một thẻ trắng bo 20px (biến thể group của DetailSection).
+    expect(grid.firstElementChild?.getAttribute("data-section-style")).toBe("cards");
+    expect(grid.firstElementChild?.className).not.toContain("rounded-[28px]");
+    expect(container.querySelector("#overview")?.className).toContain("rounded-[20px]");
+    expect(container.querySelector("#overview")?.className).toContain("bg-surface");
     expect(grid.firstElementChild?.querySelector("#overview")).not.toBeNull();
     expect(card.className).toContain("--sticky-top)_+_4.5rem");
     // Thẻ Tư vấn (đích #lead-form) ghi đè scroll-mt mặc định của LeadFormSlot để pill dính không che tiêu đề (M-1).
     expect(card.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     expect(aside.getAttribute("aria-labelledby")).toBe(card.querySelector("h2")?.id);
-    for (const id of ["overview", "location", "amenities", "floor-plans", "gallery", "legal", "sales-policy"]) {
+    for (const id of ["overview", "location", "amenities", "floor-plans", "legal", "sales-policy"]) {
       expect(container.querySelector(`#${id}`)?.className, id).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     }
   });
 
-  it("hero: ảnh đầu tải ưu tiên (LCP) và là ảnh duy nhất được preload; nút Nhận tư vấn → #lead-form, Tải tài liệu → #documents", () => {
+  it("ảnh lớn: ảnh đầu tải ưu tiên (LCP) và là ảnh duy nhất được preload; bộ đếm 01 / N, nút Xem tất cả ảnh, breadcrumb kính; thanh dính đáy → #lead-form", () => {
     const { container } = renderDetail(fullProject);
-    const hero = container.querySelector("section img") as HTMLImageElement;
+    const gallery = container.querySelector("[data-detail-gallery]") as HTMLElement;
+    const hero = gallery.querySelector("img") as HTMLImageElement;
     expect(hero.getAttribute("src")).toContain("g1");
     expect(hero).toHaveAttribute("fetchpriority", "high");
     expect(container.querySelectorAll('img[fetchpriority="high"]')).toHaveLength(1);
-    // Hero + thanh dính đáy mobile: cả hai cuộn tới form.
+    expect(gallery.textContent).toContain("01 / 03");
+    expect(within(gallery).getByRole("button", { name: "Xem tất cả ảnh" })).toBeInTheDocument();
+    expect(gallery.querySelector(".crumb-glass")).not.toBeNull();
+    // Thanh dính đáy mobile cuộn tới form; hero cũ với nút Nhận tư vấn / Tải tài liệu đã bỏ.
     for (const link of screen.getAllByRole("link", { name: "Nhận tư vấn" })) expect(link).toHaveAttribute("href", "#lead-form");
-    expect(screen.getByRole("link", { name: "Tải tài liệu" })).toHaveAttribute("href", "#documents");
+    expect(screen.queryByRole("link", { name: "Tải tài liệu" })).toBeNull();
     expect(container.querySelector("#lead-form")).not.toBeNull();
+  });
+
+  it("khối tiêu đề nổi: h1 + trạng thái + giá + dải thông số (quy mô, số sản phẩm, chủ đầu tư, bàn giao) + nút chia sẻ", () => {
+    const developer = { id: "dv", name: "Vinhomes", website: null, updatedAt: now, createdAt: now };
+    renderDetail({ ...fullProject, developer, scale: { ...fullProject.scale, landAreaM2: 450_000 } } as Project);
+    const h1 = screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" });
+    const card = h1.closest("div.shadow-lg") as HTMLElement;
+    expect(within(card).getByText("Đang mở bán")).toBeInTheDocument();
+    expect(within(card).getByText("Giá từ")).toBeInTheDocument();
+    expect(within(card).getByText("3,5 tỷ")).toBeInTheDocument();
+    const facts = within(card).getByRole("list", { name: "Thông số nổi bật" });
+    const labels = within(facts).getAllByRole("listitem").map((item) => item.querySelector("p:last-child")?.textContent);
+    expect(labels).toEqual(["Quy mô", "Số sản phẩm", "Chủ đầu tư", "Bàn giao"]);
+    expect(within(facts).getByText("1.200 căn")).toBeInTheDocument();
+    expect(within(facts).getByText("Vinhomes")).toBeInTheDocument();
+    expect(within(facts).getByText("Quý 4/2027")).toBeInTheDocument();
+    expect(within(card).getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
+  });
+
+  it("khối tiêu đề: thiếu giá → Liên hệ; thiếu mọi thông số → không dải thông số", () => {
+    renderDetail(baseProject());
+    const card = screen.getByRole("heading", { level: 1 }).closest("div.shadow-lg") as HTMLElement;
+    expect(within(card).getByText("Liên hệ")).toBeInTheDocument();
+    expect(within(card).queryByText("Giá từ")).toBeNull();
+    expect(within(card).queryByRole("list")).toBeNull();
   });
 
   it("thiếu floorPlans/tiện ích/pháp lý/chính sách/tài liệu → ẩn khối và mục con tương ứng, không lỗi", () => {
@@ -172,7 +208,7 @@ describe("ProjectDetail (S03)", () => {
       expect(screen.queryByRole("heading", { name }), name).toBeNull();
     }
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Thư viện"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan"]);
     expect(screen.queryByRole("link", { name: "Tải tài liệu" })).toBeNull();
     expect(container.querySelector("#floor-plans")).toBeNull();
     // Không có overview thì tổng quan hiện mô tả ngắn.
@@ -180,23 +216,26 @@ describe("ProjectDetail (S03)", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("mọi ảnh thư viện bị xoá → hero nền tối (không ảnh), không khối thư viện, vẫn đủ h1 + form", () => {
+  it("mọi ảnh thư viện bị xoá → ảnh lớn nền tối (không ảnh, không bộ đếm), vẫn đủ h1 + form", () => {
     const { container } = renderDetail(baseProject({ gallery: ["id-con", null as never] }));
     expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("[data-detail-gallery]")).not.toBeNull();
+    expect(container.querySelector("[data-detail-gallery]")?.textContent).not.toContain("/ 0");
     expect(screen.queryByRole("heading", { name: "Thư viện ảnh" })).toBeNull();
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
     expect(container.querySelector("#lead-form")).not.toBeNull();
   });
 
-  it("thông số: lưới dl có chủ đầu tư là link ngoài an toàn, quy mô, diện tích, giá từ, bàn giao", () => {
+  it("thông số còn lại ở Tổng quan: chủ đầu tư là link ngoài an toàn, quy mô tòa/tầng, diện tích, giá từ", () => {
     const developer = { id: "dv", name: "Vinhomes", website: "https://vinhomes.vn", updatedAt: now, createdAt: now };
     const { container } = renderDetail({ ...fullProject, developer } as Project);
     const specs = container.querySelector("dl") as HTMLElement;
     expect(specs).toHaveAttribute("aria-label", "Thông số dự án");
-    expect(within(specs).getByText("Quy mô").nextElementSibling).toHaveTextContent("1.200 căn · 4 tòa · 30 tầng");
+    expect(within(specs).getByText("Quy mô").nextElementSibling).toHaveTextContent("4 tòa · 30 tầng");
     expect(within(specs).getByText("Diện tích").nextElementSibling).toHaveTextContent("50 – 120 m²");
     expect(within(specs).getByText("Giá từ").nextElementSibling).toHaveTextContent("3,5 tỷ");
-    expect(within(specs).getByText("Bàn giao").nextElementSibling).toHaveTextContent("Quý 4/2027");
+    // Số sản phẩm + bàn giao đã lên dải thông số của khối tiêu đề, không lặp ở đây.
+    expect(within(specs).queryByText("Bàn giao")).toBeNull();
     const link = within(specs).getByRole("link", { name: /Vinhomes/ });
     expect(link).toHaveAttribute("href", "https://vinhomes.vn");
     expect(link).toHaveAttribute("target", "_blank");
@@ -207,10 +246,10 @@ describe("ProjectDetail (S03)", () => {
     const doc = baseProject({ title: "Saigon Riverside", gallery: [{ ...image("g1"), alt: "" }, image("g2"), image("g3")], documents: [pdf("d1", "Price list")] });
     const { container } = renderDetail(doc, "en");
     const nav = screen.getByRole("navigation", { name: "Project contents" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Overview", "Legal", "Gallery"]);
-    expect(screen.getByRole("link", { name: "Download documents" })).toBeInTheDocument();
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Overview", "Legal"]);
+    expect(screen.queryByRole("link", { name: "Download documents" })).toBeNull();
     expect(screen.getByRole("heading", { level: 2, name: "Get project information" })).toBeInTheDocument();
-    expect(container.textContent).not.toMatch(/Nhận|Tổng quan|Tài liệu|Thư viện/);
+    expect(container.textContent).not.toMatch(/Nhận|Tổng quan|Tài liệu|Thư viện|Chia sẻ|Giá từ/);
   });
 
   it("form lead: có hotline làm lối liên hệ tạm; dự án khác (nếu có) dùng h3", () => {
@@ -218,8 +257,11 @@ describe("ProjectDetail (S03)", () => {
       { id: "r1", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: "Hà Nội", categoryName: null, priceFrom: null, cover: null },
     ] as never[]);
     expect(screen.getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    const related = screen.getByRole("heading", { level: 2, name: "Dự án khác" }).closest("section") as HTMLElement;
+    const related = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
     expect(within(related).getByRole("heading", { level: 3, name: "Dự án B" })).toBeInTheDocument();
+    // Dải nền trắng, đầu khối canh trái (BL-045 #6).
+    expect(related.className).toContain("bg-surface");
+    expect(within(related).getByText("Có thể bạn quan tâm")).toBeInTheDocument();
   });
 });
 
@@ -240,8 +282,9 @@ describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => 
     expect(within(block).getByText("Tin BĐS")).toBeInTheDocument();
     expect(within(block).getByRole("heading", { level: 3, name: "Căn 2PN view sông" }).closest("a")).toHaveAttribute("href", "/cho-thue/can-2pn");
     expect(within(block).getByRole("heading", { level: 3, name: "Ưu đãi tháng 10" }).closest("a")).toHaveAttribute("href", "/tin-bds/uu-dai");
-    const order = [...container.querySelectorAll("#documents, #related-listings, #related-projects")].map((node) => node.id);
-    expect(order).toEqual(["documents", "related-listings", "related-projects"]);
+    const similar = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
+    expect(container.querySelector("#documents")!.compareDocumentPosition(block) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(block.compareDocumentPosition(similar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("chỉ một nhóm có tin → nhóm kia ẩn; cả hai trống → không khối, không mục con", () => {
@@ -258,28 +301,23 @@ describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => 
   it("/en: nhãn tiếng Anh cho khối, mục con và CTA", () => {
     renderDetail(fullProject, "en", [], { rentals: [rentalCard], posts: [] });
     expect(screen.getByRole("heading", { level: 2, name: "Related listings" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 2, name: "Book a site visit" })).toBeInTheDocument();
     expect(within(screen.getByRole("navigation", { name: "Project contents" })).getAllByRole("link").at(-1)).toHaveTextContent("Related listings");
   });
 
-  it("CTA 'Đăng ký tham quan' ở cuối trang: nút → #lead-form, nút phụ gọi hotline (tel:); không nhân đôi form; ảnh mới không preload", () => {
-    const { container } = renderDetail(fullProject, "vi", [], { rentals: [{ ...rentalCard, cover: image("cover-r1") }], posts: [] });
-    const cta = screen.getByRole("heading", { level: 2, name: "Đăng ký tham quan" }).closest("section") as HTMLElement;
-    expect(within(cta).getByRole("link", { name: "Đăng ký tham quan" })).toHaveAttribute("href", "#lead-form");
-    expect(within(cta).getByRole("link", { name: "Gọi hotline: 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+  it("banner tư vấn do trang truyền vào nằm cuối, sau Tin liên quan và Dự án tương tự; không nhân đôi form; ảnh mới không preload", () => {
+    const { container } = renderDetail(fullProject, "vi", [{ id: "d2", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: null, categoryName: null, priceFrom: null, cover: null }] as never[], { rentals: [{ ...rentalCard, cover: image("cover-r1") }], posts: [] });
+    const banner = screen.getByTestId("consult-banner");
+    const similar = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
+    expect(container.querySelector("#related-listings")!.compareDocumentPosition(similar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(similar.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(container.querySelectorAll("#lead-form")).toHaveLength(1);
     expect(container.querySelectorAll("form")).toHaveLength(1);
-    const relatedProjects = container.querySelector("#related-projects");
-    // Chưa có dự án khác trong ca này: CTA vẫn là khối cuối trước thanh dính, sau khối Tin liên quan.
-    expect(relatedProjects).toBeNull();
-    expect(container.querySelector("#related-listings")!.compareDocumentPosition(cta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(container.querySelectorAll('img[fetchpriority="high"]')).toHaveLength(1);
   });
 
-  it("CTA không có hotline → chỉ nút chính", () => {
-    renderDetail(fullProject, "vi", [], undefined, false);
-    const cta = screen.getByRole("heading", { level: 2, name: "Đăng ký tham quan" }).closest("section") as HTMLElement;
-    expect(within(cta).getAllByRole("link")).toHaveLength(1);
+  it("không có dự án khác → không dựng khối Dự án tương tự", () => {
+    renderDetail(fullProject, "vi", [], undefined);
+    expect(screen.queryByRole("heading", { name: /Dự án tương tự/ })).toBeNull();
   });
 });
 

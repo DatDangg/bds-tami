@@ -92,7 +92,7 @@ describe("Khối market của chi tiết dự án (BL-020 P5)", () => {
     const { container } = renderDetail(project());
     for (const name of ["Điểm nổi bật", "Bảng giá", "Câu hỏi thường gặp", "Tiện ích xung quanh"]) expect(screen.queryByRole("heading", { name }), name).toBeNull();
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Thư viện"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan"]);
     expect(container.querySelector("#highlights, #pricing, #faq")).toBeNull();
     expect(jsonLdScripts(container)).toHaveLength(0);
   });
@@ -100,13 +100,13 @@ describe("Khối market của chi tiết dự án (BL-020 P5)", () => {
   it("đủ khối → thanh mục con theo thứ tự mới, mỗi neo trỏ tới phần tử có thật, h2 đúng tên, tiện ích quanh nằm trong Vị trí", () => {
     const { container } = renderDetail(marketProject);
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Nổi bật", "Vị trí", "Pháp lý", "Giá", "Thư viện", "Hỏi đáp"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Nổi bật", "Vị trí", "Pháp lý", "Giá", "Hỏi đáp"]);
     for (const link of within(nav).getAllByRole("link")) expect(container.querySelector(link.getAttribute("href")!), link.getAttribute("href")!).not.toBeNull();
     for (const name of ["Điểm nổi bật", "Bảng giá", "Câu hỏi thường gặp"]) expect(screen.getByRole("heading", { level: 2, name }), name).toBeInTheDocument();
     const location = container.querySelector("#location") as HTMLElement;
     expect(within(location).getByRole("heading", { level: 3, name: "Tiện ích xung quanh" })).toBeInTheDocument();
-    // Thứ tự trong cột chính: Nổi bật → Vị trí → Pháp lý → Giá → Thư viện → FAQ.
-    const order = ["#highlights", "#location", "#legal", "#pricing", "#gallery", "#faq"].map((selector) => container.querySelector(selector) as HTMLElement);
+    // Thứ tự trong cột chính: Nổi bật → Vị trí → Pháp lý → Giá → FAQ.
+    const order = ["#highlights", "#location", "#legal", "#pricing", "#faq"].map((selector) => container.querySelector(selector) as HTMLElement);
     for (let index = 1; index < order.length; index += 1) {
       expect(order[index - 1]!.compareDocumentPosition(order[index]!) & Node.DOCUMENT_POSITION_FOLLOWING, `thứ ${index}`).toBeTruthy();
     }

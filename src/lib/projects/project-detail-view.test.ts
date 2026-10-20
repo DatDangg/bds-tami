@@ -51,13 +51,13 @@ describe("toProjectDetailView", () => {
     expect(view.hero?.url).toBe("/api/media/file/m1.webp");
   });
 
-  it("mọi ảnh thư viện bị xoá (FK set null: mảng rỗng, null hoặc chỉ còn id) → hero null, không có khối thư viện, không lỗi", () => {
+  it("mọi ảnh thư viện bị xoá (FK set null: mảng rỗng, null hoặc chỉ còn id) → hero null, không lỗi (mục Thư viện đã bỏ, BL-045 Q7)", () => {
     const emptied: Project["gallery"][] = [[], null, undefined, [null as never, "id-con"]];
     for (const gallery of emptied) {
       const view = toProjectDetailView(project({ gallery }), "vi");
       expect(view.hero).toBeNull();
       expect(view.gallery).toEqual([]);
-      expect(visibleSections(view)).not.toContain("gallery");
+      expect(visibleSections(view)).toEqual(["overview"]);
     }
   });
 
@@ -96,7 +96,7 @@ describe("toProjectDetailView", () => {
   it("dự án thiếu mặt bằng/tiện ích/pháp lý/chính sách/tài liệu → các mục ẩn, tổng quan luôn có", () => {
     const view = toProjectDetailView(project(), "vi");
     expect(view.floorPlans).toEqual([]);
-    expect(visibleSections(view)).toEqual(["overview", "gallery"]);
+    expect(visibleSections(view)).toEqual(["overview"]);
   });
 
   it("dự án đủ khối → thanh mục con đúng thứ tự design-spec", () => {
@@ -112,8 +112,8 @@ describe("toProjectDetailView", () => {
       "vi",
     );
     expect(view.hasOverview).toBe(true);
-    expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery"]);
-    expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "gallery", "listings"]);
+    expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy"]);
+    expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "listings"]);
   });
 
   it("khối market (BL-020 P5): đủ dữ liệu → thứ tự mục con theo spec; chỉ có tiện ích quanh vẫn có mục Vị trí; chỉ có tài liệu vẫn có mục Pháp lý", () => {
@@ -130,7 +130,7 @@ describe("toProjectDetailView", () => {
       }),
       "vi",
     );
-    expect(visibleSections(full, { hasListings: true })).toEqual(["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "gallery", "listings", "faq"]);
+    expect(visibleSections(full, { hasListings: true })).toEqual(["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "listings", "faq"]);
     const nearbyOnly = toProjectDetailView(project({ nearbyAmenities: [{ category: "park", name: "Công viên A" }] }), "vi");
     expect(visibleSections(nearbyOnly)).toContain("location");
     const docsOnly = toProjectDetailView(project({ documents: [pdf("d1")] }), "vi");

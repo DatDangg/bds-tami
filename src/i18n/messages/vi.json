@@ -419,6 +419,35 @@
         "perMonth": "/tháng"
       }
     },
+    "detail": {
+      "gallery": {
+        "region": "Thư viện ảnh",
+        "slide": "Ảnh {index} / {total}",
+        "previous": "Ảnh trước",
+        "next": "Ảnh sau",
+        "thumb": "Xem ảnh {index}",
+        "thumbs": "Ảnh thu nhỏ",
+        "viewAll": "Xem tất cả ảnh",
+        "empty": "Chưa có ảnh"
+      },
+      "share": {
+        "button": "Chia sẻ",
+        "menu": "Chia sẻ trang này"
+      },
+      "priceFrom": "Giá từ",
+      "eyebrow": {
+        "overview": "Giới thiệu",
+        "highlights": "Giá trị",
+        "location": "Kết nối",
+        "amenities": "Cuộc sống",
+        "floorPlans": "Thiết kế",
+        "legal": "Minh bạch",
+        "policy": "Ưu đãi",
+        "pricing": "Giá bán",
+        "listings": "Cơ hội",
+        "faq": "Giải đáp"
+      }
+    },
     "projectDetail": {
       "heroConsult": "Nhận tư vấn",
       "heroDocuments": "Tải tài liệu",
@@ -524,6 +553,25 @@
         "description": "Để lại thông tin, TAMI sắp xếp lịch tham quan dự án phù hợp với bạn.",
         "button": "Đăng ký tham quan",
         "hotline": "Gọi hotline"
+      },
+      "facts": {
+        "label": "Thông số nổi bật",
+        "scale": "Quy mô",
+        "units": "Số sản phẩm",
+        "developer": "Chủ đầu tư",
+        "handover": "Bàn giao",
+        "unitsValue": "{count} căn"
+      },
+      "similar": {
+        "eyebrow": "Có thể bạn quan tâm",
+        "title": "Dự án",
+        "titleAccent": "tương tự",
+        "description": "Các dự án cùng khu vực hoặc cùng loại hình.",
+        "slide": "Dự án {index} / {total}",
+        "previous": "Dự án trước",
+        "next": "Dự án sau",
+        "dots": "Chọn vị trí slide",
+        "goTo": "Chuyển tới nhóm dự án {index}"
       },
       "relatedTitle": "Dự án khác",
       "stickyConsult": "Nhận tư vấn"

@@ -53,4 +53,14 @@ describe("ConsultBanner", () => {
     renderWithIntl(await ConsultBanner({ locale: "vi" }));
     expect(screen.getByRole("heading", { level: 2, name: "Cần tư vấn bất động sản?" })).toBeInTheDocument();
   });
+
+  it("secondary (vd tel: hotline) truyền vào thắng nút phụ CMS; không truyền thì giữ nút phụ CMS", async () => {
+    getHomepage.mockResolvedValue({ ctaBanner: { title: "X", secondaryLabel: "Nút CMS", secondaryLink: "careers" } });
+    const withProp = renderWithIntl(await ConsultBanner({ locale: "vi", secondary: { label: "Gọi hotline: 0901 234 567", href: "tel:0901234567" } }));
+    expect(screen.getByRole("link", { name: "Gọi hotline: 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+    expect(screen.queryByRole("link", { name: "Nút CMS" })).toBeNull();
+    withProp.unmount();
+    renderWithIntl(await ConsultBanner({ locale: "vi" }));
+    expect(screen.getByRole("link", { name: "Nút CMS" })).toBeInTheDocument();
+  });
 });

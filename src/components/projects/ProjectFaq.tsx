@@ -13,10 +13,11 @@ import { DetailSection } from "@/components/detail/DetailSection";
 export function ProjectFaq({ faqs }: { faqs: FaqView[] }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail.sections");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
   const jsonLd = buildFaqPageJsonLd({ locale, items: faqs });
   if (!jsonLd) return null;
   return (
-    <DetailSection id={SECTION_DOM_ID.faq} title={t("faq")}>
+    <DetailSection id={SECTION_DOM_ID.faq} eyebrow={tEyebrow("faq")} title={t("faq")}>
       <div className="flex flex-col divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface px-5">
         {faqs.map((faq) => (
           <details key={faq.id} className="group py-1">
