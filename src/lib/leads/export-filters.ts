@@ -138,9 +138,9 @@ const isRecord = (value: unknown): value is PlainRecord => typeof value === "obj
 /** Kết quả chuyển where của danh sách: `ok: false` = có điều kiện không ánh xạ được (xuất sẽ ra nhiều lead hơn danh sách đang thấy). */
 export type LeadExportQuery = { ok: true; query: string } | { ok: false; reason: string };
 
-// Tên toán tử lấy đúng nhãn tiếng Việt Payload hiển thị trong bộ lọc (`@payloadcms/translations` vi: equals / isIn / exists / isGreaterThanOrEqualTo / isLessThanOrEqualTo).
+// Tên toán tử lấy đúng nhãn tiếng Việt hiển thị trong bộ lọc: `equals` / `isIn` / `exists` / `general.false` đã chỉnh ở `src/lib/admin/payload-vi-overrides.ts`; `isGreaterThanOrEqualTo` / `isLessThanOrEqualTo` giữ nhãn gốc của `@payloadcms/translations` vi.
 export const UNSUPPORTED_FILTER_MESSAGE =
-  'Chỉ xuất được khi bộ lọc dùng: Trạng thái, Nguồn hoặc Sale phụ trách với "bằng"; Trạng thái với "có trong" (các trạng thái của lead); Sale phụ trách với "tồn tại" = Sai (lead chưa giao); ' +
+  'Chỉ xuất được khi bộ lọc dùng: Trạng thái, Nguồn hoặc Sale phụ trách với "là"; Trạng thái với "là một trong" (các trạng thái của lead); Sale phụ trách với "có giá trị" = Không (lead chưa giao); ' +
   'Ngày tạo với "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng" (mỗi phía một lần). ' +
   'Không hỗ trợ nhiều nhóm điều kiện "hoặc" và các toán tử khác. Hãy đổi bộ lọc rồi xuất lại.';
 

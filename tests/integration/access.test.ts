@@ -233,7 +233,7 @@ describe.skipIf(!databaseUrl)("integration: staff auth + access (DB thật)", ()
       }
       await expect(
         payload.login({ collection: "staff", data: { email: victim.email, password } }),
-      ).rejects.toThrow(/khóa/i);
+      ).rejects.toThrow(/kho[áa]|khóa/i);
     });
   });
 

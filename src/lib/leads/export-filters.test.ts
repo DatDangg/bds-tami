@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { PAYLOAD_VI_OVERRIDES } from "../admin/payload-vi-overrides";
 import { buildLeadExportWhere, MAX_SEARCH_LENGTH, leadExportQueryFromWhere, UNSUPPORTED_FILTER_MESSAGE, parseLeadExportFilters } from "./export-filters";
 
 const SALE_ID = "0a1b2c3d-1111-4222-8333-444455556666";
@@ -156,7 +157,7 @@ describe("leadExportQueryFromWhere", () => {
   });
 
   it("thông báo khoá nút nêu rõ field + toán tử hỗ trợ (đúng nhãn tiếng Việt của Payload) và thứ không hỗ trợ", () => {
-    for (const expected of ["Trạng thái", "Nguồn", "Sale phụ trách", "Ngày tạo", '"bằng"', '"lớn hơn hoặc bằng"', '"nhỏ hơn hoặc bằng"', '"hoặc"']) {
+    for (const expected of ["Trạng thái", "Nguồn", "Sale phụ trách", "Ngày tạo", '"là"', '"lớn hơn hoặc bằng"', '"nhỏ hơn hoặc bằng"', '"hoặc"']) {
       expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
     }
     expect(UNSUPPORTED_FILTER_MESSAGE).not.toContain("tìm kiếm");
@@ -243,6 +244,17 @@ describe("chip Lead: status in + assignedTo exists false (BL-022 T02)", () => {
   });
 
   it("thông báo khoá nút nêu thêm toán tử mới đúng nhãn Payload vi", () => {
-    for (const expected of ['"có trong"', '"tồn tại"', "= Sai"]) expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
+    for (const expected of ['"là một trong"', '"có giá trị"', "= Không"]) expect(UNSUPPORTED_FILTER_MESSAGE).toContain(expected);
+  });
+
+  it("thông báo khoá nút dùng đúng chữ trong PAYLOAD_VI_OVERRIDES (không lệch nhãn bộ lọc)", () => {
+    const operators = PAYLOAD_VI_OVERRIDES.operators;
+    const falseLabel = PAYLOAD_VI_OVERRIDES.general?.false;
+    for (const label of [operators?.equals, operators?.isIn, operators?.exists]) {
+      expect(label).toBeTruthy();
+      expect(UNSUPPORTED_FILTER_MESSAGE).toContain(`"${label}"`);
+    }
+    expect(falseLabel).toBeTruthy();
+    expect(UNSUPPORTED_FILTER_MESSAGE).toContain(`= ${falseLabel}`);
   });
 });

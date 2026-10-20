@@ -1156,6 +1156,51 @@
       "scopeVersion": 40,
       "specUpdate": "spec/updates/2026-10-20-link-hover-and-slider-title-height.md",
       "residual": "chưa xem trình duyệt thật; JobDetail hover chủ yếu mất gạch chân (màu warning ≈ accent); thẻ slider thiếu địa điểm/số liệu vẫn thấp hơn; footer/TOC/LanguageSwitcher/404 còn hover:underline"
+    },
+    {
+      "slug": "admin-vietnamese-wording",
+      "title": "Admin: rà ngữ nghĩa toàn bộ chữ tiếng Việt (ghi đè bản dịch Payload + nhãn dự án) (BL-040)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-040",
+      "changeDoc": "spec/changes/2026-10-20-admin-vietnamese-wording.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-vietnamese-wording/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "PAYLOAD_VI_OVERRIDES (102 khoá + noLabel) ở src/lib/admin/payload-vi-overrides.ts, nối i18n.translations.vi; test khoá giá trị/khoá tồn tại/placeholder; export-filters đổi chữ toán tử (là / là một trong / có giá trị = Không) + test chống lệch; access.test regex khoá/khóa",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-01-round-2-review.md"
+          ],
+          "commit": "(commit T01)"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-vietnamese-wording/phase-1-task-02.md",
+          "status": "in_review_passed",
+          "attempt": 2,
+          "round": 2,
+          "note": "r1 FAIL (MAJOR-1 Q5 Rentals/ClickEvents \"… lúc\") → r2 PASS; nhãn dự án theo bảng §1–§7 + mimeType \"Loại tệp\"",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-1-review.md",
+            ".context/review-reports/feature-admin-vietnamese-wording-phase-1-task-02-round-2-review.md"
+          ]
+        }
+      ],
+      "note": "T01 PASS → commit; T02 PASS chờ close-out",
+      "planApprovedAt": "2026-10-20 (user \"ok theo đề xuất\", Q1–Q10 theo khuyến nghị)"
     }
   ],
   "bugs": [

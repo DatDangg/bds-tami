@@ -45,6 +45,7 @@ import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
 import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { jobsConfig } from "./jobs";
+import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
 import { getEnv } from "./lib/env";
 import { logger } from "./lib/logger";
 import { resolveProdMigrations } from "./lib/payload/prod-migrations";
@@ -92,8 +93,8 @@ export default buildConfig({
   graphQL: { disable: true },
   i18n: {
     supportedLanguages: { vi },
-    // Ô trống ở danh sách admin hiện `—` thay vì `<Không có …>` (chuỗi mặc định `general:noLabel`); chỉ ghi đè đúng khoá này.
-    translations: { vi: { general: { noLabel: "—" } } },
+    // Ghi đè chữ tiếng Việt mặc định của Payload (gồm `general.noLabel` = `—`): xem payload-vi-overrides.ts.
+    translations: { vi: PAYLOAD_VI_OVERRIDES },
     fallbackLanguage: "vi",
   },
   localization: {
