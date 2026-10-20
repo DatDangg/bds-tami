@@ -210,7 +210,6 @@
       "readTime": "{minutes} min read",
       "readArticle": "Read article",
       "consultTitle": "Get a consultation",
-      "relatedTitle": "Related articles",
       "tagsLabel": "Tags",
       "tocTitle": "Contents",
       "share": {
@@ -238,7 +237,6 @@
       "viewDetail": "View details",
       "description": "The latest property news, vouchers and offers from TAMI.",
       "tabsLabel": "Listing categories",
-      "resultCount": "{count, plural, one {# result} other {# results}}",
       "all": "All",
       "gridLabel": "Listings",
       "empty": {
@@ -294,13 +292,10 @@
       "allProvinces": "All",
       "statusLabel": "Status",
       "allStatuses": "All",
-      "barAllProvinces": "All provinces/cities",
       "barAllStatuses": "Any status",
-      "apply": "Filter",
       "clear": "Clear filters",
       "resultCount": "{count, plural, one {# result} other {# results}}",
       "gridLabel": "Project list",
-      "priceFrom": "From {price}",
       "emptyTitle": "No matching projects yet.",
       "noProjects": "No projects have been published yet.",
       "salesStatus": {
@@ -340,7 +335,6 @@
         "q": "Keyword",
         "qPlaceholder": "Area, project, listing code",
         "category": "Category",
-        "allCategories": "All categories",
         "province": "Province/city",
         "allProvinces": "All provinces/cities",
         "ward": "Ward/commune",
@@ -351,7 +345,6 @@
         "priceTo": "Price to",
         "fromPlaceholder": "From",
         "toPlaceholder": "To",
-        "priceHintsLabel": "Suggested price ranges",
         "area": "Floor area (m²)",
         "areaFrom": "Floor area from",
         "areaTo": "Floor area to",
@@ -360,7 +353,6 @@
         "amenities": "Amenities",
         "sort": "Sort by",
         "anyOption": "Any",
-        "priceAny": "Any price",
         "priceCustom": "Custom price range"
       },
       "amenityOption": {
@@ -484,8 +476,6 @@
       }
     },
     "projectDetail": {
-      "heroConsult": "Get advice",
-      "heroDocuments": "Download documents",
       "subNavLabel": "Project contents",
       "sections": {
         "overview": "Overview",
@@ -494,7 +484,6 @@
         "floorPlans": "Floor plans",
         "legal": "Legal information",
         "policy": "Sales policy",
-        "gallery": "Photo gallery",
         "highlights": "Highlights",
         "pricing": "Price list",
         "faq": "Frequently asked questions"
@@ -515,10 +504,8 @@
       "specs": {
         "label": "Project facts",
         "developer": "Developer",
-        "category": "Type",
         "scale": "Scale",
         "area": "Area",
-        "price": "Price from",
         "handover": "Handover",
         "units": "{count} units",
         "blocks": "{count} blocks",
@@ -584,9 +571,6 @@
         "posts": "Property posts"
       },
       "visitCta": {
-        "title": "Book a site visit",
-        "description": "Leave your details and TAMI will arrange a visit that suits you.",
-        "button": "Book a site visit",
         "hotline": "Call hotline"
       },
       "facts": {
@@ -608,7 +592,6 @@
         "dots": "Choose slide position",
         "goTo": "Go to project group {index}"
       },
-      "relatedTitle": "Other projects",
       "stickyConsult": "Get advice"
     },
     "rentalDetail": {
@@ -728,7 +711,7 @@
         "details": "Details",
         "amenities": "Amenities",
         "terms": "Terms",
-        "video": "Video"
+        "video": "See it live"
       },
       "facts": {
         "label": "Key facts",
@@ -956,10 +939,10 @@
     },
     "postDetail": {
       "eyebrow": {
-        "overview": "Overview",
+        "overview": "Details",
         "offer": "Offer",
-        "content": "Content",
-        "gallery": "Photos"
+        "content": "Description",
+        "gallery": "In pictures"
       },
       "overview": {
         "title": "Overview",

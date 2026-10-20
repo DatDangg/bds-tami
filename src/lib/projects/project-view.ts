@@ -4,7 +4,6 @@ import type { Locale } from "../../i18n/routing";
 import type { Project, Province } from "../../payload-types";
 import { CONTENT_ROUTES } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
-import { formatVndCompact } from "../format";
 import { populatedMedia, visibleCategory } from "../news/news-view";
 
 export interface ProjectCardData {
@@ -15,8 +14,6 @@ export interface ProjectCardData {
   /** Tên tỉnh/thành (ngắn nếu có), `null` khi tỉnh chưa populate. */
   provinceName: string | null;
   categoryName: string | null;
-  /** Giá thấp nhất đã rút gọn (`3,5 tỷ`), `null` khi chưa nhập giá. */
-  priceFrom: string | null;
   /** Ảnh đầu tiên của thư viện ảnh = ảnh đại diện (ERD §4.5). */
   cover: MediaImage | null;
 }
@@ -37,7 +34,6 @@ export function toProjectCardData(doc: Project, locale: Locale): ProjectCardData
     salesStatus: doc.salesStatus,
     provinceName: provinceLabel(doc.province),
     categoryName: visibleCategory(doc.category, locale)?.name ?? null,
-    priceFrom: typeof doc.priceFromVnd === "number" && doc.priceFromVnd > 0 ? formatVndCompact(doc.priceFromVnd, locale) : null,
     cover: firstImage ? populatedMedia(firstImage) : null,
   };
 }

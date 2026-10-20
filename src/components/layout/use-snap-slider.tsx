@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CaretLeft, CaretRight } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { useMediaQuery } from "@/components/home/use-environment";
+import { useMediaQuery } from "@/components/layout/use-environment";
 
 /**
  * Cơ chế chung của các slider trang chủ (dự án, ưu đãi): vùng cuộn ngang CSS scroll-snap (vuốt/phím mũi tên/cuộn gốc), KHÔNG autoplay.

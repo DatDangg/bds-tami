@@ -6,7 +6,7 @@ import type { RentalDetailView } from "@/lib/rentals/rental-view";
 import type { Locale } from "@/i18n/routing";
 
 /**
- * Nội dung khối "Thông tin chi tiết" (mockup `.kv`): `<dl>` 2 cột gồm mã tin, danh mục, diện tích, tầng, phòng ngủ, WC, nội thất, hướng nhà, hướng ban công, dự án, ngày đăng.
+ * Nội dung khối "Thông tin chi tiết" (mockup `.kv`): `<dl>` 2 cột ≥ md (1 cột < md), mỗi dòng nhãn trái / giá trị phải, gồm mã tin, danh mục, diện tích, tầng, phòng ngủ, WC, nội thất, hướng nhà, hướng ban công, dự án, ngày đăng.
  * Dòng thiếu dữ liệu bị bỏ. Tiêu đề khối do `DetailSection` ở `RentalDetail` lo. Tiện ích có khối riêng (`RentalAmenities`), giá nằm ở khối tiêu đề và thẻ liên hệ.
  */
 export function RentalDetails({ view }: { view: RentalDetailView }) {
@@ -27,11 +27,11 @@ export function RentalDetails({ view }: { view: RentalDetailView }) {
     ...(view.postedAtLabel && view.postedAtIso ? [{ label: t("postedAt"), value: <time dateTime={view.postedAtIso}>{view.postedAtLabel}</time> }] : []),
   ];
   return (
-    <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+    <dl className="grid gap-x-8 md:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label} className="flex min-w-0 flex-col gap-1 border-b border-border pb-3">
+        <div key={item.label} className="flex min-w-0 items-baseline justify-between gap-4 border-b border-border py-3">
           <dt className="text-small text-text-muted">{item.label}</dt>
-          <dd className="font-semibold break-words">{item.value}</dd>
+          <dd className="text-right font-semibold break-words">{item.value}</dd>
         </div>
       ))}
     </dl>

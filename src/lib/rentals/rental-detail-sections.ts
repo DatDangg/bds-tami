@@ -12,12 +12,12 @@ export type RentalSectionId = (typeof RENTAL_SECTION_IDS)[number];
  * phòng ngủ/WC... Tổng quan chỉ khi có mô tả.
  */
 export function visibleRentalSections(
-  view: Pick<RentalDetailView, "hasTerms" | "hasDescription" | "videoUrl" | "map" | "legalNote"> & { amenities?: readonly unknown[] },
+  view: Pick<RentalDetailView, "hasTerms" | "hasDescription" | "videoUrl" | "map" | "legalNote" | "amenities">,
 ): RentalSectionId[] {
   const present: Record<RentalSectionId, boolean> = {
     overview: view.hasDescription,
     details: true,
-    amenities: (view.amenities?.length ?? 0) > 0,
+    amenities: view.amenities.length > 0,
     terms: view.hasTerms,
     video: view.videoUrl !== null,
     location: view.map !== null,

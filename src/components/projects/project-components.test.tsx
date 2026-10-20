@@ -23,7 +23,6 @@ const card = (overrides: Partial<ProjectCardData> = {}): ProjectCardData => ({
   salesStatus: "selling",
   provinceName: "TP. Hồ Chí Minh",
   categoryName: "Căn hộ",
-  priceFrom: "3,5 tỷ",
   cover: fakeMedia("anh-1"),
   ...overrides,
 });

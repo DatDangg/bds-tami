@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { type ReactNode, useEffect } from "react";
-import { useMediaQuery } from "@/components/home/use-environment";
+import { useMediaQuery } from "@/components/layout/use-environment";
 import { useReportPending } from "@/components/layout/PendingRegion";
 import { ListOptionCell, ListSearchBar } from "@/components/listing/ListSearchBar";
 import { OptionSelect } from "@/components/ui/option-select";

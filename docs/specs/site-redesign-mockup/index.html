@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAMI Site Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Chỉ dùng token có sẵn trong src/app/(frontend)/globals.css */
+:root{
+  --color-primary:#e0bf89;--color-primary-hover:#d4af72;--color-primary-foreground:#141414;
+  --color-primary-soft:#ead3ae;--color-primary-deep:#c9a15f;--color-primary-subtle:#f8f3eb;
+  --color-accent-text:#8c6733;--color-accent-display:#a07a3f;--color-badge-foreground:#3c2704;
+  --color-bg:#f7f5f4;--color-bg-alt:#faf8f6;--color-surface:#fff;--color-surface-muted:#f1f0ee;
+  --color-border:#e8e6e3;--color-input-border:#857f79;--color-overlay:rgb(10 12 16/.55);
+  --color-banner-scrim:rgb(10 12 16/.6);--color-glass:rgb(250 248 246/.8);--color-text:#141414;--color-text-secondary:#555;--color-text-muted:#6b6b6b;
+  --color-dark:#111;--color-dark-deep:#0a0c10;--color-dark-border:#2a2a2a;--color-on-dark:#fff;--color-on-dark-muted:#b3b3b3;
+  --color-success:#2f7d5b;--color-success-subtle:#eaf4ee;--color-success-text:#1f6b4a;
+  --radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-pill:9999px;
+  --shadow-sm:0 1px 2px rgb(40 30 15/.06);--shadow-md:0 6px 16px -4px rgb(40 30 15/.12);--shadow-lg:0 16px 40px -8px rgb(40 30 15/.18);
+  --gutter:clamp(1rem,.6rem + 1.7vw,2rem);--section:clamp(3rem,2.3rem + 3vw,5rem);
+  --text-h1:clamp(1.625rem,1.15rem + 2.3vw,3rem);--text-h2:clamp(1.5rem,1.15rem + 1.5vw,2.375rem);
+  --text-h3:clamp(1.25rem,1.2rem + .25vw,1.375rem);--text-price:clamp(1.5rem,1.35rem + .62vw,1.875rem);
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:Montserrat,system-ui,sans-serif;background:var(--color-bg);color:var(--color-text);line-height:1.7;font-size:16px}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:80rem;margin:0 auto;padding:0 var(--gutter)}
+.ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Thanh chuyển mockup (không phải UI thật) */
+.mock-bar{position:sticky;top:0;z-index:100;background:var(--color-dark-deep);color:var(--color-on-dark);display:flex;gap:6px;padding:8px 12px;overflow-x:auto;font-size:12px}
+.mock-bar b{color:var(--color-primary);white-space:nowrap;padding:6px 8px}
+.mock-bar button{all:unset;cursor:pointer;white-space:nowrap;padding:6px 12px;border-radius:var(--radius-pill);color:var(--color-on-dark-muted)}
+.mock-bar button[aria-current="true"]{background:var(--color-primary);color:var(--color-primary-foreground);font-weight:600}
+.view{display:none}.view.on{display:block}
+
+/* Header */
+.hdr{background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:40px;z-index:50}
+.hdr .wrap{display:flex;align-items:center;height:72px;gap:24px}
+.hdr img{height:36px}
+.nav{display:flex;gap:26px;margin:0 auto;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.nav a{padding:6px 0;color:var(--color-text-secondary)}
+.nav a.cur{color:var(--color-text);box-shadow:inset 0 -2px 0 var(--color-primary)}
+.hdr-r{display:flex;gap:14px;align-items:center;font-size:12px;font-weight:600}
+.menu-btn{display:none}
+@media(max-width:1023px){.nav{display:none}.hdr-r{margin-left:auto}.menu-btn{display:inline-flex}}
+
+/* Nút + chip (element sẵn có) */
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:var(--radius-pill);padding:14px 24px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:0;cursor:pointer;white-space:nowrap}
+.btn-gold{background:var(--color-primary);color:var(--color-primary-foreground)}
+.btn-ghost{background:transparent;border:1px solid var(--color-border);color:var(--color-text)}
+.btn-dark{background:var(--color-dark);color:var(--color-on-dark)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-pill);border:1px solid var(--color-border);background:var(--color-surface);font-size:13px;white-space:nowrap}
+.chip.on{background:var(--color-dark);color:var(--color-on-dark);border-color:var(--color-dark)}
+.round{width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;border:1px solid var(--color-border);background:var(--color-surface);flex:none}
+.round.gold{background:var(--color-primary-subtle);border-color:transparent;color:var(--color-accent-text)}
+.round.glass{background:rgb(255 255 255/.15);border-color:rgb(255 255 255/.5);color:#fff}
+@media(max-width:767px){.eyebrow{letter-spacing:.18em}}
+.badge{white-space:nowrap;font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-pill);background:var(--color-surface);color:var(--color-text)}
+.badge.gold{background:var(--color-primary);color:var(--color-badge-foreground)}
+.badge.green{background:var(--color-success);color:#fff}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--color-accent-display)}
+.on-dark .eyebrow{color:var(--color-primary)}
+
+/* ① Hero trang con: ảnh admin tải lên, chữ trái, breadcrumb trong hero */
+.phero{position:relative;color:#fff;min-height:440px;display:flex;align-items:flex-end;overflow:hidden}
+.phero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.phero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgb(10 12 16/.78) 0%,rgb(10 12 16/.35) 60%,rgb(10 12 16/.15) 100%)}
+.phero>.wrap{position:relative;z-index:1;width:100%;padding-top:80px;padding-bottom:120px}
+.phero.short{min-height:340px}.phero.short>.wrap{padding-bottom:64px}
+/* Breadcrumb trên ảnh: dải kính mờ tối full-width ở mép trên (token --color-overlay + blur), chữ trắng, mục hiện tại vàng; ảnh vẫn nhìn xuyên qua. Trang không có ảnh: nằm trơn đầu trang */
+.crumb-wrap{position:absolute;top:20px;left:0;right:0;z-index:2}
+.crumb{font-size:12px;color:var(--color-text-secondary);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.crumb .sep{width:14px;height:14px;opacity:.75}
+.crumb span:last-child{color:var(--color-text);font-weight:600}
+.crumb.glass{display:inline-flex;max-width:100%;padding:8px 18px;border-radius:var(--radius-pill);background:color-mix(in srgb,var(--color-primary-deep) 13%,transparent);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);font-size:14px;color:#fff;text-shadow:0 1px 3px rgb(10 12 16/.6)}
+@media(max-width:767px){.crumb.glass{font-size:12px;padding:6px 14px}}
+.crumb.glass span:last-child{color:#fff}
+.crumb.plain{padding-top:24px}
+.phero h1{font-size:var(--text-h1);font-weight:500;line-height:1.15;margin:14px 0 12px;max-width:16ch}
+.phero h1 em{font-style:normal;color:var(--color-primary);display:block}
+.phero p{max-width:52ch;color:rgb(255 255 255/.85)}
+
+/* ② Thẻ lọc nổi đè hero (giống khung tìm kiếm trang chủ) */
+.fcard{position:relative;z-index:2;margin-top:-84px;background:var(--color-surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:24px 28px;display:grid;gap:16px}
+.frow{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:12px}
+.frow>span{font-size:12px;font-weight:600;color:var(--color-text-secondary)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.search{display:flex;gap:12px}
+.input{flex:1;display:flex;align-items:center;gap:10px;border:1px solid var(--color-input-border);border-radius:var(--radius-pill);padding:0 18px;height:48px;font-size:14px;color:var(--color-text-muted);background:#fff}
+.select{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--color-border);border-radius:var(--radius-pill);padding:8px 14px;font-size:13px;background:#fff}
+@media(max-width:767px){.frow{grid-template-columns:1fr}.search{flex-direction:column}.fcard{padding:20px;margin-top:-56px}.chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}}
+
+/* ③ Đầu khối kiểu trang chủ */
+.shead{text-align:center;max-width:44rem;margin:0 auto 40px}
+.shead h2{font-size:var(--text-h2);font-weight:500;line-height:1.2;margin:10px 0}
+.shead h2 em{font-style:normal;color:var(--color-accent-display)}
+.shead p{color:var(--color-text-secondary)}
+.shead.left{text-align:left;margin-left:0}
+.sec{padding:var(--section) 0}
+.sec.alt{background:var(--color-bg-alt)}
+.sec.white{background:var(--color-surface)}
+
+/* ④ Thẻ dự án / căn (kiểu "Dự án nổi bật") */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
+.card{background:var(--color-surface);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-md)}
+.card .ph{position:relative;aspect-ratio:4/3}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .ph .badge{position:absolute;top:14px;left:14px}
+.card .ph .heart{position:absolute;top:12px;right:12px;color:#fff}
+.card .ph .heart .ico{width:22px;height:22px}
+.card .bd{padding:18px 20px 20px}
+.card h3{font-size:16px;font-weight:600;line-height:1.4;margin-bottom:10px}
+.meta{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-muted)}
+.card .ft{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:12px}
+.price{color:var(--color-accent-text);font-weight:600;font-size:15px}
+.specs{display:flex;gap:14px;font-size:12px;color:var(--color-text-secondary);margin-top:10px;flex-wrap:wrap}
+.specs span{display:flex;gap:5px;align-items:center}.specs .ico{width:15px;height:15px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin:48px 0 24px;gap:16px;flex-wrap:wrap}
+.toolbar b{font-weight:600}.toolbar small{color:var(--color-text-muted);font-size:14px}
+.pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:40px}
+.dots{display:flex;gap:8px;align-items:center}.dots i{width:6px;height:6px;border-radius:50%;background:var(--color-border)}.dots i.on{width:24px;border-radius:3px;background:var(--color-primary)}
+.pnum{display:flex;gap:6px}.pnum a{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;font-size:14px}.pnum a.on{background:var(--color-dark);color:#fff}
+
+/* ⑤ Banner tư vấn + footer */
+.cta{position:relative;color:#fff;overflow:hidden}
+.cta img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cta::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--color-banner-scrim),rgb(10 12 16/.2))}
+.cta .wrap{position:relative;z-index:1;padding-top:72px;padding-bottom:72px}
+.cta h2{font-size:var(--text-h2);font-weight:500;margin-bottom:8px}.cta p{margin-bottom:24px;color:rgb(255 255 255/.85)}
+.ftr{background:var(--color-dark-deep);color:var(--color-on-dark-muted);font-size:14px}
+.ftr .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-top:56px;padding-bottom:32px}
+.ftr h4{color:var(--color-primary);font-size:12px;letter-spacing:.12em;margin-bottom:14px}
+.ftr a{display:block;margin-bottom:8px}
+.ftr .bot{grid-column:1/-1;border-top:1px solid var(--color-dark-border);padding-top:20px;display:flex;justify-content:space-between;font-size:12px}
+@media(max-width:767px){.ftr .wrap{grid-template-columns:1fr 1fr}.ftr .wrap>div:first-child{grid-column:1/-1}}
+
+/* ⑥ Trang chi tiết */
+.gal{position:relative;height:min(78vh,640px);overflow:hidden;color:#fff}
+.gal>img{width:100%;height:100%;object-fit:cover}
+.gal::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgb(10 12 16/.35) 0%,transparent 30%,transparent 55%,rgb(10 12 16/.75) 100%)}
+.gal .top,.gal .bot{position:absolute;left:0;right:0;z-index:1}
+.gal .top{top:24px}.gal .bot{bottom:76px}
+.gal .bot .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.gal .arr{position:absolute;top:50%;z-index:1;transform:translateY(-50%)}.gal .arr.l{left:24px}.gal .arr.r{right:24px}
+.counter{display:flex;align-items:center;gap:14px;font-size:13px;font-weight:600}
+.counter .bar{width:120px;height:2px;background:rgb(255 255 255/.35);position:relative}.counter .bar::before{content:"";position:absolute;inset:0 70% 0 0;background:var(--color-primary)}
+.thumbs{display:flex;gap:8px}.thumbs img{width:72px;height:52px;object-fit:cover;border-radius:8px;opacity:.7;border:2px solid transparent}.thumbs img.on{opacity:1;border-color:var(--color-primary)}
+.dhead{background:var(--color-surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);margin-top:-48px;position:relative;z-index:2;padding:28px 32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.dhead h1{font-size:clamp(1.5rem,1.2rem + 1.4vw,2.25rem);font-weight:500;line-height:1.2;margin:8px 0 10px}
+.dhead .pr{text-align:right}.dhead .pr small{display:block;font-size:12px;color:var(--color-text-muted)}
+.dhead .pr b{font-size:var(--text-price);font-weight:600;color:var(--color-accent-text)}
+@media(max-width:1023px){.thumbs{display:none}}
+@media(max-width:767px){.dhead{grid-template-columns:1fr;padding:20px;margin-top:-32px}.dhead .pr{text-align:left}.gal{height:480px}.gal .arr{display:none}.gal .bot{bottom:52px}.gal .bot .wrap{flex-wrap:wrap;align-items:center}.gal .bot .btn{padding:10px 14px;font-size:11px}.gal .bot .note{display:none}}
+.facts{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;border-top:1px solid var(--color-border);padding-top:22px}
+.fact{display:flex;gap:14px;align-items:center}
+.fact .round{width:52px;height:52px}.fact .round .ico{width:24px;height:24px}
+.fact b{display:block;font-size:16px;font-weight:600;line-height:1.3;color:var(--color-text)}.fact small{font-size:13px;color:var(--color-text-secondary)}
+@media(max-width:767px){.facts{grid-template-columns:1fr 1fr}}
+.subnav{position:sticky;top:112px;z-index:20;background:var(--color-bg);padding:16px 0;margin-top:32px;border-bottom:1px solid var(--color-border)}
+.subnav .chips{flex-wrap:nowrap;overflow-x:auto}
+/* Trang chi tiết giữ nền vàng nhạt như hiện tại (DetailLayout: bg-primary-subtle) */
+#detail-project,#detail-rent,#detail-project .subnav,#detail-rent .subnav{background:var(--color-primary-subtle)}
+.dgrid{display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;padding:40px 0 var(--section)}
+@media(max-width:1023px){.dgrid{grid-template-columns:1fr}}
+.block{background:var(--color-surface);border-radius:var(--radius-xl);padding:32px;margin-bottom:24px}
+.block .eyebrow{display:block;margin-bottom:6px}
+.block h2{font-size:var(--text-h3);font-weight:500;margin-bottom:16px}
+.block p{color:var(--color-text-secondary);margin-bottom:12px}
+.amen{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.amen div{display:flex;gap:12px;align-items:center;font-size:14px}
+@media(max-width:767px){.amen{grid-template-columns:1fr 1fr}.block{padding:22px}}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+.kv div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-border);font-size:14px}
+.kv div span{color:var(--color-text-muted)}
+@media(max-width:767px){.kv{grid-template-columns:1fr}}
+.map{aspect-ratio:16/7;border-radius:var(--radius-lg);background:var(--color-surface-muted);display:grid;place-items:center;color:var(--color-text-muted);font-size:13px}
+.aside{position:sticky;top:190px;background:var(--color-surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-md);padding:28px;display:grid;gap:14px}
+.aside h3{font-size:18px;font-weight:600}
+.agent{display:flex;gap:12px;align-items:center;padding:14px;border-radius:var(--radius-lg);background:var(--color-primary-subtle)}
+.agent .av{width:48px;height:48px;border-radius:50%;background:var(--color-primary-soft);display:grid;place-items:center;font-weight:600;color:var(--color-accent-text)}
+.field{border:1px solid var(--color-input-border);border-radius:var(--radius-md);height:46px;padding:0 14px;display:flex;align-items:center;font-size:14px;color:var(--color-text-muted)}
+.aside .btn{justify-content:center}
+.slider{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 72px)/4);gap:24px;overflow:hidden}
+@media(max-width:1023px){.slider{grid-auto-columns:calc((100% - 24px)/2)}}
+@media(max-width:600px){.slider{grid-auto-columns:82%;overflow-x:auto}}
+.floor{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+.floor .pl{aspect-ratio:4/3;border-radius:var(--radius-lg);background:var(--color-surface-muted);display:grid;place-items:center;color:var(--color-text-muted);font-size:13px;border:1px dashed var(--color-border)}
+@media(max-width:767px){.floor{grid-template-columns:1fr}}
+
+/* ⑦ Tin tức */
+.feat{display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:center;background:var(--color-surface);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-md)}
+.feat img{width:100%;height:100%;object-fit:cover;min-height:340px}
+.feat .bd{padding:32px 32px 32px 0}
+.feat h3{font-size:var(--text-h3);font-weight:500;margin:10px 0 12px}
+@media(max-width:767px){.feat{grid-template-columns:1fr}.feat .bd{padding:0 22px 24px}.feat img{min-height:220px}}
+.news .card .ph{aspect-ratio:16/10}
+.art{max-width:48rem;margin:0 auto}
+.artgrid{display:grid;grid-template-columns:minmax(0,48rem) 340px;justify-content:space-between;gap:48px;align-items:start;padding-bottom:var(--section)}
+.art-side{position:sticky;top:130px;display:grid;gap:20px;padding-top:56px}
+.mini{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--color-border)}
+.mini img{width:84px;height:60px;object-fit:cover;border-radius:var(--radius-md)}
+.mini b{display:block;font-size:14px;font-weight:600;line-height:1.4}.mini small{font-size:12px;color:var(--color-text-muted)}
+@media(max-width:1023px){.artgrid{grid-template-columns:1fr}.art-side{position:static;padding-top:0}}
+.art-hd{padding:56px 0 32px}
+.art-hd h1{font-size:var(--text-h1);font-weight:500;line-height:1.15;margin:14px 0}
+.art-img{border-radius:var(--radius-xl);overflow:hidden;aspect-ratio:16/8;margin-bottom:40px}
+.art-img img{width:100%;height:100%;object-fit:cover}
+.art-body p{color:var(--color-text-secondary);margin-bottom:18px;font-size:17px}
+.art-body h2{font-size:var(--text-h3);font-weight:500;margin:32px 0 12px}
+.quote{border-left:3px solid var(--color-primary);padding:8px 0 8px 20px;font-size:19px;color:var(--color-text);margin:28px 0}
+.share{display:flex;gap:10px;align-items:center;border-top:1px solid var(--color-border);padding-top:24px;margin:40px 0;font-size:13px;color:var(--color-text-muted)}
+
+/* ⑧ Trang đơn giản: tuyển dụng / liên hệ / chính sách */
+.strengths{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.strengths>div{display:flex;gap:14px;align-items:center}
+.strengths .round{width:56px;height:56px}.strengths .round .ico{width:26px;height:26px}
+.strengths b{display:block;font-size:15px;font-weight:600;line-height:1.3}.strengths small{font-size:12px;color:var(--color-text-muted)}
+@media(max-width:767px){.strengths{grid-template-columns:1fr 1fr}}
+.jobs{display:grid;gap:16px}
+.job{background:var(--color-surface);border-radius:var(--radius-xl);padding:24px 28px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;box-shadow:var(--shadow-sm)}
+.job h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.job .specs{margin-top:0}
+.contact{display:grid;grid-template-columns:1fr 1.2fr;gap:40px;align-items:start}
+.cinfo{display:grid;gap:20px}
+.cinfo>div{display:flex;gap:16px;align-items:flex-start}
+.cinfo b{display:block;font-weight:600;font-size:15px}.cinfo small{color:var(--color-text-secondary);font-size:14px}
+.form{background:var(--color-surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:32px;display:grid;gap:14px}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form .ta{height:120px;align-items:flex-start;padding-top:12px}
+@media(max-width:767px){.contact{grid-template-columns:1fr}.form .two{grid-template-columns:1fr}.job{grid-template-columns:1fr}}
+.legal{display:grid;grid-template-columns:240px 1fr;gap:40px;align-items:start}
+.toc{position:sticky;top:130px;background:var(--color-surface);border-radius:var(--radius-xl);padding:24px;font-size:14px;display:grid;gap:10px}
+.toc a{color:var(--color-text-secondary)}.toc a.on{color:var(--color-accent-text);font-weight:600}
+@media(max-width:767px){.legal{grid-template-columns:1fr}.toc{position:static}}
+
+/* Chú thích thiết kế (chỉ có trên mockup) */
+.note{display:inline-flex;align-items:center;gap:6px;background:var(--color-dark);color:var(--color-primary);font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);margin-bottom:10px;letter-spacing:.02em}
+.notes-off .note{display:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-area" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h5M15 20v-5"/></symbol>
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M21 18v-5a3 3 0 0 0-3-3H10v8M3 14h18"/><circle cx="6.5" cy="11" r="1.5"/></symbol>
+  <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-4 1 2-5z"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 21V5l8-2v18M12 8h8v13M8 8h0M8 12h0M8 16h0M16 12h0M16 16h0M3 21h18"/></symbol>
+  <symbol id="i-pool" viewBox="0 0 24 24"><path d="M3 18c2 0 2-1 4.5-1S9.5 18 12 18s2.5-1 4.5-1 2.5 1 4.5 1M8 15V5a2 2 0 0 1 4 0M16 15V5a2 2 0 0 0-4 0M8 9h8"/></symbol>
+  <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 22v-6M7 16h10l-5-13z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M3 16h18v3H3zM7 11h10"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+</svg>
+
+<nav class="mock-bar" aria-label="Chọn trang mockup">
+  <b>MOCKUP</b>
+  <button data-v="list-project" aria-current="true">1 · Danh sách Dự án</button>
+  <button data-v="list-rent">2 · Danh sách Cho thuê</button>
+  <button data-v="detail-project">3 · Chi tiết Dự án</button>
+  <button data-v="detail-rent">4 · Chi tiết căn Cho thuê</button>
+  <button data-v="news">5 · Tin tức</button>
+  <button data-v="article">6 · Bài viết</button>
+  <button data-v="careers">7 · Tuyển dụng</button>
+  <button data-v="contact">8 · Liên hệ</button>
+  <button data-v="legal">9 · Chính sách</button>
+  <button id="toggle-notes" style="margin-left:auto">Ẩn/hiện chú thích</button>
+</nav>
+
+<header class="hdr">
+  <div class="wrap">
+    <img src="assets/tami-logo-gold.png" alt="TAMI HOMES">
+    <nav class="nav" id="mainnav">
+      <a href="#">Trang chủ</a><a href="#" data-n="project">Dự án</a><a href="#" data-n="rent">Cho thuê</a><a href="#">Đăng tin BĐS</a><a href="#" data-n="news">Tin tức</a><a href="#" data-n="careers">Tuyển dụng</a><a href="#" data-n="contact">Liên hệ</a>
+    </nav>
+    <div class="hdr-r"><svg class="ico"><use href="#i-search"/></svg><span>VI</span><span style="color:var(--color-text-muted)">|</span><span style="color:var(--color-text-muted)">EN</span><svg class="ico menu-btn"><use href="#i-menu"/></svg></div>
+  </div>
+</header>
+
+<!-- ================= 1. DANH SÁCH DỰ ÁN ================= -->
+<main class="view on" id="list-project">
+  <section class="phero on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Dự án</span></nav></div></div>
+    <img src="assets/img2.webp" alt="">
+    <div class="wrap">
+      <span class="note">① Breadcrumb = khung mờ gần trong suốt chỉ bao quanh chữ, góc trên-trái ảnh, chữ trắng, ngăn bằng › · hero ảnh admin tải lên, chữ trái</span>
+      <div class="eyebrow">Dự án TAMI HOMES</div>
+      <h1>Dự án đang <em>phân phối</em></h1>
+      <p>Các dự án bất động sản TAMI phân phối, lọc theo loại hình, tỉnh/thành và tình trạng mở bán.</p>
+    </div>
+  </section>
+  <div class="wrap">
+    <div class="fcard">
+      <span class="note" style="justify-self:start">② Bộ lọc thành thẻ trắng nổi đè hero, bố cục như khung tìm kiếm trang chủ</span>
+      <div class="search">
+        <div class="input"><span style="flex:1">Nhập tên dự án, khu vực…</span><svg class="ico"><use href="#i-search"/></svg></div>
+        <button class="btn btn-gold">Tìm kiếm <svg class="ico"><use href="#i-arrow"/></svg></button>
+      </div>
+      <div class="frow"><span>Loại hình</span><div class="chips"><a class="chip on">Tất cả</a><a class="chip">Căn hộ chung cư</a><a class="chip">Khu đô thị</a><a class="chip">Nhà phố, biệt thự</a><a class="chip">Nghỉ dưỡng</a></div></div>
+      <div class="frow"><span>Tùy chọn khác</span><div class="chips"><span class="select">Tỉnh/thành <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Tình trạng <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Chủ đầu tư <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span></div></div>
+    </div>
+    <div class="toolbar">
+      <div><b>12 dự án</b> <small>đang hiển thị</small></div>
+      <span class="select">Sắp xếp: Mới nhất <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span>
+    </div>
+    <span class="note">④ Thẻ dùng đúng kiểu "Dự án nổi bật" của trang chủ</span>
+    <div class="grid" data-cards="project" data-n="8"></div>
+    <div class="pager">
+      <span class="round"><svg class="ico"><use href="#i-left"/></svg></span>
+      <div class="pnum"><a class="on">1</a><a>2</a><a>3</a></div>
+      <span class="round"><svg class="ico"><use href="#i-right"/></svg></span>
+    </div>
+  </div>
+  <section class="sec"><div class="wrap"><span class="note">③ Dải điểm mạnh dùng lại từ trang chủ (tuỳ chọn, bật/tắt trong admin)</span><div class="strengths" data-strengths></div></div></section>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 2. DANH SÁCH CHO THUÊ ================= -->
+<main class="view" id="list-rent">
+  <section class="phero on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Cho thuê</span></nav></div></div>
+    <img src="assets/img1.webp" alt="">
+    <div class="wrap">
+      <div class="eyebrow">Cho thuê</div>
+      <h1>Căn hộ cho thuê <em>sẵn sàng vào ở</em></h1>
+      <p>Căn hộ, nhà phố, văn phòng cho thuê do TAMI tư vấn: lọc theo khu vực, mức giá, diện tích và nội thất.</p>
+    </div>
+  </section>
+  <div class="wrap">
+    <div class="fcard">
+      <div class="search">
+        <div class="input"><span style="flex:1">Nhập khu vực, tên tòa nhà hoặc loại căn hộ…</span><svg class="ico"><use href="#i-search"/></svg></div>
+        <button class="btn btn-gold">Tìm kiếm <svg class="ico"><use href="#i-arrow"/></svg></button>
+      </div>
+      <div class="frow"><span>Danh mục</span><div class="chips"><a class="chip on">Tất cả</a><a class="chip">Căn hộ dịch vụ</a><a class="chip">Căn hộ chung cư</a><a class="chip">Studio</a><a class="chip">Nhà nguyên căn</a><a class="chip">Văn phòng</a><a class="chip">Mặt bằng kinh doanh</a></div></div>
+      <div class="frow"><span>Tùy chọn khác</span><div class="chips"><span class="select">Khu vực <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Mức giá <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Diện tích <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Loại căn hộ <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Nội thất <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span><span class="select">Tiện ích <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span></div></div>
+    </div>
+    <div class="toolbar">
+      <div><b>27 căn</b> <small>phù hợp</small></div>
+      <span class="select">Sắp xếp: Mới nhất <svg class="ico" style="width:14px"><use href="#i-down"/></svg></span>
+    </div>
+    <span class="note">④ Thẻ căn: cùng khung thẻ dự án, thêm giá + thông số nhanh</span>
+    <div class="grid" data-cards="rent" data-n="8"></div>
+    <div class="pager">
+      <span class="round"><svg class="ico"><use href="#i-left"/></svg></span>
+      <div class="pnum"><a class="on">1</a><a>2</a><a>3</a><a>4</a></div>
+      <span class="round"><svg class="ico"><use href="#i-right"/></svg></span>
+    </div>
+  </div>
+  <div style="height:var(--section)"></div>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 3. CHI TIẾT DỰ ÁN ================= -->
+<main class="view" id="detail-project">
+  <section class="gal">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Dự án</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>The Crown Đại Hoàng Sơn</span></nav></div></div>
+    <img src="assets/img2.webp" alt="">
+    <span class="round glass arr l"><svg class="ico"><use href="#i-left"/></svg></span>
+    <span class="round glass arr r"><svg class="ico"><use href="#i-right"/></svg></span>
+    <div class="bot"><div class="wrap">
+      <div><span class="note">⑥ Ảnh lớn kiểu hero thay lưới ảnh: bộ đếm + thanh tiến trình như hero trang chủ</span><div class="counter">01 <span style="opacity:.6">/ 24</span><span class="bar"></span></div></div>
+      <div style="display:flex;gap:12px;align-items:center"><div class="thumbs"><img class="on" src="assets/img2.webp" alt=""><img src="assets/img3.webp" alt=""><img src="assets/img4.webp" alt=""><img src="assets/img5.webp" alt=""></div><button class="btn btn-ghost" style="color:#fff;border-color:rgb(255 255 255/.5)"><svg class="ico"><use href="#i-grid"/></svg>Xem tất cả ảnh</button></div>
+    </div></div>
+  </section>
+  <div class="wrap">
+    <div class="dhead">
+      <div>
+        <span class="note">Khối tiêu đề nổi đè ảnh, giống thẻ tìm kiếm trang chủ</span>
+        <div style="display:flex;gap:8px;align-items:center"><span class="eyebrow">Khu đô thị</span><span class="badge green">Đang mở bán</span></div>
+        <h1>The Crown Đại Hoàng Sơn Bắc Ninh</h1>
+        <div class="meta"><svg class="ico" style="width:15px"><use href="#i-pin"/></svg>TP Bắc Ninh, Bắc Ninh</div>
+      </div>
+      <div class="pr"><small>Giá từ</small><b>3,2 tỷ</b><div style="margin-top:10px;display:flex;gap:8px;justify-content:inherit"><span class="round"><svg class="ico"><use href="#i-share"/></svg></span></div></div>
+      <div class="facts">
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-area"/></svg></span><div><b>45 ha</b><small>Quy mô</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-building"/></svg></span><div><b>1.200 căn</b><small>Số sản phẩm</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-award"/></svg></span><div><b>Đại Hoàng Sơn</b><small>Chủ đầu tư</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-clock"/></svg></span><div><b>Quý IV/2027</b><small>Bàn giao</small></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="subnav"><div class="wrap"><div class="chips"><a class="chip on">Tổng quan</a><a class="chip">Vị trí</a><a class="chip">Tiện ích</a><a class="chip">Mặt bằng</a><a class="chip">Tiến độ</a><a class="chip">Pháp lý</a><a class="chip">Lân cận</a></div></div></div>
+  <div class="wrap dgrid">
+    <div>
+      <div class="block"><span class="note">Mỗi mục: dòng nhỏ vàng + tiêu đề, nền trắng bo 20px</span><span class="eyebrow">Tổng quan</span><h2>Khu đô thị sinh thái giữa lòng Bắc Ninh</h2><p>The Crown là khu đô thị phức hợp gồm nhà phố, biệt thự và căn hộ cao tầng, quy hoạch đồng bộ hạ tầng – tiện ích, kết nối nhanh tới Hà Nội qua QL1A và cao tốc.</p><p>Không gian xanh chiếm hơn 30% diện tích, hồ điều hoà trung tâm và chuỗi tiện ích nội khu đầy đủ.</p></div>
+      <div class="block"><span class="eyebrow">Vị trí</span><h2>Kết nối thuận tiện</h2><div class="map">Bản đồ (giữ component bản đồ hiện có)</div></div>
+      <div class="block"><span class="eyebrow">Tiện ích</span><h2>Tiện ích nội khu</h2><div class="amen">
+        <div><span class="round gold"><svg class="ico"><use href="#i-pool"/></svg></span>Bể bơi ngoài trời</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-gym"/></svg></span>Phòng gym</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-tree"/></svg></span>Công viên</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-shield"/></svg></span>An ninh 24/7</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-car"/></svg></span>Hầm đỗ xe</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-users"/></svg></span>Khu sinh hoạt cộng đồng</div>
+      </div></div>
+      <div class="block"><span class="eyebrow">Mặt bằng</span><h2>Mặt bằng điển hình</h2><div class="chips" style="margin-bottom:16px"><a class="chip on">1PN</a><a class="chip">2PN</a><a class="chip">3PN</a></div><div class="floor"><div class="pl">Ảnh mặt bằng</div><div class="kv" style="grid-template-columns:1fr"><div><span>Diện tích</span>68 m²</div><div><span>Phòng ngủ</span>2</div><div><span>WC</span>2</div><div><span>Giá từ</span>3,2 tỷ</div></div></div></div>
+    </div>
+    <aside class="aside">
+      <span class="note">Thẻ liên hệ trắng bo góc, dính khi cuộn</span>
+      <h3>Nhận tư vấn dự án</h3>
+      <div class="agent"><div class="av">TM</div><div><b style="font-size:14px">Tư vấn TAMI</b><div class="meta">Phản hồi trong 15 phút</div></div></div>
+      <div class="field">Họ và tên</div><div class="field">Số điện thoại</div>
+      <button class="btn btn-gold">Nhận tư vấn <svg class="ico"><use href="#i-arrow"/></svg></button>
+      <button class="btn btn-ghost"><svg class="ico"><use href="#i-phone"/></svg>Gọi 0900 000 000</button>
+    </aside>
+  </div>
+  <section class="sec white"><div class="wrap">
+    <div class="shead left"><span class="note">Cuối trang: slider kiểu "Dự án nổi bật", đầu khối canh trái, nền trắng</span><div class="eyebrow">Có thể bạn quan tâm</div><h2>Dự án <em>tương tự</em></h2><p>Các dự án cùng khu vực hoặc cùng loại hình.</p></div>
+    <div class="slider" data-cards="project" data-n="5"></div>
+    <div class="pager"><span class="round"><svg class="ico"><use href="#i-left"/></svg></span><div class="dots"><i class="on"></i><i></i><i></i></div><span class="round"><svg class="ico"><use href="#i-right"/></svg></span></div>
+  </div></section>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 4. CHI TIẾT CHO THUÊ ================= -->
+<main class="view" id="detail-rent">
+  <section class="gal">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Cho thuê</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Căn hộ dịch vụ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>CT-000047</span></nav></div></div>
+    <img src="assets/img1.webp" alt="">
+    <span class="round glass arr l"><svg class="ico"><use href="#i-left"/></svg></span>
+    <span class="round glass arr r"><svg class="ico"><use href="#i-right"/></svg></span>
+    <div class="bot"><div class="wrap">
+      <div class="counter">01 <span style="opacity:.6">/ 12</span><span class="bar"></span></div>
+      <div style="display:flex;gap:12px;align-items:center"><div class="thumbs"><img class="on" src="assets/img1.webp" alt=""><img src="assets/img6.webp" alt=""><img src="assets/img7.webp" alt=""><img src="assets/img8.webp" alt=""></div><button class="btn btn-ghost" style="color:#fff;border-color:rgb(255 255 255/.5)"><svg class="ico"><use href="#i-play"/></svg>Video</button><button class="btn btn-ghost" style="color:#fff;border-color:rgb(255 255 255/.5)"><svg class="ico"><use href="#i-grid"/></svg>Tất cả ảnh</button></div>
+    </div></div>
+  </section>
+  <div class="wrap">
+    <div class="dhead">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="eyebrow">Căn hộ dịch vụ · CT-000047</span><span class="badge gold">Còn trống</span></div>
+        <h1>Căn hộ 2PN full nội thất view hồ Tây</h1>
+        <div class="meta"><svg class="ico" style="width:15px"><use href="#i-pin"/></svg>Quảng An, Tây Hồ, Hà Nội</div>
+      </div>
+      <div class="pr"><small>Giá thuê</small><b>18 triệu<span style="font-size:15px;font-weight:500;color:var(--color-text-muted)">/tháng</span></b><div style="margin-top:10px;display:flex;gap:8px;justify-content:inherit"><span class="round"><svg class="ico"><use href="#i-share"/></svg></span></div></div>
+      <div class="facts">
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-area"/></svg></span><div><b>75 m²</b><small>Diện tích</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-bed"/></svg></span><div><b>2 phòng ngủ</b><small>2 WC</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-sofa"/></svg></span><div><b>Đầy đủ</b><small>Nội thất</small></div></div>
+        <div class="fact"><span class="round gold"><svg class="ico"><use href="#i-compass"/></svg></span><div><b>Đông Nam</b><small>Hướng</small></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="subnav"><div class="wrap"><div class="chips"><a class="chip on">Tổng quan</a><a class="chip">Thông tin chi tiết</a><a class="chip">Tiện ích</a><a class="chip">Điều khoản</a><a class="chip">Vị trí</a></div></div></div>
+  <div class="wrap dgrid">
+    <div>
+      <div class="block"><span class="eyebrow">Tổng quan</span><h2>Mô tả căn hộ</h2><p>Căn hộ tầng cao, ban công rộng nhìn thẳng hồ Tây. Nội thất mới, đầy đủ thiết bị, dọn vào ở ngay. Phí dịch vụ đã gồm dọn phòng 2 lần/tuần và internet.</p></div>
+      <div class="block"><span class="eyebrow">Thông tin</span><h2>Thông tin chi tiết</h2><div class="kv">
+        <div><span>Mã căn</span>CT-000047</div><div><span>Loại</span>Căn hộ dịch vụ</div>
+        <div><span>Diện tích</span>75 m²</div><div><span>Tầng</span>12</div>
+        <div><span>Phòng ngủ</span>2</div><div><span>WC</span>2</div>
+        <div><span>Nội thất</span>Đầy đủ</div><div><span>Hướng</span>Đông Nam</div>
+      </div></div>
+      <div class="block"><span class="eyebrow">Tiện ích</span><h2>Tiện ích đi kèm</h2><div class="amen">
+        <div><span class="round gold"><svg class="ico"><use href="#i-gym"/></svg></span>Phòng gym</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-car"/></svg></span>Chỗ đỗ xe</div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-shield"/></svg></span>Bảo vệ 24/7</div>
+      </div></div>
+      <div class="block"><span class="eyebrow">Điều khoản</span><h2>Điều khoản thuê</h2><div class="kv"><div><span>Đặt cọc</span>1 tháng</div><div><span>Thanh toán</span>3 tháng/lần</div><div><span>Thời hạn tối thiểu</span>6 tháng</div><div><span>Phí dịch vụ</span>Đã bao gồm</div></div></div>
+      <div class="block"><span class="eyebrow">Vị trí</span><h2>Vị trí & lân cận</h2><div class="map">Bản đồ + tab lân cận (giữ component hiện có)</div></div>
+    </div>
+    <aside class="aside">
+      <h3>Đặt lịch xem nhà</h3>
+      <div class="agent"><div class="av">TM</div><div><b style="font-size:14px">Tư vấn TAMI</b><div class="meta">Phản hồi trong 15 phút</div></div></div>
+      <div class="field">Họ và tên</div><div class="field">Số điện thoại</div><div class="field">Ngày muốn xem</div>
+      <button class="btn btn-gold">Đặt lịch xem <svg class="ico"><use href="#i-arrow"/></svg></button>
+      <button class="btn btn-ghost"><svg class="ico"><use href="#i-phone"/></svg>Gọi 0900 000 000</button>
+    </aside>
+  </div>
+  <section class="sec white"><div class="wrap">
+    <div class="shead left"><div class="eyebrow">Có thể bạn quan tâm</div><h2>Căn <em>tương tự</em></h2><p>Cùng khu vực, mức giá gần giống.</p></div>
+    <div class="slider" data-cards="rent" data-n="5"></div>
+    <div class="pager"><span class="round"><svg class="ico"><use href="#i-left"/></svg></span><div class="dots"><i class="on"></i><i></i><i></i></div><span class="round"><svg class="ico"><use href="#i-right"/></svg></span></div>
+  </div></section>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 5. TIN TỨC ================= -->
+<main class="view" id="news">
+  <section class="phero short on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Tin tức</span></nav></div></div>
+    <img src="assets/img6.webp" alt="">
+    <div class="wrap">
+      <div class="eyebrow">Tin tức</div>
+      <h1>Tin tức & <em>góc nhìn thị trường</em></h1>
+      <p>Cập nhật từ TAMI HOMES và thị trường bất động sản.</p>
+    </div>
+  </section>
+  <div class="wrap">
+    <div class="subnav" style="position:static;margin-top:0;border:0"><div class="chips"><a class="chip on">Tất cả</a><a class="chip">Tin TAMI</a><a class="chip">Thị trường</a><a class="chip">Kinh nghiệm thuê nhà</a><a class="chip">Pháp lý</a></div></div>
+    <span class="note">Bài nổi bật: ảnh trái lớn, chữ phải. Lưới bài dùng khung thẻ chung</span>
+    <article class="feat"><img src="assets/img8.webp" alt=""><div class="bd"><span class="eyebrow">Thị trường</span><h3>Thị trường căn hộ cho thuê Hà Nội quý III/2026: nguồn cung tăng, giá ổn định</h3><p style="color:var(--color-text-secondary)">Khu vực phía Tây và Tây Hồ tiếp tục dẫn đầu nhu cầu thuê từ chuyên gia nước ngoài…</p><div class="meta" style="margin:16px 0 20px"><svg class="ico" style="width:15px"><use href="#i-clock"/></svg>18/10/2026 · 6 phút đọc</div><a class="btn btn-gold">Đọc bài <svg class="ico"><use href="#i-arrow"/></svg></a></div></article>
+    <div class="grid news" style="margin-top:32px" data-cards="news" data-n="6"></div>
+    <div class="pager"><span class="round"><svg class="ico"><use href="#i-left"/></svg></span><div class="pnum"><a class="on">1</a><a>2</a></div><span class="round"><svg class="ico"><use href="#i-right"/></svg></span></div>
+  </div>
+  <div style="height:var(--section)"></div>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 6. BÀI VIẾT ================= -->
+<main class="view" id="article">
+  <div class="wrap"><nav class="crumb plain" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Tin tức</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Thị trường</span></nav></div>
+  <div class="wrap artgrid">
+    <div class="art">
+      <div class="art-hd">
+        <span class="note">Bài viết: canh trái theo container như các trang khác, cột phải "Bài mới" dính khi cuộn</span>
+        <div class="eyebrow">Thị trường</div>
+        <h1>Thị trường căn hộ cho thuê Hà Nội quý III/2026</h1>
+        <div class="meta"><svg class="ico" style="width:15px"><use href="#i-clock"/></svg>18/10/2026 · 6 phút đọc · TAMI HOMES</div>
+      </div>
+      <div class="art-img"><img src="assets/img8.webp" alt=""></div>
+      <div class="art-body">
+        <p>Nguồn cung căn hộ cho thuê tại Hà Nội tiếp tục tăng trong quý III, chủ yếu từ các dự án mới bàn giao ở khu vực phía Tây.</p>
+        <h2>Giá thuê giữ ổn định</h2>
+        <p>Mức giá trung bình gần như không đổi so với quý trước, trong khi tỉ lệ lấp đầy ở các khu vực trung tâm vẫn duy trì cao.</p>
+        <p class="quote">"Nhu cầu thuê dài hạn từ chuyên gia và gia đình trẻ là động lực chính của thị trường."</p>
+        <p>Phân khúc căn hộ dịch vụ đầy đủ nội thất ghi nhận thời gian cho thuê ngắn nhất.</p>
+      </div>
+      <div class="share">Chia sẻ <span class="round"><svg class="ico"><use href="#i-share"/></svg></span><span class="round"><svg class="ico"><use href="#i-mail"/></svg></span></div>
+    </div>
+    <aside class="art-side">
+      <div class="block" style="margin:0"><span class="eyebrow">Mới cập nhật</span><h2>Bài viết mới</h2>
+        <a class="mini"><img src="assets/img6.webp" alt=""><span><b>Kinh nghiệm thuê căn hộ dịch vụ cho người mới</b><small>15/10/2026</small></span></a>
+        <a class="mini"><img src="assets/img2.webp" alt=""><span><b>TAMI HOMES phân phối dự án The Crown Bắc Ninh</b><small>12/10/2026</small></span></a>
+        <a class="mini"><img src="assets/img7.webp" alt=""><span><b>Điều khoản cần đọc kỹ trong hợp đồng thuê</b><small>08/10/2026</small></span></a>
+      </div>
+      <div class="block" style="margin:0;background:var(--color-dark);color:#fff"><span class="eyebrow" style="color:var(--color-primary)">Tư vấn</span><h2>Đang tìm căn hộ?</h2><p style="color:var(--color-on-dark-muted)">Để lại số điện thoại, TAMI gọi lại trong 15 phút.</p><a class="btn btn-gold">Nhận tư vấn <svg class="ico"><use href="#i-arrow"/></svg></a></div>
+    </aside>
+  </div>
+  <section class="sec white"><div class="wrap">
+    <div class="shead left"><div class="eyebrow">Đọc tiếp</div><h2>Bài viết <em>liên quan</em></h2></div>
+    <div class="grid news" data-cards="news" data-n="3"></div>
+  </div></section>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 7. TUYỂN DỤNG ================= -->
+<main class="view" id="careers">
+  <section class="phero short on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Tuyển dụng</span></nav></div></div>
+    <img src="assets/img7.webp" alt="">
+    <div class="wrap">
+      <div class="eyebrow">Tuyển dụng</div>
+      <h1>Gia nhập <em>TAMI HOMES</em></h1>
+      <p>Cùng xây dựng trải nghiệm an cư tốt hơn cho khách hàng.</p>
+    </div>
+  </section>
+  <section class="sec"><div class="wrap">
+    <div class="shead left"><span class="note">Đầu khối + dải 4 ý dùng kiểu "Điểm mạnh" trang chủ</span><div class="eyebrow">Vì sao chọn TAMI</div><h2>Môi trường <em>làm việc</em></h2></div>
+    <div class="strengths">
+      <div><span class="round gold"><svg class="ico"><use href="#i-award"/></svg></span><div><b>Thu nhập hấp dẫn</b><small>Lương + hoa hồng rõ ràng</small></div></div>
+      <div><span class="round gold"><svg class="ico"><use href="#i-users"/></svg></span><div><b>Đội ngũ trẻ</b><small>Hỗ trợ, chia sẻ</small></div></div>
+      <div><span class="round gold"><svg class="ico"><use href="#i-building"/></svg></span><div><b>Nguồn hàng lớn</b><small>Dự án & căn cho thuê</small></div></div>
+      <div><span class="round gold"><svg class="ico"><use href="#i-shield"/></svg></span><div><b>Đào tạo bài bản</b><small>Lộ trình thăng tiến</small></div></div>
+    </div>
+  </div></section>
+  <section class="sec white" style="padding-top:var(--section)"><div class="wrap">
+    <div class="shead left"><div class="eyebrow">Vị trí đang tuyển</div><h2>Cơ hội <em>nghề nghiệp</em></h2></div>
+    <div class="jobs">
+      <div class="job"><div><h3>Chuyên viên tư vấn cho thuê</h3><div class="specs"><span><svg class="ico"><use href="#i-pin"/></svg>Hà Nội</span><span><svg class="ico"><use href="#i-clock"/></svg>Toàn thời gian</span><span>Hạn: 30/11/2026</span></div></div><a class="btn btn-gold">Ứng tuyển <svg class="ico"><use href="#i-arrow"/></svg></a></div>
+      <div class="job"><div><h3>Chuyên viên kinh doanh dự án</h3><div class="specs"><span><svg class="ico"><use href="#i-pin"/></svg>Bắc Ninh</span><span><svg class="ico"><use href="#i-clock"/></svg>Toàn thời gian</span><span>Hạn: 15/12/2026</span></div></div><a class="btn btn-gold">Ứng tuyển <svg class="ico"><use href="#i-arrow"/></svg></a></div>
+      <div class="job"><div><h3>Nhân viên marketing nội dung</h3><div class="specs"><span><svg class="ico"><use href="#i-pin"/></svg>Hà Nội</span><span><svg class="ico"><use href="#i-clock"/></svg>Toàn thời gian</span><span>Hạn: 30/11/2026</span></div></div><a class="btn btn-gold">Ứng tuyển <svg class="ico"><use href="#i-arrow"/></svg></a></div>
+    </div>
+  </div></section>
+  <div data-cta></div>
+</main>
+
+<!-- ================= 8. LIÊN HỆ ================= -->
+<main class="view" id="contact">
+  <section class="phero short on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Liên hệ</span></nav></div></div>
+    <img src="assets/img1.webp" alt="">
+    <div class="wrap">
+      <div class="eyebrow">Liên hệ</div>
+      <h1>Kết nối với <em>TAMI HOMES</em></h1>
+      <p>Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất.</p>
+    </div>
+  </section>
+  <section class="sec"><div class="wrap contact">
+    <div>
+      <div class="shead left"><span class="note">Thông tin trái (icon tròn vàng nhạt), form phải trong thẻ trắng nổi</span><div class="eyebrow">Thông tin</div><h2>Văn phòng <em>TAMI</em></h2></div>
+      <div class="cinfo">
+        <div><span class="round gold"><svg class="ico"><use href="#i-pin"/></svg></span><div><b>Địa chỉ</b><small>Tầng 5, toà nhà ABC, Cầu Giấy, Hà Nội</small></div></div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-phone"/></svg></span><div><b>Hotline</b><small>0900 000 000</small></div></div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-mail"/></svg></span><div><b>Email</b><small>info@tamihomes.vn</small></div></div>
+        <div><span class="round gold"><svg class="ico"><use href="#i-clock"/></svg></span><div><b>Giờ làm việc</b><small>8:00 – 18:00, Thứ 2 – Thứ 7</small></div></div>
+      </div>
+    </div>
+    <div class="form">
+      <h3 style="font-size:var(--text-h3);font-weight:500">Gửi yêu cầu tư vấn</h3>
+      <div class="two"><div class="field">Họ và tên</div><div class="field">Số điện thoại</div></div>
+      <div class="field">Email</div>
+      <div class="field">Nhu cầu: Thuê / Mua / Khác</div>
+      <div class="field ta">Lời nhắn</div>
+      <button class="btn btn-gold" style="justify-self:start">Gửi yêu cầu <svg class="ico"><use href="#i-arrow"/></svg></button>
+    </div>
+  </div>
+  <div class="wrap"><div class="map" style="margin-top:40px">Bản đồ văn phòng (giữ component hiện có)</div></div>
+  </section>
+</main>
+
+<!-- ================= 9. CHÍNH SÁCH ================= -->
+<main class="view" id="legal">
+  <section class="phero short on-dark">
+    <div class="crumb-wrap"><div class="wrap"><nav class="crumb glass" aria-label="Breadcrumb"><span>Trang chủ</span><svg class="ico sep" aria-hidden="true"><use href="#i-right"/></svg><span>Chính sách bảo mật</span></nav></div></div>
+    <img src="assets/img6.webp" alt="">
+    <div class="wrap">
+      <div class="eyebrow">Pháp lý</div>
+      <h1>Chính sách <em>bảo mật</em></h1>
+      <p>Cập nhật lần cuối: 01/10/2026</p>
+    </div>
+  </section>
+  <section class="sec"><div class="wrap legal">
+    <nav class="toc"><span class="note">Mục lục dính trái, nội dung trong thẻ trắng</span><a class="on">1. Thông tin thu thập</a><a>2. Mục đích sử dụng</a><a>3. Lưu trữ & bảo vệ</a><a>4. Quyền của bạn</a><a>5. Liên hệ</a></nav>
+    <div class="block" style="margin:0"><span class="eyebrow">Mục 1</span><h2>Thông tin thu thập</h2><p>Chúng tôi thu thập họ tên, số điện thoại và email khi bạn gửi yêu cầu tư vấn hoặc đặt lịch xem nhà.</p><span class="eyebrow" style="margin-top:28px">Mục 2</span><h2>Mục đích sử dụng</h2><p>Thông tin chỉ dùng để liên hệ tư vấn và cải thiện dịch vụ, không chia sẻ cho bên thứ ba khi chưa có sự đồng ý.</p></div>
+  </div></section>
+</main>
+
+<template id="cta-tpl">
+  <section class="cta"><img src="assets/img1.webp" alt=""><div class="wrap"><span class="note">⑤ Banner tư vấn + footer giữ như trang chủ (dùng chung toàn site)</span><h2>Cần tư vấn bất động sản?</h2><p>Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất.</p><a class="btn btn-gold">Nhận tư vấn <svg class="ico"><use href="#i-arrow"/></svg></a></div></section>
+</template>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div><img src="assets/tami-logo-white.png" alt="TAMI HOMES" style="height:44px;margin-bottom:16px"><p style="max-width:40ch">TAMI HOMES là đơn vị môi giới bất động sản, đồng hành cùng khách hàng tối ưu tìm kiếm điểm an gia.</p></div>
+    <div><h4>KHÁM PHÁ</h4><a>Dự án</a><a>Cho thuê</a><a>Tin tức</a></div>
+    <div><h4>VỀ TAMI</h4><a>Tuyển dụng</a><a>Liên hệ</a><a>Chính sách bảo mật</a><a>Điều khoản sử dụng</a></div>
+    <div class="bot"><span>© TAMI HOMES. Bảo lưu mọi quyền.</span><span>VI | EN</span></div>
+  </div>
+</footer>
+
+<script>
+const projects=[["The Crown Đại Hoàng Sơn Bắc Ninh","Bắc Ninh","Đang mở bán","green","img2"],["Khu đô thị đa mục tiêu Linh Nam","Hà Nội","Sắp mở bán","gold","img3"],["Bắc Thăng Long Urban City","Đông Anh","Đang mở bán","green","img4"],["Khu đô thị Thư Lâm","Đông Anh","Sắp mở bán","gold","img5"],["Sun Feliza Tower Hà Đông","Hà Nội","Cận bàn giao","","img6"],["The Matrix One","Nam Từ Liêm","Cận bàn giao","","img7"],["Vinhomes Smart City","Tây Mỗ","Đang mở bán","green","img8"],["Masteri West Heights","Nam Từ Liêm","Cận bàn giao","","img3"]];
+const rents=[["Căn hộ 2PN full nội thất view hồ Tây","Tây Hồ, Hà Nội","18 triệu/tháng","75 m²","2PN","img1"],["Studio dịch vụ gần Lotte Center","Ba Đình, Hà Nội","9 triệu/tháng","35 m²","Studio","img6"],["Văn phòng tầng 3 tòa N01 T2","Bắc Từ Liêm","45 triệu/tháng","220 m²","Văn phòng","img7"],["Căn hộ 3PN Vinhomes Smart City","Nam Từ Liêm","15 triệu/tháng","90 m²","3PN","img8"],["Nhà nguyên căn 4 tầng Cầu Giấy","Cầu Giấy, Hà Nội","30 triệu/tháng","60 m²","4PN","img4"],["Căn hộ 1PN The Matrix One","Nam Từ Liêm","12 triệu/tháng","50 m²","1PN","img5"],["Mặt bằng kinh doanh phố Huế","Hai Bà Trưng","80 triệu/tháng","120 m²","Mặt bằng","img3"],["Căn hộ 2PN Sun Feliza","Hà Đông","13 triệu/tháng","70 m²","2PN","img2"]];
+const news=[["Thị trường","Kinh nghiệm thuê căn hộ dịch vụ cho người mới chuyển đến Hà Nội","img6"],["Tin TAMI","TAMI HOMES ký kết phân phối dự án The Crown Bắc Ninh","img2"],["Pháp lý","Những điều khoản cần đọc kỹ trong hợp đồng thuê nhà","img7"],["Thị trường","Khu Tây Hà Nội: nguồn cung mới và xu hướng giá","img4"],["Kinh nghiệm thuê nhà","Checklist bàn giao căn hộ cho thuê","img1"],["Tin TAMI","Ra mắt bộ lọc tìm căn hộ mới trên website","img8"]];
+const I=(id,s='')=>`<svg class="ico" ${s}><use href="#i-${id}"/></svg>`;
+const arrowBtn=`<span class="round gold">${I('arrow')}</span>`;
+const card={
+  project:([t,l,b,c,img])=>`<article class="card"><div class="ph"><img src="assets/${img}.webp" alt=""><span class="badge ${c}">${b}</span></div><div class="bd"><h3>${t}</h3><div class="ft"><span class="meta">${I('pin','style="width:15px"')}${l}</span>${arrowBtn}</div></div></article>`,
+  rent:([t,l,p,a,r,img])=>`<article class="card"><div class="ph"><img src="assets/${img}.webp" alt=""><span class="badge gold">Còn trống</span></div><div class="bd"><h3>${t}</h3><span class="meta">${I('pin','style="width:15px"')}${l}</span><div class="specs"><span>${I('area')}${a}</span><span>${I('bed')}${r}</span></div><div class="ft"><span class="price">${p}</span>${arrowBtn}</div></div></article>`,
+  news:([c,t,img])=>`<article class="card"><div class="ph"><img src="assets/${img}.webp" alt=""><span class="badge">${c}</span></div><div class="bd"><h3>${t}</h3><div class="ft"><span class="meta">${I('clock','style="width:15px"')}15/10/2026</span>${arrowBtn}</div></div></article>`
+};
+const data={project:projects,rent:rents,news};
+document.querySelectorAll('[data-cards]').forEach(el=>{const k=el.dataset.cards;el.innerHTML=data[k].slice(0,+el.dataset.n).map(card[k]).join('')});
+const st=[["pin","Vị trí đắc địa","Kết nối thuận tiện"],["building","Căn hộ đa dạng","Phù hợp mọi nhu cầu"],["users","Hỗ trợ chuyên nghiệp","Tư vấn tận tâm"],["shield","Thủ tục nhanh gọn","Sẵn sàng vào ở"]];
+document.querySelectorAll('[data-strengths]').forEach(el=>el.innerHTML=st.map(([i,b,s])=>`<div><span class="round gold">${I(i)}</span><div><b>${b}</b><small>${s}</small></div></div>`).join(''));
+const tpl=document.getElementById('cta-tpl');
+document.querySelectorAll('[data-cta]').forEach(el=>el.replaceWith(tpl.content.cloneNode(true)));
+const navMap={'list-project':'project','detail-project':'project','list-rent':'rent','detail-rent':'rent',news:'news',article:'news',careers:'careers',contact:'contact'};
+function show(v){
+  document.querySelectorAll('.view').forEach(m=>m.classList.toggle('on',m.id===v));
+  document.querySelectorAll('.mock-bar [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===v));
+  document.querySelectorAll('#mainnav a').forEach(a=>a.classList.toggle('cur',a.dataset.n===navMap[v]));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.mock-bar [data-v]').forEach(b=>b.onclick=()=>{location.hash=b.dataset.v});
+document.getElementById('toggle-notes').onclick=()=>document.body.classList.toggle('notes-off');
+addEventListener('hashchange',()=>show(location.hash.slice(1)||'list-project'));
+show(location.hash.slice(1)||'list-project');
+</script>
+</body>
+</html>

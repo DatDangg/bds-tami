@@ -8,7 +8,7 @@ import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 import type { HeroSlideView } from "@/lib/home/home-view";
 import { cn } from "@/lib/utils";
-import { useMediaQuery, usePageVisible, useSaveData } from "./use-environment";
+import { useMediaQuery, usePageVisible, useSaveData } from "@/components/layout/use-environment";
 
 /** Khớp `--slider-interval` (globals.css). */
 export const SLIDE_INTERVAL_MS = 6000;

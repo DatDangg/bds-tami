@@ -24,6 +24,8 @@
     "bench:rentals-search": "payload run scripts/bench/rentals-search.ts",
     "seed:pages": "payload run scripts/seed-pages.ts",
     "seed:sample-services": "payload run scripts/seed-sample-services.ts",
+    "seed:page-heroes": "payload run scripts/seed-page-heroes.ts",
+    "seed:galleries": "payload run scripts/seed-galleries.ts",
     "seed:sample-news": "payload run scripts/seed-sample-news.ts",
     "seed:shell": "payload run scripts/seed-shell-globals.ts",
     "e2e:revalidate": "payload run tests/e2e/revalidate-globals.ts",

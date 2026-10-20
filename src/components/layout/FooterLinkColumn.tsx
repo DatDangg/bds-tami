@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { CaretDown } from "@/components/icons";
-import { useMediaQuery } from "@/components/home/use-environment";
+import { useMediaQuery } from "@/components/layout/use-environment";
 import { cn } from "@/lib/utils";
 import { NavAnchor } from "./NavAnchor";
 import type { FooterColumnView } from "./shell-data";

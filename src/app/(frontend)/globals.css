@@ -326,7 +326,7 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
    Không có backdrop-filter thì nền 13% giữ nguyên (scrim đầu ảnh của hero lo độ đọc); giảm trong suốt → bỏ blur. */
 .crumb-glass {
   background-color: color-mix(in srgb, var(--color-primary-deep) 13%, transparent);
-  text-shadow: 0 1px 3px rgb(10 12 16 / 0.6);
+  text-shadow: 0 1px 3px var(--color-banner-scrim);
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .crumb-glass {

@@ -540,7 +540,7 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       await publish("Thẻ dự án", { province: otherProvinceId, category: catX, priceFromVnd: 3_500_000_000, gallery: [mediaIds[1], mediaIds[0]] });
       const result = await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [catX], provinceId: otherProvinceId, salesStatus: "selling" });
       const [card] = view.toProjectCards(result.docs, "vi");
-      expect(card).toMatchObject({ title: "Thẻ dự án", href: "/du-an/the-du-an", provinceName: "Thành phố Đà Nẵng", categoryName: "Loại X danh sách", priceFrom: "3,5 tỷ", salesStatus: "selling" });
+      expect(card).toMatchObject({ title: "Thẻ dự án", href: "/du-an/the-du-an", provinceName: "Thành phố Đà Nẵng", categoryName: "Loại X danh sách", salesStatus: "selling" });
       expect(card?.cover).toMatchObject({ id: mediaIds[1] });
       const categories = await queries.listRootProjectCategories(payload, "vi");
       expect(categories.docs.map((doc) => doc.name)).toEqual(expect.arrayContaining(["Loại X danh sách", "Loại Y danh sách"]));

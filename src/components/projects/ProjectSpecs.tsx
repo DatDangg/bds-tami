@@ -1,10 +1,10 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import type { ProjectDetailView } from "@/lib/projects/project-detail-view";
-import { formatArea, formatNumber, formatVndCompact } from "@/lib/format";
+import { formatArea, formatNumber } from "@/lib/format";
 import type { Locale } from "@/i18n/routing";
 
-type SpecsInput = Pick<ProjectDetailView, "developer" | "categoryName" | "scale" | "areaFromM2" | "areaToM2" | "priceFromVnd">;
+type SpecsInput = Pick<ProjectDetailView, "developer" | "scale" | "areaFromM2" | "areaToM2">;
 
 function areaText(from: number | null, to: number | null, locale: Locale): string | null {
   const [low, high] = [from, to].filter((value): value is number => value !== null).sort((a, b) => a - b);
@@ -13,10 +13,10 @@ function areaText(from: number | null, to: number | null, locale: Locale): strin
 }
 
 /**
- * Lưới thông số còn lại trong mục Tổng quan (BL-045): quy mô/số sản phẩm/chủ đầu tư/bàn giao đã lên dải thông số của khối tiêu đề nên ở đây chỉ còn loại hình, số tòa/tầng,
- * diện tích, giá từ và link website chủ đầu tư (khi có). 2 cột < md, 4 cột ≥ md. Mục không có dữ liệu bị bỏ; không còn mục nào thì không render gì. Link website mở tab mới, chỉ khi http(s).
+ * Lưới thông số còn lại trong mục Tổng quan (BL-045): quy mô/số sản phẩm/chủ đầu tư/bàn giao đã lên dải thông số của khối tiêu đề nên ở đây chỉ còn số tòa/tầng, diện tích và link website chủ đầu tư (khi có);
+ * loại hình và giá từ đã nằm ở khối tiêu đề nên không lặp lại. 2 cột < md, 4 cột ≥ md. Mục không có dữ liệu bị bỏ; không còn mục nào thì không render gì. Link website mở tab mới, chỉ khi http(s).
  */
-export function ProjectSpecs({ developer, categoryName, scale, areaFromM2, areaToM2, priceFromVnd }: SpecsInput) {
+export function ProjectSpecs({ developer, scale, areaFromM2, areaToM2 }: SpecsInput) {
   const t = useTranslations("page.projectDetail.specs");
   const locale = useLocale() as Locale;
   const scaleParts = [
@@ -41,10 +41,8 @@ export function ProjectSpecs({ developer, categoryName, scale, areaFromM2, areaT
           },
         ]
       : []),
-    ...(categoryName ? [{ key: "category", label: t("category"), value: categoryName }] : []),
     ...(scaleParts.length > 0 ? [{ key: "scale", label: t("scale"), value: scaleParts.join(" · ") }] : []),
     ...(area ? [{ key: "area", label: t("area"), value: area }] : []),
-    ...(priceFromVnd ? [{ key: "price", label: t("price"), value: formatVndCompact(priceFromVnd, locale) }] : []),
   ];
   if (items.length === 0) return null;
 

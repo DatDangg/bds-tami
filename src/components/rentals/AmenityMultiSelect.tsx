@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 
 interface AmenityMultiSelectProps {
-  /** Tên ô ("Tiện ích"); cũng là `aria-label` của nút và tên nhóm ô tích. */
+  /** Tên ô ("Tiện ích"); chữ trên nút khi chưa chọn gì và tên nhóm ô tích (nút có tên theo chữ hiện, nên đọc được cả số đã chọn). */
   label: string;
   /** Chữ trên nút khi đã chọn (vd "Tiện ích (2)"). */
   selectedLabel: string;
@@ -26,7 +26,6 @@ export function AmenityMultiSelect({ label, selectedLabel, options, selected, on
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={label}
           className={cn(
             "flex h-11 w-full min-w-0 cursor-pointer items-center justify-between gap-1.5 rounded-pill border border-input-border pr-2.5 pl-3.5 font-sans text-small text-text md:h-10",
             selected.length > 0 ? "bg-primary-soft" : "bg-surface hover:border-accent-text",

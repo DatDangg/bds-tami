@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useCallback, useId, useState } from "react";
-import { useMediaQuery } from "@/components/home/use-environment";
+import { useMediaQuery } from "@/components/layout/use-environment";
 import { CaretDown, List, X } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

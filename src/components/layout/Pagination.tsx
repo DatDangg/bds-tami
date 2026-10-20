@@ -86,8 +86,9 @@ function StepLink({
   const Icon = direction === "previous" ? CaretLeft : CaretRight;
   if (target === null) {
     return (
-      <span aria-disabled="true" aria-label={label} className={cn(CELL, ARROW_BORDER, "opacity-40")}>
+      <span aria-disabled="true" className={cn(CELL, ARROW_BORDER, "opacity-40")}>
         <Icon size={20} aria-hidden="true" />
+        <span className="sr-only">{label}</span>
       </span>
     );
   }

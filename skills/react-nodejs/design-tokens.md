@@ -203,7 +203,7 @@ Card **không** đổ bóng (phân lớp bằng viền `--color-border` hoặc k
 | `--shadow-md` | `0 6px 16px -4px rgba(40, 30, 15, 0.12)` | Dropdown, popover, khung giá dính (desktop) |
 | `--shadow-lg` | `0 16px 40px -8px rgba(40, 30, 15, 0.18)` | Dialog, cookie banner, nút nổi |
 
-Breadcrumb trên ảnh hero (BL-045 #1): token `--blur-breadcrumb: 4px` + utility `.crumb-glass` (`globals.css`) = nền `color-mix(in srgb, var(--color-primary-deep) 13%, transparent)` + `backdrop-filter: blur(var(--blur-breadcrumb))` + bóng chữ nhẹ; chữ `text-on-dark`. Khác `--blur-glass` (24px, header/khung kính sáng).
+Breadcrumb trên ảnh hero (BL-045 #1): token `--blur-breadcrumb: 4px` + utility `.crumb-glass` (`globals.css`) = nền `color-mix(in srgb, var(--color-primary-deep) 13%, transparent)` + `backdrop-filter: blur(var(--blur-breadcrumb))` + bóng chữ nhẹ; chữ `text-on-dark`; bóng chữ dùng `var(--color-banner-scrim)` (không rgb thô). Đã đo AA trên ảnh hero thật (BL-045 T08): ≥ 7.6:1 p95. Khác `--blur-glass` (24px, header/khung kính sáng).
 
 ## 6. Motion
 

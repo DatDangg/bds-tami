@@ -116,7 +116,7 @@ describe("RentalFilters: thẻ lọc (áp dụng ngay, URL là nguồn sự th�
   it("hàng 'Tùy chọn khác' có đủ 6 ô theo thứ tự: Khu vực, Mức giá, Diện tích, Phòng ngủ, Nội thất, Tiện ích + nút Bộ lọc", () => {
     render(ui(none));
     const more = bar().getByRole("group", { name: "Tùy chọn khác" });
-    const names = Array.from(more.querySelectorAll("button")).map((element) => element.getAttribute("aria-label"));
+    const names = Array.from(more.querySelectorAll("button")).map((element) => element.getAttribute("aria-label") ?? element.textContent?.trim());
     expect(names).toEqual(["Tỉnh/thành", "Giá/tháng (VNĐ)", "Diện tích (m²)", "Phòng ngủ", "Nội thất", "Tiện ích", "Bộ lọc"]);
   });
 
@@ -187,8 +187,7 @@ describe("RentalFilters: thẻ lọc (áp dụng ngay, URL là nguồn sự th�
   it("Tiện ích chọn NHIỀU: xổ danh sách ô tích, URL `amenities=a,b` theo thứ tự danh sách (AND); bỏ tích từng cái; nút hiện số đã chọn", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(ui({ amenities: ["gym"], sort: "newest", page: 1 }));
-    const trigger = bar().getByRole("button", { name: "Tiện ích" });
-    expect(trigger).toHaveTextContent("Tiện ích (1)");
+    const trigger = bar().getByRole("button", { name: "Tiện ích (1)" });
     await user.click(trigger);
     const group = within(await screen.findByRole("group", { name: "Tiện ích" }));
     expect(group.getAllByRole("checkbox")).toHaveLength(10);

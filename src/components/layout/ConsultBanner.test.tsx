@@ -38,6 +38,21 @@ describe("ConsultBanner", () => {
     expect(screen.getByRole("link", { name: "Get advice" })).toHaveAttribute("href", "/en/contact");
   });
 
+  it("tiêu đề + mô tả đi theo cặp: admin có tiêu đề, không có mô tả → KHÔNG chèn mô tả mặc định (hành vi chủ đích)", async () => {
+    getHomepage.mockResolvedValue({ ctaBanner: { title: "Tư vấn riêng", description: "" } });
+    renderWithIntl(await ConsultBanner({ locale: "vi" }));
+    expect(screen.getByRole("heading", { level: 2, name: "Tư vấn riêng" })).toBeInTheDocument();
+    expect(screen.queryByText("Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất.")).toBeNull();
+  });
+
+  it("tiêu đề trống nhưng có mô tả CMS → dùng cả tiêu đề lẫn mô tả mặc định (không trộn chữ admin)", async () => {
+    getHomepage.mockResolvedValue({ ctaBanner: { title: "", description: "Mô tả lẻ của admin" } });
+    renderWithIntl(await ConsultBanner({ locale: "vi" }));
+    expect(screen.getByRole("heading", { level: 2, name: "Cần tư vấn bất động sản?" })).toBeInTheDocument();
+    expect(screen.queryByText("Mô tả lẻ của admin")).toBeNull();
+    expect(screen.getByText("Để lại thông tin, chúng tôi liên hệ trong thời gian sớm nhất.")).toBeInTheDocument();
+  });
+
   it("actionHref ghi đè đích nút (chi tiết dự án → #lead-form); thiếu ảnh → khối tối, không scrim", async () => {
     getHomepage.mockResolvedValue({ ctaBanner: { title: "X" } });
     const { container } = renderWithIntl(await ConsultBanner({ locale: "vi", actionHref: "#lead-form" }));

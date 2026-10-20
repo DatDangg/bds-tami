@@ -8,6 +8,7 @@ const eslintConfig = [
       "public/vendor/", // bản chép của thư viện bên thứ ba (scripts/copy-maplibre-worker.mjs)
       "node_modules/",
       "migrations/",
+      "seed/scraped/", // dữ liệu/script dev cục bộ, gitignore
       "coverage/",
       "skills/",
       ".agent/",

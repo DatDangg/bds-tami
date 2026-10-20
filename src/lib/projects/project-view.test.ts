@@ -42,13 +42,11 @@ describe("toProjectCardData", () => {
       salesStatus: "selling",
       provinceName: "Hà Nội",
       categoryName: "Căn hộ",
-      priceFrom: "3,5 tỷ",
       cover: { id: "m1" },
     });
     expect(toProjectCardData(project({ title: "Project A", slug: "project-a", category: category({ hasEnglish: true, name: "Apartments" }) }), "en")).toMatchObject({
       href: "/en/projects/project-a",
       categoryName: "Apartments",
-      priceFrom: "3.5 billion VND",
     });
   });
 
@@ -58,7 +56,7 @@ describe("toProjectCardData", () => {
 
   it("thiếu ảnh đã populate / tỉnh chưa populate / chưa có giá → null, không vỡ", () => {
     const card = toProjectCardData(project({ gallery: ["m1"], province: "p1", priceFromVnd: null }), "vi");
-    expect(card).toMatchObject({ cover: null, provinceName: null, priceFrom: null });
+    expect(card).toMatchObject({ cover: null, provinceName: null });
     expect(toProjectCardData(project({ gallery: null }), "vi")?.cover).toBeNull();
   });
 

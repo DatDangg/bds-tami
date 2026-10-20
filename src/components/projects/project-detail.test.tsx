@@ -226,14 +226,15 @@ describe("ProjectDetail (S03)", () => {
     expect(container.querySelector("#lead-form")).not.toBeNull();
   });
 
-  it("thông số còn lại ở Tổng quan: chủ đầu tư là link ngoài an toàn, quy mô tòa/tầng, diện tích, giá từ", () => {
+  it("thông số còn lại ở Tổng quan: chủ đầu tư là link ngoài an toàn, quy mô tòa/tầng, diện tích; loại hình + giá từ không lặp", () => {
     const developer = { id: "dv", name: "Vinhomes", website: "https://vinhomes.vn", updatedAt: now, createdAt: now };
     const { container } = renderDetail({ ...fullProject, developer } as Project);
     const specs = container.querySelector("dl") as HTMLElement;
     expect(specs).toHaveAttribute("aria-label", "Thông số dự án");
     expect(within(specs).getByText("Quy mô").nextElementSibling).toHaveTextContent("4 tòa · 30 tầng");
     expect(within(specs).getByText("Diện tích").nextElementSibling).toHaveTextContent("50 – 120 m²");
-    expect(within(specs).getByText("Giá từ").nextElementSibling).toHaveTextContent("3,5 tỷ");
+    expect(within(specs).queryByText("Giá từ")).toBeNull();
+    expect(within(specs).queryByText("Loại hình")).toBeNull();
     // Số sản phẩm + bàn giao đã lên dải thông số của khối tiêu đề, không lặp ở đây.
     expect(within(specs).queryByText("Bàn giao")).toBeNull();
     const link = within(specs).getByRole("link", { name: /Vinhomes/ });
@@ -254,7 +255,7 @@ describe("ProjectDetail (S03)", () => {
 
   it("form lead: có hotline làm lối liên hệ tạm; dự án khác (nếu có) dùng h3", () => {
     renderDetail(fullProject, "vi", [
-      { id: "r1", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: "Hà Nội", categoryName: null, priceFrom: null, cover: null },
+      { id: "r1", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: "Hà Nội", categoryName: null, cover: null },
     ] as never[]);
     expect(screen.getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     const related = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
@@ -270,7 +271,7 @@ const postCard = { id: "a1", title: "Ưu đãi tháng 10", href: "/tin-bds/uu-da
 
 describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => {
   it("có cả hai nhóm: khối sau Tài liệu và trước Dự án khác, mục con 'Tin liên quan' → #related-listings, thẻ h3 là link tới tin", () => {
-    const { container } = renderDetail(fullProject, "vi", [{ id: "d2", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: null, categoryName: null, priceFrom: null, cover: null }] as never[], { rentals: [rentalCard], posts: [postCard] });
+    const { container } = renderDetail(fullProject, "vi", [{ id: "d2", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: null, categoryName: null, cover: null }] as never[], { rentals: [rentalCard], posts: [postCard] });
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
     const links = within(nav).getAllByRole("link");
     expect(links.at(-1)).toHaveTextContent("Tin liên quan");
@@ -305,7 +306,7 @@ describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => 
   });
 
   it("banner tư vấn do trang truyền vào nằm cuối, sau Tin liên quan và Dự án tương tự; không nhân đôi form; ảnh mới không preload", () => {
-    const { container } = renderDetail(fullProject, "vi", [{ id: "d2", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: null, categoryName: null, priceFrom: null, cover: null }] as never[], { rentals: [{ ...rentalCard, cover: image("cover-r1") }], posts: [] });
+    const { container } = renderDetail(fullProject, "vi", [{ id: "d2", title: "Dự án B", href: "/du-an/b", salesStatus: "selling", provinceName: null, categoryName: null, cover: null }] as never[], { rentals: [{ ...rentalCard, cover: image("cover-r1") }], posts: [] });
     const banner = screen.getByTestId("consult-banner");
     const similar = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
     expect(container.querySelector("#related-listings")!.compareDocumentPosition(similar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

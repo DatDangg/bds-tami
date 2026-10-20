@@ -210,7 +210,6 @@
       "readTime": "{minutes} phút đọc",
       "readArticle": "Đọc bài",
       "consultTitle": "Tư vấn nhu cầu",
-      "relatedTitle": "Bài liên quan",
       "tagsLabel": "Từ khoá",
       "tocTitle": "Mục lục",
       "share": {
@@ -238,7 +237,6 @@
       "viewDetail": "Xem chi tiết",
       "description": "Tin bất động sản, voucher và ưu đãi mới nhất từ TAMI.",
       "tabsLabel": "Danh mục đăng tin",
-      "resultCount": "Có {count, number} kết quả",
       "all": "Tất cả",
       "gridLabel": "Danh sách tin đăng",
       "empty": {
@@ -294,13 +292,10 @@
       "allProvinces": "Tất cả",
       "statusLabel": "Trạng thái",
       "allStatuses": "Tất cả",
-      "barAllProvinces": "Tất cả tỉnh/thành",
       "barAllStatuses": "Mọi trạng thái",
-      "apply": "Lọc",
       "clear": "Xoá bộ lọc",
       "resultCount": "Có {count, number} kết quả",
       "gridLabel": "Danh sách dự án",
-      "priceFrom": "Từ {price}",
       "emptyTitle": "Chưa có dự án phù hợp.",
       "noProjects": "Chưa có dự án nào được xuất bản.",
       "salesStatus": {
@@ -340,7 +335,6 @@
         "q": "Từ khoá",
         "qPlaceholder": "Khu vực, dự án, mã tin",
         "category": "Danh mục",
-        "allCategories": "Tất cả danh mục",
         "province": "Tỉnh/thành",
         "allProvinces": "Tất cả tỉnh/thành",
         "ward": "Phường/xã",
@@ -351,7 +345,6 @@
         "priceTo": "Giá đến",
         "fromPlaceholder": "Từ",
         "toPlaceholder": "Đến",
-        "priceHintsLabel": "Mốc giá gợi ý",
         "area": "Diện tích (m²)",
         "areaFrom": "Diện tích từ",
         "areaTo": "Diện tích đến",
@@ -360,7 +353,6 @@
         "amenities": "Tiện ích",
         "sort": "Sắp xếp",
         "anyOption": "Bất kỳ",
-        "priceAny": "Mọi mức giá",
         "priceCustom": "Khoảng giá tuỳ chọn"
       },
       "amenityOption": {
@@ -484,8 +476,6 @@
       }
     },
     "projectDetail": {
-      "heroConsult": "Nhận tư vấn",
-      "heroDocuments": "Tải tài liệu",
       "subNavLabel": "Mục lục dự án",
       "sections": {
         "overview": "Tổng quan",
@@ -494,7 +484,6 @@
         "floorPlans": "Mặt bằng",
         "legal": "Pháp lý",
         "policy": "Chính sách bán hàng",
-        "gallery": "Thư viện ảnh",
         "highlights": "Điểm nổi bật",
         "pricing": "Bảng giá",
         "faq": "Câu hỏi thường gặp"
@@ -515,10 +504,8 @@
       "specs": {
         "label": "Thông số dự án",
         "developer": "Chủ đầu tư",
-        "category": "Loại hình",
         "scale": "Quy mô",
         "area": "Diện tích",
-        "price": "Giá từ",
         "handover": "Bàn giao",
         "units": "{count} căn",
         "blocks": "{count} tòa",
@@ -584,9 +571,6 @@
         "posts": "Tin BĐS"
       },
       "visitCta": {
-        "title": "Đăng ký tham quan",
-        "description": "Để lại thông tin, TAMI sắp xếp lịch tham quan dự án phù hợp với bạn.",
-        "button": "Đăng ký tham quan",
         "hotline": "Gọi hotline"
       },
       "facts": {
@@ -608,7 +592,6 @@
         "dots": "Chọn vị trí slide",
         "goTo": "Chuyển tới nhóm dự án {index}"
       },
-      "relatedTitle": "Dự án khác",
       "stickyConsult": "Nhận tư vấn"
     },
     "rentalDetail": {
@@ -728,7 +711,7 @@
         "details": "Thông tin",
         "amenities": "Tiện ích",
         "terms": "Điều khoản",
-        "video": "Video"
+        "video": "Xem thực tế"
       },
       "facts": {
         "label": "Thông số chính",
@@ -956,10 +939,10 @@
     },
     "postDetail": {
       "eyebrow": {
-        "overview": "Tổng quan",
+        "overview": "Chi tiết",
         "offer": "Ưu đãi",
-        "content": "Nội dung",
-        "gallery": "Hình ảnh"
+        "content": "Mô tả",
+        "gallery": "Thực tế"
       },
       "overview": {
         "title": "Tổng quan",

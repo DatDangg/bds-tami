@@ -124,6 +124,9 @@ async function scanPublicProjects(payload: Payload, locale: Locale, where: Where
     });
     all.push(...result.docs);
     if (!result.hasNextPage) break;
+    if (page === SCAN_MAX_PAGES) {
+      payload.logger.warn({ cap: SCAN_MAX_PAGES * SCAN_PAGE_SIZE }, "Quét dự án chạm trần: kết quả từ khoá/sắp giá bị cắt, cần cột searchText + migration");
+    }
   }
   return all;
 }
@@ -184,9 +187,6 @@ export async function listPublicProjects(payload: Payload, locale: Locale, query
   return pageOfScannedProjects(payload, locale, ordered.map((project) => project.id), query.page);
 }
 
-/** Số chủ đầu tư tối đa ở ô lọc (danh mục tra cứu nhỏ). */
-const DEVELOPER_LIMIT = 50;
-
 /**
  * Chủ đầu tư CÓ dự án công khai (ô "Chủ đầu tư" của `/du-an`), theo `sortOrder`. Id lấy từ dự án công khai của ngôn ngữ đang xem rồi
  * đi qua `findPublicList` của `developers` (`/en` chỉ chủ đầu tư có bản EN).
@@ -211,7 +211,8 @@ export async function listDevelopersWithPublicProjects(payload: Payload, locale:
   const { docs } = await findPublicList<Developer>(payload, "developers", locale, {
     where: { id: { in: [...ids] } },
     sort: ["sortOrder", "createdAt"],
-    limit: DEVELOPER_LIMIT,
+    // Đúng số id vừa gom: không cắt cứng, để `?developer=<id>` hợp lệ không bị bỏ khi có nhiều chủ đầu tư.
+    limit: ids.size,
     depth: 0,
   });
   return docs;

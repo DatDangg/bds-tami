@@ -187,6 +187,18 @@ Dành cho process `jobs` (`expire-offers`, `close-job-postings`) làm mới cach
 
 Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/internal/revalidate/route.ts`, `src/lib/revalidate/internal-revalidate.ts`.
 
+### 3.9. Tham số URL trang `/du-an` (BL-045, as-built; không phải endpoint JSON)
+
+Trang danh sách dự án (`/du-an` · `/en/projects`) nhận thêm `?q=&developer=&sort=` ngoài `category`/`province`/`status`/`page`, URL là nguồn sự thật, dùng được không JS (form GET).
+
+| Tham số | Ý nghĩa | Giá trị không hợp lệ |
+|---|---|---|
+| `q` | Từ khoá, không phân biệt hoa/thường/dấu, khớp tên + địa chỉ + phường/xã + tỉnh; tối đa 100 ký tự (ô nhập `maxLength` 100) | Quá dài hoặc rỗng → bỏ tham số |
+| `developer` | Id chủ đầu tư CÓ dự án công khai ở ngôn ngữ đang xem (`/en` chỉ chủ đầu tư có bản EN) | Id lạ → bỏ, không 500 |
+| `sort` | `newest` (mặc định) · `price_asc` · `price_desc` (theo `priceFromVnd`, dự án chưa có giá luôn cuối) | Giá trị lạ → mặc định |
+
+Có `q`/`developer`/`sort` khác mặc định (cùng `category`, `province`, `status`) → `noindex, follow` + canonical `/du-an`; `page` giữ khi đổi sắp xếp, chip/phân trang mang theo mọi tham số trừ `page`. Có `q` hoặc sắp theo giá thì quét bộ nhớ tối đa 1000 dự án công khai (chạm trần ghi cảnh báo log; hết trần cần cột `searchText` + migration), còn lại là một truy vấn SQL phân trang. Không migration, không endpoint mới.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

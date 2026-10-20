@@ -53,7 +53,7 @@ describe("Pagination", () => {
   it("trang đầu: Trước không là link; trang cuối: Sau không là link", () => {
     const first = renderWithIntl(<Pagination page={1} totalPages={3} buildHref={buildHref} />);
     expect(screen.queryByRole("link", { name: /Trước/ })).toBeNull();
-    expect(screen.getByLabelText("Trước")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByText("Trước").closest("[aria-disabled]")).toHaveAttribute("aria-disabled", "true");
     first.unmount();
     renderWithIntl(<Pagination page={3} totalPages={3} buildHref={buildHref} />);
     expect(screen.queryByRole("link", { name: /Sau/ })).toBeNull();

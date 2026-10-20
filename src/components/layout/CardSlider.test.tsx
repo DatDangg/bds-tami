@@ -4,9 +4,11 @@ import { CardSlider, type CardSliderLabels } from "./CardSlider";
 
 const labels: CardSliderLabels = { slide: "Thẻ {index} / {total}", previous: "Trước", next: "Sau", dots: "Chọn thẻ", goTo: "Tới thẻ {index}" };
 
+const originalScrollTo = Element.prototype.scrollTo;
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  Element.prototype.scrollTo = originalScrollTo;
 });
 
 const renderSlider = (count: number) =>

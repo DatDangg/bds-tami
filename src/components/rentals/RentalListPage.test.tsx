@@ -291,7 +291,7 @@ describe("S04 /cho-thue: render", () => {
     expect(search.mock.calls.at(-1)?.[0].amenities).toEqual(["pool", "gym"]);
     expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Hồ bơi" })).toHaveAttribute("href", "/cho-thue?amenities=gym");
     expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Phòng gym" })).toHaveAttribute("href", "/cho-thue?amenities=pool");
-    expect(screen.getByRole("button", { name: "Tiện ích" })).toHaveTextContent("Tiện ích (2)");
+    expect(screen.getByRole("button", { name: "Tiện ích (2)" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Bộ lọc" })).toBeInTheDocument();
   });
 
