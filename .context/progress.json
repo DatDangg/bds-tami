@@ -1,6 +1,11 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "admin-nav-clarity",
+    "phaseTask": "phase-1-task-02",
+    "journal": ".context/runs/feature-admin-nav-clarity-phase-1-task-02.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1358,6 +1363,42 @@
       "specUpdate": "spec/updates/2026-10-21-admin-raw-slug-columns.md",
       "specValidation": ".context/review-reports/spec-validation-feature-admin-raw-slug-columns-phase-1.md",
       "residual": "chưa xem trên trình duyệt; collection-name-admin.ts nên chuyển sang src/lib/admin; chưa test khoá collection/global không trùng; build chưa chạy"
+    },
+    {
+      "slug": "admin-nav-clarity",
+      "title": "Admin điều hướng: sidebar phân cấp rõ + nhóm Nâng cao + Xem website; Tổng quan thẻ thao tác nhanh + Sửa website + bỏ Mục quản lý + banner dịch nhẹ (BL-041)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-041",
+      "changeDoc": "spec/changes/2026-10-20-admin-nav-clarity.md",
+      "startedAt": "2026-10-21",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-nav-clarity/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-2-review.md"
+          ],
+          "note": "Nhóm Nâng cao (6 mục) + admin.hidden private-files/lead-activities + NavAdvancedCollapse + SiteLink (Xem website) + CSS phân cấp/active; r2 sửa M1 vạch active ≤1024, M2 toggle 44px"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-nav-clarity/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0
+        }
+      ],
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1–D11 trong task file",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)"
     }
   ],
   "bugs": [
@@ -2274,7 +2315,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T18:42:04.265Z",
+  "lastUpdated": "2026-10-20T19:07:34.810Z",
   "approvalMilestones": [
     {
       "id": "M1",

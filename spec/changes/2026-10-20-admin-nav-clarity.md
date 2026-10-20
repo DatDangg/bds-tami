@@ -1,7 +1,7 @@
 ---
 id: admin-nav-clarity
 type: feature
-status: pending
+status: in_progress
 created: 2026-10-20
 ---
 
@@ -41,3 +41,8 @@ User 2026-10-20 (ảnh sidebar, đăng nhập admin):
 - BL-043: Lượt bấm liên hệ / Nhật ký thao tác **vẫn hiện** (trong nhóm "Nâng cao") nên BL-043 làm như cũ.
 - Chưa kiểm: `admin.hidden` của Payload 3.91 có chặn luôn route admin của collection không — agent kiểm trước khi dùng (nếu chặn thì `lead-activities` chỉ được ẩn bằng cách khác hoặc để nhóm "Nâng cao").
 - Hoãn (chưa BL): Ctrl+K tìm nhanh, phễu lead / biểu đồ lượt bấm / chi phí dịch trên Tổng quan — xem `docs/reviews/2026-10-21-admin-audit.md`.
+
+## Xử lý (change-request, 2026-10-21 — auto proceed theo chỉ thị user)
+- Classification: **MODIFY** (FR-ADM-19). Spec delta: câu "Điều hướng rõ (BL-041)" + "Tổng quan (BL-041)".
+- Task: `tasks/feature-admin-nav-clarity/phase-1-task-01.md` (sidebar + Nâng cao + ẩn mục + Xem website) · `phase-1-task-02.md` (Tổng quan + banner).
+- Quyết định tự xử lý (chi tiết + lý do trong task file): D1 ẩn `private-files`/`lead-activities` bằng `admin.hidden: true` (Payload 3.91 chặn route list/doc nhưng drawer mặc định `overrideEntityVisibility=true` → join Lịch sử chăm sóc trong form Lead vẫn chạy; thử thực tế, hỏng thì chuyển "Nâng cao"); D2 thành phần nhóm "Nâng cao"; D3 thu gọn mặc định bằng ghi preference nav một lần; D4 phân cấp thị giác do agent chốt (không chờ duyệt ảnh); D5 "Xem website" theo `NEXT_PUBLIC_SITE_URL`; D6–D7 thẻ thao tác nhanh (phân công lead chỉ admin) + "Tạo loại khác"; D8 Sửa website chỉ admin; D9 bỏ "Mục quản lý"; D10 banner warning `role=status`; D11 bố cục.

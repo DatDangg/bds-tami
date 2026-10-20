@@ -52,16 +52,44 @@ label.field-label .required {
   border-right: 1px solid var(--admin-border);
 }
 
-.nav-group__toggle {
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 600;
-  color: var(--admin-text-subtle);
-  padding: 12px 10px 4px;
+// Phân cấp (BL-041): tiêu đề nhóm = chữ HOA đậm + vạch ngăn giữa các nhóm; mục con thụt lề với vạch dọc mảnh.
+// Độ thụt của mục con = margin + padding + viền; vạch mục đang chọn (.nav__link-indicator) dùng lại đúng tổng này.
+$group-indent-margin: 10px;
+$group-indent-padding: 6px;
+$group-indent-border: 1px;
+$group-indent: $group-indent-margin + $group-indent-padding + $group-indent-border;
 
-  &:hover,
-  &:focus-visible {
+.nav-group {
+  & + .nav-group {
+    margin-top: 8px;
+    border-top: 1px solid var(--admin-border-strong);
+  }
+
+  &__toggle {
+    width: 100%;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--admin-text);
+    padding: 14px 10px 6px;
+    border-radius: var(--admin-radius-s);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+  }
+
+  // Chevron của Payload tự đổi hướng theo trạng thái (mở = lên, thu gọn = xuống); chỉ đậm nét lên (mặc định elevation-200 quá nhạt).
+  &__indicator svg .stroke {
+    stroke: var(--admin-text-muted);
+  }
+
+  &__content {
+    margin-inline-start: $group-indent-margin;
+    padding-inline-start: $group-indent-padding;
+    border-inline-start: $group-indent-border solid var(--admin-border-strong);
   }
 }
 
@@ -84,6 +112,11 @@ label.field-label .required {
     text-decoration: none;
   }
 
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: -2px;
+  }
+
   &.active,
   &:has(.nav__link-indicator) {
     background: var(--admin-accent-soft);
@@ -92,9 +125,10 @@ label.field-label .required {
   }
 }
 
-// Vạch 3px bên trái mục đang chọn, dính mép nav (nav padding-inline-start = 20px của Payload).
+// Vạch 3px bên trái mục đang chọn, dính mép nav: lùi đúng padding của nav (Payload đổi 20/10/16px theo breakpoint qua
+// --nav-padding-inline-start) + độ thụt của nhóm.
 .nav__link-indicator {
-  inset-inline-start: -20px;
+  inset-inline-start: calc(-1 * var(--nav-padding-inline-start, 20px) - #{$group-indent});
   width: 3px;
   height: 20px;
   border-start-end-radius: 3px;
@@ -208,7 +242,46 @@ label.field-label .required {
   right: calc(var(--gutter-h) * -1);
 }
 
+// Nút "Xem website" ở header admin (BL-041): link mở tab mới, vùng bấm 44px trên mobile (chữ ẩn, còn icon + aria-label).
+.tami-admin-site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: var(--admin-radius-s);
+  color: var(--admin-text);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--theme-elevation-100);
+  }
+
+  svg {
+    flex: none;
+  }
+}
+
 @media (max-width: 767px) {
+  // Nhóm "Nâng cao" mặc định thu gọn nên nút toggle là lối vào chính trên mobile: vùng bấm 44px.
+  .nav-group__toggle {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .tami-admin-site-link {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .tami-admin-site-link__text {
+    display: none;
+  }
+
   .template-minimal__wrap {
     padding: 20px;
   }

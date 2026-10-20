@@ -22,9 +22,9 @@ describe("nhóm menu admin (BL-015 T03)", async () => {
   const { default: loaded } = await import("../../payload.config");
   const config = (await loaded) as SanitizedConfig;
 
-  it("mọi collection và global thuộc đúng một trong 7 nhóm tiếng Việt", () => {
+  it("mọi collection và global thuộc đúng một trong 8 nhóm tiếng Việt", () => {
     const labels = new Set<string>(ADMIN_NAV_GROUPS.map((group) => group.label));
-    expect(labels.size).toBe(7);
+    expect(labels.size).toBe(8);
     for (const entity of visibleEntities(config)) {
       expect(labels.has(entity.admin.group as string), `${entity.slug} nhóm=${String(entity.admin.group)}`).toBe(true);
     }
@@ -45,6 +45,12 @@ describe("nhóm menu admin (BL-015 T03)", async () => {
     const labels = ADMIN_NAV_GROUPS.map((group) => group.label) as string[];
     expect(labels).toContain("Dữ liệu nền");
     expect(labels).not.toContain("Danh mục");
+  });
+
+  it("nhóm \"Nâng cao\" đứng cuối với 6 mục kỹ thuật (BL-041)", () => {
+    const last = ADMIN_NAV_GROUPS[ADMIN_NAV_GROUPS.length - 1];
+    expect(last?.label).toBe("Nâng cao");
+    expect([...(last?.collections ?? [])]).toEqual(["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "translation-usage"]);
   });
 
   it("slug chưa khai báo -> throw (không rơi vào nhóm mặc định)", () => {

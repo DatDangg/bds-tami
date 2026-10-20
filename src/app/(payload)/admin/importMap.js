@@ -40,8 +40,10 @@ import { CollectionNameCell as CollectionNameCell_ebbbd7848e3521f42b6c144797a789
 import { CollectionNameHint as CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d } from '../../../components/admin/CollectionNameHint'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
+import { SiteLink as SiteLink_a231a25015c6e0b284665d827f035a95 } from '../../../components/admin/SiteLink'
 import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 } from '../../../components/admin/SessionKeepAlive'
 import { NavigationToastGuard as NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf } from '../../../components/admin/NavigationToastGuard'
+import { NavAdvancedCollapse as NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7 } from '../../../components/admin/NavAdvancedCollapse'
 import { DashboardView as DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f } from '../../../components/admin/dashboard/DashboardView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -90,8 +92,10 @@ export const importMap = {
   "/components/admin/CollectionNameHint#CollectionNameHint": CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
+  "/components/admin/SiteLink#SiteLink": SiteLink_a231a25015c6e0b284665d827f035a95,
   "/components/admin/SessionKeepAlive#SessionKeepAlive": SessionKeepAlive_739be204eef6d8fda1df751cccf17193,
   "/components/admin/NavigationToastGuard#NavigationToastGuard": NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf,
+  "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse": NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7,
   "/components/admin/dashboard/DashboardView#DashboardView": DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

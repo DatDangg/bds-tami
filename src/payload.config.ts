@@ -65,7 +65,9 @@ export default buildConfig({
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
     dateFormat: "dd/MM/yyyy HH:mm",
     components: {
-      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard"],
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse"],
+      // Nút "Xem website" ở header (BL-041).
+      actions: ["/components/admin/SiteLink#SiteLink"],
       // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
       views: { dashboard: { Component: "/components/admin/dashboard/DashboardView#DashboardView" } },
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
