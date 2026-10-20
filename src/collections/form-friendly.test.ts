@@ -51,3 +51,43 @@ describe("form dễ dùng (BL-042): từng collection nội dung", () => {
     expect(adminOf("job-postings", "category")?.className ?? "").not.toContain(REQUIRED_MARK_CLASS);
   });
 });
+
+describe("form dễ dùng (BL-042 T02): gợi ý dưới ô nhập", () => {
+  const afterInput = (slug: string, name: string) =>
+    (findLayoutField(collection(slug).fields, name) as { admin?: { components?: { afterInput?: string[] } } } | undefined)?.admin?.components?.afterInput ?? [];
+  const COUNTER = "/components/admin/SummaryCounter#SummaryCounter";
+  const WORDS = "/components/admin/PriceInWords#PriceInWords";
+
+  it.each([
+    ["projects", "summary"],
+    ["services", "summary"],
+    ["news", "excerpt"],
+    ["property-posts", "excerpt"],
+  ])("%s.%s: có bộ đếm ký tự", (slug, name) => expect(afterInput(slug, name)).toContain(COUNTER));
+
+  it.each([
+    ["projects", "priceFromVnd"],
+    ["projects", "priceToVnd"],
+    ["rentals", "priceMonthlyVnd"],
+    ["property-posts", "priceVnd"],
+    ["job-postings", "salaryMinVnd"],
+    ["job-postings", "salaryMaxVnd"],
+  ])("%s.%s: có dòng giá đọc bằng chữ, vẫn giữ ô Cell danh sách", (slug, name) => {
+    expect(afterInput(slug, name)).toContain(WORDS);
+    const admin = (findLayoutField(collection(slug).fields, name) as { admin?: { components?: { Cell?: string } } }).admin;
+    if (slug !== "job-postings") expect(admin?.components?.Cell).toContain("VndCell");
+  });
+
+  it("bảng giá + ngày cập nhật: giá có dòng chữ, ngày có nút Hôm nay", () => {
+    const table = findLayoutField(collection("projects").fields, "priceTable") as { fields: unknown[] };
+    for (const name of ["priceFrom", "priceTo"]) {
+      const field = findLayoutField(table.fields as never, name) as { admin?: { components?: { afterInput?: string[] } } };
+      expect(field.admin?.components?.afterInput).toContain(WORDS);
+    }
+    expect(afterInput("projects", "priceUpdatedAt")).toContain("/components/admin/TodayButton#TodayButton");
+  });
+
+  it("danh mục dự án lọc theo đúng loại (filterOptions)", () => {
+    expect((findLayoutField(collection("projects").fields, "category") as { filterOptions?: unknown }).filterOptions).toEqual({ scope: { equals: "project" } });
+  });
+});

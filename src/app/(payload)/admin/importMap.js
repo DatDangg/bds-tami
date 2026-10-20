@@ -7,6 +7,7 @@ import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8
 import { UnitsSummaryCell as UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { PriceRangeCell as PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { TitleLinkCell as TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc } from '../../../components/admin/TitleLinkCell'
+import { SummaryCounter as SummaryCounter_93042eeaca9d44b149806b1027146105 } from '../../../components/admin/SummaryCounter'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -33,7 +34,9 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { VndCell as VndCell_fbd7cf2a56609098ead873f2758dcced } from '../../../components/admin/VndCell'
+import { PriceInWords as PriceInWords_e0b2be2f43b038dd1156aa747ad96870 } from '../../../components/admin/PriceInWords'
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
+import { TodayButton as TodayButton_c9ab6e875d3f646b42dd17ca5bd49331 } from '../../../components/admin/TodayButton'
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
 import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3 } from '../../../components/admin/TranslationSummary'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
@@ -66,6 +69,7 @@ export const importMap = {
   "/components/admin/ListSummaryCells#UnitsSummaryCell": UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/ListSummaryCells#PriceRangeCell": PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/TitleLinkCell#TitleLinkCell": TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc,
+  "/components/admin/SummaryCounter#SummaryCounter": SummaryCounter_93042eeaca9d44b149806b1027146105,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -92,7 +96,9 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/VndCell#VndCell": VndCell_fbd7cf2a56609098ead873f2758dcced,
+  "/components/admin/PriceInWords#PriceInWords": PriceInWords_e0b2be2f43b038dd1156aa747ad96870,
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,
+  "/components/admin/TodayButton#TodayButton": TodayButton_c9ab6e875d3f646b42dd17ca5bd49331,
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
   "/components/admin/TranslationSummary#TranslationSummary": TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,

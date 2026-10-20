@@ -10,7 +10,7 @@ const VIETNAM_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Ngày `YYYY-MM-DD` theo giờ Việt Nam của một mốc thời gian. */
-function vietnamDate(instant: Date): string {
+export function vietnamDate(instant: Date): string {
   return new Date(instant.getTime() + VIETNAM_UTC_OFFSET_MS).toISOString().slice(0, 10);
 }
 

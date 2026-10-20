@@ -38,3 +38,13 @@ export function formatRoomsArea(bedrooms: unknown, areaM2: unknown): string {
   const area = isNumber(areaM2) ? formatArea(areaM2, "vi") : undefined;
   return [rooms, area].filter(Boolean).join(" · ") || EMPTY;
 }
+
+/**
+ * Giá đọc bằng chữ cho ô nhập (BL-042): `≈ 3,5 tỷ đồng` · `≈ 15 triệu đồng` · `≈ 950.000 đồng`. Trống/0/âm → `null` (không hiện dòng).
+ * Dùng chung cách rút gọn tỷ/triệu với cột danh sách (`compactParts`), chỉ đổi hậu tố `₫` thành `đồng`.
+ */
+export function formatPriceInWords(amount: unknown): string | null {
+  if (!isPrice(amount)) return null;
+  const { number, unit } = compactParts(amount);
+  return `≈ ${number} ${unit === "₫" ? "đồng" : `${unit} đồng`}`;
+}

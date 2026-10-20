@@ -91,3 +91,45 @@
     min-width: 44px;
   }
 }
+
+// ---- Dòng gợi ý dưới ô nhập: bộ đếm Mô tả ngắn, giá đọc bằng chữ (BL-042 T02) ----
+.tami-field-hint {
+  min-height: 1.25rem; // giữ chỗ khi dòng trống để form không nhảy
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--admin-text-subtle);
+
+  &:empty {
+    display: none;
+  }
+
+  &--warn {
+    color: var(--admin-badge-warning-fg, var(--admin-text-subtle));
+  }
+}
+
+// ---- Nút "Hôm nay" cạnh ô ngày ----
+.tami-today-button {
+  margin-top: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--theme-input-bg);
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--admin-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 767px) {
+    min-height: 44px;
+  }
+}

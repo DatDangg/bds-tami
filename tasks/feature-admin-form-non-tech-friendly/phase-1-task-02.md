@@ -27,7 +27,14 @@
 `pnpm vitest run src/lib/admin src/collections src/components/admin src/fields`, `pnpm typecheck`, `pnpm lint`, importmap + generate:types không đổi trường.
 
 ## Verification summary
-(builder điền)
+- D1 (Danh mục): ĐÃ CÓ, không sửa. Evidence: `@payloadcms/ui` addFieldStatePromise.js ~L485 gán `fieldState.filterOptions = { categories: { scope: { equals } } }` cho relationship khi `filterOptions` là object; Relationship/Input.js (L112-143, L192) áp vào cả ô xổ lẫn list drawer. Thêm test config: category dự án có `filterOptions: { scope: { equals: "project" } }`.
+- D2: `SummaryCounter` (afterInput) + `withSummaryCounter` (`src/fields/form-hints.ts`) áp Projects.summary, Services.summary, News.excerpt, PropertyPosts.excerpt; logic `describeSummaryLength` ở `src/lib/admin/form-hints.ts`.
+- D3/D6: Pháp lý, Chính sách, Tổng quan dùng `createRichTextEditor(placeholder)` của T01; placeholder Địa chỉ, Thời gian bàn giao, Tên tiện ích.
+- D4: `PriceInWords` + `withPriceInWords` áp priceFromVnd/priceToVnd, priceMonthlyVnd, priceVnd, priceTable.priceFrom/priceTo, salaryMinVnd/salaryMaxVnd; hàm `formatPriceInWords` thêm vào `list-summary.ts` dùng lại `compactParts` (không formatter thứ 2).
+- D5: `TodayButton` (afterInput) trên priceUpdatedAt; giá trị = ngày VN (`vietnamDate`+`startOfVietnamDay`, export thêm `vietnamDate` ở deadline.ts) ghim 12:00Z như ô chọn ngày; type=button, 36px (44px ≤767px).
+- CSS: `.tami-field-hint`, `.tami-today-button` ở `_forms.scss` (token sáng/tối, rem). importmap đã regen.
+- Verify: vitest (lib/admin, collections, components/admin, fields, translation, globals) 61 file / 504 test PASS; typecheck PASS; lint 0 error (2 warning cũ ở tools/task-dashboard); generate:types không đổi file; không migration.
+- Residual: chưa chạy thử bằng trình duyệt (afterInput trong hàng array priceTable dựa vào prop `path` của Payload; test mock `useField`).
 
 ## Bổ sung sau spec-validation plan r1
 - G4 → D2: bộ đếm áp cả `excerpt` ("Tóm tắt") của Tin tức + Tin BĐS (và mọi textarea mô tả ngắn hiển thị ở thẻ/Google), cùng helper.

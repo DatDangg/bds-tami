@@ -1,6 +1,7 @@
 import type { ArrayField, DateField, Field, NumberField, NumberFieldSingleValidation, SelectField } from "payload";
 import { number } from "payload/shared";
 
+import { withPriceInWords, withTodayButton } from "../../fields/form-hints";
 import { formRow } from "../../lib/admin/form-layout";
 import { textRowLabel } from "../../lib/admin/row-label";
 
@@ -114,20 +115,20 @@ const priceTableField: ArrayField = {
       rangeNumber("areaTo", "Diện tích đến (m²)", notBelow("areaFrom", "Diện tích đến không được nhỏ hơn diện tích từ.")),
     ),
     formRow(
-      rangeNumber("priceFrom", "Giá từ (VNĐ)"),
-      rangeNumber("priceTo", "Giá đến (VNĐ)", notBelow("priceFrom", "Giá đến không được nhỏ hơn giá từ.")),
+      withPriceInWords(rangeNumber("priceFrom", "Giá từ (VNĐ)")),
+      withPriceInWords(rangeNumber("priceTo", "Giá đến (VNĐ)", notBelow("priceFrom", "Giá đến không được nhỏ hơn giá từ."))),
     ),
     availabilityField,
     { name: "note", type: "text", label: "Ghi chú", localized: true },
   ],
 };
 
-const priceUpdatedAtField: DateField = {
+const priceUpdatedAtField: DateField = withTodayButton({
   name: "priceUpdatedAt",
   type: "date",
   label: "Ngày cập nhật bảng giá",
   admin: { date: { pickerAppearance: "dayOnly" }, description: "Hiển thị cạnh bảng giá để khách biết giá còn mới hay cũ." },
-};
+});
 
 const faqsField: ArrayField = {
   name: "faqs",

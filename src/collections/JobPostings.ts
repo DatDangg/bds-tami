@@ -1,6 +1,7 @@
 import type { CollectionConfig, NumberFieldSingleValidation, SelectField } from "payload";
 import { number } from "payload/shared";
 
+import { withPriceInWords } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
@@ -83,8 +84,8 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
               ),
               formRow(employmentTypeField, { name: "quantity", type: "number", label: "Số lượng tuyển", min: 1 }),
               formRow(
-                { name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 },
-                { name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax },
+                withPriceInWords({ name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 }),
+                withPriceInWords({ name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax }),
               ),
               { name: "salaryText", type: "text", label: "Mức lương hiển thị", localized: true, admin: { description: "Vd: Thoả thuận, 15–20 triệu." } },
               {

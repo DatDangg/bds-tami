@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { validateCoverWhenPublished } from "../fields/cover-image";
+import { withSummaryCounter } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
@@ -37,7 +38,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
             fields: [
               titleField({ placeholder: "VD: Thị trường căn hộ TP.HCM quý 4" }),
               scopedCategoryField("news"),
-              markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
+              withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
               markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
               { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
             ],

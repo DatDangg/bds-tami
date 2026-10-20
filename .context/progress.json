@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "admin-form-non-tech-friendly",
-    "phaseTask": "phase-1-task-02",
+    "phaseTask": "phase-1-task-03",
     "journal": ".context/runs/feature-admin-form-non-tech-friendly-phase-1.md"
   },
   "features": [
@@ -1531,9 +1531,16 @@
           "task": "phase-1-task-02",
           "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-02.md",
           "title": "Dự án + ô số/giá",
-          "status": "pending",
-          "attempt": 0,
-          "round": 0
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-02-round-1-review.md"
+          ],
+          "note": "bộ đếm Mô tả ngắn/Tóm tắt, giá đọc bằng chữ, nút Hôm nay, placeholder richText Dự án; Danh mục filterOptions đã có; 5 MINOR để lại"
         },
         {
           "task": "phase-1-task-03",
@@ -2468,7 +2475,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T21:33:14.184Z",
+  "lastUpdated": "2026-10-20T21:39:39.727Z",
   "approvalMilestones": [
     {
       "id": "M1",

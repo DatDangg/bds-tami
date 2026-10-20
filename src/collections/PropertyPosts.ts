@@ -3,6 +3,7 @@ import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
+import { withPriceInWords, withSummaryCounter } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
@@ -72,7 +73,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
             fields: [
               titleField({ placeholder: "VD: Bán căn 3PN Vinhomes Central Park" }),
               scopedCategoryField("property_post"),
-              markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
+              withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
               markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
             ],
           },
@@ -80,7 +81,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
             label: "Thông tin tin đăng",
             fields: [
               formRow(
-                { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } },
+                withPriceInWords({ name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }),
                 { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
               ),
               formRow(

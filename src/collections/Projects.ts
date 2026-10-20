@@ -7,6 +7,8 @@ import type {
 } from "payload";
 import { upload } from "payload/shared";
 
+import { withSummaryCounter } from "../fields/form-hints";
+import { withPriceInWords } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
@@ -17,6 +19,7 @@ import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidat
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { createRichTextEditor } from "../lib/admin/rich-text-editor";
 import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { textRowLabel } from "../lib/admin/row-label";
@@ -62,7 +65,7 @@ const mediaUpload = (name: string, label: string, mimeType: Record<string, strin
 
 const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 /** Cột tiền: ô danh sách hiện `110.000.000 ₫` (chỉ đổi hiển thị). */
-const vndNumber = (name: string, label: string) => ({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }) as const;
+const vndNumber = (name: string, label: string) => withPriceInWords({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } });
 
 const listColumnField = (name: string, label: string, cell: string) =>
   ({ name, type: "ui", label, admin: { components: { Cell: `/components/admin/ListSummaryCells#${cell}` } } }) as const;
@@ -76,7 +79,7 @@ const scaleGroup: GroupField = {
     nonNegativeNumber("blocks", "Số tòa/block"),
     nonNegativeNumber("floors", "Số tầng"),
     nonNegativeNumber("landAreaM2", "Diện tích đất (m²)"),
-    { name: "handoverTime", type: "text", label: "Thời gian bàn giao", localized: true },
+    { name: "handoverTime", type: "text", label: "Thời gian bàn giao", localized: true, admin: { placeholder: "VD: Quý 4/2026" } },
   ],
 };
 
@@ -87,7 +90,7 @@ const amenitiesField: ArrayField = {
   labels: { singular: "Tiện ích", plural: "Tiện ích" },
   admin: { components: { RowLabel: textRowLabel({ field: "name", fallback: "Tiện ích" }) } },
   fields: [
-    { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true },
+    { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true, admin: { placeholder: "VD: Hồ bơi" } },
     { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm tiện ích." } },
   ],
 };
@@ -136,10 +139,22 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
             fields: [
               titleField({ placeholder: "VD: Vinhomes Grand Park" }),
               scopedCategoryField("project"),
-              markRequired({ name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
-              { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true },
-              { name: "legalInfo", type: "richText", label: "Pháp lý", localized: true },
-              { name: "salesPolicy", type: "richText", label: "Chính sách bán hàng", localized: true },
+              withSummaryCounter(markRequired({ name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
+              { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true, editor: createRichTextEditor("Giới thiệu vị trí, quy mô, điểm nổi bật của dự án…") },
+              {
+                name: "legalInfo",
+                type: "richText",
+                label: "Pháp lý",
+                localized: true,
+                editor: createRichTextEditor("VD: Quyết định phê duyệt quy hoạch 1/500 số …; Giấy phép xây dựng số …; Sổ hồng lâu dài."),
+              },
+              {
+                name: "salesPolicy",
+                type: "richText",
+                label: "Chính sách bán hàng",
+                localized: true,
+                editor: createRichTextEditor("VD: Chiết khấu 5% khi thanh toán sớm; Hỗ trợ vay 70%, miễn lãi 18 tháng."),
+              },
             ],
           },
           {
@@ -162,7 +177,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
                 { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
                 { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
               ),
-              { name: "address", type: "text", label: "Địa chỉ" },
+              { name: "address", type: "text", label: "Địa chỉ", admin: { placeholder: "VD: Phường Long Thạnh Mỹ, TP Thủ Đức" } },
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
               formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),

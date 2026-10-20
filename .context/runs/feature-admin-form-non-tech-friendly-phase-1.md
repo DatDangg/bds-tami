@@ -30,3 +30,4 @@ batchQueue: [phase-1-task-01, phase-1-task-02, phase-1-task-03, phase-1-task-04]
 - 2026-10-21 spec-validator plan r1 FAIL (3 partial) → G1–G12 amended vào task file (không cần user); proceed T01 builder
 - 2026-10-21 T01 builder done: 59 file/477 test PASS, typecheck/lint PASS; residual H1 tạo mới [Chưa đặt tên], không có tiền tố Đang sửa, chưa xem app (không đăng nhập)
 - 2026-10-21 T01 reviewer r1 FAIL (M1 44px) → builder r2 → reviewer r2 STRICT PASS; commit T01
+- 2026-10-21 T02 builder → reviewer STRICT r1 PASS (5 MINOR residual); commit T02
