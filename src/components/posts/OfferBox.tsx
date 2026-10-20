@@ -10,7 +10,7 @@ function RelatedCard({ target }: { target: RelatedTargetView }) {
   return (
     <Link
       href={target.href}
-      className="group flex min-h-11 items-center gap-3 rounded-sm bg-surface p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+      className="group flex min-h-11 items-center gap-3 rounded-sm bg-primary-subtle p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
     >
       <div className="size-20 shrink-0 overflow-hidden rounded-sm bg-surface-muted">
         {target.image && <ResponsiveImage media={target.image} sizes="80px" aspectRatio="1/1" decorative />}
@@ -29,7 +29,7 @@ function periodText(period: NonNullable<PostOfferView["period"]>, t: ReturnType<
 }
 
 /**
- * Khối ưu đãi của S09 (đặt TRƯỚC nội dung, nền `--color-primary-subtle`, viền `--color-primary`): giá, khu vực, thời hạn + badge trạng thái, mã
+ * Nội dung khối ưu đãi của S09 (đặt TRƯỚC nội dung; tiêu đề h2 "Thông tin ưu đãi" + thẻ trắng do `DetailSection` ở `PostDetail` lo): giá, khu vực, thời hạn + badge trạng thái, mã
  * voucher + nút sao chép, điều khoản (accordion đóng), dự án / tin cho thuê liên quan. Ưu đãi đã kết thúc: KHÔNG có mã trong HTML (view đã bỏ,
  * BR-06) và không có nút sao chép, thay bằng dòng "Ưu đãi đã kết thúc". Server Component; chỉ nút sao chép là client.
  */
@@ -41,10 +41,7 @@ export function OfferBox({ offer }: { offer: PostOfferView }) {
     ...(offer.period ? [{ label: t("period"), value: periodText(offer.period, t) }] : []),
   ];
   return (
-    <section aria-labelledby="offer-box-title" className="flex flex-col gap-5 rounded-sm border border-primary bg-primary-subtle p-5 sm:p-6">
-      <h2 id="offer-box-title" className="font-display text-h3">
-        {t("title")}
-      </h2>
+    <div className="flex flex-col gap-5">
       {(rows.length > 0 || offer.badge) && (
         <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {rows.map((row) => (
@@ -68,7 +65,7 @@ export function OfferBox({ offer }: { offer: PostOfferView }) {
         <div className="flex flex-col gap-2">
           <p className="text-xsmall text-text-muted">{t("voucher")}</p>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-sm border-2 border-dashed border-primary bg-surface px-4 py-2 font-display text-h3 tracking-[0.1em] tabular-nums">
+            <span className="rounded-sm border-2 border-dashed border-primary bg-primary-subtle px-4 py-2 font-display text-h3 tracking-[0.1em] tabular-nums">
               {offer.voucherCode}
             </span>
             <CopyVoucherButton code={offer.voucherCode} />
@@ -76,7 +73,7 @@ export function OfferBox({ offer }: { offer: PostOfferView }) {
         </div>
       )}
       {offer.terms && (
-        <details className="rounded-sm bg-surface px-4 py-2">
+        <details className="rounded-sm bg-primary-subtle px-4 py-2">
           <summary className="flex min-h-11 cursor-pointer items-center text-small font-semibold">{t("terms")}</summary>
           <p className="pb-2 text-small whitespace-pre-line text-text-secondary">{offer.terms}</p>
         </details>
@@ -90,6 +87,6 @@ export function OfferBox({ offer }: { offer: PostOfferView }) {
           ))}
         </ul>
       )}
-    </section>
+    </div>
   );
 }

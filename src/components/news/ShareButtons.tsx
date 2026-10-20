@@ -16,7 +16,7 @@ const ACTION_CLASS =
 /**
  * Chia sẻ cuối bài (S11): Facebook, Zalo, sao chép liên kết. Facebook/Zalo là link mở tab mới (không cần JS, không tải SDK
  * của bên thứ ba nên không lộ dữ liệu khách trước khi họ bấm). Chỉ nút sao chép cần JS; kết quả báo qua vùng `aria-live`.
- * Trang Đăng tin BĐS (S09) dùng `PostShare` riêng (chia sẻ đầu bài, Web Share < sm) nhưng tái dùng component này cho sm–<xl.
+ * Nút chia sẻ ở khối tiêu đề trang chi tiết (`DetailShareButton`: Dự án, Cho thuê, Đăng tin BĐS) tái dùng component này làm menu dự phòng khi trình duyệt không có Web Share.
  */
 export function ShareButtons({ url, title }: ShareButtonsProps) {
   const t = useTranslations("page.news.share");

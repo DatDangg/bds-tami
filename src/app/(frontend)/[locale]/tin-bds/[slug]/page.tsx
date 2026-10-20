@@ -1,10 +1,11 @@
 import config from "@payload-config";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { buildContact } from "@/components/layout/shell-data";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -95,6 +96,7 @@ export default async function PostDetailPage({ params }: PageProps) {
     loadHotline(locale),
     loadSiteIdentity(locale),
   ]);
+  const tLead = await getTranslations({ locale, namespace: "page.posts.leadForm" });
   const view = toPostDetailView(doc, locale);
   const ownPath = publicDetailPath(CONTENT_ROUTES["property-posts"], locale, doc.slug ?? slug);
   const siteUrl = getSiteUrl();
@@ -112,6 +114,7 @@ export default async function PostDetailPage({ params }: PageProps) {
         {...(hotline ? { hotline } : {})}
         ownPath={ownPath}
         {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: tLead("callHotline", { phone: hotline.label }), href: hotline.telHref } } : {})} />}
       />
       {pageUrl && (
         <JsonLd

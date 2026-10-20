@@ -245,7 +245,6 @@
         "noPosts": "Chưa có tin đăng.",
         "noPostsInCategory": "Chưa có tin đăng trong mục này."
       },
-      "relatedTitle": "Tin liên quan",
       "subNavLabel": "Mục lục tin đăng",
       "subNav": {
         "overview": "Tổng quan",
@@ -280,10 +279,6 @@
         "relatedRental": "Tin cho thuê"
       },
       "gallery": "Hình ảnh",
-      "share": {
-        "button": "Chia sẻ",
-        "menu": "Cách chia sẻ"
-      },
       "leadForm": {
         "title": "Nhận tư vấn",
         "callHotline": "Gọi hotline {phone}"
@@ -622,8 +617,9 @@
       "subNavLabel": "Mục lục tin cho thuê",
       "subNav": {
         "overview": "Tổng quan",
+        "details": "Thông tin chi tiết",
+        "amenities": "Tiện ích",
         "terms": "Điều khoản",
-        "description": "Mô tả",
         "video": "Video",
         "location": "Vị trí",
         "legal": "Pháp lý"
@@ -635,7 +631,6 @@
         "referencePrice": "Giá tham khảo"
       },
       "specs": {
-        "label": "Thông số chính",
         "price": "Giá thuê",
         "perMonth": "/tháng",
         "negotiable": "Thoả thuận",
@@ -644,12 +639,10 @@
         "bathrooms": "WC"
       },
       "details": {
-        "title": "Chi tiết",
         "floor": "Tầng",
         "houseDirection": "Hướng nhà",
         "balconyDirection": "Hướng ban công",
         "furnishing": "Nội thất",
-        "amenities": "Tiện ích",
         "category": "Danh mục",
         "project": "Dự án"
       },
@@ -694,7 +687,9 @@
         }
       },
       "sections": {
-        "description": "Mô tả",
+        "overview": "Mô tả căn hộ",
+        "details": "Thông tin chi tiết",
+        "amenities": "Tiện ích đi kèm",
         "video": "Video",
         "location": "Vị trí",
         "legal": "Pháp lý"
@@ -714,11 +709,40 @@
         "titleRented": "Nhận tư vấn căn tương tự"
       },
       "similar": {
-        "title": "Tin tương tự",
-        "titleRented": "Căn tương tự đang trống"
+        "eyebrow": "Có thể bạn quan tâm",
+        "title": "Căn",
+        "titleAccent": "tương tự",
+        "titleRented": "Căn tương tự",
+        "titleRentedAccent": "đang trống",
+        "description": "Cùng khu vực, mức giá gần giống.",
+        "slide": "Căn {index} / {total}",
+        "previous": "Căn trước",
+        "next": "Căn sau",
+        "dots": "Chọn vị trí slide",
+        "goTo": "Chuyển tới nhóm căn {index}"
       },
       "stickyConsult": "Nhận tư vấn",
-      "stickyConsultRented": "Nhận tư vấn căn tương tự"
+      "stickyConsultRented": "Nhận tư vấn căn tương tự",
+      "eyebrow": {
+        "overview": "Tổng quan",
+        "details": "Thông tin",
+        "amenities": "Tiện ích",
+        "terms": "Điều khoản",
+        "video": "Video"
+      },
+      "facts": {
+        "label": "Thông số chính",
+        "bedroomsValue": "{count} phòng ngủ",
+        "bathroomsValue": "{count} WC",
+        "sanitary": "Vệ sinh",
+        "direction": "Hướng"
+      },
+      "amenitiesLabel": "Tiện ích của căn",
+      "video": {
+        "button": "Video",
+        "title": "Video giới thiệu",
+        "close": "Đóng"
+      }
     },
     "careers": {
       "title": "Tuyển dụng",
@@ -928,6 +952,30 @@
       "news": {
         "defaultTitle": "Tin tức",
         "viewAll": "Xem tất cả"
+      }
+    },
+    "postDetail": {
+      "eyebrow": {
+        "overview": "Tổng quan",
+        "offer": "Ưu đãi",
+        "content": "Nội dung",
+        "gallery": "Hình ảnh"
+      },
+      "overview": {
+        "title": "Tổng quan",
+        "category": "Danh mục",
+        "publishedAt": "Ngày đăng"
+      },
+      "related": {
+        "eyebrow": "Có thể bạn quan tâm",
+        "title": "Tin",
+        "titleAccent": "liên quan",
+        "description": "Các tin đăng cùng danh mục.",
+        "slide": "Tin {index} / {total}",
+        "previous": "Tin trước",
+        "next": "Tin sau",
+        "dots": "Chọn vị trí slide",
+        "goTo": "Chuyển tới nhóm tin {index}"
       }
     }
   }

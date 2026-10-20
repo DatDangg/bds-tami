@@ -1,10 +1,11 @@
 import config from "@payload-config";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { buildContact } from "@/components/layout/shell-data";
 import { RentalDetail } from "@/components/rentals/RentalDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -116,6 +117,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
     loadSiteIdentity(locale),
     findRentalPrivateFields(payload, doc.id),
   ]);
+  const tContact = await getTranslations({ locale, namespace: "page.rentalDetail.contact" });
   const sale = toSaleContactView(await findActiveSaleContact(payload, locale, privateFields.authorId));
   const view = toRentalDetailView(doc, locale, privateFields.location);
   const ownPath = publicDetailPath(CONTENT_ROUTES.rentals, locale, doc.slug ?? slug);
@@ -136,6 +138,8 @@ export default async function RentalDetailPage({ params }: PageProps) {
         sale={sale}
         {...(hotline ? { hotline } : {})}
         ownPath={ownPath}
+        {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: tContact("callHotline", { phone: hotline.label }), href: hotline.telHref } } : {})} />}
       />
       {!view.rented && pageUrl && siteUrl && (
         <JsonLd

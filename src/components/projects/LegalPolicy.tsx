@@ -44,7 +44,7 @@ function PolicyBlockView({ block, open, onToggle, isLg }: { block: PolicyBlock; 
   return (
     <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] min-w-0 focus:outline-none">
       {block.eyebrow && <p className="mb-1.5 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{block.eyebrow}</p>}
-      <h2 id={headingId} className="font-display text-h2">
+      <h2 id={headingId} className={cn("font-display", block.eyebrow ? "text-h3" : "text-h2")}>
         {isLg ? (
           block.title
         ) : (
