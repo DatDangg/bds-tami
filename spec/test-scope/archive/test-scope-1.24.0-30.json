@@ -1,0 +1,94 @@
+{
+  "specVersion": "1.24.0",
+  "scopeVersion": 30,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-028 — thanh mục con trang chi tiết (dự án + cho thuê) rộng bằng khung nội dung bên dưới (`nav` `mx-auto max-w-container px-gutter` = khung lưới DetailLayout, `ul` `w-full` thay `w-fit`): mép trái thẳng thẻ trắng nội dung, mép phải thẳng thẻ tư vấn/liên hệ (≥ lg; < lg thẳng thẻ nội dung); nút căn trái; kiểu nút/chiều cao/neo giữ nguyên. Bản 84rem theo header bị user loại. MODIFY UI, không đổi schema/API/quyền. Spec 1.23.0 → 1.24.0.",
+  "workItem": "feature/detail-subnav-full-width",
+  "backlog": "BL-028",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-detail-subnav-full-width.md",
+  "task": [
+    "tasks/feature-detail-subnav-full-width/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-detail-subnav-full-width-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "close-out BL-028 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-028 (commit chứa file này)": "T01 — DetailSubNav `ul` `w-fit max-w-full` → `w-full` trong khung `max-w-container` + `px-gutter`; JSDoc BL-028; test project-detail.test.tsx assert nav/ul class. Review FAST PASS r1. Close-out kèm SPECIFICATIONS (Giao diện, F2) + design-spec §2.1 Sticky / S03 mục 3."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.23.0-29.json",
+  "specUpdate": "spec/updates/2026-10-20-detail-subnav-full-width.md",
+  "specRefs": [
+    "Overview — Giao diện (bố cục chi tiết dùng chung)",
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)",
+    "design-spec §2.1 Sticky / S03 mục 3"
+  ],
+  "specRefNotes": {
+    "Overview — Giao diện (bố cục chi tiết dùng chung)": "Thanh mục con viên thuốc trắng rộng bằng khung nội dung (max-w-container + px-gutter): mép trái = thẻ trắng nội dung, mép phải = thẻ tư vấn/liên hệ ≥ lg, < lg = thẻ nội dung; nút căn trái, tràn thì cuộn ngang trong thanh.",
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)": "Thanh mục con trải qua cả cột thẻ \"Tư vấn 1:1\" ≥ lg, nút căn trái; thứ tự/nhãn/neo/active như BL-027.",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)": "Cùng component DetailSubNav — thanh rộng bằng khung, mép phải = thẻ liên hệ ≥ lg.",
+    "design-spec §2.1 Sticky / S03 mục 3": "Reconcile ở close-out: khung nav = lưới DetailLayout (không phải 84rem của header), ul w-full, cao ~54px không đổi."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/projects/project-detail.test.tsx"
+    ],
+    "filesNote": "Chỉ đổi lớp `ul` + JSDoc; hằng 4.5rem, OBSERVER_MARGIN, logic IntersectionObserver/tự cuộn không đổi. Không schema/migration/API/access control/i18n. Doc impact: SPECIFICATIONS (Giao diện, F2), design-spec §2.1 Sticky / S03 mục 3.",
+    "modules": [
+      "Detail — DetailSubNav (bề rộng viên thuốc = khung nội dung, nút căn trái)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Chi tiết dự án `/du-an/<slug>` + `/en/projects/<slug>`: thanh mục con mép trái = mép thẻ trắng nội dung, mép phải = mép aside \"Tư vấn 1:1\" (≥ lg); < lg = mép thẻ nội dung — cả lúc chưa dính và lúc dính đỉnh",
+      "Chi tiết cho thuê `/cho-thue/<slug>` + `/en/for-rent/<slug>`: cùng quy tắc, mép phải = mép thẻ liên hệ (≥ lg); trang ít mục (2–3) nút vẫn căn trái, thanh không co lại"
+    ],
+    "dependents": [
+      "DetailSubNav dùng ở cả 2 trang chi tiết (dự án + cho thuê)",
+      "Thanh mục con dính `top: --sticky-top` 8/16px + neo `scroll-mt` `--sticky-top + 4.5rem` (chiều cao thanh không đổi)"
+    ],
+    "regression": [
+      "Neo cuộn tới section + highlight `aria-current` mục đang xem (BL-027)",
+      "Nhiều mục vượt bề rộng: cuộn ngang trong thanh, mục đang xem tự cuộn vào giữa; trang không tràn ngang",
+      "Kiểu nút active nền `--color-primary` chữ `--color-primary-foreground`; focus-visible",
+      "Header ẩn khi cuộn trên trang chi tiết, thanh không bị che (BL-027)"
+    ]
+  },
+  "acceptance": [
+    "≥ lg (1280 / 1440): mép trái thanh mục con = mép trái thẻ trắng nội dung, mép phải = mép phải thẻ tư vấn/liên hệ (sai lệch ≤ 1px), cả chưa dính và dính đỉnh",
+    "< lg (375 / 768): thanh rộng bằng thẻ nội dung (vd 375px: 16 → 359)",
+    "Thanh không rộng hơn nội dung bên dưới (không dùng khung 84rem của header)",
+    "Nút căn trái; kiểu nút, chiều cao ~54px, bo viên thuốc, viền + shadow giữ nguyên",
+    "Nhiều mục: cuộn ngang trong thanh; `document.documentElement.scrollWidth` = viewport ở 375 / 768 / 1280",
+    "Bấm mục con: cuộn tới section, tiêu đề không bị thanh che; `aria-current` đúng",
+    "VI + EN như nhau"
+  ],
+  "outOfScope": [
+    "Trước hydrate header có thể che thanh mục con (đã chấp nhận ở BL-027)",
+    "Các residual BL-027 (reduced-motion, tin rented, không `:has()`)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1280,
+    1440
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "Diff 1 lớp Tailwind + JSDoc + assert test; component chung nhưng chỉ 2 trang chi tiết, logic không đổi. FAST PASS r1, vitest 12 file / 156 PASS, typecheck PASS, lint 0 error. Đo dev server 1440 (dự án + cho thuê) và 375 (dự án) khớp mép. Residual: 768px chưa kiểm bằng mắt; bản /en chưa đo riêng (cùng component)."
+}

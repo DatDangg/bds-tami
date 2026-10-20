@@ -11,7 +11,8 @@ export interface SubNavItem {
 
 // Vạch "đang xem": khối đầu tiên (theo thứ tự trang) đang chiếm dải từ ngay dưới thanh viên thuốc dính tới 55% chiều cao viewport. rootMargin không dùng được var():
 // lấy mức xấp xỉ scroll-margin lớn nhất trên trang chi tiết (≥ lg: --sticky-top 16 + thanh 54 + khe 18 = 88px; < lg nhỏ hơn 8px) để khối vừa cuộn tới neo luôn nằm trong dải.
-const OBSERVER_MARGIN = "-88px 0px -45% 0px";
+const OBSERVER_TOP_PX = 88;
+const OBSERVER_MARGIN = `-${OBSERVER_TOP_PX}px 0px -45% 0px`;
 // Sau khi bấm một mục, cuộn mượt đi ngang nhiều khối: bỏ qua kết quả quan sát trong lúc cuộn để mục vừa bấm không bị khối ở giữa chiếm (và để
 // khối đứng cạnh nhau ở desktop như Pháp lý / Chính sách vẫn chọn được mục thứ hai: theo thứ tự trang, mục đầu luôn thắng khi cả hai cùng hiện).
 const SCROLL_LOCK_MS = 1000;
@@ -21,7 +22,7 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề trên của header nổi (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`);
+ * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề trên của header nổi (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`; cuộn qua hết mục cuối thì không mục nào được đánh dấu);
  * bấm cuộn mượt tới khối (tắt khi giảm chuyển động) rồi chuyển focus vào khối để người dùng bàn phím/đọc màn hình đi tiếp từ đó.
  * Bề rộng thanh = khung nội dung bên dưới (BL-028): cùng `max-w-container` + `px-gutter` với lưới thẻ nội dung + thẻ phụ nên hai mép thẳng hàng; thanh `w-full`, nút căn trái, cả lúc chưa dính lẫn dính đỉnh.
  * Link là neo `#id` thật nên chạy cả khi chưa có JS. < lg cuộn ngang và mục đang xem tự cuộn vào giữa.
@@ -43,7 +44,14 @@ export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: str
           else visible.delete(entry.target.id);
         }
         const current = ids.find((id) => visible.has(id));
-        if (current && !scrollLocked.current) setActiveId(current);
+        if (scrollLocked.current) return;
+        if (current) {
+          setActiveId(current);
+          return;
+        }
+        // Tập rỗng: chỉ bỏ active khi đã cuộn QUA mục cuối (nó nằm hẳn phía trên dải); ở trên mục đầu / khe giữa mục thì giữ nguyên.
+        const lastTarget = document.getElementById(ids[ids.length - 1] ?? "");
+        if (lastTarget && lastTarget.getBoundingClientRect().bottom <= OBSERVER_TOP_PX) setActiveId("");
       },
       { rootMargin: OBSERVER_MARGIN },
     );

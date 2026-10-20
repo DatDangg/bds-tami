@@ -1,78 +1,77 @@
 {
-  "specVersion": "1.24.0",
-  "scopeVersion": 30,
+  "specVersion": "1.24.1",
+  "scopeVersion": 31,
   "generatedAt": "2026-10-20T23:59:59+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-028 — thanh mục con trang chi tiết (dự án + cho thuê) rộng bằng khung nội dung bên dưới (`nav` `mx-auto max-w-container px-gutter` = khung lưới DetailLayout, `ul` `w-full` thay `w-fit`): mép trái thẳng thẻ trắng nội dung, mép phải thẳng thẻ tư vấn/liên hệ (≥ lg; < lg thẳng thẻ nội dung); nút căn trái; kiểu nút/chiều cao/neo giữ nguyên. Bản 84rem theo header bị user loại. MODIFY UI, không đổi schema/API/quyền. Spec 1.23.0 → 1.24.0.",
-  "workItem": "feature/detail-subnav-full-width",
-  "backlog": "BL-028",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-detail-subnav-full-width.md",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-029 — thanh mục con trang chi tiết (dự án + cho thuê, DetailSubNav): cuộn qua hết mục cuối (dải quan sát rỗng, đáy mục cuối ≤ 88px) → không nút nào active / aria-current; cuộn ngược vào mục → active lại; đầu trang/trên mục đầu giữ mục đầu active; khoá cuộn 1s sau khi bấm nút không bị xoá active. Root cause: callback IntersectionObserver không xử lý tập visible rỗng. Spec 1.24.0 → 1.24.1 (PATCH làm rõ hành vi).",
+  "workItem": "bug/detail-subnav-clear-active-past-sections",
+  "backlog": "BL-029",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-20-detail-subnav-clear-active-past-sections.md",
   "task": [
-    "tasks/feature-detail-subnav-full-width/phase-1-task-01.md"
+    "tasks/bug-detail-subnav-clear-active-past-sections/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-detail-subnav-full-width-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/bug-detail-subnav-clear-active-past-sections-phase-1-task-01-round-1-review.md"
   ],
   "commits": [
-    "close-out BL-028 (commit chứa file này)"
+    "close-out BL-029 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-028 (commit chứa file này)": "T01 — DetailSubNav `ul` `w-fit max-w-full` → `w-full` trong khung `max-w-container` + `px-gutter`; JSDoc BL-028; test project-detail.test.tsx assert nav/ul class. Review FAST PASS r1. Close-out kèm SPECIFICATIONS (Giao diện, F2) + design-spec §2.1 Sticky / S03 mục 3."
+    "close-out BL-029 (commit chứa file này)": "T01 — DetailSubNav: hằng OBSERVER_TOP_PX=88, nhánh tập rỗng + !scrollLocked + đáy mục cuối ≤ 88px → setActiveId(\"\"); test mới DetailSubNav.test.tsx 6 case. Review NORMAL PASS r1. Close-out kèm SPECIFICATIONS (F2) + design-spec S03 mục 3."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.23.0-29.json",
-  "specUpdate": "spec/updates/2026-10-20-detail-subnav-full-width.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.24.0-30.json",
+  "specUpdate": "spec/updates/2026-10-20-detail-subnav-clear-active-past-sections.md",
   "specRefs": [
-    "Overview — Giao diện (bố cục chi tiết dùng chung)",
     "F2. Dự án — Bố cục chi tiết (FR-PUB-03)",
     "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)",
-    "design-spec §2.1 Sticky / S03 mục 3"
+    "design-spec S03 mục 3 / S07"
   ],
   "specRefNotes": {
-    "Overview — Giao diện (bố cục chi tiết dùng chung)": "Thanh mục con viên thuốc trắng rộng bằng khung nội dung (max-w-container + px-gutter): mép trái = thẻ trắng nội dung, mép phải = thẻ tư vấn/liên hệ ≥ lg, < lg = thẻ nội dung; nút căn trái, tràn thì cuộn ngang trong thanh.",
-    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)": "Thanh mục con trải qua cả cột thẻ \"Tư vấn 1:1\" ≥ lg, nút căn trái; thứ tự/nhãn/neo/active như BL-027.",
-    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)": "Cùng component DetailSubNav — thanh rộng bằng khung, mép phải = thẻ liên hệ ≥ lg.",
-    "design-spec §2.1 Sticky / S03 mục 3": "Reconcile ở close-out: khung nav = lưới DetailLayout (không phải 84rem của header), ul w-full, cao ~54px không đổi."
+    "F2. Dự án — Bố cục chi tiết (FR-PUB-03)": "Mục đang xem: qua hết mục cuối → không nút active/aria-current; cuộn ngược → active lại; đầu trang → mục đầu active; khoá cuộn sau khi bấm không xoá active.",
+    "F3. Cho thuê — Bố cục chi tiết (FR-PUB-05)": "Cùng component DetailSubNav — cùng hành vi.",
+    "design-spec S03 mục 3 / S07": "Reconcile ở close-out: dải quan sát 88px → 55% viewport, quy tắc bỏ active khi qua mục cuối."
   },
   "migration": "none",
   "changed": {
     "files": [
       "src/components/detail/DetailSubNav.tsx",
-      "src/components/projects/project-detail.test.tsx"
+      "src/components/detail/DetailSubNav.test.tsx"
     ],
-    "filesNote": "Chỉ đổi lớp `ul` + JSDoc; hằng 4.5rem, OBSERVER_MARGIN, logic IntersectionObserver/tự cuộn không đổi. Không schema/migration/API/access control/i18n. Doc impact: SPECIFICATIONS (Giao diện, F2), design-spec §2.1 Sticky / S03 mục 3.",
+    "filesNote": "Chỉ logic callback IntersectionObserver + hằng OBSERVER_TOP_PX + JSDoc; markup/class/CSS không đổi. Không schema/migration/API/access control/i18n. Doc impact: SPECIFICATIONS (F2), design-spec S03 mục 3.",
     "modules": [
-      "Detail — DetailSubNav (bề rộng viên thuốc = khung nội dung, nút căn trái)"
+      "Detail — DetailSubNav (trạng thái mục đang xem / aria-current)"
     ]
   },
   "impact": {
     "direct": [
-      "Chi tiết dự án `/du-an/<slug>` + `/en/projects/<slug>`: thanh mục con mép trái = mép thẻ trắng nội dung, mép phải = mép aside \"Tư vấn 1:1\" (≥ lg); < lg = mép thẻ nội dung — cả lúc chưa dính và lúc dính đỉnh",
-      "Chi tiết cho thuê `/cho-thue/<slug>` + `/en/for-rent/<slug>`: cùng quy tắc, mép phải = mép thẻ liên hệ (≥ lg); trang ít mục (2–3) nút vẫn căn trái, thanh không co lại"
+      "Chi tiết dự án `/du-an/<slug>` + `/en/projects/<slug>`: cuộn qua hết mục cuối (vd Thư viện / Tin liên quan / Hỏi đáp) xuống Dự án liên quan / CTA \"Đăng ký tham quan\" / footer → không nút mục con nào nền `--color-primary` / `aria-current`",
+      "Chi tiết cho thuê `/cho-thue/<slug>` + `/en/for-rent/<slug>`: cuộn qua mục cuối (vd Pháp lý / Vị trí) xuống tin tương tự / footer → không nút active",
+      "Cuộn ngược lên vào một mục → nút đó active lại",
+      "Đầu trang / phía trên mục đầu → mục đầu (Tổng quan) active"
     ],
     "dependents": [
-      "DetailSubNav dùng ở cả 2 trang chi tiết (dự án + cho thuê)",
-      "Thanh mục con dính `top: --sticky-top` 8/16px + neo `scroll-mt` `--sticky-top + 4.5rem` (chiều cao thanh không đổi)"
+      "DetailSubNav dùng ở cả 2 trang chi tiết (DetailLayout)",
+      "Effect tự cuộn ngang < lg đưa mục đang xem vào giữa — phải không lỗi khi không có mục active"
     ],
     "regression": [
-      "Neo cuộn tới section + highlight `aria-current` mục đang xem (BL-027)",
-      "Nhiều mục vượt bề rộng: cuộn ngang trong thanh, mục đang xem tự cuộn vào giữa; trang không tràn ngang",
-      "Kiểu nút active nền `--color-primary` chữ `--color-primary-foreground`; focus-visible",
-      "Header ẩn khi cuộn trên trang chi tiết, thanh không bị che (BL-027)"
+      "Bấm nút mục con: cuộn mượt tới section, nút vừa bấm active suốt lúc cuộn (khoá ~1s), không nhấp nháy mục ở giữa; tiêu đề không bị thanh che (scroll-margin, BL-027)",
+      "Khối đứng cạnh nhau ≥ lg (Pháp lý / Chính sách): mục đầu theo thứ tự trang thắng, mục thứ hai vẫn chọn được",
+      "Bề rộng thanh = khung nội dung (BL-028), kiểu nút active, focus-visible",
+      "Header ẩn khi cuộn trên trang chi tiết (BL-027)"
     ]
   },
   "acceptance": [
-    "≥ lg (1280 / 1440): mép trái thanh mục con = mép trái thẻ trắng nội dung, mép phải = mép phải thẻ tư vấn/liên hệ (sai lệch ≤ 1px), cả chưa dính và dính đỉnh",
-    "< lg (375 / 768): thanh rộng bằng thẻ nội dung (vd 375px: 16 → 359)",
-    "Thanh không rộng hơn nội dung bên dưới (không dùng khung 84rem của header)",
-    "Nút căn trái; kiểu nút, chiều cao ~54px, bo viên thuốc, viền + shadow giữ nguyên",
-    "Nhiều mục: cuộn ngang trong thanh; `document.documentElement.scrollWidth` = viewport ở 375 / 768 / 1280",
-    "Bấm mục con: cuộn tới section, tiêu đề không bị thanh che; `aria-current` đúng",
-    "VI + EN như nhau"
+    "Cuộn qua hết mục cuối (mục cuối nằm hẳn phía trên thanh, không mục nào trong dải) → `document.querySelectorAll(\"nav [aria-current]\").length === 0` và không nút nào nền vàng",
+    "Cuộn ngược vào một mục → đúng nút đó `aria-current=\"location\"` + nền `--color-primary`",
+    "Mở trang / ở đầu trang → mục đầu active",
+    "Bấm một nút mục con → nút đó active trong lúc cuộn và sau khi tới nơi",
+    "< lg: không có lỗi console khi không có mục active; thanh vẫn cuộn ngang bình thường",
+    "VI + EN, dự án + cho thuê như nhau"
   ],
   "outOfScope": [
-    "Trước hydrate header có thể che thanh mục con (đã chấp nhận ở BL-027)",
-    "Các residual BL-027 (reduced-motion, tin rented, không `:has()`)"
+    "Hết khoá cuộn 1s không đánh giá lại (hành vi có từ trước)",
+    "Trước hydrate header có thể che thanh mục con (đã chấp nhận ở BL-027)"
   ],
   "viewports": [
     375,
@@ -90,5 +89,5 @@
   "uiTests": true,
   "apiTests": [],
   "risk": "low",
-  "riskNote": "Diff 1 lớp Tailwind + JSDoc + assert test; component chung nhưng chỉ 2 trang chi tiết, logic không đổi. FAST PASS r1, vitest 12 file / 156 PASS, typecheck PASS, lint 0 error. Đo dev server 1440 (dự án + cho thuê) và 375 (dự án) khớp mép. Residual: 768px chưa kiểm bằng mắt; bản /en chưa đo riêng (cùng component)."
+  "riskNote": "Diff nhỏ logic client (1 nhánh callback + 1 hằng), component chung 2 trang. NORMAL PASS r1; vitest detail + project-detail 41 PASS (builder: detail/projects/rentals 162 PASS), typecheck PASS, lint 0 error. Residual: chỉ kiểm jsdom + fake observer, chưa xem trình duyệt thật; ngưỡng 88px xấp xỉ ≥ lg (< lg lệch ~8px); mục cuối ngắn có thể thoáng mất active ở khe cuối trang."
 }
