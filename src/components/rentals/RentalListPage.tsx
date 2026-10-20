@@ -3,19 +3,19 @@ import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
-import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { EmptyState } from "@/components/layout/EmptyState";
-import { PageBanner } from "@/components/layout/PageBanner";
-import { Pagination } from "@/components/layout/Pagination";
 import { PendingLink } from "@/components/layout/PendingRegion";
+import { ListFilterRow } from "@/components/listing/ListSearchBar";
 import { ActiveFilters, useActiveFilterChips } from "@/components/rentals/ActiveFilters";
 import { RentalCard } from "@/components/rentals/RentalCard";
 import { RentalFilters } from "@/components/rentals/RentalFilters";
 import { RentalSortControl } from "@/components/rentals/RentalSortControl";
-import { RentalPendingRegion, RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
+import { RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
 import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
+import { CategoryChipList, CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
-import { loadPageBanner } from "@/lib/content/load-page-banner";
+import { loadPageHero } from "@/lib/content/load-page-banner";
 import { logger } from "@/lib/logger";
 import { visibleCategory } from "@/lib/news/news-view";
 import { listProvinces } from "@/lib/projects/project-queries";
@@ -82,19 +82,20 @@ function categoryChips(filters: RentalFilterValues, options: RentalFilterOptions
 }
 
 /**
- * S04 Danh sách Cho thuê (`/cho-thue`, `/en/for-rent`) và S05 trang danh mục (`categorySlug`): server render qua `SearchService` (một truy vấn SQL cho cả trang), bộ lọc client đổi URL.
- * Trang vượt số trang → `notFound()`. Slug danh mục/tỉnh/phường lạ bị bỏ qua. Đọc `searchParams` nên render theo request (không ISR);
+ * S04 Danh sách Cho thuê (`/cho-thue`, `/en/for-rent`) và S05 trang danh mục (`categorySlug`) trên `CategoryListTemplate` (BL-045): hero (chữ + ảnh admin; trang danh mục: eyebrow "Cho thuê",
+ * tiêu đề + mô tả của danh mục) → thẻ lọc nổi (`RentalFilters`) → hàng "N căn" + "Đang lọc" + sắp xếp → lưới → phân trang → banner tư vấn. Server render qua `SearchService` (một truy vấn SQL cho cả trang),
+ * bộ lọc client đổi URL. Trang vượt số trang → `notFound()`. Slug danh mục/tỉnh/phường lạ bị bỏ qua. Đọc `searchParams` nên render theo request (không ISR);
  * CDN giữ HTML theo `Cache-Control` của `next.config.ts`.
- * Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`; tin lọc theo danh mục + con của nó; banner, breadcrumb, đường dẫn
- * bộ lọc/phân trang/"Xoá tất cả" đều là của trang danh mục.
+ * Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`; tin lọc theo danh mục + con của nó; hero, breadcrumb, đường dẫn
+ * bộ lọc/phân trang/"Xoá bộ lọc" đều là của trang danh mục.
  */
 export async function RentalListPage({ locale, searchParams, categorySlug }: RentalListPageProps) {
   const parsed = parseRentalFilters(searchParams);
-  const [{ payload, options, filters }, t, tNav, bannerImage] = await Promise.all([
+  const [{ payload, options, filters }, t, tNav, hero] = await Promise.all([
     loadFilterContext(locale, categorySlug ? withoutCategory(parsed) : parsed),
     getTranslations({ locale, namespace: "page.rentals" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
-    loadPageBanner(locale, "rentals"),
+    loadPageHero(locale, "rentals"),
   ]);
   const category = categorySlug ? await findRentalCategory(payload, locale, categorySlug) : null;
   if (categorySlug && !category) notFound();
@@ -113,100 +114,60 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
     ...(parent ? [{ label: parent.name ?? "", href: categoryPath(locale, parent.slug ?? "") }] : []),
     ...(category ? [{ label: category.name ?? "", href: listPath }] : []),
   ];
-  // Danh mục khoá nên bỏ khỏi ô lọc (S05); ô lọc của S04 giữ nguyên.
-  const filterOptions: RentalFilterOptions = categorySlug ? { ...options, categories: [] } : options;
+  const chips = categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all"));
+  const heroTitle = category?.name ?? hero.title;
+  const heroDescription = category ? (category.description ?? undefined) : hero.description;
+  const heroEyebrow = category ? tNav("rentals") : hero.eyebrow;
 
   return (
-    <>
-      <PageBanner
-        size="compact"
-        overlap
-        title={category?.name ?? t("title")}
-        description={category ? (category.description ?? undefined) : t("description")}
-        image={bannerImage}
-      />
-      <RentalListNavigationProvider actionPath={listPath} filters={filters}>
-        {/* Băng tìm kiếm đè 3rem lên mép dưới banner (PageBanner compact chừa đúng 3rem). */}
-        <div className="relative z-10 mx-auto -mt-12 w-full max-w-container px-gutter">
-          <RentalFilters filters={filters} options={filterOptions} fixedCategory={categorySlug} focusSearch={isSearchEntry(searchParams)} />
-        </div>
-        <Breadcrumb items={breadcrumb} className="py-2" />
-        <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter pt-2 pb-section-tight">
-          <nav aria-label={t("categoriesLabel")}>
-            <ul className="-my-1 flex snap-x snap-mandatory gap-2 overflow-x-auto py-1 pr-8 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:pr-0">
-              {categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all")).map((chip) => (
-                <li key={chip.href} className="shrink-0 snap-start sm:shrink">
-                  <PendingLink
-                    href={chip.href}
-                    aria-current={chip.current ? "page" : undefined}
-                    className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full border px-4 text-small font-semibold ${chip.current ? "border-dark bg-dark text-on-dark" : "border-border text-text hover:border-input-border"}`}
-                  >
-                    {chip.label}
-                  </PendingLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <ActiveFilters filters={filters} options={filterOptions} listPath={listPath} />
-          <RentalPendingRegion className="flex flex-col gap-6">
-            {result ? (
-              <ResultList
-                result={result}
-                cards={cards}
-                filters={filters}
-                options={filterOptions}
-                listPath={listPath}
-                locale={locale}
-                query={filters.q}
-                inCategory={category !== null}
-                rentalsPath={rentalsPath}
-                buildHref={buildHref}
-              />
-            ) : (
-              <ListError retryHref={`${listPath}${rentalListQueryString(filters)}`} title={t("error.title")} retry={t("error.retry")} />
-            )}
-          </RentalPendingRegion>
-        </div>
-      </RentalListNavigationProvider>
-    </>
-  );
-}
-
-interface ResultListProps {
-  result: RentalSearchResult;
-  cards: ReturnType<typeof searchCardToRentalCardData>[];
-  filters: RentalFilterValues;
-  options: RentalFilterOptions;
-  listPath: string;
-  locale: Locale;
-  query: string | undefined;
-  buildHref: (page: number) => string;
-  /** Trang danh mục: trống thật thì nói "trong mục này" + link về `/cho-thue`. */
-  inCategory: boolean;
-  rentalsPath: string;
-}
-
-/** Số kết quả (aria-live) + lưới thẻ + phân trang, hoặc trạng thái trống kèm tối đa 3 gợi ý bỏ bớt điều kiện (design-spec §3.9). */
-function ResultList({ result, cards, filters, options, listPath, locale, query, buildHref, inCategory, rentalsPath }: ResultListProps) {
-  const t = useTranslations("page.rentals");
-  const filtering = rentalListQueryString({ ...filters, page: 1 }) !== "";
-  return (
-    <>
-      <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-        {query && <h2 className="font-display text-h3">{t("resultsFor", { query })}</h2>}
-        <div className="flex items-center justify-between gap-4">
-          <p role="status" aria-live="polite" className="text-small text-text-secondary">
-            {t("resultCount", { count: result.total })}
-          </p>
-          {result.total > 0 && <RentalSortControl />}
-        </div>
-        {result.total === 0 ? (
-          filtering ? (
-            <FilteredEmpty filters={filters} options={options} listPath={listPath} locale={locale} title={t("empty.title")} />
+    <RentalListNavigationProvider actionPath={listPath} filters={filters}>
+      <CategoryListTemplate
+        title={heroTitle}
+        {...(!category && hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
+        {...(heroEyebrow ? { eyebrow: heroEyebrow } : {})}
+        {...(heroDescription ? { description: heroDescription } : {})}
+        {...(hero.image ? { bannerImage: hero.image } : {})}
+        breadcrumb={breadcrumb}
+        filterCard={
+          <RentalFilters
+            filters={filters}
+            options={options}
+            fixedCategory={categorySlug}
+            focusSearch={isSearchEntry(searchParams)}
+            categoryRow={
+              <ListFilterRow label={t("fields.category")}>
+                <nav aria-label={t("categoriesLabel")}>
+                  <CategoryChipList chips={chips} scroll />
+                </nav>
+              </ListFilterRow>
+            }
+          />
+        }
+        {...(result
+          ? {
+              resultText: (
+                <>
+                  {t("resultTotal", { count: result.total })} <span className="text-small font-normal text-text-secondary">{t("resultSuffix")}</span>
+                </>
+              ),
+            }
+          : {})}
+        resultExtras={<ActiveFilters filters={filters} options={options} listPath={listPath} />}
+        {...(result && result.total > 0 ? { sort: <RentalSortControl /> } : {})}
+        parentListHref={rentalsPath}
+        isEmpty={!result || result.total === 0}
+        emptyState={
+          result ? (
+            <EmptyResults filters={filters} options={options} listPath={listPath} locale={locale} query={filters.q} inCategory={category !== null} rentalsPath={rentalsPath} />
           ) : (
-            <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />
+            <ListError retryHref={`${listPath}${rentalListQueryString(filters)}`} title={t("error.title")} retry={t("error.retry")} />
           )
-        ) : (
+        }
+        pagination={{ page: result?.page ?? 1, totalPages: result?.totalPages ?? 1, buildHref }}
+        consultBanner={<ConsultBanner locale={locale} />}
+      >
+        <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
+          {filters.q && <h2 className="font-display text-h3">{t("resultsFor", { query: filters.q })}</h2>}
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cards.map((card, index) => (
               <li key={card.id}>
@@ -214,10 +175,36 @@ function ResultList({ result, cards, filters, options, listPath, locale, query, 
               </li>
             ))}
           </ul>
-        )}
-      </section>
-      <Pagination page={result.page} totalPages={result.totalPages} buildHref={buildHref} />
-    </>
+        </section>
+      </CategoryListTemplate>
+    </RentalListNavigationProvider>
+  );
+}
+
+interface EmptyResultsProps {
+  filters: RentalFilterValues;
+  options: RentalFilterOptions;
+  listPath: string;
+  locale: Locale;
+  query: string | undefined;
+  /** Trang danh mục: trống thật thì nói "trong mục này" + link về `/cho-thue`. */
+  inCategory: boolean;
+  rentalsPath: string;
+}
+
+/** Trạng thái trống: có lọc → "Chưa có kết quả" + tối đa 3 gợi ý bỏ bớt điều kiện (design-spec §3.9); không lọc → chưa có tin nào. */
+function EmptyResults({ filters, options, listPath, locale, query, inCategory, rentalsPath }: EmptyResultsProps) {
+  const t = useTranslations("page.rentals");
+  const filtering = rentalListQueryString({ ...filters, page: 1 }) !== "";
+  return (
+    <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
+      {query && <h2 className="font-display text-h3">{t("resultsFor", { query })}</h2>}
+      {filtering ? (
+        <FilteredEmpty filters={filters} options={options} listPath={listPath} locale={locale} title={t("empty.title")} />
+      ) : (
+        <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />
+      )}
+    </section>
   );
 }
 

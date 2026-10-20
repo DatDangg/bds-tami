@@ -1,5 +1,4 @@
 import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import type { RentalCard, RentalSearchParams, RentalSearchResult } from "@/shared/types/api";
@@ -54,12 +53,21 @@ const notFound = vi.hoisted(() =>
   }),
 );
 const replace = vi.hoisted(() => vi.fn());
-const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
+interface HeroStub {
+  title: string;
+  description: string | undefined;
+  image?: { url: string; width: number } | undefined;
+  eyebrow?: string | undefined;
+  titleAccent?: string | undefined;
+}
+const loadPageHero = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<HeroStub>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({ find: wardsFind, findByID }) }));
 vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ replace }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
-vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageHero }));
+// ConsultBanner là Server Component bất đồng bộ đọc homepage (server-only): đã có test riêng, ở đây chỉ cần biết nó được dựng ở cuối trang.
+vi.mock("@/components/layout/ConsultBanner", () => ({ ConsultBanner: () => <aside data-testid="consult-banner" /> }));
 vi.mock("@/lib/content/public-queries", () => ({ findPublicList, findPublicBySlug }));
 vi.mock("@/lib/projects/project-queries", () => ({ listProvinces: async () => provinces }));
 vi.mock("@/lib/logger", () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
@@ -88,6 +96,8 @@ function result(items: RentalCard[], overrides: Partial<RentalSearchResult> = {}
 
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
+  // Mặc định như `loadPageHero` thật khi admin chưa nhập gì: chữ i18n, không ảnh.
+  loadPageHero.mockImplementation(async (locale) => ({ title: locale === "vi" ? "Cho thuê" : "For rent", description: "Mô tả hero", image: undefined, eyebrow: undefined, titleAccent: undefined }));
   search.mockResolvedValue(result(cards));
   wardsFind.mockResolvedValue({ docs: wardsOfHanoi });
   findPublicList.mockImplementation(async (_payload: unknown, _collection: string, locale: string) => ({
@@ -104,7 +114,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.unstubAllEnvs();
-  for (const mock of [search, wardsFind, findPublicList, findPublicBySlug, findByID, notFound, replace]) mock.mockReset();
+  for (const mock of [search, wardsFind, findPublicList, findPublicBySlug, findByID, notFound, replace, loadPageHero]) mock.mockReset();
 });
 
 async function render(locale: "vi" | "en", searchParams: Record<string, string | string[]> = {}, categorySlug?: string) {
@@ -120,30 +130,39 @@ describe("S04 /cho-thue: render", () => {
     await render("vi");
     expect(screen.getByRole("heading", { level: 1, name: "Cho thuê" })).toBeInTheDocument();
     expect(cardTitles()).toEqual(["Studio Ba Đình", "Căn hộ 2PN", "Nhà phố rộng"]);
-    const count = screen.getByText("Có 3 kết quả");
-    expect(count).toHaveAttribute("role", "status");
+    const count = screen.getByRole("status");
+    expect(count).toHaveTextContent("3 căn phù hợp");
     expect(count).toHaveAttribute("aria-live", "polite");
     expect(lastParams()).toMatchObject({ locale: "vi", limit: 12, page: 1, sort: "newest", available: true });
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/cho-thue/slug-1");
     expect(screen.queryByText(/Đang lọc/)).toBeNull();
   });
 
-  it("bố cục market: banner compact 240px, băng tìm kiếm đè mép banner, breadcrumb rồi 'Có N kết quả' + Sắp xếp cùng hàng, lưới 1/2/3/4 cột", async () => {
-    loadPageBanner.mockResolvedValueOnce({ url: "/api/media/file/banner.jpg", width: 1600 });
+  it("bố cục BL-045: hero list (breadcrumb trong hero) → thẻ lọc nổi 3 hàng trong một form → hàng 'N căn phù hợp' + Sắp xếp → lưới 1/2/3/4 cột → banner tư vấn", async () => {
+    loadPageHero.mockResolvedValue({ title: "Căn hộ cho thuê", titleAccent: "sẵn sàng vào ở", eyebrow: "Cho thuê", description: "Mô tả hero", image: { url: "/api/media/file/banner.jpg", width: 1600 } });
     const { container } = await render("vi");
-    expect(container.querySelector("section")?.className).toContain("h-60");
-    const form = screen.getByRole("search");
-    expect(form.parentElement?.className).toContain("-mt-12");
-    const breadcrumb = screen.getByRole("navigation", { name: /Breadcrumb|đường dẫn/i });
-    expect(form.compareDocumentPosition(breadcrumb) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const count = screen.getByRole("status", { name: "" });
-    expect(count.parentElement).toContainElement(screen.getByLabelText("Sắp xếp"));
-    expect(breadcrumb.compareDocumentPosition(count) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const hero = container.querySelector("[data-hero-size=list]")!;
+    expect(hero).not.toBeNull();
+    expect(hero.contains(screen.getByRole("navigation", { name: /Breadcrumb|đường dẫn/i }))).toBe(true);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Căn hộ cho thuêsẵn sàng vào ở");
+    expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
+    const card = container.querySelector("[data-filter-card]")!;
+    const form = within(card as HTMLElement).getByRole("search");
+    expect(within(form).getByLabelText("Từ khoá")).toBeInTheDocument();
+    expect(within(form).getByRole("navigation", { name: "Loại hình" })).toBeInTheDocument();
+    expect(within(form).getByRole("group", { name: "Tùy chọn khác" })).toBeInTheDocument();
+    expect(within(form).getByRole("button", { name: "Bộ lọc" })).toBeInTheDocument();
+    const status = screen.getByRole("status");
+    const sort = screen.getByLabelText("Sắp xếp");
     const grid = screen.getAllByRole("list").find((list) => list.className.includes("grid"))!;
-    expect(grid.className).toContain("grid-cols-1");
-    expect(grid.className).toContain("sm:grid-cols-2");
-    expect(grid.className).toContain("lg:grid-cols-3");
-    expect(grid.className).toContain("xl:grid-cols-4");
+    const follows = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    expect(follows(card, status)).toBe(true);
+    expect(status.parentElement?.parentElement).toContainElement(sort);
+    expect(follows(status, sort)).toBe(true);
+    expect(follows(sort, grid)).toBe(true);
+    expect(follows(grid, screen.getByTestId("consult-banner"))).toBe(true);
+    for (const cls of ["grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3", "xl:grid-cols-4"]) expect(grid.className).toContain(cls);
   });
 
   it("không có kết quả thì không hiện ô Sắp xếp", async () => {
@@ -195,14 +214,19 @@ describe("S04 /cho-thue: render", () => {
       sort: "price_asc",
     });
     expect(screen.getByRole("heading", { level: 2, name: "Kết quả cho “studio quan 1”" })).toBeInTheDocument();
-    // Băng tìm kiếm phản ánh URL: từ khoá, Loại, Khoảng giá (5-15 triệu không trùng mốc nào → "tuỳ chọn"); lọc phụ nằm trong form dưới dạng tham số giữ lại + huy hiệu (gồm cả khoảng giá tự nhập).
+    // Thẻ lọc phản ánh URL: từ khoá, Khu vực, Mức giá (5-15 triệu không trùng mốc nào → "tuỳ chọn"), Diện tích (từ 25 không trùng mốc → "tuỳ chọn"), Phòng ngủ, Nội thất; chip danh mục sáng.
     expect(screen.getByLabelText("Từ khoá")).toHaveValue("studio quan 1");
-    expect(screen.getByLabelText("Danh mục")).toHaveTextContent("Căn hộ");
+    expect(screen.getByLabelText("Tỉnh/thành")).toHaveTextContent("Hà Nội");
     expect(screen.getByLabelText("Giá/tháng (VNĐ)")).toHaveTextContent("Khoảng giá tuỳ chọn");
-    expect(screen.getByRole("button", { name: "Bộ lọc (6)" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Diện tích (m²)")).toHaveTextContent("Diện tích tuỳ chọn");
+    expect(screen.getByLabelText("Phòng ngủ")).toHaveTextContent("2 phòng ngủ");
+    expect(screen.getByLabelText("Nội thất")).toHaveTextContent("Đầy đủ");
+    // Huy hiệu "Bộ lọc" CHỈ đếm lọc trong Popover/Sheet: phường + giá tự nhập + diện tích tự nhập.
+    expect(screen.getByRole("button", { name: "Bộ lọc (3)" })).toBeInTheDocument();
     const form = screen.getByRole("search");
     expect(form.querySelector("input[name=province]")).toHaveValue("ha-noi");
     expect(form.querySelector("input[name=ward]")).toHaveValue("ba-dinh");
+    expect(within(chipNav()).getAllByRole("link").filter((link) => link.getAttribute("aria-current") === "page").map((link) => link.textContent)).toEqual(["Căn hộ"]);
   });
 
   it("phường chỉ tải của tỉnh trên URL; phường không thuộc tỉnh, slug danh mục/tỉnh lạ bị bỏ (danh sách không lọc, không 404)", async () => {
@@ -221,11 +245,14 @@ describe("S04 /cho-thue: render", () => {
     expect(wardsFind).not.toHaveBeenCalled();
   });
 
-  it("ô Loại của băng gồm danh mục con (thụt vào)", async () => {
+  it("không còn ô chọn Danh mục: danh mục là hàng chip link (nhãn 'Danh mục') nằm giữa từ khoá và 'Tùy chọn khác'", async () => {
     await render("vi");
-    await userEvent.setup().click(screen.getByLabelText("Danh mục", { selector: "#rental-bar-category" }));
-    const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
-    expect(options).toEqual(["Tất cả danh mục", "Căn hộ", "– Căn hộ dịch vụ", "Nhà phố"]);
+    const form = screen.getByRole("search");
+    expect(form.querySelector("select[name=category], input[name=category]")).toBeNull();
+    const chips = within(form).getByRole("navigation", { name: "Loại hình" });
+    expect(within(form).getByText("Danh mục")).toBeInTheDocument();
+    expect(screen.getByLabelText("Từ khoá").compareDocumentPosition(chips) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(chips.compareDocumentPosition(within(form).getByRole("group", { name: "Tùy chọn khác" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("chip Loại hình là link tới TRANG DANH MỤC giữ bộ lọc khác và bỏ trang; chip cha sáng khi đang lọc danh mục con", async () => {
@@ -259,12 +286,13 @@ describe("S04 /cho-thue: render", () => {
     expect(screen.getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue");
   });
 
-  it("Tiện ích (BL-044): ?amenities=pool,gym → SearchService nhận mảng; 'Đang lọc' một chip mỗi tiện ích bỏ riêng; huy hiệu Bộ lọc đếm 2", async () => {
+  it("Tiện ích (BL-044): ?amenities=pool,gym → SearchService nhận mảng; 'Đang lọc' một chip mỗi tiện ích bỏ riêng; ô Tiện ích hiện số đã chọn (không tính vào huy hiệu Bộ lọc)", async () => {
     await render("vi", { amenities: "pool,gym,foo" });
     expect(search.mock.calls.at(-1)?.[0].amenities).toEqual(["pool", "gym"]);
     expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Hồ bơi" })).toHaveAttribute("href", "/cho-thue?amenities=gym");
     expect(screen.getByRole("link", { name: "Bỏ lọc Tiện ích: Phòng gym" })).toHaveAttribute("href", "/cho-thue?amenities=pool");
-    expect(screen.getByRole("button", { name: "Bộ lọc (2)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tiện ích" })).toHaveTextContent("Tiện ích (2)");
+    expect(screen.getByRole("button", { name: "Bộ lọc" })).toBeInTheDocument();
   });
 
   it("phân trang giữ bộ lọc và sắp xếp, trang ≥ 2 có ?page=", async () => {
@@ -282,7 +310,7 @@ describe("S04 /cho-thue: render", () => {
     await render("en", { category: "can-ho" });
     expect(lastParams()).toMatchObject({ locale: "en" });
     expect(screen.getByRole("heading", { level: 1, name: "For rent" })).toBeInTheDocument();
-    expect(screen.getByText("1 result")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("1 listing available");
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/en/for-rent/slug-1");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent/category/can-ho"]);
   });
@@ -300,7 +328,7 @@ describe("S04 /cho-thue: trạng thái", () => {
     expect(suggestions).toHaveLength(3);
     expect(suggestions[0]).toHaveAttribute("href", "/cho-thue?province=ha-noi&priceMin=5000000&bedrooms=3&furnishing=full");
     expect(screen.getByRole("search")).toBeInTheDocument();
-    expect(screen.getByText("Có 0 kết quả")).toBeInTheDocument();
+    expect(screen.getByText(/^0 căn/)).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Studio Ba Đình/ })).toBeNull();
   });
 
@@ -481,21 +509,29 @@ describe("generateMetadata của trang danh mục", () => {
   });
 });
 
-describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
-  afterEach(() => loadPageBanner.mockReset());
-
+describe("hero trang danh sách (FR-ADM-20, BL-045)", () => {
   it("có ảnh → biến thể Ảnh (scrim riêng), loader gọi đúng key \"rentals\"", async () => {
-    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+    loadPageHero.mockResolvedValue({ title: "Cho thuê", description: undefined, image: { url: "/api/media/file/banner.jpg", width: 1600 } });
     const { container } = await render("vi");
-    expect(loadPageBanner).toHaveBeenCalledWith("vi", "rentals");
+    expect(loadPageHero).toHaveBeenCalledWith("vi", "rentals");
     expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
     expect(container.querySelector("section.bg-dark-deep img")).not.toBeNull();
   });
 
-  it("không có ảnh (hoặc đọc lỗi) → banner chữ như trước", async () => {
-    loadPageBanner.mockResolvedValue(undefined);
+  it("không có ảnh (hoặc đọc lỗi) → hero nền tối cùng chiều cao, không vỡ trang", async () => {
     const { container } = await render("vi");
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
-    expect(container.querySelector("section.bg-bg-alt")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size=list].bg-dark-deep")).not.toBeNull();
+  });
+
+  it("trang danh mục: hero dùng ảnh Cho thuê, eyebrow 'Cho thuê', tiêu đề = tên danh mục, mô tả = mô tả danh mục (không lấy chữ hero của /cho-thue)", async () => {
+    loadPageHero.mockResolvedValue({ title: "Chữ hero admin", titleAccent: "dòng vàng", description: "Mô tả hero admin", image: { url: "/api/media/file/banner.jpg", width: 1600 } });
+    findPublicBySlug.mockImplementation(async () => ({ ...categories[0], description: "Mô tả danh mục căn hộ" }));
+    const { container } = await render("vi", {}, "can-ho");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^Căn hộ$/);
+    expect(screen.getByText("Mô tả danh mục căn hộ")).toBeInTheDocument();
+    expect(screen.queryByText("Mô tả hero admin")).toBeNull();
+    expect(screen.getByText("Cho thuê", { selector: "p" })).toBeInTheDocument();
+    expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
   });
 });

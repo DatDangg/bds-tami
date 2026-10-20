@@ -122,20 +122,36 @@ export const PRICE_HINT_RANGES = [
   { key: "over20", min: 20_000_000, max: undefined },
 ] as const;
 
-/** Khoảng giá tự nhập: có min/max nhưng cặp đó không trùng mốc nào của băng (ô giá ở băng chỉ hiện "Khoảng giá tuỳ chọn"; trường tự nhập nằm trong Sheet/Popover). */
+/**
+ * Mốc diện tích (m²) của ô "Diện tích" (BL-044 ô tìm kiếm trang chủ, BL-045 thẻ lọc Cho thuê): chọn mốc → cặp `areaMin`/`areaMax`. Một hằng cho cả hai nơi
+ * (`HeroSearch` re-export tên cũ).
+ */
+export const AREA_HINT_RANGES = [
+  { key: "under30", min: undefined, max: 30 },
+  { key: "from30to50", min: 30, max: 50 },
+  { key: "from50to80", min: 50, max: 80 },
+  { key: "from80to120", min: 80, max: 120 },
+  { key: "over120", min: 120, max: undefined },
+] as const;
+
+/** Khoảng giá tự nhập: có min/max nhưng cặp đó không trùng mốc nào (ô giá trong thẻ lọc chỉ hiện "Khoảng giá tuỳ chọn"; trường tự nhập nằm trong Sheet/Popover). */
 function hasCustomPriceRange(filters: RentalFilters): boolean {
   if (filters.priceMin === undefined && filters.priceMax === undefined) return false;
   return !PRICE_HINT_RANGES.some((hint) => hint.min === filters.priceMin && hint.max === filters.priceMax);
 }
 
+/** Khoảng diện tích tự nhập: như `hasCustomPriceRange`, đối chiếu với `AREA_HINT_RANGES`. */
+function hasCustomAreaRange(filters: RentalFilters): boolean {
+  if (filters.areaMin === undefined && filters.areaMax === undefined) return false;
+  return !AREA_HINT_RANGES.some((hint) => hint.min === filters.areaMin && hint.max === filters.areaMax);
+}
+
 /**
- * Số lọc PHỤ đang bật (huy hiệu trên nút "Bộ lọc"): Tỉnh, Phường, Diện tích (một), Phòng ngủ, Nội thất, mỗi Tiện ích (một), và Khoảng giá TỰ NHẬP (một; mốc giá chọn ở băng không tính).
- * Từ khoá, Danh mục nằm ngay trên băng tìm kiếm nên không tính.
+ * Số lọc đang bật TRONG Popover/Sheet "Bộ lọc" (huy hiệu trên nút; BL-045): Phường + Khoảng giá TỰ NHẬP + Khoảng diện tích TỰ NHẬP (mỗi loại một). Tỉnh, mốc giá, mốc diện tích,
+ * phòng ngủ, nội thất, tiện ích là ô trên thẻ lọc nên không tính; từ khoá, danh mục cũng không.
  */
 export function secondaryFilterCount(filters: RentalFilters): number {
-  const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
-  const singles = [filters.province, filters.ward, filters.bedrooms, filters.furnishing];
-  return singles.filter((value) => value !== undefined).length + (sized ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0) + amenityCount(filters);
+  return (filters.ward !== undefined ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0) + (hasCustomAreaRange(filters) ? 1 : 0);
 }
 
 /**

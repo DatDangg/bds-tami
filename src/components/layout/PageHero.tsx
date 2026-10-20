@@ -3,7 +3,7 @@ import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveI
 import { cn } from "@/lib/utils";
 
 interface PageHeroProps {
-  /** Hero trang danh sách có thẻ lọc đè đáy (440px) hoặc hero ngắn (340px): chiều cao CỐ ĐỊNH (không CLS). */
+  /** Hero trang danh sách có thẻ lọc đè đáy (440px) hoặc hero ngắn (340px): chiều cao tối thiểu cố định (chữ SSR nên không CLS). */
   size: "list" | "short";
   /** Nội dung `h1` (dòng 1); mỗi trang đúng một `h1`. */
   title: string;
@@ -22,8 +22,8 @@ interface PageHeroProps {
   children?: ReactNode;
 }
 
-// Chiều cao cố định theo mockup `.phero` (440/340 ở ≥ md; 360/280 ở mobile).
-const HEIGHT = { list: "h-[360px] md:h-[440px]", short: "h-[280px] md:h-[340px]" } as const;
+// Chiều cao TỐI THIỂU theo mockup `.phero` (440/340 ở ≥ md; 360/280 ở mobile): chữ dài / màn 375px thì hero cao thêm thay vì tràn chữ ra ngoài (chữ do server dựng nên không CLS).
+const HEIGHT = { list: "min-h-[360px] md:min-h-[440px]", short: "min-h-[280px] md:min-h-[340px]" } as const;
 
 /**
  * Hero đầu trang con (BL-045, mockup `.phero`): ảnh admin tải lên + scrim token, chữ canh trái trong container (eyebrow → `h1` + dòng vàng → mô tả),

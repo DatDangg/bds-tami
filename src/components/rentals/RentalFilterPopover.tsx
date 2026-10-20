@@ -15,7 +15,7 @@ interface RentalFilterPopoverProps {
   activeCount: number;
 }
 
-/** "Bộ lọc" ≥ lg: Popover modal (bẫy focus, Esc đóng, trả focus về nút) chứa các lọc phụ; mỗi ô đổi URL ngay. */
+/** "Bộ lọc" ≥ lg: Popover modal (bẫy focus, Esc đóng, trả focus về nút) chứa phường + khoảng giá/diện tích tự nhập; mỗi ô đổi URL ngay. */
 export function RentalFilterPopover({ draft, onChange, options, activeCount }: RentalFilterPopoverProps) {
   const t = useTranslations("page.rentals.mobile");
   return (

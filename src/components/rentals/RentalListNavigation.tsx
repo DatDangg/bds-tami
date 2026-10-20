@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useTransition } from "react";
-import { ListPendingProvider, PendingRegion as ListPendingRegion } from "@/components/layout/PendingRegion";
+import { ListPendingProvider } from "@/components/layout/PendingRegion";
 import type { RentalFilters } from "@/lib/search/url-params";
 import { type FilterDraft, useLiveDraft } from "./use-rental-draft";
 
@@ -23,7 +23,7 @@ interface RentalListNavigation {
 const NavigationContext = createContext<RentalListNavigation | null>(null);
 
 /**
- * Bao toàn bộ khu lọc + kết quả của `/cho-thue`: bộ lọc (client) đổi URL, server dựng lại danh sách, `RentalPendingRegion` mờ đi tới khi xong.
+ * Bao toàn bộ trang (thẻ lọc + hàng kết quả + sắp xếp) của `/cho-thue`: bộ lọc (client) đổi URL, server dựng lại danh sách, `RentalFilters` báo "đang chờ" lên `PendingRegion` của template tới khi xong.
  * `actionPath` là đường dẫn công khai của chính trang (đã có tiền tố ngôn ngữ); `filters` là bộ lọc đang trên URL (nguồn sự thật của bản nháp).
  */
 export function RentalListNavigationProvider({ actionPath, filters, children }: { actionPath: string; filters: RentalFilters; children: ReactNode }) {
@@ -46,14 +46,4 @@ export function useRentalListNavigation(): RentalListNavigation {
   const context = useContext(NavigationContext);
   if (!context) throw new Error("useRentalListNavigation phải nằm trong RentalListNavigationProvider");
   return context;
-}
-
-/** Vùng kết quả của `/cho-thue`: chờ khi đổi bộ lọc (transition) hoặc khi bấm link phân trang/chip (design-spec S04). */
-export function RentalPendingRegion({ children, className }: { children: ReactNode; className?: string }) {
-  const { pending } = useRentalListNavigation();
-  return (
-    <ListPendingRegion forcePending={pending} {...(className ? { className } : {})}>
-      {children}
-    </ListPendingRegion>
-  );
 }

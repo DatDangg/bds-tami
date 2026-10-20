@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
-import { CategoryListTemplate } from "./CategoryListTemplate";
+import { CategoryChipList, CategoryListTemplate } from "./CategoryListTemplate";
 
 beforeEach(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example"));
 afterEach(() => vi.unstubAllEnvs());
@@ -63,14 +64,28 @@ describe("CategoryListTemplate: hero + thẻ lọc nổi (BL-045)", () => {
     expect(chipLinks(container)).toHaveLength(chips.length);
   });
 
-  it("searchBar cũ (trang chưa chuyển): hero list + băng đè mép dưới, vẫn hiển thị", () => {
+  it("trang tự dựng hàng chip trong filterCard bằng CategoryChipList: chip là link, có aria-current, nằm trong thẻ", () => {
     const { container } = renderWithIntl(
-      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} compactBanner searchBar={<form aria-label="băng" />} isEmpty={false}>
+      <CategoryListTemplate {...baseProps} bannerImage={bannerImage} filterCard={<form aria-label="lọc"><CategoryChipList chips={chips} /></form>} isEmpty={false}>
         <p>lưới</p>
       </CategoryListTemplate>,
     );
-    expect(container.querySelector("[data-hero-size]")).toHaveAttribute("data-hero-size", "list");
-    expect(screen.getByRole("form", { name: "băng" }).parentElement).toHaveAttribute("data-search-overlay", "true");
+    const card = container.querySelector("[data-filter-card]")!;
+    expect(chipLinks(container)).toHaveLength(chips.length);
+    expect(chipLinks(container).every((link) => card.contains(link))).toBe(true);
+    expect(chipLinks(container).filter((link) => link.getAttribute("aria-current") === "page")).toHaveLength(1);
+  });
+
+  it("resultText + resultExtras: chữ riêng của trang trong vùng aria-live, phần phụ ngay sau", () => {
+    renderWithIntl(
+      <CategoryListTemplate {...baseProps} resultText="12 dự án đang hiển thị" resultExtras={<Link href="/du-an">Xoá bộ lọc</Link>} sort={<button type="button">Sắp xếp</button>} isEmpty={false}>
+        <p>lưới</p>
+      </CategoryListTemplate>,
+    );
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("12 dự án đang hiển thị");
+    expect(status.compareDocumentPosition(screen.getByRole("link", { name: "Xoá bộ lọc" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Xoá bộ lọc" }).compareDocumentPosition(screen.getByRole("button", { name: "Sắp xếp" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("resultCount + sort: hàng kết quả trái 'N kết quả', phải ô sắp xếp; vi và en", () => {

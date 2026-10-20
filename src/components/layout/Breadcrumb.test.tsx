@@ -102,6 +102,15 @@ describe("Breadcrumb", () => {
     expect(jsonLd(container).itemListElement).toHaveLength(4);
   });
 
+  it("overlay: một dòng (không xuống dòng đè eyebrow), mục cuối dài bị cắt bằng truncate nhưng JSON-LD giữ nhãn đầy đủ", () => {
+    const longLabel = "Tuyển chuyên viên tư vấn bất động sản cao cấp khu vực Hà Nội và các tỉnh lân cận";
+    const { container } = renderWithIntl(<Breadcrumb variant="overlay" items={[{ label: "Tuyển dụng", href: "/tuyen-dung" }, { label: longLabel, href: "/tuyen-dung/x" }]} />);
+    expect(screen.getByRole("list")).toHaveClass("flex-nowrap");
+    expect(screen.getByRole("list")).not.toHaveClass("flex-wrap");
+    expect(screen.getByText(longLabel)).toHaveClass("truncate");
+    expect(container.querySelector('script[type="application/ld+json"]')?.textContent).toContain(longLabel);
+  });
+
   it("mặc định (trang chưa chuyển) giữ kiểu cũ: caret icon, không crumb-glass", () => {
     renderWithIntl(<Breadcrumb items={[{ label: "Dự án", href: "/du-an" }]} />);
     expect(screen.getByRole("list")).not.toHaveClass("crumb-glass");

@@ -18,7 +18,7 @@ interface SortSelectProps {
   showLabel?: boolean;
 }
 
-/** Ô Sắp xếp (Mới nhất / Giá tăng dần / Giá giảm dần): ô chọn TAMI, đổi là áp dụng ngay (design-spec S04). */
+/** Ô Sắp xếp (Mới nhất / Giá tăng dần / Giá giảm dần): ô chọn TAMI kiểu viên thuốc (`chip`, như hàng kết quả mockup), đổi là áp dụng ngay (design-spec S04). */
 export function SortSelect({ id, value, onChange, className, labelClassName, selectClassName, showLabel = true }: SortSelectProps) {
   const t = useTranslations("page.rentals");
   return (
@@ -26,7 +26,7 @@ export function SortSelect({ id, value, onChange, className, labelClassName, sel
       <label htmlFor={id} className={cn("text-small font-semibold", !showLabel && "sr-only", labelClassName)}>
         {t("fields.sort")}
       </label>
-      <OptionSelect id={id} value={value} onValueChange={onChange} options={RENTAL_SORTS.map((sort) => ({ value: sort, label: t(`sort.${sort}`) }))} {...(selectClassName ? { className: selectClassName } : {})} />
+      <OptionSelect id={id} variant="chip" value={value} onValueChange={onChange} options={RENTAL_SORTS.map((sort) => ({ value: sort, label: t(`sort.${sort}`) }))} {...(selectClassName ? { className: selectClassName } : {})} />
     </div>
   );
 }

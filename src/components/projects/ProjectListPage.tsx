@@ -3,13 +3,18 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload, type Payload } from "payload";
+import { StrengthsBlock } from "@/components/home/StrengthsBlock";
+import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { EmptyState } from "@/components/layout/EmptyState";
 import { PendingLink } from "@/components/layout/PendingRegion";
+import { ListFilterRow } from "@/components/listing/ListSearchBar";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
-import { CategoryListTemplate, type CategoryChip } from "@/components/templates/CategoryListTemplate";
+import { ProjectSortControl } from "@/components/projects/ProjectSortControl";
+import { CategoryChipList, CategoryListTemplate, type CategoryChip } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
-import { loadPageBanner } from "@/lib/content/load-page-banner";
+import { loadPageHero } from "@/lib/content/load-page-banner";
+import { loadProjectStrengths } from "@/lib/content/load-project-strengths";
 import { parsePagination } from "@/lib/content/pagination";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { visibleCategory } from "@/lib/news/news-view";
@@ -48,7 +53,7 @@ async function loadCategoryContext(payload: Payload, locale: Locale, slug: strin
   return { slug, rootId: parent?.id ?? category.id, filterIds: [category.id, ...children.map((child) => child.id)] };
 }
 
-/** Chip Loại hình (design-spec S02): "Tất cả" + danh mục cấp 1, link `?category=` giữ tỉnh/trạng thái đang lọc và về trang 1. */
+/** Chip Loại hình (design-spec S02): "Tất cả" + danh mục cấp 1, link `?category=` giữ tỉnh/trạng thái/từ khoá/chủ đầu tư/sắp xếp đang lọc và về trang 1. */
 function buildChips(roots: Category[], listPath: string, allLabel: string, carry: { province?: string; status?: string; q?: string; developer?: string; sort?: string }, currentRootId?: string): CategoryChip[] {
   const named = roots.filter((root) => root.slug && root.name);
   if (named.length === 0) return [];
@@ -63,25 +68,26 @@ function buildChips(roots: Category[], listPath: string, allLabel: string, carry
 }
 
 /**
- * Dữ liệu + bố cục S02 (`/du-an`, lọc `?category=&province=&status=&page=`) trên `CategoryListTemplate`. Slug danh mục lạ bị bỏ
- * qua (hiện danh sách không lọc, không 404); trang vượt số trang → `notFound()`. Đọc `searchParams` nên render theo request
- * (không ISR); CDN giữ theo `Cache-Control` của `next.config.ts`.
+ * Dữ liệu + bố cục S02 (`/du-an`, lọc `?category=&province=&status=&q=&developer=&sort=&page=`) trên `CategoryListTemplate` (BL-045): hero (chữ + ảnh admin) → thẻ lọc nổi → hàng "N dự án" + sắp xếp
+ * → lưới → phân trang → dải Điểm mạnh (tuỳ cờ) → banner tư vấn. Slug danh mục / tỉnh / id chủ đầu tư lạ bị bỏ qua (hiện danh sách không lọc, không 404); trang vượt số trang → `notFound()`.
+ * Đọc `searchParams` nên render theo request (không ISR); CDN giữ theo `Cache-Control` của `next.config.ts`.
  */
 export async function ProjectListPage({ locale, searchParams }: ProjectListPageProps) {
   const { page } = parsePagination(searchParams.page, undefined);
   const filters = parseProjectFilters(searchParams);
   const payload = await getPayload({ config });
-  const [context, provinces, developers, t, tNav, roots, bannerImage] = await Promise.all([
+  const [context, provinces, developers, t, tNav, roots, hero, strengths] = await Promise.all([
     filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
     listProvinces(payload),
-    // Chỉ cần khi URL có `?developer=` để đối chiếu id (id lạ bị bỏ qua, không 500).
-    filters.developerId ? listDevelopersWithPublicProjects(payload, locale) : [],
+    listDevelopersWithPublicProjects(payload, locale),
     getTranslations({ locale, namespace: "page.projects" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     listRootProjectCategories(payload, locale),
-    loadPageBanner(locale, "projects"),
+    loadPageHero(locale, "projects"),
+    loadProjectStrengths(locale),
   ]);
   const province = provinces.find((item) => item.slug === filters.provinceSlug);
+  // Id lạ (không có dự án công khai) bị bỏ qua, không 500.
   const developer = developers.find((item) => item.id === filters.developerId);
   const listing = await listPublicProjects(payload, locale, {
     page,
@@ -95,37 +101,65 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
   if (page > 1 && page > listing.totalPages) notFound();
 
   const listPath = publicPath("/du-an", locale);
-  const carry = {
+  const filterParams = {
     ...(province ? { province: province.slug } : {}),
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.q ? { q: filters.q } : {}),
     ...(developer ? { developer: developer.id } : {}),
-    ...(filters.sort ? { sort: filters.sort } : {}),
   };
+  const carry = { ...filterParams, ...(filters.sort ? { sort: filters.sort } : {}) };
   const filtersActive = Boolean(province || filters.status || context || filters.q || developer || filters.sort);
   const buildHref = (target: number) => `${listPath}${projectQueryString({ ...(context ? { category: context.slug } : {}), ...carry, page: target })}`;
+  const chips = buildChips(roots.docs, listPath, t("all"), carry, context?.rootId);
 
   return (
     <CategoryListTemplate
-      title={t("title")}
-      description={t("description")}
-      bannerImage={bannerImage}
-      compactBanner
+      title={hero.title}
+      {...(hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
+      {...(hero.eyebrow ? { eyebrow: hero.eyebrow } : {})}
+      {...(hero.description ? { description: hero.description } : {})}
+      {...(hero.image ? { bannerImage: hero.image } : {})}
       breadcrumb={[{ label: tNav("projects"), href: listPath }]}
-      chips={buildChips(roots.docs, listPath, t("all"), carry, context?.rootId)}
-      chipsLabel={t("categoriesLabel")}
-      scrollChips
-      searchBar={
+      filterCard={
         <ProjectFilters
-          // `key` theo bộ lọc trên URL: URL đổi từ ngoài (chip, "Xoá bộ lọc", back) thì hai ô nạp lại.
-          key={`${province?.slug ?? ""}|${filters.status ?? ""}`}
+          // `key` theo bộ lọc trên URL: URL đổi từ ngoài (chip, "Xoá bộ lọc", sắp xếp, back) thì các ô nạp lại.
+          key={`${province?.slug ?? ""}|${filters.status ?? ""}|${developer?.id ?? ""}|${filters.q ?? ""}|${filters.sort ?? ""}`}
           actionPath={listPath}
           provinces={provinces.map((item) => ({ slug: item.slug, name: item.shortName || item.name }))}
+          developers={developers.flatMap((item) => (item.name ? [{ id: item.id, name: item.name }] : []))}
           {...(province ? { selectedProvince: province.slug } : {})}
           {...(filters.status ? { selectedStatus: filters.status } : {})}
+          {...(developer ? { selectedDeveloper: developer.id } : {})}
+          {...(filters.q ? { query: filters.q } : {})}
+          {...(filters.sort ? { sort: filters.sort } : {})}
           {...(context ? { hiddenCategory: context.slug } : {})}
+          {...(chips.length > 0
+            ? {
+                categoryRow: (
+                  <ListFilterRow label={t("categoriesLabel")}>
+                    <nav aria-label={t("categoriesLabel")}>
+                      <CategoryChipList chips={chips} scroll />
+                    </nav>
+                  </ListFilterRow>
+                ),
+              }
+            : {})}
         />
       }
+      resultText={
+        <>
+          {t("resultTotal", { count: listing.totalDocs })} <span className="text-small font-normal text-text-secondary">{t("resultSuffix")}</span>
+        </>
+      }
+      // Hết kết quả thì nút xoá nằm ở EmptyState, tránh hai link trùng tên.
+      resultExtras={
+        filtersActive && listing.totalDocs > 0 ? (
+          <PendingLink href={listPath} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+            {t("clear")}
+          </PendingLink>
+        ) : null
+      }
+      sort={<ProjectSortControl actionPath={listPath} {...(filters.sort ? { value: filters.sort } : {})} params={{ ...(context ? { category: context.slug } : {}), ...filterParams }} />}
       emptyState={
         filtersActive ? (
           <EmptyState variant="filtered" title={t("emptyTitle")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
@@ -136,19 +170,10 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
       parentListHref={listPath}
       isEmpty={listing.totalDocs === 0}
       pagination={{ page, totalPages: listing.totalPages, buildHref }}
+      belowContent={strengths ? <StrengthsBlock block={strengths} /> : undefined}
+      consultBanner={<ConsultBanner locale={locale} />}
     >
-      <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-x-4">
-          <p role="status" aria-live="polite" className="text-small text-text-secondary">
-            {t("resultCount", { count: listing.totalDocs })}
-          </p>
-          {/* Hết kết quả thì nút xoá nằm ở EmptyState (khối này không render), tránh hai link trùng tên. */}
-          {filtersActive && (
-            <PendingLink href={listPath} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
-              {t("clear")}
-            </PendingLink>
-          )}
-        </div>
+      <section aria-label={t("gridLabel")}>
         <ul data-grid-max-cols="4" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {toProjectCards(listing.docs, locale).map((card, index) => (
             <li key={card.id}>
