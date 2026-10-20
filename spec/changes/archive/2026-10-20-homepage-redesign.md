@@ -1,7 +1,8 @@
 ---
 id: homepage-redesign
 type: feature
-status: pending
+status: done
+completed: 2026-10-20
 created: 2026-10-20
 ---
 
