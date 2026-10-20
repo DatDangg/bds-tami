@@ -165,7 +165,8 @@
       "close": "Close quick contact",
       "hotline": "Call hotline",
       "zalo": "Chat on Zalo",
-      "fanpage": "Facebook fanpage"
+      "fanpage": "Facebook fanpage",
+      "backToTop": "Back to top"
     },
     "breadcrumb": {
       "nav": "Breadcrumb",

@@ -110,8 +110,8 @@ describe("FloatingContact", () => {
     for (const link of screen.getAllByRole("link")) expect(link).toHaveClass("size-12");
   });
 
-  it("đáy cộng --floating-bottom-offset để nằm trên banner cookie", () => {
+  it("nhóm nút nhận pointer-events (khung FloatingDock là pointer-events-none)", () => {
     renderWithIntl(<FloatingContact contact={contact} />);
-    expect(screen.getByRole("group").className).toContain("var(--floating-bottom-offset,0px)");
+    expect(screen.getByRole("group")).toHaveClass("pointer-events-auto");
   });
 });

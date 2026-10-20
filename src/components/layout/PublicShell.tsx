@@ -3,7 +3,9 @@ import { CookieBanner } from "@/components/consent/CookieBanner";
 import { HomeAnnouncementBar } from "@/components/home/HomeAnnouncementBar";
 import { UtmCapture } from "@/components/leads/UtmCapture";
 import { isValidGaMeasurementId } from "@/lib/consent/consent-cookie";
+import { BackToTop } from "./BackToTop";
 import { FloatingContact } from "./FloatingContact";
+import { FloatingDock } from "./FloatingDock";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import type { ShellView } from "./shell-data";
@@ -31,7 +33,10 @@ export function PublicShell({ shell, children }: { shell: ShellView; children: R
         contact={shell.contact}
         showCookieSettings={isValidGaMeasurementId(shell.consent.gaMeasurementId)}
       />
-      <FloatingContact contact={shell.floatingContact} />
+      <FloatingDock>
+        <BackToTop />
+        <FloatingContact contact={shell.floatingContact} />
+      </FloatingDock>
       <CookieBanner {...shell.consent} />
     </>
   );

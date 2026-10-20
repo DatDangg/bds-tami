@@ -2,6 +2,7 @@
 // Dùng bản /ssr để import được cả trong Server Component.
 export {
   ArrowDown,
+  ArrowUp,
   ArrowRight,
   CaretDown,
   CaretLeft,

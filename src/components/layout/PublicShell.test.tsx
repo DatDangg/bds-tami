@@ -201,4 +201,20 @@ describe("LanguageSwitcher", () => {
     await user.click(screen.getByRole("link", { name: "Tiếng Việt" }));
     expect(document.cookie).toContain("NEXT_LOCALE=vi");
   });
+  describe("cụm nút nổi (FloatingDock)", () => {
+    it("khung mang offset banner cookie + thanh tư vấn dính đáy, ẩn khi in, không chặn click vùng trống", () => {
+      renderShell();
+      const dock = screen.getByRole("button", { name: "Lên đầu trang", hidden: true }).parentElement!;
+      expect(dock.className).toContain("var(--floating-bottom-offset,0px)");
+      expect(dock.className).toContain("var(--sticky-cta-height,0px)");
+      expect(dock).toHaveClass("print:hidden", "pointer-events-none", "fixed");
+      expect(within(dock).getByRole("group", { name: "Liên hệ nhanh" })).toBeInTheDocument();
+    });
+
+    it("không có link liên hệ nổi nào: vẫn có nút lên đầu trang", () => {
+      renderShell("vi", { ...shell, floatingContact: {} });
+      expect(screen.getByRole("button", { name: "Lên đầu trang", hidden: true })).toBeInTheDocument();
+      expect(screen.queryByRole("group", { name: "Liên hệ nhanh" })).not.toBeInTheDocument();
+    });
+  });
 });

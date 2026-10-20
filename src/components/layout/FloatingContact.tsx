@@ -36,8 +36,7 @@ const BUTTON_BASE =
 
 /**
  * Nút liên hệ nổi (design-spec §2.5). Mobile: thu gọn thành một nút "Liên hệ nhanh" bung ra 3 nút; ≥ md hiện cả 3 xếp dọc.
- * Nút tròn 48px (≥ 44px). Không đè banner cookie: vị trí đáy cộng `--floating-bottom-offset` (mặc định 0) và `--sticky-cta-height` (thanh "Nhận tư vấn" dính đáy của trang chi tiết dự án, mặc định 0); banner cookie
- * (task riêng) đặt biến này trên `<html>` bằng chiều cao của nó khi đang hiện. ≥ md banner nằm góc trái nên không va chạm.
+ * Nút tròn 48px (≥ 44px). Định vị (fixed + offset tránh banner cookie / thanh "Nhận tư vấn" dính đáy) do `FloatingDock` đảm nhiệm.
  */
 export function FloatingContact({ contact }: { contact: FloatingContactView }) {
   const t = useTranslations("page.floating");
@@ -50,7 +49,7 @@ export function FloatingContact({ contact }: { contact: FloatingContactView }) {
     <div
       role="group"
       aria-label={t("group")}
-      className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(max(1rem,env(safe-area-inset-bottom))+var(--floating-bottom-offset,0px)+var(--sticky-cta-height,0px))] z-(--z-floating) flex flex-col items-end gap-3 print:hidden"
+      className="pointer-events-auto flex flex-col items-end gap-3"
     >
       <ul id="floating-contact-actions" className={cn("flex-col items-end gap-3", open ? "flex" : "hidden md:flex")}>
         {hotline && (

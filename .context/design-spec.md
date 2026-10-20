@@ -115,6 +115,7 @@ Menu "Liên hệ / Contact" là điều hướng, không phải CTA nên không 
 - Bấm: `navigator.sendBeacon('/api/public/click-events', {type, pagePath, refCollection?, refId?})` rồi mở link. Link lấy từ `site-settings`; thiếu link nào thì ẩn nút đó.
 - Khi cookie banner đang hiện, nút nổi đẩy lên trên banner (không chồng).
 - Trang chi tiết có khung giá dính ở đáy mobile (§4.7): nút nổi đẩy lên trên thanh đó.
+- **Lên đầu trang (BL-035):** nút tròn 48px trong **cùng cụm nổi** (một khung `fixed` chung với nút liên hệ — vị trí đáy/phải, `--floating-bottom-offset`, `--sticky-cta-height`, `--z-floating`, `print:hidden` đặt ở khung chung), đứng trên cùng của cột; nền `--color-surface` + viền `--color-border` + icon `ArrowUp` 24px màu chữ, `--shadow-lg`, focus-visible ring theo token. Hiện khi `scrollY > innerHeight` (fade opacity `--duration-fast`; ẩn = `invisible` + `opacity-0` nên không nhận focus/click, không chừa vùng chặn click). Bấm: `scrollTo({top: 0, behavior: reduced-motion ? "instant" : "smooth"})` + `#main.focus({preventScroll: true})`. Site không có hotline/Zalo/fanpage → cụm chỉ còn nút này. Nhãn `page.floating.backToTop` ("Lên đầu trang" / "Back to top").
 
 ### 2.6. Breadcrumb
 - Mọi trang trừ trang chủ. `nav[aria-label="Breadcrumb"]` + `ol`, mục cuối `aria-current="page"`, không là link. Chữ `--text-small` `--color-text-muted`, phân cách icon `CaretRight` 12px `aria-hidden`.

@@ -1,102 +1,103 @@
 {
-  "specVersion": "1.29.0",
-  "scopeVersion": 36,
+  "specVersion": "1.30.0",
+  "scopeVersion": 37,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-034 — hover/focus-visible tiêu đề mọi thẻ là link (ProjectCard, RentalCard, PostCard, NewsCard mọi biến thể gồm khối Tin tức nền tối trang chủ, OfferBox chi tiết tin đăng, JobCard, ProjectsSlider trang chủ): bỏ gạch chân, chữ đổi --color-accent-text (#8C6733 trên trắng; #E0BF89 trong .theme-dark-block) + transition-colors (reduced-motion tức thì). Link khác giữ hover cũ. Spec 1.28.0 → 1.29.0 (MINOR, đổi yêu cầu trình bày như BL-030).",
-  "workItem": "feature/news-card-hover-brand-color",
-  "backlog": "BL-034",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-news-card-hover-brand-color.md",
+  "triggerNote": "BL-035 — nút nổi 'Lên đầu trang' (BackToTop) cùng cụm nổi góc dưới phải với FloatingContact (khung fixed chung mang offset --floating-bottom-offset + --sticky-cta-height + --z-floating + print:hidden), mọi trang công khai qua PublicShell, hiện khi scrollY > innerHeight, bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main. Spec 1.29.0 → 1.30.0 (MINOR, ADDITIVE).",
+  "workItem": "feature/back-to-top-button",
+  "backlog": "BL-035",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-10-20-back-to-top-button.md",
   "task": [
-    "tasks/feature-news-card-hover-brand-color/phase-1-task-01.md"
+    "tasks/feature-back-to-top-button/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-news-card-hover-brand-color-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-back-to-top-button-phase-1-task-01-round-1-review.md"
   ],
   "commits": [
-    "close-out BL-034 (commit chứa file này)"
+    "close-out BL-035 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-034 (commit chứa file này)": "T01 — thay group-hover:underline(-offset-4) bằng transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text trên tiêu đề NewsCard, PostCard, OfferBox; thêm cùng class cho tiêu đề ProjectCard (chỉ dòng tiêu đề — file có sửa dở của user ngoài scope), RentalCard, JobCard, ProjectsSlider. Doc: SPECIFICATIONS Overview — Giao diện, design-spec §3.2 bảng thẻ + đoạn 'Hover tiêu đề thẻ (BL-034)' + dòng slider dự án."
+    "close-out BL-035 (commit chứa file này)": "T01 — thêm BackToTop (client) + khung cụm nổi chung trong PublicShell (BackToTop trên, FloatingContact dưới); chuyển class định vị từ FloatingContact lên khung chung (giữ role=group, sendBeacon, toggle mobile, trả null khi không có link); thêm icon ArrowUp vào barrel, key i18n page.floating.backToTop (vi/en). Doc: SPECIFICATIONS F8, design-spec §2.5 bullet 'Lên đầu trang (BL-035)'."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.28.0-35.json",
-  "specUpdate": "spec/updates/2026-10-20-news-card-hover-brand-color.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.29.0-36.json",
+  "specUpdate": "spec/updates/2026-10-20-back-to-top-button.md",
   "specRefs": [
-    "Overview — Giao diện: hover tiêu đề thẻ link (BL-034)",
-    "design-spec §3.2 bảng thẻ — Dự án / Tin cho thuê / Tin-ưu đãi / Việc làm (BL-034)",
-    "design-spec §3.2 đoạn 'Hover tiêu đề thẻ (BL-034, user 2026-10-20)'",
-    "design-spec slider dự án trang chủ (BL-034)"
+    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)",
+    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'"
   ],
   "specRefNotes": {
-    "Overview — Giao diện: hover tiêu đề thẻ link (BL-034)": "Mọi thẻ là link khi hover hoặc focus bàn phím: tiêu đề không gạch chân, chữ đổi --color-accent-text (khối nền tối #E0BF89), transition-colors, tức thì khi prefers-reduced-motion; link khác giữ hover cũ.",
-    "design-spec §3.2 bảng thẻ — Dự án / Tin cho thuê / Tin-ưu đãi / Việc làm (BL-034)": "Cột hover mỗi hàng thêm 'tên/tiêu đề đổi màu --color-accent-text'; hiệu ứng cũ (ảnh zoom, shadow-md, viền input-border, nền primary-subtle) giữ nguyên.",
-    "design-spec §3.2 đoạn 'Hover tiêu đề thẻ (BL-034, user 2026-10-20)'": "Phạm vi 7 loại thẻ; #8C6733 5.1:1 trên trắng, #E0BF89 ≥ 9.7:1 trong .theme-dark-block; không dùng --color-primary cho chữ; breadcrumb/footer/mục lục/link danh mục/nút ghost không đổi.",
-    "design-spec slider dự án trang chủ (BL-034)": "Thẻ lớn ~464×600 một link: hover phóng ảnh nhẹ + tên đổi --color-accent-text."
+    "F8. Nút liên hệ nổi: FR-PUB-12 — Nút 'Lên đầu trang' (BL-035)": "Cùng cụm nổi góc dưới phải, đứng trên nút liên hệ, cùng đẩy lên trên cookie banner < md và thanh 'Nhận tư vấn' dính đáy; mọi trang công khai (không admin), hiện cả khi không cấu hình hotline/Zalo/fanpage; hiện khi scrollY > innerHeight, fade (tức thì khi reduced-motion), ẩn không nhận focus/không được đọc; bấm cuộn mượt về đầu (instant khi reduced-motion) + focus #main; button tròn 48px, aria-label 'Lên đầu trang' / 'Back to top', focus ring token, nền trắng viền + icon mũi tên lên, ẩn khi in; không ghi nhận lượt bấm.",
+    "design-spec §2.5 bullet 'Lên đầu trang (BL-035)'": "Khung fixed chung mang vị trí + offset var + --z-floating + print:hidden; nền --color-surface + viền --color-border + ArrowUp 24px + --shadow-lg; ẩn = invisible + opacity-0 (không chặn click); scrollTo + #main.focus({preventScroll: true}); nhãn page.floating.backToTop."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/news/NewsCard.tsx",
-      "src/components/posts/PostCard.tsx",
-      "src/components/posts/OfferBox.tsx",
-      "src/components/projects/ProjectCard.tsx",
-      "src/components/rentals/RentalCard.tsx",
-      "src/components/careers/JobCard.tsx",
-      "src/components/home/ProjectsSlider.tsx",
+      "src/components/layout/BackToTop.tsx",
+      "src/components/layout/BackToTop.test.tsx",
+      "src/components/layout/FloatingContact.tsx",
+      "src/components/layout/FloatingContact.test.tsx",
+      "src/components/layout/PublicShell.tsx",
+      "src/components/layout/PublicShell.test.tsx",
+      "src/components/layout/FloatingDock.tsx",
+      "src/components/icons.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
       "SPECIFICATIONS.md",
       ".context/design-spec.md"
     ],
-    "filesNote": "Chỉ đổi class Tailwind trên phần tử tiêu đề của 7 component thẻ (+ test thẻ liên quan nếu builder thêm assert class). ProjectCard.tsx có sửa dở của user ngoài scope — commit chỉ phần BL-034. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD.",
+    "filesNote": "Đã đối chiếu diff thật: thêm khung chung src/components/layout/FloatingDock.tsx (fixed + offset var + print:hidden + pointer-events-none) và PublicShell.test.tsx. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD. Không đụng sửa dở của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
     "modules": [
-      "Projects — ProjectCard",
-      "Rentals — RentalCard",
-      "Posts — PostCard + OfferBox (chi tiết tin đăng)",
-      "News — NewsCard (feature / boxed / row, khối Tin tức nền tối trang chủ)",
-      "Careers — JobCard",
-      "Home — ProjectsSlider"
+      "Layout — PublicShell (khung trang công khai)",
+      "Layout — BackToTop (mới)",
+      "Layout — FloatingContact (nút liên hệ nổi + ghi lượt bấm)",
+      "i18n — page.floating.backToTop"
     ]
   },
   "impact": {
     "direct": [
-      "Hover thẻ ProjectCard (/du-an, Dự án khác, trang chủ nếu có): tên dự án đổi màu vàng đậm #8C6733, không gạch chân; ảnh zoom + shadow-md giữ nguyên",
-      "Hover thẻ RentalCard (/cho-thue, khu vực, tin tương tự): tiêu đề đổi #8C6733, không gạch chân; ảnh zoom + viền input-border giữ nguyên",
-      "Hover thẻ PostCard (/tin-bds + danh mục, slider Ưu đãi trang chủ, Tin liên quan chi tiết dự án / tin đăng): tiêu đề đổi #8C6733, KHÔNG còn gạch chân",
-      "Hover NewsCard mọi biến thể trên /tin-tuc (feature, boxed, row) + Tin liên quan chi tiết tin tức: tiêu đề đổi #8C6733, KHÔNG còn gạch chân",
-      "Hover NewsCard trong khối Tin tức nền tối trang chủ (.theme-dark-block): tiêu đề đổi vàng nhạt #E0BF89 (đọc rõ trên nền tối), không gạch chân",
-      "Hover OfferBox trong chi tiết tin đăng: tiêu đề tin đổi #8C6733, KHÔNG còn gạch chân",
-      "Hover JobCard (/tuyen-dung): tên vị trí đổi #8C6733; nền thẻ surface → primary-subtle giữ nguyên",
-      "Hover thẻ ProjectsSlider trang chủ: tên dự án trên glass-panel đổi --color-accent-text; ảnh phóng nhẹ giữ nguyên",
-      "Tab (focus-visible) vào bất kỳ thẻ nào trên: tiêu đề đổi màu giống hover + vẫn có focus ring",
-      "Đổi màu có chuyển tiếp mượt (transition-colors); bật prefers-reduced-motion → đổi tức thì",
-      "Rời hover / focus → tiêu đề về màu cũ"
+      "Mọi trang công khai VI/EN: ở đầu trang không thấy nút 'Lên đầu trang'",
+      "Cuộn quá 1 màn hình (scrollY > innerHeight) → nút tròn 48px hiện (fade) ở góc dưới phải, nằm TRÊN nút liên hệ nổi",
+      "Cuộn về gần đầu trang → nút ẩn (fade); khi ẩn Tab không vào được, trình đọc màn hình không đọc, không chặn click vùng đó",
+      "Bấm nút → cuộn mượt về đầu trang; focus chuyển vào #main (không cuộn thêm)",
+      "prefers-reduced-motion → cuộn về đầu tức thì (behavior instant), ẩn/hiện không fade",
+      "aria-label 'Lên đầu trang' (vi) / 'Back to top' (/en/...); focus-visible có ring theo token; vùng chạm ≥ 44px",
+      "Nền trắng + viền + icon mũi tên lên + bóng; in trang (print) → nút ẩn",
+      "Site không cấu hình hotline/Zalo/fanpage → không có nút liên hệ nhưng nút lên đầu trang vẫn hiện khi cuộn",
+      "Admin /admin không có nút"
     ],
     "dependents": [
-      "Mọi trang dùng chung ProjectCard / RentalCard / PostCard / NewsCard (danh sách, danh mục, khu vực, trang chủ, khối liên quan ở các trang chi tiết)",
-      "Locale /en/... cùng component — cùng hành vi"
+      "FloatingContact (hotline / Zalo / fanpage, toggle mobile, ghi lượt bấm sendBeacon) nay nằm trong khung cụm nổi chung — hành vi + thống kê giữ nguyên",
+      "Cookie banner < md (--floating-bottom-offset): cả cụm (nút lên đầu trang + nút liên hệ) đẩy lên trên banner, không chồng",
+      "Thanh 'Nhận tư vấn' dính đáy trang chi tiết dự án / cho thuê / tin đăng (--sticky-cta-height) < lg: cả cụm đẩy lên trên CTA",
+      "Header ẩn khi cuộn ở DetailLayout (chi tiết dự án / cho thuê / tin đăng / tin tức): bấm lên đầu trang → header hiện lại theo logic sẵn có",
+      "Mọi trang (frontend) qua PublicShell, cả /en/..."
     ],
     "regression": [
-      "Breadcrumb, footer, mục lục (tin tức + pháp lý), link danh mục trên thẻ tin, nút ghost, menu header: hover giữ như cũ (không đổi sang vàng nếu trước đó không)",
-      "Thẻ vẫn là MỘT link, không lồng link; click điều hướng đúng chi tiết",
-      "Hiệu ứng ảnh zoom / shadow / viền / nền hover của thẻ không mất",
-      "Màu tiêu đề lúc không hover không đổi",
-      "Không tràn ngang / không CLS 375 / 768 / 1024 / 1280"
+      "Nút liên hệ không xê dịch khi nút lên đầu trang ẩn/hiện (cột bottom-anchored)",
+      "Bấm hotline / Zalo / fanpage vẫn mở đúng link và vẫn ghi lượt bấm (click stats)",
+      "Toggle mở/đóng cụm liên hệ trên mobile vẫn hoạt động",
+      "Không chồng cookie banner < md, CTA dính đáy chi tiết, hay nút nào khác",
+      "Vùng trống của khung cụm nổi không chặn click nội dung phía sau",
+      "Skip link → #main vẫn hoạt động",
+      "Không tràn ngang / không CLS 375 / 768 / 1024 / 1280; safe-area iOS giữ khoảng cách"
     ]
   },
   "acceptance": [
-    "Hover và focus-visible tiêu đề MỌI thẻ (tin tức mọi biến thể, tin đăng, ưu đãi, dự án, cho thuê, tuyển dụng, slider dự án): không gạch chân, chữ đổi vàng thương hiệu",
-    "Trên nền trắng màu chữ hover là #8C6733 (rgb(140, 103, 51)), tương phản ≥ 4.5:1; không dùng #E0BF89 trên nền trắng",
-    "Khối Tin tức nền tối trang chủ: màu hover là #E0BF89 (rgb(224, 191, 137)), đọc rõ trên nền tối",
-    "Đổi màu có transition-colors; prefers-reduced-motion → đổi gần như tức thì",
-    "Breadcrumb, footer, mục lục, link danh mục, nút ghost không đổi hành vi hover",
-    "Không test hiện có bị vỡ; nếu có assert underline cho thẻ thì đã cập nhật"
+    "Nút tròn nổi góc phải dưới, nằm chung cụm với FloatingContact — không chồng lên nút liên hệ, CTA dính đáy (--sticky-cta-height) hay cookie banner",
+    "Chỉ hiện khi đã cuộn quá ~1 màn hình; ẩn khi ở gần đầu trang (ẩn/hiện có fade, tắt khi prefers-reduced-motion)",
+    "Bấm → cuộn mượt về đầu trang (behavior instant nếu reduced-motion); focus chuyển về #main",
+    "A11y: <button> có aria-label ('Lên đầu trang' / 'Back to top' theo locale), vùng chạm ≥ 44px, focus-visible ring theo token",
+    "Style theo token thương hiệu (nền trắng + viền đồng bộ nút nổi hiện có), ẩn khi in (print:hidden)",
+    "Áp dụng mọi trang công khai (frontend layout), không áp dụng admin",
+    "FloatingContact trả null (không hotline/Zalo/fanpage) → nút lên đầu trang vẫn hiện độc lập"
   ],
   "outOfScope": [
-    "Hover của link không phải thẻ (breadcrumb, footer, mục lục, link danh mục, nút, menu)",
-    "Đổi token màu / thêm token mới",
-    "Bố cục / kích thước / nội dung thẻ",
+    "Ghi nhận lượt bấm nút lên đầu trang",
+    "Sửa logic header ẩn khi cuộn",
+    "Đổi token / thêm token mới",
     "Admin Payload",
-    "Phần sửa dở chưa commit của user trong src/components/projects/* (ngoài dòng tiêu đề ProjectCard)"
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
   ],
   "viewports": [
     375,
@@ -114,6 +115,6 @@
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "low",
-  "riskNote": "Chỉ đổi class Tailwind trên tiêu đề 7 component thẻ, không logic; blast radius rộng về trang (thẻ dùng chung ở danh sách, trang chủ, khối liên quan) nhưng chỉ style hover/focus. Residual: tiêu đề ProjectsSlider trên glass-panel phủ ảnh rất tối — --color-accent-text trường hợp xấu ~3.0:1 (chữ 22–25px, chỉ khi hover, tạm thời); ProjectCard.tsx có sửa dở của user ngoài scope (commit chỉ phần BL-034); chưa đo trực quan trên trình duyệt thật; verify builder/reviewer điền sau ở task + report round-1."
+  "risk": "low-medium",
+  "riskNote": "Component client mới trong shell công khai (mọi trang) + chuyển định vị FloatingContact lên khung chung (shared layout; thống kê lượt bấm phải giữ nguyên). Không schema/API/quyền/dữ liệu/URL. Residual: chưa kiểm trực quan trên thiết bị thật (safe-area iOS, cookie banner + CTA dính đáy cùng lúc); verify builder/reviewer điền sau ở task + report round-1."
 }

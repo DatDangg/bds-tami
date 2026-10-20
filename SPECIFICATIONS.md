@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.29.0
+- **spec_version:** 1.30.0
 - **updated_at:** 2026-10-20
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -93,7 +93,7 @@ Danh sách việc (tự ẩn khi quá hạn nộp; mở URL trực tiếp thì h
 Trang dịch vụ (Phân phối, Môi giới, Khai thác CHDV), trang liên hệ (form, bản đồ, hotline), chính sách bảo mật, điều khoản.
 
 ### F8. Nút liên hệ nổi: FR-PUB-12
-Hotline / Zalo / Fanpage ở góc dưới phải mọi trang; ghi nhận lượt bấm.
+Hotline / Zalo / Fanpage ở góc dưới phải mọi trang; ghi nhận lượt bấm. **Nút "Lên đầu trang" (BL-035):** cùng cụm nổi góc dưới phải (đứng **trên** nút liên hệ, cùng khoảng cách đáy/phải, cùng đẩy lên trên banner cookie < md và thanh "Nhận tư vấn" dính đáy; không chồng nút nào), ở **mọi trang công khai** (không admin), hiện cả khi site không cấu hình hotline/Zalo/fanpage. Chỉ hiện khi đã cuộn quá ~1 màn hình (`scrollY > innerHeight`), ẩn khi gần đầu trang; ẩn/hiện fade (tức thì khi `prefers-reduced-motion`); khi ẩn không nhận focus, không được trình đọc màn hình đọc. Bấm → cuộn mượt về đầu trang (`behavior: instant` khi reduced-motion) và chuyển focus về `#main` (đích skip link, không cuộn thêm). `<button>` tròn 48px, `aria-label` "Lên đầu trang" / "Back to top", focus-visible ring theo token, nền trắng viền + icon mũi tên lên (Phosphor), ẩn khi in. Không ghi nhận lượt bấm.
 
 ### F9. Lead: FR-PUB-13, FR-ADM-09, FR-ADM-10; BR-10…16
 Form lead ở tin cho thuê, bài Đăng tin BĐS, dự án, trang liên hệ, trang danh sách Tin tức `/tin-tuc` (form "Tư vấn nhu cầu", nguồn `contact` — BL-020 P3); consent bắt buộc; Turnstile + rate limit; chống trùng 7 ngày; tự giao cho sale đăng bài (tin cho thuê / bài Đăng tin BĐS), còn lại admin giao; email thông báo; nhắc lead chưa giao sau 30 phút; trạng thái `new/contacted/consulting/won/lost/spam`, chuyển `lost` bắt buộc nhập lý do (BR-11); admin giao lại thì email cho sale mới (BR-13); nhắc admin khi lead `new` chưa có người phụ trách sau 30 phút **giờ hành chính** (BR-14, định nghĩa ở § Quy tắc biên); lịch sử chăm sóc; xuất Excel (admin, ghi audit log; xuất đúng bộ lọc đang áp trong danh sách lead — trạng thái / nguồn / sale phụ trách với toán tử "bằng", ngày tạo với "lớn hơn hoặc bằng" / "nhỏ hơn hoặc bằng", điều kiện của chip lọc nhanh Trạng thái lead (`status` "nằm trong" tập trạng thái hợp lệ, "chưa có sale phụ trách" — BL-022), **kể cả khi đang có từ khoá ở ô tìm kiếm** — server tự dựng điều kiện tìm trên đúng tập trường của danh sách (mã, họ tên, SĐT mọi dạng, email; từ khoá ≤ 100 ký tự, quá → 400) nên file ra đúng tập lead đang thấy; audit chỉ ghi cờ có tìm kiếm, không ghi từ khoá (BL-021); bộ lọc khác thì nút khoá kèm thông báo nêu rõ các toán tử được hỗ trợ; nút không hiện ở thùng rác và trong cửa sổ chọn lead (list drawer)). UTM (`utm_source/medium/campaign/term/content`) được ghi ở **mọi** trang công khai VI/EN (island client ở khung trang, không làm trang thành dynamic) vào `sessionStorage` của phiên — URL mới có UTM ghi đè bản đã lưu, URL không có UTM không ghi; form lead gửi kèm UTM của URL hiện tại, không có thì bản đã lưu (BR-10, design-spec §3.3). Phân công chỉ sinh activity/email/audit ở **một** nơi (hook `leads.afterChange`, `docs/API_SPEC.md` §5).

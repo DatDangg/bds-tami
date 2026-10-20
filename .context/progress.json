@@ -1066,6 +1066,36 @@
       "scopeVersion": 36,
       "specUpdate": "spec/updates/2026-10-20-news-card-hover-brand-color.md",
       "residual": "slider dự án trên kính phủ ảnh rất tối ~3.0:1 khi hover; chưa assert ProjectCard/JobCard/OfferBox/ProjectsSlider; chưa xem trình duyệt"
+    },
+    {
+      "slug": "back-to-top-button",
+      "title": "Nút nổi \"Lên đầu trang\" chung cụm nút liên hệ (BL-035)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-035",
+      "changeDoc": "spec/changes/archive/2026-10-20-back-to-top-button.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-back-to-top-button/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "note": "FloatingDock (fixed + offset var + print:hidden + pointer-events-none) chứa BackToTop (hiện khi scrollY > innerHeight, invisible khi ẩn, smooth/instant theo reduced-motion, focus #main) + FloatingContact (bỏ class định vị); i18n page.floating.backToTop vi/en; ArrowUp; 6 test BackToTop + 2 test dock",
+          "report": ".context/review-reports/feature-back-to-top-button-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-035)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.30.0",
+      "scopeVersion": 37,
+      "specUpdate": "spec/updates/2026-10-20-back-to-top-button.md",
+      "residual": "chưa xem trình duyệt thật (cookie banner < md + CTA dính đáy, safe-area iOS); hover có thể dính trên cảm ứng; 2 MINOR test (parentElement, so handler listener)"
     }
   ],
   "bugs": [
