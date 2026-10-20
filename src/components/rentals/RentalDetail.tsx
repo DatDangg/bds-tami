@@ -141,7 +141,7 @@ export function RentalDetail({ doc, view, similar, sale, hotline, ownPath }: Ren
             />
             {view.rented && <RentedBanner />}
             {view.gallery.length > 0 && (
-              <div className="mx-auto mt-4 w-full max-w-container px-gutter">
+              <div className="mx-auto mt-4 w-full max-w-container px-gutter pb-8">
                 <div className="relative">
                   {/* Ảnh LCP của trang là ảnh đầu thư viện. */}
                   <Gallery images={view.gallery} priorityFirst />
@@ -153,7 +153,8 @@ export function RentalDetail({ doc, view, similar, sale, hotline, ownPath }: Ren
                 </div>
               </div>
             )}
-            {view.rented && similarBlock}
+            {/* Tin đã thuê: khối tin tương tự nền xám nằm ngay trên thanh mục con → chừa cùng khoảng pb-8 như dưới thư viện ảnh (BL-031). */}
+            {view.rented && similar.length > 0 && <div className="pb-8">{similarBlock}</div>}
           </>
         }
         subNav={{ items: visibleRentalSections(view).map((id) => ({ id: RENTAL_SECTION_DOM_ID[id], label: t(`subNav.${id}`) })), label: t("subNavLabel") }}

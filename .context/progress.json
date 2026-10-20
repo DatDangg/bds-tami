@@ -945,6 +945,36 @@
       "scopeVersion": 32,
       "specUpdate": "spec/updates/2026-10-20-form-fields-rounded.md",
       "residual": "chưa xem bằng mắt 375/768/1280; ProjectFilters (user đang sửa) giữ override rounded-md riêng; RentalFilters override rounded-md thừa vô hại; item dropdown Radix giữ rounded-sm"
+    },
+    {
+      "slug": "detail-aside-no-inner-scroll",
+      "title": "Chi tiết: thẻ tư vấn/liên hệ không cuộn riêng (dính theo đáy khi cao) + khoảng ảnh↔thanh mục con cho thuê (BL-031)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-031",
+      "changeDoc": "spec/changes/archive/2026-10-20-detail-aside-no-inner-scroll.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-detail-aside-no-inner-scroll/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "NORMAL (r1) / FAST (r2 delta)",
+          "reviewerResult": "PASS",
+          "note": "DETAIL_ASIDE_CARD_CLASS bỏ max-h/overflow-y-auto, top=min(--sticky-top+4.5rem, 100dvh-var(--detail-aside-h)-1rem); DetailAsideFit (client, ResizeObserver) ghi --detail-aside-h; RentalDetail ảnh pb-8 + rented similarBlock pb-8",
+          "report": ".context/review-reports/feature-detail-aside-no-inner-scroll-phase-1-task-01-round-2-review.md",
+          "commit": "(commit close-out BL-031)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.26.0",
+      "scopeVersion": 33,
+      "specUpdate": "spec/updates/2026-10-20-detail-aside-no-inner-scroll.md",
+      "residual": "thẻ cao hơn (viewport − thanh mục con) khi dính theo đáy để ~28px đầu thẻ (padding) dưới thanh mục con; không JS = dính trên như cũ; rented+similar chưa đo trực quan; 768/1280 và /en chưa đo riêng; khoảng 32px < 60px hero↔thanh dự án (gồm breadcrumb)"
     }
   ],
   "bugs": [
@@ -1831,7 +1861,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20",
+  "lastUpdated": "2026-10-20T05:19:06.744Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
+import { DetailAsideFit } from "./DetailAsideFit";
 import { DetailSubNav, type SubNavItem } from "./DetailSubNav";
 
 /**
- * Thẻ phụ dính ở cột phải (≥ lg): dính dưới thanh mục con (`--sticky-top` + thanh 54px + khe 18px = 4.5rem); cao tối đa bằng phần viewport còn lại
- * và tự cuộn bên trong nếu nội dung dài hơn nên không bao giờ kẹt dính / che nội dung. Gắn vào phần tử bên trong `aside`.
+ * Thẻ phụ dính ở cột phải (≥ lg), KHÔNG cuộn riêng: `top` = min(dưới thanh mục con = `--sticky-top` + 4.5rem, đáy viewport − chiều cao thẻ − 1rem).
+ * Thẻ vừa viewport → dính dưới thanh mục con; cao hơn → cuộn theo trang tới khi đáy thẻ chạm đáy viewport rồi mới dính (không bị cắt).
+ * `--detail-aside-h` do `DetailAsideFit` đo bằng JS (CSS không biết chiều cao chính thẻ); chưa có biến (0px) = dính trên như cũ. Gắn vào phần tử con đầu của `aside`.
  */
 export const DETAIL_ASIDE_CARD_CLASS =
-  "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:sticky lg:top-[calc(var(--sticky-top)+4.5rem)] lg:max-h-[calc(100dvh-var(--sticky-top)-5.5rem)] lg:overflow-y-auto lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
+  "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:sticky lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))] lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
 
 interface DetailLayoutProps {
   /** Hero + breadcrumb phía trên thanh mục con. */
@@ -26,7 +28,7 @@ interface DetailLayoutProps {
 /**
  * Khung chi tiết dùng chung (BL-027, design-spec S03): gốc đánh dấu `data-detail-page` để `globals.css` (a) ẩn hẳn header khi cuộn và (b) đặt
  * `--sticky-top` = lề trên header nổi (8/16px) cho thanh mục con, thẻ dính và mọi `scroll-mt`. Nền `bg-primary-subtle`; cột chính là một thẻ trắng,
- * thẻ phụ tách riêng. Server Component; chỉ thanh mục con là client.
+ * thẻ phụ tách riêng. Server Component; chỉ thanh mục con và vỏ `aside` đo chiều cao (`DetailAsideFit`) là client.
  */
 export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after }: DetailLayoutProps) {
   return (
@@ -36,9 +38,9 @@ export function DetailLayout({ before, subNav, children, aside, asideLabelledBy,
       <div className="mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10">
         <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
         {aside && (
-          <aside {...(asideLabelledBy ? { "aria-labelledby": asideLabelledBy } : {})} className="pt-6 lg:pt-0">
+          <DetailAsideFit {...(asideLabelledBy ? { "aria-labelledby": asideLabelledBy } : {})} className="pt-6 lg:pt-0">
             {aside}
-          </aside>
+          </DetailAsideFit>
         )}
       </div>
       {after}

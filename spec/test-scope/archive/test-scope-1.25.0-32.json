@@ -1,0 +1,114 @@
+{
+  "specVersion": "1.25.0",
+  "scopeVersion": 32,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-030 — ô nhập form công khai bo góc đồng bộ thẻ 20/28px + nút viên thuốc: input, textarea, select Radix + <select> gốc progressive, ô file, ô thả CV rounded-sm 2px → --radius-md 12px; checkbox 6px (= --radius-md/2); nút chọn file viên thuốc; khung form mặc định LeadFormSlot --radius-lg 16px (override sẵn có giữ). Admin Payload không đổi. Spec 1.24.1 → 1.25.0 (MINOR, đổi yêu cầu trình bày).",
+  "workItem": "feature/form-fields-rounded",
+  "backlog": "BL-030",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-form-fields-rounded.md",
+  "task": [
+    "tasks/feature-form-fields-rounded/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/feature-form-fields-rounded-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "close-out BL-030 (commit chứa file này)"
+  ],
+  "commitNotes": {
+    "close-out BL-030 (commit chứa file này)": "T01 — class-only D1–D5: ui/input, ui/checkbox, ui/select (trigger), ui/option-select, forms/FormField (base + file:rounded-pill), forms/LeadFormSlot (rounded-lg), careers/CvPicker; comment globals.css; test FormField.test.tsx. Review STRICT-light PASS r1. Doc: design-spec, docs/DESIGN.md, skills/react-nodejs/design-tokens.md, SPECIFICATIONS (Giao diện)."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.24.1-31.json",
+  "specUpdate": "spec/updates/2026-10-20-form-fields-rounded.md",
+  "specRefs": [
+    "Overview — Giao diện (ô nhập form công khai, Select TAMI)",
+    "design-spec §bo góc",
+    "docs/DESIGN.md bảng radius"
+  ],
+  "specRefNotes": {
+    "Overview — Giao diện (ô nhập form công khai, Select TAMI)": "Ô nhập (input/textarea/select/file/ô thả CV) --radius-md 12px; checkbox 6px; LeadFormSlot mặc định --radius-lg 16px; Select TAMI cùng bo với input; admin Payload không đổi.",
+    "design-spec §bo góc": "Reconcile cùng task: ô nhập md, checkbox md/2, panel form lg.",
+    "docs/DESIGN.md bảng radius": "--radius-sm không còn dùng cho ô nhập."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/ui/input.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/select.tsx",
+      "src/components/ui/option-select.tsx",
+      "src/components/forms/FormField.tsx",
+      "src/components/forms/LeadFormSlot.tsx",
+      "src/components/forms/FormField.test.tsx",
+      "src/components/careers/CvPicker.tsx",
+      "src/app/(frontend)/globals.css",
+      ".context/design-spec.md",
+      "docs/DESIGN.md",
+      "skills/react-nodejs/design-tokens.md"
+    ],
+    "filesNote": "Chỉ đổi lớp bo góc (Tailwind class) + comment/doc; không logic, không token mới, --radius-sm toàn cục giữ. Không schema/migration/API/access control/i18n. Item trong dropdown Select và nút X của CvPicker giữ nguyên.",
+    "modules": [
+      "UI — Input / Checkbox / Select / OptionSelect (component chung form công khai)",
+      "Forms — FormField, LeadFormSlot",
+      "Careers — CvPicker"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Liên hệ `/lien-he` + `/en/contact`: input, textarea, checkbox đồng ý bo 12px / 6px; khung form 16px",
+      "Form lead chi tiết dự án `/du-an/<slug>` + chi tiết cho thuê `/cho-thue/<slug>` (VI + EN): ô nhập 12px; khung giữ override (dự án 28px, cho thuê trong suốt)",
+      "Đăng tin BĐS: input/textarea/select/ô file 12px, nút chọn file viên thuốc, khung form 16px",
+      "Form cuối trang tin tức: ô nhập 12px; khung giữ `rounded-xl`",
+      "Form ứng tuyển (tuyển dụng chi tiết) + CvPicker: ô thả CV (md+) và dòng file đã chọn bo 12px, ô nhập 12px"
+    ],
+    "dependents": [
+      "Bộ lọc dự án / cho thuê / tuyển dụng (Input + Select chung)",
+      "Select sắp xếp danh sách",
+      "Select mặt bằng (FloorPlans)",
+      "Tìm kiếm trang chủ (input/select chung)",
+      "<select> gốc progressive (OptionSelect, BL-016) khi chưa hydrate / không JS"
+    ],
+    "regression": [
+      "Focus ring (focus-visible) và viền lỗi theo đúng bo góc, không bị cắt / lệch",
+      "Select Radix: mở/đóng, bàn phím + typeahead, danh sách không tràn màn hình, chữ dài cắt …",
+      "Checkbox consent: tick/bỏ tick, focus, trạng thái lỗi; dấu tick không bị bo che",
+      "Input file: chọn / đổi / xoá file; CvPicker kéo-thả + nút X",
+      "Override LeadFormSlot: chi tiết dự án 28px, tin tức rounded-xl, cho thuê bg-transparent p-0 vẫn thắng lớp mặc định",
+      "Admin `/admin` (Payload) không đổi giao diện ô nhập"
+    ]
+  },
+  "acceptance": [
+    "Mọi input / textarea / select trigger / <select> gốc / ô file của form công khai có border-radius 12px (computed = var(--radius-md))",
+    "Checkbox form công khai border-radius 6px",
+    "Nút chọn file trong ô file dạng viên thuốc",
+    "Khung form Liên hệ / Đăng tin BĐS / ứng tuyển border-radius 16px; chi tiết dự án 28px, tin tức rounded-xl, cho thuê trong suốt như trước",
+    "Focus ring + viền lỗi đi theo bo góc, không lộ góc vuông",
+    "Bộ lọc / sắp xếp / mặt bằng / tìm kiếm trang chủ cùng bo 12px, chức năng không đổi",
+    "Admin Payload không đổi",
+    "VI + EN như nhau; 375 / 768 / 1280 không tràn ngang"
+  ],
+  "outOfScope": [
+    "Token --radius-sm toàn cục (giữ 2px cho chỗ khác)",
+    "Item highlight bên trong dropdown Select",
+    "Giao diện admin Payload",
+    "ProjectFilters override rounded-md (file user đang sửa, giữ nguyên)"
+  ],
+  "viewports": [
+    375,
+    768,
+    1280
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low-medium",
+  "riskNote": "Class-only nhưng ở component chung dùng mọi form công khai + bộ lọc. Review STRICT-light PASS r1; vitest src/components 90 files / 855 tests PASS, lint 0 error, typecheck PASS. Residual: chưa kiểm trực quan 375/768/1280; lớp rounded-[calc(var(--radius-md)/2)] chỉ assert tên lớp, chưa kiểm CSS build thật."
+}

@@ -133,8 +133,8 @@ describe("ProjectDetail (S03)", () => {
     expect(card).not.toBeNull();
     expect(card.contains(aside.querySelector("form"))).toBe(true);
     expect(card.className).toContain("lg:sticky");
-    expect(card.className).toContain("lg:max-h-");
-    expect(card.className).toContain("overflow-y-auto");
+    expect(card.className).not.toMatch(/max-h|overflow-y/);
+    expect(card.className).toContain("--detail-aside-h");
     expect(within(aside).getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     // Cột chính và aside là hai cột của cùng một lưới ≥ lg; aside không nằm trong cột chính.
     const grid = aside.parentElement as HTMLElement;
@@ -145,7 +145,7 @@ describe("ProjectDetail (S03)", () => {
     expect(grid.firstElementChild?.className).toContain("bg-surface");
     expect(grid.firstElementChild?.className).toContain("rounded-[28px]");
     expect(grid.firstElementChild?.querySelector("#overview")).not.toBeNull();
-    expect(card.className).toContain("lg:top-[calc(var(--sticky-top)+4.5rem)]");
+    expect(card.className).toContain("--sticky-top)_+_4.5rem");
     // Thẻ Tư vấn (đích #lead-form) ghi đè scroll-mt mặc định của LeadFormSlot để pill dính không che tiêu đề (M-1).
     expect(card.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     expect(aside.getAttribute("aria-labelledby")).toBe(card.querySelector("h2")?.id);

@@ -1,104 +1,102 @@
 {
-  "specVersion": "1.25.0",
-  "scopeVersion": 32,
+  "specVersion": "1.26.0",
+  "scopeVersion": 33,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-030 — ô nhập form công khai bo góc đồng bộ thẻ 20/28px + nút viên thuốc: input, textarea, select Radix + <select> gốc progressive, ô file, ô thả CV rounded-sm 2px → --radius-md 12px; checkbox 6px (= --radius-md/2); nút chọn file viên thuốc; khung form mặc định LeadFormSlot --radius-lg 16px (override sẵn có giữ). Admin Payload không đổi. Spec 1.24.1 → 1.25.0 (MINOR, đổi yêu cầu trình bày).",
-  "workItem": "feature/form-fields-rounded",
-  "backlog": "BL-030",
+  "triggerNote": "BL-031 — thẻ tư vấn / liên hệ cột phải trang chi tiết (DETAIL_ASIDE_CARD_CLASS) ≥ lg không còn thanh cuộn riêng: bỏ max-h + overflow-y-auto; top = min(--sticky-top + 4.5rem, 100dvh − --detail-aside-h − 1rem), --detail-aside-h do DetailAsideFit (client, ResizeObserver) ghi. Chi tiết cho thuê: pb-8 (32px) giữa thư viện ảnh / khối tin tương tự (tin đã thuê) và thanh mục con. Spec 1.25.0 → 1.26.0 (MINOR, đổi yêu cầu trình bày).",
+  "workItem": "feature/detail-aside-no-inner-scroll",
+  "backlog": "BL-031",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-form-fields-rounded.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-detail-aside-no-inner-scroll.md",
   "task": [
-    "tasks/feature-form-fields-rounded/phase-1-task-01.md"
+    "tasks/feature-detail-aside-no-inner-scroll/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-form-fields-rounded-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-detail-aside-no-inner-scroll-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-detail-aside-no-inner-scroll-phase-1-task-01-round-2-review.md"
   ],
   "commits": [
-    "close-out BL-030 (commit chứa file này)"
+    "close-out BL-031 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-030 (commit chứa file này)": "T01 — class-only D1–D5: ui/input, ui/checkbox, ui/select (trigger), ui/option-select, forms/FormField (base + file:rounded-pill), forms/LeadFormSlot (rounded-lg), careers/CvPicker; comment globals.css; test FormField.test.tsx. Review STRICT-light PASS r1. Doc: design-spec, docs/DESIGN.md, skills/react-nodejs/design-tokens.md, SPECIFICATIONS (Giao diện)."
+    "close-out BL-031 (commit chứa file này)": "T01 — DetailLayout (bỏ max-h/overflow-y-auto, top min(...), bọc aside bằng DetailAsideFit), DetailAsideFit.tsx mới, RentalDetail pb-8 (ảnh + similarBlock tin rented); test DetailLayout / rental-detail / project-detail. Review NORMAL PASS r1 (4 MINOR, đã sửa MINOR-1/3) → FAST PASS r2. Doc: SPECIFICATIONS (Giao diện, F2, F3), design-spec S03 + S07."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.24.1-31.json",
-  "specUpdate": "spec/updates/2026-10-20-form-fields-rounded.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.25.0-32.json",
+  "specUpdate": "spec/updates/2026-10-20-detail-aside-no-inner-scroll.md",
   "specRefs": [
-    "Overview — Giao diện (ô nhập form công khai, Select TAMI)",
-    "design-spec §bo góc",
-    "docs/DESIGN.md bảng radius"
+    "Overview — Giao diện (khung chi tiết chung, thẻ tư vấn / liên hệ dính)",
+    "F2 — Bố cục chi tiết dự án (thẻ Tư vấn 1:1)",
+    "F3 — Bố cục chi tiết cho thuê (khoảng ảnh → thanh mục con, thẻ liên hệ)",
+    "design-spec S03 Bố cục",
+    "design-spec S07 mục 3"
   ],
   "specRefNotes": {
-    "Overview — Giao diện (ô nhập form công khai, Select TAMI)": "Ô nhập (input/textarea/select/file/ô thả CV) --radius-md 12px; checkbox 6px; LeadFormSlot mặc định --radius-lg 16px; Select TAMI cùng bo với input; admin Payload không đổi.",
-    "design-spec §bo góc": "Reconcile cùng task: ô nhập md, checkbox md/2, panel form lg.",
-    "docs/DESIGN.md bảng radius": "--radius-sm không còn dùng cho ô nhập."
+    "Overview — Giao diện (khung chi tiết chung, thẻ tư vấn / liên hệ dính)": "Thẻ không thanh cuộn riêng; top = min(--sticky-top + 4.5rem, 100dvh − chiều cao thẻ − 1rem); không JS dính trên như cũ; < lg không đổi.",
+    "F2 — Bố cục chi tiết dự án (thẻ Tư vấn 1:1)": "Bỏ 'cao tối đa phần viewport còn lại, cuộn trong thẻ'.",
+    "F3 — Bố cục chi tiết cho thuê (khoảng ảnh → thanh mục con, thẻ liên hệ)": "pb-8 (32px) trước thanh mục con, kể cả khối tin tương tự của tin đã thuê; breadcrumb giữ vị trí.",
+    "design-spec S03 Bố cục": "Thay đoạn max-height/tự cuộn bên trong bằng công thức top + DetailAsideFit.",
+    "design-spec S07 mục 3": "Thẻ liên hệ dính như S03; khối liền trước thanh mục con pb-8."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/ui/input.tsx",
-      "src/components/ui/checkbox.tsx",
-      "src/components/ui/select.tsx",
-      "src/components/ui/option-select.tsx",
-      "src/components/forms/FormField.tsx",
-      "src/components/forms/LeadFormSlot.tsx",
-      "src/components/forms/FormField.test.tsx",
-      "src/components/careers/CvPicker.tsx",
-      "src/app/(frontend)/globals.css",
-      ".context/design-spec.md",
-      "docs/DESIGN.md",
-      "skills/react-nodejs/design-tokens.md"
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailAsideFit.tsx",
+      "src/components/rentals/RentalDetail.tsx",
+      "src/components/detail/DetailLayout.test.tsx",
+      "src/components/rentals/rental-detail.test.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
     ],
-    "filesNote": "Chỉ đổi lớp bo góc (Tailwind class) + comment/doc; không logic, không token mới, --radius-sm toàn cục giữ. Không schema/migration/API/access control/i18n. Item trong dropdown Select và nút X của CvPicker giữ nguyên.",
+    "filesNote": "Đổi lớp Tailwind thẻ phụ + 1 client island nhỏ ghi biến CSS --detail-aside-h (DOM thẻ vẫn server render); RentalDetail thêm pb-8. Không schema/migration/API/access control/i18n/nguồn lead/JSON-LD.",
     "modules": [
-      "UI — Input / Checkbox / Select / OptionSelect (component chung form công khai)",
-      "Forms — FormField, LeadFormSlot",
-      "Careers — CvPicker"
+      "Detail — DetailLayout / DetailAsideFit (khung chi tiết dùng chung)",
+      "Rentals — RentalDetail",
+      "Projects — chi tiết dự án (dùng DetailLayout)"
     ]
   },
   "impact": {
     "direct": [
-      "Liên hệ `/lien-he` + `/en/contact`: input, textarea, checkbox đồng ý bo 12px / 6px; khung form 16px",
-      "Form lead chi tiết dự án `/du-an/<slug>` + chi tiết cho thuê `/cho-thue/<slug>` (VI + EN): ô nhập 12px; khung giữ override (dự án 28px, cho thuê trong suốt)",
-      "Đăng tin BĐS: input/textarea/select/ô file 12px, nút chọn file viên thuốc, khung form 16px",
-      "Form cuối trang tin tức: ô nhập 12px; khung giữ `rounded-xl`",
-      "Form ứng tuyển (tuyển dụng chi tiết) + CvPicker: ô thả CV (md+) và dòng file đã chọn bo 12px, ô nhập 12px"
+      "/du-an/[slug] + /en/projects/[slug] ≥ lg: thẻ Tư vấn 1:1 không có thanh cuộn dọc riêng (overflow-y visible, max-height none); thẻ vừa viewport dính top = --sticky-top + 4.5rem (88px ở ≥ lg) dưới thanh mục con",
+      "/cho-thue/[slug] + /en/for-rent/[slug] ≥ lg: thẻ liên hệ (giá + sale/hotline + form) không thanh cuộn riêng; thẻ cao hơn viewport cuộn theo trang tới khi đáy thẻ cách đáy viewport 1rem rồi dính — checkbox đồng ý + nút gửi luôn tới được, không bị cắt",
+      "Chi tiết cho thuê mọi breakpoint: khoảng 32px giữa thư viện ảnh và thanh mục con (chưa dính)",
+      "Tin cho thuê đã thuê có tin tương tự: khối tin tương tự cách thanh mục con 32px"
     ],
     "dependents": [
-      "Bộ lọc dự án / cho thuê / tuyển dụng (Input + Select chung)",
-      "Select sắp xếp danh sách",
-      "Select mặt bằng (FloorPlans)",
-      "Tìm kiếm trang chủ (input/select chung)",
-      "<select> gốc progressive (OptionSelect, BL-016) khi chưa hydrate / không JS"
+      "DetailAsideFit: đổi kích thước cửa sổ / thẻ đổi chiều cao (lỗi validate form, thông báo gửi thành công, sale bị khoá → hotline chung) → top tính lại",
+      "Thẻ phụ khi chưa hydrate / không JS: --detail-aside-h = 0 → dính trên như cũ, không lỗi bố cục"
     ],
     "regression": [
-      "Focus ring (focus-visible) và viền lỗi theo đúng bo góc, không bị cắt / lệch",
-      "Select Radix: mở/đóng, bàn phím + typeahead, danh sách không tràn màn hình, chữ dài cắt …",
-      "Checkbox consent: tick/bỏ tick, focus, trạng thái lỗi; dấu tick không bị bo che",
-      "Input file: chọn / đổi / xoá file; CvPicker kéo-thả + nút X",
-      "Override LeadFormSlot: chi tiết dự án 28px, tin tức rounded-xl, cho thuê bg-transparent p-0 vẫn thắng lớp mặc định",
-      "Admin `/admin` (Payload) không đổi giao diện ô nhập"
+      "Thanh mục con dính sát đỉnh 8 / ≥ lg 16px + neo scroll-margin khi bấm mục; active mục đúng, cuộn qua mục cuối không nút active (BL-029)",
+      "Lead form chỉ một bản trong DOM (#lead-form), source project / rental đúng",
+      "< lg: thẻ tư vấn / liên hệ nằm sau thẻ nội dung, không đổi; sticky CTA đáy (ProjectStickyCta / thanh đáy cho thuê) dẫn tới #lead-form, ẩn khi form trong viewport",
+      "Header ẩn khi cuộn trên trang chi tiết (BL-027), thanh mục con rộng bằng khung nội dung (BL-028)",
+      "Breadcrumb chi tiết cho thuê giữ nguyên vị trí; chi tiết dự án khoảng hero → thanh mục con không đổi",
+      "Không CLS, không tràn ngang 375 / 768 / 1280"
     ]
   },
   "acceptance": [
-    "Mọi input / textarea / select trigger / <select> gốc / ô file của form công khai có border-radius 12px (computed = var(--radius-md))",
-    "Checkbox form công khai border-radius 6px",
-    "Nút chọn file trong ô file dạng viên thuốc",
-    "Khung form Liên hệ / Đăng tin BĐS / ứng tuyển border-radius 16px; chi tiết dự án 28px, tin tức rounded-xl, cho thuê trong suốt như trước",
-    "Focus ring + viền lỗi đi theo bo góc, không lộ góc vuông",
-    "Bộ lọc / sắp xếp / mặt bằng / tìm kiếm trang chủ cùng bo 12px, chức năng không đổi",
-    "Admin Payload không đổi",
-    "VI + EN như nhau; 375 / 768 / 1280 không tràn ngang"
+    "≥ lg cả 2 trang chi tiết: thẻ phụ computed overflow-y visible, max-height none, không có thanh cuộn dọc riêng",
+    "Thẻ vừa viewport: dính dưới thanh mục con (top = --sticky-top + 4.5rem) như BL-027",
+    "Thẻ cao hơn viewport (vd cho thuê 842px ở 1440×900): khi dính đáy thẻ ≤ đáy viewport − 1rem, nút gửi nằm trong viewport, tới được bằng cuộn trang",
+    "Aside có biến --detail-aside-h = chiều cao thẻ sau hydrate; đổi kích thước cửa sổ thì cập nhật",
+    "Chi tiết cho thuê: khoảng 32px giữa thư viện ảnh và thanh mục con; tin đã thuê có tin tương tự: khối tin tương tự có pb-8 ngay trước thanh mục con",
+    "Thanh mục con đã dính đầu trang thì không đổi; breadcrumb không đổi vị trí",
+    "< lg không đổi; VI + EN như nhau"
   ],
   "outOfScope": [
-    "Token --radius-sm toàn cục (giữ 2px cho chỗ khác)",
-    "Item highlight bên trong dropdown Select",
-    "Giao diện admin Payload",
-    "ProjectFilters override rounded-md (file user đang sửa, giữ nguyên)"
+    "Chuyển breadcrumb chi tiết cho thuê (user bỏ 2026-10-20)",
+    "Bằng hẳn khoảng 60px của chi tiết dự án (60px gồm dòng breadcrumb) — đổi token nếu user muốn",
+    "Tinh chỉnh phần đầu thẻ cao nằm dưới thanh mục con khi dính theo đáy (MINOR-2, task riêng nếu cần)",
+    "Admin Payload"
   ],
   "viewports": [
     375,
     768,
-    1280
+    1024,
+    1280,
+    1440
   ],
   "locales": [
     "vi",
@@ -109,6 +107,6 @@
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "low-medium",
-  "riskNote": "Class-only nhưng ở component chung dùng mọi form công khai + bộ lọc. Review STRICT-light PASS r1; vitest src/components 90 files / 855 tests PASS, lint 0 error, typecheck PASS. Residual: chưa kiểm trực quan 375/768/1280; lớp rounded-[calc(var(--radius-md)/2)] chỉ assert tên lớp, chưa kiểm CSS build thật."
+  "risk": "medium",
+  "riskNote": "Đụng khung chi tiết dùng chung 2 trang + thêm client island đo chiều cao. Review NORMAL PASS r1 (4 MINOR) → FAST PASS r2; vitest detail/projects/rentals 13 file / 166 test PASS, typecheck PASS, lint 0 error. Đo :3000 1440×900 cho thuê + dự án OK. Residual: thẻ cao khi dính theo đáy phần đầu (~28px padding) nằm dưới thanh mục con; không JS thẻ cao chỉ lộ đáy khi cuộn hết lưới; tin đã thuê chưa đo trực quan; 768/1280 + /en chưa đo riêng."
 }

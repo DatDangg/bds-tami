@@ -114,7 +114,9 @@ describe("RentalDetail (S07, khung chi tiết chung)", () => {
     const contact = aside.firstElementChild as HTMLElement;
     expect(contact.className).toContain("bg-surface");
     expect(contact.className).toContain("lg:sticky");
-    expect(contact.className).toContain("lg:top-[calc(var(--sticky-top)+4.5rem)]");
+    expect(contact.className).toContain("--sticky-top)_+_4.5rem");
+    expect(contact.className).toContain("--detail-aside-h");
+    expect(contact.className).not.toMatch(/max-h|overflow-y/);
     expect(contact.className).not.toContain("bg-primary-subtle");
     expect(contact.className).not.toContain("--header-offset");
     expect(aside).toHaveAttribute("aria-labelledby", "rental-consult-heading");
@@ -122,6 +124,12 @@ describe("RentalDetail (S07, khung chi tiết chung)", () => {
     expect(within(aside).getByRole("link", { name: /0901 234 567/ })).toHaveAttribute("href", "tel:0901234567");
     // Thẻ liên hệ sau thẻ nội dung trong DOM (< lg nằm dưới).
     expect(follows(card, aside)).toBe(true);
+  });
+
+  it("thư viện ảnh có khoảng dưới (pb-8) để thanh mục con không dính sát ảnh", () => {
+    renderRental(fullRental);
+    const nav = screen.getByRole("navigation", { name: "Mục lục tin cho thuê" });
+    expect(nav.previousElementSibling?.className).toContain("pb-8");
   });
 
   it("form lead chỉ MỘT bản trong DOM (#lead-form nằm trong thẻ liên hệ), scroll-mt theo --sticky-top", () => {
@@ -142,6 +150,9 @@ describe("RentalDetail (S07, khung chi tiết chung)", () => {
     const similarHeading = screen.getByRole("heading", { level: 2, name: "Căn tương tự đang trống" });
     const nav = screen.getByRole("navigation", { name: "Mục lục tin cho thuê" });
     expect(follows(similarHeading, nav)).toBe(true);
+    // Khối tin tương tự (nền xám) không dính sát thanh mục con.
+    expect(nav.previousElementSibling?.className).toContain("pb-8");
+    expect(nav.previousElementSibling?.contains(similarHeading)).toBe(true);
     expect(screen.getAllByText("Giá tham khảo").length).toBeGreaterThan(0);
     // Điều khoản: accordion đóng, tiêu đề là summary (không thêm h2 thứ hai), neo #terms vẫn có.
     const terms = container.querySelector("#terms") as HTMLElement;

@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
-import { DetailLayout } from "./DetailLayout";
+import { DETAIL_ASIDE_CARD_CLASS, DetailLayout } from "./DetailLayout";
 import { DetailSection } from "./DetailSection";
 
 function renderLayout(props: Partial<Parameters<typeof DetailLayout>[0]> = {}) {
@@ -41,6 +41,47 @@ describe("DetailLayout", () => {
     expect(card.className).toContain("p-5");
     expect(card.nextElementSibling?.tagName).toBe("ASIDE");
     expect(card.nextElementSibling?.getAttribute("aria-labelledby")).toBe("card");
+  });
+
+  it("thẻ phụ không cuộn riêng: không max-h/overflow-y, top = min(dưới thanh mục con, đáy viewport − chiều cao thẻ − 1rem)", () => {
+    expect(DETAIL_ASIDE_CARD_CLASS).not.toMatch(/max-h|overflow-y/);
+    expect(DETAIL_ASIDE_CARD_CLASS).toContain("lg:sticky");
+    expect(DETAIL_ASIDE_CARD_CLASS).toContain(
+      "lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]",
+    );
+  });
+
+  describe("DetailAsideFit (ResizeObserver)", () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("ghi --detail-aside-h lên aside theo chiều cao thẻ con đầu; ngắt observer khi unmount", () => {
+      let notify: () => void = () => {};
+      const disconnect = vi.fn();
+      class FakeResizeObserver {
+        constructor(callback: () => void) {
+          notify = callback;
+        }
+        observe() {}
+        disconnect = disconnect;
+      }
+      vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+      const { container, unmount } = renderLayout();
+      const aside = container.querySelector("aside") as HTMLElement;
+      const card = aside.firstElementChild as HTMLElement;
+      expect(aside).toHaveAttribute("aria-labelledby", "card");
+      expect(aside.className).toContain("pt-6");
+      card.getBoundingClientRect = () => ({ height: 812 }) as DOMRect;
+      notify();
+      expect(aside.style.getPropertyValue("--detail-aside-h")).toBe("812px");
+      unmount();
+      expect(disconnect).toHaveBeenCalled();
+    });
+
+    it("không có ResizeObserver: không lỗi, không ghi biến", () => {
+      vi.stubGlobal("ResizeObserver", undefined);
+      const { container } = renderLayout();
+      expect((container.querySelector("aside") as HTMLElement).style.getPropertyValue("--detail-aside-h")).toBe("");
+    });
   });
 
   it("không có subNav/aside thì không dựng nav/aside", () => {
