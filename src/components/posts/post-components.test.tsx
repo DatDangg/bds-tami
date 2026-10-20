@@ -70,6 +70,8 @@ describe("PostCard", () => {
     const heading = screen.getByRole("heading", { level: 2 });
     expect(heading.className).toContain("line-clamp-2 font-display text-h4");
     expect(heading.parentElement?.className).toContain("gap-1");
+    expect(heading).toHaveClass("group-hover:text-accent-text", "group-focus-visible:text-accent-text");
+    expect(heading).not.toHaveClass("group-hover:underline");
   });
 
   it("en: nhãn tiếng Anh", () => {

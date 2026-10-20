@@ -88,7 +88,7 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
                   </Badge>
                 )}
                 <div className="glass-panel absolute inset-x-3 bottom-3 flex flex-col gap-1 rounded-lg p-4 text-text sm:inset-x-4 sm:bottom-4 sm:p-5">
-                  <h3 id={`${labelledBy}-${slide.id}`} className="line-clamp-2 font-display text-h3 group-hover:underline group-hover:underline-offset-4">{slide.title}</h3>
+                  <h3 id={`${labelledBy}-${slide.id}`} className="line-clamp-2 font-display text-h3 transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{slide.title}</h3>
                   {slide.provinceName && (
                     <p className="flex items-center gap-1 text-small">
                       <MapPin size={16} aria-hidden="true" className="shrink-0" />

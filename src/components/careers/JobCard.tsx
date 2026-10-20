@@ -28,7 +28,7 @@ export function JobCard({ data, headingLevel = "h2" }: JobCardProps) {
         href={data.href}
         className="group flex min-h-11 flex-col gap-2 rounded-xl border border-border bg-surface p-4 transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring md:grid md:grid-cols-[minmax(0,1fr)_9rem_9rem_8rem_1.25rem] md:items-center md:gap-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_12rem_11rem_10rem_1.25rem]"
       >
-        <Heading className="font-display text-h3 text-balance group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
+        <Heading className="font-display text-h3 text-balance transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
         <p className="text-small text-text-secondary">{place}</p>
         {salary ? <p className="text-small font-semibold">{salary}</p> : <span aria-hidden="true" className="hidden md:block" />}
         <p className="flex flex-wrap items-center gap-2 text-small text-text-secondary">

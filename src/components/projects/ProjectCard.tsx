@@ -41,7 +41,7 @@ export function ProjectCard({ data, priority = false, headingLevel = "h2" }: Pro
           </Badge>
         </div>
         <div className="flex min-w-0 flex-col gap-1 p-4">
-          <Heading className="line-clamp-2 font-display text-h4 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
+          <Heading className="line-clamp-2 font-display text-h4 transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
           {data.provinceName && <p className="text-small text-text-muted">{data.provinceName}</p>}
           {data.priceFrom && <p className="text-small font-semibold">{t("priceFrom", { price: data.priceFrom })}</p>}
         </div>

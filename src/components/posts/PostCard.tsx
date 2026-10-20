@@ -40,7 +40,7 @@ export function PostCard({ data, headingLevel, priority = false, imageSizes }: P
         </div>
         <div className="flex min-w-0 flex-col gap-1 p-4">
           {data.categoryName && <p className="text-xsmall font-semibold text-accent-text">{data.categoryName}</p>}
-          <Heading className="line-clamp-2 font-display text-h4 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
+          <Heading className="line-clamp-2 font-display text-h4 transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
           {data.excerpt && <p className="line-clamp-2 text-small text-text-secondary">{data.excerpt}</p>}
           {data.priceLabel && <p className="text-small font-semibold">{data.priceLabel}</p>}
           <p className="flex flex-wrap items-center gap-x-3 text-xsmall text-text-muted">

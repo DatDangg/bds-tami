@@ -1036,6 +1036,36 @@
       "specUpdate": "spec/updates/2026-10-20-news-detail-card-toc.md",
       "specValidation": ".context/review-reports/feature-news-detail-card-toc-spec-validation.md",
       "residual": "chưa xem trình duyệt thật 375/768/1024/1280; ACTIVE_LINE_PX=48 xấp xỉ; header còn hiện có thể che tạm heading; bài không heading thẻ rộng chữ 68ch căn trái; bản gập < lg không highlight; đổi chữ heading đổi id"
+    },
+    {
+      "slug": "news-card-hover-brand-color",
+      "title": "Hover tiêu đề mọi thẻ: bỏ gạch chân, đổi chữ vàng thương hiệu (BL-034)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-034",
+      "changeDoc": "spec/changes/archive/2026-10-20-news-card-hover-brand-color.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-news-card-hover-brand-color/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "note": "7 tiêu đề thẻ group-hover/group-focus-visible:text-accent-text + transition-colors, bỏ underline; test assert news/rentals/posts",
+          "report": ".context/review-reports/feature-news-card-hover-brand-color-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-034)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.29.0",
+      "scopeVersion": 36,
+      "specUpdate": "spec/updates/2026-10-20-news-card-hover-brand-color.md",
+      "residual": "slider dự án trên kính phủ ảnh rất tối ~3.0:1 khi hover; chưa assert ProjectCard/JobCard/OfferBox/ProjectsSlider; chưa xem trình duyệt"
     }
   ],
   "bugs": [
@@ -1922,7 +1952,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T16:00:00+07:00",
+  "lastUpdated": "2026-10-20",
   "approvalMilestones": [
     {
       "id": "M1",

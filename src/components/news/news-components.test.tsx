@@ -33,6 +33,13 @@ describe("NewsCard", () => {
     expect(link).toHaveTextContent("Thị trường");
   });
 
+  it("hover tiêu đề: đổi sang màu thương hiệu, không gạch chân", () => {
+    renderWithIntl(<NewsCard data={card("1")} headingLevel="h2" />);
+    const heading = screen.getByRole("heading", { level: 2 });
+    expect(heading).toHaveClass("group-hover:text-accent-text", "group-focus-visible:text-accent-text");
+    expect(heading).not.toHaveClass("group-hover:underline");
+  });
+
   it("ảnh là trang trí (alt rỗng, tên link đã có tiêu đề); thiếu ảnh vẫn giữ khung tỉ lệ", () => {
     const { container, rerender } = renderWithIntl(<NewsCard data={card("1")} headingLevel="h3" />);
     expect(container.querySelector("img")).toHaveAttribute("alt", "");

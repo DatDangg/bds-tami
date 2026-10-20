@@ -26,6 +26,13 @@ describe("RentalCard (dùng chung danh sách S04 + tin tương tự S07)", () =>
     expect(screen.getByRole("heading", { level: 2, name: "Studio Ba Đình" })).toBeInTheDocument();
   });
 
+  it("hover tiêu đề: đổi sang màu thương hiệu, không gạch chân", () => {
+    renderWithIntl(<RentalCard data={data} />);
+    const heading = screen.getByRole("heading", { level: 3 });
+    expect(heading).toHaveClass("group-hover:text-accent-text", "group-focus-visible:text-accent-text");
+    expect(heading).not.toHaveClass("group-hover:underline");
+  });
+
   it("vi: giá rút gọn + /tháng, diện tích, PN, khu vực; en: BR và đơn vị tiếng Anh", () => {
     const { unmount } = renderWithIntl(<RentalCard data={data} />);
     const link = screen.getByRole("link");

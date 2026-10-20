@@ -17,7 +17,7 @@ function RelatedCard({ target }: { target: RelatedTargetView }) {
       </div>
       <span className="flex min-w-0 flex-col">
         <span className="text-xsmall text-text-muted">{t(target.kind === "project" ? "relatedProject" : "relatedRental")}</span>
-        <span className="line-clamp-2 text-small font-semibold group-hover:underline">{target.title}</span>
+        <span className="line-clamp-2 text-small font-semibold transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{target.title}</span>
       </span>
     </Link>
   );

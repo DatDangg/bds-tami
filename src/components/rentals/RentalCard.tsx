@@ -36,7 +36,7 @@ export function RentalCard({ data, headingLevel = 3, priority = false, imageSize
           )}
         </div>
         <div className="flex min-w-0 flex-col gap-1 p-4">
-          <Heading className="line-clamp-2 font-display text-h4 group-hover:underline group-hover:underline-offset-4">{data.title}</Heading>
+          <Heading className="line-clamp-2 font-display text-h4 transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
           {data.areaLabel && <p className="text-small text-text-muted">{data.areaLabel}</p>}
           <p className="text-small font-semibold">
             {data.priceMonthlyVnd === null ? (

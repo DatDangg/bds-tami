@@ -60,7 +60,7 @@ export function NewsCard({ data, variant = "card", headingLevel, priority = fals
           {data.categoryName && <p className="text-xsmall font-semibold text-accent-text">{data.categoryName}</p>}
           <Heading
             className={cn(
-              "group-hover:underline group-hover:underline-offset-4",
+              "transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text",
               // Chỉ nạp font-display 400/500 (fonts.ts): 600 sẽ bị tổng hợp thành bold giả.
               isFeature ? "font-display font-medium text-h3 lg:text-h2-sm" : "text-h4 font-semibold",
             )}
