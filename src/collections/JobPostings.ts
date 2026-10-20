@@ -57,6 +57,7 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
       admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "category", "employmentType", "deadline", "status", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Tin tuyển dụng của công ty; quá hạn nộp sẽ tự ẩn khỏi danh sách công khai.",
       },
       defaultSort: "-publishedAt",

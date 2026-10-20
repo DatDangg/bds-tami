@@ -25,6 +25,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
       admin: {
         useAsTitle: "title",
         defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Bài viết tin tức, kiến thức thị trường; không thu lead.",
       },
       defaultSort: "-publishedAt",

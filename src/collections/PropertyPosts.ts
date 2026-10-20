@@ -60,6 +60,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
       admin: {
         useAsTitle: "title",
         defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.",
       },
       defaultSort: "-publishedAt",

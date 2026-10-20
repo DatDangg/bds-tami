@@ -32,6 +32,7 @@ import { VndCell as VndCell_fbd7cf2a56609098ead873f2758dcced } from '../../../co
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
+import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
@@ -84,6 +85,7 @@ export const importMap = {
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
+  "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,

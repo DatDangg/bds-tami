@@ -26,7 +26,7 @@ import { projectMarketBlockFields } from "./projects/market-blocks";
 export const SALES_STATUSES = ["upcoming", "selling", "handed_over"] as const;
 export type SalesStatus = (typeof SALES_STATUSES)[number];
 
-const SALES_STATUS_LABELS: Record<SalesStatus, string> = {
+export const SALES_STATUS_LABELS: Record<SalesStatus, string> = {
   upcoming: "Sắp mở bán",
   selling: "Đang mở bán",
   handed_over: "Đã bàn giao",
@@ -117,6 +117,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       admin: {
         useAsTitle: "title",
         defaultColumns: ["gallery", "title", "category", "salesStatus", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Dự án bất động sản giới thiệu trên website: thông tin, quy mô, tiện ích, mặt bằng và tài liệu.",
       },
       defaultSort: "-publishedAt",

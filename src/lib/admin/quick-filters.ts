@@ -96,7 +96,7 @@ export function withChip(where: Where | undefined, group: QuickFilterGroup, key:
   return rebuildWhere(where, rebuilt);
 }
 
-const cond = (field: string, operator: string, value: unknown): Where => ({ [field]: { [operator]: value } });
+export const cond = (field: string, operator: string, value: unknown): Where => ({ [field]: { [operator]: value } });
 
 const MILLION = 1_000_000;
 
