@@ -1,7 +1,10 @@
 ---
 id: admin-form-non-tech-friendly
 type: feature
-status: pending
+status: done
+done: 2026-10-21
+spec_version: 1.38.0
+scopeVersion: 48
 created: 2026-10-20
 ---
 
@@ -94,3 +97,7 @@ Nguyên tắc: người nhập liệu là nhân viên văn phòng/sale — nhìn
 - Q3 Alt mặc định = tên file đã làm sạch (bỏ đuôi, `-`/`_` → khoảng trắng); không lấy tiêu đề bài (Payload upload drawer không biết bài cha một cách tin cậy) — ghi residual.
 - Q4 Zalo dùng `https://zalo.me/<số chuẩn hoá 0xxxxxxxxx>` (không cần app id).
 - Q5 Thứ tự task: T01 chung → T02 Dự án + trường số/giá → T03 Lead → T04 Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh; tuần tự (cùng file chung).
+
+## Kết quả (2026-10-21)
+- Done: T01 865ee10 · T02 a0aaa2c · T03 f4437c3 · T04 bfa5d5f · T05 2f59c9b (sửa 16 test bộ đầy đủ) + close-out. Spec 1.38.0 / scope v48.
+- Residual: tiêu đề lớn màn tạo mới vẫn "[Chưa đặt tên]" (thanh nút "Thêm … mới"); không có tiền tố "Đang sửa:"; dấu * hiện cả bản en; alt tự điền chỉ từ tên file (không lấy tiêu đề bài); chưa kiểm trên trình duyệt (cần QA tay); MINOR review để lại (mailto ?/&, +84 0…, nút Hôm nay bỏ qua readOnly, aria-live bộ đếm).

@@ -509,7 +509,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | Trường | Kiểu | Ràng buộc | Ghi chú |
 |---|---|---|---|
 | file | upload | R | Ảnh ≤ 10MB (JPG/PNG/WebP/AVIF), PDF ≤ 20MB, video MP4/WebM ≤ 15MB (chỉ dùng cho `homepage.hero.slides[].video`) |
-| `alt` | text | R với ảnh | Accessibility + SEO |
+| `alt` | text | R với ảnh | Accessibility + SEO. Ảnh mới tải lên trống alt được hook `fillImageAlt` điền từ tên file gốc đã làm sạch (fallback "Hình ảnh", BL-042); sửa ảnh cũ để trống alt vẫn bị chặn |
 | `caption` | text | | |
 | `uploadedBy` | `rel→staff` | | |
 

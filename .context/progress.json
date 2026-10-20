@@ -1,11 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "admin-form-non-tech-friendly",
-    "phaseTask": "phase-1-closeout",
-    "journal": ".context/runs/feature-admin-form-non-tech-friendly-phase-1.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1503,10 +1498,10 @@
       "slug": "admin-form-non-tech-friendly",
       "title": "Admin form dễ dùng cho người không rành công nghệ: bỏ đuôi ngôn ngữ, richText thanh công cụ cố định, dấu * đủ, placeholder, Người tạo tự điền, slug/bản dịch gọn, Dự án/Lead/Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh (BL-042)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-042",
-      "changeDoc": "spec/changes/2026-10-20-admin-form-non-tech-friendly.md",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-form-non-tech-friendly.md",
       "startedAt": "2026-10-21",
       "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
       "note": "Auto proceed: bảng điểm sửa + Q1–Q5 trong change doc; D* trong task file",
@@ -1587,7 +1582,11 @@
           ],
           "note": "nhãn 3 field ui; media-upload test theo hành vi alt mới + ghim filename (R3 do test song song); pnpm test 3422/3422 PASS; dọn 2 media rác do lần chạy test cũ"
         }
-      ]
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.38.0",
+      "scopeVersion": 48,
+      "phaseValidation": ".context/review-reports/spec-validation-feature-admin-form-non-tech-friendly-phase-1.md (r1 FAIL 16 test → T05 fix, pnpm test 3422 PASS)"
     }
   ],
   "bugs": [
@@ -2504,7 +2503,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T22:16:32.044Z",
+  "lastUpdated": "2026-10-20T22:20:59.253Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -247,18 +247,20 @@ Nguyên tắc: **chỉ dùng tab không tên, `row`, `collapsible`** — không 
 | Tab **Thông tin** (tên theo loại: "Thông tin dự án" / "Thông tin căn") | giá, diện tích, vị trí, quy mô… dùng `row` 2 cột |
 | Tab **Hình ảnh** | cover, gallery, mặt bằng, tài liệu |
 | Tab **SEO** | group `seo` |
-| Tab **Bản dịch** | group `translation` (chỉ đọc) + nút "Dịch lại bằng AI" / "Duyệt bản EN" hiện có |
-| Sidebar phải (320px) | Trạng thái · Ngày xuất bản · Tác giả · Nổi bật · Đường dẫn (slug) · Có bản tiếng Anh |
+| Tab **Bản dịch** | group `translation`: trường hệ thống ẩn khỏi form, chỉ 1 dòng tóm tắt (`TranslationSummary`) + nút "Dịch lại bằng AI" / "Duyệt bản EN" (BL-042) |
+| Sidebar phải (320px) | Trạng thái · Ngày xuất bản · Tác giả (tự điền người đăng nhập) · Nổi bật · Có bản tiếng Anh · khối thu gọn **Nâng cao** (Đường dẫn trang) — BL-042 |
 
 Mỗi field có `label` tiếng Việt; field khó hiểu có `admin.description` (1 câu, 12px subtle). Nhãn hàng array dùng `RowLabel` hiện giá trị chính (vd "Tầng 12 – 2PN", "Facebook").
 
+**As-built (BL-042, 2026-10-21):** editor toàn cục `createRichTextEditor()` (`src/lib/admin/rich-text-editor.ts`): thanh công cụ cố định + Hoàn tác/Làm lại, ẩn gutter/"+"/tay kéo, placeholder tiếng Việt; Dự án có placeholder riêng cho Tổng quan/Pháp lý/Chính sách. Nhãn ẩn đuôi ngôn ngữ (`.localized`); `*` qua `markRequired` (`admin.className: tami-required`) cho trường bắt buộc bằng validate (hiện cả ở bản en). `afterInput` dùng chung (`src/fields/form-hints.ts`): bộ đếm Mô tả ngắn/Tóm tắt, "≈ … đồng" dưới ô VNĐ, nút "Hôm nay" (Ngày cập nhật bảng giá). Nút "+" quan hệ có chữ "Thêm mới"; thanh nút tạo mới "Thêm {{label}} mới", tiêu đề lớn khi trống "[Chưa đặt tên]". Cho thuê: khối mã tin to + Sao chép (`codeBanner`). Tuyển dụng: "Đã quá hạn" dưới ô Hạn nộp + trong cột Hạn nộp. Ảnh: tải mới trống alt → tự điền từ tên file gốc. CSS: `src/components/admin/styles/_forms.scss`.
+
 ### 5.2. Leads
 
-Tab **Khách hàng** (họ tên, SĐT, email, lời nhắn — chỉ đọc với sale) · Tab **Nguồn** (source, bài liên quan, UTM, pageUrl, referrer) · Tab **Lịch sử chăm sóc** (join `activities`). Sidebar: Trạng thái · Lý do không thành (khi `lost`) · Người phụ trách + `LeadAssigneeWarning` · các mốc thời gian (chỉ đọc).
+Tab **Khách hàng** (họ tên, SĐT + nút Gọi/Zalo, email + Gửi email, lời nhắn — chỉ đọc với sale; ngôn ngữ khách dạng nhãn) · Tab **Nguồn** (source, bài liên quan, khối thu gọn "Dữ liệu chiến dịch marketing" = UTM + link rút gọn Trang gửi/đến; cuối tab: ngày/phiên bản đồng ý chính sách chỉ đọc) · Tab **Lịch sử chăm sóc** (join `activities`). Sidebar: Trạng thái · Lý do không thành (khi `lost`) · Người phụ trách + `LeadAssigneeWarning` · Ngày giao · 1 dòng tóm tắt hoạt động (các mốc + `anonymizedAt` không vẽ ở form, vẫn là cột/bộ lọc) — BL-042.
 
 ### 5.3. Globals
 
-`homepage`: tab theo khối (Hero · Giới thiệu · Dự án nổi bật · Dịch vụ · Ưu đãi · Đối tác · Kêu gọi · Thứ tự khối · SEO · Bản dịch). `site-settings`: tab Thông tin công ty · Liên hệ & mạng xã hội · Email nhận thông báo · Dịch tự động · Kỹ thuật (GA, phiên bản chính sách).
+`homepage`: tab theo khối (Hero · Giới thiệu · Dự án nổi bật · Dịch vụ · Ưu đãi · Đối tác · Kêu gọi · Thứ tự khối · SEO · Bản dịch). `site-settings`: tab Thông tin công ty · Liên hệ & mạng xã hội · Email nhận thông báo · Dịch tự động · Kỹ thuật (GA, phiên bản chính sách). BL-042: phiên bản chính sách hiện chữ nhỏ chỉ đọc; GA có chỉ dẫn lấy mã + placeholder; thuật ngữ dịch có ví dụ.
 
 Mobile < 768: sidebar phải xuống dưới (Payload mặc định), tab cuộn ngang.
 
