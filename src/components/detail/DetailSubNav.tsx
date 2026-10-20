@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 
@@ -10,9 +9,9 @@ export interface SubNavItem {
   label: string;
 }
 
-// Vạch "đang xem": khối đầu tiên (theo thứ tự trang) đang chiếm dải từ ngay dưới header nổi + thanh viên thuốc tới 55% chiều cao viewport. rootMargin không dùng được var():
-// lấy mức xấp xỉ scroll-margin lớn nhất (≥ lg: header 104 + thanh 54 + khe 18 = 176px) để khối vừa cuộn tới neo luôn nằm trong dải.
-const OBSERVER_MARGIN = "-176px 0px -45% 0px";
+// Vạch "đang xem": khối đầu tiên (theo thứ tự trang) đang chiếm dải từ ngay dưới thanh viên thuốc dính tới 55% chiều cao viewport. rootMargin không dùng được var():
+// lấy mức xấp xỉ scroll-margin lớn nhất trên trang chi tiết (≥ lg: --sticky-top 16 + thanh 54 + khe 18 = 88px; < lg nhỏ hơn 8px) để khối vừa cuộn tới neo luôn nằm trong dải.
+const OBSERVER_MARGIN = "-88px 0px -45% 0px";
 // Sau khi bấm một mục, cuộn mượt đi ngang nhiều khối: bỏ qua kết quả quan sát trong lúc cuộn để mục vừa bấm không bị khối ở giữa chiếm (và để
 // khối đứng cạnh nhau ở desktop như Pháp lý / Chính sách vẫn chọn được mục thứ hai: theo thứ tự trang, mục đầu luôn thắng khi cả hai cùng hiện).
 const SCROLL_LOCK_MS = 1000;
@@ -22,12 +21,11 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Thanh mục con dạng viên thuốc dính dưới header nổi (design-spec S03 khối 3): đặt tại `top: var(--header-offset)` nên giữ khe như một thanh nổi thứ hai (BL-020 m-4); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`);
+ * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề trên của header nổi (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`);
  * bấm cuộn mượt tới khối (tắt khi giảm chuyển động) rồi chuyển focus vào khối để người dùng bàn phím/đọc màn hình đi tiếp từ đó.
  * Link là neo `#id` thật nên chạy cả khi chưa có JS. < lg cuộn ngang và mục đang xem tự cuộn vào giữa.
  */
-export function ProjectSubNav({ items }: { items: SubNavItem[] }) {
-  const t = useTranslations("page.projectDetail");
+export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: string }) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
   const listRef = useRef<HTMLUListElement>(null);
   const scrollLocked = useRef(false);
@@ -81,7 +79,7 @@ export function ProjectSubNav({ items }: { items: SubNavItem[] }) {
   }
 
   return (
-    <nav aria-label={t("subNavLabel")} className="pointer-events-none sticky top-(--header-offset) z-(--z-sticky) mx-auto w-full max-w-container px-gutter print:hidden">
+    <nav aria-label={label} className="pointer-events-none sticky top-(--sticky-top) z-(--z-sticky) mx-auto w-full max-w-container px-gutter print:hidden">
       <ul
         ref={listRef}
         className="pointer-events-auto relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-pill border border-border bg-surface p-1 whitespace-nowrap shadow-md [scrollbar-width:none]"
@@ -95,8 +93,8 @@ export function ProjectSubNav({ items }: { items: SubNavItem[] }) {
                 aria-current={current ? "location" : undefined}
                 onClick={(event) => handleClick(event, item.id)}
                 className={cn(
-                  "inline-flex min-h-11 items-center rounded-pill px-4 text-small font-semibold transition-colors duration-(--duration-fast)",
-                  current ? "bg-dark text-on-dark" : "text-text-secondary hover:bg-surface-muted hover:text-text",
+                  "inline-flex min-h-11 items-center rounded-pill px-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring text-small font-semibold transition-colors duration-(--duration-fast)",
+                  current ? "bg-primary text-primary-foreground" : "text-text-secondary hover:bg-surface-muted hover:text-text",
                 )}
               >
                 {item.label}

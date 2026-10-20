@@ -3,7 +3,7 @@ import { RichText } from "@/components/content/RichText";
 import { SECTION_DOM_ID, type ProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
-import { ProjectSection } from "./ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 import { ProjectSpecs } from "./ProjectSpecs";
 
 interface ProjectOverviewProps {
@@ -20,7 +20,7 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
   const t = useTranslations("page.projectDetail");
   const tRich = useTranslations("page.richText");
   return (
-    <ProjectSection id={SECTION_DOM_ID.overview} title={t("sections.overview")}>
+    <DetailSection id={SECTION_DOM_ID.overview} title={t("sections.overview")}>
       <div className="flex flex-col gap-10">
         <ProjectSpecs {...view} />
         {view.hasOverview ? (
@@ -29,6 +29,6 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
           view.summary && <p className="max-w-[68ch] text-body text-text-secondary">{view.summary}</p>
         )}
       </div>
-    </ProjectSection>
+    </DetailSection>
   );
 }

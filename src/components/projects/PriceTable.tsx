@@ -3,7 +3,7 @@ import { formatDate, formatNumber, formatVndCompact } from "@/lib/format";
 import { SECTION_DOM_ID, type PriceAvailability, type PriceRowView } from "@/lib/projects/project-detail-view";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
-import { ProjectSection } from "./ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 
 /** Cặp token chữ/nền đạt AA (xanh / vàng nâu / đỏ), kèm chữ nên không dựa riêng vào màu. */
 const AVAILABILITY_CLASS: Record<PriceAvailability, string> = {
@@ -50,7 +50,7 @@ export function PriceTable({ rows, updatedAt }: { rows: PriceRowView[]; updatedA
   const t = useTranslations("page.projectDetail.price");
   const rangeLabels: RangeLabels = { from: (value) => t("from", { value }), to: (value) => t("to", { value }) };
   return (
-    <ProjectSection id={SECTION_DOM_ID.pricing} title={tSection("pricing")}>
+    <DetailSection id={SECTION_DOM_ID.pricing} title={tSection("pricing")}>
       {updatedAt && <p className="mb-4 text-small text-text-muted">{t("updated", { date: formatDate(updatedAt, locale) })}</p>}
       <div
         role="region"
@@ -90,6 +90,6 @@ export function PriceTable({ rows, updatedAt }: { rows: PriceRowView[]; updatedA
           </tbody>
         </table>
       </div>
-    </ProjectSection>
+    </DetailSection>
   );
 }

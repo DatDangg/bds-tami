@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { useId } from "react";
 import { PostCard } from "@/components/posts/PostCard";
 import { RentalCard } from "@/components/rentals/RentalCard";
-import { ProjectSection } from "@/components/projects/ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 import { SECTION_DOM_ID } from "@/lib/projects/project-detail-view";
 import type { PostCardData } from "@/lib/posts/post-view";
 import type { RentalCardData } from "@/lib/rentals/rental-view";
@@ -37,7 +37,7 @@ export function ProjectListings({ rentals, posts }: ProjectListingCards) {
   const t = useTranslations("page.projectDetail.listings");
   if (rentals.length === 0 && posts.length === 0) return null;
   return (
-    <ProjectSection id={SECTION_DOM_ID.listings} title={t("title")}>
+    <DetailSection id={SECTION_DOM_ID.listings} title={t("title")}>
       <div className="flex flex-col gap-10">
         {rentals.length > 0 && (
           <Group label={t("rentals")}>
@@ -58,6 +58,6 @@ export function ProjectListings({ rentals, posts }: ProjectListingCards) {
           </Group>
         )}
       </div>
-    </ProjectSection>
+    </DetailSection>
   );
 }

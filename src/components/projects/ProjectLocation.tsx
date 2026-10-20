@@ -4,7 +4,7 @@ import type { LatLng } from "@/components/media/map-geometry";
 import type { MapMarker } from "@/components/media/LazyMap";
 import { SECTION_DOM_ID, type NearbyGroupView } from "@/lib/projects/project-detail-view";
 import { NearbyTabs } from "./NearbyTabs";
-import { ProjectSection } from "./ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 
 interface ProjectLocationProps {
   projectName: string;
@@ -25,7 +25,7 @@ export function ProjectLocation({ projectName, location, address, areaLabel, nea
   // Tiện ích có toạ độ hiện thành điểm phụ trên bản đồ (mọi nhóm, không theo tab: bản đồ dựng một lần).
   const markers: MapMarker[] = nearby.flatMap((group) => group.items.flatMap((item) => (item.location ? [{ ...item.location, label: item.name }] : [])));
   return (
-    <ProjectSection id={SECTION_DOM_ID.location} title={t("sections.location")}>
+    <DetailSection id={SECTION_DOM_ID.location} title={t("sections.location")}>
       <div className="grid gap-8 xl:grid-cols-12 xl:gap-12">
         {location && (
           <div className="xl:col-span-7">
@@ -44,6 +44,6 @@ export function ProjectLocation({ projectName, location, address, areaLabel, nea
           <NearbyTabs groups={nearby} />
         </div>
       )}
-    </ProjectSection>
+    </DetailSection>
   );
 }

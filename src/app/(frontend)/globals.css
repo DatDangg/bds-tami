@@ -227,10 +227,42 @@
    thanh mục con dính (`sticky top-*`) và `scroll-mt-*` dưới header đều dựa vào nó để nội dung không bị header che. */
 :root {
   --header-offset: 5rem;
+  /* Vị trí dính / lề neo của nội dung dưới header: trang thường = chiều cao header (header luôn che phía trên); trang chi tiết (BL-027) = lề trên của
+     header nổi (8/16px) vì header ẩn khi cuộn. Thanh mục con, thẻ dính và mọi scroll-mt trong trang chi tiết dùng biến này. */
+  --sticky-top: var(--header-offset);
 }
 @media (min-width: 64rem) {
   :root {
     --header-offset: 6.5rem;
+  }
+}
+
+/* Trang chi tiết (gốc có data-detail-page, do DetailLayout dựng): header ĐÃ CUỘN trượt lên ẩn hẳn, KHÔNG hiện lại khi cuộn lên (chốt BL-027) —
+   chỉ hiện ở đầu trang (thanh phẳng, chưa data-scrolled) hoặc khi focus bàn phím vào header. Chiều cao trong luồng giữ nguyên (--header-offset)
+   nên không CLS. KHÔNG dùng visibility:hidden: link trong header phải còn focus được thì Tab mới đưa header trở lại. Hiện lại chỉ khi focus BÀN PHÍM
+   (:has(:focus-visible)); :focus-within không dùng vì focus bằng chuột/chạm (vd. Radix trả focus về nút hamburger sau khi đóng menu) sẽ giữ header che thanh mục con.
+   --sticky-top cố định 8/16px trên mọi trang chi tiết, KHÔNG phụ thuộc .site-header[data-scrolled] (round 3, user chấp nhận): scroll-mt tính theo giá trị này
+   nên neo hạ cánh đúng chỗ khi bấm từ đầu trang. Rủi ro đã chấp nhận: không JS / chưa hydrate, header đầy đủ chiều cao che thanh mục con đang dính ở 8/16px.
+   Trình duyệt chưa có :has() bỏ qua cả khối (header nổi như trang thường, --sticky-top = --header-offset). */
+html:has([data-detail-page]) {
+  --sticky-top: 0.5rem;
+}
+@media (min-width: 64rem) {
+  html:has([data-detail-page]) {
+    --sticky-top: 1rem;
+  }
+}
+html:has([data-detail-page]) .site-header {
+  transition:
+    padding var(--duration-slow) var(--ease-standard),
+    transform var(--duration-slow) var(--ease-standard);
+}
+html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible)) {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  html:has([data-detail-page]) .site-header {
+    transition: none;
   }
 }
 

@@ -11,7 +11,7 @@ const TONE_CLASS: Record<SectionTone, string> = {
   dark: "theme-dark-block my-section-tight rounded-[20px] p-6 xl:p-10",
 };
 
-interface ProjectSectionProps {
+interface DetailSectionProps {
   /** `id` phần tử: đích của thanh mục con. */
   id: string;
   title: string;
@@ -20,13 +20,13 @@ interface ProjectSectionProps {
 }
 
 /**
- * Khung một khối trong CỘT CHÍNH của trang chi tiết dự án (cột trái lưới 2 cột ≥ lg; container + lề do `ProjectDetail` lo): `section[aria-labelledby]` + `h2` + đường kẻ trên (khối tối là thẻ bo 20px). `scroll-mt` = `--header-offset` (header nổi, 80/104px) +
+ * Khung một khối trong CỘT CHÍNH của trang chi tiết dùng chung (dự án, cho thuê; thẻ trắng + lề do `DetailLayout` lo): `section[aria-labelledby]` + `h2` + đường kẻ trên (khối tối là thẻ bo 20px). `scroll-mt` = `--sticky-top` (8/16px: trên trang chi tiết header ẩn khi cuộn) +
  * thanh mục con viên thuốc dính (~54px) + khe 18px (= 4.5rem) để tiêu đề không bị che khi cuộn tới; `tabIndex={-1}` để thanh mục con chuyển focus vào khối được chọn.
  */
-export function ProjectSection({ id, title, tone = "default", children }: ProjectSectionProps) {
+export function DetailSection({ id, title, tone = "default", children }: DetailSectionProps) {
   const headingId = useId();
   return (
-    <section id={id} tabIndex={-1} aria-labelledby={headingId} className={cn("scroll-mt-[calc(var(--header-offset)+4.5rem)] focus:outline-none", TONE_CLASS[tone])}>
+    <section id={id} tabIndex={-1} aria-labelledby={headingId} className={cn("scroll-mt-[calc(var(--sticky-top)+4.5rem)] focus:outline-none", TONE_CLASS[tone])}>
       <h2 id={headingId} className="mb-8 font-display text-h2">
         {title}
       </h2>

@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { CheckCircle } from "@/components/icons";
 import { SECTION_DOM_ID, type HighlightView } from "@/lib/projects/project-detail-view";
-import { ProjectSection } from "./ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 
 /**
  * Khối Điểm nổi bật (BL-020 P5): lưới thẻ trắng bo 20px, 1 cột < sm / 2 cột ≥ sm / 3 cột ≥ xl (trong cột chính, đã trừ cột Tư vấn). Trường `icon` của dữ liệu là chữ tự do
@@ -10,7 +10,7 @@ import { ProjectSection } from "./ProjectSection";
 export function ProjectHighlights({ highlights }: { highlights: HighlightView[] }) {
   const t = useTranslations("page.projectDetail");
   return (
-    <ProjectSection id={SECTION_DOM_ID.highlights} title={t("sections.highlights")}>
+    <DetailSection id={SECTION_DOM_ID.highlights} title={t("sections.highlights")}>
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {highlights.map((item) => (
           <li key={item.id} className="flex flex-col gap-3 rounded-[20px] border border-border bg-surface p-5">
@@ -20,6 +20,6 @@ export function ProjectHighlights({ highlights }: { highlights: HighlightView[] 
           </li>
         ))}
       </ul>
-    </ProjectSection>
+    </DetailSection>
   );
 }

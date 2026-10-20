@@ -7,7 +7,7 @@ const SCROLLED_THRESHOLD_PX = 4;
 
 /**
  * Khung `<header>` dính đầu trang (BL-025, design-spec §2.1). Hai trạng thái, CÙNG chiều cao `--header-offset` nên không CLS và
- * hero/ProjectSubNav/scroll-margin/HeroSlider không phải đổi:
+ * hero/DetailSubNav/scroll-margin/HeroSlider không phải đổi:
  * - Đầu trang (mặc định SSR, không `data-scrolled`): thanh phẳng full-width lấp đầy header, góc vuông, không bóng.
  * - Đã cuộn (`data-scrolled`): thanh nổi bo tròn hai đầu (header đệm 8/16px, thanh tối đa 84rem, shadow-md).
  * Radius đích = nửa chiều cao thanh nổi (32px < lg, 36px lg+) thay vì 9999px: nội suy 9999px sẽ giữ tròn gần hết quãng rồi mới bật vuông.

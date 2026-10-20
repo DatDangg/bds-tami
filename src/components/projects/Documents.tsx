@@ -11,7 +11,7 @@ export function Documents({ documents }: { documents: DocumentView[] }) {
   const t = useTranslations("page.projectDetail");
   if (documents.length === 0) return null;
   return (
-    <div id={DOCUMENTS_DOM_ID} className="scroll-mt-[calc(var(--header-offset)+4.5rem)]">
+    <div id={DOCUMENTS_DOM_ID} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)]">
       <h3 className="mb-4 font-display text-h3">{t("documents.title")}</h3>
       <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface px-5">
         {documents.map((file) => (

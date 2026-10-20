@@ -4,7 +4,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SECTION_DOM_ID, type FaqView } from "@/lib/projects/project-detail-view";
 import { buildFaqPageJsonLd } from "@/lib/seo/json-ld";
 import type { Locale } from "@/i18n/routing";
-import { ProjectSection } from "./ProjectSection";
+import { DetailSection } from "@/components/detail/DetailSection";
 
 /**
  * Câu hỏi thường gặp (BL-020 P5): accordion bằng `details/summary` gốc (bàn phím + đọc màn hình sẵn có, chạy cả khi chưa có JS; mỗi câu mở độc lập) và JSON-LD `FAQPage`
@@ -16,7 +16,7 @@ export function ProjectFaq({ faqs }: { faqs: FaqView[] }) {
   const jsonLd = buildFaqPageJsonLd({ locale, items: faqs });
   if (!jsonLd) return null;
   return (
-    <ProjectSection id={SECTION_DOM_ID.faq} title={t("faq")}>
+    <DetailSection id={SECTION_DOM_ID.faq} title={t("faq")}>
       <div className="flex flex-col divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface px-5">
         {faqs.map((faq) => (
           <details key={faq.id} className="group py-1">
@@ -29,6 +29,6 @@ export function ProjectFaq({ faqs }: { faqs: FaqView[] }) {
         ))}
       </div>
       <JsonLd data={jsonLd} />
-    </ProjectSection>
+    </DetailSection>
   );
 }

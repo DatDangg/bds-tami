@@ -11,7 +11,7 @@ import { FloorPlans } from "./FloorPlans";
 import { LegalPolicy } from "./LegalPolicy";
 import { ProjectDetail } from "./ProjectDetail";
 import { ProjectStickyCta } from "./ProjectStickyCta";
-import { ProjectSubNav } from "./ProjectSubNav";
+import { DetailSubNav } from "@/components/detail/DetailSubNav";
 
 const now = "2026-01-01T00:00:00.000Z";
 const image = (id: string): Media => ({ ...fakeMedia(id), id, mimeType: "image/webp", updatedAt: now, createdAt: now });
@@ -140,11 +140,17 @@ describe("ProjectDetail (S03)", () => {
     const grid = aside.parentElement as HTMLElement;
     expect(grid.className).toContain("lg:grid-cols-");
     expect(grid.firstElementChild?.contains(aside)).toBe(false);
+    // Khung dùng chung (BL-027): gốc đánh dấu trang chi tiết; cột chính là MỘT thẻ trắng bo lớn chứa các khối; thẻ Tư vấn dính theo --sticky-top.
+    expect(container.querySelector("[data-detail-page]")).not.toBeNull();
+    expect(grid.firstElementChild?.className).toContain("bg-surface");
+    expect(grid.firstElementChild?.className).toContain("rounded-[28px]");
+    expect(grid.firstElementChild?.querySelector("#overview")).not.toBeNull();
+    expect(card.className).toContain("lg:top-[calc(var(--sticky-top)+4.5rem)]");
     // Thẻ Tư vấn (đích #lead-form) ghi đè scroll-mt mặc định của LeadFormSlot để pill dính không che tiêu đề (M-1).
-    expect(card.className).toContain("scroll-mt-[calc(var(--header-offset)+4.5rem)]");
+    expect(card.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     expect(aside.getAttribute("aria-labelledby")).toBe(card.querySelector("h2")?.id);
     for (const id of ["overview", "location", "amenities", "floor-plans", "gallery", "legal", "sales-policy"]) {
-      expect(container.querySelector(`#${id}`)?.className, id).toContain("scroll-mt-[calc(var(--header-offset)+4.5rem)]");
+      expect(container.querySelector(`#${id}`)?.className, id).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     }
   });
 
@@ -228,7 +234,7 @@ describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => 
     expect(links.at(-1)).toHaveTextContent("Tin liên quan");
     expect(links.at(-1)).toHaveAttribute("href", "#related-listings");
     const block = container.querySelector("#related-listings") as HTMLElement;
-    expect(block.className).toContain("scroll-mt-[calc(var(--header-offset)+4.5rem)]");
+    expect(block.className).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     expect(within(block).getByRole("heading", { level: 2, name: "Tin liên quan" })).toBeInTheDocument();
     expect(within(block).getByText("Cho thuê")).toBeInTheDocument();
     expect(within(block).getByText("Tin BĐS")).toBeInTheDocument();
@@ -294,7 +300,7 @@ describe("Documents", () => {
   });
 });
 
-describe("ProjectSubNav", () => {
+describe("DetailSubNav", () => {
   const items = [
     { id: "overview", label: "Tổng quan" },
     { id: "location", label: "Vị trí" },
@@ -302,7 +308,7 @@ describe("ProjectSubNav", () => {
 
   function renderNav() {
     document.body.insertAdjacentHTML("beforeend", '<section id="overview" tabindex="-1"></section><section id="location" tabindex="-1"></section>');
-    return renderWithIntl(<ProjectSubNav items={items} />);
+    return renderWithIntl(<DetailSubNav items={items} label="Mục lục dự án" />);
   }
 
   afterEach(() => {
@@ -337,10 +343,19 @@ describe("ProjectSubNav", () => {
     const nav = screen.getByRole("navigation");
     expect(nav.className).toContain("sticky");
     // Viên thuốc dính dưới header nổi: nav trong suốt không chặn click, viên thuốc (ul) mới nhận chuột.
-    expect(nav.className).toContain("top-(--header-offset)");
+    expect(nav.className).toContain("top-(--sticky-top)");
     expect(nav.className).toContain("pointer-events-none");
     expect(within(nav).getByRole("list").className).toContain("rounded-pill");
     expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute("aria-current", "location");
+  });
+
+  it("mục đang xem tô nền primary + chữ primary-foreground; nhãn nav lấy từ prop", () => {
+    renderNav();
+    expect(screen.getByRole("navigation", { name: "Mục lục dự án" })).toBeInTheDocument();
+    const active = screen.getByRole("link", { name: "Tổng quan" });
+    expect(active.className).toContain("bg-primary");
+    expect(active.className).toContain("text-primary-foreground");
+    expect(screen.getByRole("link", { name: "Vị trí" }).className).not.toContain("bg-primary");
   });
 });
 
@@ -403,7 +418,7 @@ describe("LegalPolicy (accordion < lg)", () => {
     Element.prototype.scrollIntoView = vi.fn();
     renderWithIntl(
       <>
-        <ProjectSubNav items={[{ id: "legal", label: "Pháp lý" }, { id: "sales-policy", label: "Chính sách" }]} />
+        <DetailSubNav items={[{ id: "legal", label: "Pháp lý" }, { id: "sales-policy", label: "Chính sách" }]} label="Mục lục dự án" />
         <LegalPolicy blocks={blocks} />
       </>,
     );

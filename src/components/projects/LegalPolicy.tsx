@@ -40,7 +40,7 @@ function PolicyBlockView({ block, open, onToggle, isLg }: { block: PolicyBlock; 
   const headingId = useId();
   const panelId = useId();
   return (
-    <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--header-offset)+4.5rem)] min-w-0 focus:outline-none">
+    <section id={block.id} tabIndex={-1} aria-labelledby={headingId} className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] min-w-0 focus:outline-none">
       <h2 id={headingId} className="font-display text-h2">
         {isLg ? (
           block.title
