@@ -18,11 +18,11 @@ describe("PageHero", () => {
 
   it("hai cỡ có chiều cao cố định: list 440 (mobile 360), short 340 (mobile 280)", () => {
     const list = render(<PageHero size="list" title="A" />);
-    expect(list.container.querySelector("section")).toHaveClass("h-[360px]", "md:h-[440px]");
+    expect(list.container.querySelector("section")).toHaveClass("min-h-[360px]", "md:min-h-[440px]");
     expect(list.container.querySelector("section")).toHaveAttribute("data-hero-size", "list");
     list.unmount();
     const short = render(<PageHero size="short" title="A" />);
-    expect(short.container.querySelector("section")).toHaveClass("h-[280px]", "md:h-[340px]");
+    expect(short.container.querySelector("section")).toHaveClass("min-h-[280px]", "md:min-h-[340px]");
   });
 
   it("chừa đáy cho thẻ lọc mặc định ở list, không ở short", () => {

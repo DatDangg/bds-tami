@@ -10,23 +10,14 @@ import { Input } from "@/components/ui/input";
 import { OptionSelect, type SelectOption } from "@/components/ui/option-select";
 import type { HeroSearchChipView } from "@/lib/home/home-view";
 import { SALES_STATUS_VALUES } from "@/lib/projects/project-filters";
-import { PRICE_HINT_RANGES, type RentalFilters, rentalListQueryString } from "@/lib/search/url-params";
+import { AREA_HINT_RANGES, PRICE_HINT_RANGES, type RentalFilters, rentalListQueryString } from "@/lib/search/url-params";
 import { cn } from "@/lib/utils";
 import { RENTAL_AMENITIES, RENTAL_FURNISHINGS } from "@/shared/types/api";
 
 /** Tên tham số từ khoá CÓ SẴN của `/cho-thue` (`parseRentalFilters`, trùng `GET /api/public/rentals`). `/du-an` không có từ khoá: tab Dự án lọc bằng `province`/`status` có sẵn của nó. */
 export const RENTAL_KEYWORD_PARAM = "q";
-/**
- * Mốc diện tích (m²) của ô "Diện tích" (BL-044): chọn mốc → cặp `areaMin`/`areaMax` của `/cho-thue`. Tên ô `areaRange`/`priceRange` KHÔNG trùng tham số
- * của `/cho-thue` nên form không JS gửi lên bị trang đích bỏ qua (mốc giá/diện tích cần JS để tách thành min/max).
- */
-export const AREA_HINT_RANGES = [
-  { key: "under30", min: undefined, max: 30 },
-  { key: "from30to50", min: 30, max: 50 },
-  { key: "from50to80", min: 50, max: 80 },
-  { key: "from80to120", min: 80, max: 120 },
-  { key: "over120", min: 120, max: undefined },
-] as const;
+/** Mốc diện tích (BL-044): dùng chung với thẻ lọc Cho thuê nên nằm ở `url-params`; re-export giữ tên cũ. Tên ô `areaRange`/`priceRange` KHÔNG trùng tham số của `/cho-thue` (mốc cần JS để tách min/max). */
+export { AREA_HINT_RANGES };
 const TABS = ["rentals", "projects"] as const;
 type Tab = (typeof TABS)[number];
 

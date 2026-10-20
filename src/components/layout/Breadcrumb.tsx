@@ -58,17 +58,17 @@ export function Breadcrumb({ items, className, jsonLd = true, variant = "default
       {parent && (
         <Link href={parent.href} className={cn(linkClass, "gap-1 md:hidden", overlay && PILL_CLASS)}>
           <CaretLeft size={12} aria-hidden="true" />
-          <span>{t("backTo", { label: parent.label })}</span>
+          <span className={cn(overlay && "truncate")}>{t("backTo", { label: parent.label })}</span>
         </Link>
       )}
-      <ol className={cn("flex-wrap items-center", parent ? "hidden md:flex" : "flex", overlay && cn(PILL_CLASS, "w-fit"))}>
+      <ol className={cn("items-center", overlay ? "flex-nowrap" : "flex-wrap", parent ? "hidden md:flex" : "flex", overlay && cn(PILL_CLASS, "w-fit"))}>
         {trail.map((entry, index) => {
           const isLast = index === trail.length - 1;
           return (
-            <li key={`${index}-${entry.href}`} className="flex items-center">
+            <li key={`${index}-${entry.href}`} className={cn("flex items-center", overlay && (isLast ? "min-w-0" : "shrink-0"))}>
               {isLast ? (
-                <span aria-current="page" className={cn("inline-flex min-h-11 items-center", overlay ? "font-semibold text-on-dark" : "text-text")}>
-                  {entry.label}
+                <span aria-current="page" className={cn("inline-flex min-h-11 items-center", overlay ? "min-w-0 font-semibold text-on-dark" : "text-text")}>
+                  {overlay ? <span className="truncate">{entry.label}</span> : entry.label}
                 </span>
               ) : (
                 <>

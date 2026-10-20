@@ -303,6 +303,23 @@
         "upcoming": "Sắp mở bán",
         "selling": "Đang mở bán",
         "handed_over": "Đã bàn giao"
+      },
+      "keywordLabel": "Từ khoá dự án",
+      "keywordPlaceholder": "Nhập tên dự án, khu vực…",
+      "search": "Tìm kiếm",
+      "moreLabel": "Tùy chọn khác",
+      "sortLabel": "Sắp xếp",
+      "resultTotal": "{count, number} dự án",
+      "resultSuffix": "đang hiển thị",
+      "chips": {
+        "province": "Tỉnh/thành",
+        "status": "Tình trạng",
+        "developer": "Chủ đầu tư"
+      },
+      "sort": {
+        "newest": "Mới nhất",
+        "price_asc": "Giá tăng dần",
+        "price_desc": "Giá giảm dần"
       }
     },
     "rentals": {
@@ -417,6 +434,20 @@
         "bedrooms": "{count} PN",
         "negotiable": "Thoả thuận",
         "perMonth": "/tháng"
+      },
+      "moreLabel": "Tùy chọn khác",
+      "resultTotal": "{count, number} căn",
+      "resultSuffix": "phù hợp",
+      "chips": {
+        "province": "Khu vực",
+        "price": "Mức giá",
+        "area": "Diện tích",
+        "areaCustom": "Diện tích tuỳ chọn",
+        "bedrooms": "Phòng ngủ",
+        "bedroomsValue": "{value} phòng ngủ",
+        "furnishing": "Nội thất",
+        "amenities": "Tiện ích",
+        "amenitiesCount": "Tiện ích ({count})"
       }
     },
     "projectDetail": {

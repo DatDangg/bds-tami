@@ -25,16 +25,16 @@ interface RentalFilterSheetProps {
   fixedCategory?: string | undefined;
 }
 
-/** "Xoá" chỉ dọn các lọc PHỤ trong Sheet; từ khoá và danh mục nằm ở băng tìm kiếm nên giữ nguyên. */
-const CLEARED: Pick<FilterDraft, "province" | "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax" | "bedrooms" | "furnishing" | "amenities"> = { province: "", ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "", bedrooms: "", furnishing: "", amenities: [] };
+/** "Xoá" chỉ dọn các lọc nằm TRONG Sheet (phường + khoảng giá/diện tích tự nhập); từ khoá, danh mục, tỉnh, phòng ngủ… nằm trên thẻ lọc nên giữ nguyên. */
+const CLEARED: Pick<FilterDraft, "ward" | "priceMin" | "priceMax" | "areaMin" | "areaMax"> = { ward: "", priceMin: "", priceMax: "", areaMin: "", areaMax: "" };
 
 function secondaryPatch(draft: FilterDraft): typeof CLEARED {
-  const { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing, amenities } = draft;
-  return { province, ward, priceMin, priceMax, areaMin, areaMax, bedrooms, furnishing, amenities };
+  const { ward, priceMin, priceMax, areaMin, areaMax } = draft;
+  return { ward, priceMin, priceMax, areaMin, areaMax };
 }
 
 /**
- * Nút "Bộ lọc" (+ huy hiệu n) + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg) chứa các lọc phụ. Khác Popover desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
+ * Nút "Bộ lọc" (+ huy hiệu n) + Sheet từ dưới lên cao 90svh (design-spec §3.5, < lg) chứa các lọc trong Sheet (phường, khoảng giá/diện tích tự nhập). Khác Popover desktop: ô lọc KHÔNG đổi URL ngay mà gom vào bản nháp; chân Sheet
  * dính có "Xoá" và "Xem n tin" (n lấy sống từ `GET /api/public/rentals?limit=1` theo bản nháp). Áp dụng mới đổi URL.
  */
 export function RentalFilterSheet({ filters, options, fixedCategory }: RentalFilterSheetProps) {
@@ -74,7 +74,7 @@ export function RentalFilterSheet({ filters, options, fixedCategory }: RentalFil
           <FilterFields
             idPrefix="rental-sheet"
             draft={draft}
-            options={{ provinces: options.provinces, wards, wardsLoading }}
+            options={{ wards, wardsLoading }}
             onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
           />
         </div>

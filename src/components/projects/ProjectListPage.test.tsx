@@ -56,19 +56,29 @@ const notFound = vi.hoisted(() =>
     throw new Error("NEXT_NOT_FOUND");
   }),
 );
-const loadPageBanner = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<{ url: string; width: number } | undefined>>());
+interface HeroStub {
+  image?: { url: string; width: number } | undefined;
+  eyebrow?: string | undefined;
+  titleAccent?: string | undefined;
+}
+const loadPageHero = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<HeroStub & { title: string; description: string | undefined }>>());
+const loadProjectStrengths = vi.hoisted(() => vi.fn<(locale: string) => Promise<unknown>>());
+const developerDocs = vi.hoisted(() => [{ id: "dev1", name: "Vinhomes" }, { id: "dev2", name: "Ecopark" }]);
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
 vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
-vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner }));
+vi.mock("@/lib/content/load-page-banner", () => ({ loadPageHero }));
+vi.mock("@/lib/content/load-project-strengths", () => ({ loadProjectStrengths }));
+// ConsultBanner là Server Component bất đồng bộ đọc homepage (server-only): đã có test riêng, ở đây chỉ cần biết nó được dựng ở cuối trang.
+vi.mock("@/components/layout/ConsultBanner", () => ({ ConsultBanner: () => <aside data-testid="consult-banner" /> }));
 vi.mock("@/lib/projects/project-queries", () => ({
   listProvinces: async () => [hanoi, danang],
   listRootProjectCategories: async (_payload: unknown, locale: string) => ({
     docs: [apartments, urban].filter((item) => locale === "vi" || item.hasEnglish),
   }),
   listChildProjectCategories: async () => ({ docs: [] }),
-  listDevelopersWithPublicProjects: async () => [],
+  listDevelopersWithPublicProjects: async () => developerDocs,
   findProjectCategoryBySlug: async (_payload: unknown, locale: string, slug: string) => {
     const found = [apartments, urban, luxury].find((item) => item.slug === slug);
     return found && (locale === "vi" || found.hasEnglish) ? found : null;
@@ -108,11 +118,18 @@ async function render(locale: "vi" | "en", searchParams: Record<string, string> 
 const cardTitles = () => screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
 const chipNav = () => screen.getByRole("navigation", { name: /Loại hình|Project type/ });
 
-beforeEach(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example"));
+beforeEach(() => {
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
+  // Mặc định như `loadPageHero` thật khi admin chưa nhập gì: chữ i18n, không ảnh.
+  loadPageHero.mockImplementation(async (locale) => ({ title: locale === "vi" ? "Dự án" : "Projects", description: "Mô tả hero", image: undefined, eyebrow: undefined, titleAccent: undefined }));
+  loadProjectStrengths.mockResolvedValue(null);
+});
 afterEach(() => {
   vi.unstubAllEnvs();
   listPublicProjects.mockClear();
   notFound.mockClear();
+  loadPageHero.mockReset();
+  loadProjectStrengths.mockReset();
 });
 
 describe("S02 /du-an: render", () => {
@@ -120,22 +137,68 @@ describe("S02 /du-an: render", () => {
     await render("vi");
     expect(screen.getByRole("heading", { level: 1, name: "Dự án" })).toBeInTheDocument();
     expect(cardTitles()).toEqual(["Sông Sài Gòn", "Tây Hồ", "Biển Đà Nẵng"]);
-    expect(screen.getByRole("status")).toHaveTextContent("Có 3 kết quả");
+    expect(screen.getByRole("status")).toHaveTextContent("3 dự án đang hiển thị");
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
     expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1 });
   });
 
-  it("bố cục market: banner gọn 240px, băng tìm kiếm đè banner (trước breadcrumb), lưới 1/2/3/4 cột, không có ô từ khoá / nút Bộ lọc", async () => {
-    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+  it("bố cục BL-045: hero list (breadcrumb trong hero) → thẻ lọc nổi trong form (từ khoá, Loại hình, Tùy chọn khác) → hàng kết quả + sắp xếp → lưới 4 cột → banner tư vấn", async () => {
+    loadPageHero.mockResolvedValue({ title: "Dự án đang", titleAccent: "phân phối", eyebrow: "Dự án TAMI HOMES", description: "Mô tả hero", image: { url: "/api/media/file/banner.jpg", width: 1600 } });
     const { container } = await render("vi");
-    expect(container.querySelector("[data-hero-size=list]")).not.toBeNull();
-    const bar = screen.getByRole("search", { name: "Bộ lọc dự án" });
-    expect(bar.parentElement).toHaveAttribute("data-search-overlay", "true");
-    // BL-045: breadcrumb nằm trong hero nên đứng TRƯỚC băng tìm kiếm đè đáy hero.
-    expect(bar.compareDocumentPosition(screen.getByRole("navigation", { name: /Breadcrumb/ })) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
-    expect(container.querySelector("[data-grid-max-cols]")).toHaveAttribute("data-grid-max-cols", "4");
-    expect(within(bar).queryByRole("searchbox")).toBeNull();
-    expect(within(bar).queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
+    const hero = container.querySelector("[data-hero-size=list]")!;
+    expect(hero).not.toBeNull();
+    expect(hero.contains(screen.getByRole("navigation", { name: /Breadcrumb/ }))).toBe(true);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Dự án đangphân phối");
+    expect(screen.getByText("Dự án TAMI HOMES")).toBeInTheDocument();
+    const card = container.querySelector("[data-filter-card]")!;
+    const form = within(card as HTMLElement).getByRole("search", { name: "Bộ lọc dự án" });
+    expect(within(form).getByRole("searchbox", { name: "Từ khoá dự án" })).toBeInTheDocument();
+    expect(within(form).getByRole("navigation", { name: "Loại hình" })).toBeInTheDocument();
+    const more = within(form).getByRole("group", { name: "Tùy chọn khác" });
+    expect(within(more).getByLabelText("Tỉnh/thành")).toBeInTheDocument();
+    expect(within(more).getByLabelText("Trạng thái")).toBeInTheDocument();
+    expect(within(more).getByLabelText("Chủ đầu tư")).toBeInTheDocument();
+    expect(within(form).queryByRole("button", { name: /Bộ lọc/ })).toBeNull();
+    // Thứ tự: thẻ lọc → hàng kết quả (status) → sắp xếp → lưới → banner tư vấn.
+    const status = screen.getByRole("status");
+    const sort = screen.getByLabelText("Sắp xếp");
+    const grid = container.querySelector("[data-grid-max-cols]")!;
+    const follows = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    expect(follows(card, status)).toBe(true);
+    expect(follows(status, sort)).toBe(true);
+    expect(follows(sort, grid)).toBe(true);
+    expect(follows(grid, screen.getByTestId("consult-banner"))).toBe(true);
+    expect(grid).toHaveAttribute("data-grid-max-cols", "4");
+    expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
+  });
+
+  it("dải Điểm mạnh: chỉ hiện khi loader trả khối (cờ + homepage), nằm sau lưới và trước banner tư vấn", async () => {
+    loadProjectStrengths.mockResolvedValue({
+      kind: "strengths",
+      items: [
+        { icon: "shield-check", title: "Pháp lý rõ ràng", description: null },
+        { icon: "headset", title: "Tư vấn tận tâm", description: "Đồng hành" },
+      ],
+    });
+    const { container } = await render("vi");
+    const strengths = screen.getByRole("region", { name: "Điểm mạnh" });
+    expect(within(strengths).getByRole("heading", { level: 3, name: "Pháp lý rõ ràng" })).toBeInTheDocument();
+    const grid = container.querySelector("[data-grid-max-cols]")!;
+    expect(grid.compareDocumentPosition(strengths) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(strengths.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("không có khối Điểm mạnh (cờ tắt / thiếu mục) → không có dải; banner tư vấn vẫn có", async () => {
+    await render("vi");
+    expect(screen.queryByRole("region", { name: "Điểm mạnh" })).toBeNull();
+    expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
+    expect(loadProjectStrengths).toHaveBeenCalledWith("vi");
+  });
+
+  it("chữ + ảnh hero lấy từ admin qua loadPageHero(\"projects\"); EN gọi đúng locale", async () => {
+    await render("en");
+    expect(loadPageHero).toHaveBeenCalledWith("en", "projects");
   });
 
   it("lọc theo tỉnh: truy vấn đúng id tỉnh, chỉ dự án của tỉnh; select giữ giá trị; có nút xoá bộ lọc về /du-an", async () => {
@@ -195,7 +258,7 @@ describe("S02 /du-an: render", () => {
     expect(listPublicProjects).toHaveBeenCalledWith({}, "en", { page: 1 });
     expect(cardTitles()).toEqual(["Sông Sài Gòn", "Tây Hồ"]);
     expect(screen.getByRole("heading", { level: 1, name: "Projects" })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("2 results");
+    expect(screen.getByRole("status")).toHaveTextContent("2 projects shown");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/projects", "/en/projects?category=can-ho"]);
     expect(screen.getByRole("link", { name: /Sông Sài Gòn/ })).toHaveAttribute("href", "/en/projects/slug-1");
   });
@@ -263,23 +326,45 @@ describe("S02 /du-an: metadata tham số BL-045", () => {
     await render("vi", { q: "Sài Gòn", sort: "price_desc", developer: "khong-co" });
     expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, q: "Sài Gòn", sort: "price_desc" });
   });
+
+  it("chủ đầu tư hợp lệ → truy vấn theo id; ô nạp lại từ URL (q, developer, sort); chip Loại hình + phân trang giữ q/developer/sort, bỏ trang", async () => {
+    const { container } = await render("vi", { q: "sông", developer: "dev2", sort: "price_asc" });
+    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, q: "sông", developerId: "dev2", sort: "price_asc" });
+    expect(screen.getByRole("searchbox")).toHaveValue("sông");
+    expect(container.querySelector("input[name=developer]")).toHaveValue("dev2");
+    expect(container.querySelector("input[type=hidden][name=sort]")).toHaveValue("price_asc");
+    expect(screen.getByLabelText("Sắp xếp")).toHaveTextContent("Giá tăng dần");
+    const hrefs = within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(hrefs).toEqual([
+      "/du-an?q=s%C3%B4ng&developer=dev2&sort=price_asc",
+      "/du-an?category=can-ho&q=s%C3%B4ng&developer=dev2&sort=price_asc",
+      "/du-an?category=khu-do-thi&q=s%C3%B4ng&developer=dev2&sort=price_asc",
+    ]);
+    expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
+  });
+
+  it("không JS: ô từ khoá và ba ô chọn có `name` (q, province, status, developer) trong cùng một form GET về /du-an", async () => {
+    const { container } = await render("vi");
+    const form = screen.getByRole("search", { name: "Bộ lọc dự án" }) as HTMLFormElement;
+    expect(form).toHaveAttribute("action", "/du-an");
+    expect(form).toHaveAttribute("method", "get");
+    for (const name of ["q", "province", "status", "developer"]) expect(form.querySelector(`[name=${name}]`)).not.toBeNull();
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+  });
 });
 
-describe("ảnh banner trang danh sách (FR-ADM-20)", () => {
-  afterEach(() => loadPageBanner.mockReset());
-
+describe("hero trang danh sách (FR-ADM-20, BL-045)", () => {
   it("có ảnh → biến thể Ảnh (scrim riêng), loader gọi đúng key \"projects\"", async () => {
-    loadPageBanner.mockResolvedValue({ url: "/api/media/file/banner.jpg", width: 1600 });
+    loadPageHero.mockResolvedValue({ title: "Dự án", description: undefined, image: { url: "/api/media/file/banner.jpg", width: 1600 } });
     const { container } = await render("vi");
-    expect(loadPageBanner).toHaveBeenCalledWith("vi", "projects");
+    expect(loadPageHero).toHaveBeenCalledWith("vi", "projects");
     expect(container.querySelector(".bg-banner-scrim")).not.toBeNull();
     expect(container.querySelector("section.bg-dark-deep img")).not.toBeNull();
   });
 
-  it("không có ảnh (hoặc đọc lỗi) → banner chữ như trước", async () => {
-    loadPageBanner.mockResolvedValue(undefined);
+  it("không có ảnh (hoặc đọc lỗi) → hero nền tối cùng chiều cao, không vỡ trang", async () => {
     const { container } = await render("vi");
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
-    expect(container.querySelector("section[data-hero-size].bg-dark-deep")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size=list].bg-dark-deep")).not.toBeNull();
   });
 });

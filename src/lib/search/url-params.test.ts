@@ -142,7 +142,7 @@ describe("activeFilterCount / hasNarrowingParams", () => {
 
   it("mỗi tiện ích đếm 1 (khớp số chip Đang lọc), cả tổng lẫn lọc phụ", () => {
     expect(activeFilterCount({ amenities: ["pool", "gym"], sort: "newest", page: 1 })).toBe(2);
-    expect(secondaryFilterCount({ amenities: ["pool", "gym"], furnishing: "full", sort: "newest", page: 1 })).toBe(3);
+    expect(secondaryFilterCount({ amenities: ["pool", "gym"], furnishing: "full", sort: "newest", page: 1 })).toBe(0);
     expect(hasNarrowingParams({ amenities: ["pool"], sort: "newest", page: 1 })).toBe(true);
   });
 

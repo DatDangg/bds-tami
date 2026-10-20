@@ -248,7 +248,7 @@ function toAbout(homepage: Homepage, locale: Locale): AboutView {
 }
 
 /** Điểm mạnh: mục thiếu tiêu đề (ở `/en` = chưa dịch) bị bỏ; còn < 2 mục thì ẩn khối. */
-function toStrengths(homepage: Homepage): StrengthsView | null {
+export function toStrengths(homepage: Pick<Homepage, "strengths">): StrengthsView | null {
   const items = (homepage.strengths?.items ?? []).flatMap((item) => {
     const title = text(item.title);
     return title ? [{ icon: item.icon, title, description: text(item.description) || null }] : [];

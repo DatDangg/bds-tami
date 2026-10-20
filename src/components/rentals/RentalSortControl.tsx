@@ -9,5 +9,5 @@ import { SortSelect } from "./SortSelect";
  */
 export function RentalSortControl() {
   const { draft, update } = useRentalListNavigation();
-  return <SortSelect id="rental-sort" value={draft.sort} onChange={(sort) => update({ sort }, "now")} labelClassName="max-sm:sr-only" className="min-w-0 flex-1 flex-row items-center justify-end gap-3 sm:flex-none" selectClassName="w-full min-w-[11rem] sm:w-56" />;
+  return <SortSelect id="rental-sort" value={draft.sort} onChange={(sort) => update({ sort }, "now")} labelClassName="max-sm:sr-only" className="min-w-0 flex-1 flex-row items-center justify-end gap-3 sm:flex-none" selectClassName="w-full min-w-[11rem] bg-surface sm:w-52" />;
 }

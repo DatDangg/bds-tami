@@ -303,6 +303,23 @@
         "upcoming": "Coming soon",
         "selling": "Now selling",
         "handed_over": "Handed over"
+      },
+      "keywordLabel": "Project keyword",
+      "keywordPlaceholder": "Enter a project name or area…",
+      "search": "Search",
+      "moreLabel": "More options",
+      "sortLabel": "Sort by",
+      "resultTotal": "{count, plural, one {# project} other {# projects}}",
+      "resultSuffix": "shown",
+      "chips": {
+        "province": "Province/city",
+        "status": "Status",
+        "developer": "Developer"
+      },
+      "sort": {
+        "newest": "Newest",
+        "price_asc": "Price: low to high",
+        "price_desc": "Price: high to low"
       }
     },
     "rentals": {
@@ -417,6 +434,20 @@
         "bedrooms": "{count} BR",
         "negotiable": "Negotiable",
         "perMonth": "/month"
+      },
+      "moreLabel": "More options",
+      "resultTotal": "{count, plural, one {# listing} other {# listings}}",
+      "resultSuffix": "available",
+      "chips": {
+        "province": "Area",
+        "price": "Price",
+        "area": "Floor area",
+        "areaCustom": "Custom floor area",
+        "bedrooms": "Bedrooms",
+        "bedroomsValue": "{value} bedrooms",
+        "furnishing": "Furnishing",
+        "amenities": "Amenities",
+        "amenitiesCount": "Amenities ({count})"
       }
     },
     "projectDetail": {
