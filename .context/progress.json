@@ -1126,6 +1126,36 @@
       "scopeVersion": 38,
       "specUpdate": "spec/updates/2026-10-20-single-font-montserrat.md",
       "residual": "chưa xem trình duyệt thật (tràn chữ 390/1280, dấu chồng Ầ/Ỗ/Ẫ dưới line-clamp-2 tiêu đề thẻ); font-bold LanguageSwitcher + <strong> RichText cần 700 chưa nạp (có từ trước, ngoài scope)"
+    },
+    {
+      "slug": "link-hover-and-slider-title-height",
+      "title": "Hover Xem thêm/Xem tất cả + breadcrumb bỏ gạch chân, đổi màu thương hiệu; khung tên slider Dự án nổi bật đều chiều cao (BL-037)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-037",
+      "changeDoc": "spec/changes/archive/2026-10-20-link-hover-and-slider-title-height.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-link-hover-and-slider-title-height/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "note": "Breadcrumb + Button ghost hover → accent-text, NewsHomeBody/danh mục tin tức/tin đăng (đã accent) hover → text, JobDetail hover bỏ gạch chân + accent (4.57:1); bỏ hover:underline; RichText/footer không đổi; ProjectsSlider h3 min-h-[2lh]",
+          "report": ".context/review-reports/feature-link-hover-and-slider-title-height-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-037)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.32.0",
+      "scopeVersion": 40,
+      "specUpdate": "spec/updates/2026-10-20-link-hover-and-slider-title-height.md",
+      "residual": "chưa xem trình duyệt thật; JobDetail hover chủ yếu mất gạch chân (màu warning ≈ accent); thẻ slider thiếu địa điểm/số liệu vẫn thấp hơn; footer/TOC/LanguageSwitcher/404 còn hover:underline"
     }
   ],
   "bugs": [

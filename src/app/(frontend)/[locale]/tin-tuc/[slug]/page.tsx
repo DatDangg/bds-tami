@@ -141,7 +141,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
       >
         <header className="flex flex-col gap-4 pb-6">
           {category && (
-            <Link href={categoryHref(category, locale)} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text hover:underline">
+            <Link href={categoryHref(category, locale)} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text transition-colors hover:text-text">
               {category.name}
             </Link>
           )}

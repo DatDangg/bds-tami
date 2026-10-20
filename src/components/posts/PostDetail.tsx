@@ -43,7 +43,7 @@ function PostOverview({ view, shareUrl }: Pick<PostDetailProps, "view" | "shareU
       className="flex scroll-mt-[calc(var(--sticky-top)+4.5rem)] flex-col gap-4 focus:outline-none not-last:pb-section-tight"
     >
       {view.category && (
-        <Link href={view.category.href} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text hover:underline">
+        <Link href={view.category.href} className="inline-flex min-h-11 w-fit items-center text-small font-semibold text-accent-text transition-colors hover:text-text">
           {view.category.label}
         </Link>
       )}

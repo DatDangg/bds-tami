@@ -27,6 +27,13 @@ describe("Breadcrumb", () => {
     expect(current?.closest("a")).toBeNull();
   });
 
+  it("BL-037: link hover đổi màu accent, không gạch chân", () => {
+    renderWithIntl(<Breadcrumb items={[{ label: "Dự án", href: "/du-an" }, { label: "X", href: "/du-an/x" }]} />);
+    const link = screen.getByRole("link", { name: "Dự án" });
+    expect(link).toHaveClass("hover:text-accent-text");
+    expect(link).not.toHaveClass("hover:underline");
+  });
+
   it("JSON-LD BreadcrumbList có URL tuyệt đối theo ngôn ngữ", () => {
     const { container } = renderWithIntl(
       <Breadcrumb

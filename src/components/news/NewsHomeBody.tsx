@@ -18,7 +18,7 @@ function CategoryRow({ row }: { row: NewsCategoryRow }) {
         <Link
           href={row.href}
           aria-label={t("viewMoreIn", { name: row.name })}
-          className="inline-flex min-h-11 shrink-0 items-center text-small font-semibold text-accent-text hover:underline hover:underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+          className="inline-flex min-h-11 shrink-0 items-center text-small font-semibold text-accent-text transition-colors hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
         >
           {t("viewMore")}
         </Link>

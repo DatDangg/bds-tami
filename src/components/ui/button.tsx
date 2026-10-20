@@ -18,7 +18,7 @@ export const buttonVariants = cva(
           "border-text bg-transparent text-text hover:bg-text hover:text-surface",
         dark: "bg-dark text-on-dark hover:bg-dark-deep",
         ghost:
-          "bg-transparent text-text underline-offset-4 hover:underline",
+          "bg-transparent text-text hover:text-accent-text",
       },
       size: {
         sm: "h-9 px-5 text-button-sm",

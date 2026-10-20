@@ -72,7 +72,7 @@ export function JobDetail({ doc, view, others, contact, ownPath, shareUrl, turns
               <p className="font-semibold">{t("expiredTitle")}</p>
               <p className="text-small">{t("expiredBody")}</p>
             </div>
-            <Link href={listPath} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">
+            <Link href={listPath} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 transition-colors hover:text-accent-text hover:no-underline">
               {t("viewAll")}
             </Link>
           </div>

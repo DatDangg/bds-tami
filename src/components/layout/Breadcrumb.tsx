@@ -14,7 +14,7 @@ export interface BreadcrumbItem {
   href: string;
 }
 
-const LINK_CLASS = "inline-flex min-h-11 items-center hover:text-text hover:underline";
+const LINK_CLASS = "inline-flex min-h-11 items-center transition-colors hover:text-accent-text";
 
 /**
  * Breadcrumb mọi trang trừ trang chủ (design-spec §2.6). `items` là các mục SAU "Trang chủ" (component tự thêm mục đầu

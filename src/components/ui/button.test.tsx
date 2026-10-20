@@ -16,7 +16,7 @@ describe("Button", () => {
     ["chip", ["border-on-dark/30", "bg-transparent", "text-on-dark"]],
     ["outline", ["border-text", "bg-transparent", "hover:bg-text"]],
     ["dark", ["bg-dark", "text-on-dark"]],
-    ["ghost", ["bg-transparent", "hover:underline"]],
+    ["ghost", ["bg-transparent", "hover:text-accent-text"]],
   ] as const)("variant %s render đúng class", (variant, classes) => {
     render(<Button variant={variant}>Nút</Button>);
     expect(screen.getByRole("button")).toHaveClass(...classes);

@@ -1,0 +1,136 @@
+{
+  "specVersion": "1.31.1",
+  "scopeVersion": 39,
+  "generatedAt": "2026-10-20T23:59:59+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-038 — slider Dự án nổi bật trang chủ: mũi tên ‹ › nhảy cóc 2 thẻ, chấm active lệch thẻ đang hiện. Root cause: useSnapSlider lấy current từ IntersectionObserver threshold 0.6, entry phải nhất thắng; số chấm = số thẻ dù chỉ 5 vị trí cuộn được ở 1280px. Fix: đo offset thẻ + max scroll, chấm = số vị trí cuộn được, active = vị trí gần scrollLeft nhất (cuộn hết → chấm cuối), mũi tên 1 bước, vòng ở đầu/cuối. Spec 1.31.0 → 1.31.1 (PATCH, BUG).",
+  "workItem": "bug-projects-slider-pagination",
+  "backlog": "BL-038",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-20-projects-slider-pagination-bug.md",
+  "task": [
+    "tasks/bug-projects-slider-pagination/phase-1-task-01.md"
+  ],
+  "reviewReport": [
+    ".context/review-reports/bug-projects-slider-pagination-phase-1-task-01-round-1-review.md"
+  ],
+  "commits": [
+    "(commit close-out BL-038)"
+  ],
+  "commitNotes": {
+    "(commit close-out BL-038)": "T01 — use-snap-slider.tsx bỏ IntersectionObserver: measure() đo offset thẻ (getBoundingClientRect) + max = scrollWidth − clientWidth → pageCount; updateCurrent() theo scroll (passive, rAF) chọn vị trí gần scrollLeft nhất, cuộn hết → cuối; ResizeObserver đo lại; scrollToSlide dùng list.scrollTo({left: min(offset, max)}) vòng đầu/cuối, chưa đo → fallback scrollIntoView; trả thêm pageCount. ProjectsSlider.tsx chấm theo pageCount, ẩn điều khiển khi ≤ 1. Test: ProjectsSlider.test.tsx (repro BL-038 layout giả lập 1280px). Doc: SPECIFICATIONS (F1 Dự án nổi bật), design-spec S01 khối 3."
+  },
+  "previousScope": "spec/test-scope/archive/test-scope-1.31.0-38.json",
+  "specUpdate": "spec/updates/2026-10-20-projects-slider-pagination-bug.md",
+  "specRefs": [
+    "F1 Trang chủ — Dự án nổi bật: điều khiển slider (BL-038)",
+    "design-spec S01 khối 3 — Điều khiển"
+  ],
+  "specRefNotes": {
+    "F1 Trang chủ — Dự án nổi bật: điều khiển slider (BL-038)": "Chấm = số vị trí cuộn được thật; chấm active = vị trí gần scrollLeft nhất, cuộn hết → chấm cuối; mũi tên đi đúng 1 vị trí, đầu/cuối vòng; chỉ hiện điều khiển khi > 1 vị trí.",
+    "design-spec S01 khối 3 — Điều khiển": "Mũi tên ≥ md (44px) + chấm dưới, cơ chế chung useSnapSlider; ở 1280px 6 dự án → 5 chấm."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/home/use-snap-slider.tsx",
+      "src/components/home/ProjectsSlider.tsx",
+      "src/components/home/ProjectsSlider.test.tsx",
+      "SPECIFICATIONS.md",
+      ".context/design-spec.md"
+    ],
+    "filesNote": "Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "modules": [
+      "Home — useSnapSlider (hook slider dùng chung)",
+      "Home — ProjectsSlider (Dự án nổi bật)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "1280px, 6 dự án: hiện 5 chấm (không phải 6); tải trang → chấm 1 active",
+      "Bấm › đi đúng 1 vị trí (thẻ đầu đang hiện tăng 1), không nhảy cóc 2 thẻ",
+      "Chấm active khớp thẻ đầu đang hiện; cuộn hết sang phải → chấm cuối active",
+      "Bấm › ở vị trí cuối → vòng về đầu; bấm ‹ ở đầu → vòng về cuối",
+      "Bấm chấm N → cuộn tới đúng vị trí N",
+      "Ít dự án vừa khung (≤ 1 vị trí cuộn) → không hiện mũi tên/chấm"
+    ],
+    "dependents": [
+      "Trang chủ / và /en — slider Ưu đãi nổi bật (useSnapSlider, chỉ scrollByPage)",
+      "Trang chủ / và /en — tab Cho thuê (useSnapSlider, chỉ scrollByPage)"
+    ],
+    "regression": [
+      "Mobile 390: vuốt ngang + snap thẻ vẫn mượt, chấm active cập nhật theo vuốt",
+      "Slider Ưu đãi nổi bật: mũi tên/cuộn trang không đổi",
+      "Tab Cho thuê: đổi tab + cuộn slider không đổi",
+      "Hover tiêu đề thẻ dự án đổi vàng thương hiệu (BL-034) giữ",
+      "Đổi kích thước cửa sổ (768 ↔ 1280) → số chấm tính lại đúng",
+      "Không lỗi console, không CLS"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL038-01",
+      "viewport": 1280,
+      "steps": "Mở / (vi), cuộn tới khối Dự án nổi bật (6 dự án).",
+      "expected": "5 chấm, chấm 1 active, có mũi tên ‹ ›."
+    },
+    {
+      "id": "BL038-02",
+      "viewport": 1280,
+      "steps": "Bấm › liên tiếp 4 lần (chờ cuộn xong mỗi lần).",
+      "expected": "Mỗi lần thẻ đầu đang hiện tăng đúng 1; chấm active 2 → 3 → 4 → 5; ở chấm 5 thẻ 6 hiện hết."
+    },
+    {
+      "id": "BL038-03",
+      "viewport": 1280,
+      "steps": "Ở vị trí cuối bấm ›; rồi ở đầu bấm ‹.",
+      "expected": "› ở cuối vòng về đầu (chấm 1); ‹ ở đầu vòng về cuối (chấm 5)."
+    },
+    {
+      "id": "BL038-04",
+      "viewport": 1280,
+      "steps": "Bấm chấm 3, rồi chấm 5, rồi chấm 1.",
+      "expected": "Cuộn đúng vị trí tương ứng, chấm bấm thành active."
+    },
+    {
+      "id": "BL038-05",
+      "viewport": 390,
+      "steps": "Vuốt ngang slider Dự án nổi bật từ đầu tới cuối.",
+      "expected": "Snap từng thẻ, chấm active cập nhật theo vị trí, cuộn hết → chấm cuối active; không có mũi tên (< md)."
+    },
+    {
+      "id": "BL038-06",
+      "viewport": 1280,
+      "steps": "Slider Ưu đãi nổi bật + tab Cho thuê: bấm mũi tên / đổi tab.",
+      "expected": "Hành vi như trước (cuộn theo trang), không lỗi."
+    }
+  ],
+  "acceptance": [
+    "Mũi tên chuyển đúng 1 vị trí, không nhảy cóc",
+    "Chấm = số vị trí cuộn được thật; chấm active khớp thẻ đầu đang hiện; cuộn hết → chấm cuối",
+    "Đầu/cuối vòng nhất quán",
+    "Slider Ưu đãi + tab Cho thuê (dùng chung hook) và vuốt mobile không vỡ",
+    "Test hook/slider cập nhật (repro BL-038 FAIL trước fix, PASS sau fix)"
+  ],
+  "outOfScope": [
+    "Đổi bố cục / kích thước thẻ slider",
+    "Nội dung BL-037 (cùng chạm ProjectsSlider.tsx, xử lý riêng)",
+    "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
+  ],
+  "viewports": [
+    390,
+    768,
+    1280
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "medium",
+  "riskNote": "Hook slider dùng chung (useSnapSlider) trên trang chủ. Không schema/API/quyền/dữ liệu/URL. Verify reviewer STRICT round 1 PASS: pnpm vitest run src/components/home 82/82, typecheck PASS, lint 0 error. Residual: chưa kiểm trình duyệt thật — smooth scroll + snap khi bấm › nhanh liên tiếp, scrollLeft lẻ pixel khi zoom (dung sai 1px)."
+}

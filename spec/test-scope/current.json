@@ -1,120 +1,172 @@
 {
-  "specVersion": "1.31.1",
-  "scopeVersion": 39,
+  "specVersion": "1.32.0",
+  "scopeVersion": 40,
   "generatedAt": "2026-10-20T23:59:59+07:00",
-  "trigger": "bug-fix",
-  "triggerNote": "BL-038 — slider Dự án nổi bật trang chủ: mũi tên ‹ › nhảy cóc 2 thẻ, chấm active lệch thẻ đang hiện. Root cause: useSnapSlider lấy current từ IntersectionObserver threshold 0.6, entry phải nhất thắng; số chấm = số thẻ dù chỉ 5 vị trí cuộn được ở 1280px. Fix: đo offset thẻ + max scroll, chấm = số vị trí cuộn được, active = vị trí gần scrollLeft nhất (cuộn hết → chấm cuối), mũi tên 1 bước, vòng ở đầu/cuối. Spec 1.31.0 → 1.31.1 (PATCH, BUG).",
-  "workItem": "bug-projects-slider-pagination",
-  "backlog": "BL-038",
-  "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-20-projects-slider-pagination-bug.md",
+  "trigger": "feature-update",
+  "triggerNote": "BL-037 — link điều hướng (breadcrumb, Button ghost \"Xem tất cả\", \"Xem thêm\" /tin-tuc, link danh mục tin tức / tin đăng, \"Xem tất cả vị trí\" tin tuyển dụng hết hạn) hover không gạch chân, đổi màu thương hiệu như BL-034; slider Dự án nổi bật: tên dự án giữ chỗ 2 dòng (min-h-[2lh]) để khung kính mọi thẻ cùng chiều cao. Spec 1.31.1 → 1.32.0 (MINOR, MODIFY).",
+  "workItem": "feature-link-hover-and-slider-title-height",
+  "backlog": "BL-037",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-link-hover-and-slider-title-height.md",
   "task": [
-    "tasks/bug-projects-slider-pagination/phase-1-task-01.md"
+    "tasks/feature-link-hover-and-slider-title-height/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/bug-projects-slider-pagination-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/feature-link-hover-and-slider-title-height-phase-1-task-01-round-1-review.md"
   ],
   "commits": [
-    "(commit close-out BL-038)"
+    "(commit close-out BL-037)"
   ],
   "commitNotes": {
-    "(commit close-out BL-038)": "T01 — use-snap-slider.tsx bỏ IntersectionObserver: measure() đo offset thẻ (getBoundingClientRect) + max = scrollWidth − clientWidth → pageCount; updateCurrent() theo scroll (passive, rAF) chọn vị trí gần scrollLeft nhất, cuộn hết → cuối; ResizeObserver đo lại; scrollToSlide dùng list.scrollTo({left: min(offset, max)}) vòng đầu/cuối, chưa đo → fallback scrollIntoView; trả thêm pageCount. ProjectsSlider.tsx chấm theo pageCount, ẩn điều khiển khi ≤ 1. Test: ProjectsSlider.test.tsx (repro BL-038 layout giả lập 1280px). Doc: SPECIFICATIONS (F1 Dự án nổi bật), design-spec S01 khối 3."
+    "(commit close-out BL-037)": "T01 — Breadcrumb.tsx LINK_CLASS bỏ hover:underline → transition-colors hover:text-accent-text; button.tsx variant ghost bỏ underline-offset-4 hover:underline → hover:text-accent-text; NewsHomeBody \"Xem thêm\", tin-tuc/[slug]/page.tsx + PostDetail.tsx link danh mục (đã accent) bỏ hover:underline → transition-colors hover:text-text; JobDetail.tsx \"Xem tất cả vị trí\" giữ underline lúc thường, hover:no-underline hover:text-accent-text; ProjectsSlider.tsx h3 thêm min-h-[2lh] (giữ line-clamp-2). Test: Breadcrumb.test, button.test (ghost), ProjectsSlider.test. Doc: SPECIFICATIONS (Giao diện, F1 Dự án nổi bật), design-spec (đoạn Hover link điều hướng BL-037 + S01 khối 3)."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.31.0-38.json",
-  "specUpdate": "spec/updates/2026-10-20-projects-slider-pagination-bug.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.31.1-39.json",
+  "specUpdate": "spec/updates/2026-10-20-link-hover-and-slider-title-height.md",
   "specRefs": [
-    "F1 Trang chủ — Dự án nổi bật: điều khiển slider (BL-038)",
-    "design-spec S01 khối 3 — Điều khiển"
+    "Giao diện — hover link điều hướng (BL-037)",
+    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)",
+    "design-spec — Hover link điều hướng (BL-037)",
+    "design-spec S01 khối 3 — khung kính tên dự án"
   ],
   "specRefNotes": {
-    "F1 Trang chủ — Dự án nổi bật: điều khiển slider (BL-038)": "Chấm = số vị trí cuộn được thật; chấm active = vị trí gần scrollLeft nhất, cuộn hết → chấm cuối; mũi tên đi đúng 1 vị trí, đầu/cuối vòng; chỉ hiện điều khiển khi > 1 vị trí.",
-    "design-spec S01 khối 3 — Điều khiển": "Mũi tên ≥ md (44px) + chấm dưới, cơ chế chung useSnapSlider; ở 1280px 6 dự án → 5 chấm."
+    "Giao diện — hover link điều hướng (BL-037)": "Breadcrumb, Button ghost, \"Xem thêm\" /tin-tuc, link danh mục chi tiết tin tức + tin đăng, \"Xem tất cả vị trí\": hover không gạch chân, transition-colors; chữ thường → --color-accent-text (khối tối #E0BF89), link vốn vàng → --color-text; \"Xem tất cả vị trí\" giữ gạch chân lúc thường; focus-visible giữ outline chung; RichText giữ gạch chân.",
+    "F1 Trang chủ — Dự án nổi bật: khung tên đều chiều cao (BL-037)": "Tên tối đa 2 dòng, luôn giữ chỗ 2 dòng → khung kính mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng.",
+    "design-spec — Hover link điều hướng (BL-037)": "Đoạn sau quy tắc hover thẻ BL-034; liệt kê link đổi, link chưa đổi (footer / mục lục / LanguageSwitcher / 404).",
+    "design-spec S01 khối 3 — khung kính tên dự án": "h3 --text-h3, line-clamp-2 + min-h-[2lh]."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/home/use-snap-slider.tsx",
+      "src/components/layout/Breadcrumb.tsx",
+      "src/components/layout/Breadcrumb.test.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/button.test.tsx",
+      "src/components/news/NewsHomeBody.tsx",
+      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
+      "src/components/posts/PostDetail.tsx",
+      "src/components/careers/JobDetail.tsx",
       "src/components/home/ProjectsSlider.tsx",
       "src/components/home/ProjectsSlider.test.tsx",
       "SPECIFICATIONS.md",
       ".context/design-spec.md"
     ],
-    "filesNote": "Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
+    "filesNote": "Chỉ class Tailwind. Không schema/migration/API/access control/dữ liệu CMS/URL/metadata/JSON-LD/i18n. Không gồm sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*).",
     "modules": [
-      "Home — useSnapSlider (hook slider dùng chung)",
+      "Layout — Breadcrumb (mọi trang công khai)",
+      "UI — Button variant ghost (dùng chung)",
+      "News — NewsHomeBody, chi tiết tin tức",
+      "Posts — PostDetail",
+      "Careers — JobDetail",
       "Home — ProjectsSlider (Dự án nổi bật)"
     ]
   },
   "impact": {
     "direct": [
-      "1280px, 6 dự án: hiện 5 chấm (không phải 6); tải trang → chấm 1 active",
-      "Bấm › đi đúng 1 vị trí (thẻ đầu đang hiện tăng 1), không nhảy cóc 2 thẻ",
-      "Chấm active khớp thẻ đầu đang hiện; cuộn hết sang phải → chấm cuối active",
-      "Bấm › ở vị trí cuối → vòng về đầu; bấm ‹ ở đầu → vòng về cuối",
-      "Bấm chấm N → cuộn tới đúng vị trí N",
-      "Ít dự án vừa khung (≤ 1 vị trí cuộn) → không hiện mũi tên/chấm"
+      "Breadcrumb hover: không gạch chân, chữ đổi vàng thương hiệu --color-accent-text; Tab focus còn vòng focus rõ",
+      "Trang chủ \"Xem tất cả\" khối Dự án nổi bật (Button ghost) hover: không gạch chân, đổi vàng thương hiệu",
+      "/tin-tuc \"Xem thêm\" hàng danh mục hover: không gạch chân, chữ đổi --color-text",
+      "Chi tiết tin tức + chi tiết tin đăng BĐS: link danh mục hover không gạch chân, chữ đổi --color-text",
+      "Tin tuyển dụng hết hạn: \"Xem tất cả vị trí\" gạch chân lúc thường, hover bỏ gạch chân",
+      "Slider Dự án nổi bật: khung kính tên mọi thẻ cùng chiều cao dù tên 1 hay 2 dòng"
     ],
     "dependents": [
-      "Trang chủ / và /en — slider Ưu đãi nổi bật (useSnapSlider, chỉ scrollByPage)",
-      "Trang chủ / và /en — tab Cho thuê (useSnapSlider, chỉ scrollByPage)"
+      "EmptyState \"Nhận tư vấn\" (Button ghost) — hover không gạch chân, đổi vàng thương hiệu",
+      "Breadcrumb trên mọi trang danh sách / chi tiết / tĩnh (vi + en)"
     ],
     "regression": [
-      "Mobile 390: vuốt ngang + snap thẻ vẫn mượt, chấm active cập nhật theo vuốt",
-      "Slider Ưu đãi nổi bật: mũi tên/cuộn trang không đổi",
-      "Tab Cho thuê: đổi tab + cuộn slider không đổi",
-      "Hover tiêu đề thẻ dự án đổi vàng thương hiệu (BL-034) giữ",
-      "Đổi kích thước cửa sổ (768 ↔ 1280) → số chấm tính lại đúng",
+      "Link trong nội dung bài (RichText) vẫn gạch chân",
+      "Hover tiêu đề thẻ (BL-034) giữ: không gạch chân, đổi vàng",
+      "Điều khiển slider Dự án nổi bật (BL-038): mũi tên 1 vị trí, chấm = số vị trí cuộn được, vòng đầu/cuối",
+      "Nút outline \"Xem thêm\" (Ưu đãi nổi bật, Tin tức, Cho thuê trang chủ) không đổi",
+      "Footer / mục lục / LanguageSwitcher / 404 vẫn hover gạch chân như cũ",
       "Không lỗi console, không CLS"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL038-01",
+      "id": "BL037-01",
       "viewport": 1280,
-      "steps": "Mở / (vi), cuộn tới khối Dự án nổi bật (6 dự án).",
-      "expected": "5 chấm, chấm 1 active, có mũi tên ‹ ›."
+      "steps": "Mở /du-an (vi) và /en/... một trang có breadcrumb; hover từng link breadcrumb.",
+      "expected": "Không gạch chân; chữ đổi vàng thương hiệu (#8C6733), chuyển màu mượt."
     },
     {
-      "id": "BL038-02",
+      "id": "BL037-02",
       "viewport": 1280,
-      "steps": "Bấm › liên tiếp 4 lần (chờ cuộn xong mỗi lần).",
-      "expected": "Mỗi lần thẻ đầu đang hiện tăng đúng 1; chấm active 2 → 3 → 4 → 5; ở chấm 5 thẻ 6 hiện hết."
+      "steps": "Trên trang có breadcrumb, Tab tới các link breadcrumb.",
+      "expected": "Vòng focus (outline --color-focus-ring) thấy rõ trên từng link."
     },
     {
-      "id": "BL038-03",
+      "id": "BL037-03",
       "viewport": 1280,
-      "steps": "Ở vị trí cuối bấm ›; rồi ở đầu bấm ‹.",
-      "expected": "› ở cuối vòng về đầu (chấm 1); ‹ ở đầu vòng về cuối (chấm 5)."
+      "steps": "Mở / (vi), khối Dự án nổi bật: hover link \"Xem tất cả\".",
+      "expected": "Không gạch chân, chữ đổi vàng thương hiệu."
     },
     {
-      "id": "BL038-04",
+      "id": "BL037-04",
       "viewport": 1280,
-      "steps": "Bấm chấm 3, rồi chấm 5, rồi chấm 1.",
-      "expected": "Cuộn đúng vị trí tương ứng, chấm bấm thành active."
+      "steps": "Mở /tin-tuc, hover \"Xem thêm\" ở hàng danh mục.",
+      "expected": "Không gạch chân, chữ đổi từ vàng sang màu chữ thường (--color-text)."
     },
     {
-      "id": "BL038-05",
+      "id": "BL037-05",
+      "viewport": 1280,
+      "steps": "Mở một chi tiết tin tức /tin-tuc/[slug] và một chi tiết tin đăng BĐS; hover link danh mục.",
+      "expected": "Không gạch chân, chữ đổi sang --color-text."
+    },
+    {
+      "id": "BL037-06",
+      "viewport": 1280,
+      "steps": "Mở một tin tuyển dụng đã hết hạn; nhìn rồi hover \"Xem tất cả vị trí\" trong hộp cảnh báo.",
+      "expected": "Lúc thường có gạch chân; hover bỏ gạch chân, chữ màu vàng thương hiệu; bấm đi tới /tuyen-dung."
+    },
+    {
+      "id": "BL037-07",
+      "viewport": 1280,
+      "steps": "Mở một chi tiết tin tức có link trong nội dung bài; nhìn và hover link đó.",
+      "expected": "Link trong nội dung vẫn gạch chân (không đổi)."
+    },
+    {
+      "id": "BL037-08",
+      "viewport": 1280,
+      "steps": "Mở / (vi), khối Dự án nổi bật có cả dự án tên 1 dòng (vd \"Căn hộ Trung Tâm Hà Nội\") và tên 2 dòng; so khung kính đáy ảnh.",
+      "expected": "Khung kính mọi thẻ (cùng có địa điểm + số liệu) cao bằng nhau; địa điểm + hàng số liệu thẳng hàng; tên dài vẫn cắt tối đa 2 dòng."
+    },
+    {
+      "id": "BL037-09",
+      "viewport": 768,
+      "steps": "Lặp BL037-08 ở 768.",
+      "expected": "Khung kính các thẻ cùng chiều cao, không tràn ảnh."
+    },
+    {
+      "id": "BL037-10",
       "viewport": 390,
-      "steps": "Vuốt ngang slider Dự án nổi bật từ đầu tới cuối.",
-      "expected": "Snap từng thẻ, chấm active cập nhật theo vị trí, cuộn hết → chấm cuối active; không có mũi tên (< md)."
+      "steps": "Lặp BL037-08 ở 390 (vuốt qua các thẻ).",
+      "expected": "Khung kính các thẻ cùng chiều cao; tên 2 dòng không đè địa điểm."
     },
     {
-      "id": "BL038-06",
+      "id": "BL037-11",
       "viewport": 1280,
-      "steps": "Slider Ưu đãi nổi bật + tab Cho thuê: bấm mũi tên / đổi tab.",
-      "expected": "Hành vi như trước (cuộn theo trang), không lỗi."
+      "steps": "Regression BL-038: khối Dự án nổi bật bấm › liên tiếp, bấm chấm, › ở cuối / ‹ ở đầu.",
+      "expected": "Mũi tên đi đúng 1 vị trí, chấm active khớp, vòng đầu/cuối như BL-038."
+    },
+    {
+      "id": "BL037-12",
+      "viewport": 1280,
+      "steps": "Regression: hover tiêu đề thẻ dự án / tin tức (BL-034); hover link footer.",
+      "expected": "Tiêu đề thẻ không gạch chân, đổi vàng (BL-034); footer vẫn hover gạch chân như cũ."
     }
   ],
   "acceptance": [
-    "Mũi tên chuyển đúng 1 vị trí, không nhảy cóc",
-    "Chấm = số vị trí cuộn được thật; chấm active khớp thẻ đầu đang hiện; cuộn hết → chấm cuối",
-    "Đầu/cuối vòng nhất quán",
-    "Slider Ưu đãi + tab Cho thuê (dùng chung hook) và vuốt mobile không vỡ",
-    "Test hook/slider cập nhật (repro BL-038 FAIL trước fix, PASS sau fix)"
+    "Breadcrumb hover không gạch chân, chữ --color-accent-text; focus-visible còn thấy",
+    "Ghost \"Xem tất cả\" / \"Xem thêm\" /tin-tuc / link danh mục tin tức + tin đăng / \"Xem tất cả vị trí\" hover không gạch chân, đổi màu đúng quy tắc; nền tối dùng biến thể sáng",
+    "Link RichText không đổi (vẫn gạch chân)",
+    "Slider Dự án nổi bật: khung tên mọi thẻ cùng chiều cao, địa điểm + số liệu thẳng hàng",
+    "Kiểm 390 / 768 / 1280"
   ],
   "outOfScope": [
-    "Đổi bố cục / kích thước thẻ slider",
-    "Nội dung BL-037 (cùng chạm ProjectsSlider.tsx, xử lý riêng)",
+    "Footer / FooterLinkColumn / LanguageSwitcher / TableOfContents / NewsToc / not-found (còn hover:underline — task riêng nếu user muốn)",
+    "Link gạch chân cố định trong form / thông báo (ApplyForm, ConsentCheckbox, FormStatus, CookieBanner, ...)",
+    "Thẻ slider thiếu địa điểm / số liệu vẫn thấp hơn (không thêm placeholder)",
     "Sửa dở chưa commit của user (next.config.ts, src/payload-types.ts, src/components/projects/*)"
   ],
   "viewports": [
@@ -131,6 +183,6 @@
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "medium",
-  "riskNote": "Hook slider dùng chung (useSnapSlider) trên trang chủ. Không schema/API/quyền/dữ liệu/URL. Verify reviewer STRICT round 1 PASS: pnpm vitest run src/components/home 82/82, typecheck PASS, lint 0 error. Residual: chưa kiểm trình duyệt thật — smooth scroll + snap khi bấm › nhanh liên tiếp, scrollLeft lẻ pixel khi zoom (dung sai 1px)."
+  "risk": "low",
+  "riskNote": "Chỉ class Tailwind; Breadcrumb + Button ghost là component dùng chung (blast radius mọi trang công khai). Không schema/API/quyền/dữ liệu/URL/i18n. Verify reviewer STRICT round 1 PASS: pnpm vitest run src/components src/app 972/972, typecheck PASS, lint 0 error. Residual (MINOR): \"Xem tất cả vị trí\" màu thường #8A5A0A gần accent #8C6733 → tín hiệu hover chủ yếu là bỏ gạch chân; thẻ slider thiếu địa điểm/số liệu thấp hơn; chưa kiểm trình duyệt thật."
 }
