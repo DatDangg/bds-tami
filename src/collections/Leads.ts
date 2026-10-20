@@ -167,7 +167,7 @@ const UTM_LABELS: Record<string, string> = { source: "Nguồn (utm_source)", med
  */
 const hiddenInForm = { Field: "/components/admin/LeadFormDisplay#LeadHiddenField" } as const;
 const timelineFields: Field[] = [
-  { name: "activitySummary", type: "ui", admin: { position: "sidebar", components: { Field: "/components/admin/LeadFormDisplay#LeadActivitySummary" } } },
+  { name: "activitySummary", type: "ui", label: "Tóm tắt hoạt động", admin: { position: "sidebar", components: { Field: "/components/admin/LeadFormDisplay#LeadActivitySummary" } } },
   { name: "firstContactedAt", type: "date", label: "Ngày liên hệ đầu tiên", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },
   // Mốc tính hạn lưu 24 tháng (ERD §7); `stampLeadTimestamps` và hook của `lead-activities` ghi.
   { name: "lastActivityAt", type: "date", label: "Hoạt động gần nhất", index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },

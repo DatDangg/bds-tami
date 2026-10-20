@@ -161,7 +161,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
         codeField,
         // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
         { name: "roomsArea", type: "ui", label: "Phòng · diện tích", admin: { components: { Cell: "/components/admin/ListSummaryCells#RoomsAreaCell" } } },
-        { name: "codeBanner", type: "ui", admin: { components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeBanner" } } },
+        { name: "codeBanner", type: "ui", label: "Mã tin", admin: { components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeBanner" } } },
         formTabs([
           {
             label: "Nội dung",

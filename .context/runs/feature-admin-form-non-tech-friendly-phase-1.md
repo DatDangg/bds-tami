@@ -33,3 +33,5 @@ batchQueue: [phase-1-task-01, phase-1-task-02, phase-1-task-03, phase-1-task-04]
 - 2026-10-21 T02 builder → reviewer STRICT r1 PASS (5 MINOR residual); commit T02
 - 2026-10-21 T03 builder → reviewer STRICT r1 PASS (4 MINOR residual); commit T03
 - 2026-10-21 T04 builder → reviewer STRICT r1 PASS (4 MINOR residual); commit T04; next phase spec-validator + spec-publisher + close-out
+- 2026-10-21 phase spec-validator FAIL: 16 test bộ đầy đủ (nhãn ui + media-upload integration) → tạo T05 fix; builder running
+- 2026-10-21 T05 builder → reviewer NORMAL PASS; pnpm test 3422/3422; xoá 2 media rác (alt a) do test cũ để lại; commit T05; next spec-publisher + close-out

@@ -24,6 +24,7 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
   const staffIds: string[] = [];
   const mediaIds: string[] = [];
   const privateIds: string[] = [];
+  let uploadedJpegFilename = "";
   const tokens: Record<string, string> = {};
   const ids: Record<string, string> = {};
   let payload: Payload;
@@ -137,18 +138,19 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
         expect(await objectExists(publicBucket, size?.filename ?? "missing")).toBe(true);
       }
       expect(await objectExists(publicBucket, doc.filename)).toBe(true);
+      uploadedJpegFilename = doc.filename;
     });
 
     it("khách đọc được danh sách và file media", async () => {
-      const latest = await payload.find({ collection: "media", overrideAccess: true, limit: 1, sort: "-createdAt" });
-      const file = await rest(`/media/file/${latest.docs[0]?.filename}`, { method: "GET" });
+      // Ghim đúng file test trước đã tải lên: "bản ghi mới nhất" không đáng tin vì file test khác (homepage/projects) chèn media không có object S3.
+      const file = await rest(`/media/file/${uploadedJpegFilename}`, { method: "GET" });
       expect(file.status).toBe(200);
       expect(file.headers.get("content-type")).toContain("image/jpeg");
       // Ngoại lệ cache G1: storage-s3 không tự đặt Cache-Control, header do `Media.upload.modifyResponseHeaders` đặt.
       expect(file.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
       const etag = file.headers.get("etag");
       await file.arrayBuffer();
-      const revalidated = await rest(`/media/file/${latest.docs[0]?.filename}`, { method: "GET", ifNoneMatch: etag ?? "" });
+      const revalidated = await rest(`/media/file/${uploadedJpegFilename}`, { method: "GET", ifNoneMatch: etag ?? "" });
       expect(revalidated.status).toBe(304);
       expect(revalidated.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
       const list = await rest("/media", { method: "GET" });
@@ -161,14 +163,19 @@ describe.skipIf(!databaseUrl)("integration: media + private-files (DB + SeaweedF
       expect(staffDocs.some((doc) => "uploadedBy" in doc)).toBe(true);
     });
 
-    it("ảnh thiếu alt bị từ chối; PDF không cần alt", async () => {
+    it("ảnh mới trống alt: tự điền từ tên file gốc (BL-042); sửa ảnh cũ để trống alt bị chặn; PDF không cần alt", async () => {
       const noAlt = await rest("/media?locale=vi", {
         method: "POST",
         token: tokens.sale,
         file: { bytes: await bigJpeg(), name: "a.jpg", type: "image/jpeg" },
         data: {},
       });
-      expect(noAlt.status).toBe(400);
+      expect(noAlt.status).toBe(201);
+      const created = ((await noAlt.json()) as { doc: { id: string; alt: string } }).doc;
+      mediaIds.push(created.id);
+      expect(created.alt).toBe("a");
+      const clearAlt = await rest(`/media/${created.id}?locale=vi`, { method: "PATCH", token: tokens.sale, data: { alt: "" } });
+      expect(clearAlt.status).toBe(400);
       const pdf = await rest("/media?locale=vi", {
         method: "POST",
         token: tokens.sale,

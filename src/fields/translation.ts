@@ -66,7 +66,7 @@ export function translationGroup(): GroupField {
       { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       // Trường ảo (không có cột DB): 1 dòng tóm tắt thay cho các trường hệ thống đã ẩn (BL-042), rồi nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.
-      { name: "translationSummary", type: "ui", admin: { components: { Field: "/components/admin/TranslationSummary#TranslationSummary" } } },
+      { name: "translationSummary", type: "ui", label: "Tình trạng bản tiếng Anh", admin: { components: { Field: "/components/admin/TranslationSummary#TranslationSummary" } } },
       { name: "retranslateAction", type: "ui", label: "Dịch lại bằng AI", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
     ],
   };

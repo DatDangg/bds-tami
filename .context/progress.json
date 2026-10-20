@@ -1571,6 +1571,21 @@
             ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-04-round-1-review.md"
           ],
           "note": "mã CT to + sao chép, badge Đã quá hạn form+danh sách, Cấu hình chung dễ hiểu, alt ảnh tự điền từ tên gốc (req.context); 4 MINOR residual"
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-05.md",
+          "title": "Sửa 16 test hỏng bộ đầy đủ (phase validation R1–R3)",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-05-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-05-round-1-review.md"
+          ],
+          "note": "nhãn 3 field ui; media-upload test theo hành vi alt mới + ghim filename (R3 do test song song); pnpm test 3422/3422 PASS; dọn 2 media rác do lần chạy test cũ"
         }
       ]
     }
@@ -2489,7 +2504,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T21:56:06.636Z",
+  "lastUpdated": "2026-10-20T22:16:32.044Z",
   "approvalMilestones": [
     {
       "id": "M1",
