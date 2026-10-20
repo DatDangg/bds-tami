@@ -22,6 +22,6 @@ export function publishedAtField(): DateField {
     index: true,
     access: { create: denyAll, update: denyAll },
     hooks: { beforeChange: [stampFirstPublish] },
-    admin: { position: "sidebar", readOnly: true, date: { pickerAppearance: "dayAndTime" } },
+    admin: { position: "sidebar", readOnly: true, description: "Tự điền khi xuất bản lần đầu.", date: { pickerAppearance: "dayAndTime" } },
   };
 }

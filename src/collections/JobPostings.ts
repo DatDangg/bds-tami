@@ -1,7 +1,7 @@
 import type { CollectionConfig, NumberFieldSingleValidation, SelectField } from "payload";
 import { number } from "payload/shared";
 
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { guardJobPostingHardDelete } from "../hooks/job-postings/guard-delete";
@@ -67,10 +67,10 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Nhân viên kinh doanh BĐS" }),
               scopedCategoryField("job", { required: false }),
-              { name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
-              { name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
+              markRequired({ name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") }),
+              markRequired({ name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") }),
               { name: "benefits", type: "richText", label: "Quyền lợi", localized: true },
             ],
           },

@@ -1,5 +1,4 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { vi } from "@payloadcms/translations/languages/vi";
 import { buildConfig } from "payload";
@@ -27,6 +26,7 @@ import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { jobsConfig } from "./jobs";
 import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
+import { createRichTextEditor } from "./lib/admin/rich-text-editor";
 import { getEnv } from "./lib/env";
 import { logger } from "./lib/logger";
 import { resolveProdMigrations } from "./lib/payload/prod-migrations";
@@ -62,7 +62,7 @@ export default buildConfig({
   // Collection nghiệp vụ thêm dần ở các layer sau.
   collections: ADMIN_COLLECTIONS,
   globals: [SiteSettings, Homepage, Header, Footer],
-  editor: lexicalEditor(),
+  editor: createRichTextEditor(),
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint],
   jobs: jobsConfig,

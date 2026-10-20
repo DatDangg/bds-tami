@@ -1,0 +1,93 @@
+// Form soạn nội dung cho người không rành công nghệ (BL-042). Selector lấy từ @payloadcms/ui + richtext-lexical 3.91.
+// CSS ngoài @layer thắng lớp payload-default của Payload; không dùng !important.
+
+// ---- Đuôi "— Tiếng Việt"/"— vi" sau nhãn: ngôn ngữ đang sửa đã có ở ô chọn ngôn ngữ trên đầu form ----
+.field-label .localized {
+  display: none;
+}
+
+// ---- Dấu * cho trường bắt buộc bằng validate (`markRequired` ở src/fields/required-by-locale.ts) ----
+// Cùng màu với dấu * `required` của Payload (xem _surfaces.scss).
+.tami-required label.field-label::after {
+  content: "*";
+  color: var(--admin-badge-danger-fg);
+}
+
+// ---- Ô soạn thảo văn bản: khung viền + nền như input khác, thanh công cụ cố định nằm trong khung ----
+.rich-text-lexical__wrap {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+
+  &:hover {
+    border-color: var(--admin-text-subtle);
+  }
+
+  &:focus-within {
+    border-color: var(--admin-accent);
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  .fixed-toolbar {
+    border: 0;
+    border-bottom: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-s) var(--admin-radius-s) 0 0;
+    background: var(--theme-input-bg);
+  }
+
+  .ContentEditable__root {
+    min-height: 140px;
+    padding-inline: 12px;
+  }
+
+  .LexicalEditorTheme__placeholder {
+    left: 12px;
+    color: var(--admin-text-subtle);
+  }
+
+  // Nút Hoàn tác / Làm lại (feature riêng, không dùng class `.icon` của Payload).
+  .toolbar-popup__button.disabled svg {
+    opacity: 0.35;
+  }
+}
+
+// Có lỗi: viền đỏ thay viền thường (Payload tự tô nền đỏ ở màn hẹp).
+.rich-text-lexical.error .rich-text-lexical__wrap {
+  border-color: var(--admin-badge-danger-fg);
+}
+
+// ---- Nút "+" cạnh ô quan hệ: hiện chữ "Thêm mới", vùng bấm cao ≥ 36px ----
+.relationship-add-new__add-button {
+  min-height: 36px;
+  min-width: 36px;
+  gap: 6px;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+
+  &::after {
+    content: "Thêm mới";
+  }
+}
+
+// ---- Dòng tóm tắt bản dịch (TranslationSummary) ----
+.tami-translation-summary {
+  margin-bottom: 16px;
+
+  &__text {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  &__warning {
+    margin: 4px 0 0;
+  }
+}
+
+// Vùng bấm >= 44px trên màn cảm ứng.
+@media (max-width: 767px) {
+  .relationship-add-new__add-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

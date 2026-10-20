@@ -10,6 +10,8 @@ import { TitleLinkCell as TitleLinkCell_e6e0a64398a75c5f69f867ca18c402bc } from 
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
+import { HistoryFeatureClient as HistoryFeatureClient_a0df8647b387e33803cfdbd5797aaed8 } from '../../../components/admin/lexical/HistoryFeatureClient'
+import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -33,6 +35,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { VndCell as VndCell_fbd7cf2a56609098ead873f2758dcced } from '../../../components/admin/VndCell'
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
+import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3 } from '../../../components/admin/TranslationSummary'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
@@ -66,6 +69,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
+  "/components/admin/lexical/HistoryFeatureClient#HistoryFeatureClient": HistoryFeatureClient_a0df8647b387e33803cfdbd5797aaed8,
+  "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -89,6 +94,7 @@ export const importMap = {
   "/components/admin/VndCell#VndCell": VndCell_fbd7cf2a56609098ead873f2758dcced,
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
+  "/components/admin/TranslationSummary#TranslationSummary": TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,

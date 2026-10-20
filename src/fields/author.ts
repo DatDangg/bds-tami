@@ -17,6 +17,8 @@ export function authorField(): RelationshipField {
     relationTo: "staff",
     required: true,
     index: true,
+    // Điền sẵn người đang đăng nhập khi mở form tạo mới (BL-042). Là hàm nên KHÔNG thành DEFAULT ở DB (drizzle bỏ qua defaultValue hàm).
+    defaultValue: ({ user }) => user?.id,
     access: { create: isAdmin, update: isAdmin },
     hooks: { beforeChange: [defaultToCreator] },
     admin: { position: "sidebar" },

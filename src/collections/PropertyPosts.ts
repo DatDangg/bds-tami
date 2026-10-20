@@ -3,9 +3,9 @@ import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
@@ -70,10 +70,10 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Bán căn 3PN Vinhomes Central Park" }),
               scopedCategoryField("property_post"),
-              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+              markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
             ],
           },
           {

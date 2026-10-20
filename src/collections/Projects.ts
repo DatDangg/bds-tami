@@ -7,10 +7,10 @@ import type {
 } from "payload";
 import { upload } from "payload/shared";
 
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
@@ -134,9 +134,9 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Vinhomes Grand Park" }),
               scopedCategoryField("project"),
-              { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
+              markRequired({ name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
               { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true },
               { name: "legalInfo", type: "richText", label: "Pháp lý", localized: true },
               { name: "salesPolicy", type: "richText", label: "Chính sách bán hàng", localized: true },

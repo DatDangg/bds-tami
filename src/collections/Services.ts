@@ -2,8 +2,8 @@ import type { CollectionConfig, UploadField, UploadFieldSingleValidation } from 
 
 import { isAdmin } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
-import { requiredByLocale } from "../fields/required-by-locale";
-import { titleField } from "../fields/title";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { createRevalidateHomepageOnService } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
@@ -44,8 +44,8 @@ export function createServices(revalidate?: RevalidatePaths, revalidateTags?: Re
           {
             label: "Nội dung",
             fields: [
-              titleField(),
-              { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
+              titleField({ placeholder: "VD: Tư vấn pháp lý mua nhà" }),
+              markRequired({ name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
               { name: "content", type: "richText", label: "Nội dung", localized: true },
               { name: "sortOrder", type: "number", label: "Thứ tự hiển thị", defaultValue: 0, index: true },
             ],

@@ -1,7 +1,7 @@
 import type { CollectionConfig, DateField, FieldAccess, GroupField, SelectField, TextField } from "payload";
 
 import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { RENTAL_STATUSES } from "../fields/status";
 import { titleField } from "../fields/title";
@@ -163,9 +163,9 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Căn hộ 2PN view sông, đủ nội thất" }),
               scopedCategoryField("rental"),
-              { name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
+              markRequired({ name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") }),
               { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },
             ],
           },

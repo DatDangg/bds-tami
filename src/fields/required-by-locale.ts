@@ -1,4 +1,4 @@
-import type { PayloadRequest } from "payload";
+import type { Field, PayloadRequest } from "payload";
 
 import { defaultLocale } from "../i18n/routing";
 import { isFilled } from "../hooks/require-english-fields";
@@ -18,4 +18,17 @@ export function requiredByLocale(message: string) {
     const hasEnglish = (data as { hasEnglish?: boolean } | undefined)?.hasEnglish === true;
     return req.locale === defaultLocale || hasEnglish ? message : true;
   };
+}
+
+/** Lớp CSS đánh dấu trường bắt buộc theo ngôn ngữ: `_forms.scss` vẽ dấu * sau nhãn (BL-042), vì validate tự viết không bật `required` của Payload. */
+export const REQUIRED_MARK_CLASS = "tami-required";
+
+/**
+ * Thêm dấu * cạnh nhãn cho trường dùng `requiredByLocale`/validate bắt buộc. Chỉ đổi `admin.className`: KHÔNG chuyển sang `required: true`
+ * (sẽ thành NOT NULL ở DB và chặn sửa bản `en` dở dang). Dấu * hiện ở cả bản `en` dù chỉ bắt buộc khi đã bật "Có bản tiếng Anh".
+ */
+export function markRequired<T extends Field>(field: T): T {
+  const admin = (field as { admin?: { className?: string } }).admin;
+  const className = [admin?.className, REQUIRED_MARK_CLASS].filter(Boolean).join(" ");
+  return { ...field, admin: { ...admin, className } } as T;
 }

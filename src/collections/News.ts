@@ -1,9 +1,9 @@
 import type { CollectionConfig } from "payload";
 
 import { validateCoverWhenPublished } from "../fields/cover-image";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
@@ -35,10 +35,10 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Thị trường căn hộ TP.HCM quý 4" }),
               scopedCategoryField("news"),
-              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+              markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } }),
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
               { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
             ],
           },

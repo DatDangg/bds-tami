@@ -60,3 +60,37 @@ Nguyên tắc: người nhập liệu là nhân viên văn phòng/sale — nhìn
 - Doc impact dự kiến: FR-ADM (form admin) trong spec, `docs/DESIGN.md` phần admin.
 - Nguồn bổ sung: `docs/reviews/2026-10-21-admin-audit.md` (đối chiếu code trước khi sửa — tài liệu chưa kiểm hết). Phạm vi lớn → agent nên chia nhiều task theo màn.
 - **Ngoài phạm vi** (cần đổi schema hoặc component lớn — hoãn, chưa BL): bản đồ chọn vị trí, bộ chọn icon, lý do "Không thành" dạng danh sách, tên hiển thị tài liệu PDF, quý/năm bàn giao, tạo tiêu đề chuẩn + tự điền Tỉnh/Phường cho Cho thuê, thời hạn ưu đãi 7/15/30 ngày, gợi ý tag, cắt ảnh bìa, Lead dạng dòng thời gian.
+
+## Bảng điểm sửa (checkpoint — agent tự duyệt theo chỉ thị user 2026-10-21 "auto proceed, khỏi hỏi lại")
+> Đối chiếu code (Payload 3.91, `@payloadcms/richtext-lexical` 3.91) trước khi lập. Ảnh mock thay bằng mô tả (auto proceed). Không đổi schema/DB/access/endpoint.
+
+| # | Màn | Điểm khó dùng | Cách sửa (quyết định) | Task |
+|---|---|---|---|---|
+| 1 | Mọi form | Đuôi "— Tiếng Việt"/"— vi" sau nhãn trường dịch được (`FieldLabel` `.localized`) | Ẩn bằng CSS admin; ngôn ngữ đang sửa thể hiện 1 chỗ = ô chọn ngôn ngữ ở thanh trên (BL-039 đã có nhãn "Tiếng Việt/English"), thêm tiền tố "Đang sửa:" nếu làm được bằng chữ/CSS, không thay component Payload | T01 |
+| 2 | Mọi ô richText | Không thanh công cụ, chữ "nhấn '/'", không viền, "+"/ô vuông lạ | `lexicalEditor` toàn cục: `FixedToolbarFeature` + `admin.hideGutter/hideAddBlockButton/hideDraggableBlockElement`, `placeholder` tiếng Việt "Nhập nội dung tại đây…"; khung viền như ô khác bằng CSS; nút Hoàn tác/Làm lại = feature client nhỏ (lexical không có sẵn) — không được thì residual (Ctrl+Z) | T01 |
+| 3 | Mọi form | Trường validate bắt buộc theo ngôn ngữ (`requiredByLocale`, `scopedCategoryField`) không có * | Đánh dấu * cho trường dùng `requiredByLocale`/danh mục bắt buộc (helper chung, chỉ `admin`); lỗi Payload đã hiện dưới ô bằng câu tiếng Việt — giữ | T01 |
+| 4 | Mọi nội dung | Ô trống không gợi ý | `admin.placeholder` cho Tiêu đề (theo collection, vd Dự án "VD: Vinhomes Grand Park"), Mô tả ngắn, các ô quan trọng | T01 (chung) + T02 (Dự án) |
+| 5 | Mọi nội dung | "Người tạo *" bắt chọn | `defaultValue` = người đang đăng nhập (hàm, không là default DB); hook `defaultToCreator` giữ; quyền đổi giữ (chỉ admin) | T01 |
+| 6 | Mọi nội dung | Đường dẫn (slug) ở cột phải | Gom vào khối thu gọn "Nâng cao" ở cột phải (`collapsible` không tên, `initCollapsed`) — đường dẫn dữ liệu không đổi; mô tả ngắn lại | T01 |
+| 7 | Mọi nội dung | "Có bản tiếng Anh" khó hiểu; tab "Bản dịch" đầy trường hệ thống | Mô tả 1 câu cho `hasEnglish`; trong nhóm `translation` ẩn (`admin.hidden`) các trường hệ thống, thêm 1 dòng tóm tắt trạng thái ("Bản tiếng Anh: đã dịch tự động lúc …") + giữ nút "Dịch lại" | T01 |
+| 8 | Mọi form tạo | Tiêu đề "[Chưa có tiêu đề]" + "Đang tạo mới Dự án" | Ghi đè chữ Payload ở `payload-vi-overrides.ts`: tạo mới = "Thêm {{label}} mới"; tiêu đề trống khi tạo không hiện "[Chưa có tiêu đề]" (chữ thay "Chưa đặt tên") | T01 |
+| 9 | Form có quan hệ | Nút "+" không chữ | Nút thêm mới cạnh ô quan hệ hiện chữ/tooltip "Thêm mới" (CSS/ARIA, không thay component) — tab "Nội dung mở rộng" đã đổi "Bảng giá & thông tin thêm" ở BL-040, giữ | T01 |
+| 10 | Mọi nội dung | "Ngày xuất bản" xám như khoá | Mô tả: "Tự điền khi xuất bản lần đầu." | T01 |
+| 12a | Mọi ô Danh mục | Xổ cả danh mục loại khác | `scopedCategoryField` ĐÃ có `filterOptions: { scope }` — builder xác minh trên app; lỗi thật thì sửa, đúng thì ghi "đã có" | T02 |
+| 12b | Mô tả ngắn (mọi collection có `summary`) | Không đếm ký tự | Thành phần `afterInput` đếm ký tự + gợi ý 150–200 | T02 |
+| 12c | Dự án | Pháp lý / Chính sách trống trơn | `editor` riêng có `placeholder` mẫu (chỉ placeholder) | T02 |
+| 12d | Giá VND (Dự án, Cho thuê, Tin BĐS, bảng giá, lương) | Dễ gõ thừa/thiếu số 0 | `afterInput` dòng đọc bằng chữ "≈ 3,5 tỷ đồng" | T02 |
+| 12e | Ngày cập nhật bảng giá | Phải mở lịch | Nút "Hôm nay" (`afterInput`) | T02 |
+| 11 | Lead | UTM/URL, mốc thời gian, anonymizedAt, SĐT/email, locale, consent | Collapsible "Dữ liệu chiến dịch marketing" (đóng) gồm UTM + Trang gửi/đến (URL rút gọn, link mở tab mới); consent xuống cuối tab Nguồn chỉ đọc; mốc thời gian ẩn khỏi form, thay 1 dòng tóm tắt (`ui`); `anonymizedAt` `admin.hidden`; nút Gọi (`tel:`) / Zalo (`https://zalo.me/<sđt>`) / Gửi email (`mailto:`); `locale` chỉ đọc dạng nhãn | T03 |
+| 13 | Cho thuê | Mã `CT-…` nhỏ | Khối mã to đầu form + nút sao chép (`ui`) | T04 |
+| 14 | Tin tuyển dụng | Quá hạn không báo | Badge "Đã quá hạn" ở form + cột danh sách (theo `startOfVietnamDay`) | T04 |
+| 15 | Cấu hình chung | privacyPolicyVersion ô to; GA; glossary | Nhãn thông tin nhỏ (`ui`/Field tuỳ biến chỉ đọc); mô tả chỉ chỗ lấy mã GA; ví dụ glossary | T04 |
+| 16 | Ảnh | Thiếu alt chặn lưu | Hook `beforeValidate` media: ảnh trống alt → alt = tên file đã làm sạch; validator giữ; ảnh có alt không đổi | T04 |
+| — | Các collection khác (Tin tức, Tin BĐS, Dịch vụ, Trang, Chủ đầu tư, Danh mục, Tuyển dụng, Hồ sơ, Nhân sự, globals) | Các điểm 1–10 | Hưởng thay đổi chung T01; placeholder tiêu đề theo collection | T01 |
+
+### Quyết định tự xử lý (auto proceed)
+- Q1 Không tạo thanh "Đang sửa: Tiếng Việt" riêng: dùng ô ngôn ngữ sẵn có của Payload (1 chỗ, đã có nhãn từ BL-039) để không thay component Payload.
+- Q2 Slug vào khối "Nâng cao" ở cột phải (không chuyển sang tab SEO) để collection không có tab cũng giống nhau.
+- Q3 Alt mặc định = tên file đã làm sạch (bỏ đuôi, `-`/`_` → khoảng trắng); không lấy tiêu đề bài (Payload upload drawer không biết bài cha một cách tin cậy) — ghi residual.
+- Q4 Zalo dùng `https://zalo.me/<số chuẩn hoá 0xxxxxxxxx>` (không cần app id).
+- Q5 Thứ tự task: T01 chung → T02 Dự án + trường số/giá → T03 Lead → T04 Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh; tuần tự (cùng file chung).

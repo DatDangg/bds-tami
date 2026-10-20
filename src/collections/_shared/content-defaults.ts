@@ -1,4 +1,4 @@
-import type { Access, CollectionConfig, CollectionSlug, Field, FieldAccess, TabsField } from "payload";
+import type { Access, CollapsibleField, CollectionConfig, CollectionSlug, Field, FieldAccess, TabsField } from "payload";
 
 import { isAdmin, isAuthorOrAdmin, isStaff, makePublishedOnly, PUBLIC_STATUSES } from "../../access";
 import { authorField } from "../../fields/author";
@@ -110,6 +110,14 @@ function withFieldAccess(fields: Field[], override: FieldAccessOverrides): Field
   );
 }
 
+/**
+ * Khối "Nâng cao" thu gọn mặc định ở cột phải chứa `slug` (+ `scopeSlug`): đường dẫn tự sinh từ tiêu đề, người dùng văn phòng ít khi cần sửa (BL-042).
+ * Collapsible KHÔNG tên nên đường dẫn dữ liệu không đổi; bọc SAU khi áp access (`withFieldAccess` chỉ map field cấp đầu).
+ */
+function advancedSidebarBlock(fields: Field[]): CollapsibleField {
+  return { type: "collapsible", label: "Nâng cao", admin: { position: "sidebar", initCollapsed: true }, fields };
+}
+
 function resolveSharedFields(options: ContentOptions, collectionSlug: string): Field[] {
   const omitted = new Set<string>(options.omit ?? []);
   if (options.scopeField && omitted.has("slug")) {
@@ -123,7 +131,10 @@ function resolveSharedFields(options: ContentOptions, collectionSlug: string): F
       `Collection "${collectionSlug}": fieldAccess nhắm trường không phải trường dùng chung (hoặc đã omit): ${unknown.join(", ")}.`,
     );
   }
-  return available.flatMap(([name, fields]) => (overrides[name] ? withFieldAccess(fields, overrides[name]) : fields));
+  return available.flatMap(([name, fields]) => {
+    const withAccess = overrides[name] ? withFieldAccess(fields, overrides[name]) : fields;
+    return name === "slug" ? [advancedSidebarBlock(withAccess)] : withAccess;
+  });
 }
 
 const isNamed = (field: Field, name: string) => "name" in field && field.name === name;

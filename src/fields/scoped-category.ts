@@ -2,6 +2,7 @@ import type { RelationshipField, RelationshipFieldSingleValidation } from "paylo
 
 import type { CategoryScope } from "../hooks/categories/scope-collections";
 import { preserveRequestLocale } from "../lib/payload/preserve-request-locale";
+import { markRequired } from "./required-by-locale";
 
 /** `category` có thể là id hoặc bản ghi đã populate (depth > 0). */
 function toId(value: unknown): string | number | null {
@@ -36,7 +37,7 @@ export function scopedCategoryField(scope: CategoryScope, { required = true }: {
     if (category.deletedAt) return "Danh mục đang ở thùng rác.";
     return true;
   };
-  return {
+  const field: RelationshipField = {
     name: "category",
     type: "relationship",
     label: "Danh mục",
@@ -45,4 +46,6 @@ export function scopedCategoryField(scope: CategoryScope, { required = true }: {
     validate,
     filterOptions: { scope: { equals: scope } },
   };
+  // Bắt buộc bằng validate (không dùng `required` của Payload) nên đánh dấu * riêng (BL-042).
+  return required ? markRequired(field) : field;
 }

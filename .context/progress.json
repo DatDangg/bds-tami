@@ -1,6 +1,11 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "admin-form-non-tech-friendly",
+    "phaseTask": "phase-1-task-02",
+    "journal": ".context/runs/feature-admin-form-non-tech-friendly-phase-1.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1493,6 +1498,60 @@
       "docReconcile": "docs/specs/2026-10-19-admin-ui-saas-design.md §4, docs/ERD.md §1.1",
       "gap": "ID / Ngày xoá vẫn trong menu cột (Payload 3.91, cần schema)",
       "residual": "chưa xem 375px (popup ngôn ngữ, hàng chip); cột Thuộc dự án nháy Đang tải; preferences cột cũ; chip Tuyển dụng qua nửa đêm cần tải lại; MINOR T02 (3), T03 MINOR-2"
+    },
+    {
+      "slug": "admin-form-non-tech-friendly",
+      "title": "Admin form dễ dùng cho người không rành công nghệ: bỏ đuôi ngôn ngữ, richText thanh công cụ cố định, dấu * đủ, placeholder, Người tạo tự điền, slug/bản dịch gọn, Dự án/Lead/Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh (BL-042)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-042",
+      "changeDoc": "spec/changes/2026-10-20-admin-form-non-tech-friendly.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "note": "Auto proceed: bảng điểm sửa + Q1–Q5 trong change doc; D* trong task file",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-01.md",
+          "title": "Nền chung mọi form",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-2-review.md"
+          ],
+          "note": "editor chung FixedToolbar + Hoàn tác/Làm lại, ẩn đuôi locale, * requiredByLocale, placeholder tiêu đề, author defaultValue, slug trong Nâng cao, tóm tắt bản dịch; residual H1 tạo mới [Chưa đặt tên]"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-02.md",
+          "title": "Dự án + ô số/giá",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-03.md",
+          "title": "Form Lead",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-04.md",
+          "title": "Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0
+        }
+      ]
     }
   ],
   "bugs": [
@@ -2409,7 +2468,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T20:48:50.019Z",
+  "lastUpdated": "2026-10-20T21:33:14.184Z",
   "approvalMilestones": [
     {
       "id": "M1",

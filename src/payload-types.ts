@@ -328,7 +328,7 @@ export interface Rental {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -350,13 +350,19 @@ export interface Rental {
   rentedAt?: string | null;
   searchText?: string | null;
   status: 'draft' | 'published' | 'hidden' | 'rented';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -376,13 +382,16 @@ export interface Category {
   description?: string | null;
   sortOrder?: number | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
   scopeSlug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -688,7 +697,7 @@ export interface Project {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -708,13 +717,19 @@ export interface Project {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -752,12 +767,15 @@ export interface Developer {
   showAsPartner?: boolean | null;
   sortOrder?: number | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -883,7 +901,7 @@ export interface PropertyPost {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -903,13 +921,19 @@ export interface PropertyPost {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -976,7 +1000,7 @@ export interface News {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -996,13 +1020,19 @@ export interface News {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1050,7 +1080,7 @@ export interface Service {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1071,9 +1101,12 @@ export interface Service {
   };
   status: 'draft' | 'published' | 'hidden';
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1110,9 +1143,12 @@ export interface Page {
   version: string;
   effectiveDate: string;
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1228,7 +1264,7 @@ export interface JobPosting {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1248,12 +1284,18 @@ export interface JobPosting {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -2590,7 +2632,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2863,7 +2905,7 @@ export interface Homepage {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2921,7 +2963,7 @@ export interface Header {
     link?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2973,7 +3015,7 @@ export interface Footer {
   contactBlock?: string | null;
   copyright?: string | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;

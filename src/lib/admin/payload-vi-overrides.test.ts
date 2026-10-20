@@ -96,6 +96,8 @@ const EXPECTED: Record<string, string> = {
   "authentication.emailNotValid": "Email không hợp lệ",
   "authentication.loggedOutInactivity": "Bạn đã được tự động đăng xuất vì lâu không thao tác.",
   "authentication.youAreInactive": "Bạn đã không thao tác một lúc và sẽ được tự động đăng xuất để bảo mật. Bạn muốn tiếp tục làm việc?",
+  "general.creatingNewLabel": "Thêm {{label}} mới",
+  "general.untitled": "Chưa đặt tên",
   "general.dashboard": "Tổng quan",
   "general.backToDashboard": "Về trang Tổng quan",
   "general.adminTheme": "Giao diện trang quản trị",
