@@ -474,6 +474,7 @@ Responsive: theo màn cha.
 ### S08. Danh sách Đăng tin BĐS · `/tin-bds` · `/en/property-news` (FR-PUB-06)
 
 - **Bố cục as-built (BL-020 P3-T02):** banner gọn 240px; **chưa có băng tìm kiếm** (trang hiện không có từ khoá/lọc/sắp xếp — không thêm); dòng "Có N kết quả" (aria-live, gồm cả bài nổi bật) trên bài nổi bật; lưới 1/2/3/4 cột (4 ≥ xl); thẻ `PostCard` trắng bo 20px viền nhạt, tiêu đề thẻ nổi bật `font-display font-medium lg:text-h2-sm` (EB Garamond chỉ nạp 400/500). Áp cho cả trang danh mục `/tin-bds/danh-muc/[category]`.
+- **BL-032 (thay mục bài nổi bật bên dưới):** đồng bộ `/du-an` + `/cho-thue` — bài nổi bật là **thẻ đầu lưới** (ảnh `priority`), không còn thẻ ngang 7/5; hàng "Có N kết quả" + lưới trong `section[aria-label]`; `PostCard` ảnh 4:3, tiêu đề `font-display text-h4` `line-clamp-2`, thân `gap-1` như RentalCard/ProjectCard; trống: tiêu đề riêng ("Chưa có tin đăng." / "Chưa có tin đăng trong mục này." + về `/tin-bds`).
 - Page banner + breadcrumb. Tab danh mục (link tới S05): "Tất cả" · Tin BĐS · Voucher / Ưu đãi · … (tab cuộn ngang < md).
 - Trang 1, tab Tất cả: **bài nổi bật** đầu tiên (`isFeatured` mới nhất còn hạn) thẻ ngang lớn: ảnh 16:10 7 cột + chữ 5 cột (tiêu đề `--text-h2`, excerpt 3 dòng, hạn ưu đãi) (≥ lg); dưới là lưới thẻ Tin/ưu đãi.
 - Thẻ có `offer.endAt`: còn ≤ 3 ngày → badge "Còn <n> ngày / <n> days left" (warning); đã qua → badge "Đã kết thúc / Ended" + ảnh `opacity 0.7`, **vẫn** hiện trong danh sách (BR-06 chỉ rút khỏi khối trang chủ) nhưng xếp sau bài còn hạn.
@@ -489,6 +490,8 @@ Responsive: theo màn cha.
 **States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống §3.9; EN theo `hasEnglish`. **Eyebrow:** 0 (nhãn danh mục trên thẻ là metadata).
 
 ### S09. Chi tiết bài Đăng tin BĐS · `/tin-bds/[slug]` · `/en/property-news/[slug]` (FR-PUB-07)
+
+> **As-built BL-032 (thay các bước 1–7 về bố cục; nội dung từng khối giữ nguyên):** khung chi tiết chung S03/S07 (`DetailLayout`, nền `--color-primary-subtle`): breadcrumb → ảnh bìa 16:9 trong `max-w-container px-gutter`, bo 20px, `priority`, `pb-8` → thanh mục con Tổng quan · Ưu đãi · Nội dung · Hình ảnh (mục rỗng ẩn; id `overview` / `offer` / `content` / `gallery`) → MỘT thẻ trắng bo 28px: Tổng quan (danh mục, h1 `font-display text-h2`, ngày, `PostShare` < sm 1 nút / ≥ sm hàng ngang — **không còn rail ≥ xl**) · Khối ưu đãi · Nội dung richText 68ch · Thư viện; cột phải ≥ lg thẻ liên hệ `DETAIL_ASIDE_CARD_CLASS` (nút gọi hotline + `LeadFormSlot`/`LeadForm source=property_post`, tiêu đề "Nhận tư vấn"), < lg sau thẻ nội dung + `ProjectStickyCta` "Nhận tư vấn"; Tin liên quan ngoài thẻ nền `bg-bg-alt`. Header ẩn khi cuộn (`data-detail-page`).
 
 1. Breadcrumb.
 2. Đầu bài (container text 768px, căn trái): danh mục (link), tiêu đề cỡ `--text-h1`, chữ thường (§1.7), ngày đăng, nút chia sẻ (Facebook, Zalo, sao chép link). Chỉ một cụm chia sẻ trong bài (không lặp ở cuối bài); < sm: 1 nút "Chia sẻ / Share" gọi `navigator.share` (tiêu đề + URL canonical), trình duyệt không hỗ trợ hoặc lỗi khác huỷ → mở menu (Facebook, Zalo, sao chép link; `aria-expanded`, Esc/bấm ra ngoài đóng); sm–xl: hàng ngang ngay dưới ngày đăng; ≥ xl: cụm dọc chỉ icon (có `aria-label`) dính (`sticky`) ở lề trái cột chữ suốt phần đầu bài → hết nội dung/thư viện ảnh (không đè form lead, bài liên quan).

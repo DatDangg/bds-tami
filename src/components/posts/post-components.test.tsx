@@ -63,6 +63,15 @@ describe("PostCard", () => {
     expect(container.querySelector(".opacity-70")).toBeNull();
   });
 
+  it("kiểu thẻ như RentalCard: ảnh 4:3, tiêu đề 2 dòng font-display, thân gap-1", () => {
+    const { container } = renderWithIntl(<PostCard data={card("1")} headingLevel="h2" />);
+    expect(container.querySelector('[class*="aspect-[4/3]"]')).not.toBeNull();
+    expect(container.querySelector('[class*="aspect-[16/10]"]')).toBeNull();
+    const heading = screen.getByRole("heading", { level: 2 });
+    expect(heading.className).toContain("line-clamp-2 font-display text-h4");
+    expect(heading.parentElement?.className).toContain("gap-1");
+  });
+
   it("en: nhãn tiếng Anh", () => {
     renderWithIntl(<PostCard data={card("1", { badge: { kind: "ended" } })} headingLevel="h2" />, "en");
     expect(screen.getByText("Ended")).toBeInTheDocument();
@@ -70,18 +79,21 @@ describe("PostCard", () => {
 });
 
 describe("PostListBody", () => {
-  it("nổi bật + lưới: mọi tiêu đề h2, hai vùng có tên", () => {
-    renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} totalDocs={3} />);
+  it("bài nổi bật là thẻ đầu lưới (priority), MỘT vùng có tên, mọi tiêu đề h2", () => {
+    const { container } = renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} totalDocs={3} />);
     expect(screen.getByRole("status")).toHaveTextContent("Có 3 kết quả");
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 1", "Tin 2", "Tin 3"]);
-    expect(screen.getByRole("region", { name: "Tin nổi bật" })).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Tin đăng khác" })).toBeInTheDocument();
+    expect(screen.getAllByRole("region")).toHaveLength(1);
+    expect(screen.getByRole("region", { name: "Danh sách tin đăng" })).toBeInTheDocument();
+    expect(container.querySelectorAll("ul.grid > li")).toHaveLength(3);
+    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
+    // Không còn thẻ ngang riêng cho bài nổi bật.
+    expect(container.querySelector(".lg\:grid-cols-12")).toBeNull();
   });
 
-  it("không có bài nổi bật: chỉ lưới, vùng mang tên trang", () => {
+  it("không có bài nổi bật: chỉ lưới các thẻ còn lại", () => {
     renderWithIntl(<PostListBody featured={null} items={[card("2")]} totalDocs={1} />);
-    expect(screen.queryByRole("region", { name: "Tin nổi bật" })).toBeNull();
-    expect(screen.getByRole("region", { name: "Đăng tin BĐS" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 2"]);
   });
 });
 

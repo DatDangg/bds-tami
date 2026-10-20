@@ -9,6 +9,7 @@ const notFound = vi.hoisted(() =>
   }),
 );
 const loadPostListing = vi.hoisted(() => vi.fn());
+const loadPostCategoryContext = vi.hoisted(() => vi.fn(async () => null as unknown));
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
 vi.mock("next/navigation", () => ({ notFound }));
@@ -16,7 +17,7 @@ vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({
 vi.mock("@/lib/content/load-page-banner", () => ({ loadPageBanner: async () => ({ url: "/api/media/file/banner.jpg", width: 1600, alt: "" }) }));
 vi.mock("@/lib/posts/post-listing", () => ({
   loadPostListing,
-  loadPostCategoryContext: async () => null,
+  loadPostCategoryContext,
   postCategoryFilterIds: () => [],
   buildPostChips: async () => [
     { label: "Tất cả", href: "/tin-bds", current: true },
@@ -54,6 +55,8 @@ const listing = (overrides: Record<string, unknown> = {}) => ({ featured: null, 
 
 afterEach(() => {
   loadPostListing.mockReset();
+  loadPostCategoryContext.mockReset();
+  loadPostCategoryContext.mockResolvedValue(null);
   notFound.mockClear();
 });
 
@@ -77,6 +80,21 @@ describe("/tin-bds (BL-020 P3-T02): banner gọn, đếm kết quả, lưới 4 
     const hrefs = pager.getAllByRole("link").map((link) => link.getAttribute("href"));
     expect(hrefs).toContain("/tin-bds");
     expect(hrefs).toContain("/tin-bds?page=3");
+  });
+
+  it("danh sách trống: tiêu đề riêng, không link về chính trang này", async () => {
+    loadPostListing.mockResolvedValue(listing({ items: [], isEmpty: true, totalDocs: 0, totalPages: 0 }));
+    renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
+    expect(screen.getByRole("heading", { name: "Chưa có tin đăng." })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Về danh sách" })).not.toBeInTheDocument();
+  });
+
+  it("danh mục trống: tiêu đề theo mục, vẫn link về /tin-bds", async () => {
+    loadPostCategoryContext.mockResolvedValue({ category: { id: "c1", name: "Voucher", slug: "voucher" }, parent: null });
+    loadPostListing.mockResolvedValue(listing({ items: [], isEmpty: true, totalDocs: 0, totalPages: 0 }));
+    renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined, categorySlug: "voucher" }));
+    expect(screen.getByRole("heading", { name: "Chưa có tin đăng trong mục này." })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Về danh sách" })).toHaveAttribute("href", "/tin-bds");
   });
 
   it("trang vượt số trang → notFound", async () => {

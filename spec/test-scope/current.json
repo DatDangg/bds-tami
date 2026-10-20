@@ -1,94 +1,117 @@
 {
-  "specVersion": "1.26.0",
-  "scopeVersion": 33,
+  "specVersion": "1.27.0",
+  "scopeVersion": 34,
   "generatedAt": "2026-10-20T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-031 — thẻ tư vấn / liên hệ cột phải trang chi tiết (DETAIL_ASIDE_CARD_CLASS) ≥ lg không còn thanh cuộn riêng: bỏ max-h + overflow-y-auto; top = min(--sticky-top + 4.5rem, 100dvh − --detail-aside-h − 1rem), --detail-aside-h do DetailAsideFit (client, ResizeObserver) ghi. Chi tiết cho thuê: pb-8 (32px) giữa thư viện ảnh / khối tin tương tự (tin đã thuê) và thanh mục con. Spec 1.25.0 → 1.26.0 (MINOR, đổi yêu cầu trình bày).",
-  "workItem": "feature/detail-aside-no-inner-scroll",
-  "backlog": "BL-031",
+  "triggerNote": "BL-032 — tin đăng BĐS đồng bộ UI với dự án / cho thuê: chi tiết /tin-bds/[slug] dùng DetailLayout (nền primary-subtle, header ẩn khi cuộn, breadcrumb → ảnh bìa 16:9 bo 20px pb-8 → thanh mục con overview/offer/content/gallery → một thẻ trắng; PostContactBox dính ≥ lg; Tin liên quan nền bg-alt; bỏ PostShareRail). Danh sách: bài nổi bật = thẻ đầu lưới, PostCard ảnh 4:3 + tiêu đề serif 2 dòng, trạng thái trống có tiêu đề. Spec 1.26.0 → 1.27.0 (MINOR, đổi yêu cầu trình bày).",
+  "workItem": "feature/post-detail-unified-layout",
+  "backlog": "BL-032",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-20-detail-aside-no-inner-scroll.md",
+  "changeDoc": "spec/changes/archive/2026-10-20-post-detail-unified-layout.md",
   "task": [
-    "tasks/feature-detail-aside-no-inner-scroll/phase-1-task-01.md"
+    "tasks/feature-post-detail-unified-layout/phase-1-task-01.md"
   ],
   "reviewReport": [
-    ".context/review-reports/feature-detail-aside-no-inner-scroll-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/feature-detail-aside-no-inner-scroll-phase-1-task-01-round-2-review.md"
+    ".context/review-reports/feature-post-detail-unified-layout-phase-1-task-01-round-1-review.md"
   ],
   "commits": [
-    "close-out BL-031 (commit chứa file này)"
+    "close-out BL-032 (commit chứa file này)"
   ],
   "commitNotes": {
-    "close-out BL-031 (commit chứa file này)": "T01 — DetailLayout (bỏ max-h/overflow-y-auto, top min(...), bọc aside bằng DetailAsideFit), DetailAsideFit.tsx mới, RentalDetail pb-8 (ảnh + similarBlock tin rented); test DetailLayout / rental-detail / project-detail. Review NORMAL PASS r1 (4 MINOR, đã sửa MINOR-1/3) → FAST PASS r2. Doc: SPECIFICATIONS (Giao diện, F2, F3), design-spec S03 + S07."
+    "close-out BL-032 (commit chứa file này)": "T01 — PostDetail → DetailLayout (section Tổng quan/Ưu đãi/Nội dung/Hình ảnh, ProjectStickyCta, article pb-16 lg:pb-0), PostContactBox.tsx mới, post-detail-sections.ts mới, PostShare (xoá PostShareRail, bỏ xl:hidden), PostCard (xoá biến thể feature; 4:3, line-clamp-2 font-display text-h4, gap-1), PostListBody (section gridLabel + thẻ đầu priority), PostListPage (EmptyState tiêu đề + backHref), vi/en.json. Review NORMAL PASS r1 (4 MINOR tuỳ chọn). Doc: SPECIFICATIONS (Giao diện, F4), design-spec S08 + S09."
   },
-  "previousScope": "spec/test-scope/archive/test-scope-1.25.0-32.json",
-  "specUpdate": "spec/updates/2026-10-20-detail-aside-no-inner-scroll.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.26.0-33.json",
+  "specUpdate": "spec/updates/2026-10-20-post-detail-unified-layout.md",
   "specRefs": [
-    "Overview — Giao diện (khung chi tiết chung, thẻ tư vấn / liên hệ dính)",
-    "F2 — Bố cục chi tiết dự án (thẻ Tư vấn 1:1)",
-    "F3 — Bố cục chi tiết cho thuê (khoảng ảnh → thanh mục con, thẻ liên hệ)",
-    "design-spec S03 Bố cục",
-    "design-spec S07 mục 3"
+    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)",
+    "F4 — Đăng tin BĐS: chi tiết (BL-032)",
+    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)",
+    "design-spec S08 Danh sách tin đăng",
+    "design-spec S09 Chi tiết tin đăng"
   ],
   "specRefNotes": {
-    "Overview — Giao diện (khung chi tiết chung, thẻ tư vấn / liên hệ dính)": "Thẻ không thanh cuộn riêng; top = min(--sticky-top + 4.5rem, 100dvh − chiều cao thẻ − 1rem); không JS dính trên như cũ; < lg không đổi.",
-    "F2 — Bố cục chi tiết dự án (thẻ Tư vấn 1:1)": "Bỏ 'cao tối đa phần viewport còn lại, cuộn trong thẻ'.",
-    "F3 — Bố cục chi tiết cho thuê (khoảng ảnh → thanh mục con, thẻ liên hệ)": "pb-8 (32px) trước thanh mục con, kể cả khối tin tương tự của tin đã thuê; breadcrumb giữ vị trí.",
-    "design-spec S03 Bố cục": "Thay đoạn max-height/tự cuộn bên trong bằng công thức top + DetailAsideFit.",
-    "design-spec S07 mục 3": "Thẻ liên hệ dính như S03; khối liền trước thanh mục con pb-8."
+    "Overview — Giao diện (ngoại lệ header ẩn khi cuộn + khung chi tiết chung gồm tin đăng BĐS)": "Chi tiết tin đăng BĐS thuộc nhóm trang dùng DetailLayout; header cuộn xuống ẩn hẳn, chỉ hiện ở đầu trang / khi Tab focus.",
+    "F4 — Đăng tin BĐS: chi tiết (BL-032)": "Breadcrumb → ảnh bìa 16:9 bo 20px → thanh mục con dính Tổng quan · Ưu đãi · Nội dung · Hình ảnh (mục trống ẩn) → thẻ trắng; thẻ liên hệ 'Nhận tư vấn' (nút gọi hotline + LeadForm property_post) dính ≥ lg không cuộn riêng; < lg sau thẻ + CTA dính đáy; một cụm chia sẻ ở Tổng quan, bỏ rail ≥ xl (thay BL-007).",
+    "F4 — Đăng tin BĐS: danh sách + danh mục (BL-032)": "Bài nổi bật = thẻ đầu lưới; dòng kết quả + lưới trong section có nhãn; PostCard ảnh 4:3 tiêu đề serif 2 dòng; trạng thái trống có tiêu đề riêng (+ quay lại ở danh mục). URL/phân trang/canonical không đổi.",
+    "design-spec S08 Danh sách tin đăng": "As-built BL-032 thay mục bài nổi bật ngang.",
+    "design-spec S09 Chi tiết tin đăng": "As-built BL-032 thay bố cục bước 1–7 bằng khung chi tiết chung S03/S07; nội dung từng khối giữ nguyên."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/components/detail/DetailLayout.tsx",
-      "src/components/detail/DetailAsideFit.tsx",
-      "src/components/rentals/RentalDetail.tsx",
-      "src/components/detail/DetailLayout.test.tsx",
-      "src/components/rentals/rental-detail.test.tsx",
-      "src/components/projects/project-detail.test.tsx",
+      "src/components/posts/PostDetail.tsx",
+      "src/components/posts/PostContactBox.tsx",
+      "src/components/posts/PostCard.tsx",
+      "src/components/posts/PostListBody.tsx",
+      "src/components/posts/PostListPage.tsx",
+      "src/components/posts/PostShare.tsx",
+      "src/lib/posts/post-detail-sections.ts",
+      "src/lib/posts/post-detail-sections.test.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/components/posts/post-components.test.tsx",
+      "src/components/posts/PostShare.test.tsx",
+      "src/components/posts/PostListPage.test.tsx",
+      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.test.tsx",
       "SPECIFICATIONS.md",
       ".context/design-spec.md"
     ],
-    "filesNote": "Đổi lớp Tailwind thẻ phụ + 1 client island nhỏ ghi biến CSS --detail-aside-h (DOM thẻ vẫn server render); RentalDetail thêm pb-8. Không schema/migration/API/access control/i18n/nguồn lead/JSON-LD.",
+    "filesNote": "Trang tin đăng BĐS chuyển sang khung chi tiết chung src/components/detail/* (không sửa khung); PostCard dùng chung đổi kiểu thẻ; i18n thêm gridLabel, empty.*, subNavLabel, subNav.*, sections.content, leadForm.callHotline; xoá page.posts.featuredLabel/moreLabel, leadForm.hotline. Route page.tsx không đổi. Không schema/migration/API/access control/nguồn lead/JSON-LD.",
     "modules": [
-      "Detail — DetailLayout / DetailAsideFit (khung chi tiết dùng chung)",
-      "Rentals — RentalDetail",
-      "Projects — chi tiết dự án (dùng DetailLayout)"
+      "Posts — PostDetail / PostContactBox / PostShare (chi tiết tin đăng)",
+      "Posts — PostListPage / PostListBody / PostCard (danh sách + thẻ dùng chung)",
+      "Detail — DetailLayout / DetailSubNav / DetailAsideFit (dùng lại, không sửa)",
+      "Home — slider Ưu đãi (PostCard)",
+      "Projects — khối Tin liên quan chi tiết dự án (PostCard)"
     ]
   },
   "impact": {
     "direct": [
-      "/du-an/[slug] + /en/projects/[slug] ≥ lg: thẻ Tư vấn 1:1 không có thanh cuộn dọc riêng (overflow-y visible, max-height none); thẻ vừa viewport dính top = --sticky-top + 4.5rem (88px ở ≥ lg) dưới thanh mục con",
-      "/cho-thue/[slug] + /en/for-rent/[slug] ≥ lg: thẻ liên hệ (giá + sale/hotline + form) không thanh cuộn riêng; thẻ cao hơn viewport cuộn theo trang tới khi đáy thẻ cách đáy viewport 1rem rồi dính — checkbox đồng ý + nút gửi luôn tới được, không bị cắt",
-      "Chi tiết cho thuê mọi breakpoint: khoảng 32px giữa thư viện ảnh và thanh mục con (chưa dính)",
-      "Tin cho thuê đã thuê có tin tương tự: khối tin tương tự cách thanh mục con 32px"
+      "/tin-bds/[slug] + /en/property-news/[slug]: nền --color-primary-subtle (data-detail-page), header ẩn khi cuộn xuống; breadcrumb → ảnh bìa 16:9 bo 20px, khoảng 32px (pb-8) tới thanh mục con; không ảnh bìa → chỉ breadcrumb",
+      "Thanh mục con dính: Tổng quan (#overview, luôn có) · Ưu đãi (#offer, chỉ khi có ưu đãi) · Nội dung (#content, chỉ khi có nội dung) · Hình ảnh (#gallery, chỉ khi có ảnh); bấm nút cuộn tới đúng mục, mục đang xem active",
+      "Nội dung trong một thẻ trắng bo ~28px; một h1 (tiêu đề tin) trong Tổng quan cùng danh mục (link), ngày đăng, cụm chia sẻ",
+      "Chia sẻ: < sm một nút Web Share (navigator.share, không hỗ trợ → menu Facebook/Zalo/sao chép link); ≥ sm hàng ngang; ≥ xl KHÔNG còn cụm dọc lề trái",
+      "≥ lg thẻ liên hệ 'Nhận tư vấn' cột phải dính, không thanh cuộn riêng: nút 'Gọi hotline {phone}' (tel:, chỉ khi có hotline) + một LeadForm source=property_post",
+      "< lg: thẻ liên hệ nằm sau thẻ nội dung; CTA dính đáy dẫn tới #lead-form, ẩn khi form trong viewport; nội dung không bị CTA che (pb-16)",
+      "Tin liên quan nằm ngoài thẻ trắng, nền bg-alt, lưới sm 2 / lg 3 cột, tiêu đề thẻ h3",
+      "/tin-bds + /tin-bds/danh-muc/[category] (+ EN): bài nổi bật là thẻ đầu lưới (ảnh priority), không còn thẻ ngang 7/5; dòng 'Có N kết quả' + lưới 1/2/3/4 cột trong section có aria-label",
+      "PostCard: ảnh 4:3, tiêu đề serif h4 tối đa 2 dòng; giữ danh mục, tóm tắt 2 dòng, giá, ngày/hạn, badge, ảnh mờ khi kết thúc",
+      "Trạng thái trống: '/tin-bds' → 'Chưa có tin đăng.'; danh mục → 'Chưa có tin đăng trong mục này.' + link quay lại /tin-bds (EN tương ứng)"
     ],
     "dependents": [
-      "DetailAsideFit: đổi kích thước cửa sổ / thẻ đổi chiều cao (lỗi validate form, thông báo gửi thành công, sale bị khoá → hotline chung) → top tính lại",
-      "Thẻ phụ khi chưa hydrate / không JS: --detail-aside-h = 0 → dính trên như cũ, không lỗi bố cục"
+      "Trang chủ slider Ưu đãi dùng PostCard — thẻ đổi tỉ lệ ảnh 4:3 + tiêu đề serif, slider không vỡ / không tràn",
+      "Chi tiết dự án khối Tin liên quan (nhóm tin đăng) dùng PostCard — kiểu thẻ mới",
+      "DetailLayout / DetailSubNav / DetailAsideFit nay có thêm trang thứ 3 dùng chung"
     ],
     "regression": [
-      "Thanh mục con dính sát đỉnh 8 / ≥ lg 16px + neo scroll-margin khi bấm mục; active mục đúng, cuộn qua mục cuối không nút active (BL-029)",
-      "Lead form chỉ một bản trong DOM (#lead-form), source project / rental đúng",
-      "< lg: thẻ tư vấn / liên hệ nằm sau thẻ nội dung, không đổi; sticky CTA đáy (ProjectStickyCta / thanh đáy cho thuê) dẫn tới #lead-form, ẩn khi form trong viewport",
-      "Header ẩn khi cuộn trên trang chi tiết (BL-027), thanh mục con rộng bằng khung nội dung (BL-028)",
-      "Breadcrumb chi tiết cho thuê giữ nguyên vị trí; chi tiết dự án khoảng hero → thanh mục con không đổi",
+      "Chi tiết dự án + chi tiết cho thuê không đổi (khung chung chỉ dùng lại)",
+      "Một h1 trên trang chi tiết tin; JSON-LD Article + BreadcrumbList giữ nguyên",
+      "Lead form chỉ một bản trong DOM (#lead-form), gửi lead source=property_post, sourceId = id tin, UTM + Turnstile như cũ",
+      "OfferBox (giá, hạn, mã voucher) hiển thị như cũ trong mục Ưu đãi, không lặp tiêu đề",
+      "Tin hết hạn / kết thúc: badge + ảnh mờ trên thẻ; trang chi tiết vẫn truy cập được",
+      "Danh sách: URL, phân trang, canonical, tham số danh mục không đổi; trang 2+ không nhân đôi bài nổi bật",
+      "Thanh mục con: cuộn qua mục cuối không nút active (BL-029), rộng bằng khung nội dung (BL-028)",
       "Không CLS, không tràn ngang 375 / 768 / 1280"
     ]
   },
   "acceptance": [
-    "≥ lg cả 2 trang chi tiết: thẻ phụ computed overflow-y visible, max-height none, không có thanh cuộn dọc riêng",
-    "Thẻ vừa viewport: dính dưới thanh mục con (top = --sticky-top + 4.5rem) như BL-027",
-    "Thẻ cao hơn viewport (vd cho thuê 842px ở 1440×900): khi dính đáy thẻ ≤ đáy viewport − 1rem, nút gửi nằm trong viewport, tới được bằng cuộn trang",
-    "Aside có biến --detail-aside-h = chiều cao thẻ sau hydrate; đổi kích thước cửa sổ thì cập nhật",
-    "Chi tiết cho thuê: khoảng 32px giữa thư viện ảnh và thanh mục con; tin đã thuê có tin tương tự: khối tin tương tự có pb-8 ngay trước thanh mục con",
-    "Thanh mục con đã dính đầu trang thì không đổi; breadcrumb không đổi vị trí",
-    "< lg không đổi; VI + EN như nhau"
+    "Chi tiết tin: [data-detail-page] nền primary-subtle; nội dung trong một thẻ trắng; thanh mục con chỉ có mục có nội dung (tin không ưu đãi → không nút Ưu đãi; không ảnh → không Hình ảnh)",
+    "Ảnh bìa 16:9 bo 20px, khoảng 32px tới thanh mục con",
+    "Đúng một h1; JSON-LD Article + breadcrumb có trong HTML",
+    "≥ lg thẻ liên hệ dính, overflow-y visible, không thanh cuộn riêng; nút gọi hotline href tel:; form lead source=property_post duy nhất",
+    "< lg CTA dính đáy tới #lead-form, ẩn khi form trong viewport",
+    "Chia sẻ ở Tổng quan mọi breakpoint; ≥ xl không có rail dọc lề trái",
+    "Header ẩn khi cuộn xuống trên chi tiết tin, hiện lại ở đầu trang / khi Tab focus",
+    "Danh sách + danh mục: bài nổi bật là thẻ đầu lưới, không thẻ ngang; thẻ ảnh 4:3, tiêu đề cắt 2 dòng",
+    "Trạng thái trống đúng tiêu đề (+ link quay lại ở danh mục)",
+    "Slider Ưu đãi trang chủ + Tin liên quan chi tiết dự án hiển thị thẻ mới không vỡ",
+    "VI + EN đủ nhãn (thanh mục con, nút gọi hotline, kết quả, trống), không lộ khoá i18n"
   ],
   "outOfScope": [
-    "Chuyển breadcrumb chi tiết cho thuê (user bỏ 2026-10-20)",
-    "Bằng hẳn khoảng 60px của chi tiết dự án (60px gồm dòng breadcrumb) — đổi token nếu user muốn",
-    "Tinh chỉnh phần đầu thẻ cao nằm dưới thanh mục con khi dính theo đáy (MINOR-2, task riêng nếu cần)",
+    "Băng tìm kiếm / bộ lọc trên /tin-bds (F4 không có tham số lọc — đổi URL/dữ liệu)",
+    "Sửa khung chi tiết chung src/components/detail/*",
+    "Chi tiết dự án / cho thuê, tin tức, tuyển dụng (ShareButtons)",
+    "4 MINOR review tuỳ chọn",
     "Admin Payload"
   ],
   "viewports": [
@@ -108,5 +131,5 @@
   "uiTests": true,
   "apiTests": [],
   "risk": "medium",
-  "riskNote": "Đụng khung chi tiết dùng chung 2 trang + thêm client island đo chiều cao. Review NORMAL PASS r1 (4 MINOR) → FAST PASS r2; vitest detail/projects/rentals 13 file / 166 test PASS, typecheck PASS, lint 0 error. Đo :3000 1440×900 cho thuê + dự án OK. Residual: thẻ cao khi dính theo đáy phần đầu (~28px padding) nằm dưới thanh mục con; không JS thẻ cao chỉ lộ đáy khi cuộn hết lưới; tin đã thuê chưa đo trực quan; 768/1280 + /en chưa đo riêng."
+  "riskNote": "PostCard dùng chung (trang chủ slider Ưu đãi, Tin liên quan chi tiết dự án) + trang chi tiết tin chuyển sang khung chung + đổi khoá i18n. Review NORMAL PASS r1 (4 MINOR tuỳ chọn); vitest 19 file / 154 test PASS, typecheck PASS, lint 0 error. Residual: chưa đo trực quan trên trình duyệt thật 375 / 768 / 1280."
 }

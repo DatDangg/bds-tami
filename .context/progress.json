@@ -975,6 +975,36 @@
       "scopeVersion": 33,
       "specUpdate": "spec/updates/2026-10-20-detail-aside-no-inner-scroll.md",
       "residual": "thẻ cao hơn (viewport − thanh mục con) khi dính theo đáy để ~28px đầu thẻ (padding) dưới thanh mục con; không JS = dính trên như cũ; rented+similar chưa đo trực quan; 768/1280 và /en chưa đo riêng; khoảng 32px < 60px hero↔thanh dự án (gồm breadcrumb)"
+    },
+    {
+      "slug": "post-detail-unified-layout",
+      "title": "Tin đăng BĐS (danh sách + chi tiết) đồng bộ UI với dự án / cho thuê (BL-032)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-032",
+      "changeDoc": "spec/changes/archive/2026-10-20-post-detail-unified-layout.md",
+      "startedAt": "2026-10-20",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-post-detail-unified-layout/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "NORMAL (r1) / FAST (r2 delta)",
+          "reviewerResult": "PASS",
+          "note": "PostDetail dùng DetailLayout (ảnh bìa pb-8, subnav overview/offer/content/gallery, PostContactBox aside + LeadForm property_post, ProjectStickyCta, Tin liên quan after); bỏ PostShareRail; PostCard 4:3 + serif h4 2 dòng, bỏ variant feature; PostListBody bài nổi bật = thẻ đầu lưới; empty state tiêu đề riêng",
+          "report": ".context/review-reports/feature-post-detail-unified-layout-phase-1-task-01-round-2-review.md",
+          "commit": "(commit close-out BL-032)"
+        }
+      ],
+      "planApprovedAt": "2026-10-20 (auto proceed)",
+      "completedAt": "2026-10-20",
+      "specVersion": "1.27.0",
+      "scopeVersion": 34,
+      "specUpdate": "spec/updates/2026-10-20-post-detail-unified-layout.md",
+      "residual": "chưa xem trình duyệt thật 375/768/1280; MINOR-2/3/4 hoãn (PostDetail dài, hasRichText từ careers, thiếu test CTA); PostCard 4:3 ảnh hưởng slider trang chủ + Tin liên quan dự án; bỏ rail chia sẻ xl"
     }
   ],
   "bugs": [
@@ -1861,7 +1891,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T05:19:06.744Z",
+  "lastUpdated": "2026-10-20T15:00:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

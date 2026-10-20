@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
-import { PostShare, PostShareRail } from "./PostShare";
+import { PostShare } from "./PostShare";
 
 const URL = "https://tami.example/tin-bds/uu-dai?x=1&y=2";
 
@@ -92,50 +92,19 @@ describe("PostShare — nút gọn < sm (Web Share API)", () => {
 });
 
 describe("PostShare — mỗi breakpoint chỉ một cụm hiển thị", () => {
-  it("cụm gọn `sm:hidden`; hàng ngang (ShareButtons) `hidden sm:… xl:hidden`", () => {
+  it("cụm gọn `sm:hidden`; hàng ngang (ShareButtons) `hidden sm:block`", () => {
     const { container } = renderWithIntl(<PostShare url={URL} title="Ưu đãi" />);
     const compact = compactButton().closest("[data-share-variant='compact']");
     expect(compact?.className).toContain("sm:hidden");
     const row = container.querySelector("[data-share-variant='row']");
     expect(row?.className).toMatch(/\bhidden\b/);
     expect(row?.className).toMatch(/\bsm:(block|flex)\b/);
-    expect(row?.className).toContain("xl:hidden");
+    expect(row?.className).not.toContain("xl:hidden");
     expect(within(row as HTMLElement).getByRole("group", { name: "Chia sẻ bài viết" })).toBeInTheDocument();
   });
 
-  it("wrapper ngoài cũng `xl:hidden` để không chừa khoảng trống trong header khi chỉ còn rail", () => {
+  it("wrapper ngoài luôn hiện (không còn rail ≥ xl nên không `xl:hidden`)", () => {
     const { container } = renderWithIntl(<PostShare url={URL} title="Ưu đãi" />);
-    expect(container.firstElementChild?.className).toContain("xl:hidden");
-  });
-});
-
-describe("PostShareRail — cụm dọc dính ≥ xl", () => {
-  it("chỉ hiện từ xl, con `sticky`; icon có aria-label; sao chép báo qua status", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    vi.stubGlobal("navigator", { clipboard: { writeText } });
-    const { container } = renderWithIntl(<PostShareRail url={URL} />);
-    const rail = container.firstElementChild as HTMLElement;
-    expect(rail.className).toMatch(/\bhidden\b/);
-    expect(rail.className).toContain("xl:block");
-    const sticky = rail.querySelector(".sticky") as HTMLElement;
-    expect(sticky).not.toBeNull();
-    // Ảnh bìa (positioned, đứng sau trong DOM) không được vẽ đè rail → wrapper nâng z theo token, dưới header (--z-header).
-    expect(rail.className).toContain("z-(--z-raised)");
-    // Wrapper absolute cao suốt vùng bài: chỉ cụm nút nhận click, cột trống không chặn click ảnh bìa.
-    expect(rail.className).toContain("pointer-events-none");
-    expect(sticky.className).toContain("pointer-events-auto");
-    expect(screen.getByRole("link", { name: "Chia sẻ lên Facebook" })).toHaveAttribute("target", "_blank");
-    expect(screen.getByRole("link", { name: "Chia sẻ lên Facebook" })).toHaveAttribute("title", "Chia sẻ lên Facebook");
-    expect(screen.getByRole("link", { name: "Chia sẻ qua Zalo" }).className).toContain("text-xsmall");
-    expect(screen.getByRole("link", { name: "Chia sẻ qua Zalo" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Sao chép liên kết" }));
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Đã sao chép liên kết"));
-    expect(writeText).toHaveBeenCalledWith(URL);
-  });
-
-  it("không có URL gốc: chỉ còn nút sao chép", () => {
-    renderWithIntl(<PostShareRail />);
-    expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByRole("button", { name: "Sao chép liên kết" })).toBeInTheDocument();
+    expect(container.firstElementChild?.className).not.toContain("xl:hidden");
   });
 });

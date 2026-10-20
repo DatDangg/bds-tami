@@ -229,9 +229,22 @@
       "tabsLabel": "Danh mục đăng tin",
       "resultCount": "Có {count, number} kết quả",
       "all": "Tất cả",
-      "featuredLabel": "Tin nổi bật",
-      "moreLabel": "Tin đăng khác",
+      "gridLabel": "Danh sách tin đăng",
+      "empty": {
+        "noPosts": "Chưa có tin đăng.",
+        "noPostsInCategory": "Chưa có tin đăng trong mục này."
+      },
       "relatedTitle": "Tin liên quan",
+      "subNavLabel": "Mục lục tin đăng",
+      "subNav": {
+        "overview": "Tổng quan",
+        "offer": "Ưu đãi",
+        "content": "Nội dung",
+        "gallery": "Hình ảnh"
+      },
+      "sections": {
+        "content": "Nội dung"
+      },
       "endedBadge": "Đã kết thúc",
       "daysLeft": "Còn {count} ngày",
       "endsToday": "Hết hạn hôm nay",
@@ -262,7 +275,7 @@
       },
       "leadForm": {
         "title": "Nhận tư vấn",
-        "hotline": "Hotline"
+        "callHotline": "Gọi hotline {phone}"
       }
     },
     "projects": {

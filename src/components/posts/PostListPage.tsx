@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { EmptyState } from "@/components/layout/EmptyState";
 import { PostListBody } from "@/components/posts/PostListBody";
 import { CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
 import { publicPath } from "@/lib/content/content-paths";
@@ -66,6 +67,7 @@ export async function PostListPage({ locale, rawPage, categorySlug }: PostListPa
       chipsLabel={t("tabsLabel")}
       scrollChips
       parentListHref={listPath}
+      emptyState={<EmptyState variant="empty" title={t(context ? "empty.noPostsInCategory" : "empty.noPosts")} {...(context ? { backHref: listPath } : {})} />}
       isEmpty={listing.isEmpty}
       pagination={{ page, totalPages: listing.totalPages, buildHref: (n) => withPage(ownPath, n) }}
     >

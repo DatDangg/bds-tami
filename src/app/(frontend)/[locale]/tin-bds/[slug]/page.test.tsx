@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
@@ -73,35 +73,32 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     expect(screen.queryByRole("heading", { name: "Thông tin ưu đãi" })).toBeNull();
   });
 
-  it("chia sẻ ở ĐẦU bài (trong header, sau ngày đăng) + rail dính ≥ xl; KHÔNG còn cụm chia sẻ cuối bài (S09)", async () => {
+  it("khung chi tiết chung: nền data-detail-page, thanh mục con, thẻ liên hệ (aside) có form lead; KHÔNG còn rail chia sẻ", async () => {
     findPublicPostBySlug.mockResolvedValue(post());
     const { container } = await renderPost();
-    const header = container.querySelector("header") as HTMLElement;
-    expect(header).toContainElement(screen.getByRole("heading", { level: 1 }));
-    expect(header.querySelector("time")).not.toBeNull();
-    // Nút gọn (< sm) + hàng ngang (sm–<xl) nằm trong header, sau <time>.
-    const compact = screen.getByRole("button", { name: "Chia sẻ" });
-    expect(header).toContainElement(compact);
-    const time = header.querySelector("time") as HTMLElement;
-    expect(time.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const groups = screen.getAllByRole("group", { name: "Chia sẻ bài viết" });
-    expect(groups.length).toBeGreaterThan(0);
-    for (const group of groups) {
-      // Mọi cụm chia sẻ đứng TRƯỚC vùng form lead; không có <footer> chia sẻ cuối bài.
-      const leadHeading = screen.getByRole("heading", { level: 2, name: "Nhận tư vấn" });
-      expect(group.compareDocumentPosition(leadHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    }
+    expect(container.querySelector("[data-detail-page]")).not.toBeNull();
+    expect(container.querySelector("[data-share-variant='rail']")).toBeNull();
+    const nav = screen.getByRole("navigation", { name: "Mục lục tin đăng" });
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Nội dung"]);
+    const aside = screen.getByRole("complementary");
+    expect(within(aside).getByRole("heading", { level: 2, name: "Nhận tư vấn" })).toBeInTheDocument();
+    expect(within(aside).getByRole("link", { name: "Gọi hotline 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+    // Chia sẻ một cụm trong Tổng quan (sau ngày đăng), trước form lead.
+    const overview = container.querySelector("#overview") as HTMLElement;
+    expect(overview).toContainElement(screen.getByRole("heading", { level: 1 }));
+    expect(overview.querySelector("time")).not.toBeNull();
+    expect(overview).toContainElement(screen.getByRole("button", { name: "Chia sẻ" }));
     expect(container.querySelector("article > footer")).toBeNull();
-    // Rail ≥ xl: ẩn dưới xl, con sticky, cùng wrapper với header + nội dung (không bao form lead).
-    const rail = container.querySelector("[data-share-variant='rail']") as HTMLElement;
-    expect(rail.className).toMatch(/\bhidden\b/);
-    expect(rail.className).toContain("xl:block");
-    expect(rail.querySelector(".sticky")).not.toBeNull();
-    // Thứ tự Tab: tiêu đề/ngày trước, rail sau header (rail `absolute` nên vị trí hiển thị không đổi).
-    expect(header.compareDocumentPosition(rail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(rail.parentElement).toContainElement(header);
-    expect(rail.parentElement).toContainElement(screen.getByText("Nội dung chi tiết của ưu đãi."));
-    expect(rail.parentElement).not.toContainElement(screen.getByRole("heading", { level: 2, name: "Nhận tư vấn" }));
+  });
+
+  it("thanh mục con thêm Ưu đãi / Hình ảnh khi có dữ liệu, thứ tự cố định; ảnh bìa nằm trên thanh mục con", async () => {
+    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-30T12:00:00.000Z" }, gallery: [image("g1")] as PropertyPost["gallery"] }));
+    const { container } = await renderPost();
+    const nav = screen.getByRole("navigation", { name: "Mục lục tin đăng" });
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Ưu đãi", "Nội dung", "Hình ảnh"]);
+    expect(container.querySelector("#offer")).not.toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Hình ảnh" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
   it("ưu đãi còn hạn: khối ưu đãi TRƯỚC nội dung, có mã voucher và nút sao chép", async () => {

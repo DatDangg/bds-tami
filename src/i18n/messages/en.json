@@ -229,9 +229,22 @@
       "tabsLabel": "Listing categories",
       "resultCount": "{count, plural, one {# result} other {# results}}",
       "all": "All",
-      "featuredLabel": "Featured listing",
-      "moreLabel": "More listings",
+      "gridLabel": "Listings",
+      "empty": {
+        "noPosts": "No listings yet.",
+        "noPostsInCategory": "No listings in this category yet."
+      },
       "relatedTitle": "Related listings",
+      "subNavLabel": "Listing contents",
+      "subNav": {
+        "overview": "Overview",
+        "offer": "Offer",
+        "content": "Content",
+        "gallery": "Photos"
+      },
+      "sections": {
+        "content": "Content"
+      },
       "endedBadge": "Ended",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
       "endsToday": "Ends today",
@@ -262,7 +275,7 @@
       },
       "leadForm": {
         "title": "Get advice",
-        "hotline": "Hotline"
+        "callHotline": "Call hotline {phone}"
       }
     },
     "projects": {
