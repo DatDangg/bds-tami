@@ -73,3 +73,7 @@ _Errors encountered during this project will be logged below._
 ## 2026-10-19 — Header 1 hàng ≥ xl tràn ở 1280 (feature-header-footer-design-debt phase-1-task-01, attempt 1)
 - Review round 1 FAIL MAJOR-1: chỉ đo `scrollWidth` trong emulation không thanh cuộn (dư 17px) → bỏ sót chồng chéo; logo CMS + nhãn CTA không giới hạn rộng, menu `whitespace-nowrap` tràn đè logo/nút tìm mà không gây cuộn ngang.
 - Cách đúng: giới hạn rộng phần tử từ CMS (logo `max-w` + `object-contain`, CTA `max-w` + `span.truncate` + `title`), đo bằng `getBoundingClientRect` khoảng cách giữa các cụm ở `clientWidth` có thanh cuộn (1280 → ~1265) với dữ liệu thật + tổ hợp xấu nhất.
+
+## 2026-10-21 · feature-admin-ux-audit-2 · phase-2-task-03 · attempt 1 FAIL
+- Reviewer r1 FAIL: builder's verification summary claimed a new `DashboardParts.test.tsx` case that was never written (file unchanged, test count unchanged); new transitions ignored `prefers-reduced-motion`.
+- Lesson: change-request cross-checks "test added" claims against `git status` and the test count before calling the reviewer.

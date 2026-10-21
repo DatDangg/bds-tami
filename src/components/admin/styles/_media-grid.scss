@@ -58,10 +58,11 @@
     gap: 16px;
   }
 
+  // Thẻ = lưới 4 hàng (ảnh, mô tả, tên tệp, loại tệp); liên kết `a` là một hộp thật (focus được) trải 4 hàng bằng subgrid.
   tbody tr {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
     min-width: 0;
     overflow: hidden;
     border: 1px solid var(--admin-border);
@@ -91,14 +92,24 @@
     }
   }
 
-  // Ô tên tệp "tan" vào thẻ: ảnh và tên tệp thành con của thẻ để sắp thứ tự (ảnh, alt, tên tệp, loại).
+  // Ô và `.file` "tan" vào lưới; riêng `a` KHÔNG dùng display: contents (mất vùng focus/Tab) mà là subgrid trải cả 4 hàng,
+  // nên ảnh (hàng 1) và tên tệp (hàng 3) vẫn xen kẽ với mô tả (hàng 2) / loại tệp (hàng 4) là ô anh em.
   td.cell-filename,
-  td.cell-filename a,
   td.cell-filename .file {
     display: contents;
   }
 
-  // Cả thẻ bấm được → màn sửa. Viền focus vẽ trên lớp phủ vì `a` không có hộp riêng.
+  td.cell-filename a {
+    display: grid;
+    grid-row: 1 / -1;
+    grid-column: 1;
+    grid-template-rows: subgrid;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // Cả thẻ bấm được → màn sửa (lớp phủ). Viền focus vẽ trên lớp phủ.
   td.cell-filename a::after {
     content: "";
     position: absolute;
@@ -114,7 +125,7 @@
 
   .thumbnail {
     position: relative;
-    order: 0;
+    grid-row: 1;
     width: 100%;
     height: auto;
     // Payload đặt .thumbnail--size-small cố định 100px, max-height 100px, min-height 100%.
@@ -136,7 +147,8 @@
   }
 
   td.cell-alt {
-    order: 1;
+    grid-row: 2;
+    grid-column: 1;
     padding: 10px 12px 0;
     color: var(--admin-text);
     font-size: 14px;
@@ -154,7 +166,7 @@
   }
 
   .file__filename {
-    order: 2;
+    grid-row: 3;
     display: block;
     align-self: stretch;
     min-width: 0;
@@ -170,12 +182,14 @@
   }
 
   td.cell-mimeType {
-    order: 3;
-    margin-top: auto;
+    grid-row: 4;
+    grid-column: 1;
+    align-self: end;
     padding: 8px 12px 12px;
   }
 
-  td.cell-uploadedBy {
+  // Chỉ giữ 4 ô: chọn, tên tệp, mô tả, loại tệp — mọi ô khác (uploadedBy, cột người dùng thêm...) ẩn khỏi thẻ.
+  tbody tr td:not(.cell-_select, .cell-filename, .cell-alt, .cell-mimeType) {
     display: none;
   }
 

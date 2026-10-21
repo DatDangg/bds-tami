@@ -62,6 +62,15 @@ describe("QuickActions", () => {
     expect(screen.getByRole("link", { name: "Dự án", hidden: true }).getAttribute("href")).toBe("/admin/collections/projects/create");
   });
 
+  it("'Tạo loại khác' là thẻ: summary có icon + nhãn + chevron", () => {
+    const { container } = render(<QuickActions actions={actions} moreShortcuts={more} />);
+    const summary = container.querySelector("details.tami-dash-create > summary.tami-dash-create__button");
+    expect(summary).toBeTruthy();
+    expect(summary?.querySelector(".tami-dash-action__icon svg")).toBeTruthy();
+    expect(summary?.querySelector(".tami-dash-create__label")?.textContent).toBe("Tạo loại khác");
+    expect(summary?.querySelector(".tami-dash-create__chevron svg")).toBeTruthy();
+  });
+
   it("không còn lối tắt phụ -> không có 'Tạo loại khác'; không có gì -> không render", () => {
     const { container, unmount } = render(<QuickActions actions={actions} moreShortcuts={[]} />);
     expect(screen.queryByText("Tạo loại khác")).toBeNull();
@@ -78,6 +87,20 @@ describe("WebsiteShortcuts", () => {
     render(<WebsiteShortcuts shortcuts={shortcuts} />);
     expect(screen.getByRole("navigation", { name: "Sửa website" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Trang chủ" }).getAttribute("href")).toBe("/admin/globals/homepage");
+  });
+
+  it("là lưới thẻ điều hướng: tiêu đề mục + thẻ có icon và chevron, không phải chip", () => {
+    const shortcuts: WebsiteShortcut[] = [
+      { slug: "homepage", label: "Trang chủ", href: "/admin/globals/homepage" },
+      { slug: "footer", label: "Chân trang", href: "/admin/globals/footer" },
+    ];
+    const { container } = render(<WebsiteShortcuts shortcuts={shortcuts} />);
+    expect(screen.getByRole("heading", { level: 2, name: "Sửa website" }).className).toBe("tami-dash__section-title");
+    const cards = container.querySelectorAll("ul.tami-dash-site__grid a.tami-dash-site__card");
+    expect(cards.length).toBe(2);
+    expect(cards[1]?.getAttribute("href")).toBe("/admin/globals/footer");
+    expect(cards[0]?.querySelectorAll("svg").length).toBe(2);
+    expect(cards[0]?.querySelector(".tami-dash-site__chevron svg")).toBeTruthy();
   });
 
   it("rỗng (sale) -> không render", () => {

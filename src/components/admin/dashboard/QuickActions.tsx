@@ -9,7 +9,7 @@ interface QuickActionsProps {
 
 /**
  * Hàng thẻ thao tác nhanh (BL-041): việc hay làm nhất, bấm một lần. Loại nội dung còn lại ("Tạo loại khác") nằm trong
- * `<details>` (không cần JS, bàn phím/đọc màn hình sẵn có). Thẻ/mục không đủ quyền đã bị loại ở `dashboard-data`.
+ * `<details>` dạng thẻ cùng tỉ lệ các thẻ cùng hàng (không cần JS, bàn phím/đọc màn hình sẵn có). Thẻ/mục không đủ quyền đã bị loại ở `dashboard-data`.
  */
 export function QuickActions({ actions, moreShortcuts }: QuickActionsProps) {
   if (actions.length === 0 && moreShortcuts.length === 0) return null;
@@ -25,7 +25,15 @@ export function QuickActions({ actions, moreShortcuts }: QuickActionsProps) {
       ))}
       {moreShortcuts.length > 0 && (
         <details className="tami-dash-create">
-          <summary className="tami-dash-create__button">Tạo loại khác</summary>
+          <summary className="tami-dash-create__button">
+            <span className="tami-dash-action__icon">
+              <DashboardIcon name="plus" />
+            </span>
+            <span className="tami-dash-create__label">Tạo loại khác</span>
+            <span className="tami-dash-create__chevron">
+              <DashboardIcon name="chevron" />
+            </span>
+          </summary>
           <ul className="tami-dash-create__menu" aria-label="Tạo loại khác">
             {moreShortcuts.map((shortcut) => (
               <li key={shortcut.slug}>

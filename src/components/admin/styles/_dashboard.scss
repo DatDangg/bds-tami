@@ -33,9 +33,10 @@
 }
 
 // ---- Thẻ thao tác nhanh (BL-041) ----
+// Lưới đều cột: mọi thẻ (kể cả "Tạo loại khác") cùng bề rộng + chiều cao.
 .tami-dash-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   align-items: stretch;
   gap: 12px;
   margin-bottom: 16px;
@@ -43,7 +44,6 @@
 
 .tami-dash-action {
   display: flex;
-  flex: 1 1 240px;
   align-items: center;
   gap: 12px;
   min-height: 64px;
@@ -79,75 +79,41 @@
   }
 }
 
-// ---- Hàng "Sửa website" (admin) ----
+// ---- Mục "Sửa website" (admin): lưới thẻ điều hướng (icon + tên + chevron) ----
 .tami-dash-site {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
   margin-bottom: 24px;
 
-  &__title {
-    font-size: 13px;
-    line-height: 18px;
-    font-weight: 600;
-    color: var(--admin-text-subtle);
-  }
-
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: 12px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  a {
-    display: inline-flex;
+  &__card {
+    display: flex;
     align-items: center;
-    min-height: 36px;
-    padding: 0 14px;
+    gap: 12px;
+    min-height: 56px;
+    padding: 10px 16px;
     border: 1px solid var(--admin-border);
-    border-radius: var(--admin-radius-s);
+    border-radius: var(--admin-radius-l);
     background: var(--admin-surface);
+    box-shadow: var(--admin-shadow-sm);
     color: var(--admin-text);
+    font-weight: 500;
     text-decoration: none;
 
     &:hover {
       border-color: var(--admin-accent);
-      color: var(--admin-accent);
-    }
-  }
-}
-
-// ---- "Tạo loại khác": menu <details> phụ ----
-.tami-dash-create {
-  position: relative;
-  align-self: center;
-
-  &__button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 40px;
-    padding: 0 16px;
-    border: 1px solid var(--admin-border);
-    border-radius: var(--admin-radius-s);
-    background: var(--admin-surface);
-    color: var(--admin-text);
-    font-weight: 500;
-    cursor: pointer;
-    list-style: none;
-    white-space: nowrap;
-
-    &::-webkit-details-marker {
-      display: none;
+      background: var(--admin-surface-hover);
     }
 
-    &:hover {
-      border-color: var(--admin-accent);
+    &:hover .tami-dash-site__chevron {
       color: var(--admin-accent);
+      transform: translateX(2px);
     }
 
     &:focus-visible {
@@ -156,8 +122,100 @@
     }
   }
 
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--admin-radius-m);
+    background: var(--admin-accent-soft);
+    color: var(--admin-accent-soft-text);
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__chevron {
+    display: inline-grid;
+    flex: none;
+    color: var(--admin-text-subtle);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &__chevron {
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+  }
+}
+
+// ---- "Tạo loại khác": menu <details> phụ ----
+.tami-dash-create {
+  position: relative;
+
+  // Cùng kiểu/chiều cao thẻ với .tami-dash-action (summary là thẻ, không phải nút nhỏ).
+  // details không chắc là flex container ở mọi trình duyệt → flex đặt trên summary, cao bằng ô lưới.
+  &__button {
+    display: flex;
+    box-sizing: border-box;
+    height: 100%;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 12px 20px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-l);
+    background: var(--admin-surface);
+    box-shadow: var(--admin-shadow-sm);
+    color: var(--admin-text);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      border-color: var(--admin-accent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--admin-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  &__label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__chevron {
+    display: inline-grid;
+    flex: none;
+    color: var(--admin-text-subtle);
+    transform: rotate(90deg);
+  }
+
+  &[open] &__chevron {
+    transform: rotate(-90deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &__chevron {
+      transition: transform 0.15s ease;
+    }
+  }
+
   &__menu {
     position: absolute;
+    top: 100%;
     right: 0;
     z-index: 5;
     min-width: 220px;
@@ -264,14 +322,9 @@
   }
 
   // Vùng bấm >= 44px trên màn cảm ứng.
-  .tami-dash-create__button,
   .tami-dash-create__menu a,
-  .tami-dash-site a {
+  .tami-dash-site__card {
     min-height: 44px;
-  }
-
-  .tami-dash-action {
-    flex-basis: 100%;
   }
 
   .tami-dash-create__menu {
