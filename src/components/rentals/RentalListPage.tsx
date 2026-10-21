@@ -23,9 +23,10 @@ import {
   dropUnknownSlugs,
   findRentalCategory,
   listRentalCategoryOptions,
+  listRentalProjectOptions,
+  listRentals,
   listWardOptions,
   type RentalFilterOptions,
-  searchRentals,
   toProvinceOptions,
 } from "@/lib/rentals/rental-list-queries";
 import { searchCardToRentalCardData } from "@/lib/rentals/rental-view";
@@ -35,24 +36,24 @@ import {
   type RentalFilters as RentalFilterValues,
   rentalListQueryString,
 } from "@/lib/search/url-params";
-import type { RentalSearchResult } from "@/shared/types/api";
+import type { RentalListingResult } from "@/lib/search/search-service";
 import type { Locale } from "@/i18n/routing";
 
-/** Tải danh mục + tỉnh + phường (của tỉnh trên URL) và bỏ slug lạ khỏi bộ lọc. Phường chỉ tải khi URL có tỉnh hợp lệ. */
+/** Tải danh mục + tỉnh + dự án (BL-052) + phường (của tỉnh trên URL) và bỏ slug lạ khỏi bộ lọc. Phường chỉ tải khi URL có tỉnh hợp lệ. */
 async function loadFilterContext(locale: Locale, parsed: RentalFilterValues) {
   const payload = await getPayload({ config });
-  const [categories, provinceDocs] = await Promise.all([listRentalCategoryOptions(payload, locale), listProvinces(payload)]);
+  const [categories, provinceDocs, projects] = await Promise.all([listRentalCategoryOptions(payload, locale), listProvinces(payload), listRentalProjectOptions(payload, locale)]);
   const provinces = toProvinceOptions(provinceDocs);
   const province = provinces.find((item) => item.slug === parsed.province);
   const wards = province ? await listWardOptions(payload, province.id) : [];
-  const options: RentalFilterOptions = { categories, provinces, wards, wardsProvince: province?.slug ?? null };
+  const options: RentalFilterOptions = { categories, provinces, wards, wardsProvince: province?.slug ?? null, projects };
   return { payload, options, filters: dropUnknownSlugs(parsed, options) };
 }
 
 /** Lỗi truy vấn không làm sập cả trang: bộ lọc vẫn hiện, khung kết quả báo lỗi + "Thử lại" (design-spec S04 "Lỗi API"). */
-async function trySearch(payload: Awaited<ReturnType<typeof getPayload>>, filters: RentalFilterValues, locale: Locale): Promise<RentalSearchResult | null> {
+async function trySearch(payload: Awaited<ReturnType<typeof getPayload>>, filters: RentalFilterValues, locale: Locale): Promise<RentalListingResult | null> {
   try {
-    return await searchRentals(payload, filters, locale);
+    return await listRentals(payload, filters, locale);
   } catch (error) {
     logger.error({ err: error }, "Không tải được danh sách tin cho thuê");
     return null;
@@ -107,7 +108,8 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
   const rentalsPath = publicPath("/cho-thue", locale);
   const listPath = categorySlug ? categoryPath(locale, categorySlug) : rentalsPath;
   const buildHref = (page: number) => `${listPath}${rentalListQueryString(filters, { page })}`;
-  const cards = result?.items.map((item) => searchCardToRentalCardData(item, locale)) ?? [];
+  // Tạm tới P2-T02 (khung danh sách mới): tin nổi bật (chỉ trang 1, đã bị loại khỏi lưới) đặt đầu lưới để không biến mất khỏi trang.
+  const cards = [...(result?.featured ?? []), ...(result?.items ?? [])].map((item) => searchCardToRentalCardData(item, locale));
   const parent = category ? visibleCategory(category.parent, locale) : null;
   const breadcrumb = [
     { label: tNav("rentals"), href: rentalsPath },

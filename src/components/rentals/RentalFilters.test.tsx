@@ -21,8 +21,8 @@ import { RentalSortControl } from "./RentalSortControl";
 
 const options: RentalFilterOptions = {
   categories: [
-    { slug: "can-ho", label: "Căn hộ", depth: 0 },
-    { slug: "can-ho-dich-vu", label: "Căn hộ dịch vụ", depth: 1 },
+    { id: "c1", slug: "can-ho", label: "Căn hộ", depth: 0 },
+    { id: "c2", slug: "can-ho-dich-vu", label: "Căn hộ dịch vụ", depth: 1 },
   ],
   provinces: [
     { id: "p1", slug: "ha-noi", name: "Hà Nội" },
@@ -30,6 +30,7 @@ const options: RentalFilterOptions = {
   ],
   wards: [],
   wardsProvince: null,
+  projects: [],
 };
 const withHanoiWards: RentalFilterOptions = {
   ...options,

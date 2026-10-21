@@ -37,6 +37,7 @@ const card = (id: string, title: string, extra: Partial<RentalCard> = {}): Renta
   furnishing: "full",
   province: { name: "Hà Nội", slug: "ha-noi" },
   ward: { name: "Phường Ba Đình", slug: "ba-dinh" },
+  category: null,
   publishedAt: now,
   ...extra,
 });
@@ -74,8 +75,11 @@ vi.mock("@/lib/logger", () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: 
 vi.mock("@/lib/search/search-service", () => ({
   PostgresRentalSearch: class {
     search = search;
+    // BL-052: trang gọi `listing` (lưới + nổi bật + số đếm); test cũ chỉ quan tâm lưới nên dựng từ `search`.
+    listing = async (params: RentalSearchParams) => ({ ...(await search(params)), featured: [], facets: { category: { all: 0, counts: {} }, provinces: [] } });
   },
-  sqlExecutorOf: () => ({}),
+  // Ô "Dự án" (BL-052) đọc SQL trực tiếp: không có dự án nào.
+  sqlExecutorOf: () => ({ execute: async () => ({ rows: [] }) }),
 }));
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");

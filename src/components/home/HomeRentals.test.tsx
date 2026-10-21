@@ -15,11 +15,27 @@ const card = (id: string): RentalCardData => ({
   bedrooms: 1,
   areaLabel: "Phường 1, TP.HCM",
   cover: fakeMedia(id),
+  rented: false,
+  categoryLabel: "Căn hộ dịch vụ",
+  furnishing: "full",
+  bathrooms: 1,
 });
 const tab = (slug: string, label: string, ids: string[]): RentalTabView => ({ id: slug, label, href: `/cho-thue/danh-muc/${slug}`, cards: ids.map(card) });
 const tabs = [tab("nha-o", "Thuê nhà ở", ["1", "2"]), tab("kinh-doanh", "Thuê kinh doanh", ["3"]), tab("van-phong", "Văn phòng", ["4"])];
 
 describe("HomeRentals", () => {
+  it("BL-052: trang chủ GIỮ thẻ Cho thuê cũ (biến thể home: badge Còn trống, không tag danh mục / nội thất, không phòng tắm)", () => {
+    renderWithIntl(<HomeRentals title="Cho thuê" tabs={tabs} />);
+    const articles = [...document.querySelectorAll("article")];
+    expect(articles.map((article) => article.getAttribute("data-card-variant"))).toEqual(["home", "home", "home", "home"]);
+    const first = articles[0] as HTMLElement;
+    expect(first).toHaveTextContent("Còn trống");
+    expect(first).not.toHaveTextContent("Căn hộ dịch vụ");
+    expect(first).not.toHaveTextContent("Nội thất đầy đủ");
+    expect(first).not.toHaveTextContent("PT");
+    expect(within(first).queryByRole("list")).toBeNull();
+  });
+
   it("heading h2 + tablist có tên; tab đầu được chọn sẵn, các panel còn lại có hidden (HTML server render đủ mọi tab)", () => {
     renderWithIntl(<HomeRentals title="Cho thuê" tabs={tabs} />);
     expect(screen.getByRole("heading", { level: 2, name: "Cho thuê" })).toBeInTheDocument();

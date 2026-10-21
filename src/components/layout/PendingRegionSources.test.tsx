@@ -20,7 +20,7 @@ vi.mock("next/link", () => ({
 }));
 vi.mock("react-dom", async (importOriginal) => ({ ...(await importOriginal<typeof import("react-dom")>()), useFormStatus: () => ({ pending: formStatus.pending }) }));
 
-const options = { categories: [], provinces: [], wards: [], wardsProvince: null };
+const options = { categories: [], provinces: [], wards: [], wardsProvince: null, projects: [] };
 const busy = () => screen.getByText("Kết quả").parentElement;
 
 describe("các nguồn chờ khác của vùng kết quả", () => {

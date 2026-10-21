@@ -1,6 +1,7 @@
 // Bench `PostgresRentalSearch` với 100.000 tin giả lập (NFR-01: p95 ≤ 500ms): `pnpm bench:rentals-search` (= `payload run`).
 // KHÔNG nằm trong `pnpm test`. Chỉ chạy trên DB dev (có chặn cứng ở `bench-guard.ts`: production/staging hoặc host DB không phải localhost -> thoát): script chèn tin có mã `BENCH-*` rồi xoá hết ở `finally` (cascade xoá dòng ngôn ngữ).
-// Số tin đổi bằng `BENCH_ROWS`, số lần lặp mỗi kịch bản bằng `BENCH_RUNS`.
+// Số tin đổi bằng `BENCH_ROWS`, số lần lặp mỗi kịch bản bằng `BENCH_RUNS`. `BENCH_METHOD=listing` đo trang danh sách `/cho-thue` (BL-052: lưới + nổi bật + số đếm,
+// `available=true`) thay cho `search` (API).
 import { sql } from "@payloadcms/db-postgres";
 import { getPayload } from "payload";
 
@@ -17,6 +18,7 @@ if (blocked) {
 
 const ROWS = Number(process.env.BENCH_ROWS ?? 100_000);
 const RUNS = Number(process.env.BENCH_RUNS ?? 40);
+const METHOD = process.env.BENCH_METHOD === "listing" ? "listing" : "search";
 const P95_BUDGET_MS = 500;
 
 const payload = await getPayload({ config });
@@ -30,12 +32,12 @@ const wordsSql = sql`(SELECT string_agg((ARRAY[${sql.join(WORDS.map((word) => sq
 async function seed(): Promise<void> {
   await db.execute(sql`
     INSERT INTO "rentals" ("code", "category_id", "province_id", "ward_id", "address", "show_exact_address", "price_monthly_vnd", "price_negotiable",
-                           "area_m2", "bedrooms", "bathrooms", "furnishing", "status", "published_at", "author_id", "has_english")
+                           "area_m2", "bedrooms", "bathrooms", "furnishing", "status", "published_at", "author_id", "has_english", "is_featured")
     SELECT 'BENCH-' || g.n, c."id", w."province_id", w."id", g.n || ' duong gia lap', g.n % 2 = 0,
            CASE WHEN g.n % 15 = 0 THEN NULL ELSE 3000000 + (g.n % 90) * 1000000 END, g.n % 15 = 0,
            20 + (g.n % 180), g.n % 5, 1 + g.n % 3, (ARRAY['none','basic','full'])[1 + g.n % 3]::"enum_rentals_furnishing",
            CASE WHEN g.n % 20 = 0 THEN 'rented' WHEN g.n % 25 = 0 THEN 'draft' ELSE 'published' END::"enum_rentals_status",
-           now() - (g.n || ' minutes')::interval, (SELECT "id" FROM "staff" LIMIT 1), g.n % 3 = 0
+           now() - (g.n || ' minutes')::interval, (SELECT "id" FROM "staff" LIMIT 1), g.n % 3 = 0, g.n % 97 = 0
     FROM generate_series(1, ${ROWS}) AS g(n)
     JOIN LATERAL (SELECT "id", "province_id" FROM "wards" OFFSET (g.n * 7) % (SELECT count(*) FROM "wards") LIMIT 1) w ON true
     JOIN LATERAL (SELECT "id" FROM "categories" WHERE "scope" = 'rental' AND "deleted_at" IS NULL OFFSET g.n % (SELECT count(*) FROM "categories" WHERE "scope" = 'rental' AND "deleted_at" IS NULL) LIMIT 1) c ON true`);
@@ -66,17 +68,20 @@ const SCENARIOS: Record<string, Record<string, unknown>> = {
   "q + giá + sort": { q: "noi that cao cap", priceMax: 15_000_000, sort: "price_asc" },
   "tiếng Anh": { locale: "en" },
   "tiếng Anh + q": { locale: "en", q: "ho boi", limit: 48 },
+  "tỉnh": { province: "ho-chi-minh" },
+  "dự án (BL-052)": { project: "du-an-mau-can-ho-song-sai-gon" },
 };
 
 const percentile = (sorted: number[], p: number): number => sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)] ?? 0;
 
 async function measure(params: Record<string, unknown>): Promise<number[]> {
-  const parsed = rentalSearchParamsSchema.parse(params);
-  await search.search(parsed); // khởi động nguội bỏ ra ngoài số đo
+  const parsed = rentalSearchParamsSchema.parse(METHOD === "listing" ? { available: true, ...params } : params);
+  const runOnce = () => (METHOD === "listing" ? search.listing(parsed) : search.search(parsed));
+  await runOnce(); // khởi động nguội bỏ ra ngoài số đo
   const samples: number[] = [];
   for (let run = 0; run < RUNS; run++) {
     const startedAt = performance.now();
-    await search.search(parsed);
+    await runOnce();
     samples.push(performance.now() - startedAt);
   }
   return samples.sort((a, b) => a - b);
@@ -85,7 +90,7 @@ async function measure(params: Record<string, unknown>): Promise<number[]> {
 let exitCode = 0;
 try {
   await cleanup(); // lần chạy trước bị ngắt giữa chừng
-  console.log(`Chèn ${ROWS} tin giả lập...`);
+  console.log(`Chèn ${ROWS} tin giả lập (đo ${METHOD})...`);
   await seed();
   const all: number[] = [];
   for (const [name, params] of Object.entries(SCENARIOS)) {

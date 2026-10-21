@@ -26,7 +26,7 @@ const lexical = (text: string) => ({
 /** Tên các khoá được phép có trong một `RentalCard` (API_SPEC §3.3); `address` chỉ khi `showExactAddress`. */
 const CARD_KEYS = [
   "id", "code", "title", "slug", "status", "thumbnail", "priceMonthlyVnd", "priceNegotiable", "areaM2", "bedrooms", "bathrooms",
-  "furnishing", "province", "ward", "address", "publishedAt",
+  "furnishing", "province", "ward", "category", "address", "publishedAt",
 ];
 
 /** DB tạm chạy migration thật (gồm index trigram) + config thật. Redis chỉ cần cho test endpoint (rate limit). */
@@ -577,6 +577,133 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       await payload.update({ collection: "projects", id: projectId, data: { title: "Dự án Beta" } as never, locale: "vi", overrideAccess: true });
       expect(await searchTextOf("c", "vi")).toContain("du an beta");
       expect(await searchTextOf("c", "vi")).not.toContain("alpha");
+    });
+  });
+
+  /**
+   * BL-052 (P2-T01): tham số `project`, trang danh sách (`listing`: nổi bật không lặp lưới, `total` gồm nổi bật, số đếm theo chiều), ô "Dự án".
+   * Dữ liệu riêng ở tỉnh Đà Nẵng + danh mục riêng (tạo ở đây, chạy SAU mọi khối khác nên không đổi số đếm của chúng; DB tạm bị xoá cuối file).
+   */
+  describe("BL-052: project + listing (nổi bật, số đếm)", () => {
+    let dnSlug = "";
+    let officeRootId = "";
+    let officeChildId = "";
+    let projectSlug = "";
+    let draftProjectSlug = "";
+    const dnKeys: string[] = [];
+    const listing = (params: Record<string, unknown>) => service.listing(rentalSearchParamsSchema.parse({ available: true, ...params }));
+
+    beforeAll(async () => {
+      const dn = await payload.create({ collection: "provinces", data: { code: "48", name: "Thành phố Đà Nẵng", slug: "da-nang-bl052" }, overrideAccess: true });
+      dnSlug = dn.slug;
+      const dnWard = await payload.create({ collection: "wards", data: { province: dn.id, code: "20194", name: "Phường Hải Châu", type: "phuong", slug: "hai-chau" }, overrideAccess: true });
+      const category = (name: string, parent?: string) =>
+        payload.create({ collection: "categories", data: { name, scope: "rental", ...(parent ? { parent } : {}) } as never, locale: "vi", overrideAccess: true, depth: 0 });
+      officeRootId = (await category("Văn phòng BL052")).id;
+      officeChildId = (await category("Văn phòng chia sẻ BL052", officeRootId)).id;
+      const projectCategoryId = (await payload.create({ collection: "categories", data: { name: "Dự án BL052", scope: "project" } as never, locale: "vi", overrideAccess: true, depth: 0 })).id;
+      const project = await payload.create({
+        collection: "projects",
+        data: { title: "Dự án Gamma BL052", summary: "Tóm tắt", overview: lexical("Tổng quan"), category: projectCategoryId, province: dn.id, salesStatus: "selling" } as never,
+        locale: "vi",
+        user: admin as never,
+        overrideAccess: false,
+        depth: 0,
+      });
+      // Xuất bản thẳng ở DB: điều kiện xuất bản đầy đủ của dự án không phải đối tượng của test này.
+      await withDatabase((client) => client.query(`UPDATE "projects" SET "status" = 'published' WHERE "id" = $1`, [project.id]));
+      const slugOf = async (id: string) =>
+        (await withDatabase((client) => client.query(`SELECT "slug" FROM "projects_locales" WHERE "_parent_id" = $1 AND "_locale" = 'vi'`, [id]))).rows[0].slug as string;
+      projectSlug = await slugOf(project.id);
+      draftProjectSlug = await slugOf(projectId);
+
+      const place = { province: dn.id, ward: dnWard.id };
+      // 7 tin nổi bật (căn hộ, thuộc dự án) + 1 nổi bật đã thuê + 6 tin thường (văn phòng con; 3 thuộc dự án).
+      for (let i = 1; i <= 7; i++) {
+        await createRental(`dnf${i}`, `Nổi bật Đà Nẵng ${i}`, { ...place, isFeatured: true, project: project.id, priceMonthlyVnd: 10_000_000 + i });
+        dnKeys.push(`dnf${i}`);
+      }
+      const rentedFeatured = await createRental("dnfr", "Nổi bật đã thuê Đà Nẵng", { ...place, isFeatured: true, project: project.id });
+      await payload.update({ collection: "rentals", id: rentedFeatured.id, data: { status: "rented" }, locale: "vi", user: admin as never, overrideAccess: false, depth: 0 });
+      for (let i = 1; i <= 6; i++) {
+        await createRental(`dno${i}`, `Văn phòng Đà Nẵng ${i}`, { ...place, category: officeChildId, ...(i <= 3 ? { project: project.id } : {}), priceMonthlyVnd: 20_000_000 + i });
+        dnKeys.push(`dno${i}`);
+      }
+    }, 180_000);
+
+    it("search ?project=: chỉ tin của dự án công khai; slug lạ hoặc dự án nháp → rỗng (không lỗi)", async () => {
+      const result = await search({ project: projectSlug, available: true, limit: 48 });
+      expect(result.total).toBe(10);
+      expect(result.items.every((card) => dnKeys.some((key) => ids[key] === card.id))).toBe(true);
+      // Mặc định API trả cả tin đã thuê.
+      expect((await search({ project: projectSlug, limit: 48 })).total).toBe(11);
+      expect((await search({ project: "khong-co-du-an" })).total).toBe(0);
+      expect((await search({ project: draftProjectSlug })).total).toBe(0);
+      expect((await search({ project: projectSlug, category: "van-phong-bl052", limit: 48 })).total).toBe(3);
+    });
+
+    it("listing: ≤ 5 nổi bật (mới nhất trước, chỉ tin còn trống), không lặp trong lưới ở MỌI trang; total gồm nổi bật; totalPages trên phần còn lại", async () => {
+      const page1 = await listing({ province: dnSlug, limit: 4, page: 1 });
+      expect(page1.featured).toHaveLength(5);
+      expect(page1.featured.every((card) => card.status === "published")).toBe(true);
+      expect(page1.total).toBe(13);
+      expect(page1.totalPages).toBe(2);
+      const page2 = await listing({ province: dnSlug, limit: 4, page: 2 });
+      expect(page2.featured).toEqual([]);
+      const featuredIds = page1.featured.map((card) => card.id);
+      const gridIds = [...page1.items, ...page2.items].map((card) => card.id);
+      expect(gridIds).toHaveLength(8);
+      expect(gridIds.filter((id) => featuredIds.includes(id))).toEqual([]);
+      expect(new Set([...featuredIds, ...gridIds]).size).toBe(13);
+      // Hai tin nổi bật còn lại (vượt trần 5) nằm trong lưới.
+      expect(gridIds.filter((id) => ["dnf1", "dnf2", "dnf3", "dnf4", "dnf5", "dnf6", "dnf7"].some((key) => ids[key] === id))).toHaveLength(2);
+      const published = (await listing({ province: dnSlug, limit: 48 })).featured.map((card) => card.publishedAt ?? "");
+      expect([...published].sort().reverse()).toEqual(published);
+    });
+
+    it("listing: nổi bật khớp bộ lọc (lọc văn phòng → không còn tin nổi bật, lưới đủ 6)", async () => {
+      const result = await listing({ province: dnSlug, category: "van-phong-bl052", limit: 48 });
+      expect(result.featured).toEqual([]);
+      expect(result.items).toHaveLength(6);
+      expect(result.total).toBe(6);
+    });
+
+    it("số đếm: tab danh mục cấp 1 (con tính vào cha) + Tất cả bỏ chiều danh mục; tỉnh bỏ chiều tỉnh, total không lọc", async () => {
+      const filtered = await listing({ province: dnSlug, category: "van-phong-bl052", project: projectSlug, limit: 12 });
+      // Danh mục: khớp tỉnh + dự án, bỏ danh mục → 7 căn hộ (root) + 3 văn phòng (con → cha).
+      expect(filtered.facets.category.counts[rootCategoryId]).toBe(7);
+      expect(filtered.facets.category.counts[officeRootId]).toBe(3);
+      expect(filtered.facets.category.counts[officeChildId]).toBeUndefined();
+      expect(filtered.facets.category.all).toBe(10);
+      // Tỉnh: khớp danh mục văn phòng + dự án, bỏ tỉnh → Đà Nẵng 3, HCM 0 (vẫn có dòng vì có tin công khai còn trống).
+      const byId = new Map(filtered.facets.provinces.map((entry) => [entry.provinceId, entry]));
+      const dnId = (await payload.find({ collection: "provinces", where: { slug: { equals: dnSlug } }, overrideAccess: true, depth: 0 })).docs[0]!.id;
+      expect(byId.get(dnId)).toEqual({ provinceId: dnId, count: 3, total: 13 });
+      expect(byId.get(hcmId)).toMatchObject({ count: 0 });
+      expect(byId.get(hcmId)!.total).toBeGreaterThan(0);
+    });
+
+    it("thẻ có danh mục của tin (danh mục con giữ tên con)", async () => {
+      const { items } = await listing({ province: dnSlug, category: "van-phong-bl052", limit: 48 });
+      expect(items.map((card) => card.category)).toEqual(items.map(() => ({ name: "Văn phòng chia sẻ BL052", slug: "van-phong-chia-se-bl052" })));
+    });
+
+    it("ô Dự án: chỉ dự án công khai có tin còn trống (dự án nháp không có)", async () => {
+      const { listRentalProjectOptions } = await import("../../src/lib/rentals/rental-list-queries");
+      expect(await listRentalProjectOptions(payload, "vi")).toEqual([{ slug: projectSlug, title: "Dự án Gamma BL052" }]);
+      // /en: dự án chưa có bản EN → không có.
+      expect(await listRentalProjectOptions(payload, "en")).toEqual([]);
+    });
+
+    it.skipIf(!hasRedis)("GET /api/public/rentals?project=: 200 + đúng tập; slug lạ → 200 rỗng; thẻ có khoá category", async () => {
+      const response = await getHandler(`project=${projectSlug}&available=true&limit=48`, newIp());
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as { data: { items: RentalCard[]; total: number } };
+      expect(body.data.total).toBe(10);
+      expect(body.data.items.every((card) => "category" in card)).toBe(true);
+      const unknown = await getHandler("project=khong-co-du-an", newIp());
+      expect(unknown.status).toBe(200);
+      expect(((await unknown.json()) as { data: { total: number } }).data.total).toBe(0);
     });
   });
 });

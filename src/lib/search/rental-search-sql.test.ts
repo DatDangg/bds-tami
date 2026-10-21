@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { buildPublicWhere, PUBLIC_STATUSES } from "../../access";
 import { rentalSearchParamsSchema } from "../../shared/types/api";
 import { publicWhere } from "../content/public-queries";
-import { rentalOrderBy, rentalWhere, searchTerms } from "./rental-search-sql";
+import { allOf, filterConditions, projectOptionsQuery, rentalConditions, rentalOrderBy, rentalWhere, searchTerms } from "./rental-search-sql";
 
 const dialect = new PgDialect();
 const render = (query: Parameters<PgDialect["sqlToQuery"]>[0]) => dialect.sqlToQuery(query);
@@ -173,5 +173,60 @@ describe("rentalOrderBy", () => {
       `ORDER BY page."price_monthly_vnd" ASC NULLS LAST, page."published_at" DESC NULLS LAST, page."id" DESC`,
     );
     expect(render(rentalOrderBy("price_desc", "r")).sql).toContain(`"price_monthly_vnd" DESC NULLS LAST`);
+  });
+});
+
+describe("project (BL-052)", () => {
+  it("lọc theo slug dự án CÔNG KHAI theo locale; giá trị chỉ đi qua tham số", () => {
+    const hostile = "x'; DROP TABLE projects; --";
+    const vi = render(rentalWhere(parse({ project: hostile })));
+    expect(vi.sql).toContain(`r."project_id" IN (SELECT pl."_parent_id" FROM "projects_locales" pl JOIN "projects" p ON p."id" = pl."_parent_id" WHERE pl."_locale" = `);
+    expect(vi.sql).toContain(`p."status" IN (`);
+    expect(vi.sql).toContain(`p."deleted_at" IS NULL`);
+    expect(vi.sql).not.toContain("DROP");
+    expect(vi.sql).not.toContain(`p."has_english"`);
+    expect(vi.params).toEqual(expect.arrayContaining([hostile, "vi", "published"]));
+    expect(render(rentalWhere(parse({ project: "a", locale: "en" }))).sql).toContain(`p."has_english" = true`);
+    expect(render(rentalWhere(parse({}))).sql).not.toContain("project_id");
+  });
+
+  it("ô Dự án: dự án công khai có tin còn trống, theo tên; en cần bản EN của cả dự án lẫn tin", () => {
+    const vi = render(projectOptionsQuery("vi"));
+    expect(vi.sql).toContain(`EXISTS (SELECT 1 FROM "rentals" r`);
+    expect(vi.sql).toContain(`r."project_id" = p."id"`);
+    expect(vi.sql).toContain(`r."status" = 'published'`);
+    expect(vi.sql).toContain(`ORDER BY pl."title"`);
+    const en = render(projectOptionsQuery("en"));
+    expect(en.sql).toContain(`p."has_english" = true`);
+    expect(en.sql).toContain(`r."has_english" = true`);
+  });
+});
+
+describe("rentalConditions / filterConditions (số đếm BL-052)", () => {
+  const sqlOf = (conditions: ReturnType<typeof filterConditions>) => render(allOf(conditions)).sql;
+
+  it("phạm vi (công khai + còn trống) tách khỏi bộ lọc; bỏ chiều danh mục chỉ bỏ danh mục", () => {
+    const conditions = rentalConditions(parse({ available: true, category: "can-ho", province: "ha-noi", ward: "ba-dinh", bedrooms: 2 }));
+    expect(render(allOf(conditions.scope)).sql).toContain(`r."status" = 'published'`);
+    const noCategory = sqlOf(filterConditions(conditions, "category"));
+    expect(noCategory).not.toContain("categories");
+    expect(noCategory).toContain("provinces");
+    expect(noCategory).toContain(`r."bedrooms" = `);
+  });
+
+  it("bỏ chiều tỉnh bỏ cả phường (phường chỉ có nghĩa trong tỉnh), giữ danh mục và bộ lọc khác", () => {
+    const conditions = rentalConditions(parse({ category: "can-ho", province: "ha-noi", ward: "ba-dinh", q: "studio" }));
+    const noProvince = sqlOf(filterConditions(conditions, "province"));
+    expect(noProvince).not.toContain("province");
+    expect(noProvince).not.toContain("ward_id");
+    expect(noProvince).toContain("categories");
+    expect(noProvince).toContain("search_text");
+  });
+
+  it("không bộ lọc → true (dùng được trong FILTER); rentalWhere = phạm vi + mọi bộ lọc", () => {
+    expect(render(allOf([])).sql).toBe("true");
+    const params = parse({ category: "a", province: "b", furnishing: "full" });
+    const conditions = rentalConditions(params);
+    expect(render(rentalWhere(params)).sql).toBe(`WHERE ${render(allOf([...conditions.scope, ...filterConditions(conditions)])).sql}`);
   });
 });
