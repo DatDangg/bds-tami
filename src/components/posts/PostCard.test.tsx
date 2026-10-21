@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { PostCardData } from "@/lib/posts/post-view";
 import { PostCard } from "./PostCard";
-import { PostListBody } from "./PostListBody";
 
 const card = (id: string, overrides: Partial<PostCardData> = {}): PostCardData => ({
   id,
@@ -104,13 +103,5 @@ describe("PostCard listing — thẻ voucher (BL-052)", () => {
     expect(screen.queryByText(/Offer ends/)).toBeNull();
     expect(screen.getByText("Offer")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
-  });
-});
-
-describe("PostListBody với nhiều tin nổi bật (tạm tới P3-T03)", () => {
-  it("tin nổi bật đầu là thẻ ngang, các tin nổi bật còn lại đứng đầu lưới; không lặp", () => {
-    const { container } = renderWithIntl(<PostListBody featured={[card("1"), card("2")]} items={[card("3")]} />);
-    expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-1");
-    expect([...container.querySelectorAll("ul.grid > li h2")].map((heading) => heading.textContent)).toEqual(["Tin 2", "Tin 3"]);
   });
 });

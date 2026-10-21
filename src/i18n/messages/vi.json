@@ -280,6 +280,50 @@
       "leadForm": {
         "title": "Nhận tư vấn",
         "callHotline": "Gọi hotline {phone}"
+      },
+      "list": {
+        "keywordPlaceholder": "Tìm theo tiêu đề, khu vực, địa chỉ…",
+        "resultTotal": "{count, number} tin",
+        "emptyTitle": "Không tìm thấy tin phù hợp",
+        "sortBy": "Sắp xếp theo",
+        "sort": {
+          "newest": "Mới nhất",
+          "price_asc": "Giá tăng dần",
+          "price_desc": "Giá giảm dần"
+        },
+        "filterGroups": {
+          "type": "Loại hình",
+          "province": "Tỉnh / thành",
+          "price": "Mức giá",
+          "area": "Diện tích",
+          "bedrooms": "Phòng ngủ",
+          "direction": "Hướng",
+          "handover": "Tình trạng bàn giao"
+        },
+        "provinceSearch": "Tìm tỉnh / thành",
+        "priceValue": "{value, number} tỷ",
+        "priceValueMax": "{value, number}+ tỷ",
+        "priceLow": "Giá thấp nhất",
+        "priceHigh": "Giá cao nhất",
+        "areaValue": "{value, number} m²",
+        "areaValueMax": "{value, number}+ m²",
+        "areaLow": "Diện tích nhỏ nhất",
+        "areaHigh": "Diện tích lớn nhất",
+        "bedroomsOption": {
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4+"
+        },
+        "spotlight": {
+          "label": "Tin nổi bật",
+          "price": "Giá",
+          "area": "Diện tích",
+          "bedrooms": "Phòng ngủ",
+          "offerEnds": "Hạn ưu đãi",
+          "offerStatus": "Trạng thái",
+          "consult": "Nhận tư vấn"
+        }
       }
     },
     "projects": {

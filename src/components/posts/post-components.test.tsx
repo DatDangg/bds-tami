@@ -4,7 +4,7 @@ import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { PostCardData, PostOfferView } from "@/lib/posts/post-view";
 import { OfferBox } from "./OfferBox";
 import { PostCard } from "./PostCard";
-import { PostListBody } from "./PostListBody";
+import { PostSpotlightContent } from "./PostSpotlightContent";
 
 const card = (id: string, overrides: Partial<PostCardData> = {}): PostCardData => ({
   id,
@@ -89,36 +89,39 @@ describe("PostCard home (slider Ưu đãi trang chủ, thẻ BL-045 giữ nguyê
   });
 });
 
-describe("PostCard feature (bài nổi bật ngang)", () => {
-  it("MỘT link, ảnh trái + chữ phải ≥ lg, giá, nút 'Xem chi tiết'; không canh giữa", () => {
-    const { container } = renderWithIntl(<PostCard data={card("1", { priceLabel: "Từ 5 triệu" })} variant="feature" headingLevel="h2" priority />);
-    expect(container.querySelectorAll("a")).toHaveLength(1);
-    const link = screen.getByRole("link");
-    expect(link).toHaveClass("lg:grid-cols-[1.3fr_1fr]", "rounded-xl", "bg-surface");
-    expect(within(link).getByRole("heading", { level: 2, name: "Tin 1" })).toBeInTheDocument();
-    expect(link).toHaveTextContent("Từ 5 triệu");
-    expect(link).toHaveTextContent("Xem chi tiết");
-    expect(container.querySelector("button")).toBeNull();
-    expect(container.innerHTML).not.toContain("text-center");
-  });
-});
-
-describe("PostListBody", () => {
-  it("bài nổi bật là thẻ ngang riêng (priority) trước lưới, MỘT vùng có tên, mọi tiêu đề h2, lưới 1/2/3 cột", () => {
-    const { container } = renderWithIntl(<PostListBody featured={[card("1")]} items={[card("2"), card("3")]} />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 1", "Tin 2", "Tin 3"]);
-    expect(screen.getAllByRole("region")).toHaveLength(1);
-    expect(screen.getByRole("region", { name: "Danh sách tin đăng" })).toBeInTheDocument();
-    expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-1");
-    expect(container.querySelectorAll("ul.grid > li")).toHaveLength(2);
-    expect(container.querySelector("ul.grid")?.className).toContain("grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4");
-    expect(screen.queryByRole("status")).toBeNull();
+describe("PostSpotlightContent (thẻ nổi bật /tin-bds, BL-052)", () => {
+  it("thẻ BĐS: tag danh mục + loại hình + Ưu đãi, h2, khu vực, Giá · Diện tích · Phòng ngủ; nút Xem chi tiết + Nhận tư vấn (#lead-form)", () => {
+    const { container } = renderWithIntl(
+      <PostSpotlightContent data={card("1", { priceLabel: "5,4 tỷ", areaM2: 80, bedrooms: 2, propertyType: "apartment", placeLabel: "Phường Láng, Hà Nội", hasOffer: true })} />,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Tin 1" })).toBeInTheDocument();
+    expect(container).toHaveTextContent("Căn hộ");
+    expect(container).toHaveTextContent("Ưu đãi");
+    expect(container).toHaveTextContent("Phường Láng, Hà Nội");
+    const facts = [...container.querySelectorAll("dt")].map((node) => node.textContent);
+    expect(facts).toEqual(["Giá", "Diện tích", "Phòng ngủ"]);
+    expect(container.querySelector("dl")).toHaveTextContent("5,4 tỷ");
+    expect(screen.getByRole("link", { name: "Xem chi tiết: Tin 1" })).toHaveAttribute("href", "/tin-bds/tin-1");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" })).toHaveAttribute("href", "/tin-bds/tin-1#lead-form");
   });
 
-  it("không có bài nổi bật: chỉ lưới các thẻ còn lại", () => {
-    const { container } = renderWithIntl(<PostListBody featured={[]} items={[card("2")]} />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 2"]);
-    expect(container.querySelector("[data-post-featured]")).toBeNull();
+  it("thẻ BĐS không giá: \"Liên hệ\"; ô trống bị bỏ", () => {
+    const { container } = renderWithIntl(<PostSpotlightContent data={card("1")} />);
+    expect([...container.querySelectorAll("dt")].map((node) => node.textContent)).toEqual(["Giá"]);
+    expect(container.querySelector("dd")).toHaveTextContent("Liên hệ");
+  });
+
+  it("thẻ voucher: Hạn ưu đãi · Trạng thái thay giá / diện tích; đã kết thúc → \"Đã kết thúc\"", () => {
+    const { container } = renderWithIntl(<PostSpotlightContent data={card("1", { kind: "voucher", hasOffer: true, endLabel: "30/10/2026", badge: { kind: "ended" } })} />);
+    expect([...container.querySelectorAll("dt")].map((node) => node.textContent)).toEqual(["Hạn ưu đãi", "Trạng thái"]);
+    expect(container.querySelector("dl")).toHaveTextContent("30/10/2026");
+    expect(container.querySelector("dl")).toHaveTextContent("Đã kết thúc");
+  });
+
+  it("en: nhãn tiếng Anh", () => {
+    renderWithIntl(<PostSpotlightContent data={card("1", { kind: "voucher", hasOffer: true, endLabel: "30/10/2026" })} />, "en");
+    expect(screen.getByText("Offer ends")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Get advice: Tin 1" })).toBeInTheDocument();
   });
 });
 
