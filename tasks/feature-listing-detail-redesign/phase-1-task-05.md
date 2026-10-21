@@ -33,3 +33,8 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Bổ sung từ review P1-T02 r3 (change-request)
+- Lắp ráp: gọi `useListingFilterNav` **một lần** ở component cha client, truyền `navigate` cho mọi ô lọc ở sidebar + Sheet, `reset` → `onClear` của cả hai; import `RangeSliderFacet` từ `./RangeSliderFacet`; `emitJsonLd` chỉ trang sạch; `countActiveFilters` cho badge.
+- Sửa MINOR n1–n3 (`src/components/listing/*`): `reset` tăng bộ đếm `generation` dùng làm `key` nội dung bộ lọc (huỷ timer slider + chip đồng bộ khi "Xoá tất cả"/Back); slider commit ngay khi thả chuột/ngón tay, chỉ debounce bàn phím (không mất giá khi bấm "Xem kết quả" ngay). Test cho từng trường hợp.
+- Giá "Giá từ": dùng một helper duy nhất (P1-T06 `projectPriceFromVnd` trong `project-detail-view.ts` / P1-T04 `effectivePriceFromVnd`) — gom về một nơi.

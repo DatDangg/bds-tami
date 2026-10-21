@@ -2068,11 +2068,15 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-listing-detail-redesign/phase-1-task-02.md",
-          "status": "in_review",
-          "attempt": 2,
+          "status": "done",
+          "attempt": 3,
           "dependsOn": [],
           "wave": "1A",
-          "note": "component listing dùng chung"
+          "note": "component listing dùng chung",
+          "review": "STRICT PASS",
+          "round": 3,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-02-round-3-review.md",
+          "commit": "6e810c0"
         },
         {
           "task": "phase-1-task-03",
@@ -2111,7 +2115,8 @@
           "note": "chi tiết dự án",
           "review": "STRICT PASS",
           "round": 1,
-          "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-06-round-1-review.md"
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-06-round-1-review.md",
+          "commit": "a995b58"
         },
         {
           "task": "phase-1-task-07",
@@ -3215,7 +3220,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T15:29:52.921Z",
+  "lastUpdated": "2026-10-21T15:35:56.091Z",
   "approvalMilestones": [
     {
       "id": "M1",
