@@ -1,11 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "admin-ux-audit-2",
-    "phaseTask": "phase-2-task-06",
-    "journal": ".context/runs/feature-admin-ux-audit-2-phase-2.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1909,13 +1904,13 @@
       "slug": "admin-ux-audit-2",
       "title": "Admin UX audit lần 2 — GĐ1: ẩn API, tắt + Thêm mới inline dữ liệu nền, chữ Tải lên, Tạo mới nút chính, tách Xuất Excel, thanh Lưu dính + Quay lại/Xem trên website, Cột/Lọc chỉ admin (BL-051)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 2,
       "backlog": "BL-051",
-      "changeDoc": "spec/changes/2026-10-21-admin-ux-audit-2.md",
+      "changeDoc": "spec/changes/archive/2026-10-21-admin-ux-audit-2.md",
       "startedAt": "2026-10-21",
       "planApprovedAt": "2026-10-21 (user: \"tự làm tự quyết nhé, đừng hỏi t\" = auto proceed; GĐ1 = 1 phase / 3 task tuần tự)",
-      "stage": "GĐ1 done (1.44.0/v55); GĐ2 (A6,A8–A12,A14) đang làm cùng lượt (coordinator)",
+      "stage": "GĐ1 + GĐ2 done",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2016,9 +2011,27 @@
         "commits": [
           "e83a86b",
           "b7f762c",
-          "(T03 close-out)"
+          "d641351"
         ]
-      }
+      },
+      "completedAt": "2026-10-21",
+      "specVersion": "1.45.0",
+      "scopeVersion": 56,
+      "phase2": {
+        "status": "done",
+        "specVersion": "1.45.0",
+        "scopeVersion": 56,
+        "commits": [
+          "9f18876",
+          "a336fcf",
+          "15d2e8b",
+          "e7641aa",
+          "e2c2473",
+          "6e65c31"
+        ]
+      },
+      "phaseReview": ".context/review-reports/feature-admin-ux-audit-2-phase-review.md (PASS)",
+      "migration": "none (migrate:create: No schema changes detected)"
     }
   ],
   "bugs": [
@@ -2966,7 +2979,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T09:52:31.673Z",
+  "lastUpdated": "2026-10-21T09:56:14.242Z",
   "approvalMilestones": [
     {
       "id": "M1",

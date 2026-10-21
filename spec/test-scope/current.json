@@ -1,288 +1,337 @@
 {
-  "specVersion": "1.44.0",
-  "scopeVersion": 55,
+  "specVersion": "1.45.0",
+  "scopeVersion": 56,
   "generatedAt": "2026-10-21T23:59:59+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-051 MODIFY, giai đoạn 1 (admin gọn cho người không rành kỹ thuật — audit lần 2): A1 ẩn API, A2 bỏ thêm nhanh dữ liệu nền, A3 'Tải lên', A4 Tạo mới chính / Thùng rác phụ, A5 Lead Xuất Excel lên hàng tìm, A13 Cột/Lọc chỉ admin + tách khỏi ô tìm, A7 thanh Lưu nền đặc + 'Quay lại danh sách' + 'Xem trên website'. Giai đoạn 2 chưa thuộc scope này.",
+  "triggerNote": "BL-051 MODIFY, giai đoạn 2 (admin gọn — audit lần 2, đóng BL-051): A6 thanh hàng loạt nổi đáy, A12 cột 'Thao tác' theo quyền từng dòng, A9 Media lưới thẻ, A8 Tổng quan thẻ, A10 ô 'Liên kết' chọn trang, A11 Dịch AI một khối cột phải, A14 Trang chủ 5 tab. Hồi quy giai đoạn 1 (A1–A5, A7, A13).",
   "workItem": "feature/admin-ux-audit-2",
   "backlog": "BL-051",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-21-admin-ux-audit-2.md",
-  "changeDocStatus": "pending (giai đoạn 2 tiếp theo)",
+  "changeDoc": "spec/changes/archive/2026-10-21-admin-ux-audit-2.md",
+  "changeDocStatus": "done (archive bởi change-request ngay sau bản phát hành này)",
   "task": [
-    "tasks/feature-admin-ux-audit-2/phase-1-task-01.md",
-    "tasks/feature-admin-ux-audit-2/phase-1-task-02.md",
-    "tasks/feature-admin-ux-audit-2/phase-1-task-03.md"
+    "tasks/feature-admin-ux-audit-2/phase-2-task-01.md",
+    "tasks/feature-admin-ux-audit-2/phase-2-task-02.md",
+    "tasks/feature-admin-ux-audit-2/phase-2-task-03.md",
+    "tasks/feature-admin-ux-audit-2/phase-2-task-04.md",
+    "tasks/feature-admin-ux-audit-2/phase-2-task-05.md",
+    "tasks/feature-admin-ux-audit-2/phase-2-task-06.md"
   ],
-  "reviewReport": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-03-round-1-review.md",
+  "reviewReport": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-06-round-1-review.md",
   "reviewResults": [
     {
-      "task": "phase-1-task-01",
+      "task": "phase-2-task-01",
+      "round": 1,
+      "result": "PASS",
+      "level": "STRICT",
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-01-round-1-review.md",
+      "note": "MINOR chuyển P2-T02: Xoá thêm điều kiện quyền update; 404 báo như không có quyền; encodeURIComponent(locale); test CSS chỉ dò chuỗi"
+    },
+    {
+      "task": "phase-2-task-02",
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL (STRICT cho carry-over quyền)",
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-02-round-1-review.md",
+      "note": "MINOR chuyển P2-T03: link thẻ Tab tới được, ẩn ô cột thừa, nhãn 'Chọn tất cả' bằng CSS; nhãn loại tệp dài bị cắt (chấp nhận)"
+    },
+    {
+      "task": "phase-2-task-03",
+      "round": 2,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-03-round-2-review.md",
+      "note": "r1 FAIL (F1 test được nêu nhưng chưa viết; transition bỏ qua reduced-motion) → r2 PASS; chiều cao thẻ summary giao P2-T04 kiểm trình duyệt"
+    },
+    {
+      "task": "phase-2-task-04",
       "round": 1,
       "result": "PASS",
       "level": "NORMAL",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-01-round-1-review.md",
-      "note": "MINOR chuyển T02: UploadButtonLabel ghi .btn__label, bỏ characterData, test unmount/idempotent"
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-04-round-1-review.md",
+      "note": "MINOR chuyển P2-T05: otherChosen khi giá trị đổi từ ngoài; tách ô URL"
     },
     {
-      "task": "phase-1-task-02",
+      "task": "phase-2-task-05",
       "round": 1,
       "result": "PASS",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-02-round-1-review.md",
-      "note": "MINOR: breakpoint 767/768 lệch (đã thống nhất ở T03); test style chỉ regex SCSS; UploadButtonLabel ghi vào node React quản lý; chưa kiểm Media 375/768, 375 tối, drawer với sale"
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-05-round-1-review.md",
+      "note": "payload-types.ts chỉ hoán vị; MINOR chuyển P2-T06 (wrapper thừa, tách translationDataGroup, JSDoc, migrate:create)"
     },
     {
-      "task": "phase-1-task-03",
+      "task": "phase-2-task-06",
       "round": 1,
       "result": "PASS",
-      "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-03-round-1-review.md",
-      "note": "MINOR: tin tuyển dụng quá hạn vẫn có 'Xem trên website'; public-doc-url.ts chép logic buildPublicWhere; guard rời trang chưa lưu chưa test; chưa thử Lưu thật"
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-06-round-1-review.md",
+      "note": "MINOR mở: Homepage.ts 310 dòng; JSDoc blocks.ts:43 tên cũ; tên test; nguồn PATHS_BEFORE_A14"
     }
   ],
   "specValidation": [
-    ".context/review-reports/feature-admin-ux-audit-2-spec-validation.md",
-    ".context/review-reports/feature-admin-ux-audit-2-spec-validation-round-2.md"
+    ".context/review-reports/feature-admin-ux-audit-2-phase-2-spec-validation.md",
+    ".context/review-reports/feature-admin-ux-audit-2-phase-2-spec-validation-round-2.md"
   ],
   "commits": [
-    "e83a86b (phase-1-task-01)",
-    "b7f762c (phase-1-task-02)",
-    "phase-1-task-03: close-out commit cùng bản phát hành này"
+    "9f18876 (phase-2-task-01, A6 + A12)",
+    "a336fcf (phase-2-task-02, A9 + carry-over A12)",
+    "15d2e8b (phase-2-task-03, A8 + carry-over A9)",
+    "e7641aa (phase-2-task-04, A10)",
+    "e2c2473 (phase-2-task-05, A11 + carry-over A10)",
+    "6e65c31 (phase-2-task-06, A14 + carry-over A11)"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.43.1-54.json",
-  "specUpdate": "spec/updates/2026-10-21-admin-ux-audit-2-phase-1.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.44.0-55.json",
+  "specUpdate": "spec/updates/2026-10-21-admin-ux-audit-2-phase-2.md",
   "specRefs": [
     "F10",
     "FR-ADM-19"
   ],
   "specRefNotes": {
-    "F10": "Thêm đoạn 'Admin gọn cho người không rành kỹ thuật — audit lần 2, giai đoạn 1 (BL-051)' — A1, A2, A3, A4, A5, A13, A7; thay câu cũ BL-039 về vị trí 'Lọc nâng cao' và hàng 'Xuất Excel', và câu 'còn lại lọc qua Lọc nâng cao' với sale.",
-    "FR-ADM-19": "Giao diện quản trị: nút chính/phụ danh sách, Cột/Lọc chỉ admin (gọn UI, không phải ranh giới quyền), thanh Lưu luôn thấy, 'Quay lại danh sách', 'Xem trên website'."
+    "F10": "Thêm đoạn 'Admin gọn — audit lần 2, giai đoạn 2 (BL-051)' — A6, A8, A9, A10, A11, A12 (kèm câu Xoá: admin hoặc author là mình + quyền sửa, không xét quyền xoá cấp danh sách), A14; câu hướng dẫn tắt khối Trang chủ (dòng ~75) trỏ tới ô 'Thứ tự các khối' tab 'Chuyển đổi & Bố cục'.",
+    "FR-ADM-19": "Giao diện quản trị: thanh hàng loạt nổi, cột thao tác dòng theo quyền, Media lưới, Tổng quan thẻ, ô Liên kết chọn trang, Dịch AI một khối, Trang chủ 5 tab."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/lib/admin/master-data-relations.ts",
+      "src/lib/admin/row-actions.ts",
+      "src/components/admin/RowActions.tsx",
+      "src/components/admin/RowActionsCell.tsx",
+      "src/components/admin/styles/_list-actions.scss",
       "src/collections/admin-collections.ts",
-      "src/collections/redirects-plugin.ts",
-      "src/payload.config.ts",
-      "src/lib/admin/payload-vi-overrides.ts",
-      "src/components/admin/UploadButtonLabel.tsx",
-      "src/components/admin/AdminRoleAttribute.tsx",
-      "src/components/admin/LeadExportButton.tsx",
-      "src/components/admin/styles/_list-toolbar.scss",
-      "src/components/admin/DocumentNavSlot.tsx",
-      "src/components/admin/DocumentNavLinks.tsx",
-      "src/lib/admin/public-doc-url.ts",
-      "src/lib/admin/document-nav-slot.ts",
-      "src/components/admin/styles/_doc-controls.scss",
+      "src/components/admin/styles/_media-grid.scss",
+      "src/components/admin/MediaTypeCell.tsx",
+      "src/lib/admin/media-type-label.ts",
+      "src/collections/Media.ts",
+      "src/components/admin/dashboard/QuickActions.tsx",
+      "src/components/admin/dashboard/WebsiteShortcuts.tsx",
+      "src/components/admin/dashboard/DashboardIcons.tsx",
+      "src/components/admin/styles/_dashboard.scss",
+      "src/components/admin/NavLinkField.tsx",
+      "src/fields/nav-link.ts",
+      "src/lib/content/nav-link.ts",
+      "src/components/admin/styles/_controls.scss",
+      "src/collections/_shared/content-defaults.ts",
+      "src/fields/translation.ts",
+      "src/lib/admin/form-layout.ts",
+      "src/collections/Pages.ts",
+      "src/components/admin/TranslationSummary.tsx",
+      "src/globals/Homepage.ts",
+      "src/globals/homepage/blocks.ts",
+      "src/components/admin/styles/_forms.scss",
       "src/app/(payload)/custom.scss",
       "src/app/(payload)/admin/importMap.js",
-      "src/collections/Leads.ts"
+      "src/payload-types.ts"
     ],
-    "filesNote": "Test mới/sửa: master-data-relations.test.ts, UploadButtonLabel.test.tsx, AdminRoleAttribute.test.tsx, list-toolbar-styles.test.ts, public-doc-url.test.ts (12), DocumentNavLinks.test.tsx (4), document-nav-slot.test.ts (2), doc-controls-styles.test.ts (2). Leads.ts chỉ đổi comment. importMap.js regen (UploadButtonLabel, AdminRoleAttribute, DocumentNavSlot). payload-types.ts không đổi.",
+    "filesNote": "Test mới/sửa: row-actions.test.ts, RowActions.test.tsx, list-actions-style.test.ts, MediaTypeCell.test.tsx, media-type-label.test.ts, media-grid-style.test.ts, DashboardParts.test.tsx, NavLinkField.test.tsx, content-defaults.test.ts, form-friendly.test.ts, form-layout.test.ts, tests/integration/retranslate.test.ts, src/globals/Homepage.test.ts (97 đường dẫn dữ liệu trước/sau), tests/unit/admin-labels.test.ts. payload-types.ts chỉ đổi chú thích + thứ tự thành viên (kiểu giữ nguyên). importMap.js regen (RowActionsCell, MediaTypeCell, NavLinkField). migrate:create: 'No schema changes detected'.",
     "modules": [
-      "admin config chung (ADMIN_COLLECTIONS / ADMIN_GLOBALS, withAdminUxDefaults)",
-      "admin providers (UploadButtonLabel, AdminRoleAttribute)",
-      "admin list view toolbar (_list-toolbar.scss: header, ô tìm, Cột/Lọc, Xuất Excel)",
-      "Lead export (LeadExportSlot / LeadExportButton)",
-      "admin edit view doc-controls (DocumentNavSlot / DocumentNavLinks, _doc-controls.scss)",
-      "public URL helper (public-doc-url.ts → doc-link.ts resolveInternalDocHref)"
+      "admin list view (thanh hàng loạt _list-actions.scss; cột Thao tác RowActions + row-actions.ts)",
+      "Media list view (_media-grid.scss, MediaTypeCell)",
+      "admin dashboard (QuickActions, WebsiteShortcuts, _dashboard.scss)",
+      "navLinkField dùng chung (NavLinkField, nav-link.ts) — Header, Footer, nút Trang chủ",
+      "khối bản dịch dùng chung (content-defaults gatherTranslationBlock, fields/translation.ts)",
+      "global Trang chủ (Homepage.ts homepageTabs, homepage/blocks.ts enabledField)"
     ]
   },
   "impact": {
     "direct": [
-      "A1: màn sửa/tạo mọi collection + global (Cho thuê, Dự án, Tin BĐS, Tin tức, Lead, Media, Redirects, global Trang chủ/Cài đặt/Header/Footer) không có nút/tab 'API'; REST /api/** vẫn trả dữ liệu như cũ",
-      "A2: ô Tỉnh/thành, Phường/xã (Dự án, Cho thuê, Tin BĐS, Tin tuyển dụng, Phường/xã→Tỉnh), Người tạo, Sale phụ trách (Lead), Người tải lên (Media) không có nút '+' và không có hàng 'Thêm mới' trong danh sách xổ; vẫn tìm/chọn được giá trị có sẵn; ô Danh mục, Chủ đầu tư, Thuộc dự án vẫn còn '+'",
-      "A2: admin vẫn tạo Tỉnh/Phường/Nhân viên ở màn riêng (Nâng cao · Hệ thống)",
-      "A3: ô upload (ảnh đơn, gallery hasMany, ô ảnh trong drawer) nút đọc 'Tải lên' (chữ + aria-label); 'Chọn từ thư viện' + kéo thả vẫn chạy; nút 'Tạo mới' ở danh sách và trong drawer thư viện vẫn 'Tạo mới'",
-      "A4: mọi danh sách có quyền tạo: 'Tạo mới' là nút chính màu nhấn, cao ≥ 44px, góc phải hàng tiêu đề; 'Tất cả'/'Thùng rác' là phụ; Lead (không quyền tạo) không có nút",
-      "A5: Lead (admin) 'Xuất Excel' (icon tải + chữ) ở bên phải hàng ô tìm, không nằm trong hàng chip; bấm xuất ra file đúng bộ lọc hiện tại (search + chip + where); thông báo lỗi/khoá hiển thị hàng riêng bên dưới",
-      "A13 sale: mọi danh sách (Lead, Cho thuê, Tin tức, Tin BĐS…) không thấy 'Hiển thị cột'/'Lọc nâng cao' và không thấy panel cột/lọc kể cả khi URL có where (chip, reload); không nháy khi tải; chip + ô tìm vẫn chạy; Lead vẫn chỉ thấy lead được giao",
-      "A13 admin: thấy 'Hiển thị cột' và 'Lọc nâng cao' là 2 nút phụ ngoài khung ô tìm, bên phải; mở được panel cột + trình dựng lọc dưới hàng, không đè chip",
-      "A13: đăng xuất / đổi tài khoản admin↔sale → data-admin-role trên <html> cập nhật đúng (không giữ role cũ)",
-      "A7: cuộn form dài (Cho thuê, Dự án) — thanh Lưu luôn thấy, nền đặc (sáng/tối), nội dung không xuyên qua; 375px bấm được Lưu",
-      "A7: màn sửa/tạo collection có 'Quay lại danh sách' → /admin/collections/<slug>; global không có",
-      "A7 'Xem trên website' hiện: doc đã lưu + status công khai (published; Cho thuê thêm rented) + chưa vào thùng rác; mở tab mới rel noopener, URL đúng /<route-vi>/<slug> hoặc /en/<route-en>/<slug-en>",
-      "A7 'Xem trên website' KHÔNG hiện: đang tạo mới (chưa có id), bản nháp (draft), trong thùng rác, locale EN khi hasEnglish=false, collection không có trang công khai (Lead, Media…), global, drawer sửa nhanh"
+      "A6: mọi danh sách có chọn nhiều — tích ≥ 1 dòng → thanh 'Đã chọn N — Chọn tất cả — Chỉnh sửa — Xoá…' nổi ghim đáy, nền đặc + bóng, nút ≥ 44px; bỏ chọn hết → mất; hàng cuối + phân trang không bị che (đệm đáy); 375px không tràn; hành động Payload (sửa hàng loạt, xoá, xuất bản…) giữ nguyên",
+      "A12 admin: Dự án, Cho thuê, Tin BĐS, Tin tức, Tin tuyển dụng, Dịch vụ, Trang pháp lý có cột 'Thao tác' cuối bảng (hiện mặc định), mỗi icon có tên đọc + tooltip: Xem trên web (chỉ dòng công khai), Sửa, Nhân bản (không có ở Trang pháp lý), Xoá (hộp xác nhận → vào Thùng rác)",
+      "A12 sale: dòng của mình (author = mình) có Sửa + Xoá (+ Nhân bản nếu có quyền tạo); dòng người khác không có Sửa/Xoá; author populate (object) hay id đều đúng; thiếu author → không Sửa/Xoá",
+      "A12: chế độ Thùng rác và dòng đã xoá không có nút; drawer chọn quan hệ không có nút; server 403/404 → toast tiếng Việt 'không có quyền', trang không vỡ",
+      "A9: /admin/collections/media là lưới thẻ (ảnh ≥ 120px giữ tỉ lệ, alt hoặc tên tệp rút gọn, loại tệp 'Ảnh · WEBP'/'PDF'); bấm thẻ → màn sửa; Tab tới được từng thẻ (focus ring); checkbox góc trái 44×44, thẻ chọn viền nhấn; tìm/chip/lọc/phân trang/chọn nhiều/thanh hàng loạt chạy",
+      "A9: drawer chọn ảnh (ảnh bìa, gallery) trong form vẫn là bảng, chọn đơn/nhiều được; cột loại tệp dễ đọc",
+      "A8: /admin Tổng quan — 'Tạo loại khác' là thẻ cùng chiều cao/tỉ lệ thẻ thao tác nhanh, mở menu xổ; 'Sửa website' (chỉ admin) là lưới thẻ icon + tên + chevron dưới tiêu đề mục h2",
+      "A10: global Header (menu + nút CTA), Footer (cột link), Trang chủ (nút) — ô 'Liên kết' là ô chọn: Trang chủ, Dự án, Cho thuê, Tin bất động sản, Tin tức, Tuyển dụng, Liên hệ, Chính sách bảo mật, Điều khoản sử dụng, 'Địa chỉ khác (https://…)' mở ô URL; lưu ra mã trang hoặc URL như cũ",
+      "A10: giá trị cũ mã trang → hiện đúng tên trang; URL cũ → 'Địa chỉ khác' + URL trong ô; ô không bắt buộc bấm xoá → lưu rỗng; URL không hợp lệ bị validateNavLink chặn",
+      "A11: form Cho thuê, Dự án, Tin BĐS, Tin tức, Tuyển dụng, Dịch vụ, Danh mục, Chủ đầu tư, Trang pháp lý — khối 'Bản dịch tiếng Anh' cột phải gồm 'Có bản tiếng Anh' (chỉ đọc), tóm tắt trạng thái dịch, 'Dịch lại bằng AI' (+ 'Duyệt bản tiếng Anh' ở Trang pháp lý); không còn tab 'Bản dịch'",
+      "A11: global (Trang chủ, Header, Footer, Cài đặt) giữ khối bản dịch ở chỗ cũ (Trang chủ: tab 'SEO & Đa ngôn ngữ')",
+      "A14: global Trang chủ 5 tab: Đầu trang & Banner · Giới thiệu & Uy tín · Sản phẩm & Tin nổi bật · Chuyển đổi & Bố cục · SEO & Đa ngôn ngữ; mỗi khối là thanh thu gọn có tên khối (khối đầu tab mở, sau thu gọn); 11 công tắc nhãn 'Hiện khối này trên web'; 'Thứ tự các khối' cuối tab 4 kèm hướng dẫn; Banner không có công tắc",
+      "A14: lưu Trang chủ sau khi đổi tab/công tắc → website công khai hiện/ẩn khối đúng như trước BL-051 (đường dẫn dữ liệu không đổi)"
     ],
     "dependents": [
-      "List drawer chọn quan hệ (vd chọn ảnh từ Tin tức): header drawer giữ nút 'Tạo mới' riêng, Cột/Lọc theo role",
-      "Drawer sửa nhanh (icon sửa ô Danh mục): mở trên thanh dính, không có 2 link A7",
-      "Media: Tạo mới + 'Tải lên nhiều tệp', ô Người tải lên",
-      "Mọi màn /admin/** đã đăng nhập (provider dùng chung, CSS danh sách + doc-controls dùng chung)"
+      "Website công khai: header/footer/nút trang chủ đọc navLink (resolveNavLink không đổi) — link menu VI/EN mở đúng trang",
+      "Website trang chủ công khai: khối, thứ tự, bật/tắt đọc cùng đường dẫn homepage.* — giao diện không đổi",
+      "API dịch lại POST /api/admin/translations/<collection>/<id> và duyệt EN Trang pháp lý (FR-ADM-17/18) — chỉ đổi vị trí nút",
+      "List drawer chọn quan hệ: không cột Thao tác, không thanh hàng loạt nổi",
+      "Nhân bản Payload (mở bản sao) — Trang pháp lý disableDuplicate"
     ],
     "regression": [
-      "BL-050: mục 'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng (≥ 8px) ở 1280/1000/768/375, sáng/tối",
-      "BL-022/039: chip lọc nhanh vẫn lọc đúng, URL where giữ khi reload; lọc kỹ thuật BL-039 (hideTechnicalListFields) giữ nguyên",
-      "Ô 'Trạng thái dịch' (danh sách nội dung) vẫn ở hàng thanh công cụ dưới hàng tìm, cạnh chip, vẫn hiện khi lọc ra 0 kết quả",
-      "Gợi ý ô tìm 'Tìm theo …' vẫn hiện",
-      "Lead Xuất Excel: quyền, endpoint, tham số lọc, thông báo lỗi không đổi",
-      "Danh sách xổ Ngôn ngữ nằm trên cùng, không bị thanh dính / header danh sách xuyên",
-      "Drawer (z-index 101) và popup không bị thanh Lưu dính che",
-      "Không tràn ngang 375px ở danh sách (Lead, Cho thuê, Media) và màn sửa (Dự án)",
-      "Chuyển ngôn ngữ nội dung trên màn sửa vẫn hoạt động; 'Xem trên website' đổi URL theo locale",
-      "Chuỗi 'Lọc nâng cao' / 'Hiển thị cột' / 'Tạo mới' (payload-vi-overrides) giữ nguyên"
+      "Giai đoạn 1 BL-051: A1 không nút 'API'; A2 Tỉnh/Phường/nhân viên không '+ Thêm mới'; A3 'Tải lên'; A4 'Tạo mới' nút chính góc phải; A5 Lead 'Xuất Excel' hàng tìm; A7 thanh Lưu dính + 'Quay lại danh sách' + 'Xem trên website'; A13 Cột/Lọc chỉ admin",
+      "BL-050: 'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng",
+      "BL-022/039: chip lọc nhanh đúng, where giữ khi reload; lọc kỹ thuật giữ",
+      "Ô 'Trạng thái dịch' (lọc theo translation.status / hasEnglish) vẫn lọc đúng dù nhóm translation ẩn khỏi form",
+      "Link menu công khai (header, menu toàn màn hình, footer, nút CTA) VI/EN không đổi URL",
+      "Thanh mobile BL-024 (.collection-list__list-selection) vẫn ở đáy, test BL-024 xanh",
+      "Trang chủ công khai VI/EN: đủ khối, đúng thứ tự, khối tắt vẫn ẩn",
+      "375px không tràn ngang ở danh sách (Cho thuê, Media), Tổng quan, Header/Trang chủ global; collapsible ≥ 44px ở mobile"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL051-01",
+      "id": "BL051-P2-01",
       "viewport": 1280,
-      "steps": "Đăng nhập admin; mở màn sửa một tin Cho thuê, một Dự án, global Trang chủ, một Redirect.",
-      "expected": "Không có nút/tab 'API' ở bất kỳ màn nào (doc-tabs chỉ còn 'Chỉnh sửa' nếu có)."
+      "steps": "Admin mở danh sách Cho thuê; tích 2 dòng; cuộn xuống cuối trang; bỏ tích hết.",
+      "expected": "Khi có chọn: thanh 'Đã chọn 2…' nổi ghim đáy, nền đặc + bóng, nút cao ≥ 44px; hàng cuối và phân trang vẫn thấy/bấm được; bỏ tích → thanh biến mất."
     },
     {
-      "id": "BL051-02",
-      "viewport": 1280,
-      "steps": "Mở màn sửa Cho thuê: kiểm ô Tỉnh/thành, Phường/xã, Người tạo; mở danh sách xổ từng ô. Kiểm ô Danh mục, Thuộc dự án.",
-      "expected": "Tỉnh/Phường/Người tạo không có nút '+' và không có hàng 'Thêm mới'; vẫn tìm và chọn được giá trị. Danh mục, Thuộc dự án vẫn có '+'."
-    },
-    {
-      "id": "BL051-03",
-      "viewport": 1280,
-      "steps": "Mở Lead, kiểm ô Sale phụ trách; mở Media tạo mới, kiểm ô Người tải lên.",
-      "expected": "Cả hai ô không có '+'/'Thêm mới'; chọn giá trị có sẵn được."
-    },
-    {
-      "id": "BL051-04",
-      "viewport": 1280,
-      "steps": "Màn sửa Cho thuê, tab Hình ảnh: xem nút upload ô ảnh đơn và gallery; mở 'Chọn từ thư viện'.",
-      "expected": "Nút upload hiện 'Tải lên', aria-label 'Tải lên'; drawer thư viện mở, nút 'Tạo mới' trong drawer vẫn 'Tạo mới'; kéo thả tệp vẫn tải lên."
-    },
-    {
-      "id": "BL051-05",
-      "viewport": 1280,
-      "steps": "Admin mở danh sách Cho thuê, Tin tức, Media (sáng rồi tối).",
-      "expected": "'Tạo mới' là nút màu nhấn góc phải hàng tiêu đề, cao ≥ 44px, chữ đọc rõ; 'Tất cả'/'Thùng rác' dạng phụ, không lấn nút chính."
-    },
-    {
-      "id": "BL051-06",
-      "viewport": 1280,
-      "steps": "Admin mở Lead.",
-      "expected": "Không có 'Tạo mới' (không quyền tạo); 'Xuất Excel' (icon + chữ) bên phải cùng hàng ô tìm với Cột/Lọc, không nằm trong hàng chip."
-    },
-    {
-      "id": "BL051-07",
-      "viewport": 1280,
-      "steps": "Admin ở Lead: gõ từ khoá tìm, bấm một chip lọc nhanh, rồi bấm 'Xuất Excel'.",
-      "expected": "File Excel tải về chỉ chứa lead khớp từ khoá + chip hiện tại (cùng số dòng với danh sách)."
-    },
-    {
-      "id": "BL051-08",
-      "viewport": 1280,
-      "steps": "Đăng nhập sale; mở Lead, Cho thuê, Tin tức; bấm một chip rồi reload trang.",
-      "expected": "Không thấy 'Hiển thị cột'/'Lọc nâng cao' và không thấy panel cột/lọc (kể cả sau reload có where); không nháy khi tải; chip + ô tìm lọc đúng; Lead chỉ hiện lead được giao; không có 'Xuất Excel'."
-    },
-    {
-      "id": "BL051-09",
-      "viewport": 1280,
-      "steps": "Admin mở Cho thuê; bấm 'Hiển thị cột' rồi 'Lọc nâng cao'.",
-      "expected": "Hai nút nằm ngoài khung ô tìm (khung chỉ có kính lúp + chữ), bên phải; panel cột và trình dựng lọc mở dưới hàng, không đè chip; ô 'Trạng thái dịch' vẫn cạnh chip."
-    },
-    {
-      "id": "BL051-10",
-      "viewport": 1280,
-      "steps": "Đăng nhập admin, xem Cho thuê; đăng xuất, đăng nhập sale cùng tab; xem lại Cho thuê.",
-      "expected": "Admin thấy Cột/Lọc; sau khi đổi sang sale, <html data-admin-role='sale'> và 2 nút ẩn."
-    },
-    {
-      "id": "BL051-11",
+      "id": "BL051-P2-02",
       "viewport": 375,
-      "steps": "Admin mở Lead, Cho thuê, Media ở 375px (sáng và tối).",
-      "expected": "scrollWidth = 375; ô tìm 1 hàng, Cột/Lọc hàng dưới, Xuất Excel (Lead) hàng riêng, Tạo mới góc phải cùng hàng tiêu đề; vùng bấm ≥ 44px."
+      "steps": "Admin mở Cho thuê và Media ở 375px (sáng + tối), tích 1 dòng/thẻ.",
+      "expected": "Thanh hàng loạt ở đáy, nền đặc, không tràn ngang (scrollWidth = 375); nút ≥ 44px."
     },
     {
-      "id": "BL051-12",
+      "id": "BL051-P2-03",
       "viewport": 1280,
-      "steps": "Mở màn sửa Cho thuê và Dự án, cuộn xuống cuối form (sáng và tối).",
-      "expected": "Thanh có nút Lưu luôn thấy ở đỉnh, nền đặc (không thấy chữ form xuyên qua); có 'Quay lại danh sách' → /admin/collections/<slug>."
+      "steps": "Admin mở lần lượt Dự án, Cho thuê, Tin BĐS, Tin tức, Tin tuyển dụng, Dịch vụ, Trang pháp lý.",
+      "expected": "Cột 'Thao tác' cuối bảng; dòng công khai có Xem trên web (tab mới, đúng URL), Sửa, Nhân bản, Xoá; dòng nháp không có Xem trên web; Trang pháp lý không có Nhân bản; hover icon hiện tooltip, mỗi icon có tên đọc."
     },
     {
-      "id": "BL051-13",
+      "id": "BL051-P2-04",
       "viewport": 1280,
-      "steps": "Mở một Dự án đã xuất bản (published), locale VI; bấm 'Xem trên website'. Đổi ô Ngôn ngữ sang English (hasEnglish=true), bấm lại.",
-      "expected": "Mở tab mới đúng /du-an/<slug> (VI) và /en/projects/<slug-en> (EN), trang trả 200."
+      "steps": "Admin bấm Nhân bản ở một tin Cho thuê; quay lại, bấm Xoá ở một tin khác → Huỷ, rồi Xoá → Xác nhận; mở Thùng rác.",
+      "expected": "Nhân bản mở màn sửa bản sao; Huỷ không xoá; Xác nhận → tin vào Thùng rác (không xoá thật), danh sách cập nhật; trong Thùng rác không có nút ở cột Thao tác."
     },
     {
-      "id": "BL051-14",
+      "id": "BL051-P2-05",
       "viewport": 1280,
-      "steps": "Mở một tin Cho thuê trạng thái 'Đã thuê' (rented).",
-      "expected": "Có 'Xem trên website' → /cho-thue/<slug>, trang công khai mở được."
+      "steps": "Đăng nhập sale; mở Tin BĐS (hoặc collection sale có quyền) có cả bài của mình và của người khác.",
+      "expected": "Dòng của mình: Sửa + Xoá (+ Xem trên web nếu công khai, + Nhân bản nếu có quyền tạo); dòng người khác: không Sửa, không Xoá. Xoá bài của mình → vào Thùng rác thành công."
     },
     {
-      "id": "BL051-15",
+      "id": "BL051-P2-06",
       "viewport": 1280,
-      "steps": "Kiểm lần lượt: bài nháp (draft); bài trong Thùng rác; Trang pháp lý ở EN khi hasEnglish=false; màn tạo mới Cho thuê; Lead; global Trang chủ.",
-      "expected": "Không có 'Xem trên website' ở mọi trường hợp; tạo mới Cho thuê chỉ có 'Quay lại danh sách'; Lead có 'Quay lại danh sách'; global không có link nào."
+      "steps": "Sale có cột đã lưu riêng từ trước BL-051 mở danh sách; sale mới (chưa lưu cột) mở cùng danh sách.",
+      "expected": "Sale mới thấy cột 'Thao tác'; sale đã lưu cột riêng không thấy (chấp nhận, ghi gap) — không lỗi trang."
     },
     {
-      "id": "BL051-16",
+      "id": "BL051-P2-07",
       "viewport": 1280,
-      "steps": "Tạo bài nháp Tin tức, Lưu; đổi trạng thái sang xuất bản, Lưu (không tải lại trang).",
-      "expected": "Sau lưu nháp không có 'Xem trên website'; sau lưu xuất bản nút hiện ngay với URL đúng slug."
+      "steps": "Mở form có ô quan hệ chọn bài (vd Tin tức → bài liên quan / Dự án) để mở drawer danh sách.",
+      "expected": "Drawer không có cột 'Thao tác' nút, không có thanh hàng loạt nổi đáy; chọn được bài."
     },
     {
-      "id": "BL051-17",
+      "id": "BL051-P2-08",
       "viewport": 1280,
-      "steps": "Màn sửa Cho thuê: bấm icon sửa ô Danh mục (drawer sửa nhanh); mở popup ⋮ của thanh Lưu.",
-      "expected": "Drawer nằm trên thanh dính, trong drawer không có 'Quay lại danh sách'/'Xem trên website'; popup không bị che."
+      "steps": "Admin mở /admin/collections/media (sáng + tối); Tab qua các thẻ; bấm một thẻ; tích 2 thẻ.",
+      "expected": "Lưới thẻ: ảnh ≥ 120px giữ tỉ lệ, alt (≤ 2 dòng) hoặc tên tệp rút gọn, loại tệp 'Ảnh · WEBP'…; Tab tới từng thẻ có focus ring; bấm thẻ → màn sửa; thẻ chọn viền màu nhấn; thanh hàng loạt hiện."
     },
     {
-      "id": "BL051-18",
+      "id": "BL051-P2-09",
+      "viewport": 1280,
+      "steps": "Media: gõ tìm, bấm chip/lọc, sang trang 2; admin bật thêm cột qua 'Hiển thị cột'.",
+      "expected": "Tìm/lọc/phân trang chạy; cột bật thêm không làm thẻ lệch/hiện ô không nhãn."
+    },
+    {
+      "id": "BL051-P2-10",
+      "viewport": 1280,
+      "steps": "Màn sửa Tin tức: 'Chọn từ thư viện' cho ảnh bìa; màn sửa Cho thuê: chọn nhiều ảnh gallery.",
+      "expected": "Drawer là bảng (không lưới), cột loại tệp dễ đọc; chọn 1 ảnh / nhiều ảnh thành công."
+    },
+    {
+      "id": "BL051-P2-11",
+      "viewport": 1280,
+      "steps": "Admin mở /admin (Tổng quan) 1280 + 375; bấm 'Tạo loại khác'; xem hàng 'Sửa website'. Đăng nhập sale mở /admin.",
+      "expected": "Admin: 'Tạo loại khác' là thẻ cùng chiều cao/tỉ lệ các thẻ thao tác nhanh, mở menu xổ; 'Sửa website' có tiêu đề mục + lưới thẻ icon + tên + chevron, bấm mở đúng global. Sale: không có 'Sửa website'. 375 không tràn."
+    },
+    {
+      "id": "BL051-P2-12",
+      "viewport": 1280,
+      "steps": "Global Header: mở ô 'Liên kết' của một mục menu, chọn 'Tin tức', Lưu; mở website công khai VI và EN.",
+      "expected": "Ô chọn liệt kê 9 trang tiếng Việt + 'Địa chỉ khác (https://…)'; sau lưu ô hiện 'Tin tức'; menu công khai link đúng /tin-tuc và /en/<route-en>."
+    },
+    {
+      "id": "BL051-P2-13",
+      "viewport": 1280,
+      "steps": "Global Footer: chọn 'Địa chỉ khác (https://…)', gõ 'https://example.com', Lưu; thử gõ 'abc' rồi Lưu.",
+      "expected": "URL hợp lệ lưu được, reload vẫn hiện 'Địa chỉ khác' + URL; 'abc' bị chặn bởi thông báo validate."
+    },
+    {
+      "id": "BL051-P2-14",
+      "viewport": 1280,
+      "steps": "Mở Header/Footer/Trang chủ có giá trị cũ (mã trang và URL lưu trước BL-051); với ô không bắt buộc bấm nút xoá rồi Lưu.",
+      "expected": "Mã trang cũ hiện đúng tên trang; URL cũ hiện 'Địa chỉ khác' + URL; xoá → lưu rỗng, link đó không hiện trên web; ô bắt buộc không có nút xoá."
+    },
+    {
+      "id": "BL051-P2-15",
+      "viewport": 1280,
+      "steps": "Mở màn sửa Cho thuê, Dự án, Tin tức, Danh mục, Chủ đầu tư, Trang pháp lý.",
+      "expected": "Cột phải có khối 'Bản dịch tiếng Anh' (mở sẵn): 'Có bản tiếng Anh' chỉ đọc, tóm tắt trạng thái dịch, nút 'Dịch lại bằng AI'; Trang pháp lý thêm 'Duyệt bản tiếng Anh'; không còn tab 'Bản dịch'."
+    },
+    {
+      "id": "BL051-P2-16",
+      "viewport": 1280,
+      "steps": "Admin bấm 'Dịch lại bằng AI' ở một tin Cho thuê (hoặc chặn mạng để chỉ xem request); sale bấm ở bài của mình nếu có quyền.",
+      "expected": "Gửi POST /api/admin/translations/rentals/<id>, thông báo 'Đã gửi yêu cầu dịch lại…'; quyền như trước BL-051."
+    },
+    {
+      "id": "BL051-P2-17",
+      "viewport": 1280,
+      "steps": "Danh sách Tin tức: dùng ô 'Trạng thái dịch' lọc 'Chưa có bản tiếng Anh' / 'Dịch lỗi'.",
+      "expected": "Lọc đúng như trước (dữ liệu translation.* giữ dù nhóm ẩn khỏi form)."
+    },
+    {
+      "id": "BL051-P2-18",
+      "viewport": 1280,
+      "steps": "Admin mở global Trang chủ; duyệt 5 tab; mở/gập khối; tắt 'Hiện khối này trên web' của khối Đối tác, Lưu; mở trang chủ công khai VI + EN; bật lại.",
+      "expected": "5 tab đúng tên/thứ tự; khối đầu tab mở, sau thu gọn, tiêu đề tên khối không lặp; 11 công tắc nhãn 'Hiện khối này trên web'; Banner không công tắc; tắt → khối Đối tác ẩn trên web, bật → hiện lại; các khối khác và thứ tự không đổi."
+    },
+    {
+      "id": "BL051-P2-19",
       "viewport": 375,
-      "steps": "Mở màn sửa Dự án ở 375px, cuộn 1500px, bấm Lưu.",
-      "expected": "Không tràn ngang; 2 link chỉ icon 44×44 có tên đọc; Lưu cao 44px bấm được."
+      "steps": "Mở global Trang chủ ở 375px (sáng + tối), bấm thanh tiêu đề khối.",
+      "expected": "Không tràn ngang; thanh thu gọn cao ≥ 44px; tab cuộn ngang/xuống dòng được."
     },
     {
-      "id": "BL051-19",
+      "id": "BL051-P2-20",
       "viewport": 1280,
-      "steps": "Sửa một ô ở màn Cho thuê (chưa lưu), bấm 'Quay lại danh sách'.",
-      "expected": "Payload hỏi xác nhận rời trang chưa lưu (không mất dữ liệu im lặng)."
+      "steps": "Global Trang chủ tab 'Chuyển đổi & Bố cục': đổi 'Thứ tự các khối' rồi Lưu; xem trang chủ công khai.",
+      "expected": "'Thứ tự các khối' không bọc thu gọn, có hướng dẫn tắt khối; thứ tự trên web đổi theo; lỗi validate (nếu có) nêu đúng tên ô."
     },
     {
-      "id": "BL051-20",
+      "id": "BL051-P2-21",
       "viewport": 1280,
-      "steps": "Regression BL-050: admin mở /admin và /admin/collections/rentals ở 1280, 1000, 768, 375 (sáng/tối).",
-      "expected": "'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng (≥ 8px); danh sách xổ Ngôn ngữ nằm trên header danh sách / thanh dính."
+      "steps": "Regression giai đoạn 1: chạy lại BL051-01 … BL051-22 của scope v55 (spec/test-scope/archive/test-scope-1.44.0-55.json).",
+      "expected": "Tất cả vẫn đạt (API ẩn, không thêm nhanh Tỉnh/Phường/nhân viên, 'Tải lên', Tạo mới chính, Xuất Excel, Cột/Lọc chỉ admin, thanh Lưu + 2 link)."
     },
     {
-      "id": "BL051-21",
+      "id": "BL051-P2-22",
       "viewport": 1280,
-      "steps": "Regression chip + Lọc dịch: admin mở Tin tức, bấm chip danh mục, chọn 'Trạng thái dịch' tới khi 0 kết quả; reload.",
-      "expected": "Chip lọc đúng, URL where giữ sau reload; ô 'Trạng thái dịch' vẫn hiện khi 0 kết quả; gợi ý 'Tìm theo …' còn."
-    },
-    {
-      "id": "BL051-22",
-      "viewport": 1280,
-      "steps": "Sale mở drawer chọn ảnh (Media) từ một ô upload của Tin tức/Cho thuê (nếu sale có quyền sửa).",
-      "expected": "Drawer không có Cột/Lọc; ô tìm và chọn ảnh vẫn chạy."
+      "steps": "Regression BL-050 + chip: admin mở /admin và Tin tức (1280, 768, 375); bấm chip danh mục, reload.",
+      "expected": "'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng; chip lọc đúng, where giữ sau reload."
     }
   ],
   "acceptance": [
-    "Không còn nút/tab 'API' ở màn sửa mọi collection + global (test quét config hideAPIURL === true)",
-    "Mọi relationship tới provinces/wards/staff có allowCreate === false; relationship khác không đổi; vẫn chọn/tìm được",
-    "Ô upload hiện 'Tải lên' (chữ + tên đọc); 'Tạo mới' ở chỗ khác không đổi",
-    "'Tạo mới' nút chính góc phải, Thùng rác/Tất cả phụ; không quyền tạo → không có nút",
-    "Lead 'Xuất Excel' bên phải hàng tìm, tách hàng chip, xuất đúng bộ lọc hiện tại",
-    "Sale không thấy 'Hiển thị cột'/'Lọc nâng cao' (cả panel), không nháy; admin thấy, ngoài khung ô tìm; dữ liệu vẫn do access control giới hạn",
-    "Thanh Lưu luôn thấy, nền đặc sáng/tối; 'Quay lại danh sách' ở collection; 'Xem trên website' chỉ khi đã lưu + công khai, đúng URL vi/en, tab mới rel noopener",
-    "375px + 1280px không tràn, vùng bấm ≥ 44px, AA sáng/tối; BL-050 không vỡ",
-    "Không đổi schema/access/API, không migration"
+    "Chọn ≥ 1 dòng → thanh hàng loạt nổi đáy nền đặc, nút ≥ 44px, không che hàng cuối/phân trang, mất khi bỏ chọn; 375 không tràn",
+    "Cột 'Thao tác' ở 7 collection: Xem trên web (chỉ công khai) / Sửa / Nhân bản (không Trang pháp lý) / Xoá vào Thùng rác có xác nhận; theo quyền collection + author dòng; Xoá = admin hoặc bài mình + quyền sửa; ẩn ở Thùng rác và drawer; lỗi server → toast tiếng Việt",
+    "Media danh sách lưới thẻ (ảnh ≥ 120px, alt/tên tệp, loại tệp), bấm thẻ mở màn sửa, Tab tới được; drawer chọn ảnh vẫn chọn được",
+    "Tổng quan: 'Tạo loại khác' thẻ cùng tỉ lệ; 'Sửa website' lưới thẻ điều hướng có tiêu đề mục",
+    "Ô 'Liên kết' chọn trang theo tên tiếng Việt + 'Địa chỉ khác'; giá trị lưu giữ định dạng; giá trị cũ hiển thị đúng; link công khai không đổi",
+    "Khối 'Bản dịch tiếng Anh' cột phải ở collection dùng helper bản dịch; không còn tab 'Bản dịch'; 'Có bản tiếng Anh' chỉ đọc; lọc 'Trạng thái dịch' vẫn đúng",
+    "Trang chủ 5 tab, khối thu gọn, công tắc 'Hiện khối này trên web'; trang chủ công khai không đổi",
+    "Không đổi schema/access/API, không migration (migrate:create: No schema changes detected)"
   ],
   "verify": {
-    "test": "pnpm test 353 files / 3585 PASS (T03 close-out); T02 reviewer chạy full PASS (access.test.ts timeout lần builder do tải)",
+    "test": "pnpm test 361 files / 3639 PASS (P2-T06 close-out)",
     "typecheck": "pnpm typecheck PASS",
     "lint": "pnpm lint 0 error (2 warning có sẵn ở tools/task-dashboard/server.mjs)",
-    "importmap": "pnpm generate:importmap đã chạy (UploadButtonLabel, AdminRoleAttribute, DocumentNavSlot)",
-    "runtime": "Browser (dev :3000, tài khoản test @example.test admin + sale, đã xoá): T01 Cho thuê/Trang chủ/Media; T02 admin 1280 sáng/tối + 375 sáng, sale 1280 tối, drawer, BL-050; T03 Cho thuê rented 1024/1280 tối, Dự án 1280 sáng + 375 sáng + EN, pháp lý EN hasEnglish=false, drawer sửa nhanh"
+    "importmap": "pnpm generate:importmap đã chạy (RowActionsCell, MediaTypeCell, NavLinkField)",
+    "types": "pnpm generate:types — payload-types.ts chỉ chú thích + thứ tự thành viên",
+    "migration": "pnpm payload migrate:create → No schema changes detected",
+    "runtime": "Browser dev :3000 (tài khoản test @example.test, đã xoá): danh sách + thanh hàng loạt, Media lưới 1024 tối / 375 sáng, Tổng quan, Header/Footer/Trang chủ ô Liên kết, khối dịch Cho thuê 375 + Projects 375, Trang chủ 5 tab"
   },
   "outOfScope": [
-    "Giai đoạn 2 BL-051: thanh thao tác hàng loạt, chỉnh Tổng quan, Media dạng lưới, dropdown chọn trang cho liên kết menu, gom Dịch AI, cột thao tác dòng, gom tab Trang chủ",
-    "Hẹn giờ publishedAt (FR-ADM-16) chưa có trong buildPublicWhere / publicDocUrl",
-    "Nút 'Chọn tệp' của form tạo Media (không thuộc .upload__createNewToggler)",
+    "Sắp xếp theo cột trong Media lưới (mất do thead ẩn — gap)",
+    "Tên đọc ô 'Chọn tất cả trên trang' Media (GAP-A11Y-1, giới hạn Payload 3.91)",
+    "Cờ bật/tắt mới cho khối không có công tắc (Banner)",
+    "Gọi AI dịch thật (chỉ kiểm request)",
     "GraphQL (đã tắt)"
+  ],
+  "knownGaps": [
+    "GAP-A11Y-1: 'Chọn tất cả trên trang' (Media) không có accessible name — Payload 3.91 CheckboxInput hard-code aria-label=\"\"",
+    "Media lưới mất sắp xếp theo cột",
+    "A6 / A9 / A13 dựa class nội bộ Payload 3.91 (.list-selection, .collection-list__list-selection, .collection-list--media, .list-drawer__header) — kiểm lại khi nâng Payload; subgrid cần Chrome 117+ / Safari 16+",
+    "Sale đã lưu cột riêng trước BL-051 không thấy cột 'Thao tác' (không có 'Hiển thị cột' để bật) — chấp nhận",
+    "Cột 'Thao tác' còn tiêu đề (ô trống) ở chế độ Thùng rác"
   ],
   "openQuestions": [],
   "viewports": [
@@ -308,12 +357,15 @@
   ],
   "uiTests": true,
   "apiTests": [
-    "REST /api/<collection> và /api/globals/<slug> vẫn trả dữ liệu như trước (hideAPIURL chỉ ẩn nút UI)",
-    "Sale gọi /api/leads?where=... vẫn chỉ nhận lead được giao (A13 không đổi access)",
-    "Endpoint Xuất Excel Lead nhận cùng tham số search/where như trước"
+    "Sale PATCH /api/<collection>/<id> {deletedAt} bài của mình → 200 (vào Thùng rác); bài người khác → 403/404 (access không đổi)",
+    "POST /api/<collection>/<id>/duplicate (hoặc cơ chế nhân bản Payload) tạo bản sao; Trang pháp lý không nhân bản",
+    "GET /api/globals/header, /api/globals/footer, /api/globals/homepage trả đúng đường dẫn/giá trị như trước (navLink mã trang/URL, homepage.* không đổi path)",
+    "PATCH global với navLink 'abc' bị validateNavLink từ chối; mã trang / https URL hợp lệ được",
+    "POST /api/admin/translations/<collection>/<id> vẫn chạy như trước",
+    "GET /api/<collection>?where[translation.status][equals]=failed vẫn lọc được"
   ],
   "risk": "medium",
-  "riskNote": "Shared admin config + CSS cho mọi danh sách/màn sửa; ẩn điều khiển theo role chỉ ở UI (không phải ranh giới quyền). Residual: A3/A5/A7 dựa DOM/class Payload 3.91 (.upload__createNewToggler, DefaultListView, .doc-controls) — kiểm lại khi nâng Payload; public-doc-url.ts chép điều kiện buildPublicWhere; tin tuyển dụng quá hạn vẫn có 'Xem trên website'; chưa kiểm Lưu thật → nút hiện ngay, guard rời trang chưa lưu, drawer với sale, 768px, 375 tối, tải file Xuất Excel thật.",
+  "riskNote": "Shared admin CSS/config cho mọi danh sách + form; cột Thao tác có logic quyền theo dòng phía client (khớp access server, server vẫn là ranh giới quyền). Không đổi schema/API/access, đường dẫn dữ liệu Trang chủ + bản dịch giữ (test 97 path, migrate:create sạch). Residual: dựa class nội bộ Payload 3.91; GAP-A11Y-1; Media mất sort; sale có cột đã lưu không thấy Thao tác; chưa kiểm thật 403 server, bulk xoá Media, PDF/video, dịch AI thật.",
   "status": "published",
-  "statusNote": "published 2026-10-21 — BL-051 giai đoạn 1 feature-update (change doc vẫn pending cho giai đoạn 2)"
+  "statusNote": "published 2026-10-21 — BL-051 giai đoạn 2 feature-update (đóng BL-051; change doc archive sang spec/changes/archive/)"
 }
