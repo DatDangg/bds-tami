@@ -825,7 +825,43 @@
     "listing": {
       "resultCount": "{count} kết quả",
       "sortLabel": "Sắp xếp",
-      "moreOptions": "Tuỳ chọn khác"
+      "moreOptions": "Tuỳ chọn khác",
+      "hero": {
+        "searchLabel": "Tìm kiếm trong danh sách",
+        "keywordLabel": "Từ khoá",
+        "submit": "Tìm kiếm",
+        "quickSearch": "Tìm nhanh:"
+      },
+      "filters": {
+        "title": "Bộ lọc",
+        "clearAll": "Xoá tất cả",
+        "apply": "Áp dụng",
+        "close": "Đóng bộ lọc",
+        "sheetDescription": "Chọn tiêu chí, danh sách cập nhật ngay.",
+        "showResults": "Xem kết quả",
+        "searchIn": "Tìm trong danh sách {label}",
+        "noMatch": "Không có mục phù hợp",
+        "showMore": "Xem thêm",
+        "showLess": "Thu gọn",
+        "rangeFrom": "Từ",
+        "rangeTo": "Đến",
+        "rangeLow": "Thấp nhất",
+        "rangeHigh": "Cao nhất"
+      },
+      "resultsMatching": "<strong>{label}</strong> phù hợp",
+      "spotlight": {
+        "roleCarousel": "băng chuyền",
+        "roleSlide": "trang chiếu",
+        "slide": "{index} / {total}",
+        "previous": "Mục nổi bật trước",
+        "next": "Mục nổi bật sau"
+      },
+      "learnMore": {
+        "faqTitle": "Câu hỏi thường gặp",
+        "play": "Phát video: {title}",
+        "videoTitle": "Video giới thiệu",
+        "close": "Đóng video"
+      }
     },
     "services": {
       "otherTitle": "Dịch vụ khác",

@@ -825,7 +825,43 @@
     "listing": {
       "resultCount": "{count, plural, one {# result} other {# results}}",
       "sortLabel": "Sort by",
-      "moreOptions": "More options"
+      "moreOptions": "More options",
+      "hero": {
+        "searchLabel": "Search this list",
+        "keywordLabel": "Keyword",
+        "submit": "Search",
+        "quickSearch": "Quick search:"
+      },
+      "filters": {
+        "title": "Filters",
+        "clearAll": "Clear all",
+        "apply": "Apply",
+        "close": "Close filters",
+        "sheetDescription": "Pick your criteria; the list updates right away.",
+        "showResults": "Show results",
+        "searchIn": "Search {label}",
+        "noMatch": "No matching items",
+        "showMore": "Show more",
+        "showLess": "Show less",
+        "rangeFrom": "From",
+        "rangeTo": "To",
+        "rangeLow": "Minimum",
+        "rangeHigh": "Maximum"
+      },
+      "resultsMatching": "<strong>{label}</strong> found",
+      "spotlight": {
+        "roleCarousel": "carousel",
+        "roleSlide": "slide",
+        "slide": "{index} / {total}",
+        "previous": "Previous featured item",
+        "next": "Next featured item"
+      },
+      "learnMore": {
+        "faqTitle": "Frequently asked questions",
+        "play": "Play video: {title}",
+        "videoTitle": "Introduction video",
+        "close": "Close video"
+      }
     },
     "services": {
       "otherTitle": "Other services",
