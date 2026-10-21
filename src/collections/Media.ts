@@ -72,7 +72,8 @@ export const Media: CollectionConfig = {
     ],
   },
   fields: [
-    mimeTypeLabelField,
+    // Nhãn dễ đọc ("Ảnh · WEBP") cho ô lưới/bảng Thư viện; trường giữ nguyên tên/kiểu nên không đổi schema.
+    { ...mimeTypeLabelField, admin: { components: { Cell: "/components/admin/MediaTypeCell#MediaTypeCell" } } },
     {
       name: "alt",
       type: "text",

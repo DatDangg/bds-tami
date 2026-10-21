@@ -42,11 +42,11 @@ export function isRowAuthor(author: unknown, userId: unknown): boolean {
 }
 
 /**
- * Nút nào được hiện ở một dòng, khớp server: Sửa = quyền update + (admin | tác giả, như `isAuthorOrAdmin`); Xoá mềm = admin | tác giả
- * (KHÔNG xét quyền delete cấp danh sách vì server cho sale xoá mềm bài của mình); Nhân bản = quyền create và collection không `disableDuplicate`.
+ * Nút nào được hiện ở một dòng, khớp server: Sửa = quyền update + (admin | tác giả, như `isAuthorOrAdmin`); Xoá mềm = (admin | tác giả) VÀ quyền update
+ * (server PATCH deletedAt kiểm update + delete theo dòng; KHÔNG xét quyền delete cấp danh sách vì server cho sale xoá mềm bài của mình); Nhân bản = quyền create và collection không `disableDuplicate`.
  */
 export function rowActionVisibility({ user, permissions, rowData, disableDuplicate }: RowActionInput): RowActionVisibility {
   if (!user) return { edit: false, duplicate: false, trash: false };
   const owns = user.role === "admin" || isRowAuthor(rowData?.author, user.id);
-  return { edit: Boolean(permissions?.update) && owns, duplicate: Boolean(permissions?.create) && !disableDuplicate, trash: owns };
+  return { edit: Boolean(permissions?.update) && owns, duplicate: Boolean(permissions?.create) && !disableDuplicate, trash: Boolean(permissions?.update) && owns };
 }

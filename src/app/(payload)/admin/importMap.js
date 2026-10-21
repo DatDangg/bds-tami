@@ -58,6 +58,7 @@ import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e548
 import { JobDeadlineCell as JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
 import { JobDeadlineNotice as JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
 import { CvDownloadButton as CvDownloadButton_46916355d4dc89977cecc3f317404219 } from '../../../components/admin/CvDownloadButton'
+import { MediaTypeCell as MediaTypeCell_c5116bbd351d1f5603b84783c15fdd8a } from '../../../components/admin/MediaTypeCell'
 import { CollectionNameCell as CollectionNameCell_ebbbd7848e3521f42b6c144797a789c2 } from '../../../components/admin/CollectionNameCell'
 import { CollectionNameHint as CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d } from '../../../components/admin/CollectionNameHint'
 import { PrivacyPolicyVersionField as PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2 } from '../../../components/admin/SiteSettingsDisplay'
@@ -136,6 +137,7 @@ export const importMap = {
   "/components/admin/JobDeadlineDisplay#JobDeadlineCell": JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
   "/components/admin/JobDeadlineDisplay#JobDeadlineNotice": JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
   "/components/admin/CvDownloadButton#CvDownloadButton": CvDownloadButton_46916355d4dc89977cecc3f317404219,
+  "/components/admin/MediaTypeCell#MediaTypeCell": MediaTypeCell_c5116bbd351d1f5603b84783c15fdd8a,
   "/components/admin/CollectionNameCell#CollectionNameCell": CollectionNameCell_ebbbd7848e3521f42b6c144797a789c2,
   "/components/admin/CollectionNameHint#CollectionNameHint": CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d,
   "/components/admin/SiteSettingsDisplay#PrivacyPolicyVersionField": PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2,

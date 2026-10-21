@@ -1,0 +1,228 @@
+// A9 (BL-051 GĐ2): danh sách Thư viện ảnh & tệp thành lưới thẻ — CHỈ CSS, không thay view List của Payload.
+// Selector từ @payloadcms/ui 3.91: views/List (`.collection-list--<slug>`), elements/Table (`.table`), cell tên tệp
+// (`td.cell-filename > a > .file > .thumbnail + .file__filename`). Không áp trong list drawer (picker ảnh có `.list-drawer__header`)
+// để drawer chọn ảnh trong form giữ nguyên bảng gốc. Không dùng !important; nằm ngoài @layer payload-default nên thắng style gốc.
+// Thẻ: ảnh (thumb 400px, tỉ lệ giữ nguyên — contain) → mô tả (alt) tối đa 2 dòng → tên tệp rút gọn → loại tệp. Cả thẻ là liên kết tới màn sửa
+// (pseudo-element phủ thẻ); checkbox chọn nhiều nằm góc trái trên, vùng bấm 44px, nổi trên liên kết.
+
+.collection-list--media:not(:has(.list-drawer__header)) {
+  .table-wrap,
+  .table {
+    overflow: visible;
+  }
+
+  .table {
+    margin-inline: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+
+    table {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  // Tiêu đề cột bỏ (cột đã thành thẻ); chỉ giữ ô "chọn tất cả trang này" với nhãn chữ.
+  thead,
+  thead tr {
+    display: block;
+  }
+
+  thead th {
+    display: none;
+  }
+
+  thead th#heading-_select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    min-height: 44px;
+    padding: 0 0 8px;
+    border: 0;
+    background: transparent;
+    color: var(--admin-text-muted);
+    font-size: 13px;
+    font-weight: 500;
+
+    &::after {
+      content: "Chọn tất cả trên trang";
+    }
+  }
+
+  tbody {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+
+  tbody tr {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-l);
+    background: var(--admin-surface);
+    box-shadow: var(--admin-shadow-sm);
+
+    &:hover {
+      border-color: var(--admin-accent);
+    }
+
+    &:has(input:checked) {
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 1px var(--admin-accent);
+    }
+
+    &:hover td {
+      background: transparent;
+    }
+
+    td {
+      display: block;
+      min-width: 0;
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+  }
+
+  // Ô tên tệp "tan" vào thẻ: ảnh và tên tệp thành con của thẻ để sắp thứ tự (ảnh, alt, tên tệp, loại).
+  td.cell-filename,
+  td.cell-filename a,
+  td.cell-filename .file {
+    display: contents;
+  }
+
+  // Cả thẻ bấm được → màn sửa. Viền focus vẽ trên lớp phủ vì `a` không có hộp riêng.
+  td.cell-filename a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  td.cell-filename a:focus-visible::after {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: -2px;
+  }
+
+  .thumbnail {
+    position: relative;
+    order: 0;
+    width: 100%;
+    height: auto;
+    // Payload đặt .thumbnail--size-small cố định 100px, max-height 100px, min-height 100%.
+    max-width: none;
+    max-height: none;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    border-radius: 0;
+    background: var(--admin-canvas);
+
+    // Ảnh phủ khung 4:3 (không để kích thước gốc của ảnh kéo giãn khung).
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  td.cell-alt {
+    order: 1;
+    padding: 10px 12px 0;
+    color: var(--admin-text);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+
+    span {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+  }
+
+  .file__filename {
+    order: 2;
+    display: block;
+    align-self: stretch;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    padding: 2px 12px 0;
+    text-align: left;
+    color: var(--admin-text-muted);
+    font-size: 12px;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  td.cell-mimeType {
+    order: 3;
+    margin-top: auto;
+    padding: 8px 12px 12px;
+  }
+
+  td.cell-uploadedBy {
+    display: none;
+  }
+
+  // Chọn nhiều: góc trái trên ảnh, nền đặc để thấy được trên mọi ảnh; input phủ kín ô 44px.
+  td.cell-_select {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--admin-border-strong);
+    border-radius: var(--admin-radius-s);
+    background: var(--admin-surface);
+
+    .select-row,
+    .checkbox-input__input {
+      position: static;
+    }
+
+    .select-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    // inset -1px bù viền 1px của ô để vùng bấm đủ 44×44.
+    input[type="checkbox"] {
+      position: absolute;
+      inset: -1px;
+      width: 44px;
+      height: 44px;
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+}
+
+.tami-media-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--admin-accent-soft);
+  color: var(--admin-accent-soft-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}

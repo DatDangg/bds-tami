@@ -49,8 +49,8 @@ const rowTitle = (row: RowActionsRow): string => {
   return value || String(row.id);
 };
 
-/** Thông báo tiếng Việt cho phản hồi lỗi của server (thông điệp gốc của Payload là tiếng Anh/khó hiểu). */
-const failureMessage = (status: number): string => (status === 401 || status === 403 ? FORBIDDEN_MESSAGE : FAILED_MESSAGE);
+/** Thông báo tiếng Việt cho phản hồi lỗi của server (thông điệp gốc của Payload là tiếng Anh/khó hiểu); 404 = server giấu dòng không đủ quyền → báo như không có quyền. */
+const failureMessage = (status: number): string => (status === 401 || status === 403 || status === 404 ? FORBIDDEN_MESSAGE : FAILED_MESSAGE);
 
 /**
  * Cột "Thao tác" của danh sách nội dung (BL-051 A12): icon-button Xem trên web / Sửa / Nhân bản / Chuyển vào Thùng rác.
@@ -93,7 +93,7 @@ export function RowActions({ collectionSlug, row, inTrash, siteUrl }: RowActions
     const { ok, doc } = await send(`${apiBase}/duplicate?locale=${encodeURIComponent(locale)}`, "POST", {});
     if (!ok) return;
     toast.success("Đã nhân bản.");
-    if (doc?.id !== undefined) router.push(`${base}/${doc.id}?locale=${locale}`);
+    if (doc?.id !== undefined) router.push(`${base}/${doc.id}?locale=${encodeURIComponent(locale)}`);
     else router.refresh();
   };
 

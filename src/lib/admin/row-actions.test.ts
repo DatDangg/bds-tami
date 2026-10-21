@@ -49,12 +49,13 @@ describe("rowActionVisibility (BL-051 A12)", () => {
     expect(rowActionVisibility({ user: SALE, permissions: ALL, rowData: undefined, disableDuplicate: false })).toMatchObject({ edit: false, trash: false });
   });
 
-  it("Xoá KHÔNG xét quyền delete cấp danh sách; Sửa vẫn cần quyền update; Nhân bản cần quyền create", () => {
-    const noDelete = { create: true, update: true, delete: undefined };
+  it("Xoá cần quyền update (server PATCH kiểm update) nhưng KHÔNG xét quyền delete cấp danh sách; Sửa cần update; Nhân bản cần create", () => {
+    const noDelete = { create: true, update: true };
     expect(rowActionVisibility({ ...input(SALE, { author: "u-sale" }), permissions: noDelete }).trash).toBe(true);
-    expect(rowActionVisibility({ ...input(SALE, { author: "u-sale" }), permissions: { create: true } }).edit).toBe(false);
+    expect(rowActionVisibility({ ...input(SALE, { author: "u-sale" }), permissions: { create: true } })).toMatchObject({ edit: false, trash: false });
+    expect(rowActionVisibility({ ...input(ADMIN, {}), permissions: { create: true } }).trash).toBe(false);
     expect(rowActionVisibility({ ...input(SALE, { author: "u-sale" }), permissions: { update: true } }).duplicate).toBe(false);
-    expect(rowActionVisibility({ ...input(ADMIN, {}), permissions: undefined })).toEqual({ edit: false, duplicate: false, trash: true });
+    expect(rowActionVisibility({ ...input(ADMIN, {}), permissions: undefined })).toEqual({ edit: false, duplicate: false, trash: false });
   });
 
   it("collection disableDuplicate (Trang pháp lý) → không Nhân bản", () => {

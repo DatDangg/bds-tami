@@ -128,6 +128,14 @@ describe("RowActions (BL-051 A12)", () => {
     expect(state.refresh).not.toHaveBeenCalled();
   });
 
+  it("server 404 (giấu dòng không đủ quyền) khi nhân bản → báo như không có quyền", async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
+    view(row());
+    fireEvent.click(screen.getByRole("button", { name: "Nhân bản" }));
+    await waitFor(() => expect(state.toastError).toHaveBeenCalledWith("Bạn không có quyền thực hiện thao tác này."));
+    expect(state.push).not.toHaveBeenCalled();
+  });
+
   it("lỗi mạng khi nhân bản → toast tiếng Việt", async () => {
     fetchMock.mockRejectedValue(new Error("network"));
     view(row());
