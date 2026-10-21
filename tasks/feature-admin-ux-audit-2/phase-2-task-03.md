@@ -70,3 +70,4 @@
 
 ## Doc impact
 - Spec delta F10 GĐ2. Không đổi API/ERD.
+- F5 browser check (P2-T04 builder): PASS — tami-dev, đã đăng nhập. 1280px: 4 thẻ thao tác nhanh cùng 1 hàng, "Tạo loại khác" (summary/details) cao 74px = 3 thẻ bên cạnh (74px), cùng rộng 291px. 375px: xếp 1 cột, cả 4 thẻ cao 64px rộng 343px, không tràn ngang (scrollWidth 375). Không đổi code P2-T03.

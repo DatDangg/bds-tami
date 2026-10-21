@@ -22,6 +22,19 @@ export type PageLinkKey = keyof typeof PAGE_LINK_KEYS;
 
 export const PAGE_LINK_KEY_LIST = Object.keys(PAGE_LINK_KEYS) as PageLinkKey[];
 
+/** Tên tiếng Việt từng mã trang (mã giữ nguyên vì là giá trị lưu); `Record` bắt buộc bổ sung khi thêm mã mới. Dùng cho ô chọn trang ở admin. */
+export const PAGE_LINK_KEY_MEANINGS: Record<PageLinkKey, string> = {
+  home: "Trang chủ",
+  projects: "Dự án",
+  rentals: "Cho thuê",
+  "property-posts": "Tin bất động sản",
+  news: "Tin tức",
+  careers: "Tuyển dụng",
+  contact: "Liên hệ",
+  "privacy-policy": "Chính sách bảo mật",
+  "terms-of-use": "Điều khoản sử dụng",
+};
+
 export function isPageLinkKey(value: string): value is PageLinkKey {
   return Object.hasOwn(PAGE_LINK_KEYS, value);
 }

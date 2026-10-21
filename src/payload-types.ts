@@ -2772,7 +2772,7 @@ export interface Homepage {
     enabled?: boolean | null;
     text?: string | null;
     /**
-     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
      */
     link?: string | null;
   };
@@ -2792,7 +2792,7 @@ export interface Homepage {
       subtitle?: string | null;
       ctaLabel?: string | null;
       /**
-       * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+       * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
        */
       ctaLink?: string | null;
       id?: string | null;
@@ -2909,7 +2909,7 @@ export interface Homepage {
       | null;
     ctaLabel?: string | null;
     /**
-     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
      */
     ctaLink?: string | null;
     /**
@@ -2976,7 +2976,7 @@ export interface Homepage {
      */
     ctaLabel?: string | null;
     /**
-     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
      */
     ctaLink?: string | null;
     /**
@@ -2989,7 +2989,7 @@ export interface Homepage {
     image?: (string | null) | Media;
     secondaryLabel?: string | null;
     /**
-     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
      */
     secondaryLink?: string | null;
   };
@@ -3059,14 +3059,14 @@ export interface Header {
     | {
         label: string;
         /**
-         * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+         * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
          */
         link: string;
         children?:
           | {
               label: string;
               /**
-               * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+               * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
                */
               link: string;
               id?: string | null;
@@ -3078,7 +3078,7 @@ export interface Header {
   ctaButton?: {
     label?: string | null;
     /**
-     * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+     * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
      */
     link?: string | null;
   };
@@ -3120,7 +3120,7 @@ export interface Footer {
           | {
               label: string;
               /**
-               * Mã trang có sẵn: home (Trang chủ), projects (Dự án), rentals (Cho thuê), property-posts (Tin bất động sản), news (Tin tức), careers (Tuyển dụng), contact (Liên hệ), privacy-policy (Chính sách bảo mật), terms-of-use (Điều khoản sử dụng) — hoặc địa chỉ đầy đủ https://…
+               * Chọn trang trong website, hoặc chọn “Địa chỉ khác” để dán địa chỉ đầy đủ (https://…).
                */
               link: string;
               id?: string | null;
