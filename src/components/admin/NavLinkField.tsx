@@ -27,6 +27,18 @@ export function navLinkChoiceFromSelection(selection: unknown): string {
   return known ? String(known.value) : "";
 }
 
+/** Ô nhập URL hiện khi chọn "Địa chỉ khác". */
+function NavLinkUrlInput({ inputId, value, onChange, readOnly }: { inputId: string; value: string; onChange: (next: string) => void; readOnly?: boolean }) {
+  return (
+    <div className="tami-nav-link__url">
+      <label className="field-label" htmlFor={inputId}>
+        Địa chỉ (https://…)
+      </label>
+      <input id={inputId} inputMode="url" onChange={(event) => onChange(event.target.value)} placeholder="https://" readOnly={readOnly} type="text" value={value} />
+    </div>
+  );
+}
+
 /**
  * Ô "Liên kết" dùng chung (Header, Footer, nút Trang chủ): chọn trang theo tên tiếng Việt hoặc "Địa chỉ khác" rồi nhập URL.
  * Giá trị ghi vào field text y như trước (mã trang hoặc URL) nên dữ liệu cũ, validate, API và website không đổi.
@@ -35,8 +47,9 @@ export function NavLinkField({ field, path, readOnly }: TextFieldClientProps) {
   const { value, setValue, showError } = useField<string>({ path });
   const currentValue = typeof value === "string" ? value : "";
   // Chọn "Địa chỉ khác" khi ô còn trống vẫn phải giữ ô nhập mở: lựa chọn không suy ra được từ giá trị rỗng.
+  // Chỉ dùng trạng thái đã chọn đó khi giá trị đang rỗng; có giá trị (kể cả đổi từ ngoài: đặt lại, khôi phục phiên bản) thì lựa chọn suy ra từ chính giá trị.
   const [otherChosen, setOtherChosen] = useState(() => navLinkChoice(value) === OTHER_CHOICE);
-  const choice = otherChosen ? OTHER_CHOICE : navLinkChoice(currentValue);
+  const choice = otherChosen && !currentValue ? OTHER_CHOICE : navLinkChoice(currentValue);
   const label = typeof field.label === "string" ? field.label : "Liên kết";
   const description = typeof field.admin?.description === "string" ? field.admin.description : undefined;
   const inputId = `field-${path.replace(/\./g, "__")}__url`;
@@ -72,22 +85,7 @@ export function NavLinkField({ field, path, readOnly }: TextFieldClientProps) {
           value={choice}
         />
       </label>
-      {choice === OTHER_CHOICE ? (
-        <div className="tami-nav-link__url">
-          <label className="field-label" htmlFor={inputId}>
-            Địa chỉ (https://…)
-          </label>
-          <input
-            id={inputId}
-            inputMode="url"
-            onChange={(event) => setValue(event.target.value)}
-            placeholder="https://"
-            readOnly={readOnly}
-            type="text"
-            value={currentValue}
-          />
-        </div>
-      ) : null}
+      {choice === OTHER_CHOICE ? <NavLinkUrlInput inputId={inputId} onChange={setValue} readOnly={readOnly} value={currentValue} /> : null}
       <FieldError path={path} showError={showError} />
       {description ? <div className="field-description">{description}</div> : null}
     </div>

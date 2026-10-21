@@ -120,7 +120,7 @@ describe("withContentDefaults: scopeField (G7)", () => {
 });
 
 describe("withContentDefaults: slug trong khối Nâng cao (BL-042)", () => {
-  const advancedBlock = (config: CollectionConfig) => config.fields.find((field) => field.type === "collapsible");
+  const advancedBlock = (config: CollectionConfig) => config.fields.find((field) => field.type === "collapsible" && field.label === "Nâng cao");
   const namesIn = (fields: Field[]) => fields.map((field) => ("name" in field ? field.name : null));
 
   it("slug nằm trong collapsible KHÔNG tên 'Nâng cao' ở cột phải, thu gọn mặc định", () => {

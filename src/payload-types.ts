@@ -327,6 +327,23 @@ export interface Rental {
      */
     canonical?: string | null;
   };
+  rentedAt?: string | null;
+  searchText?: string | null;
+  status: 'draft' | 'published' | 'hidden' | 'rented';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -347,23 +364,6 @@ export interface Rental {
     model?: string | null;
     lastError?: string | null;
   };
-  rentedAt?: string | null;
-  searchText?: string | null;
-  status: 'draft' | 'published' | 'hidden' | 'rented';
-  /**
-   * Tự điền khi xuất bản lần đầu.
-   */
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -696,6 +696,21 @@ export interface Project {
      */
     canonical?: string | null;
   };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -716,21 +731,6 @@ export interface Project {
     model?: string | null;
     lastError?: string | null;
   };
-  status: 'draft' | 'published' | 'hidden';
-  /**
-   * Tự điền khi xuất bản lần đầu.
-   */
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -900,6 +900,21 @@ export interface PropertyPost {
      */
     canonical?: string | null;
   };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -920,21 +935,6 @@ export interface PropertyPost {
     model?: string | null;
     lastError?: string | null;
   };
-  status: 'draft' | 'published' | 'hidden';
-  /**
-   * Tự điền khi xuất bản lần đầu.
-   */
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -999,6 +999,21 @@ export interface News {
      */
     canonical?: string | null;
   };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
+  publishedAt?: string | null;
+  author: string | Staff;
+  isFeatured?: boolean | null;
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -1019,21 +1034,6 @@ export interface News {
     model?: string | null;
     lastError?: string | null;
   };
-  status: 'draft' | 'published' | 'hidden';
-  /**
-   * Tự điền khi xuất bản lần đầu.
-   */
-  publishedAt?: string | null;
-  author: string | Staff;
-  isFeatured?: boolean | null;
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -1079,6 +1079,15 @@ export interface Service {
      */
     canonical?: string | null;
   };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -1099,15 +1108,6 @@ export interface Service {
     model?: string | null;
     lastError?: string | null;
   };
-  status: 'draft' | 'published' | 'hidden';
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -1263,6 +1263,20 @@ export interface JobPosting {
      */
     canonical?: string | null;
   };
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
+  publishedAt?: string | null;
+  author: string | Staff;
+  /**
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
+   */
+  slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
+  hasEnglish?: boolean | null;
   /**
    * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
@@ -1283,20 +1297,6 @@ export interface JobPosting {
     model?: string | null;
     lastError?: string | null;
   };
-  status: 'draft' | 'published' | 'hidden';
-  /**
-   * Tự điền khi xuất bản lần đầu.
-   */
-  publishedAt?: string | null;
-  author: string | Staff;
-  /**
-   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
-   */
-  slug?: string | null;
-  /**
-   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
-   */
-  hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -1885,6 +1885,12 @@ export interface ProjectsSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -1896,12 +1902,6 @@ export interface ProjectsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1952,6 +1952,14 @@ export interface RentalsSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  rentedAt?: T;
+  searchText?: T;
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -1963,14 +1971,6 @@ export interface RentalsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  rentedAt?: T;
-  searchText?: T;
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2009,6 +2009,12 @@ export interface PropertyPostsSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -2020,12 +2026,6 @@ export interface PropertyPostsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2050,6 +2050,12 @@ export interface NewsSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  isFeatured?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -2061,12 +2067,6 @@ export interface NewsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  isFeatured?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2091,6 +2091,9 @@ export interface ServicesSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  status?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -2102,9 +2105,6 @@ export interface ServicesSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  status?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2172,6 +2172,11 @@ export interface JobPostingsSelect<T extends boolean = true> {
         noindex?: T;
         canonical?: T;
       };
+  status?: T;
+  publishedAt?: T;
+  author?: T;
+  slug?: T;
+  hasEnglish?: T;
   translation?:
     | T
     | {
@@ -2183,11 +2188,6 @@ export interface JobPostingsSelect<T extends boolean = true> {
         model?: T;
         lastError?: T;
       };
-  status?: T;
-  publishedAt?: T;
-  author?: T;
-  slug?: T;
-  hasEnglish?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

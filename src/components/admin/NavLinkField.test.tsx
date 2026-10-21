@@ -86,12 +86,30 @@ describe("NavLinkField", () => {
 
   it("chọn 'Địa chỉ khác' từ mã trang: mở ô nhập trống rồi ghi URL gõ vào", () => {
     state.value = "news";
-    renderField();
+    const { rerender } = renderField();
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "__other__" } });
     expect(state.setValue).toHaveBeenCalledWith("");
+    // useField đã bị mock: mô phỏng giá trị form sau setValue("").
+    state.value = "";
+    rerender(<NavLinkField field={{ name: "link", type: "text", label: "Liên kết" } as never} path="header.link" />);
     const input = screen.getByPlaceholderText("https://");
     fireEvent.change(input, { target: { value: "https://abc.vn" } });
     expect(state.setValue).toHaveBeenLastCalledWith("https://abc.vn");
+  });
+
+  it("giá trị đổi từ ngoài (đặt lại / khôi phục phiên bản) khi đã chọn 'Địa chỉ khác': lựa chọn theo giá trị mới, ô trống vẫn giữ 'Địa chỉ khác'", () => {
+    state.value = "news";
+    const { rerender } = renderField();
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "__other__" } });
+    state.value = "";
+    rerender(<NavLinkField field={{ name: "link", type: "text", label: "Liên kết" } as never} path="header.link" />);
+    expect(screen.getByRole("combobox")).toHaveValue("__other__");
+    expect(screen.getByPlaceholderText("https://")).toBeInTheDocument();
+    // Giá trị bị đặt lại từ ngoài thành một mã trang: hiện đúng trang, ô URL đóng.
+    state.value = "careers";
+    rerender(<NavLinkField field={{ name: "link", type: "text", label: "Liên kết" } as never} path="header.link" />);
+    expect(screen.getByRole("combobox")).toHaveValue("careers");
+    expect(screen.queryByPlaceholderText("https://")).not.toBeInTheDocument();
   });
 
   it("ô không bắt buộc: xoá về trống; ô bắt buộc: không có nút xoá", () => {

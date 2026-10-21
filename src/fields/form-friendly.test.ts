@@ -6,7 +6,7 @@ import { publishedAtField } from "./published-at";
 import { markRequired, REQUIRED_MARK_CLASS } from "./required-by-locale";
 import { scopedCategoryField } from "./scoped-category";
 import { titleField } from "./title";
-import { translationFields, translationGroup } from "./translation";
+import { translationBlockFields, translationFields, translationGroup } from "./translation";
 
 const adminOf = (field: unknown) => (field as { admin?: { className?: string; placeholder?: string; hidden?: boolean; description?: string } }).admin;
 
@@ -49,7 +49,14 @@ describe("form dễ dùng (BL-042): trường dùng chung", () => {
     expect((hasEnglish as { admin?: { readOnly?: boolean } }).admin?.readOnly).toBe(true);
   });
 
-  it("nhóm translation: trường hệ thống ẩn khỏi form, có dòng tóm tắt (ui) trước nút Dịch lại; dữ liệu vẫn còn", () => {
+  it("collection nội dung: nhóm translation ẩn cả nhóm, không chứa ui; tóm tắt rồi nút Dịch lại do translationBlockFields (đặt cạnh công tắc)", () => {
+    const group = translationFields().find((field) => "name" in field && field.name === "translation") as GroupField;
+    expect(adminOf(group)?.hidden).toBe(true);
+    expect(group.fields.some((field) => field.type === "ui")).toBe(false);
+    expect(translationBlockFields().map((field) => ("name" in field ? field.name : null))).toEqual(["translationSummary", "retranslateAction"]);
+  });
+
+  it("global: nhóm translation (translationGroup()) vẫn hiện, trường hệ thống ẩn khỏi form, có dòng tóm tắt (ui) trước nút Dịch lại; dữ liệu vẫn còn", () => {
     const fields = (translationGroup() as GroupField).fields;
     const hidden = ["status", "enSource", "viChangedAfterManual", "sourceHash", "translatedAt", "model", "lastError"];
     for (const name of hidden) {

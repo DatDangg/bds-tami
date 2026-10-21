@@ -540,7 +540,7 @@ describe.skipIf(!baseUrl)("integration: dịch lại bằng AI + duyệt EN tran
 
     it("cấu hình: hasEnglish của pages chỉ đọc trong form (duyệt qua nút), như mọi collection khác", () => {
       const hasEnglishOf = (slug: "pages" | "news") =>
-        payload.collections[slug].config.fields.find((field) => "name" in field && field.name === "hasEnglish") as { admin?: { readOnly?: boolean } };
+        payload.collections[slug].config.flattenedFields.find((field) => field.name === "hasEnglish") as { admin?: { readOnly?: boolean } };
       expect(hasEnglishOf("pages").admin?.readOnly).toBe(true);
       expect(hasEnglishOf("news").admin?.readOnly).toBe(true);
     });

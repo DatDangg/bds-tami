@@ -8,7 +8,7 @@ import { scopeSlugField } from "../../fields/scope-slug";
 import { seoField } from "../../fields/seo";
 import { slugField } from "../../fields/slug";
 import { CONTENT_STATUSES, type ContentStatus, statusField } from "../../fields/status";
-import { translationFields } from "../../fields/translation";
+import { translationBlockFields, translationFields } from "../../fields/translation";
 import { auditContentPurge, auditContentTrash } from "../../hooks/audit-content-delete";
 import { createSlugRedirect } from "../../hooks/create-slug-redirect";
 import { defaultReadLocale } from "../../hooks/default-read-locale";
@@ -69,6 +69,8 @@ export interface ContentOptions {
    * mở quyền); tên không phải trường dùng chung (hoặc đã `omit`) thì ném lỗi. Access cấp collection ghi đè qua `collection.access`.
    */
   fieldAccess?: Readonly<Record<string, FieldAccessOverrides>>;
+  /** Trường thêm vào khối "Bản dịch tiếng Anh" ở cột phải (vd nút "Duyệt bản tiếng Anh" của Trang pháp lý), sau nút "Dịch lại bằng AI". */
+  translationActions?: readonly Field[];
   /** Chỉ test ghi đè để không phụ thuộc Next. */
   revalidate?: RevalidatePaths;
 }
@@ -131,31 +133,48 @@ function resolveSharedFields(options: ContentOptions, collectionSlug: string): F
       `Collection "${collectionSlug}": fieldAccess nhắm trường không phải trường dùng chung (hoặc đã omit): ${unknown.join(", ")}.`,
     );
   }
-  return available.flatMap(([name, fields]) => {
+  const resolved = available.flatMap(([name, fields]): Field[] => {
     const withAccess = overrides[name] ? withFieldAccess(fields, overrides[name]) : fields;
     return name === "slug" ? [advancedSidebarBlock(withAccess)] : withAccess;
   });
+  return gatherTranslationBlock(resolved, options.translationActions ?? []);
 }
 
 const isNamed = (field: Field, name: string) => "name" in field && field.name === name;
 
 /**
- * Collection có bộ tab không tên ở cấp gốc (`formTabs`) thì nhóm `seo` và `translation` (giữ nguyên tên, đường dẫn dữ liệu không đổi)
- * thành tab "SEO" và "Bản dịch" nối vào bộ tab đó; các trường dùng chung còn lại (cột phải, `position: "sidebar"`) đứng sau bộ tab ở
+ * Gom mọi thứ về bản dịch vào MỘT khối cột phải (A11, BL-051 GĐ2): công tắc "Có bản tiếng Anh" (chỉ đọc), nhóm dữ liệu `translation` (ẩn, chỉ giữ đường dẫn
+ * dữ liệu), dòng tóm tắt + nút "Dịch lại bằng AI" và các nút riêng của collection. Collapsible KHÔNG tên nên `hasEnglish` / `translation.*` giữ nguyên đường dẫn.
+ * Đứng đúng chỗ `hasEnglish` từng ở (sau "Nâng cao"); không còn tab "Bản dịch". Collection `omit` cả hai thì không có khối.
+ */
+function gatherTranslationBlock(resolved: Field[], actions: readonly Field[]): Field[] {
+  const hasEnglish = resolved.find((field) => isNamed(field, "hasEnglish"));
+  const translation = resolved.find((field) => isNamed(field, "translation"));
+  if (!hasEnglish && !translation) return resolved;
+  const block: CollapsibleField = {
+    type: "collapsible",
+    label: "Bản dịch tiếng Anh",
+    admin: { position: "sidebar", initCollapsed: false },
+    fields: [...(hasEnglish ? [hasEnglish] : []), ...(translation ? [translation, ...translationBlockFields(), ...actions] : [...actions])],
+  };
+  const anchor = resolved.findIndex((field) => field === hasEnglish || field === translation);
+  const rest = resolved.filter((field) => field !== hasEnglish && field !== translation);
+  return [...rest.slice(0, anchor), block, ...rest.slice(anchor)];
+}
+
+/**
+ * Collection có bộ tab không tên ở cấp gốc (`formTabs`) thì nhóm `seo` (giữ nguyên tên, đường dẫn dữ liệu không đổi)
+ * thành tab "SEO" nối vào bộ tab đó (khối bản dịch nằm ở cột phải, xem `gatherTranslationBlock`); các trường dùng chung còn lại (cột phải, `position: "sidebar"`) đứng sau bộ tab ở
  * cấp gốc, vì Payload chỉ đặt vào cột phải field `sidebar` ở cấp gốc. Không có bộ tab thì giữ cách cũ: nối vào cuối.
  */
 function placeSharedFields(own: Field[], shared: Field[]): Field[] {
   const tabsIndex = own.findIndex((field) => field.type === "tabs");
   if (tabsIndex === -1) return [...own, ...shared];
   const seo = shared.find((field) => isNamed(field, "seo"));
-  const translation = shared.find((field) => isNamed(field, "translation"));
   const tabs = own[tabsIndex] as TabsField;
-  const sharedTabs = [
-    ...(seo ? [{ label: "SEO", fields: [seo] }] : []),
-    ...(translation ? [{ label: "Bản dịch", fields: [translation] }] : []),
-  ];
+  const sharedTabs = seo ? [{ label: "SEO", fields: [seo] }] : [];
   const withSharedTabs: TabsField = { ...tabs, tabs: [...tabs.tabs, ...sharedTabs] };
-  const sidebar = shared.filter((field) => field !== seo && field !== translation);
+  const sidebar = shared.filter((field) => field !== seo);
   return [...own.slice(0, tabsIndex), withSharedTabs, ...own.slice(tabsIndex + 1), ...sidebar];
 }
 

@@ -37,22 +37,42 @@ describe("form-layout", () => {
 describe("withContentDefaults: bố cục tab", () => {
   const base = (fields: Field[]): CollectionConfig => ({ slug: "news", fields });
 
-  it("có bộ tab ở cấp gốc: seo + translation thành tab SEO / Bản dịch, trường dùng chung còn lại ở cấp gốc sau bộ tab", () => {
+  it("có bộ tab ở cấp gốc: seo thành tab SEO (không còn tab Bản dịch), trường dùng chung còn lại ở cấp gốc sau bộ tab", () => {
     const config = withContentDefaults(base([formTabs([{ label: "Nội dung", fields: [{ name: "title", type: "text", localized: true }] }])]));
     const [tabs, ...rest] = config.fields;
     expect(tabs?.type).toBe("tabs");
     const tabList = (tabs as { tabs: { label: string; fields: Field[] }[] }).tabs;
-    expect(tabList.map((tab) => tab.label)).toEqual(["Nội dung", "SEO", "Bản dịch"]);
+    expect(tabList.map((tab) => tab.label)).toEqual(["Nội dung", "SEO"]);
     expect(namesOf(tabList[1]!.fields)).toEqual(["seo"]);
-    expect(namesOf(tabList[2]!.fields)).toEqual(["translation"]);
-    // Cột phải theo thứ tự: trạng thái · ngày xuất bản · tác giả · nổi bật · khối "Nâng cao" (slug) · có bản EN.
-    expect(namesOf(rest)).toEqual(["status", "publishedAt", "author", "isFeatured", "(collapsible)", "hasEnglish"]);
-    expect(namesOf(flattenLayoutFields(rest))).toEqual(["status", "publishedAt", "author", "isFeatured", "slug", "hasEnglish"]);
+    // Cột phải theo thứ tự: trạng thái · ngày xuất bản · tác giả · nổi bật · khối "Nâng cao" (slug) · khối "Bản dịch tiếng Anh" (công tắc EN + tóm tắt + nút).
+    expect(namesOf(rest)).toEqual(["status", "publishedAt", "author", "isFeatured", "(collapsible)", "(collapsible)"]);
+    expect(namesOf(flattenLayoutFields(rest))).toEqual(["status", "publishedAt", "author", "isFeatured", "slug", "hasEnglish", "translation", "translationSummary", "retranslateAction"]);
     for (const field of rest) expect((field as { admin?: { position?: string } }).admin?.position).toBe("sidebar");
   });
 
   it("không có bộ tab: nối trường dùng chung vào cuối như cũ", () => {
     const config = withContentDefaults(base([{ name: "title", type: "text", localized: true }]));
-    expect(namesOf(config.fields)).toEqual(["title", "status", "publishedAt", "author", "isFeatured", "(collapsible)", "hasEnglish", "translation", "seo"]);
+    expect(namesOf(config.fields)).toEqual(["title", "status", "publishedAt", "author", "isFeatured", "(collapsible)", "(collapsible)", "seo"]);
+  });
+
+  it("khối bản dịch cột phải: công tắc chỉ đọc + nhóm translation ẩn (đường dẫn dữ liệu giữ) + tóm tắt + nút Dịch lại + nút riêng của collection", () => {
+    const config = withContentDefaults(base([{ name: "title", type: "text", localized: true }]), {
+      translationActions: [{ name: "approveEnglishAction", type: "ui", admin: {} }],
+    });
+    const block = config.fields.find((field) => field.type === "collapsible" && field.label === "Bản dịch tiếng Anh") as { admin: { position: string }; fields: Field[] };
+    expect(block.admin.position).toBe("sidebar");
+    expect(namesOf(block.fields)).toEqual(["hasEnglish", "translation", "translationSummary", "retranslateAction", "approveEnglishAction"]);
+    const [hasEnglish, translation] = block.fields as unknown as [{ admin: { readOnly: boolean } }, { type: string; admin: { hidden: boolean } }];
+    expect(hasEnglish.admin.readOnly).toBe(true);
+    expect(translation.type).toBe("group");
+    expect(translation.admin.hidden).toBe(true);
+    // Không còn trường nào tên hasEnglish/translation ở chỗ khác (không nhân đôi, không tab riêng).
+    expect(config.fields.some((field) => field.type === "tabs")).toBe(false);
+  });
+
+  it("omit cả hasEnglish + translation: không có khối bản dịch", () => {
+    const config = withContentDefaults(base([{ name: "title", type: "text", localized: true }]), { omit: ["hasEnglish", "translation"] });
+    expect(config.fields.some((field) => field.type === "collapsible" && field.label === "Bản dịch tiếng Anh")).toBe(false);
+    expect(namesOf(flattenLayoutFields(config.fields))).not.toContain("translationSummary");
   });
 });

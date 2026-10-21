@@ -10,7 +10,7 @@ export interface FormTab {
   fields: Field[];
 }
 
-/** Một bộ tab không tên; `withContentDefaults` thêm tab SEO + Bản dịch vào bộ tab ở cấp gốc của collection. */
+/** Một bộ tab không tên; `withContentDefaults` thêm tab SEO vào bộ tab (khối bản dịch ở cột phải) ở cấp gốc của collection. */
 export function formTabs(tabs: readonly FormTab[]): TabsField {
   return { type: "tabs", tabs: tabs.map(({ label, fields }) => ({ label, fields })) };
 }
