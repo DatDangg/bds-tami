@@ -572,7 +572,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | `news` | `enabled` (mặc định bật), `title`, `intro` (textarea, localized), `posts` (`rel→news` hasMany, tối đa 3; trống thì lấy 3 bài mới nhất) |
 | `partners` | `enabled`, `title` (lấy `developers.showAsPartner`) |
 | `ctaBanner` | `enabled`, `title` (R khi `enabled`), `description`, `ctaLabel` (trống thì dùng chuỗi "Nhận tư vấn"), `ctaLink` (khoá trang hoặc URL), `backgroundImage` (tuỳ chọn), `image` (ảnh minh hoạ, tuỳ chọn), `secondaryLabel` (localized) + `secondaryLink` (nút phụ, tuỳ chọn). Chưa có `title` EN thì ẩn khối ở `/en` |
-| `strengths` | (BL-044) `enabled`, `items` (array 2–6: `icon` (select, 8 icon Phosphor), `title` (localized, R), `description` (localized)) |
+| `strengths` | (BL-044) `enabled`, `items` (array 2–6: `icon` (select, 10 icon Phosphor — BL-047 thêm `medal`, `users-three`, migration additive `20261021_020651_about_stats_icons` cho enum `homepage_strengths_items` / `homepage_about_stats` / `site_settings_careers_perks`; down đổi 2 giá trị mới về `star` / `users`), `title` (localized, R), `description` (localized)) |
 | `blockOrder` | array thứ tự khối (gồm `strengths`, `ctaBanner`, `rentals`, `news`); mặc định bản ghi mới: `strengths, about, featuredProjects, ctaBanner` (BL-044) |
 | `seo` | group |
 

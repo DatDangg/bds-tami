@@ -1,151 +1,159 @@
 {
-  "specVersion": "1.42.0",
-  "scopeVersion": 52,
-  "generatedAt": "2026-10-21T23:59:45+07:00",
+  "specVersion": "1.43.0",
+  "scopeVersion": 53,
+  "generatedAt": "2026-10-21T23:59:50+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-046 MODIFY: header theo mockup site redesign — --header-offset 64px (≥ lg 72px), thanh nổi 52/56px lề trên 6/8px hai bên 8/16px bo 26/28px, logo ≥ lg 36px, menu ngang 12px/.04em/gap 24px; thẻ tiêu đề trang chi tiết cách thanh mục con 32px. Nền kính + hành vi cuộn giữ nguyên.",
-  "workItem": "feature/header-match-site-mockup",
-  "backlog": "BL-046",
+  "triggerNote": "BL-047 MODIFY: khối Về TAMI trang chủ đúng mockup — ≥ lg cụm ảnh 7/12 cột (ảnh lớn 62%, ảnh phụ 36%, chú thích 34%), chữ cột 8–12 tối đa 27rem, tiêu đề h1; ảnh toà nhà trang trí 10% mép phải mờ 60% + mask chỉ từ 1400px; danh sách icon dùng chung thêm medal, users-three (migration additive). < lg không đổi.",
+  "workItem": "feature/home-about-match-mockup",
+  "backlog": "BL-047",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-21-header-match-site-mockup.md",
+  "changeDoc": "spec/changes/archive/2026-10-21-home-about-match-mockup.md",
   "task": [
-    "tasks/feature-header-match-site-mockup/phase-1-task-01.md"
+    "tasks/feature-home-about-match-mockup/phase-1-task-01.md"
   ],
-  "reviewReport": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-2-review.md",
+  "reviewReport": ".context/review-reports/feature-home-about-match-mockup-phase-1-task-01-round-2-review.md",
   "reviewResults": [
     {
       "task": "phase-1-task-01",
       "round": 1,
       "result": "FAIL",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-1-review.md"
+      "report": ".context/review-reports/feature-home-about-match-mockup-phase-1-task-01-round-1-review.md",
+      "note": "MAJOR-1: ảnh toà nhà trang trí đè cột chữ ở 1280–1392px; MINOR-1..4"
     },
     {
       "task": "phase-1-task-01",
       "round": 2,
       "result": "PASS",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-2-review.md"
+      "report": ".context/review-reports/feature-home-about-match-mockup-phase-1-task-01-round-2-review.md",
+      "note": "MAJOR-1 + MINOR-1..4 đóng; 3 MINOR mới không chặn (lề mỏng khi có scrollbar, JSDoc cũ, seed ghi dở)"
     }
   ],
   "commits": [],
-  "previousScope": "spec/test-scope/archive/test-scope-1.41.0-51.json",
-  "specUpdate": "spec/updates/2026-10-21-header-match-site-mockup.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.42.0-52.json",
+  "specUpdate": "spec/updates/2026-10-21-home-about-match-mockup.md",
   "specRefs": [
-    "Overview: Khung trang",
-    "design-spec §2.1"
+    "Overview: Trang chủ — Điểm mạnh (danh sách icon)",
+    "design-spec S01 — 2 Về TAMI (as-built BL-047)"
   ],
   "specRefNotes": {
-    "Overview: Khung trang": "--header-offset 64px (≥ lg 72px); thanh nổi cách mép trên 6px (≥ lg 8px), hai bên 8px (≥ lg 16px), cao 52px (≥ lg 56px); thanh mục con trang chi tiết dính đúng lề ngang header nổi (8/16px). Nền kính, hai hình dạng theo cuộn, ẩn khi cuộn ở trang chi tiết giữ nguyên.",
-    "design-spec §2.1": "Logo ≥ lg 36px; menu ngang --text-xsmall 12px, letter-spacing .04em, gap 24px; thanh nổi bo 26/28px; DetailTitleCard pb-8 (32px) trước thanh mục con."
+    "Overview: Trang chủ — Điểm mạnh (danh sách icon)": "strengths.items[].icon thêm medal, users-three (migration 20261021_020651_about_stats_icons additive); cùng danh sách cho about.stats[].icon và site-settings careersPerks[].icon.",
+    "design-spec S01 — 2 Về TAMI (as-built BL-047)": "≥ lg cụm ảnh 7/12 cột (ảnh lớn 62% ≈ 430px ở 1440, ảnh phụ 36% ≈ 250px, chú thích 34% dưới ảnh phụ), chữ cột 8–12 max 27rem, tiêu đề --text-h1; decorImage 10% mép phải, opacity 60% + mask, chỉ ≥ 1400px; < lg không đổi."
   },
-  "migration": "none — không đổi schema/DB",
+  "migration": "20261021_020651_about_stats_icons — up additive (ALTER TYPE ADD VALUE medal, users-three trên enum homepage_about_stats, homepage_strengths_items, site_settings_careers_perks); down lossy (medal→star, users-three→users rồi dựng lại enum cũ). Không HIGH_RISK.",
   "changed": {
     "files": [
-      "src/components/layout/DesktopNav.tsx",
-      "src/components/layout/Header.tsx",
-      "src/components/layout/HeaderFrame.tsx",
-      "src/components/layout/Header.test.tsx",
-      "src/components/layout/HeaderFrame.test.tsx",
-      "src/components/detail/DetailTitleCard.tsx",
-      "src/components/detail/DetailLayout.tsx",
-      "src/components/detail/DetailSubNav.tsx",
-      "src/components/detail/DetailTitleCard.test.tsx",
-      "src/components/detail/detail-header-css.test.ts",
-      "src/app/(frontend)/globals.css"
+      "src/components/home/AboutBlock.tsx",
+      "src/components/home/AboutBlock.test.tsx",
+      "src/components/home/strength-icons.ts",
+      "src/components/icons.ts",
+      "src/globals/homepage/blocks.ts",
+      "src/payload-types.ts",
+      "migrations/20261021_020651_about_stats_icons.ts",
+      "migrations/20261021_020651_about_stats_icons.json",
+      "migrations/index.ts",
+      "scripts/seed-page-heroes.ts"
     ],
-    "filesNote": "globals.css chỉ đổi --header-offset (4rem / ≥ lg 4.5rem). Doc: docs/DESIGN.md, .context/design-spec.md §2.1.",
+    "filesNote": "scripts/seed-page-heroes.ts chỉ dữ liệu dev (seedHomeAbout). Doc: docs/ERD.md, .context/design-spec.md S01.",
     "modules": [
-      "layout/Header + HeaderFrame (header phẳng / thanh nổi)",
-      "layout/DesktopNav (menu ngang ≥ xl)",
-      "design tokens (--header-offset)",
-      "detail/DetailTitleCard, DetailLayout, DetailSubNav"
+      "home/AboutBlock (khối Về TAMI)",
+      "icons + home/strength-icons (bản đồ icon dùng chung)",
+      "globals/homepage blocks (STRENGTH_ICONS / strengthIconField — dùng ở homepage + site-settings)",
+      "DB enum icon (3 bảng)"
     ]
   },
   "impact": {
     "direct": [
-      "Header mọi trang public vi/en: đầu trang thanh phẳng cao 64px (≥ lg 72px); cuộn xuống → thanh nổi bo tròn 52/56px, cách mép trên 6/8px, hai bên 8/16px",
-      "Trang chi tiết dự án / cho thuê / tin BĐS: cuộn xuống header vẫn ẩn hẳn; thẻ tiêu đề cách thanh mục con 32px",
-      "Menu ngang desktop chữ 12px giãn .04em, gap 24px — 1280 VI/EN 1 hàng; logo ≥ lg 36px"
+      "Trang chủ / và /en khối Về TAMI ≥ lg: cụm ảnh to hơn (7/12 cột), chữ cột hẹp 8–12 max 27rem, tiêu đề cỡ h1",
+      "Ảnh toà nhà trang trí mép phải chỉ hiện từ 1400px, mờ 60% + mask, không đè chữ",
+      "Admin Trang chủ: Điểm mạnh + số liệu Về TAMI chọn được icon 'medal', 'users-three'",
+      "Admin Cài đặt: quyền lợi Tuyển dụng chọn được 2 icon mới"
     ],
     "dependents": [
-      "Hero trang chủ bù header (--header-offset)",
-      "Ô tìm kiếm trang chủ / trang danh sách",
-      "Mục lục trang pháp lý dính",
-      "Thanh mục con trang chi tiết + aside dính",
-      "scroll-margin khi bấm neo mục (mục con, mục lục)"
+      "Dải Điểm mạnh trang chủ render icon",
+      "/tuyen-dung dải quyền lợi (careersPerks) render icon",
+      "/du-an dải điểm mạnh (showProjectStrengths) render icon",
+      "Migration chạy trên staging/prod (enum 3 bảng)"
     ],
     "regression": [
-      "Nền kính mờ, chuyển phẳng ↔ nổi, reduced-motion tức thì không đổi",
-      "< xl nút Menu + menu toàn màn hình không đổi",
-      "Nút CTA header, VI|EN, tìm kiếm vẫn hiện như trước"
+      "< lg khối Về TAMI không đổi (eyebrow + tiêu đề → ảnh 4:3 → nội dung → số liệu → nút)",
+      "Nền kem --color-primary-subtle, nút play mở hộp thoại YouTube-nocookie, thứ tự khối giữ nguyên",
+      "Thiếu ảnh lớn → ẩn cả cụm ảnh (gồm nút video), cột chữ vẫn hiện",
+      "8 icon cũ vẫn hiển thị đúng; dữ liệu icon cũ không bị đổi sau migrate up"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL046-01",
+      "id": "BL047-01",
       "viewport": 1440,
-      "steps": "Mở /du-an (vi) ở đầu trang, đo header; cuộn xuống 300px.",
-      "expected": "Đầu trang: header phẳng full-width cao 72px, logo 36px. Cuộn: thanh nổi bo tròn cao 56px, cách mép trên 8px, hai bên 16px, có bóng; cuộn về đầu → phẳng lại."
+      "steps": "Mở / (vi), cuộn tới khối Về TAMI; đo cụm ảnh và cột chữ.",
+      "expected": "Cụm ảnh chiếm ~7/12 bên trái: ảnh lớn vuông ~430px, ảnh phụ ~250px lệch mép trái phía trên, thẻ chú thích ngay dưới ảnh phụ. Cột chữ bên phải hẹp (≤ 27rem), tiêu đề cỡ h1. Ảnh toà nhà trang trí mờ hé ở mép phải, không đè chữ."
     },
     {
-      "id": "BL046-02",
-      "viewport": 375,
-      "steps": "Như BL046-01 trên mobile.",
-      "expected": "Đầu trang header 64px; cuộn → thanh nổi 52px cách mép trên 6px, hai bên 8px; không tràn ngang; nút Menu mở menu toàn màn hình như cũ."
-    },
-    {
-      "id": "BL046-03",
+      "id": "BL047-02",
       "viewport": 1280,
-      "steps": "Mở / và /en ở 1280.",
-      "expected": "Menu ngang chữ 12px giãn chữ, khoảng cách đều 24px, nằm trên 1 hàng cả VI và EN (không xuống dòng, không đè nút phải)."
+      "steps": "Mở / và /en ở 1280 (thêm 1392 nếu được); xem mép phải khối Về TAMI.",
+      "expected": "KHÔNG hiện ảnh toà nhà trang trí; chữ/số liệu/nút đọc rõ, không bị ảnh nào đè."
     },
     {
-      "id": "BL046-04",
-      "viewport": 1440,
-      "steps": "Mở chi tiết dự án, chi tiết cho thuê, chi tiết tin BĐS; xem khoảng thẻ tiêu đề → thanh mục con; cuộn xuống; bấm 1 mục con.",
-      "expected": "Khoảng 32px giữa đáy thẻ tiêu đề và thanh mục con. Cuộn: header ẩn hẳn, thanh mục con dính sát đỉnh đúng lề 16px. Bấm mục con: tiêu đề mục không bị che."
+      "id": "BL047-03",
+      "viewport": 1400,
+      "steps": "Mở / ở 1400 và 1920.",
+      "expected": "Ảnh toà nhà trang trí hiện ở 10% mép phải, mờ + nhạt dần sang trái, không chạm cột chữ; 1920 bố cục không vỡ."
     },
     {
-      "id": "BL046-05",
-      "viewport": 1440,
-      "steps": "Trang chủ: hero + ô tìm kiếm; trang pháp lý: cuộn mục lục; bấm neo trong mục lục.",
-      "expected": "Hero không hở/đè dưới header; mục lục dính không bị header che; neo cuộn tới đúng tiêu đề, không bị che."
+      "id": "BL047-04",
+      "viewport": 1024,
+      "steps": "Mở /en ở 1024 (lg nhỏ nhất).",
+      "expected": "Bố cục 2 cột không tràn ngang; thẻ chú thích EN không tràn ra ngoài cụm ảnh; tiêu đề không đè ảnh."
     },
     {
-      "id": "BL046-06",
+      "id": "BL047-05",
       "viewport": 390,
-      "steps": "Mở chi tiết cho thuê trên mobile, cuộn xuống rồi về đầu; Tab bàn phím vào header khi đang cuộn.",
-      "expected": "Header ẩn khi cuộn, hiện lại khi về đầu hoặc khi focus Tab vào header; thanh mục con lề 8px."
+      "steps": "Mở / và /en trên mobile, cuộn qua khối Về TAMI.",
+      "expected": "Như trước BL-047: 1 cột, ảnh lớn 4:3, không tràn ngang (scrollWidth = 390), không ảnh trang trí."
+    },
+    {
+      "id": "BL047-06",
+      "viewport": 1440,
+      "steps": "Admin → Trang chủ: ở Điểm mạnh và số liệu Về TAMI chọn icon 'medal' và 'users-three', lưu; mở / và /en.",
+      "expected": "Lưu không lỗi; icon huy chương và nhóm người hiện đúng trong ô tròn ở dải Điểm mạnh và số liệu Về TAMI."
+    },
+    {
+      "id": "BL047-07",
+      "viewport": 1440,
+      "steps": "Admin → Cài đặt → quyền lợi Tuyển dụng: chọn 'medal' cho 1 ý, lưu; mở /tuyen-dung. Mở /du-an (cờ showProjectStrengths bật).",
+      "expected": "Ô chọn icon có 2 giá trị mới; /tuyen-dung hiện icon huy chương ở ý đó; /du-an dải điểm mạnh render icon không lỗi."
     }
   ],
   "acceptance": [
-    "--header-offset = 4rem (64px), ≥ lg 4.5rem (72px)",
-    "Thanh nổi: cao 52px (≥ lg 56px), cách mép trên 6px (≥ lg 8px), hai bên 8px (≥ lg 16px), bo 26px (≥ lg 28px), rộng tối đa 84rem, có bóng",
-    "Logo header ≥ lg 36px",
-    "Menu ngang ≥ xl: 12px (--text-xsmall), letter-spacing .04em, gap 24px; 1280 VI/EN 1 hàng",
-    "DetailTitleCard có pb-8 (32px) trước thanh mục con ở chi tiết dự án / cho thuê / tin BĐS",
-    "Nền kính, chuyển phẳng ↔ nổi, ẩn khi cuộn ở trang chi tiết, < xl nút Menu không đổi"
+    "Danh sách icon dùng chung có đủ 10 giá trị gồm medal, users-three; chọn được ở admin Trang chủ (Điểm mạnh, số liệu Về TAMI) và Cài đặt (quyền lợi Tuyển dụng)",
+    "Migration 20261021_020651_about_stats_icons up chỉ thêm giá trị enum, dữ liệu cũ giữ nguyên",
+    "≥ lg cụm ảnh 7/12 cột (ảnh lớn 62%, ảnh phụ 36%, chú thích 34%); chữ cột 8–12 tối đa 27rem; tiêu đề --text-h1",
+    "decorImage chỉ hiện ≥ 1400px, rộng 10% mép phải, mờ 60% + mask; không đè chữ ở mọi bề rộng",
+    "< lg, nền kem, nút video, thứ tự khối không đổi"
   ],
   "verify": {
-    "test": "pnpm vitest run src/components/layout src/components/detail: 26 files / 182 tests PASS (reviewer r2); pnpm test toàn bộ 344 files / 3531 tests PASS (builder, chung working tree với BL-047)",
+    "test": "pnpm vitest run src/components/home: 12 files / 108 tests PASS (reviewer r2); pnpm test toàn bộ 344 files / 3531 tests PASS (builder, chung working tree với BL-046)",
     "typecheck": "pnpm typecheck PASS",
-    "lint": "pnpm lint 0 error (2 warning có sẵn)",
-    "runtime": "builder đo tay 1440/375 (header 72/64, không tràn) và 1280 VI/EN 1 hàng; khoảng 32px ở 3 trang chi tiết — cần UI test BL046-01..06 xác nhận"
+    "lint": "pnpm lint 0 error (2 warning có sẵn) — builder; không chạy lại ở r2",
+    "migration": "pnpm payload migrate đã chạy local (builder); reviewer inspect up additive / down lossy",
+    "runtime": "Responsive kiểm bằng tính CSS, chưa đo trình duyệt — cần UI test BL047-01..07 xác nhận (đặc biệt caption EN 1024px, 1280–1400px không có decor)"
   },
   "outOfScope": [
-    "Nền trắng đặc + viền dưới như mockup (giữ kính mờ)",
-    "Sticky đứng yên như mockup (giữ thanh nổi BL-025, ẩn ở trang chi tiết BL-027)",
-    "Bỏ nút CTA header",
-    "Gạch chân vàng mục menu đang xem",
-    "BL-047 (icon Điểm mạnh medal / users-three) — work item riêng"
+    "Hoa văn sóng mép trái mockup",
+    "Bố cục < lg khối Về TAMI",
+    "BL-046 (header theo mockup) — work item riêng"
   ],
   "openQuestions": [],
   "viewports": [
+    1920,
     1440,
+    1400,
     1280,
-    390,
-    375
+    1024,
+    390
   ],
   "locales": [
     "vi",
@@ -157,7 +165,7 @@
   "uiTests": true,
   "apiTests": [],
   "risk": "medium",
-  "riskNote": "--header-offset là biến dùng chung cho mọi chỗ bù sticky/scroll-margin; header là shared component mọi trang. Residual: pnpm test toàn bộ và lint không chạy lại sau round 2 (chỉ 26 file layout/detail + typecheck).",
+  "riskNote": "Migration enum trên 3 bảng dùng field icon chung (homepage + site-settings); down lossy (medal→star, users-three→users). Full test (344 files / 3533 PASS) + lint 0 error + typecheck chạy lại sau fix attempt 2. Residual: responsive chưa đo trên trình duyệt; 3 MINOR r2 mở (lề mỏng khi có scrollbar ở ~1400px, JSDoc cũ, seed ghi dở).",
   "status": "published",
-  "statusNote": "published 2026-10-21 — BL-046 feature-update"
+  "statusNote": "published 2026-10-21 — BL-047 feature-update"
 }

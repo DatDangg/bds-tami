@@ -16,9 +16,10 @@ function ImageCluster({ block }: { block: AboutView }) {
   const t = useTranslations("page.home.about");
   if (!image) return null;
   return (
-    <div className="relative lg:col-span-6 lg:row-span-2 lg:row-start-1 lg:self-center">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted lg:ml-auto lg:aspect-square lg:w-[66%]">
-        <ResponsiveImage media={image} sizes="(min-width: 1280px) 430px, (min-width: 1024px) 34vw, 100vw" />
+    // ≥ lg cụm ảnh chiếm 7/12 cột (mockup: ảnh lớn ~430px, ảnh phụ ~235px ở 1440, chữ cột hẹp bên phải — BL-047).
+    <div className="relative lg:col-span-7 lg:row-span-2 lg:row-start-1 lg:self-center">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted lg:ml-auto lg:aspect-[49/50] lg:w-[62%]">
+        <ResponsiveImage media={image} sizes="(min-width: 1280px) 440px, (min-width: 1024px) 38vw, 100vw" />
         {videoEmbedUrl && (
           <div className="absolute inset-x-0 bottom-0 bg-banner-scrim p-4">
             <AboutVideoButton embedUrl={videoEmbedUrl} label={videoLabel ?? t("defaultVideoLabel")} />
@@ -27,15 +28,15 @@ function ImageCluster({ block }: { block: AboutView }) {
       </div>
       {secondaryImage && (
         // Mảng nền be `primary-soft` lệch sau ảnh phụ (mockup BL-044); chỉ trang trí.
-        <div aria-hidden="true" data-testid="about-backdrop" className="absolute top-[3%] left-[5%] hidden aspect-square w-[34%] rounded-xl bg-primary-soft lg:block" />
+        <div aria-hidden="true" data-testid="about-backdrop" className="absolute top-0 left-[6%] hidden aspect-square w-[34%] rounded-xl bg-primary-soft lg:block" />
       )}
       {secondaryImage && (
-        <div className="absolute top-[7%] left-0 hidden aspect-square w-[36%] overflow-hidden rounded-xl bg-surface-muted shadow-md lg:block">
-          <ResponsiveImage media={secondaryImage} sizes="(min-width: 1280px) 230px, 20vw" decorative />
+        <div className="absolute top-[6%] left-0 hidden aspect-[49/50] w-[36%] overflow-hidden rounded-xl bg-surface-muted shadow-md lg:block">
+          <ResponsiveImage media={secondaryImage} sizes="(min-width: 1280px) 240px, 20vw" decorative />
         </div>
       )}
       {imageCaption && (
-        <div className="mt-4 flex items-end justify-between gap-3 rounded-lg bg-surface p-5 shadow-md lg:absolute lg:bottom-[3%] lg:left-0 lg:mt-0 lg:w-[36%]">
+        <div className="mt-4 flex items-end justify-between gap-3 rounded-lg bg-surface p-5 shadow-md lg:absolute lg:top-[66%] lg:left-0 lg:mt-0 lg:w-[34%]">
           <p className="min-w-0 text-small whitespace-pre-line text-text">{imageCaption}</p>
           <span aria-hidden="true" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-accent-text">
             <ArrowRight size={16} />
@@ -72,7 +73,7 @@ function StatsList({ stats }: { stats: AboutView["stats"] }) {
 
 /**
  * Về TAMI (design-spec S01.2, mockup BL-044): < lg xếp dọc (tiêu đề → cụm ảnh → nội dung → số liệu → nút); ≥ lg lưới 12 cột, cụm ảnh cột 1-6, chữ cột 7-12,
- * ảnh toà nhà trang trí mép phải từ xl. Mọi chữ do admin nhập; thiếu (vd chưa có bản EN) thì phần tử đó ẩn. Server Component; chỉ nút play là client.
+ * ảnh toà nhà trang trí mép phải từ 1400px. Mọi chữ do admin nhập; thiếu (vd chưa có bản EN) thì phần tử đó ẩn. Server Component; chỉ nút play là client.
  */
 export function AboutBlock({ block }: { block: AboutView }) {
   const tRich = useTranslations("page.richText");
@@ -82,20 +83,21 @@ export function AboutBlock({ block }: { block: AboutView }) {
   return (
     <section aria-labelledby={headingId} data-block="about" className="relative isolate overflow-hidden bg-primary-subtle pt-section pb-6">
       {block.decorImage && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[9%] xl:block">
-          <ResponsiveImage media={block.decorImage} sizes="9vw" decorative className="absolute inset-0" />
+        // Ảnh toà nhà mép phải nhạt dần vào nền (mask trái → phải), như mockup BL-044 (BL-047). Chỉ từ 1400px: dưới đó 10% mép phải đè lên cột chữ (cần lề ngoài khung 80rem).
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[10%] opacity-60 [mask-image:linear-gradient(to_right,transparent,black_60%)] min-[1400px]:block">
+          <ResponsiveImage media={block.decorImage} sizes="10vw" decorative className="absolute inset-0" />
         </div>
       )}
       <div className="mx-auto grid w-full max-w-container gap-y-6 px-gutter lg:grid-cols-12 lg:gap-x-10">
-        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:max-w-[30rem] lg:self-end">
+        <div className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-w-[27rem] lg:self-end">
           <p className="mb-3 text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{block.eyebrow ?? tAbout("defaultEyebrow")}</p>
-          <h2 id={headingId} className="font-display text-h2">
+          <h2 id={headingId} className="font-display text-h2 lg:text-h1">
             {block.title}
             {block.titleAccent && <> <span className="text-accent-text">{block.titleAccent}</span></>}
           </h2>
         </div>
         <ImageCluster block={block} />
-        <div className="flex flex-col gap-6 lg:col-span-6 lg:col-start-7 lg:row-start-2 lg:max-w-[30rem] lg:self-start">
+        <div className="flex flex-col gap-6 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:max-w-[27rem] lg:self-start">
           <RichText data={block.content} locale={locale} tableLabel={tRich("table")} className="text-text-secondary" />
           {block.stats.length > 0 && <StatsList stats={block.stats} />}
           {block.cta && (

@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { IconProps } from "@phosphor-icons/react";
-import { Buildings, ClipboardText, Clock, Headset, MapPin, ShieldCheck, Star, Users } from "@/components/icons";
+import { Buildings, ClipboardText, Clock, Headset, MapPin, Medal, ShieldCheck, Star, Users, UsersThree } from "@/components/icons";
 import type { StrengthIcon } from "@/globals/homepage/blocks";
 
 /**
@@ -16,4 +16,6 @@ export const STRENGTH_ICON_COMPONENTS: Record<StrengthIcon, ComponentType<IconPr
   clock: Clock,
   users: Users,
   star: Star,
+  medal: Medal,
+  "users-three": UsersThree,
 };

@@ -2678,7 +2678,17 @@ export interface SiteSetting {
    */
   careersPerks?:
     | {
-        icon: 'map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star';
+        icon:
+          | 'map-pin'
+          | 'buildings'
+          | 'headset'
+          | 'file-check'
+          | 'shield-check'
+          | 'clock'
+          | 'users'
+          | 'star'
+          | 'medal'
+          | 'users-three';
         title: string;
         description?: string | null;
         id?: string | null;
@@ -2813,7 +2823,17 @@ export interface Homepage {
      */
     items?:
       | {
-          icon: 'map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star';
+          icon:
+            | 'map-pin'
+            | 'buildings'
+            | 'headset'
+            | 'file-check'
+            | 'shield-check'
+            | 'clock'
+            | 'users'
+            | 'star'
+            | 'medal'
+            | 'users-three';
           title: string;
           description?: string | null;
           id?: string | null;
@@ -2863,7 +2883,19 @@ export interface Homepage {
     stats?:
       | {
           icon?:
-            ('map-pin' | 'buildings' | 'headset' | 'file-check' | 'shield-check' | 'clock' | 'users' | 'star') | null;
+            | (
+                | 'map-pin'
+                | 'buildings'
+                | 'headset'
+                | 'file-check'
+                | 'shield-check'
+                | 'clock'
+                | 'users'
+                | 'star'
+                | 'medal'
+                | 'users-three'
+              )
+            | null;
           /**
            * Vd: 10+, 1.500
            */

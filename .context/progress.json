@@ -1871,6 +1871,34 @@
       "completedAt": "2026-10-21",
       "specVersion": "1.42.0",
       "scopeVersion": 52
+    },
+    {
+      "slug": "home-about-match-mockup",
+      "title": "Trang chủ — khối Về TAMI làm lại đúng mockup: cụm ảnh 7/12 cột, chữ cột hẹp + h1, toà nhà trang trí mép phải (≥1400px), icon medal/users-three (migration additive), seed dev (BL-047)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-047",
+      "changeDoc": "spec/changes/archive/2026-10-21-home-about-match-mockup.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user: \"xử lý nốt đi\" = auto proceed; 1 phase/1 task)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-home-about-match-mockup/phase-1-task-01.md",
+          "title": "Bố cục Về TAMI + icon mới + migration + seed",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-home-about-match-mockup-phase-1-task-01-round-2-review.md"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.43.0",
+      "scopeVersion": 53,
+      "migration": "20261021_020651_about_stats_icons (additive; down lossy)"
     }
   ],
   "bugs": [
@@ -2787,7 +2815,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T03:46:33.860Z",
+  "lastUpdated": "2026-10-21T03:51:55.703Z",
   "approvalMilestones": [
     {
       "id": "M1",

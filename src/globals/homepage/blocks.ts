@@ -16,7 +16,8 @@ export const STRENGTH_ITEMS_MAX = 6;
  * Icon cho mục Điểm mạnh và số liệu Về TAMI (BL-044): giá trị lưu là tên kebab, map sang component Phosphor ở `components/home/strength-icons.ts`.
  * `file-check` giữ tên theo spec dù Phosphor không có `FileCheck` (hiển thị bằng `ClipboardText`).
  */
-export const STRENGTH_ICONS = ["map-pin", "buildings", "headset", "file-check", "shield-check", "clock", "users", "star"] as const;
+// `medal` + `users-three` (BL-047): icon số liệu Về TAMI theo mockup trang chủ (huy chương "năm kinh nghiệm", nhóm người "khách hàng").
+export const STRENGTH_ICONS = ["map-pin", "buildings", "headset", "file-check", "shield-check", "clock", "users", "star", "medal", "users-three"] as const;
 export type StrengthIcon = (typeof STRENGTH_ICONS)[number];
 
 const STRENGTH_ICON_LABELS: Record<StrengthIcon, string> = {
@@ -28,6 +29,8 @@ const STRENGTH_ICON_LABELS: Record<StrengthIcon, string> = {
   clock: "Đồng hồ",
   users: "Khách hàng",
   star: "Ngôi sao",
+  medal: "Huy chương",
+  "users-three": "Nhóm khách hàng",
 };
 
 export const strengthIconField = (required: boolean): Field => ({

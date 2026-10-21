@@ -1,7 +1,9 @@
 // Seed DEV cho BL-045: chữ hero vi/en 6 trang con, dải ý Tuyển dụng (4 mục vi/en), ảnh banner Liên hệ + Pháp lý,
 // xuất bản 2 trang pháp lý mẫu. Chạy: `pnpm seed:page-heroes` (= `payload run scripts/seed-page-heroes.ts`).
 // Idempotent (ghi đè đúng các trường này, ảnh dò theo `alt`); từ chối khi NODE_ENV=production hoặc DATABASE_URL trùng staging/prod (`checkSeedEnvironment`); không xếp job dịch AI.
+// BL-047: `seedHomeAbout` GHI ĐÈ khối Về TAMI trang chủ (ảnh phụ, ảnh trang trí, nội dung vi/en, chú thích, icon số liệu) của DB dev; cần thư mục ảnh `seed/scraped*` (gitignore), thiếu thì báo lỗi rõ.
 // Xuất bản CHỈ 2 trang pháp lý (`kind` privacy/terms) và 3 dịch vụ mẫu của `seed:sample-services` (theo slug), không đụng bản nháp khác.
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getPayload, type Payload } from "payload";
@@ -61,14 +63,21 @@ const PERKS = [
   { icon: "shield-check", vi: ["Đào tạo bài bản", "Lộ trình thăng tiến"], en: ["Structured training", "A clear growth path"] },
 ] as const;
 
-async function uploadMockupImage(payload: Payload, file: string, alt: string): Promise<string> {
+type ImageExtract = { left: number; top: number; width: number; height: number };
+
+/** Đưa một ảnh webp vào media, dò theo `alt` (idempotent); `extract` cắt vùng trước khi lưu (ảnh trang trí dọc). */
+async function uploadImage(payload: Payload, root: string, file: string, alt: string, extract?: ImageExtract): Promise<string> {
   const found = await payload.find({ collection: "media", where: { alt: { equals: alt } }, locale: "vi", fallbackLocale: false, ...Q });
   if (found.docs[0]) return found.docs[0].id as string;
-  const data = await readFile(path.join(MOCKUP_ASSETS, file));
+  let data = await readFile(path.join(root, file));
+  if (extract) {
+    const sharp = (await import("sharp")).default;
+    data = await sharp(data).extract(extract).webp({ quality: 82 }).toBuffer();
+  }
   const created = await payload.create({
     collection: "media",
     data: { alt },
-    file: { data, mimetype: "image/webp", name: file, size: data.byteLength },
+    file: { data, mimetype: "image/webp", name: path.basename(file), size: data.byteLength },
     locale: "vi",
     depth: 0,
     overrideAccess: true,
@@ -76,6 +85,8 @@ async function uploadMockupImage(payload: Payload, file: string, alt: string): P
   });
   return created.id as string;
 }
+
+const uploadMockupImage = (payload: Payload, file: string, alt: string) => uploadImage(payload, MOCKUP_ASSETS, file, alt);
 
 async function seedSettings(payload: Payload) {
   const contact = await uploadMockupImage(payload, "img1.webp", "Banner trang Liên hệ (mẫu dev)");
@@ -113,6 +124,51 @@ async function seedSettings(payload: Payload) {
   });
 }
 
+const SCRAPED = path.resolve(process.cwd(), "seed");
+const ABOUT_SECONDARY_FILE = "scraped/images/c6c00bbf03a0f703.webp";
+const ABOUT_DECOR_FILE = "scraped-extra/images/71246155afaf2609.webp";
+
+/** BL-047 — khối Về TAMI trang chủ theo mockup: ảnh phụ nội thất, ảnh toà nhà trang trí mép phải, chữ giới thiệu + chú thích + icon số liệu. */
+async function seedHomeAbout(payload: Payload) {
+  // Kiểm nguồn ảnh TRƯỚC khi ghi gì để không bỏ dở giữa chừng.
+  const missing = [ABOUT_SECONDARY_FILE, ABOUT_DECOR_FILE].filter((file) => !existsSync(path.join(SCRAPED, file)));
+  if (missing.length > 0) throw new Error(`seedHomeAbout: thiếu ảnh nguồn (gitignore, lấy từ máy có thư mục seed/scraped*): ${missing.join(", ")}`);
+  const secondaryImage = await uploadImage(payload, SCRAPED, ABOUT_SECONDARY_FILE, "Phòng khách căn hộ nhìn ra thành phố (mẫu dev)");
+  const decorImage = await uploadImage(payload, SCRAPED, ABOUT_DECOR_FILE, "Toà tháp xanh trang trí Về TAMI (mẫu dev)", { left: 640, top: 0, width: 760, height: 1080 });
+  const { paragraphsToLexical } = await import("../seed/lexical");
+  const home = (await payload.findGlobal({ slug: "homepage", locale: "vi", depth: 0, overrideAccess: true })) as unknown as {
+    about?: { stats?: { id: string; value: string; label: string; icon?: string | null }[] };
+  };
+  const stats = home.about?.stats ?? [];
+  const icons = ["medal", "users-three"];
+  const common = { depth: 0, overrideAccess: true, context: context() } as const;
+  await payload.updateGlobal({
+    slug: "homepage",
+    locale: "vi",
+    data: {
+      about: {
+        secondaryImage,
+        decorImage,
+        content: paragraphsToLexical(["TAMI HOMES là đơn vị phân phối, môi giới và khai thác căn hộ dịch vụ, mang đến giải pháp an cư tiện nghi, hiện đại cho khách hàng."]),
+        imageCaption: "Không gian sống\nhiện đại\nTiện nghi\nSẵn sàng vào ở",
+        stats: stats.map((row, i) => ({ ...row, icon: icons[i] ?? row.icon })),
+      },
+    } as never,
+    ...common,
+  });
+  await payload.updateGlobal({
+    slug: "homepage",
+    locale: "en",
+    data: {
+      about: {
+        content: paragraphsToLexical(["TAMI HOMES distributes, brokers and operates serviced apartments, bringing clients comfortable, modern places to live."]),
+        imageCaption: "Modern\nliving spaces\nFully equipped\nReady to move in",
+      },
+    } as never,
+    ...common,
+  });
+}
+
 /** Dev: xuất bản đúng 2 trang pháp lý mẫu (`kind` privacy/terms) nếu còn nháp để trang Pháp lý xem được. */
 async function publishLegalPages(payload: Payload) {
   const pages = await payload.find({ collection: "pages", where: { kind: { in: ["privacy", "terms"] } }, depth: 0, limit: 10, pagination: false, overrideAccess: true, locale: "vi", draft: false });
@@ -143,7 +199,8 @@ try {
   await seedSettings(payload);
   await publishLegalPages(payload);
   await publishSampleServices(payload);
-  payload.logger.info("Seed page-heroes xong: chữ hero vi/en, careersPerks, ảnh banner Liên hệ + Pháp lý.");
+  await seedHomeAbout(payload);
+  payload.logger.info("Seed page-heroes xong: chữ hero vi/en, careersPerks, ảnh banner Liên hệ + Pháp lý, khối Về TAMI trang chủ.");
 } finally {
   await payload.destroy();
 }

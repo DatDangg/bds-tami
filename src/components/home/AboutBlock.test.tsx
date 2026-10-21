@@ -66,11 +66,20 @@ describe("AboutBlock (BL-044)", () => {
     expect(screen.getByText("năm kinh nghiệm").tagName).toBe("DT");
   });
 
+  it("số liệu: icon mới medal / users-three render trong ô tròn", () => {
+    const { container } = renderWithIntl(
+      <AboutBlock block={view({ stats: [{ value: "10+", label: "năm", icon: "medal" }, { value: "500+", label: "khách", icon: "users-three" }] })} />,
+    );
+    const items = container.querySelectorAll("dl > div");
+    expect(items[0]?.querySelector("span[aria-hidden='true'].bg-primary-soft svg")).not.toBeNull();
+    expect(items[1]?.querySelector("span[aria-hidden='true'].bg-primary-soft svg")).not.toBeNull();
+  });
+
   it("thẻ chú thích giữ xuống dòng, ảnh trang trí aria-hidden và alt rỗng", () => {
     const { container } = renderWithIntl(<AboutBlock block={view()} />);
     expect(screen.getByText(/Không gian sống/)).toHaveClass("whitespace-pre-line");
     const decor = container.querySelector("section > div[aria-hidden='true']");
-    expect(decor).toHaveClass("pointer-events-none", "hidden", "xl:block");
+    expect(decor).toHaveClass("pointer-events-none", "hidden", "min-[1400px]:block");
     expect(decor?.querySelector("img")).toHaveAttribute("alt", "");
   });
 
