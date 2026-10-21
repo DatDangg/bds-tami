@@ -18,7 +18,7 @@ import { loadProjectStrengths } from "@/lib/content/load-project-strengths";
 import { parsePagination } from "@/lib/content/pagination";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { visibleCategory } from "@/lib/news/news-view";
-import { hasFilterParams, parseProjectFilters, projectQueryString, type RawProjectParams } from "@/lib/projects/project-filters";
+import { hasFilterParams, parseProjectFilters, projectQueryString, type ProjectQueryParams, type RawProjectParams } from "@/lib/projects/project-filters";
 import {
   findProjectCategoryBySlug,
   listChildProjectCategories,
@@ -54,7 +54,7 @@ async function loadCategoryContext(payload: Payload, locale: Locale, slug: strin
 }
 
 /** Chip Loại hình (design-spec S02): "Tất cả" + danh mục cấp 1, link `?category=` giữ tỉnh/trạng thái/từ khoá/chủ đầu tư/sắp xếp đang lọc và về trang 1. */
-function buildChips(roots: Category[], listPath: string, allLabel: string, carry: { province?: string; status?: string; q?: string; developer?: string; sort?: string }, currentRootId?: string): CategoryChip[] {
+function buildChips(roots: Category[], listPath: string, allLabel: string, carry: Omit<ProjectQueryParams, "category" | "page">, currentRootId?: string): CategoryChip[] {
   const named = roots.filter((root) => root.slug && root.name);
   if (named.length === 0) return [];
   return [
@@ -86,29 +86,39 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
     loadPageHero(locale, "projects"),
     loadProjectStrengths(locale),
   ]);
-  const province = provinces.find((item) => item.slug === filters.provinceSlug);
+  // BL-052: nhiều tỉnh (OR); slug lạ bị bỏ qua. Ô chọn tỉnh hiện tại (một giá trị) hiện tỉnh đầu — P1-T05 thay bằng ô tích.
+  const selectedProvinces = provinces.filter((item) => filters.provinceSlugs?.includes(item.slug));
+  const province = selectedProvinces[0];
   // Id lạ (không có dự án công khai) bị bỏ qua, không 500.
   const developer = developers.find((item) => item.id === filters.developerId);
   const listing = await listPublicProjects(payload, locale, {
     page,
     ...(context ? { categoryIds: context.filterIds } : {}),
-    ...(province ? { provinceId: province.id } : {}),
+    ...(selectedProvinces.length > 0 ? { provinceIds: selectedProvinces.map((item) => item.id) } : {}),
     ...(filters.status ? { salesStatus: filters.status } : {}),
     ...(filters.q ? { q: filters.q } : {}),
     ...(developer ? { developerId: developer.id } : {}),
     ...(filters.sort ? { sort: filters.sort } : {}),
+    ...(filters.types ? { types: filters.types } : {}),
+    ...(filters.features ? { features: filters.features } : {}),
+    ...(filters.priceMin !== undefined ? { priceMin: filters.priceMin } : {}),
+    ...(filters.priceMax !== undefined ? { priceMax: filters.priceMax } : {}),
   });
   if (page > 1 && page > listing.totalPages) notFound();
 
   const listPath = publicPath("/du-an", locale);
   const filterParams = {
-    ...(province ? { province: province.slug } : {}),
+    ...(selectedProvinces.length > 0 ? { province: selectedProvinces.map((item) => item.slug) } : {}),
+    ...(filters.types ? { type: filters.types } : {}),
+    ...(filters.features ? { feature: filters.features } : {}),
+    ...(filters.priceMin !== undefined ? { priceMin: filters.priceMin } : {}),
+    ...(filters.priceMax !== undefined ? { priceMax: filters.priceMax } : {}),
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.q ? { q: filters.q } : {}),
     ...(developer ? { developer: developer.id } : {}),
   };
   const carry = { ...filterParams, ...(filters.sort ? { sort: filters.sort } : {}) };
-  const filtersActive = Boolean(province || filters.status || context || filters.q || developer || filters.sort);
+  const filtersActive = Boolean(province || filters.types || filters.features || filters.priceMin !== undefined || filters.priceMax !== undefined || filters.status || context || filters.q || developer || filters.sort);
   const buildHref = (target: number) => `${listPath}${projectQueryString({ ...(context ? { category: context.slug } : {}), ...carry, page: target })}`;
   const chips = buildChips(roots.docs, listPath, t("all"), carry, context?.rootId);
 
@@ -175,7 +185,8 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
     >
       <section aria-label={t("gridLabel")}>
         <ul data-grid-max-cols="4" className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {toProjectCards(listing.docs, locale).map((card, index) => (
+          {/* Tạm tới P1-T05 (thẻ nổi bật): dự án nổi bật bị loại khỏi lưới nên đặt đầu lưới trang 1 để không mất khỏi danh sách. */}
+          {toProjectCards([...listing.featured, ...listing.docs], locale).map((card, index) => (
             <li key={card.id}>
               <ProjectCard data={card} priority={index === 0} />
             </li>

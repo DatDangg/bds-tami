@@ -1103,5 +1103,16 @@
       "pool_gym_spa": "Hồ bơi, gym, spa",
       "green_park": "Công viên cây xanh"
     }
+  },
+  "projectCard": {
+    "productTypesLabel": "Loại sản phẩm",
+    "moreTypes": "+{count, number}",
+    "moreTypesLabel": "và {count, number} loại khác",
+    "priceFrom": "Giá từ",
+    "contact": "Liên hệ",
+    "area": "Diện tích",
+    "handover": "Bàn giao",
+    "viewDetail": "Xem chi tiết",
+    "consult": "Nhận tư vấn"
   }
 }

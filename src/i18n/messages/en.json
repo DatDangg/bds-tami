@@ -1103,5 +1103,16 @@
       "pool_gym_spa": "Pool, gym, spa",
       "green_park": "Green parks"
     }
+  },
+  "projectCard": {
+    "productTypesLabel": "Product types",
+    "moreTypes": "+{count, number}",
+    "moreTypesLabel": "and {count, number} more",
+    "priceFrom": "Price from",
+    "contact": "Contact us",
+    "area": "Area",
+    "handover": "Handover",
+    "viewDetail": "View details",
+    "consult": "Get advice"
   }
 }

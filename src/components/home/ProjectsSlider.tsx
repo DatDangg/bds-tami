@@ -9,7 +9,7 @@ import type { ProjectSlideView } from "@/lib/home/home-view";
 const IMAGE_SIZES = "(min-width: 1024px) 272px, (min-width: 640px) 320px, 82vw";
 
 /**
- * Slider dự án nổi bật (design-spec S01 khối 3, BL-044/BL-045): `CardSlider` + `ProjectCard` — cùng thẻ với lưới `/du-an`, KHÔNG icon tim.
+ * Slider dự án nổi bật (design-spec S01 khối 3, BL-044/BL-045): `CardSlider` + `ProjectCard` — biến thể `home` (thẻ BL-045, không tag / giá — BL-052 F3 giữ thẻ trang chủ), KHÔNG icon tim.
  * `ProjectSlideView` đã chứa mọi trường thẻ cần (tên, link, tỉnh, ảnh, trạng thái) nên truyền thẳng làm `data`.
  */
 export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideView[]; labelledBy: string }) {
@@ -17,6 +17,7 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
   const items = slides.map((slide) => (
     <ProjectCard
       key={slide.id}
+      variant="home"
       data={{ id: slide.id, title: slide.title, href: slide.href, provinceName: slide.provinceName, cover: slide.image, salesStatus: slide.salesStatus }}
       headingLevel="h3"
       sizes={IMAGE_SIZES}

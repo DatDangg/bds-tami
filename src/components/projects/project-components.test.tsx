@@ -11,6 +11,7 @@ const push = vi.hoisted(() => vi.fn());
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 import { ProjectCard } from "./ProjectCard";
+import { ProjectSpotlightContent } from "./ProjectSpotlightContent";
 import { ProjectFilters } from "./ProjectFilters";
 import { ProjectSortControl } from "./ProjectSortControl";
 
@@ -24,6 +25,12 @@ const card = (overrides: Partial<ProjectCardData> = {}): ProjectCardData => ({
   provinceName: "TP. Hồ Chí Minh",
   categoryName: "Căn hộ",
   cover: fakeMedia("anh-1"),
+  productTypes: [],
+  priceFromLabel: null,
+  areaRangeLabel: null,
+  handoverTime: null,
+  summary: null,
+  address: null,
   ...overrides,
 });
 
@@ -69,6 +76,78 @@ describe("ProjectCard", () => {
     first.unmount();
     const second = renderWithIntl(<ProjectCard data={card()} />);
     expect(second.container.querySelector("img")).toHaveAttribute("loading", "lazy");
+  });
+});
+
+describe("ProjectCard biến thể (BL-052)", () => {
+  it("listing (mặc định): ≤ 3 tag loại sản phẩm + '+n', 'Giá từ' vàng; vẫn MỘT link, không tim", () => {
+    const { container } = renderWithIntl(
+      <ProjectCard data={card({ productTypes: ["apartment", "townhouse", "villa", "shophouse", "land"], priceFromLabel: "5,4 tỷ" })} />,
+    );
+    const article = container.querySelector("article");
+    expect(article).toHaveAttribute("data-card-variant", "listing");
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    const tags = screen.getByRole("list", { name: "Loại sản phẩm" });
+    expect(within(tags).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Căn hộ", "Nhà phố/Liền kề", "Biệt thự", "+2và 2 loại khác"]);
+    expect(screen.getByText("Giá từ")).toBeInTheDocument();
+    expect(screen.getByText("5,4 tỷ").className).toContain("text-accent-text");
+    expect(container.querySelector("[data-testid*=heart i], [class*=heart i]")).toBeNull();
+  });
+
+  it("listing: không có giá → 'Liên hệ'; không có loại → không có danh sách tag; EN nhãn tiếng Anh", () => {
+    const { unmount } = renderWithIntl(<ProjectCard data={card()} />);
+    expect(screen.getByText("Liên hệ")).toBeInTheDocument();
+    expect(screen.queryByText("Giá từ")).toBeNull();
+    expect(screen.queryByRole("list")).toBeNull();
+    unmount();
+    renderWithIntl(<ProjectCard data={card({ productTypes: ["office"], priceFromLabel: "3.5 billion VND" })} />, "en");
+    expect(screen.getByText("Office")).toBeInTheDocument();
+    expect(screen.getByText("Price from")).toBeInTheDocument();
+  });
+
+  it("home (trang chủ): giữ thẻ BL-045 — không tag, không giá, không 'Liên hệ'; ghim tỉnh + mũi tên", () => {
+    const { container } = renderWithIntl(
+      <ProjectCard variant="home" data={{ id: "d1", title: "Dự án A", href: "/du-an/a", provinceName: "Hà Nội", cover: null, salesStatus: "selling" }} headingLevel="h3" />,
+    );
+    expect(container.querySelector("article")).toHaveAttribute("data-card-variant", "home");
+    expect(screen.getByRole("heading", { level: 3, name: "Dự án A" })).toBeInTheDocument();
+    expect(screen.getByText("Hà Nội")).toBeInTheDocument();
+    expect(screen.queryByText("Liên hệ")).toBeNull();
+    expect(screen.queryByText("Giá từ")).toBeNull();
+    expect(screen.queryByRole("list")).toBeNull();
+    expect(container.querySelector("a [aria-hidden=true].rounded-full")).not.toBeNull();
+  });
+});
+
+describe("ProjectSpotlightContent (BL-052)", () => {
+  it("badge danh mục + tình trạng, tên, địa chỉ, tóm tắt, Giá từ · Diện tích · Bàn giao, nút Xem chi tiết + Nhận tư vấn (#lead-form)", () => {
+    renderWithIntl(
+      <ProjectSpotlightContent
+        data={card({ address: "12 Lê Lợi", summary: "Mô tả ngắn", priceFromLabel: "5,4 tỷ", areaRangeLabel: "50–120 m²", handoverTime: "Quý IV/2027" })}
+      />,
+    );
+    expect(screen.getByText("Căn hộ")).toBeInTheDocument();
+    expect(screen.getByText("Đang mở bán")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
+    expect(screen.getByText("12 Lê Lợi")).toBeInTheDocument();
+    expect(screen.getByText("Mô tả ngắn")).toBeInTheDocument();
+    const facts = screen.getAllByRole("term").map((term) => [term.textContent, term.nextElementSibling?.textContent]);
+    expect(facts).toEqual([
+      ["Giá từ", "5,4 tỷ"],
+      ["Diện tích", "50–120 m²"],
+      ["Bàn giao", "Quý IV/2027"],
+    ]);
+    expect(screen.getByRole("link", { name: /Xem chi tiết/ })).toHaveAttribute("href", "/du-an/song-sai-gon");
+    expect(screen.getByRole("link", { name: /Nhận tư vấn/ })).toHaveAttribute("href", "/du-an/song-sai-gon#lead-form");
+  });
+
+  it("thiếu dữ liệu: địa chỉ → tỉnh, giá → 'Liên hệ', ô diện tích / bàn giao trống bị bỏ, không danh mục → chỉ badge tình trạng", () => {
+    renderWithIntl(<ProjectSpotlightContent data={card({ categoryName: null })} headingLevel="h3" />);
+    expect(screen.getByText("TP. Hồ Chí Minh")).toBeInTheDocument();
+    expect(screen.getAllByRole("term").map((term) => term.textContent)).toEqual(["Giá từ"]);
+    expect(screen.getByText("Liên hệ")).toBeInTheDocument();
+    expect(screen.queryByText("Căn hộ")).toBeNull();
+    expect(screen.getByRole("heading", { level: 3 })).toBeInTheDocument();
   });
 });
 

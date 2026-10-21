@@ -100,14 +100,14 @@ import { ProjectListPage, buildProjectListMetadata } from "./ProjectListPage";
 
 /** Mô phỏng ngữ nghĩa `listPublicProjects` thật (đã kiểm bằng DB ở tests/integration/projects.test.ts) trên fixture. */
 listPublicProjects.mockImplementation(
-  async (_payload: unknown, locale: string, query: { page: number; categoryIds?: string[]; provinceId?: string; salesStatus?: string }) => {
+  async (_payload: unknown, locale: string, query: { page: number; categoryIds?: string[]; provinceIds?: string[]; salesStatus?: string }) => {
     const matched = fixtures
       .filter((item) => locale === "vi" || item.hasEnglish)
       .map((item) => item.doc)
       .filter((doc) => !query.categoryIds || query.categoryIds.includes((doc.category as Category).id))
-      .filter((doc) => !query.provinceId || (doc.province as Province).id === query.provinceId)
+      .filter((doc) => !query.provinceIds || query.provinceIds.includes((doc.province as Province).id))
       .filter((doc) => !query.salesStatus || doc.salesStatus === query.salesStatus);
-    return { docs: matched, page: query.page, limit: 12, totalDocs: matched.length, totalPages: Math.max(1, Math.ceil(matched.length / 12)), hasNextPage: false, hasPrevPage: false };
+    return { docs: matched, page: query.page, limit: 12, totalDocs: matched.length, totalPages: Math.max(1, Math.ceil(matched.length / 12)), hasNextPage: false, hasPrevPage: false, featured: [] };
   },
 );
 
@@ -203,7 +203,7 @@ describe("S02 /du-an: render", () => {
 
   it("lọc theo tỉnh: truy vấn đúng id tỉnh, chỉ dự án của tỉnh; select giữ giá trị; có nút xoá bộ lọc về /du-an", async () => {
     await render("vi", { province: "da-nang" });
-    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, provinceId: "p2" });
+    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, provinceIds: ["p2"] });
     expect(cardTitles()).toEqual(["Biển Đà Nẵng"]);
     expect(document.querySelector("input[name=province]")).toHaveValue("da-nang");
     expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/du-an");
@@ -217,7 +217,7 @@ describe("S02 /du-an: render", () => {
 
   it("?category= hợp lệ lọc theo danh mục (giữ bằng input ẩn); slug lạ bị bỏ qua", async () => {
     const { container, unmount } = await render("vi", { category: "khu-do-thi", province: "ha-noi" });
-    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, categoryIds: ["c2"], provinceId: "p1" });
+    expect(listPublicProjects).toHaveBeenCalledWith({}, "vi", { page: 1, categoryIds: ["c2"], provinceIds: ["p1"] });
     expect(cardTitles()).toEqual(["Tây Hồ"]);
     expect(container.querySelector("input[type=hidden][name=category]")).toHaveAttribute("value", "khu-do-thi");
     unmount();

@@ -529,14 +529,15 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       const list = async (query: Partial<Parameters<typeof queries.listPublicProjects>[2]>) =>
         titlesOf(await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: allCategories(), ...query })).sort();
       expect(await list({})).toEqual(["Lọc 1", "Lọc 2", "Lọc 3", "Lọc 4"]);
-      expect(await list({ provinceId: otherProvinceId })).toEqual(["Lọc 2"]);
+      expect(await list({ provinceIds: [otherProvinceId] })).toEqual(["Lọc 2"]);
       expect(await list({ salesStatus: "selling" })).toEqual(["Lọc 1", "Lọc 4"]);
       expect(await list({ salesStatus: "handed_over" })).toEqual(["Lọc 3"]);
-      expect(await list({ provinceId, salesStatus: "upcoming" })).toEqual([]);
+      expect(await list({ provinceIds: [provinceId], salesStatus: "upcoming" })).toEqual([]);
       expect(await list({ categoryIds: [catY] })).toEqual(["Lọc 3"]);
       expect(await list({ categoryIds: [catX] })).toEqual(["Lọc 1", "Lọc 2"]);
       expect(await list({ categoryIds: [catX, catChild] })).toEqual(["Lọc 1", "Lọc 2", "Lọc 4"]);
-      expect(await list({ categoryIds: [catX, catChild], provinceId, salesStatus: "selling" })).toEqual(["Lọc 1", "Lọc 4"]);
+      expect(await list({ categoryIds: [catX, catChild], provinceIds: [provinceId], salesStatus: "selling" })).toEqual(["Lọc 1", "Lọc 4"]);
+      expect(await list({ provinceIds: [provinceId, otherProvinceId], salesStatus: "upcoming" })).toEqual(["Lọc 2"]);
     });
 
     it("/en chỉ gồm dự án đã có bản EN; mới xuất bản xếp trước", async () => {
@@ -569,7 +570,7 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
 
     it("thẻ: ảnh đại diện = ảnh đầu thư viện, tỉnh/danh mục đã populate, link chi tiết theo ngôn ngữ; truy vấn danh mục + tỉnh", async () => {
       await publish("Thẻ dự án", { province: otherProvinceId, category: catX, priceFromVnd: 3_500_000_000, gallery: [mediaIds[1], mediaIds[0]] });
-      const result = await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [catX], provinceId: otherProvinceId, salesStatus: "selling" });
+      const result = await queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [catX], provinceIds: [otherProvinceId], salesStatus: "selling" });
       const [card] = view.toProjectCards(result.docs, "vi");
       expect(card).toMatchObject({ title: "Thẻ dự án", href: "/du-an/the-du-an", provinceName: "Thành phố Đà Nẵng", categoryName: "Loại X danh sách", salesStatus: "selling" });
       expect(card?.cover).toMatchObject({ id: mediaIds[1] });
@@ -580,6 +581,85 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect((await queries.findProjectCategoryBySlug(payload, "vi", "loai-x-danh-sach"))?.id).toBe(catX);
       expect(await queries.findProjectCategoryBySlug(payload, "en", "loai-x-danh-sach")).toBeNull();
       expect((await queries.listProvinces(payload)).map((province) => province.slug)).toEqual(expect.arrayContaining(["ha-noi", "da-nang-list"]));
+    });
+  });
+
+  describe("danh sách dự án BL-052: lọc mới, giá hiệu lực, nổi bật, số đếm (phase-1-task-04)", () => {
+    let queries: typeof import("../../src/lib/projects/project-queries");
+    let view: typeof import("../../src/lib/projects/project-view");
+    let cat = "";
+    let secondProvinceId = "";
+    const titlesOf = (result: { docs: Array<{ title?: string | null }> }) => result.docs.map((doc) => doc.title);
+
+    beforeAll(async () => {
+      queries = await import("../../src/lib/projects/project-queries");
+      view = await import("../../src/lib/projects/project-view");
+      cat = (await createCategory("Loại BL-052 danh sách", "project")).id;
+      secondProvinceId = (
+        await payload.create({ collection: "provinces", data: { code: "97", name: "Tỉnh BL-052", slug: "tinh-bl052" }, overrideAccess: true })
+      ).id;
+      const create = (title: string, data: Record<string, unknown>) => createProject({ title, status: "published", gallery: [mediaIds[0]], category: cat, ...data });
+      const a = await create("BL52 A", {
+        province: provinceId,
+        productTypes: ["apartment", "villa"],
+        featuredAmenities: ["near_school", "water_view"],
+        // Giá hiệu lực = min bảng giá (5,4 tỷ), KHÔNG phải priceFromVnd (1 tỷ).
+        priceFromVnd: 1_000_000_000,
+        priceTable: [
+          { unitType: "2PN", priceFrom: 7_000_000_000 },
+          { unitType: "1PN", priceFrom: 5_400_000_000 },
+        ],
+      });
+      const b = await create("BL52 B", { province: secondProvinceId, productTypes: ["townhouse"], featuredAmenities: ["near_school"], priceFromVnd: 9_000_000_000 });
+      const c = await create("BL52 C", { province: provinceId, salesStatus: "upcoming" });
+      await updateProject(b.id, { isFeatured: true });
+      const at = (id: string, iso: string) => withDatabase((client) => client.query(`UPDATE "projects" SET published_at = $1 WHERE id = $2`, [iso, id]));
+      await at(a.id, "2026-03-01T00:00:00.000Z");
+      await at(b.id, "2026-02-01T00:00:00.000Z");
+      await at(c.id, "2026-01-01T00:00:00.000Z");
+    });
+
+    const run = (query: Partial<Parameters<typeof queries.listPublicProjects>[2]>) => queries.listPublicProjects(payload, "vi", { page: 1, categoryIds: [cat], ...query });
+
+    it("nổi bật (isFeatured) tách khỏi lưới, không lặp; totalDocs gồm nổi bật; lưới mới nhất trước", async () => {
+      const result = await run({});
+      expect(titlesOf({ docs: result.featured })).toEqual(["BL52 B"]);
+      expect(titlesOf(result)).toEqual(["BL52 A", "BL52 C"]);
+      expect(result).toMatchObject({ totalDocs: 3, totalPages: 1, hasNextPage: false });
+      expect((await run({ page: 2 })).featured).toEqual([]);
+    });
+
+    it("loại sản phẩm (OR), tiện ích (AND), nhiều tỉnh (OR), khoảng giá theo giá hiệu lực; sắp giá không giá xếp cuối", async () => {
+      const all = async (query: Partial<Parameters<typeof queries.listPublicProjects>[2]>) => {
+        const result = await run(query);
+        return [...titlesOf({ docs: result.featured }), ...titlesOf(result)];
+      };
+      expect(await all({ types: ["villa", "townhouse"] })).toEqual(["BL52 B", "BL52 A"]);
+      expect(await all({ features: ["near_school", "water_view"] })).toEqual(["BL52 A"]);
+      expect(await all({ features: ["near_school"] })).toEqual(["BL52 B", "BL52 A"]);
+      expect(await all({ provinceIds: [provinceId, secondProvinceId] })).toHaveLength(3);
+      expect(await all({ priceMin: 5, priceMax: 6 })).toEqual(["BL52 A"]);
+      expect(await all({ priceMax: 2 })).toEqual([]);
+      expect(await all({ priceMin: 8 })).toEqual(["BL52 B"]);
+      expect(titlesOf(await run({ sort: "price_desc" }))).toEqual(["BL52 A", "BL52 C"]);
+    });
+
+    it("số đếm theo chiều: khớp mọi bộ lọc khác trừ chính chiều đó", async () => {
+      const { facets, totalDocs } = await run({ provinceIds: [provinceId], salesStatus: "selling" });
+      expect(totalDocs).toBe(1);
+      expect(facets.status.counts).toEqual({ upcoming: 1, selling: 1, handed_over: 0 });
+      expect(facets.type.counts).toMatchObject({ apartment: 1, villa: 1, townhouse: 0 });
+      const provinceCounts = Object.fromEntries(facets.provinces.map((item) => [item.id, item.count]));
+      expect(provinceCounts).toMatchObject({ [provinceId]: 1, [secondProvinceId]: 1 });
+      expect(facets.category.counts[cat]).toBe(1);
+      const totals = facets.provinces.map((item) => item.total);
+      expect(totals).toEqual([...totals].sort((x, y) => y - x));
+    });
+
+    it("thẻ: giá hiệu lực rút gọn, loại sản phẩm; không có giá → null ('Liên hệ')", async () => {
+      const cards = view.toProjectCards((await run({})).docs, "vi");
+      expect(cards[0]).toMatchObject({ title: "BL52 A", priceFromLabel: "5,4 tỷ", productTypes: ["apartment", "villa"] });
+      expect(cards[1]).toMatchObject({ title: "BL52 C", priceFromLabel: null, productTypes: [] });
     });
   });
 

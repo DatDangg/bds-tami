@@ -32,3 +32,27 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Quyết định (builder)
+- **Giá hiệu lực** ở file mới `src/lib/projects/project-price.ts` (`effectivePriceFromVnd`, `BILLION_VND`) để queries / view / (P1-T06 chi tiết) cùng dùng, không vòng import.
+- **`listPublicProjects` luôn quét** ≤ 1000 dự án công khai (không điều kiện SQL ngoài `publicWhere`) rồi lọc / đếm / sắp trong bộ nhớ: số đếm "trừ chính chiều đó" + danh sách tỉnh "đếm không lọc" cần tập không lọc. Sau đó **một** truy vấn `id in` lấy trường thẻ cho trang lưới + thẻ nổi bật. Đường SQL phân trang cũ (không q / sort) bị bỏ — mỗi request = 1 lượt quét (1 truy vấn khi ≤ 50 dự án) + 1 truy vấn thẻ.
+- **Tỉnh nhiều giá trị**: `parseProjectFilters` trả `provinceSlugs` (không trùng, sắp chữ cái, trần 50); `ProjectPageQuery.provinceId` → `provinceIds` (đổi chữ ký, đã sửa ProjectListPage + test). Khoá lặp (`?province=a&province=b`) nay là nhiều tỉnh (trước: lấy giá trị đầu).
+- **Giá `priceMin`/`priceMax` (tỷ)**: chỉ nhận chuỗi chữ số; kẹp ≤ 50; **min > max → đổi chỗ** (URL sửa tay vẫn ra khoảng hợp lý); rồi bỏ đầu ở mép (min 0, max ≥ 50). `priceMax=0` giữ (khoảng "≤ 0 tỷ" → rỗng). `ProjectPageQuery.priceMin/priceMax` cùng đơn vị tỷ; có một đầu → dự án không có giá bị loại.
+- **type / feature**: chỉ giữ giá trị trong `PROPERTY_TYPES` / `PROJECT_FEATURES`, theo thứ tự danh sách → URL ổn định. `projectQueryString` nhận mảng, nối dấu phẩy **không mã hoá** (`a,b`, không `%2C`), thứ tự khoá cố định `category, province, status, q, developer, sort, type, feature, priceMin, priceMax, page`.
+- **Số đếm**: mỗi chiều = khớp mọi bộ lọc khác trừ chính chiều đó, áp đúng chữ spec cả cho chiều AND (tiện ích): số ở một tiện ích = số dự án có tiện ích đó khi bỏ cả chiều tiện ích (không phải "nếu bật thêm"). Tab danh mục đếm theo **danh mục cấp 1** (dự án ở danh mục con tính vào cha, lấy `category.parent` đã populate — không thêm truy vấn). `facets.provinces` chỉ tỉnh có ≥ 1 dự án công khai, sắp theo tổng không lọc giảm dần, hoà theo `sortOrder`.
+- **Nổi bật**: ≤ 5 `isFeatured` khớp bộ lọc, **mới nhất trước bất kể `sort`**; trả ở trang 1, loại khỏi lưới ở mọi trang; `totalDocs` gồm nổi bật, `totalPages` tính trên phần còn lại. `ProjectListPage` (tạm tới P1-T05) đặt thẻ nổi bật đầu lưới trang 1 để dự án nổi bật không biến mất.
+- **ProjectCard**: prop `variant` — `listing` (mặc định, có tag loại ≤ 3 + "+n", "Giá từ" vàng / "Liên hệ") và `home` (đúng markup BL-045, chỉ `ProjectsSlider` truyền). `SimilarProjects` / "Dự án khác" tự nhận thẻ mới, không sửa file của P1-T06. `data-card-variant` trên `article` để test/kiểm.
+- **Thẻ nổi bật**: P1-T02 (`SpotlightSlider`) chưa có trên staging → tạo `ProjectSpotlightContent` thuần (cột nội dung; ảnh + điều hướng do khung lo). Badge danh mục dùng biến thể `dark` (khác badge tình trạng).
+- i18n namespace mới: **`projectCard`** (cuối file vi/en). Nhãn loại dùng `listingOptions.propertyType` sẵn có.
+
+## Verification summary (Builder)
+- Xem báo cáo builder (lệnh + số test). Unit mới: `project-price.test.ts`, mở rộng `project-filters.test.ts`, `project-queries.test.ts` (lọc / đếm / nổi bật / phân trang), `project-view.test.ts`, `project-components.test.tsx` (biến thể listing / home, spotlight). Integration: `tests/integration/projects.test.ts` khối "danh sách dự án BL-052" (DB tạm, tạo/xoá trong test).
+- `pnpm typecheck` PASS · `pnpm lint` PASS (0 error, 2 warning có sẵn ở `tools/task-dashboard/server.mjs`).
+- `pnpm test` toàn bộ (lần 1): 3574 pass / 10 fail — mọi fail là môi trường (hook timeout 60s ở integration khi nhiều worktree chạy song song, timeout 5s ở vài test UI userEvent) + 1 lỗi thật `messages-check` (ICU `projectCard.moreTypesLabel` EN khác VI) → đã sửa. Chạy lại riêng: `src/i18n` + `src/components/projects` + HeroSearch/Header/ApplyForm 12 file / 166 test PASS; `src/lib/projects` 6 file / 62 test PASS; integration `homepage, projects, public-queries-no-status, locale-counterpart, globals, news` 6 file / 133 test PASS (`projects.test.ts` 36 test gồm 4 test BL-052 mới). Chạy lại cả thư mục integration tuần tự bị worker Windows crash (exit 0xC0000142, cạn tài nguyên) — không chạy lại hết 30 file.
+- Trình duyệt (dev `-p 3104`, DB `tami_wt52_p1t04` = bản dump DB dev, 61 dự án công khai / 8 nổi bật): `/` 6 thẻ `data-card-variant="home"`, không tag / giá; `/du-an` 17 thẻ `listing` (5 nổi bật + 12), tag loại + "Giá từ"; `/du-an?province=ha-noi,quang-ninh&type=apartment&priceMin=3&priceMax=8&sort=price_asc` → 15 dự án, nổi bật trước rồi lưới tăng giá 3 → 3,6 tỷ, canonical `/du-an`, noindex; 375px không tràn ngang.
+
+## Review
+- Round 1: `.context/review-reports/feature-listing-detail-redesign-phase-1-task-04-round-1-review.md` — **STRICT PASS**. MINOR: m1 `project-queries.ts` 414 dòng → tách facet sang `project-list-facets.ts` (P1-T05); m2 quét mọi request + populate đầy đủ → thu hẹp populate + đo p95 (P1-T05); m3 spec/updates dòng 17 thứ tự giá cũ → primary sửa; m4 tham số bị bỏ vẫn noindex — giữ.
+
+## Verification summary (close-out)
+- Acceptance: **PASS**. typecheck · lint 0 error · vitest projects/home/i18n 279 PASS · integration projects+homepage 64 PASS.
