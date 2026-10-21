@@ -1,14 +1,34 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { type ReactNode, useId } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 import { SlidersHorizontal } from "@/components/icons";
 import { PendingLink } from "@/components/layout/PendingRegion";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useHydrated } from "./FilterFacets";
-import { ListFiltersButton } from "./ListSearchBar";
+
+type FiltersButtonProps = Omit<ComponentProps<typeof Button>, "children" | "variant"> & {
+  label: string;
+  /** Số lọc đang bật (huy hiệu số); 0 = không hiện. */
+  count: number;
+};
+
+/** Nút "Bộ lọc" kiểu viên thuốc + huy hiệu số lọc đang bật: trigger (`asChild`) của Sheet; `aria-label` luôn là "Bộ lọc (n)". */
+function ListFiltersButton({ label, count, className, ...props }: FiltersButtonProps) {
+  return (
+    <Button variant="secondary" aria-label={count > 0 ? `${label} (${count})` : label} className={cn("h-11 gap-1.5 px-4 text-small normal-case md:h-10", className)} {...props}>
+      <SlidersHorizontal size={16} aria-hidden="true" />
+      {label}
+      {count > 0 && (
+        <span aria-hidden="true" data-testid="filters-count" className="inline-flex size-6 items-center justify-center rounded-full bg-dark text-xsmall text-on-dark">
+          {count}
+        </span>
+      )}
+    </Button>
+  );
+}
 
 interface FilterFormProps {
   /** Đường dẫn của chính trang (đã có tiền tố ngôn ngữ): đích form GET khi chưa có JS. */

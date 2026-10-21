@@ -461,6 +461,29 @@
         "furnishing": "Furnishing",
         "amenities": "Amenities",
         "amenitiesCount": "Amenities ({count})"
+      },
+      "filterGroups": {
+        "project": "Project",
+        "price": "Monthly rent",
+        "area": "Floor area"
+      },
+      "allProjects": "All projects",
+      "priceValue": "VND {value, number}M",
+      "priceValueMax": "VND {value, number}M+",
+      "priceLow": "Minimum rent",
+      "priceHigh": "Maximum rent",
+      "areaValue": "{value, number} m²",
+      "areaValueMax": "{value, number}+ m²",
+      "areaLow": "Minimum area",
+      "areaHigh": "Maximum area",
+      "sortBy": "Sort by",
+      "activeProject": "Project: {value}",
+      "spotlight": {
+        "label": "Featured rentals",
+        "price": "Monthly rent",
+        "layout": "Bed / bath",
+        "viewDetail": "View details",
+        "consult": "Get advice"
       }
     },
     "detail": {

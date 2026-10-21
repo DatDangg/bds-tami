@@ -194,6 +194,7 @@ describe("searchCardToRentalCardData (DTO của SearchService -> cùng view mode
       href: "/cho-thue/studio-ba-dinh",
       code: "CT-000009",
       priceMonthlyVnd: 8_500_000,
+      priceNegotiable: false,
       areaM2: 32,
       bedrooms: 0,
       areaLabel: "Phường Ba Đình, Hà Nội",
@@ -207,8 +208,8 @@ describe("searchCardToRentalCardData (DTO của SearchService -> cùng view mode
   });
 
   it("thương lượng hoặc không giá -> giá null; không ảnh -> cover null; phòng ngủ null giữ null", () => {
-    expect(searchCardToRentalCardData({ ...dto, priceNegotiable: true }, "vi").priceMonthlyVnd).toBeNull();
-    expect(searchCardToRentalCardData({ ...dto, priceMonthlyVnd: null }, "vi").priceMonthlyVnd).toBeNull();
+    expect(searchCardToRentalCardData({ ...dto, priceNegotiable: true }, "vi")).toMatchObject({ priceMonthlyVnd: null, priceNegotiable: true });
+    expect(searchCardToRentalCardData({ ...dto, priceMonthlyVnd: null }, "vi")).toMatchObject({ priceMonthlyVnd: null, priceNegotiable: false });
     expect(searchCardToRentalCardData({ ...dto, thumbnail: null, bedrooms: null }, "vi")).toMatchObject({ cover: null, bedrooms: null });
   });
 

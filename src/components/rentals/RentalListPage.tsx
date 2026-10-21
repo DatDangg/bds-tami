@@ -3,18 +3,28 @@ import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { StrengthsBlock } from "@/components/home/StrengthsBlock";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ConsultBanner } from "@/components/layout/ConsultBanner";
 import { EmptyState } from "@/components/layout/EmptyState";
-import { PendingLink } from "@/components/layout/PendingRegion";
-import { ListFilterRow } from "@/components/listing/ListSearchBar";
-import { ActiveFilters, useActiveFilterChips } from "@/components/rentals/ActiveFilters";
+import { Pagination } from "@/components/layout/Pagination";
+import { ListPendingProvider, PendingLink } from "@/components/layout/PendingRegion";
+import { LearnMoreFaq } from "@/components/listing/LearnMoreFaq";
+import { ListingCategoryTabs } from "@/components/listing/ListingCategoryTabs";
+import { ListingHero } from "@/components/listing/ListingHero";
+import { countActiveFilters } from "@/components/listing/listing-params";
+import { SpotlightSlider } from "@/components/listing/SpotlightSlider";
+import { FocusListingSearch } from "@/components/rentals/FocusListingSearch";
 import { RentalCard } from "@/components/rentals/RentalCard";
-import { RentalFilters } from "@/components/rentals/RentalFilters";
+import { RentalListBody } from "@/components/rentals/RentalListBody";
 import { RentalSortControl } from "@/components/rentals/RentalSortControl";
-import { RentalListNavigationProvider } from "@/components/rentals/RentalListNavigation";
+import { RentalSpotlightContent } from "@/components/rentals/RentalSpotlightContent";
 import { categoryPath, type RentalListPageProps, withoutCategory } from "@/components/rentals/rental-list-metadata";
-import { CategoryChipList, CategoryListTemplate } from "@/components/templates/CategoryListTemplate";
+import { buildCategoryTabs, RENTAL_ACTIVE_FILTER_SPEC, toCurrentParams, toFilterOptions, toFilterValues, toPreservedParams } from "@/components/rentals/rental-list-state";
+import { useActiveFilterChips } from "@/components/rentals/use-active-filter-chips";
 import { publicPath } from "@/lib/content/content-paths";
+import { loadListingPageContent, type ListingLearnMoreView } from "@/lib/content/load-listing-page";
+import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { loadPageHero } from "@/lib/content/load-page-banner";
 import { logger } from "@/lib/logger";
 import { visibleCategory } from "@/lib/news/news-view";
@@ -28,18 +38,17 @@ import {
   listWardOptions,
   type RentalFilterOptions,
   toProvinceOptions,
+  toRentalProvinceFacets,
 } from "@/lib/rentals/rental-list-queries";
 import { searchCardToRentalCardData } from "@/lib/rentals/rental-view";
-import {
-  parseRentalFilters,
-  type RawRentalParams,
-  type RentalFilters as RentalFilterValues,
-  rentalListQueryString,
-} from "@/lib/search/url-params";
+import { parseRentalFilters, type RawRentalParams, type RentalFilters as RentalFilterValues, rentalListQueryString } from "@/lib/search/url-params";
 import type { RentalListingResult } from "@/lib/search/search-service";
 import type { Locale } from "@/i18n/routing";
 
-/** Tải danh mục + tỉnh + dự án (BL-052) + phường (của tỉnh trên URL) và bỏ slug lạ khỏi bộ lọc. Phường chỉ tải khi URL có tỉnh hợp lệ. */
+/** Ảnh thẻ lưới khi có cột lọc trái (như `/du-an`): ≥ xl ~300px, lg 3 cột trong ~70% khung, md 2 cột. */
+const GRID_CARD_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 22vw, (min-width: 768px) 50vw, 100vw";
+
+/** Tải danh mục + tỉnh + dự án + phường (của tỉnh trên URL) và bỏ slug lạ khỏi bộ lọc. Phường chỉ tải khi URL có tỉnh hợp lệ. */
 async function loadFilterContext(locale: Locale, parsed: RentalFilterValues) {
   const payload = await getPayload({ config });
   const [categories, provinceDocs, projects] = await Promise.all([listRentalCategoryOptions(payload, locale), listProvinces(payload), listRentalProjectOptions(payload, locale)]);
@@ -66,120 +75,123 @@ function isSearchEntry(searchParams: RawRentalParams): boolean {
   return q !== undefined && q.trim() === "";
 }
 
-/**
- * Chip loại hình: "Tất cả" (`/cho-thue`) + danh mục cấp 1, mỗi chip là link tới TRANG DANH MỤC (S05) và giữ các bộ lọc khác, về trang 1.
- * Chip của danh mục cha sáng cả khi đang ở một danh mục con của nó. `filters` không mang `category` (nó nằm trong đường dẫn).
- */
-function categoryChips(filters: RentalFilterValues, options: RentalFilterOptions, currentSlug: string | undefined, locale: Locale, allLabel: string) {
-  const roots = options.categories.filter((item) => item.depth === 0);
-  // `categories` xếp cha rồi các con của nó: danh mục cấp 1 gần nhất ở trước mục đang chọn là cha (hoặc chính nó).
-  const currentIndex = options.categories.findIndex((item) => item.slug === currentSlug);
-  const currentRoot = options.categories.slice(0, currentIndex + 1).reverse().find((item) => item.depth === 0);
-  const query = rentalListQueryString({ ...filters, page: 1 });
-  return [
-    { label: allLabel, href: `${publicPath("/cho-thue", locale)}${query}`, current: currentSlug === undefined },
-    ...roots.map((root) => ({ label: root.label, href: `${categoryPath(locale, root.slug)}${query}`, current: currentRoot?.slug === root.slug })),
-  ];
+function toLearnMoreContent(view: ListingLearnMoreView | null) {
+  if (!view) return null;
+  return { eyebrow: view.eyebrow ?? null, title: view.title, titleAccent: view.titleAccent ?? null, description: view.description ?? null, image: view.image ?? null, videoUrl: view.videoUrl ?? null, cta: view.cta ?? null };
 }
 
 /**
- * S04 Danh sách Cho thuê (`/cho-thue`, `/en/for-rent`) và S05 trang danh mục (`categorySlug`) trên `CategoryListTemplate` (BL-045): hero (chữ + ảnh admin; trang danh mục: eyebrow "Cho thuê",
- * tiêu đề + mô tả của danh mục) → thẻ lọc nổi (`RentalFilters`) → hàng "N căn" + "Đang lọc" + sắp xếp → lưới → phân trang → banner tư vấn. Server render qua `SearchService` (một truy vấn SQL cho cả trang),
- * bộ lọc client đổi URL. Trang vượt số trang → `notFound()`. Slug danh mục/tỉnh/phường lạ bị bỏ qua. Đọc `searchParams` nên render theo request (không ISR);
- * CDN giữ HTML theo `Cache-Control` của `next.config.ts`.
- * Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`; tin lọc theo danh mục + con của nó; hero, breadcrumb, đường dẫn
- * bộ lọc/phân trang/"Xoá bộ lọc" đều là của trang danh mục.
+ * S04 `/cho-thue` (`/en/for-rent`) và S05 trang danh mục (`categorySlug`) theo khung danh sách BL-052 (cùng `/du-an`): hero (ảnh + chữ `pageHeroes.rentals`; trang danh mục:
+ * eyebrow "Cho thuê", tiêu đề + mô tả của danh mục) + ô tìm `q` + "Tìm nhanh" (`listingPages.rentals`) → tab danh mục cấp 1 (link route danh mục, số đếm) → cột lọc trái
+ * (< lg là Sheet) | thẻ nổi bật (trang 1) → "N căn phù hợp" + sắp xếp → lưới 3 cột → phân trang → "Tìm hiểu thêm" + FAQ → dải Điểm mạnh (cờ `showStrengths`) → banner tư vấn.
+ * Link cũ `/cho-thue?category=<slug>` (ô tìm kiếm trang chủ) vẫn lọc theo danh mục đó và đánh dấu tab của nó. Slug danh mục/tỉnh/phường/dự án lạ bị bỏ; trang vượt số trang
+ * → `notFound()`. Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`. Đọc `searchParams` nên render theo request (không ISR).
  */
 export async function RentalListPage({ locale, searchParams, categorySlug }: RentalListPageProps) {
   const parsed = parseRentalFilters(searchParams);
-  const [{ payload, options, filters }, t, tNav, hero] = await Promise.all([
+  const [{ payload, options, filters }, t, tNav, hero, content, strengths] = await Promise.all([
     loadFilterContext(locale, categorySlug ? withoutCategory(parsed) : parsed),
     getTranslations({ locale, namespace: "page.rentals" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     loadPageHero(locale, "rentals"),
+    loadListingPageContent(locale, "rentals"),
+    loadListingStrengths(locale, "rentals"),
   ]);
   const category = categorySlug ? await findRentalCategory(payload, locale, categorySlug) : null;
   if (categorySlug && !category) notFound();
   // `filters` = thứ hiện trên URL/bộ lọc (S05: không có `category`, nó nằm trong đường dẫn); `searchFilters` = thứ gửi SearchService.
-  const searchFilters: RentalFilterValues = categorySlug ? { ...filters, category: categorySlug } : filters;
-  const result = await trySearch(payload, searchFilters, locale);
+  const result = await trySearch(payload, categorySlug ? { ...filters, category: categorySlug } : filters, locale);
   if (result && filters.page > 1 && filters.page > result.totalPages) notFound();
 
   const rentalsPath = publicPath("/cho-thue", locale);
   const listPath = categorySlug ? categoryPath(locale, categorySlug) : rentalsPath;
-  const buildHref = (page: number) => `${listPath}${rentalListQueryString(filters, { page })}`;
-  // Tạm tới P2-T02 (khung danh sách mới): tin nổi bật (chỉ trang 1, đã bị loại khỏi lưới) đặt đầu lưới để không biến mất khỏi trang.
-  const cards = [...(result?.featured ?? []), ...(result?.items ?? [])].map((item) => searchCardToRentalCardData(item, locale));
+  const current = toCurrentParams(filters);
+  const otherFilters = rentalListQueryString({ ...withoutCategory(filters), page: 1 });
+  const tabs = buildCategoryTabs({
+    options,
+    facets: result?.facets ?? null,
+    currentSlug: categorySlug ?? filters.category,
+    allLabel: t("all"),
+    countLabel: (count) => t("resultTotal", { count }),
+    href: (slug) => `${slug ? categoryPath(locale, slug) : rentalsPath}${otherFilters}`,
+  });
+  const provinceFacets = toRentalProvinceFacets(options.provinces, result?.facets.provinces ?? []);
+  const featuredCards = (result?.featured ?? []).map((item) => searchCardToRentalCardData(item, locale));
+  const cards = (result?.items ?? []).map((item) => searchCardToRentalCardData(item, locale));
   const parent = category ? visibleCategory(category.parent, locale) : null;
   const breadcrumb = [
     { label: tNav("rentals"), href: rentalsPath },
     ...(parent ? [{ label: parent.name ?? "", href: categoryPath(locale, parent.slug ?? "") }] : []),
     ...(category ? [{ label: category.name ?? "", href: listPath }] : []),
   ];
-  const chips = categoryChips(withoutCategory(filters), options, categorySlug ?? filters.category, locale, t("all"));
-  const heroTitle = category?.name ?? hero.title;
   const heroDescription = category ? (category.description ?? undefined) : hero.description;
   const heroEyebrow = category ? tNav("rentals") : hero.eyebrow;
 
   return (
-    <RentalListNavigationProvider actionPath={listPath} filters={filters}>
-      <CategoryListTemplate
-        title={heroTitle}
+    <ListPendingProvider>
+      <ListingHero
+        title={category?.name ?? hero.title}
         {...(!category && hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
         {...(heroEyebrow ? { eyebrow: heroEyebrow } : {})}
         {...(heroDescription ? { description: heroDescription } : {})}
-        {...(hero.image ? { bannerImage: hero.image } : {})}
-        breadcrumb={breadcrumb}
-        filterCard={
-          <RentalFilters
-            filters={filters}
-            options={options}
-            fixedCategory={categorySlug}
-            focusSearch={isSearchEntry(searchParams)}
-            categoryRow={
-              <ListFilterRow label={t("fields.category")}>
-                <nav aria-label={t("categoriesLabel")}>
-                  <CategoryChipList chips={chips} scroll />
-                </nav>
-              </ListFilterRow>
-            }
-          />
-        }
-        {...(result
+        {...(hero.image ? { image: hero.image } : {})}
+        breadcrumb={<Breadcrumb variant="overlay" items={breadcrumb} />}
+        search={{ action: listPath, ...(filters.q ? { value: filters.q } : {}), placeholder: t("fields.qPlaceholder"), preservedParams: current }}
+        quickSearch={content.quickSearch}
+      />
+      {isSearchEntry(searchParams) && <FocusListingSearch />}
+      <ListingCategoryTabs label={t("categoriesLabel")} tabs={tabs} />
+      <RentalListBody
+        path={listPath}
+        current={current}
+        values={toFilterValues(filters)}
+        options={toFilterOptions(options, provinceFacets, filters.province)}
+        preservedParams={toPreservedParams(current)}
+        activeCount={countActiveFilters(current, RENTAL_ACTIVE_FILTER_SPEC)}
+        clearHref={listPath}
+        {...(result ? { countLabel: t("resultTotal", { count: result.total }) } : {})}
+        {...(featuredCards.length > 0
           ? {
-              resultText: (
-                <>
-                  {t("resultTotal", { count: result.total })} <span className="text-small font-normal text-text-secondary">{t("resultSuffix")}</span>
-                </>
+              spotlight: (
+                <SpotlightSlider
+                  label={t("spotlight.label")}
+                  badge={t("spotlight.label")}
+                  items={featuredCards.map((card) => ({ id: card.id, image: card.cover, content: <RentalSpotlightContent data={card} /> }))}
+                />
               ),
             }
           : {})}
-        resultExtras={<ActiveFilters filters={filters} options={options} listPath={listPath} />}
-        {...(result && result.total > 0 ? { sort: <RentalSortControl /> } : {})}
-        parentListHref={rentalsPath}
-        isEmpty={!result || result.total === 0}
-        emptyState={
-          result ? (
-            <EmptyResults filters={filters} options={options} listPath={listPath} locale={locale} query={filters.q} inCategory={category !== null} rentalsPath={rentalsPath} />
-          ) : (
-            <ListError retryHref={`${listPath}${rentalListQueryString(filters)}`} title={t("error.title")} retry={t("error.retry")} />
-          )
-        }
-        pagination={{ page: result?.page ?? 1, totalPages: result?.totalPages ?? 1, buildHref }}
-        consultBanner={<ConsultBanner locale={locale} />}
+        {...(result && result.total > 0 ? { sort: <RentalSortControl actionPath={listPath} filters={filters} /> } : {})}
       >
-        <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-          {filters.q && <h2 className="font-display text-h3">{t("resultsFor", { query: filters.q })}</h2>}
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cards.map((card, index) => (
-              <li key={card.id}>
-                <RentalCard data={card} headingLevel={2} priority={index === 0} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      </CategoryListTemplate>
-    </RentalListNavigationProvider>
+        {!result ? (
+          <ListError retryHref={`${listPath}${rentalListQueryString(filters)}`} title={t("error.title")} retry={t("error.retry")} />
+        ) : result.total === 0 ? (
+          <EmptyResults filters={filters} options={options} listPath={listPath} locale={locale} inCategory={category !== null} rentalsPath={rentalsPath} />
+        ) : (
+          <>
+            {cards.length > 0 && (
+              <section aria-label={t("gridLabel")}>
+                <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {cards.map((card, index) => (
+                    <li key={card.id}>
+                      {/* Ảnh LCP là ảnh hero; thẻ đầu chỉ ưu tiên khi hero không có ảnh và không có thẻ nổi bật. */}
+                      <RentalCard data={card} headingLevel={2} imageSizes={GRID_CARD_SIZES} priority={index === 0 && !hero.image && featuredCards.length === 0} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            <Pagination page={result.page} totalPages={result.totalPages} buildHref={(page) => `${listPath}${rentalListQueryString(filters, { page })}`} />
+          </>
+        )}
+      </RentalListBody>
+      {/* FAQ JSON-LD chỉ ở trang sạch `/cho-thue` (trang 1, không lọc): trang danh mục cũng hiện khối nhưng không phát lặp `FAQPage`. */}
+      <div className="mx-auto w-full max-w-container px-gutter pb-section-tight empty:hidden">
+        <LearnMoreFaq learnMore={toLearnMoreContent(content.learnMore)} faqs={content.faqs} emitJsonLd={!categorySlug && rentalListQueryString(filters) === ""} />
+      </div>
+      {strengths ? <StrengthsBlock block={strengths} /> : null}
+      <ConsultBanner locale={locale} />
+    </ListPendingProvider>
   );
 }
 
@@ -188,60 +200,34 @@ interface EmptyResultsProps {
   options: RentalFilterOptions;
   listPath: string;
   locale: Locale;
-  query: string | undefined;
   /** Trang danh mục: trống thật thì nói "trong mục này" + link về `/cho-thue`. */
   inCategory: boolean;
   rentalsPath: string;
 }
 
-/** Trạng thái trống: có lọc → "Chưa có kết quả" + tối đa 3 gợi ý bỏ bớt điều kiện (design-spec §3.9); không lọc → chưa có tin nào. */
-function EmptyResults({ filters, options, listPath, locale, query, inCategory, rentalsPath }: EmptyResultsProps) {
-  const t = useTranslations("page.rentals");
-  const filtering = rentalListQueryString({ ...filters, page: 1 }) !== "";
-  return (
-    <section aria-label={t("gridLabel")} className="flex flex-col gap-6">
-      {query && <h2 className="font-display text-h3">{t("resultsFor", { query })}</h2>}
-      {filtering ? (
-        <FilteredEmpty filters={filters} options={options} listPath={listPath} locale={locale} title={t("empty.title")} />
-      ) : (
-        <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />
-      )}
-    </section>
-  );
-}
-
-interface FilteredEmptyProps {
-  filters: RentalFilterValues;
-  options: RentalFilterOptions;
-  listPath: string;
-  locale: Locale;
-  title: string;
-}
-
+/** Số gợi ý "bỏ bớt điều kiện" tối đa (design-spec §3.9). */
 const MAX_SUGGESTIONS = 3;
 
-function FilteredEmpty({ filters, options, listPath, locale, title }: FilteredEmptyProps) {
+/** Trạng thái trống: có lọc → "Không tìm thấy" + Xoá bộ lọc + Nhận tư vấn + tối đa 3 gợi ý bỏ điều kiện; không lọc → chưa có tin nào. */
+function EmptyResults({ filters, options, listPath, locale, inCategory, rentalsPath }: EmptyResultsProps) {
+  const t = useTranslations("page.rentals");
+  const chips = useActiveFilterChips({ filters, options, listPath, limit: MAX_SUGGESTIONS });
+  if (rentalListQueryString({ ...filters, page: 1 }) === "") {
+    return <EmptyState variant="empty" title={t(inCategory ? "empty.noListingsInCategory" : "empty.noListings")} {...(inCategory ? { backHref: rentalsPath } : {})} />;
+  }
   return (
     <div className="flex flex-col items-center gap-2">
-      <EmptyState variant="filtered" title={title} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
-      <Suggestions filters={filters} options={options} listPath={listPath} />
+      <EmptyState variant="filtered" title={t("empty.title")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
+      <ul className="flex flex-wrap justify-center gap-3" data-testid="empty-suggestions">
+        {chips.map((chip) => (
+          <li key={chip.kind}>
+            <PendingLink href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+              {chip.name}
+            </PendingLink>
+          </li>
+        ))}
+      </ul>
     </div>
-  );
-}
-
-/** "Bỏ <điều kiện>" cho vài điều kiện lọc đầu tiên: mỗi gợi ý là link thật tới URL đã bỏ điều kiện đó. */
-function Suggestions({ filters, options, listPath }: { filters: RentalFilterValues; options: RentalFilterOptions; listPath: string }) {
-  const chips = useActiveFilterChips({ filters, options, listPath, limit: MAX_SUGGESTIONS });
-  return (
-    <ul className="flex flex-wrap justify-center gap-3" data-testid="empty-suggestions">
-      {chips.map((chip) => (
-        <li key={chip.kind}>
-          <PendingLink href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
-            {chip.name}
-          </PendingLink>
-        </li>
-      ))}
-    </ul>
   );
 }
 

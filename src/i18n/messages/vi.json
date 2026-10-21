@@ -461,6 +461,29 @@
         "furnishing": "Nội thất",
         "amenities": "Tiện ích",
         "amenitiesCount": "Tiện ích ({count})"
+      },
+      "filterGroups": {
+        "project": "Dự án",
+        "price": "Giá thuê",
+        "area": "Diện tích"
+      },
+      "allProjects": "Tất cả dự án",
+      "priceValue": "{value, number} triệu",
+      "priceValueMax": "{value, number}+ triệu",
+      "priceLow": "Giá thuê thấp nhất",
+      "priceHigh": "Giá thuê cao nhất",
+      "areaValue": "{value, number} m²",
+      "areaValueMax": "{value, number}+ m²",
+      "areaLow": "Diện tích nhỏ nhất",
+      "areaHigh": "Diện tích lớn nhất",
+      "sortBy": "Sắp xếp theo",
+      "activeProject": "Dự án: {value}",
+      "spotlight": {
+        "label": "Tin cho thuê nổi bật",
+        "price": "Giá thuê",
+        "layout": "Phòng ngủ / tắm",
+        "viewDetail": "Xem chi tiết",
+        "consult": "Nhận tư vấn"
       }
     },
     "detail": {

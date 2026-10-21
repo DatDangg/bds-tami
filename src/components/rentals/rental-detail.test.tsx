@@ -161,7 +161,7 @@ describe("RentalDetail (BL-052, khung chi tiết chung)", () => {
     renderRental(fullRental);
     const bar = within(screen.getByRole("group", { name: "Thông số chính" }));
     expect(bar.getAllByRole("term").map((term) => term.textContent)).toEqual(["Giá thuê", "Diện tích", "Phòng ngủ / tắm", "Nội thất", "Hướng", "Dọn vào từ"]);
-    expect(bar.getAllByRole("definition").map((value) => value.textContent)).toEqual(["12 triệu​/tháng", "55 m²", "2 phòng ngủ · 1 WC", "Đầy đủ", "Đông Nam", "15/11/2026"]);
+    expect(bar.getAllByRole("definition").map((value) => value.textContent)).toEqual(["12 triệu\u200B/tháng", "55 m²", "2 phòng ngủ · 1 WC", "Đầy đủ", "Đông Nam", "15/11/2026"]);
   });
 
   it("giá: tick thương lượng → 'Thương lượng'; chưa nhập giá → 'Liên hệ' (thanh thông số + cột liên hệ)", () => {

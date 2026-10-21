@@ -5,10 +5,10 @@ import type { RentalFilters } from "../search/url-params";
 export type AmenityFilterKind = `amenity:${RentalAmenity}`;
 
 /** Loại điều kiện hiện thành một chip "Đang lọc"; mỗi loại bỏ đi một nhóm tham số URL. */
-export type ActiveFilterKind = "q" | "category" | "province" | "ward" | "price" | "area" | "bedrooms" | "furnishing" | AmenityFilterKind;
+export type ActiveFilterKind = "q" | "category" | "province" | "ward" | "project" | "price" | "area" | "bedrooms" | "furnishing" | AmenityFilterKind;
 
 /** Thứ tự chip: giống thứ tự ô trên bộ lọc (tiện ích nối sau, theo thứ tự trong URL). */
-const KIND_ORDER = ["q", "category", "province", "ward", "price", "area", "bedrooms", "furnishing"] as const;
+const KIND_ORDER = ["q", "category", "province", "ward", "project", "price", "area", "bedrooms", "furnishing"] as const;
 
 const AMENITY_PREFIX = "amenity:";
 

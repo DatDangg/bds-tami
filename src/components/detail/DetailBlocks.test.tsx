@@ -66,6 +66,13 @@ describe("DetailInfoGrid", () => {
     expect(internal).toHaveAttribute("href", "/du-an/song-sai-gon");
     expect(internal).not.toHaveAttribute("target");
   });
+
+  it("ô ngày (dateTime): giá trị bọc <time dateTime> (ngày đăng tin cho thuê)", () => {
+    renderWithIntl(<DetailInfoGrid items={[{ icon, label: "Ngày đăng", value: "15/11/2026", dateTime: "2026-11-15T00:00:00.000Z" }]} />);
+    const time = screen.getByText("15/11/2026");
+    expect(time.tagName).toBe("TIME");
+    expect(time).toHaveAttribute("datetime", "2026-11-15T00:00:00.000Z");
+  });
 });
 
 describe("DetailStatCards", () => {

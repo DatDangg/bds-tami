@@ -1,23 +1,24 @@
 import { useLocale, useTranslations } from "next-intl";
-import { X } from "@/components/icons";
-import { PendingLink } from "@/components/layout/PendingRegion";
 import { formatNumber, formatVndCompact } from "@/lib/format";
 import { type ActiveFilterKind, type AmenityFilterKind, activeFilterKinds, amenityOfKind, filtersWithout } from "@/lib/rentals/active-filters";
 import type { RentalFilterOptions } from "@/lib/rentals/rental-list-queries";
 import { type RentalFilters, rentalListQueryString } from "@/lib/search/url-params";
 import type { Locale } from "@/i18n/routing";
 
-interface ActiveFiltersProps {
+interface ActiveFilterChipsInput {
   filters: RentalFilters;
   options: RentalFilterOptions;
   /** Đường dẫn công khai của chính trang (đã có tiền tố ngôn ngữ). */
   listPath: string;
-  /** Tối đa bao nhiêu chip (trạng thái trống chỉ gợi ý vài thao tác đầu); bỏ trống = tất cả. */
+  /** Tối đa bao nhiêu mục; bỏ trống = tất cả. */
   limit?: number;
 }
 
-/** Chip "Đang lọc" của một điều kiện: nhãn hiển thị + tên cho `aria-label="Bỏ lọc <tên>"` + bộ lọc sau khi bỏ nó. Server Component, mọi chip là link thật (không cần JS). */
-export function useActiveFilterChips({ filters, options, listPath, limit }: ActiveFiltersProps) {
+/**
+ * Từng điều kiện lọc đang bật: nhãn + link thật tới URL đã bỏ điều kiện đó. Dùng cho gợi ý "bỏ bớt điều kiện" của trạng thái trống `/cho-thue`
+ * (BL-052 bỏ hàng chip "Đang lọc": thẻ lọc trái / Sheet đã hiện mọi lựa chọn đang bật + "Xoá tất cả", như `/du-an`). Hook next-intl: gọi trong component.
+ */
+export function useActiveFilterChips({ filters, options, listPath, limit }: ActiveFilterChipsInput) {
   const t = useTranslations("page.rentals");
   const locale = useLocale() as Locale;
   const money = (value: number) => formatVndCompact(value, locale);
@@ -36,6 +37,8 @@ export function useActiveFilterChips({ filters, options, listPath, limit }: Acti
         return options.provinces.find((item) => item.slug === filters.province)?.name ?? "";
       case "ward":
         return options.wards.find((item) => item.slug === filters.ward)?.name ?? "";
+      case "project":
+        return t("activeProject", { value: options.projects.find((item) => item.slug === filters.project)?.title ?? "" });
       case "price":
         return t("active.price", { value: range(filters.priceMin, filters.priceMax, money) });
       case "area":
@@ -57,34 +60,4 @@ export function useActiveFilterChips({ filters, options, listPath, limit }: Acti
     name: nameOf(kind),
     href: `${listPath}${rentalListQueryString(filtersWithout(filters, kind))}`,
   }));
-}
-
-/** Hàng "Đang lọc": chip từng điều kiện có nút xoá + "Xoá tất cả" (design-spec §3.5). Không có điều kiện thì không render. */
-export function ActiveFilters(props: ActiveFiltersProps) {
-  const t = useTranslations("page.rentals.active");
-  const chips = useActiveFilterChips(props);
-  if (chips.length === 0) return null;
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-small font-semibold">{t("label")}</span>
-      <ul className="flex flex-wrap gap-2">
-        {chips.map((chip) => (
-          <li key={chip.kind}>
-            <PendingLink
-              href={chip.href}
-              scroll={false}
-              aria-label={t("remove", { name: chip.name })}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 text-small font-semibold hover:border-input-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
-            >
-              {chip.name}
-              <X size={14} aria-hidden="true" />
-            </PendingLink>
-          </li>
-        ))}
-      </ul>
-      <PendingLink href={props.listPath} scroll={false} className="inline-flex min-h-11 items-center px-2 text-small font-semibold underline underline-offset-4">
-        {t("clearAll")}
-      </PendingLink>
-    </div>
-  );
 }

@@ -13,6 +13,8 @@ export interface DetailInfoItem {
    * không có → đường dẫn nội bộ (vd dự án của tin cho thuê), mở tại chỗ.
    */
   link?: { href: string; newTabLabel?: string } | null;
+  /** Giá trị là ngày (ISO): bọc `<time dateTime>` (vd ngày đăng tin cho thuê). */
+  dateTime?: string | null;
 }
 
 const LINK_CLASS = "text-accent-text underline underline-offset-4 hover:text-text";
@@ -45,6 +47,8 @@ export function DetailInfoGrid({ items, label, className }: { items: DetailInfoI
               <Link href={item.link.href} className={LINK_CLASS}>
                 {item.value}
               </Link>
+            ) : item.dateTime ? (
+              <time dateTime={item.dateTime}>{item.value}</time>
             ) : (
               item.value
             )}
