@@ -3,8 +3,8 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "admin-ux-audit-2",
-    "phaseTask": "phase-1-task-03",
-    "journal": ".context/runs/feature-admin-ux-audit-2-phase-1-task-03.md"
+    "phaseTask": "phase-2",
+    "journal": ".context/runs/feature-admin-ux-audit-2-phase-2.md"
   },
   "features": [
     {
@@ -1910,7 +1910,7 @@
       "title": "Admin UX audit lần 2 — GĐ1: ẩn API, tắt + Thêm mới inline dữ liệu nền, chữ Tải lên, Tạo mới nút chính, tách Xuất Excel, thanh Lưu dính + Quay lại/Xem trên website, Cột/Lọc chỉ admin (BL-051)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 1,
+      "currentPhase": 2,
       "backlog": "BL-051",
       "changeDoc": "spec/changes/2026-10-21-admin-ux-audit-2.md",
       "startedAt": "2026-10-21",
@@ -1940,15 +1940,25 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-admin-ux-audit-2/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0,
-          "round": 0,
-          "reviewLevel": "NORMAL",
-          "reviewerResult": null,
-          "report": null
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-03-round-1-review.md"
         }
       ],
-      "specValidation": ".context/review-reports/feature-admin-ux-audit-2-spec-validation-round-2.md (PASS r2)"
+      "specValidation": ".context/review-reports/feature-admin-ux-audit-2-spec-validation-round-2.md (PASS r2)",
+      "phase1": {
+        "status": "done",
+        "specVersion": "1.44.0",
+        "scopeVersion": 55,
+        "commits": [
+          "e83a86b",
+          "b7f762c",
+          "(T03 close-out)"
+        ]
+      }
     }
   ],
   "bugs": [
@@ -2896,7 +2906,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T07:12:53.983Z",
+  "lastUpdated": "2026-10-21T07:36:17.302Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -52,3 +52,12 @@ describe("list toolbar styles (BL-051)", () => {
     expect(body).toMatch(/grid-row:\s*2/);
   });
 });
+
+describe("list toolbar breakpoint (BL-051 T03 carry-over)", () => {
+  it("mọi @media max-width dùng một mốc 768px (khớp mid-break Payload); min-width là 769px", () => {
+    const maxWidths = [...source.matchAll(/@media \(max-width:\s*(\d+)px\)/g)].map((match) => match[1]);
+    expect(maxWidths.length).toBeGreaterThan(1);
+    expect(new Set(maxWidths)).toEqual(new Set(["768"]));
+    expect([...source.matchAll(/@media \(min-width:\s*(\d+)px\)/g)].map((match) => match[1])).toEqual(["769"]);
+  });
+});

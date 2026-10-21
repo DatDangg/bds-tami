@@ -1,0 +1,57 @@
+// Thanh điều khiển màn sửa (BL-051 A7). Selector lấy từ @payloadcms/ui 3.91: elements/DocumentControls.
+// Payload đã tự dính thanh này (`position: sticky; top: 0`, z-index 5) nên chỉ bổ sung phần còn thiếu: NỀN ĐẶC
+// (Payload để trong suốt nên nội dung form cuộn xuyên qua nút Lưu) và hai link "Quay lại danh sách" / "Xem trên website".
+// Không cần cờ ép độ ưu tiên; z-index giữ nguyên 5 của Payload để drawer/popup/ô Ngôn ngữ (z-index cao hơn) vẫn nằm trên.
+
+.doc-controls {
+  background: var(--theme-bg);
+}
+
+// Hai link cạnh nút Lưu: nút phụ viền mảnh, đồng bộ nút "Hiển thị cột" ở danh sách.
+.tami-doc-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--theme-elevation-100);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+
+  svg {
+    flex: none;
+  }
+}
+
+// Màn hẹp: thanh chỉ đủ chỗ cho icon + nút Lưu; chữ ẩn (còn aria-label / chữ ẩn cho đọc màn hình), vùng chạm 44px.
+@media (max-width: 768px) {
+  .tami-doc-nav {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .tami-doc-nav__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

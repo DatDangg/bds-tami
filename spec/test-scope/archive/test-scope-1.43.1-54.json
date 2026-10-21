@@ -1,0 +1,146 @@
+{
+  "specVersion": "1.43.1",
+  "scopeVersion": 54,
+  "generatedAt": "2026-10-21T23:59:59+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-050 BUG: (1) sidebar admin thiếu lối vào màn Tổng quan → thêm mục 'Tổng quan' đầu menu (beforeNavLinks); (2) ô Ngôn ngữ đè nút 'Xem website' trên header admin do Payload 3.91 đặt ô thật right: base(4.5) giả định --gutter-h mặc định → right: calc(var(--gutter-h) + 25px).",
+  "workItem": "bug/admin-nav-dashboard-sitelink",
+  "backlog": "BL-050",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-21-admin-nav-dashboard-sitelink.md",
+  "task": [
+    "tasks/bug-admin-nav-dashboard-sitelink/phase-1-task-01.md"
+  ],
+  "reviewReport": ".context/review-reports/bug-admin-nav-dashboard-sitelink-phase-1-task-01-round-1-review.md",
+  "reviewResults": [
+    {
+      "task": "phase-1-task-01",
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/bug-admin-nav-dashboard-sitelink-phase-1-task-01-round-1-review.md",
+      "note": "Không CRITICAL/MAJOR; 4 MINOR không chặn (_surfaces.scss 343 dòng nên tách _nav.scss, khoảng ngăn dưới Tổng quan dư ~8px, mục active thiếu aria-current như Payload, hằng 25px phụ thuộc avatar mặc định)"
+    }
+  ],
+  "commits": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.43.0-53.json",
+  "specUpdate": "spec/updates/2026-10-21-admin-nav-dashboard-sitelink.md",
+  "specRefs": [
+    "FR-ADM-19"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Thêm: mục 'Tổng quan' đầu menu trái (trên các nhóm, về /admin, trạng thái đang chọn như mục khác); 'Xem website' và ô ngôn ngữ nội dung không chồng ở mọi bề rộng (≥ 8px), mobile chỉ icon vùng bấm 44px."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/admin/NavDashboardLink.tsx",
+      "src/components/admin/styles/_surfaces.scss",
+      "src/payload.config.ts",
+      "src/app/(payload)/admin/importMap.js"
+    ],
+    "filesNote": "Test: src/components/admin/NavDashboardLink.test.tsx (mới), src/components/admin/admin-mobile-overflow.test.ts (+ assert SCSS). importMap.js regen bằng pnpm generate:importmap. Doc: no doc impact.",
+    "modules": [
+      "admin nav (beforeNavLinks → NavDashboardLink)",
+      "admin header (SiteLink 'Xem website' + Payload localizer)",
+      "admin styles _surfaces.scss"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Sidebar admin: mục 'Tổng quan' đầu menu, trên nhóm Khách hàng, vạch ngăn với nhóm đầu; ở /admin là mục đang chọn, ở màn khác là link /admin",
+      "Header admin: 'Xem website' và ô Ngôn ngữ cách nhau rõ (≥ 8px; đo 20px ở 1600, 37px ở 1000), ô Ngôn ngữ thật trùng ô giữ chỗ"
+    ],
+    "dependents": [
+      "Mọi màn /admin/** đã đăng nhập (khung nav + header dùng chung)"
+    ],
+    "regression": [
+      "Nav BL-041: active state (nền nhấn nhạt, chữ đậm, indicator) của các mục collection/global vẫn đúng",
+      "Nhóm 'Nâng cao' vẫn thu gọn mặc định; các nhóm khác mở",
+      "Header mobile 375px không tràn ngang (scrollWidth = 375), 'Xem website' chỉ icon 44×44",
+      "Chuyển ngôn ngữ nội dung qua ô Ngôn ngữ vẫn hoạt động (mở dropdown, chọn EN/VI, form đổi locale)"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL050-01",
+      "viewport": 1440,
+      "steps": "Đăng nhập admin, mở /admin; xem menu trái.",
+      "expected": "'Tổng quan' là mục đầu tiên, trên nhóm Khách hàng, có vạch ngăn; đang ở trạng thái chọn (nền nhấn nhạt, chữ đậm, vạch indicator mép trái), rộng bằng tiêu đề nhóm."
+    },
+    {
+      "id": "BL050-02",
+      "viewport": 1440,
+      "steps": "Mở /admin/collections/rentals; bấm 'Tổng quan' trong menu trái.",
+      "expected": "Ở màn Cho thuê, 'Tổng quan' là link thường (không active), mục Cho thuê active; bấm → về /admin, Tổng quan chuyển active."
+    },
+    {
+      "id": "BL050-03",
+      "viewport": 1600,
+      "steps": "Mở /admin/collections/rentals (sáng), rồi chuyển theme tối; đo khoảng giữa đuôi 'Xem website' và ô 'Ngôn ngữ'.",
+      "expected": "Không chồng; khoảng cách ≥ 8px (kỳ vọng ~20px) ở cả sáng và tối."
+    },
+    {
+      "id": "BL050-04",
+      "viewport": 1000,
+      "steps": "Mở /admin/collections/rentals và /admin/collections/leads.",
+      "expected": "'Xem website' và ô Ngôn ngữ không chồng, khoảng cách ≥ 8px."
+    },
+    {
+      "id": "BL050-05",
+      "viewport": 768,
+      "steps": "Mở /admin/collections/rentals ở 768px.",
+      "expected": "Không chồng giữa nút 'Xem website' và ô Ngôn ngữ; header không tràn ngang."
+    },
+    {
+      "id": "BL050-06",
+      "viewport": 375,
+      "steps": "Mở /admin/collections/rentals trên mobile.",
+      "expected": "'Xem website' chỉ còn icon vùng bấm 44×44, không đè ô Ngôn ngữ, trang không tràn ngang (scrollWidth = 375)."
+    },
+    {
+      "id": "BL050-07",
+      "viewport": 1440,
+      "steps": "Ở menu trái kiểm nhóm 'Nâng cao'; mở form một tin Cho thuê, đổi ô Ngôn ngữ sang English rồi về Tiếng Việt.",
+      "expected": "'Nâng cao' vẫn thu gọn mặc định, mở/đóng được; đổi ngôn ngữ nội dung hoạt động bình thường, form tải lại đúng locale."
+    }
+  ],
+  "acceptance": [
+    "Sidebar có mục 'Tổng quan' ở đầu, bấm về /admin, có trạng thái active như mục khác (BL-041), không phá nhóm 'Nâng cao' thu gọn",
+    "Header: 'Xem website' không bị đè ở ≥ 768px (sáng/tối), khoảng cách tối thiểu ~8px với ô Ngôn ngữ; mobile vẫn chỉ icon 44px",
+    "Root cause việc đè ghi trong task (CSS localizer Payload 3.91), fix theo công thức chỗ giữ, không số cứng mò",
+    "Kiểm bằng trình duyệt màn Cho thuê, Lead, Tổng quan"
+  ],
+  "verify": {
+    "test": "pnpm vitest run src/components/admin: 241/241 tests PASS (reviewer r1)",
+    "typecheck": "pnpm typecheck PASS",
+    "lint": "pnpm lint 0 error (2 warning có sẵn ở tools/task-dashboard)",
+    "importmap": "pnpm generate:importmap đã chạy; diff chỉ thêm NavDashboardLink",
+    "runtime": "Browser check (change-request, dev :3000): 1600 sáng / 1000 tối / 375 — khoảng cách 20 / 37 / 18px, ô thật − ô giữ chỗ = 0; sidebar Tổng quan active ở /admin, rộng 215px"
+  },
+  "outOfScope": [
+    "aria-current cho mục đang chọn của toàn bộ nav admin (MINOR-3, task a11y riêng)",
+    "Tách _surfaces.scss → _nav.scss (MINOR-1)",
+    "Avatar admin custom kích thước khác 25px"
+  ],
+  "openQuestions": [],
+  "viewports": [
+    1600,
+    1440,
+    1000,
+    768,
+    375
+  ],
+  "locales": [
+    "vi"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "Chỉ khung admin (nav + header), không schema/API/auth/data. Residual: hằng 25px giả định avatar mặc định Payload; khoảng ngăn dưới 'Tổng quan' dư ~8px (thẩm mỹ); mục active không có aria-current (giống Payload).",
+  "status": "published",
+  "statusNote": "published 2026-10-21 — BL-050 bug-fix"
+}
