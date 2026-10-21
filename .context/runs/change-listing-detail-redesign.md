@@ -3,9 +3,9 @@
 ```yaml
 workItem: feature/listing-detail-redesign
 phaseTask: phase-review P3
-step: spec_validator
+step: closeout
 agent: change-request
-status: running
+status: awaiting
 attempt: 0
 interrupted: false
 updatedAt: 2026-10-22
@@ -33,7 +33,7 @@ committed:
   P3-T03: 3d6c598
   P3-T06: 7e39d98
 remaining: [danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
-next: "P3-T03 builder-strong → reviewer → merge; rồi P3-T06; rồi spec-validator phase review P3; close-out"
+next: "user chốt ngày hạn ưu đãi /en → spec-publisher as-built (asBuiltPending) → BACKLOG BL-052 done + follow-ups (progress.followUps, C-1..C-8) → archive change doc"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
 testDbs: "tami_wt52_p1t01..p1t07, tami_wt52_p2t01, tami_wt52_p2t03 (bản sao dev, đã migrate BL-052; p1t05/p2t01/p2t03 mới nhất, có dữ liệu thử listingPages/rentals) — dùng lại được làm DB worktree cho task sau (chạy pnpm payload migrate), hoặc drop. Redis db đã dùng: 4–9, 11–13."
 dirtyNotMine: [BL-054 change doc, template-feedback.md, .claude/launch.json, .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md (sửa ngoài BL-052), .context/runs/* khác, .context/review-reports/assets/]
@@ -81,3 +81,4 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ▶ START builder-strong P3-T06 (worktree từ staging c43f3fd, DB tami_wt52_p2t03, redis 15) (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE builder-strong P3-T06 — wt agent-afed16067ec55c7b8 (chưa commit); sửa sort mất lọc 3 trang, FAQ JSON-LD/noindex, canonical ?category=, step=any, CardSlider tràn ngang 390, regex backfill, gom helper, xoá 5 component + 148 key i18n chết, doc as-built API_SPEC/DESIGN/design-spec/ERD/ARCHITECTURE; typecheck/lint/test 385/3878/build PASS. ▶ START reviewer r1 P3-T06 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P3-T06 STRICT PASS (drift sạch, build PASS; MINOR-1 noindex/canonical ?category= → openItems; MINOR-2 CardSlider chưa chụp) → 7e39d98 merged + progress, typecheck PASS. ✅ DONE P3-T06 — hết task BL-052. ▶ START spec-validator phase review P3 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE spec-validator phase review P3 — code PASS, 0 bug; P-1 verification summary 7 task file, P-3 thêm 6 as-built + followUps; P-2 primary kiểm 33 lượt (11 URL × 3 khổ) không tràn, 1 h1, slider trang chủ 390 OK. Chờ user: ngày /en.
