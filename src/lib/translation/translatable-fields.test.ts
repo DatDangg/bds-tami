@@ -11,7 +11,7 @@ function localizedTextTopLevel(fields: readonly Field[]): string[] {
   const hasLocalizedText = (list: readonly Field[], inherited: boolean): boolean =>
     list.some((field) => {
       if (field.type === "group") return hasLocalizedText(field.fields, inherited || field.localized === true);
-      if (field.type === "array") return hasLocalizedText(field.fields, inherited);
+      if (field.type === "array" || field.type === "row" || field.type === "collapsible") return hasLocalizedText(field.fields, inherited);
       if (field.type === "text" || field.type === "textarea" || field.type === "richText") {
         return (inherited || ("localized" in field && field.localized === true)) && !["slug", "scopeSlug", "searchText", "canonical"].includes(field.name);
       }

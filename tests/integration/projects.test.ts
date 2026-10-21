@@ -247,6 +247,37 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
       expect(await statusOf(createProject({ title: "Quá 8 điểm nổi bật", highlights: nine }))).toBe(400);
     });
 
+    it("trường BL-052: dự án để trống vẫn lưu; có dữ liệu thì lưu/đọc lại đủ; giá trị sai → 400", async () => {
+      const bare = await createProject({ title: "Dự án chưa có trường BL-052" });
+      expect(bare.productTypes ?? []).toEqual([]);
+      expect(bare.products ?? []).toEqual([]);
+
+      const doc = await createProject({
+        title: "Dự án có trường BL-052",
+        productTypes: ["apartment", "villa"],
+        featuredAmenities: ["near_school", "pool_gym_spa"],
+        products: [{ type: "Căn hộ 2PN", count: 120, areaFrom: 60, areaTo: 75 }],
+        videoUrl: "https://www.youtube.com/watch?v=abc",
+        amenities: [{ name: "Hồ bơi", description: "Hồ bơi tràn bờ" }],
+        amenitiesImage: mediaIds[0],
+      });
+      const stored = await payload.findByID({ collection: "projects", id: doc.id, locale: "vi", depth: 0, overrideAccess: true });
+      expect(stored.productTypes).toEqual(["apartment", "villa"]);
+      expect(stored.featuredAmenities).toEqual(["near_school", "pool_gym_spa"]);
+      expect(stored.products?.[0]).toMatchObject({ type: "Căn hộ 2PN", count: 120, areaFrom: 60, areaTo: 75 });
+      expect(stored.videoUrl).toBe("https://www.youtube.com/watch?v=abc");
+      expect(stored.amenities?.[0]).toMatchObject({ name: "Hồ bơi", description: "Hồ bơi tràn bờ" });
+      expect(stored.amenitiesImage).toBe(mediaIds[0]);
+
+      expect(await statusOf(createProject({ title: "Sản phẩm diện tích ngược", products: [{ type: "A", areaFrom: 80, areaTo: 70 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Sản phẩm thiếu tên", products: [{ count: 1 }] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Loại lạ", productTypes: ["castle"] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Tiện ích lạ", featuredAmenities: ["near_moon"] }))).toBe(400);
+      expect(await statusOf(createProject({ title: "Video lạ", videoUrl: "https://evil.example/v" }))).toBe(400);
+      const nine = Array.from({ length: 9 }, (_, index) => ({ type: "Loại " + index }));
+      expect(await statusOf(createProject({ title: "Quá 8 sản phẩm", products: nine }))).toBe(400);
+    });
+
     it("số âm, salesStatus lạ, thiếu province / salesStatus → 400", async () => {
       expect(await statusOf(createProject({ title: "Giá âm", priceFromVnd: -1 }))).toBe(400);
       expect(await statusOf(createProject({ title: "Diện tích âm", areaToM2: -5 }))).toBe(400);

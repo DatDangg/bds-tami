@@ -11,7 +11,7 @@ import { isLexicalRoot } from "./lexical";
  * `slug` được sinh riêng từ tiêu đề EN, không dịch trực tiếp. Không có `leads`, `job-applications`... vì đã bị `allowlist.ts` chặn.
  */
 export const TRANSLATABLE_FIELDS = {
-  projects: ["title", "summary", "overview", "legalInfo", "salesPolicy", "scale", "amenities", "floorPlans", "highlights", "nearbyAmenities", "priceTable", "faqs", "seo"],
+  projects: ["title", "summary", "overview", "legalInfo", "salesPolicy", "scale", "amenities", "floorPlans", "highlights", "nearbyAmenities", "priceTable", "faqs", "products", "seo"],
   rentals: ["title", "description", "legalNote", "seo"],
   "property-posts": ["title", "excerpt", "content", "priceNote", "offer", "seo"],
   news: ["title", "excerpt", "content", "seo"],
@@ -20,7 +20,7 @@ export const TRANSLATABLE_FIELDS = {
   pages: ["title", "content", "seo"],
   categories: ["name", "description", "seo"],
   developers: ["name", "description"],
-  "site-settings": ["siteName", "address", "pageHeroes", "careersPerks"],
+  "site-settings": ["siteName", "address", "pageHeroes", "careersPerks", "listingPages"],
   homepage: ["announcementBar", "hero", "heroSearch", "strengths", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news", "seo"],
   header: ["navItems", "ctaButton"],
   footer: ["columns", "contactBlock", "copyright"],

@@ -33,6 +33,7 @@ import * as migration_20261020_095907_rentals_amenities from './20261020_095907_
 import * as migration_20261020_103248_homepage_redesign from './20261020_103248_homepage_redesign';
 import * as migration_20261020_183923_site_redesign_page_heroes from './20261020_183923_site_redesign_page_heroes';
 import * as migration_20261021_020651_about_stats_icons from './20261021_020651_about_stats_icons';
+import * as migration_20261021_135620_listing_detail_redesign from './20261021_135620_listing_detail_redesign';
 
 export const migrations = [
   {
@@ -208,6 +209,11 @@ export const migrations = [
   {
     up: migration_20261021_020651_about_stats_icons.up,
     down: migration_20261021_020651_about_stats_icons.down,
-    name: '20261021_020651_about_stats_icons'
+    name: '20261021_020651_about_stats_icons',
+  },
+  {
+    up: migration_20261021_135620_listing_detail_redesign.up,
+    down: migration_20261021_135620_listing_detail_redesign.down,
+    name: '20261021_135620_listing_detail_redesign'
   },
 ];

@@ -961,5 +961,26 @@
         "goTo": "Go to listing group {index}"
       }
     }
+  },
+  "listingOptions": {
+    "propertyType": {
+      "apartment": "Apartment",
+      "townhouse": "Townhouse",
+      "villa": "Villa",
+      "shophouse": "Shophouse",
+      "land": "Land plot",
+      "resort": "Resort",
+      "condotel": "Condotel",
+      "office": "Office"
+    },
+    "projectFeature": {
+      "near_school": "Near schools",
+      "near_hospital": "Near hospitals",
+      "near_mall": "Near shopping malls",
+      "near_metro": "Near metro",
+      "water_view": "River/lake view",
+      "pool_gym_spa": "Pool, gym, spa",
+      "green_park": "Green parks"
+    }
   }
 }

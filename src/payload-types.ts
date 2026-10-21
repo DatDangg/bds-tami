@@ -590,6 +590,17 @@ export interface Project {
   priceToVnd?: number | null;
   areaFromM2?: number | null;
   areaToM2?: number | null;
+  /**
+   * Các loại sản phẩm dự án có (chọn nhiều). Dùng cho bộ lọc "Loại hình" ở trang Dự án.
+   */
+  productTypes?:
+    ('apartment' | 'townhouse' | 'villa' | 'shophouse' | 'land' | 'resort' | 'condotel' | 'office')[] | null;
+  /**
+   * Chọn những điểm khách hay lọc khi tìm dự án. Khác danh sách "Tiện ích" bên dưới (hiện ở trang chi tiết).
+   */
+  featuredAmenities?:
+    | ('near_school' | 'near_hospital' | 'near_mall' | 'near_metro' | 'water_view' | 'pool_gym_spa' | 'green_park')[]
+    | null;
   scale?: {
     totalUnits?: number | null;
     blocks?: number | null;
@@ -597,6 +608,21 @@ export interface Project {
     landAreaM2?: number | null;
     handoverTime?: string | null;
   };
+  /**
+   * Các dòng sản phẩm của dự án (tối đa 8), hiện thành thẻ "Sản phẩm" ở phần Tổng quan trang chi tiết.
+   */
+  products?:
+    | {
+        type: string;
+        /**
+         * Để trống nếu chưa công bố.
+         */
+        count?: number | null;
+        areaFrom?: number | null;
+        areaTo?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   amenities?:
     | {
         name: string;
@@ -604,9 +630,14 @@ export interface Project {
          * Tên biểu tượng hiển thị kèm tiện ích.
          */
         icon?: string | null;
+        description?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Ảnh lớn bên trái danh sách tiện ích ở trang chi tiết. Để trống thì danh sách tiện ích rộng hết khối.
+   */
+  amenitiesImage?: (string | null) | Media;
   /**
    * Các điểm bán hàng chính của dự án (tối đa 8), hiển thị thành khối riêng trên trang chi tiết.
    */
@@ -675,6 +706,10 @@ export interface Project {
    * Ảnh đầu tiên là ảnh đại diện của dự án.
    */
   gallery?: (string | Media)[] | null;
+  /**
+   * Link YouTube hoặc TikTok (https://). Có link thì trang chi tiết hiện nút "Xem video giới thiệu".
+   */
+  videoUrl?: string | null;
   floorPlans?:
     | {
         title: string;
@@ -1814,6 +1849,8 @@ export interface ProjectsSelect<T extends boolean = true> {
   priceToVnd?: T;
   areaFromM2?: T;
   areaToM2?: T;
+  productTypes?: T;
+  featuredAmenities?: T;
   scale?:
     | T
     | {
@@ -1823,13 +1860,24 @@ export interface ProjectsSelect<T extends boolean = true> {
         landAreaM2?: T;
         handoverTime?: T;
       };
+  products?:
+    | T
+    | {
+        type?: T;
+        count?: T;
+        areaFrom?: T;
+        areaTo?: T;
+        id?: T;
+      };
   amenities?:
     | T
     | {
         name?: T;
         icon?: T;
+        description?: T;
         id?: T;
       };
+  amenitiesImage?: T;
   highlights?:
     | T
     | {
@@ -1868,6 +1916,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         id?: T;
       };
   gallery?: T;
+  videoUrl?: T;
   floorPlans?:
     | T
     | {
@@ -2695,6 +2744,133 @@ export interface SiteSetting {
       }[]
     | null;
   /**
+   * Từ khoá tìm nhanh, khối "Tìm hiểu thêm" và câu hỏi thường gặp của từng trang. Chữ nhập riêng cho tiếng Việt và tiếng Anh; dòng chưa có chữ tiếng Anh thì không hiện ở bản tiếng Anh.
+   */
+  listingPages?: {
+    projects?: {
+      /**
+       * Các từ khoá gợi ý dưới ô tìm kiếm (tối đa 8). Bấm vào từ khoá là tìm theo từ đó.
+       */
+      quickSearch?:
+        | {
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Khối ảnh/video kèm giới thiệu ở cuối trang. Để trống tiêu đề thì không hiện khối.
+       */
+      learnMore?: {
+        eyebrow?: string | null;
+        title?: string | null;
+        titleAccent?: string | null;
+        description?: string | null;
+        image?: (string | null) | Media;
+        /**
+         * Link YouTube hoặc TikTok (https://). Có link thì ảnh có nút phát video.
+         */
+        videoUrl?: string | null;
+        ctaLabel?: string | null;
+        /**
+         * Trang trong website bắt đầu bằng / (VD: /lien-he) hoặc địa chỉ https://. Thiếu chữ hoặc đường dẫn thì ẩn nút.
+         */
+        ctaHref?: string | null;
+      };
+      /**
+       * Tối đa 10 câu hỏi, hiện ở cuối trang.
+       */
+      faqs?:
+        | {
+            question: string;
+            answer: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    rentals?: {
+      /**
+       * Các từ khoá gợi ý dưới ô tìm kiếm (tối đa 8). Bấm vào từ khoá là tìm theo từ đó.
+       */
+      quickSearch?:
+        | {
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Khối ảnh/video kèm giới thiệu ở cuối trang. Để trống tiêu đề thì không hiện khối.
+       */
+      learnMore?: {
+        eyebrow?: string | null;
+        title?: string | null;
+        titleAccent?: string | null;
+        description?: string | null;
+        image?: (string | null) | Media;
+        /**
+         * Link YouTube hoặc TikTok (https://). Có link thì ảnh có nút phát video.
+         */
+        videoUrl?: string | null;
+        ctaLabel?: string | null;
+        /**
+         * Trang trong website bắt đầu bằng / (VD: /lien-he) hoặc địa chỉ https://. Thiếu chữ hoặc đường dẫn thì ẩn nút.
+         */
+        ctaHref?: string | null;
+      };
+      /**
+       * Tối đa 10 câu hỏi, hiện ở cuối trang.
+       */
+      faqs?:
+        | {
+            question: string;
+            answer: string;
+            id?: string | null;
+          }[]
+        | null;
+      showStrengths?: boolean | null;
+    };
+    propertyPosts?: {
+      /**
+       * Các từ khoá gợi ý dưới ô tìm kiếm (tối đa 8). Bấm vào từ khoá là tìm theo từ đó.
+       */
+      quickSearch?:
+        | {
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Khối ảnh/video kèm giới thiệu ở cuối trang. Để trống tiêu đề thì không hiện khối.
+       */
+      learnMore?: {
+        eyebrow?: string | null;
+        title?: string | null;
+        titleAccent?: string | null;
+        description?: string | null;
+        image?: (string | null) | Media;
+        /**
+         * Link YouTube hoặc TikTok (https://). Có link thì ảnh có nút phát video.
+         */
+        videoUrl?: string | null;
+        ctaLabel?: string | null;
+        /**
+         * Trang trong website bắt đầu bằng / (VD: /lien-he) hoặc địa chỉ https://. Thiếu chữ hoặc đường dẫn thì ẩn nút.
+         */
+        ctaHref?: string | null;
+      };
+      /**
+       * Tối đa 10 câu hỏi, hiện ở cuối trang.
+       */
+      faqs?:
+        | {
+            question: string;
+            answer: string;
+            id?: string | null;
+          }[]
+        | null;
+      showStrengths?: boolean | null;
+    };
+  };
+  /**
    * Số hiển thị và gọi từ nút liên hệ nổi trên website
    */
   hotline?: string | null;
@@ -3258,6 +3434,99 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         id?: T;
+      };
+  listingPages?:
+    | T
+    | {
+        projects?:
+          | T
+          | {
+              quickSearch?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              learnMore?:
+                | T
+                | {
+                    eyebrow?: T;
+                    title?: T;
+                    titleAccent?: T;
+                    description?: T;
+                    image?: T;
+                    videoUrl?: T;
+                    ctaLabel?: T;
+                    ctaHref?: T;
+                  };
+              faqs?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+            };
+        rentals?:
+          | T
+          | {
+              quickSearch?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              learnMore?:
+                | T
+                | {
+                    eyebrow?: T;
+                    title?: T;
+                    titleAccent?: T;
+                    description?: T;
+                    image?: T;
+                    videoUrl?: T;
+                    ctaLabel?: T;
+                    ctaHref?: T;
+                  };
+              faqs?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              showStrengths?: T;
+            };
+        propertyPosts?:
+          | T
+          | {
+              quickSearch?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              learnMore?:
+                | T
+                | {
+                    eyebrow?: T;
+                    title?: T;
+                    titleAccent?: T;
+                    description?: T;
+                    image?: T;
+                    videoUrl?: T;
+                    ctaLabel?: T;
+                    ctaHref?: T;
+                  };
+              faqs?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              showStrengths?: T;
+            };
       };
   hotline?: T;
   zaloUrl?: T;

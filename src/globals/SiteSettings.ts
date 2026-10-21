@@ -10,6 +10,7 @@ import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
+import { listingPagesField } from "./site-settings/listing-pages";
 import { careersPerksField, pageHeroesField, showProjectStrengthsField } from "./site-settings/page-heroes";
 
 const validateHttpUrl: TextFieldSingleValidation = (value) => {
@@ -113,6 +114,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
             careersPerksField,
           ],
         },
+        { label: "Trang danh sách", fields: [listingPagesField] },
         {
           label: "Liên hệ & mạng xã hội",
           fields: [
