@@ -34,6 +34,8 @@ export interface DocPlan {
   fieldStates: Record<string, FieldState>;
   filled: FilledValue[];
   review: ReviewNote[];
+  /** Lý do bỏ qua cả tin (vd tin ưu đãi / voucher của Tin BĐS): không lập kế hoạch, không ghi. */
+  skipped?: string;
   /** Có khi `--apply` ghi lỗi (thông báo ngắn, không chứa chuỗi kết nối). */
   error?: string;
 }

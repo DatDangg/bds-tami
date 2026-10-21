@@ -6,7 +6,7 @@ import type { Payload } from "payload";
 import { describe, expect, it, vi } from "vitest";
 
 import { TRANSLATION_JOB_CONTEXT_KEY } from "../../hooks/translation/translation-targets";
-import type { Project } from "../../payload-types";
+import type { Project, PropertyPost } from "../../payload-types";
 import { projectsBackfill } from "./projects";
 import { backfillReportFileName, renderBackfillReport, writeBackfillReport } from "./report";
 import { parseBackfillArgs, runBackfill } from "./run";
@@ -14,20 +14,36 @@ import { parseBackfillArgs, runBackfill } from "./run";
 const overview = (text: string) => ({ root: { type: "root", children: [{ type: "paragraph", children: [{ type: "text", text }] }] } });
 
 /** Payload giả: giữ tin trong bộ nhớ, `update` gộp `data` vào tin (đủ để kiểm dry-run / apply / chạy lại). */
-function fakePayload(projects: Partial<Project>[]) {
+function fakePayload(projects: Partial<Project>[], posts: Partial<PropertyPost>[] = []) {
   const docs = projects.map((p) => ({ ...p })) as Project[];
-  const update = vi.fn(async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
-    const doc = docs.find((d) => d.id === id);
+  const postDocs = posts.map((p) => ({ ...p })) as PropertyPost[];
+  const listOf = (collection: string): { id: string; title?: string | null }[] => (collection === "property-posts" ? postDocs : docs);
+  const update = vi.fn(async ({ collection, id, data }: { collection: string; id: string; data: Record<string, unknown> }) => {
+    const doc = listOf(collection).find((d) => d.id === id);
     if (!doc) throw new Error("not found");
     if (doc.title === "Lỗi ghi") throw new Error("ValidationError: The following field is invalid: gallery\nstack…");
     Object.assign(doc, data);
     return doc;
   });
   const find = vi.fn(async ({ collection }: { collection: string }) => ({
-    docs: collection === "categories" ? [{ id: "c1", title: "Căn hộ chung cư" }] : docs.map((d) => structuredClone(d)),
+    docs: collection === "categories" ? [{ id: "c1", title: "Căn hộ chung cư" }] : listOf(collection).map((d) => structuredClone(d)),
   }));
-  return { payload: { find, update } as unknown as Payload, update, docs };
+  return { payload: { find, update } as unknown as Payload, update, docs, postDocs };
 }
+
+const content = (...lines: string[]) => ({ root: { type: "root", children: lines.map((text) => ({ type: "paragraph", children: [{ type: "text", text }] })) } });
+
+/** Mẫu theo tin thật trong DB dev: tin bán thường, tin voucher, tin đã đủ thông số. */
+const seedPosts = (): Partial<PropertyPost>[] => [
+  { id: "p1", title: "Bán liền kề hướng Bắc - Elegant Park Thạch Bàn xây thô 4 tầng mặt tiền 5m", status: "published", content: content("Diện tích: 96m² (tham khảo)") } as unknown as Partial<PropertyPost>,
+  { id: "p2", title: "Voucher tri ân khách thuê căn hộ 2PN", status: "draft", offer: { endAt: "2026-12-31T00:00:00.000Z" } } as Partial<PropertyPost>,
+  {
+    id: "p3",
+    title: "Đã đủ",
+    status: "published",
+    ...{ propertyType: "villa", areaM2: 1, bedrooms: 1, bathrooms: 1, houseDirection: "N", frontageM: 1, floors: 1, address: "x" },
+  } as Partial<PropertyPost>,
+];
 
 const seed = (): Partial<Project>[] => [
   { id: "a", title: "Biệt thự Hồ Tây", status: "published", category: "c1", overview: overview("Gồm 20 căn biệt thự đơn lập 200 – 300 m², gần bệnh viện.") } as unknown as Partial<Project>,
@@ -67,9 +83,59 @@ describe("runBackfill", () => {
   });
 });
 
+describe("runBackfill — Tin BĐS (property-posts)", () => {
+  it("dry-run không ghi; --apply chỉ ghi ô trống của tin thường, bỏ qua tin voucher; chạy lại không đổi gì", async () => {
+    const { payload, update, postDocs } = fakePayload([], seedPosts());
+    const [dry] = await runBackfill(payload, parseBackfillArgs(["--collection", "property-posts"]));
+    expect(update).not.toHaveBeenCalled();
+    expect(dry?.plans.find((p) => p.id === "p2")).toMatchObject({ skipped: "tin ưu đãi / voucher", patch: {} });
+
+    await runBackfill(payload, parseBackfillArgs(["--apply", "--collection", "property-posts"]));
+    expect(update).toHaveBeenCalledTimes(1);
+    const call = update.mock.calls[0]?.[0] as unknown as Record<string, unknown>;
+    expect(call).toMatchObject({ collection: "property-posts", id: "p1", locale: "vi", context: { [TRANSLATION_JOB_CONTEXT_KEY]: true } });
+    expect(call.data).toEqual({ propertyType: "townhouse", areaM2: 96, houseDirection: "N", frontageM: 5, floors: 4 });
+    expect(postDocs.find((d) => d.id === "p2")).not.toHaveProperty("bedrooms");
+    expect(postDocs.find((d) => d.id === "p3")).toMatchObject({ areaM2: 1, houseDirection: "N", address: "x" });
+
+    update.mockClear();
+    const [again] = await runBackfill(payload, parseBackfillArgs(["--apply", "--collection", "property-posts"]));
+    expect(update).not.toHaveBeenCalled();
+    expect(again?.plans.every((p) => Object.keys(p.patch).length === 0)).toBe(true);
+  });
+
+  it("báo cáo có mục Tin BĐS, đếm tin bỏ qua riêng (không lẫn vào \"không trích được\")", async () => {
+    const { payload } = fakePayload([], seedPosts());
+    const report = renderBackfillReport(await runBackfill(payload, parseBackfillArgs([])), { apply: false, ranAt: "x" });
+    expect(report).toContain("## Tin BĐS (`property-posts`)");
+    const section = report.slice(report.indexOf("## Tin BĐS"));
+    expect(section).toContain("| Sẽ điền (ít nhất 1 ô) | 1 |");
+    expect(section).toContain("| Không điền — mọi ô đã có giá trị | 1 |");
+    expect(section).toContain("| Không điền — có ô trống nhưng không trích được | 0 |");
+    expect(section).toContain("| Bỏ qua (tin ưu đãi / voucher) | 1 |");
+    expect(section).toContain("| Diện tích (m²) (`areaM2`) | 1 | 1 | 0 |");
+    expect(section).toContain("| Diện tích (m²) | 96 m² | Diện tích: 96m² (tham khảo) | nội dung | trung bình |");
+  });
+});
+
+describe("báo cáo --apply khi có tin ghi lỗi (P1-T07 r2 N1)", () => {
+  it("tin ghi lỗi không tính vào \"Đã điền\" (tổng, theo trường, bảng chi tiết) — chỉ ở \"Lỗi khi ghi\" + mục cần soát", async () => {
+    const { payload } = fakePayload([{ id: "x", title: "Lỗi ghi", status: "published", overview: overview("Căn hộ cao cấp") } as unknown as Partial<Project>, ...seed()]);
+    const [result] = await runBackfill(payload, parseBackfillArgs(["--apply", "--collection", "projects"]));
+    const report = renderBackfillReport(result ? [result] : [], { apply: true, ranAt: "x" });
+    expect(report).toContain("| Đã điền (ít nhất 1 ô) | 1 |");
+    expect(report).toContain("| Lỗi khi ghi | 1 |");
+    // "x" (lỗi) và "a" đều có productTypes "fill" nhưng chỉ "a" được tính.
+    expect(report).toContain("| Loại sản phẩm (`productTypes`) | 1 |");
+    expect(report).not.toMatch(/\| Lỗi ghi \| Loại sản phẩm \|/);
+    expect(report).toContain("- **Lỗi ghi** — ghi lỗi, chưa điền: ValidationError");
+  });
+});
+
 describe("parseBackfillArgs", () => {
   it("mặc định dry-run + mọi collection; nhận --apply và --collection", () => {
-    expect(parseBackfillArgs([])).toEqual({ apply: false, collections: ["projects"] });
+    expect(parseBackfillArgs([])).toEqual({ apply: false, collections: ["projects", "property-posts"] });
+    expect(parseBackfillArgs(["--collection", "property-posts"])).toEqual({ apply: false, collections: ["property-posts"] });
     expect(parseBackfillArgs(["--apply", "--collection", "projects"])).toEqual({ apply: true, collections: ["projects"] });
     expect(parseBackfillArgs(["--collection=projects"])).toEqual({ apply: false, collections: ["projects"] });
   });

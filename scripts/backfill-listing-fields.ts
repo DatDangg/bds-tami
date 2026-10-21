@@ -1,5 +1,6 @@
-// Điền dữ liệu cũ cho trường mới của BL-052 (Dự án: loại sản phẩm, tiện ích nổi bật, sản phẩm) từ nội dung sẵn có. CHỈ DB dev.
-// Chạy: `pnpm backfill:listing-fields` (chạy thử, không ghi) · `pnpm backfill:listing-fields --apply` (ghi) · thêm `--collection projects`.
+// Điền dữ liệu cũ cho trường mới của BL-052 từ nội dung sẵn có. CHỈ DB dev.
+// Dự án: loại sản phẩm, tiện ích nổi bật, sản phẩm. Tin BĐS: loại hình, diện tích, phòng ngủ/tắm, hướng nhà, mặt tiền, số tầng, địa chỉ (bỏ qua tin ưu đãi/voucher).
+// Chạy: `pnpm backfill:listing-fields` (chạy thử, không ghi, mọi collection) · `--apply` (ghi) · `--collection projects|property-posts` (chỉ một collection).
 // (`payload run` chỉ chuyển tham số đứng sau `--` cho script, nên lệnh trong package.json kết thúc bằng `--`.)
 // Chỉ điền ô trống, idempotent; mỗi lần chạy ghi 1 báo cáo MỚI `docs/reports/backfill-listing-fields-<YYYY-MM-DD>-<HHmm>-<apply|dry-run>.md` (không ghi đè; bản dry-run bị gitignore).
 // Từ chối khi không phải DB dev cục bộ (`checkBackfillEnvironment`, chặn cả staging/prod — không có cờ mở).
