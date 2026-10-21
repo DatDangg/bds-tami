@@ -989,5 +989,26 @@
       "showLess": "Thu gọn",
       "showAll": "Xem tất cả"
     }
+  },
+  "listingOptions": {
+    "propertyType": {
+      "apartment": "Căn hộ",
+      "townhouse": "Nhà phố/Liền kề",
+      "villa": "Biệt thự",
+      "shophouse": "Shophouse",
+      "land": "Đất nền",
+      "resort": "Nghỉ dưỡng",
+      "condotel": "Condotel",
+      "office": "Văn phòng"
+    },
+    "projectFeature": {
+      "near_school": "Gần trường học",
+      "near_hospital": "Gần bệnh viện",
+      "near_mall": "Gần TTTM",
+      "near_metro": "Gần metro",
+      "water_view": "View sông/hồ",
+      "pool_gym_spa": "Hồ bơi, gym, spa",
+      "green_park": "Công viên cây xanh"
+    }
   }
 }

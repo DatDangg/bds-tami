@@ -356,4 +356,68 @@ describe.skipIf(!baseUrl)("integration: globals site-settings / header / footer 
       expect(await statusOf(updateSettings({ careersPerks: [{ icon: "star", title: "Một mục" }] }, admin))).toBe(400);
     });
   });
+
+  describe("nội dung trang danh sách (BL-052)", () => {
+    it("admin lưu listingPages vi + en riêng; /en không rơi về tiếng Việt; cờ Điểm mạnh mặc định bật", async () => {
+      const before = await readPublicGlobal(payload, "site-settings", "vi");
+      expect(before.listingPages?.rentals?.showStrengths).not.toBe(false);
+      const doc = await updateSettings(
+        {
+          listingPages: {
+            rentals: {
+              quickSearch: [{ label: "Căn hộ Quận 7" }, { label: "Studio" }],
+              learnMore: { title: "Thuê nhà", titleAccent: "dễ dàng", ctaLabel: "Liên hệ", ctaHref: "/lien-he", videoUrl: "https://www.youtube.com/watch?v=abc" },
+              faqs: [{ question: "Cọc mấy tháng?", answer: "Thường 1 đến 2 tháng." }],
+              showStrengths: false,
+            },
+          },
+        },
+        admin,
+      );
+      const rentals = doc.listingPages?.rentals;
+      expect(rentals?.quickSearch?.map((row) => row.label)).toEqual(["Căn hộ Quận 7", "Studio"]);
+      expect(rentals?.showStrengths).toBe(false);
+      // Chưa lưu/dịch bản en: hàng có ở en nhưng chữ trống (loader bỏ hàng), không lấy chữ Việt.
+      const enBefore = (await readPublicGlobal(payload, "site-settings", "en")).listingPages?.rentals;
+      expect(enBefore?.quickSearch?.map((row) => row.label ?? null)).toEqual([null, null]);
+      expect(enBefore?.learnMore?.title).toBeFalsy();
+      expect(enBefore?.faqs?.[0]?.question).toBeFalsy();
+
+      // Lưu bản en: hàng bắt buộc chữ phải có chữ en (như careersPerks); chữ không nhập ở en (titleAccent) để trống.
+      await updateSettings(
+        {
+          siteName: "TAMI",
+          listingPages: {
+            rentals: {
+              quickSearch: [{ id: rentals?.quickSearch?.[0]?.id, label: "District 7 apartments" }, { id: rentals?.quickSearch?.[1]?.id, label: "Studio" }],
+              learnMore: { title: "Renting" },
+              faqs: [{ id: rentals?.faqs?.[0]?.id, question: "How many months deposit?", answer: "Usually 1 to 2 months." }],
+            },
+          },
+        },
+        admin,
+        "en",
+      );
+      const en = (await readPublicGlobal(payload, "site-settings", "en")).listingPages?.rentals;
+      expect(en?.quickSearch?.map((row) => row.label)).toEqual(["District 7 apartments", "Studio"]);
+      expect(en?.learnMore?.title).toBe("Renting");
+      expect(en?.learnMore?.titleAccent).toBeFalsy();
+      expect(en?.learnMore?.ctaHref).toBe("/lien-he");
+      expect(en?.faqs?.[0]?.question).toBe("How many months deposit?");
+      const vi = (await readPublicGlobal(payload, "site-settings", "vi")).listingPages?.rentals;
+      expect(vi?.learnMore?.title).toBe("Thuê nhà");
+      expect(vi?.quickSearch?.map((row) => row.label)).toEqual(["Căn hộ Quận 7", "Studio"]);
+    });
+
+    it("ctaHref chỉ nhận đường dẫn nội bộ / https; video lạ, thiếu chữ hàng bắt buộc, quá số dòng → 400", async () => {
+      const learnMore = (patch: Record<string, unknown>) => updateSettings({ listingPages: { projects: { learnMore: { title: "T", ...patch } } } }, admin);
+      expect(await statusOf(learnMore({ ctaHref: "javascript:alert(1)" }))).toBe(400);
+      expect(await statusOf(learnMore({ ctaHref: "//evil.example" }))).toBe(400);
+      expect(await statusOf(learnMore({ videoUrl: "https://evil.example/v" }))).toBe(400);
+      expect(await statusOf(learnMore({ ctaHref: "https://example.test/a" }))).toBeUndefined();
+      expect(await statusOf(updateSettings({ listingPages: { projects: { faqs: [{ question: "Q" }] } } }, admin))).toBe(400);
+      const nine = Array.from({ length: 9 }, (_, index) => ({ label: "Từ " + index }));
+      expect(await statusOf(updateSettings({ listingPages: { propertyPosts: { quickSearch: nine } } }, admin))).toBe(400);
+    });
+  });
 });

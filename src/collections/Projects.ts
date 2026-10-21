@@ -15,6 +15,8 @@ import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
+import { validateVideoUrl } from "../hooks/rentals/field-validators";
+import { trimText } from "../hooks/trim-text";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
@@ -24,6 +26,7 @@ import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { textRowLabel } from "../lib/admin/row-label";
 import { withContentDefaults } from "./_shared/content-defaults";
+import { featuredAmenitiesField, productsField, productTypesField } from "./projects/listing-fields";
 import { projectMarketBlockFields } from "./projects/market-blocks";
 
 export const SALES_STATUSES = ["upcoming", "selling", "handed_over"] as const;
@@ -92,6 +95,7 @@ const amenitiesField: ArrayField = {
   fields: [
     { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true, admin: { placeholder: "VD: Hồ bơi" } },
     { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm tiện ích." } },
+    { name: "description", type: "textarea", label: "Mô tả ngắn (tuỳ chọn)", localized: true, admin: { placeholder: "VD: Hồ bơi tràn bờ 50m trên tầng thượng" } },
   ],
 };
 
@@ -181,8 +185,14 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
               formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),
+              formRow(productTypesField, featuredAmenitiesField),
               scaleGroup,
+              productsField,
               amenitiesField,
+              {
+                ...mediaUpload("amenitiesImage", "Ảnh khối tiện ích", imageMimeType),
+                admin: { description: "Ảnh lớn bên trái danh sách tiện ích ở trang chi tiết. Để trống thì danh sách tiện ích rộng hết khối." },
+              },
             ],
           },
           { label: "Bảng giá & thông tin thêm", fields: projectMarketBlockFields },
@@ -199,6 +209,14 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
                 validate: validateGallery,
                 admin: { description: "Ảnh đầu tiên là ảnh đại diện của dự án.", components: { Cell: "/components/admin/ThumbnailCell#ThumbnailCell" } },
               },
+              {
+                name: "videoUrl",
+                type: "text",
+                label: "Link video giới thiệu",
+                validate: validateVideoUrl,
+                hooks: { beforeValidate: [trimText] },
+                admin: { placeholder: "https://www.youtube.com/watch?v=…", description: "Link YouTube hoặc TikTok (https://). Có link thì trang chi tiết hiện nút \"Xem video giới thiệu\"." },
+              },
               floorPlansField,
               { ...mediaUpload("documents", "Tài liệu (PDF)", { equals: "application/pdf" }), hasMany: true },
             ],
@@ -208,8 +226,8 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
     },
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },
   );
-  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale, priceUpdatedAt ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFields(collection, ["address", "scale", "priceUpdatedAt"]);
+  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale, priceUpdatedAt, videoUrl ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
+  return hideTechnicalListFields(collection, ["address", "scale", "priceUpdatedAt", "videoUrl"]);
 }
 
 export const Projects = createProjects();

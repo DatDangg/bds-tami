@@ -39,7 +39,7 @@ describe("Thêm bộ lọc: chỉ còn trường nghiệp vụ (BL-021 #06)", ()
   it("projects", () => {
     expect(filterable(createProjects())).toEqual(
       [
-        "areaFromM2", "areaToM2", "author", "category", "developer", "isFeatured", "priceFromVnd", "priceToVnd", "province", "publishedAt",
+        "areaFromM2", "areaToM2", "author", "category", "developer", "featuredAmenities", "isFeatured", "priceFromVnd", "priceToVnd", "productTypes", "province", "publishedAt",
         "salesStatus", "status", "title", "ward",
       ].sort(),
     );

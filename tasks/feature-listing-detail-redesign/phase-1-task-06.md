@@ -36,3 +36,7 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Bổ sung từ review P1-T03 (change-request 2026-10-21)
+- **Bố cục theo design:** cột phải (form + hotline) chỉ **cạnh khối Tổng quan** (dính trong phạm vi đó); Vị trí / Tiện ích / Hình ảnh / khối giữ lại / Tương tự là **dải full-width nền xen kẽ** qua slot `after` của `DetailPageShell` (cập nhật mô tả slot hoặc thêm prop riêng). Kiểm: scroll-spy tab vẫn chạy cho khối trong `after`, `#lead-form` + CTA dính đáy < lg vẫn tới form.
+- `DetailSpecBar`: lg 3 cột, xl 1 hàng 6 ô (chữ không gãy giữa từ 1024–1150px); key `label+index` ở `DetailSpecBar` / `DetailInfoGrid`.

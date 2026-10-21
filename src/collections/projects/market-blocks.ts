@@ -40,7 +40,7 @@ export const MAX_FAQS = 20;
 const rangeNumber = (name: string, label: string, validate?: NumberFieldSingleValidation): NumberField => ({ name, type: "number", label, min: 0, validate });
 
 /** Cặp "từ – đến": khi cả hai có giá trị thì "đến" không được nhỏ hơn "từ" (validate chạy sau `min`/kiểu số mặc định của Payload). */
-const notBelow = (fromName: string, message: string): NumberFieldSingleValidation => (value, options) => {
+export const notBelow = (fromName: string, message: string): NumberFieldSingleValidation => (value, options) => {
   const base = number(value, options);
   if (base !== true) return base;
   const from = (options.siblingData as Record<string, unknown> | undefined)?.[fromName];
