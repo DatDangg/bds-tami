@@ -18,6 +18,12 @@ const card = (id: string, overrides: Partial<PostCardData> = {}): PostCardData =
   priceLabel: null,
   badge: null,
   endLabel: null,
+  kind: "property",
+  hasOffer: false,
+  propertyType: null,
+  placeLabel: null,
+  areaM2: null,
+  bedrooms: null,
   ...overrides,
 });
 
@@ -35,9 +41,9 @@ const offer = (overrides: Partial<PostOfferView> = {}): PostOfferView => ({
 
 afterEach(() => vi.unstubAllGlobals());
 
-describe("PostCard", () => {
+describe("PostCard home (slider Ưu đãi trang chủ, thẻ BL-045 giữ nguyên)", () => {
   it("cả thẻ là MỘT link, tiêu đề đúng cấp heading, giá và hạn ưu đãi", () => {
-    const { container } = renderWithIntl(<PostCard data={card("1", { priceLabel: "3,5 tỷ", endLabel: "30/10/2026" })} headingLevel="h2" />);
+    const { container } = renderWithIntl(<PostCard data={card("1", { priceLabel: "3,5 tỷ", endLabel: "30/10/2026" })} variant="home" headingLevel="h2" />);
     expect(container.querySelectorAll("a")).toHaveLength(1);
     expect(within(screen.getByRole("link")).getByRole("heading", { level: 2, name: "Tin 1" })).toBeInTheDocument();
     expect(screen.getByText("3,5 tỷ")).toBeInTheDocument();
@@ -45,26 +51,26 @@ describe("PostCard", () => {
   });
 
   it("ưu đãi đã kết thúc: badge 'Đã kết thúc' + ảnh mờ; vẫn là link", () => {
-    const { container } = renderWithIntl(<PostCard data={card("1", { badge: { kind: "ended" } })} headingLevel="h2" />);
+    const { container } = renderWithIntl(<PostCard data={card("1", { badge: { kind: "ended" } })} variant="home" headingLevel="h2" />);
     expect(screen.getByText("Đã kết thúc")).toBeInTheDocument();
     expect(container.querySelector(".opacity-70")).not.toBeNull();
     expect(screen.getByRole("link")).toHaveAttribute("href", "/tin-bds/tin-1");
   });
 
   it("sắp hết hạn: 'Còn n ngày' / 'Hết hạn hôm nay'; không hết hạn: không badge, ảnh không mờ", () => {
-    const first = renderWithIntl(<PostCard data={card("1", { badge: { kind: "endingSoon", daysLeft: 2 } })} headingLevel="h2" />);
+    const first = renderWithIntl(<PostCard data={card("1", { badge: { kind: "endingSoon", daysLeft: 2 } })} variant="home" headingLevel="h2" />);
     expect(screen.getByText("Còn 2 ngày")).toBeInTheDocument();
     first.unmount();
-    const second = renderWithIntl(<PostCard data={card("1", { badge: { kind: "endingSoon", daysLeft: 0 } })} headingLevel="h2" />);
+    const second = renderWithIntl(<PostCard data={card("1", { badge: { kind: "endingSoon", daysLeft: 0 } })} variant="home" headingLevel="h2" />);
     expect(screen.getByText("Hết hạn hôm nay")).toBeInTheDocument();
     second.unmount();
-    const { container } = renderWithIntl(<PostCard data={card("1")} headingLevel="h2" />);
+    const { container } = renderWithIntl(<PostCard data={card("1")} variant="home" headingLevel="h2" />);
     expect(screen.queryByText(/Còn|Đã kết thúc|Hết hạn/)).toBeNull();
     expect(container.querySelector(".opacity-70")).toBeNull();
   });
 
   it("kiểu thẻ như ProjectCard: ảnh 11:10, tiêu đề 2 dòng font-display, mũi tên tròn, không tóm tắt", () => {
-    const { container } = renderWithIntl(<PostCard data={card("1")} headingLevel="h2" />);
+    const { container } = renderWithIntl(<PostCard data={card("1")} variant="home" headingLevel="h2" />);
     expect(container.querySelector('[class*="aspect-[11/10]"]')).not.toBeNull();
     expect(container.querySelector('[class*="aspect-[16/10]"]')).toBeNull();
     const heading = screen.getByRole("heading", { level: 2 });
@@ -78,7 +84,7 @@ describe("PostCard", () => {
   });
 
   it("en: nhãn tiếng Anh", () => {
-    renderWithIntl(<PostCard data={card("1", { badge: { kind: "ended" } })} headingLevel="h2" />, "en");
+    renderWithIntl(<PostCard data={card("1", { badge: { kind: "ended" } })} variant="home" headingLevel="h2" />, "en");
     expect(screen.getByText("Ended")).toBeInTheDocument();
   });
 });
@@ -99,7 +105,7 @@ describe("PostCard feature (bài nổi bật ngang)", () => {
 
 describe("PostListBody", () => {
   it("bài nổi bật là thẻ ngang riêng (priority) trước lưới, MỘT vùng có tên, mọi tiêu đề h2, lưới 1/2/3 cột", () => {
-    const { container } = renderWithIntl(<PostListBody featured={card("1")} items={[card("2"), card("3")]} />);
+    const { container } = renderWithIntl(<PostListBody featured={[card("1")]} items={[card("2"), card("3")]} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 1", "Tin 2", "Tin 3"]);
     expect(screen.getAllByRole("region")).toHaveLength(1);
     expect(screen.getByRole("region", { name: "Danh sách tin đăng" })).toBeInTheDocument();
@@ -110,7 +116,7 @@ describe("PostListBody", () => {
   });
 
   it("không có bài nổi bật: chỉ lưới các thẻ còn lại", () => {
-    const { container } = renderWithIntl(<PostListBody featured={null} items={[card("2")]} />);
+    const { container } = renderWithIntl(<PostListBody featured={[]} items={[card("2")]} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Tin 2"]);
     expect(container.querySelector("[data-post-featured]")).toBeNull();
   });

@@ -1,6 +1,7 @@
 import type { MediaImage } from "../../components/media/ResponsiveImage";
 import type { Locale } from "../../i18n/routing";
 import type { Category, Project, Province, PropertyPost, Rental, Ward } from "../../payload-types";
+import type { PropertyType } from "../../shared/listing-options";
 import { daysUntilDeadline } from "../careers/deadline";
 import { CONTENT_ROUTES, publicPath } from "../content/content-paths";
 import { isOfferEnded } from "../content/offer-status";
@@ -64,14 +65,44 @@ export interface PostCardData {
   badge: OfferBadge | null;
   /** "dd/mm/yyyy" của hạn ưu đãi (có `offer.endAt` hợp lệ), cho dòng "Đến ngày". */
   endLabel: string | null;
+  /**
+   * BL-052 — thẻ nào ở danh sách: `voucher` khi tin có ưu đãi (`offer.endAt` hoặc `offer.voucherCode`) VÀ không có giá lẫn diện tích;
+   * còn lại `property` (tin bán kèm ưu đãi vẫn là thẻ BĐS, thêm badge ưu đãi).
+   */
+  kind: "property" | "voucher";
+  /** Có ưu đãi (hạn hợp lệ hoặc mã voucher) — badge "Ưu đãi" / trạng thái trên thẻ. */
+  hasOffer: boolean;
+  propertyType: PropertyType | null;
+  /** "Phường, Tỉnh" (phần nào có thì in). */
+  placeLabel: string | null;
+  /** > 0 hoặc `null`. */
+  areaM2: number | null;
+  bedrooms: number | null;
+}
+
+const positiveOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && value > 0 ? value : null);
+
+/** Hạn ưu đãi hợp lệ (parse được) hoặc `null`. */
+function validEndAt(post: Pick<PropertyPost, "offer">): string | null {
+  const endAt = post.offer?.endAt;
+  return hasText(endAt) && !Number.isNaN(new Date(endAt).getTime()) ? endAt : null;
 }
 
 export function toPostCardData(doc: PropertyPost, locale: Locale, now: Date): PostCardData | null {
   // Bài không có tiêu đề/slug không dựng được thẻ có link: bỏ qua thay vì render thẻ rỗng.
   if (!doc.title || !doc.slug) return null;
   const published = doc.publishedAt ?? null;
-  const endAt = doc.offer?.endAt;
+  const endAt = validEndAt(doc);
+  const hasOffer = endAt !== null || hasText(doc.offer?.voucherCode);
+  const priceVnd = positiveOrNull(doc.priceVnd);
+  const areaM2 = positiveOrNull(doc.areaM2);
   return {
+    kind: hasOffer && priceVnd === null && areaM2 === null ? "voucher" : "property",
+    hasOffer,
+    propertyType: doc.propertyType ?? null,
+    placeLabel: placeLabel(doc.ward, doc.province),
+    areaM2,
+    bedrooms: typeof doc.bedrooms === "number" && doc.bedrooms >= 0 ? doc.bedrooms : null,
     id: doc.id,
     title: doc.title,
     href: publicDetailPath(CONTENT_ROUTES["property-posts"], locale, doc.slug),
@@ -82,7 +113,7 @@ export function toPostCardData(doc: PropertyPost, locale: Locale, now: Date): Po
     cover: toPublicImage(renderableImage(doc.cover)),
     priceLabel: priceLabel(doc, locale, true),
     badge: offerBadge(doc, now),
-    endLabel: endAt && !Number.isNaN(new Date(endAt).getTime()) ? formatDate(endAt, locale) : null,
+    endLabel: endAt ? formatDate(endAt, locale) : null,
   };
 }
 

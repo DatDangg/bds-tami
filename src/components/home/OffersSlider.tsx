@@ -33,7 +33,7 @@ export function OffersSlider({ cards, labelledBy }: { cards: PostCardData[]; lab
             aria-label={t("slide", { index: position + 1, total: cards.length })}
             className={`shrink-0 snap-start ${SLIDE_WIDTH}`}
           >
-            <PostCard data={card} headingLevel="h3" imageSizes={IMAGE_SIZES} />
+            <PostCard data={card} variant="home" headingLevel="h3" imageSizes={IMAGE_SIZES} />
           </li>
         ))}
       </ul>

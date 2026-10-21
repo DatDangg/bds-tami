@@ -58,9 +58,15 @@ const card = (id: string): PostCardData => ({
   priceLabel: null,
   badge: null,
   endLabel: null,
+  kind: "property",
+  hasOffer: false,
+  propertyType: null,
+  placeLabel: null,
+  areaM2: null,
+  bedrooms: null,
 });
 
-const listing = (overrides: Record<string, unknown> = {}) => ({ featured: null, items: [card("1"), card("2")], totalPages: 3, totalDocs: 25, outOfRange: false, isEmpty: false, ...overrides });
+const listing = (overrides: Record<string, unknown> = {}) => ({ featured: [], items: [card("1"), card("2")], totalPages: 3, totalDocs: 25, outOfRange: false, isEmpty: false, ...overrides });
 
 afterEach(() => {
   loadPostListing.mockReset();
@@ -82,7 +88,7 @@ describe("/tin-bds (BL-045, Q4): bố cục như Tin tức, tham số URL không
   });
 
   it("bài nổi bật ngang đứng trước lưới (trang 1)", async () => {
-    loadPostListing.mockResolvedValue(listing({ featured: card("9") }));
+    loadPostListing.mockResolvedValue(listing({ featured: [card("9")] }));
     const { container } = renderWithIntl(await PostListPage({ locale: "vi", rawPage: undefined }));
     expect(container.querySelector("[data-post-featured] a")).toHaveAttribute("href", "/tin-bds/tin-9");
   });

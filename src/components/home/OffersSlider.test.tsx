@@ -16,6 +16,12 @@ const card = (n: number, overrides: Partial<PostCardData> = {}): PostCardData =>
   priceLabel: "3,5 tỷ",
   badge: null,
   endLabel: null,
+  kind: "property",
+  hasOffer: true,
+  propertyType: "villa",
+  placeLabel: "TP.HCM",
+  areaM2: 120,
+  bedrooms: 3,
   ...overrides,
 });
 
@@ -50,5 +56,14 @@ describe("FeaturedOffers (slider)", () => {
   it("EN: link 'See more' theo tiền tố ngôn ngữ", () => {
     renderWithIntl(<FeaturedOffers title="Buy direct" cards={[card(1, { href: "/en/property-news/x" })]} />, "en");
     expect(screen.getByRole("link", { name: "See more" })).toHaveAttribute("href", "/en/property-news");
+  });
+
+  it("BL-052: trang chủ GIỮ thẻ cũ (biến thể home) — không tag loại hình / thông số / badge 'Ưu đãi' của thẻ danh sách", () => {
+    const { container } = renderWithIntl(<FeaturedOffers title="Mua từ chủ đầu tư" cards={[card(1), card(2)]} />);
+    const variants = [...container.querySelectorAll("article")].map((article) => article.getAttribute("data-card-variant"));
+    expect(variants).toEqual(["home", "home"]);
+    expect(screen.queryByText("Biệt thự")).toBeNull();
+    expect(screen.queryByRole("list", { name: "Thông số" })).toBeNull();
+    expect(screen.queryByText("Ưu đãi")).toBeNull();
   });
 });
