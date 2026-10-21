@@ -380,6 +380,7 @@ const rentalDto = (id: string, extra: Partial<RentalSearchCard> = {}): RentalSea
   furnishing: null,
   province: { name: "TP.HCM", slug: "tp-hcm" },
   ward: { name: "Phường 1", slug: "phuong-1" },
+  category: null,
   publishedAt: null,
   ...extra,
 });

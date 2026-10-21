@@ -46,30 +46,89 @@ function wardCondition(ward: string, province: string | undefined): SqlFragment 
   return sql`r."ward_id" IN (SELECT w."id" FROM "wards" w JOIN "provinces" p ON p."id" = w."province_id" WHERE w."slug" = ${ward} AND p."slug" = ${province})`;
 }
 
-/** Mệnh đề WHERE đầy đủ. Mọi giá trị người dùng đi qua tham số (`${}`), không có chuỗi nào được nối vào SQL. */
-export function rentalWhere(params: RentalSearchParams): SqlFragment {
-  const { locale } = params;
+/** Dự án (bí danh `p`) khách thấy được: cùng nghĩa `publicWhere("projects", locale)` — `published`, chưa xoá mềm, `en` thì `hasEnglish`. */
+function publicProjectConditions(locale: string): SqlFragment {
+  const statuses = sql.join(PUBLIC_STATUSES.default.map((status) => sql`${status}`), sql`, `);
+  const english = locale === "en" ? sql` AND p."has_english" = true` : sql``;
+  return sql`p."status" IN (${statuses}) AND p."deleted_at" IS NULL${english}`;
+}
+
+/** Tin thuộc dự án CÔNG KHAI có slug (theo `locale`) này; slug không có / dự án chưa công khai → không tin nào khớp. */
+function projectCondition(slug: string, locale: string): SqlFragment {
+  return sql`r."project_id" IN (SELECT pl."_parent_id" FROM "projects_locales" pl JOIN "projects" p ON p."id" = pl."_parent_id" WHERE pl."_locale" = ${locale} AND pl."slug" = ${slug} AND ${publicProjectConditions(locale)})`;
+}
+
+/** Phạm vi tin được liệt kê: công khai; `available` (trang danh sách S04) thì chỉ tin còn trống — tin đã thuê chỉ truy cập bằng URL. */
+function scopeConditions(locale: string, available: boolean | undefined): SqlFragment[] {
   const conditions = publicConditions(locale);
-  // Trang danh sách S04 không liệt kê tin đã thuê (chỉ truy cập bằng URL).
-  if (params.available) conditions.push(sql`r."status" = 'published'`);
-  for (const term of searchTerms(params.q)) conditions.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`);
-  if (params.category) conditions.push(categoryCondition(params.category, locale));
-  if (params.province) conditions.push(sql`r."province_id" IN (SELECT "id" FROM "provinces" WHERE "slug" = ${params.province})`);
-  if (params.ward) conditions.push(wardCondition(params.ward, params.province));
-  if (params.priceMin !== undefined) conditions.push(sql`r."price_monthly_vnd" >= ${params.priceMin}`);
-  if (params.priceMax !== undefined) conditions.push(sql`r."price_monthly_vnd" <= ${params.priceMax}`);
-  if (params.areaMin !== undefined) conditions.push(sql`r."area_m2" >= ${params.areaMin}`);
-  if (params.areaMax !== undefined) conditions.push(sql`r."area_m2" <= ${params.areaMax}`);
+  if (available) conditions.push(sql`r."status" = 'published'`);
+  return conditions;
+}
+
+/**
+ * Ô "Dự án" của `/cho-thue` (BL-052): slug + tên (theo `locale`) của dự án công khai có ≥ 1 tin cho thuê công khai CÒN TRỐNG (cùng phạm vi trang danh sách),
+ * theo tên. Dự án thiếu slug/tên ở ngôn ngữ này bị bỏ.
+ */
+export function projectOptionsQuery(locale: string): SqlFragment {
+  return sql`SELECT pl."slug", pl."title" FROM "projects" p JOIN "projects_locales" pl ON pl."_parent_id" = p."id" AND pl."_locale" = ${locale}
+    WHERE ${publicProjectConditions(locale)} AND COALESCE(pl."slug", '') <> '' AND COALESCE(pl."title", '') <> ''
+      AND EXISTS (SELECT 1 ${rentalFrom(locale)} WHERE r."project_id" = p."id" AND ${allOf(scopeConditions(locale, true))})
+    ORDER BY pl."title", p."id"`;
+}
+
+/** Chiều lọc có số đếm riêng trên trang danh sách (BL-052): khi đếm một chiều, điều kiện của CHÍNH chiều đó bị bỏ. */
+export type RentalFacetDimension = "category" | "province";
+
+/**
+ * Điều kiện tìm kiếm tách nhóm: `scope` = phạm vi tin được liệt kê (công khai + `available`, không phải "bộ lọc" nên không bao giờ bị bỏ khi đếm);
+ * `byDimension` = điều kiện của chiều có số đếm (`province` gồm cả `ward`: phường chỉ có nghĩa trong tỉnh); `other` = mọi bộ lọc còn lại.
+ */
+export interface RentalConditions {
+  scope: SqlFragment[];
+  byDimension: Record<RentalFacetDimension, SqlFragment[]>;
+  other: SqlFragment[];
+}
+
+/** Mọi giá trị người dùng đi qua tham số (`${}`), không có chuỗi nào được nối vào SQL. */
+export function rentalConditions(params: RentalSearchParams): RentalConditions {
+  const { locale } = params;
+  const scope = scopeConditions(locale, params.available);
+  const category = params.category ? [categoryCondition(params.category, locale)] : [];
+  const province: SqlFragment[] = [];
+  if (params.province) province.push(sql`r."province_id" IN (SELECT "id" FROM "provinces" WHERE "slug" = ${params.province})`);
+  if (params.ward) province.push(wardCondition(params.ward, params.province));
+  const other: SqlFragment[] = [];
+  for (const term of searchTerms(params.q)) other.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`);
+  if (params.project) other.push(projectCondition(params.project, locale));
+  if (params.priceMin !== undefined) other.push(sql`r."price_monthly_vnd" >= ${params.priceMin}`);
+  if (params.priceMax !== undefined) other.push(sql`r."price_monthly_vnd" <= ${params.priceMax}`);
+  if (params.areaMin !== undefined) other.push(sql`r."area_m2" >= ${params.areaMin}`);
+  if (params.areaMax !== undefined) other.push(sql`r."area_m2" <= ${params.areaMax}`);
   // `4` nghĩa là 4 phòng ngủ trở lên (API_SPEC §3.3).
   if (params.bedrooms !== undefined) {
-    conditions.push(params.bedrooms >= 4 ? sql`r."bedrooms" >= 4` : sql`r."bedrooms" = ${params.bedrooms}`);
+    other.push(params.bedrooms >= 4 ? sql`r."bedrooms" >= 4` : sql`r."bedrooms" = ${params.bedrooms}`);
   }
-  if (params.furnishing) conditions.push(sql`r."furnishing" = ${params.furnishing}`);
+  if (params.furnishing) other.push(sql`r."furnishing" = ${params.furnishing}`);
   // Tin phải có ĐỦ mọi tiện ích (AND): mỗi tiện ích một EXISTS trên bảng hasMany `rentals_amenities` (cột `parent_id`/`value`, index `parent_id` do Payload tạo).
   for (const amenity of params.amenities ?? []) {
-    conditions.push(sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${amenity})`);
+    other.push(sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${amenity})`);
   }
-  return sql`WHERE ${sql.join(conditions, sql` AND `)}`;
+  return { scope, byDimension: { category, province }, other };
+}
+
+/** Bộ lọc (không gồm `scope`) trừ chiều `except`; không chiều nào bị bỏ khi `except` không truyền. */
+export function filterConditions(conditions: RentalConditions, except?: RentalFacetDimension): SqlFragment[] {
+  const dimensions = (Object.keys(conditions.byDimension) as RentalFacetDimension[]).filter((dimension) => dimension !== except);
+  return [...dimensions.flatMap((dimension) => conditions.byDimension[dimension]), ...conditions.other];
+}
+
+/** Nối điều kiện bằng AND; rỗng → `true` (dùng được trong `FILTER (WHERE …)`). */
+export const allOf = (conditions: readonly SqlFragment[]): SqlFragment => (conditions.length > 0 ? sql.join([...conditions], sql` AND `) : sql`true`);
+
+/** Mệnh đề WHERE đầy đủ (phạm vi + mọi bộ lọc). */
+export function rentalWhere(params: RentalSearchParams): SqlFragment {
+  const conditions = rentalConditions(params);
+  return sql`WHERE ${allOf([...conditions.scope, ...filterConditions(conditions)])}`;
 }
 
 /**

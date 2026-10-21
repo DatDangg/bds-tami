@@ -1131,5 +1131,19 @@
     "handover": "Bàn giao",
     "viewDetail": "Xem chi tiết",
     "consult": "Nhận tư vấn"
+  },
+  "rentalCard": {
+    "rented": "Đã thuê",
+    "tagsLabel": "Phân loại",
+    "specsLabel": "Thông số",
+    "furnishing": {
+      "none": "Không nội thất",
+      "basic": "Nội thất cơ bản",
+      "full": "Nội thất đầy đủ"
+    },
+    "bedrooms": "{count, number} PN",
+    "bedroomsLabel": "{count, plural, other {# phòng ngủ}}",
+    "bathrooms": "{count, number} PT",
+    "bathroomsLabel": "{count, plural, other {# phòng tắm}}"
   }
 }

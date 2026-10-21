@@ -29,7 +29,7 @@ function RentalsSlider({ cards, labelledBy }: { cards: RentalTabView["cards"]; l
       >
         {cards.map((card, position) => (
           <li key={card.id} role="group" aria-roledescription="slide" aria-label={t("slide", { index: position + 1, total: cards.length })} className={`shrink-0 snap-start ${SLIDE_WIDTH}`}>
-            <RentalCard data={card} headingLevel={3} />
+            <RentalCard data={card} variant="home" headingLevel={3} />
           </li>
         ))}
       </ul>

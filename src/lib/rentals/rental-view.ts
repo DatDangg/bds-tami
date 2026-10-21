@@ -191,6 +191,13 @@ export interface RentalCardData {
   /** "Phường, Tỉnh" ngắn; rỗng khi chưa populate. */
   areaLabel: string;
   cover: MediaImage | null;
+  /** BL-052 (thẻ `listing`): tin đã thuê → badge "Đã thuê". */
+  rented: boolean;
+  /** BL-052: tag danh mục của tin (tên theo ngôn ngữ đang xem); `null` khi không có / chưa có bản EN. */
+  categoryLabel: string | null;
+  /** BL-052: tag nội thất. */
+  furnishing: RentalFurnishing | null;
+  bathrooms: number | null;
 }
 
 export function toRentalCardData(doc: Rental, locale: Locale): RentalCardData | null {
@@ -207,6 +214,10 @@ export function toRentalCardData(doc: Rental, locale: Locale): RentalCardData | 
     bedrooms: nonNegative(doc.bedrooms),
     areaLabel: placeNames(doc.ward, doc.province).join(", "),
     cover,
+    rented: doc.status === "rented",
+    categoryLabel: visibleCategory(doc.category, locale)?.name ?? null,
+    furnishing: doc.furnishing ?? null,
+    bathrooms: nonNegative(doc.bathrooms),
   };
 }
 
@@ -225,6 +236,10 @@ export function searchCardToRentalCardData(card: RentalSearchCard, locale: Local
     bedrooms: nonNegative(card.bedrooms),
     areaLabel: [card.ward.name, card.province.name].filter(hasText).join(", "),
     cover: card.thumbnail ? { url: card.thumbnail.url, alt: card.thumbnail.alt, width: SEARCH_COVER_WIDTH } : null,
+    rented: card.status === "rented",
+    categoryLabel: card.category?.name ?? null,
+    furnishing: card.furnishing,
+    bathrooms: nonNegative(card.bathrooms),
   };
 }
 

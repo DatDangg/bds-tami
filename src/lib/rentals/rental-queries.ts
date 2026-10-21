@@ -30,6 +30,9 @@ export const RENTAL_CARD_FIELDS = {
   areaM2: true,
   bedrooms: true,
   bathrooms: true,
+  // BL-052: tag danh mục + nội thất của thẻ `listing` (danh mục populate ở `depth: 1`).
+  category: true,
+  furnishing: true,
 } as const;
 
 /** Tin cho thuê công khai (`published` hoặc `rented`) theo slug của ngôn ngữ đang xem; `depth: 1` populate ảnh, tỉnh, phường, danh mục, dự án. */

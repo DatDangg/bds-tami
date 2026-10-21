@@ -17,6 +17,8 @@ export interface RentalFilters {
   category?: string;
   province?: string;
   ward?: string;
+  /** BL-052: slug dự án (theo ngôn ngữ đang xem) mà tin thuộc về. */
+  project?: string;
   priceMin?: number;
   priceMax?: number;
   areaMin?: number;
@@ -33,7 +35,7 @@ export interface RentalFilters {
 export type RawRentalParams = Record<string, string | string[] | undefined>;
 
 /** Thứ tự khoá khi dựng query string (cố định để URL ổn định, dễ cache/so sánh). */
-const QUERY_KEYS = ["q", "category", "province", "ward", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "sort", "page"] as const;
+const QUERY_KEYS = ["q", "category", "province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "sort", "page"] as const;
 type QueryKey = (typeof QUERY_KEYS)[number];
 
 const DEFAULT_SORT: RentalSort = "newest";
@@ -68,6 +70,7 @@ export function parseRentalFilters(raw: RawRentalParams): RentalFilters {
     category: read("category") as string | undefined,
     province,
     ward,
+    project: read("project") as string | undefined,
     priceMin,
     priceMax,
     areaMin,
@@ -110,7 +113,7 @@ const amenityCount = (filters: RentalFilters): number => filters.amenities?.leng
 export function activeFilterCount(filters: RentalFilters): number {
   const priced = filters.priceMin !== undefined || filters.priceMax !== undefined;
   const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
-  const singles = [filters.q, filters.category, filters.province, filters.ward, filters.bedrooms, filters.furnishing];
+  const singles = [filters.q, filters.category, filters.province, filters.ward, filters.project, filters.bedrooms, filters.furnishing];
   return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0) + amenityCount(filters);
 }
 

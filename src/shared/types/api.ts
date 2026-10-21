@@ -155,6 +155,11 @@ export const rentalSearchParamsSchema = z
     category: slugParam,
     province: slugParam,
     ward: slugParam,
+    /**
+     * BL-052: slug (theo `locale`) của dự án CÔNG KHAI mà tin thuộc về. Cùng quy ước với `category`/`province`: slug không có / dự án chưa công khai
+     * → không tin nào khớp (rỗng, không 400). Trang `/cho-thue` tự bỏ slug lạ trước khi tìm.
+     */
+    project: slugParam,
     priceMin: wholeNumber(MAX_PRICE_VND),
     priceMax: wholeNumber(MAX_PRICE_VND),
     areaMin: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
@@ -205,6 +210,8 @@ export interface RentalCard {
   furnishing: (typeof RENTAL_FURNISHINGS)[number] | null;
   province: { name: string; slug: string };
   ward: { name: string; slug: string };
+  /** BL-052: danh mục CỦA TIN (có thể là danh mục con) theo `locale`; `null` khi không có / đã xoá mềm / `/en` chưa có bản EN. */
+  category: { name: string; slug: string } | null;
   address?: string;
   publishedAt: string | null;
 }

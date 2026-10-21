@@ -130,6 +130,13 @@ describe("toRentalCardData", () => {
     expect(card?.cover?.url).toBe("/api/media/file/g2.webp");
   });
 
+  it("BL-052: tag danh mục (ẩn ở /en khi danh mục chưa có bản EN), nội thất, phòng tắm, cờ đã thuê", () => {
+    const doc = rental({ category, furnishing: "basic", bathrooms: 2, status: "rented" });
+    expect(toRentalCardData(doc, "vi")).toMatchObject({ categoryLabel: "Căn hộ", furnishing: "basic", bathrooms: 2, rented: true });
+    expect(toRentalCardData({ ...doc, category: { ...category, hasEnglish: false } as Category }, "en")?.categoryLabel).toBeNull();
+    expect(toRentalCardData(rental({ category: "c1", furnishing: null, bathrooms: null }), "vi")).toMatchObject({ categoryLabel: null, furnishing: null, bathrooms: null, rented: false });
+  });
+
   it("thiếu tiêu đề hoặc slug → bỏ khỏi danh sách", () => {
     expect(toRentalCards([rental({ title: null }), rental({ slug: null }), rental()], "vi")).toHaveLength(1);
   });
@@ -176,6 +183,7 @@ describe("searchCardToRentalCardData (DTO của SearchService -> cùng view mode
     furnishing: "full",
     province: { name: "Hà Nội", slug: "ha-noi" },
     ward: { name: "Phường Ba Đình", slug: "ba-dinh" },
+    category: null,
     publishedAt: now,
   };
 
@@ -190,6 +198,10 @@ describe("searchCardToRentalCardData (DTO của SearchService -> cùng view mode
       bedrooms: 0,
       areaLabel: "Phường Ba Đình, Hà Nội",
       cover: { url: "/api/media/file/studio-800.webp", alt: "Phòng khách", width: 800 },
+      rented: false,
+      categoryLabel: null,
+      furnishing: "full",
+      bathrooms: 1,
     });
     expect(searchCardToRentalCardData(dto, "en").href).toBe("/en/for-rent/studio-ba-dinh");
   });
@@ -198,6 +210,13 @@ describe("searchCardToRentalCardData (DTO của SearchService -> cùng view mode
     expect(searchCardToRentalCardData({ ...dto, priceNegotiable: true }, "vi").priceMonthlyVnd).toBeNull();
     expect(searchCardToRentalCardData({ ...dto, priceMonthlyVnd: null }, "vi").priceMonthlyVnd).toBeNull();
     expect(searchCardToRentalCardData({ ...dto, thumbnail: null, bedrooms: null }, "vi")).toMatchObject({ cover: null, bedrooms: null });
+  });
+
+  it("BL-052: danh mục của DTO → tag; tin đã thuê → rented", () => {
+    expect(searchCardToRentalCardData({ ...dto, category: { name: "Căn hộ dịch vụ", slug: "can-ho-dich-vu" }, status: "rented" }, "vi")).toMatchObject({
+      categoryLabel: "Căn hộ dịch vụ",
+      rented: true,
+    });
   });
 
   it("cùng kết quả với thẻ dựng từ doc Payload cho cùng dữ liệu (một component dùng chung)", () => {

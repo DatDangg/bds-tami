@@ -6,6 +6,7 @@ export {
   ArrowRight,
   ArrowUp,
   Barbell,
+  Bathtub,
   Bed,
   Briefcase,
   BuildingApartment,

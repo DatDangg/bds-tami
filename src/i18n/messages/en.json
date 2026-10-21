@@ -1131,5 +1131,19 @@
     "handover": "Handover",
     "viewDetail": "View details",
     "consult": "Get advice"
+  },
+  "rentalCard": {
+    "rented": "Rented",
+    "tagsLabel": "Tags",
+    "specsLabel": "Key facts",
+    "furnishing": {
+      "none": "Unfurnished",
+      "basic": "Basic furnishing",
+      "full": "Fully furnished"
+    },
+    "bedrooms": "{count, number} BR",
+    "bedroomsLabel": "{count, plural, one {# bedroom} other {# bedrooms}}",
+    "bathrooms": "{count, number} BA",
+    "bathroomsLabel": "{count, plural, one {# bathroom} other {# bathrooms}}"
   }
 }

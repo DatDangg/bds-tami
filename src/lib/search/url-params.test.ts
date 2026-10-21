@@ -177,3 +177,16 @@ describe("toRentalSearchParams", () => {
     expect(new URL(rentalCountApiPath({ amenities: ["pool", "gym"], sort: "newest", page: 1 }, "vi"), "http://x").searchParams.get("amenities")).toBe("pool,gym");
   });
 });
+
+describe("project (BL-052)", () => {
+  it("đọc slug dự án; ghi sau ward, trước priceMin; đếm là một lọc; làm trang noindex; đi qua schema API", () => {
+    const filters = parseRentalFilters({ project: " vinhomes-ocean-park ", province: "ha-noi", priceMin: "5000000" });
+    expect(filters.project).toBe("vinhomes-ocean-park");
+    expect(rentalListQueryString(filters)).toBe("?province=ha-noi&project=vinhomes-ocean-park&priceMin=5000000");
+    expect(parseRentalFilters({ project: "" }).project).toBeUndefined();
+    expect(activeFilterCount({ project: "a", sort: "newest", page: 1 })).toBe(1);
+    expect(hasNarrowingParams({ project: "a", sort: "newest", page: 1 })).toBe(true);
+    expect(toRentalSearchParams({ project: "a", sort: "newest", page: 1 }, "vi").project).toBe("a");
+    expect(new URL(rentalCountApiPath({ project: "a", sort: "newest", page: 1 }, "vi"), "http://x").searchParams.get("project")).toBe("a");
+  });
+});
