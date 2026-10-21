@@ -55,7 +55,10 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: " - TAMI Admin",
-      icons: [{ rel: "icon", type: "image/png", url: "/brand/tami-icon-gold.png" }],
+      icons: [
+        { rel: "icon", type: "image/png", url: "/icon.png" },
+        { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", url: "/apple-icon.png" },
+      ],
     },
     importMap: { baseDir: path.resolve(dirname) },
   },

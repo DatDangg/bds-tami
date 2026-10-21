@@ -1775,6 +1775,43 @@
       "specVersion": "1.38.0",
       "scopeVersion": 48,
       "phaseValidation": ".context/review-reports/spec-validation-feature-admin-form-non-tech-friendly-phase-1.md (r1 FAIL 16 test → T05 fix, pnpm test 3422 PASS)"
+    },
+    {
+      "slug": "favicon-tab-logo",
+      "title": "Logo TAMI trên tab trình duyệt: favicon ô bo góc nền tối + mái vàng, apple-touch-icon 180 nền kem — public vi/en, 404, trang lỗi gốc, /admin (BL-048)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-048",
+      "changeDoc": "spec/changes/archive/2026-10-21-favicon-tab-logo.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user chốt qua AskUserQuestion: chỉ BL-048 + làm cả /admin; 1 phase/1 task)",
+      "note": "Icon tab đổi sang ô nền --color-dark vì vàng nhạt trong suốt chỉ ~1.5:1 trên tab sáng (acceptance đòi đọc rõ tab sáng)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-favicon-tab-logo/phase-1-task-01.md",
+          "title": "Favicon + apple-touch-icon public + admin",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-2-review.md"
+          ],
+          "note": "src/app/icon.png + apple-icon.png (file convention gốc), global-error head links, admin.meta.icons → /icon.png + apple-touch-icon; scripts/gen-favicon.mjs"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.40.0",
+      "scopeVersion": 50,
+      "phaseValidation": {
+        "report": ".context/review-reports/spec-validation-feature-favicon-tab-logo-phase-1.md",
+        "result": "PASS (W1/W2 đã sửa ở round 2)"
+      }
     }
   ],
   "bugs": [
@@ -2691,7 +2728,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T02:26:41.864Z",
+  "lastUpdated": "2026-10-21T03:08:36.605Z",
   "approvalMilestones": [
     {
       "id": "M1",

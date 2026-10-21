@@ -48,6 +48,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
       <head>
         <meta name="robots" content="noindex, nofollow" />
         <title>TAMI</title>
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
       </head>
       <body style={PAGE_STYLE}>
         <svg role="img" aria-label="TAMI" width="120" height="40" viewBox="0 0 120 40">
