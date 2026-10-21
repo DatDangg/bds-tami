@@ -2,10 +2,10 @@
 
 ```yaml
 workItem: feature/listing-detail-redesign
-phaseTask: phase-review P1+P2
-step: spec_validator
+phaseTask: wave 3A (P3-T01 ‖ P2-T04)
+step: builder
 agent: change-request
-status: awaiting
+status: running
 attempt: 0
 interrupted: false
 updatedAt: 2026-10-22
@@ -53,3 +53,5 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-21 /resume (session mới): reconcile OK (commit đủ tới a07b8bf, dirty chỉ file ngoài BL-052; payload-types.ts chỉ CRLF). ▶ START builder-strong P2-T02 (worktree mới từ staging a07b8bf, DB tami_wt52_p2t01 dùng lại, redis db 14) (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE builder-strong P2-T02 — wt agent-a910e54a34f4a96c1 (chưa commit); typecheck/lint/build PASS, test 379/381 (2 integration timeout không liên quan, chạy riêng PASS); bỏ ActiveFilters (lý do: sidebar/Sheet đã hiện), xoá RentalFilters*/ListSearchBar…; as-built note: bỏ hàng Đang lọc, FAQ JSON-LD chỉ /cho-thue sạch, thẻ Thương lượng/Liên hệ. ▶ START reviewer r1 P2-T02 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P2-T02 STRICT PASS (5 MINOR → P3-T06; gap số đếm tiện ích/phòng ngủ/nội thất → phase review) → 926f5e3 merged vào staging + progress. ✅ DONE P2-T02 — next phase review P1+P2.
+- 2026-10-22 ▶ START spec-validator phase review P1+P2 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE spec-validator phase review P1+P2 — phase 1 COMPLETE; phase 2 G1 MAJOR (số đếm Tiện ích /cho-thue) → task mới phase-2-task-04 (wave 3A song song P3-T01); B1 (chip đơn chọn không đếm) chờ user chọn; B2–B5 → asBuiltPending; M1 → P3-T06; P3-T02 nhận quy tắc đếm. ▶ START builder-strong P3-T01 (worktree mới từ staging, DB tami_wt52_p2t03, redis db 15) (running — cancel sẽ redo bước này)

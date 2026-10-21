@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "listing-detail-redesign",
-    "phaseTask": "phase-review P1+P2 (spec-validator)",
+    "phaseTask": "wave 3A: phase-3-task-01 ‖ phase-2-task-04",
     "journal": ".context/runs/change-listing-detail-redesign.md"
   },
   "features": [
@@ -2043,7 +2043,7 @@
       "title": "Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS theo design mới + trường mới (BL-052)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 2,
+      "currentPhase": 3,
       "backlog": "BL-052",
       "changeDoc": "spec/changes/2026-10-21-listing-detail-redesign.md",
       "startedAt": "2026-10-21",
@@ -2264,9 +2264,20 @@
           ],
           "wave": "3D",
           "note": "gom MINOR + dọn + doc"
+        },
+        {
+          "task": "phase-2-task-04",
+          "file": "tasks/feature-listing-detail-redesign/phase-2-task-04.md",
+          "status": "pending",
+          "attempt": 0,
+          "dependsOn": [
+            "phase-2-task-02"
+          ],
+          "wave": "3A",
+          "note": "fix G1 phase review: số đếm Tiện ích /cho-thue"
         }
       ],
-      "stage": "2026-10-22: P1 + P2 tasks done; next phase-review P1+P2 (spec-validator), rồi P3 wave A (T01)",
+      "stage": "2026-10-22: phase review P1+P2 xong (G1 → P2-T04); wave 3A P3-T01 ‖ P2-T04",
       "asBuiltPending": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",
@@ -2276,8 +2287,17 @@
         "ô Dự án /cho-thue chỉ dự án có tin còn trống",
         "/cho-thue bỏ hàng chip Đang lọc (ActiveFilters) — sidebar/Sheet đã hiện",
         "FAQ JSON-LD chỉ phát ở /cho-thue sạch (trang 1, không lọc); trang danh mục không phát",
-        "slider Giá thuê theo VNĐ, kẹp 0–100 triệu (>100tr hiển thị 100+)"
-      ]
+        "slider Giá thuê theo VNĐ, kẹp 0–100 triệu (>100tr hiển thị 100+)",
+        "tên báo cáo backfill backfill-listing-fields-<date>-<time>-<mode>.md",
+        "dải Hình ảnh chi tiết chỉ hiện khi ≥ 2 ảnh",
+        "tab danh mục cho thuê đếm theo danh mục cấp 1",
+        "Xoá tất cả trên link cũ ?category= xoá luôn danh mục"
+      ],
+      "phaseReview12": {
+        "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
+        "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-2-phase-review.md",
+        "at": "2026-10-22"
+      }
     }
   ],
   "bugs": [

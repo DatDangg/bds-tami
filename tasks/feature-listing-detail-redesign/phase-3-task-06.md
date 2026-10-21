@@ -40,3 +40,4 @@
 - Tin liên quan chi tiết dự án (`ProjectListings.tsx`) dùng thẻ biến thể mới (spec-validation r2 N3).
 - P2-T02 (review r1): `RangeSliderFacet.tsx:78,82` nhánh chưa hydrate bỏ `step`/`max` hoặc `step="any"` (giá trị lẻ link cũ chặn submit không JS); `RentalSortControl.tsx:37` + `ProjectSortControl` gửi sort qua `navigate({ sort })` (tránh đè thay đổi lọc đang chờ); dọn key `page.rentals.resultSuffix`/`resultsFor`/`fields.amenitiesCount`, `card.negotiable`, `chips.*`, `mobile.*`, `active.label` (trừ key `HeroSearch` còn dùng) + khoá "Thoả thuận"; tách hàm `RentalListPage` (~115 dòng).
 - P2-T02 gap → phase review: số đếm cho ô tích/chip Tiện ích, Phòng ngủ, Nội thất ở `/cho-thue` (spec khung chung) — P2-T01 chỉ trả đếm danh mục + tỉnh.
+- P2-T03 M1 (phase review): `RentalPriceText.tsx:20` ký tự U+200B viết trực tiếp → `\u200B` (nếu P2-T02 chưa khép hết).

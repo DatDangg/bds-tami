@@ -28,3 +28,6 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Bổ sung từ phase review P1+P2 (2026-10-22)
+- Số đếm bộ lọc `/tin-bds` dùng đúng quy tắc chốt cho G1/B1 (ô tích có số đếm; chip đơn chọn theo quyết định ghi ở `phase-2-task-04.md` § Quyết định).
