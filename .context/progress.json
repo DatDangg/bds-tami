@@ -2291,7 +2291,8 @@
         "tên báo cáo backfill backfill-listing-fields-<date>-<time>-<mode>.md",
         "dải Hình ảnh chi tiết chỉ hiện khi ≥ 2 ảnh",
         "tab danh mục cho thuê đếm theo danh mục cấp 1",
-        "Xoá tất cả trên link cũ ?category= xoá luôn danh mục"
+        "Xoá tất cả trên link cũ ?category= xoá luôn danh mục",
+        "chip đơn chọn (Phòng ngủ/Nội thất /cho-thue, Tình trạng /du-an, /tin-bds) không hiện số đếm — theo design, user duyệt 2026-10-22; ô tích vẫn đếm"
       ],
       "phaseReview12": {
         "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",

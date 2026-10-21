@@ -32,6 +32,7 @@ testDbs: "tami_wt52_p1t01..p1t07, tami_wt52_p2t01, tami_wt52_p2t03 (bản sao de
 dirtyNotMine: [BL-054 change doc, template-feedback.md, .claude/launch.json, .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md (sửa ngoài BL-052), .context/runs/* khác, .context/review-reports/assets/]
 loopSignal: none
 approvals:
+  - {gate: as_built_B1, at: 2026-10-22, ok: "user: chip đơn chọn không đếm, theo design"}
   - {gate: phase_plan, at: 2026-10-21, ok: "change doc Chế độ chạy: auto proceed"}
   - {gate: pause, at: 2026-10-21, ok: "coordinator: dừng sau các task đang chạy, không mở task mới"}
 lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm", "i18n: JSON.stringify 2 dấu cách → gộp xung đột bằng deep-merge (scratchpad merge-i18n.js)", "SendMessage resume là async — chờ bằng theo dõi output file"]
@@ -55,3 +56,4 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 reviewer r1 P2-T02 STRICT PASS (5 MINOR → P3-T06; gap số đếm tiện ích/phòng ngủ/nội thất → phase review) → 926f5e3 merged vào staging + progress. ✅ DONE P2-T02 — next phase review P1+P2.
 - 2026-10-22 ▶ START spec-validator phase review P1+P2 (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE spec-validator phase review P1+P2 — phase 1 COMPLETE; phase 2 G1 MAJOR (số đếm Tiện ích /cho-thue) → task mới phase-2-task-04 (wave 3A song song P3-T01); B1 (chip đơn chọn không đếm) chờ user chọn; B2–B5 → asBuiltPending; M1 → P3-T06; P3-T02 nhận quy tắc đếm. ▶ START builder-strong P3-T01 (worktree mới từ staging, DB tami_wt52_p2t03, redis db 15) (running — cancel sẽ redo bước này)
+- 2026-10-22 user duyệt B1 (chip không đếm). ▶ START builder-strong P2-T04 (worktree mới từ staging, DB tami_wt52_p2t01, redis db 10) (running — cancel sẽ redo bước này)

@@ -14,11 +14,11 @@
 ## Scope
 1. `listRentals()` trả thêm `facets.amenities` — số tin khớp các bộ lọc hiện tại (trừ chính chiều tiện ích, theo đúng quy tắc đếm faceted của `/du-an` cho tiện ích, AND) cho mỗi tiện ích; dùng lại cách đếm chiều tiện ích của `/du-an` (`src/lib/projects/*`, `project-list-state.ts:82`).
 2. UI: ô tích Tiện ích hiển thị `count` như `/du-an`; tiện ích đang chọn mà đếm 0 vẫn bỏ chọn được.
-3. Chip Phòng ngủ / Nội thất: **theo quyết định user (journal 2026-10-22)** — xem mục Quyết định bên dưới.
+3. Chip Phòng ngủ / Nội thất: **không** số đếm (quyết định user 2026-10-22, theo design).
 4. Đo lại thời gian query (p95 local) trước/sau, ghi vào báo cáo.
 
 ## Quyết định
-- (chờ user) chip đơn chọn có số đếm hay ghi as-built B1.
+- 2026-10-22 user chọn: chip đơn chọn (Phòng ngủ, Nội thất /cho-thue; Tình trạng /du-an; tương tự /tin-bds) **không** hiện số đếm, theo design → as-built B1 ghi spec ở close-out. Ô tích vẫn có số đếm.
 
 ## Acceptance
 - [ ] Ô tích Tiện ích `/cho-thue` có số đếm đúng (test query + UI).
