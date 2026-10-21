@@ -18,7 +18,7 @@ describe("tham số URL của /du-an không đổi sau khi thay băng tìm kiế
 
   it("URL cũ đọc ra đúng bộ lọc: giá trị lạ/quá dài bị bỏ, tham số ngoài (utm) bỏ qua", () => {
     const raw = Object.fromEntries(new URLSearchParams("category=can-ho&province=da-nang&status=handed_over&utm_source=fb"));
-    expect(parseProjectFilters(raw)).toEqual({ categorySlug: "can-ho", provinceSlug: "da-nang", status: "handed_over" });
+    expect(parseProjectFilters(raw)).toEqual({ categorySlug: "can-ho", provinceSlugs: ["da-nang"], status: "handed_over" });
     expect(parseProjectFilters({ status: "sai", province: "x".repeat(101) })).toEqual({});
   });
 
