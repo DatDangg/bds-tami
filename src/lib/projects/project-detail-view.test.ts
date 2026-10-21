@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Developer, Media, Project, Province, Ward } from "../../payload-types";
-import { formatAreaRange, formatHectares, projectPriceFromVnd, safeFileHref, toProjectDetailView, visibleSections } from "./project-detail-view";
+import { formatAreaRange, formatHectares, safeFileHref, toProjectDetailView, visibleSections } from "./project-detail-view";
 
 const now = "2026-01-01T00:00:00.000Z";
 const image = (id: string, alt: string | null = `Ảnh ${id}`): Media => ({
@@ -193,10 +193,11 @@ describe("toProjectDetailView", () => {
 });
 
 describe("BL-052: trường chi tiết mới", () => {
-  it("Giá từ = min bảng giá > 0, không có → priceFromVnd, không có nữa → null", () => {
-    expect(projectPriceFromVnd({ priceTable: [{ unitType: "A", priceFrom: 5e9 }, { unitType: "B", priceFrom: 3.2e9 }, { unitType: "C", priceFrom: 0 }, { unitType: "D" }], priceFromVnd: 2e9 })).toBe(3.2e9);
-    expect(projectPriceFromVnd({ priceTable: [{ unitType: "A", priceFrom: -1 }], priceFromVnd: 2e9 })).toBe(2e9);
-    expect(projectPriceFromVnd({ priceTable: null, priceFromVnd: 0 })).toBeNull();
+  it("Giá từ hiển thị = effectivePriceFromVnd: min bảng giá > 0, không có → priceFromVnd, không có nữa → null", () => {
+    const price = (overrides: Partial<Project>) => toProjectDetailView(project(overrides), "vi").displayPriceFromVnd;
+    expect(price({ priceTable: [{ unitType: "A", priceFrom: 5e9 }, { unitType: "B", priceFrom: 3.2e9 }, { unitType: "C", priceFrom: 0 }, { unitType: "D" }], priceFromVnd: 2e9 })).toBe(3.2e9);
+    expect(price({ priceTable: [{ unitType: "A", priceFrom: -1 }], priceFromVnd: 2e9 })).toBe(2e9);
+    expect(price({ priceTable: null, priceFromVnd: 0 })).toBeNull();
     // Bản EN thiếu tên loại căn vẫn cùng giá (đọc số, không đọc dòng đã lọc theo chữ).
     expect(toProjectDetailView(project({ priceTable: [{ unitType: "", priceFrom: 4e9 }] }), "en").displayPriceFromVnd).toBe(4e9);
   });

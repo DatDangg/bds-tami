@@ -7,6 +7,7 @@ import { PROPERTY_TYPES, type PropertyType } from "../../shared/listing-options"
 import { formatArea, formatFileSize, formatNumber } from "../format";
 import { lexicalPlainText } from "../news/read-time";
 import { populatedMedia } from "../news/news-view";
+import { effectivePriceFromVnd } from "./project-price";
 
 const SQUARE_METERS_PER_HECTARE = 10_000;
 
@@ -117,7 +118,7 @@ export interface ProjectDetailView {
   areaFromM2: number | null;
   areaToM2: number | null;
   priceFromVnd: number | null;
-  /** Giá "Giá từ" hiển thị (BL-052): xem `projectPriceFromVnd`. */
+  /** Giá "Giá từ" hiển thị (BL-052): `effectivePriceFromVnd` (`project-price.ts`) — cùng nguồn với thẻ, lọc và sắp giá của danh sách. */
   displayPriceFromVnd: number | null;
   /** Loại sản phẩm theo thứ tự `PROPERTY_TYPES` (nhãn i18n `listingOptions.propertyType`). */
   productTypes: PropertyType[];
@@ -256,15 +257,6 @@ function toFaqs(items: Project["faqs"]): FaqView[] {
   return (items ?? []).flatMap((item, index) => (hasText(item.question) && hasText(item.answer) ? [{ id: item.id ?? String(index), question: item.question.trim(), answer: item.answer.trim() }] : []));
 }
 
-/**
- * Giá "Giá từ" của trang chi tiết (BL-052): giá thấp nhất > 0 của bảng giá (`priceTable[].priceFrom`), không có thì `priceFromVnd`, không có nữa → `null` ("Liên hệ").
- * Đọc thẳng `priceTable` (số không localized) nên `/en` cùng giá dù dòng bảng giá thiếu chữ EN. Thuần — P1-T04/T05 gom về helper chung của thẻ / danh sách.
- */
-export function projectPriceFromVnd(doc: Pick<Project, "priceTable" | "priceFromVnd">): number | null {
-  const fromTable = (doc.priceTable ?? []).flatMap((row) => numberOrNull(row.priceFrom) ?? []);
-  return fromTable.length > 0 ? Math.min(...fromTable) : numberOrNull(doc.priceFromVnd);
-}
-
 function toProducts(items: Project["products"]): ProductView[] {
   return (items ?? []).flatMap((item, index) =>
     hasText(item.type) ? [{ id: item.id ?? String(index), type: item.type.trim(), count: numberOrNull(item.count), areaFrom: numberOrNull(item.areaFrom), areaTo: numberOrNull(item.areaTo) }] : [],
@@ -316,7 +308,8 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     areaFromM2: positive(doc.areaFromM2) ?? null,
     areaToM2: positive(doc.areaToM2) ?? null,
     priceFromVnd: positive(doc.priceFromVnd) ?? null,
-    displayPriceFromVnd: projectPriceFromVnd(doc),
+    // Đọc thẳng `priceTable` (số không localized) nên `/en` cùng giá dù dòng bảng giá thiếu chữ EN.
+    displayPriceFromVnd: effectivePriceFromVnd(doc),
     productTypes: toProductTypes(doc.productTypes),
     products: toProducts(doc.products),
     videoUrl: parseVideoUrl(doc.videoUrl) ? (doc.videoUrl?.trim() ?? null) : null,

@@ -319,7 +319,24 @@
         "newest": "Mới nhất",
         "price_asc": "Giá tăng dần",
         "price_desc": "Giá giảm dần"
-      }
+      },
+      "spotlightLabel": "Dự án nổi bật",
+      "tabsLabel": "Danh mục dự án",
+      "sortBy": "Sắp xếp theo",
+      "filterGroups": {
+        "status": "Tình trạng",
+        "province": "Tỉnh / thành",
+        "developer": "Chủ đầu tư",
+        "price": "Mức giá",
+        "type": "Loại hình",
+        "feature": "Tiện ích nổi bật"
+      },
+      "provinceSearch": "Tìm tỉnh / thành",
+      "allDevelopers": "Tất cả chủ đầu tư",
+      "priceValue": "{value, number} tỷ",
+      "priceValueMax": "{value, number}+ tỷ",
+      "priceLow": "Giá thấp nhất",
+      "priceHigh": "Giá cao nhất"
     },
     "rentals": {
       "title": "Cho thuê",

@@ -319,7 +319,24 @@
         "newest": "Newest",
         "price_asc": "Price: low to high",
         "price_desc": "Price: high to low"
-      }
+      },
+      "spotlightLabel": "Featured projects",
+      "tabsLabel": "Project categories",
+      "sortBy": "Sort by",
+      "filterGroups": {
+        "status": "Status",
+        "province": "Province / city",
+        "developer": "Developer",
+        "price": "Price",
+        "type": "Property type",
+        "feature": "Key amenities"
+      },
+      "provinceSearch": "Search provinces",
+      "allDevelopers": "All developers",
+      "priceValue": "VND {value, number}B",
+      "priceValueMax": "VND {value, number}B+",
+      "priceLow": "Minimum price",
+      "priceHigh": "Maximum price"
     },
     "rentals": {
       "title": "For rent",

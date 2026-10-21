@@ -16,7 +16,7 @@ interface ProjectSortControlProps {
   params: Omit<ProjectQueryParams, "sort" | "page">;
 }
 
-/** Ô "Sắp xếp" ở hàng kết quả `/du-an` (BL-045): Mới nhất (mặc định, không lên URL) / Giá tăng / Giá giảm; đổi là đổi URL ngay, giữ mọi bộ lọc trên URL. */
+/** Ô "Sắp xếp theo" ở hàng kết quả `/du-an` (BL-045; nhãn BL-052): Mới nhất (mặc định, không lên URL) / Giá tăng / Giá giảm; đổi là đổi URL ngay, giữ mọi bộ lọc trên URL. */
 export function ProjectSortControl({ actionPath, value = DEFAULT_PROJECT_SORT, params }: ProjectSortControlProps) {
   const t = useTranslations("page.projects");
   const router = useRouter();
@@ -26,7 +26,7 @@ export function ProjectSortControl({ actionPath, value = DEFAULT_PROJECT_SORT, p
   return (
     <div className="flex min-w-0 items-center gap-3">
       <label htmlFor="project-sort" className="text-small font-semibold max-sm:sr-only">
-        {t("sortLabel")}
+        {t("sortBy")}
       </label>
       <OptionSelect
         id="project-sort"

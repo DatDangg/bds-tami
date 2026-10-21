@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useRef, useTransition } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { useReportPending } from "@/components/layout/PendingRegion";
 import { type ListingParamPatch, listingHref, type RawListingParams } from "./listing-params";
 
@@ -15,6 +15,8 @@ import { type ListingParamPatch, listingHref, type RawListingParams } from "./li
  * - Các thay đổi chưa về tới URL được gom trong ref và gộp vào mỗi lần điều hướng (đổi hai ô liên tiếp không đè nhau).
  *   Ref xoá khi URL chuẩn hoá của `current` đổi, hoặc khi gọi `reset` (link "Xoá tất cả" có thể về đúng URL hiện tại).
  * Trang nên gọi hook MỘT lần, truyền `navigate` cho ô lọc của cả `FilterSidebar` lẫn `FilterSheet` và `reset` vào `onClear` của hai thành phần đó.
+ * `generation` tăng mỗi lần `reset`: trang dùng làm `key` của nội dung bộ lọc để các ô dựng lại từ URL — huỷ hẹn giờ commit của thanh trượt
+ * (không "sống lại" lọc cũ sau "Xoá tất cả") và bỏ giá trị lạc quan khi link xoá về đúng URL hiện tại (P1-T02 review r3 n1 / n3).
  */
 export function useListingFilterNav(path: string, current: RawListingParams) {
   const router = useRouter();
@@ -25,6 +27,7 @@ export function useListingFilterNav(path: string, current: RawListingParams) {
     latest.current = { path, current };
   });
   const pendingPatch = useRef<ListingParamPatch>({});
+  const [generation, setGeneration] = useState(0);
   const base = listingHref(path, current);
   useEffect(() => {
     pendingPatch.current = {};
@@ -32,6 +35,7 @@ export function useListingFilterNav(path: string, current: RawListingParams) {
   /** Bỏ các thay đổi đang gom: gắn vào link "Xoá tất cả" (`onClear` của `FilterSidebar`/`FilterSheet`) — link đó có thể về đúng URL hiện tại nên `base` không đổi. */
   const reset = useCallback(() => {
     pendingPatch.current = {};
+    setGeneration((value) => value + 1);
   }, []);
 
   const navigate = useCallback(
@@ -43,5 +47,5 @@ export function useListingFilterNav(path: string, current: RawListingParams) {
     },
     [router],
   );
-  return { navigate, reset, pending };
+  return { navigate, reset, generation, pending };
 }
