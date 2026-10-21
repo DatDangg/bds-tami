@@ -4,10 +4,8 @@ import {
   activeFilterCount,
   hasNarrowingParams,
   parseRentalFilters,
-  rentalCountApiPath,
   rentalListQueryString,
   RENTAL_LIST_PAGE_SIZE,
-  secondaryFilterCount,
   toRentalSearchParams,
   type RentalFilters,
 } from "./url-params";
@@ -140,9 +138,8 @@ describe("activeFilterCount / hasNarrowingParams", () => {
     expect(activeFilterCount({ q: "x", province: "ha-noi", ward: "w", priceMin: 1, priceMax: 2, areaMin: 1, bedrooms: 3, furnishing: "none", category: "c", sort: "newest", page: 1 })).toBe(8);
   });
 
-  it("mỗi tiện ích đếm 1 (khớp số chip Đang lọc), cả tổng lẫn lọc phụ", () => {
+  it("mỗi tiện ích đếm 1", () => {
     expect(activeFilterCount({ amenities: ["pool", "gym"], sort: "newest", page: 1 })).toBe(2);
-    expect(secondaryFilterCount({ amenities: ["pool", "gym"], furnishing: "full", sort: "newest", page: 1 })).toBe(0);
     expect(hasNarrowingParams({ amenities: ["pool"], sort: "newest", page: 1 })).toBe(true);
   });
 
@@ -165,16 +162,8 @@ describe("toRentalSearchParams", () => {
     expect(RENTAL_LIST_PAGE_SIZE).toBe(12);
   });
 
-  it("đường dẫn đếm cho Sheet: cùng bộ lọc, limit=1, chỉ tin còn trống, không sort/page", () => {
-    const path = rentalCountApiPath({ q: "studio", province: "ha-noi", sort: "price_asc", page: 4 }, "vi");
-    const url = new URL(path, "http://x");
-    expect(url.pathname).toBe("/api/public/rentals");
-    expect(Object.fromEntries(url.searchParams)).toEqual({ q: "studio", province: "ha-noi", locale: "vi", limit: "1", available: "true" });
-  });
-
-  it("amenities đi qua schema API nguyên mảng và vào đường dẫn đếm dạng `a,b`", () => {
+  it("amenities đi qua schema API nguyên mảng", () => {
     expect(toRentalSearchParams({ amenities: ["pool", "gym"], sort: "newest", page: 1 }, "vi").amenities).toEqual(["pool", "gym"]);
-    expect(new URL(rentalCountApiPath({ amenities: ["pool", "gym"], sort: "newest", page: 1 }, "vi"), "http://x").searchParams.get("amenities")).toBe("pool,gym");
   });
 });
 
@@ -187,6 +176,5 @@ describe("project (BL-052)", () => {
     expect(activeFilterCount({ project: "a", sort: "newest", page: 1 })).toBe(1);
     expect(hasNarrowingParams({ project: "a", sort: "newest", page: 1 })).toBe(true);
     expect(toRentalSearchParams({ project: "a", sort: "newest", page: 1 }, "vi").project).toBe("a");
-    expect(new URL(rentalCountApiPath({ project: "a", sort: "newest", page: 1 }, "vi"), "http://x").searchParams.get("project")).toBe("a");
   });
 });

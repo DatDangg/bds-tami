@@ -26,11 +26,12 @@ interface RentalCardProps {
 
 const DEFAULT_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
 
-/** Giá/tháng vàng đậm, hoặc "Thoả thuận" khi tin không có giá (như BL-045). */
-function MonthlyPrice({ value }: { value: number | null }) {
+/** Giá/tháng; tin không có giá → "Thương lượng" (admin tick thương lượng) hoặc "Liên hệ" (chưa nhập giá) — cùng chữ với trang chi tiết (BL-052, bỏ "Thoả thuận"). */
+export function MonthlyPrice({ value, negotiable }: { value: number | null; negotiable: boolean }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentals.card");
-  if (value === null) return <>{t("negotiable")}</>;
+  const tPrice = useTranslations("page.rentalDetail.v2.spec");
+  if (value === null) return <>{tPrice(negotiable ? "negotiable" : "contact")}</>;
   return (
     <>
       {formatVndCompact(value, locale)}
@@ -77,7 +78,7 @@ function HomeBody({ data }: { data: RentalCardData }) {
       </p>
       {/* Thứ tự theo mockup data-cards=rent: tên → ghim → thông số → chân thẻ (giá + mũi tên). */}
       <CardFooter labelClassName="text-body font-semibold text-accent-text">
-        <MonthlyPrice value={data.priceMonthlyVnd} />
+        <MonthlyPrice value={data.priceMonthlyVnd} negotiable={data.priceNegotiable} />
       </CardFooter>
     </>
   );
@@ -97,15 +98,15 @@ function ListingBody({ data }: { data: RentalCardData }) {
       )}
       {tags.length > 0 && (
         <ul aria-label={t("tagsLabel")} className="flex flex-wrap gap-1.5">
-          {tags.map((tag) => (
-            <li key={tag} className="rounded-pill bg-surface-muted px-2.5 py-0.5 text-xsmall text-text-secondary">
+          {tags.map((tag, index) => (
+            <li key={`${index}:${tag}`} className="rounded-pill bg-surface-muted px-2.5 py-0.5 text-xsmall text-text-secondary">
               {tag}
             </li>
           ))}
         </ul>
       )}
       <p className="text-body font-semibold text-accent-text">
-        <MonthlyPrice value={data.priceMonthlyVnd} />
+        <MonthlyPrice value={data.priceMonthlyVnd} negotiable={data.priceNegotiable} />
       </p>
       <div className="mt-auto flex items-end justify-between gap-3 pt-1">
         <ul aria-label={t("specsLabel")} className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 text-small text-text-secondary">

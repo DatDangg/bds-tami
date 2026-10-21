@@ -11,6 +11,7 @@ const card = (id: string): RentalCardData => ({
   href: `/cho-thue/can-ho-${id}`,
   code: `CT-${id}`,
   priceMonthlyVnd: 9_000_000,
+  priceNegotiable: false,
   areaM2: 40,
   bedrooms: 1,
   areaLabel: "Phường 1, TP.HCM",

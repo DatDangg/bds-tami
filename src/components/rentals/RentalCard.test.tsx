@@ -10,6 +10,7 @@ const data: RentalCardData = {
   href: "/cho-thue/studio-ba-dinh",
   code: "CT-000001",
   priceMonthlyVnd: 8_500_000,
+  priceNegotiable: false,
   areaM2: 32.5,
   bedrooms: 1,
   areaLabel: "Phường Ba Đình, Hà Nội",
@@ -54,10 +55,11 @@ describe("RentalCard biến thể home (trang chủ giữ thẻ BL-045)", () => 
     expect(screen.getByRole("link")).toHaveTextContent("Available");
   });
 
-  it("không giá -> Thoả thuận; không phòng ngủ -> chỉ diện tích; không ảnh -> icon thay thế, không <img>", () => {
-    renderWithIntl(<RentalCard variant="home" data={{ ...data, priceMonthlyVnd: null, bedrooms: null, cover: null }} />);
+  it("không giá -> Thương lượng (cùng chữ trang chi tiết); không phòng ngủ -> chỉ diện tích; không ảnh -> icon thay thế, không <img>", () => {
+    renderWithIntl(<RentalCard variant="home" data={{ ...data, priceMonthlyVnd: null, priceNegotiable: true, bedrooms: null, cover: null }} />);
     const link = screen.getByRole("link");
-    expect(link).toHaveTextContent("Thoả thuận");
+    expect(link).toHaveTextContent("Thương lượng");
+    expect(link).not.toHaveTextContent("Thoả thuận");
     expect(link).not.toHaveTextContent("PN");
     expect(link.querySelector("img")).toBeNull();
   });
@@ -104,12 +106,20 @@ describe("RentalCard biến thể listing (mặc định, BL-052)", () => {
     expect(screen.getByText("Đã thuê")).toHaveAttribute("data-variant", "dark");
   });
 
-  it("thiếu danh mục / nội thất / phòng: không có list tag, chỉ diện tích; không giá → Thoả thuận", () => {
-    renderWithIntl(<RentalCard data={{ ...data, categoryLabel: null, furnishing: null, bedrooms: null, bathrooms: null, priceMonthlyVnd: null }} />);
+  it("thiếu danh mục / nội thất / phòng: không có list tag, chỉ diện tích; không giá, không tick thương lượng → Liên hệ", () => {
+    const { unmount } = renderWithIntl(<RentalCard data={{ ...data, categoryLabel: null, furnishing: null, bedrooms: null, bathrooms: null, priceMonthlyVnd: null }} />);
     expect(screen.queryByRole("list", { name: "Phân loại" })).toBeNull();
     const specs = screen.getByRole("list", { name: "Thông số" });
     expect(specs.querySelectorAll("li")).toHaveLength(1);
-    expect(screen.getByRole("link")).toHaveTextContent("Thoả thuận");
+    expect(screen.getByRole("link")).toHaveTextContent("Liên hệ");
+    unmount();
+    renderWithIntl(<RentalCard data={{ ...data, priceMonthlyVnd: null, priceNegotiable: true }} />, "en");
+    expect(screen.getByRole("link")).toHaveTextContent("Negotiable");
+  });
+
+  it("tag danh mục trùng chữ nhãn nội thất: hai tag, không trùng key", () => {
+    renderWithIntl(<RentalCard data={{ ...data, categoryLabel: "Nội thất đầy đủ" }} />);
+    expect([...screen.getByRole("list", { name: "Phân loại" }).querySelectorAll("li")].map((item) => item.textContent)).toEqual(["Nội thất đầy đủ", "Nội thất đầy đủ"]);
   });
 
   it("en: nhãn tiếng Anh (BR / BA, nội thất, /month)", () => {

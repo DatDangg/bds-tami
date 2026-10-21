@@ -186,6 +186,8 @@ export interface RentalCardData {
   href: string;
   code: string;
   priceMonthlyVnd: number | null;
+  /** Admin tick "thương lượng": không giá → "Thương lượng"; không tick mà không giá → "Liên hệ" (cùng chữ với trang chi tiết, BL-052). */
+  priceNegotiable: boolean;
   areaM2: number;
   bedrooms: number | null;
   /** "Phường, Tỉnh" ngắn; rỗng khi chưa populate. */
@@ -210,6 +212,7 @@ export function toRentalCardData(doc: Rental, locale: Locale): RentalCardData | 
     href: publicDetailPath(CONTENT_ROUTES.rentals, locale, doc.slug),
     code: doc.code,
     priceMonthlyVnd: doc.priceNegotiable === true ? null : positive(doc.priceMonthlyVnd),
+    priceNegotiable: doc.priceNegotiable === true,
     areaM2: doc.areaM2,
     bedrooms: nonNegative(doc.bedrooms),
     areaLabel: placeNames(doc.ward, doc.province).join(", "),
@@ -232,6 +235,7 @@ export function searchCardToRentalCardData(card: RentalSearchCard, locale: Local
     href: publicDetailPath(CONTENT_ROUTES.rentals, locale, card.slug),
     code: card.code,
     priceMonthlyVnd: card.priceNegotiable ? null : positive(card.priceMonthlyVnd),
+    priceNegotiable: card.priceNegotiable,
     areaM2: card.areaM2,
     bedrooms: nonNegative(card.bedrooms),
     areaLabel: [card.ward.name, card.province.name].filter(hasText).join(", "),

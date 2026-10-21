@@ -38,3 +38,5 @@
 - P3-T05 nhận: `report.ts` dòng ghi lỗi không tính vào "Đã điền" (P1-T07 r2 N1).
 - Dọn key i18n cũ không dùng: `page.projects.sortLabel`, `page.projects.chips.*`, khoá cũ `page.projectDetail` / `page.rentalDetail` (ngoài `.v2`).
 - Tin liên quan chi tiết dự án (`ProjectListings.tsx`) dùng thẻ biến thể mới (spec-validation r2 N3).
+- P2-T02 (review r1): `RangeSliderFacet.tsx:78,82` nhánh chưa hydrate bỏ `step`/`max` hoặc `step="any"` (giá trị lẻ link cũ chặn submit không JS); `RentalSortControl.tsx:37` + `ProjectSortControl` gửi sort qua `navigate({ sort })` (tránh đè thay đổi lọc đang chờ); dọn key `page.rentals.resultSuffix`/`resultsFor`/`fields.amenitiesCount`, `card.negotiable`, `chips.*`, `mobile.*`, `active.label` (trừ key `HeroSearch` còn dùng) + khoá "Thoả thuận"; tách hàm `RentalListPage` (~115 dòng).
+- P2-T02 gap → phase review: số đếm cho ô tích/chip Tiện ích, Phòng ngủ, Nội thất ở `/cho-thue` (spec khung chung) — P2-T01 chỉ trả đếm danh mục + tỉnh.

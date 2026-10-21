@@ -17,7 +17,7 @@ export function useRentalPrice({ priceMonthlyVnd, priceNegotiable }: RentalPrice
   if (priceMonthlyVnd !== null) {
     const amount = formatVndCompact(priceMonthlyVnd, locale);
     // U+200B trước "/tháng": ô hẹp (thanh thông số 2 cột < sm) xuống dòng trước "/month" thay vì cắt giữa từ ("VND/mont-h").
-    return { amount, perMonth, text: `${amount}​${perMonth}` };
+    return { amount, perMonth, text: `${amount}\u200B${perMonth}` };
   }
   return { amount: null, perMonth, text: priceNegotiable ? t("v2.spec.negotiable") : t("v2.spec.contact") };
 }

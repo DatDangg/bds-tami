@@ -117,7 +117,7 @@ export function activeFilterCount(filters: RentalFilters): number {
   return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0) + amenityCount(filters);
 }
 
-/** Mốc giá gợi ý (VNĐ/tháng) của ô "Khoảng giá" trên băng tìm kiếm: < 5tr, 5-10tr, 10-20tr, > 20tr. */
+/** Mốc giá gợi ý (VNĐ/tháng) của ô "Khoảng giá" ở ô tìm kiếm trang chủ (`HeroSearch`): < 5tr, 5-10tr, 10-20tr, > 20tr. */
 export const PRICE_HINT_RANGES = [
   { key: "under5", min: undefined, max: 5_000_000 },
   { key: "from5to10", min: 5_000_000, max: 10_000_000 },
@@ -126,8 +126,7 @@ export const PRICE_HINT_RANGES = [
 ] as const;
 
 /**
- * Mốc diện tích (m²) của ô "Diện tích" (BL-044 ô tìm kiếm trang chủ, BL-045 thẻ lọc Cho thuê): chọn mốc → cặp `areaMin`/`areaMax`. Một hằng cho cả hai nơi
- * (`HeroSearch` re-export tên cũ).
+ * Mốc diện tích (m²) của ô "Diện tích" ở ô tìm kiếm trang chủ (BL-044): chọn mốc → cặp `areaMin`/`areaMax` của `/cho-thue` (`HeroSearch` re-export tên cũ).
  */
 export const AREA_HINT_RANGES = [
   { key: "under30", min: undefined, max: 30 },
@@ -136,26 +135,6 @@ export const AREA_HINT_RANGES = [
   { key: "from80to120", min: 80, max: 120 },
   { key: "over120", min: 120, max: undefined },
 ] as const;
-
-/** Khoảng giá tự nhập: có min/max nhưng cặp đó không trùng mốc nào (ô giá trong thẻ lọc chỉ hiện "Khoảng giá tuỳ chọn"; trường tự nhập nằm trong Sheet/Popover). */
-function hasCustomPriceRange(filters: RentalFilters): boolean {
-  if (filters.priceMin === undefined && filters.priceMax === undefined) return false;
-  return !PRICE_HINT_RANGES.some((hint) => hint.min === filters.priceMin && hint.max === filters.priceMax);
-}
-
-/** Khoảng diện tích tự nhập: như `hasCustomPriceRange`, đối chiếu với `AREA_HINT_RANGES`. */
-function hasCustomAreaRange(filters: RentalFilters): boolean {
-  if (filters.areaMin === undefined && filters.areaMax === undefined) return false;
-  return !AREA_HINT_RANGES.some((hint) => hint.min === filters.areaMin && hint.max === filters.areaMax);
-}
-
-/**
- * Số lọc đang bật TRONG Popover/Sheet "Bộ lọc" (huy hiệu trên nút; BL-045): Phường + Khoảng giá TỰ NHẬP + Khoảng diện tích TỰ NHẬP (mỗi loại một). Tỉnh, mốc giá, mốc diện tích,
- * phòng ngủ, nội thất, tiện ích là ô trên thẻ lọc nên không tính; từ khoá, danh mục cũng không.
- */
-export function secondaryFilterCount(filters: RentalFilters): number {
-  return (filters.ward !== undefined ? 1 : 0) + (hasCustomPriceRange(filters) ? 1 : 0) + (hasCustomAreaRange(filters) ? 1 : 0);
-}
 
 /**
  * Trang này có nên `noindex, follow` không (design-spec S04, tránh trùng lặp): trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh
@@ -171,13 +150,4 @@ export function hasNarrowingParams(filters: RentalFilters): boolean {
 /** Tham số cho `SearchService` (cùng kiểu với API): thêm ngôn ngữ đang xem, cỡ trang cố định 12 và chỉ tin còn trống (`available`, S04). */
 export function toRentalSearchParams(filters: RentalFilters, locale: "vi" | "en"): RentalSearchParams {
   return rentalSearchParamsSchema.parse({ ...filters, locale, limit: RENTAL_LIST_PAGE_SIZE, available: true });
-}
-
-/** Đường dẫn `GET /api/public/rentals` chỉ để ĐẾM kết quả của bộ lọc (nút "Xem n tin" của Sheet): cùng bộ lọc, `limit=1`, tin còn trống. */
-export function rentalCountApiPath(filters: RentalFilters, locale: "vi" | "en"): string {
-  const search = new URLSearchParams(rentalListQueryString({ ...filters, sort: DEFAULT_SORT, page: 1 }).slice(1));
-  search.set("locale", locale);
-  search.set("limit", "1");
-  search.set("available", "true");
-  return `/api/public/rentals?${search.toString()}`;
 }

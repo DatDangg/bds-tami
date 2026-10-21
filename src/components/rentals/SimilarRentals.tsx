@@ -16,7 +16,7 @@ const IMAGE_SIZES = "(min-width: 1024px) 272px, (min-width: 640px) 320px, 82vw";
 export function SimilarRentals({ cards, rented = false }: { cards: RentalCardData[]; rented?: boolean }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentalDetail");
-  const items = cards.map((card) => <RentalCard key={card.id} data={card} headingLevel={3} imageSizes={IMAGE_SIZES} />);
+  const items = cards.map((card) => <RentalCard key={card.id} data={card} variant="listing" headingLevel={3} imageSizes={IMAGE_SIZES} />);
   // `raw`: giữ nguyên `{index}` / `{total}` để CardSlider thay (nhãn truyền được từ Server Component).
   const labels = {
     slide: t.raw("similar.slide") as string,

@@ -2,10 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
-import { ActiveFilters } from "@/components/rentals/ActiveFilters";
-import { parseRentalFilters } from "@/lib/search/url-params";
 import { EmptyState } from "./EmptyState";
-import { FormPendingMarker, ListPendingProvider, PendingRegion } from "./PendingRegion";
+import { FormPendingMarker, ListPendingProvider, PendingLink, PendingRegion } from "./PendingRegion";
 
 const linkStatus = vi.hoisted(() => ({ pending: false }));
 const formStatus = vi.hoisted(() => ({ pending: false }));
@@ -20,7 +18,6 @@ vi.mock("next/link", () => ({
 }));
 vi.mock("react-dom", async (importOriginal) => ({ ...(await importOriginal<typeof import("react-dom")>()), useFormStatus: () => ({ pending: formStatus.pending }) }));
 
-const options = { categories: [], provinces: [], wards: [], wardsProvince: null, projects: [] };
 const busy = () => screen.getByText("Kết quả").parentElement;
 
 describe("các nguồn chờ khác của vùng kết quả", () => {
@@ -29,11 +26,11 @@ describe("các nguồn chờ khác của vùng kết quả", () => {
     formStatus.pending = false;
   });
 
-  it("chip bỏ điều kiện / Xoá tất cả đang chờ → vùng kết quả aria-busy", () => {
+  it("link lọc (tab, Xoá tất cả, gợi ý bỏ điều kiện) đang chờ → vùng kết quả aria-busy", () => {
     linkStatus.pending = true;
     renderWithIntl(
       <ListPendingProvider>
-        <ActiveFilters filters={parseRentalFilters({ q: "abc" })} options={options} listPath="/cho-thue" />
+        <PendingLink href="/cho-thue">Xoá tất cả</PendingLink>
         <PendingRegion>
           <p>Kết quả</p>
         </PendingRegion>

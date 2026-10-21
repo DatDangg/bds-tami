@@ -83,7 +83,7 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
     { icon: <SquaresFour size={ICON_SIZE} />, label: t("details.floor"), value: view.floor },
     { icon: <Compass size={ICON_SIZE} />, label: t("details.balconyDirection"), value: view.balconyDirection ? t(`direction.${view.balconyDirection}`) : null },
     { icon: <Buildings size={ICON_SIZE} />, label: t("v2.info.project"), value: view.project?.label ?? null, link: view.project ? { href: view.project.href } : null },
-    { icon: <Clock size={ICON_SIZE} />, label: t("postedAt"), value: view.postedAtLabel },
+    { icon: <Clock size={ICON_SIZE} />, label: t("postedAt"), value: view.postedAtLabel, dateTime: view.postedAtIso },
   ];
   return (
     <DetailSection id={RENTAL_SECTION_DOM_ID.overview} eyebrow={t("v2.eyebrow.overview")} title={t("v2.titles.overview")}>

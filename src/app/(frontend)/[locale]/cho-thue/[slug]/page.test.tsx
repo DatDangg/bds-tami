@@ -115,7 +115,7 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     expect(container.textContent).toContain("Phường Sài Gòn, TP.HCM");
     const facts = within(screen.getByRole("group", { name: "Thông số chính" }));
     // U+200B cho phép xuống dòng trước "/tháng" ở ô hẹp.
-    expect(facts.getByText("12 triệu​/tháng")).toBeInTheDocument();
+    expect(facts.getByText("12 triệu\u200B/tháng")).toBeInTheDocument();
     expect(facts.getByText("55 m²")).toBeInTheDocument();
     expect(facts.getByText("Đông Nam")).toBeInTheDocument();
     expect(facts.getByText("Đầy đủ")).toBeInTheDocument();
