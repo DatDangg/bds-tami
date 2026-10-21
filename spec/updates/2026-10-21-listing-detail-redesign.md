@@ -41,3 +41,4 @@
 - F8: JSON-LD `FAQPage` danh sách chỉ ở trang sạch. F9: voucher card khi có ưu đãi và không có `priceVnd`/`areaM2`; `address`/`location` tin BĐS công khai.
 - F10: Cho thuê / Tin BĐS được lọc + đếm trong bộ nhớ có trần nếu cần cho p95. F11: slider Cho thuê 0–100+ triệu (bước 1), 0–300+ m² (bước 5); Tin BĐS 0–50+ tỷ (bước 1), 0–500+ m² (bước 10).
 - F12: "Xem tất cả N ảnh" phủ thumbnail đầu như design. F14: `scale.handoverTime`; cờ dải Điểm mạnh áp cả danh sách + chi tiết theo màn. F15: tỉnh Cho thuê chọn một (radio).
+- Sau review P1-T03 (MINOR-1): cột phải chi tiết nằm **cạnh khối Tổng quan** (dính trong phạm vi đó), các khối sau là dải full-width nền xen kẽ — theo design (`detail-du-an.webp`), áp chung Dự án / Cho thuê / Tin BĐS.

@@ -77,4 +77,24 @@ describe("CardSlider", () => {
     renderSlider(1);
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it('arrows="sides" (BL-052): mũi tên đè hai mép vùng carousel, hàng dưới chỉ còn chấm; mặc định giữ mũi tên cạnh chấm', () => {
+    const { unmount } = renderSlider(3);
+    expect(screen.getByRole("button", { name: "Trước" }).parentElement).toBe(screen.getByRole("group", { name: "Chọn thẻ" }).parentElement);
+    unmount();
+    render(
+      <>
+        <h2 id="h">Tiêu đề</h2>
+        <CardSlider arrows="sides" labelledBy="h" labels={labels} items={[1, 2, 3].map((n) => <a key={n} href={`/x/${n}`}>Thẻ {n}</a>)} />
+      </>,
+    );
+    const region = screen.getByRole("region", { name: "Tiêu đề" });
+    expect(region).toHaveClass("relative");
+    for (const name of ["Trước", "Sau"]) {
+      const arrow = screen.getByRole("button", { name });
+      expect(arrow.parentElement).toBe(region);
+      expect(arrow).toHaveClass("absolute");
+    }
+    expect(screen.getAllByRole("button", { name: /^Tới thẻ/ })).toHaveLength(3);
+  });
 });
