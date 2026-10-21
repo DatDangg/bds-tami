@@ -44,7 +44,7 @@ function toParamString(value: RawParamValue | readonly string[] | null): string 
 
 /**
  * URL mới của trang danh sách sau khi đổi một / vài tham số: giữ mọi tham số khác (thứ tự khoá như hiện có, khoá mới nối cuối),
- * bỏ `page`, bỏ tham số rỗng; mảng ghi `a,b`. `path` đã có tiền tố ngôn ngữ (vd `/en/du-an`). Không còn tham số → chỉ `path`.
+ * bỏ `page`, bỏ tham số rỗng; mảng ghi `a,b` (dấu phẩy không mã hoá). `path` đã có tiền tố ngôn ngữ (vd `/en/du-an`). Không còn tham số → chỉ `path`.
  */
 export function listingHref(path: string, current: RawListingParams, patch: ListingParamPatch = {}): string {
   const merged: Record<string, RawParamValue | readonly string[] | null> = { ...current, ...patch };
@@ -54,7 +54,8 @@ export function listingHref(path: string, current: RawListingParams, patch: List
     const text = toParamString(value);
     if (text !== "") query.set(key, text);
   }
-  const search = query.toString();
+  // Dấu phẩy phân cách nhiều giá trị giữ nguyên (`a,b`, không `%2C`) như `projectQueryString`: link chia sẻ dễ đọc, cùng bộ lọc cùng dạng.
+  const search = query.toString().replaceAll("%2C", ",");
   return search ? `${path}?${search}` : path;
 }
 

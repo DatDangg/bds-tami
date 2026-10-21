@@ -1,4 +1,4 @@
-import type { CollectionSlug, Payload, SelectType, Where } from "payload";
+import type { CollectionSlug, Payload, PopulateType, SelectType, Where } from "payload";
 
 import { buildPublicWhere, PUBLIC_STATUSES } from "../../access";
 import type { Locale } from "../../i18n/routing";
@@ -47,6 +47,8 @@ export interface PublicListOptions extends Partial<Pagination> {
   depth?: number;
   /** Chỉ lấy các trường này (thẻ danh sách không cần richText dài); bỏ trống = đủ trường. */
   select?: SelectType;
+  /** Trường lấy ở doc liên quan được populate (theo collection), vd chỉ `name` của phường; bỏ trống = đủ trường. */
+  populate?: PopulateType;
 }
 
 export interface PublicListResult<T> {
@@ -84,6 +86,7 @@ export async function findPublicList<T = unknown>(
     page,
     limit,
     ...(options.select ? { select: options.select } : {}),
+    ...(options.populate ? { populate: options.populate } : {}),
   });
   return {
     docs: result.docs as T[],

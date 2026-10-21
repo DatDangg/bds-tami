@@ -43,10 +43,15 @@ describe("listingHref", () => {
     expect(listingHref("/du-an", { province: "ha-noi" }, { province: [] })).toBe("/du-an");
   });
 
-  it("mảng ghi `a,b`; khoá lặp đang có trên URL gộp thành `a,b`; khoá mới nối cuối", () => {
+  it("mảng ghi `a,b` (dấu phẩy không mã hoá, kể cả trong từ khoá); khoá lặp đang có trên URL gộp thành `a,b`; khoá mới nối cuối", () => {
     expect(listingHref("/en/du-an", { q: "a b", province: ["ha-noi", "bac-ninh"] }, { type: ["villa", "apartment"] })).toBe(
-      "/en/du-an?q=a+b&province=ha-noi%2Cbac-ninh&type=villa%2Capartment",
+      "/en/du-an?q=a+b&province=ha-noi,bac-ninh&type=villa,apartment",
     );
+  });
+
+  it("dấu phẩy trong từ khoá giữ nguyên, đọc lại vẫn là một giá trị", () => {
+    expect(listingHref("/du-an", { q: "a,b" })).toBe("/du-an?q=a,b");
+    expect(new URLSearchParams("q=a,b").get("q")).toBe("a,b");
   });
 
   it("không patch → URL sạch của bộ lọc hiện tại (bỏ trang, bỏ rỗng)", () => {

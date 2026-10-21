@@ -20,7 +20,10 @@ interface RangeSliderFacetProps {
   formatValue: (value: number) => string;
   /** Tên hai đầu kéo; mặc định "Thấp nhất" / "Cao nhất". */
   thumbLabels?: readonly [string, string];
-  /** Gọi khi thả đầu kéo / ngừng bấm phím `RANGE_COMMIT_DELAY_MS` (giữ phím ←/→ không bắn mỗi bước một lần điều hướng). Đầu ở mép → `null`. */
+  /**
+   * Gọi NGAY khi thả đầu kéo (chuột / ngón tay), hoặc sau khi ngừng bấm phím `RANGE_COMMIT_DELAY_MS` (giữ phím ←/→ không bắn mỗi bước một lần điều hướng).
+   * Đầu ở mép → `null`.
+   */
   onCommit?: (value: RangeValue) => void;
 }
 
@@ -37,6 +40,7 @@ function sameNumbers(a: readonly number[], b: readonly number[]) {
  * Khoảng giá trị bằng thanh trượt 2 đầu (BL-052 Mức giá / Diện tích): bàn phím ←/→/Home/End (Radix), `aria-valuetext` theo `formatValue`, nhãn hai đầu dưới thanh.
  * Chưa có JS → hai ô số `name` (Từ / Đến) để form GET vẫn lọc được. Đầu ở mép không lên URL.
  * Hẹn giờ commit gọi `onCommit` MỚI NHẤT (qua ref): trong 300ms chờ, URL có thể đã đổi (ô lọc khác vừa áp dụng) và `onCommit` của lần render cũ sẽ dựng URL từ tham số cũ.
+ * Thả chuột / ngón tay thì commit ngay, không hẹn giờ (P1-T02 review r3 n2): kéo rồi bấm "Xem kết quả" đóng Sheet ngay không làm mất giá vừa chọn.
  */
 export function RangeSliderFacet({ names, min, max, step, value, formatValue, thumbLabels, onCommit }: RangeSliderFacetProps) {
   const t = useTranslations("page.listing.filters");
@@ -55,11 +59,15 @@ export function RangeSliderFacet({ names, min, max, step, value, formatValue, th
     onCommitRef.current = onCommit;
   });
   const commitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  /** Lần tương tác cuối là con trỏ (kéo / chạm) hay bàn phím: Radix gọi `onValueCommit` cho cả hai. */
+  const fromPointer = useRef(false);
   useEffect(() => () => clearTimeout(commitTimer.current), []);
 
-  function scheduleCommit([nextLow = min, nextHigh = max]: number[]) {
+  function commit([nextLow = min, nextHigh = max]: number[]) {
     clearTimeout(commitTimer.current);
-    commitTimer.current = setTimeout(() => onCommitRef.current?.([nextLow === min ? null : nextLow, nextHigh === max ? null : nextHigh]), RANGE_COMMIT_DELAY_MS);
+    const report = () => onCommitRef.current?.([nextLow === min ? null : nextLow, nextHigh === max ? null : nextHigh]);
+    if (fromPointer.current) report();
+    else commitTimer.current = setTimeout(report, RANGE_COMMIT_DELAY_MS);
   }
 
   if (!hydrated) {
@@ -86,7 +94,13 @@ export function RangeSliderFacet({ names, min, max, step, value, formatValue, th
         minStepsBetweenThumbs={0}
         value={[low, high]}
         onValueChange={(next) => setRange(next)}
-        onValueCommit={scheduleCommit}
+        onValueCommit={commit}
+        onPointerDown={() => {
+          fromPointer.current = true;
+        }}
+        onKeyDown={() => {
+          fromPointer.current = false;
+        }}
         thumbs={[
           { label: labels[0], valueText: formatValue(low) },
           { label: labels[1], valueText: formatValue(high) },

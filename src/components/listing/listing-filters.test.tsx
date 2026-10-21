@@ -309,7 +309,7 @@ describe("useListingFilterNav", () => {
     const user = userEvent.setup();
     renderWithIntl(<Harness />);
     await user.click(screen.getByRole("radio", { name: "Đang mở bán" }));
-    expect(push).toHaveBeenCalledWith("/en/du-an?q=vin&province=ha-noi%2Cbac-ninh&status=selling", { scroll: false });
+    expect(push).toHaveBeenCalledWith("/en/du-an?q=vin&province=ha-noi,bac-ninh&status=selling", { scroll: false });
   });
 
   function TwoFacets({ current }: { current: Record<string, string> }) {
