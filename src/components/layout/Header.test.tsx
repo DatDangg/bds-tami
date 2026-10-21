@@ -42,13 +42,13 @@ describe("Header: khung và landmark", () => {
     expect(screen.getByRole("link", { name: "TAMI, về trang chủ" })).toHaveAttribute("href", "/");
   });
 
-  it("thanh: đầu trang phẳng, khi cuộn mới bo viên thuốc; hàng cao 64px (72px từ lg), đệm ngang thu theo breakpoint", () => {
+  it("thanh: đầu trang phẳng, khi cuộn mới bo viên thuốc; hàng cao bằng khung (64px, 72px từ lg — BL-046), đệm ngang thu theo breakpoint", () => {
     renderIntl(<Header items={viItems} contact={contact} logo={noLogo} />);
     const bar = screen.getByRole("banner").firstElementChild;
-    expect(bar).toHaveClass("site-header-bar", "rounded-none", "group-data-[scrolled]:rounded-[2rem]");
+    expect(bar).toHaveClass("site-header-bar", "rounded-none", "group-data-[scrolled]:rounded-[1.625rem]");
     const frame = bar?.firstElementChild; // khung nội dung 84rem
     expect(frame).toHaveClass("max-w-[84rem]");
-    expect(frame?.firstElementChild).toHaveClass("h-16", "lg:h-18");
+    expect(frame?.firstElementChild).toHaveClass("h-full");
   });
 
   it("EN: tìm kiếm dẫn tới /en/for-rent?q=", () => {

@@ -28,3 +28,10 @@ describe("globals.css: header trên trang chi tiết (BL-027)", () => {
     expect(rule.slice(0, 200)).not.toContain("visibility");
   });
 });
+
+describe("globals.css: --header-offset (BL-046)", () => {
+  it("header cao 4rem (64px), từ lg 4.5rem (72px) = lề + thanh nổi 52/56px", () => {
+    expect(css).toMatch(/:root\s*\{\s*--header-offset:\s*4rem;/);
+    expect(css).toMatch(/@media \(min-width: 64rem\)\s*\{\s*:root\s*\{\s*--header-offset:\s*4\.5rem;/);
+  });
+});

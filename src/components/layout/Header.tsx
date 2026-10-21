@@ -43,10 +43,10 @@ export function Header({ items, contact, logo, cta }: HeaderProps) {
   const homeHref = resolveNavLink("home", locale)?.href ?? "/";
   return (
     <HeaderFrame>
-      <div className="flex h-16 w-full items-center gap-4 px-3 md:px-5 lg:h-18 lg:px-6 xl:gap-3 xl:px-5 2xl:gap-6">
+      <div className="flex h-full w-full items-center gap-4 px-3 md:px-5 lg:px-6 xl:gap-3 xl:px-5 2xl:gap-6">
         <Link href={homeHref} aria-label={t("home")} className="order-2 inline-flex min-h-11 min-w-11 shrink-0 items-center xl:order-1">
           {/* xl: logo ≤ 6rem — đo ở 1265px, logo CMS 120px + CTA 160px + 7 mục EN đã đè menu lên logo/tìm 3px. */}
-          <BrandLogo image={logo.onLight} className="xl:max-w-[6rem]" />
+          <BrandLogo image={logo.onLight} className="lg:h-9 xl:max-w-[6rem]" />
         </Link>
         <div className="order-2 hidden min-w-0 xl:flex xl:flex-1 xl:justify-center">
           <DesktopNav items={items} />

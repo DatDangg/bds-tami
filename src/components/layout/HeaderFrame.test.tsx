@@ -47,15 +47,15 @@ describe("HeaderFrame", () => {
     // lớp nổi chỉ nằm sau variant data-scrolled, không có bản vô điều kiện
     expect(bar).not.toHaveClass("rounded-pill");
     expect(bar).not.toHaveClass("shadow-md");
-    // radius thật (nửa chiều cao thanh nổi 64/72px), không còn 9999px
+    // radius thật (nửa chiều cao thanh nổi 52/56px), không còn 9999px
     expect(bar).not.toHaveClass("group-data-[scrolled]:rounded-pill");
     expect(bar).toHaveClass(
-      "group-data-[scrolled]:rounded-[2rem]",
-      "lg:group-data-[scrolled]:rounded-[2.25rem]",
+      "group-data-[scrolled]:rounded-[1.625rem]",
+      "lg:group-data-[scrolled]:rounded-[1.75rem]",
       "group-data-[scrolled]:shadow-md",
       "group-data-[scrolled]:max-w-[84rem]",
     );
-    expect(header).toHaveClass("data-[scrolled]:px-2", "data-[scrolled]:py-2", "lg:data-[scrolled]:px-4", "lg:data-[scrolled]:py-4");
+    expect(header).toHaveClass("data-[scrolled]:px-2", "data-[scrolled]:py-1.5", "lg:data-[scrolled]:px-4", "lg:data-[scrolled]:py-2");
   });
 
   it("header và thanh cùng thời lượng/easing chuyển; tôn trọng prefers-reduced-motion", () => {

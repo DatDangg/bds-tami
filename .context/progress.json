@@ -1844,6 +1844,33 @@
         "report": ".context/review-reports/feature-page-hero-warm-scrim-spec-validation.md",
         "result": "PASS"
       }
+    },
+    {
+      "slug": "header-match-site-mockup",
+      "title": "Header theo mockup site redesign: chữ menu 12px/.04em/gap 24px, header 64/72px (thanh nổi 52/56px, bo 26/28px, logo ≥lg 36px), khoảng 32px trước thanh mục con trang chi tiết (BL-046)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-046",
+      "changeDoc": "spec/changes/archive/2026-10-21-header-match-site-mockup.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user: \"xử lý nốt đi\" = auto proceed; 1 phase/1 task)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-header-match-site-mockup/phase-1-task-01.md",
+          "title": "Chữ menu + chiều cao header + khoảng thẻ tiêu đề chi tiết",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-2-review.md"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.42.0",
+      "scopeVersion": 52
     }
   ],
   "bugs": [
@@ -2760,7 +2787,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T03:08:36.605Z",
+  "lastUpdated": "2026-10-21T03:46:33.860Z",
   "approvalMilestones": [
     {
       "id": "M1",

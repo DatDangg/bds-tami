@@ -36,7 +36,8 @@ interface DetailTitleCardProps {
  */
 export function DetailTitleCard({ eyebrow, badge, title, location, priceLabel, price, facts = [], factsLabel, shareTitle, shareUrl }: DetailTitleCardProps) {
   return (
-    <div className="relative z-10 mx-auto -mt-8 w-full max-w-container px-gutter md:-mt-12">
+    // `pb-8`: khoảng 32px trước thanh mục con (BL-046, BL-045 T04 bỏ sót khoảng BL-031; mockup `.subnav` margin-top 32px) — thẻ là khối liền trước thanh.
+    <div className="relative z-10 mx-auto -mt-8 w-full max-w-container px-gutter pb-8 md:-mt-12">
       <div className="grid gap-5 rounded-[28px] bg-surface p-5 shadow-lg md:grid-cols-[1fr_auto] md:items-end md:gap-6 md:p-8">
         <div className="min-w-0">
           {(eyebrow || badge) && (

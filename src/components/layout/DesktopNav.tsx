@@ -34,8 +34,8 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
 
   return (
     <nav aria-label={t("main")} className="hidden xl:block">
-      {/* gap-4 ở xl: hàng header 1280px còn chỗ cho logo + 7 mục + tìm/VI|EN/CTA/Menu không tràn (BL-001); rộng hơn mới nới gap. */}
-      <ul ref={listRef} className="flex items-center gap-4 2xl:gap-8">
+      {/* Chữ 12px giãn .04em + gap 24px như mockup site redesign (BL-046); 1280px vẫn đủ chỗ logo + 7 mục + tìm/VI|EN/CTA (BL-001). */}
+      <ul ref={listRef} className="flex items-center gap-6 2xl:gap-8">
         {items.map((item) => {
           const key = item.href + item.label;
           const hasChildren = item.children.length > 0;
@@ -62,7 +62,7 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
               <NavAnchor
                 link={item}
                 aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
-                className="inline-flex min-h-11 items-center border-b-2 border-transparent text-small font-semibold tracking-[0.08em] whitespace-nowrap text-text uppercase hover:border-text/40 aria-[current=page]:border-text"
+                className="inline-flex min-h-11 items-center border-b-2 border-transparent text-xsmall font-semibold tracking-[0.04em] whitespace-nowrap text-text uppercase hover:border-text/40 aria-[current=page]:border-text"
               />
               {hasChildren && (
                 <>

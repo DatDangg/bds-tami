@@ -233,18 +233,18 @@
   color: var(--color-text);
 }
 
-/* Chiều cao `<header>` cố định ở CẢ HAI trạng thái (BL-025): đầu trang = thanh phẳng cao 80px (≥ lg 104px); đã cuộn = lề trên + thanh + lề dưới
-   (8+64+8 = 80px; ≥ lg 16+72+16 = 104px). Hero kéo lên bằng đúng giá trị này;
+/* Chiều cao `<header>` cố định ở CẢ HAI trạng thái (BL-025): đầu trang = thanh phẳng cao 64px (≥ lg 72px như mockup site redesign, BL-046);
+   đã cuộn = lề trên + thanh + lề dưới (6+52+6 = 64px; ≥ lg 8+56+8 = 72px). Hero kéo lên bằng đúng giá trị này;
    thanh mục con dính (`sticky top-*`) và `scroll-mt-*` dưới header đều dựa vào nó để nội dung không bị header che. */
 :root {
-  --header-offset: 5rem;
-  /* Vị trí dính / lề neo của nội dung dưới header: trang thường = chiều cao header (header luôn che phía trên); trang chi tiết (BL-027) = lề trên của
-     header nổi (8/16px) vì header ẩn khi cuộn. Thanh mục con, thẻ dính và mọi scroll-mt trong trang chi tiết dùng biến này. */
+  --header-offset: 4rem;
+  /* Vị trí dính / lề neo của nội dung dưới header: trang thường = chiều cao header (header luôn che phía trên); trang chi tiết (BL-027) = lề ngang của
+     header nổi (ở đây cố định 8/16px, bằng lề hai bên) vì header ẩn khi cuộn. Thanh mục con, thẻ dính và mọi scroll-mt trong trang chi tiết dùng biến này. */
   --sticky-top: var(--header-offset);
 }
 @media (min-width: 64rem) {
   :root {
-    --header-offset: 6.5rem;
+    --header-offset: 4.5rem;
   }
 }
 

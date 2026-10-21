@@ -1,128 +1,151 @@
 {
-  "specVersion": "1.41.0",
-  "scopeVersion": 51,
-  "generatedAt": "2026-10-21T23:59:30+07:00",
+  "specVersion": "1.42.0",
+  "scopeVersion": 52,
+  "generatedAt": "2026-10-21T23:59:45+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-049 MODIFY: lớp phủ ảnh (token dùng chung --color-banner-scrim) đổi từ đen lạnh rgb(10 12 16 / 0.6) sang đen ánh nâu vàng rgb(20 13 2 / 0.6); giữ độ mờ, gradient, bố cục.",
-  "workItem": "feature/page-hero-warm-scrim",
-  "backlog": "BL-049",
+  "triggerNote": "BL-046 MODIFY: header theo mockup site redesign — --header-offset 64px (≥ lg 72px), thanh nổi 52/56px lề trên 6/8px hai bên 8/16px bo 26/28px, logo ≥ lg 36px, menu ngang 12px/.04em/gap 24px; thẻ tiêu đề trang chi tiết cách thanh mục con 32px. Nền kính + hành vi cuộn giữ nguyên.",
+  "workItem": "feature/header-match-site-mockup",
+  "backlog": "BL-046",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-21-page-hero-warm-scrim.md",
+  "changeDoc": "spec/changes/archive/2026-10-21-header-match-site-mockup.md",
   "task": [
-    "tasks/feature-page-hero-warm-scrim/phase-1-task-01.md"
+    "tasks/feature-header-match-site-mockup/phase-1-task-01.md"
   ],
-  "reviewReport": ".context/review-reports/feature-page-hero-warm-scrim-phase-1-task-01-round-1-review.md",
+  "reviewReport": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-2-review.md",
   "reviewResults": [
-    {
-      "task": "pre-plan",
-      "round": 1,
-      "result": "PASS",
-      "level": "spec-validator",
-      "report": ".context/review-reports/feature-page-hero-warm-scrim-spec-validation.md"
-    },
     {
       "task": "phase-1-task-01",
       "round": 1,
+      "result": "FAIL",
+      "level": "STRICT",
+      "report": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-01",
+      "round": 2,
       "result": "PASS",
-      "level": "NORMAL",
-      "report": ".context/review-reports/feature-page-hero-warm-scrim-phase-1-task-01-round-1-review.md"
+      "level": "STRICT",
+      "report": ".context/review-reports/feature-header-match-site-mockup-phase-1-task-01-round-2-review.md"
     }
   ],
   "commits": [],
-  "previousScope": "spec/test-scope/archive/test-scope-1.40.0-50.json",
-  "specUpdate": "spec/updates/2026-10-21-page-hero-warm-scrim.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.41.0-51.json",
+  "specUpdate": "spec/updates/2026-10-21-header-match-site-mockup.md",
   "specRefs": [
-    "Overview: Hero trang con",
-    "FR-ADM-20",
-    "NFR-07"
+    "Overview: Khung trang",
+    "design-spec §2.1"
   ],
   "specRefNotes": {
-    "Overview: Hero trang con": "Câu \"Lớp phủ ảnh (BL-049)\": scrim đen ánh nâu vàng dùng chung mọi lớp phủ ảnh dùng token; chữ trắng ≥ 4.5:1 trên ảnh trắng; dòng vàng ≥ 4.5:1 ở mép trái.",
-    "FR-ADM-20": "PageBanner biến thể Ảnh dùng cùng token — chữ trắng vẫn đạt AA.",
-    "NFR-07": "Mục tiêu AA trang chính: không đổi ngưỡng, chỉ đổi tông."
+    "Overview: Khung trang": "--header-offset 64px (≥ lg 72px); thanh nổi cách mép trên 6px (≥ lg 8px), hai bên 8px (≥ lg 16px), cao 52px (≥ lg 56px); thanh mục con trang chi tiết dính đúng lề ngang header nổi (8/16px). Nền kính, hai hình dạng theo cuộn, ẩn khi cuộn ở trang chi tiết giữ nguyên.",
+    "design-spec §2.1": "Logo ≥ lg 36px; menu ngang --text-xsmall 12px, letter-spacing .04em, gap 24px; thanh nổi bo 26/28px; DetailTitleCard pb-8 (32px) trước thanh mục con."
   },
   "migration": "none — không đổi schema/DB",
   "changed": {
     "files": [
-      "src/app/(frontend)/globals.css",
-      "src/lib/contrast.test.ts"
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/Header.tsx",
+      "src/components/layout/HeaderFrame.tsx",
+      "src/components/layout/Header.test.tsx",
+      "src/components/layout/HeaderFrame.test.tsx",
+      "src/components/detail/DetailTitleCard.tsx",
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/detail/DetailTitleCard.test.tsx",
+      "src/components/detail/detail-header-css.test.ts",
+      "src/app/(frontend)/globals.css"
     ],
-    "filesNote": "globals.css chỉ đổi giá trị + comment --color-banner-scrim; contrast.test thêm test BL-049 (R > G > B, alpha 0.6). Doc: docs/DESIGN.md, .context/design-spec.md, skills/react-nodejs/design-tokens.md.",
+    "filesNote": "globals.css chỉ đổi --header-offset (4rem / ≥ lg 4.5rem). Doc: docs/DESIGN.md, .context/design-spec.md §2.1.",
     "modules": [
-      "design tokens (globals.css)",
-      "layout/PageHero",
-      "layout/PageBanner",
-      "layout/CtaBanner (+ ConsultBanner)",
-      "home/AboutBlock (chú thích ảnh)",
-      ".crumb-glass (breadcrumb trên ảnh)"
+      "layout/Header + HeaderFrame (header phẳng / thanh nổi)",
+      "layout/DesktopNav (menu ngang ≥ xl)",
+      "design tokens (--header-offset)",
+      "detail/DetailTitleCard, DetailLayout, DetailSubNav"
     ]
   },
   "impact": {
     "direct": [
-      "Hero trang con có ảnh (PageHero): lớp phủ toàn ảnh + gradient trái ngả nâu vàng — /du-an, /cho-thue (+ danh mục), /dang-tin-bds, /tin-tuc, /tuyen-dung, /lien-he, dịch vụ, chính sách/điều khoản (vi + en)",
-      "Breadcrumb kính trên hero: chữ trắng + bóng chữ dùng token mới",
-      "Banner CTA trang chủ (có ảnh) + ConsultBanner cuối trang con",
-      "Chú thích ảnh khối Về TAMI trang chủ",
-      "PageBanner biến thể Ảnh (nếu còn trang dùng)"
+      "Header mọi trang public vi/en: đầu trang thanh phẳng cao 64px (≥ lg 72px); cuộn xuống → thanh nổi bo tròn 52/56px, cách mép trên 6/8px, hai bên 8/16px",
+      "Trang chi tiết dự án / cho thuê / tin BĐS: cuộn xuống header vẫn ẩn hẳn; thẻ tiêu đề cách thanh mục con 32px",
+      "Menu ngang desktop chữ 12px giãn .04em, gap 24px — 1280 VI/EN 1 hàng; logo ≥ lg 36px"
     ],
     "dependents": [
-      "Tiêu đề, mô tả, eyebrow, dòng vàng trên các hero/banner trên",
-      "Vòng focus link trong banner CTA có ảnh (outline trắng)"
+      "Hero trang chủ bù header (--header-offset)",
+      "Ô tìm kiếm trang chủ / trang danh sách",
+      "Mục lục trang pháp lý dính",
+      "Thanh mục con trang chi tiết + aside dính",
+      "scroll-margin khi bấm neo mục (mục con, mục lục)"
     ],
     "regression": [
-      "Hero không ảnh (nền --color-dark-deep) không đổi",
-      "Overlay dialog/sheet (--color-overlay) không đổi",
-      "Chiều cao/bố cục hero và banner không đổi"
+      "Nền kính mờ, chuyển phẳng ↔ nổi, reduced-motion tức thì không đổi",
+      "< xl nút Menu + menu toàn màn hình không đổi",
+      "Nút CTA header, VI|EN, tìm kiếm vẫn hiện như trước"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL049-01",
+      "id": "BL046-01",
       "viewport": 1440,
-      "steps": "Mở /cho-thue, /du-an, /tin-tuc, /tuyen-dung (vi) có ảnh hero.",
-      "expected": "Lớp phủ ảnh ngả ấm (đen ánh nâu vàng), không còn xám xanh lạnh; tiêu đề trắng, dòng vàng, mô tả, breadcrumb đọc rõ."
+      "steps": "Mở /du-an (vi) ở đầu trang, đo header; cuộn xuống 300px.",
+      "expected": "Đầu trang: header phẳng full-width cao 72px, logo 36px. Cuộn: thanh nổi bo tròn cao 56px, cách mép trên 8px, hai bên 16px, có bóng; cuộn về đầu → phẳng lại."
     },
     {
-      "id": "BL049-02",
+      "id": "BL046-02",
+      "viewport": 375,
+      "steps": "Như BL046-01 trên mobile.",
+      "expected": "Đầu trang header 64px; cuộn → thanh nổi 52px cách mép trên 6px, hai bên 8px; không tràn ngang; nút Menu mở menu toàn màn hình như cũ."
+    },
+    {
+      "id": "BL046-03",
+      "viewport": 1280,
+      "steps": "Mở / và /en ở 1280.",
+      "expected": "Menu ngang chữ 12px giãn chữ, khoảng cách đều 24px, nằm trên 1 hàng cả VI và EN (không xuống dòng, không đè nút phải)."
+    },
+    {
+      "id": "BL046-04",
+      "viewport": 1440,
+      "steps": "Mở chi tiết dự án, chi tiết cho thuê, chi tiết tin BĐS; xem khoảng thẻ tiêu đề → thanh mục con; cuộn xuống; bấm 1 mục con.",
+      "expected": "Khoảng 32px giữa đáy thẻ tiêu đề và thanh mục con. Cuộn: header ẩn hẳn, thanh mục con dính sát đỉnh đúng lề 16px. Bấm mục con: tiêu đề mục không bị che."
+    },
+    {
+      "id": "BL046-05",
+      "viewport": 1440,
+      "steps": "Trang chủ: hero + ô tìm kiếm; trang pháp lý: cuộn mục lục; bấm neo trong mục lục.",
+      "expected": "Hero không hở/đè dưới header; mục lục dính không bị header che; neo cuộn tới đúng tiêu đề, không bị che."
+    },
+    {
+      "id": "BL046-06",
       "viewport": 390,
-      "steps": "Như BL049-01 trên mobile, gồm trang có ảnh hero sáng.",
-      "expected": "Chữ trắng + dòng vàng đọc rõ; bố cục/chiều cao hero không đổi so với trước."
-    },
-    {
-      "id": "BL049-03",
-      "viewport": 1440,
-      "steps": "Trang chủ: cuộn tới khối Về TAMI và banner CTA có ảnh; cuối một trang con xem ConsultBanner.",
-      "expected": "Lớp phủ cùng tông ấm; chữ trắng và nút đọc rõ; Tab tới link trong banner → vòng focus trắng thấy rõ."
-    },
-    {
-      "id": "BL049-04",
-      "viewport": 1440,
-      "steps": "Mở /en/rentals (hoặc trang con EN tương ứng).",
-      "expected": "Cùng tông scrim như bản vi."
+      "steps": "Mở chi tiết cho thuê trên mobile, cuộn xuống rồi về đầu; Tab bàn phím vào header khi đang cuộn.",
+      "expected": "Header ẩn khi cuộn, hiện lại khi về đầu hoặc khi focus Tab vào header; thanh mục con lề 8px."
     }
   ],
   "acceptance": [
-    "--color-banner-scrim = rgb(20 13 2 / 0.6) (ngả ấm R > G > B, alpha 0.6 không đổi); không component nào hardcode màu scrim",
-    "Trên ảnh trắng tinh: chữ trắng / nền phẳng 5.07:1; chữ trắng breadcrumb .crumb-glass 4.60:1; dòng vàng #e0bf89 mép trái 7.03:1 (≥ 4.5:1)",
-    "Áp chung cho PageHero (lớp phẳng + gradient), PageBanner, CtaBanner/ConsultBanner, chú thích ảnh AboutBlock, bóng chữ breadcrumb",
-    "Không đổi --color-overlay, độ mờ, gradient, bố cục, ảnh"
+    "--header-offset = 4rem (64px), ≥ lg 4.5rem (72px)",
+    "Thanh nổi: cao 52px (≥ lg 56px), cách mép trên 6px (≥ lg 8px), hai bên 8px (≥ lg 16px), bo 26px (≥ lg 28px), rộng tối đa 84rem, có bóng",
+    "Logo header ≥ lg 36px",
+    "Menu ngang ≥ xl: 12px (--text-xsmall), letter-spacing .04em, gap 24px; 1280 VI/EN 1 hàng",
+    "DetailTitleCard có pb-8 (32px) trước thanh mục con ở chi tiết dự án / cho thuê / tin BĐS",
+    "Nền kính, chuyển phẳng ↔ nổi, ẩn khi cuộn ở trang chi tiết, < xl nút Menu không đổi"
   ],
   "verify": {
-    "test": "pnpm vitest run contrast + PageHero + PageBanner + CtaBanner + ProjectListPage + RentalListPage: 6 files / 123 tests PASS",
+    "test": "pnpm vitest run src/components/layout src/components/detail: 26 files / 182 tests PASS (reviewer r2); pnpm test toàn bộ 344 files / 3531 tests PASS (builder, chung working tree với BL-047)",
     "typecheck": "pnpm typecheck PASS",
-    "lint": "pnpm lint 0 error (2 warning cũ ở tools/task-dashboard/server.mjs)",
-    "runtime": "chưa kiểm thị giác trên dev server (residual risk) — cần UI test BL049-01..04"
+    "lint": "pnpm lint 0 error (2 warning có sẵn)",
+    "runtime": "builder đo tay 1440/375 (header 72/64, không tràn) và 1280 VI/EN 1 hàng; khoảng 32px ở 3 trang chi tiết — cần UI test BL046-01..06 xác nhận"
   },
   "outOfScope": [
-    "Độ mờ / độ dày gradient / bố cục hero",
-    "--color-overlay (dialog, sheet, hero trang chủ)",
-    "Tách helper parse rgb trong contrast.test (MINOR follow-up)",
-    "Mô tả cũ của --color-overlay trong design-tokens.md (MINOR follow-up)"
+    "Nền trắng đặc + viền dưới như mockup (giữ kính mờ)",
+    "Sticky đứng yên như mockup (giữ thanh nổi BL-025, ẩn ở trang chi tiết BL-027)",
+    "Bỏ nút CTA header",
+    "Gạch chân vàng mục menu đang xem",
+    "BL-047 (icon Điểm mạnh medal / users-three) — work item riêng"
   ],
   "openQuestions": [],
   "viewports": [
     1440,
-    390
+    1280,
+    390,
+    375
   ],
   "locales": [
     "vi",
@@ -133,8 +156,8 @@
   ],
   "uiTests": true,
   "apiTests": [],
-  "risk": "low",
-  "riskNote": "Chỉ đổi 1 token màu có test tương phản tự động; residual: chữ vàng < 4.5:1 từ ~50% bề rộng hero (chữ lớn, vẫn ≥ 3:1), chưa soi trên ảnh thật.",
+  "risk": "medium",
+  "riskNote": "--header-offset là biến dùng chung cho mọi chỗ bù sticky/scroll-margin; header là shared component mọi trang. Residual: pnpm test toàn bộ và lint không chạy lại sau round 2 (chỉ 26 file layout/detail + typecheck).",
   "status": "published",
-  "statusNote": "published 2026-10-21 — BL-049 feature-update"
+  "statusNote": "published 2026-10-21 — BL-046 feature-update"
 }

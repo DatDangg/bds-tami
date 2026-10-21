@@ -22,7 +22,7 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề trên của header nổi (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`; cuộn qua hết mục cuối thì không mục nào được đánh dấu);
+ * Thanh mục con dạng viên thuốc dính (design-spec S03 khối 3; dùng chung chi tiết dự án + cho thuê): đặt tại `top: var(--sticky-top)` = đúng lề ngang của header nổi (8/16px) (header ẩn khi cuộn trên trang chi tiết, BL-027); `nav` trong suốt + `pointer-events-none` để không chặn click vùng nội dung bên cạnh viên thuốc. Mục đang xem do IntersectionObserver đánh dấu (`aria-current="location"`; cuộn qua hết mục cuối thì không mục nào được đánh dấu);
  * bấm cuộn mượt tới khối (tắt khi giảm chuyển động) rồi chuyển focus vào khối để người dùng bàn phím/đọc màn hình đi tiếp từ đó.
  * Bề rộng thanh = khung nội dung bên dưới (BL-028): cùng `max-w-container` + `px-gutter` với lưới thẻ nội dung + thẻ phụ nên hai mép thẳng hàng; thanh `w-full`, nút căn trái, cả lúc chưa dính lẫn dính đỉnh.
  * Link là neo `#id` thật nên chạy cả khi chưa có JS. < lg cuộn ngang và mục đang xem tự cuộn vào giữa.

@@ -37,10 +37,10 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
   return (
     <header
       data-scrolled={scrolled ? "" : undefined}
-      className="site-header group pointer-events-none sticky top-0 z-(--z-header) h-(--header-offset) p-0 transition-[padding] duration-(--duration-slow) ease-standard motion-reduce:transition-none data-[scrolled]:px-2 data-[scrolled]:py-2 lg:data-[scrolled]:px-4 lg:data-[scrolled]:py-4 print:hidden"
+      className="site-header group pointer-events-none sticky top-0 z-(--z-header) h-(--header-offset) p-0 transition-[padding] duration-(--duration-slow) ease-standard motion-reduce:transition-none data-[scrolled]:px-2 data-[scrolled]:py-1.5 lg:data-[scrolled]:px-4 lg:data-[scrolled]:py-2 print:hidden"
     >
       {/* 84rem = --container-container (80rem) + 4rem chỗ thở hai bên: thanh nổi rộng hơn nội dung một chút. */}
-      <div className="site-header-bar pointer-events-auto mx-auto flex h-full w-full max-w-full items-center rounded-none shadow-none transition-[max-width,border-radius,box-shadow] duration-(--duration-slow) ease-standard motion-reduce:transition-none group-data-[scrolled]:max-w-[84rem] group-data-[scrolled]:rounded-[2rem] lg:group-data-[scrolled]:rounded-[2.25rem] group-data-[scrolled]:shadow-md">
+      <div className="site-header-bar pointer-events-auto mx-auto flex h-full w-full max-w-full items-center rounded-none shadow-none transition-[max-width,border-radius,box-shadow] duration-(--duration-slow) ease-standard motion-reduce:transition-none group-data-[scrolled]:max-w-[84rem] group-data-[scrolled]:rounded-[1.625rem] lg:group-data-[scrolled]:rounded-[1.75rem] group-data-[scrolled]:shadow-md">
         {/* Chỉ NỀN thanh full-width ở đầu trang; nội dung luôn trong khung 84rem căn giữa để khi cuộn (thanh co về 84rem) logo/nút không nhảy ngang. */}
         <div className="mx-auto flex h-full w-full max-w-[84rem] items-center">{children}</div>
       </div>

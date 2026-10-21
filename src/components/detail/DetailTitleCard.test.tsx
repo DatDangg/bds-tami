@@ -33,6 +33,8 @@ describe("DetailTitleCard", () => {
     expect(within(list).getByText("Quy mô").className).toContain("text-text-muted");
     expect(list.querySelector("span.bg-primary-subtle")).not.toBeNull();
     // Dải thông số nằm TRONG thẻ trắng (cùng khối với h1), ngăn bằng đường kẻ.
+    // BL-046: 32px trước thanh mục con (thẻ là khối liền trước thanh).
+    expect((container.querySelector("div.bg-surface") as HTMLElement).parentElement).toHaveClass("pb-8");
     const card = container.querySelector("div.bg-surface") as HTMLElement;
     expect(card.contains(list)).toBe(true);
     expect(card.contains(screen.getByRole("heading", { level: 1 }))).toBe(true);

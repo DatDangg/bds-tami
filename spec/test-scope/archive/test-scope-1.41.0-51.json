@@ -1,0 +1,140 @@
+{
+  "specVersion": "1.41.0",
+  "scopeVersion": 51,
+  "generatedAt": "2026-10-21T23:59:30+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-049 MODIFY: lớp phủ ảnh (token dùng chung --color-banner-scrim) đổi từ đen lạnh rgb(10 12 16 / 0.6) sang đen ánh nâu vàng rgb(20 13 2 / 0.6); giữ độ mờ, gradient, bố cục.",
+  "workItem": "feature/page-hero-warm-scrim",
+  "backlog": "BL-049",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-21-page-hero-warm-scrim.md",
+  "task": [
+    "tasks/feature-page-hero-warm-scrim/phase-1-task-01.md"
+  ],
+  "reviewReport": ".context/review-reports/feature-page-hero-warm-scrim-phase-1-task-01-round-1-review.md",
+  "reviewResults": [
+    {
+      "task": "pre-plan",
+      "round": 1,
+      "result": "PASS",
+      "level": "spec-validator",
+      "report": ".context/review-reports/feature-page-hero-warm-scrim-spec-validation.md"
+    },
+    {
+      "task": "phase-1-task-01",
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-page-hero-warm-scrim-phase-1-task-01-round-1-review.md"
+    }
+  ],
+  "commits": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.40.0-50.json",
+  "specUpdate": "spec/updates/2026-10-21-page-hero-warm-scrim.md",
+  "specRefs": [
+    "Overview: Hero trang con",
+    "FR-ADM-20",
+    "NFR-07"
+  ],
+  "specRefNotes": {
+    "Overview: Hero trang con": "Câu \"Lớp phủ ảnh (BL-049)\": scrim đen ánh nâu vàng dùng chung mọi lớp phủ ảnh dùng token; chữ trắng ≥ 4.5:1 trên ảnh trắng; dòng vàng ≥ 4.5:1 ở mép trái.",
+    "FR-ADM-20": "PageBanner biến thể Ảnh dùng cùng token — chữ trắng vẫn đạt AA.",
+    "NFR-07": "Mục tiêu AA trang chính: không đổi ngưỡng, chỉ đổi tông."
+  },
+  "migration": "none — không đổi schema/DB",
+  "changed": {
+    "files": [
+      "src/app/(frontend)/globals.css",
+      "src/lib/contrast.test.ts"
+    ],
+    "filesNote": "globals.css chỉ đổi giá trị + comment --color-banner-scrim; contrast.test thêm test BL-049 (R > G > B, alpha 0.6). Doc: docs/DESIGN.md, .context/design-spec.md, skills/react-nodejs/design-tokens.md.",
+    "modules": [
+      "design tokens (globals.css)",
+      "layout/PageHero",
+      "layout/PageBanner",
+      "layout/CtaBanner (+ ConsultBanner)",
+      "home/AboutBlock (chú thích ảnh)",
+      ".crumb-glass (breadcrumb trên ảnh)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Hero trang con có ảnh (PageHero): lớp phủ toàn ảnh + gradient trái ngả nâu vàng — /du-an, /cho-thue (+ danh mục), /dang-tin-bds, /tin-tuc, /tuyen-dung, /lien-he, dịch vụ, chính sách/điều khoản (vi + en)",
+      "Breadcrumb kính trên hero: chữ trắng + bóng chữ dùng token mới",
+      "Banner CTA trang chủ (có ảnh) + ConsultBanner cuối trang con",
+      "Chú thích ảnh khối Về TAMI trang chủ",
+      "PageBanner biến thể Ảnh (nếu còn trang dùng)"
+    ],
+    "dependents": [
+      "Tiêu đề, mô tả, eyebrow, dòng vàng trên các hero/banner trên",
+      "Vòng focus link trong banner CTA có ảnh (outline trắng)"
+    ],
+    "regression": [
+      "Hero không ảnh (nền --color-dark-deep) không đổi",
+      "Overlay dialog/sheet (--color-overlay) không đổi",
+      "Chiều cao/bố cục hero và banner không đổi"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL049-01",
+      "viewport": 1440,
+      "steps": "Mở /cho-thue, /du-an, /tin-tuc, /tuyen-dung (vi) có ảnh hero.",
+      "expected": "Lớp phủ ảnh ngả ấm (đen ánh nâu vàng), không còn xám xanh lạnh; tiêu đề trắng, dòng vàng, mô tả, breadcrumb đọc rõ."
+    },
+    {
+      "id": "BL049-02",
+      "viewport": 390,
+      "steps": "Như BL049-01 trên mobile, gồm trang có ảnh hero sáng.",
+      "expected": "Chữ trắng + dòng vàng đọc rõ; bố cục/chiều cao hero không đổi so với trước."
+    },
+    {
+      "id": "BL049-03",
+      "viewport": 1440,
+      "steps": "Trang chủ: cuộn tới khối Về TAMI và banner CTA có ảnh; cuối một trang con xem ConsultBanner.",
+      "expected": "Lớp phủ cùng tông ấm; chữ trắng và nút đọc rõ; Tab tới link trong banner → vòng focus trắng thấy rõ."
+    },
+    {
+      "id": "BL049-04",
+      "viewport": 1440,
+      "steps": "Mở /en/rentals (hoặc trang con EN tương ứng).",
+      "expected": "Cùng tông scrim như bản vi."
+    }
+  ],
+  "acceptance": [
+    "--color-banner-scrim = rgb(20 13 2 / 0.6) (ngả ấm R > G > B, alpha 0.6 không đổi); không component nào hardcode màu scrim",
+    "Trên ảnh trắng tinh: chữ trắng / nền phẳng 5.07:1; chữ trắng breadcrumb .crumb-glass 4.60:1; dòng vàng #e0bf89 mép trái 7.03:1 (≥ 4.5:1)",
+    "Áp chung cho PageHero (lớp phẳng + gradient), PageBanner, CtaBanner/ConsultBanner, chú thích ảnh AboutBlock, bóng chữ breadcrumb",
+    "Không đổi --color-overlay, độ mờ, gradient, bố cục, ảnh"
+  ],
+  "verify": {
+    "test": "pnpm vitest run contrast + PageHero + PageBanner + CtaBanner + ProjectListPage + RentalListPage: 6 files / 123 tests PASS",
+    "typecheck": "pnpm typecheck PASS",
+    "lint": "pnpm lint 0 error (2 warning cũ ở tools/task-dashboard/server.mjs)",
+    "runtime": "chưa kiểm thị giác trên dev server (residual risk) — cần UI test BL049-01..04"
+  },
+  "outOfScope": [
+    "Độ mờ / độ dày gradient / bố cục hero",
+    "--color-overlay (dialog, sheet, hero trang chủ)",
+    "Tách helper parse rgb trong contrast.test (MINOR follow-up)",
+    "Mô tả cũ của --color-overlay trong design-tokens.md (MINOR follow-up)"
+  ],
+  "openQuestions": [],
+  "viewports": [
+    1440,
+    390
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [],
+  "risk": "low",
+  "riskNote": "Chỉ đổi 1 token màu có test tương phản tự động; residual: chữ vàng < 4.5:1 từ ~50% bề rộng hero (chữ lớn, vẫn ≥ 3:1), chưa soi trên ảnh thật.",
+  "status": "published",
+  "statusNote": "published 2026-10-21 — BL-049 feature-update"
+}
