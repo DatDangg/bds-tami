@@ -2,7 +2,7 @@
 id: BL-053
 title: URL gốc (canonical / sitemap / OG / JSON-LD) ra http://localhost:3000 trên server
 class: BUG
-status: pending
+status: done
 created: 2026-10-21
 ---
 

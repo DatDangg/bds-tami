@@ -1,371 +1,106 @@
 {
-  "specVersion": "1.45.0",
-  "scopeVersion": 56,
+  "specVersion": "1.45.1",
+  "scopeVersion": 57,
   "generatedAt": "2026-10-21T23:59:59+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-051 MODIFY, giai đoạn 2 (admin gọn — audit lần 2, đóng BL-051): A6 thanh hàng loạt nổi đáy, A12 cột 'Thao tác' theo quyền từng dòng, A9 Media lưới thẻ, A8 Tổng quan thẻ, A10 ô 'Liên kết' chọn trang, A11 Dịch AI một khối cột phải, A14 Trang chủ 5 tab. Hồi quy giai đoạn 1 (A1–A5, A7, A13).",
-  "workItem": "feature/admin-ux-audit-2",
-  "backlog": "BL-051",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-21-admin-ux-audit-2.md",
-  "changeDocStatus": "done (archive bởi change-request ngay sau bản phát hành này)",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-053 BUG: URL gốc (canonical, hreflang, og:url, JSON-LD, sitemap, robots, llms.txt) bị nhúng placeholder lúc build (http://localhost:3000) thay vì NEXT_PUBLIC_SITE_URL lúc chạy. Sửa getSiteUrl() đọc runtime qua parseSiteUrl(process.env) + Dockerfile placeholder phân biệt + guard build.",
+  "workItem": "bug/site-url-build-inlined",
+  "backlog": "BL-053",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-21-site-url-build-inlined.md",
+  "changeDocStatus": "pending → archive ở close-out (spec/changes/archive/)",
   "task": [
-    "tasks/feature-admin-ux-audit-2/phase-2-task-01.md",
-    "tasks/feature-admin-ux-audit-2/phase-2-task-02.md",
-    "tasks/feature-admin-ux-audit-2/phase-2-task-03.md",
-    "tasks/feature-admin-ux-audit-2/phase-2-task-04.md",
-    "tasks/feature-admin-ux-audit-2/phase-2-task-05.md",
-    "tasks/feature-admin-ux-audit-2/phase-2-task-06.md"
+    "tasks/bug-site-url-build-inlined/phase-1-task-01.md"
   ],
-  "reviewReport": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-06-round-1-review.md",
+  "reviewReport": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
   "reviewResults": [
     {
-      "task": "phase-2-task-01",
+      "task": "phase-1-task-01",
       "round": 1,
       "result": "PASS",
       "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-01-round-1-review.md",
-      "note": "MINOR chuyển P2-T02: Xoá thêm điều kiện quyền update; 404 báo như không có quyền; encodeURIComponent(locale); test CSS chỉ dò chuỗi"
-    },
-    {
-      "task": "phase-2-task-02",
-      "round": 1,
-      "result": "PASS",
-      "level": "NORMAL (STRICT cho carry-over quyền)",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-02-round-1-review.md",
-      "note": "MINOR chuyển P2-T03: link thẻ Tab tới được, ẩn ô cột thừa, nhãn 'Chọn tất cả' bằng CSS; nhãn loại tệp dài bị cắt (chấp nhận)"
-    },
-    {
-      "task": "phase-2-task-03",
-      "round": 2,
-      "result": "PASS",
-      "level": "NORMAL",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-03-round-2-review.md",
-      "note": "r1 FAIL (F1 test được nêu nhưng chưa viết; transition bỏ qua reduced-motion) → r2 PASS; chiều cao thẻ summary giao P2-T04 kiểm trình duyệt"
-    },
-    {
-      "task": "phase-2-task-04",
-      "round": 1,
-      "result": "PASS",
-      "level": "NORMAL",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-04-round-1-review.md",
-      "note": "MINOR chuyển P2-T05: otherChosen khi giá trị đổi từ ngoài; tách ô URL"
-    },
-    {
-      "task": "phase-2-task-05",
-      "round": 1,
-      "result": "PASS",
-      "level": "STRICT",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-05-round-1-review.md",
-      "note": "payload-types.ts chỉ hoán vị; MINOR chuyển P2-T06 (wrapper thừa, tách translationDataGroup, JSDoc, migrate:create)"
-    },
-    {
-      "task": "phase-2-task-06",
-      "round": 1,
-      "result": "PASS",
-      "level": "NORMAL",
-      "report": ".context/review-reports/feature-admin-ux-audit-2-phase-2-task-06-round-1-review.md",
-      "note": "MINOR mở: Homepage.ts 310 dòng; JSDoc blocks.ts:43 tên cũ; tên test; nguồn PATHS_BEFORE_A14"
+      "report": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
+      "note": "3 MINOR mở: guard try/catch nuốt mọi lỗi đọc thư mục; findPlaceholderFiles chưa có unit test; fix dựa vào Next/SWC không gập hằng qua var e=process.env (guard Docker bắt nếu nâng Next)"
     }
   ],
-  "specValidation": [
-    ".context/review-reports/feature-admin-ux-audit-2-phase-2-spec-validation.md",
-    ".context/review-reports/feature-admin-ux-audit-2-phase-2-spec-validation-round-2.md"
-  ],
-  "commits": [
-    "9f18876 (phase-2-task-01, A6 + A12)",
-    "a336fcf (phase-2-task-02, A9 + carry-over A12)",
-    "15d2e8b (phase-2-task-03, A8 + carry-over A9)",
-    "e7641aa (phase-2-task-04, A10)",
-    "e2c2473 (phase-2-task-05, A11 + carry-over A10)",
-    "6e65c31 (phase-2-task-06, A14 + carry-over A11)"
-  ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.44.0-55.json",
-  "specUpdate": "spec/updates/2026-10-21-admin-ux-audit-2-phase-2.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.45.0-56.json",
+  "specUpdate": "spec/updates/2026-10-21-site-url-build-inlined.md",
   "specRefs": [
-    "F10",
-    "FR-ADM-19"
+    "F11",
+    "FR-PUB-15",
+    "NFR-03"
   ],
   "specRefNotes": {
-    "F10": "Thêm đoạn 'Admin gọn — audit lần 2, giai đoạn 2 (BL-051)' — A6, A8, A9, A10, A11, A12 (kèm câu Xoá: admin hoặc author là mình + quyền sửa, không xét quyền xoá cấp danh sách), A14; câu hướng dẫn tắt khối Trang chủ (dòng ~75) trỏ tới ô 'Thứ tự các khối' tab 'Chuyển đổi & Bố cục'.",
-    "FR-ADM-19": "Giao diện quản trị: thanh hàng loạt nổi, cột thao tác dòng theo quyền, Media lưới, Tổng quan thẻ, ô Liên kết chọn trang, Dịch AI một khối, Trang chủ 5 tab."
+    "F11": "Thêm câu 'URL gốc tuyệt đối (BL-053)': canonical / hreflang / og:url / JSON-LD / sitemap / robots / llms.txt dùng NEXT_PUBLIC_SITE_URL lúc chạy; build FAIL nếu placeholder lọt vào bundle; staging vẫn noindex.",
+    "FR-PUB-15": "SEO công khai — URL tuyệt đối đúng tên miền từng môi trường.",
+    "NFR-03": "SEO — không đổi yêu cầu, chỉ làm rõ nguồn URL gốc."
   },
   "migration": "none",
   "changed": {
     "files": [
-      "src/lib/admin/row-actions.ts",
-      "src/components/admin/RowActions.tsx",
-      "src/components/admin/RowActionsCell.tsx",
-      "src/components/admin/styles/_list-actions.scss",
-      "src/collections/admin-collections.ts",
-      "src/components/admin/styles/_media-grid.scss",
-      "src/components/admin/MediaTypeCell.tsx",
-      "src/lib/admin/media-type-label.ts",
-      "src/collections/Media.ts",
-      "src/components/admin/dashboard/QuickActions.tsx",
-      "src/components/admin/dashboard/WebsiteShortcuts.tsx",
-      "src/components/admin/dashboard/DashboardIcons.tsx",
-      "src/components/admin/styles/_dashboard.scss",
-      "src/components/admin/NavLinkField.tsx",
-      "src/fields/nav-link.ts",
-      "src/lib/content/nav-link.ts",
-      "src/components/admin/styles/_controls.scss",
-      "src/collections/_shared/content-defaults.ts",
-      "src/fields/translation.ts",
-      "src/lib/admin/form-layout.ts",
-      "src/collections/Pages.ts",
-      "src/components/admin/TranslationSummary.tsx",
-      "src/globals/Homepage.ts",
-      "src/globals/homepage/blocks.ts",
-      "src/components/admin/styles/_forms.scss",
-      "src/app/(payload)/custom.scss",
-      "src/app/(payload)/admin/importMap.js",
-      "src/payload-types.ts"
+      "src/lib/seo/site-url.ts",
+      "src/lib/seo/site-url.test.ts",
+      "docker/Dockerfile",
+      "scripts/check-build-placeholder.mjs"
     ],
-    "filesNote": "Test mới/sửa: row-actions.test.ts, RowActions.test.tsx, list-actions-style.test.ts, MediaTypeCell.test.tsx, media-type-label.test.ts, media-grid-style.test.ts, DashboardParts.test.tsx, NavLinkField.test.tsx, content-defaults.test.ts, form-friendly.test.ts, form-layout.test.ts, tests/integration/retranslate.test.ts, src/globals/Homepage.test.ts (97 đường dẫn dữ liệu trước/sau), tests/unit/admin-labels.test.ts. payload-types.ts chỉ đổi chú thích + thứ tự thành viên (kiểu giữ nguyên). importMap.js regen (RowActionsCell, MediaTypeCell, NavLinkField). migrate:create: 'No schema changes detected'.",
+    "filesNote": "site-url.ts: parseSiteUrl(env) hàm thuần, getSiteUrl() = parseSiteUrl(process.env); hành vi cũ giữ (build phase → undefined; thiếu/sai/không http(s) → undefined; trả origin). Dockerfile: placeholder build http://build-placeholder.invalid + chạy guard sau pnpm build. Guard quét .next/server + .next/static (bỏ .map).",
     "modules": [
-      "admin list view (thanh hàng loạt _list-actions.scss; cột Thao tác RowActions + row-actions.ts)",
-      "Media list view (_media-grid.scss, MediaTypeCell)",
-      "admin dashboard (QuickActions, WebsiteShortcuts, _dashboard.scss)",
-      "navLinkField dùng chung (NavLinkField, nav-link.ts) — Header, Footer, nút Trang chủ",
-      "khối bản dịch dùng chung (content-defaults gatherTranslationBlock, fields/translation.ts)",
-      "global Trang chủ (Homepage.ts homepageTabs, homepage/blocks.ts enabledField)"
+      "SEO dùng chung (src/lib/seo/site-url.ts — 11 file gọi getSiteUrl: layout [locale], 7 trang danh sách/chi tiết, robots.ts, Breadcrumb.tsx, load-home.ts)",
+      "build pipeline Docker (stage builder)"
     ]
   },
   "impact": {
     "direct": [
-      "A6: mọi danh sách có chọn nhiều — tích ≥ 1 dòng → thanh 'Đã chọn N — Chọn tất cả — Chỉnh sửa — Xoá…' nổi ghim đáy, nền đặc + bóng, nút ≥ 44px; bỏ chọn hết → mất; hàng cuối + phân trang không bị che (đệm đáy); 375px không tràn; hành động Payload (sửa hàng loạt, xoá, xuất bản…) giữ nguyên",
-      "A12 admin: Dự án, Cho thuê, Tin BĐS, Tin tức, Tin tuyển dụng, Dịch vụ, Trang pháp lý có cột 'Thao tác' cuối bảng (hiện mặc định), mỗi icon có tên đọc + tooltip: Xem trên web (chỉ dòng công khai), Sửa, Nhân bản (không có ở Trang pháp lý), Xoá (hộp xác nhận → vào Thùng rác)",
-      "A12 sale: dòng của mình (author = mình) có Sửa + Xoá (+ Nhân bản nếu có quyền tạo); dòng người khác không có Sửa/Xoá; author populate (object) hay id đều đúng; thiếu author → không Sửa/Xoá",
-      "A12: chế độ Thùng rác và dòng đã xoá không có nút; drawer chọn quan hệ không có nút; server 403/404 → toast tiếng Việt 'không có quyền', trang không vỡ",
-      "A9: /admin/collections/media là lưới thẻ (ảnh ≥ 120px giữ tỉ lệ, alt hoặc tên tệp rút gọn, loại tệp 'Ảnh · WEBP'/'PDF'); bấm thẻ → màn sửa; Tab tới được từng thẻ (focus ring); checkbox góc trái 44×44, thẻ chọn viền nhấn; tìm/chip/lọc/phân trang/chọn nhiều/thanh hàng loạt chạy",
-      "A9: drawer chọn ảnh (ảnh bìa, gallery) trong form vẫn là bảng, chọn đơn/nhiều được; cột loại tệp dễ đọc",
-      "A8: /admin Tổng quan — 'Tạo loại khác' là thẻ cùng chiều cao/tỉ lệ thẻ thao tác nhanh, mở menu xổ; 'Sửa website' (chỉ admin) là lưới thẻ icon + tên + chevron dưới tiêu đề mục h2",
-      "A10: global Header (menu + nút CTA), Footer (cột link), Trang chủ (nút) — ô 'Liên kết' là ô chọn: Trang chủ, Dự án, Cho thuê, Tin bất động sản, Tin tức, Tuyển dụng, Liên hệ, Chính sách bảo mật, Điều khoản sử dụng, 'Địa chỉ khác (https://…)' mở ô URL; lưu ra mã trang hoặc URL như cũ",
-      "A10: giá trị cũ mã trang → hiện đúng tên trang; URL cũ → 'Địa chỉ khác' + URL trong ô; ô không bắt buộc bấm xoá → lưu rỗng; URL không hợp lệ bị validateNavLink chặn",
-      "A11: form Cho thuê, Dự án, Tin BĐS, Tin tức, Tuyển dụng, Dịch vụ, Danh mục, Chủ đầu tư, Trang pháp lý — khối 'Bản dịch tiếng Anh' cột phải gồm 'Có bản tiếng Anh' (chỉ đọc), tóm tắt trạng thái dịch, 'Dịch lại bằng AI' (+ 'Duyệt bản tiếng Anh' ở Trang pháp lý); không còn tab 'Bản dịch'",
-      "A11: global (Trang chủ, Header, Footer, Cài đặt) giữ khối bản dịch ở chỗ cũ (Trang chủ: tab 'SEO & Đa ngôn ngữ')",
-      "A14: global Trang chủ 5 tab: Đầu trang & Banner · Giới thiệu & Uy tín · Sản phẩm & Tin nổi bật · Chuyển đổi & Bố cục · SEO & Đa ngôn ngữ; mỗi khối là thanh thu gọn có tên khối (khối đầu tab mở, sau thu gọn); 11 công tắc nhãn 'Hiện khối này trên web'; 'Thứ tự các khối' cuối tab 4 kèm hướng dẫn; Banner không có công tắc",
-      "A14: lưu Trang chủ sau khi đổi tab/công tắc → website công khai hiện/ẩn khối đúng như trước BL-051 (đường dẫn dữ liệu không đổi)"
+      "Staging https://tami.genieplatform.cloud sau redeploy: <link rel=\"canonical\"> ở / và /en dùng https://tami.genieplatform.cloud",
+      "sitemap.xml + mọi sitemap con: mọi <loc> bắt đầu https://tami.genieplatform.cloud",
+      "og:url và hreflang (vi, en, x-default) trên trang chủ, danh sách và chi tiết Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng dùng tên miền staging",
+      "JSON-LD (Organization, RealEstateListing, Article, JobPosting, FAQPage, BreadcrumbList) url/@id dùng tên miền staging",
+      "robots.txt (dòng Sitemap) và llms.txt dùng tên miền staging",
+      "Không trang nào còn chuỗi http://localhost:3000 hoặc build-placeholder.invalid trong HTML/XML/TXT trả về"
     ],
     "dependents": [
-      "Website công khai: header/footer/nút trang chủ đọc navLink (resolveNavLink không đổi) — link menu VI/EN mở đúng trang",
-      "Website trang chủ công khai: khối, thứ tự, bật/tắt đọc cùng đường dẫn homepage.* — giao diện không đổi",
-      "API dịch lại POST /api/admin/translations/<collection>/<id> và duyệt EN Trang pháp lý (FR-ADM-17/18) — chỉ đổi vị trí nút",
-      "List drawer chọn quan hệ: không cột Thao tác, không thanh hàng loạt nổi",
-      "Nhân bản Payload (mở bản sao) — Trang pháp lý disableDuplicate"
+      "Mọi trang công khai vi/en có metadata SEO (layout [locale], trang chủ, danh sách + chi tiết các module)",
+      "Build Docker image (CI): build thành công khi bundle sạch; build FAIL nếu placeholder lọt vào bundle"
     ],
     "regression": [
-      "Giai đoạn 1 BL-051: A1 không nút 'API'; A2 Tỉnh/Phường/nhân viên không '+ Thêm mới'; A3 'Tải lên'; A4 'Tạo mới' nút chính góc phải; A5 Lead 'Xuất Excel' hàng tìm; A7 thanh Lưu dính + 'Quay lại danh sách' + 'Xem trên website'; A13 Cột/Lọc chỉ admin",
-      "BL-050: 'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng",
-      "BL-022/039: chip lọc nhanh đúng, where giữ khi reload; lọc kỹ thuật giữ",
-      "Ô 'Trạng thái dịch' (lọc theo translation.status / hasEnglish) vẫn lọc đúng dù nhóm translation ẩn khỏi form",
-      "Link menu công khai (header, menu toàn màn hình, footer, nút CTA) VI/EN không đổi URL",
-      "Thanh mobile BL-024 (.collection-list__list-selection) vẫn ở đáy, test BL-024 xanh",
-      "Trang chủ công khai VI/EN: đủ khối, đúng thứ tự, khối tắt vẫn ẩn",
-      "375px không tràn ngang ở danh sách (Cho thuê, Media), Tổng quan, Header/Trang chủ global; collapsible ≥ 44px ở mobile"
+      "Staging vẫn noindex (meta robots / X-Robots-Tag) và chặn truy cập công khai",
+      "Link 'Xem website' admin, link trong email lead/ứng tuyển (qua getEnv()) vẫn đúng tên miền",
+      "Thiếu/sai NEXT_PUBLIC_SITE_URL → trang vẫn render, không xuất URL tuyệt đối như trước (không lỗi 500)",
+      "Redirect 301 khi đổi slug, hreflang vi/en, sitemap gồm cả hai bản ngôn ngữ không đổi"
     ]
   },
   "uiTestCases": [
     {
-      "id": "BL051-P2-01",
+      "id": "BL053-01",
       "viewport": 1280,
-      "steps": "Admin mở danh sách Cho thuê; tích 2 dòng; cuộn xuống cuối trang; bỏ tích hết.",
-      "expected": "Khi có chọn: thanh 'Đã chọn 2…' nổi ghim đáy, nền đặc + bóng, nút cao ≥ 44px; hàng cuối và phân trang vẫn thấy/bấm được; bỏ tích → thanh biến mất."
+      "steps": "Mở https://tami.genieplatform.cloud/ và /en, xem nguồn trang (link canonical, alternate hreflang, meta og:url, script application/ld+json).",
+      "expected": "Mọi URL tuyệt đối bắt đầu https://tami.genieplatform.cloud; không có http://localhost:3000 hay build-placeholder.invalid; meta robots noindex vẫn có."
     },
     {
-      "id": "BL051-P2-02",
-      "viewport": 375,
-      "steps": "Admin mở Cho thuê và Media ở 375px (sáng + tối), tích 1 dòng/thẻ.",
-      "expected": "Thanh hàng loạt ở đáy, nền đặc, không tràn ngang (scrollWidth = 375); nút ≥ 44px."
-    },
-    {
-      "id": "BL051-P2-03",
+      "id": "BL053-02",
       "viewport": 1280,
-      "steps": "Admin mở lần lượt Dự án, Cho thuê, Tin BĐS, Tin tức, Tin tuyển dụng, Dịch vụ, Trang pháp lý.",
-      "expected": "Cột 'Thao tác' cuối bảng; dòng công khai có Xem trên web (tab mới, đúng URL), Sửa, Nhân bản, Xoá; dòng nháp không có Xem trên web; Trang pháp lý không có Nhân bản; hover icon hiện tooltip, mỗi icon có tên đọc."
+      "steps": "Mở /sitemap.xml rồi 1 sitemap con; mở /robots.txt và /llms.txt.",
+      "expected": "Mọi <loc> và dòng Sitemap/URL dùng https://tami.genieplatform.cloud."
     },
     {
-      "id": "BL051-P2-04",
+      "id": "BL053-03",
       "viewport": 1280,
-      "steps": "Admin bấm Nhân bản ở một tin Cho thuê; quay lại, bấm Xoá ở một tin khác → Huỷ, rồi Xoá → Xác nhận; mở Thùng rác.",
-      "expected": "Nhân bản mở màn sửa bản sao; Huỷ không xoá; Xác nhận → tin vào Thùng rác (không xoá thật), danh sách cập nhật; trong Thùng rác không có nút ở cột Thao tác."
-    },
-    {
-      "id": "BL051-P2-05",
-      "viewport": 1280,
-      "steps": "Đăng nhập sale; mở Tin BĐS (hoặc collection sale có quyền) có cả bài của mình và của người khác.",
-      "expected": "Dòng của mình: Sửa + Xoá (+ Xem trên web nếu công khai, + Nhân bản nếu có quyền tạo); dòng người khác: không Sửa, không Xoá. Xoá bài của mình → vào Thùng rác thành công."
-    },
-    {
-      "id": "BL051-P2-06",
-      "viewport": 1280,
-      "steps": "Sale có cột đã lưu riêng từ trước BL-051 mở danh sách; sale mới (chưa lưu cột) mở cùng danh sách.",
-      "expected": "Sale mới thấy cột 'Thao tác'; sale đã lưu cột riêng không thấy (chấp nhận, ghi gap) — không lỗi trang."
-    },
-    {
-      "id": "BL051-P2-07",
-      "viewport": 1280,
-      "steps": "Mở form có ô quan hệ chọn bài (vd Tin tức → bài liên quan / Dự án) để mở drawer danh sách.",
-      "expected": "Drawer không có cột 'Thao tác' nút, không có thanh hàng loạt nổi đáy; chọn được bài."
-    },
-    {
-      "id": "BL051-P2-08",
-      "viewport": 1280,
-      "steps": "Admin mở /admin/collections/media (sáng + tối); Tab qua các thẻ; bấm một thẻ; tích 2 thẻ.",
-      "expected": "Lưới thẻ: ảnh ≥ 120px giữ tỉ lệ, alt (≤ 2 dòng) hoặc tên tệp rút gọn, loại tệp 'Ảnh · WEBP'…; Tab tới từng thẻ có focus ring; bấm thẻ → màn sửa; thẻ chọn viền màu nhấn; thanh hàng loạt hiện."
-    },
-    {
-      "id": "BL051-P2-09",
-      "viewport": 1280,
-      "steps": "Media: gõ tìm, bấm chip/lọc, sang trang 2; admin bật thêm cột qua 'Hiển thị cột'.",
-      "expected": "Tìm/lọc/phân trang chạy; cột bật thêm không làm thẻ lệch/hiện ô không nhãn."
-    },
-    {
-      "id": "BL051-P2-10",
-      "viewport": 1280,
-      "steps": "Màn sửa Tin tức: 'Chọn từ thư viện' cho ảnh bìa; màn sửa Cho thuê: chọn nhiều ảnh gallery.",
-      "expected": "Drawer là bảng (không lưới), cột loại tệp dễ đọc; chọn 1 ảnh / nhiều ảnh thành công."
-    },
-    {
-      "id": "BL051-P2-11",
-      "viewport": 1280,
-      "steps": "Admin mở /admin (Tổng quan) 1280 + 375; bấm 'Tạo loại khác'; xem hàng 'Sửa website'. Đăng nhập sale mở /admin.",
-      "expected": "Admin: 'Tạo loại khác' là thẻ cùng chiều cao/tỉ lệ các thẻ thao tác nhanh, mở menu xổ; 'Sửa website' có tiêu đề mục + lưới thẻ icon + tên + chevron, bấm mở đúng global. Sale: không có 'Sửa website'. 375 không tràn."
-    },
-    {
-      "id": "BL051-P2-12",
-      "viewport": 1280,
-      "steps": "Global Header: mở ô 'Liên kết' của một mục menu, chọn 'Tin tức', Lưu; mở website công khai VI và EN.",
-      "expected": "Ô chọn liệt kê 9 trang tiếng Việt + 'Địa chỉ khác (https://…)'; sau lưu ô hiện 'Tin tức'; menu công khai link đúng /tin-tuc và /en/<route-en>."
-    },
-    {
-      "id": "BL051-P2-13",
-      "viewport": 1280,
-      "steps": "Global Footer: chọn 'Địa chỉ khác (https://…)', gõ 'https://example.com', Lưu; thử gõ 'abc' rồi Lưu.",
-      "expected": "URL hợp lệ lưu được, reload vẫn hiện 'Địa chỉ khác' + URL; 'abc' bị chặn bởi thông báo validate."
-    },
-    {
-      "id": "BL051-P2-14",
-      "viewport": 1280,
-      "steps": "Mở Header/Footer/Trang chủ có giá trị cũ (mã trang và URL lưu trước BL-051); với ô không bắt buộc bấm nút xoá rồi Lưu.",
-      "expected": "Mã trang cũ hiện đúng tên trang; URL cũ hiện 'Địa chỉ khác' + URL; xoá → lưu rỗng, link đó không hiện trên web; ô bắt buộc không có nút xoá."
-    },
-    {
-      "id": "BL051-P2-15",
-      "viewport": 1280,
-      "steps": "Mở màn sửa Cho thuê, Dự án, Tin tức, Danh mục, Chủ đầu tư, Trang pháp lý.",
-      "expected": "Cột phải có khối 'Bản dịch tiếng Anh' (mở sẵn): 'Có bản tiếng Anh' chỉ đọc, tóm tắt trạng thái dịch, nút 'Dịch lại bằng AI'; Trang pháp lý thêm 'Duyệt bản tiếng Anh'; không còn tab 'Bản dịch'."
-    },
-    {
-      "id": "BL051-P2-16",
-      "viewport": 1280,
-      "steps": "Admin bấm 'Dịch lại bằng AI' ở một tin Cho thuê (hoặc chặn mạng để chỉ xem request); sale bấm ở bài của mình nếu có quyền.",
-      "expected": "Gửi POST /api/admin/translations/rentals/<id>, thông báo 'Đã gửi yêu cầu dịch lại…'; quyền như trước BL-051."
-    },
-    {
-      "id": "BL051-P2-17",
-      "viewport": 1280,
-      "steps": "Danh sách Tin tức: dùng ô 'Trạng thái dịch' lọc 'Chưa có bản tiếng Anh' / 'Dịch lỗi'.",
-      "expected": "Lọc đúng như trước (dữ liệu translation.* giữ dù nhóm ẩn khỏi form)."
-    },
-    {
-      "id": "BL051-P2-18",
-      "viewport": 1280,
-      "steps": "Admin mở global Trang chủ; duyệt 5 tab; mở/gập khối; tắt 'Hiện khối này trên web' của khối Đối tác, Lưu; mở trang chủ công khai VI + EN; bật lại.",
-      "expected": "5 tab đúng tên/thứ tự; khối đầu tab mở, sau thu gọn, tiêu đề tên khối không lặp; 11 công tắc nhãn 'Hiện khối này trên web'; Banner không công tắc; tắt → khối Đối tác ẩn trên web, bật → hiện lại; các khối khác và thứ tự không đổi."
-    },
-    {
-      "id": "BL051-P2-19",
-      "viewport": 375,
-      "steps": "Mở global Trang chủ ở 375px (sáng + tối), bấm thanh tiêu đề khối.",
-      "expected": "Không tràn ngang; thanh thu gọn cao ≥ 44px; tab cuộn ngang/xuống dòng được."
-    },
-    {
-      "id": "BL051-P2-20",
-      "viewport": 1280,
-      "steps": "Global Trang chủ tab 'Chuyển đổi & Bố cục': đổi 'Thứ tự các khối' rồi Lưu; xem trang chủ công khai.",
-      "expected": "'Thứ tự các khối' không bọc thu gọn, có hướng dẫn tắt khối; thứ tự trên web đổi theo; lỗi validate (nếu có) nêu đúng tên ô."
-    },
-    {
-      "id": "BL051-P2-21",
-      "viewport": 1280,
-      "steps": "Regression giai đoạn 1: chạy lại BL051-01 … BL051-22 của scope v55 (spec/test-scope/archive/test-scope-1.44.0-55.json).",
-      "expected": "Tất cả vẫn đạt (API ẩn, không thêm nhanh Tỉnh/Phường/nhân viên, 'Tải lên', Tạo mới chính, Xuất Excel, Cột/Lọc chỉ admin, thanh Lưu + 2 link)."
-    },
-    {
-      "id": "BL051-P2-22",
-      "viewport": 1280,
-      "steps": "Regression BL-050 + chip: admin mở /admin và Tin tức (1280, 768, 375); bấm chip danh mục, reload.",
-      "expected": "'Tổng quan' đầu sidebar; 'Xem website' và ô Ngôn ngữ không chồng; chip lọc đúng, where giữ sau reload."
+      "steps": "Mở 1 trang chi tiết Dự án, Cho thuê, Tin tức, Tuyển dụng (vi + en), xem canonical, og:url, JSON-LD BreadcrumbList.",
+      "expected": "URL tuyệt đối đúng tên miền staging và đúng path trang đang xem."
     }
   ],
   "acceptance": [
-    "Chọn ≥ 1 dòng → thanh hàng loạt nổi đáy nền đặc, nút ≥ 44px, không che hàng cuối/phân trang, mất khi bỏ chọn; 375 không tràn",
-    "Cột 'Thao tác' ở 7 collection: Xem trên web (chỉ công khai) / Sửa / Nhân bản (không Trang pháp lý) / Xoá vào Thùng rác có xác nhận; theo quyền collection + author dòng; Xoá = admin hoặc bài mình + quyền sửa; ẩn ở Thùng rác và drawer; lỗi server → toast tiếng Việt",
-    "Media danh sách lưới thẻ (ảnh ≥ 120px, alt/tên tệp, loại tệp), bấm thẻ mở màn sửa, Tab tới được; drawer chọn ảnh vẫn chọn được",
-    "Tổng quan: 'Tạo loại khác' thẻ cùng tỉ lệ; 'Sửa website' lưới thẻ điều hướng có tiêu đề mục",
-    "Ô 'Liên kết' chọn trang theo tên tiếng Việt + 'Địa chỉ khác'; giá trị lưu giữ định dạng; giá trị cũ hiển thị đúng; link công khai không đổi",
-    "Khối 'Bản dịch tiếng Anh' cột phải ở collection dùng helper bản dịch; không còn tab 'Bản dịch'; 'Có bản tiếng Anh' chỉ đọc; lọc 'Trạng thái dịch' vẫn đúng",
-    "Trang chủ 5 tab, khối thu gọn, công tắc 'Hiện khối này trên web'; trang chủ công khai không đổi",
-    "Không đổi schema/access/API, không migration (migrate:create: No schema changes detected)"
+    "Trên staging https://tami.genieplatform.cloud sau redeploy: canonical, sitemap <loc>, og:url, JSON-LD dùng https://tami.genieplatform.cloud, không phải http://localhost:3000",
+    "Staging vẫn noindex",
+    "Bundle production không chứa placeholder build; Docker build FAIL nếu chứa",
+    "pnpm vitest run src/lib/seo, pnpm typecheck, pnpm lint PASS"
   ],
-  "verify": {
-    "test": "pnpm test 361 files / 3639 PASS (P2-T06 close-out)",
-    "typecheck": "pnpm typecheck PASS",
-    "lint": "pnpm lint 0 error (2 warning có sẵn ở tools/task-dashboard/server.mjs)",
-    "importmap": "pnpm generate:importmap đã chạy (RowActionsCell, MediaTypeCell, NavLinkField)",
-    "types": "pnpm generate:types — payload-types.ts chỉ chú thích + thứ tự thành viên",
-    "migration": "pnpm payload migrate:create → No schema changes detected",
-    "runtime": "Browser dev :3000 (tài khoản test @example.test, đã xoá): danh sách + thanh hàng loạt, Media lưới 1024 tối / 375 sáng, Tổng quan, Header/Footer/Trang chủ ô Liên kết, khối dịch Cho thuê 375 + Projects 375, Trang chủ 5 tab"
+  "verification": {
+    "unit": "pnpm vitest run src/lib/seo — 8 file / 75 test PASS (+2 case parseSiteUrl)",
+    "typecheck": "PASS",
+    "lint": "0 error (2 warning cũ ngoài scope)",
+    "bundle": "Trước fix 3 chunk .next/server chứa let e=\"http://build-placeholder.invalid\".trim(); sau fix grep rỗng, guard exit 0",
+    "runtime": "chưa kiểm — cần build lại image + redeploy staging"
   },
-  "outOfScope": [
-    "Sắp xếp theo cột trong Media lưới (mất do thead ẩn — gap)",
-    "Tên đọc ô 'Chọn tất cả trên trang' Media (GAP-A11Y-1, giới hạn Payload 3.91)",
-    "Cờ bật/tắt mới cho khối không có công tắc (Banner)",
-    "Gọi AI dịch thật (chỉ kiểm request)",
-    "GraphQL (đã tắt)"
-  ],
-  "knownGaps": [
-    "GAP-A11Y-1: 'Chọn tất cả trên trang' (Media) không có accessible name — Payload 3.91 CheckboxInput hard-code aria-label=\"\"",
-    "Media lưới mất sắp xếp theo cột",
-    "A6 / A9 / A13 dựa class nội bộ Payload 3.91 (.list-selection, .collection-list__list-selection, .collection-list--media, .list-drawer__header) — kiểm lại khi nâng Payload; subgrid cần Chrome 117+ / Safari 16+",
-    "Sale đã lưu cột riêng trước BL-051 không thấy cột 'Thao tác' (không có 'Hiển thị cột' để bật) — chấp nhận",
-    "Cột 'Thao tác' còn tiêu đề (ô trống) ở chế độ Thùng rác"
-  ],
-  "openQuestions": [],
-  "viewports": [
-    1280,
-    1024,
-    768,
-    375
-  ],
-  "locales": [
-    "vi",
-    "en"
-  ],
-  "roles": [
-    "admin",
-    "sale"
-  ],
-  "themes": [
-    "light",
-    "dark"
-  ],
-  "browsers": [
-    "chrome"
-  ],
-  "uiTests": true,
-  "apiTests": [
-    "Sale PATCH /api/<collection>/<id> {deletedAt} bài của mình → 200 (vào Thùng rác); bài người khác → 403/404 (access không đổi)",
-    "POST /api/<collection>/<id>/duplicate (hoặc cơ chế nhân bản Payload) tạo bản sao; Trang pháp lý không nhân bản",
-    "GET /api/globals/header, /api/globals/footer, /api/globals/homepage trả đúng đường dẫn/giá trị như trước (navLink mã trang/URL, homepage.* không đổi path)",
-    "PATCH global với navLink 'abc' bị validateNavLink từ chối; mã trang / https URL hợp lệ được",
-    "POST /api/admin/translations/<collection>/<id> vẫn chạy như trước",
-    "GET /api/<collection>?where[translation.status][equals]=failed vẫn lọc được"
-  ],
-  "risk": "medium",
-  "riskNote": "Shared admin CSS/config cho mọi danh sách + form; cột Thao tác có logic quyền theo dòng phía client (khớp access server, server vẫn là ranh giới quyền). Không đổi schema/API/access, đường dẫn dữ liệu Trang chủ + bản dịch giữ (test 97 path, migrate:create sạch). Residual: dựa class nội bộ Payload 3.91; GAP-A11Y-1; Media mất sort; sale có cột đã lưu không thấy Thao tác; chưa kiểm thật 403 server, bulk xoá Media, PDF/video, dịch AI thật.",
-  "status": "published",
-  "statusNote": "published 2026-10-21 — BL-051 giai đoạn 2 feature-update (đóng BL-051; change doc archive sang spec/changes/archive/)"
+  "risk": "medium"
 }

@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.45.0
+- **spec_version:** 1.45.1
 - **updated_at:** 2026-10-21
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -137,6 +137,7 @@ Danh mục cha–con theo từng loại nội dung (danh mục đang có nội d
 
 ### F11. SEO: FR-PUB-15, NFR-03
 SSR/ISR, URL tiếng Việt không dấu + URL tiếng Anh `/en/...`, meta + OG theo từng ngôn ngữ, `hreflang` (`vi`, `en`, `x-default`), `<html lang>`, `sitemap.xml` gồm cả hai bản, `robots.txt`, breadcrumb, JSON-LD (`Organization`, `RealEstateListing`, `Article`, `JobPosting`, `FAQPage` ở chi tiết dự án có câu hỏi thường gặp, có `inLanguage`), redirect 301 khi đổi slug (theo từng ngôn ngữ).
+**URL gốc tuyệt đối (BL-053):** canonical, `hreflang`, `og:url`, JSON-LD (kể cả Breadcrumb), `sitemap.xml` + sitemap con, `robots.txt`, `llms.txt` dùng `NEXT_PUBLIC_SITE_URL` **lúc chạy** của từng môi trường (một image build dùng cho cả staging và production), không đóng cứng giá trị lúc build; image build bằng placeholder `http://build-placeholder.invalid` và build FAIL nếu chuỗi đó lọt vào bundle. Thiếu / sai / không phải http(s) → không xuất URL tuyệt đối như trước. Staging vẫn `noindex`. Không đổi schema/API/quyền.
 **Icon tab trình duyệt (BL-048):** mọi trang public (vi + en, kể cả trang 404/lỗi) và trang quản trị `/admin` khai `<link rel="icon">` là logo TAMI (mái nhà vàng từ `public/brand/tami-icon-gold.png` trên ô vuông bo góc nền tối `--color-dark` — vàng nhạt trên nền trong suốt quá mờ ở tab sáng, ~1.5:1 — đọc rõ ở 16/32px trên tab sáng và tối) + `apple-touch-icon` 180×180 nền đặc (iOS thêm vào màn hình chính không bị nền đen). URL icon trả 200. Không đổi schema/API.
 
 ### F12. Song ngữ Việt – Anh: FR-PUB-18, FR-PUB-19, FR-ADM-17, FR-ADM-18; BR-05, BR-07, BR-08, BR-17

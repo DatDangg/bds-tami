@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { absoluteUrl, getSiteUrl, isIndexingAllowed } from "./site-url";
+import { absoluteUrl, getSiteUrl, isIndexingAllowed, parseSiteUrl } from "./site-url";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -40,5 +40,18 @@ describe("absoluteUrl / isIndexingAllowed", () => {
     expect(isIndexingAllowed()).toBe(true);
     vi.stubEnv("APP_ENV", "staging");
     expect(isIndexingAllowed()).toBe(false);
+  });
+});
+
+describe("parseSiteUrl (hàm thuần, nhận nguyên object env)", () => {
+  it("đọc từ object truyền vào, không từ process.env", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://khac.example");
+    expect(parseSiteUrl({ NEXT_PUBLIC_SITE_URL: "https://tami.example/vi" })).toBe("https://tami.example");
+  });
+
+  it("thiếu / sai / giao thức lạ / đang build → undefined", () => {
+    expect(parseSiteUrl({})).toBeUndefined();
+    expect(parseSiteUrl({ NEXT_PUBLIC_SITE_URL: "ftp://x.example" })).toBeUndefined();
+    expect(parseSiteUrl({ NEXT_PUBLIC_SITE_URL: "https://tami.example", NEXT_PHASE: "phase-production-build" })).toBeUndefined();
   });
 });
