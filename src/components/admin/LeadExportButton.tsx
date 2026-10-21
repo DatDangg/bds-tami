@@ -20,13 +20,22 @@ export function exportErrorMessage(status: number, retryAfter: string | null): s
   return "Không thể xuất lead lúc này. Thử lại sau.";
 }
 
+/** Icon tải xuống (trang trí; tên nút do chữ bên cạnh). */
+function DownloadIcon() {
+  return (
+    <svg className="list-search-action__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13h11" />
+    </svg>
+  );
+}
+
 function fileNameFrom(contentDisposition: string | null): string {
   const match = /filename="([A-Za-z0-9._-]+)"/.exec(contentDisposition ?? "");
   return match?.[1] ?? DEFAULT_FILE_NAME;
 }
 
 /**
- * Nút "Xuất Excel" trên danh sách lead, chỉ hiện cho admin (sale không được xuất: PERMISSION §3.3). Xuất đúng bộ lọc đang áp
+ * Nút "Xuất Excel" trên danh sách lead (BL-051 A5: CSS `_list-toolbar.scss` đặt nó bên phải hàng tìm kiếm, cạnh "Hiển thị cột"/"Lọc nâng cao"), chỉ hiện cho admin (sale không được xuất: PERMISSION §3.3). Xuất đúng bộ lọc đang áp
  * trong danh sách (trạng thái, nguồn, sale, khoảng ngày, ô tìm kiếm: server tự dựng điều kiện tìm như danh sách). Bộ lọc không chuyển được (nhiều nhóm điều kiện, toán tử lạ)
  * thì nút bị khoá kèm thông báo, không xuất lặng lẽ toàn bộ lead. Dùng fetch thay vì liên kết tải thẳng để
  * lỗi 429/422 hiện thành thông báo thay vì tải về một file JSON lỗi. Thùng rác do `LeadExportSlot` (server) chặn; ở đây chỉ ẩn
@@ -67,26 +76,33 @@ export function LeadExportButton() {
   }
 
   return (
-    <div className="list-toolbar-item">
-      <button
-        type="button"
-        className="btn btn--style-secondary btn--size-medium"
-        disabled={busy || !converted.ok}
-        aria-busy={busy}
-        onClick={exportLeads}
-      >
-        {busy ? "Đang xuất…" : "Xuất Excel"}
-      </button>
-      {!converted.ok ? (
-        <p role="status" className="field-description list-toolbar-item__note">
-          {converted.reason}
-        </p>
+    <>
+      <div className="list-search-action">
+        <button
+          type="button"
+          className="btn btn--style-secondary btn--size-medium list-search-action__button"
+          disabled={busy || !converted.ok}
+          aria-busy={busy}
+          onClick={exportLeads}
+        >
+          <DownloadIcon />
+          {busy ? "Đang xuất…" : "Xuất Excel"}
+        </button>
+      </div>
+      {!converted.ok || message ? (
+        <div className="list-toolbar-item">
+          {!converted.ok ? (
+            <p role="status" className="field-description list-toolbar-item__note">
+              {converted.reason}
+            </p>
+          ) : null}
+          {message ? (
+            <p role="alert" className="field-description list-toolbar-item__note">
+              {message}
+            </p>
+          ) : null}
+        </div>
       ) : null}
-      {message ? (
-        <p role="alert" className="field-description list-toolbar-item__note">
-          {message}
-        </p>
-      ) : null}
-    </div>
+    </>
   );
 }

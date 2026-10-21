@@ -232,7 +232,7 @@ export const Leads: CollectionConfig = hideTechnicalListFields({
     defaultColumns: ["code", "fullName", "source", "status", "assignedTo", "createdAt"],
     listSearchableFields: [...LEAD_LIST_SEARCHABLE_FIELDS],
     description: "Khách để lại thông tin từ website; sale chỉ thấy lead được giao, admin phân công và xuất Excel.",
-    // Nút xuất Excel (slot beforeListTable: trong lề trang, ngay dưới hàng tìm kiếm/Cột/Bộ lọc) theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
+    // Nút xuất Excel (slot beforeListTable; CSS `_list-toolbar.scss` đưa nó lên bên phải hàng tìm kiếm, BL-051 A5) theo bộ lọc đang áp (admin; FR-ADM-10). Slot server chặn thùng rác; chỉ admin thấy, endpoint kiểm quyền lại.
     // Chip lọc nhanh Trạng thái (BL-022) đứng trước nút xuất, cùng hàng toolbar.
     components: { beforeListTable: ["/components/admin/LeadQuickFilterSlot#LeadQuickFilterSlot", "/components/admin/LeadExportSlot#LeadExportSlot"] },
   },

@@ -9,7 +9,9 @@ const SELECTOR = ".upload__createNewToggler";
 /** Đổi chữ + tên đọc của nút upload; idempotent (chỉ ghi khi khác) nên không tự kích hoạt lại observer vô hạn. */
 function relabelUploadButtons(root: ParentNode): void {
   for (const button of root.querySelectorAll<HTMLElement>(SELECTOR)) {
-    if (button.textContent !== UPLOAD_BUTTON_LABEL) button.textContent = UPLOAD_BUTTON_LABEL;
+    // Chỉ ghi vào .btn__label (giữ nguyên cấu trúc .btn__content của Payload); nút lạ không có nhãn con thì ghi cả nút.
+    const label = button.querySelector<HTMLElement>(".btn__label") ?? button;
+    if (label.textContent !== UPLOAD_BUTTON_LABEL) label.textContent = UPLOAD_BUTTON_LABEL;
     if (button.getAttribute("aria-label") !== UPLOAD_BUTTON_LABEL) button.setAttribute("aria-label", UPLOAD_BUTTON_LABEL);
   }
 }
@@ -22,7 +24,7 @@ export function UploadButtonLabel({ children }: { children: ReactNode }) {
   useEffect(() => {
     relabelUploadButtons(document);
     const observer = new MutationObserver(() => relabelUploadButtons(document));
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
 
