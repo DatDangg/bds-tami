@@ -2,10 +2,11 @@ import type { CollectionSlug, Payload } from "payload";
 
 import { TRANSLATION_JOB_CONTEXT_KEY } from "../../hooks/translation/translation-targets";
 import { projectsBackfill } from "./projects";
+import { propertyPostsBackfill } from "./property-posts";
 import type { BackfillAdapter, DocPlan } from "./types";
 
-/** Collection hỗ trợ của `pnpm backfill:listing-fields` (thứ tự chạy + báo cáo). P3-T05 thêm `property-posts` vào đây. */
-export const BACKFILL_ADAPTERS: readonly BackfillAdapter[] = [projectsBackfill];
+/** Collection hỗ trợ của `pnpm backfill:listing-fields` (thứ tự chạy + báo cáo; không truyền `--collection` → chạy tất cả). */
+export const BACKFILL_ADAPTERS: readonly BackfillAdapter[] = [projectsBackfill, propertyPostsBackfill];
 
 export interface BackfillOptions {
   apply: boolean;

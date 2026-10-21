@@ -46,26 +46,32 @@ const docName = (plan: DocPlan) => (plan.isPublic ? cell(plan.title) : `(chưa x
 const docSnippet = (plan: DocPlan, snippet: string | undefined) => (plan.isPublic ? cell(snippet ?? "") : "(ẩn — tin chưa xuất bản)");
 
 const hasPatch = (plan: DocPlan) => Object.keys(plan.patch).length > 0;
+/** Tin có giá trị "đã điền / sẽ điền": có dữ liệu ghi và (khi `--apply`) ghi không lỗi — tin ghi lỗi chỉ nằm ở "Lỗi khi ghi" + "Cần admin soát". */
+const isWritten = (plan: DocPlan, apply: boolean) => hasPatch(plan) && !(apply && plan.error);
 
 function summaryTable({ adapter, plans }: CollectionResult, apply: boolean, fillVerb: string): string[] {
   const states = (plan: DocPlan) => adapter.fields.map((f) => plan.fieldStates[f.name]);
-  const noFill = plans.filter((p) => !hasPatch(p));
+  const skipped = plans.filter((p) => p.skipped);
+  const noFill = plans.filter((p) => !p.skipped && !hasPatch(p));
   const complete = noFill.filter((p) => states(p).every((s) => s === "has-value"));
-  const filledCount = apply ? plans.filter((p) => hasPatch(p) && !p.error).length : plans.filter(hasPatch).length;
+  const written = plans.filter((p) => isWritten(p, apply));
+  const skipReasons = [...new Set(skipped.map((p) => p.skipped ?? ""))].join(", ");
   return [
     "| Chỉ số | Số tin |",
     "|---|---|",
     `| Tin quét | ${plans.length} |`,
-    `| ${fillVerb} (ít nhất 1 ô) | ${filledCount} |`,
+    `| ${fillVerb} (ít nhất 1 ô) | ${written.length} |`,
     `| Không điền — mọi ô đã có giá trị | ${complete.length} |`,
     `| Không điền — có ô trống nhưng không trích được | ${noFill.length - complete.length} |`,
+    ...(skipped.length > 0 ? [`| Bỏ qua (${cell(skipReasons)}) | ${skipped.length} |`] : []),
     ...(apply ? [`| Lỗi khi ghi | ${plans.filter((p) => p.error).length} |`] : []),
     "",
     `| Trường | ${fillVerb} | Đã có giá trị (giữ nguyên) | Ô trống, không trích được |`,
     "|---|---|---|---|",
     ...adapter.fields.map((f) => {
       const count = (state: string) => plans.filter((p) => p.fieldStates[f.name] === state).length;
-      return `| ${f.label} (\`${f.name}\`) | ${count("fill")} | ${count("has-value")} | ${count("not-found")} |`;
+      const filled = written.filter((p) => p.fieldStates[f.name] === "fill").length;
+      return `| ${f.label} (\`${f.name}\`) | ${filled} | ${count("has-value")} | ${count("not-found")} |`;
     }),
     "",
   ];
@@ -76,7 +82,7 @@ function collectionSection(result: CollectionResult, apply: boolean): string[] {
   const fillVerb = apply ? "Đã điền" : "Sẽ điền";
   const label = (name: string) => adapter.fields.find((f) => f.name === name)?.label ?? name;
   const rows = plans
-    .filter(hasPatch)
+    .filter((p) => isWritten(p, apply))
     .flatMap((p) => p.filled.map((v) => `| ${docName(p)} | ${cell(label(v.field))} | ${cell(v.value)} | ${docSnippet(p, v.snippet)} | ${cell(v.source)} | ${v.confidence} |`));
   const notes = plans.flatMap((p) => [
     ...(p.error ? [`- **${docName(p)}** — ghi lỗi, chưa điền: ${cell(p.error)}`] : []),
@@ -105,7 +111,8 @@ export function renderBackfillReport(results: readonly CollectionResult[], optio
     `- Chế độ: ${options.apply ? "**Ghi thật (`--apply`)**" : "**Chạy thử (dry-run) — KHÔNG ghi DB**; chạy lại với `--apply` để ghi"}`,
     `- Collection: ${results.map((r) => `\`${r.adapter.collection}\``).join(", ")}`,
     "- Quy tắc: chỉ điền ô đang trống (không ghi đè giá trị admin đã nhập), trích từ nội dung tiếng Việt; không xuất bản / đổi trạng thái tin; không xếp job dịch tự động.",
-    "- Độ tin cậy: **cao** = từ tên / danh mục / bảng giá / danh sách tiện ích; **trung bình** = từ mô tả ngắn / tổng quan (cần soát).",
+    "- Độ tin cậy: **cao** = từ tên / tiêu đề / danh mục / bảng giá / danh sách tiện ích; **trung bình** = từ mô tả ngắn / tóm tắt / tổng quan / nội dung (cần soát).",
+    "- Giá trị mơ hồ (nhiều giá trị khác nhau, chỉ có khoảng, hướng ban công…) không điền — ghi ở \"Cần admin soát\". Tin BĐS ưu đãi / voucher bỏ qua cả tin.",
     "- Tin chưa xuất bản chỉ ghi id + trường + giá trị (không tên, không đoạn nội dung).",
     "",
     ...results.flatMap((r) => collectionSection(r, options.apply)),

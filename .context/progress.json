@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "listing-detail-redesign",
-    "phaseTask": "wave 3A: phase-3-task-01 ‖ phase-2-task-04",
+    "phaseTask": "phase-3-task-03",
     "journal": ".context/runs/change-listing-detail-redesign.md"
   },
   "features": [
@@ -2248,13 +2248,18 @@
         {
           "task": "phase-3-task-05",
           "file": "tasks/feature-listing-detail-redesign/phase-3-task-05.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-3-task-01"
           ],
           "wave": "3B",
-          "note": "backfill tin BĐS"
+          "note": "backfill tin BĐS",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-05-round-1-review.md",
+          "commit": "f001cb9",
+          "applied": "DB dev tami 2026-10-22: 38 quét / 37 điền / 1 bỏ qua / 0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md"
         },
         {
           "task": "phase-3-task-03",
@@ -2294,7 +2299,7 @@
           "commit": "dfa0884"
         }
       ],
-      "stage": "2026-10-22: phase 2 xong (kể cả G1 fix); P3-T01 xong; wave 3B (T02‖T04‖T05) builder running",
+      "stage": "2026-10-22: wave 3B xong (T02/T04/T05) + backfill Tin BĐS dev; next P3-T03 /tin-bds",
       "asBuiltPending": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",

@@ -2,7 +2,7 @@
 
 ```yaml
 workItem: feature/listing-detail-redesign
-phaseTask: wave 3B (P3-T02 ‖ P3-T04 ‖ P3-T05) + P2-T04 review
+phaseTask: phase-3-task-03
 step: builder
 agent: change-request
 status: running
@@ -29,8 +29,9 @@ committed:
   P2-T04: dfa0884 — fix G1 số đếm Tiện ích
   P3-T04: 32f5d44
   P3-T02: 59cd5bc
-remaining: [phase-review P1+P2 (spec-validator), P3-T01 schema tin BĐS (migration), P3-T02, P3-T04, P3-T05 (wave B), P3-T03, P3-T06 (gom MINOR, danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
-next: "spec-validator phase review P1+P2 → rồi P3 wave A (T01 migration) → B (T02‖T04‖T05) → C (T03) → D (T06)"
+  P3-T05: f001cb9 — backfill --apply DB dev tami 38/37/0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md
+remaining: [P3-T03 (/tin-bds page), P3-T06 (gom MINOR, danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
+next: "P3-T03 builder-strong → reviewer → merge; rồi P3-T06; rồi spec-validator phase review P3; close-out"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
 testDbs: "tami_wt52_p1t01..p1t07, tami_wt52_p2t01, tami_wt52_p2t03 (bản sao dev, đã migrate BL-052; p1t05/p2t01/p2t03 mới nhất, có dữ liệu thử listingPages/rentals) — dùng lại được làm DB worktree cho task sau (chạy pnpm payload migrate), hoặc drop. Redis db đã dùng: 4–9, 11–13."
 dirtyNotMine: [BL-054 change doc, template-feedback.md, .claude/launch.json, .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md (sửa ngoài BL-052), .context/runs/* khác, .context/review-reports/assets/]
@@ -71,3 +72,4 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ✅ DONE builder-strong P3-T02 — wt agent-a780d52efbdc5ce09 (chưa commit); lọc/đếm in-memory như /du-an (cap 1000), PostCard listing/voucher + variant home; /tin-bds p95 248ms; typecheck/lint/test/build PASS; i18n postCard. ▶ START reviewer r1 P3-T02 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P3-T04 STRICT PASS (4 MINOR → P3-T06) → 32f5d44 merged vào staging + progress, typecheck PASS. ✅ DONE P3-T04. P3-T02/T05 reviewer running.
 - 2026-10-22 reviewer r1 P3-T02 STRICT PASS (5 MINOR → P3-T06; ngày /en chờ user) → 59cd5bc merged (i18n auto-merge OK, JSON hợp lệ), typecheck + vitest posts/home/projects/tin-bds 29 file 290 PASS. ✅ DONE P3-T02. reviewer r1 P3-T05 STRICT PASS (4 MINOR → P3-T06).
+- 2026-10-22 P3-T05 → f001cb9 merged; dry-run DB dev tami: 26 giá trị hướng/mặt tiền soát tay đều đúng (không dính địa danh N1) → --apply: 38 quét / 37 điền / 1 bỏ qua / 0 lỗi (cảnh báo pg client.query đồng thời — không lỗi). ✅ DONE P3-T05, hết wave 3B.
