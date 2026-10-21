@@ -2,7 +2,7 @@
 //  - Dự án: thêm ảnh tải về ở `seed/scraped-extra/` (xem `scripts/fetch-scraped-extra.mjs`, gitignore) tới tối đa 6 ảnh.
 //  - Tin BĐS: mượn lại ảnh nội thất của các tin cho thuê (không tải thêm) cho đủ 6 ảnh; 1 tin được đặt `isFeatured`.
 //  - Cho thuê: 3 căn có `videoUrl` YouTube để thử nút video.
-// Chạy: `pnpm seed:galleries` (= `payload run scripts/seed-galleries.ts`). Idempotent; từ chối khi NODE_ENV=production hoặc DATABASE_URL trùng staging/prod (`checkSeedEnvironment`).
+// Chạy: `pnpm seed:galleries` (= `payload run scripts/seed-galleries.ts`). Idempotent; từ chối khi NODE_ENV=production hoặc DATABASE_URL trùng staging/prod, trừ staging bật `ALLOW_STAGING_SEED=1` (`checkSeedEnvironment`).
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";

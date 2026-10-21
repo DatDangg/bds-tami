@@ -30,7 +30,7 @@ export function sampleAmenitiesFor(rentalId: string): RentalAmenity[] {
   return RENTAL_AMENITIES.filter((amenity) => picked.includes(amenity));
 }
 
-/** Kết quả kiểm môi trường của seed: chỉ cho chạy trên DB dev, không bao giờ trên staging/prod. */
+/** Kết quả kiểm môi trường của seed: chỉ cho chạy trên DB dev, hoặc staging khi bật `ALLOW_STAGING_SEED=1`; không bao giờ trên prod. */
 export type SeedEnvCheck = { allowed: true } | { allowed: false; reason: string };
 
 /**
@@ -38,9 +38,14 @@ export type SeedEnvCheck = { allowed: true } | { allowed: false; reason: string 
  * `DATABASE_URL_STAGING` / `DATABASE_URL_PROD`). So khớp chuỗi đủ cho mục đích chặn nhầm; không parse URL để khỏi lộ secret ra log.
  */
 export function checkSeedEnvironment(env: Record<string, string | undefined>): SeedEnvCheck {
-  if (env.NODE_ENV === "production") return { allowed: false, reason: "NODE_ENV=production" };
+  if (env.APP_ENV === "production") return { allowed: false, reason: "APP_ENV=production" };
   const current = env.DATABASE_URL?.trim();
   if (!current) return { allowed: false, reason: "thiếu DATABASE_URL" };
+  const prod = env.DATABASE_URL_PROD?.trim();
+  if (prod && prod === current) return { allowed: false, reason: "DATABASE_URL trùng DATABASE_URL_PROD" };
+  // Staging là dữ liệu mẫu (ARCHITECTURE §8): cho seed khi bật rõ cờ trong container staging (image luôn NODE_ENV=production).
+  if (env.APP_ENV === "staging" && env.ALLOW_STAGING_SEED === "1") return { allowed: true };
+  if (env.NODE_ENV === "production") return { allowed: false, reason: "NODE_ENV=production" };
   for (const name of ["DATABASE_URL_STAGING", "DATABASE_URL_PROD"] as const) {
     const guarded = env[name]?.trim();
     if (guarded && guarded === current) return { allowed: false, reason: `DATABASE_URL trùng ${name}` };

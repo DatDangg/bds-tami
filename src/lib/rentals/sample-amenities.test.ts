@@ -38,4 +38,12 @@ describe("checkSeedEnvironment", () => {
     expect(checkSeedEnvironment({ DATABASE_URL: dev, DATABASE_URL_STAGING: dev })).toEqual({ allowed: false, reason: "DATABASE_URL trùng DATABASE_URL_STAGING" });
     expect(checkSeedEnvironment({ DATABASE_URL: dev, DATABASE_URL_PROD: ` ${dev} ` })).toEqual({ allowed: false, reason: "DATABASE_URL trùng DATABASE_URL_PROD" });
   });
+
+  it("staging chỉ chạy khi bật ALLOW_STAGING_SEED=1; production luôn bị chặn", () => {
+    const staging = { NODE_ENV: "production", APP_ENV: "staging", DATABASE_URL: dev };
+    expect(checkSeedEnvironment(staging).allowed).toBe(false);
+    expect(checkSeedEnvironment({ ...staging, ALLOW_STAGING_SEED: "1" })).toEqual({ allowed: true });
+    expect(checkSeedEnvironment({ ...staging, APP_ENV: "production", ALLOW_STAGING_SEED: "1" })).toEqual({ allowed: false, reason: "APP_ENV=production" });
+    expect(checkSeedEnvironment({ ...staging, ALLOW_STAGING_SEED: "1", DATABASE_URL_PROD: dev })).toEqual({ allowed: false, reason: "DATABASE_URL trùng DATABASE_URL_PROD" });
+  });
 });

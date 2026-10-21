@@ -1,6 +1,6 @@
 // Seed DEV cho BL-045: chữ hero vi/en 6 trang con, dải ý Tuyển dụng (4 mục vi/en), ảnh banner Liên hệ + Pháp lý,
 // xuất bản 2 trang pháp lý mẫu. Chạy: `pnpm seed:page-heroes` (= `payload run scripts/seed-page-heroes.ts`).
-// Idempotent (ghi đè đúng các trường này, ảnh dò theo `alt`); từ chối khi NODE_ENV=production hoặc DATABASE_URL trùng staging/prod (`checkSeedEnvironment`); không xếp job dịch AI.
+// Idempotent (ghi đè đúng các trường này, ảnh dò theo `alt`); từ chối khi NODE_ENV=production hoặc DATABASE_URL trùng staging/prod, trừ staging bật `ALLOW_STAGING_SEED=1` (`checkSeedEnvironment`); không xếp job dịch AI.
 // BL-047: `seedHomeAbout` GHI ĐÈ khối Về TAMI trang chủ (ảnh phụ, ảnh trang trí, nội dung vi/en, chú thích, icon số liệu) của DB dev; cần thư mục ảnh `seed/scraped*` (gitignore), thiếu thì báo lỗi rõ.
 // Xuất bản CHỈ 2 trang pháp lý (`kind` privacy/terms) và 3 dịch vụ mẫu của `seed:sample-services` (theo slug), không đụng bản nháp khác.
 import { existsSync } from "node:fs";
