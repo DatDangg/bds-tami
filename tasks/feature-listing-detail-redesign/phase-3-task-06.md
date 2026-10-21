@@ -28,3 +28,13 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## MINOR gom từ review phase 1–2 (change-request 2026-10-21)
+- P1-T03: tách `DetailHeroMosaic` (> 50 dòng/hàm); hằng sticky dùng chung `DetailContactAside`/`DetailLayout`.
+- P1-T06: tách hàm `ProjectDetail`; gom `ICON_SIZE`/nhãn Loại hình/quy mô ha lặp giữa `ProjectDetail` + `ProjectOverview`.
+- P1-T05: `project-category-icon.ts` khớp theo đoạn slug (shophouse → Storefront, "land" ≠ "island") + test; tách `ProjectListPage`.
+- P2-T01: `docs/ARCHITECTURE.md:127` `searchRentals` → `listRentals` + `listRentalProjectOptions`; hoàn 2 dòng chỉ đổi khoảng trắng ở `docs/API_SPEC.md`.
+- P2-T03: `DetailInfoGrid` link ngoài/nội bộ bằng union type (không dựa `newTabLabel`).
+- P3-T05 nhận: `report.ts` dòng ghi lỗi không tính vào "Đã điền" (P1-T07 r2 N1).
+- Dọn key i18n cũ không dùng: `page.projects.sortLabel`, `page.projects.chips.*`, khoá cũ `page.projectDetail` / `page.rentalDetail` (ngoài `.v2`).
+- Tin liên quan chi tiết dự án (`ProjectListings.tsx`) dùng thẻ biến thể mới (spec-validation r2 N3).
