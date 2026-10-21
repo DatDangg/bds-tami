@@ -11,6 +11,8 @@ import { shouldEmitBrowserSourceMaps } from "./src/lib/monitoring/browser-source
 // productionBrowserSourceMaps: chỉ khi có GLITCHTIP_AUTH_TOKEN (build release): `scripts/upload-sourcemaps.mjs` upload lên GlitchTip rồi xoá `.map`.
 const nextConfig: NextConfig = {
   agentRules: false,
+  // Chỉ có tác dụng ở `next dev`: cho phép mở dev server qua IP LAN/VPN (HMR + dev resource), không ảnh hưởng build prod.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*", "26.*.*.*"],
   experimental: { globalNotFound: true },
   productionBrowserSourceMaps: shouldEmitBrowserSourceMaps(process.env),
   headers: async () => cacheControlHeaders(),

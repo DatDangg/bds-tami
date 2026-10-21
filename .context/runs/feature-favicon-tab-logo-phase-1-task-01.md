@@ -15,7 +15,7 @@ evidence:
   reportPath: .context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-2-review.md
   round: 2
   verdict: PASS (NORMAL r2)
-next: "none — BL-048 đóng"
+next: "none — committed 4b402ce"
 loopSignal: none
 approvals: [{gate: phase_plan, at: 2026-10-21, ok: "user chọn scope BL-048 only + admin qua AskUserQuestion"}]
 batchQueue: []
@@ -40,3 +40,4 @@ Working tree có sẵn thay đổi dở của BL-046/047 (chưa commit) — comm
 - ▶ START [agent: spec-publisher] (cancel sẽ redo bước này)
 - ✅ DONE [agent: spec-publisher] spec 1.40.0 / scope v50
 - close-out: progress feature done, BACKLOG BL-048 done, change doc archive, commit chọn lọc (hunk BL-048 qua update-index)
+- 2026-10-21 ✅ DONE change-request — commit 4b402ce, spec 1.40.0 / scope v50

@@ -42,6 +42,8 @@ const AGENT_MODEL_KEY = {
   'spec-validator': 'models.spec_validator',
   design: 'models.spec_validator',
   graph: 'models.change_request',
+  'spec-init': 'models.spec_init',
+  'spec-publisher': 'models.spec_publisher',
 }
 
 // Thay thuật ngữ riêng của opencode bằng tương đương Claude Code (chỉ áp cho file sinh ra).
@@ -91,7 +93,7 @@ function applyTerms(body) {
 }
 
 // Đọc block `models:` trong .context/project-config.md. Chỉ nhận giá trị Claude Code hiểu được
-// (alias sonnet/opus/haiku/inherit, id claude-*, hoặc anthropic/claude-* kiểu opencode → bỏ prefix);
+// (alias fable/sonnet/opus/haiku/inherit, id claude-*, hoặc anthropic/claude-* kiểu opencode → bỏ prefix);
 // giá trị provider khác (openai/..., <placeholder>) → inherit vì Claude Code không chạy được.
 function readClaudeModels() {
   const file = path.join(ROOT, '.context', 'project-config.md')
@@ -104,7 +106,7 @@ function readClaudeModels() {
     const m = line.match(/^\s+([a-z_]+):\s*([^\s#]+)/)
     if (!m) { if (line.trim() && !/^\s/.test(line)) inBlock = false; continue }
     const value = m[2].replace(/^anthropic\//, '')
-    if (/^(inherit|sonnet|opus|haiku|claude-[\w.-]+)$/.test(value)) models[m[1]] = value
+    if (/^(inherit|fable|sonnet|opus|haiku|claude-[\w.-]+)$/.test(value)) models[m[1]] = value
   }
   return models
 }
@@ -118,7 +120,7 @@ function buildAgent(name, text) {
   if (AGENT_TOOLS[name]) lines.push(`tools: ${AGENT_TOOLS[name]}`)
   const modelKey = AGENT_MODEL_KEY[name] || (name === 'change-request' ? 'models.change_request' : '')
   lines.push(`model: ${CLAUDE_MODELS[modelKey.replace('models.', '')] || 'inherit'}`)
-  if (modelKey) lines.push(`# model lấy từ ${modelKey} trong .context/project-config.md (sonnet|opus|haiku|claude-*; giá trị provider khác → inherit)`)
+  if (modelKey) lines.push(`# model lấy từ ${modelKey} trong .context/project-config.md (fable|sonnet|opus|haiku|claude-*; giá trị provider khác → inherit)`)
   lines.push(`# ${MARKER} — nguồn: .opencode/agent/${name}.md`, '---', '')
 
   const extra = []
