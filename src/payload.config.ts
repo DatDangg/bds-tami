@@ -1,5 +1,4 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { vi } from "@payloadcms/translations/languages/vi";
 import { buildConfig } from "payload";
@@ -7,27 +6,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-import { AuditLogs } from "./collections/AuditLogs";
-import { Categories } from "./collections/Categories";
-import { ClickEvents } from "./collections/ClickEvents";
-import { ClickStatsDaily } from "./collections/ClickStatsDaily";
-import { TranslationUsage } from "./collections/TranslationUsage";
-import { Developers } from "./collections/Developers";
-import { Provinces } from "./collections/Provinces";
-import { Wards } from "./collections/Wards";
 import { contentRedirectsPlugin } from "./collections/redirects-plugin";
-import { JobApplications } from "./collections/JobApplications";
-import { JobPostings } from "./collections/JobPostings";
-import { Media } from "./collections/Media";
-import { Pages } from "./collections/Pages";
-import { PrivateFiles } from "./collections/PrivateFiles";
-import { News } from "./collections/News";
-import { Projects } from "./collections/Projects";
-import { LeadActivities } from "./collections/LeadActivities";
-import { Leads } from "./collections/Leads";
-import { PropertyPosts } from "./collections/PropertyPosts";
-import { Rentals } from "./collections/Rentals";
-import { Services } from "./collections/Services";
+import { ADMIN_COLLECTIONS } from "./collections/admin-collections";
 import { Staff } from "./collections/Staff";
 import { adminNavGroupsPlugin } from "./components/admin/admin-groups";
 import { Footer } from "./globals/Footer";
@@ -46,6 +26,7 @@ import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { jobsConfig } from "./jobs";
 import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
+import { createRichTextEditor } from "./lib/admin/rich-text-editor";
 import { getEnv } from "./lib/env";
 import { logger } from "./lib/logger";
 import { resolveProdMigrations } from "./lib/payload/prod-migrations";
@@ -65,7 +46,9 @@ export default buildConfig({
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
     dateFormat: "dd/MM/yyyy HH:mm",
     components: {
-      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard"],
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse"],
+      // Nút "Xem website" ở header (BL-041).
+      actions: ["/components/admin/SiteLink#SiteLink"],
       // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
       views: { dashboard: { Component: "/components/admin/dashboard/DashboardView#DashboardView" } },
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
@@ -77,9 +60,9 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
-  collections: [Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities],
+  collections: ADMIN_COLLECTIONS,
   globals: [SiteSettings, Homepage, Header, Footer],
-  editor: lexicalEditor(),
+  editor: createRichTextEditor(),
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint],
   jobs: jobsConfig,
@@ -98,7 +81,11 @@ export default buildConfig({
     fallbackLanguage: "vi",
   },
   localization: {
-    locales: ["vi", "en"],
+    // Có `label` để ô chọn ngôn ngữ nội dung hiện "Tiếng Việt"/"English" thay vì mã vi/en (BL-039); `code` giữ nguyên.
+    locales: [
+      { code: "vi", label: "Tiếng Việt" },
+      { code: "en", label: "English" },
+    ],
     defaultLocale: "vi",
     // Không tự rơi về tiếng Việt khi thiếu bản en (BRD BR-07).
     fallback: false,

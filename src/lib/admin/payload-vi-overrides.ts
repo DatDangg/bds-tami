@@ -58,6 +58,8 @@ export const PAYLOAD_VI_OVERRIDES: DeepPartial<typeof viTranslations> = {
     noResults: "Chưa có {{label}} nào, hoặc không có mục nào khớp bộ lọc hiện tại.",
     noResultsDescription: "Chưa có dữ liệu, hoặc không có mục nào khớp bộ lọc ở trên.",
     searchBy: "Tìm theo {{label}}",
+    // Nút mở trình dựng bộ lọc (khoá này chỉ dùng ở ListControls của Payload).
+    filters: "Lọc nâng cao",
     filterWhere: "Lọc {{label}} theo điều kiện:",
     descending: "Giảm dần",
     and: "và",
@@ -84,6 +86,9 @@ export const PAYLOAD_VI_OVERRIDES: DeepPartial<typeof viTranslations> = {
     documentOutOfDate: "Mục này vừa được người khác cập nhật. Tải lại để xem bản mới nhất.",
     reloadDocument: "Tải lại",
     documentModified: "Mục đã được sửa",
+    // Form tạo mới (BL-042): thanh nút hiện "Thêm … mới"; tiêu đề trống không hiện "[Chưa có tiêu đề]".
+    creatingNewLabel: "Thêm {{label}} mới",
+    untitled: "Chưa đặt tên",
     // Tên màn chính thống nhất "Tổng quan".
     dashboard: "Tổng quan",
     backToDashboard: "Về trang Tổng quan",

@@ -67,16 +67,21 @@ export function TranslationFailedBanner() {
   }, [isAdmin]);
 
   if (!isAdmin || groups.length === 0) return null;
+  const total = groups.reduce((sum, group) => sum + group.count, 0);
   const overBudget = groups.some((group) => group.overBudget);
   return (
-    // Style: .tami-admin-alert trong src/components/admin/styles/_surfaces.scss (tone danger, token BL-015).
-    <div role="alert" className="tami-admin-alert tami-admin-alert--danger">
-      <strong>{overBudget ? "Dịch tự động bị dừng do vượt hạn mức tháng." : "Có nội dung dịch lỗi."}</strong>
+    // Cảnh báo nhẹ (BL-041): bản tiếng Việt vẫn hiển thị nên dùng role="status", không phải "alert". Style: _surfaces.scss.
+    <div role="status" className="tami-admin-alert tami-admin-alert--warning">
+      <strong>
+        {overBudget
+          ? "Dịch tự động tạm dừng vì đã hết hạn mức tháng — bản tiếng Việt vẫn hiển thị bình thường."
+          : `${total} bài chưa dịch được sang tiếng Anh — bản tiếng Việt vẫn hiển thị bình thường.`}
+      </strong>
       <ul className="tami-admin-alert__list">
         {groups.map((group) => (
           <li key={group.slug}>
             <Link href={group.href} prefetch={false}>
-              {group.label}: {group.count} nội dung dịch lỗi
+              {group.label}: {group.count} bài — xem danh sách
             </Link>
           </li>
         ))}

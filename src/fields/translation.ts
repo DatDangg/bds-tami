@@ -29,7 +29,7 @@ function hasEnglishField(): CheckboxField {
     access: readOnlyForEveryone,
     // Nhân bản bỏ slug `en` (xem `slugField`) nên bản sao chưa đủ điều kiện bật; kể cả khi Local API `overrideAccess: true` giữ nguyên giá trị.
     hooks: { beforeDuplicate: [() => false] },
-    admin: { position: "sidebar", readOnly: true },
+    admin: { position: "sidebar", readOnly: true, description: "Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt." },
   };
 }
 
@@ -40,14 +40,14 @@ function hasEnglishField(): CheckboxField {
  */
 const resetOnDuplicate = (value: unknown): FieldHook => () => value;
 
-/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). Globals chỉ dùng group này (không `hasEnglish`: header/footer/site-settings luôn render ở cả hai ngôn ngữ). */
+/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). Trường hệ thống ẩn khỏi form (BL-042): chỉ hiện dòng tóm tắt + nút Dịch lại; dữ liệu và lọc theo `translation.*` giữ nguyên. Globals chỉ dùng group này (không `hasEnglish`: header/footer/site-settings luôn render ở cả hai ngôn ngữ). */
 export function translationGroup(): GroupField {
   return {
     name: "translation",
     type: "group",
     label: "Bản dịch tiếng Anh",
     access: readOnlyForEveryone,
-    admin: { readOnly: true, description: "Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc." },
+    admin: { readOnly: true, description: "Hệ thống tự dịch sang tiếng Anh khi xuất bản." },
     fields: [
       {
         name: "status",
@@ -57,15 +57,16 @@ export function translationGroup(): GroupField {
         defaultValue: "none",
         options: options(TRANSLATION_STATUSES, TRANSLATION_STATUS_LABELS),
         hooks: { beforeDuplicate: [resetOnDuplicate("none")] },
-        admin: { components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
+        admin: { hidden: true, components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
       },
-      { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "viChangedAfterManual", type: "checkbox", label: "Bản tiếng Việt đã sửa sau khi sửa tay bản tiếng Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] } },
-      { name: "sourceHash", type: "json", label: "Mã kiểm tra bản đã dịch (hệ thống)", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] } },
-      // Trường ảo (không có cột DB): nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.
+      { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      { name: "viChangedAfterManual", type: "checkbox", label: "Bản tiếng Việt đã sửa sau khi sửa tay bản tiếng Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] }, admin: { hidden: true } },
+      { name: "sourceHash", type: "json", label: "Mã kiểm tra bản đã dịch (hệ thống)", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      // Trường ảo (không có cột DB): 1 dòng tóm tắt thay cho các trường hệ thống đã ẩn (BL-042), rồi nút "Dịch lại bằng AI"; tự ẩn khi người dùng không được dịch lại bản ghi này.
+      { name: "translationSummary", type: "ui", label: "Tình trạng bản tiếng Anh", admin: { components: { Field: "/components/admin/TranslationSummary#TranslationSummary" } } },
       { name: "retranslateAction", type: "ui", label: "Dịch lại bằng AI", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
     ],
   };

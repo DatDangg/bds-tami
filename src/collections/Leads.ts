@@ -10,8 +10,8 @@ import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/le
 import { computeAssigneeInactive, computeAssigneeName, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
-import { formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { formRow, formTabs } from "../lib/admin/form-layout";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { ASSIGNEE_NOT_ASSIGNABLE_MESSAGE, isAssignableSale } from "../lib/leads/assignable-sale";
 import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "../lib/leads/lead-values";
 import { isUuid } from "../lib/uuid";
@@ -70,10 +70,10 @@ const sourceFields: Field[] = [
 
 const customerFields: Field[] = [
   { name: "fullName", type: "text", label: "Họ tên khách", required: true, maxLength: 120, access: customerFieldAccess },
-  { name: "phone", type: "text", label: "Số điện thoại", required: true, maxLength: 20, validate: validatePhone, access: customerFieldAccess },
+  { name: "phone", type: "text", label: "Số điện thoại", required: true, maxLength: 20, validate: validatePhone, access: customerFieldAccess, admin: { components: { afterInput: ["/components/admin/LeadContactButtons#LeadPhoneActions"] } } },
   // Suy ra từ `phone` bởi hook `syncPhoneNormalized`; index đơn cho tra cứu, index tổng hợp (DESC) tạo trong migration.
   { name: "phoneNormalized", type: "text", required: true, index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, hidden: true } },
-  { name: "email", type: "email", label: "Email", access: customerFieldAccess },
+  { name: "email", type: "email", label: "Email", access: customerFieldAccess, admin: { components: { afterInput: ["/components/admin/LeadContactButtons#LeadEmailAction"] } } },
   { name: "message", type: "textarea", label: "Lời nhắn của khách", maxLength: 2000, access: customerFieldAccess },
   {
     name: "locale",
@@ -83,6 +83,8 @@ const customerFields: Field[] = [
     index: true,
     options: LEAD_LOCALES.map((value) => ({ label: value === "vi" ? "Tiếng Việt" : "Tiếng Anh", value })),
     access: customerFieldAccess,
+    // Nhãn chữ chỉ đọc thay ô chọn (BL-042 #11); dữ liệu/quyền/bắt buộc giữ nguyên.
+    admin: { components: { Field: "/components/admin/LeadFormDisplay#LeadLocaleField" } },
   },
 ];
 
@@ -159,34 +161,50 @@ const assignmentFields: Field[] = [
 
 const UTM_LABELS: Record<string, string> = { source: "Nguồn (utm_source)", medium: "Kênh (utm_medium)", campaign: "Chiến dịch (utm_campaign)", term: "Từ khoá (utm_term)", content: "Nội dung (utm_content)" };
 
-/** Mốc thời gian + dấu hệ thống ghi: cột phải của form (chỉ đọc). */
+/**
+ * Mốc thời gian + dấu hệ thống ghi (chỉ đọc). Form chỉ hiện 1 dòng tóm tắt; 5 trường mốc dùng Field trả null (KHÔNG dùng `admin.hidden`
+ * vì `hideTechnicalListFields` sẽ bỏ chúng khỏi "Hiển thị cột"/bộ lọc đang dùng).
+ */
+const hiddenInForm = { Field: "/components/admin/LeadFormDisplay#LeadHiddenField" } as const;
 const timelineFields: Field[] = [
-  { name: "firstContactedAt", type: "date", label: "Ngày liên hệ đầu tiên", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "activitySummary", type: "ui", label: "Tóm tắt hoạt động", admin: { position: "sidebar", components: { Field: "/components/admin/LeadFormDisplay#LeadActivitySummary" } } },
+  { name: "firstContactedAt", type: "date", label: "Ngày liên hệ đầu tiên", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },
   // Mốc tính hạn lưu 24 tháng (ERD §7); `stampLeadTimestamps` và hook của `lead-activities` ghi.
-  { name: "lastActivityAt", type: "date", label: "Hoạt động gần nhất", index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
-  { name: "mergedCount", type: "number", label: "Số lần khách gửi lại (đã gộp)", min: 0, defaultValue: 0, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
+  { name: "lastActivityAt", type: "date", label: "Hoạt động gần nhất", index: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },
+  { name: "mergedCount", type: "number", label: "Số lần khách gửi lại (đã gộp)", min: 0, defaultValue: 0, access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", components: hiddenInForm } },
   // Dấu "đã nhắc admin lead chưa giao" (job `remind-unassigned-leads`, BR-14): nhắc đúng một lần mỗi lead.
-  { name: "remindedAt", type: "date", label: "Ngày nhắc phân công", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
-  { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin } },
+  { name: "remindedAt", type: "date", label: "Ngày nhắc phân công", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },
+  { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: systemFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: dateTimeInAdmin, components: hiddenInForm } },
 ];
 
 const consentFields: Field[] = [
+  formRow(
   { name: "consentAt", type: "date", label: "Ngày đồng ý chính sách", required: true, access: systemFieldAccess, admin: { ...readOnlyInAdmin, date: dateTimeInAdmin } },
   { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: systemFieldAccess, admin: readOnlyInAdmin },
+  ),
 ];
+
+const linkFieldComponent = "/components/admin/LeadFormDisplay#LeadLinkField";
 
 /** Dấu vết nguồn khách đến (tab Nguồn); `ipHash`/`userAgent` ẩn khỏi form. */
 const trackingFields: Field[] = [
   {
-    name: "utm",
-    type: "group",
-    label: "Nguồn quảng cáo (UTM)",
-    access: systemFieldAccess,
-    admin: readOnlyInAdmin,
-    fields: ["source", "medium", "campaign", "term", "content"].map((name): Field => ({ name, type: "text", label: UTM_LABELS[name], maxLength: 200 })),
+    type: "collapsible",
+    label: "Dữ liệu chiến dịch marketing",
+    admin: { initCollapsed: true },
+    fields: [
+      {
+        name: "utm",
+        type: "group",
+        label: "Nguồn quảng cáo (UTM)",
+        access: systemFieldAccess,
+        admin: readOnlyInAdmin,
+        fields: ["source", "medium", "campaign", "term", "content"].map((name): Field => ({ name, type: "text", label: UTM_LABELS[name], maxLength: 200 })),
+      },
+      { name: "pageUrl", type: "text", label: "Trang khách gửi form", maxLength: 2000, access: systemFieldAccess, admin: { ...readOnlyInAdmin, components: { Field: linkFieldComponent } } },
+      { name: "referrer", type: "text", label: "Trang khách đến từ", maxLength: 2000, access: systemFieldAccess, admin: { ...readOnlyInAdmin, components: { Field: linkFieldComponent } } },
+    ],
   },
-  { name: "pageUrl", type: "text", label: "Trang khách gửi form", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
-  { name: "referrer", type: "text", label: "Trang khách đến từ", maxLength: 2000, access: systemFieldAccess, admin: readOnlyInAdmin },
   { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
   { name: "userAgent", type: "text", maxLength: 500, access: { read: adminOnlyRead, create: denyAll, update: denyAll }, admin: { ...readOnlyInAdmin, hidden: true } },
 ];
@@ -206,7 +224,7 @@ const LEAD_HIDDEN_FILTER_PATHS = ["fullName", "phone", "phoneNormalized", "email
  * - SĐT/email thuộc lead nên chỉ admin và sale phụ trách thấy (BR-32); lead chưa giao: chỉ admin.
  * - Admin xoá mềm/khôi phục/xoá hẳn có audit (PERMISSION §6); bản đã xoá mềm chỉ admin sửa. Xuất Excel không thuộc collection này.
  */
-export const Leads: CollectionConfig = hideTechnicalListFilters({
+export const Leads: CollectionConfig = hideTechnicalListFields({
   slug: "leads",
   labels: collectionLabels("leads"),
   admin: {
@@ -236,8 +254,8 @@ export const Leads: CollectionConfig = hideTechnicalListFilters({
   fields: [
     codeField,
     formTabs([
-      { label: "Khách hàng", fields: [...customerFields, ...consentFields] },
-      { label: "Nguồn", fields: [...sourceFields, ...trackingFields] },
+      { label: "Khách hàng", fields: customerFields },
+      { label: "Nguồn", fields: [...sourceFields, ...trackingFields, ...consentFields] },
       { label: "Lịch sử chăm sóc", fields: [activitiesField] },
     ]),
     ...statusFields,

@@ -1,7 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin } from "../access";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
 import { createRevalidatePage } from "../hooks/pages/revalidate-page";
 import { approveEnglish, guardEnglishApproval, revokeEnglishOnManualEdit } from "../hooks/pages/approve-english";
@@ -57,10 +57,10 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
           access: { update: denyAll },
           admin: { position: "sidebar" },
         },
-        titleField(),
+        titleField({ placeholder: "VD: Giới thiệu" }),
         // Trường ảo: nút "Duyệt bản EN" (chỉ admin, chỉ khi bản dịch AI đang chờ duyệt).
         { name: "approveEnglishAction", type: "ui", label: "Duyệt bản tiếng Anh", admin: { position: "sidebar", components: { Field: "/components/admin/ApproveEnglishButton#ApproveEnglishButton" } } },
-        { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+        markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
         { name: "version", type: "text", label: "Phiên bản", required: true, admin: { description: "Phiên bản văn bản, vd 1.0. Phiên bản chính sách bảo mật đang xuất bản được lưu kèm mỗi lần khách đồng ý trên form." } },
         { name: "effectiveDate", type: "date", label: "Ngày hiệu lực", required: true, admin: { date: { pickerAppearance: "dayOnly" } } },
       ],

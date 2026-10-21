@@ -3,9 +3,10 @@ import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { withPriceInWords, withSummaryCounter } from "../fields/form-hints";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
@@ -13,7 +14,7 @@ import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -60,6 +61,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
       admin: {
         useAsTitle: "title",
         defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Tin đăng bất động sản (mua bán, voucher, ưu đãi) có thể gắn với dự án hoặc tin cho thuê.",
       },
       defaultSort: "-publishedAt",
@@ -69,17 +71,17 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Bán căn 3PN Vinhomes Central Park" }),
               scopedCategoryField("property_post"),
-              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+              withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
             ],
           },
           {
             label: "Thông tin tin đăng",
             fields: [
               formRow(
-                { name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } },
+                withPriceInWords({ name: "priceVnd", type: "number", label: "Giá (VNĐ)", min: 0, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }),
                 { name: "priceNote", type: "text", label: "Ghi chú giá", localized: true, admin: { description: "Vd: Giá thương lượng, Giá chưa gồm VAT." } },
               ),
               formRow(
@@ -114,7 +116,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): priceNote, offer.voucherCode ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["priceNote", "offer.voucherCode"]);
+  return hideTechnicalListFields(collection, ["priceNote", "offer.voucherCode"]);
 }
 
 export const PropertyPosts = createPropertyPosts();

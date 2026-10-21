@@ -8,7 +8,7 @@ import { collectionLabels } from "../lib/admin/collection-labels";
 export const APPLICATION_STATUSES = ["new", "reviewing", "interview", "hired", "rejected"] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
-const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   new: "Mới",
   reviewing: "Đang xem xét",
   interview: "Phỏng vấn",
@@ -82,6 +82,7 @@ export const JobApplications: CollectionConfig = {
   admin: {
     useAsTitle: "fullName",
     defaultColumns: ["fullName", "jobPosting", "status", "createdAt"],
+    components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
     hidden: ({ user }) => user?.role !== ROLES.admin,
     description: "Hồ sơ ứng viên nộp qua website (chỉ admin xem); tự xoá thông tin cá nhân và CV sau 12 tháng.",
   },

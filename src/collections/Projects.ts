@@ -7,18 +7,21 @@ import type {
 } from "payload";
 import { upload } from "payload/shared";
 
-import { requiredByLocale } from "../fields/required-by-locale";
+import { withSummaryCounter } from "../fields/form-hints";
+import { withPriceInWords } from "../fields/form-hints";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { createRichTextEditor } from "../lib/admin/rich-text-editor";
 import { formRow, formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { textRowLabel } from "../lib/admin/row-label";
 import { withContentDefaults } from "./_shared/content-defaults";
 import { projectMarketBlockFields } from "./projects/market-blocks";
@@ -26,7 +29,7 @@ import { projectMarketBlockFields } from "./projects/market-blocks";
 export const SALES_STATUSES = ["upcoming", "selling", "handed_over"] as const;
 export type SalesStatus = (typeof SALES_STATUSES)[number];
 
-const SALES_STATUS_LABELS: Record<SalesStatus, string> = {
+export const SALES_STATUS_LABELS: Record<SalesStatus, string> = {
   upcoming: "Sắp mở bán",
   selling: "Đang mở bán",
   handed_over: "Đã bàn giao",
@@ -62,7 +65,10 @@ const mediaUpload = (name: string, label: string, mimeType: Record<string, strin
 
 const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 /** Cột tiền: ô danh sách hiện `110.000.000 ₫` (chỉ đổi hiển thị). */
-const vndNumber = (name: string, label: string) => ({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }) as const;
+const vndNumber = (name: string, label: string) => withPriceInWords({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } });
+
+const listColumnField = (name: string, label: string, cell: string) =>
+  ({ name, type: "ui", label, admin: { components: { Cell: `/components/admin/ListSummaryCells#${cell}` } } }) as const;
 
 const scaleGroup: GroupField = {
   name: "scale",
@@ -73,7 +79,7 @@ const scaleGroup: GroupField = {
     nonNegativeNumber("blocks", "Số tòa/block"),
     nonNegativeNumber("floors", "Số tầng"),
     nonNegativeNumber("landAreaM2", "Diện tích đất (m²)"),
-    { name: "handoverTime", type: "text", label: "Thời gian bàn giao", localized: true },
+    { name: "handoverTime", type: "text", label: "Thời gian bàn giao", localized: true, admin: { placeholder: "VD: Quý 4/2026" } },
   ],
 };
 
@@ -84,7 +90,7 @@ const amenitiesField: ArrayField = {
   labels: { singular: "Tiện ích", plural: "Tiện ích" },
   admin: { components: { RowLabel: textRowLabel({ field: "name", fallback: "Tiện ích" }) } },
   fields: [
-    { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true },
+    { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true, admin: { placeholder: "VD: Hồ bơi" } },
     { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm tiện ích." } },
   ],
 };
@@ -116,23 +122,39 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
       labels: collectionLabels("projects"),
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["gallery", "title", "category", "salesStatus", "status", "publishedAt", "author"],
+        defaultColumns: ["gallery", "title", "category", "salesStatus", "unitsSummary", "priceRange", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Dự án bất động sản giới thiệu trên website: thông tin, quy mô, tiện ích, mặt bằng và tài liệu.",
       },
       defaultSort: "-publishedAt",
       hooks: { afterChange: [reindexRentalsOnProjectRename, revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
       fields: [
         searchReindexPendingField("project"),
+        // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
+        listColumnField("unitsSummary", "Quy mô", "UnitsSummaryCell"),
+        listColumnField("priceRange", "Khoảng giá", "PriceRangeCell"),
         formTabs([
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Vinhomes Grand Park" }),
               scopedCategoryField("project"),
-              { name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống.") },
-              { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true },
-              { name: "legalInfo", type: "richText", label: "Pháp lý", localized: true },
-              { name: "salesPolicy", type: "richText", label: "Chính sách bán hàng", localized: true },
+              withSummaryCounter(markRequired({ name: "summary", type: "textarea", label: "Mô tả ngắn", localized: true, validate: requiredByLocale("Mô tả ngắn không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
+              { name: "overview", type: "richText", label: "Tổng quan dự án", localized: true, editor: createRichTextEditor("Giới thiệu vị trí, quy mô, điểm nổi bật của dự án…") },
+              {
+                name: "legalInfo",
+                type: "richText",
+                label: "Pháp lý",
+                localized: true,
+                editor: createRichTextEditor("VD: Quyết định phê duyệt quy hoạch 1/500 số …; Giấy phép xây dựng số …; Sổ hồng lâu dài."),
+              },
+              {
+                name: "salesPolicy",
+                type: "richText",
+                label: "Chính sách bán hàng",
+                localized: true,
+                editor: createRichTextEditor("VD: Chiết khấu 5% khi thanh toán sớm; Hỗ trợ vay 70%, miễn lãi 18 tháng."),
+              },
             ],
           },
           {
@@ -155,7 +177,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
                 { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
                 { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
               ),
-              { name: "address", type: "text", label: "Địa chỉ" },
+              { name: "address", type: "text", label: "Địa chỉ", admin: { placeholder: "VD: Phường Long Thạnh Mỹ, TP Thủ Đức" } },
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
               formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),
@@ -187,7 +209,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale, priceUpdatedAt ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["address", "scale", "priceUpdatedAt"]);
+  return hideTechnicalListFields(collection, ["address", "scale", "priceUpdatedAt"]);
 }
 
 export const Projects = createProjects();

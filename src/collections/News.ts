@@ -1,14 +1,15 @@
 import type { CollectionConfig } from "payload";
 
 import { validateCoverWhenPublished } from "../fields/cover-image";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { withSummaryCounter } from "../fields/form-hints";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
-import { titleField } from "../fields/title";
+import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /**
@@ -25,6 +26,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
       admin: {
         useAsTitle: "title",
         defaultColumns: ["cover", "title", "category", "status", "publishedAt", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Bài viết tin tức, kiến thức thị trường; không thu lead.",
       },
       defaultSort: "-publishedAt",
@@ -34,10 +36,10 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Thị trường căn hộ TP.HCM quý 4" }),
               scopedCategoryField("news"),
-              { name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống.") },
-              { name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") },
+              withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
               { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
             ],
           },
@@ -62,7 +64,7 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): tags ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["tags"]);
+  return hideTechnicalListFields(collection, ["tags"]);
 }
 
 export const News = createNews();

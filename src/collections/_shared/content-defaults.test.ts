@@ -2,11 +2,12 @@ import type { CollectionConfig, Field } from "payload";
 import { describe, expect, it } from "vitest";
 
 import { isAdmin } from "../../access";
+import { findLayoutField, flattenLayoutFields } from "../../lib/admin/form-layout";
 import { withContentDefaults } from "./content-defaults";
 
 const base: CollectionConfig = { slug: "news", fields: [{ name: "title", type: "text", localized: true }] };
-const find = (config: CollectionConfig, name: string) =>
-  config.fields.find((field: Field) => "name" in field && field.name === name) as { access?: Record<string, unknown> };
+// Tìm xuyên vỏ bố cục không tên (slug nằm trong khối "Nâng cao" thu gọn).
+const find = (config: CollectionConfig, name: string) => findLayoutField(config.fields, name) as { access?: Record<string, unknown> };
 
 describe("withContentDefaults: fieldAccess", () => {
   it("mặc định hasEnglish không ai sửa được (access deny-all)", () => {
@@ -29,7 +30,7 @@ describe("withContentDefaults: fieldAccess", () => {
 });
 
 const fieldNames = (config: CollectionConfig) =>
-  config.fields.flatMap((field: Field) => ("name" in field ? [field.name] : []));
+  flattenLayoutFields(config.fields).flatMap((field: Field) => ("name" in field ? [field.name] : []));
 const denyAllAccess = () => false;
 
 describe("withContentDefaults: fieldAccess (n2)", () => {
@@ -115,6 +116,33 @@ describe("withContentDefaults: scopeField (G7)", () => {
     const config = scoped({ fieldAccess: { slug: { update: isAdmin } } });
     expect((find(config, "slug").access as { update?: unknown }).update).toBe(isAdmin);
     expect((find(config, "scopeSlug").access as { update: () => boolean }).update()).toBe(false);
+  });
+});
+
+describe("withContentDefaults: slug trong khối Nâng cao (BL-042)", () => {
+  const advancedBlock = (config: CollectionConfig) => config.fields.find((field) => field.type === "collapsible");
+  const namesIn = (fields: Field[]) => fields.map((field) => ("name" in field ? field.name : null));
+
+  it("slug nằm trong collapsible KHÔNG tên 'Nâng cao' ở cột phải, thu gọn mặc định", () => {
+    const block = advancedBlock(withContentDefaults(base)) as { label?: string; admin?: { position?: string; initCollapsed?: boolean }; fields: Field[] };
+    expect(block).toMatchObject({ label: "Nâng cao", admin: { position: "sidebar", initCollapsed: true } });
+    expect("name" in block).toBe(false);
+    expect(namesIn(block.fields)).toEqual(["slug"]);
+  });
+
+  it("có scopeField: khối chứa cả slug và scopeSlug", () => {
+    const config = withContentDefaults({ ...base, slug: "categories" }, { route: null, scopeField: "scope" });
+    expect(namesIn((advancedBlock(config) as { fields: Field[] }).fields)).toEqual(["slug", "scopeSlug"]);
+  });
+
+  it("omit slug thì không còn khối Nâng cao", () => {
+    expect(advancedBlock(withContentDefaults(base, { omit: ["slug"] }))).toBeUndefined();
+  });
+
+  it("slug có mô tả ngắn, không đặt position riêng (đã ở khối)", () => {
+    const slug = find(withContentDefaults(base), "slug") as { admin?: { description?: string; position?: string } };
+    expect(slug.admin?.description).toBe("Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.");
+    expect(slug.admin?.position).toBeUndefined();
   });
 });
 

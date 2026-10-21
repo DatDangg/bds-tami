@@ -1,6 +1,7 @@
 import type { Where } from "payload";
 
 import { ADMIN_COLLECTION_LABELS, ADMIN_GLOBAL_LABELS } from "../admin/collection-labels";
+import { TRANSLATION_ERROR_MESSAGES, type TranslationErrorCode } from "./errors";
 
 /** Bộ lọc trạng thái dịch trên danh sách nội dung (FR-ADM-18): mỗi mục là một điều kiện trên trường có sẵn của nhóm `translation`, không cần cột mới. */
 export const TRANSLATION_FILTERS = {
@@ -93,4 +94,52 @@ export function retranslateMessage(status: number, retryAfter: string | null): s
   if (status === 503) return "Dịch tự động chưa được cấu hình hoặc hệ thống đang tạm thời lỗi. Thử lại sau.";
   if (status === 401 || status === 403 || status === 404) return "Bạn không có quyền dịch lại nội dung này.";
   return "Không thể dịch lại lúc này. Thử lại sau.";
+}
+
+export interface TranslationSummaryInput {
+  status?: unknown;
+  enSource?: unknown;
+  translatedAt?: unknown;
+  viChangedAfterManual?: unknown;
+  lastError?: unknown;
+}
+
+/** `lastError` lưu mã lỗi (xem errors.ts): đổi sang câu tiếng Việt có sẵn; mã lạ → câu chung, không hiện mã thô. */
+const GENERIC_ERROR_MESSAGE = "không dịch được, thử dịch lại sau";
+function describeTranslationError(code: string): string {
+  if (code === "") return "";
+  return Object.prototype.hasOwnProperty.call(TRANSLATION_ERROR_MESSAGES, code) ? TRANSLATION_ERROR_MESSAGES[code as TranslationErrorCode] : GENERIC_ERROR_MESSAGE;
+}
+
+/** `dd/MM/yyyy HH:mm` theo giờ Việt Nam; giá trị không hợp lệ → `null`. */
+function formatVietnamDateTime(value: unknown): string | null {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(date)
+      .map((part) => [part.type, part.value]),
+  );
+  return `${parts.day}/${parts.month}/${parts.year} ${parts.hour}:${parts.minute}`;
+}
+
+/**
+ * Một dòng tóm tắt trạng thái bản tiếng Anh cho form (BL-042) thay cho 7 trường hệ thống đã ẩn.
+ * `warning` có khi bản tiếng Việt đã sửa sau khi người dùng sửa tay bản tiếng Anh.
+ */
+export function translationSummary(input: TranslationSummaryInput): { text: string; warning: string | null } {
+  const warning = input.viChangedAfterManual === true ? "Bản tiếng Việt đã sửa sau khi bạn sửa tay bản tiếng Anh, nên kiểm tra lại bản tiếng Anh." : null;
+  const lastError = typeof input.lastError === "string" ? input.lastError.trim() : "";
+  const shortError = describeTranslationError(lastError);
+  let state: string;
+  if (input.status === "failed") state = shortError ? `dịch lỗi — ${shortError}` : "dịch lỗi";
+  else if (input.status === "queued") state = "đang chờ dịch";
+  else if (input.status === "pending_review") state = "chờ duyệt";
+  else if (input.enSource === "manual") state = "đã sửa tay";
+  else if (input.status === "done") {
+    const at = formatVietnamDateTime(input.translatedAt);
+    state = at ? `đã dịch tự động lúc ${at}` : "đã dịch tự động";
+  } else state = "chưa dịch";
+  return { text: `Bản tiếng Anh: ${state}`, warning };
 }

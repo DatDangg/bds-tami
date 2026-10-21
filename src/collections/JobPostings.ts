@@ -1,7 +1,8 @@
 import type { CollectionConfig, NumberFieldSingleValidation, SelectField } from "payload";
 import { number } from "payload/shared";
 
-import { requiredByLocale } from "../fields/required-by-locale";
+import { withPriceInWords } from "../fields/form-hints";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { titleField } from "../fields/title";
 import { guardJobPostingHardDelete } from "../hooks/job-postings/guard-delete";
@@ -57,6 +58,7 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
       admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "category", "employmentType", "deadline", "status", "author"],
+        components: { beforeListTable: ["/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot"] },
         description: "Tin tuyển dụng của công ty; quá hạn nộp sẽ tự ẩn khỏi danh sách công khai.",
       },
       defaultSort: "-publishedAt",
@@ -66,10 +68,10 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Nhân viên kinh doanh BĐS" }),
               scopedCategoryField("job", { required: false }),
-              { name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") },
-              { name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") },
+              markRequired({ name: "description", type: "richText", label: "Mô tả công việc", localized: true, validate: requiredByLocale("Mô tả công việc không được để trống.") }),
+              markRequired({ name: "requirements", type: "richText", label: "Yêu cầu ứng viên", localized: true, validate: requiredByLocale("Yêu cầu ứng viên không được để trống.") }),
               { name: "benefits", type: "richText", label: "Quyền lợi", localized: true },
             ],
           },
@@ -82,8 +84,8 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
               ),
               formRow(employmentTypeField, { name: "quantity", type: "number", label: "Số lượng tuyển", min: 1 }),
               formRow(
-                { name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 },
-                { name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax },
+                withPriceInWords({ name: "salaryMinVnd", type: "number", label: "Lương tối thiểu (VNĐ)", min: 0 }),
+                withPriceInWords({ name: "salaryMaxVnd", type: "number", label: "Lương tối đa (VNĐ)", min: 0, validate: validateSalaryMax }),
               ),
               { name: "salaryText", type: "text", label: "Mức lương hiển thị", localized: true, admin: { description: "Vd: Thoả thuận, 15–20 triệu." } },
               {
@@ -92,7 +94,11 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
                 label: "Hạn nộp hồ sơ",
                 required: true,
                 index: true,
-                admin: { date: { pickerAppearance: "dayOnly" } },
+                admin: {
+                  date: { pickerAppearance: "dayOnly" },
+                  // BL-042 #14: badge "Đã quá hạn" ở form và danh sách (cùng mốc giờ VN với chip "Hết hạn"); dữ liệu/lọc không đổi.
+                  components: { Cell: "/components/admin/JobDeadlineDisplay#JobDeadlineCell", afterInput: ["/components/admin/JobDeadlineDisplay#JobDeadlineNotice"] },
+                },
               },
             ],
           },

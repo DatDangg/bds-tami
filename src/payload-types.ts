@@ -81,10 +81,10 @@ export interface Config {
     'private-files': PrivateFile;
     categories: Category;
     developers: Developer;
-    provinces: Province;
-    wards: Ward;
     redirects: Redirect;
     staff: Staff;
+    provinces: Province;
+    wards: Ward;
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
@@ -115,10 +115,10 @@ export interface Config {
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     developers: DevelopersSelect<false> | DevelopersSelect<true>;
-    provinces: ProvincesSelect<false> | ProvincesSelect<true>;
-    wards: WardsSelect<false> | WardsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     staff: StaffSelect<false> | StaffSelect<true>;
+    provinces: ProvincesSelect<false> | ProvincesSelect<true>;
+    wards: WardsSelect<false> | WardsSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
@@ -203,8 +203,6 @@ export interface Lead {
   email?: string | null;
   message?: string | null;
   locale: 'vi' | 'en';
-  consentAt: string;
-  consentVersion: string;
   source: 'rental' | 'property_post' | 'project' | 'contact';
   rental?: (string | null) | Rental;
   propertyPost?: (string | null) | PropertyPost;
@@ -220,6 +218,8 @@ export interface Lead {
   referrer?: string | null;
   ipHash?: string | null;
   userAgent?: string | null;
+  consentAt: string;
+  consentVersion: string;
   activities?: {
     docs?: (string | LeadActivity)[];
     hasNextPage?: boolean;
@@ -328,7 +328,7 @@ export interface Rental {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -350,13 +350,19 @@ export interface Rental {
   rentedAt?: string | null;
   searchText?: string | null;
   status: 'draft' | 'published' | 'hidden' | 'rented';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -376,13 +382,16 @@ export interface Category {
   description?: string | null;
   sortOrder?: number | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
   scopeSlug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -688,7 +697,7 @@ export interface Project {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -708,13 +717,19 @@ export interface Project {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -752,12 +767,15 @@ export interface Developer {
   showAsPartner?: boolean | null;
   sortOrder?: number | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -883,7 +901,7 @@ export interface PropertyPost {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -903,13 +921,19 @@ export interface PropertyPost {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -976,7 +1000,7 @@ export interface News {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -996,13 +1020,19 @@ export interface News {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   isFeatured?: boolean | null;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1050,7 +1080,7 @@ export interface Service {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1071,9 +1101,12 @@ export interface Service {
   };
   status: 'draft' | 'published' | 'hidden';
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1110,9 +1143,12 @@ export interface Page {
   version: string;
   effectiveDate: string;
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1228,7 +1264,7 @@ export interface JobPosting {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -1248,12 +1284,18 @@ export interface JobPosting {
     lastError?: string | null;
   };
   status: 'draft' | 'published' | 'hidden';
+  /**
+   * Tự điền khi xuất bản lần đầu.
+   */
   publishedAt?: string | null;
   author: string | Staff;
   /**
-   * Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…
+   * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
   slug?: string | null;
+  /**
+   * Bật thì website có trang tiếng Anh; hệ thống tự dịch từ bản tiếng Việt.
+   */
   hasEnglish?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1614,20 +1656,20 @@ export interface PayloadLockedDocument {
         value: string | Developer;
       } | null)
     | ({
-        relationTo: 'provinces';
-        value: string | Province;
-      } | null)
-    | ({
-        relationTo: 'wards';
-        value: string | Ward;
-      } | null)
-    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
     | ({
         relationTo: 'staff';
         value: string | Staff;
+      } | null)
+    | ({
+        relationTo: 'provinces';
+        value: string | Province;
+      } | null)
+    | ({
+        relationTo: 'wards';
+        value: string | Ward;
       } | null)
     | ({
         relationTo: 'audit-logs';
@@ -1699,8 +1741,6 @@ export interface LeadsSelect<T extends boolean = true> {
   email?: T;
   message?: T;
   locale?: T;
-  consentAt?: T;
-  consentVersion?: T;
   source?: T;
   rental?: T;
   propertyPost?: T;
@@ -1718,6 +1758,8 @@ export interface LeadsSelect<T extends boolean = true> {
   referrer?: T;
   ipHash?: T;
   userAgent?: T;
+  consentAt?: T;
+  consentVersion?: T;
   activities?: T;
   status?: T;
   lostReason?: T;
@@ -2321,40 +2363,6 @@ export interface DevelopersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "provinces_select".
- */
-export interface ProvincesSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  code?: T;
-  name?: T;
-  shortName?: T;
-  slug?: T;
-  sortOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wards_select".
- */
-export interface WardsSelect<T extends boolean = true> {
-  searchReindexPending?: T;
-  province?: T;
-  code?: T;
-  name?: T;
-  type?: T;
-  slug?: T;
-  legacyNames?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -2392,6 +2400,40 @@ export interface StaffSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provinces_select".
+ */
+export interface ProvincesSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  code?: T;
+  name?: T;
+  shortName?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wards_select".
+ */
+export interface WardsSelect<T extends boolean = true> {
+  searchReindexPending?: T;
+  province?: T;
+  code?: T;
+  name?: T;
+  type?: T;
+  slug?: T;
+  legacyNames?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2670,7 +2712,7 @@ export interface SiteSetting {
    */
   translationEnabled?: boolean | null;
   /**
-   * Thuật ngữ AI luôn dịch cố định như bảng này
+   * Thuật ngữ AI luôn dịch cố định như bảng này. VD: "Căn hộ dịch vụ" → "Serviced Apartment". AI luôn dịch đúng từ này.
    */
   translationGlossary?:
     | {
@@ -2681,7 +2723,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -2701,12 +2743,9 @@ export interface SiteSetting {
     lastError?: string | null;
   };
   /**
-   * Dạng G-XXXXXXXXXX
+   * Lấy ở Google Analytics → Quản trị → Luồng dữ liệu → chọn luồng web → Mã đo lường (dạng G-XXXXXXXXXX).
    */
   gaMeasurementId?: string | null;
-  /**
-   * Tự cập nhật khi xuất bản chính sách bảo mật
-   */
   privacyPolicyVersion?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2954,7 +2993,7 @@ export interface Homepage {
     canonical?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -3012,7 +3051,7 @@ export interface Header {
     link?: string | null;
   };
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;
@@ -3064,7 +3103,7 @@ export interface Footer {
   contactBlock?: string | null;
   copyright?: string | null;
   /**
-   * Hệ thống tự dịch tiếng Việt sang tiếng Anh khi xuất bản; các mục dưới đây chỉ đọc.
+   * Hệ thống tự dịch sang tiếng Anh khi xuất bản.
    */
   translation?: {
     status?: ('none' | 'queued' | 'done' | 'failed' | 'pending_review') | null;

@@ -79,8 +79,7 @@ describe.skipIf(!databaseUrl)("integration: dashboard admin theo quyền (BL-015
   async function contextFor(actor: Actor): Promise<DashboardContext> {
     const user = { ...actor, collection: "staff" as const } as DashboardUser;
     const req = await createLocalReq({ user: user as never }, payload);
-    const { getVisibleEntities } = await import("@payloadcms/ui/shared");
-    return { payload, user, permissions: await getAccessResults({ req }), visibleEntities: getVisibleEntities({ req }) };
+    return { payload, user, permissions: await getAccessResults({ req }) };
   }
 
   const cardCount = (cards: Array<{ id: string; count: number }>, id: string) => cards.find((card) => card.id === id)?.count;
@@ -181,7 +180,7 @@ describe.skipIf(!databaseUrl)("integration: dashboard admin theo quyền (BL-015
     });
   });
 
-  describe("lối tắt, danh sách gần đây, card nhóm", () => {
+  describe("lối tắt, danh sách gần đây, thao tác nhanh", () => {
     it("lối tắt chỉ gồm collection có quyền create: sale không có Dịch vụ / Trang pháp lý / Lịch sử chăm sóc; admin có đủ", async () => {
       const saleSlugs = dashboard.buildShortcuts(await contextFor(sale)).map((shortcut) => shortcut.slug);
       expect(saleSlugs).toEqual(["projects", "rentals", "property-posts", "news", "job-postings"]);
@@ -210,16 +209,20 @@ describe.skipIf(!databaseUrl)("integration: dashboard admin theo quyền (BL-015
       expect(titles.some((title) => title.includes("người khác") || title.includes("đã xoá"))).toBe(false);
     });
 
-    it("card nhóm: sale không thấy Hồ sơ ứng tuyển / Tệp CV / globals ẩn / Nhật ký; admin thấy cả globals", async () => {
-      const saleItems = dashboard.buildNavGroupCards(await contextFor(sale)).flatMap((group) => group.items.map((item) => item.href));
-      expect(saleItems).toContain("/admin/collections/leads");
-      for (const hidden of ["job-applications", "private-files", "audit-logs", "click-events", "translation-usage"]) {
-        expect(saleItems.some((href) => href.endsWith(`/${hidden}`))).toBe(false);
-      }
-      expect(saleItems.some((href) => href.startsWith("/admin/globals/"))).toBe(false);
-      const adminGroups = dashboard.buildNavGroupCards(await contextFor(admin));
-      expect(adminGroups.map((group) => group.label)).toEqual(["Khách hàng", "Nội dung", "Tuyển dụng", "Thư viện", "Dữ liệu nền", "Website", "Hệ thống"]);
-      expect(adminGroups.flatMap((group) => group.items.map((item) => item.href))).toContain("/admin/globals/site-settings");
+    it("thao tác nhanh + Sửa website: admin thấy 3 thẻ và 4 globals; sale không có thẻ phân công, không có Sửa website", async () => {
+      const adminCtx = await contextFor(admin);
+      const adminActions = dashboard.buildQuickActions(adminCtx, await dashboard.loadStatCards(adminCtx));
+      expect(adminActions.map((action) => action.id)).toEqual(["new-rental", "assign-leads", "new-news"]);
+      expect(dashboard.buildWebsiteShortcuts(adminCtx).map((shortcut) => shortcut.href)).toEqual([
+        "/admin/globals/homepage",
+        "/admin/globals/header",
+        "/admin/globals/footer",
+        "/admin/globals/site-settings",
+      ]);
+      const saleCtx = await contextFor(sale);
+      const saleActions = dashboard.buildQuickActions(saleCtx, await dashboard.loadStatCards(saleCtx));
+      expect(saleActions.map((action) => action.id)).toEqual(["new-rental", "new-news"]);
+      expect(dashboard.buildWebsiteShortcuts(saleCtx)).toEqual([]);
     });
   });
 });

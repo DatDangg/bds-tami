@@ -1,0 +1,2 @@
+# builder — feature-admin-form-non-tech-friendly phase-1-task-01
+Đã implement D1–D11 (+ amendments G3/G6/G2/G10): editor chung có thanh công cụ cố định + Hoàn tác/Làm lại, dấu * (markRequired), placeholder tiêu đề, author defaultValue, slug vào khối "Nâng cao", nhóm dịch ẩn trường hệ thống + dòng tóm tắt, mô tả hasEnglish/publishedAt, nút "Thêm mới", vi overrides. Verify xanh. Còn dở: kiểm trực quan trên app (cần đăng nhập). Chưa commit. Chi tiết: "Verification summary" trong task file.

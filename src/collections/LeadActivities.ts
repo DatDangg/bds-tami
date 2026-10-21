@@ -83,7 +83,8 @@ export const LeadActivities: CollectionConfig = {
   admin: {
     useAsTitle: "type",
     defaultColumns: ["lead", "type", "content", "actor", "createdAt"],
-    hidden: ({ user }) => user?.active !== true,
+    // Ẩn khỏi menu (BL-041); form Lead vẫn xem/thêm qua join "Lịch sử chăm sóc" (drawer bỏ qua hidden).
+    hidden: true,
     description: "Ghi chú, cuộc gọi và các thay đổi của lead; chỉ thêm, không sửa/xoá.",
   },
   defaultSort: "-createdAt",

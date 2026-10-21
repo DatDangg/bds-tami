@@ -1,14 +1,15 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 // StatusBadge (dùng ở dashboard) import LinkedCell → @payloadcms/ui kéo file .css mà Node không nạp được; dashboard chỉ dùng phần badge.
 vi.mock("@payloadcms/ui", () => ({ useListDrawerContext: () => ({}), useConfig: () => ({ config: { routes: { admin: "/admin" } } }), Link: () => null }));
 
-import type { NavGroupCard, RecentLead, RecentOwnDoc, Shortcut, StatCard } from "./dashboard-data";
+import type { QuickAction, RecentLead, RecentOwnDoc, Shortcut, StatCard, WebsiteShortcut } from "./dashboard-data";
 import { DashboardHeader } from "./DashboardHeader";
-import { NavGroupCards } from "./NavGroupCards";
+import { QuickActions } from "./QuickActions";
 import { RecentLeadsCard, RecentOwnDocsCard } from "./RecentLists";
 import { StatCards } from "./StatCards";
+import { WebsiteShortcuts } from "./WebsiteShortcuts";
 
 const NOW = new Date("2026-10-19T03:00:00Z");
 
@@ -39,18 +40,49 @@ describe("StatCards", () => {
 });
 
 describe("DashboardHeader", () => {
-  const shortcuts: Shortcut[] = [{ slug: "news", label: "Tin tức", href: "/admin/collections/news/create" }];
-
-  it("lời chào theo giờ + tên + ngày, menu Tạo mới liệt kê lối tắt", () => {
-    render(<DashboardHeader name="Minh" now={NOW} shortcuts={shortcuts} />);
+  it("lời chào theo giờ + tên + ngày", () => {
+    render(<DashboardHeader name="Minh" now={NOW} />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Chào buổi sáng, Minh");
     expect(screen.getByText("Thứ Hai, 19/10/2026")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Tin tức", hidden: true }).getAttribute("href")).toBe("/admin/collections/news/create");
+  });
+});
+
+describe("QuickActions", () => {
+  const actions: QuickAction[] = [
+    { id: "new-rental", label: "Đăng tin cho thuê mới", href: "/admin/collections/rentals/create", icon: "plus" },
+    { id: "assign-leads", label: "Phân công lead (3 chưa giao)", href: "/admin/collections/leads?x", icon: "lead" },
+  ];
+  const more: Shortcut[] = [{ slug: "projects", label: "Dự án", href: "/admin/collections/projects/create" }];
+
+  it("thẻ thao tác là link; 'Tạo loại khác' liệt kê lối tắt còn lại", () => {
+    render(<QuickActions actions={actions} moreShortcuts={more} />);
+    expect(screen.getByRole("link", { name: "Đăng tin cho thuê mới" }).getAttribute("href")).toBe("/admin/collections/rentals/create");
+    expect(screen.getByRole("link", { name: "Phân công lead (3 chưa giao)" }).getAttribute("href")).toBe("/admin/collections/leads?x");
+    expect(screen.getByText("Tạo loại khác")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Dự án", hidden: true }).getAttribute("href")).toBe("/admin/collections/projects/create");
   });
 
-  it("không có quyền tạo nào -> không có nút Tạo mới", () => {
-    render(<DashboardHeader name="Minh" now={NOW} shortcuts={[]} />);
-    expect(screen.queryByText("Tạo mới")).toBeNull();
+  it("không còn lối tắt phụ -> không có 'Tạo loại khác'; không có gì -> không render", () => {
+    const { container, unmount } = render(<QuickActions actions={actions} moreShortcuts={[]} />);
+    expect(screen.queryByText("Tạo loại khác")).toBeNull();
+    unmount();
+    const empty = render(<QuickActions actions={[]} moreShortcuts={[]} />);
+    expect(empty.container.textContent).toBe("");
+    expect(container).toBeTruthy();
+  });
+});
+
+describe("WebsiteShortcuts", () => {
+  it("hàng Sửa website liệt kê globals", () => {
+    const shortcuts: WebsiteShortcut[] = [{ slug: "homepage", label: "Trang chủ", href: "/admin/globals/homepage" }];
+    render(<WebsiteShortcuts shortcuts={shortcuts} />);
+    expect(screen.getByRole("navigation", { name: "Sửa website" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Trang chủ" }).getAttribute("href")).toBe("/admin/globals/homepage");
+  });
+
+  it("rỗng (sale) -> không render", () => {
+    const { container } = render(<WebsiteShortcuts shortcuts={[]} />);
+    expect(container.textContent).toBe("");
   });
 });
 
@@ -94,19 +126,5 @@ describe("RecentLists", () => {
     expect(screen.getByRole("link", { name: "Thị trường quý III" }).getAttribute("href")).toBe("/admin/collections/news/1");
     expect(screen.getByText("Nháp")).toBeTruthy();
     expect(screen.getByText(/Tin tức · 20 phút trước/)).toBeTruthy();
-  });
-});
-
-describe("NavGroupCards", () => {
-  it("mỗi nhóm một card liệt kê mục", () => {
-    const groups: NavGroupCard[] = [{ label: "Khách hàng", items: [{ label: "Lead", href: "/admin/collections/leads" }] }];
-    render(<NavGroupCards groups={groups} />);
-    const nav = screen.getByRole("navigation", { name: "Khách hàng" });
-    expect(within(nav).getByRole("link", { name: "Lead" }).getAttribute("href")).toBe("/admin/collections/leads");
-  });
-
-  it("rỗng -> không render", () => {
-    const { container } = render(<NavGroupCards groups={[]} />);
-    expect(container.textContent).toBe("");
   });
 });

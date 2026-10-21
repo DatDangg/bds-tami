@@ -5,10 +5,11 @@
 // BL-015 (design docs/specs/2026-10-19-admin-ui-saas-design.md): token --admin-* sáng/tối + map thang
 // --theme-elevation-* / radius / border của Payload và restyle điều khiển, bề mặt nằm ở
 // src/components/admin/styles/ (_tokens: giá trị, trùng admin-tokens.ts; _controls: nút/input/select;
-// _surfaces: chữ/nav/popup/alert/login; _lists: bảng/card/tab/pill). File này giữ palette success, nút chính, logo.
+// _surfaces: chữ/nav/popup/alert/login; _forms: ô soạn thảo/dấu */nhãn form; _lists: bảng/card/tab/pill). File này giữ palette success, nút chính, logo.
 @use "../../components/admin/styles/tokens";
 @use "../../components/admin/styles/controls";
 @use "../../components/admin/styles/surfaces";
+@use "../../components/admin/styles/forms";
 @use "../../components/admin/styles/lists";
 @use "../../components/admin/styles/badges";
 @use "../../components/admin/styles/dashboard";

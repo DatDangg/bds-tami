@@ -1,0 +1,143 @@
+{
+  "specVersion": "1.35.0",
+  "scopeVersion": 45,
+  "generatedAt": "2026-10-21T10:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-043 — cột loại dữ liệu admin hiện tên tiếng Việt số ít thay mã thô: \"Loại dữ liệu\" (Nhật ký thao tác, `collection`) và \"Loại nội dung\" (Lượt bấm liên hệ + Thống kê liên hệ theo ngày, `refCollection`); gợi ý \"Tên gọi: …\" ở màn chi tiết; mã lạ hiện nguyên, trống → `—`; lọc/sắp xếp/xuất/API theo giá trị gốc. Không đổi schema.",
+  "workItem": "feature-admin-raw-slug-columns",
+  "backlog": "BL-043",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-20-admin-raw-slug-columns.md",
+  "task": [
+    "tasks/feature-admin-raw-slug-columns/phase-1-task-01.md"
+  ],
+  "reviewReport": ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md",
+  "reviewResults": [
+    {
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "round": 2,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md"
+    }
+  ],
+  "commits": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.34.1-44.json",
+  "specUpdate": "spec/updates/2026-10-21-admin-raw-slug-columns.md",
+  "specRefs": [
+    "FR-ADM-19"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19": "Câu \"Cột loại dữ liệu (BL-043)\": ô `collection` (Nhật ký thao tác) và `refCollection` (Lượt bấm liên hệ, Thống kê liên hệ theo ngày) hiện tên số ít từ `collection-labels.ts`, cả danh sách lẫn chi tiết; mã lạ hiện nguyên, trống → `—`; lọc/sắp xếp/xuất/API theo giá trị gốc; không đổi schema."
+  },
+  "migration": "none — không đổi schema/DB",
+  "changed": {
+    "files": [
+      "src/lib/admin/collection-labels.ts",
+      "src/lib/admin/collection-labels.test.ts",
+      "src/components/admin/CollectionNameCell.tsx",
+      "src/components/admin/CollectionNameCell.test.tsx",
+      "src/components/admin/CollectionNameHint.tsx",
+      "src/collections/AuditLogs.ts",
+      "src/collections/ClickEvents.ts",
+      "src/collections/ClickStatsDaily.ts",
+      "src/app/(payload)/admin/importMap.js",
+      "src/components/admin/collection-name-admin.ts"
+    ],
+    "filesNote": "Commit close-out BL-043 trên branch claude/admin-bl039-043 (xem git log, \"feature-admin-raw-slug-columns\").",
+    "modules": [
+      "Admin — helper `collectionDisplayName` (collection-labels.ts)",
+      "Admin — ô danh sách CollectionNameCell (dựa LinkedCell) + gợi ý chi tiết CollectionNameHint",
+      "Admin — collection AuditLogs, ClickEvents, ClickStatsDaily (Cell/Description component)",
+      "Admin — importMap"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Danh sách Nhật ký thao tác: cột \"Loại dữ liệu\" hiện tên tiếng Việt (vd `leads` → \"Lead\", `rentals` → \"Tin cho thuê\")",
+      "Danh sách Lượt bấm liên hệ + Thống kê liên hệ theo ngày: cột \"Loại nội dung\" hiện tên tiếng Việt",
+      "Màn chi tiết 3 collection trên: ô mã read-only giữ nguyên + dòng \"Tên gọi: <tên>\" ngay dưới"
+    ],
+    "dependents": [
+      "Ô lọc / sắp xếp / xuất / API của 3 collection vẫn theo mã gốc"
+    ],
+    "regression": [
+      "Các ô admin khác dùng LinkedCell (VndCell, ô Sale phụ trách…) hiển thị như trước",
+      "Test quét nhãn admin (collection-labels / label scan) PASS",
+      "Link sang bản ghi chi tiết từ ô đầu tiên danh sách vẫn hoạt động"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL043-01",
+      "viewport": 1440,
+      "steps": "Đăng nhập admin, mở danh sách Nhật ký thao tác; xem cột \"Loại dữ liệu\" với bản ghi có `collection` = `leads`, `rentals`.",
+      "expected": "Hiện \"Lead\", \"Tin cho thuê\" (tên số ít tiếng Việt), không hiện mã thô."
+    },
+    {
+      "id": "BL043-02",
+      "viewport": 1440,
+      "steps": "Mở danh sách Lượt bấm liên hệ và Thống kê liên hệ theo ngày; xem cột \"Loại nội dung\".",
+      "expected": "Hiện tên tiếng Việt số ít của `refCollection` (vd \"Tin cho thuê\", \"Dự án\"); ô trống hiện `—`."
+    },
+    {
+      "id": "BL043-03",
+      "viewport": 1440,
+      "steps": "Mở chi tiết 1 bản ghi Nhật ký thao tác (và 1 Lượt bấm liên hệ).",
+      "expected": "Ô mã read-only giữ giá trị gốc; ngay dưới có dòng \"Tên gọi: <tên>\"."
+    },
+    {
+      "id": "BL043-04",
+      "viewport": 1440,
+      "steps": "Dùng \"Thêm bộ lọc\" trên cột Loại dữ liệu, nhập mã gốc `leads`; sắp xếp theo cột này.",
+      "expected": "Lọc theo mã gốc ra đúng bản ghi; sắp xếp theo giá trị gốc; không lỗi."
+    },
+    {
+      "id": "BL043-05",
+      "viewport": 390,
+      "steps": "Mở danh sách Nhật ký thao tác ở 390px.",
+      "expected": "Cột hiển thị tên tiếng Việt, không tràn ngang trang."
+    }
+  ],
+  "acceptance": [
+    "Cột Loại dữ liệu / Loại nội dung hiện tên tiếng Việt từ collection-labels.ts ở cả 3 danh sách: collection → tên số ít, global (site-settings/homepage/header/footer — nhật ký Dịch lại nội dung) → nhãn global",
+    "Màn chi tiết có gợi ý \"Tên gọi: …\" dưới ô read-only, chỉ hiện khi tên khác mã gốc (mã lạ/rỗng → không hiện)",
+    "Mã không có trong collection-labels hiện nguyên giá trị; rỗng/null → `—`; key prototype (`constructor`…) không bị coi là mã biết",
+    "Lọc/sắp xếp/xuất/API không đổi (giá trị gốc)",
+    "Không đổi schema, không migration"
+  ],
+  "verify": {
+    "test": "pnpm vitest run src/lib/admin src/components/admin — 31 files / 224 tests PASS (reviewer r2)",
+    "typecheck": "PASS",
+    "lint": "0 error (2 warning có sẵn ngoài diff)",
+    "build": "không chạy (residual)"
+  },
+  "outOfScope": [
+    "Đổi ô lọc thành select theo tên (ô lọc vẫn là ô chữ nhập mã gốc)",
+    "Đổi giá trị lưu DB / API / xuất",
+    "Các collection admin khác ngoài AuditLogs, ClickEvents, ClickStatsDaily"
+  ],
+  "openQuestions": [],
+  "viewports": [
+    390,
+    1440
+  ],
+  "locales": [
+    "vi"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "GET /api/audit-logs, /api/click-events, /api/click-stats-daily (admin) → trường `collection`/`refCollection` vẫn là mã gốc (không bị đổi sang tên hiển thị)"
+  ],
+  "risk": "low",
+  "riskNote": "Chỉ đổi hiển thị admin (Cell + Description component) trên 3 collection nội bộ; không schema/quyền/endpoint. Reviewer NORMAL r1 PASS → r2 PASS (D5: thêm nhãn global, hint ẩn khi trùng mã, test assert path). MINOR còn: hằng COLLECTION_NAME_ADMIN nằm ở components/admin (nên ở lib/admin); chưa test khoá collection/global không trùng. Chưa xem trên trình duyệt.",
+  "status": "published"
+}

@@ -4,15 +4,21 @@ import type { Config, Plugin } from "payload";
  * Nhóm menu trái của admin theo nghiệp vụ (BL-015 T03, FR-ADM-19, design §2). Nguồn duy nhất cho tên nhóm,
  * thứ tự nhóm và thứ tự mục trong nhóm — dashboard (T04) dùng lại để dựng card nhóm.
  * Không có icon (Payload 3.91 không hỗ trợ icon nav qua config; chốt design Q4).
+ * `private-files` và `lead-activities` vẫn khai báo ở đây nhưng `admin.hidden: true` nên không hiện trong menu (BL-041).
  */
+/** Nhóm cuối của menu, mặc định thu gọn (NavAdvancedCollapse). */
+export const ADVANCED_NAV_GROUP_LABEL = "Nâng cao";
+
 export const ADMIN_NAV_GROUPS = [
   { label: "Khách hàng", collections: ["leads", "lead-activities"], globals: [] },
   { label: "Nội dung", collections: ["projects", "rentals", "property-posts", "news", "services", "pages"], globals: [] },
   { label: "Tuyển dụng", collections: ["job-postings", "job-applications"], globals: [] },
   { label: "Thư viện", collections: ["media", "private-files"], globals: [] },
-  { label: "Dữ liệu nền", collections: ["categories", "developers", "provinces", "wards"], globals: [] },
+  { label: "Dữ liệu nền", collections: ["categories", "developers"], globals: [] },
   { label: "Website", collections: ["redirects"], globals: ["site-settings", "homepage", "header", "footer"] },
-  { label: "Hệ thống", collections: ["staff", "audit-logs", "click-events", "click-stats-daily", "translation-usage"], globals: [] },
+  { label: "Hệ thống", collections: ["staff"], globals: [] },
+  // Mục kỹ thuật/hiếm dùng (BL-041): nhóm cuối, mặc định thu gọn (NavAdvancedCollapse).
+  { label: ADVANCED_NAV_GROUP_LABEL, collections: ["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "translation-usage"], globals: [] },
 ] as const satisfies readonly { label: string; collections: readonly string[]; globals: readonly string[] }[];
 
 export type AdminNavGroupLabel = (typeof ADMIN_NAV_GROUPS)[number]["label"];

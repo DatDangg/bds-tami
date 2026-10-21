@@ -1,7 +1,8 @@
 import type { CollectionConfig, DateField, FieldAccess, GroupField, SelectField, TextField } from "payload";
 
 import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
-import { requiredByLocale } from "../fields/required-by-locale";
+import { withPriceInWords } from "../fields/form-hints";
+import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { RENTAL_STATUSES } from "../fields/status";
 import { titleField } from "../fields/title";
@@ -20,7 +21,7 @@ import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
-import { hideTechnicalListFilters } from "../lib/admin/list-filter";
+import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 import { RENTAL_AMENITIES } from "../shared/types/api";
 
@@ -84,7 +85,8 @@ const codeField: TextField = {
   required: true,
   unique: true,
   access: { create: denyAll, update: denyAll },
-  admin: { readOnly: true, position: "sidebar" },
+  // Mã hiện to ở đầu form (`codeBanner`); field giữ dữ liệu + cột + tìm kiếm nhưng không vẽ ô nhập riêng ở sidebar (BL-042 #13).
+  admin: { readOnly: true, position: "sidebar", components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeHiddenField" } },
 };
 
 /** Thời điểm chuyển sang `rented`, hệ thống ghi (hook `stampRentedAt`). */
@@ -145,7 +147,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
         listSearchableFields: ["code", "title", "address"],
         // Chip lọc nhanh (BL-022) nằm trước ô "Trạng thái dịch" mà withContentDefaults nối thêm; slot server ẩn ở thùng rác.
         components: { beforeListTable: ["/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot"] },
-        defaultColumns: ["gallery", "code", "title", "category", "priceMonthlyVnd", "status", "author"],
+        defaultColumns: ["gallery", "code", "title", "category", "roomsArea", "project", "priceMonthlyVnd", "status", "author"],
         description: "Tin cho thuê căn hộ/nhà: vị trí, giá, diện tích, nội thất và điều kiện thuê. Mã tin tự sinh.",
       },
       defaultSort: "-publishedAt",
@@ -157,13 +159,16 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
       },
       fields: [
         codeField,
+        // Cột ghép của danh sách (BL-039): `ui` không có cột DB, không hiện ở form, không sắp xếp/lọc; Cell đọc `rowData`.
+        { name: "roomsArea", type: "ui", label: "Phòng · diện tích", admin: { components: { Cell: "/components/admin/ListSummaryCells#RoomsAreaCell" } } },
+        { name: "codeBanner", type: "ui", label: "Mã tin", admin: { components: { Field: "/components/admin/RentalCodeDisplay#RentalCodeBanner" } } },
         formTabs([
           {
             label: "Nội dung",
             fields: [
-              titleField(),
+              titleField({ placeholder: "VD: Căn hộ 2PN view sông, đủ nội thất" }),
               scopedCategoryField("rental"),
-              { name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") },
+              markRequired({ name: "description", type: "richText", label: "Mô tả", localized: true, validate: requiredByLocale("Mô tả không được để trống.") }),
               { name: "legalNote", type: "textarea", label: "Ghi chú pháp lý", localized: true },
             ],
           },
@@ -188,7 +193,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
               { name: "showExactAddress", type: "checkbox", label: "Cho khách xem địa chỉ chính xác", defaultValue: false },
               { name: "location", type: "point", label: "Toạ độ bản đồ", access: { read: readExactAddress } },
               formRow(
-                { name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } },
+                withPriceInWords({ name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }),
                 { name: "priceNegotiable", type: "checkbox", label: "Giá thương lượng", defaultValue: false },
               ),
               formRow(
@@ -232,7 +237,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
     },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, showExactAddress, videoUrl, rentalTerms.includedServices, searchText ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFilters(collection, ["address", "showExactAddress", "videoUrl", "rentalTerms.includedServices", "searchText"]);
+  return hideTechnicalListFields(collection, ["address", "showExactAddress", "videoUrl", "rentalTerms.includedServices", "searchText"]);
 }
 
 export const Rentals = createRentals();

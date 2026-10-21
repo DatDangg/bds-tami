@@ -3,6 +3,8 @@ import { fileTypeFromBuffer } from "file-type";
 import { APIError } from "payload";
 import type { CollectionBeforeOperationHook } from "payload";
 
+import { ORIGINAL_UPLOAD_NAME_KEY } from "./alt-from-filename";
+
 const MB = 1024 * 1024;
 
 interface AllowedType {
@@ -83,6 +85,8 @@ export function createUploadGuard(policy: UploadPolicy): CollectionBeforeOperati
       return args;
     }
     const { mime, extension } = await inspectUpload(file.data, policy);
+    // Tên người dùng đặt chỉ để hook `fillImageAlt` (chạy sau bước đổi tên này) dựng alt; không bao giờ được lưu làm tên file.
+    args.req.context[ORIGINAL_UPLOAD_NAME_KEY] = file.name;
     file.name = `${randomUUID()}.${extension}`;
     file.mimetype = mime;
     return args;

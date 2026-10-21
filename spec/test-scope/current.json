@@ -1,120 +1,37 @@
 {
-  "specVersion": "1.35.0",
-  "scopeVersion": 45,
-  "generatedAt": "2026-10-21T23:00:00+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-045 close-out — các trang còn lại làm lại giao diện theo phong cách trang chủ mới (BL-044): hero trang con 2 cỡ + breadcrumb trên ảnh (token `--blur-breadcrumb`), thẻ lọc nổi đè hero, thẻ dùng chung kiểu \"Dự án nổi bật\" + bỏ icon tim mọi màn (kể cả trang chủ), khung chi tiết mới (ảnh lớn kiểu hero + khối tiêu đề nổi có dải thông số + mục thẻ trắng + slider tương tự), Tin tức / Đăng tin BĐS / Bài viết / Tuyển dụng / Liên hệ / Pháp lý / Dịch vụ theo mockup; `/du-an` thêm `q` / `developer` / `sort`; site-settings thêm `pageHeroes`, `careersPerks`, ảnh Liên hệ / Pháp lý, cờ `showProjectStrengths` (migration additive `20261020_183923_site_redesign_page_heroes`). Build xong 10 task T00–T09 trên staging, mọi reviewer STRICT PASS; phase review r1 GAPS FOUND (GAP-1 bài nổi bật danh mục tin, GAP-2 lưới 4 cột) → sửa ở T09; phase review r2 do dispatcher chạy sau publish. Spec 1.35.0 giữ nguyên (as-built AB-1..AB-8 ghi trước khi 1.35.0 được commit lần đầu → không cần PATCH). Scope v45 planned → published (v45 chưa từng commit / bàn giao nên không tăng số).",
-  "workItem": "feature/site-redesign-homepage-style",
-  "backlog": "BL-045",
+  "specVersion": "1.39.0",
+  "scopeVersion": 49,
+  "generatedAt": "2026-10-21T23:30:00+07:00",
+  "trigger": "merge",
+  "triggerNote": "Gộp nhánh claude/admin-bl039-043 vào staging: scope = BL-045 (v45, site công khai theo phong cách trang chủ) ∪ BL-043/041/039/042 (v48, admin). Test lại cả hai phần trên cùng build.",
+  "workItem": [
+    "feature/site-redesign-homepage-style",
+    "feature-admin-form-non-tech-friendly"
+  ],
+  "backlog": [
+    "BL-045",
+    "BL-043",
+    "BL-041",
+    "BL-039",
+    "BL-042"
+  ],
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-21-site-redesign-homepage-style.md",
-  "mockup": [
-    "docs/specs/site-redesign-mockup/index.html",
-    "docs/specs/site-redesign-mockup/DECISIONS.md"
+  "changeDoc": [
+    "spec/changes/2026-10-21-site-redesign-homepage-style.md",
+    "spec/changes/archive/2026-10-20-admin-form-non-tech-friendly.md"
   ],
-  "task": [
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-00.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-01.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-02.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-03.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-04.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-05.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-06.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-07.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-08.md",
-    "tasks/feature-site-redesign-homepage-style/phase-1-task-09.md"
-  ],
-  "taskPlan": {
-    "T00": "`/du-an` tham số `q` / `developer` / `sort` + metadata noindex (ADDITIVE, STRICT) — wave A",
-    "T01": "Nền tảng A: schema `site-settings` + migration additive, PageHero 2 cỡ, Breadcrumb overlay/plain + token, CategoryListTemplate slot thẻ lọc, Pagination tròn, SectionHeading, ConsultBanner, i18n chung — wave A",
-    "T02": "Nền tảng B: ProjectCard / RentalCard / NewsCard / PostCard kiểu \"Dự án nổi bật\", bỏ tim mọi màn, CardSlider dùng chung — wave A",
-    "T03": "Danh sách Dự án + Cho thuê + danh mục Cho thuê (hero danh sách, thẻ lọc nổi, toolbar, lưới, Điểm mạnh, banner) — wave B (sau T00/T01/T02)",
-    "T04": "Khung chi tiết mới (DetailGalleryHero, DetailTitleCard, sectionStyle cards) + Chi tiết Dự án — wave B",
-    "T05": "Chi tiết Cho thuê + chi tiết Đăng tin BĐS (Q4) — wave C (sau T04)",
-    "T06": "Tin tức danh sách / danh mục (Q2) + Bài viết (Q3) + danh sách Đăng tin BĐS (Q4) — wave B",
-    "T07": "Tuyển dụng danh sách + chi tiết (Q5, Q9) + Liên hệ + Chính sách / Điều khoản + Dịch vụ — wave B",
-    "T08": "Close-out: seed dev `pnpm seed:page-heroes`, so khớp toàn site 1440/390, AA breadcrumb ảnh thật, quét hồi quy, doc reconcile — cuối",
-    "T09": "Fix GAP-1/GAP-2 phase review r1: bài nổi bật trang 1 danh mục Tin tức / Tin BĐS (không trùng / mất bài ở trang sau) + lưới Tin tức / Tin BĐS 4 cột ≥ xl; xem thật /en (GAP-4) — sau T08"
+  "mergedScopes": {
+    "BL-045": "spec/test-scope/archive/test-scope-1.35.0-45-bl045.json",
+    "BL-042 (+BL-043/041/039)": "spec/test-scope/archive/test-scope-1.38.0-48.json"
   },
-  "reviewReport": [
-    ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-pre-plan.md",
-    ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-pre-plan-round-2.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-00-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-02-round-2-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-03-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-04-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-05-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-06-round-1-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-07-round-2-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-08-round-2-review.md",
-    ".context/review-reports/feature-site-redesign-homepage-style-phase-1-task-09-round-1-review.md",
-    ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1.md"
+  "previousScope": [
+    "spec/test-scope/archive/test-scope-1.35.0-45-bl045.json",
+    "spec/test-scope/archive/test-scope-1.38.0-48.json"
   ],
-  "commits": [
-    {
-      "task": "phase-1-task-00",
-      "sha": "389a816",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-01",
-      "sha": "72623dc",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-02",
-      "sha": "8f586a5",
-      "review": "STRICT PASS",
-      "round": 2
-    },
-    {
-      "task": "phase-1-task-03",
-      "sha": "a3d51de",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-04",
-      "sha": "6953d10",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-05",
-      "sha": "0f7a025",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-06",
-      "sha": "adfff04",
-      "review": "STRICT PASS",
-      "round": 1
-    },
-    {
-      "task": "phase-1-task-07",
-      "sha": "b77840d",
-      "review": "STRICT PASS",
-      "round": 2
-    },
-    {
-      "task": "phase-1-task-08",
-      "sha": "6a747fe",
-      "review": "STRICT PASS",
-      "round": 2
-    },
-    {
-      "task": "phase-1-task-09",
-      "sha": "2c63564",
-      "review": "STRICT PASS",
-      "round": 1
-    }
+  "specUpdate": [
+    "spec/updates/2026-10-21-site-redesign-homepage-style.md",
+    "spec/updates/2026-10-21-admin-form-non-tech-friendly.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.34.1-44.json",
-  "specUpdate": "spec/updates/2026-10-21-site-redesign-homepage-style.md",
   "specRefs": [
     "Giao diện (Overview — khối BL-045)",
     "FR-PUB-01",
@@ -130,7 +47,8 @@
     "FR-PUB-11",
     "FR-PUB-14",
     "FR-ADM-20",
-    "Khung trang"
+    "Khung trang",
+    "FR-ADM-19"
   ],
   "specRefNotes": {
     "Giao diện (Overview — khối BL-045)": "Khối \"Giao diện toàn site theo phong cách trang chủ mới (BL-045 …)\" — breadcrumb trên ảnh, hero trang con, trang danh sách, thẻ dùng chung, trang chi tiết, Tin tức, Bài viết, Tuyển dụng, Liên hệ, Chính sách / Điều khoản, Dịch vụ, banner tư vấn + footer. Các đoạn cũ bị thay mang nhãn \"(bố cục thay bởi BL-045)\".",
@@ -147,9 +65,13 @@
     "FR-PUB-11": "F7 Liên hệ: hero thấp + thông tin icon tròn + form lead source=contact trong thẻ trắng nổi (giữ trường) + bản đồ; không banner tư vấn.",
     "FR-PUB-14": "F7 Chính sách / Điều khoản: hero thấp ảnh Pháp lý + mục lục dính trái + nội dung thẻ trắng; BR-08 (EN chưa duyệt ẩn /en) giữ.",
     "FR-ADM-20": "site-settings: pageBanners đổi nhãn \"Ảnh banner trang con\" + contact + legal (không localized); pageHeroes.{projects,rentals,news,propertyPosts,careers,contact}.{eyebrow,title,titleAccent,description} localized (trống → i18n mặc định, h1 luôn có); careersPerks 2–6 mục (icon STRENGTH_ICONS, title localized bắt buộc, description); showProjectStrengths (mặc định bật).",
-    "Khung trang": "Breadcrumb overlay trên ảnh / plain (Bài viết), ngăn ›, JSON-LD BreadcrumbList + \"> 3 mục < md chỉ ← mục cha\" giữ; Bài viết header hành vi thường (không ẩn khi cuộn); banner tư vấn dùng chung (homepage.ctaBanner, không phụ thuộc enabled) + footer BL-044."
+    "Khung trang": "Breadcrumb overlay trên ảnh / plain (Bài viết), ngăn ›, JSON-LD BreadcrumbList + \"> 3 mục < md chỉ ← mục cha\" giữ; Bài viết header hành vi thường (không ẩn khi cuộn); banner tư vấn dùng chung (homepage.ctaBanner, không phụ thuộc enabled) + footer BL-044.",
+    "FR-ADM-19": "Câu \"Form dễ dùng cho người không rành công nghệ (BL-042)\": nhãn không đuôi ngôn ngữ; richText thanh công cụ cố định + Hoàn tác/Làm lại, khung viền, gợi ý tiếng Việt, không \"/\"/\"+\"/tay kéo; * mọi trường bắt buộc (cả theo ngôn ngữ/danh mục; hiện cả ở bản EN); lỗi tại ô bằng câu tiếng Việt; placeholder ví dụ; Người tạo tự điền (chỉ admin đổi); Đường dẫn trang trong khối thu gọn \"Nâng cao\"; Có bản tiếng Anh có giải thích; bản dịch 1 dòng tóm tắt + \"Dịch lại bằng AI\"; thanh nút \"Thêm <tên mục> mới\" (H1 vẫn \"[Chưa đặt tên]\"); nút \"Thêm mới\" cạnh ô quan hệ; Ngày xuất bản có mô tả. Bộ đếm Mô tả ngắn/Tóm tắt 150–200; gợi ý Pháp lý/Chính sách; giá VNĐ đọc bằng chữ; nút Hôm nay; Danh mục đúng loại. Lead / Cho thuê / Tin tuyển dụng / Cấu hình chung / Ảnh (alt tự điền khi tải mới)."
   },
-  "migration": "additive, versioned — `migrations/20261020_183923_site_redesign_page_heroes.ts` (+ .json, đăng ký `migrations/index.ts`) (T01): up chỉ ADD COLUMN / CREATE TABLE (locales, careersPerks) / CREATE TYPE / FK / INDEX cho `site-settings` pageBanners.contact / legal, pageHeroes (localized), careersPerks, showProjectStrengths (default true); DROP chỉ ở down. Không HIGH_RISK_MIGRATION. T00 `/du-an` không migration. Staging/prod: chạy `payload migrate` theo flow dev → staging verify → prod; chữ hero / careersPerks / ảnh Liên hệ-Pháp lý admin tự nhập (seed chỉ dev).",
+  "migration": {
+    "BL-045": "additive, versioned — `migrations/20261020_183923_site_redesign_page_heroes.ts` (+ .json, đăng ký `migrations/index.ts`) (T01): up chỉ ADD COLUMN / CREATE TABLE (locales, careersPerks) / CREATE TYPE / FK / INDEX cho `site-settings` pageBanners.contact / legal, pageHeroes (localized), careersPerks, showProjectStrengths (default true); DROP chỉ ở down. Không HIGH_RISK_MIGRATION. T00 `/du-an` không migration. Staging/prod: chạy `payload migrate` theo flow dev → staging verify → prod; chữ hero / careersPerks / ảnh Liên hệ-Pháp lý admin tự nhập (seed chỉ dev).",
+    "BL-042": "none — không đổi schema/DB (payload-types.ts chỉ đổi thứ tự consentAt/consentVersion trong Lead + comment mô tả; trường ui không có cột DB)"
+  },
   "changed": {
     "files": [
       ".gitignore",
@@ -280,9 +202,74 @@
       "src/lib/rentals/rental-detail-sections.ts",
       "src/lib/search/url-params.ts",
       "src/lib/translation/leaves.ts",
-      "src/payload-types.ts"
+      "src/payload-types.ts",
+      "src/app/(payload)/admin/importMap.js",
+      "src/app/(payload)/custom.scss",
+      "src/collections/JobPostings.ts",
+      "src/collections/Leads.ts",
+      "src/collections/Media.ts",
+      "src/collections/News.ts",
+      "src/collections/Pages.ts",
+      "src/collections/Projects.ts",
+      "src/collections/PropertyPosts.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/Services.ts",
+      "src/collections/_shared/content-defaults.ts",
+      "src/collections/_shared/content-defaults.test.ts",
+      "src/collections/form-friendly.test.ts",
+      "src/collections/form-friendly-ops.test.ts",
+      "src/collections/leads-form.test.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/components/admin/JobDeadlineDisplay.tsx",
+      "src/components/admin/LeadContactButtons.tsx",
+      "src/components/admin/LeadFormDisplay.tsx",
+      "src/components/admin/LeadFormDisplay.test.tsx",
+      "src/components/admin/PriceInWords.tsx",
+      "src/components/admin/RentalCodeDisplay.tsx",
+      "src/components/admin/RentalJobSettingsDisplay.test.tsx",
+      "src/components/admin/SiteSettingsDisplay.tsx",
+      "src/components/admin/SummaryCounter.tsx",
+      "src/components/admin/SummaryCounter.test.tsx",
+      "src/components/admin/TodayButton.tsx",
+      "src/components/admin/TranslationSummary.tsx",
+      "src/components/admin/TranslationSummary.test.tsx",
+      "src/components/admin/lexical/HistoryFeatureClient.tsx",
+      "src/components/admin/styles/_forms.scss",
+      "src/fields/author.ts",
+      "src/fields/form-friendly.test.ts",
+      "src/fields/form-hints.ts",
+      "src/fields/published-at.ts",
+      "src/fields/required-by-locale.ts",
+      "src/fields/scoped-category.ts",
+      "src/fields/slug.ts",
+      "src/fields/title.ts",
+      "src/fields/translation.ts",
+      "src/hooks/media/default-alt.ts",
+      "src/hooks/media/default-alt.test.ts",
+      "src/lib/admin/clipboard.ts",
+      "src/lib/admin/form-hints.ts",
+      "src/lib/admin/form-hints.test.ts",
+      "src/lib/admin/form-layout.test.ts",
+      "src/lib/admin/job-deadline.ts",
+      "src/lib/admin/job-deadline.test.ts",
+      "src/lib/admin/lead-contact.ts",
+      "src/lib/admin/lead-contact.test.ts",
+      "src/lib/admin/list-summary.ts",
+      "src/lib/admin/payload-vi-overrides.ts",
+      "src/lib/admin/payload-vi-overrides.test.ts",
+      "src/lib/admin/rich-text-editor.ts",
+      "src/lib/admin/rich-text-editor.test.ts",
+      "src/lib/careers/deadline.ts",
+      "src/lib/translation/admin-ui.ts",
+      "src/lib/upload/alt-from-filename.ts",
+      "src/lib/upload/alt-from-filename.test.ts",
+      "src/lib/upload/original-name-context.test.ts",
+      "src/lib/upload/validate-file.ts",
+      "src/payload.config.ts",
+      "tests/integration/media-upload.test.ts",
+      "SPECIFICATIONS.md",
+      "docs/specs/2026-10-19-admin-ui-saas-design.md"
     ],
-    "filesNote": "Danh sách thật theo 10 commit task T00–T09 (git show --name-only, bỏ file test, task file, .context, ảnh mockup). Commit merge worktree (e07a160, e0768a5, ffc31b8, 463a9eb, d50319c, 5d089ac, 561e03f, 4200bcd) không thêm file. File mới: PageHero, SectionHeading, ConsultBanner, CardSlider, DetailGalleryHero, DetailGalleryParts, DetailTitleCard, DetailSection, DetailShareButton, NewsArticleSidebar, ProjectSortControl, RentalVideoButton, page-heroes, careers-perks, load-careers-perks, load-project-strengths, seed-page-heroes, seed-galleries, migration 20261020_183923_site_redesign_page_heroes. PageBanner giữ cho 404.",
     "modules": [
       "Lọc `/du-an` — tham số q / developer / sort + danh sách chủ đầu tư + metadata noindex (T00)",
       "CMS — global site-settings: pageBanners contact/legal, pageHeroes, careersPerks, showProjectStrengths + migration additive (T01)",
@@ -295,7 +282,14 @@
       "Tuyển dụng / Liên hệ / Pháp lý / Dịch vụ (T07)",
       "Seed dev + so khớp + doc reconcile (T08)",
       "Bài nổi bật trang danh mục Tin tức / Tin BĐS + lưới 4 cột ≥ xl (T09 — news-listing, post-listing, post-queries, NewsListBody, PostListBody)",
-      "i18n vi/en chuỗi hero / breadcrumb / phân trang / toolbar / banner tư vấn / namespace từng trang"
+      "i18n vi/en chuỗi hero / breadcrumb / phân trang / toolbar / banner tư vấn / namespace từng trang",
+      "Admin — nền chung mọi form (rich-text-editor.ts createRichTextEditor + HistoryFeatureClient, _forms.scss nhãn/khung/*, required-by-locale markRequired, title placeholder, author defaultValue, content-defaults advancedSidebarBlock, translation.ts + TranslationSummary, payload-vi-overrides creatingNewLabel/untitled)",
+      "Admin — gợi ý nhập liệu (form-hints SummaryCounter, PriceInWords formatPriceInWords, TodayButton, placeholder Pháp lý/Chính sách)",
+      "Admin — form Lead (Leads.ts collapsible marketing, LeadFormDisplay activitySummary/locale/link, LeadContactButtons, lead-contact.ts tel/Zalo/mailto)",
+      "Admin — form Cho thuê (RentalCodeDisplay codeBanner + clipboard.ts)",
+      "Admin — Tin tuyển dụng (job-deadline.ts isJobPostingExpired, JobDeadlineDisplay form afterInput + Cell cột Hạn nộp)",
+      "Admin — Cấu hình chung (SiteSettings.ts + SiteSettingsDisplay)",
+      "Media — alt tự điền khi tải ảnh mới (validate-file.ts originalUploadName, hooks/media/default-alt.ts fillImageAlt, alt-from-filename.ts)"
     ]
   },
   "impact": {
@@ -318,7 +312,18 @@
       "`/dich-vu/[slug]`: hero thấp ảnh bìa dịch vụ + nội dung thẻ trắng + thẻ tư vấn dính (tel: + Nhận tư vấn → /lien-he, không form) + banner tư vấn chữ trái",
       "Banner tư vấn cuối mọi trang (trừ Liên hệ / Chính sách): nội dung homepage.ctaBanner theo locale kể cả khi khối tắt ở trang chủ; thiếu chữ → i18n; thiếu ảnh → nền tối; tiêu đề + mô tả đi theo cặp: có tiêu đề admin mà trống mô tả → không hiện mô tả mặc định (AB-6)",
       "Admin Cài đặt website tab Ảnh banner: nhãn \"Ảnh banner trang con\", ảnh Liên hệ + Pháp lý, nhóm chữ hero 6 trang có bản EN, careersPerks 2–6 mục, cờ Hiện dải Điểm mạnh ở trang Dự án (mặc định bật)",
-      "Migration 20261020_183923_site_redesign_page_heroes: up sạch trên DB có dữ liệu, chỉ additive, down xoá được"
+      "Migration 20261020_183923_site_redesign_page_heroes: up sạch trên DB có dữ liệu, chỉ additive, down xoá được",
+      "Mọi form tạo/sửa collection nội dung + globals (Dự án, Tin tức, Tin BĐS, Cho thuê, Dịch vụ, Trang, Chủ đầu tư, Danh mục, Tuyển dụng, Header/Footer/Trang chủ/Cấu hình chung): nhãn không còn \"— Tiếng Việt\"; dấu * cho trường bắt buộc; placeholder tiêu đề theo collection",
+      "Mọi ô richText: thanh công cụ cố định luôn hiện (Đậm, Nghiêng, Tiêu đề, Danh sách, Liên kết, Chèn ảnh, Hoàn tác, Làm lại), khung viền như ô khác, gợi ý \"Nhập nội dung tại đây…\", không còn \"nhấn '/'\", nút \"+\", tay kéo",
+      "Cột phải: \"Người tạo\" tự điền người đăng nhập (sale không đổi được, admin đổi được); \"Đường dẫn trang\" nằm trong khối thu gọn \"Nâng cao\" (mặc định đóng); \"Có bản tiếng Anh\" có câu giải thích; \"Ngày xuất bản\" có mô tả tự điền",
+      "Tab Bản dịch: chỉ 1 dòng \"Tình trạng bản tiếng Anh\" (lỗi hiện câu tiếng Việt) + nút \"Dịch lại bằng AI\" / \"Duyệt bản EN\"; không còn hash nguồn/mô hình AI/mã lỗi",
+      "Màn tạo mới: thanh nút \"Thêm Dự án mới\" (… theo tên mục); nút thêm nhanh cạnh ô quan hệ có chữ \"Thêm mới\" (≥ 44px ở ≤ 767px)",
+      "Dự án: bộ đếm Mô tả ngắn (gợi ý 150–200, cũng ở Dịch vụ, Tin tức, Tin BĐS Tóm tắt); giá đọc bằng chữ \"≈ 3,5 tỷ đồng\" (cũng ở Cho thuê, Tin BĐS, bảng giá, lương Tuyển dụng); nút \"Hôm nay\" ở Ngày cập nhật bảng giá; chữ gợi ý Tổng quan/Pháp lý/Chính sách; ô Danh mục chỉ danh mục Dự án",
+      "Lead: khối thu gọn \"Dữ liệu chiến dịch marketing\" (UTM + Trang gửi/đến rút gọn); đồng ý chính sách cuối tab Nguồn chỉ đọc; 1 dòng tóm tắt hoạt động; không hiện anonymizedAt + mốc thời gian ở form; nút Gọi / Zalo / Gửi email; ngôn ngữ khách là nhãn",
+      "Cho thuê: mã CT-… to đầu form + nút Sao chép",
+      "Tin tuyển dụng: badge \"Đã quá hạn\" ở form và cột Hạn nộp khi hạn trước hôm nay (giờ VN)",
+      "Cấu hình chung: phiên bản chính sách bảo mật là nhãn nhỏ; ô mã GA có chỉ dẫn lấy mã; bảng thuật ngữ dịch có ví dụ",
+      "Media: tải ảnh mới trống alt → lưu được, alt = tên file gốc đã làm sạch (UUID/toàn số → \"Hình ảnh\"); sửa ảnh cũ xoá alt → vẫn báo lỗi"
     ],
     "dependents": [
       "Lọc / URL / canonical / noindex / phân trang `/cho-thue`, `/cho-thue/danh-muc/*`, `/cho-thue/khu-vuc/*` (url-params, rental-search-sql dùng chung) — hành vi không đổi, chỉ bố cục",
@@ -334,7 +339,14 @@
       "`DetailLayout` biến thể một thẻ vẫn đúng cho trang chưa đổi",
       "PageBanner trang 404 không đổi",
       "Bản dịch tự động (leaves) cho field localized mới của site-settings nếu áp dụng",
-      "Revalidate / cache tag site-settings + homepage khi admin sửa chữ hero / ctaBanner"
+      "Revalidate / cache tag site-settings + homepage khi admin sửa chữ hero / ctaBanner",
+      "Job dịch tự động vẫn ghi/đọc translation.* (chỉ ẩn ở form) — Dịch lại / Duyệt bản EN chạy như trước",
+      "Hook defaultToCreator + quyền đổi tác giả (chỉ admin) giữ; API tạo không truyền author vẫn được gán người tạo",
+      "Validator alt vẫn là lưới an toàn khi sửa metadata ảnh cũ; PDF không cần alt",
+      "Upload guard đổi tên UUID: tên gốc ghi vào req.context trước khi đổi — alt lấy theo tên gốc, không theo UUID",
+      "Mốc Lead (firstContactedAt/lastActivityAt/mergedCount/remindedAt/anonymizedAt) vẫn chọn được làm cột/bộ lọc danh sách (BL-039)",
+      "Badge Tuyển dụng dùng cùng mốc startOfVietnamDay với chip Đang tuyển/Hết hạn (BL-039) và trang tuyển dụng công khai",
+      "Test quét nhãn admin (admin-labels.test.ts) — 3 trường ui mới có label"
     ],
     "regression": [
       "`/du-an` không tham số mới: kết quả, phân trang, canonical, index như trước",
@@ -347,7 +359,14 @@
       "Trang chủ BL-044 khác (hero, ô tìm kiếm, Điểm mạnh, Về TAMI, banner, footer) không đổi ngoài bỏ tim",
       "Header kính mờ phẳng/nổi (BL-025) ở trang danh sách có hero mới; trang chi tiết ẩn khi cuộn",
       "404 + trang pháp lý EN chưa duyệt (BR-08)",
-      "Không lỗi console; pnpm test / typecheck / lint / build PASS"
+      "Không lỗi console; pnpm test / typecheck / lint / build PASS",
+      "Danh sách admin BL-039: menu Hiển thị cột / Thêm bộ lọc, chip lọc nhanh, cột Quy mô/Khoảng giá/Phòng · diện tích/Thuộc dự án không đổi",
+      "Chip Lead/Cho thuê (BL-022), xuất Excel lead, Lọc dịch (BL-016) vẫn chạy",
+      "Sidebar BL-041 (nhóm Nâng cao, Xem website) không đổi",
+      "Lưu/xuất bản nội dung, slug tự sinh + trùng tự thêm -2, URL công khai không đổi",
+      "Alt ảnh trên web công khai (ResponsiveImage, Lightbox, view-model dự án/tin/cho thuê, ảnh OG) vẫn có alt",
+      "Trang tuyển dụng công khai vẫn ẩn tin hết hạn; frontend /en bình thường",
+      "Sale chỉ thấy/sửa lead được giao như trước (nút liên hệ chỉ đọc form state, không fetch)"
     ]
   },
   "uiTestCases": [
@@ -446,6 +465,120 @@
       "viewport": 1440,
       "steps": "Admin homepage.ctaBanner: nhập tiêu đề, để trống mô tả; xem banner cuối `/du-an`, chi tiết cho thuê, chi tiết tin BĐS, `/tin-tuc`.",
       "expected": "Banner hiện tiêu đề admin, không mô tả (cặp AB-6); chi tiết dự án / cho thuê / tin BĐS nút → #lead-form + nút gọi hotline khi có số; trang khác nút → /lien-he."
+    },
+    {
+      "id": "BL042-01",
+      "viewport": 1440,
+      "steps": "Admin, mở /admin/collections/projects/create; xem nhãn các trường dịch được (Tiêu đề, Mô tả ngắn, Pháp lý…).",
+      "expected": "Nhãn không còn đuôi \"— Tiếng Việt\"/\"— vi\"; ô ngôn ngữ thanh trên hiện \"Tiếng Việt\"; thanh nút hiện \"Thêm Dự án mới\" (H1 \"[Chưa đặt tên]\" là residual, không tính lỗi)."
+    },
+    {
+      "id": "BL042-02",
+      "viewport": 1440,
+      "steps": "Ở form Dự án và Tin tức, bấm vào ô Tổng quan / Nội dung khi trống; dùng thanh công cụ: đậm, nghiêng, tiêu đề, danh sách, liên kết, chèn ảnh; gõ rồi bấm Hoàn tác, Làm lại.",
+      "expected": "Thanh công cụ luôn hiện (không cần chọn chữ); ô có khung viền như ô khác; gợi ý tiếng Việt khi trống, không có \"nhấn '/'\", nút \"+\" hay tay kéo; Hoàn tác/Làm lại chạy và mờ khi không còn bước."
+    },
+    {
+      "id": "BL042-03",
+      "viewport": 1440,
+      "steps": "Form tạo Dự án: không nhập Tiêu đề, Mô tả ngắn, Danh mục; bấm Lưu. Chuyển ô ngôn ngữ sang English (chưa bật Có bản tiếng Anh) rồi lưu.",
+      "expected": "Các trường bắt buộc có dấu *; lỗi hiện tại ô (khung báo đỏ) bằng câu tiếng Việt; ở bản English dấu * vẫn hiện nhưng chỉ chặn lưu khi đã bật \"Có bản tiếng Anh\"."
+    },
+    {
+      "id": "BL042-04",
+      "viewport": 1440,
+      "steps": "Tạo mới Dự án / Tin tức / Tin BĐS / Dịch vụ; xem placeholder Tiêu đề, Mô tả ngắn, Địa chỉ, Thời gian bàn giao.",
+      "expected": "Có chữ gợi ý ví dụ (vd Dự án \"VD: Vinhomes Grand Park\"); không chèn sẵn nội dung."
+    },
+    {
+      "id": "BL042-05",
+      "viewport": 1440,
+      "steps": "Đăng nhập sale, tạo Tin tức; xem ô Người tạo. Đăng nhập admin, tạo tin, đổi Người tạo sang người khác rồi lưu.",
+      "expected": "Người tạo tự điền người đang đăng nhập; sale không đổi được; admin đổi được và lưu đúng."
+    },
+    {
+      "id": "BL042-06",
+      "viewport": 1440,
+      "steps": "Form Tin tức: tìm \"Đường dẫn trang\"; mở khối \"Nâng cao\"; nhập tiêu đề mới rồi lưu; tạo tin thứ 2 cùng tiêu đề.",
+      "expected": "Đường dẫn nằm trong khối thu gọn \"Nâng cao\" ở cột phải (mặc định đóng); tự sinh từ tiêu đề; trùng tự thêm -2; URL công khai của tin mở được."
+    },
+    {
+      "id": "BL042-07",
+      "viewport": 1440,
+      "steps": "Form một Dự án đã dịch, một bài dịch lỗi: xem \"Có bản tiếng Anh\" và tab Bản dịch; bấm \"Dịch lại bằng AI\".",
+      "expected": "\"Có bản tiếng Anh\" có 1 câu giải thích; tab Bản dịch chỉ 1 dòng \"Tình trạng bản tiếng Anh\" (đã dịch lúc …/lỗi bằng câu tiếng Việt, không mã lỗi) + nút; không còn hash nguồn/mô hình AI; Dịch lại chạy như trước."
+    },
+    {
+      "id": "BL042-08",
+      "viewport": 1440,
+      "steps": "Form Dự án: xem nút cạnh ô Danh mục / Chủ đầu tư; mở ô Danh mục; xem Ngày xuất bản.",
+      "expected": "Nút thêm nhanh có chữ \"Thêm mới\"; ô Danh mục chỉ liệt kê danh mục loại Dự án; Ngày xuất bản có mô tả \"Tự điền khi xuất bản lần đầu.\""
+    },
+    {
+      "id": "BL042-09",
+      "viewport": 1440,
+      "steps": "Form Dự án: gõ Mô tả ngắn 120, 180, 230 ký tự; nhập Giá từ 3500000000; bấm \"Hôm nay\" ở Ngày cập nhật bảng giá; xem Pháp lý / Chính sách bán hàng khi trống.",
+      "expected": "Bộ đếm ký tự cập nhật + gợi ý 150–200 (ngắn/vừa/dài); dòng \"≈ 3,5 tỷ đồng\" dưới ô giá; Hôm nay điền ngày hiện tại giờ VN; Pháp lý/Chính sách có chữ gợi ý mẫu nhưng không có nội dung lưu."
+    },
+    {
+      "id": "BL042-10",
+      "viewport": 1440,
+      "steps": "Kiểm dòng đọc giá ở Cho thuê (Giá thuê/tháng 15000000), Tin BĐS (Giá), bảng giá Dự án, lương Tuyển dụng; bộ đếm Tóm tắt ở Tin tức/Tin BĐS/Dịch vụ.",
+      "expected": "Mỗi ô tiền có dòng đọc bằng chữ đúng (vd \"≈ 15 triệu đồng\"); ô trống không hiện dòng; bộ đếm có ở các ô Tóm tắt."
+    },
+    {
+      "id": "BL042-11",
+      "viewport": 1440,
+      "steps": "Admin mở một Lead có UTM, Trang gửi/đến, đã đồng ý chính sách, đã gửi lại 2 lần; xem các tab và cột phải.",
+      "expected": "Tab Nguồn có khối \"Dữ liệu chiến dịch marketing\" đóng mặc định (UTM + link rút gọn, bấm mở tab mới, chỉ http(s)); ngày/phiên bản đồng ý chính sách cuối tab, chỉ đọc; cột phải 1 dòng tóm tắt (\"Hoạt động gần nhất … · khách gửi lại 2 lần\"), Ngày phân công giữ ô riêng; không thấy \"Ngày xoá thông tin cá nhân\"; ngôn ngữ khách là nhãn chữ."
+    },
+    {
+      "id": "BL042-12",
+      "viewport": 375,
+      "steps": "Sale mở Lead được giao ở 375px; bấm Gọi, Zalo, Gửi email.",
+      "expected": "Nút Gọi mở tel:<SĐT>, Zalo mở https://zalo.me/0xxxxxxxxx (số chuẩn hoá, kể cả nhập +84), Gửi email mở mailto:; vùng bấm ≥ 44px; sale vẫn không sửa được dữ liệu chỉ đọc."
+    },
+    {
+      "id": "BL042-13",
+      "viewport": 1440,
+      "steps": "Danh sách Lead: \"Hiển thị cột\" / \"Thêm bộ lọc\" tìm các mốc (Ngày liên hệ đầu, Hoạt động gần nhất, Ngày xoá thông tin cá nhân).",
+      "expected": "Các mốc vẫn chọn được làm cột / bộ lọc như BL-039 (chỉ ẩn ở form)."
+    },
+    {
+      "id": "BL042-14",
+      "viewport": 1440,
+      "steps": "Mở form một tin Cho thuê; bấm Sao chép cạnh mã CT-…; dán vào ô tìm kiếm danh sách Cho thuê.",
+      "expected": "Mã hiện to đầu form; Sao chép báo đã chép; dán tìm ra đúng tin (mã vẫn là cột/tìm kiếm như trước)."
+    },
+    {
+      "id": "BL042-15",
+      "viewport": 1440,
+      "steps": "Tin tuyển dụng: một tin hạn nộp hôm qua, một tin hạn hôm nay, một tin chưa có hạn; xem form và cột Hạn nộp danh sách.",
+      "expected": "Chỉ tin hạn hôm qua có badge \"Đã quá hạn\" ở form và cột (ngày dd/MM/yyyy); tin hạn hôm nay không badge; chưa có hạn → —."
+    },
+    {
+      "id": "BL042-16",
+      "viewport": 1440,
+      "steps": "Admin mở Cấu hình chung: xem phiên bản chính sách bảo mật, ô mã Google Analytics, bảng thuật ngữ dịch.",
+      "expected": "Phiên bản chính sách là nhãn thông tin nhỏ chỉ đọc; ô GA có mô tả chỉ chỗ lấy (Google Analytics → Quản trị → Luồng dữ liệu) + placeholder; bảng thuật ngữ có ví dụ (\"Căn hộ dịch vụ\" → \"Serviced Apartment\")."
+    },
+    {
+      "id": "BL042-17",
+      "viewport": 1440,
+      "steps": "Thư viện ảnh: tải ảnh mới \"can-ho-mau_2pn.jpg\" để trống Mô tả ảnh; tải ảnh tên UUID; mở 1 ảnh cũ xoá Mô tả ảnh rồi lưu; tải PDF.",
+      "expected": "Ảnh mới lưu được, alt = \"can ho mau 2pn\"; ảnh tên UUID alt = \"Hình ảnh\"; alt sửa lại được; ảnh cũ xoá alt → báo lỗi; ảnh đã có alt không đổi; PDF không cần alt."
+    },
+    {
+      "id": "BL042-18",
+      "viewport": 375,
+      "steps": "Ở 375px mở form Dự án, Lead, Cho thuê: thanh công cụ soạn thảo, khối Nâng cao, nút Thêm mới, Hôm nay, Sao chép.",
+      "expected": "Không tràn ngang trang; thanh công cụ xuống dòng/cuộn gọn; các nút bấm được (≥ 44px)."
+    },
+    {
+      "id": "BL042-19",
+      "viewport": 1440,
+      "steps": "Regression: danh sách Dự án/Cho thuê/Tuyển dụng (chip, cột ghép), xuất Excel lead, Lọc dịch, sidebar; mở trang công khai dự án + tin + /en + trang tuyển dụng; xem alt ảnh trong mã nguồn trang.",
+      "expected": "BL-039/BL-041/BL-022 như trước; ảnh công khai có alt (alt tự điền hoặc fallback tiêu đề); tin tuyển dụng hết hạn vẫn ẩn ở trang công khai; /en bình thường."
     }
   ],
   "acceptance": [
@@ -457,13 +590,44 @@
     "Ảnh + chữ hero các trang danh sách sửa được trong admin, có bản EN; thiếu ảnh → fallback hợp lý (không vỡ trang)",
     "AA tương phản (kể cả chữ breadcrumb trên ảnh sáng), tests / typecheck / build PASS",
     "`/du-an` q / developer / sort lọc đúng + noindex/canonical khi lọc; T00 không migration",
-    "Migration site-settings additive up/down sạch"
+    "Migration site-settings additive up/down sạch",
+    "Bỏ đuôi \"— vi\"/\"— en\" khỏi nhãn; ngôn ngữ đang sửa thể hiện 1 chỗ (ô chọn ngôn ngữ thanh trên)",
+    "Ô soạn văn bản có thanh công cụ cố định luôn hiện (đậm, nghiêng, tiêu đề, danh sách, liên kết, chèn ảnh, hoàn tác) + khung viền + chữ gợi ý tiếng Việt; không còn \"+\"/ô vuông lạ khi trống",
+    "Mọi trường bắt buộc (kể cả validate theo ngôn ngữ) có dấu *; lỗi hiện ngay tại ô bằng câu dễ hiểu",
+    "Ô quan trọng có placeholder/ví dụ",
+    "\"Người tạo\" tự điền người đang đăng nhập (vẫn đổi được nếu có quyền)",
+    "Đường dẫn tự sinh, chuyển vào khối thu gọn \"Nâng cao\"; trường hệ thống bản dịch ẩn, chỉ 1 dòng tóm tắt + nút \"Dịch lại\"",
+    "\"Có bản tiếng Anh\" có giải thích 1 câu",
+    "Nút \"+\" có chữ \"Thêm mới\"; màn tạo mới \"Thêm <tên mục> mới\" (thanh nút; H1 = residual)",
+    "Lead: UTM + Trang gửi/đến trong khối thu gọn \"Dữ liệu chiến dịch marketing\"; đồng ý chính sách cuối tab Nguồn chỉ đọc; mốc thời gian 1 dòng tóm tắt; ẩn anonymizedAt khỏi form; nút Gọi/Zalo/Gửi email; ngôn ngữ khách nhãn chỉ đọc",
+    "Ô Danh mục chỉ liệt kê danh mục đúng loại",
+    "Mô tả ngắn có bộ đếm ký tự + gợi ý 150–200",
+    "Pháp lý / Chính sách bán hàng có chữ gợi ý mẫu (chỉ placeholder)",
+    "Ô giá VND có dòng đọc bằng chữ",
+    "Ngày cập nhật bảng giá có nút \"Hôm nay\"",
+    "Cho thuê: mã CT-… to đầu form + nút sao chép",
+    "Tin tuyển dụng: badge \"Đã quá hạn\" (form + cột danh sách) khi deadline < hôm nay",
+    "Cấu hình chung: privacyPolicyVersion nhãn nhỏ; chỉ dẫn mã GA; ví dụ bảng từ khoá dịch",
+    "Ảnh: tải lên trống alt → tự điền alt từ tên file đã làm sạch thay vì chặn; vẫn sửa được; ảnh đã có alt không đổi; không làm yếu a11y/SEO web công khai",
+    "Không đổi schema/slug/URL/access/dữ liệu; test hiện có PASS (pnpm test 0 fail)"
   ],
   "verify": {
-    "status": "đã chạy theo từng task (builder + reviewer STRICT)",
-    "result": "pnpm typecheck PASS; pnpm lint 0 error (2 warning cũ tools/task-dashboard); vitest src PASS (T09: 253 file / 2496 test); integration projects 31/31, globals 30/30, news + property-posts 53/53; migrate trên DB riêng PASS; contrast.test + no-raw-colors.test PASS; AA breadcrumb đo ảnh thật median ≥ 9.9:1, p95 ≥ 7.6:1; /en 6 trang xem thật (T09).",
-    "residual": "`pnpm build` PASS sau T08 round 2 và lại PASS sau T09 (dispatcher chạy trên staging 2c63564 working tree). 3 file integration (access / jobs-email / media-upload) cần DB+SMTP+S3 thật, chạy riêng PASS.",
-    "commands": "theo `.context/project-config.md`: pnpm test / pnpm typecheck / pnpm lint / pnpm build; ảnh so mockup `.context/review-reports/assets/site-redesign-t0N-*.png`"
+    "BL-045": {
+      "status": "đã chạy theo từng task (builder + reviewer STRICT)",
+      "result": "pnpm typecheck PASS; pnpm lint 0 error (2 warning cũ tools/task-dashboard); vitest src PASS (T09: 253 file / 2496 test); integration projects 31/31, globals 30/30, news + property-posts 53/53; migrate trên DB riêng PASS; contrast.test + no-raw-colors.test PASS; AA breadcrumb đo ảnh thật median ≥ 9.9:1, p95 ≥ 7.6:1; /en 6 trang xem thật (T09).",
+      "residual": "`pnpm build` PASS sau T08 round 2 và lại PASS sau T09 (dispatcher chạy trên staging 2c63564 working tree). 3 file integration (access / jobs-email / media-upload) cần DB+SMTP+S3 thật, chạy riêng PASS.",
+      "commands": "theo `.context/project-config.md`: pnpm test / pnpm typecheck / pnpm lint / pnpm build; ảnh so mockup `.context/review-reports/assets/site-redesign-t0N-*.png`"
+    },
+    "BL-042": {
+      "test": "pnpm test (bộ đầy đủ, DB + S3 local) sau T05: 333 files / 3422 tests, 0 fail. Trước đó từng task chạy subset vitest src/... PASS (T03 78 files / 663; T04 80 files / 597); phase review r1 bắt 16 fail ở tests/unit + tests/integration → sửa ở T05",
+      "typecheck": "PASS",
+      "lint": "0 error (2 warning có sẵn ở tools/task-dashboard)",
+      "generateTypes": "payload generate:types: chỉ đổi comment mô tả + thứ tự consentAt/consentVersion, không thêm/bớt trường",
+      "generateImportMap": "thêm component mới (T01–T04) vào importMap.js",
+      "runtime": "chưa kiểm trên trình duyệt T01–T04 (residual)",
+      "build": "không chạy (residual)"
+    },
+    "merge": "xem commit merge"
   },
   "outOfScope": [
     "Mục \"Tiến độ\" chi tiết dự án (không có dữ liệu)",
@@ -473,7 +637,12 @@
     "Endpoint REST mới; đổi quyền; cột / migration cho lọc /du-an",
     "Trang 404 (giữ PageBanner)",
     "Admin Payload UI ngoài site-settings",
-    "Sửa dở chưa commit ngoài BL-045"
+    "Sửa dở chưa commit ngoài BL-045",
+    "H1 màn tạo mới vẫn \"[Chưa đặt tên]\" (phải thay view Payload); tên mục giữ hoa chữ đầu (\"Thêm Dự án mới\")",
+    "Thanh \"Đang sửa: Tiếng Việt\" riêng (dùng ô ngôn ngữ sẵn có)",
+    "Lỗi bắt buộc dạng dòng chữ dưới ô (giữ khung báo đỏ của Payload)",
+    "Alt mặc định theo tiêu đề bài khi tải từ form bài",
+    "Bản đồ chọn vị trí, bộ chọn icon, lý do Không thành dạng danh sách, tên hiển thị PDF, quý/năm bàn giao, tạo tiêu đề chuẩn + tự điền Tỉnh/Phường Cho thuê, thời hạn ưu đãi, gợi ý tag, cắt ảnh bìa, Lead dạng dòng thời gian (cần đổi schema/component lớn)"
   ],
   "openQuestions": [
     "Chữ hero / careersPerks / ảnh Liên hệ-Pháp lý staging/prod: admin tự nhập (seed chỉ dev) — test staging cần nhập trước",
@@ -481,7 +650,8 @@
   ],
   "viewports": [
     390,
-    1440
+    1440,
+    375
   ],
   "locales": [
     "vi",
@@ -496,10 +666,15 @@
     "GET /du-an?developer=abc&sort=xyz → 200, tham số lạ bị bỏ qua",
     "GET /api/public/rentals với tham số F3 hiện có → contract không đổi",
     "Admin REST global site-settings: lưu pageHeroes vi/en; careersPerks 1 mục → 400 (minRows 2), 7 mục → 400 (maxRows 6), thiếu title → 400; showProjectStrengths mặc định true",
-    "Migration site_redesign_page_heroes: migrate up trên DB có dữ liệu sạch; down xoá được"
+    "Migration site_redesign_page_heroes: migrate up trên DB có dữ liệu sạch; down xoá được",
+    "POST /api/media (ảnh, alt trống) → 201, alt = tên file gốc đã làm sạch; tên UUID/toàn số → \"Hình ảnh\"",
+    "PATCH /api/media/:id { alt: \"\" } (ảnh) → 400; POST /api/media PDF không alt → 201",
+    "POST /api/news không truyền author (đăng nhập sale) → author = người đăng nhập",
+    "GET /api/leads/:id, /api/rentals/:id, /api/projects/:id → response shape không đổi (trường ui codeBanner/activitySummary/translationSummary không có trong dữ liệu; translation.* + anonymizedAt vẫn trả như trước theo quyền)",
+    "GET /api/job-postings → không đổi; trang công khai vẫn ẩn tin hết hạn"
   ],
   "risk": "high",
-  "riskNote": "Đổi bố cục gần như mọi trang công khai (danh sách, chi tiết, tin tức, tuyển dụng, liên hệ, pháp lý, dịch vụ) + component dùng chung (Breadcrumb, Pagination, CategoryListTemplate, DetailLayout, thẻ, slider) + URL contract mới /du-an (SEO noindex) + migration additive site-settings + bỏ tim trang chủ. Đã build + review STRICT từng task; rủi ro hồi quy lọc / form lead / scroll-spy / JSON-LD / i18n vẫn cao vì diện rộng — test full regression; build cuối PASS.",
+  "riskNote": "BL-045: Đổi bố cục gần như mọi trang công khai (danh sách, chi tiết, tin tức, tuyển dụng, liên hệ, pháp lý, dịch vụ) + component dùng chung (Breadcrumb, Pagination, CategoryListTemplate, DetailLayout, thẻ, slider) + URL contract mới /du-an (SEO noindex) + migration additive site-settings + bỏ tim trang chủ. Đã build + review STRICT từng task; rủi ro hồi quy lọc / form lead / scroll-spy / JSON-LD / i18n vẫn cao vì diện rộng — test full regression; build cuối PASS. | BL-042: Đụng field dùng chung mọi collection/global (title, slug, author, published-at, required-by-locale, translation, content-defaults, editor richText toàn cục trong payload.config) + hook upload Media + form Lead. Không schema/access/endpoint. T01 STRICT r1 FAIL (vùng bấm/rem) → r2 PASS; T02/T03/T04 STRICT r1 PASS; phase review r1 FAIL vì 16 test bộ đầy đủ (thiếu label 3 trường ui, test media cũ, test chọn media \"mới nhất\" toàn DB) → T05 NORMAL PASS, pnpm test 0 fail. Residual: chưa xem trên trình duyệt (thanh công cụ, Hoàn tác/Làm lại, *, khối Nâng cao, banner mã, badge, nút liên hệ, ≤ 767px) — nên QA tay trước deploy; H1 \"[Chưa đặt tên]\"; ảnh tải trống alt giờ nhận alt từ tên file (chất lượng alt phụ thuộc tên file — biên tập viên nên sửa).",
   "status": "published",
-  "statusNote": "published 2026-10-21 — close-out BL-045 sau T00–T09 PASS (commit trên staging). Phase review r2 (spec-validator) do dispatcher chạy sau publish; feature progress giữ in_progress tới khi r2 PASS."
+  "statusNote": "published 2026-10-21 — merge claude/admin-bl039-043 → staging"
 }

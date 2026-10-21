@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { COLLECTION_NAME_ADMIN } from "../components/admin/collection-name-admin";
 import { CLICK_TYPE_LABELS, CLICK_TYPES } from "../lib/click-stats/click-types";
 import { NO_REF } from "../lib/click-stats/aggregate";
 
@@ -33,7 +34,7 @@ export const ClickStatsDaily: CollectionConfig = {
       required: true,
       options: CLICK_TYPES.map((value) => ({ label: CLICK_TYPE_LABELS[value], value })),
     },
-    { name: "refCollection", type: "text", label: "Loại nội dung", defaultValue: NO_REF },
+    { name: "refCollection", type: "text", label: "Loại nội dung", defaultValue: NO_REF, admin: COLLECTION_NAME_ADMIN },
     { name: "refId", type: "text", label: "Mã nội dung", defaultValue: NO_REF },
     { name: "count", type: "number", label: "Số lượt bấm", required: true, min: 0, defaultValue: 0 },
   ],

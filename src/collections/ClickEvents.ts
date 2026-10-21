@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { COLLECTION_NAME_ADMIN } from "../components/admin/collection-name-admin";
 import { CLICK_TYPE_LABELS, CLICK_TYPES } from "../lib/click-stats/click-types";
 
 const denyAll = (): boolean => false;
@@ -32,7 +33,7 @@ export const ClickEvents: CollectionConfig = {
       options: CLICK_TYPES.map((value) => ({ label: CLICK_TYPE_LABELS[value], value })),
     },
     { name: "pagePath", type: "text", label: "Trang được bấm", required: true },
-    { name: "refCollection", type: "text", label: "Loại nội dung" },
+    { name: "refCollection", type: "text", label: "Loại nội dung", admin: COLLECTION_NAME_ADMIN },
     { name: "refId", type: "text", label: "Mã nội dung" },
     // Dấu "đã gộp vào click-stats-daily": job chỉ cộng các bản chưa có dấu và chỉ xoá các bản đã có dấu,
     // nên chạy lại không cộng trùng và không mất lượt bấm chưa gộp.

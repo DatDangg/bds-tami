@@ -169,7 +169,9 @@ Dùng `admin.group` (chuỗi tiếng Việt) + **sắp xếp lại mảng `colle
 
 **As-built (BL-040, 2026-10-20):** tên hiển thị đã đổi — nhóm 5 "Danh mục" → **"Dữ liệu nền"**; `leads` = "Lead" (giữ từ đội sale quen dùng), `lead-activities` = "Lịch sử chăm sóc"; `private-files` = "Tệp CV ứng viên"; `media` = "Thư viện ảnh & tệp"; `click-stats-daily` = "Thống kê liên hệ theo ngày"; `translation-usage` = "Chi phí dịch tự động"; `redirects` = "Chuyển hướng đường dẫn". Nguồn: `src/lib/admin/collection-labels.ts`, `src/components/admin/admin-groups.ts`.
 
-Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
+**As-built (BL-041, 2026-10-21):** thêm nhóm 8 **"Nâng cao"** cuối menu, mặc định thu gọn (`NavAdvancedCollapse`, ghi preference nav một lần) — gom Tỉnh/thành · Phường/xã · Nhật ký thao tác · Lượt bấm liên hệ · Thống kê liên hệ theo ngày · Chi phí dịch tự động; "Dữ liệu nền" còn Danh mục · Chủ đầu tư, "Hệ thống" còn Nhân viên. `private-files` + `lead-activities` **ẩn khỏi menu** (`admin.hidden: true`; lịch sử chăm sóc xem/thêm trong form Lead qua drawer, CV tải ở Hồ sơ ứng tuyển). Style sidebar thay dòng "Style sidebar" dưới: nhãn nhóm VIẾT HOA 700 màu chữ mạnh + vạch ngăn `--admin-border-strong`, mục con thụt lề có vạch dọc, mục đang chọn nền `accent-soft` + vạch 3px accent + chữ 600, toggle 44px ở mobile. Header có nút "Xem website" (`SiteLink`, `NEXT_PUBLIC_SITE_URL`).
+
+*(Superseded by BL-041 — xem As-built BL-041 ở trên.)* Câu hỏi mở: `lead-activities` nên ẩn khỏi menu (xem trong form lead) hay giữ? `click-events` (dữ liệu thô) có cần hiện không? → §7.
 
 **Icon:** Payload 3.91 không hỗ trợ icon cho mục nav qua config; muốn có phải thay cả `admin.components.Nav` (component tự viết, phải tự xử lý quyền/ẩn/active/collapse/mobile) → rủi ro cao, bảo trì khi nâng Payload. **Đề xuất: không icon ở menu** (nhóm + khoảng trắng đã đủ phân cấp); icon chỉ dùng ở card dashboard + lối tắt (component của mình). → hỏi user §7.
 
@@ -217,6 +219,8 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 
 **As-built (BL-040):** tiêu đề card đổi "Danh mục quản lý" → **"Mục quản lý"**; gợi ý thẻ lead chưa phân công: "Mới, chưa giao sale" (thống nhất "Sale phụ trách").
 
+**As-built (BL-041, 2026-10-21):** bố cục §3.1 thay bằng: lời chào/ngày → **thẻ thao tác nhanh** (Đăng tin cho thuê mới · Phân công lead (N chưa giao) — chỉ admin · Viết tin tức) + menu phụ "Tạo loại khác" (thay `[＋ Tạo mới ▾]` và dòng "Lối tắt tạo nội dung") → hàng **"Sửa website"** (Trang chủ · Menu đầu trang · Chân trang · Cấu hình chung, chỉ admin) → banner dịch lỗi mức **cảnh báo nhẹ** (warning, `role=status`, câu trấn an — thay "alert danger") → thẻ số liệu → lead mới nhất + bài của bạn. Khối **"Mục quản lý" đã bỏ** (trùng sidebar).
+
 ## 4. Màn danh sách (list view)
 
 - Header trang: H1 + mô tả ngắn 1 dòng (`admin.description` collection, tiếng Việt) + nút "Tạo mới" primary bên phải; thanh tìm kiếm + nút Cột/Bộ lọc gom một hàng, cao 36px.
@@ -225,6 +229,7 @@ Thẻ: card `surface` bo 12px, nhãn 13/500 muted, số 28/600, dòng phụ 12 s
 - **Badge trạng thái**: `admin.components.Cell` cho các field select trạng thái (`status`, `salesStatus`, lead `status`, application `status`, translation status) dùng chung component `StatusBadge` + `status-tones.ts`.
 - `defaultColumns` rà lại (đề xuất ở mock): bỏ cột kỹ thuật khỏi mặc định (vd `assigneeInactive` → gộp thành badge "Sale đã nghỉ" cạnh tên người phụ trách).
 - **As-built (T01/T05):** header cột **không dính** khi cuộn (`.table` của Payload có `overflow:auto` nên `position: sticky` vô tác dụng); thumbnail lấy size `thumb` của Media qua `useListRelationships` (1 request/trang); cột tiêu đề giữ link edit / nút chọn trong ListDrawer qua `LinkedCell`.
+- **As-built (BL-039, 2026-10-21):** menu "Hiển thị cột" + "Thêm bộ lọc" mọi collection chỉ còn trường nghiệp vụ — `hideTechnicalListFields` (`src/lib/admin/list-filter.ts`) áp một lần qua `ADMIN_COLLECTIONS` (`src/collections/admin-collections.ts`); Media ẩn nhóm `sizes` bằng cờ trên từng `imageSizes` (plugin S3 dựng lại nhóm). Cột **ID** và **Ngày xoá** vẫn hiện (Payload 3.91 miễn `id` trong ColumnSelector, `deletedAt` do sanitize thêm — không ẩn được nếu không đổi schema). Nút bộ lọc đổi chữ **"Lọc nâng cao"** (`general.filters`), vị trí giữ theo ListControls (chip nằm hàng ngay dưới). Ô ngôn ngữ "Tiếng Việt"/"English" (`localization.locales` có `label`, ẩn mã `(vi)`). Gợi ý tìm kiếm "Tìm theo …" từ `LIST_SEARCHABLE_FIELDS`. Chip lọc nhanh thêm ở Dự án / Tin tức / Tin BĐS / Tuyển dụng / Hồ sơ ứng tuyển (`CollectionQuickFilterSlot`, trước ô Trạng thái dịch). Cột ghép `ui` + Cell: Dự án "Quy mô", "Khoảng giá"; Cho thuê "Phòng · diện tích" + "Thuộc dự án" (ô quan hệ mặc định, tên hiện sau một nhịp tải).
 - Phân trang + "Số dòng/trang" giữ Payload, chỉ restyle. Trạng thái rỗng: minh hoạ đơn giản + nút "Tạo &lt;tên&gt; đầu tiên".
 - Mobile < 768: bảng cuộn ngang trong card (Payload mặc định), cột tiêu đề dính trái; header trang xếp dọc.
 - `TranslationStatusFilter` (BL-016) nằm ở hàng bộ lọc này — xem §8.
@@ -242,18 +247,20 @@ Nguyên tắc: **chỉ dùng tab không tên, `row`, `collapsible`** — không 
 | Tab **Thông tin** (tên theo loại: "Thông tin dự án" / "Thông tin căn") | giá, diện tích, vị trí, quy mô… dùng `row` 2 cột |
 | Tab **Hình ảnh** | cover, gallery, mặt bằng, tài liệu |
 | Tab **SEO** | group `seo` |
-| Tab **Bản dịch** | group `translation` (chỉ đọc) + nút "Dịch lại bằng AI" / "Duyệt bản EN" hiện có |
-| Sidebar phải (320px) | Trạng thái · Ngày xuất bản · Tác giả · Nổi bật · Đường dẫn (slug) · Có bản tiếng Anh |
+| Tab **Bản dịch** | group `translation`: trường hệ thống ẩn khỏi form, chỉ 1 dòng tóm tắt (`TranslationSummary`) + nút "Dịch lại bằng AI" / "Duyệt bản EN" (BL-042) |
+| Sidebar phải (320px) | Trạng thái · Ngày xuất bản · Tác giả (tự điền người đăng nhập) · Nổi bật · Có bản tiếng Anh · khối thu gọn **Nâng cao** (Đường dẫn trang) — BL-042 |
 
 Mỗi field có `label` tiếng Việt; field khó hiểu có `admin.description` (1 câu, 12px subtle). Nhãn hàng array dùng `RowLabel` hiện giá trị chính (vd "Tầng 12 – 2PN", "Facebook").
 
+**As-built (BL-042, 2026-10-21):** editor toàn cục `createRichTextEditor()` (`src/lib/admin/rich-text-editor.ts`): thanh công cụ cố định + Hoàn tác/Làm lại, ẩn gutter/"+"/tay kéo, placeholder tiếng Việt; Dự án có placeholder riêng cho Tổng quan/Pháp lý/Chính sách. Nhãn ẩn đuôi ngôn ngữ (`.localized`); `*` qua `markRequired` (`admin.className: tami-required`) cho trường bắt buộc bằng validate (hiện cả ở bản en). `afterInput` dùng chung (`src/fields/form-hints.ts`): bộ đếm Mô tả ngắn/Tóm tắt, "≈ … đồng" dưới ô VNĐ, nút "Hôm nay" (Ngày cập nhật bảng giá). Nút "+" quan hệ có chữ "Thêm mới"; thanh nút tạo mới "Thêm {{label}} mới", tiêu đề lớn khi trống "[Chưa đặt tên]". Cho thuê: khối mã tin to + Sao chép (`codeBanner`). Tuyển dụng: "Đã quá hạn" dưới ô Hạn nộp + trong cột Hạn nộp. Ảnh: tải mới trống alt → tự điền từ tên file gốc. CSS: `src/components/admin/styles/_forms.scss`.
+
 ### 5.2. Leads
 
-Tab **Khách hàng** (họ tên, SĐT, email, lời nhắn — chỉ đọc với sale) · Tab **Nguồn** (source, bài liên quan, UTM, pageUrl, referrer) · Tab **Lịch sử chăm sóc** (join `activities`). Sidebar: Trạng thái · Lý do không thành (khi `lost`) · Người phụ trách + `LeadAssigneeWarning` · các mốc thời gian (chỉ đọc).
+Tab **Khách hàng** (họ tên, SĐT + nút Gọi/Zalo, email + Gửi email, lời nhắn — chỉ đọc với sale; ngôn ngữ khách dạng nhãn) · Tab **Nguồn** (source, bài liên quan, khối thu gọn "Dữ liệu chiến dịch marketing" = UTM + link rút gọn Trang gửi/đến; cuối tab: ngày/phiên bản đồng ý chính sách chỉ đọc) · Tab **Lịch sử chăm sóc** (join `activities`). Sidebar: Trạng thái · Lý do không thành (khi `lost`) · Người phụ trách + `LeadAssigneeWarning` · Ngày giao · 1 dòng tóm tắt hoạt động (các mốc + `anonymizedAt` không vẽ ở form, vẫn là cột/bộ lọc) — BL-042.
 
 ### 5.3. Globals
 
-`homepage`: tab theo khối (Hero · Giới thiệu · Dự án nổi bật · Dịch vụ · Ưu đãi · Đối tác · Kêu gọi · Thứ tự khối · SEO · Bản dịch). `site-settings`: tab Thông tin công ty · Liên hệ & mạng xã hội · Email nhận thông báo · Dịch tự động · Kỹ thuật (GA, phiên bản chính sách).
+`homepage`: tab theo khối (Hero · Giới thiệu · Dự án nổi bật · Dịch vụ · Ưu đãi · Đối tác · Kêu gọi · Thứ tự khối · SEO · Bản dịch). `site-settings`: tab Thông tin công ty · Liên hệ & mạng xã hội · Email nhận thông báo · Dịch tự động · Kỹ thuật (GA, phiên bản chính sách). BL-042: phiên bản chính sách hiện chữ nhỏ chỉ đọc; GA có chỉ dẫn lấy mã + placeholder; thuật ngữ dịch có ví dụ.
 
 Mobile < 768: sidebar phải xuống dưới (Payload mặc định), tab cuộn ngang.
 
@@ -279,7 +286,7 @@ Q1 Thẻ số liệu dashboard · Q2 Dashboard: khung ở BL-015 + số liệu s
 **Đã chốt (user 2026-10-19: "ok theo đề xuất"):**
 - Q1: thẻ số liệu như §3.2 (admin: lead mới, lead chưa phân công, hồ sơ ứng tuyển mới, nội dung đang hiển thị; sale: lead mới giao cho mình, lead đang xử lý, bản nháp của mình, tin đang đăng). **Không** có số "so với hôm qua".
 - Q2: (a) BL-015 T04 làm khung dashboard + thẻ đếm nhanh; L13-T01 sau này cắm biểu đồ/lượt bấm/chi phí dịch vào khung.
-- Q3: duyệt 7 nhóm §2 như thiết kế, không ẩn mục nào (giữ `lead-activities`, `click-events` — quyền xem giữ nguyên như hiện tại). *(Không có đề xuất riêng → giữ nguyên thiết kế, thay đổi tối thiểu.)*
+- Q3 *(superseded by BL-041, 2026-10-21: thêm nhóm "Nâng cao", ẩn `lead-activities`/`private-files`)*: duyệt 7 nhóm §2 như thiết kế, không ẩn mục nào (giữ `lead-activities`, `click-events` — quyền xem giữ nguyên như hiện tại). *(Không có đề xuất riêng → giữ nguyên thiết kế, thay đổi tối thiểu.)*
 - Q4: không icon menu; icon chỉ trên dashboard.
 - Q5: thumbnail `projects` = ảnh đầu `gallery` (nhất quán với `rentals`). *(Không có đề xuất riêng → chọn theo nhất quán.)*
 - Q6: dòng bảng 48px.

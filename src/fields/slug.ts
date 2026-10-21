@@ -122,6 +122,7 @@ export function slugField({ sourceField = "title", scopeField }: SlugFieldOption
     index: true,
     validate: validateSlug,
     hooks: { beforeValidate: [makeSlugHook(sourceField, scopeField)], beforeDuplicate: [dropSlugOnDuplicate] },
-    admin: { position: "sidebar", description: "Phần cuối địa chỉ trang, vd du-an-abc. Để trống thì tự tạo từ tiêu đề; trùng thì tự thêm -2, -3…" },
+    // Nằm trong khối "Nâng cao" (content-defaults) nên không đặt `position` ở đây.
+    admin: { description: "Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang." },
   };
 }

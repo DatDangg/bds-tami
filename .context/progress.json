@@ -1510,6 +1510,271 @@
       "completedAt": "2026-10-21",
       "review": "STRICT PASS",
       "report": ".context/review-reports/spec-validation-feature-site-redesign-homepage-style-phase-1-round-2.md"
+    },
+    {
+      "slug": "admin-raw-slug-columns",
+      "title": "Admin: cột Loại dữ liệu/Loại nội dung hiện tên tiếng Việt thay slug thô (BL-043)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-043",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-raw-slug-columns.md",
+      "startedAt": "2026-10-21",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-raw-slug-columns/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "note": "collectionDisplayName (collection số ít → global → giữ nguyên, rỗng —) + CollectionNameCell + CollectionNameHint trên AuditLogs.collection / ClickEvents.refCollection / ClickStatsDaily.refCollection; r2 thêm nhãn global (D5) + MINOR r1",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-raw-slug-columns-phase-1-task-01-round-2-review.md"
+          ],
+          "commit": "(commit close-out BL-043)"
+        }
+      ],
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1 số ít, D2 lọc ô chữ (select N/A), D3 gợi ý Description, D4 spec-validator gộp ở phase review, D5 nhãn global",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "completedAt": "2026-10-21",
+      "specVersion": "1.35.0",
+      "scopeVersion": 45,
+      "specUpdate": "spec/updates/2026-10-21-admin-raw-slug-columns.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-raw-slug-columns-phase-1.md",
+      "residual": "chưa xem trên trình duyệt; collection-name-admin.ts nên chuyển sang src/lib/admin; chưa test khoá collection/global không trùng; build chưa chạy"
+    },
+    {
+      "slug": "admin-nav-clarity",
+      "title": "Admin điều hướng: sidebar phân cấp rõ + nhóm Nâng cao + Xem website; Tổng quan thẻ thao tác nhanh + Sửa website + bỏ Mục quản lý + banner dịch nhẹ (BL-041)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-041",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-nav-clarity.md",
+      "startedAt": "2026-10-21",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-nav-clarity/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-nav-clarity-phase-1-task-01-round-2-review.md"
+          ],
+          "note": "Nhóm Nâng cao (6 mục) + admin.hidden private-files/lead-activities + NavAdvancedCollapse + SiteLink (Xem website) + CSS phân cấp/active; r2 sửa M1 vạch active ≤1024, M2 toggle 44px",
+          "commit": "f3d5291"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-nav-clarity/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-nav-clarity-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-nav-clarity-phase-1-task-02-round-1-review.md"
+          ],
+          "note": "QuickActions (Đăng tin cho thuê / Phân công lead N chưa giao (admin) / Viết tin tức) + Tạo loại khác + WebsiteShortcuts (admin) + bỏ NavGroupCards + banner dịch warning role=status",
+          "commit": "(commit close-out BL-041)"
+        }
+      ],
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1–D11 trong task file",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "completedAt": "2026-10-21",
+      "specVersion": "1.36.0",
+      "scopeVersion": 46,
+      "specUpdate": "spec/updates/2026-10-21-admin-nav-clarity.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-nav-clarity-phase-1.md",
+      "runtimeCheck": "local 2026-10-21: drawer Lịch sử chăm sóc OK, lead-activities route 404, Nâng cao thu gọn, Tổng quan đúng bố cục",
+      "residual": "chưa chụp 375px/tối; integration test dashboard chưa chạy; sale chưa kiểm runtime; Nâng cao có thể mở thoáng qua lần đầu (DOM Payload 3.91); MINOR reviewer T01 n1/n2, T02 4 mục"
+    },
+    {
+      "slug": "admin-list-columns-filters-locale",
+      "title": "Admin danh sách gọn: cột/bộ lọc chỉ trường nghiệp vụ mọi màn + ô ngôn ngữ Tiếng Việt/English + Lọc nâng cao + gợi ý tìm kiếm + chip lọc nhanh 5 màn + cột Quy mô/Khoảng giá/Phòng·diện tích/Dự án (BL-039)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-039",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-list-columns-filters-locale.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "note": "Auto proceed (user chỉ thị 2026-10-21): D1–D12 trong task file",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "note": "hideTechnicalListFields (cột+lọc) áp 21 collection qua ADMIN_COLLECTIONS; Media imageSizes cờ ẩn; gap: ID/Đã xoá lúc không ẩn được bằng config (Payload 3.91)",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-01-round-2-review.md"
+          ],
+          "commit": "35f4517"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "locales label Tiếng Việt/English + ẩn mã (vi); general.filters = Lọc nâng cao (vị trí giữ — D7); LIST_SEARCHABLE_FIELDS 13 collection; 3 MINOR",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-02-round-1-review.md"
+          ],
+          "commit": "38d33c9"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-03.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "CollectionQuickFilterSlot + collection-quick-filters.ts: Dự án (mở bán, trạng thái), Tin tức/Tin BĐS (trạng thái, danh mục ≤12 theo quyền), Tuyển dụng (Đang tuyển/Hết hạn, startOfVietnamDay), Hồ sơ (trạng thái); MINOR-1/3 sửa sau r1",
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-03-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-03-round-1-review.md"
+          ],
+          "commit": "e6aee3a"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-list-columns-filters-locale/phase-1-task-04.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "note": "ui unitsSummary/priceRange (Dự án), roomsArea + project (Cho thuê); list-summary.ts; m2/m3 sửa sau r1; m1 nháy Đang tải cột dự án = residual",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-list-columns-filters-locale-phase-1-task-04-round-1-review.md"
+          ],
+          "commit": "0d4a1f4"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.37.0",
+      "scopeVersion": 47,
+      "specUpdate": "spec/updates/2026-10-21-admin-list-columns-filters-locale.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-admin-list-columns-filters-locale-phase-1.md",
+      "docReconcile": "docs/specs/2026-10-19-admin-ui-saas-design.md §4, docs/ERD.md §1.1",
+      "gap": "ID / Ngày xoá vẫn trong menu cột (Payload 3.91, cần schema)",
+      "residual": "chưa xem 375px (popup ngôn ngữ, hàng chip); cột Thuộc dự án nháy Đang tải; preferences cột cũ; chip Tuyển dụng qua nửa đêm cần tải lại; MINOR T02 (3), T03 MINOR-2"
+    },
+    {
+      "slug": "admin-form-non-tech-friendly",
+      "title": "Admin form dễ dùng cho người không rành công nghệ: bỏ đuôi ngôn ngữ, richText thanh công cụ cố định, dấu * đủ, placeholder, Người tạo tự điền, slug/bản dịch gọn, Dự án/Lead/Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh (BL-042)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-042",
+      "changeDoc": "spec/changes/archive/2026-10-20-admin-form-non-tech-friendly.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (auto proceed theo chỉ thị user)",
+      "note": "Auto proceed: bảng điểm sửa + Q1–Q5 trong change doc; D* trong task file",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-01.md",
+          "title": "Nền chung mọi form",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-2-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-1-review.md",
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-01-round-2-review.md"
+          ],
+          "note": "editor chung FixedToolbar + Hoàn tác/Làm lại, ẩn đuôi locale, * requiredByLocale, placeholder tiêu đề, author defaultValue, slug trong Nâng cao, tóm tắt bản dịch; residual H1 tạo mới [Chưa đặt tên]"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-02.md",
+          "title": "Dự án + ô số/giá",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-02-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-02-round-1-review.md"
+          ],
+          "note": "bộ đếm Mô tả ngắn/Tóm tắt, giá đọc bằng chữ, nút Hôm nay, placeholder richText Dự án; Danh mục filterOptions đã có; 5 MINOR để lại"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-03.md",
+          "title": "Form Lead",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-03-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-03-round-1-review.md"
+          ],
+          "note": "Lead: khối Dữ liệu chiến dịch marketing, consent cuối tab Nguồn, tóm tắt mốc thời gian, ẩn anonymizedAt (Field null giữ cột BL-039), Gọi/Zalo/Gửi email, locale nhãn; 4 MINOR residual (mailto ?/&, +84 0…)"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-04.md",
+          "title": "Cho thuê/Tuyển dụng/Cấu hình chung/Ảnh",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-04-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-04-round-1-review.md"
+          ],
+          "note": "mã CT to + sao chép, badge Đã quá hạn form+danh sách, Cấu hình chung dễ hiểu, alt ảnh tự điền từ tên gốc (req.context); 4 MINOR residual"
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/feature-admin-form-non-tech-friendly/phase-1-task-05.md",
+          "title": "Sửa 16 test hỏng bộ đầy đủ (phase validation R1–R3)",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-05-round-1-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-non-tech-friendly-phase-1-task-05-round-1-review.md"
+          ],
+          "note": "nhãn 3 field ui; media-upload test theo hành vi alt mới + ghim filename (R3 do test song song); pnpm test 3422/3422 PASS; dọn 2 media rác do lần chạy test cũ"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.38.0",
+      "scopeVersion": 48,
+      "phaseValidation": ".context/review-reports/spec-validation-feature-admin-form-non-tech-friendly-phase-1.md (r1 FAIL 16 test → T05 fix, pnpm test 3422 PASS)"
     }
   ],
   "bugs": [
@@ -2426,7 +2691,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-20T18:30:01.818Z",
+  "lastUpdated": "2026-10-21T02:26:41.864Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { denyAll, isAdmin, ROLES } from "../access";
+import { denyAll, isAdmin } from "../access";
 import { deleteObjectBeforeDelete } from "../hooks/private-files/delete-object-before-delete";
 import { mimeTypeLabelField } from "../fields/mime-type-label";
 import { collectionLabels } from "../lib/admin/collection-labels";
@@ -23,7 +23,8 @@ export const PrivateFiles: CollectionConfig = {
   slug: "private-files",
   labels: collectionLabels("private-files"),
   admin: {
-    hidden: ({ user }) => user?.role !== ROLES.admin,
+    // Ẩn khỏi menu (BL-041); tải CV đi qua nút "Tải CV" + endpoint riêng.
+    hidden: true,
     defaultColumns: ["filename", "mimeType", "createdAt"],
     description: "CV ứng viên gửi qua website, lưu riêng tư; chỉ admin tải được bằng nút \"Tải CV\" trong hồ sơ ứng tuyển.",
   },
