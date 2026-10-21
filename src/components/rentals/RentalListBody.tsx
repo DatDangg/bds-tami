@@ -10,7 +10,7 @@ import { RangeSliderFacet, type RangeValue } from "@/components/listing/RangeSli
 import { ResultsBar } from "@/components/listing/ResultsBar";
 import { useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
 import type { SelectOption } from "@/components/ui/option-select";
-import { RENTAL_AMENITIES, RENTAL_FURNISHINGS } from "@/shared/types/api";
+import { RENTAL_AMENITIES, RENTAL_FURNISHINGS, type RentalAmenity } from "@/shared/types/api";
 import { RadioFacetList } from "./RadioFacetList";
 
 /** Thanh trượt Giá thuê (BL-052): 0 – 100+ triệu/tháng, bước 1 triệu. Đơn vị của ô = VNĐ như tham số `priceMin`/`priceMax` (form không JS gửi thẳng). */
@@ -44,6 +44,8 @@ export interface RentalFilterOptionsView {
   /** Phường của tỉnh đang trên URL (rỗng khi chưa chọn tỉnh). */
   wards: SelectOption[];
   projects: SelectOption[];
+  /** Số đếm ô Tiện ích "trừ chiều tiện ích"; `undefined` khi truy vấn lỗi (ô tích không hiện số). */
+  amenityCounts?: Readonly<Record<RentalAmenity, number>>;
 }
 
 interface RentalFilterFieldsProps {
@@ -132,7 +134,7 @@ function RentalFilterFields({ values, options, navigate }: RentalFilterFieldsPro
         <CheckboxFacetList
           name="amenities"
           label={t("fields.amenities")}
-          options={RENTAL_AMENITIES.map((value) => ({ value, label: t(`amenityOption.${value}`) }))}
+          options={RENTAL_AMENITIES.map((value) => ({ value, label: t(`amenityOption.${value}`), ...(options.amenityCounts ? { count: options.amenityCounts[value] } : {}) }))}
           value={values.amenities}
           onChange={(amenities) => navigate({ amenities })}
         />

@@ -145,7 +145,7 @@ export async function RentalListPage({ locale, searchParams, categorySlug }: Ren
         path={listPath}
         current={current}
         values={toFilterValues(filters)}
-        options={toFilterOptions(options, provinceFacets, filters.province)}
+        options={toFilterOptions(options, provinceFacets, filters.province, result?.facets.amenities ?? null)}
         preservedParams={toPreservedParams(current)}
         activeCount={countActiveFilters(current, RENTAL_ACTIVE_FILTER_SPEC)}
         clearHref={listPath}

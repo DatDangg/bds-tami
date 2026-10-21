@@ -77,11 +77,12 @@ export function projectOptionsQuery(locale: string): SqlFragment {
 }
 
 /** Chiều lọc có số đếm riêng trên trang danh sách (BL-052): khi đếm một chiều, điều kiện của CHÍNH chiều đó bị bỏ. */
-export type RentalFacetDimension = "category" | "province";
+export type RentalFacetDimension = "category" | "province" | "amenity";
 
 /**
  * Điều kiện tìm kiếm tách nhóm: `scope` = phạm vi tin được liệt kê (công khai + `available`, không phải "bộ lọc" nên không bao giờ bị bỏ khi đếm);
- * `byDimension` = điều kiện của chiều có số đếm (`province` gồm cả `ward`: phường chỉ có nghĩa trong tỉnh); `other` = mọi bộ lọc còn lại.
+ * `byDimension` = điều kiện của chiều có số đếm (`province` gồm cả `ward`: phường chỉ có nghĩa trong tỉnh; `amenity` = mọi tiện ích đang chọn, bỏ cả cụm
+ * khi đếm tiện ích — cùng quy tắc ô Tiện ích `/du-an`); `other` = mọi bộ lọc còn lại.
  */
 export interface RentalConditions {
   scope: SqlFragment[];
@@ -110,10 +111,8 @@ export function rentalConditions(params: RentalSearchParams): RentalConditions {
   }
   if (params.furnishing) other.push(sql`r."furnishing" = ${params.furnishing}`);
   // Tin phải có ĐỦ mọi tiện ích (AND): mỗi tiện ích một EXISTS trên bảng hasMany `rentals_amenities` (cột `parent_id`/`value`, index `parent_id` do Payload tạo).
-  for (const amenity of params.amenities ?? []) {
-    other.push(sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${amenity})`);
-  }
-  return { scope, byDimension: { category, province }, other };
+  const amenity = (params.amenities ?? []).map((value) => sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${value})`);
+  return { scope, byDimension: { category, province, amenity }, other };
 }
 
 /** Bộ lọc (không gồm `scope`) trừ chiều `except`; không chiều nào bị bỏ khi `except` không truyền. */

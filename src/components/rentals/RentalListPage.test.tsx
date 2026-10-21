@@ -55,6 +55,8 @@ const FACETS: RentalListingFacets = {
     { provinceId: "p2", count: 2, total: 4 },
     { provinceId: "p1", count: 5, total: 6 },
   ],
+  // P2-T04: ô Tiện ích "trừ chiều tiện ích".
+  amenities: { pool: 3, gym: 1, elevator: 4, parking: 0, security: 2, balcony: 0, washing_machine: 0, air_conditioner: 5, pet_friendly: 0, kitchen: 0 },
 };
 
 const search = vi.hoisted(() => vi.fn<(params: RentalSearchParams) => Promise<RentalSearchResult>>());
@@ -207,7 +209,7 @@ describe("S04 /cho-thue (BL-052): bố cục", () => {
     expect(within(aside).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["0 triệu", "100+ triệu", "0 m²", "300+ m²"]);
     expect(within(aside).getAllByRole("radio", { name: /^(1|2|3|4\+)$/ })).toHaveLength(4);
     expect(within(aside).getByRole("radio", { name: "Đầy đủ" })).toBeInTheDocument();
-    expect(within(aside).getByRole("checkbox", { name: "Hồ bơi" })).toBeInTheDocument();
+    expect(within(aside).getByRole("checkbox", { name: "Hồ bơi(3)" })).toBeInTheDocument();
     expect(within(aside).getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue");
     expect(screen.queryByText(/Đang lọc/)).toBeNull();
   });
@@ -307,8 +309,8 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     expect(within(aside).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["5 triệu", "15 triệu", "25 m²", "300+ m²"]);
     expect(within(aside).getByRole("radio", { name: "2" })).toBeChecked();
     expect(within(aside).getByRole("radio", { name: "Đầy đủ" })).toBeChecked();
-    expect(within(aside).getByRole("checkbox", { name: "Hồ bơi" })).toBeChecked();
-    expect(within(aside).getByRole("checkbox", { name: "Phòng gym" })).toBeChecked();
+    expect(within(aside).getByRole("checkbox", { name: "Hồ bơi(3)" })).toBeChecked();
+    expect(within(aside).getByRole("checkbox", { name: "Phòng gym(1)" })).toBeChecked();
     // Badge < lg: tỉnh + phường + dự án + phòng ngủ + nội thất + giá + diện tích + 2 tiện ích = 9 (từ khoá, sắp xếp không tính).
     expect(screen.getByRole("button", { name: "Bộ lọc (9)" })).toBeInTheDocument();
     expect(screen.getByLabelText("Sắp xếp theo")).toHaveTextContent("Giá tăng dần");
@@ -333,6 +335,30 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     const item = within(within(sidebar()).getByRole("list", { name: "Tỉnh/thành" })).getByRole("radio", { name: /Huế/ }).closest("li")!;
     expect(item).toHaveTextContent("Huế(0)");
     expect(item).toHaveAttribute("data-empty", "true");
+  });
+
+  it("ô Tiện ích có số đếm (P2-T04); tiện ích đang chọn mà đếm 0 vẫn hiện (0, mờ) và bỏ tích được; chip Phòng ngủ / Nội thất không số", async () => {
+    await render("vi", { amenities: "pool,kitchen" });
+    const aside = sidebar();
+    const list = within(aside).getByRole("list", { name: "Tiện ích" });
+    expect(within(list).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      "Hồ bơi(3)",
+      "Phòng gym(1)",
+      "Thang máy(4)",
+      "Chỗ đậu xe(0)",
+      "Bảo vệ 24/7(2)",
+      "Ban công(0)",
+      "Máy giặt(0)",
+      "Điều hoà(5)",
+      "Cho nuôi thú cưng(0)",
+      "Bếp riêng(0)",
+    ]);
+    const kitchen = within(list).getByRole("checkbox", { name: "Bếp riêng(0)" });
+    expect(kitchen).toBeChecked();
+    expect(kitchen).toBeEnabled();
+    expect(kitchen.closest("li")).toHaveAttribute("data-empty", "true");
+    expect(within(aside).getByRole("radio", { name: "Đầy đủ" }).closest("label")).toHaveTextContent(/^Đầy đủ$/);
+    expect(within(aside).getByRole("radio", { name: "2" }).closest("label")).toHaveTextContent(/^2$/);
   });
 
   it("link cũ /cho-thue?category=<slug> (ô tìm kiếm trang chủ): lọc đúng danh mục, tab đó aria-current; tab giữ lọc khác, bỏ danh mục + trang; form giữ category", async () => {
@@ -413,6 +439,7 @@ describe("S04 /cho-thue (BL-052): trạng thái", () => {
     expect(within(alert).getByRole("link", { name: "Thử lại" })).toHaveAttribute("href", "/cho-thue?province=ha-noi");
     expect(sidebar()).toBeInTheDocument();
     expect(tabs().map((tab) => tab.textContent)).toEqual(["Tất cả", "Căn hộ", "Nhà phố"]);
+    expect(within(within(sidebar()).getByRole("list", { name: "Tiện ích" })).getAllByRole("listitem")[0]).toHaveTextContent(/^Hồ bơi$/);
   });
 });
 

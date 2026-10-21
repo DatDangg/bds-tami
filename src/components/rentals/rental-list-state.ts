@@ -48,14 +48,20 @@ export function toFilterValues(filters: RentalFilters): RentalFilterValues {
 
 /**
  * Lựa chọn của các ô lọc. Tỉnh: chỉ tỉnh có ≥ 1 tin (`provinceFacets`, số đếm "trừ chiều tỉnh"); tỉnh đang chọn mà không còn tin vẫn hiện (đếm 0) để bỏ chọn được.
- * Phường: của tỉnh trên URL (server đã tải). Dự án: dự án có tin công khai còn trống.
+ * Phường: của tỉnh trên URL (server đã tải). Dự án: dự án có tin công khai còn trống. Tiện ích: số đếm "trừ chiều tiện ích" (`null` = truy vấn lỗi → không số).
  */
-export function toFilterOptions(options: RentalFilterOptions, provinceFacets: readonly RentalProvinceFacet[], selectedProvince: string | undefined): RentalFilterOptionsView {
+export function toFilterOptions(
+  options: RentalFilterOptions,
+  provinceFacets: readonly RentalProvinceFacet[],
+  selectedProvince: string | undefined,
+  amenityCounts: RentalListingFacets["amenities"] | null,
+): RentalFilterOptionsView {
   const selected = selectedProvince && !provinceFacets.some((item) => item.slug === selectedProvince) ? options.provinces.find((item) => item.slug === selectedProvince) : undefined;
   return {
     provinces: [...provinceFacets.map((item) => ({ value: item.slug, label: item.name, count: item.count })), ...(selected ? [{ value: selected.slug, label: selected.name, count: 0 }] : [])],
     wards: options.wards.map((ward) => ({ value: ward.slug, label: ward.name })),
     projects: options.projects.map((project) => ({ value: project.slug, label: project.title })),
+    ...(amenityCounts ? { amenityCounts } : {}),
   };
 }
 
