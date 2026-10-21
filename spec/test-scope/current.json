@@ -1,106 +1,126 @@
 {
-  "specVersion": "1.45.1",
-  "scopeVersion": 57,
+  "specVersion": "1.46.0",
+  "scopeVersion": 58,
   "generatedAt": "2026-10-21T23:59:59+07:00",
-  "trigger": "bug-fix",
-  "triggerNote": "BL-053 BUG: URL gốc (canonical, hreflang, og:url, JSON-LD, sitemap, robots, llms.txt) bị nhúng placeholder lúc build (http://localhost:3000) thay vì NEXT_PUBLIC_SITE_URL lúc chạy. Sửa getSiteUrl() đọc runtime qua parseSiteUrl(process.env) + Dockerfile placeholder phân biệt + guard build.",
-  "workItem": "bug/site-url-build-inlined",
-  "backlog": "BL-053",
-  "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-21-site-url-build-inlined.md",
-  "changeDocStatus": "pending → archive ở close-out (spec/changes/archive/)",
-  "task": [
-    "tasks/bug-site-url-build-inlined/phase-1-task-01.md"
+  "trigger": "feature-update",
+  "triggerNote": "BL-052 MODIFY + ADDITIVE schema: redesign màn danh sách + chi tiết Dự án / Cho thuê / Tin BĐS theo design list-du-an.webp + detail-du-an.webp; trường mới additive cho Dự án, Tin BĐS, site-settings listingPages; tham số lọc mới.",
+  "status": "planned — build theo phase 1 (Dự án) → 2 (Cho thuê) → 3 (Tin BĐS)",
+  "statusNote": "Scope phát hành ngay sau spec delta (trước build) để bên test nắm phạm vi; changed.files sẽ chốt khi close-out từng phase. Chế độ auto proceed, builder-strong, commit staging không push.",
+  "workItem": "feature/listing-detail-redesign",
+  "backlog": "BL-052",
+  "classification": "MODIFY + ADDITIVE schema",
+  "changeDoc": "spec/changes/2026-10-21-listing-detail-redesign.md",
+  "changeDocStatus": "in_progress → archive ở close-out (spec/changes/archive/)",
+  "design": [
+    "docs/specs/listing-detail-redesign/list-du-an.webp",
+    "docs/specs/listing-detail-redesign/detail-du-an.webp"
   ],
-  "reviewReport": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
-  "reviewResults": [
-    {
-      "task": "phase-1-task-01",
-      "round": 1,
-      "result": "PASS",
-      "level": "STRICT",
-      "report": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
-      "note": "3 MINOR mở: guard try/catch nuốt mọi lỗi đọc thư mục; findPlaceholderFiles chưa có unit test; fix dựa vào Next/SWC không gập hằng qua var e=process.env (guard Docker bắt nếu nâng Next)"
-    }
-  ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.45.0-56.json",
-  "specUpdate": "spec/updates/2026-10-21-site-url-build-inlined.md",
+  "task": [],
+  "reviewResults": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.45.1-57.json",
+  "specUpdate": "spec/updates/2026-10-21-listing-detail-redesign.md",
   "specRefs": [
-    "F11",
-    "FR-PUB-15",
-    "NFR-03"
+    "Giao diện / Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS (BL-052)",
+    "F2",
+    "F3",
+    "F4",
+    "FR-PUB-02",
+    "FR-PUB-03",
+    "FR-PUB-04",
+    "FR-PUB-05",
+    "FR-PUB-06",
+    "FR-PUB-07",
+    "FR-PUB-16",
+    "FR-ADM-01",
+    "FR-ADM-02",
+    "FR-ADM-03",
+    "BR-06",
+    "BR-07"
   ],
   "specRefNotes": {
-    "F11": "Thêm câu 'URL gốc tuyệt đối (BL-053)': canonical / hreflang / og:url / JSON-LD / sitemap / robots / llms.txt dùng NEXT_PUBLIC_SITE_URL lúc chạy; build FAIL nếu placeholder lọt vào bundle; staging vẫn noindex.",
-    "FR-PUB-15": "SEO công khai — URL tuyệt đối đúng tên miền từng môi trường.",
-    "NFR-03": "SEO — không đổi yêu cầu, chỉ làm rõ nguồn URL gốc."
+    "BL-052": "Khối mới ở mục Giao diện (sau 'Doc impact khi build' của BL-045): khung danh sách chung, admin listingPages, trường mới Dự án / Tin BĐS, giá 'Giá từ', lọc /du-an /cho-thue /tin-bds, chi tiết Dự án / Cho thuê / Tin BĐS, backfill dev.",
+    "F2": "Dự án — bố cục thay bởi BL-052; trường productTypes / featuredAmenities / products / videoUrl / amenities[].description / amenitiesImage; lọc type / feature / province nhiều / giá tỷ.",
+    "F3": "Cho thuê — bố cục thay bởi BL-052; tham số mới project (URL + GET /api/public/rentals).",
+    "F4": "Tin BĐS — bố cục thay bởi BL-052; trường có cấu trúc mới; thẻ voucher riêng trong cùng lưới.",
+    "BR-06": "Ưu đãi hết hạn — thẻ voucher hiện Còn hạn / Đã kết thúc.",
+    "BR-07": "i18n vi/en — nhãn mới đủ EN; chữ EN thiếu thì bỏ hàng, không rơi về VI."
   },
-  "migration": "none",
+  "migration": "additive (versioned) — projects (productTypes, featuredAmenities, products, videoUrl, amenities.description, amenitiesImage), property-posts (propertyType, areaM2, bedrooms, bathrooms, houseDirection, frontageM, floors, handoverCondition, address, location), site-settings listingPages. Chỉ ADD, không DROP / đổi type.",
   "changed": {
-    "files": [
-      "src/lib/seo/site-url.ts",
-      "src/lib/seo/site-url.test.ts",
-      "docker/Dockerfile",
-      "scripts/check-build-placeholder.mjs"
-    ],
-    "filesNote": "site-url.ts: parseSiteUrl(env) hàm thuần, getSiteUrl() = parseSiteUrl(process.env); hành vi cũ giữ (build phase → undefined; thiếu/sai/không http(s) → undefined; trả origin). Dockerfile: placeholder build http://build-placeholder.invalid + chạy guard sau pnpm build. Guard quét .next/server + .next/static (bỏ .map).",
+    "files": [],
+    "filesNote": "Dự kiến — chốt khi close-out từng phase.",
     "modules": [
-      "SEO dùng chung (src/lib/seo/site-url.ts — 11 file gọi getSiteUrl: layout [locale], 7 trang danh sách/chi tiết, robots.ts, Breadcrumb.tsx, load-home.ts)",
-      "build pipeline Docker (stage builder)"
+      "src/collections/Projects.ts",
+      "src/collections/projects/*",
+      "src/collections/PropertyPosts.ts",
+      "src/globals/SiteSettings.ts",
+      "src/globals/site-settings/*",
+      "src/components/listing/* (MỚI — hero / bộ lọc / thẻ nổi bật / lưới / Tìm hiểu thêm + FAQ dùng chung, BL-054 tái dùng)",
+      "src/components/detail/* (hero full-bleed, thanh thông số, tab dính, cột phải)",
+      "src/components/projects/*",
+      "src/components/rentals/*",
+      "src/components/posts/*",
+      "src/lib/projects/*",
+      "src/lib/rentals/*",
+      "src/lib/posts/*",
+      "src/shared/types/api.ts",
+      "src/endpoints/public/rentals*",
+      "migrations/*",
+      "scripts backfill (pnpm backfill:listing-fields)",
+      "messages/* (i18n vi/en)"
     ]
   },
   "impact": {
     "direct": [
-      "Staging https://tami.genieplatform.cloud sau redeploy: <link rel=\"canonical\"> ở / và /en dùng https://tami.genieplatform.cloud",
-      "sitemap.xml + mọi sitemap con: mọi <loc> bắt đầu https://tami.genieplatform.cloud",
-      "og:url và hreflang (vi, en, x-default) trên trang chủ, danh sách và chi tiết Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng dùng tên miền staging",
-      "JSON-LD (Organization, RealEstateListing, Article, JobPosting, FAQPage, BreadcrumbList) url/@id dùng tên miền staging",
-      "robots.txt (dòng Sitemap) và llms.txt dùng tên miền staging",
-      "Không trang nào còn chuỗi http://localhost:3000 hoặc build-placeholder.invalid trong HTML/XML/TXT trả về"
+      "/du-an: hero ảnh + ô tìm q + chip 'Tìm nhanh' (link ?q=, trống → ẩn); tab danh mục có icon + số đếm, aria-current; cột 'Bộ lọc' (Tình trạng, Tỉnh/thành nhiều + Xem thêm, Chủ đầu tư, Mức giá thanh trượt tỷ, Loại hình theo productTypes, Tiện ích nổi bật AND) + 'Xoá tất cả'; thẻ nổi bật lớn (≤ 5 isFeatured, trang 1, không lặp trong lưới); 'N dự án phù hợp' + Sắp xếp; lưới 3/2/1 cột; phân trang số",
+      "Số đếm (tab, ô tích, chip) = khớp mọi lọc khác trừ chính chiều đó; mục 0 vẫn hiện mờ; tỉnh chỉ liệt kê tỉnh có ≥ 1 tin",
+      "Thẻ dự án: badge tình trạng, tên 2 dòng, ghim tỉnh, ≤ 3 tag Loại sản phẩm (+n), 'Giá từ' (priceFromVnd > 0, không thì min priceTable.priceFrom > 0) hoặc 'Liên hệ'; không icon yêu thích",
+      "/du-an/[slug]: hero full-bleed + 3 thumbnail + 'Xem tất cả N ảnh' (Lightbox) + nút video chỉ khi có videoUrl; thanh thông số ≤ 6 ô KHÔNG có Pháp lý; tab dính Tổng quan · Vị trí · Tiện ích · Hình ảnh + khối giữ lại (Nổi bật, Mặt bằng, Bảng giá, Pháp lý & chính sách + #documents, Tin liên quan, Hỏi đáp) sau Hình ảnh; thẻ Sản phẩm; cột phải form 'Nhận thông tin dự án' (#lead-form, source=project) + Hotline 'Gọi ngay'; Vị trí có danh sách khoảng cách; 'Dự án tương tự' carousel",
+      "/cho-thue (+ danh mục, khu vực): cùng khung; tab = danh mục; lọc Tỉnh (1) + Phường, Dự án (project MỚI), Giá thuê, Diện tích, Phòng ngủ, Nội thất, Tiện ích AND; thẻ giá/tháng + diện tích · PN · PT + tag danh mục + nội thất",
+      "/cho-thue/[slug]: thanh thông số Giá thuê · Diện tích · PN/PT · Nội thất · Hướng · Dọn vào từ; tab Tổng quan · Vị trí · Tiện ích · Hình ảnh + Điều khoản thuê + Pháp lý (khi có); form lead source=rental; 'Căn tương tự'",
+      "/tin-bds (+ danh mục): cùng khung; lọc type, province nhiều, giá tỷ, diện tích, phòng ngủ, hướng, handover, q, sort; voucher/ưu đãi chung lưới với thẻ voucher riêng (hạn + Còn hạn / Đã kết thúc)",
+      "/tin-bds/[slug]: thanh thông số theo loại tin (BĐS: Giá · Diện tích · PN/PT · Hướng · Mặt tiền · Số tầng; voucher: Hạn · Trạng thái); tab Ưu đãi giữ OfferBox mã voucher",
+      "Admin: Dự án có Loại sản phẩm, Tiện ích nổi bật, Sản phẩm (≤ 8, đến ≥ từ), Link video (validate YouTube/TikTok), mô tả tiện ích, Ảnh khối tiện ích; Tin BĐS có 10 trường có cấu trúc ở tab 'Thông tin tin đăng'; Cài đặt website tab 'Trang danh sách' (quickSearch, learnMore, faqs, showStrengths) — nhãn tiếng Việt",
+      "Khối 'Tìm hiểu thêm' + FAQ (JSON-LD FAQPage) cuối danh sách riêng từng màn; trống → ẩn",
+      "Mobile (< lg): nút 'Bộ lọc' + badge số lọc mở Sheet; cột phải chi tiết xuống sau nội dung + thanh CTA dính đáy",
+      "Bộ lọc nằm trên searchParams, chia sẻ link giữ nguyên; không JS → form GET + nút 'Áp dụng'; giá trị lạ bị bỏ, không 400/500",
+      "Backfill dev: pnpm backfill:listing-fields dry-run mặc định, --apply chỉ điền ô trống, từ chối NODE_ENV=production"
     ],
     "dependents": [
-      "Mọi trang công khai vi/en có metadata SEO (layout [locale], trang chủ, danh sách + chi tiết các module)",
-      "Build Docker image (CI): build thành công khi bundle sạch; build FAIL nếu placeholder lọt vào bundle"
+      "Trang chủ: thẻ dự án dùng chung / ProjectsSlider, slider dự án nổi bật",
+      "DetailLayout và component chi tiết dùng chung (DetailGalleryHero, DetailTitleCard…) — mọi trang chi tiết đang dùng",
+      "GET /api/public/rentals (tham số project mới, client hiện có không truyền vẫn chạy)",
+      "Sitemap / JSON-LD (RealEstateListing, FAQPage, BreadcrumbList) các trang danh sách + chi tiết",
+      "Admin form Projects / PropertyPosts / Site settings (Dịch AI TRANSLATABLE_FIELDS.projects thêm chữ localized mới)",
+      "BL-054 (Tin tức / Tuyển dụng / Liên hệ) sẽ tái dùng src/components/listing/*"
     ],
     "regression": [
-      "Staging vẫn noindex (meta robots / X-Robots-Tag) và chặn truy cập công khai",
-      "Link 'Xem website' admin, link trong email lead/ứng tuyển (qua getEnv()) vẫn đúng tên miền",
-      "Thiếu/sai NEXT_PUBLIC_SITE_URL → trang vẫn render, không xuất URL tuyệt đối như trước (không lỗi 500)",
-      "Redirect 301 khi đổi slug, hreflang vi/en, sitemap gồm cả hai bản ngôn ngữ không đổi"
+      "Link lọc cũ /du-an (province 1 slug, status, developer, q, sort, page) và /cho-thue (danh mục, tỉnh, phường, giá VNĐ, diện tích, phòng ngủ, nội thất, tiện ích) vẫn chạy đúng",
+      "Canonical về trang sạch + noindex, follow khi có lọc / sắp xếp / q; trang sạch index như trước",
+      "Lead form: nguồn đúng (project / rental / post), Turnstile, consent, gửi thành công; 1 LeadForm duy nhất mỗi trang chi tiết",
+      "Tin cho thuê đã thuê: băng 'Đã thuê', noindex, căn tương tự như hiện tại",
+      "Ưu đãi hết hạn (BR-06): trạng thái Đã kết thúc, hành vi cũ giữ",
+      "Bản EN (/en/...) mọi màn: nhãn i18n đủ, chữ EN thiếu thì bỏ hàng không rơi về VI, hreflang đúng",
+      "Dự án / tin cũ không có trường mới vẫn lưu, xuất bản, hiển thị (ô trống ẩn, không khung rỗng)",
+      "Header, footer, ConsultBanner, StrengthsBlock, breadcrumb trên ảnh không đổi; no-raw-colors.test PASS",
+      "Scroll-spy tab chi tiết (BL-027/028/029), neo #documents, #lead-form giữ",
+      "1 h1 mỗi trang; p95 danh sách ≤ 500ms"
     ]
   },
-  "uiTestCases": [
-    {
-      "id": "BL053-01",
-      "viewport": 1280,
-      "steps": "Mở https://tami.genieplatform.cloud/ và /en, xem nguồn trang (link canonical, alternate hreflang, meta og:url, script application/ld+json).",
-      "expected": "Mọi URL tuyệt đối bắt đầu https://tami.genieplatform.cloud; không có http://localhost:3000 hay build-placeholder.invalid; meta robots noindex vẫn có."
-    },
-    {
-      "id": "BL053-02",
-      "viewport": 1280,
-      "steps": "Mở /sitemap.xml rồi 1 sitemap con; mở /robots.txt và /llms.txt.",
-      "expected": "Mọi <loc> và dòng Sitemap/URL dùng https://tami.genieplatform.cloud."
-    },
-    {
-      "id": "BL053-03",
-      "viewport": 1280,
-      "steps": "Mở 1 trang chi tiết Dự án, Cho thuê, Tin tức, Tuyển dụng (vi + en), xem canonical, og:url, JSON-LD BreadcrumbList.",
-      "expected": "URL tuyệt đối đúng tên miền staging và đúng path trang đang xem."
-    }
-  ],
   "acceptance": [
-    "Trên staging https://tami.genieplatform.cloud sau redeploy: canonical, sitemap <loc>, og:url, JSON-LD dùng https://tami.genieplatform.cloud, không phải http://localhost:3000",
-    "Staging vẫn noindex",
-    "Bundle production không chứa placeholder build; Docker build FAIL nếu chứa",
-    "pnpm vitest run src/lib/seo, pnpm typecheck, pnpm lint PASS"
+    "/du-an + /du-an/[slug] khớp bố cục 2 ảnh design ở desktop; responsive mobile/tablet hợp lý (bộ lọc trái thành sheet trên mobile)",
+    "/cho-thue, /cho-thue/[slug], /tin-bds, /tin-bds/[slug] (+ trang danh mục danh-muc/[category]) dùng cùng layout với trường theo 'Quyết định'",
+    "Trường mới có trong admin (nhãn tiếng Việt, localized khi là chữ), migration versioned, không phá dữ liệu cũ (chỉ ADD)",
+    "Bộ lọc mới chạy qua searchParams, giữ được khi chia sẻ link; số đếm đúng theo bộ lọc khác đang chọn (hoặc ghi rõ cách đếm)",
+    "Ô Pháp lý không hiện trên thanh thông số dự án",
+    "Không có icon yêu thích",
+    "Khối trống (video, sản phẩm, tiện ích, FAQ…) ẩn, không để khung rỗng",
+    "Bản EN hoạt động như bản VI (nhãn i18n đủ)",
+    "Test + typecheck + lint + build PASS"
   ],
   "verification": {
-    "unit": "pnpm vitest run src/lib/seo — 8 file / 75 test PASS (+2 case parseSiteUrl)",
-    "typecheck": "PASS",
-    "lint": "0 error (2 warning cũ ngoài scope)",
-    "bundle": "Trước fix 3 chunk .next/server chứa let e=\"http://build-placeholder.invalid\".trim(); sau fix grep rỗng, guard exit 0",
-    "runtime": "chưa kiểm — cần build lại image + redeploy staging"
+    "status": "chưa chạy — planned, sẽ cập nhật ở close-out từng phase"
   },
-  "risk": "medium"
+  "risk": "high",
+  "riskNote": "UI rộng (6 route + danh mục, component dùng chung trang chủ / DetailLayout) + schema additive 3 collection/global + tham số API mới (project ở /api/public/rentals). Migration additive nên không gắn HIGH_RISK_MIGRATION trừ khi build phát sinh op phá huỷ."
 }

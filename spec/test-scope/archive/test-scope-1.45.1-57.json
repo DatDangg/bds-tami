@@ -1,0 +1,106 @@
+{
+  "specVersion": "1.45.1",
+  "scopeVersion": 57,
+  "generatedAt": "2026-10-21T23:59:59+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-053 BUG: URL gốc (canonical, hreflang, og:url, JSON-LD, sitemap, robots, llms.txt) bị nhúng placeholder lúc build (http://localhost:3000) thay vì NEXT_PUBLIC_SITE_URL lúc chạy. Sửa getSiteUrl() đọc runtime qua parseSiteUrl(process.env) + Dockerfile placeholder phân biệt + guard build.",
+  "workItem": "bug/site-url-build-inlined",
+  "backlog": "BL-053",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-21-site-url-build-inlined.md",
+  "changeDocStatus": "pending → archive ở close-out (spec/changes/archive/)",
+  "task": [
+    "tasks/bug-site-url-build-inlined/phase-1-task-01.md"
+  ],
+  "reviewReport": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
+  "reviewResults": [
+    {
+      "task": "phase-1-task-01",
+      "round": 1,
+      "result": "PASS",
+      "level": "STRICT",
+      "report": ".context/review-reports/bug-site-url-build-inlined-phase-1-task-01-round-1-review.md",
+      "note": "3 MINOR mở: guard try/catch nuốt mọi lỗi đọc thư mục; findPlaceholderFiles chưa có unit test; fix dựa vào Next/SWC không gập hằng qua var e=process.env (guard Docker bắt nếu nâng Next)"
+    }
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.45.0-56.json",
+  "specUpdate": "spec/updates/2026-10-21-site-url-build-inlined.md",
+  "specRefs": [
+    "F11",
+    "FR-PUB-15",
+    "NFR-03"
+  ],
+  "specRefNotes": {
+    "F11": "Thêm câu 'URL gốc tuyệt đối (BL-053)': canonical / hreflang / og:url / JSON-LD / sitemap / robots / llms.txt dùng NEXT_PUBLIC_SITE_URL lúc chạy; build FAIL nếu placeholder lọt vào bundle; staging vẫn noindex.",
+    "FR-PUB-15": "SEO công khai — URL tuyệt đối đúng tên miền từng môi trường.",
+    "NFR-03": "SEO — không đổi yêu cầu, chỉ làm rõ nguồn URL gốc."
+  },
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/lib/seo/site-url.ts",
+      "src/lib/seo/site-url.test.ts",
+      "docker/Dockerfile",
+      "scripts/check-build-placeholder.mjs"
+    ],
+    "filesNote": "site-url.ts: parseSiteUrl(env) hàm thuần, getSiteUrl() = parseSiteUrl(process.env); hành vi cũ giữ (build phase → undefined; thiếu/sai/không http(s) → undefined; trả origin). Dockerfile: placeholder build http://build-placeholder.invalid + chạy guard sau pnpm build. Guard quét .next/server + .next/static (bỏ .map).",
+    "modules": [
+      "SEO dùng chung (src/lib/seo/site-url.ts — 11 file gọi getSiteUrl: layout [locale], 7 trang danh sách/chi tiết, robots.ts, Breadcrumb.tsx, load-home.ts)",
+      "build pipeline Docker (stage builder)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Staging https://tami.genieplatform.cloud sau redeploy: <link rel=\"canonical\"> ở / và /en dùng https://tami.genieplatform.cloud",
+      "sitemap.xml + mọi sitemap con: mọi <loc> bắt đầu https://tami.genieplatform.cloud",
+      "og:url và hreflang (vi, en, x-default) trên trang chủ, danh sách và chi tiết Dự án / Cho thuê / Đăng tin BĐS / Tin tức / Tuyển dụng dùng tên miền staging",
+      "JSON-LD (Organization, RealEstateListing, Article, JobPosting, FAQPage, BreadcrumbList) url/@id dùng tên miền staging",
+      "robots.txt (dòng Sitemap) và llms.txt dùng tên miền staging",
+      "Không trang nào còn chuỗi http://localhost:3000 hoặc build-placeholder.invalid trong HTML/XML/TXT trả về"
+    ],
+    "dependents": [
+      "Mọi trang công khai vi/en có metadata SEO (layout [locale], trang chủ, danh sách + chi tiết các module)",
+      "Build Docker image (CI): build thành công khi bundle sạch; build FAIL nếu placeholder lọt vào bundle"
+    ],
+    "regression": [
+      "Staging vẫn noindex (meta robots / X-Robots-Tag) và chặn truy cập công khai",
+      "Link 'Xem website' admin, link trong email lead/ứng tuyển (qua getEnv()) vẫn đúng tên miền",
+      "Thiếu/sai NEXT_PUBLIC_SITE_URL → trang vẫn render, không xuất URL tuyệt đối như trước (không lỗi 500)",
+      "Redirect 301 khi đổi slug, hreflang vi/en, sitemap gồm cả hai bản ngôn ngữ không đổi"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL053-01",
+      "viewport": 1280,
+      "steps": "Mở https://tami.genieplatform.cloud/ và /en, xem nguồn trang (link canonical, alternate hreflang, meta og:url, script application/ld+json).",
+      "expected": "Mọi URL tuyệt đối bắt đầu https://tami.genieplatform.cloud; không có http://localhost:3000 hay build-placeholder.invalid; meta robots noindex vẫn có."
+    },
+    {
+      "id": "BL053-02",
+      "viewport": 1280,
+      "steps": "Mở /sitemap.xml rồi 1 sitemap con; mở /robots.txt và /llms.txt.",
+      "expected": "Mọi <loc> và dòng Sitemap/URL dùng https://tami.genieplatform.cloud."
+    },
+    {
+      "id": "BL053-03",
+      "viewport": 1280,
+      "steps": "Mở 1 trang chi tiết Dự án, Cho thuê, Tin tức, Tuyển dụng (vi + en), xem canonical, og:url, JSON-LD BreadcrumbList.",
+      "expected": "URL tuyệt đối đúng tên miền staging và đúng path trang đang xem."
+    }
+  ],
+  "acceptance": [
+    "Trên staging https://tami.genieplatform.cloud sau redeploy: canonical, sitemap <loc>, og:url, JSON-LD dùng https://tami.genieplatform.cloud, không phải http://localhost:3000",
+    "Staging vẫn noindex",
+    "Bundle production không chứa placeholder build; Docker build FAIL nếu chứa",
+    "pnpm vitest run src/lib/seo, pnpm typecheck, pnpm lint PASS"
+  ],
+  "verification": {
+    "unit": "pnpm vitest run src/lib/seo — 8 file / 75 test PASS (+2 case parseSiteUrl)",
+    "typecheck": "PASS",
+    "lint": "0 error (2 warning cũ ngoài scope)",
+    "bundle": "Trước fix 3 chunk .next/server chứa let e=\"http://build-placeholder.invalid\".trim(); sau fix grep rỗng, guard exit 0",
+    "runtime": "chưa kiểm — cần build lại image + redeploy staging"
+  },
+  "risk": "medium"
+}
