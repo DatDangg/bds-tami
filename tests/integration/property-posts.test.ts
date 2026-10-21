@@ -284,6 +284,42 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
       const ok = await createPost({ title: "Cùng ngày", offer: { startAt: pickerDate("2026-10-20"), endAt: pickerDate("2026-10-20") } });
       expect(await statusOf(updatePost(ok.id, { offer: { endAt: pickerDate("2026-10-01") } }))).toBe(400);
     });
+
+    it("thông số BĐS (BL-052): tin để trống vẫn xuất bản; có dữ liệu lưu/đọc lại đủ, khách đọc được địa chỉ + toạ độ; giá trị sai → 400; có index", async () => {
+      const bare = await createPost({ title: "Voucher không thông số", status: "published", cover: imageIds[0] });
+      expect(bare.status).toBe("published");
+      for (const name of ["propertyType", "areaM2", "bedrooms", "bathrooms", "houseDirection", "frontageM", "floors", "handoverCondition", "address", "location"] as const) {
+        expect(bare[name] ?? null).toBeNull();
+      }
+
+      const specs = {
+        propertyType: "townhouse",
+        areaM2: 72.5,
+        bedrooms: 4,
+        bathrooms: 3,
+        houseDirection: "SE",
+        frontageM: 5,
+        floors: 4,
+        handoverCondition: "basic",
+        address: "12 Nguyễn Huệ, Phường Sài Gòn",
+        location: [106.7031, 10.7769],
+      };
+      const doc = await createPost({ title: "Nhà phố đủ thông số", status: "published", cover: imageIds[0], ...specs });
+      const stored = await payload.findByID({ collection: "property-posts", id: doc.id, locale: "en", depth: 0, overrideAccess: true });
+      expect(stored).toMatchObject(specs);
+      const asGuest = await payload.findByID({ collection: "property-posts", id: doc.id, locale: "vi", depth: 0, overrideAccess: false });
+      expect(asGuest).toMatchObject({ address: specs.address, location: specs.location });
+
+      expect(await statusOf(createPost({ title: "Loại lạ", propertyType: "castle" }))).toBe(400);
+      expect(await statusOf(createPost({ title: "Hướng lạ", houseDirection: "UP" }))).toBe(400);
+      expect(await statusOf(createPost({ title: "Bàn giao lạ", handoverCondition: "luxury" }))).toBe(400);
+      for (const name of ["areaM2", "bedrooms", "bathrooms", "frontageM", "floors"]) {
+        expect(await statusOf(createPost({ title: `Âm ${name}`, [name]: -1 }))).toBe(400);
+      }
+
+      const indexes = await withDatabase((client) => client.query(`SELECT indexname FROM pg_indexes WHERE tablename = 'property_posts'`));
+      expect(indexes.rows.map((row) => String(row.indexname))).toEqual(expect.arrayContaining(["property_posts_property_type_idx", "property_posts_area_m2_idx"]));
+    });
   });
 
   describe("ảnh bìa", () => {

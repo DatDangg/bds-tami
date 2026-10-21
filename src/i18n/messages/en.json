@@ -1173,6 +1173,11 @@
       "water_view": "River/lake view",
       "pool_gym_spa": "Pool, gym, spa",
       "green_park": "Green parks"
+    },
+    "handoverCondition": {
+      "raw": "Bare shell",
+      "basic": "Basic finish",
+      "full": "Fully furnished"
     }
   },
   "projectCard": {

@@ -325,6 +325,14 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `ward` | `rel→wards` | | Tuỳ chọn |
 | `relatedProject` | `rel→projects` | | Tuỳ chọn |
 | `relatedRental` | `rel→rentals` | | Tuỳ chọn |
+| `propertyType` | select (`PROPERTY_TYPES`) | I | BL-052, tuỳ chọn. Cùng danh sách `projects.productTypes` (`src/shared/listing-options.ts`) |
+| `areaM2` | number ≥ 0 | I | BL-052, tuỳ chọn. Diện tích (m²) |
+| `bedrooms`, `bathrooms` | number ≥ 0 | | BL-052, tuỳ chọn |
+| `houseDirection` | select (`DIRECTIONS`) | | BL-052, tuỳ chọn. Cùng danh sách hướng của `rentals` |
+| `handoverCondition` | select (`HANDOVER_CONDITIONS`: `raw` · `basic` · `full`) | | BL-052, tuỳ chọn. Tình trạng bàn giao |
+| `frontageM`, `floors` | number ≥ 0 | | BL-052, tuỳ chọn. Mặt tiền (m), số tầng |
+| `address` | text | | BL-052, tuỳ chọn, không localized, **công khai** (không ẩn như `rentals.address`) |
+| `location` | point | | BL-052, tuỳ chọn, công khai. Không có index GIST |
 | `offer` | group | | `startAt`, `endAt` (I), `voucherCode`, `terms` (textarea). Có `endAt` đã qua thì gắn "Đã kết thúc" (BR-06) |
 | `isFeatured` | checkbox | I | Ứng viên khối "Ưu đãi nổi bật" |
 | `status` | select | R, I | |
@@ -333,6 +341,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `seo` | group | | |
 
 **As-built (layer-7-task-01):** `src/collections/PropertyPosts.ts`, migration `20261018_075627_property_posts` (bảng `property_posts`, `_locales`, `_rels` + bảng phiên bản; thêm giá trị `expire-offers` vào enum task của Payload Jobs; additive, không DROP/đổi kiểu).
+- **Thông số BĐS (BL-052, phase-3-task-01):** migration `20261021_173246_property_post_specs` — 3 enum mới (+ 3 enum bảng phiên bản), 10 cột nullable trên `property_posts` và `_property_posts_v`, index đơn `property_posts_property_type_idx` + `property_posts_area_m2_idx` (+ bản `_v`); additive, không DROP/đổi kiểu/NOT NULL/backfill. Admin: vỏ `collapsible` không tên "Thông số bất động sản" ở tab "Thông tin tin đăng" (trường ở cấp gốc, không group); không nằm trong `englishRequiredFields` nên tin cũ / tin voucher để trống vẫn lưu và xuất bản được. Nhãn công khai: `listingOptions.propertyType`, `listingOptions.handoverCondition`, `page.rentalDetail.direction`. `address` ẩn khỏi "Thêm bộ lọc" (như `rentals`).
 - **Trường localized:** `title`, `slug`, `excerpt`, `content`, `priceNote`, `offer.terms`; còn lại dùng chung các ngôn ngữ. `status` chỉ `draft`/`published`/`hidden`; khách thấy `published`.
 - **`cover`:** bắt buộc khi `published`, bản nháp được thiếu (như `news`); validator dùng chung `src/fields/cover-image.ts` (cũng dùng cho `news.cover`, `services.coverImage`), luôn chạy validator `upload` mặc định trước nên chỉ nhận ảnh. `gallery` chỉ nhận ảnh, tuỳ chọn.
 - **`province`/`ward` đều tuỳ chọn; `ward` phải thuộc `province` (G22)** — `filterOptions` trong admin + validator ở server; chọn `ward` mà thiếu `province` là lỗi 400. Không xoá được tỉnh/phường còn bài tham chiếu (409, tính cả bài xoá mềm).

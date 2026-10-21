@@ -2202,13 +2202,18 @@
         {
           "task": "phase-3-task-01",
           "file": "tasks/feature-listing-detail-redesign/phase-3-task-01.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-2"
           ],
           "wave": "3A",
-          "note": "schema tin BĐS, migration"
+          "note": "schema tin BĐS, migration",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-01-round-1-review.md",
+          "commit": "65f4cf0",
+          "migration": "20261021_173246_property_post_specs SAFE_ADDITIVE, đã migrate DB dev tami 2026-10-22"
         },
         {
           "task": "phase-3-task-02",
@@ -2277,7 +2282,7 @@
           "note": "fix G1 phase review: số đếm Tiện ích /cho-thue"
         }
       ],
-      "stage": "2026-10-22: phase review P1+P2 xong (G1 → P2-T04); wave 3A P3-T01 ‖ P2-T04",
+      "stage": "2026-10-22: P3-T01 merged + migrate dev; P2-T04 reviewer running; next wave 3B P3-T02‖T04‖T05",
       "asBuiltPending": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",

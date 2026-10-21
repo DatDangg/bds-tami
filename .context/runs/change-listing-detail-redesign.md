@@ -25,6 +25,7 @@ committed:
   P2-T01: 3d9c2e4 (merge 75f36b0)
   P2-T03: 0d82e5d (merge 12033f8)
   P2-T02: 926f5e3 (merge staging, xem log)
+  P3-T01: 65f4cf0 — migration 20261021_173246_property_post_specs SAFE_ADDITIVE, đã migrate DB dev tami
 remaining: [phase-review P1+P2 (spec-validator), P3-T01 schema tin BĐS (migration), P3-T02, P3-T04, P3-T05 (wave B), P3-T03, P3-T06 (gom MINOR, danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
 next: "spec-validator phase review P1+P2 → rồi P3 wave A (T01 migration) → B (T02‖T04‖T05) → C (T03) → D (T06)"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
@@ -57,3 +58,6 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ▶ START spec-validator phase review P1+P2 (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE spec-validator phase review P1+P2 — phase 1 COMPLETE; phase 2 G1 MAJOR (số đếm Tiện ích /cho-thue) → task mới phase-2-task-04 (wave 3A song song P3-T01); B1 (chip đơn chọn không đếm) chờ user chọn; B2–B5 → asBuiltPending; M1 → P3-T06; P3-T02 nhận quy tắc đếm. ▶ START builder-strong P3-T01 (worktree mới từ staging, DB tami_wt52_p2t03, redis db 15) (running — cancel sẽ redo bước này)
 - 2026-10-22 user duyệt B1 (chip không đếm). ▶ START builder-strong P2-T04 (worktree mới từ staging, DB tami_wt52_p2t01, redis db 10) (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE builder-strong P3-T01 — wt agent-a162565e94c21661c (chưa commit); migration 20261021_173246_property_post_specs additive (6 enum, 20 cột nullable, 4 index), up/down/up PASS; typecheck/lint/test 382/3809/build PASS; DIRECTIONS chuyển src/shared/listing-options.ts. ▶ START reviewer r1 P3-T01 STRICT (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE builder-strong P2-T04 — wt agent-a8dac0ad1547957b1 (chưa commit); facets.amenities qua truy vấn JOIN riêng (4→5 query), +2–4ms local; typecheck/lint/test 381/3807/build PASS. ▶ START reviewer r1 P2-T04 STRICT (running — cancel sẽ redo bước này)
+- 2026-10-22 reviewer r1 P3-T01 STRICT PASS (3 MINOR → P3-T06; drift check sạch) → 65f4cf0 merged vào staging + progress; pnpm payload migrate DB dev tami OK (25ms). ✅ DONE P3-T01. P2-T04 reviewer vẫn running.

@@ -914,6 +914,25 @@ export interface PropertyPost {
   ward?: (string | null) | Ward;
   relatedProject?: (string | null) | Project;
   relatedRental?: (string | null) | Rental;
+  propertyType?: ('apartment' | 'townhouse' | 'villa' | 'shophouse' | 'land' | 'resort' | 'condotel' | 'office') | null;
+  areaM2?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  houseDirection?: ('N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW') | null;
+  handoverCondition?: ('raw' | 'basic' | 'full') | null;
+  frontageM?: number | null;
+  floors?: number | null;
+  /**
+   * Hiện công khai trên trang tin. Vd: 12 Nguyễn Huệ, Phường Sài Gòn.
+   */
+  address?: string | null;
+  /**
+   * Hiện công khai trên bản đồ trang tin.
+   *
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
   offer?: {
     startAt?: string | null;
     endAt?: string | null;
@@ -2039,6 +2058,16 @@ export interface PropertyPostsSelect<T extends boolean = true> {
   ward?: T;
   relatedProject?: T;
   relatedRental?: T;
+  propertyType?: T;
+  areaM2?: T;
+  bedrooms?: T;
+  bathrooms?: T;
+  houseDirection?: T;
+  handoverCondition?: T;
+  frontageM?: T;
+  floors?: T;
+  address?: T;
+  location?: T;
   offer?:
     | T
     | {
