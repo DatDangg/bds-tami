@@ -572,8 +572,11 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
     let listCategoryId = "";
     const ids: Record<string, string> = {};
 
-    it("listPublicPosts: bài còn hạn / không hạn trước, bài đã kết thúc sau; phân trang nối hai nhóm; lọc danh mục; loại id nổi bật", async () => {
-      const { listPublicPosts, findFeaturedPost } = await import("../../src/lib/posts/post-queries");
+    it("listPublicPostListing: bài còn hạn / không hạn trước, bài đã kết thúc sau; lọc danh mục; nổi bật còn hiệu lực không lặp lưới", async () => {
+      const { listPublicPostListing } = await import("../../src/lib/posts/post-queries");
+      const list = (query: { categoryIds?: string[]; now?: Date; page?: number }, locale: Locale = "vi") =>
+        listPublicPostListing(payload, locale, { page: query.page ?? 1, now: query.now ?? now, ...(query.categoryIds ? { categoryIds: query.categoryIds } : {}) });
+      const idsOf = (docs: readonly { id: string }[]) => docs.map((doc) => doc.id);
       listCategoryId = (await createCategory("Danh mục truy vấn", "property_post")).id;
       const make = async (key: string, offer?: Record<string, unknown>, extra: Record<string, unknown> = {}) => {
         const doc = await createPost({ title: `Truy vấn ${key}`, status: "published", cover: imageIds[0], category: listCategoryId, ...(offer ? { offer } : {}), ...extra });
@@ -587,40 +590,69 @@ describe.skipIf(!baseUrl)("integration: property-posts (DB tạm)", () => {
       await updatePost(ids["active-future"]!, { isFeatured: true });
       await updatePost(ids["ended-old"]!, { isFeatured: true });
 
-      // Hai nhóm nối nhau theo trang: trang 1 = 3 bài còn hạn / không hạn, trang 2 = 2 bài đã kết thúc.
-      const first = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId] });
-      expect(first.docs.map((doc) => doc.id).sort()).toEqual(["active-today", "active-none", "active-future"].map((key) => ids[key]!).sort());
-      expect(first).toMatchObject({ totalPages: 2, isEmpty: false });
-      const second = await listPublicPosts(payload, "vi", { page: 2, now, categoryIds: [listCategoryId] });
-      expect(second.docs.map((doc) => doc.id).sort()).toEqual(["ended-old", "ended-yesterday"].map((key) => ids[key]!).sort());
-      expect((await listPublicPosts(payload, "vi", { page: 3, now, categoryIds: [listCategoryId] })).docs).toEqual([]);
+      // Nổi bật = isFeatured CÒN HIỆU LỰC (bài isFeatured đã kết thúc không lên); không lặp trong lưới; totalDocs gồm nổi bật.
+      const first = await list({ categoryIds: [listCategoryId] });
+      expect(idsOf(first.featured)).toEqual([ids["active-future"]]);
+      // Lưới: còn hạn / không hạn (mới nhất trước) rồi đã kết thúc (mới nhất trước).
+      expect(idsOf(first.docs)).toEqual(["active-none", "active-today", "ended-yesterday", "ended-old"].map((key) => ids[key]!));
+      expect(first).toMatchObject({ totalDocs: 5, totalPages: 1 });
+      const second = await list({ categoryIds: [listCategoryId], page: 2 });
+      expect(second).toMatchObject({ docs: [], featured: [] });
 
-      // Hạn là NGÀY: ưu đãi hết hạn hôm nay (15/06) vẫn còn hiệu lực hết ngày; sang 00:00 ngày 16 giờ VN thì đã kết thúc.
+      // Hạn là NGÀY: ưu đãi hết hạn hôm nay (15/06) vẫn còn hiệu lực hết ngày; sang 00:00 ngày 16 giờ VN thì đã kết thúc (xuống nhóm cuối).
       const tomorrow = new Date("2031-06-15T17:00:00.000Z");
-      const after = await listPublicPosts(payload, "vi", { page: 1, now: tomorrow, categoryIds: [listCategoryId] });
-      expect(after.docs.map((doc) => doc.id)).not.toContain(ids["active-today"]);
-      expect(after.docs).toHaveLength(2);
+      const after = await list({ categoryIds: [listCategoryId], now: tomorrow });
+      expect(idsOf(after.docs)).toEqual(["active-none", "active-today", "ended-yesterday", "ended-old"].map((key) => ids[key]!));
+      expect(after.docs.slice(1).every((doc) => isOfferEnded(doc, tomorrow))).toBe(true);
 
-      const excluded = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId], excludeIds: [ids["active-none"]!] });
-      expect(excluded.docs.map((doc) => doc.id)).not.toContain(ids["active-none"]);
-      expect((await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [categoryId], excludeIds: [] })).docs.map((doc) => doc.id)).not.toContain(ids["active-none"]);
-
-      // Nổi bật = isFeatured còn hạn mới nhất: bài isFeatured đã kết thúc không được chọn.
-      const featured = await findFeaturedPost(payload, "vi", now);
-      expect(featured?.id).toBe(ids["active-future"]);
-      // Trang danh mục dùng cùng quy tắc, chỉ xét bài trong danh mục: danh mục khác (trống) không có bài nổi bật.
-      expect((await findFeaturedPost(payload, "vi", now, [listCategoryId]))?.id).toBe(ids["active-future"]);
+      // Danh mục khác: không lẫn bài; danh mục trống → không nổi bật, rỗng.
+      expect(idsOf((await list({ categoryIds: [categoryId] })).docs)).not.toContain(ids["active-none"]);
       const otherCategory = await createCategory("Danh mục không nổi bật", "property_post");
-      expect(await findFeaturedPost(payload, "vi", now, [otherCategory.id])).toBeNull();
+      expect(await list({ categoryIds: [otherCategory.id] })).toMatchObject({ docs: [], featured: [], totalDocs: 0 });
+    });
+
+    it("listPublicPostListing BL-052: lọc thuộc tính mới (loại hình, giá, diện tích, phòng ngủ, hướng, bàn giao, tỉnh, từ khoá) + số đếm trừ chính chiều", async () => {
+      const { listPublicPostListing } = await import("../../src/lib/posts/post-queries");
+      const specsCategoryId = (await createCategory("Danh mục thông số", "property_post")).id;
+      const make = (title: string, extra: Record<string, unknown>) =>
+        createPost({ title, status: "published", cover: imageIds[0], category: specsCategoryId, ...extra }).then((doc) => doc.id);
+      const villa = await make("Biệt thự ven sông", { propertyType: "villa", priceVnd: 20_000_000_000, areaM2: 300, bedrooms: 5, houseDirection: "S", handoverCondition: "raw", province: provinceId, ward: wardId });
+      const flat = await make("Căn hộ trung tâm", { propertyType: "apartment", priceVnd: 3_000_000_000, areaM2: 70, bedrooms: 2, houseDirection: "SE", handoverCondition: "full", province: otherProvinceId, address: "12 Tràng Tiền" });
+      const voucher = await make("Voucher khai trương", { offer: { voucherCode: "MO2031" } });
+      const run = (filters: Record<string, unknown>) => listPublicPostListing(payload, "vi", { page: 1, now, categoryIds: [specsCategoryId], ...filters });
+      const idsOf = (docs: readonly { id: string }[]) => docs.map((doc) => doc.id);
+
+      expect(idsOf((await run({ types: ["villa"] })).docs)).toEqual([villa]);
+      expect(idsOf((await run({ priceMin: 1, priceMax: 5 })).docs)).toEqual([flat]);
+      expect(idsOf((await run({ areaMin: 100 })).docs)).toEqual([villa]);
+      expect(idsOf((await run({ bedrooms: 4 })).docs)).toEqual([villa]);
+      expect(idsOf((await run({ directions: ["SE"] })).docs)).toEqual([flat]);
+      expect(idsOf((await run({ handovers: ["raw"] })).docs)).toEqual([villa]);
+      expect(idsOf((await run({ provinceIds: [otherProvinceId] })).docs)).toEqual([flat]);
+      expect(idsOf((await run({ q: "trang tien" })).docs)).toEqual([flat]);
+      expect(idsOf((await run({ q: "phuong sai gon" })).docs)).toEqual([villa]);
+      // Không lọc: đủ 3 tin (voucher không thông số vẫn có).
+      expect((await run({})).totalDocs).toBe(3);
+
+      const { facets } = await run({ types: ["villa"], provinceIds: [otherProvinceId] });
+      expect(facets.type.counts).toMatchObject({ apartment: 1, villa: 0 });
+      expect(facets.provinces.find((item) => item.id === provinceId)).toMatchObject({ slug: "ho-chi-minh", count: 1 });
+      expect(facets.provinces.find((item) => item.id === otherProvinceId)).toMatchObject({ slug: "ha-noi", count: 0 });
+
+      // Thẻ: trường thẻ mới có mặt; voucher (có mã, không giá / diện tích) → thẻ voucher.
+      const { toPostCards } = await import("../../src/lib/posts/post-view");
+      const cards = toPostCards((await run({})).docs, "vi", now);
+      expect(cards.find((card) => card.id === voucher)).toMatchObject({ kind: "voucher", hasOffer: true });
+      expect(cards.find((card) => card.id === villa)).toMatchObject({ kind: "property", propertyType: "villa", areaM2: 300, bedrooms: 5, placeLabel: "Phường Sài Gòn, Thành phố Hồ Chí Minh" });
     });
 
     it("/en chỉ gồm bài có bản EN; bài nháp không bao giờ xuất hiện", async () => {
-      const { listPublicPosts } = await import("../../src/lib/posts/post-queries");
+      const { listPublicPostListing } = await import("../../src/lib/posts/post-queries");
       const draft = await createPost({ title: "Truy vấn nháp", status: "draft", category: listCategoryId });
-      const vi = await listPublicPosts(payload, "vi", { page: 1, now, categoryIds: [listCategoryId] });
+      const vi = await listPublicPostListing(payload, "vi", { page: 1, now, categoryIds: [listCategoryId] });
       expect(vi.docs.map((doc) => doc.id)).not.toContain(draft.id);
-      const en = await listPublicPosts(payload, "en", { page: 1, now, categoryIds: [listCategoryId] });
-      expect(en.docs).toEqual([]);
+      const en = await listPublicPostListing(payload, "en", { page: 1, now, categoryIds: [listCategoryId] });
+      expect(en).toMatchObject({ docs: [], featured: [], totalDocs: 0 });
     });
 
     it("findPublicPostBySlug + findRelatedTargets: chỉ trả dự án / tin cho thuê công khai (nháp thì không)", async () => {

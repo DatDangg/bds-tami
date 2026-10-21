@@ -1248,5 +1248,16 @@
     "bedroomsLabel": "{count, plural, one {# bedroom} other {# bedrooms}}",
     "bathrooms": "{count, number} BA",
     "bathroomsLabel": "{count, plural, one {# bathroom} other {# bathrooms}}"
+  },
+  "postCard": {
+    "offer": "Offer",
+    "contact": "Contact us",
+    "tagsLabel": "Tags",
+    "specsLabel": "Key facts",
+    "bedrooms": "{count, number} BR",
+    "bedroomsLabel": "{count, plural, one {# bedroom} other {# bedrooms}}",
+    "offerEnds": "Offer ends: {date}",
+    "offerActive": "Active",
+    "offerEnded": "Ended"
   }
 }

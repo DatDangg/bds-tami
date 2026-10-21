@@ -4,52 +4,59 @@ import type { Locale } from "../../i18n/routing";
 import type { Category } from "../../payload-types";
 import { publicPath } from "../content/content-paths";
 import { visibleCategory } from "../news/news-view";
-import {
-  findFeaturedPost,
-  findPostCategoryBySlug,
-  listChildPostCategories,
-  listPublicPosts,
-  listRootPostCategories,
-} from "./post-queries";
+import { listProvinces } from "../projects/project-queries";
+import type { PostFilters } from "./post-filters";
+import { findPostCategoryBySlug, listChildPostCategories, listPublicPostListing, listRootPostCategories, type PostFacets } from "./post-queries";
 import { type PostCardData, postCategoryHref, toPostCards } from "./post-view";
 
 export interface PostListing {
-  /** Chỉ ở trang 1 của `/tin-bds` và trang danh mục (phạm vi danh mục + con): `isFeatured` mới nhất còn hạn (S08). */
-  featured: PostCardData | null;
+  /** ≤ 5 tin `isFeatured` còn hiệu lực khớp bộ lọc (slider nổi bật); chỉ ở trang 1, không lặp trong `items` ở mọi trang. */
+  featured: PostCardData[];
   items: PostCardData[];
+  /** ≥ 1 (trang 1 luôn hợp lệ, kể cả khi trống). */
   totalPages: number;
-  /** Tổng số bài của danh sách (lưới + bài nổi bật) cho "Có N kết quả"; không đổi theo trang. */
+  /** Tổng số tin khớp (lưới + nổi bật) cho "N … phù hợp"; không đổi theo trang. */
   totalDocs: number;
-  /** Trang yêu cầu vượt số trang có dữ liệu (trang 1 luôn hợp lệ, kể cả khi trống). */
+  /** Trang yêu cầu vượt số trang có dữ liệu. */
   outOfRange: boolean;
   isEmpty: boolean;
+  /** Số đếm tab danh mục + ô tích (loại hình, tỉnh, hướng, bàn giao). */
+  facets: PostFacets;
+  /** Bộ lọc thực sự áp dụng: như `filters` truyền vào nhưng slug tỉnh lạ đã bị bỏ (chip "đang lọc", URL phân trang). */
+  filters: PostFilters;
 }
 
 /**
- * Dữ liệu một trang danh sách Đăng tin BĐS. `/tin-bds` và trang danh mục (cùng quy tắc, phạm vi danh mục + con): bài nổi bật (nếu có) tách riêng và bị loại khỏi lưới ở MỌI trang để
- * không trùng khi sang trang 2; lưới xếp bài còn hạn trước, bài đã kết thúc sau (`listPublicPosts`). `categoryIds` gồm danh mục + con của nó.
+ * Dữ liệu một trang danh sách Đăng tin BĐS (BL-052). `/tin-bds` và trang danh mục cùng quy tắc (`categoryIds` = danh mục + con của nó) — `listPublicPostListing`:
+ * lọc / đếm / sắp trong bộ nhớ, tin nổi bật tách riêng và bị loại khỏi lưới ở MỌI trang, tin ưu đãi đã kết thúc xếp sau.
+ * Slug tỉnh đối chiếu với danh sách tỉnh: slug lạ bị bỏ (không lọc thành rỗng); tỉnh hợp lệ chưa có tin thì vẫn lọc (ra rỗng).
  */
 export async function loadPostListing(
   payload: Payload,
   locale: Locale,
-  options: { page: number; now: Date; categoryIds?: readonly string[] },
+  options: { page: number; now: Date; categoryIds?: readonly string[]; filters?: PostFilters },
 ): Promise<PostListing> {
   const { page, now, categoryIds } = options;
-  const featuredDoc = await findFeaturedPost(payload, locale, now, categoryIds);
-  const grid = await listPublicPosts(payload, locale, {
+  const { provinceSlugs, ...rest } = options.filters ?? {};
+  const known = provinceSlugs?.length ? (await listProvinces(payload)).filter((province) => provinceSlugs.includes(province.slug)) : [];
+  const filters: PostFilters = { ...rest, ...(known.length > 0 ? { provinceSlugs: known.map((province) => province.slug).sort() } : {}) };
+  const result = await listPublicPostListing(payload, locale, {
+    ...filters,
     page,
     now,
     ...(categoryIds ? { categoryIds } : {}),
-    ...(featuredDoc ? { excludeIds: [featuredDoc.id] } : {}),
+    ...(known.length > 0 ? { provinceIds: known.map((province) => province.id) } : {}),
   });
-  const featured = featuredDoc && page === 1 ? (toPostCards([featuredDoc], locale, now)[0] ?? null) : null;
+  const totalPages = Math.max(1, result.totalPages);
   return {
-    featured,
-    items: toPostCards(grid.docs, locale, now),
-    totalPages: grid.totalPages,
-    totalDocs: grid.totalDocs + (featuredDoc ? 1 : 0),
-    outOfRange: page > 1 && page > grid.totalPages,
-    isEmpty: grid.isEmpty && featuredDoc === null,
+    featured: toPostCards(result.featured, locale, now),
+    items: toPostCards(result.docs, locale, now),
+    totalPages,
+    totalDocs: result.totalDocs,
+    outOfRange: page > totalPages,
+    isEmpty: result.totalDocs === 0,
+    facets: result.facets,
+    filters,
   };
 }
 

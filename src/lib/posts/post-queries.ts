@@ -2,11 +2,14 @@ import type { Payload, Where } from "payload";
 
 import type { Locale } from "../../i18n/routing";
 import type { Category, Project, PropertyPost, Rental } from "../../payload-types";
-import { offerEndedWhere, offerNotEndedWhere } from "../content/offer-status";
+import { isOfferEnded, offerEndedWhere, offerNotEndedWhere } from "../content/offer-status";
+import { MAX_PAGE_SIZE } from "../content/pagination";
 import { findPublicBySlug, findPublicList, type PublicListResult } from "../content/public-queries";
 import { relationId } from "../payload/relation-id";
+import { DEFAULT_POST_SORT, type PostSortKey } from "./post-filters";
+import { buildPostPredicates, computePostFacets, orderPosts, postMatcher, type PostFacets, type PostFilterCriteria } from "./post-list-facets";
 
-/** 12 bài/trang (design-spec S08); bài nổi bật ở trang 1 của `/tin-bds` không tính vào 12 bài này. */
+/** 12 tin/trang (design-spec S08); tin nổi bật ở trang 1 của `/tin-bds` không tính vào 12 tin này. */
 export const POST_PAGE_SIZE = 12;
 export const RELATED_POSTS_COUNT = 3;
 
@@ -27,6 +30,12 @@ export const POST_CARD_FIELDS = {
   priceVnd: true,
   priceNote: true,
   offer: true,
+  // BL-052 thẻ BĐS: vị trí, loại hình, diện tích · phòng ngủ.
+  province: true,
+  ward: true,
+  propertyType: true,
+  areaM2: true,
+  bedrooms: true,
 } as const;
 
 /** Danh mục `property_post` cấp 1 của một ngôn ngữ (tab danh mục của S08). `/en` chỉ gồm danh mục đã có bản EN. */
@@ -53,24 +62,6 @@ export function findPostCategoryBySlug(payload: Payload, locale: Locale, slug: s
   return findPublicBySlug<Category>(payload, "categories", locale, slug, { where: PROPERTY_POST_SCOPE, depth: 1 });
 }
 
-export interface PostPageQuery {
-  page: number;
-  /** Lọc theo các danh mục này (danh mục + con của nó). Bỏ trống = mọi danh mục. */
-  categoryIds?: readonly string[];
-  /** Bài nổi bật đã hiện riêng, loại khỏi lưới để không trùng. */
-  excludeIds?: readonly string[];
-  /** Mốc "bây giờ" để tách bài còn hạn / đã kết thúc (truyền vào để test được). */
-  now: Date;
-}
-
-export interface PostPage {
-  docs: PropertyPost[];
-  totalPages: number;
-  /** Số bài của lưới (còn hạn + đã kết thúc, đã trừ `excludeIds`) — dùng cho dòng "Có N kết quả". */
-  totalDocs: number;
-  isEmpty: boolean;
-}
-
 function listPostsWhere(where: Where[], locale: Locale, page: number, payload: Payload): Promise<PublicListResult<PropertyPost>> {
   return findPublicList<PropertyPost>(payload, "property-posts", locale, {
     where: { and: where },
@@ -82,50 +73,135 @@ function listPostsWhere(where: Where[], locale: Locale, page: number, payload: P
   });
 }
 
+/** Quét tối đa 20 trang x 50 = 1000 tin công khai (như `/du-an`); vượt thì phần sau không được lọc / đếm / sắp và có log cảnh báo. */
+const SCAN_MAX_PAGES = 20;
+const SCAN_PAGE_SIZE = MAX_PAGE_SIZE;
+/** Số thẻ tối đa của slider nổi bật đầu lưới `/tin-bds`. */
+export const POST_FEATURED_LIMIT = 5;
+
+/** Trường đủ để lọc / đếm / sắp ở bộ nhớ (không ảnh, không nội dung). */
+const POST_SCAN_FIELDS = {
+  title: true,
+  excerpt: true,
+  address: true,
+  province: true,
+  ward: true,
+  category: true,
+  propertyType: true,
+  priceVnd: true,
+  areaM2: true,
+  bedrooms: true,
+  houseDirection: true,
+  handoverCondition: true,
+  isFeatured: true,
+  offer: true,
+} as const;
+/** Doc liên quan khi quét: tỉnh (slug / tên / thứ tự cho ô tích + từ khoá), phường (tên cho từ khoá), danh mục (`parent` để đếm tab cấp 1). */
+const POST_SCAN_POPULATE = {
+  provinces: { slug: true, name: true, shortName: true, sortOrder: true },
+  wards: { name: true },
+  categories: { parent: true },
+} as const;
+/** Thẻ chỉ cần tên tỉnh / phường và tên / slug / `hasEnglish` danh mục (`visibleCategory`); ảnh bìa giữ đủ trường cho `ResponsiveImage`. */
+const POST_CARD_POPULATE = {
+  provinces: { name: true, shortName: true },
+  wards: { name: true },
+  categories: { name: true, slug: true, hasEnglish: true },
+} as const;
+
 /**
- * Một trang danh sách công khai theo thứ tự "bài còn hạn (hoặc không có hạn) trước, bài ưu đãi đã kết thúc sau" (BR-06, design-spec S08):
- * hai nhóm nối nhau theo trang (hết các trang của nhóm còn hạn mới sang trang của nhóm đã kết thúc; trang cuối của nhóm đầu có thể ngắn).
- * Cả hai đều đi qua `findPublicList` (luôn kèm `publicWhere`) và `isOfferEnded` là nguồn chân lý của việc tách (`offerEndedWhere`/`offerNotEndedWhere`).
+ * Quét MỌI tin công khai của ngôn ngữ (mới nhất trước): số đếm "trừ chính chiều đó" cần tập không lọc, từ khoá không dấu không có cột tìm kiếm,
+ * và "không giá xếp cuối" không làm được bằng `sort` của Payload (Postgres đặt NULL đầu khi DESC).
  */
-export async function listPublicPosts(payload: Payload, locale: Locale, query: PostPageQuery): Promise<PostPage> {
-  const { page, categoryIds, excludeIds, now } = query;
-  const base: Where[] = [
-    ...(categoryIds ? [{ category: { in: [...categoryIds] } }] : []),
-    ...(excludeIds?.length ? [{ id: { not_in: [...excludeIds] } }] : []),
-  ];
-  const [active, endedHead] = await Promise.all([
-    listPostsWhere([...base, offerNotEndedWhere(now)], locale, page, payload),
-    listPostsWhere([...base, offerEndedWhere(now)], locale, 1, payload),
-  ]);
-  // Danh sách rỗng báo `totalPages` không thống nhất giữa các adapter: tự tính từ `totalDocs`.
-  const activePages = active.totalDocs === 0 ? 0 : active.totalPages;
-  const endedPages = endedHead.totalDocs === 0 ? 0 : endedHead.totalPages;
-  const endedPage = page - activePages;
-  let docs: PropertyPost[] = [];
-  if (page <= activePages) docs = active.docs;
-  else if (endedPage === 1) docs = endedHead.docs;
-  else if (endedPage <= endedPages) docs = (await listPostsWhere([...base, offerEndedWhere(now)], locale, endedPage, payload)).docs;
-  const totalDocs = active.totalDocs + endedHead.totalDocs;
-  return { docs, totalPages: Math.max(1, activePages + endedPages), totalDocs, isEmpty: totalDocs === 0 };
+async function scanPublicPosts(payload: Payload, locale: Locale): Promise<PropertyPost[]> {
+  const all: PropertyPost[] = [];
+  for (let page = 1; page <= SCAN_MAX_PAGES; page += 1) {
+    const result = await findPublicList<PropertyPost>(payload, "property-posts", locale, {
+      sort: POST_SORT,
+      page,
+      limit: SCAN_PAGE_SIZE,
+      depth: 1,
+      select: POST_SCAN_FIELDS,
+      populate: POST_SCAN_POPULATE,
+    });
+    all.push(...result.docs);
+    if (!result.hasNextPage) break;
+    if (page === SCAN_MAX_PAGES) {
+      payload.logger.warn({ cap: SCAN_MAX_PAGES * SCAN_PAGE_SIZE }, "Quét tin BĐS chạm trần: kết quả lọc/đếm/sắp bị cắt, cần cột lọc + truy vấn SQL");
+    }
+  }
+  return all;
 }
 
-/** Bài nổi bật đầu danh sách: `isFeatured` mới nhất còn hạn (S08). */
-export async function findFeaturedPost(
-  payload: Payload,
-  locale: Locale,
-  now: Date,
-  categoryIds?: readonly string[],
-): Promise<PropertyPost | null> {
+/** Đủ trường thẻ của các id (một truy vấn), theo id. */
+async function cardsByIds(payload: Payload, locale: Locale, ids: readonly string[]): Promise<Map<string, PropertyPost>> {
+  if (ids.length === 0) return new Map();
   const { docs } = await findPublicList<PropertyPost>(payload, "property-posts", locale, {
-    where: {
-      and: [{ isFeatured: { equals: true } }, offerNotEndedWhere(now), ...(categoryIds ? [{ category: { in: [...categoryIds] } }] : [])],
-    },
-    sort: POST_SORT,
-    limit: 1,
+    where: { id: { in: [...ids] } },
+    limit: ids.length,
     depth: 1,
     select: POST_CARD_FIELDS,
+    populate: POST_CARD_POPULATE,
   });
-  return docs[0] ?? null;
+  return new Map(docs.map((doc) => [doc.id, doc]));
+}
+
+export interface PostListQuery extends PostFilterCriteria {
+  page: number;
+  sort?: PostSortKey;
+  /** Mốc "bây giờ" để tách tin còn hạn / đã kết thúc (truyền vào để test được). */
+  now: Date;
+}
+
+export type { PostFacetCounts, PostFacets, PostProvinceFacet } from "./post-list-facets";
+
+/**
+ * Kết quả danh sách `/tin-bds` (BL-052). `docs` = một trang lưới trên phần còn lại SAU KHI bỏ tin nổi bật; `totalDocs` = MỌI tin khớp
+ * (gồm nổi bật — "N phù hợp"); `totalPages` tính trên phần còn lại (0 khi không còn tin nào ngoài nổi bật).
+ */
+export interface PostListResult {
+  docs: PropertyPost[];
+  /** ≤ 5 tin `isFeatured` còn hiệu lực khớp bộ lọc, mới nhất trước; chỉ có ở trang 1 (trang khác rỗng, nhưng vẫn bị loại khỏi lưới). */
+  featured: PropertyPost[];
+  totalDocs: number;
+  totalPages: number;
+  facets: PostFacets;
+}
+
+/**
+ * Danh sách Tin BĐS công khai (`/tin-bds` + trang danh mục, BL-052). Mọi truy vấn đi qua `findPublicList` (đã xuất bản, chưa xoá mềm, `/en` chỉ tin `hasEnglish`).
+ * Quét ≤ 1000 tin công khai rồi lọc / đếm / sắp ở bộ nhớ (như `/du-an`), sau đó MỘT truy vấn lấy trường thẻ cho trang lưới + thẻ nổi bật.
+ * - Thứ tự: tin ưu đãi đã kết thúc luôn sau (BR-06); `newest` (mặc định) hoặc theo giá (không giá cuối) — `orderPosts`.
+ * - Nổi bật: ≤ `POST_FEATURED_LIMIT` tin `isFeatured` CÒN HIỆU LỰC (ưu đãi chưa kết thúc, BR-06) khớp bộ lọc, mới nhất trước (không theo `sort`);
+ *   trả ở trang 1, bị loại khỏi lưới ở MỌI trang nên không lặp; `totalDocs` vẫn tính cả chúng.
+ * - `facets`: số đếm từng chiều theo quy tắc "khớp mọi bộ lọc khác trừ chính chiều đó".
+ */
+export async function listPublicPostListing(payload: Payload, locale: Locale, query: PostListQuery): Promise<PostListResult> {
+  const { page, now } = query;
+  const scanned = await scanPublicPosts(payload, locale);
+  const predicates = buildPostPredicates(query);
+  const matched = scanned.filter(postMatcher(predicates));
+  const featuredIds = matched
+    .filter((post) => post.isFeatured === true && !isOfferEnded(post, now))
+    .slice(0, POST_FEATURED_LIMIT)
+    .map((post) => post.id);
+  const rest = orderPosts(
+    matched.filter((post) => !featuredIds.includes(post.id)),
+    query.sort ?? DEFAULT_POST_SORT,
+    now,
+  );
+  const totalPages = Math.ceil(rest.length / POST_PAGE_SIZE);
+  const pageIds = rest.slice((page - 1) * POST_PAGE_SIZE, page * POST_PAGE_SIZE).map((post) => post.id);
+  const shownFeaturedIds = page === 1 ? featuredIds : [];
+  const cards = await cardsByIds(payload, locale, [...shownFeaturedIds, ...pageIds]);
+  const inOrder = (ids: readonly string[]) => ids.flatMap((id) => cards.get(id) ?? []);
+  return {
+    docs: inOrder(pageIds),
+    featured: inOrder(shownFeaturedIds),
+    totalDocs: matched.length,
+    totalPages,
+    facets: computePostFacets(scanned, predicates),
+  };
 }
 
 /** Bài công khai theo slug của ngôn ngữ đang xem; `category`/`cover`/`gallery`/tỉnh/phường đã populate. */

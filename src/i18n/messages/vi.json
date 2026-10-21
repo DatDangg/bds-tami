@@ -1248,5 +1248,16 @@
     "bedroomsLabel": "{count, plural, other {# phòng ngủ}}",
     "bathrooms": "{count, number} PT",
     "bathroomsLabel": "{count, plural, other {# phòng tắm}}"
+  },
+  "postCard": {
+    "offer": "Ưu đãi",
+    "contact": "Liên hệ",
+    "tagsLabel": "Phân loại",
+    "specsLabel": "Thông số",
+    "bedrooms": "{count, number} PN",
+    "bedroomsLabel": "{count, plural, other {# phòng ngủ}}",
+    "offerEnds": "Hạn ưu đãi: {date}",
+    "offerActive": "Còn hạn",
+    "offerEnded": "Đã kết thúc"
   }
 }

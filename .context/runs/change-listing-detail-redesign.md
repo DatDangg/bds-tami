@@ -28,6 +28,7 @@ committed:
   P3-T01: 65f4cf0 — migration 20261021_173246_property_post_specs SAFE_ADDITIVE, đã migrate DB dev tami
   P2-T04: dfa0884 — fix G1 số đếm Tiện ích
   P3-T04: 32f5d44
+  P3-T02: 59cd5bc
 remaining: [phase-review P1+P2 (spec-validator), P3-T01 schema tin BĐS (migration), P3-T02, P3-T04, P3-T05 (wave B), P3-T03, P3-T06 (gom MINOR, danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
 next: "spec-validator phase review P1+P2 → rồi P3 wave A (T01 migration) → B (T02‖T04‖T05) → C (T03) → D (T06)"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
@@ -69,3 +70,4 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ✅ DONE builder-strong P3-T05 — wt agent-a2688a4fbacb121db (chưa commit); dry-run/apply DB worktree 38 quét/37 điền/0 lỗi, idempotent; N1 fix; typecheck/lint/test 383/3828/build PASS. ▶ START reviewer r1 P3-T05 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE builder-strong P3-T02 — wt agent-a780d52efbdc5ce09 (chưa commit); lọc/đếm in-memory như /du-an (cap 1000), PostCard listing/voucher + variant home; /tin-bds p95 248ms; typecheck/lint/test/build PASS; i18n postCard. ▶ START reviewer r1 P3-T02 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P3-T04 STRICT PASS (4 MINOR → P3-T06) → 32f5d44 merged vào staging + progress, typecheck PASS. ✅ DONE P3-T04. P3-T02/T05 reviewer running.
+- 2026-10-22 reviewer r1 P3-T02 STRICT PASS (5 MINOR → P3-T06; ngày /en chờ user) → 59cd5bc merged (i18n auto-merge OK, JSON hợp lệ), typecheck + vitest posts/home/projects/tin-bds 29 file 290 PASS. ✅ DONE P3-T02. reviewer r1 P3-T05 STRICT PASS (4 MINOR → P3-T06).

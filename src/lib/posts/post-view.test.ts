@@ -64,6 +64,28 @@ describe("toPostCardData", () => {
     const noEnglish = { ...category, hasEnglish: false } as Category;
     expect(toPostCardData(post({ category: noEnglish }), "en", NOW)?.categoryName).toBeNull();
   });
+
+  it("BL-052 thẻ voucher: có ưu đãi (hạn hoặc mã) VÀ không có giá lẫn diện tích; còn lại thẻ BĐS", () => {
+    expect(toPostCardData(post(endAt("2026-10-30T12:00:00.000Z")), "vi", NOW)).toMatchObject({ kind: "voucher", hasOffer: true });
+    expect(toPostCardData(post({ offer: { voucherCode: "THU2026" } }), "vi", NOW)).toMatchObject({ kind: "voucher", hasOffer: true, endLabel: null });
+    // Tin bán kèm ưu đãi → thẻ BĐS (+ badge ưu đãi).
+    expect(toPostCardData(post({ ...endAt("2026-10-30T12:00:00.000Z"), priceVnd: 2_000_000_000 }), "vi", NOW)).toMatchObject({ kind: "property", hasOffer: true });
+    expect(toPostCardData(post({ offer: { voucherCode: "X" }, areaM2: 80 }), "vi", NOW)?.kind).toBe("property");
+    // Không ưu đãi (mã rỗng, hạn hỏng) → thẻ BĐS dù không có giá / diện tích.
+    expect(toPostCardData(post({ offer: { voucherCode: "  ", endAt: "khong-phai-ngay" } }), "vi", NOW)).toMatchObject({ kind: "property", hasOffer: false, endLabel: null });
+  });
+
+  it("BL-052 thẻ BĐS: loại hình, vị trí (phường, tỉnh), diện tích > 0, phòng ngủ; trống → null", () => {
+    const ward = { id: "w1", name: "Phường Bến Nghé" } as PropertyPost["ward"];
+    const province = { id: "p1", name: "Thành phố Hồ Chí Minh", shortName: "TP.HCM" } as PropertyPost["province"];
+    expect(toPostCardData(post({ propertyType: "villa", ward, province, areaM2: 120.5, bedrooms: 0 }), "vi", NOW)).toMatchObject({
+      propertyType: "villa",
+      placeLabel: "Phường Bến Nghé, TP.HCM",
+      areaM2: 120.5,
+      bedrooms: 0,
+    });
+    expect(toPostCardData(post({ areaM2: 0, province: "p1" }), "vi", NOW)).toMatchObject({ propertyType: null, placeLabel: null, areaM2: null, bedrooms: null });
+  });
 });
 
 describe("toPostOfferView", () => {
