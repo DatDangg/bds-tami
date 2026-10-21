@@ -46,14 +46,18 @@ function childFields(field: Field): Field[] {
   return [];
 }
 
-/** Mọi vi phạm nhãn trong cây field; chuỗi `path` để thông báo lỗi chỉ đúng chỗ. */
-export function scanFieldLabels(fields: Field[], prefix: string): string[] {
+/**
+ * Mọi vi phạm nhãn trong cây field; chuỗi `path` để thông báo lỗi chỉ đúng chỗ.
+ * `titledByParent`: các field con của collapsible có nhãn — group con được đặt `label: false` để tiêu đề không lặp (Trang chủ, BL-051 A14).
+ */
+export function scanFieldLabels(fields: Field[], prefix: string, titledByParent = false): string[] {
   const problems: string[] = [];
   for (const field of fields) {
     const entry = field as Labelled;
     const here = `${prefix}.${entry.name ?? `(${entry.type})`}`;
     const hiddenInAdmin = entry.admin?.hidden === true;
-    if (entry.name && !hiddenInAdmin && !isVietnameseLabel(entry.label)) problems.push(`${here}: thiếu label`);
+    const titleHandledByParent = titledByParent && field.type === "group" && entry.label === false;
+    if (entry.name && !hiddenInAdmin && !titleHandledByParent && !isVietnameseLabel(entry.label)) problems.push(`${here}: thiếu label`);
     if ((field.type === "array" || field.type === "blocks") && !hiddenInAdmin && !hasPluralLabels(entry.labels) && !entry.admin?.components?.RowLabel) {
       problems.push(`${here}: array/blocks thiếu labels hoặc RowLabel`);
     }
@@ -67,7 +71,7 @@ export function scanFieldLabels(fields: Field[], prefix: string): string[] {
         if (rawCode || !isVietnameseLabel(option.label)) problems.push(`${here}: option ${JSON.stringify(typeof option === "string" ? option : option.value)} thiếu label`);
       }
     }
-    if (!hiddenInAdmin) problems.push(...scanFieldLabels(childFields(field), here));
+    if (!hiddenInAdmin) problems.push(...scanFieldLabels(childFields(field), here, field.type === "collapsible" && isVietnameseLabel(entry.label)));
   }
   return problems;
 }
@@ -111,6 +115,8 @@ describe("nhãn tiếng Việt của admin (quét config thô, không cần DB)"
       { name: "secret", type: "text", admin: { hidden: true } },
       { name: "rows", type: "array", label: "Dòng", fields: [{ name: "inner", type: "select", label: "Trong", options: [{ label: "", value: "a" }, "b", { label: "c", value: "c" }] }] },
       { type: "row", fields: [{ name: "deep", type: "number" }] },
+      { type: "collapsible", label: "Khối", fields: [{ name: "titled", type: "group", label: false, fields: [] }] },
+      { type: "row", fields: [{ name: "unTitled", type: "group", label: false, fields: [] }] },
     ];
     expect(scanFieldLabels(fields, "x")).toEqual([
       "x.missing: thiếu label",
@@ -119,6 +125,7 @@ describe("nhãn tiếng Việt của admin (quét config thô, không cần DB)"
       'x.rows.inner: option "b" thiếu label',
       'x.rows.inner: option "c" thiếu label',
       "x.(row).deep: thiếu label",
+      "x.(row).unTitled: thiếu label",
     ]);
     expect(scanCollection({ slug: "c", fields: [] })).toEqual(["c: thiếu labels.singular/plural"]);
     expect(scanGlobal({ slug: "g", fields: [] })).toEqual(["g: thiếu label"]);

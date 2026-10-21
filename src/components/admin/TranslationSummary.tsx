@@ -8,7 +8,8 @@ import { translationSummary } from "@/lib/translation/admin-ui";
 const useTranslationField = (name: string) => useFormFields(([fields]) => fields[`translation.${name}`]?.value);
 
 /**
- * Dòng tóm tắt trạng thái bản tiếng Anh trong nhóm "Bản dịch" (BL-042). Đọc các trường hệ thống `translation.*` (đã `admin.hidden` nhưng vẫn nằm
+ * Dòng tóm tắt trạng thái bản tiếng Anh: trong khối "Bản dịch tiếng Anh" ở cột phải (collection nội dung, BL-051 A11) hoặc nhóm "Bản dịch tiếng Anh" của global
+ * (BL-042; Trang chủ: tab "SEO & Đa ngôn ngữ"). Đọc các trường hệ thống `translation.*` (đã `admin.hidden` nhưng vẫn nằm
  * trong form state) nên người dùng không phải đọc 7 ô kỹ thuật. Chỉ hiển thị, không ghi dữ liệu.
  */
 export function TranslationSummary() {

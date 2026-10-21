@@ -1,4 +1,4 @@
-import type { Field, RelationshipFieldManyValidation } from "payload";
+import type { Field, GroupField, RelationshipFieldManyValidation } from "payload";
 import { relationship } from "payload/shared";
 
 import { navLinkField } from "../../fields/nav-link";
@@ -41,9 +41,9 @@ export const strengthIconField = (required: boolean): Field => ({
   options: STRENGTH_ICONS.map((icon) => ({ label: STRENGTH_ICON_LABELS[icon], value: icon })),
 });
 /** Khối không có trong "Thứ tự khối" thì không hiện (bản ghi trang chủ có từ trước chưa có hai khối này): nhắc ở admin thay vì tự thêm lúc render. */
-export const BLOCK_ORDER_NOTE = "Khối chỉ hiện khi có trong mục Thứ tự khối.";
+export const BLOCK_ORDER_NOTE = 'Khối chỉ hiện khi có trong mục "Thứ tự các khối" (tab "Chuyển đổi & Bố cục").';
 
-export const enabledField = { name: "enabled", type: "checkbox", label: "Hiển thị khối này", defaultValue: true } as const satisfies Field;
+export const enabledField = { name: "enabled", type: "checkbox", label: "Hiện khối này trên web", defaultValue: true } as const satisfies Field;
 export const titleField = { name: "title", type: "text", label: "Tiêu đề khối", localized: true } as const satisfies Field;
 
 /** Danh mục của khối Cho thuê phải thuộc scope `rental`: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn). */
@@ -66,7 +66,7 @@ const validateRentalCategories: RelationshipFieldManyValidation = async (value, 
   return allRental ? true : 'Chỉ chọn danh mục thuộc loại "Cho thuê".';
 };
 
-export const announcementBarBlock: Field = {
+export const announcementBarBlock: GroupField = {
   name: "announcementBar",
   type: "group",
   label: "Thanh thông báo (đầu trang chủ)",
@@ -78,7 +78,7 @@ export const announcementBarBlock: Field = {
   ],
 };
 
-export const heroSearchBlock: Field = {
+export const heroSearchBlock: GroupField = {
   name: "heroSearch",
   type: "group",
   label: "Ô tìm kiếm trên banner",
@@ -91,7 +91,7 @@ export const heroSearchBlock: Field = {
 };
 
 /** Dải 4 điểm mạnh dưới ô tìm kiếm (BL-044). Không có tiêu đề khối; `/en` bỏ mục thiếu `title` EN, < 2 mục thì ẩn khối. */
-export const strengthsBlock: Field = {
+export const strengthsBlock: GroupField = {
   name: "strengths",
   type: "group",
   label: STRENGTHS_BLOCK_LABEL,
@@ -115,7 +115,7 @@ export const strengthsBlock: Field = {
   ],
 };
 
-export const rentalsBlock: Field = {
+export const rentalsBlock: GroupField = {
   name: "rentals",
   type: "group",
   label: RENTALS_BLOCK_LABEL,
@@ -138,7 +138,7 @@ export const rentalsBlock: Field = {
   ],
 };
 
-export const newsBlock: Field = {
+export const newsBlock: GroupField = {
   name: "news",
   type: "group",
   label: NEWS_BLOCK_LABEL,

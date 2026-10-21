@@ -1,4 +1,4 @@
-import type { Field, GlobalConfig, TextFieldSingleValidation, UploadFieldSingleValidation } from "payload";
+import type { ArrayField, CollapsibleField, Field, GlobalConfig, GroupField, TextFieldSingleValidation, UploadFieldSingleValidation } from "payload";
 import { upload } from "payload/shared";
 
 import { hideFromNonAdmin, isAdmin } from "../access";
@@ -113,7 +113,7 @@ const BLOCK_LABELS: Record<(typeof HOMEPAGE_BLOCKS)[number], string> = {
   news: NEWS_BLOCK_LABEL,
 };
 
-const heroBlock: Field = {
+const heroBlock: GroupField = {
   name: "hero",
   type: "group",
   label: "Banner đầu trang",
@@ -152,7 +152,7 @@ const heroBlock: Field = {
   ],
 };
 
-const aboutBlock: Field = {
+const aboutBlock: GroupField = {
   name: "about",
   type: "group",
   label: BLOCK_LABELS.about,
@@ -186,7 +186,7 @@ const aboutBlock: Field = {
   ],
 };
 
-const featuredProjectsBlock: Field = {
+const featuredProjectsBlock: GroupField = {
   name: "featuredProjects",
   type: "group",
   label: BLOCK_LABELS.featuredProjects,
@@ -200,14 +200,14 @@ const featuredProjectsBlock: Field = {
   ],
 };
 
-const servicesBlock: Field = {
+const servicesBlock: GroupField = {
   name: "services",
   type: "group",
   label: BLOCK_LABELS.services,
   fields: [enabledField, titleField, { name: "items", type: "relationship", label: "Dịch vụ hiển thị", relationTo: "services", hasMany: true }],
 };
 
-const featuredOffersBlock: Field = {
+const featuredOffersBlock: GroupField = {
   name: "featuredOffers",
   type: "group",
   label: BLOCK_LABELS.featuredOffers,
@@ -220,9 +220,9 @@ const featuredOffersBlock: Field = {
 };
 
 // Danh sách đối tác lấy từ `developers.showAsPartner`.
-const partnersBlock: Field = { name: "partners", type: "group", label: BLOCK_LABELS.partners, fields: [enabledField, titleField] };
+const partnersBlock: GroupField = { name: "partners", type: "group", label: BLOCK_LABELS.partners, fields: [enabledField, titleField] };
 
-const ctaBannerBlock: Field = {
+const ctaBannerBlock: GroupField = {
   name: "ctaBanner",
   type: "group",
   label: BLOCK_LABELS.ctaBanner,
@@ -240,7 +240,7 @@ const ctaBannerBlock: Field = {
   ],
 };
 
-const blockOrderField: Field = {
+const blockOrderField: ArrayField = {
   name: "blockOrder",
   type: "array",
   label: "Thứ tự các khối",
@@ -249,11 +249,45 @@ const blockOrderField: Field = {
   validate: validateBlockOrder,
   admin: {
     description:
-      "Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích Hiển thị) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.",
+      "Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích \"Hiện khối này trên web\" ở khối đó) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.",
     components: { RowLabel: textRowLabel({ field: "block", fallback: "Khối", valueLabels: BLOCK_LABELS }) },
   },
   fields: [{ name: "block", type: "select", label: "Khối", required: true, options: HOMEPAGE_BLOCKS.map((block) => ({ label: BLOCK_LABELS[block], value: block })) }],
 };
+
+/**
+ * Khối của form Trang chủ: khối thu gọn (collapsible KHÔNG tên) mang tiêu đề tên khối; nhãn của chính group đặt `false` để tiêu đề không lặp.
+ * Vỏ không tên nên đường dẫn dữ liệu (`about.enabled`…), hook, validate và API giữ nguyên, không đổi schema.
+ * "Thứ tự các khối" (`blockOrder`) KHÔNG bọc: nó điều khiển cả trang chứ không phải một khối, và mô tả hướng dẫn tắt khối của nó phải luôn thấy được.
+ */
+function homepageBlock(label: string, field: GroupField, initCollapsed: boolean): CollapsibleField {
+  return { type: "collapsible", label, admin: { initCollapsed }, fields: [{ ...field, label: false }] };
+}
+
+type BlockEntry = [label: string, field: GroupField];
+
+/** Khối đầu mỗi tab mở sẵn, các khối sau thu gọn (tab dài vẫn lướt được). */
+const blocksOf = (entries: BlockEntry[]) => entries.map(([label, field], index) => homepageBlock(label, field, index > 0));
+
+/** 5 tab không tên theo luồng trang (BL-051 A14): tab không `name` nên không thêm cấp vào dữ liệu. */
+function homepageTabs() {
+  return formTabs([
+    { label: "Đầu trang & Banner", fields: blocksOf([["Thanh thông báo (đầu trang chủ)", announcementBarBlock], ["Banner đầu trang", heroBlock], ["Ô tìm kiếm trên banner", heroSearchBlock]]) },
+    { label: "Giới thiệu & Uy tín", fields: blocksOf([[BLOCK_LABELS.about, aboutBlock], [STRENGTHS_BLOCK_LABEL, strengthsBlock], [BLOCK_LABELS.partners, partnersBlock]]) },
+    {
+      label: "Sản phẩm & Tin nổi bật",
+      fields: blocksOf([
+        [BLOCK_LABELS.featuredProjects, featuredProjectsBlock],
+        [RENTALS_BLOCK_LABEL, rentalsBlock],
+        [BLOCK_LABELS.services, servicesBlock],
+        [BLOCK_LABELS.featuredOffers, featuredOffersBlock],
+        [NEWS_BLOCK_LABEL, newsBlock],
+      ]),
+    },
+    { label: "Chuyển đổi & Bố cục", fields: [...blocksOf([[BLOCK_LABELS.ctaBanner, ctaBannerBlock]]), blockOrderField] },
+    { label: "SEO & Đa ngôn ngữ", fields: blocksOf([["SEO", seoField()], ["Bản dịch tiếng Anh", translationGroup()]]) },
+  ]);
+}
 
 /**
  * Trang chủ (ERD §4.15, FR-PUB-01, FR-ADM-08): admin bật/tắt, sắp xếp khối và sửa nội dung. Khách đọc; CHỈ admin ghi.
@@ -268,22 +302,7 @@ export function createHomepage(revalidators?: HomepageRevalidators): GlobalConfi
     access: { read: () => true, update: isAdmin },
     hooks: { beforeChange: [detectManualEnglishGlobal], afterChange: [createRevalidateHomepageGlobal(revalidators), enqueueTranslation.globalAfterChange] },
     fields: [
-      formTabs([
-        { label: "Thanh thông báo", fields: [announcementBarBlock] },
-        { label: "Banner đầu trang", fields: [heroBlock, heroSearchBlock] },
-        { label: STRENGTHS_BLOCK_LABEL, fields: [strengthsBlock] },
-        { label: "Giới thiệu", fields: [aboutBlock] },
-        { label: "Dự án nổi bật", fields: [featuredProjectsBlock] },
-        { label: "Dịch vụ", fields: [servicesBlock] },
-        { label: "Ưu đãi", fields: [featuredOffersBlock] },
-        { label: "Cho thuê", fields: [rentalsBlock] },
-        { label: "Tin tức", fields: [newsBlock] },
-        { label: "Đối tác", fields: [partnersBlock] },
-        { label: "Mời tư vấn", fields: [ctaBannerBlock] },
-        { label: "Thứ tự khối", fields: [blockOrderField] },
-        { label: "SEO", fields: [seoField()] },
-        { label: "Bản dịch", fields: [translationGroup()] },
-      ]),
+      homepageTabs(),
     ],
   };
 }

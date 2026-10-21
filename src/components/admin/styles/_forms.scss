@@ -90,6 +90,11 @@
     min-height: 44px;
     min-width: 44px;
   }
+
+  // Thanh tiêu đề khối thu gọn (Trang chủ: mỗi khối là một collapsible, BL-051 A14) mặc định cao 40px.
+  .collapsible__toggle {
+    min-height: 44px;
+  }
 }
 
 // ---- Dòng gợi ý dưới ô nhập: bộ đếm Mô tả ngắn, giá đọc bằng chữ (BL-042 T02) ----

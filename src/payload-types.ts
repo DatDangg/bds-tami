@@ -2813,33 +2813,6 @@ export interface Homepage {
      */
     chipProjects?: (string | Project)[] | null;
   };
-  /**
-   * Khối chỉ hiện khi có trong mục Thứ tự khối.
-   */
-  strengths?: {
-    enabled?: boolean | null;
-    /**
-     * 2–6 mục; mỗi mục gồm biểu tượng, tiêu đề ngắn và một dòng mô tả.
-     */
-    items?:
-      | {
-          icon:
-            | 'map-pin'
-            | 'buildings'
-            | 'headset'
-            | 'file-check'
-            | 'shield-check'
-            | 'clock'
-            | 'users'
-            | 'star'
-            | 'medal'
-            | 'users-three';
-          title: string;
-          description?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
   about?: {
     enabled?: boolean | null;
     /**
@@ -2917,6 +2890,37 @@ export interface Homepage {
      */
     decorImage?: (string | null) | Media;
   };
+  /**
+   * Khối chỉ hiện khi có trong mục "Thứ tự các khối" (tab "Chuyển đổi & Bố cục").
+   */
+  strengths?: {
+    enabled?: boolean | null;
+    /**
+     * 2–6 mục; mỗi mục gồm biểu tượng, tiêu đề ngắn và một dòng mô tả.
+     */
+    items?:
+      | {
+          icon:
+            | 'map-pin'
+            | 'buildings'
+            | 'headset'
+            | 'file-check'
+            | 'shield-check'
+            | 'clock'
+            | 'users'
+            | 'star'
+            | 'medal'
+            | 'users-three';
+          title: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  partners?: {
+    enabled?: boolean | null;
+    title?: string | null;
+  };
   featuredProjects?: {
     enabled?: boolean | null;
     eyebrow?: string | null;
@@ -2926,6 +2930,17 @@ export interface Homepage {
      * Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.
      */
     projects?: (string | Project)[] | null;
+  };
+  /**
+   * Khối chỉ hiện khi có trong mục "Thứ tự các khối" (tab "Chuyển đổi & Bố cục").
+   */
+  rentals?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    /**
+     * Tối đa 4. Để trống thì tự lấy các danh mục cho thuê đang có tin.
+     */
+    categories?: (string | Category)[] | null;
   };
   services?: {
     enabled?: boolean | null;
@@ -2941,18 +2956,7 @@ export interface Homepage {
     posts?: (string | PropertyPost)[] | null;
   };
   /**
-   * Khối chỉ hiện khi có trong mục Thứ tự khối.
-   */
-  rentals?: {
-    enabled?: boolean | null;
-    title?: string | null;
-    /**
-     * Tối đa 4. Để trống thì tự lấy các danh mục cho thuê đang có tin.
-     */
-    categories?: (string | Category)[] | null;
-  };
-  /**
-   * Khối chỉ hiện khi có trong mục Thứ tự khối.
+   * Khối chỉ hiện khi có trong mục "Thứ tự các khối" (tab "Chuyển đổi & Bố cục").
    */
   news?: {
     enabled?: boolean | null;
@@ -2962,10 +2966,6 @@ export interface Homepage {
      * Tối đa 3. Để trống thì tự lấy 3 bài mới nhất.
      */
     posts?: (string | News)[] | null;
-  };
-  partners?: {
-    enabled?: boolean | null;
-    title?: string | null;
   };
   ctaBanner?: {
     enabled?: boolean | null;
@@ -2994,7 +2994,7 @@ export interface Homepage {
     secondaryLink?: string | null;
   };
   /**
-   * Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích Hiển thị) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.
+   * Banner đầu trang và ô tìm kiếm luôn đứng đầu; kéo thả để sắp xếp các khối còn lại. Bố cục mới chỉ gồm Điểm mạnh, Giới thiệu, Dự án nổi bật, Mời tư vấn — các khối khác (Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác) bỏ khỏi danh sách (hoặc bỏ tích "Hiện khối này trên web" ở khối đó) để tắt, thêm lại để bật. Khối chỉ hiện khi có trong danh sách này.
    */
   blockOrder?:
     | {
@@ -3339,19 +3339,6 @@ export interface HomepageSelect<T extends boolean = true> {
         placeholder?: T;
         chipProjects?: T;
       };
-  strengths?:
-    | T
-    | {
-        enabled?: T;
-        items?:
-          | T
-          | {
-              icon?: T;
-              title?: T;
-              description?: T;
-              id?: T;
-            };
-      };
   about?:
     | T
     | {
@@ -3377,6 +3364,25 @@ export interface HomepageSelect<T extends boolean = true> {
         ctaLink?: T;
         decorImage?: T;
       };
+  strengths?:
+    | T
+    | {
+        enabled?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
+  partners?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+      };
   featuredProjects?:
     | T
     | {
@@ -3385,6 +3391,13 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         projects?: T;
+      };
+  rentals?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        categories?: T;
       };
   services?:
     | T
@@ -3400,13 +3413,6 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         posts?: T;
       };
-  rentals?:
-    | T
-    | {
-        enabled?: T;
-        title?: T;
-        categories?: T;
-      };
   news?:
     | T
     | {
@@ -3414,12 +3420,6 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         intro?: T;
         posts?: T;
-      };
-  partners?:
-    | T
-    | {
-        enabled?: T;
-        title?: T;
       };
   ctaBanner?:
     | T

@@ -42,24 +42,24 @@ const resetOnDuplicate = (value: unknown): FieldHook => () => value;
 
 /**
  * Trường ảo (không có cột DB): 1 dòng tóm tắt thay cho các trường hệ thống đã ẩn (BL-042), rồi nút "Dịch lại bằng AI"; nút tự ẩn khi người dùng không được dịch lại bản ghi này.
- * Hai component đọc `translation.*` theo đường dẫn tuyệt đối nên đặt trong hay ngoài nhóm đều chạy.
+ * Hai component đọc `translation.*` theo đường dẫn tuyệt đối nên đặt trong hay ngoài nhóm đều chạy: global đặt trong nhóm (`translationGroup`),
+ * collection nội dung đặt ở khối cột phải (`gatherTranslationBlock`).
  */
-function translationActionFields(): Field[] {
+export function translationBlockFields(): Field[] {
   return [
     { name: "translationSummary", type: "ui", label: "Tình trạng bản tiếng Anh", admin: { components: { Field: "/components/admin/TranslationSummary#TranslationSummary" } } },
     { name: "retranslateAction", type: "ui", label: "Dịch lại bằng AI", admin: { components: { Field: "/components/admin/RetranslateButton#RetranslateButton" } } },
   ];
 }
 
-/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). Trường hệ thống ẩn khỏi form (BL-042): chỉ hiện dòng tóm tắt + nút Dịch lại; dữ liệu và lọc theo `translation.*` giữ nguyên. Globals chỉ dùng group này (không `hasEnglish`: header/footer/site-settings luôn render ở cả hai ngôn ngữ). */
-export function translationGroup(withActions = true): GroupField {
+/** Trạng thái dịch (ERD §1.1): không localized, hệ thống ghi, mọi người chỉ đọc (PERMISSION §4). Trường hệ thống ẩn khỏi form (BL-042); dữ liệu và lọc theo `translation.*` giữ nguyên. */
+function buildTranslationGroup(showInForm: boolean): GroupField {
   return {
     name: "translation",
     type: "group",
     label: "Bản dịch tiếng Anh",
     access: readOnlyForEveryone,
-    // Collection nội dung: nhóm chỉ giữ dữ liệu (ẩn cả nhóm), phần hiển thị nằm ở khối cột phải (`translationBlockFields`). Global: nhóm vẫn hiện đủ.
-    admin: { readOnly: true, description: "Hệ thống tự dịch sang tiếng Anh khi xuất bản.", ...(withActions ? {} : { hidden: true }) },
+    admin: { readOnly: true, description: "Hệ thống tự dịch sang tiếng Anh khi xuất bản.", ...(showInForm ? {} : { hidden: true }) },
     fields: [
       {
         name: "status",
@@ -77,17 +77,22 @@ export function translationGroup(withActions = true): GroupField {
       { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
-      ...(withActions ? translationActionFields() : []),
+      ...(showInForm ? translationBlockFields() : []),
     ],
   };
 }
 
-/** Collection nội dung: `hasEnglish` + nhóm dữ liệu `translation` (ẩn). Tóm tắt + nút do `translationBlockFields` thêm vào khối cột phải. */
-export function translationFields(): Field[] {
-  return [hasEnglishField(), translationGroup(false)];
+/** Global (không có `hasEnglish`: header/footer/site-settings/trang chủ luôn render ở cả hai ngôn ngữ): nhóm hiện trong form, có dòng tóm tắt + nút "Dịch lại bằng AI". */
+export function translationGroup(): GroupField {
+  return buildTranslationGroup(true);
 }
 
-/** Tóm tắt + nút "Dịch lại bằng AI" đặt cạnh công tắc "Có bản tiếng Anh" trong khối bản dịch cột phải. */
-export function translationBlockFields(): Field[] {
-  return translationActionFields();
+/** Collection nội dung: nhóm chỉ giữ dữ liệu (ẩn cả nhóm); phần hiển thị nằm ở khối cột phải (`translationBlockFields`). */
+export function translationDataGroup(): GroupField {
+  return buildTranslationGroup(false);
+}
+
+/** Collection nội dung: `hasEnglish` + nhóm dữ liệu `translation` (ẩn). Tóm tắt + nút do `translationBlockFields` thêm vào khối cột phải. */
+export function translationFields(): Field[] {
+  return [hasEnglishField(), translationDataGroup()];
 }
