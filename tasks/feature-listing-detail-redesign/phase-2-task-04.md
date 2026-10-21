@@ -9,7 +9,7 @@
 - Type: **MODIFY** (fix gap spec).
 - Risk: **HIGH** — query SQL công khai, hiệu năng danh sách.
 - Expected review level: **STRICT**.
-- Blast radius: `src/lib/rentals/rental-list-queries.ts` (+ test), `src/components/rentals/RentalListBody.tsx`, `src/components/rentals/rental-list-state.ts` (+ test).
+- Blast radius (as-built): `src/lib/search/rental-search-sql.ts`, `src/lib/search/search-service.ts` (+ test), `RentalListPage.tsx`, `src/components/rentals/RentalListBody.tsx`, `src/components/rentals/rental-list-state.ts` (+ test).
 
 ## Scope
 1. `listRentals()` trả thêm `facets.amenities` — số tin khớp các bộ lọc hiện tại (trừ chính chiều tiện ích, theo đúng quy tắc đếm faceted của `/du-an` cho tiện ích, AND) cho mỗi tiện ích; dùng lại cách đếm chiều tiện ích của `/du-an` (`src/lib/projects/*`, `project-list-state.ts:82`).
@@ -21,9 +21,15 @@
 - 2026-10-22 user chọn: chip đơn chọn (Phòng ngủ, Nội thất /cho-thue; Tình trạng /du-an; tương tự /tin-bds) **không** hiện số đếm, theo design → as-built B1 ghi spec ở close-out. Ô tích vẫn có số đếm.
 
 ## Acceptance
-- [ ] Ô tích Tiện ích `/cho-thue` có số đếm đúng (test query + UI).
-- [ ] Không chậm rõ rệt (ghi số đo).
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] Ô tích Tiện ích `/cho-thue` có số đếm đúng (test query + UI).
+- [x] Không chậm rõ rệt (ghi số đo).
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Verification summary (close-out 2026-10-22)
+- Builder: typecheck/lint/test 381 file 3807/build PASS; reviewer r1 STRICT PASS (full + integration chạy riêng PASS).
+- Đếm: truy vấn JOIN rentals_amenities riêng (4→5 query/trang); local 32 tin p95 +2–4ms (không lọc 4.0→7.9ms).
+- Residual: chưa EXPLAIN dữ liệu lớn; chưa ca locale=en cho số đếm tiện ích; 4 integration timeout beforeAll khi chạy full (ngoài phạm vi).
+- Commit: dfa0884.

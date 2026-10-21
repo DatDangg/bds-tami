@@ -683,6 +683,24 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(byId.get(hcmId)!.total).toBeGreaterThan(0);
     });
 
+    it("số đếm Tiện ích (P2-T04): bỏ CẢ chiều tiện ích, giữ lọc khác; chỉ tin công khai còn trống; tiện ích đang chọn mà 0 vẫn có khoá", async () => {
+      // Tin đã thuê (f) và tin nháp có "pool": không được tính (phạm vi danh sách = công khai + còn trống).
+      const extra = [ids.f!, ids.draft!];
+      await withDatabase((client) => client.query(`INSERT INTO "rentals_amenities" ("order", "parent_id", "value") SELECT 1, unnest($1::uuid[]), 'pool'`, [extra]));
+      try {
+        // a: pool, gym, elevator · b: gym (HCM). Chọn pool + kitchen: đếm không phụ thuộc tiện ích đang chọn.
+        const selected = await listing({ amenities: "pool,kitchen", limit: 1 });
+        expect(selected.total).toBe(0);
+        expect(selected.facets.amenities).toMatchObject({ pool: 1, gym: 2, elevator: 1, kitchen: 0, parking: 0 });
+        expect(await listing({ limit: 1 }).then((result) => result.facets.amenities)).toEqual(selected.facets.amenities);
+        // Lọc khác vẫn áp dụng: 1 phòng ngủ → chỉ còn a.
+        expect((await listing({ bedrooms: 1, amenities: "gym", limit: 1 })).facets.amenities).toMatchObject({ pool: 1, gym: 1, elevator: 1 });
+        expect(Object.values((await listing({ province: dnSlug, limit: 1 })).facets.amenities).every((count) => count === 0)).toBe(true);
+      } finally {
+        await withDatabase((client) => client.query(`DELETE FROM "rentals_amenities" WHERE "parent_id" = ANY($1::uuid[])`, [extra]));
+      }
+    });
+
     it("thẻ có danh mục của tin (danh mục con giữ tên con)", async () => {
       const { items } = await listing({ province: dnSlug, category: "van-phong-bl052", limit: 48 });
       expect(items.map((card) => card.category)).toEqual(items.map(() => ({ name: "Văn phòng chia sẻ BL052", slug: "van-phong-chia-se-bl052" })));

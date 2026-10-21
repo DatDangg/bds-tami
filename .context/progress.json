@@ -2273,16 +2273,20 @@
         {
           "task": "phase-2-task-04",
           "file": "tasks/feature-listing-detail-redesign/phase-2-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-2-task-02"
           ],
           "wave": "3A",
-          "note": "fix G1 phase review: số đếm Tiện ích /cho-thue"
+          "note": "fix G1 phase review: số đếm Tiện ích /cho-thue",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-2-task-04-round-1-review.md",
+          "commit": "dfa0884"
         }
       ],
-      "stage": "2026-10-22: P3-T01 merged + migrate dev; P2-T04 reviewer running; next wave 3B P3-T02‖T04‖T05",
+      "stage": "2026-10-22: phase 2 xong (kể cả G1 fix); P3-T01 xong; wave 3B (T02‖T04‖T05) builder running",
       "asBuiltPending": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",

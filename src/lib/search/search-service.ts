@@ -1,8 +1,8 @@
 import { sql } from "@payloadcms/db-postgres";
 import type { Payload } from "payload";
 
-import type { RentalCard, RentalSearchParams, RentalSearchResult } from "../../shared/types/api";
-import { allOf, filterConditions, rentalConditions, rentalFrom, rentalOrderBy, rentalWhere, type SqlFragment } from "./rental-search-sql";
+import { RENTAL_AMENITIES, type RentalAmenity, type RentalCard, type RentalSearchParams, type RentalSearchResult } from "../../shared/types/api";
+import { allOf, filterConditions, type RentalConditions, rentalConditions, rentalFrom, rentalOrderBy, rentalWhere, type SqlFragment } from "./rental-search-sql";
 
 /**
  * Cổng tìm kiếm (ERD §6, ARCHITECTURE §9.1): chỉ đổi implementation khi chuyển sang OpenSearch, không đổi chỗ gọi.
@@ -74,6 +74,8 @@ export interface RentalListingFacets {
   category: RentalFacetCounts;
   /** Chỉ tỉnh có ≥ 1 tin trong phạm vi; thứ tự không xác định (nơi gọi sắp theo `total`). */
   provinces: RentalProvinceCount[];
+  /** Đủ mọi tiện ích (0 nếu không có tin): số tin khớp mọi bộ lọc trừ CẢ chiều tiện ích và có tiện ích đó (ô tích AND, cùng quy tắc `/du-an`). */
+  amenities: Record<RentalAmenity, number>;
 }
 
 /**
@@ -110,7 +112,7 @@ export class PostgresRentalSearch implements RentalSearchService {
 
   /**
    * Trang danh sách `/cho-thue` (BL-052): 4 truy vấn song song — đếm (tổng + số nổi bật), trang lưới ĐÃ loại tin nổi bật (truy vấn con nên lưới không
-   * lặp thẻ nổi bật ở MỌI trang), thẻ nổi bật (chỉ trang 1), số đếm theo chiều (một lượt quét `GROUPING SETS`).
+   * lặp thẻ nổi bật ở MỌI trang), thẻ nổi bật (chỉ trang 1), số đếm theo chiều (một lượt quét `GROUPING SETS` + một truy vấn đếm tiện ích).
    * `total` gồm cả tin nổi bật; `totalPages` tính trên phần còn lại.
    */
   async listing(params: RentalSearchParams): Promise<RentalListingResult> {
@@ -141,7 +143,12 @@ export class PostgresRentalSearch implements RentalSearchService {
    */
   private async facets(params: RentalSearchParams): Promise<RentalListingFacets> {
     const conditions = rentalConditions(params);
-    const result = await this.db.execute(sql`
+    const [result, amenities] = await Promise.all([this.groupedCounts(params, conditions), this.amenityCounts(params, conditions)]);
+    return { ...toFacets(result.rows), amenities };
+  }
+
+  private groupedCounts(params: RentalSearchParams, conditions: RentalConditions) {
+    return this.db.execute(sql`
       SELECT GROUPING(x."root_id") AS by_root, GROUPING(x."province_id") AS by_province, x."root_id", x."province_id",
              count(*)::int AS total,
              count(*) FILTER (WHERE x."no_category")::int AS without_category,
@@ -155,7 +162,20 @@ export class PostgresRentalSearch implements RentalSearchService {
         WHERE ${allOf(conditions.scope)}
       ) x
       GROUP BY GROUPING SETS ((x."root_id"), (x."province_id"), ())`);
-    return toFacets(result.rows);
+  }
+
+  /**
+   * Số đếm ô Tiện ích: tin khớp phạm vi + mọi bộ lọc trừ chiều tiện ích, nối bảng hasMany `rentals_amenities` (index `parent_id`) rồi gom theo giá trị.
+   * Truy vấn riêng (song song lượt `GROUPING SETS`) vì phép nối nhân dòng theo số tiện ích của tin; `DISTINCT` phòng giá trị lặp.
+   */
+  private async amenityCounts(params: RentalSearchParams, conditions: RentalConditions): Promise<Record<RentalAmenity, number>> {
+    const result = await this.db.execute(sql`
+      SELECT ra."value" AS "amenity", count(DISTINCT r."id")::int AS "count"
+      ${rentalFrom(params.locale)}
+      JOIN "rentals_amenities" ra ON ra."parent_id" = r."id"
+      WHERE ${allOf([...conditions.scope, ...filterConditions(conditions, "amenity")])}
+      GROUP BY ra."value"`);
+    return toAmenityCounts(result.rows);
   }
 
   /** Thẻ của các tin khớp `where`, một trang theo `params.page`/`limit`, sắp theo `sort`. */
@@ -199,8 +219,8 @@ export class PostgresRentalSearch implements RentalSearchService {
  * Hàng `GROUPING SETS` → số đếm. `GROUPING(col) = 0` nghĩa là hàng gom THEO cột đó; cả hai = 1 là hàng tổng. Tin không có danh mục (hoặc danh mục
  * xoá mềm) chỉ góp vào "Tất cả". Thuần để test được.
  */
-export function toFacets(rows: readonly Record<string, unknown>[]): RentalListingFacets {
-  const facets: RentalListingFacets = { category: { all: 0, counts: {} }, provinces: [] };
+export function toFacets(rows: readonly Record<string, unknown>[]): Omit<RentalListingFacets, "amenities"> {
+  const facets: Omit<RentalListingFacets, "amenities"> = { category: { all: 0, counts: {} }, provinces: [] };
   for (const row of rows) {
     const byRoot = Number(row.by_root) === 0;
     const byProvince = Number(row.by_province) === 0;
@@ -213,4 +233,14 @@ export function toFacets(rows: readonly Record<string, unknown>[]): RentalListin
     }
   }
   return facets;
+}
+
+/** Hàng `amenity`/`count` → đủ mọi tiện ích (thiếu = 0); giá trị ngoài `RENTAL_AMENITIES` (dữ liệu cũ) bị bỏ. Thuần để test được. */
+export function toAmenityCounts(rows: readonly Record<string, unknown>[]): Record<RentalAmenity, number> {
+  const counts = Object.fromEntries(RENTAL_AMENITIES.map((amenity) => [amenity, 0])) as Record<RentalAmenity, number>;
+  for (const row of rows) {
+    const amenity = String(row.amenity);
+    if (Object.hasOwn(counts, amenity)) counts[amenity as RentalAmenity] = Number(row.count);
+  }
+  return counts;
 }

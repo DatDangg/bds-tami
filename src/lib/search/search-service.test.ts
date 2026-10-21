@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { rentalSearchParamsSchema } from "../../shared/types/api";
 import type { SqlFragment } from "./rental-search-sql";
-import { PostgresRentalSearch, RENTAL_FEATURED_LIMIT, type SqlExecutor, toFacets } from "./search-service";
+import { PostgresRentalSearch, RENTAL_FEATURED_LIMIT, type SqlExecutor, toAmenityCounts, toFacets } from "./search-service";
 
 const dialect = new PgDialect();
 const parse = (input: Record<string, unknown>) => rentalSearchParamsSchema.parse({ available: true, ...input });
@@ -31,13 +31,14 @@ const row = (id: string, extra: Record<string, unknown> = {}) => ({
 });
 
 /** Executor giả: trả hàng theo loại truy vấn (đếm / số đếm theo chiều / nổi bật / lưới) và ghi lại SQL đã chạy. */
-function fakeExecutor(data: { total: number; featuredCount: number; featured: string[]; grid: string[]; facets?: Record<string, unknown>[] }) {
+function fakeExecutor(data: { total: number; featuredCount: number; featured: string[]; grid: string[]; facets?: Record<string, unknown>[]; amenities?: Record<string, unknown>[] }) {
   const queries: string[] = [];
   const executor: SqlExecutor = {
     async execute(query: SqlFragment) {
       const { sql } = dialect.sqlToQuery(query);
       queries.push(sql);
       if (sql.includes("GROUPING SETS")) return { rows: data.facets ?? [] };
+      if (sql.includes(`GROUP BY ra."value"`)) return { rows: data.amenities ?? [] };
       if (sql.includes("count(*)::int AS total")) return { rows: [{ total: data.total, featured: data.featuredCount }] };
       if (sql.includes(`NOT IN (SELECT r."id"`)) return { rows: data.grid.map((id) => row(id)) };
       return { rows: data.featured.map((id) => row(id)) };
@@ -53,7 +54,7 @@ describe("PostgresRentalSearch.listing (BL-052)", () => {
     expect(result.featured.map((card) => card.id)).toEqual(["f1", "f2"]);
     expect(result.items.map((card) => card.id)).toEqual(["a", "b"]);
     expect(result).toMatchObject({ total: 30, page: 1, totalPages: Math.ceil(25 / 12) });
-    expect(queries).toHaveLength(4);
+    expect(queries).toHaveLength(5);
     const grid = queries.find((sql) => sql.includes("NOT IN"))!;
     expect(grid).toContain(`r."is_featured" = true ORDER BY r."published_at" DESC NULLS LAST, r."id" DESC LIMIT $`);
     const featured = queries.find((sql) => !sql.includes("NOT IN") && sql.includes("WITH page AS"))!;
@@ -65,8 +66,22 @@ describe("PostgresRentalSearch.listing (BL-052)", () => {
     const result = await new PostgresRentalSearch(executor).listing(parse({ page: 2, limit: 12 }));
     expect(result.featured).toEqual([]);
     expect(result.items.map((card) => card.id)).toEqual(["m"]);
-    expect(queries).toHaveLength(3);
+    expect(queries).toHaveLength(4);
     expect(queries.some((sql) => sql.includes("NOT IN"))).toBe(true);
+  });
+
+  it("số đếm Tiện ích (P2-T04): truy vấn riêng bỏ CẢ chiều tiện ích, giữ mọi lọc khác; đủ khoá, thiếu = 0", async () => {
+    const { executor, queries } = fakeExecutor({ total: 0, featuredCount: 0, featured: [], grid: [], amenities: [{ amenity: "pool", count: 3 }] });
+    const result = await new PostgresRentalSearch(executor).listing(parse({ amenities: "pool,gym", bedrooms: 2, province: "ha-noi" }));
+    expect(result.facets.amenities).toMatchObject({ pool: 3, gym: 0, kitchen: 0 });
+    const amenityQuery = queries.find((sql) => sql.includes(`GROUP BY ra."value"`))!;
+    expect(amenityQuery).toContain(`JOIN "rentals_amenities" ra ON ra."parent_id" = r."id"`);
+    expect(amenityQuery).toContain(`count(DISTINCT r."id")`);
+    expect(amenityQuery).not.toContain("EXISTS (SELECT 1 FROM \"rentals_amenities\"");
+    expect(amenityQuery).toContain(`r."bedrooms" = $`);
+    expect(amenityQuery).toContain(`r."province_id" IN`);
+    // Các truy vấn khác vẫn lọc AND theo tiện ích (lượt GROUPING SETS cũng vậy: tiện ích không phải chiều của tab/tỉnh).
+    expect(queries.find((sql) => sql.includes("GROUPING SETS"))!.match(/EXISTS \(SELECT 1 FROM "rentals_amenities"/g)).toHaveLength(4);
   });
 
   it("đếm nổi bật bị chặn ở trần RENTAL_FEATURED_LIMIT ngay trong SQL", async () => {
@@ -109,5 +124,17 @@ describe("toFacets", () => {
       category: { all: 0, counts: {} },
       provinces: [],
     });
+  });
+});
+
+describe("toAmenityCounts", () => {
+  it("đủ mọi tiện ích (thiếu = 0), giá trị ngoài danh sách (kể cả khoá của Object.prototype) bị bỏ", () => {
+    const counts = toAmenityCounts([
+      { amenity: "gym", count: 2 },
+      { amenity: "kitchen", count: 1 },
+      { amenity: "sauna", count: 9 },
+      { amenity: "constructor", count: 9 },
+    ]);
+    expect(counts).toEqual({ pool: 0, gym: 2, elevator: 0, parking: 0, security: 0, balcony: 0, washing_machine: 0, air_conditioner: 0, pet_friendly: 0, kitchen: 1 });
   });
 });
