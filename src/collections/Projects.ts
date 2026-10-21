@@ -9,6 +9,7 @@ import { upload } from "payload/shared";
 
 import { withSummaryCounter } from "../fields/form-hints";
 import { withPriceInWords } from "../fields/form-hints";
+import { nonNegativeNumber } from "../fields/listing-field-helpers";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
@@ -66,7 +67,6 @@ const mediaUpload = (name: string, label: string, mimeType: Record<string, strin
   filterOptions: { mimeType },
 });
 
-const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 /** Cột tiền: ô danh sách hiện `110.000.000 ₫` (chỉ đổi hiển thị). */
 const vndNumber = (name: string, label: string) => withPriceInWords({ ...nonNegativeNumber(name, label), admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } });
 

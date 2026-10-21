@@ -92,6 +92,9 @@ describe("PostCard listing — thẻ voucher (BL-052)", () => {
     expect(first.container.querySelector('[data-offer-status="ended"]')).toHaveTextContent("Đã kết thúc");
     expect(first.container.querySelector(".opacity-70")).not.toBeNull();
     expect(screen.getByRole("link")).toHaveAttribute("href", "/tin-bds/tin-v");
+    // Trình đọc màn hình chỉ đọc "Đã kết thúc" một lần (badge ảnh aria-hidden, nhãn thân thẻ đọc được).
+    expect(screen.getByRole("link").textContent?.match(/Đã kết thúc/g)).toHaveLength(2);
+    expect(screen.getAllByText("Đã kết thúc").filter((node) => !node.closest("[aria-hidden=true]"))).toHaveLength(1);
     first.unmount();
     const { container } = renderWithIntl(<PostCard data={voucher({ badge: { kind: "endingSoon", daysLeft: 2 } })} headingLevel="h2" />);
     expect(screen.getByText("Còn 2 ngày")).toBeInTheDocument();

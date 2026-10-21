@@ -38,7 +38,8 @@ function sameNumbers(a: readonly number[], b: readonly number[]) {
 
 /**
  * Khoảng giá trị bằng thanh trượt 2 đầu (BL-052 Mức giá / Diện tích): bàn phím ←/→/Home/End (Radix), `aria-valuetext` theo `formatValue`, nhãn hai đầu dưới thanh.
- * Chưa có JS → hai ô số `name` (Từ / Đến) để form GET vẫn lọc được. Đầu ở mép không lên URL.
+ * Chưa có JS → hai ô số `name` (Từ / Đến) để form GET vẫn lọc được; `step="any"`, không `max` để giá trị lẻ bước / vượt mép của link cũ không chặn gửi form
+ * (server tự đối chiếu). Đầu ở mép không lên URL.
  * Hẹn giờ commit gọi `onCommit` MỚI NHẤT (qua ref): trong 300ms chờ, URL có thể đã đổi (ô lọc khác vừa áp dụng) và `onCommit` của lần render cũ sẽ dựng URL từ tham số cũ.
  * Thả chuột / ngón tay thì commit ngay, không hẹn giờ (P1-T02 review r3 n2): kéo rồi bấm "Xem kết quả" đóng Sheet ngay không làm mất giá vừa chọn.
  */
@@ -75,11 +76,11 @@ export function RangeSliderFacet({ names, min, max, step, value, formatValue, th
       <div className="grid grid-cols-2 gap-3">
         <label htmlFor={fromId} className="flex flex-col gap-1 text-xsmall text-text-secondary">
           {t("rangeFrom")}
-          <Input id={fromId} type="number" name={names[0]} min={min} max={max} step={step} defaultValue={value[0] ?? ""} placeholder={String(min)} className="h-11 text-small" />
+          <Input id={fromId} type="number" name={names[0]} min={min} step="any" defaultValue={value[0] ?? ""} placeholder={String(min)} className="h-11 text-small" />
         </label>
         <label htmlFor={toId} className="flex flex-col gap-1 text-xsmall text-text-secondary">
           {t("rangeTo")}
-          <Input id={toId} type="number" name={names[1]} min={min} max={max} step={step} defaultValue={value[1] ?? ""} placeholder={String(max)} className="h-11 text-small" />
+          <Input id={toId} type="number" name={names[1]} min={min} step="any" defaultValue={value[1] ?? ""} placeholder={String(max)} className="h-11 text-small" />
         </label>
       </div>
     );

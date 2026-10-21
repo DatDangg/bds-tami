@@ -24,10 +24,13 @@ interface PostCardProps {
 
 const IMAGE_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
 
-/** Badge góc ảnh của thẻ `listing`: trạng thái ưu đãi ("Còn n ngày" / "Đã kết thúc", BR-06) nếu có, không thì "Ưu đãi" khi tin có ưu đãi. */
+/**
+ * Badge góc ảnh của thẻ `listing`: trạng thái ưu đãi ("Còn n ngày" / "Đã kết thúc", BR-06) nếu có, không thì "Ưu đãi" khi tin có ưu đãi.
+ * Thẻ voucher đã có nhãn "Đã kết thúc" ở thân thẻ → badge ảnh chỉ để nhìn (trình đọc màn hình đọc 1 lần).
+ */
 function ListingOfferBadge({ data }: { data: PostCardData }) {
   const t = useTranslations("postCard");
-  if (data.badge) return <OfferStatusBadge badge={data.badge} className="absolute top-3 left-3" />;
+  if (data.badge) return <OfferStatusBadge badge={data.badge} decorative={data.kind === "voucher"} className="absolute top-3 left-3" />;
   if (!data.hasOffer) return null;
   return <Badge className="absolute top-3 left-3">{t("offer")}</Badge>;
 }

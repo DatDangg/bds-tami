@@ -64,7 +64,8 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below" }: Card
             role="group"
             aria-roledescription="slide"
             aria-label={fill(labels.slide, { index: position + 1, total: count })}
-            className={cn("shrink-0 snap-start", SLIDE_WIDTH)}
+            // `relative`: phần tử định vị tuyệt đối trong thẻ (vd nhãn `sr-only` phòng ngủ/tắm) lấy slide làm khối chứa, không thoát vùng cuộn ngang làm trang rộng ra (P3-T06).
+            className={cn("relative shrink-0 snap-start", SLIDE_WIDTH)}
           >
             {item}
           </li>

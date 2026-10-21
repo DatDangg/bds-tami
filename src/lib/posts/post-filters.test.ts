@@ -57,7 +57,13 @@ describe("parsePostFilters", () => {
     expect(parsePostFilters({ priceMin: "10", priceMax: "2" })).toEqual({ priceMin: 2, priceMax: 10 });
     expect(parsePostFilters({ areaMin: "0", areaMax: "900" })).toEqual({});
     expect(parsePostFilters({ areaMin: "300", areaMax: "100" })).toEqual({ areaMin: 100, areaMax: 300 });
-    expect(parsePostFilters({ priceMax: "0" })).toEqual({ priceMax: 0 });
+  });
+
+  it("priceMax=0 / areaMax=0 gõ tay = không giới hạn trên (không lọc về 0), kể cả khi có đầu dưới", () => {
+    expect(parsePostFilters({ priceMax: "0" })).toEqual({});
+    expect(parsePostFilters({ areaMax: "0" })).toEqual({});
+    expect(parsePostFilters({ priceMin: "5", priceMax: "0" })).toEqual({ priceMin: 5 });
+    expect(parsePostFilters({ areaMin: "40", areaMax: "00" })).toEqual({ areaMin: 40 });
   });
 
   it("sort mặc định (newest) không có trong kết quả", () => {

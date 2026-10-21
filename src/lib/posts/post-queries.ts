@@ -211,7 +211,7 @@ export function findPublicPostBySlug(payload: Payload, locale: Locale, slug: str
 
 /**
  * Tối đa 3 bài CÙNG danh mục, mới nhất trước, loại bài hiện tại. Bài còn hạn trước; còn thiếu (danh mục chỉ có 1-2 bài còn hạn) thì lấy bù
- * bài ưu đãi đã kết thúc cho đủ 3 thẻ (S09). `listPublicPosts` không dùng được ở đây: nó chỉ sang nhóm đã kết thúc ở các trang sau.
+ * bài ưu đãi đã kết thúc cho đủ 3 thẻ (S09). Truy vấn riêng, không qua `listPublicPostListing` (bộ lọc + phân trang của trang danh sách): cần tách còn hạn / đã kết thúc rồi bù.
  */
 export async function findRelatedPosts(payload: Payload, locale: Locale, current: Pick<PropertyPost, "id" | "category">, now: Date): Promise<PropertyPost[]> {
   const categoryId = relationId(current.category);

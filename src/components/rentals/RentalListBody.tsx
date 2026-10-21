@@ -8,7 +8,7 @@ import { FilterSheet, FilterSidebar } from "@/components/listing/FilterPanel";
 import type { RawListingParams } from "@/components/listing/listing-params";
 import { RangeSliderFacet, type RangeValue } from "@/components/listing/RangeSliderFacet";
 import { ResultsBar } from "@/components/listing/ResultsBar";
-import { useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
+import { ListingNavigateContext, useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
 import type { SelectOption } from "@/components/ui/option-select";
 import { RENTAL_AMENITIES, RENTAL_FURNISHINGS, type RentalAmenity } from "@/shared/types/api";
 import { RadioFacetList } from "./RadioFacetList";
@@ -180,15 +180,17 @@ export function RentalListBody({ path, current, values, options, preservedParams
     </FilterSheet>
   );
   return (
-    <div className="mx-auto grid w-full max-w-container items-start gap-8 px-gutter pt-8 pb-section-tight lg:grid-cols-[16rem_minmax(0,1fr)] lg:pt-10 xl:grid-cols-[17.5rem_minmax(0,1fr)]">
-      <FilterSidebar action={path} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
-        {fields}
-      </FilterSidebar>
-      <div className="flex min-w-0 flex-col gap-6">
-        {spotlight && <PendingRegion>{spotlight}</PendingRegion>}
-        {countLabel === undefined ? sheet : <ResultsBar countLabel={countLabel} sort={sort} leading={sheet} />}
-        <PendingRegion className="flex flex-col gap-8">{children}</PendingRegion>
+    <ListingNavigateContext value={navigate}>
+      <div className="mx-auto grid w-full max-w-container items-start gap-8 px-gutter pt-8 pb-section-tight lg:grid-cols-[16rem_minmax(0,1fr)] lg:pt-10 xl:grid-cols-[17.5rem_minmax(0,1fr)]">
+        <FilterSidebar action={path} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
+          {fields}
+        </FilterSidebar>
+        <div className="flex min-w-0 flex-col gap-6">
+          {spotlight && <PendingRegion>{spotlight}</PendingRegion>}
+          {countLabel === undefined ? sheet : <ResultsBar countLabel={countLabel} sort={sort} leading={sheet} />}
+          <PendingRegion className="flex flex-col gap-8">{children}</PendingRegion>
+        </div>
       </div>
-    </div>
+    </ListingNavigateContext>
   );
 }

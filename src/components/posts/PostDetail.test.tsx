@@ -140,8 +140,9 @@ describe("PostDetail (BL-052, khung chi tiết chung)", () => {
     expect(screen.queryByRole("group", { name: "Thông số tin đăng" })).toBeNull();
     expect(tabLabels()).toEqual(["Tổng quan"]);
     expect(container.querySelector("[data-detail-band]")).toBeNull();
-    // Không có nội dung → tóm tắt thay chỗ trong Tổng quan.
-    expect(container.querySelector("#overview")).toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
+    // Không có nội dung → tóm tắt chỉ ở hero, không lặp lại trong Tổng quan (P3-T04 review r1).
+    expect(container.querySelector("[data-detail-hero]")).toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
+    expect(container.querySelector("#overview")).not.toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
   });
 
   it("Vị trí: có toạ độ → bản đồ; chỉ địa chỉ / khu vực → dòng địa chỉ, không bản đồ", () => {

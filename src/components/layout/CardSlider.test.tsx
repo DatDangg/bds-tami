@@ -46,6 +46,8 @@ describe("CardSlider", () => {
     expect(screen.getByRole("list", { name: "Tiêu đề" })).toHaveAttribute("tabindex", "0");
     expect(screen.getByRole("group", { name: "Thẻ 2 / 3" })).toHaveAttribute("aria-roledescription", "slide");
     expect(screen.getAllByRole("link")).toHaveLength(3);
+    // Slide là khối chứa của phần tử tuyệt đối trong thẻ (nhãn sr-only): không thoát vùng cuộn làm trang cuộn ngang ở 390px (P3-T06).
+    expect(screen.getByRole("group", { name: "Thẻ 2 / 3" })).toHaveClass("relative");
   });
 
   it("BL-038: 6 thẻ, hiện 4 → 3 chấm (= số vị trí cuộn được); chấm theo scrollLeft; chấm/mũi tên cuộn tới offset thẻ", () => {

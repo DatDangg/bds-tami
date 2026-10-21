@@ -212,6 +212,17 @@ describe("RangeSliderFacet", () => {
     ]);
     expect(html.querySelector('[role="slider"]')).toBeNull();
   });
+
+  it("không JS: giá trị lẻ bước / vượt mép từ link cũ vẫn hợp lệ (không chặn gửi form) — `step=any`, không `max`", () => {
+    const html = serverHtml(<RangeSliderFacet names={["areaMin", "areaMax"]} min={0} max={300} step={5} value={[7, 420]} formatValue={String} />);
+    const inputs = [...html.querySelectorAll<HTMLInputElement>('input[type="number"]')];
+    expect(inputs.map((input) => input.value)).toEqual(["7", "420"]);
+    for (const input of inputs) {
+      expect(input.getAttribute("step")).toBe("any");
+      expect(input.hasAttribute("max")).toBe(false);
+      expect(input.validity.valid).toBe(true);
+    }
+  });
 });
 
 describe("FilterSidebar / FilterSheet", () => {

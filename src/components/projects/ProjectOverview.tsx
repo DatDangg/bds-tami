@@ -3,13 +3,13 @@ import { RichText } from "@/components/content/RichText";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { DetailStatCards } from "@/components/detail/DetailStatCards";
+import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
 import { Briefcase, Buildings, CalendarCheck, House, MapPin, SquaresFour } from "@/components/icons";
 import { formatNumber } from "@/lib/format";
-import { formatAreaRange, formatHectares, SECTION_DOM_ID, type ProjectDetailView } from "@/lib/projects/project-detail-view";
+import { useHectareText, useProductTypesText } from "@/components/projects/project-labels";
+import { formatAreaRange, SECTION_DOM_ID, type ProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/payload-types";
-
-const ICON_SIZE = 20;
 
 interface ProjectOverviewProps {
   view: ProjectDetailView;
@@ -21,7 +21,7 @@ function useScaleText({ scale }: Pick<ProjectDetailView, "scale">): string | nul
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail");
   const parts = [
-    scale.landAreaM2 ? t("v2.spec.hectare", { value: formatHectares(scale.landAreaM2, locale) }) : null,
+    useHectareText(scale.landAreaM2),
     scale.totalUnits ? t("facts.unitsValue", { count: formatNumber(scale.totalUnits, locale) }) : null,
     scale.blocks ? t("specs.blocks", { count: formatNumber(scale.blocks, locale) }) : null,
     scale.floors ? t("specs.floors", { count: formatNumber(scale.floors, locale) }) : null,
@@ -37,7 +37,7 @@ function useScaleText({ scale }: Pick<ProjectDetailView, "scale">): string | nul
 export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail.v2");
-  const tType = useTranslations("listingOptions.propertyType");
+  const productTypesText = useProductTypesText(view.productTypes);
   const tRich = useTranslations("page.richText");
   const scaleText = useScaleText(view);
   const info: DetailInfoItem[] = [
@@ -46,11 +46,11 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
       icon: <Briefcase size={ICON_SIZE} />,
       label: t("info.developer"),
       value: view.developer?.name ?? null,
-      link: view.developer?.website ? { href: view.developer.website, newTabLabel: t("info.newTab") } : null,
+      link: view.developer?.website ? { kind: "external", href: view.developer.website, newTabLabel: t("info.newTab") } : null,
     },
     { icon: <MapPin size={ICON_SIZE} />, label: t("info.location"), value: view.areaLabel ?? view.address },
     { icon: <SquaresFour size={ICON_SIZE} />, label: t("info.scale"), value: scaleText },
-    { icon: <House size={ICON_SIZE} />, label: t("info.propertyTypes"), value: view.productTypes.map((type) => tType(type)).join(", ") },
+    { icon: <House size={ICON_SIZE} />, label: t("info.propertyTypes"), value: productTypesText },
     { icon: <CalendarCheck size={ICON_SIZE} />, label: t("info.handover"), value: view.handoverTime },
   ];
   const stats = view.products.map((product) => ({

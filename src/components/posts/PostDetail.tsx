@@ -6,6 +6,7 @@ import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
 import { DetailSection } from "@/components/detail/DetailSection";
+import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
 import { DetailShareButton } from "@/components/detail/DetailShareButton";
 import { DetailSpecBar, type DetailSpecItem } from "@/components/detail/DetailSpecBar";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
@@ -28,8 +29,6 @@ import { OfferBox } from "./OfferBox";
 import { OfferStatusBadge } from "./OfferStatusBadge";
 import { POST_CONTACT_HEADING_ID, PostContactBox } from "./PostContactBox";
 import { RelatedPosts } from "./RelatedPosts";
-
-const ICON_SIZE = 20;
 
 /** Chip trên hero nền tối (`theme-dark-block`): viền sáng, chữ trắng — cùng kiểu chip danh mục của chi tiết Dự án / Cho thuê. */
 const HERO_CHIP_CLASS =
@@ -111,7 +110,7 @@ function useLayoutText({ bedrooms, bathrooms }: Pick<PostDetailSpecs, "bedrooms"
 function usePostSpecItems(specs: PostDetailSpecs, offer: PostOfferView | null): DetailSpecItem[] {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.postDetail.v2.spec");
-  const tDirection = useTranslations("page.rentalDetail.direction");
+  const tDirection = useTranslations("listingOptions.direction");
   const layoutText = useLayoutText(specs);
   const statusText = useOfferStatusText(offer);
   const price: DetailSpecItem = { icon: <Tag size={ICON_SIZE} />, label: t("price"), value: specs.price };
@@ -133,7 +132,7 @@ function usePostSpecItems(specs: PostDetailSpecs, offer: PostOfferView | null): 
 }
 
 /**
- * Khối Tổng quan (cạnh cột liên hệ ≥ lg): eyebrow "Giới thiệu" + `h2` → nội dung bài (richText; bài cũ không có nội dung thì tóm tắt) → lưới thông tin (Loại hình, Tình trạng
+ * Khối Tổng quan (cạnh cột liên hệ ≥ lg): eyebrow "Giới thiệu" + `h2` → nội dung bài (richText; bài cũ không có nội dung thì bỏ — tóm tắt đã ở hero) → lưới thông tin (Loại hình, Tình trạng
  * bàn giao, danh mục, dự án / tin cho thuê liên quan là link nội bộ, ngày đăng; ô trống bị bỏ). Luôn có.
  */
 function PostOverview({ doc, view, specs, offer }: Pick<PostDetailProps, "doc" | "view" | "specs" | "offer">) {
@@ -141,26 +140,21 @@ function PostOverview({ doc, view, specs, offer }: Pick<PostDetailProps, "doc" |
   const t = useTranslations("page.postDetail.v2");
   const tOptions = useTranslations("listingOptions");
   const tRich = useTranslations("page.richText");
-  const hasContent = hasRichText(doc.content);
   const relatedTarget = (kind: "project" | "rental") => offer?.related.find((target) => target.kind === kind) ?? null;
   const project = relatedTarget("project");
   const rental = relatedTarget("rental");
   const info: DetailInfoItem[] = [
     { icon: <House size={ICON_SIZE} />, label: t("info.propertyType"), value: specs.propertyType ? tOptions(`propertyType.${specs.propertyType}`) : null },
     { icon: <HouseLine size={ICON_SIZE} />, label: t("info.handover"), value: specs.handover ? tOptions(`handoverCondition.${specs.handover}`) : null },
-    { icon: <ClipboardText size={ICON_SIZE} />, label: t("info.category"), value: view.category?.label ?? null, link: view.category ? { href: view.category.href } : null },
-    { icon: <Buildings size={ICON_SIZE} />, label: t("info.project"), value: project?.title ?? null, link: project ? { href: project.href } : null },
-    { icon: <BuildingApartment size={ICON_SIZE} />, label: t("info.rental"), value: rental?.title ?? null, link: rental ? { href: rental.href } : null },
+    { icon: <ClipboardText size={ICON_SIZE} />, label: t("info.category"), value: view.category?.label ?? null, link: view.category ? { kind: "internal", href: view.category.href } : null },
+    { icon: <Buildings size={ICON_SIZE} />, label: t("info.project"), value: project?.title ?? null, link: project ? { kind: "internal", href: project.href } : null },
+    { icon: <BuildingApartment size={ICON_SIZE} />, label: t("info.rental"), value: rental?.title ?? null, link: rental ? { kind: "internal", href: rental.href } : null },
     { icon: <Clock size={ICON_SIZE} />, label: t("info.publishedAt"), value: view.publishedAtLabel, dateTime: view.publishedAtIso },
   ];
   return (
     <DetailSection id={POST_SECTION_DOM_ID.overview} eyebrow={t("eyebrow.overview")} title={t("titles.overview")}>
       <div className="flex flex-col gap-8">
-        {hasContent ? (
-          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
-        ) : (
-          doc.excerpt && <p className="max-w-[68ch] text-body text-text-secondary">{doc.excerpt}</p>
-        )}
+        {hasRichText(doc.content) && <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />}
         <DetailInfoGrid items={info} label={t("info.label")} />
       </div>
     </DetailSection>

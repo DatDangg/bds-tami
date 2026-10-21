@@ -2,13 +2,13 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Phone } from "@/components/icons";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
+import { DETAIL_ASIDE_STICKY_CLASS } from "./DetailLayout";
 
 /**
- * Cột phải dính (≥ lg) KHÔNG cuộn riêng, cùng công thức `DETAIL_ASIDE_CARD_CLASS` (BL-031): `top` = min(dưới thanh mục con, đáy viewport − chiều cao khối − 1rem);
+ * Cột phải dính (≥ lg) KHÔNG cuộn riêng, dùng chung `DETAIL_ASIDE_STICKY_CLASS` với `DETAIL_ASIDE_CARD_CLASS` (BL-031): `top` = min(dưới thanh mục con, đáy viewport − chiều cao khối − 1rem);
  * `--detail-aside-h` do `DetailAsideFit` đo trên phần tử con đầu của `aside` — chính là gốc của component này.
  */
-const STICKY_CLASS =
-  "flex flex-col gap-4 lg:sticky lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]";
+const STICKY_CLASS = `flex flex-col gap-4 ${DETAIL_ASIDE_STICKY_CLASS}`;
 
 interface DetailContactAsideProps {
   /** Tiêu đề thẻ form (vd "Nhận thông tin dự án"); `h2`. */

@@ -1,5 +1,5 @@
 import config from "@payload-config";
-import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getPayload, type Payload } from "payload";
@@ -18,42 +18,21 @@ import { PostCard } from "@/components/posts/PostCard";
 import { PostListBody } from "@/components/posts/PostListBody";
 import { PostSortControl } from "@/components/posts/PostSortControl";
 import { PostSpotlightContent } from "@/components/posts/PostSpotlightContent";
+import { isFilteredList, legacyCategorySlug, type PostListPageProps, type RawPostListParams } from "@/components/posts/post-list-metadata";
 import { buildPostTabs, POST_ACTIVE_FILTER_SPEC, toCurrentParams, toFilterOptions, toFilterValues, toPreservedParams, toQueryString } from "@/components/posts/post-list-state";
 import { publicPath } from "@/lib/content/content-paths";
 import { loadListingPageContent, type ListingLearnMoreView } from "@/lib/content/load-listing-page";
 import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { loadPageHero } from "@/lib/content/load-page-banner";
 import { parsePagination } from "@/lib/content/pagination";
-import { loadSiteIdentity } from "@/lib/content/site-identity";
-import { findLocalizedSlugs } from "@/lib/news/news-queries";
 import { listProvinces } from "@/lib/projects/project-queries";
-import { hasPostFilterParams, parsePostFilters, postQueryString, type RawPostParams } from "@/lib/posts/post-filters";
+import { parsePostFilters, postQueryString } from "@/lib/posts/post-filters";
 import { buildPostChips, loadPostCategoryContext, loadPostListing, postCategoryFilterIds, type PostCategoryContext } from "@/lib/posts/post-listing";
-import { postCategoryHref } from "@/lib/posts/post-view";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { type PostCardData, postCategoryHref } from "@/lib/posts/post-view";
 import type { Locale } from "@/i18n/routing";
-
-/** Tham số của hai route: bộ lọc BL-052 + `category` của link cũ `/tin-bds?category=<slug>` (chỉ có nghĩa ở `/tin-bds`). */
-export type RawPostListParams = RawPostParams & { category?: string | string[] };
-
-interface PostListPageProps {
-  locale: Locale;
-  searchParams: RawPostListParams;
-  /** Slug danh mục (trang S05); bỏ trống = `/tin-bds` (S08). */
-  categorySlug?: string;
-}
 
 /** Ảnh thẻ lưới khi có cột lọc trái (như `/du-an`, `/cho-thue`): ≥ xl ~300px, lg 3 cột trong ~70% khung, md 2 cột. */
 const GRID_CARD_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 22vw, (min-width: 768px) 50vw, 100vw";
-
-function firstParam(value: string | string[] | undefined): string {
-  return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
-}
-
-/** `?category=` của link cũ (chỉ ở `/tin-bds`; route danh mục bỏ qua): slug danh mục tin BĐS có thật hoặc rỗng. */
-function legacyCategorySlug(searchParams: RawPostListParams, categorySlug: string | undefined): string {
-  return categorySlug ? "" : firstParam(searchParams.category).slice(0, 100);
-}
 
 function toLearnMoreContent(view: ListingLearnMoreView | null) {
   if (!view) return null;
@@ -72,8 +51,99 @@ async function selectedProvinceNames(payload: Payload, slugs: readonly string[] 
   return (await listProvinces(payload)).filter((item) => slugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.shortName || item.name }));
 }
 
+interface PostListHeroProps {
+  hero: Awaited<ReturnType<typeof loadPageHero>>;
+  /** Trang danh mục (S05): eyebrow "Đăng tin BĐS", tên + mô tả danh mục, breadcrumb thêm danh mục cha + danh mục. Link cũ `?category=` → `null`. */
+  routeContext: PostCategoryContext | null;
+  locale: Locale;
+  listPath: string;
+  postsPath: string;
+  query: string | undefined;
+  current: Record<string, string>;
+  quickSearch: string[];
+}
+
+/** Hero (ảnh + chữ `pageHeroes.propertyPosts`; trang danh mục dùng chữ của danh mục) + breadcrumb + ô tìm `q` + "Tìm nhanh". */
+function PostListHero({ hero, routeContext, locale, listPath, postsPath, query, current, quickSearch }: PostListHeroProps) {
+  const t = useTranslations("page.posts");
+  const tNav = useTranslations("layout.nav.items");
+  const breadcrumb = [
+    { label: tNav("property-posts"), href: postsPath },
+    ...(routeContext?.parent ? [{ label: routeContext.parent.name ?? "", href: postCategoryHref(routeContext.parent, locale) }] : []),
+    ...(routeContext ? [{ label: routeContext.category.name ?? "", href: listPath }] : []),
+  ];
+  const description = routeContext ? (routeContext.category.description ?? undefined) : hero.description;
+  const eyebrow = routeContext ? t("title") : hero.eyebrow;
+  return (
+    <ListingHero
+      title={routeContext?.category.name ?? hero.title}
+      {...(!routeContext && hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
+      {...(eyebrow ? { eyebrow } : {})}
+      {...(description ? { description } : {})}
+      {...(hero.image ? { image: hero.image } : {})}
+      breadcrumb={<Breadcrumb variant="overlay" items={breadcrumb} />}
+      search={{ action: listPath, ...(query ? { value: query } : {}), placeholder: t("list.keywordPlaceholder"), preservedParams: current }}
+      quickSearch={quickSearch}
+    />
+  );
+}
+
+/** Thẻ nổi bật (trang 1, ≤ 5 tin `isFeatured` còn hiệu lực khớp lọc). */
+function PostSpotlight({ cards }: { cards: PostCardData[] }) {
+  const t = useTranslations("page.posts.list.spotlight");
+  return <SpotlightSlider label={t("label")} badge={t("label")} items={cards.map((card) => ({ id: card.id, image: card.cover, content: <PostSpotlightContent data={card} /> }))} />;
+}
+
+interface PostGridProps {
+  cards: PostCardData[];
+  /** Thẻ đầu là ảnh LCP (hero không có ảnh và không có thẻ nổi bật). */
+  priorityFirst: boolean;
+  page: number;
+  totalPages: number;
+  buildHref: (page: number) => string;
+}
+
+/** Lưới 3 cột thẻ BĐS / voucher (tiêu đề thẻ `h2`) + phân trang. */
+function PostGrid({ cards, priorityFirst, page, totalPages, buildHref }: PostGridProps) {
+  const t = useTranslations("page.posts");
+  return (
+    <>
+      {cards.length > 0 && (
+        <section aria-label={t("gridLabel")}>
+          <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {cards.map((card, index) => (
+              <li key={card.id}>
+                {/* Ảnh LCP là ảnh hero; thẻ đầu chỉ ưu tiên khi hero không có ảnh và không có thẻ nổi bật. */}
+                <PostCard data={card} headingLevel="h2" imageSizes={GRID_CARD_SIZES} priority={priorityFirst && index === 0} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
+    </>
+  );
+}
+
+/** Danh mục (route hoặc link cũ) → danh sách + facet + nổi bật → tab + tên tỉnh đang chọn; hero / Tìm hiểu thêm / Điểm mạnh. Danh mục route không có / vượt số trang → `notFound()`. */
+async function loadPostListData(locale: Locale, searchParams: RawPostListParams, categorySlug: string | undefined, allLabel: string) {
+  const { page } = parsePagination(searchParams.page, undefined);
+  const payload = await getPayload({ config });
+  const context = await loadContext(payload, locale, categorySlug, legacyCategorySlug(searchParams, categorySlug));
+  if (categorySlug && !context) notFound();
+  const [listing, hero, content, strengths] = await Promise.all([
+    loadPostListing(payload, locale, { page, now: new Date(), filters: parsePostFilters(searchParams), ...(context ? { categoryIds: postCategoryFilterIds(context) } : {}) }),
+    loadPageHero(locale, "propertyPosts"),
+    loadListingPageContent(locale, "propertyPosts"),
+    loadListingStrengths(locale, "propertyPosts"),
+  ]);
+  if (listing.outOfRange) notFound();
+  const [chips, provinceNames] = await Promise.all([buildPostChips(payload, locale, allLabel, context), selectedProvinceNames(payload, listing.filters.provinceSlugs)]);
+  return { page, context, listing, chips, provinceNames, hero, content, strengths };
+}
+
 /**
- * S08 `/tin-bds` (`/en/property-posts`) và S05 trang danh mục (`categorySlug`) theo khung danh sách BL-052 (cùng `/du-an`, `/cho-thue`): hero (ảnh + chữ
+ * S08 `/tin-bds` (`/en/property-news`) và S05 trang danh mục (`categorySlug`) theo khung danh sách BL-052 (cùng `/du-an`, `/cho-thue`): hero (ảnh + chữ
  * `pageHeroes.propertyPosts`; trang danh mục: eyebrow "Đăng tin BĐS", tên + mô tả danh mục) + ô tìm `q` + "Tìm nhanh" (`listingPages.propertyPosts`) → tab danh mục
  * (link route danh mục, số đếm) → cột lọc trái (< lg là Sheet) | thẻ nổi bật (trang 1, ≤ 5 tin `isFeatured` còn hiệu lực khớp lọc) → "N tin phù hợp" + sắp xếp
  * → lưới 3 cột thẻ BĐS / voucher → phân trang → "Tìm hiểu thêm" + FAQ → dải Điểm mạnh (cờ `showStrengths`) → banner tư vấn. Không form lead.
@@ -81,26 +151,10 @@ async function selectedProvinceNames(payload: Payload, slugs: readonly string[] 
  * và trang vượt số trang → `notFound()`. Đọc `searchParams` nên render theo request (không ISR); "bây giờ" là lúc render (nhãn "Đã kết thúc" đúng `isOfferEnded`).
  */
 export async function PostListPage({ locale, searchParams, categorySlug }: PostListPageProps) {
-  const { page } = parsePagination(searchParams.page, undefined);
-  const legacySlug = legacyCategorySlug(searchParams, categorySlug);
-  const payload = await getPayload({ config });
-  const context = await loadContext(payload, locale, categorySlug, legacySlug);
-  if (categorySlug && !context) notFound();
+  const [t, tOptions] = await Promise.all([getTranslations({ locale, namespace: "page.posts" }), getTranslations({ locale, namespace: "listingOptions" })]);
+  const { page, context, listing, chips, provinceNames, hero, content, strengths } = await loadPostListData(locale, searchParams, categorySlug, t("all"));
   // Danh mục của link cũ chỉ lọc + đánh dấu tab; hero / breadcrumb / đường dẫn vẫn của `/tin-bds`.
   const routeContext = categorySlug ? context : null;
-
-  const [listing, t, tNav, tOptions, tDirection, hero, content, strengths] = await Promise.all([
-    loadPostListing(payload, locale, { page, now: new Date(), filters: parsePostFilters(searchParams), ...(context ? { categoryIds: postCategoryFilterIds(context) } : {}) }),
-    getTranslations({ locale, namespace: "page.posts" }),
-    getTranslations({ locale, namespace: "layout.nav.items" }),
-    getTranslations({ locale, namespace: "listingOptions" }),
-    getTranslations({ locale, namespace: "page.rentalDetail.direction" }),
-    loadPageHero(locale, "propertyPosts"),
-    loadListingPageContent(locale, "propertyPosts"),
-    loadListingStrengths(locale, "propertyPosts"),
-  ]);
-  if (listing.outOfRange) notFound();
-  const [chips, provinceNames] = await Promise.all([buildPostChips(payload, locale, t("all"), context), selectedProvinceNames(payload, listing.filters.provinceSlugs)]);
 
   const postsPath = publicPath("/tin-bds", locale);
   const listPath = routeContext ? postCategoryHref(routeContext.category, locale) : postsPath;
@@ -110,30 +164,14 @@ export async function PostListPage({ locale, searchParams, categorySlug }: PostL
   const tabs = buildPostTabs({ chips, facets: listing.facets, countLabel, query: filterQuery });
   const options = toFilterOptions(listing.facets, provinceNames, {
     type: (value) => tOptions(`propertyType.${value}`),
-    direction: (value) => tDirection(value),
+    direction: (value) => tOptions(`direction.${value}`),
     handover: (value) => tOptions(`handoverCondition.${value}`),
   });
   const filtered = filterQuery !== "";
-  const breadcrumb = [
-    { label: tNav("property-posts"), href: postsPath },
-    ...(routeContext?.parent ? [{ label: routeContext.parent.name ?? "", href: postCategoryHref(routeContext.parent, locale) }] : []),
-    ...(routeContext ? [{ label: routeContext.category.name ?? "", href: listPath }] : []),
-  ];
-  const heroDescription = routeContext ? (routeContext.category.description ?? undefined) : hero.description;
-  const heroEyebrow = routeContext ? t("title") : hero.eyebrow;
 
   return (
     <ListPendingProvider>
-      <ListingHero
-        title={routeContext?.category.name ?? hero.title}
-        {...(!routeContext && hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
-        {...(heroEyebrow ? { eyebrow: heroEyebrow } : {})}
-        {...(heroDescription ? { description: heroDescription } : {})}
-        {...(hero.image ? { image: hero.image } : {})}
-        breadcrumb={<Breadcrumb variant="overlay" items={breadcrumb} />}
-        search={{ action: listPath, ...(listing.filters.q ? { value: listing.filters.q } : {}), placeholder: t("list.keywordPlaceholder"), preservedParams: current }}
-        quickSearch={content.quickSearch}
-      />
+      <PostListHero hero={hero} routeContext={routeContext} locale={locale} listPath={listPath} postsPath={postsPath} query={listing.filters.q} current={current} quickSearch={content.quickSearch} />
       <ListingCategoryTabs label={t("tabsLabel")} tabs={tabs} />
       <PostListBody
         path={listPath}
@@ -144,18 +182,8 @@ export async function PostListPage({ locale, searchParams, categorySlug }: PostL
         activeCount={countActiveFilters(current, POST_ACTIVE_FILTER_SPEC)}
         clearHref={listPath}
         countLabel={countLabel(listing.totalDocs)}
-        {...(listing.featured.length > 0
-          ? {
-              spotlight: (
-                <SpotlightSlider
-                  label={t("list.spotlight.label")}
-                  badge={t("list.spotlight.label")}
-                  items={listing.featured.map((card) => ({ id: card.id, image: card.cover, content: <PostSpotlightContent data={card} /> }))}
-                />
-              ),
-            }
-          : {})}
-        {...(listing.totalDocs > 0 ? { sort: <PostSortControl actionPath={listPath} current={current} /> } : {})}
+        {...(listing.featured.length > 0 ? { spotlight: <PostSpotlight cards={listing.featured} /> } : {})}
+        {...(listing.totalDocs > 0 ? { sort: <PostSortControl {...(current.sort ? { value: current.sort } : {})} /> } : {})}
       >
         {listing.isEmpty ? (
           filtered ? (
@@ -164,26 +192,12 @@ export async function PostListPage({ locale, searchParams, categorySlug }: PostL
             <EmptyState variant="empty" title={t(context ? "empty.noPostsInCategory" : "empty.noPosts")} {...(context ? { backHref: postsPath } : {})} />
           )
         ) : (
-          <>
-            {listing.items.length > 0 && (
-              <section aria-label={t("gridLabel")}>
-                <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {listing.items.map((card, index) => (
-                    <li key={card.id}>
-                      {/* Ảnh LCP là ảnh hero; thẻ đầu chỉ ưu tiên khi hero không có ảnh và không có thẻ nổi bật. */}
-                      <PostCard data={card} headingLevel="h2" imageSizes={GRID_CARD_SIZES} priority={index === 0 && !hero.image && listing.featured.length === 0} />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-            <Pagination page={page} totalPages={listing.totalPages} buildHref={(target) => `${listPath}${toQueryString(current, target)}`} />
-          </>
+          <PostGrid cards={listing.items} priorityFirst={!hero.image && listing.featured.length === 0} page={page} totalPages={listing.totalPages} buildHref={(target) => `${listPath}${toQueryString(current, target)}`} />
         )}
       </PostListBody>
-      {/* FAQ JSON-LD chỉ ở trang sạch `/tin-bds` (trang 1, không lọc): trang danh mục cũng hiện khối nhưng không phát lặp `FAQPage`. */}
+      {/* FAQ JSON-LD chỉ ở trang sạch `/tin-bds` (trang 1, không lọc, cùng điều kiện noindex của metadata): trang danh mục cũng hiện khối nhưng không phát lặp `FAQPage`. */}
       <div className="mx-auto w-full max-w-container px-gutter pb-section-tight empty:hidden">
-        <LearnMoreFaq learnMore={toLearnMoreContent(content.learnMore)} faqs={content.faqs} emitJsonLd={!context && page === 1 && !hasPostFilterParams(searchParams)} />
+        <LearnMoreFaq learnMore={toLearnMoreContent(content.learnMore)} faqs={content.faqs} emitJsonLd={!categorySlug && page === 1 && !isFilteredList(searchParams, categorySlug)} />
       </div>
       {strengths ? <StrengthsBlock block={strengths} /> : null}
       <ConsultBanner locale={locale} />
@@ -191,44 +205,4 @@ export async function PostListPage({ locale, searchParams, categorySlug }: PostL
   );
 }
 
-/** `/tin-bds?page=2` · trang 1 không kèm tham số. */
-function withPage(path: string, page: number): string {
-  return page > 1 ? `${path}?page=${page}` : path;
-}
-
-/**
- * `generateMetadata` của hai trang danh sách. Có tham số lọc / `q` / `sort` khác mặc định (`hasPostFilterParams`) hoặc `?category=` của link cũ → `noindex, follow`
- * + canonical về trang sạch (`/tin-bds` hoặc trang danh mục, không `?page`). Không lọc: canonical chính nó (kèm `?page=n` ở trang ≥ 2). Danh mục không có → metadata rỗng (trang tự `notFound()`).
- */
-export async function buildPostListMetadata({ locale, searchParams, categorySlug }: PostListPageProps): Promise<Metadata> {
-  const { page } = parsePagination(searchParams.page, undefined);
-  const filtered = hasPostFilterParams(searchParams) || legacyCategorySlug(searchParams, categorySlug) !== "";
-  const pageFor = (path: string) => (filtered ? path : withPage(path, page));
-  const payload = await getPayload({ config });
-  const [t, identity] = await Promise.all([getTranslations({ locale, namespace: "page.posts" }), loadSiteIdentity(locale)]);
-  const common = { locale, siteName: identity.siteName, defaultImage: identity.logo, forceNoindex: filtered };
-
-  if (!categorySlug) {
-    return buildPageMetadata({
-      ...common,
-      title: t("title"),
-      description: t("description"),
-      paths: { vi: pageFor(publicPath("/tin-bds", "vi")), en: pageFor(publicPath("/tin-bds", "en")) },
-      hasEnglish: true,
-    });
-  }
-  const context = await loadPostCategoryContext(payload, locale, categorySlug);
-  if (!context) return {};
-  const { category } = context;
-  const slugs = await findLocalizedSlugs(payload, "categories", category.id);
-  const hasEnglish = category.hasEnglish === true && Boolean(slugs.en);
-  const pathFor = (target: Locale, slug: string) => pageFor(publicPath("/tin-bds/danh-muc/[category]", target, { category: slug }));
-  return buildPageMetadata({
-    ...common,
-    seo: category.seo,
-    title: category.name ?? t("title"),
-    description: category.description,
-    paths: { vi: pathFor("vi", slugs.vi ?? category.slug ?? categorySlug), ...(hasEnglish && slugs.en ? { en: pathFor("en", slugs.en) } : {}) },
-    hasEnglish,
-  });
-}
+export { buildPostListMetadata, type RawPostListParams } from "./post-list-metadata";

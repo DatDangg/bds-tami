@@ -38,7 +38,7 @@ export type RawRentalParams = Record<string, string | string[] | undefined>;
 const QUERY_KEYS = ["q", "category", "province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "sort", "page"] as const;
 type QueryKey = (typeof QUERY_KEYS)[number];
 
-const DEFAULT_SORT: RentalSort = "newest";
+export const DEFAULT_RENTAL_SORT: RentalSort = "newest";
 
 /**
  * Giá trị của một khoá đã qua đúng schema của API: sai kiểu/ngoài khoảng/rỗng -> `undefined` (bị bỏ, không làm vỡ trang).
@@ -82,7 +82,7 @@ export function parseRentalFilters(raw: RawRentalParams): RentalFilters {
   const present = Object.entries(optionals).filter(([, value]) => value !== undefined && value !== "");
   return {
     ...(Object.fromEntries(present) as Partial<RentalFilters>),
-    sort: (read("sort") as RentalSort | undefined) ?? DEFAULT_SORT,
+    sort: (read("sort") as RentalSort | undefined) ?? DEFAULT_RENTAL_SORT,
     page: (read("page") as number | undefined) ?? 1,
   };
 }
@@ -94,7 +94,7 @@ export function rentalListQueryString(filters: RentalFilters, override: Partial<
   for (const key of QUERY_KEYS) {
     const value = merged[key];
     if (value === undefined || value === "") continue;
-    if (key === "sort" && value === DEFAULT_SORT) continue;
+    if (key === "sort" && value === DEFAULT_RENTAL_SORT) continue;
     if (key === "page" && value === 1) continue;
     if (Array.isArray(value)) {
       if (value.length > 0) search.set(key, value.join(","));
@@ -141,10 +141,10 @@ export const AREA_HINT_RANGES = [
  * (kèm `page`) vẫn index; mọi tổ hợp sâu hơn (từ khoá, phường, giá, diện tích, phòng ngủ, nội thất, danh mục + tỉnh) hoặc đổi sắp xếp thì không.
  */
 export function hasNarrowingParams(filters: RentalFilters): boolean {
-  if (filters.sort !== DEFAULT_SORT) return true;
+  if (filters.sort !== DEFAULT_RENTAL_SORT) return true;
   const { category, province, ...rest } = filters;
   if (category !== undefined && province !== undefined) return true;
-  return activeFilterCount({ ...rest, sort: DEFAULT_SORT, page: 1 }) > 0;
+  return activeFilterCount({ ...rest, sort: DEFAULT_RENTAL_SORT, page: 1 }) > 0;
 }
 
 /** Tham số cho `SearchService` (cùng kiểu với API): thêm ngôn ngữ đang xem, cỡ trang cố định 12 và chỉ tin còn trống (`available`, S04). */

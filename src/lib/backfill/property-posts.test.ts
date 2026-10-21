@@ -107,6 +107,36 @@ describe("planPropertyPost — cú pháp VN khác", () => {
     expect(patchOf({ title: "Nhà phố mặt tiền đường 20m" })).not.toHaveProperty("frontageM");
   });
 
+  it("mặt tiền: \"cách 50m mặt tiền\" / \"cách mặt tiền 30m\" là khoảng cách, không nhận (P3-T05 review r1)", () => {
+    expect(patchOf({ title: "Nhà phố ngõ ô tô cách 50m mặt tiền phố" })).not.toHaveProperty("frontageM");
+    expect(patchOf({ title: "Nhà phố cách mặt tiền 30m" })).not.toHaveProperty("frontageM");
+    expect(patchOf({ title: "Nhà phố 5m mặt tiền" }).frontageM).toBe(5);
+  });
+
+  it("hướng chính: \"hướng Bắc Ninh\" / \"hướng Tây Hồ\" / \"chính Nam Từ Liêm\" là địa danh, không phải hướng nhà", () => {
+    expect(patchOf({ title: "Bán nhà phố mặt đường hướng Bắc Ninh" })).not.toHaveProperty("houseDirection");
+    expect(patchOf({ title: "Biệt thự view hồ hướng Tây Hồ" })).not.toHaveProperty("houseDirection");
+    expect(patchOf({ title: "Nhà phố trung tâm chính Nam Từ Liêm" })).not.toHaveProperty("houseDirection");
+    expect(patchOf({ title: "Liền kề hướng Đông Nam Bộ Hồ" })).not.toHaveProperty("houseDirection");
+    expect(patchOf({ title: "Nhà phố hướng Nam rộng thoáng" }).houseDirection).toBe("S");
+  });
+
+  it("số tầng lẻ / có tum → vẫn điền nhưng ghi chú soát", () => {
+    const half = { title: "Bán biệt thự song lập hướng Tây Bắc 3.5 tầng nổi" };
+    expect(patchOf(half).floors).toBe(3.5);
+    expect(reviewOf(half, "floors")).toEqual(["Số tầng lẻ 3.5 (thường là có lửng / tum) — soát lại"]);
+    const tum = { title: "Bán biệt thự song lập hướng Tây xây thô 3 tầng 1 tum" };
+    expect(patchOf(tum).floors).toBe(3);
+    expect(reviewOf(tum, "floors")).toEqual(['Có "tum" — soát số tầng 3 có tính tum không']);
+    expect(reviewOf({ title: "Nhà phố 4 tầng" }, "floors")).toEqual([]);
+  });
+
+  it("ban công cùng hướng với hướng nhà → vẫn giữ ghi chú ban công", () => {
+    const over = { title: "Bán chung cư Starlake 79 m² ban công hướng Tây Nam", contentText: "Hướng: Tây Nam" };
+    expect(patchOf(over).houseDirection).toBe("SW");
+    expect(reviewOf(over, "houseDirection")).toContain("Hướng ban công Tây Nam (SW) — trùng hướng nhà đã trích, soát lại");
+  });
+
   it("địa chỉ: dòng \"Địa chỉ: …\" (cắt ở hết câu), không nhận \"Địa chỉ văn phòng: …\"", () => {
     expect(patchOf({ title: "Nhà phố", contentText: "Thông tin\n- Địa chỉ: 12 Nguyễn Huệ, Phường Sài Gòn. Giá 5 tỷ\nLiên hệ" }).address).toBe("12 Nguyễn Huệ, Phường Sài Gòn");
     expect(patchOf({ title: "Nhà phố", contentText: "Địa chỉ văn phòng: 1 Lê Lợi" })).not.toHaveProperty("address");

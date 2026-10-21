@@ -242,7 +242,11 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
     const clean = await render("vi");
     expect(hasFaqJsonLd(clean.container)).toBe(true);
     clean.unmount();
-    expect(hasFaqJsonLd((await render("vi", { type: "villa" })).container)).toBe(false);
+    const filtered = await render("vi", { type: "villa" });
+    expect(hasFaqJsonLd(filtered.container)).toBe(false);
+    filtered.unmount();
+    // Slug lạ ở `?category=` bị trang bỏ qua nhưng metadata vẫn noindex → không phát FAQ (P3-T03 review r1).
+    expect(hasFaqJsonLd((await render("vi", { category: "khong-co" })).container)).toBe(false);
   });
 
   it("trang vượt số trang → notFound", async () => {
@@ -298,13 +302,22 @@ describe("buildPostListMetadata", () => {
     expect((await buildPostListMetadata({ locale: "vi", searchParams: { page: "2" } })).alternates?.canonical).toBe("https://tami.example/tin-bds?page=2");
   });
 
-  it("có lọc / q / sort khác mặc định / ?category= cũ → noindex, follow + canonical trang sạch (không ?page)", async () => {
-    for (const searchParams of [{ type: "villa" }, { q: "abc", page: "2" }, { sort: "price_desc" }, { category: "voucher" }]) {
+  it("có lọc / q / sort khác mặc định / ?category= slug lạ → noindex, follow + canonical trang sạch (không ?page)", async () => {
+    for (const searchParams of [{ type: "villa" }, { q: "abc", page: "2" }, { sort: "price_desc" }, { category: "khong-co" }]) {
       const meta = await buildPostListMetadata({ locale: "vi", searchParams });
       expect(meta.robots).toMatchObject({ index: false, follow: true });
       expect(meta.alternates?.canonical).toBe("https://tami.example/tin-bds");
     }
     expect((await buildPostListMetadata({ locale: "vi", searchParams: { sort: "newest" } })).robots).toEqual({ index: true, follow: true });
+  });
+
+  it("link cũ /tin-bds?category=<slug có thật> → noindex + canonical về trang danh mục, không hreflang", async () => {
+    for (const searchParams of [{ category: "voucher" }, { category: "voucher", type: "villa", page: "2" }]) {
+      const meta = await buildPostListMetadata({ locale: "vi", searchParams });
+      expect(meta.robots).toMatchObject({ index: false, follow: true });
+      expect(meta.alternates?.canonical).toBe("https://tami.example/tin-bds/danh-muc/voucher");
+      expect(meta.alternates?.languages).toBeUndefined();
+    }
   });
 
   it("trang danh mục có lọc → noindex + canonical về trang danh mục sạch", async () => {

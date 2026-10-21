@@ -94,11 +94,12 @@ function parseBounded(value: string | string[] | undefined, cap: number): number
 
 /**
  * Khoảng của một thanh trượt (cùng quy tắc giá `/du-an`): kẹp về 0–`cap`, `min > max` thì ĐỔI CHỖ (URL sửa tay vẫn ra khoảng hợp lý),
- * rồi bỏ đầu ở mép (min 0, max `cap`) vì đó là "không giới hạn".
+ * rồi bỏ đầu ở mép (min 0, max `cap`) vì đó là "không giới hạn". `max = 0` (gõ tay, hoặc kéo đầu trên về 0) cũng coi là không giới hạn trên —
+ * lọc "giá / diện tích ≤ 0" vô nghĩa và ra trang trống (P3-T02 review r1).
  */
 function parseRange(rawMin: string | string[] | undefined, rawMax: string | string[] | undefined, cap: number): { min?: number; max?: number } {
   let min = parseBounded(rawMin, cap);
-  let max = parseBounded(rawMax, cap);
+  let max = parseBounded(rawMax, cap) || undefined;
   if (min !== undefined && max !== undefined && min > max) [min, max] = [max, min];
   return { ...(min !== undefined && min > 0 ? { min } : {}), ...(max !== undefined && max < cap ? { max } : {}) };
 }

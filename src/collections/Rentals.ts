@@ -2,6 +2,7 @@ import type { CollectionConfig, DateField, FieldAccess, GroupField, SelectField,
 
 import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
 import { withPriceInWords } from "../fields/form-hints";
+import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { RENTAL_STATUSES } from "../fields/status";
@@ -61,11 +62,7 @@ const SERVICE_LABELS: Record<(typeof INCLUDED_SERVICES)[number], string> = {
   security: "An ninh",
 };
 
-const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) =>
-  values.map((value) => ({ label: labels[value], value }));
-
 const directionField = (name: string, label: string): SelectField => ({ name, type: "select", label, options: selectOptions(DIRECTIONS, DIRECTION_ADMIN_LABELS) });
-const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 
 /** Mã `CT-000001` (ERD §4.6): chỉ đọc với mọi người (PERMISSION §4), do hook `assignRentalCode` sinh từ sequence. */
 const codeField: TextField = {

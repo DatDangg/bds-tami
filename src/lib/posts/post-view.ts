@@ -9,6 +9,7 @@ import { publicDetailPath } from "../content/redirect-paths";
 import { formatDate, formatVnd, formatVndCompact } from "../format";
 import { visibleCategory } from "../news/news-view";
 import { renderableImage } from "../projects/project-detail-view";
+import { hasPostOffer, isVoucherPost, validOfferEndAt } from "./post-kind";
 
 /** Ưu đãi còn từng này ngày (hoặc ít hơn) thì hiện badge cảnh báo (design-spec S08/S09). */
 export const OFFER_ENDING_SOON_DAYS = 3;
@@ -82,23 +83,15 @@ export interface PostCardData {
 
 const positiveOrNull = (value: number | null | undefined): number | null => (typeof value === "number" && value > 0 ? value : null);
 
-/** Hạn ưu đãi hợp lệ (parse được) hoặc `null`. */
-function validEndAt(post: Pick<PropertyPost, "offer">): string | null {
-  const endAt = post.offer?.endAt;
-  return hasText(endAt) && !Number.isNaN(new Date(endAt).getTime()) ? endAt : null;
-}
-
 export function toPostCardData(doc: PropertyPost, locale: Locale, now: Date): PostCardData | null {
   // Bài không có tiêu đề/slug không dựng được thẻ có link: bỏ qua thay vì render thẻ rỗng.
   if (!doc.title || !doc.slug) return null;
   const published = doc.publishedAt ?? null;
-  const endAt = validEndAt(doc);
-  const hasOffer = endAt !== null || hasText(doc.offer?.voucherCode);
-  const priceVnd = positiveOrNull(doc.priceVnd);
+  const endAt = validOfferEndAt(doc);
   const areaM2 = positiveOrNull(doc.areaM2);
   return {
-    kind: hasOffer && priceVnd === null && areaM2 === null ? "voucher" : "property",
-    hasOffer,
+    kind: isVoucherPost(doc) ? "voucher" : "property",
+    hasOffer: hasPostOffer(doc),
     propertyType: doc.propertyType ?? null,
     placeLabel: placeLabel(doc.ward, doc.province),
     areaM2,
