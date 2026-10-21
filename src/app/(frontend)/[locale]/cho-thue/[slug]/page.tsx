@@ -11,6 +11,7 @@ import { RentalDetail } from "@/components/rentals/RentalDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT_ROUTES } from "@/lib/content/content-paths";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
@@ -111,11 +112,12 @@ export default async function RentalDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [similarDocs, hotline, identity, privateFields] = await Promise.all([
+  const [similarDocs, hotline, identity, privateFields, strengths] = await Promise.all([
     findSimilarRentals(payload, locale, doc),
     loadHotline(locale),
     loadSiteIdentity(locale),
     findRentalPrivateFields(payload, doc.id),
+    loadListingStrengths(locale, "rentals"),
   ]);
   const tContact = await getTranslations({ locale, namespace: "page.rentalDetail.contact" });
   const sale = toSaleContactView(await findActiveSaleContact(payload, locale, privateFields.authorId));
@@ -138,7 +140,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
         sale={sale}
         {...(hotline ? { hotline } : {})}
         ownPath={ownPath}
-        {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        strengths={strengths}
         consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: tContact("callHotline", { phone: hotline.label }), href: hotline.telHref } } : {})} />}
       />
       {!view.rented && pageUrl && siteUrl && (

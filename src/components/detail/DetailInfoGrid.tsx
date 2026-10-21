@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -7,9 +8,14 @@ export interface DetailInfoItem {
   label: string;
   /** Trống / null → ô bị bỏ. */
   value?: string | null;
-  /** Link ngoài đã kiểm http(s) (vd website chủ đầu tư): giá trị thành link mở tab mới; `newTabLabel` là chữ đọc màn hình "(mở tab mới)". */
-  link?: { href: string; newTabLabel: string } | null;
+  /**
+   * Giá trị thành link. Có `newTabLabel` → link ngoài đã kiểm http(s) (vd website chủ đầu tư) mở tab mới, `newTabLabel` là chữ đọc màn hình "(mở tab mới)";
+   * không có → đường dẫn nội bộ (vd dự án của tin cho thuê), mở tại chỗ.
+   */
+  link?: { href: string; newTabLabel?: string } | null;
 }
+
+const LINK_CLASS = "text-accent-text underline underline-offset-4 hover:text-text";
 
 /**
  * Lưới thông tin trong khối Tổng quan (BL-052, design `detail-du-an`: Tên thương mại, Chủ đầu tư, Vị trí…): icon vuông viền mảnh + nhãn nhỏ + giá trị;
@@ -30,11 +36,15 @@ export function DetailInfoGrid({ items, label, className }: { items: DetailInfoI
             {item.label}
           </dt>
           <dd className="text-small font-semibold break-words text-text">
-            {item.link ? (
-              <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="text-accent-text underline underline-offset-4 hover:text-text">
+            {item.link?.newTabLabel ? (
+              <a href={item.link.href} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
                 {item.value}
                 <span className="sr-only"> {item.link.newTabLabel}</span>
               </a>
+            ) : item.link ? (
+              <Link href={item.link.href} className={LINK_CLASS}>
+                {item.value}
+              </Link>
             ) : (
               item.value
             )}

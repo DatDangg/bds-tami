@@ -30,3 +30,8 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Bổ sung từ review P2-T01 / P2-T03 + mẫu P1-T05 (change-request 2026-10-21)
+- Lắp ráp theo mẫu `/du-an` (P1-T05): `src/components/projects/ProjectListBody.tsx` + `project-list-state.ts` — hook `useListingFilterNav` gọi 1 lần, `generation` làm `key`, `reset` → `onClear`; `findPublicList({ populate })` nếu cần.
+- Data P2-T01: `listRentals()` trả `items`/`total`/`featured`/`facets.category`/`facets.provinces`; `toRentalProvinceFacets`; `RentalFilterOptions.projects`; RentalListPage hiện tạm đặt nổi bật đầu lưới trang 1 → thay bằng `SpotlightSlider`.
+- MINOR mang sang: `RentalCard` `key={tag}` thêm tiền tố; thống nhất chữ giá thẻ với chi tiết ("Thương lượng" / "Liên hệ", bỏ "Thoả thuận"); `RentalPriceText.tsx` U+200B → `\u200B`; ngày đăng chi tiết bọc lại `<time>`; "Căn tương tự" dùng biến thể `listing`.

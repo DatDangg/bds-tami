@@ -51,6 +51,21 @@ describe("DetailInfoGrid", () => {
     const { container } = renderWithIntl(<DetailInfoGrid items={[{ icon, label: "A", value: "" }]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("link: có newTabLabel → mở tab mới; không có → link nội bộ mở tại chỗ", () => {
+    renderWithIntl(
+      <DetailInfoGrid
+        items={[
+          { icon, label: "Chủ đầu tư", value: "TAMI", link: { href: "https://tami.example", newTabLabel: "(mở tab mới)" } },
+          { icon, label: "Thuộc dự án", value: "Sông Sài Gòn", link: { href: "/du-an/song-sai-gon" } },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("link", { name: /^TAMI\s?\(mở tab mới\)$/ })).toHaveAttribute("target", "_blank");
+    const internal = screen.getByRole("link", { name: "Sông Sài Gòn" });
+    expect(internal).toHaveAttribute("href", "/du-an/song-sai-gon");
+    expect(internal).not.toHaveAttribute("target");
+  });
 });
 
 describe("DetailStatCards", () => {
@@ -117,5 +132,22 @@ describe("DetailContactAside", () => {
     );
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.queryByText("Hotline tư vấn")).toBeNull();
+  });
+
+  it("header: một thẻ trắng bọc phần đầu + vùng form (#lead-form nền trong suốt), phần đầu nằm trên tiêu đề form", () => {
+    renderWithIntl(
+      <DetailContactAside title="Nhận tư vấn" headingId="c3" header={<p>12 triệu/tháng</p>}>
+        <form aria-label="lead" />
+      </DetailContactAside>,
+    );
+    const slot = screen.getByRole("region", { name: "Nhận tư vấn" });
+    expect(slot).toHaveAttribute("id", "lead-form");
+    expect(slot.className).toContain("bg-transparent");
+    const card = slot.parentElement as HTMLElement;
+    expect(card.className).toContain("bg-surface");
+    expect(card.parentElement?.className).toContain("lg:sticky");
+    const header = screen.getByText("12 triệu/tháng");
+    expect(card).toContainElement(header);
+    expect(header.compareDocumentPosition(slot) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

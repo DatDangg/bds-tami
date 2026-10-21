@@ -17,6 +17,9 @@ vi.mock("payload", () => ({ getPayload: vi.fn().mockResolvedValue({}) }));
 vi.mock("@/lib/rentals/rental-queries", () => ({ findPublicRentalBySlug, findSimilarRentals, findRentalPrivateFields, findActiveSaleContact }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "can-ho-2pn", en: "two-bedroom" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
+const loadListingStrengths = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
+vi.mock("@/lib/content/load-listing-strengths", () => ({ loadListingStrengths }));
+vi.mock("@/components/home/StrengthsBlock", () => ({ StrengthsBlock: () => <section data-testid="strengths" /> }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 // LazyMap là Client Component dựng MapLibre: thay bằng bản ghi props để kiểm toạ độ nào được đưa vào HTML công khai.
 vi.mock("@/components/media/LazyMap", () => ({
@@ -94,36 +97,36 @@ beforeEach(() => {
   findSimilarRentals.mockResolvedValue([]);
   findRentalPrivateFields.mockResolvedValue({ authorId: "s1", location: null });
   findActiveSaleContact.mockResolvedValue(sale);
+  loadListingStrengths.mockResolvedValue(null);
   lazyMapProps.length = 0;
 });
 afterEach(() => {
   vi.unstubAllEnvs();
-  for (const mock of [findPublicRentalBySlug, findSimilarRentals, findRentalPrivateFields, findActiveSaleContact, getSiteSettings]) mock.mockReset();
+  for (const mock of [findPublicRentalBySlug, findSimilarRentals, findRentalPrivateFields, findActiveSaleContact, getSiteSettings, loadListingStrengths]) mock.mockReset();
 });
 
 describe("trang chi tiết tin cho thuê (S07)", () => {
-  it("render đủ: một h1, mã tin, giá/thông số, chi tiết, điều khoản, mô tả, vị trí phường/tỉnh, sale phụ trách + form lead", async () => {
+  it("render đủ: một h1, mã tin, thanh thông số, Tổng quan (mô tả + lưới thông tin), điều khoản, vị trí phường/tỉnh, sale phụ trách + form lead", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental({ videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", legalNote: "Sổ hồng riêng" }));
     const { container } = await renderRental();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Căn hộ 2PN Quận 1" })).toBeInTheDocument();
     expect(container.textContent).toContain("CT-000001");
     expect(container.textContent).toContain("Phường Sài Gòn, TP.HCM");
-    const titleCard = screen.getByRole("heading", { level: 1 }).closest("div[class*='rounded-[28px]']") as HTMLElement;
-    expect(titleCard).toHaveTextContent("12 triệu/tháng");
-    const facts = within(screen.getByRole("list", { name: "Thông số chính" }));
+    const facts = within(screen.getByRole("group", { name: "Thông số chính" }));
+    // U+200B cho phép xuống dòng trước "/tháng" ở ô hẹp.
+    expect(facts.getByText("12 triệu​/tháng")).toBeInTheDocument();
     expect(facts.getByText("55 m²")).toBeInTheDocument();
-    const details = within(screen.getByRole("heading", { level: 2, name: "Thông tin chi tiết" }).closest("section") as HTMLElement);
-    expect(details.getByText("Tầng 12")).toBeInTheDocument();
-    expect(details.getByText("Đông Nam")).toBeInTheDocument();
-    expect(details.getByText("Đầy đủ")).toBeInTheDocument();
-    expect(details.getByRole("link", { name: "Căn hộ" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
+    expect(facts.getByText("Đông Nam")).toBeInTheDocument();
+    expect(facts.getByText("Đầy đủ")).toBeInTheDocument();
+    const overview = within(screen.getByRole("heading", { level: 2, name: "Tổng quan" }).closest("section") as HTMLElement);
+    expect(overview.getByText("Căn hộ thoáng, đầy đủ nội thất.")).toBeInTheDocument();
+    expect(overview.getByText("Tầng 12")).toBeInTheDocument();
+    expect(overview.getByRole("link", { name: "Căn hộ" })).toHaveAttribute("href", "/cho-thue/danh-muc/can-ho");
     const terms = within(screen.getByRole("heading", { level: 2, name: "Điều khoản thuê" }).closest("section") as HTMLElement);
     expect(terms.getByText("Hàng quý")).toBeInTheDocument();
     expect(terms.getByText("Internet")).toBeInTheDocument();
-    expect(screen.getByText("Căn hộ thoáng, đầy đủ nội thất.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Phát video/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Video" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Xem video giới thiệu" })).toBeInTheDocument();
     expect(screen.getByText("Sổ hồng riêng")).toBeInTheDocument();
     expect(screen.getByText("Nguyễn Văn Sale")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gọi 0901 111 222" })).toHaveAttribute("href", "tel:0901111222");
@@ -138,13 +141,13 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     const { container, unmount } = await renderRental();
     expect(container.textContent).not.toContain("Nguyễn Văn Sale");
     expect(screen.queryByText("Người phụ trách")).toBeNull();
-    expect(screen.getByRole("link", { name: "Gọi hotline 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+    expect(screen.getByRole("link", { name: "Gọi ngay 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     unmount();
 
     findActiveSaleContact.mockResolvedValue({ fullName: "Sale Không SĐT", phone: "  ", avatar: null });
     const second = await renderRental();
     expect(second.container.textContent).not.toContain("Sale Không SĐT");
-    expect(screen.getByRole("link", { name: "Gọi hotline 0901 234 567" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Gọi ngay 0901 234 567" })).toBeInTheDocument();
   });
 
   it("tin tương tự: gọi truy vấn với tin hiện tại, hiện thẻ link h3 trong khối 'Căn tương tự' sau nội dung", async () => {
@@ -154,7 +157,8 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
     expect(findSimilarRentals).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ id: "r1" }));
     const section = screen.getByRole("heading", { level: 2, name: "Căn tương tự" }).closest("section") as HTMLElement;
     expect(within(section).getByRole("heading", { level: 3, name: "Căn hộ 1PN" })).toBeInTheDocument();
-    expect(within(section).getByRole("link")).toHaveAttribute("href", "/cho-thue/can-ho-1pn");
+    expect(within(section).getByRole("link", { name: /Căn hộ 1PN/ })).toHaveAttribute("href", "/cho-thue/can-ho-1pn");
+    expect(within(section).getByRole("link", { name: /Xem tất cả căn cho thuê/ })).toHaveAttribute("href", "/cho-thue");
     expect(section.textContent).toContain("8,5 triệu/tháng");
     const h1 = container.querySelector("h1") as HTMLElement;
     expect(h1.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -183,20 +187,33 @@ describe("trang chi tiết tin cho thuê (S07)", () => {
   it("/en: nhãn tiếng Anh, breadcrumb về /en/for-rent, JSON-LD inLanguage en", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental({ title: "Two bedroom", slug: "two-bedroom", hasEnglish: true }));
     const { container } = await renderRental("en", "two-bedroom");
-    expect(screen.getByRole("list", { name: "Key facts" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Key facts" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "For rent" })).toHaveAttribute("href", "/en/for-rent");
     expect(jsonLdItems(container).find((item) => item["@type"] === "RealEstateListing")).toMatchObject({ inLanguage: "en", url: "https://tami.example/en/for-rent/two-bedroom" });
     expect(container.textContent).not.toMatch(/Thông số|Điều khoản|Gọi/);
   });
 });
 
-describe("khung chi tiết mới: chia sẻ + banner tư vấn", () => {
-  it("nút chia sẻ trong khối tiêu đề; banner tư vấn nhận nút chính cuộn tới #lead-form và nút phụ gọi hotline", async () => {
+describe("khung chi tiết BL-052: Điểm mạnh + banner tư vấn", () => {
+  it("banner tư vấn nhận nút chính cuộn tới #lead-form và nút phụ gọi hotline; không nút chia sẻ (như chi tiết Dự án)", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental());
     await renderRental();
-    expect(screen.getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Chia sẻ" })).toBeNull();
     expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
     expect(consultBannerProps).toHaveBeenCalledWith(expect.objectContaining({ locale: "vi", actionHref: "#lead-form", secondary: { label: "Gọi hotline 0901 234 567", href: "tel:0901234567" } }));
+  });
+
+  it("dải Điểm mạnh theo cờ trang Cho thuê (`listingPages.rentals`), nằm trước banner; loader trả null → không dải", async () => {
+    findPublicRentalBySlug.mockResolvedValue(rental());
+    loadListingStrengths.mockResolvedValue({ title: "Điểm mạnh", items: [] });
+    const { unmount } = await renderRental("en", "two-bedroom");
+    expect(loadListingStrengths).toHaveBeenCalledWith("en", "rentals");
+    const strengths = screen.getByTestId("strengths");
+    expect(strengths.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    unmount();
+    loadListingStrengths.mockResolvedValue(null);
+    await renderRental();
+    expect(screen.queryByTestId("strengths")).toBeNull();
   });
 });
 
@@ -238,7 +255,7 @@ describe("tin đã thuê (BR-01)", () => {
     const section = screen.getByRole("heading", { level: 2, name: "Căn tương tự đang trống" }).closest("section") as HTMLElement;
     const h1 = container.querySelector("h1") as HTMLElement;
     expect(h1.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(section.compareDocumentPosition(container.querySelector("#details") as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(section.compareDocumentPosition(container.querySelector("#overview") as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(findSimilarRentals).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ status: "rented" }));
   });
 });
@@ -293,10 +310,10 @@ describe("JSON-LD tin còn trống", () => {
     expect(container.querySelectorAll("script")).toHaveLength(items.length);
   });
 
-  it("giá thoả thuận → hiện 'Thoả thuận', JSON-LD không khai offers", async () => {
+  it("giá thương lượng → hiện 'Thương lượng', JSON-LD không khai offers", async () => {
     findPublicRentalBySlug.mockResolvedValue(rental({ priceNegotiable: true }));
     const { container } = await renderRental();
-    expect(screen.getAllByText("Thoả thuận").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Thương lượng").length).toBeGreaterThanOrEqual(2);
     expect(jsonLdItems(container).find((item) => item["@type"] === "RealEstateListing")).not.toHaveProperty("offers");
   });
 });

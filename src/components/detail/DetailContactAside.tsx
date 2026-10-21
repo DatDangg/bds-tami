@@ -20,20 +20,36 @@ interface DetailContactAsideProps {
   children: ReactNode;
   /** Hotline; trống → ẩn khối nền tối. */
   hotline?: { label: string; telHref: string } | null;
+  /** Phần đầu thẻ, TRÊN tiêu đề form (vd giá thuê + người phụ trách của tin cho thuê); thẻ khi đó bọc cả hai, `#lead-form` vẫn là vùng form. */
+  header?: ReactNode;
 }
+
+const CARD_CLASS = "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:p-6";
+/** Đích cuộn của `#lead-form`: dưới thanh tab dính. */
+const SCROLL_MT_CLASS = "scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
 
 /**
  * Cột liên hệ trang chi tiết (BL-052, design `detail-du-an`): thẻ trắng bo 20px chứa tiêu đề + mô tả + form (neo `#lead-form` của `LeadFormSlot`, đích của CTA dính đáy
  * và banner tư vấn) → khối Hotline nền tối (số + nút "Gọi ngay" `tel:`). Đặt trong `DetailPageShell aside` (bọc `DetailAsideFit`). Server Component.
  */
-export function DetailContactAside({ title, headingId, description, children, hotline }: DetailContactAsideProps) {
+export function DetailContactAside({ title, headingId, description, children, hotline, header }: DetailContactAsideProps) {
   const t = useTranslations("detailKit.contact");
+  const form = (
+    <LeadFormSlot title={title} headingId={headingId} className={header ? `bg-transparent p-0 lg:p-0 ${SCROLL_MT_CLASS}` : `${CARD_CLASS} ${SCROLL_MT_CLASS}`}>
+      {description && <p className="-mt-2 mb-4 text-small text-text-secondary">{description}</p>}
+      {children}
+    </LeadFormSlot>
+  );
   return (
     <div className={STICKY_CLASS}>
-      <LeadFormSlot title={title} headingId={headingId} className="rounded-[20px] border border-border bg-surface p-6 shadow-md lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]">
-        {description && <p className="-mt-2 mb-4 text-small text-text-secondary">{description}</p>}
-        {children}
-      </LeadFormSlot>
+      {header ? (
+        <div className={`flex flex-col gap-6 ${CARD_CLASS}`}>
+          {header}
+          {form}
+        </div>
+      ) : (
+        form
+      )}
       {hotline && (
         <div className="theme-dark-block flex items-center justify-between gap-4 rounded-[20px] bg-dark-deep p-5 text-on-dark">
           <p className="min-w-0">
