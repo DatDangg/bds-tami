@@ -1812,6 +1812,38 @@
         "report": ".context/review-reports/spec-validation-feature-favicon-tab-logo-phase-1.md",
         "result": "PASS (W1/W2 đã sửa ở round 2)"
       }
+    },
+    {
+      "slug": "page-hero-warm-scrim",
+      "title": "Lớp phủ ảnh (scrim) đen ánh nâu vàng thay đen lạnh — đổi chung --color-banner-scrim (BL-049)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-049",
+      "changeDoc": "spec/changes/archive/2026-10-21-page-hero-warm-scrim.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user: \"làm đi\" + chọn đổi chung token; 1 phase/1 task)",
+      "note": "rgb(20 13 2 / 0.6) thay gợi ý rgb(28 20 10 / 0.6) vì gợi ý làm breadcrumb kính tụt 4.35:1",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-page-hero-warm-scrim/phase-1-task-01.md",
+          "title": "Đổi token --color-banner-scrim + test + doc",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-page-hero-warm-scrim-phase-1-task-01-round-1-review.md"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.41.0",
+      "scopeVersion": 51,
+      "specValidation": {
+        "report": ".context/review-reports/feature-page-hero-warm-scrim-spec-validation.md",
+        "result": "PASS"
+      }
     }
   ],
   "bugs": [

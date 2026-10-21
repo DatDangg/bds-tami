@@ -1,0 +1,150 @@
+{
+  "specVersion": "1.40.0",
+  "scopeVersion": 50,
+  "generatedAt": "2026-10-21T23:59:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-048 ADDITIVE: logo TAMI trên tab trình duyệt (favicon + apple-touch-icon) cho mọi trang public vi/en, 404, trang lỗi gốc và /admin.",
+  "workItem": "feature/favicon-tab-logo",
+  "backlog": "BL-048",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-10-21-favicon-tab-logo.md",
+  "task": [
+    "tasks/feature-favicon-tab-logo/phase-1-task-01.md"
+  ],
+  "reviewReport": ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-2-review.md",
+  "reviewResults": [
+    {
+      "task": "phase-1-task-01",
+      "round": 1,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-01",
+      "round": 2,
+      "result": "PASS",
+      "level": "NORMAL",
+      "report": ".context/review-reports/feature-favicon-tab-logo-phase-1-task-01-round-2-review.md",
+      "note": "r2 xử lý W1 (global-error thiếu icon) + W2 (tab sáng mờ → ô bo góc nền tối) của spec-validator"
+    },
+    {
+      "task": "phase",
+      "round": 1,
+      "result": "PASS",
+      "level": "spec-validator",
+      "report": ".context/review-reports/spec-validation-feature-favicon-tab-logo-phase-1.md"
+    }
+  ],
+  "commits": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.39.0-49.json",
+  "specUpdate": "spec/updates/2026-10-21-favicon-tab-logo.md",
+  "specRefs": [
+    "FR-PUB-15",
+    "F11"
+  ],
+  "specRefNotes": {
+    "FR-PUB-15": "F11 SEO — câu \"Icon tab trình duyệt (BL-048)\": rel=icon logo TAMI (mái nhà vàng trên ô bo góc nền --color-dark) + apple-touch-icon 180×180 nền đặc; mọi trang public vi/en kể cả 404/lỗi + /admin; URL icon 200.",
+    "F11": "Mục SEO: chỉ thêm 1 câu, không đổi meta/OG/hreflang/sitemap/robots/JSON-LD."
+  },
+  "migration": "none — không đổi schema/DB",
+  "changed": {
+    "files": [
+      "src/app/icon.png",
+      "src/app/apple-icon.png",
+      "src/app/global-error.tsx",
+      "src/payload.config.ts",
+      "scripts/gen-favicon.mjs"
+    ],
+    "filesNote": "icon.png 64×64 (alpha, ô bo góc #111111); apple-icon.png 180×180 opaque nền #f7f5f4; payload.config.ts chỉ đổi admin.meta.icons; gen-favicon.mjs chạy tay khi đổi logo.",
+    "modules": [
+      "App Router metadata file convention (icon/apple-icon)",
+      "global-error <head>",
+      "Payload admin.meta.icons"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "<head> mọi trang public vi + en (`/`, `/en`, danh sách, chi tiết, tin tức, tuyển dụng, liên hệ, pháp lý…): 1 `<link rel=\"icon\">` `/icon.png?…` (sizes 64x64, image/png) + 1 `apple-touch-icon` `/apple-icon.png` (180x180)",
+      "Trang 404 (`/khong-ton-tai`, `/en/khong-ton-tai`): cùng 2 link",
+      "Trang lỗi gốc (`global-error.tsx`): tự khai `<link rel=\"icon\" href=\"/icon.png\">` + apple-touch-icon",
+      "`/admin`: 1 icon `/icon.png` + 1 apple-touch-icon `/apple-icon.png` (trước đây `/brand/tami-icon-gold.png`)"
+    ],
+    "dependents": [
+      "`src/proxy.ts` bỏ qua path có dấu chấm → `/icon.png`, `/apple-icon.png` phục vụ trực tiếp, không qua i18n redirect"
+    ],
+    "regression": [
+      "Metadata/head trang: title, description, OG, hreflang, canonical, robots, JSON-LD không đổi; không có `shortcut icon` trùng",
+      "Tải admin `/admin` (đăng nhập, dashboard) bình thường, không trùng link icon"
+    ]
+  },
+  "uiTestCases": [
+    {
+      "id": "BL048-01",
+      "viewport": 1440,
+      "steps": "Mở `/`, `/en`, một trang chi tiết dự án, `/admin` trên Chrome giao diện sáng; nhìn tab.",
+      "expected": "Tab hiện logo TAMI (mái nhà vàng trên ô vuông bo góc nền tối), không phải icon mặc định; nhận ra được ở cỡ tab 16px."
+    },
+    {
+      "id": "BL048-02",
+      "viewport": 1440,
+      "steps": "Chuyển Chrome sang giao diện tối, mở lại `/` và `/admin`.",
+      "expected": "Mái nhà vàng vẫn đọc rõ trên tab tối (viền ô tối có thể chìm vào tab — chấp nhận)."
+    },
+    {
+      "id": "BL048-03",
+      "viewport": 1440,
+      "steps": "Mở `/khong-ton-tai` và `/en/khong-ton-tai`.",
+      "expected": "Trang 404, tab vẫn hiện logo TAMI."
+    },
+    {
+      "id": "BL048-04",
+      "viewport": 390,
+      "steps": "Đọc source/DOM `<head>` của `/`, `/en`, `/khong-ton-tai`, `/admin`; đếm `link[rel=icon]` và `link[rel=apple-touch-icon]`.",
+      "expected": "Mỗi trang đúng 1 rel=icon + 1 apple-touch-icon; không có `shortcut icon`."
+    }
+  ],
+  "acceptance": [
+    "Mỗi trang public vi/en (gồm 404) và `/admin` có đúng 1 `<link rel=\"icon\">` + 1 `<link rel=\"apple-touch-icon\">`",
+    "URL icon (`/icon.png`, `/icon.png?<hash>`, `/apple-icon.png`) trả 200 `image/png`",
+    "Icon đọc rõ ở 16/32px trên tab sáng và tối",
+    "`apple-icon.png` 180×180, opaque (không kênh alpha) — iOS thêm vào màn hình chính không nền đen",
+    "`global-error.tsx` khai icon + apple-touch-icon trong `<head>`",
+    "Title/meta/OG/hreflang/JSON-LD các trang không đổi"
+  ],
+  "verify": {
+    "typecheck": "pnpm typecheck PASS",
+    "lint": "pnpm lint 0 error (2 warning cũ ở tools/task-dashboard/server.mjs)",
+    "test": "skip — không có test bao các file này (asset tĩnh + link head); vitest cache-policy 48 pass",
+    "runtime": "curl dev server: `/`, `/en`, `/khong-ton-tai` (404), `/en/khong-ton-tai` (404), `/admin` — mỗi trang 1 icon + 1 apple-touch-icon; `/icon.png`, URL hash, `/apple-icon.png` 200 image/png (2291 B / 6174 B); sharp: icon 64×64 hasAlpha, apple 180×180 3 kênh opaque",
+    "residual": "Chưa kiểm trên tab trình duyệt thật / thiết bị iOS; global-error chưa render runtime (chỉ kiểm diff)",
+    "commands": "theo `.context/project-config.md`: pnpm typecheck / pnpm lint / pnpm test; curl head + URL icon"
+  },
+  "outOfScope": [
+    "`favicon.ico` / web manifest / icon PWA nhiều cỡ",
+    "Logo header/footer, admin graphics.Logo/Icon (không đổi)",
+    "Tự tính bbox crop trong gen-favicon.mjs (MINOR, follow-up tuỳ chọn)"
+  ],
+  "openQuestions": [],
+  "viewports": [
+    1440,
+    390
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "browsers": [
+    "chrome"
+  ],
+  "uiTests": true,
+  "apiTests": [
+    "GET /icon.png → 200, Content-Type image/png, 64×64",
+    "GET /apple-icon.png → 200, Content-Type image/png, 180×180 opaque",
+    "GET / , /en , /khong-ton-tai (404) , /en/khong-ton-tai (404) , /admin → HTML `<head>` có đúng 1 link rel=icon + 1 link rel=apple-touch-icon, href trả 200"
+  ],
+  "risk": "low",
+  "riskNote": "ADDITIVE: thêm 2 PNG tĩnh + link head; không schema/API/auth. Đụng `<head>` dùng chung mọi trang + admin nên review NORMAL. Rủi ro còn lại: hiển thị thật trên tab/iOS chưa kiểm bằng mắt trên thiết bị.",
+  "status": "published",
+  "statusNote": "published 2026-10-21 — BL-048 feature-update"
+}

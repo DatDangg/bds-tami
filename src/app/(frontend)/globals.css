@@ -27,8 +27,8 @@
   --color-overlay: rgb(10 12 16 / 0.55);
   /* Nền kính mờ SÁNG của header nổi (BL-020): kem ~80% + blur --blur-glass. Chữ --color-text phải đạt 4.5:1 dù kính nằm trên nền đen hay trắng. */
   --color-glass: rgb(250 248 246 / 0.8);
-  /* Scrim riêng của PageBanner biến thể Ảnh: đậm hơn --color-overlay (hero dùng chung) để chữ trắng đạt 4.5:1 cả trên ảnh trắng tinh (FR-ADM-20). */
-  --color-banner-scrim: rgb(10 12 16 / 0.6);
+  /* Scrim dùng chung: PageHero (lớp phẳng + gradient trái), PageBanner, CtaBanner, chú thích ảnh AboutBlock, bóng chữ .crumb-glass. Đen ánh nâu vàng (BL-049) thay đen lạnh, alpha giữ 0.6; vẫn đậm hơn --color-overlay để chữ trắng >= 4.5:1 trên ảnh trắng tinh (FR-ADM-20, đo ở contrast.test). */
+  --color-banner-scrim: rgb(20 13 2 / 0.6);
 
   --color-text: #141414;
   --color-text-secondary: #555555;

@@ -54,6 +54,7 @@
 | `--color-border` | `#E8E6E3` | Đường kẻ trang trí, viền card (không dùng làm viền input) |
 | `--color-input-border` | `#857F79` (mới) | Viền input/select/checkbox: cần ≥ 3:1 cho thành phần UI (WCAG 1.4.11). `--color-border` chỉ 1.25:1 |
 | `--color-overlay` | `rgba(10, 12, 16, 0.55)` | Lớp phủ modal/menu, scrim trên ảnh hero |
+| `--color-banner-scrim` | `rgb(20 13 2 / 0.6)` | Scrim dùng chung trên ảnh (PageHero, PageBanner, CtaBanner, chú thích AboutBlock, bóng `.crumb-glass`); đen ánh nâu vàng (BL-049), đậm hơn overlay: chữ trắng 5.07:1 / breadcrumb 4.60:1 trên ảnh trắng |
 
 ### 1.3. Chữ
 
@@ -346,6 +347,7 @@ Ba lớp, **không** khai cùng một tên biến ở hai nơi (tránh vòng tha
   --color-border: #E8E6E3;
   --color-input-border: #857F79;
   --color-overlay: rgb(10 12 16 / 0.55);
+  --color-banner-scrim: rgb(20 13 2 / 0.6);
 
   --color-text: #141414;
   --color-text-secondary: #555555;

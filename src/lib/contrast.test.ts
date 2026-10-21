@@ -230,3 +230,12 @@ describe("hero trang con: breadcrumb kính + eyebrow trên ảnh sáng (BL-045)"
     expect(contrast(light("--color-primary"), leftSide)).toBeGreaterThanOrEqual(TEXT);
   });
 });
+
+describe("scrim ảnh đen ánh nâu vàng (BL-049)", () => {
+  it("--color-banner-scrim ngả ấm (R > G > B) và alpha giữ 0.6", () => {
+    const [, r, g, b, alpha] = /^rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)$/.exec(light("--color-banner-scrim"))!;
+    expect(Number(r)).toBeGreaterThan(Number(g));
+    expect(Number(g)).toBeGreaterThan(Number(b));
+    expect(Number(alpha)).toBe(0.6);
+  });
+});
