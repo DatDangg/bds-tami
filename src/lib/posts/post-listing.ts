@@ -61,6 +61,10 @@ export async function loadPostListing(
 }
 
 export interface PostChip {
+  /** Id danh mục mà số đếm của tab lấy theo (`facets.category.counts[id]`); `null` = cả `/tin-bds` (`facets.category.all`). */
+  countId: string | null;
+  /** Slug danh mục (chọn icon tab); `null` = "Tất cả" của `/tin-bds`. */
+  slug: string | null;
   label: string;
   href: string;
   current?: boolean;
@@ -98,14 +102,14 @@ export function postCategoryFilterIds(context: PostCategoryContext): string[] {
 export async function buildPostChips(payload: Payload, locale: Locale, allLabel: string, context: PostCategoryContext | null): Promise<PostChip[]> {
   if (context && context.children.length > 0) {
     return [
-      { label: allLabel, href: postCategoryHref(context.root, locale), current: context.category.id === context.root.id },
-      ...context.children.map((child) => ({ label: child.name ?? "", href: postCategoryHref(child, locale), current: child.id === context.category.id })),
+      { countId: context.root.id, slug: context.root.slug ?? null, label: allLabel, href: postCategoryHref(context.root, locale), current: context.category.id === context.root.id },
+      ...context.children.map((child) => ({ countId: child.id, slug: child.slug ?? null, label: child.name ?? "", href: postCategoryHref(child, locale), current: child.id === context.category.id })),
     ].filter((chip) => chip.label !== "");
   }
   const roots = (await listRootPostCategories(payload, locale)).docs.filter((doc) => doc.slug && doc.name);
   if (roots.length === 0) return [];
   return [
-    { label: allLabel, href: publicPath("/tin-bds", locale), current: context === null },
-    ...roots.map((root) => ({ label: root.name ?? "", href: postCategoryHref(root, locale), current: context?.root.id === root.id })),
+    { countId: null, slug: null, label: allLabel, href: publicPath("/tin-bds", locale), current: context === null },
+    ...roots.map((root) => ({ countId: root.id, slug: root.slug ?? null, label: root.name ?? "", href: postCategoryHref(root, locale), current: context?.root.id === root.id })),
   ];
 }

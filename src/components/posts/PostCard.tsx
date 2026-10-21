@@ -1,10 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { ArrowRight, Bed, CalendarCheck, Clock, MapPin, Ruler } from "@/components/icons";
+import { Bed, CalendarCheck, Clock, MapPin, Ruler } from "@/components/icons";
 import { CARD_IMAGE_ZOOM, CARD_LINK_CLASS, CARD_TITLE_CLASS, CardArrow, CardFooter, CardPin } from "@/components/layout/card-parts";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import { formatArea } from "@/lib/format";
 import type { PostCardData } from "@/lib/posts/post-view";
 import { cn } from "@/lib/utils";
@@ -20,48 +19,10 @@ interface PostCardProps {
   /** Ghi đè `sizes` của ảnh khi thẻ nằm trong khung không theo lưới mặc định (slider trang chủ). */
   imageSizes?: string;
   /** Xem JSDoc của `PostCard`. */
-  variant?: "listing" | "home" | "feature";
+  variant?: "listing" | "home";
 }
 
 const IMAGE_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
-const FEATURE_IMAGE_SIZES = "(min-width: 1280px) 700px, (min-width: 1024px) 55vw, 100vw";
-
-/** Bài nổi bật ngang (mockup `.feat`): cùng khung với bài nổi bật Tin tức; cả khối là MỘT link, nút "Xem chi tiết" chỉ là giao diện. */
-function FeaturePostCard({ data, headingLevel: Heading, priority, imageSizes }: Pick<PostCardProps, "data" | "headingLevel" | "imageSizes"> & { priority: boolean }) {
-  const t = useTranslations("page.posts");
-  const ended = data.badge?.kind === "ended";
-  return (
-    <article>
-      <Link
-        href={data.href}
-        className="group grid min-h-11 overflow-hidden rounded-xl border border-border bg-surface shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring lg:grid-cols-[1.3fr_1fr] lg:items-center lg:gap-8"
-      >
-        <div className={cn("relative aspect-[16/10] w-full overflow-hidden bg-surface-muted lg:aspect-auto lg:h-full lg:min-h-[340px]", CARD_IMAGE_ZOOM)}>
-          {data.cover && <ResponsiveImage media={data.cover} sizes={imageSizes ?? FEATURE_IMAGE_SIZES} aspectRatio="16/10" priority={priority} decorative className={cn(ended && "opacity-70")} />}
-          {data.badge && <OfferStatusBadge badge={data.badge} className="absolute top-3 left-3" />}
-        </div>
-        <div className="flex min-w-0 flex-col items-start gap-3 p-5 lg:py-8 lg:pr-8 lg:pl-0">
-          {data.categoryName && <p className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{data.categoryName}</p>}
-          <Heading className="font-display text-h3 font-medium text-balance transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
-          {data.priceLabel && <p className="text-body font-semibold text-accent-text">{data.priceLabel}</p>}
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-text-muted">
-            {data.dateLabel && data.publishedAt && (
-              <span className="flex items-center gap-1.5">
-                <Clock size={16} aria-hidden="true" className="shrink-0" />
-                <time dateTime={data.publishedAt}>{data.dateLabel}</time>
-              </span>
-            )}
-            {data.endLabel && <span>{t("endsOn", { date: data.endLabel })}</span>}
-          </p>
-          <span className={buttonVariants()}>
-            {t("viewDetail")}
-            <ArrowRight size={18} aria-hidden="true" />
-          </span>
-        </div>
-      </Link>
-    </article>
-  );
-}
 
 /** Badge góc ảnh của thẻ `listing`: trạng thái ưu đãi ("Còn n ngày" / "Đã kết thúc", BR-06) nếu có, không thì "Ưu đãi" khi tin có ưu đãi. */
 function ListingOfferBadge({ data }: { data: PostCardData }) {
@@ -150,12 +111,10 @@ function VoucherBody({ data, Heading }: { data: PostCardData; Heading: "h2" | "h
  * - `listing` (mặc định, BL-052): danh sách `/tin-bds`, tin liên quan, tin trong trang dự án — `data.kind` chọn thẻ BĐS (giá, diện tích, phòng ngủ, tag loại hình,
  *   badge ưu đãi nếu có) hoặc thẻ voucher (hạn ưu đãi + Còn hạn / Đã kết thúc thay giá / diện tích).
  * - `home`: slider Ưu đãi trang chủ GIỮ thẻ BL-045 (danh mục, tên, giá, ngày đăng + "Đến ngày"; spec BL-052 F3).
- * - `feature`: bài nổi bật ngang (bố cục BL-045 Q4, tới khi trang danh sách chuyển sang slider nổi bật).
  */
 export function PostCard({ data, headingLevel, priority = false, imageSizes, variant = "listing" }: PostCardProps) {
   const Heading = headingLevel;
   const ended = data.badge?.kind === "ended";
-  if (variant === "feature") return <FeaturePostCard data={data} headingLevel={headingLevel} priority={priority} imageSizes={imageSizes} />;
   if (variant === "home") return <HomePostCard data={data} headingLevel={headingLevel} priority={priority} imageSizes={imageSizes} />;
   return (
     <article className="h-full" data-card-variant="listing" data-post-kind={data.kind}>
