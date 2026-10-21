@@ -48,8 +48,8 @@ describe("Thêm bộ lọc: chỉ còn trường nghiệp vụ (BL-021 #06)", ()
   it("property-posts", () => {
     expect(filterable(createPropertyPosts())).toEqual(
       [
-        "author", "category", "isFeatured", "offer.endAt", "offer.startAt", "priceVnd", "province", "publishedAt", "relatedProject", "relatedRental",
-        "status", "title", "ward",
+        "areaM2", "author", "bathrooms", "bedrooms", "category", "floors", "frontageM", "handoverCondition", "houseDirection", "isFeatured", "offer.endAt",
+        "offer.startAt", "priceVnd", "propertyType", "province", "publishedAt", "relatedProject", "relatedRental", "status", "title", "ward",
       ].sort(),
     );
   });

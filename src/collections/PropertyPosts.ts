@@ -1,4 +1,4 @@
-import type { CollectionConfig, DateFieldValidation, GroupField } from "payload";
+import type { CollapsibleField, CollectionConfig, DateFieldValidation, GroupField, NumberField } from "payload";
 import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
@@ -15,6 +15,14 @@ import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
+import {
+  DIRECTION_ADMIN_LABELS,
+  DIRECTIONS,
+  HANDOVER_CONDITION_ADMIN_LABELS,
+  HANDOVER_CONDITIONS,
+  PROPERTY_TYPE_ADMIN_LABELS,
+  PROPERTY_TYPES,
+} from "../shared/listing-options";
 import { withContentDefaults } from "./_shared/content-defaults";
 
 /** Ngày kết thúc không được trước ngày bắt đầu (`siblingData` đã gộp giá trị đã lưu nên sửa riêng một đầu vẫn bị so với đầu kia). */
@@ -41,6 +49,34 @@ const offerGroup: GroupField = {
     { name: "endAt", type: "date", label: "Kết thúc ưu đãi", index: true, admin: dayOnly, validate: validateOfferEnd },
     { name: "voucherCode", type: "text", label: "Mã voucher", maxLength: 64 },
     { name: "terms", type: "textarea", label: "Điều kiện áp dụng", localized: true },
+  ],
+};
+
+const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) => values.map((value) => ({ label: labels[value], value }));
+const nonNegativeNumber = (name: string, label: string, { index = false } = {}): NumberField => ({ name, type: "number", label, min: 0, index });
+
+/**
+ * Thông số bất động sản (BL-052): toàn bộ tuỳ chọn, không localized, không nằm trong `englishRequiredFields` nên tin cũ / tin voucher để
+ * trống vẫn lưu và xuất bản được (UI công khai ẩn ô trống). Vỏ `collapsible` không tên nên trường nằm ở cấp gốc (`propertyType`, `areaM2`…),
+ * không đổi đường dẫn dữ liệu. `address` + `location` công khai — tin BĐS không có cơ chế ẩn địa chỉ như tin cho thuê.
+ */
+const specsSection: CollapsibleField = {
+  type: "collapsible",
+  label: "Thông số bất động sản",
+  admin: { description: "Để trống nếu tin là voucher/ưu đãi." },
+  fields: [
+    formRow(
+      { name: "propertyType", type: "select", label: "Loại hình", index: true, options: selectOptions(PROPERTY_TYPES, PROPERTY_TYPE_ADMIN_LABELS) },
+      nonNegativeNumber("areaM2", "Diện tích (m²)", { index: true }),
+    ),
+    formRow(nonNegativeNumber("bedrooms", "Số phòng ngủ"), nonNegativeNumber("bathrooms", "Số phòng tắm")),
+    formRow(
+      { name: "houseDirection", type: "select", label: "Hướng nhà", options: selectOptions(DIRECTIONS, DIRECTION_ADMIN_LABELS) },
+      { name: "handoverCondition", type: "select", label: "Tình trạng bàn giao", options: selectOptions(HANDOVER_CONDITIONS, HANDOVER_CONDITION_ADMIN_LABELS) },
+    ),
+    formRow(nonNegativeNumber("frontageM", "Mặt tiền (m)"), nonNegativeNumber("floors", "Số tầng")),
+    { name: "address", type: "text", label: "Địa chỉ", admin: { description: "Hiện công khai trên trang tin. Vd: 12 Nguyễn Huệ, Phường Sài Gòn." } },
+    { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Hiện công khai trên bản đồ trang tin." } },
   ],
 };
 
@@ -92,6 +128,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
                 { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },
                 { name: "relatedRental", type: "relationship", label: "Tin cho thuê liên quan", relationTo: "rentals", index: true },
               ),
+              specsSection,
               offerGroup,
             ],
           },
@@ -115,8 +152,8 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
     },
     { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
   );
-  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): priceNote, offer.voucherCode ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFields(collection, ["priceNote", "offer.voucherCode"]);
+  // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): priceNote, offer.voucherCode, address ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
+  return hideTechnicalListFields(collection, ["priceNote", "offer.voucherCode", "address"]);
 }
 
 export const PropertyPosts = createPropertyPosts();

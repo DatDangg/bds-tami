@@ -24,22 +24,12 @@ import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
 import { RENTAL_AMENITIES } from "../shared/types/api";
+import { DIRECTION_ADMIN_LABELS, DIRECTIONS } from "../shared/listing-options";
 
-export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
 export const FURNISHINGS = ["none", "basic", "full"] as const;
 export const PAYMENT_CYCLES = ["monthly", "quarterly", "semiannual", "annual"] as const;
 export const INCLUDED_SERVICES = ["electricity", "water", "internet", "cleaning", "laundry", "parking", "management_fee", "security"] as const;
 
-const DIRECTION_LABELS: Record<(typeof DIRECTIONS)[number], string> = {
-  N: "Bắc",
-  NE: "Đông Bắc",
-  E: "Đông",
-  SE: "Đông Nam",
-  S: "Nam",
-  SW: "Tây Nam",
-  W: "Tây",
-  NW: "Tây Bắc",
-};
 const FURNISHING_LABELS: Record<(typeof FURNISHINGS)[number], string> = { none: "Không nội thất", basic: "Cơ bản", full: "Đầy đủ" };
 const PAYMENT_CYCLE_LABELS: Record<(typeof PAYMENT_CYCLES)[number], string> = {
   monthly: "Hàng tháng",
@@ -74,7 +64,7 @@ const SERVICE_LABELS: Record<(typeof INCLUDED_SERVICES)[number], string> = {
 const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) =>
   values.map((value) => ({ label: labels[value], value }));
 
-const directionField = (name: string, label: string): SelectField => ({ name, type: "select", label, options: selectOptions(DIRECTIONS, DIRECTION_LABELS) });
+const directionField = (name: string, label: string): SelectField => ({ name, type: "select", label, options: selectOptions(DIRECTIONS, DIRECTION_ADMIN_LABELS) });
 const nonNegativeNumber = (name: string, label: string) => ({ name, type: "number", label, min: 0 }) as const;
 
 /** Mã `CT-000001` (ERD §4.6): chỉ đọc với mọi người (PERMISSION §4), do hook `assignRentalCode` sinh từ sequence. */

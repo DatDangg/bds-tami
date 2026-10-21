@@ -31,3 +31,28 @@ export const PROJECT_FEATURE_ADMIN_LABELS: Record<ProjectFeature, string> = {
   pool_gym_spa: "Hồ bơi, gym, spa",
   green_park: "Công viên cây xanh",
 };
+
+/** Hướng nhà / ban công: `rentals.houseDirection` / `rentals.balconyDirection`, `property-posts.houseDirection`. Nhãn công khai ở i18n `page.rentalDetail.direction`. */
+export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
+export type Direction = (typeof DIRECTIONS)[number];
+
+export const DIRECTION_ADMIN_LABELS: Record<Direction, string> = {
+  N: "Bắc",
+  NE: "Đông Bắc",
+  E: "Đông",
+  SE: "Đông Nam",
+  S: "Nam",
+  SW: "Tây Nam",
+  W: "Tây",
+  NW: "Tây Bắc",
+};
+
+/** Tình trạng bàn giao của tin BĐS: `property-posts.handoverCondition`. Nhãn công khai ở i18n `listingOptions.handoverCondition`. */
+export const HANDOVER_CONDITIONS = ["raw", "basic", "full"] as const;
+export type HandoverCondition = (typeof HANDOVER_CONDITIONS)[number];
+
+export const HANDOVER_CONDITION_ADMIN_LABELS: Record<HandoverCondition, string> = {
+  raw: "Bàn giao thô",
+  basic: "Hoàn thiện cơ bản",
+  full: "Nội thất đầy đủ",
+};

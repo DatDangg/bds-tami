@@ -1173,6 +1173,11 @@
       "water_view": "View sông/hồ",
       "pool_gym_spa": "Hồ bơi, gym, spa",
       "green_park": "Công viên cây xanh"
+    },
+    "handoverCondition": {
+      "raw": "Bàn giao thô",
+      "basic": "Hoàn thiện cơ bản",
+      "full": "Nội thất đầy đủ"
     }
   },
   "projectCard": {
