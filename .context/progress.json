@@ -1,6 +1,11 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "admin-ux-audit-2",
+    "phaseTask": "phase-1-task-02",
+    "journal": ".context/runs/feature-admin-ux-audit-2-phase-1-task-02.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -1899,6 +1904,51 @@
       "specVersion": "1.43.0",
       "scopeVersion": 53,
       "migration": "20261021_020651_about_stats_icons (additive; down lossy)"
+    },
+    {
+      "slug": "admin-ux-audit-2",
+      "title": "Admin UX audit lần 2 — GĐ1: ẩn API, tắt + Thêm mới inline dữ liệu nền, chữ Tải lên, Tạo mới nút chính, tách Xuất Excel, thanh Lưu dính + Quay lại/Xem trên website, Cột/Lọc chỉ admin (BL-051)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-051",
+      "changeDoc": "spec/changes/2026-10-21-admin-ux-audit-2.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user: \"tự làm tự quyết nhé, đừng hỏi t\" = auto proceed; GĐ1 = 1 phase / 3 task tuần tự)",
+      "stage": "GĐ1 (A1,A2,A3,A4,A5,A7,A13); GĐ2 (A6,A8–A12,A14) lượt sau",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-ux-audit-2/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-admin-ux-audit-2-phase-1-task-01-round-1-review.md"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-ux-audit-2/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "reviewLevel": "STRICT",
+          "reviewerResult": null,
+          "report": null
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-ux-audit-2/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0,
+          "round": 0,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": null,
+          "report": null
+        }
+      ],
+      "specValidation": ".context/review-reports/feature-admin-ux-audit-2-spec-validation-round-2.md (PASS r2)"
     }
   ],
   "bugs": [
@@ -2846,7 +2896,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T05:55:38.874Z",
+  "lastUpdated": "2026-10-21T06:49:44.700Z",
   "approvalMilestones": [
     {
       "id": "M1",

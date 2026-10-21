@@ -66,6 +66,7 @@ import { NavDashboardLink as NavDashboardLink_f21c41cb6664ab07812fb4cacb5cd539 }
 import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 } from '../../../components/admin/SessionKeepAlive'
 import { NavigationToastGuard as NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf } from '../../../components/admin/NavigationToastGuard'
 import { NavAdvancedCollapse as NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7 } from '../../../components/admin/NavAdvancedCollapse'
+import { UploadButtonLabel as UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29 } from '../../../components/admin/UploadButtonLabel'
 import { DashboardView as DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f } from '../../../components/admin/dashboard/DashboardView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -140,6 +141,7 @@ export const importMap = {
   "/components/admin/SessionKeepAlive#SessionKeepAlive": SessionKeepAlive_739be204eef6d8fda1df751cccf17193,
   "/components/admin/NavigationToastGuard#NavigationToastGuard": NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf,
   "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse": NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7,
+  "/components/admin/UploadButtonLabel#UploadButtonLabel": UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29,
   "/components/admin/dashboard/DashboardView#DashboardView": DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

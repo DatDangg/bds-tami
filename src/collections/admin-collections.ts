@@ -1,6 +1,11 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, GlobalConfig } from "payload";
 
+import { Footer } from "../globals/Footer";
+import { Header } from "../globals/Header";
+import { Homepage } from "../globals/Homepage";
+import { SiteSettings } from "../globals/SiteSettings";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
+import { withAdminUxDefaults } from "../lib/admin/master-data-relations";
 import { AuditLogs } from "./AuditLogs";
 import { Categories } from "./Categories";
 import { ClickEvents } from "./ClickEvents";
@@ -56,7 +61,10 @@ export const LIST_SEARCHABLE_FIELDS: Readonly<Record<string, readonly string[]>>
  */
 export const ADMIN_COLLECTIONS: CollectionConfig[] = [
   Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities,
-].map((collection) => withListSearchableFields(hideTechnicalListFields(collection, [], EXTRA_HIDDEN_COLUMNS[collection.slug])));
+].map((collection) => withAdminUxDefaults(withListSearchableFields(hideTechnicalListFields(collection, [], EXTRA_HIDDEN_COLUMNS[collection.slug]))));
+
+/** Mọi global admin, áp cùng mặc định UX như collection (ẩn nút API, tắt "+ Thêm mới" ô dữ liệu nền — BL-051). */
+export const ADMIN_GLOBALS: GlobalConfig[] = [SiteSettings, Homepage, Header, Footer].map((global) => withAdminUxDefaults(global));
 
 function withListSearchableFields(collection: CollectionConfig): CollectionConfig {
   const fields = LIST_SEARCHABLE_FIELDS[collection.slug];

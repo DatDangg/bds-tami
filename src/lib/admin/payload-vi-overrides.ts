@@ -149,3 +149,9 @@ export const PAYLOAD_VI_OVERRIDES: DeepPartial<typeof viTranslations> = {
     selectLocales: "Chọn ngôn ngữ để hiển thị",
   },
 };
+
+/**
+ * Chữ nút "Tạo mới" của khung tải tệp/ảnh (BL-051 A3). Ngoại lệ hẹp của quy tắc "ghi đè ở MỘT nơi": nút này dùng chung khoá
+ * `general:createNew` với nút "Tạo mới" của danh sách nên không ghi đè khoá được; `UploadButtonLabel` áp chuỗi này riêng cho nút upload.
+ */
+export const UPLOAD_BUTTON_LABEL = "Tải lên";

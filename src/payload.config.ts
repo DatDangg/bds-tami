@@ -7,13 +7,9 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 import { contentRedirectsPlugin } from "./collections/redirects-plugin";
-import { ADMIN_COLLECTIONS } from "./collections/admin-collections";
+import { ADMIN_COLLECTIONS, ADMIN_GLOBALS } from "./collections/admin-collections";
 import { Staff } from "./collections/Staff";
 import { adminNavGroupsPlugin } from "./components/admin/admin-groups";
-import { Footer } from "./globals/Footer";
-import { Header } from "./globals/Header";
-import { Homepage } from "./globals/Homepage";
-import { SiteSettings } from "./globals/SiteSettings";
 import { migrations } from "../migrations";
 import { clickEventsEndpoint } from "./endpoints/public/click-events";
 import { leadAssignEndpoint } from "./endpoints/admin/lead-assign";
@@ -46,7 +42,7 @@ export default buildConfig({
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
     dateFormat: "dd/MM/yyyy HH:mm",
     components: {
-      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse"],
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel"],
       // Nút "Xem website" ở header (BL-041).
       actions: ["/components/admin/SiteLink#SiteLink"],
       // Mục "Tổng quan" đầu sidebar: Payload DefaultNav không có lối vào dashboard (BL-050).
@@ -66,7 +62,7 @@ export default buildConfig({
   },
   // Collection nghiệp vụ thêm dần ở các layer sau.
   collections: ADMIN_COLLECTIONS,
-  globals: [SiteSettings, Homepage, Header, Footer],
+  globals: ADMIN_GLOBALS,
   editor: createRichTextEditor(),
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint],

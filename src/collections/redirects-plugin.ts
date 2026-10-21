@@ -21,6 +21,7 @@ export function contentRedirectsPlugin() {
     overrides: {
       labels: collectionLabels("redirects"),
       admin: {
+        hideAPIURL: true,
         useAsTitle: "from",
         defaultColumns: ["from", "to", "createdAt"],
         hidden: ({ user }) => user?.role !== ROLES.admin,
