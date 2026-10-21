@@ -22,10 +22,15 @@ interface CardSliderProps {
   /** `id` của heading đặt tên cho vùng carousel. */
   labelledBy: string;
   labels: CardSliderLabels;
+  /** Vị trí mũi tên: `below` (mặc định) cạnh chấm dưới slider; `sides` (BL-052 "Dự án tương tự") tròn nền trắng đè hai mép danh sách (từ md), chấm vẫn ở dưới. */
+  arrows?: "below" | "sides";
 }
 
 /** 82% < sm (lộ thẻ kế), 320px ≥ sm, 272px ≥ lg (~5 thẻ/khung desktop, BL-044). */
 const SLIDE_WIDTH = "w-[82%] sm:w-[320px] lg:w-[272px]";
+
+/** Mũi tên hai mép: giữa chiều cao danh sách (trừ hàng chấm 44px + khe 24px bên dưới), nền trắng + bóng để nổi trên thẻ. */
+const SIDE_ARROW_CLASS = "absolute top-[calc(50%-2.125rem)] z-10 -translate-y-1/2 border-border bg-surface shadow-md";
 
 const fill = (template: string, values: Record<string, number>) => template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match));
 
@@ -34,12 +39,17 @@ const fill = (template: string, values: Record<string, number>) => template.repl
  * mũi tên tròn (từ md) + chấm giữa dưới. Số chấm = số vị trí cuộn thật (`pageCount`, BL-038), không phải số thẻ; mũi tên/chấm chỉ hiện khi `pageCount > 1`.
  * Slider không biết loại thẻ: nhận thẻ qua `items`.
  */
-export function CardSlider({ items, labelledBy, labels }: CardSliderProps) {
+export function CardSlider({ items, labelledBy, labels, arrows = "below" }: CardSliderProps) {
   const count = items.length;
   const { listRef, current, pageCount, scrollToSlide } = useSnapSlider(count, true);
+  const sides = arrows === "sides";
+  const previousArrow = (className?: string) => (
+    <SliderArrow direction="previous" label={labels.previous} onClick={() => scrollToSlide(current - 1)} {...(className ? { className } : {})} />
+  );
+  const nextArrow = (className?: string) => <SliderArrow direction="next" label={labels.next} onClick={() => scrollToSlide(current + 1)} {...(className ? { className } : {})} />;
 
   return (
-    <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy}>
+    <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy} className={sides ? "relative" : undefined}>
       <ul
         ref={listRef}
         // `tabIndex=0`: vùng cuộn ngang dùng được bằng bàn phím (mũi tên) khi chưa có điều khiển nào nhận focus.
@@ -61,9 +71,16 @@ export function CardSlider({ items, labelledBy, labels }: CardSliderProps) {
         ))}
       </ul>
 
+      {sides && pageCount > 1 && (
+        <>
+          {previousArrow(cn(SIDE_ARROW_CLASS, "left-0"))}
+          {nextArrow(cn(SIDE_ARROW_CLASS, "right-0"))}
+        </>
+      )}
+
       {pageCount > 1 && (
         <div className="mx-auto mt-6 flex w-full max-w-container items-center justify-center gap-4 px-gutter">
-          <SliderArrow direction="previous" label={labels.previous} onClick={() => scrollToSlide(current - 1)} />
+          {!sides && previousArrow()}
           <div role="group" aria-label={labels.dots} className="flex items-center">
             {Array.from({ length: pageCount }, (_, position) => (
               <button
@@ -81,7 +98,7 @@ export function CardSlider({ items, labelledBy, labels }: CardSliderProps) {
               </button>
             ))}
           </div>
-          <SliderArrow direction="next" label={labels.next} onClick={() => scrollToSlide(current + 1)} />
+          {!sides && nextArrow()}
         </div>
       )}
     </div>

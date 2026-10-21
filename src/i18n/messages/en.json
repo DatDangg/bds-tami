@@ -961,5 +961,33 @@
         "goTo": "Go to listing group {index}"
       }
     }
+  },
+  "detailKit": {
+    "hero": {
+      "region": "Featured photos",
+      "viewAll": "View all {count} photos",
+      "viewPhoto": "View photo {index}",
+      "thumbs": "More photos",
+      "playVideo": "Watch the intro video",
+      "videoTitle": "Intro video",
+      "videoClose": "Close video"
+    },
+    "specBar": {
+      "label": "Key facts"
+    },
+    "gallery": {
+      "open": "View photo {index} of {total}",
+      "viewAll": "View all photos"
+    },
+    "contact": {
+      "hotline": "Advisory hotline",
+      "callNow": "Call now",
+      "callNowAria": "Call now {number}"
+    },
+    "expand": {
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "showAll": "Show all"
+    }
   }
 }

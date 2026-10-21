@@ -961,5 +961,33 @@
         "goTo": "Chuyển tới nhóm tin {index}"
       }
     }
+  },
+  "detailKit": {
+    "hero": {
+      "region": "Ảnh giới thiệu",
+      "viewAll": "Xem tất cả {count} ảnh",
+      "viewPhoto": "Xem ảnh {index}",
+      "thumbs": "Ảnh khác",
+      "playVideo": "Xem video giới thiệu",
+      "videoTitle": "Video giới thiệu",
+      "videoClose": "Đóng video"
+    },
+    "specBar": {
+      "label": "Thông số chính"
+    },
+    "gallery": {
+      "open": "Xem ảnh {index} / {total}",
+      "viewAll": "Xem tất cả hình ảnh"
+    },
+    "contact": {
+      "hotline": "Hotline tư vấn",
+      "callNow": "Gọi ngay",
+      "callNowAria": "Gọi ngay {number}"
+    },
+    "expand": {
+      "showMore": "Xem thêm",
+      "showLess": "Thu gọn",
+      "showAll": "Xem tất cả"
+    }
   }
 }
