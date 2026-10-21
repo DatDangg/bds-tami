@@ -2324,11 +2324,17 @@
         "Xoá tất cả trên link cũ ?category= xoá luôn danh mục",
         "chip đơn chọn (Phòng ngủ/Nội thất /cho-thue, Tình trạng /du-an, /tin-bds) không hiện số đếm — theo design, user duyệt 2026-10-22; ô tích vẫn đếm",
         "chi tiết Tin BĐS bỏ neo #content (nội dung vào Tổng quan)",
-        "/tin-bds nhận ?category=<slug> cũ (lọc + tab, noindex) — API_SPEC",
+        "/tin-bds nhận ?category=<slug> cũ (lọc + tab, noindex, canonical → /tin-bds/danh-muc/<slug>) — API_SPEC",
         "PostCard chỉ còn variant listing + home (bỏ feature); PostChip thêm countId/slug",
         "/tin-bds hàng N phù hợp trở lại (bỏ ở BL-045)",
         "nhãn hướng công khai listingOptions.direction (dùng chung Cho thuê + Tin BĐS)",
-        "/cho-thue FAQ JSON-LD chỉ khi URL không tham số; /tin-bds theo điều kiện noindex"
+        "/cho-thue FAQ JSON-LD chỉ khi URL không tham số; /tin-bds theo điều kiện noindex",
+        "/tin-bds Hướng + Tình trạng bàn giao là ô tích nhiều lựa chọn (OR) có số đếm, không phải chip",
+        "/tin-bds priceMax=0 / areaMax=0 = không giới hạn trên",
+        "backfill bỏ qua mọi tin có ưu đãi (kể cả tin bán có ưu đãi); giá trị mâu thuẫn không điền → danh sách soát",
+        "chi tiết Tin BĐS giữ nút chia sẻ ở hero (ngoại lệ — Dự án/Cho thuê đã bỏ)",
+        "tab danh mục Tin BĐS đếm theo danh mục cấp 1 (gồm con)",
+        "/tin-bds q tìm trong tiêu đề + tóm tắt + địa chỉ + phường + tỉnh (không dấu)"
       ],
       "phaseReview12": {
         "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
@@ -2340,6 +2346,19 @@
         "CardSlider trang chủ chưa chụp trình duyệt 390/768/1280 (MINOR-2)",
         "ngày hạn ưu đãi /en MM/DD/YYYY vs spec dd/MM/yyyy — chờ user",
         "/du-an priceMax=0 vẫn là bộ lọc"
+      ],
+      "phaseReview3": {
+        "verdict": "GAPS (code PASS; P-1 task summary, P-2 browser evidence, P-3 as-built)",
+        "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-phase-review.md",
+        "at": "2026-10-22"
+      },
+      "followUps": [
+        "C-1 308 redirect ?category= cho /tin-bds + /cho-thue",
+        "C-4 /du-an priceMax=0 = không giới hạn (đồng bộ /tin-bds)",
+        "C-5 index rentals_amenities.value + ca EN đếm tiện ích",
+        "C-6 GIST index property_posts.location (khi có lọc bản đồ)",
+        "C-7 integration hookTimeout",
+        "C-8 backfill isOfferPost trùng hasPostOffer"
       ]
     }
   ],

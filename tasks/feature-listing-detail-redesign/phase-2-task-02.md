@@ -19,10 +19,10 @@
 5. Kiểm trình duyệt 1440 / 390, VI + EN, không JS.
 
 ## Acceptance
-- [ ] `/cho-thue`, `/cho-thue/danh-muc/[category]` cùng khung danh sách Dự án, bộ lọc theo spec, số đếm đúng.
-- [ ] Link cũ (tham số cũ) vẫn lọc đúng; canonical/noindex đúng (test).
-- [ ] Mobile Sheet; không tràn 375px; EN đủ nhãn.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] `/cho-thue`, `/cho-thue/danh-muc/[category]` cùng khung danh sách Dự án, bộ lọc theo spec, số đếm đúng.
+- [x] Link cũ (tham số cũ) vẫn lọc đúng; canonical/noindex đúng (test).
+- [x] Mobile Sheet; không tràn 375px; EN đủ nhãn.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -35,3 +35,10 @@
 - Lắp ráp theo mẫu `/du-an` (P1-T05): `src/components/projects/ProjectListBody.tsx` + `project-list-state.ts` — hook `useListingFilterNav` gọi 1 lần, `generation` làm `key`, `reset` → `onClear`; `findPublicList({ populate })` nếu cần.
 - Data P2-T01: `listRentals()` trả `items`/`total`/`featured`/`facets.category`/`facets.provinces`; `toRentalProvinceFacets`; `RentalFilterOptions.projects`; RentalListPage hiện tạm đặt nổi bật đầu lưới trang 1 → thay bằng `SpotlightSlider`.
 - MINOR mang sang: `RentalCard` `key={tag}` thêm tiền tố; thống nhất chữ giá thẻ với chi tiết ("Thương lượng" / "Liên hệ", bỏ "Thoả thuận"); `RentalPriceText.tsx` U+200B → `\u200B`; ngày đăng chi tiết bọc lại `<time>`; "Căn tương tự" dùng biến thể `listing`.
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 926f5e3 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-2-task-02-round-1-review.md`).
+- Verify: typecheck · lint 0 error · test 381 file / 3803 PASS · build PASS (builder).
+- Kiểm thực tế: Trình duyệt (builder): 1440/390 VI, 390 EN, không JS (form GET), link cũ ?category= aria-current, canonical đúng.
+- Doc impact: as-built: bỏ hàng chip Đang lọc; FAQ JSON-LD chỉ /cho-thue sạch; slider giá VNĐ kẹp 0–100tr; thẻ Thương lượng/Liên hệ. Không đổi API/schema.
+- Residual risk: Không JS: giá trị lẻ link cũ chặn submit (đã sửa P3-T06); tiện ích chưa đếm (đã sửa P2-T04); chưa kiểm EN 1440.

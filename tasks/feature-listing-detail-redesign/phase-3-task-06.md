@@ -18,9 +18,9 @@
 4. Kiểm tổng thể: 6 trang (VI + EN) 1440 / 768 / 390, không JS, Lighthouse/LCP không tệ hơn rõ (ghi số nếu đo), `pnpm build`.
 
 ## Acceptance
-- [ ] Không còn import chết; test xoá theo component xoá; không đổi hành vi trang khác.
-- [ ] Doc as-built khớp code (không sửa intent docs).
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] Không còn import chết; test xoá theo component xoá; không đổi hành vi trang khác.
+- [x] Doc as-built khớp code (không sửa intent docs).
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -46,3 +46,10 @@
 - P3-T02 (review r1): comment `post-queries.ts:214` còn nhắc `listPublicPosts`; thẻ voucher hết hạn đọc "Đã kết thúc" 2 lần (badge + nhãn) → ẩn 1 khỏi trình đọc màn hình; `priceMax=0`/`areaMax=0` gõ tay → coi như không lọc; ngày hạn ưu đãi `/en` MM/DD/YYYY vs spec dd/MM/yyyy (chờ user chốt).
 - P3-T05 (review r1): regex hướng chính (`property-posts.ts:147`) loại địa danh (Tây Hồ, Bắc Ninh…) như regex gợi ý; `FRONTAGE_RES[1]` (dòng 174) không đọc "cách 50m mặt tiền"; ghi chú soát cho tầng lẻ (3.5) / "tum"; giữ ghi chú ban công khi trùng nội dung; tách phần extract (file 307 dòng).
 - P3-T03 (review r1): **sort làm mất lọc đang chờ** ở cả 3 trang — `PostSortControl.tsx:37`, `RentalSortControl.tsx:37`, `ProjectSortControl` → gửi sort qua `navigate` của `useListingFilterNav` (+ test đổi lọc rồi đổi sort nhanh); FAQ JSON-LD không phát khi trang noindex (`PostListPage.tsx:590`, dùng chung điều kiện "có lọc" với metadata — kiểm cả /cho-thue); link cũ `/tin-bds?category=<slug hợp lệ>` canonical → `/tin-bds/danh-muc/<slug>` (hoặc 308); JSDoc `/en/property-posts` → `/en/property-news`; nhãn hướng công khai dùng chung (thay mượn `page.rentalDetail.direction` ở Tin BĐS list + detail); tách hàm `PostListPage` (~140 dòng).
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 7e39d98 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-06-round-1-review.md`).
+- Verify: typecheck · lint · test 385 file / 3878 PASS (media-upload timeout chạy riêng PASS) · build PASS; drift check sạch.
+- Kiểm thực tế: Trình duyệt (builder): 11 URL VI/EN × 1440/768/390, 1 h1, không tràn ngang (sau fix CardSlider); không JS GET form. LCP chưa đo (pane ẩn). Bằng chứng primary: xem mục dưới nếu có.
+- Doc impact: docs/API_SPEC.md §3.9–3.11, docs/DESIGN.md, .context/design-spec.md §4, docs/ERD.md, docs/ARCHITECTURE.md (as-built).
+- Residual risk: ?category= noindex + canonical sang trang danh mục (backlog 308); /du-an priceMax=0 vẫn là bộ lọc (backlog).

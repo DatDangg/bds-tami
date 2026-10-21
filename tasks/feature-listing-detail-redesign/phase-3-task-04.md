@@ -19,9 +19,9 @@
 5. Kiểm 1440 / 390, VI + EN, tin BĐS đủ trường / tin cũ trống / voucher còn hạn / hết hạn.
 
 ## Acceptance
-- [ ] Cùng khung chi tiết; thanh thông số theo loại tin; ô trống ẩn.
-- [ ] Voucher: hộp mã + điều kiện giữ, hết hạn hiện "Đã kết thúc" (BR-06).
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] Cùng khung chi tiết; thanh thông số theo loại tin; ô trống ẩn.
+- [x] Voucher: hộp mã + điều kiện giữ, hết hạn hiện "Đã kết thúc" (BR-06).
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -29,3 +29,10 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 32f5d44 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-04-round-1-review.md`).
+- Verify: typecheck · lint · test 383 file / 3822 PASS · build PASS.
+- Kiểm thực tế: Trình duyệt (builder): 1440/390, 1 h1, 4 tab, thanh liên hệ dính mobile.
+- Doc impact: as-built: bỏ neo #content (nội dung vào Tổng quan); giữ nút chia sẻ hero (ngoại lệ so với Dự án/Cho thuê). Không đổi API/schema.
+- Residual risk: EN + voucher hết hạn chỉ qua unit test (dev không có dữ liệu).

@@ -18,9 +18,9 @@
 4. Test schema + `admin-labels.test` PASS.
 
 ## Acceptance
-- [ ] Admin tin BĐS có các trường mới; tin cũ lưu/xuất bản được khi để trống.
-- [ ] Migration additive (không HIGH_RISK), up/down/up PASS.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
+- [x] Admin tin BĐS có các trường mới; tin cũ lưu/xuất bản được khi để trống.
+- [x] Migration additive (không HIGH_RISK), up/down/up PASS.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -28,3 +28,10 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`. Thao tác phá huỷ → DỪNG `HIGH_RISK_MIGRATION`.
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 65f4cf0 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-01-round-1-review.md`).
+- Verify: typecheck · lint · test 382 file (2 integration timeout chạy riêng PASS) · build PASS; migration up/down/up PASS; drift check sạch.
+- Kiểm thực tế: Admin: chỉ qua unit/integration test (không mở trình duyệt).
+- Doc impact: docs/ERD.md §4.7 (trường mới). Migration 20261021_173246_property_post_specs SAFE_ADDITIVE, đã migrate DB dev tami.
+- Residual risk: Không GIST index location (chỉ cần khi lọc bản đồ — backlog); số thực cho phòng ngủ không chặn (giống Cho thuê).

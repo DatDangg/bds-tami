@@ -18,9 +18,9 @@
 4. Thẻ: **thẻ BĐS** (ảnh, danh mục/loại hình tag, tiêu đề, vị trí, giá (rút gọn, `priceNote` khi không có giá → "Liên hệ"), diện tích · phòng ngủ, nút mũi tên) và **thẻ voucher** (tin có `offer.endAt` hoặc `offer.voucherCode`: ảnh, badge ưu đãi, tiêu đề, hạn ưu đãi `dd/MM/yyyy`, trạng thái Còn hạn / Đã kết thúc — BR-06, nút mũi tên). Không tim. Biến thể thẻ mới dùng cho danh sách; **trang chủ (`OffersSlider`/`FeaturedOffers`) giữ biến thể hiện tại**. `RelatedPosts` thuộc P3-T04 (không sửa ở đây). Thẻ voucher khi có ưu đãi **và không có `priceVnd` lẫn `areaM2`**; tin bán kèm ưu đãi → thẻ BĐS + badge ưu đãi.
 
 ## Acceptance
-- [ ] Test parse, test lọc + đếm + nổi bật không lặp, test thẻ BĐS / voucher (hết hạn, không giá).
-- [ ] Trang chủ khối Ưu đãi (giữ thẻ cũ) + tin liên quan dự án vẫn render.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
+- [x] Test parse, test lọc + đếm + nổi bật không lặp, test thẻ BĐS / voucher (hết hạn, không giá).
+- [x] Trang chủ khối Ưu đãi (giữ thẻ cũ) + tin liên quan dự án vẫn render.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -31,3 +31,10 @@
 
 ## Bổ sung từ phase review P1+P2 (2026-10-22)
 - Số đếm bộ lọc `/tin-bds` dùng đúng quy tắc chốt cho G1/B1 (ô tích có số đếm; chip đơn chọn theo quyết định ghi ở `phase-2-task-04.md` § Quyết định).
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 59cd5bc · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-02-round-1-review.md`).
+- Verify: typecheck · lint · test 385 file (integration timeout chạy riêng PASS) · build PASS; /vi/tin-bds p95 248ms.
+- Kiểm thực tế: Trình duyệt (builder): /vi/tin-bds 12 thẻ BĐS, trang chủ 6 thẻ home.
+- Doc impact: API_SPEC tham số /tin-bds ở P3-T06 (§3.11). PostCard variant listing mặc định, home cho trang chủ.
+- Residual risk: Quét ≤1000 tin/request (cảnh báo khi chạm trần); ngày /en theo en-US (chờ user).

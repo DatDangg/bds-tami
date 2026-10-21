@@ -19,9 +19,9 @@
 5. **Primary** chạy `--apply` trên DB dev chính sau merge.
 
 ## Acceptance
-- [ ] Dry-run không ghi; `--apply` chỉ điền ô trống; chạy lại không đổi; voucher bỏ qua.
-- [ ] Báo cáo có mục Tin BĐS.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
+- [x] Dry-run không ghi; `--apply` chỉ điền ô trống; chạy lại không đổi; voucher bỏ qua.
+- [x] Báo cáo có mục Tin BĐS.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -29,3 +29,10 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Verification summary (close-out 2026-10-22)
+- Commit: f001cb9 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-05-round-1-review.md`).
+- Verify: typecheck · lint · test 383 file (integration timeout chạy riêng PASS) · build PASS.
+- Kiểm thực tế: DB worktree: 38 quét / 37 điền / 0 lỗi, idempotent. DB dev tami: dry-run soát tay 26 giá trị hướng/mặt tiền → --apply 38/37/1 bỏ qua/0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md.
+- Doc impact: no doc impact (script dev).
+- Residual risk: Regex chỉnh theo dữ liệu dev; regex địa danh/mặt tiền siết thêm ở P3-T06 (chưa chạy lại trên dev — dev đã điền, chạy lại chỉ điền ô trống).

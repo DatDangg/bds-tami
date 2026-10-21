@@ -17,9 +17,9 @@
 3. Kiểm 1440 / 390, VI + EN, danh mục voucher (thẻ voucher), lọc ra rỗng.
 
 ## Acceptance
-- [ ] `/tin-bds`, `/tin-bds/danh-muc/[category]` cùng khung danh sách; voucher/ưu đãi chung lưới thẻ riêng; lọc theo loại tin (tab).
-- [ ] Canonical/noindex đúng; EN đủ nhãn; không tràn 375px.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] `/tin-bds`, `/tin-bds/danh-muc/[category]` cùng khung danh sách; voucher/ưu đãi chung lưới thẻ riêng; lọc theo loại tin (tab).
+- [x] Canonical/noindex đúng; EN đủ nhãn; không tràn 375px.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Quy ước song song (spec-validation r1 F2/F6)
 - i18n: chỉ thêm key trong **namespace riêng của task** (ghi tên namespace trong báo cáo), thêm vào **cuối** object namespace đó ở `src/i18n/messages/vi.json` + `en.json`; không sắp xếp lại / format lại file. Primary gộp xung đột khi merge.
@@ -27,3 +27,10 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Verification summary (close-out 2026-10-22)
+- Commit: 3d6c598 · Review: r1 STRICT PASS (`.context/review-reports/feature-listing-detail-redesign-phase-3-task-03-round-1-review.md`).
+- Verify: typecheck · lint · test 387 file / 3885 PASS · build PASS.
+- Kiểm thực tế: Trình duyệt (builder): 1440/390, EN /en/property-news, không JS (form GET, khoá lặp), ?category= cũ aria-current.
+- Doc impact: as-built: ?category= cũ lọc + noindex (canonical → trang danh mục ở P3-T06); bỏ PostCard variant feature; hàng N phù hợp trở lại. API_SPEC §3.11.
+- Residual risk: DB worktree không có voucher/EN → chỉ unit test; sort mất lọc (đã sửa P3-T06).
