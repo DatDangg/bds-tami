@@ -1123,6 +1123,50 @@
         "next": "Next listings",
         "dots": "Choose slide position",
         "goTo": "Go to listing group {index}"
+      },
+      "v2": {
+        "tabs": {
+          "overview": "Overview",
+          "offer": "Offer",
+          "location": "Location",
+          "gallery": "Photos",
+          "related": "Related listings"
+        },
+        "eyebrow": {
+          "overview": "Introduction",
+          "offer": "Offer",
+          "location": "Location",
+          "gallery": "Photos"
+        },
+        "titles": {
+          "overview": "Overview",
+          "location": "Location",
+          "gallery": "Property photos"
+        },
+        "galleryDescription": "Photos of {name}.",
+        "mapLabel": "Map of {name}",
+        "spec": {
+          "label": "Listing facts",
+          "price": "Price",
+          "area": "Area",
+          "layout": "Bed / bath",
+          "direction": "Facing",
+          "frontage": "Frontage",
+          "floors": "Floors",
+          "offerEnd": "Offer ends",
+          "offerStatus": "Status",
+          "offerActive": "Active"
+        },
+        "info": {
+          "label": "Listing information",
+          "propertyType": "Property type",
+          "handover": "Handover condition",
+          "category": "Category",
+          "project": "Related project",
+          "rental": "Related rental",
+          "publishedAt": "Posted on"
+        },
+        "similarViewAll": "View all listings"
       }
     }
   },
