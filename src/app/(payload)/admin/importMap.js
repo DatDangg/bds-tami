@@ -49,8 +49,8 @@ import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
 import { RentalCodeHiddenField as RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
-import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
+import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { JobDeadlineCell as JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
@@ -122,8 +122,8 @@ export const importMap = {
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
   "/components/admin/RentalCodeDisplay#RentalCodeHiddenField": RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2,
-  "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/ListSummaryCells#RoomsAreaCell": RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1,
+  "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/JobDeadlineDisplay#JobDeadlineCell": JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
