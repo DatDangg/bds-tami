@@ -2,16 +2,16 @@
 
 ```yaml
 workItem: feature/listing-detail-redesign
-phaseTask: phase-review P3
-step: closeout
+phaseTask: done
+step: done
 agent: change-request
-status: awaiting
+status: done
 attempt: 0
 interrupted: false
 updatedAt: 2026-10-22
 classification: MODIFY (+ADDITIVE schema projects/site-settings; property-posts ở P3)
-specVersion: 1.46.0 (published, planned scope)
-scopeVersion: 58
+specVersion: 1.46.1 (as-built)
+scopeVersion: 59
 runMode: "auto proceed; builder-strong mọi task; commit staging, KHÔNG push; dừng chỉ khi architecture_review_needed / HIGH_RISK_MIGRATION"
 committed:
   plan: c26d69e
@@ -32,8 +32,8 @@ committed:
   P3-T05: f001cb9 — backfill --apply DB dev tami 38/37/0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md
   P3-T03: 3d6c598
   P3-T06: 7e39d98
-remaining: [danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
-next: "user chốt ngày hạn ưu đãi /en → spec-publisher as-built (asBuiltPending) → BACKLOG BL-052 done + follow-ups (progress.followUps, C-1..C-8) → archive change doc"
+remaining: []
+next: "BL-052 xong. Việc còn mở → BL-055 (spec/changes/2026-10-22-listing-followups.md) qua /change"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
 testDbs: "tami_wt52_p1t01..p1t07, tami_wt52_p2t01, tami_wt52_p2t03 (bản sao dev, đã migrate BL-052; p1t05/p2t01/p2t03 mới nhất, có dữ liệu thử listingPages/rentals) — dùng lại được làm DB worktree cho task sau (chạy pnpm payload migrate), hoặc drop. Redis db đã dùng: 4–9, 11–13."
 dirtyNotMine: [BL-054 change doc, template-feedback.md, .claude/launch.json, .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md (sửa ngoài BL-052), .context/runs/* khác, .context/review-reports/assets/]
@@ -82,3 +82,5 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ✅ DONE builder-strong P3-T06 — wt agent-afed16067ec55c7b8 (chưa commit); sửa sort mất lọc 3 trang, FAQ JSON-LD/noindex, canonical ?category=, step=any, CardSlider tràn ngang 390, regex backfill, gom helper, xoá 5 component + 148 key i18n chết, doc as-built API_SPEC/DESIGN/design-spec/ERD/ARCHITECTURE; typecheck/lint/test 385/3878/build PASS. ▶ START reviewer r1 P3-T06 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P3-T06 STRICT PASS (drift sạch, build PASS; MINOR-1 noindex/canonical ?category= → openItems; MINOR-2 CardSlider chưa chụp) → 7e39d98 merged + progress, typecheck PASS. ✅ DONE P3-T06 — hết task BL-052. ▶ START spec-validator phase review P3 (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE spec-validator phase review P3 — code PASS, 0 bug; P-1 verification summary 7 task file, P-3 thêm 6 as-built + followUps; P-2 primary kiểm 33 lượt (11 URL × 3 khổ) không tràn, 1 h1, slider trang chủ 390 OK. Chờ user: ngày /en.
+- 2026-10-22 user chốt: /en giữ ngày en-US (as-built). ▶ START spec-publisher as-built BL-052 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE spec-publisher as-built — 1.46.1 / scope v59 (spec/updates/2026-10-22-listing-detail-redesign-as-built.md, CHANGELOG, archive test-scope-1.46.0-58.json). Close-out: BACKLOG BL-052 done, BL-055 follow-ups pending, change doc archive, progress done, activeWorkItem null.

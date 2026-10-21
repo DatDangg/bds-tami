@@ -1,7 +1,8 @@
 ---
 id: listing-detail-redesign
 type: feature
-status: in_progress
+status: done
+completed: 2026-10-22
 created: 2026-10-21
 ---
 

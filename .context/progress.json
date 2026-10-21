@@ -1,11 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "listing-detail-redesign",
-    "phaseTask": "phase-review P3",
-    "journal": ".context/runs/change-listing-detail-redesign.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2042,14 +2037,14 @@
       "slug": "listing-detail-redesign",
       "title": "Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS theo design mới + trường mới (BL-052)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 3,
       "backlog": "BL-052",
-      "changeDoc": "spec/changes/2026-10-21-listing-detail-redesign.md",
+      "changeDoc": "spec/changes/archive/2026-10-21-listing-detail-redesign.md",
       "startedAt": "2026-10-21",
       "planApprovedAt": "2026-10-21 (change doc Chế độ chạy: auto proceed, builder-strong mọi task, commit staging không push)",
-      "specVersion": "1.46.0",
-      "scopeVersion": 58,
+      "specVersion": "1.46.1",
+      "scopeVersion": 59,
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2307,8 +2302,31 @@
           "commit": "dfa0884"
         }
       ],
-      "stage": "2026-10-22: phase review P3 code PASS + P-1/P-2/P-3 xong; chờ user chốt ngày /en → spec-publish as-built → close-out",
-      "asBuiltPending": [
+      "stage": "done — as-built 1.46.1 / scope v59; follow-ups BL-055",
+      "phaseReview12": {
+        "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
+        "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-2-phase-review.md",
+        "at": "2026-10-22"
+      },
+      "openItems": [
+        "/tin-bds?category= noindex + canonical sang trang danh mục (tín hiệu trái nhau) — khuyến nghị 308 cho cả /tin-bds và /cho-thue ?category= (P3-T06 r1 MINOR-1)",
+        "/du-an priceMax=0 vẫn là bộ lọc"
+      ],
+      "phaseReview3": {
+        "verdict": "GAPS (code PASS; P-1 task summary, P-2 browser evidence, P-3 as-built)",
+        "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-phase-review.md",
+        "at": "2026-10-22"
+      },
+      "followUps": [
+        "C-1 308 redirect ?category= cho /tin-bds + /cho-thue",
+        "C-4 /du-an priceMax=0 = không giới hạn (đồng bộ /tin-bds)",
+        "C-5 index rentals_amenities.value + ca EN đếm tiện ích",
+        "C-6 GIST index property_posts.location (khi có lọc bản đồ)",
+        "C-7 integration hookTimeout",
+        "C-8 backfill isOfferPost trùng hasPostOffer"
+      ],
+      "completedAt": "2026-10-22",
+      "asBuiltPublished": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",
         "giá cho thuê Thương lượng/Liên hệ thay Thoả thuận (thẻ thống nhất ở P2-T02)",
@@ -2334,30 +2352,8 @@
         "backfill bỏ qua mọi tin có ưu đãi (kể cả tin bán có ưu đãi); giá trị mâu thuẫn không điền → danh sách soát",
         "chi tiết Tin BĐS giữ nút chia sẻ ở hero (ngoại lệ — Dự án/Cho thuê đã bỏ)",
         "tab danh mục Tin BĐS đếm theo danh mục cấp 1 (gồm con)",
-        "/tin-bds q tìm trong tiêu đề + tóm tắt + địa chỉ + phường + tỉnh (không dấu)"
-      ],
-      "phaseReview12": {
-        "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
-        "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-2-phase-review.md",
-        "at": "2026-10-22"
-      },
-      "openItems": [
-        "/tin-bds?category= noindex + canonical sang trang danh mục (tín hiệu trái nhau) — khuyến nghị 308 cho cả /tin-bds và /cho-thue ?category= (P3-T06 r1 MINOR-1)",
-        "ngày hạn ưu đãi /en MM/DD/YYYY vs spec dd/MM/yyyy — chờ user",
-        "/du-an priceMax=0 vẫn là bộ lọc"
-      ],
-      "phaseReview3": {
-        "verdict": "GAPS (code PASS; P-1 task summary, P-2 browser evidence, P-3 as-built)",
-        "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-phase-review.md",
-        "at": "2026-10-22"
-      },
-      "followUps": [
-        "C-1 308 redirect ?category= cho /tin-bds + /cho-thue",
-        "C-4 /du-an priceMax=0 = không giới hạn (đồng bộ /tin-bds)",
-        "C-5 index rentals_amenities.value + ca EN đếm tiện ích",
-        "C-6 GIST index property_posts.location (khi có lọc bản đồ)",
-        "C-7 integration hookTimeout",
-        "C-8 backfill isOfferPost trùng hasPostOffer"
+        "/tin-bds q tìm trong tiêu đề + tóm tắt + địa chỉ + phường + tỉnh (không dấu)",
+        "/en ngày (kể cả hạn ưu đãi thẻ voucher) theo định dạng en-US MM/DD/YYYY như toàn site — user chốt 2026-10-22"
       ]
     }
   ],
@@ -3337,7 +3333,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T16:48:18.390Z",
+  "lastUpdated": "2026-10-22",
   "approvalMilestones": [
     {
       "id": "M1",
