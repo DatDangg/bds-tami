@@ -1,0 +1,123 @@
+// A6 thanh chọn hàng loạt nổi đáy + A12 cột "Thao tác" (BL-051 GĐ2). Selector lấy từ @payloadcms/ui 3.91:
+// elements/ListSelection (`.list-selection`), views/List (`.collection-list__list-selection` chỉ ở ≤ 768px). Không dùng !important.
+// Nằm ngoài @layer payload-default nên thắng style gốc của Payload; không thay view List.
+
+// ---- A6: một diện mạo cho cả hai chỗ Payload vẽ cụm chọn hàng loạt ----
+// Desktop: `.list-selection` nằm trong hàng tiêu đề (`.list-header__actions`) → ghim nổi đáy vùng nội dung (position: fixed, giữa màn).
+// ≤ 768px: Payload tự vẽ thanh `.collection-list__list-selection` cố định đáy (đã chỉnh mép ở _lists.scss, BL-024) → chỉ bổ sung nền đặc/bóng/nút.
+// Không áp trong list drawer (picker quan hệ có `.list-drawer__header`) để không phủ lên drawer.
+.collection-list .list-header:not(.list-drawer__header) .list-selection {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 8px 16px;
+  row-gap: 4px;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-l);
+  background: var(--admin-surface);
+  box-shadow: var(--admin-shadow-md);
+  color: var(--admin-text);
+}
+
+.collection-list__list-selection {
+  z-index: 20;
+  border-top: 1px solid var(--admin-border-strong);
+  background: var(--admin-surface);
+  box-shadow: var(--admin-shadow-md);
+  color: var(--admin-text);
+}
+
+// Nút trong thanh: vùng bấm ≥ 44px, kiểu nút phụ viền mảnh (Payload để dạng link gạch chân, chữ nhỏ).
+.collection-list .list-selection__button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--theme-elevation-100);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
+  }
+}
+
+.collection-list .list-selection {
+  color: var(--admin-text);
+}
+
+// Chừa đệm đáy khi có dòng được chọn để thanh không che hàng cuối + phân trang (thanh cao ~ 60-120px khi xuống dòng ở 375px).
+.collection-list:has(.list-selection) {
+  padding-bottom: 140px;
+}
+
+// ---- A12: cột "Thao tác" (RowActions) ----
+.tami-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.tami-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--admin-radius-s);
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--theme-elevation-100);
+    color: var(--admin-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-focus);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.5;
+  }
+
+  &--danger:hover {
+    background: var(--admin-badge-danger-bg);
+    color: var(--admin-badge-danger-fg);
+  }
+
+  svg {
+    flex: none;
+  }
+}
+
+// `.collection-list .table td a` (đặt màu chữ/đậm cho link ô) không được làm đổi icon.
+.collection-list .table td a.tami-row-action {
+  color: var(--admin-text-muted);
+  font-weight: normal;
+
+  &:hover {
+    color: var(--admin-text);
+  }
+}
