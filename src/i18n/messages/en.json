@@ -782,6 +782,37 @@
         "button": "Video",
         "title": "Property video",
         "close": "Close"
+      },
+      "v2": {
+        "tabs": {
+          "overview": "Overview",
+          "location": "Location",
+          "amenities": "Amenities",
+          "gallery": "Photos",
+          "terms": "Rental terms",
+          "legal": "Legal"
+        },
+        "eyebrow": {
+          "overview": "About",
+          "gallery": "Gallery"
+        },
+        "titles": {
+          "overview": "Overview",
+          "gallery": "Real photos"
+        },
+        "galleryDescription": "Real photos of {name}.",
+        "codeChip": "Listing {code}",
+        "spec": {
+          "negotiable": "Negotiable",
+          "contact": "Contact us",
+          "layout": "Bed / bath",
+          "availableFrom": "Move in from"
+        },
+        "info": {
+          "label": "Unit details",
+          "project": "Project"
+        },
+        "similarViewAll": "View all rentals"
       }
     },
     "careers": {

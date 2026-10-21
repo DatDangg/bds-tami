@@ -782,6 +782,37 @@
         "button": "Video",
         "title": "Video giới thiệu",
         "close": "Đóng"
+      },
+      "v2": {
+        "tabs": {
+          "overview": "Tổng quan",
+          "location": "Vị trí",
+          "amenities": "Tiện ích",
+          "gallery": "Hình ảnh",
+          "terms": "Điều khoản thuê",
+          "legal": "Pháp lý"
+        },
+        "eyebrow": {
+          "overview": "Giới thiệu",
+          "gallery": "Thư viện ảnh"
+        },
+        "titles": {
+          "overview": "Tổng quan",
+          "gallery": "Hình ảnh thực tế"
+        },
+        "galleryDescription": "Ảnh thực tế của {name}.",
+        "codeChip": "Mã tin {code}",
+        "spec": {
+          "negotiable": "Thương lượng",
+          "contact": "Liên hệ",
+          "layout": "Phòng ngủ / tắm",
+          "availableFrom": "Dọn vào từ"
+        },
+        "info": {
+          "label": "Thông tin căn",
+          "project": "Thuộc dự án"
+        },
+        "similarViewAll": "Xem tất cả căn cho thuê"
       }
     },
     "careers": {

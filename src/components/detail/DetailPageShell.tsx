@@ -16,6 +16,8 @@ interface DetailPageShellProps {
   hero: ReactNode;
   /** `DetailSpecBar` nổi đè mép dưới hero; trống → chỉ còn khoảng cách. */
   specBar?: ReactNode;
+  /** Khối ngay sau thanh thông số, trước tab (vd băng "Đã thuê" + "Căn tương tự đang trống" của tin cho thuê đã thuê); tự lo lề trên, khung chừa `pb-8` sau nó. */
+  belowSpecBar?: ReactNode;
   /** Thanh tab dính (viên thuốc, scroll-spy BL-027/028/029); bỏ trống thì không dựng. */
   subNav?: { items: SubNavItem[]; label: string };
   /** Khối cạnh cột phải (design: chỉ Tổng quan) — mỗi `DetailSection` là một thẻ trắng bo 20px. */
@@ -39,7 +41,7 @@ interface DetailPageShellProps {
  * Dựng trên `DetailLayout sectionStyle="cards"` nên giữ nguyên `data-detail-page` (header ẩn khi cuộn, `--sticky-top`), nền `bg-primary-subtle`, lưới 2 cột,
  * `DetailAsideFit` và thẻ trắng từng `DetailSection` trong lưới. CTA dính đáy < lg do trang tự đặt như hiện tại. Server Component.
  */
-export function DetailPageShell({ hero, specBar, subNav, children, aside, asideLabelledBy, bands = [], after }: DetailPageShellProps) {
+export function DetailPageShell({ hero, specBar, belowSpecBar, subNav, children, aside, asideLabelledBy, bands = [], after }: DetailPageShellProps) {
   const tail =
     bands.length > 0 || after ? (
       <>
@@ -57,7 +59,10 @@ export function DetailPageShell({ hero, specBar, subNav, children, aside, asideL
       before={
         <>
           {hero}
-          <div className="pb-8">{specBar}</div>
+          <div className="pb-8">
+            {specBar}
+            {belowSpecBar}
+          </div>
         </>
       }
       {...(subNav ? { subNav } : {})}

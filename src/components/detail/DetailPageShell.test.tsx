@@ -68,6 +68,20 @@ describe("DetailPageShell", () => {
     expect(screen.queryByRole("navigation")).toBeNull();
     expect(screen.queryByRole("complementary")).toBeNull();
   });
+
+  it("belowSpecBar: ngay sau thanh thông số, trước tab, cùng khối pb-8", () => {
+    renderWithIntl(
+      <DetailPageShell hero={<h1>Hero</h1>} specBar={<div data-testid="spec" />} belowSpecBar={<div data-testid="below" />} subNav={{ items: [{ id: "overview", label: "Tổng quan" }], label: "Mục" }}>
+        <DetailSection id="overview" title="Tổng quan">
+          <p>x</p>
+        </DetailSection>
+      </DetailPageShell>,
+    );
+    const below = screen.getByTestId("below");
+    expect(screen.getByTestId("spec").compareDocumentPosition(below) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(below.compareDocumentPosition(screen.getByRole("navigation", { name: "Mục" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(below.parentElement?.className).toBe("pb-8");
+  });
 });
 
 describe("SimilarCarousel", () => {
