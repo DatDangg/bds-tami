@@ -14,6 +14,10 @@ vi.mock("payload", () => ({ getPayload: vi.fn().mockResolvedValue({}) }));
 vi.mock("@/lib/posts/post-queries", () => ({ findPublicPostBySlug, findRelatedPosts, findRelatedTargets }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "uu-dai-mua-thu", en: "autumn-offer" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
+const loadListingStrengths = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
+vi.mock("@/lib/content/load-listing-strengths", () => ({ loadListingStrengths }));
+vi.mock("@/components/home/StrengthsBlock", () => ({ StrengthsBlock: () => <section data-testid="strengths" /> }));
+vi.mock("@/components/media/LazyMap", () => ({ LazyMap: ({ label }: { label: string }) => <div role="img" aria-label={label} /> }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 // ConsultBanner là Server Component async (đọc homepage CMS): jsdom không dựng được; chỉ kiểm tra trang truyền đúng props.
 const consultBannerProps = vi.hoisted(() => vi.fn());
@@ -71,11 +75,12 @@ beforeEach(() => {
   getSiteSettings.mockResolvedValue({ hotline: "0901 234 567" });
   findRelatedPosts.mockResolvedValue([]);
   findRelatedTargets.mockResolvedValue({ project: null, rental: null });
+  loadListingStrengths.mockResolvedValue(null);
 });
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllEnvs();
-  for (const mock of [findPublicPostBySlug, findRelatedPosts, findRelatedTargets, getSiteSettings]) mock.mockReset();
+  for (const mock of [findPublicPostBySlug, findRelatedPosts, findRelatedTargets, getSiteSettings, loadListingStrengths]) mock.mockReset();
 });
 
 describe("trang chi tiết Đăng tin BĐS (S09)", () => {
@@ -91,55 +96,54 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     expect(screen.queryByRole("heading", { name: "Thông tin ưu đãi" })).toBeNull();
   });
 
-  it("khung chi tiết mới: ảnh lớn 1 ảnh (không bộ đếm), khối tiêu đề chứa h1 + chia sẻ, thanh mục con, thẻ liên hệ (aside) có form lead", async () => {
+  it("khung chi tiết BL-052: hero chứa h1 + chip danh mục + tóm tắt + chia sẻ; tab; cột liên hệ (aside) có form lead + hotline", async () => {
     findPublicPostBySlug.mockResolvedValue(post());
     const { container } = await renderPost();
     expect(container.querySelector("[data-detail-page]")).not.toBeNull();
-    expect(container.querySelector("[data-share-variant='rail']")).toBeNull();
+    const hero = container.querySelector("[data-detail-hero]") as HTMLElement;
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(hero).toContainElement(h1);
+    expect(hero).toHaveTextContent("Voucher");
+    expect(hero).toHaveTextContent("Giảm giá sâu cho khách mua sớm");
+    expect(hero).toContainElement(screen.getByRole("navigation", { name: "Đường dẫn trang (Breadcrumb)" }));
+    expect(within(hero).getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Mục lục tin đăng" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Nội dung"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan"]);
     const aside = screen.getByRole("complementary");
     expect(within(aside).getByRole("heading", { level: 2, name: "Nhận tư vấn" })).toBeInTheDocument();
-    expect(within(aside).getByRole("link", { name: "Gọi hotline 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    // Ảnh bìa là ảnh lớn kiểu hero, 1 ảnh: không bộ đếm / carousel; breadcrumb kính nằm trên ảnh.
-    const hero = container.querySelector("[data-detail-gallery]") as HTMLElement;
-    expect(hero).not.toBeNull();
-    expect(hero).not.toHaveAttribute("aria-roledescription");
-    expect(hero.textContent).not.toMatch(/01 \/ 01/);
-    expect(hero).toContainElement(screen.getByRole("navigation", { name: "Đường dẫn trang (Breadcrumb)" }));
-    // h1 + chia sẻ trong khối tiêu đề (dưới ảnh); Tổng quan là thẻ riêng có ngày đăng và danh mục.
-    const h1 = screen.getByRole("heading", { level: 1 });
-    const titleCard = h1.closest("div[class*='rounded-[28px]']") as HTMLElement;
-    expect(titleCard).not.toBeNull();
-    expect(titleCard).toHaveTextContent("Voucher");
-    expect(within(titleCard).getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
+    expect(within(aside).getByRole("link", { name: "Gọi ngay 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     const overview = container.querySelector("#overview") as HTMLElement;
     expect(overview).not.toContainElement(h1);
-    expect(overview).toHaveTextContent("Giảm giá sâu cho khách mua sớm");
+    expect(overview).toHaveTextContent("Nội dung chi tiết của ưu đãi.");
     expect(overview.querySelector("time")).not.toBeNull();
-    expect(container.querySelector("[data-section-style='cards']")).toContainElement(overview);
-    expect(container.querySelector("article > footer")).toBeNull();
+    // Bài không có trường có cấu trúc → không thanh thông số.
+    expect(screen.queryByRole("group", { name: "Thông số tin đăng" })).toBeNull();
   });
 
-  it("thanh mục con thêm Ưu đãi / Hình ảnh khi có dữ liệu, thứ tự cố định; ảnh bìa nằm trên thanh mục con", async () => {
-    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-30T12:00:00.000Z" }, gallery: [image("g1")] as PropertyPost["gallery"] }));
+  it("tab thêm Ưu đãi / Vị trí / Hình ảnh khi có dữ liệu, thứ tự cố định", async () => {
+    findPublicPostBySlug.mockResolvedValue(
+      post({ offer: { endAt: "2026-10-30T12:00:00.000Z" }, gallery: [image("g1")] as PropertyPost["gallery"], address: "12 Nguyễn Huệ", location: [106.7, 10.77] }),
+    );
     const { container } = await renderPost();
     const nav = screen.getByRole("navigation", { name: "Mục lục tin đăng" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Ưu đãi", "Nội dung", "Hình ảnh"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Ưu đãi", "Vị trí", "Hình ảnh"]);
     expect(container.querySelector("#offer")).not.toBeNull();
-    expect(screen.getByRole("heading", { level: 2, name: "Hình ảnh" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Bản đồ vị trí Ưu đãi mùa thu" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Hình ảnh thực tế" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("ưu đãi còn hạn: khối ưu đãi TRƯỚC nội dung, có mã voucher và nút sao chép", async () => {
-    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-30T12:00:00.000Z", voucherCode: "TAMI500" }, priceVnd: 5_500_000 }));
+  it("ưu đãi còn hạn (voucher): thanh thông số Hạn ưu đãi · Trạng thái; khối ưu đãi sau Tổng quan, có mã voucher và nút sao chép", async () => {
+    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-30T12:00:00.000Z", voucherCode: "TAMI500" } }));
     await renderPost();
+    const bar = screen.getByRole("group", { name: "Thông số tin đăng" });
+    expect(bar).toHaveTextContent("30/10/2026");
+    expect(bar).toHaveTextContent("Còn hạn");
     const box = screen.getByRole("region", { name: "Thông tin ưu đãi" });
     expect(box).toHaveTextContent("TAMI500");
-    expect(box).toHaveTextContent("5.500.000 ₫");
     expect(screen.getByRole("button", { name: "Sao chép" })).toBeInTheDocument();
     const content = screen.getByText("Nội dung chi tiết của ưu đãi.");
-    expect(box.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(content.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("ưu đãi hết hạn: trang vẫn mở (200) với badge 'Đã kết thúc', ẩn mã voucher và nút sao chép", async () => {
@@ -185,12 +189,16 @@ describe("trang chi tiết Đăng tin BĐS (S09)", () => {
     expect(related.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("ưu đãi: badge trạng thái, giá và khu vực hiện ở khối tiêu đề", async () => {
-    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-20T12:00:00.000Z" }, priceVnd: 5_500_000 }));
-    await renderPost();
-    const titleCard = screen.getByRole("heading", { level: 1 }).closest("div[class*='rounded-[28px]']") as HTMLElement;
-    expect(titleCard).toHaveTextContent("5.500.000 ₫");
-    expect(titleCard).toHaveTextContent(/Còn \d+ ngày/);
+  it("tin bán kèm ưu đãi (EN): badge trạng thái ở hero, giá + diện tích ở thanh thông số; dải Điểm mạnh theo cờ propertyPosts", async () => {
+    findPublicPostBySlug.mockResolvedValue(post({ offer: { endAt: "2026-10-20T12:00:00.000Z" }, priceVnd: 5_500_000_000, areaM2: 80 }));
+    loadListingStrengths.mockResolvedValue({ title: "Điểm mạnh", items: [] });
+    const { container } = await renderPost("en");
+    expect(loadListingStrengths).toHaveBeenCalledWith("en", "propertyPosts");
+    expect(screen.getByTestId("strengths")).toBeInTheDocument();
+    expect(container.querySelector("[data-detail-hero]")).toHaveTextContent(/\d+ days? left/);
+    const bar = screen.getByRole("group", { name: "Listing facts" });
+    expect(bar).toHaveTextContent("5.5 billion VND");
+    expect(bar).toHaveTextContent("80 m²");
   });
 
   it("không có bài (không tồn tại / chưa công khai / thiếu bản EN) → notFound", async () => {

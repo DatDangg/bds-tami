@@ -11,11 +11,13 @@ import { PostDetail } from "@/components/posts/PostDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT_ROUTES } from "@/lib/content/content-paths";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
 import { findLocalizedSlugs } from "@/lib/news/news-queries";
 import { populatedMedia } from "@/lib/news/news-view";
+import { toPostDetailSpecs } from "@/lib/posts/post-detail-specs";
 import { findPublicPostBySlug, findRelatedPosts, findRelatedTargets } from "@/lib/posts/post-queries";
 import { toPostCards, toPostDetailView, toPostOfferView } from "@/lib/posts/post-view";
 import { buildArticleJsonLd } from "@/lib/seo/json-ld";
@@ -90,11 +92,12 @@ export default async function PostDetailPage({ params }: PageProps) {
   const { payload, doc } = loaded;
 
   const now = new Date();
-  const [relatedDocs, targets, hotline, identity] = await Promise.all([
+  const [relatedDocs, targets, hotline, identity, strengths] = await Promise.all([
     findRelatedPosts(payload, locale, doc, now),
     findRelatedTargets(payload, locale, doc),
     loadHotline(locale),
     loadSiteIdentity(locale),
+    loadListingStrengths(locale, "propertyPosts"),
   ]);
   const tLead = await getTranslations({ locale, namespace: "page.posts.leadForm" });
   const view = toPostDetailView(doc, locale);
@@ -109,11 +112,13 @@ export default async function PostDetailPage({ params }: PageProps) {
       <PostDetail
         doc={doc}
         view={view}
+        specs={toPostDetailSpecs(doc, locale)}
         offer={toPostOfferView(doc, locale, now, targets)}
         related={toPostCards(relatedDocs, locale, now)}
         {...(hotline ? { hotline } : {})}
         ownPath={ownPath}
         {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        strengths={strengths}
         consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: tLead("callHotline", { phone: hotline.label }), href: hotline.telHref } } : {})} />}
       />
       {pageUrl && (

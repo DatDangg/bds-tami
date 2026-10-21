@@ -1123,6 +1123,50 @@
         "next": "Tin sau",
         "dots": "Chọn vị trí slide",
         "goTo": "Chuyển tới nhóm tin {index}"
+      },
+      "v2": {
+        "tabs": {
+          "overview": "Tổng quan",
+          "offer": "Ưu đãi",
+          "location": "Vị trí",
+          "gallery": "Hình ảnh",
+          "related": "Tin liên quan"
+        },
+        "eyebrow": {
+          "overview": "Giới thiệu",
+          "offer": "Ưu đãi",
+          "location": "Vị trí",
+          "gallery": "Hình ảnh"
+        },
+        "titles": {
+          "overview": "Tổng quan",
+          "location": "Vị trí",
+          "gallery": "Hình ảnh thực tế"
+        },
+        "galleryDescription": "Hình ảnh của {name}.",
+        "mapLabel": "Bản đồ vị trí {name}",
+        "spec": {
+          "label": "Thông số tin đăng",
+          "price": "Giá",
+          "area": "Diện tích",
+          "layout": "Phòng ngủ / tắm",
+          "direction": "Hướng",
+          "frontage": "Mặt tiền",
+          "floors": "Số tầng",
+          "offerEnd": "Hạn ưu đãi",
+          "offerStatus": "Trạng thái",
+          "offerActive": "Còn hạn"
+        },
+        "info": {
+          "label": "Thông tin tin đăng",
+          "propertyType": "Loại hình",
+          "handover": "Tình trạng bàn giao",
+          "category": "Danh mục",
+          "project": "Dự án liên quan",
+          "rental": "Tin cho thuê liên quan",
+          "publishedAt": "Ngày đăng"
+        },
+        "similarViewAll": "Xem tất cả tin đăng"
       }
     }
   },

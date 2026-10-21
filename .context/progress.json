@@ -2229,13 +2229,17 @@
         {
           "task": "phase-3-task-04",
           "file": "tasks/feature-listing-detail-redesign/phase-3-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-3-task-01"
           ],
           "wave": "3B",
-          "note": "chi tiết tin BĐS"
+          "note": "chi tiết tin BĐS",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-04-round-1-review.md",
+          "commit": "32f5d44"
         },
         {
           "task": "phase-3-task-05",
@@ -2301,7 +2305,8 @@
         "dải Hình ảnh chi tiết chỉ hiện khi ≥ 2 ảnh",
         "tab danh mục cho thuê đếm theo danh mục cấp 1",
         "Xoá tất cả trên link cũ ?category= xoá luôn danh mục",
-        "chip đơn chọn (Phòng ngủ/Nội thất /cho-thue, Tình trạng /du-an, /tin-bds) không hiện số đếm — theo design, user duyệt 2026-10-22; ô tích vẫn đếm"
+        "chip đơn chọn (Phòng ngủ/Nội thất /cho-thue, Tình trạng /du-an, /tin-bds) không hiện số đếm — theo design, user duyệt 2026-10-22; ô tích vẫn đếm",
+        "chi tiết Tin BĐS bỏ neo #content (nội dung vào Tổng quan)"
       ],
       "phaseReview12": {
         "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
