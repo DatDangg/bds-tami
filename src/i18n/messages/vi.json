@@ -592,7 +592,64 @@
         "dots": "Chọn vị trí slide",
         "goTo": "Chuyển tới nhóm dự án {index}"
       },
-      "stickyConsult": "Nhận tư vấn"
+      "stickyConsult": "Nhận tư vấn",
+      "v2": {
+        "tabs": {
+          "overview": "Tổng quan",
+          "location": "Vị trí",
+          "amenities": "Tiện ích",
+          "gallery": "Hình ảnh",
+          "highlights": "Nổi bật",
+          "floorPlans": "Mặt bằng",
+          "pricing": "Bảng giá",
+          "legal": "Pháp lý",
+          "policy": "Chính sách",
+          "legalPolicy": "Pháp lý & chính sách",
+          "listings": "Tin liên quan",
+          "faq": "Hỏi đáp"
+        },
+        "eyebrow": {
+          "overview": "Giới thiệu",
+          "location": "Kết nối",
+          "amenities": "Không gian sống",
+          "gallery": "Thư viện ảnh"
+        },
+        "titles": {
+          "overview": "Tổng quan dự án",
+          "location": "Vị trí dự án",
+          "amenities": "Tiện ích nổi bật",
+          "gallery": "Hình ảnh dự án"
+        },
+        "galleryDescription": "Hình ảnh thực tế và phối cảnh của {name}.",
+        "spec": {
+          "label": "Thông số dự án",
+          "priceFrom": "Giá từ",
+          "contact": "Liên hệ",
+          "scale": "Quy mô",
+          "hectare": "{value} ha",
+          "area": "Diện tích",
+          "developer": "Chủ đầu tư",
+          "handover": "Bàn giao",
+          "propertyTypes": "Loại hình"
+        },
+        "info": {
+          "label": "Thông tin dự án",
+          "name": "Tên thương mại",
+          "developer": "Chủ đầu tư",
+          "location": "Vị trí",
+          "scale": "Quy mô",
+          "propertyTypes": "Loại hình",
+          "handover": "Bàn giao",
+          "newTab": "(mở tab mới)"
+        },
+        "products": {
+          "label": "Sản phẩm của dự án"
+        },
+        "contactDescription": "Đăng ký để nhận bảng giá, chính sách và tư vấn chi tiết từ chuyên viên.",
+        "distanceTitle": "Khoảng cách đến các địa điểm quan trọng",
+        "amenitiesExpand": "Khám phá tất cả tiện ích",
+        "similarViewAll": "Xem tất cả dự án"
+      }
     },
     "rentalDetail": {
       "code": "Mã tin",

@@ -13,6 +13,9 @@ vi.mock("@/lib/projects/project-queries", () => ({ findPublicProjectBySlug, find
 vi.mock("@/lib/projects/project-listings", () => ({ findProjectListings }));
 vi.mock("@/lib/news/news-queries", () => ({ findLocalizedSlugs: async () => ({ vi: "song-sai-gon", en: "saigon-riverside" }) }));
 vi.mock("@/lib/content/get-globals", () => ({ getSiteSettings }));
+// `load-project-strengths` là module `server-only` (đọc global CMS): giả lập, chỉ kiểm tra trang truyền dải xuống.
+const loadProjectStrengths = vi.hoisted(() => vi.fn<(...args: unknown[]) => Promise<unknown>>());
+vi.mock("@/lib/content/load-project-strengths", () => ({ loadProjectStrengths }));
 // ConsultBanner là Server Component async (đọc homepage CMS): jsdom không dựng được; chỉ kiểm tra trang truyền đúng props.
 const consultBannerProps = vi.hoisted(() => vi.fn());
 vi.mock("@/components/layout/ConsultBanner", () => ({
@@ -66,6 +69,7 @@ beforeEach(() => {
   getSiteSettings.mockResolvedValue({ hotline: "0901 234 567" });
   findOtherProjects.mockResolvedValue([]);
   findProjectListings.mockResolvedValue({ rentals: [], posts: [] });
+  loadProjectStrengths.mockResolvedValue(null);
 });
 afterEach(() => {
   findProjectListings.mockReset();
@@ -83,10 +87,13 @@ describe("trang chi tiết dự án (S03)", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
     expect(container.querySelector("#lead-form")).not.toBeNull();
-    expect(screen.getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
+    expect(screen.getByRole("link", { name: "Gọi ngay 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
     const related = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
-    expect(within(related).getByRole("heading", { level: 3, name: "Dự án B" })).toBeInTheDocument();
-    expect(within(related).getByRole("link")).toHaveAttribute("href", "/du-an/du-an-b");
+    expect(within(related).getByRole("heading", { level: 3, name: "Dự án B" }).closest("a")).toHaveAttribute("href", "/du-an/du-an-b");
+    expect(within(related).getByRole("link", { name: "Xem tất cả dự án" })).toHaveAttribute("href", "/du-an");
+    expect(loadProjectStrengths).toHaveBeenCalledWith("vi");
+    // Cờ Điểm mạnh tắt (loader trả null) → không dải.
+    expect(screen.queryByRole("region", { name: /Điểm mạnh/ })).toBeNull();
     expect(findOtherProjects).toHaveBeenCalledWith({}, "vi", expect.objectContaining({ id: "d1" }));
     // Banner tư vấn cuối trang: nút chính cuộn tới form tại chỗ, nút phụ gọi hotline.
     expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
@@ -121,7 +128,15 @@ describe("trang chi tiết dự án (S03)", () => {
     await renderProject();
     expect(consultBannerProps).toHaveBeenCalledWith({ locale: "vi", actionHref: "#lead-form" });
     expect(screen.getByRole("heading", { level: 1, name: "Dự án Sông Sài Gòn" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "0901 234 567" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /0901 234 567/ })).toBeNull();
+  });
+
+  it("dải Điểm mạnh theo cờ showProjectStrengths (loader dùng chung /du-an) nằm sau Dự án tương tự, trước banner tư vấn", async () => {
+    findPublicProjectBySlug.mockResolvedValue(project());
+    loadProjectStrengths.mockResolvedValue({ kind: "strengths", items: [{ icon: "star", title: "Uy tín", description: null }, { icon: "clock", title: "Nhanh", description: null }] });
+    await renderProject();
+    const strengths = screen.getByRole("heading", { level: 3, name: "Uy tín" }).closest("section") as HTMLElement;
+    expect(strengths.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("dự án đã xuất bản nhưng mọi ảnh gallery bị xoá → ảnh lớn nền tối, không ảnh, không vỡ", async () => {

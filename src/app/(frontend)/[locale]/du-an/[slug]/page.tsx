@@ -11,6 +11,7 @@ import { ProjectDetail } from "@/components/projects/ProjectDetail";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT_ROUTES } from "@/lib/content/content-paths";
 import { getSiteSettings } from "@/lib/content/get-globals";
+import { loadProjectStrengths } from "@/lib/content/load-project-strengths";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { logger } from "@/lib/logger";
@@ -102,11 +103,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const { payload, doc } = loaded;
 
   const now = new Date();
-  const [relatedDocs, listingDocs, hotline, identity] = await Promise.all([
+  const [relatedDocs, listingDocs, hotline, identity, strengths] = await Promise.all([
     findOtherProjects(payload, locale, doc),
     findProjectListings(payload, locale, doc.id, now),
     loadHotline(locale),
     loadSiteIdentity(locale),
+    // BL-052: dải Điểm mạnh cùng cờ `showProjectStrengths` với `/du-an` (áp cho cả danh sách lẫn chi tiết).
+    loadProjectStrengths(locale),
   ]);
   const tVisit = await getTranslations({ locale, namespace: "page.projectDetail.visitCta" });
   const view = toProjectDetailView(doc, locale);
@@ -123,7 +126,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     <>
       <ProjectDetail doc={doc} view={view} related={toProjectCards(relatedDocs, locale)}
         listings={{ rentals: toRentalCards(listingDocs.rentals, locale), posts: toPostCards(listingDocs.posts, locale, now) }}
-        {...(hotline ? { hotline } : {})} ownPath={ownPath} {...(pageUrl ? { shareUrl: pageUrl } : {})}
+        {...(hotline ? { hotline } : {})} ownPath={ownPath} strengths={strengths}
         consultBanner={<ConsultBanner locale={locale} actionHref="#lead-form" {...(hotline ? { secondary: { label: `${tVisit("hotline")}: ${hotline.label}`, href: hotline.telHref } } : {})} />} />
       {pageUrl && siteUrl && (
         <JsonLd

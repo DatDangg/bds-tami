@@ -1,48 +1,59 @@
 import { useTranslations } from "next-intl";
-import { LazyMap } from "@/components/media/LazyMap";
-import type { LatLng } from "@/components/media/map-geometry";
-import type { MapMarker } from "@/components/media/LazyMap";
-import { SECTION_DOM_ID, type NearbyGroupView } from "@/lib/projects/project-detail-view";
-import { NearbyTabs } from "./NearbyTabs";
+import type { ComponentType } from "react";
+import { DetailDistanceList } from "@/components/detail/DetailDistanceList";
 import { DetailSection } from "@/components/detail/DetailSection";
+import { Bus, FirstAid, GraduationCap, MapPin, ShoppingBag, Tree } from "@/components/icons";
+import { LazyMap, type MapMarker } from "@/components/media/LazyMap";
+import type { LatLng } from "@/components/media/map-geometry";
+import { SECTION_DOM_ID, type NearbyCategory, type NearbyGroupView } from "@/lib/projects/project-detail-view";
+
+/** Icon theo nhóm địa điểm (cùng giá trị `nearbyAmenities.category`). */
+const CATEGORY_ICON: Record<NearbyCategory, ComponentType<{ size?: number }>> = {
+  education: GraduationCap,
+  healthcare: FirstAid,
+  shopping: ShoppingBag,
+  park: Tree,
+  transport: Bus,
+  other: MapPin,
+};
 
 interface ProjectLocationProps {
   projectName: string;
   location: LatLng | null;
   address: string | null;
   areaLabel: string | null;
-  /** Tiện ích quanh dự án theo nhóm (chỉ nhóm có dòng); trống = không có khối tab. */
+  /** Địa điểm quanh dự án theo nhóm (chỉ nhóm có dòng, đúng thứ tự `NEARBY_CATEGORY_ORDER`). */
   nearby?: NearbyGroupView[];
 }
 
 /**
- * Khối Vị trí (S03 khối 5): bản đồ lười 7 cột + địa chỉ 5 cột (≥ lg); < lg bản đồ trên, địa chỉ dưới. Không có toạ độ hợp lệ thì chỉ
- * hiện địa chỉ (không dựng bản đồ sai chỗ). Dự án luôn công khai địa chỉ nên bản đồ ghim chính xác, không phải vòng gần đúng.
+ * Khối Vị trí (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Kết nối" + `h2` + địa chỉ (đoạn mô tả) → ≥ lg bản đồ lười 7 cột (điểm dự án + điểm lân cận có toạ độ)
+ * cạnh danh sách "Khoảng cách đến các địa điểm quan trọng" 5 cột (icon theo nhóm, tên, chip khoảng cách; > 8 hàng → "Xem thêm") — thay tab lân cận theo nhóm cũ.
+ * Thiếu toạ độ → không bản đồ, danh sách rộng hết; thiếu cả hai → chỉ còn địa chỉ. Server Component.
  */
 export function ProjectLocation({ projectName, location, address, areaLabel, nearby = [] }: ProjectLocationProps) {
   const t = useTranslations("page.projectDetail");
-  const tEyebrow = useTranslations("page.detail.eyebrow");
   const addressText = [address, areaLabel].filter(Boolean).join(", ");
-  // Tiện ích có toạ độ hiện thành điểm phụ trên bản đồ (mọi nhóm, không theo tab: bản đồ dựng một lần).
+  const items = nearby.flatMap((group) => {
+    const Icon = CATEGORY_ICON[group.category];
+    return group.items.map((item) => ({ icon: <Icon size={16} />, name: item.name, distance: item.distance }));
+  });
+  // Điểm lân cận có toạ độ thành điểm phụ trên bản đồ (bản đồ dựng một lần cho mọi nhóm).
   const markers: MapMarker[] = nearby.flatMap((group) => group.items.flatMap((item) => (item.location ? [{ ...item.location, label: item.name }] : [])));
   return (
-    <DetailSection id={SECTION_DOM_ID.location} eyebrow={tEyebrow("location")} title={t("sections.location")}>
-      <div className="grid gap-8 xl:grid-cols-12 xl:gap-12">
-        {location && (
-          <div className="xl:col-span-7">
-            <LazyMap location={location} markers={markers} label={t("location.mapLabel", { name: projectName })} />
-          </div>
-        )}
-        {addressText && (
-          <div className={location ? "xl:col-span-5" : "xl:col-span-12"}>
-            <h3 className="mb-2 text-small font-semibold text-text-muted">{t("location.address")}</h3>
-            <p className="font-display text-h3">{addressText}</p>
-          </div>
-        )}
-      </div>
-      {nearby.length > 0 && (
-        <div className={addressText || location ? "mt-10" : undefined}>
-          <NearbyTabs groups={nearby} />
+    <DetailSection id={SECTION_DOM_ID.location} eyebrow={t("v2.eyebrow.location")} title={t("v2.titles.location")} description={addressText || null}>
+      {(location || items.length > 0) && (
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
+          {location && (
+            <div className={items.length > 0 ? "min-w-0 lg:col-span-7" : "min-w-0 lg:col-span-12"}>
+              <LazyMap location={location} markers={markers} label={t("location.mapLabel", { name: projectName })} />
+            </div>
+          )}
+          {items.length > 0 && (
+            <div className={location ? "min-w-0 lg:col-span-5" : "min-w-0 lg:col-span-12"}>
+              <DetailDistanceList items={items} title={t("v2.distanceTitle")} />
+            </div>
+          )}
         </div>
       )}
     </DetailSection>

@@ -1,10 +1,26 @@
 import { isValidLocation, type LatLng } from "../../components/media/map-geometry";
 import type { MediaImage } from "../../components/media/ResponsiveImage";
+import { parseVideoUrl } from "../../components/media/video-url";
 import type { Locale } from "../../i18n/routing";
 import type { Media, Project, Province, Ward } from "../../payload-types";
-import { formatFileSize } from "../format";
+import { PROPERTY_TYPES, type PropertyType } from "../../shared/listing-options";
+import { formatArea, formatFileSize, formatNumber } from "../format";
 import { lexicalPlainText } from "../news/read-time";
 import { populatedMedia } from "../news/news-view";
+
+const SQUARE_METERS_PER_HECTARE = 10_000;
+
+/** Diện tích đất m² → số ha đã định dạng theo ngôn ngữ, tối đa 2 chữ số lẻ ("36,21" · "36.21"); đơn vị "ha" do chuỗi i18n thêm. */
+export function formatHectares(squareMeters: number, locale: Locale): string {
+  return formatNumber(squareMeters / SQUARE_METERS_PER_HECTARE, locale);
+}
+
+/** Khoảng diện tích "55 – 136 m²"; một đầu hoặc hai đầu bằng nhau → "55 m²"; không có → `null`. */
+export function formatAreaRange(from: number | null, to: number | null, locale: Locale): string | null {
+  const [low, high] = [from, to].filter((value): value is number => value !== null).sort((a, b) => a - b);
+  if (low === undefined) return null;
+  return high === undefined || high === low ? formatArea(low, locale) : `${formatNumber(low, locale)} – ${formatArea(high, locale)}`;
+}
 
 export const PDF_MIME_TYPE = "application/pdf";
 
@@ -30,6 +46,16 @@ export interface DocumentView {
 export interface AmenityView {
   id: string;
   name: string;
+  description: string | null;
+}
+
+/** Thẻ "Sản phẩm" trong Tổng quan (BL-052): số lượng + loại + khoảng diện tích; số 0 / âm coi như chưa nhập. */
+export interface ProductView {
+  id: string;
+  type: string;
+  count: number | null;
+  areaFrom: number | null;
+  areaTo: number | null;
 }
 
 export interface HighlightView {
@@ -91,8 +117,17 @@ export interface ProjectDetailView {
   areaFromM2: number | null;
   areaToM2: number | null;
   priceFromVnd: number | null;
+  /** Giá "Giá từ" hiển thị (BL-052): xem `projectPriceFromVnd`. */
+  displayPriceFromVnd: number | null;
+  /** Loại sản phẩm theo thứ tự `PROPERTY_TYPES` (nhãn i18n `listingOptions.propertyType`). */
+  productTypes: PropertyType[];
+  products: ProductView[];
+  /** Link video đã qua whitelist YouTube/TikTok (`parseVideoUrl`); khác → `null`, không nút video. */
+  videoUrl: string | null;
   hasOverview: boolean;
   amenities: AmenityView[];
+  /** Ảnh lớn khối Tiện ích nổi bật; thiếu / đã xoá → `null` (danh sách rộng hết). */
+  amenitiesImage: MediaImage | null;
   floorPlans: FloorPlanView[];
   documents: DocumentView[];
   hasLegal: boolean;
@@ -221,6 +256,26 @@ function toFaqs(items: Project["faqs"]): FaqView[] {
   return (items ?? []).flatMap((item, index) => (hasText(item.question) && hasText(item.answer) ? [{ id: item.id ?? String(index), question: item.question.trim(), answer: item.answer.trim() }] : []));
 }
 
+/**
+ * Giá "Giá từ" của trang chi tiết (BL-052): giá thấp nhất > 0 của bảng giá (`priceTable[].priceFrom`), không có thì `priceFromVnd`, không có nữa → `null` ("Liên hệ").
+ * Đọc thẳng `priceTable` (số không localized) nên `/en` cùng giá dù dòng bảng giá thiếu chữ EN. Thuần — P1-T04/T05 gom về helper chung của thẻ / danh sách.
+ */
+export function projectPriceFromVnd(doc: Pick<Project, "priceTable" | "priceFromVnd">): number | null {
+  const fromTable = (doc.priceTable ?? []).flatMap((row) => numberOrNull(row.priceFrom) ?? []);
+  return fromTable.length > 0 ? Math.min(...fromTable) : numberOrNull(doc.priceFromVnd);
+}
+
+function toProducts(items: Project["products"]): ProductView[] {
+  return (items ?? []).flatMap((item, index) =>
+    hasText(item.type) ? [{ id: item.id ?? String(index), type: item.type.trim(), count: numberOrNull(item.count), areaFrom: numberOrNull(item.areaFrom), areaTo: numberOrNull(item.areaTo) }] : [],
+  );
+}
+
+function toProductTypes(values: Project["productTypes"]): PropertyType[] {
+  const chosen = new Set(values ?? []);
+  return PROPERTY_TYPES.filter((value) => chosen.has(value));
+}
+
 function areaLabel(ward: Project["ward"], province: Project["province"]): string | null {
   const wardName = ward && typeof ward === "object" ? (ward as Ward).name : null;
   const provinceName = province && typeof province === "object" ? ((province as Province).shortName || (province as Province).name) : null;
@@ -240,6 +295,7 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
   });
   const category = doc.category && typeof doc.category === "object" && doc.category.name && (locale === "vi" || doc.category.hasEnglish === true) ? doc.category.name : null;
   const scale = doc.scale ?? {};
+  const amenitiesImage = renderableImage(doc.amenitiesImage);
   return {
     title,
     summary: doc.summary ?? "",
@@ -260,8 +316,13 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     areaFromM2: positive(doc.areaFromM2) ?? null,
     areaToM2: positive(doc.areaToM2) ?? null,
     priceFromVnd: positive(doc.priceFromVnd) ?? null,
+    displayPriceFromVnd: projectPriceFromVnd(doc),
+    productTypes: toProductTypes(doc.productTypes),
+    products: toProducts(doc.products),
+    videoUrl: parseVideoUrl(doc.videoUrl) ? (doc.videoUrl?.trim() ?? null) : null,
     hasOverview: lexicalPlainText(doc.overview).trim() !== "",
-    amenities: (doc.amenities ?? []).flatMap((item, index) => (hasText(item.name) ? [{ id: item.id ?? String(index), name: item.name.trim() }] : [])),
+    amenities: (doc.amenities ?? []).flatMap((item, index) => (hasText(item.name) ? [{ id: item.id ?? String(index), name: item.name.trim(), description: trimmedOrNull(item.description) }] : [])),
+    amenitiesImage: amenitiesImage ? { ...amenitiesImage, alt: amenitiesImage.alt?.trim() || title } : null,
     floorPlans: toFloorPlans(doc.floorPlans, title),
     documents: toDocuments(doc.documents, locale),
     hasLegal: lexicalPlainText(doc.legalInfo).trim() !== "",
@@ -275,8 +336,11 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
   };
 }
 
-/** Mã mục của thanh mục con, theo thứ tự hiển thị (design-spec S03 khối 3). Không còn "Thư viện": ảnh nằm ở ảnh lớn đầu trang + lightbox (BL-045 Q7). */
-export const SECTION_IDS = ["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "listings", "faq"] as const;
+/**
+ * Mã mục của thanh mục con, theo thứ tự hiển thị (BL-052, design `detail-du-an`): Tổng quan · Vị trí · Tiện ích · Hình ảnh, rồi các khối giữ lại
+ * (Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách · Tin liên quan · Hỏi đáp). "Hình ảnh" thêm lại khối ảnh mà BL-045 Q7 đã bỏ.
+ */
+export const SECTION_IDS = ["overview", "location", "amenities", "gallery", "highlights", "floorPlans", "pricing", "legal", "policy", "listings", "faq"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 /**
@@ -289,6 +353,8 @@ export function visibleSections(view: ProjectDetailView, { hasListings = false }
     highlights: view.highlights.length > 0,
     location: view.location !== null || view.address !== null || view.nearby.length > 0,
     amenities: view.amenities.length > 0,
+    // 1 ảnh đã là nền hero: khối Hình ảnh chỉ có nghĩa từ 2 ảnh.
+    gallery: view.gallery.length > 1,
     floorPlans: view.floorPlans.length > 0,
     // Pháp lý gộp richText + tài liệu PDF: chỉ có tài liệu vẫn là một khối Pháp lý.
     legal: view.hasLegal || view.documents.length > 0,
@@ -306,6 +372,7 @@ export const SECTION_DOM_ID: Record<SectionId, string> = {
   highlights: "highlights",
   location: "location",
   amenities: "amenities",
+  gallery: "gallery",
   floorPlans: "floor-plans",
   legal: "legal",
   policy: "sales-policy",
