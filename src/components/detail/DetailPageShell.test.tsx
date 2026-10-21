@@ -33,6 +33,31 @@ describe("DetailPageShell", () => {
     expect(container.querySelector('[data-section-style="cards"]')).not.toBeNull();
   });
 
+  it("bands: dải rộng hết khung ngoài lưới, sau aside và trước after, nền xen kẽ trắng / bg-alt; khối trong dải không phải thẻ", () => {
+    const { container } = renderWithIntl(
+      <DetailPageShell
+        hero={<h1>Hero</h1>}
+        aside={<h2 id="aside-h">Liên hệ</h2>}
+        asideLabelledBy="aside-h"
+        bands={["location", "amenities", "gallery"].map((id) => ({ key: id, content: <DetailSection id={id} title={id}><p>{id}</p></DetailSection> }))}
+        after={<div data-testid="after" />}
+      >
+        <DetailSection id="overview" title="Tổng quan">
+          <p>x</p>
+        </DetailSection>
+      </DetailPageShell>,
+    );
+    const bands = Array.from(container.querySelectorAll<HTMLElement>("[data-detail-band]"));
+    expect(bands.map((band) => band.className)).toEqual(["bg-surface", "bg-bg-alt", "bg-surface"]);
+    const aside = screen.getByRole("complementary", { name: "Liên hệ" });
+    expect(aside.compareDocumentPosition(bands[0]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(bands[2]!.compareDocumentPosition(screen.getByTestId("after")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Dải nằm ngoài cột `group/detail` (thẻ) và ngoài lưới có aside.
+    expect(container.querySelector('[data-section-style="cards"] #location')).toBeNull();
+    expect(aside.parentElement?.contains(bands[0]!)).toBe(false);
+    expect(bands[0]!.firstElementChild).toHaveClass("max-w-container", "px-gutter");
+  });
+
   it("không specBar / subNav / aside: vẫn dựng nội dung", () => {
     renderWithIntl(
       <DetailPageShell hero={<h1>Hero</h1>}>

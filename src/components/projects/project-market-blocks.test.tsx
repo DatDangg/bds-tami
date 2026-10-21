@@ -1,11 +1,9 @@
 import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import { toProjectDetailView } from "@/lib/projects/project-detail-view";
 import type { Locale } from "@/i18n/routing";
 import type { Media, Project, Province } from "@/payload-types";
-import { NearbyTabs } from "./NearbyTabs";
 import { PriceTable } from "./PriceTable";
 import { ProjectDetail } from "./ProjectDetail";
 import { ProjectListings } from "./ProjectListings";
@@ -97,16 +95,16 @@ describe("Khối market của chi tiết dự án (BL-020 P5)", () => {
     expect(jsonLdScripts(container)).toHaveLength(0);
   });
 
-  it("đủ khối → thanh mục con theo thứ tự mới, mỗi neo trỏ tới phần tử có thật, h2 đúng tên, tiện ích quanh nằm trong Vị trí", () => {
+  it("đủ khối → thanh mục con theo thứ tự BL-052, mỗi neo trỏ tới phần tử có thật, h2 đúng tên, khoảng cách lân cận nằm trong Vị trí", () => {
     const { container } = renderDetail(marketProject);
     const nav = screen.getByRole("navigation", { name: "Mục lục dự án" });
-    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Nổi bật", "Vị trí", "Pháp lý", "Giá", "Hỏi đáp"]);
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual(["Tổng quan", "Vị trí", "Nổi bật", "Bảng giá", "Pháp lý", "Hỏi đáp"]);
     for (const link of within(nav).getAllByRole("link")) expect(container.querySelector(link.getAttribute("href")!), link.getAttribute("href")!).not.toBeNull();
     for (const name of ["Điểm nổi bật", "Bảng giá", "Câu hỏi thường gặp"]) expect(screen.getByRole("heading", { level: 2, name }), name).toBeInTheDocument();
     const location = container.querySelector("#location") as HTMLElement;
-    expect(within(location).getByRole("heading", { level: 3, name: "Tiện ích xung quanh" })).toBeInTheDocument();
-    // Thứ tự trong cột chính: Nổi bật → Vị trí → Pháp lý → Giá → FAQ.
-    const order = ["#highlights", "#location", "#legal", "#pricing", "#faq"].map((selector) => container.querySelector(selector) as HTMLElement);
+    expect(within(location).getByRole("heading", { level: 3, name: "Khoảng cách đến các địa điểm quan trọng" })).toBeInTheDocument();
+    // Thứ tự dải: Vị trí → Nổi bật → Bảng giá → Pháp lý → FAQ.
+    const order = ["#location", "#highlights", "#pricing", "#legal", "#faq"].map((selector) => container.querySelector(selector) as HTMLElement);
     for (let index = 1; index < order.length; index += 1) {
       expect(order[index - 1]!.compareDocumentPosition(order[index]!) & Node.DOCUMENT_POSITION_FOLLOWING, `thứ ${index}`).toBeTruthy();
     }
@@ -144,55 +142,24 @@ function nav(container: HTMLElement): HTMLElement {
   return within(container).getByRole("navigation", { name: "Mục lục dự án" });
 }
 
-describe("NearbyTabs", () => {
-  const groups = toProjectDetailView(marketProject, "vi").nearby;
-
-  it("tablist ARIA: chỉ nhóm có dòng, tab đầu chọn sẵn, ←/→ vòng, Home/End, roving tabindex, panel gắn đúng tab", async () => {
-    const user = userEvent.setup();
-    renderWithIntl(<NearbyTabs groups={groups} />);
-    const tablist = screen.getByRole("tablist", { name: "Nhóm tiện ích xung quanh" });
-    const tabs = within(tablist).getAllByRole("tab");
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Giáo dục", "Y tế", "Giao thông"]);
-    expect(tabs.map((tab) => tab.getAttribute("aria-selected"))).toEqual(["true", "false", "false"]);
-    expect(tabs.map((tab) => tab.tabIndex)).toEqual([0, -1, -1]);
-    expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveTextContent("Trường A");
-    expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveTextContent("500 m");
-    expect(screen.getByRole("tabpanel", { name: "Giáo dục" })).toHaveAttribute("tabindex", "0");
-    tabs[0]!.focus();
-    await user.keyboard("{ArrowRight}");
-    expect(tabs[1]).toHaveFocus();
-    expect(tabs[1]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel", { name: "Y tế" })).toHaveTextContent("Bệnh viện B");
-    expect(screen.queryByRole("tabpanel", { name: "Giáo dục" })).toBeNull();
-    await user.keyboard("{End}");
-    expect(tabs[2]).toHaveFocus();
-    await user.keyboard("{ArrowRight}");
-    expect(tabs[0]).toHaveFocus();
-    await user.keyboard("{ArrowLeft}");
-    expect(tabs[2]).toHaveFocus();
-    await user.keyboard("{Home}");
-    expect(tabs[0]).toHaveFocus();
-    await user.click(tabs[2]!);
-    expect(screen.getByRole("tabpanel", { name: "Giao thông" })).toHaveTextContent("5 phút");
-  });
-
-  it("HTML đầu có đủ panel (panel không chọn chỉ `hidden`); một nhóm duy nhất không dựng tablist", () => {
-    const { container, unmount } = renderWithIntl(<NearbyTabs groups={groups} />);
-    expect(container.querySelectorAll('[role="tabpanel"]')).toHaveLength(3);
-    expect(container.querySelectorAll('[role="tabpanel"][hidden]')).toHaveLength(2);
-    unmount();
-    renderWithIntl(<NearbyTabs groups={groups.slice(0, 1)} />);
+describe("ProjectLocation + khoảng cách lân cận (BL-052)", () => {
+  it("eyebrow Kết nối + h2 + địa chỉ; danh sách khoảng cách theo thứ tự nhóm, icon theo nhóm, chip khoảng cách (dòng không khoảng cách thì không chip); không còn tab nhóm", () => {
+    const view = toProjectDetailView(
+      project({ ...marketProject, nearbyAmenities: [...(marketProject.nearbyAmenities ?? []), { category: "other", name: "Chợ D" }] }),
+      "vi",
+    );
+    const { container } = renderWithIntl(<ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />);
+    const section = container.querySelector("#location") as HTMLElement;
+    expect(within(section).getByText("Kết nối")).toBeInTheDocument();
+    expect(within(section).getByRole("heading", { level: 2, name: "Vị trí dự án" })).toBeInTheDocument();
+    expect(within(section).getByText("Số 1 Đường A, Hà Nội")).toBeInTheDocument();
     expect(screen.queryByRole("tablist")).toBeNull();
-    expect(screen.getByRole("list", { name: "Giáo dục" })).toHaveTextContent("Trường A");
+    const list = screen.getByRole("list", { name: "Khoảng cách đến các địa điểm quan trọng" });
+    const rows = within(list).getAllByRole("listitem");
+    expect(rows.map((row) => row.textContent)).toEqual(["Trường A500 m", "Bệnh viện B1,2 km", "Ga C5 phút", "Chợ D"]);
+    expect(rows.every((row) => row.querySelector("svg"))).toBe(true);
   });
 
-  it("/en: nhãn nhóm tiếng Anh", () => {
-    renderWithIntl(<NearbyTabs groups={groups} />, "en");
-    expect(within(screen.getByRole("tablist", { name: "Nearby amenity groups" })).getAllByRole("tab").map((tab) => tab.textContent)).toEqual(["Education", "Healthcare", "Transport"]);
-  });
-});
-
-describe("ProjectLocation + tiện ích quanh", () => {
   it("tiện ích có toạ độ → điểm phụ truyền cho bản đồ (tiện ích không toạ độ thì không); chỉ có tiện ích quanh vẫn render khối, không dựng bản đồ", () => {
     const view = toProjectDetailView(marketProject, "vi");
     renderWithIntl(<ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />);

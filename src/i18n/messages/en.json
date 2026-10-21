@@ -592,7 +592,64 @@
         "dots": "Choose slide position",
         "goTo": "Go to project group {index}"
       },
-      "stickyConsult": "Get advice"
+      "stickyConsult": "Get advice",
+      "v2": {
+        "tabs": {
+          "overview": "Overview",
+          "location": "Location",
+          "amenities": "Amenities",
+          "gallery": "Photos",
+          "highlights": "Highlights",
+          "floorPlans": "Floor plans",
+          "pricing": "Price list",
+          "legal": "Legal",
+          "policy": "Policy",
+          "legalPolicy": "Legal & policy",
+          "listings": "Related listings",
+          "faq": "FAQ"
+        },
+        "eyebrow": {
+          "overview": "Introduction",
+          "location": "Connectivity",
+          "amenities": "Living spaces",
+          "gallery": "Photo gallery"
+        },
+        "titles": {
+          "overview": "Project overview",
+          "location": "Project location",
+          "amenities": "Key amenities",
+          "gallery": "Project photos"
+        },
+        "galleryDescription": "Real photos and renderings of {name}.",
+        "spec": {
+          "label": "Project key facts",
+          "priceFrom": "Price from",
+          "contact": "Contact us",
+          "scale": "Site area",
+          "hectare": "{value} ha",
+          "area": "Unit area",
+          "developer": "Developer",
+          "handover": "Handover",
+          "propertyTypes": "Property types"
+        },
+        "info": {
+          "label": "Project information",
+          "name": "Project name",
+          "developer": "Developer",
+          "location": "Location",
+          "scale": "Scale",
+          "propertyTypes": "Property types",
+          "handover": "Handover",
+          "newTab": "(opens in a new tab)"
+        },
+        "products": {
+          "label": "Project products"
+        },
+        "contactDescription": "Sign up to receive the price list, sales policy and detailed advice from our consultants.",
+        "distanceTitle": "Distances to key places",
+        "amenitiesExpand": "Explore all amenities",
+        "similarViewAll": "View all projects"
+      }
     },
     "rentalDetail": {
       "code": "Listing ID",

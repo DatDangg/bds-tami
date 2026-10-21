@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Developer, Media, Project, Province, Ward } from "../../payload-types";
-import { safeFileHref, toProjectDetailView, visibleSections } from "./project-detail-view";
+import { formatAreaRange, formatHectares, projectPriceFromVnd, safeFileHref, toProjectDetailView, visibleSections } from "./project-detail-view";
 
 const now = "2026-01-01T00:00:00.000Z";
 const image = (id: string, alt: string | null = `Ảnh ${id}`): Media => ({
@@ -93,10 +93,11 @@ describe("toProjectDetailView", () => {
     expect(view.floorPlans[0]?.image.alt).toBe("Căn 2PN - Dự án A");
   });
 
-  it("dự án thiếu mặt bằng/tiện ích/pháp lý/chính sách/tài liệu → các mục ẩn, tổng quan luôn có", () => {
-    const view = toProjectDetailView(project(), "vi");
+  it("dự án thiếu mặt bằng/tiện ích/pháp lý/chính sách/tài liệu → các mục ẩn, tổng quan luôn có; Hình ảnh chỉ khi ≥ 2 ảnh (ảnh 1 đã là nền hero)", () => {
+    const view = toProjectDetailView(project({ gallery: [image("m1")] }), "vi");
     expect(view.floorPlans).toEqual([]);
     expect(visibleSections(view)).toEqual(["overview"]);
+    expect(visibleSections(toProjectDetailView(project(), "vi"))).toEqual(["overview", "gallery"]);
   });
 
   it("dự án đủ khối → thanh mục con đúng thứ tự design-spec", () => {
@@ -112,8 +113,8 @@ describe("toProjectDetailView", () => {
       "vi",
     );
     expect(view.hasOverview).toBe(true);
-    expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy"]);
-    expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "floorPlans", "legal", "policy", "listings"]);
+    expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "gallery", "floorPlans", "legal", "policy"]);
+    expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "gallery", "floorPlans", "legal", "policy", "listings"]);
   });
 
   it("khối market (BL-020 P5): đủ dữ liệu → thứ tự mục con theo spec; chỉ có tiện ích quanh vẫn có mục Vị trí; chỉ có tài liệu vẫn có mục Pháp lý", () => {
@@ -130,7 +131,8 @@ describe("toProjectDetailView", () => {
       }),
       "vi",
     );
-    expect(visibleSections(full, { hasListings: true })).toEqual(["overview", "highlights", "location", "amenities", "floorPlans", "legal", "policy", "pricing", "listings", "faq"]);
+    // BL-052: Tổng quan · Vị trí · Tiện ích · Hình ảnh rồi các khối giữ lại (Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách · Tin liên quan · Hỏi đáp).
+    expect(visibleSections(full, { hasListings: true })).toEqual(["overview", "location", "amenities", "gallery", "highlights", "floorPlans", "pricing", "legal", "policy", "listings", "faq"]);
     const nearbyOnly = toProjectDetailView(project({ nearbyAmenities: [{ category: "park", name: "Công viên A" }] }), "vi");
     expect(visibleSections(nearbyOnly)).toContain("location");
     const docsOnly = toProjectDetailView(project({ documents: [pdf("d1")] }), "vi");
@@ -187,6 +189,47 @@ describe("toProjectDetailView", () => {
     expect(toProjectDetailView(project({ category }), "en").categoryName).toBeNull();
     expect(toProjectDetailView(project({ category }), "vi").categoryName).toBe("Căn hộ");
     expect(toProjectDetailView(project({ scale: { totalUnits: 0, blocks: 3 }, areaFromM2: 0 }), "vi")).toMatchObject({ scale: { blocks: 3 }, areaFromM2: null });
+  });
+});
+
+describe("BL-052: trường chi tiết mới", () => {
+  it("Giá từ = min bảng giá > 0, không có → priceFromVnd, không có nữa → null", () => {
+    expect(projectPriceFromVnd({ priceTable: [{ unitType: "A", priceFrom: 5e9 }, { unitType: "B", priceFrom: 3.2e9 }, { unitType: "C", priceFrom: 0 }, { unitType: "D" }], priceFromVnd: 2e9 })).toBe(3.2e9);
+    expect(projectPriceFromVnd({ priceTable: [{ unitType: "A", priceFrom: -1 }], priceFromVnd: 2e9 })).toBe(2e9);
+    expect(projectPriceFromVnd({ priceTable: null, priceFromVnd: 0 })).toBeNull();
+    // Bản EN thiếu tên loại căn vẫn cùng giá (đọc số, không đọc dòng đã lọc theo chữ).
+    expect(toProjectDetailView(project({ priceTable: [{ unitType: "", priceFrom: 4e9 }] }), "en").displayPriceFromVnd).toBe(4e9);
+  });
+
+  it("loại sản phẩm theo thứ tự PROPERTY_TYPES; sản phẩm thiếu tên bị bỏ, số 0 thành null; mô tả tiện ích; ảnh tiện ích thiếu alt dùng tên dự án", () => {
+    const view = toProjectDetailView(
+      project({
+        productTypes: ["villa", "apartment"],
+        products: [{ type: "Biệt thự", count: 0, areaFrom: 200, areaTo: 360 }, { type: " ", count: 5 }],
+        amenities: [{ name: "Hồ bơi", description: "  Tràn bờ " }, { name: "Gym" }],
+        amenitiesImage: image("am", " "),
+      }),
+      "vi",
+    );
+    expect(view.productTypes).toEqual(["apartment", "villa"]);
+    expect(view.products).toEqual([{ id: "0", type: "Biệt thự", count: null, areaFrom: 200, areaTo: 360 }]);
+    expect(view.amenities.map((item) => item.description)).toEqual(["Tràn bờ", null]);
+    expect(view.amenitiesImage?.alt).toBe("Dự án A");
+    expect(toProjectDetailView(project({ amenitiesImage: pdf("x") }), "vi").amenitiesImage).toBeNull();
+  });
+
+  it("video chỉ nhận link qua whitelist YouTube/TikTok", () => {
+    expect(toProjectDetailView(project({ videoUrl: " https://www.youtube.com/watch?v=dQw4w9WgXcQ " }), "vi").videoUrl).toBe("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    expect(toProjectDetailView(project({ videoUrl: "https://evil.example/v.mp4" }), "vi").videoUrl).toBeNull();
+    expect(toProjectDetailView(project(), "vi").videoUrl).toBeNull();
+  });
+
+  it("định dạng ha và khoảng diện tích theo ngôn ngữ", () => {
+    expect(formatHectares(362_100, "vi")).toBe("36,21");
+    expect(formatHectares(362_100, "en")).toBe("36.21");
+    expect(formatAreaRange(136, 55, "vi")).toBe("55 – 136 m²");
+    expect(formatAreaRange(null, 90, "vi")).toBe("90 m²");
+    expect(formatAreaRange(null, null, "vi")).toBeNull();
   });
 });
 

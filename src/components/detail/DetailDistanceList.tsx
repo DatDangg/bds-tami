@@ -9,8 +9,8 @@ export interface DetailDistance {
   /** Icon nhóm địa điểm đã dựng; trống → ghim bản đồ. */
   icon?: ReactNode;
   name: string;
-  /** Chip khoảng cách đã định dạng ("5 phút", "1,2 km"). */
-  distance: string;
+  /** Chip khoảng cách đã định dạng ("5 phút", "1,2 km"); trống → không chip (vẫn hiện tên). */
+  distance?: string | null;
 }
 
 /** Hiện tối đa ngần này hàng trước nút "Xem thêm". */
@@ -42,7 +42,7 @@ export function DetailDistanceList({ items, title }: { items: DetailDistance[]; 
               {item.icon ?? <MapPin size={16} />}
             </span>
             <span className="min-w-0 flex-1 text-small break-words text-text">{item.name}</span>
-            <span className="shrink-0 rounded-pill bg-primary-subtle px-3 py-1 text-xsmall font-semibold text-accent-text tabular-nums">{item.distance}</span>
+            {item.distance && <span className="shrink-0 rounded-pill bg-primary-subtle px-3 py-1 text-xsmall font-semibold text-accent-text tabular-nums">{item.distance}</span>}
           </li>
         ))}
       </ul>
