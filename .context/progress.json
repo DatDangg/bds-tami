@@ -2162,6 +2162,37 @@
       "scopeVersion": 39,
       "specUpdate": "spec/updates/2026-10-20-projects-slider-pagination-bug.md",
       "residual": "chưa kiểm trình duyệt thật; bấm liên tiếp khi đang cuộn mượt có thể mất 1 bước; MINOR: hook dài, scrollTo stub test không khôi phục, ResizeObserver chưa test"
+    },
+    {
+      "slug": "admin-nav-dashboard-sitelink",
+      "title": "Admin: thêm mục \"Tổng quan\" đầu sidebar + ô Ngôn ngữ header đè \"Xem website\" (BL-050)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-050",
+      "changeDoc": "spec/changes/archive/2026-10-21-admin-nav-dashboard-sitelink.md",
+      "startedAt": "2026-10-21",
+      "planApprovedAt": "2026-10-21 (user: \"tự làm tự quyết nhé, đừng hỏi t\" = auto proceed; 1 phase/1 task)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-nav-dashboard-sitelink/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "note": "Payload 3.91 ô Ngôn ngữ thật right: base(4.5) cứng theo gutter mặc định 60px; project override --gutter-h 32/20/16 → lệch trái 33–45px so với ô giữ chỗ, đè Xem website; fix right: calc(var(--gutter-h) + 25px) + rtl; Tổng quan qua beforeNavLinks NavDashboardLink",
+          "report": ".context/review-reports/bug-admin-nav-dashboard-sitelink-phase-1-task-01-round-1-review.md",
+          "commit": "(commit close-out BL-050)"
+        }
+      ],
+      "completedAt": "2026-10-21",
+      "specVersion": "1.43.1",
+      "scopeVersion": 54,
+      "specUpdate": "spec/updates/2026-10-21-admin-nav-dashboard-sitelink.md",
+      "residual": "MINOR: _surfaces.scss > 300 dòng; khoảng ngăn dưới Tổng quan dư ~8px; thiếu aria-current (cả nav Payload); 25px avatar mặc định Payload"
     }
   ],
   "projectName": "tami-website",
@@ -2815,7 +2846,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-21T03:51:55.703Z",
+  "lastUpdated": "2026-10-21T05:55:38.874Z",
   "approvalMilestones": [
     {
       "id": "M1",

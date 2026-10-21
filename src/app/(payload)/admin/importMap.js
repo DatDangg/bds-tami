@@ -62,6 +62,7 @@ import { PrivacyPolicyVersionField as PrivacyPolicyVersionField_8208b80a2da7ad0a
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { SiteLink as SiteLink_a231a25015c6e0b284665d827f035a95 } from '../../../components/admin/SiteLink'
+import { NavDashboardLink as NavDashboardLink_f21c41cb6664ab07812fb4cacb5cd539 } from '../../../components/admin/NavDashboardLink'
 import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 } from '../../../components/admin/SessionKeepAlive'
 import { NavigationToastGuard as NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf } from '../../../components/admin/NavigationToastGuard'
 import { NavAdvancedCollapse as NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7 } from '../../../components/admin/NavAdvancedCollapse'
@@ -135,6 +136,7 @@ export const importMap = {
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/SiteLink#SiteLink": SiteLink_a231a25015c6e0b284665d827f035a95,
+  "/components/admin/NavDashboardLink#NavDashboardLink": NavDashboardLink_f21c41cb6664ab07812fb4cacb5cd539,
   "/components/admin/SessionKeepAlive#SessionKeepAlive": SessionKeepAlive_739be204eef6d8fda1df751cccf17193,
   "/components/admin/NavigationToastGuard#NavigationToastGuard": NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf,
   "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse": NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7,

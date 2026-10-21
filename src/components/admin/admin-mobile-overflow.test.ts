@@ -40,6 +40,22 @@ describe("admin mobile overflow (375px)", () => {
     expect(body).toMatch(/flex-wrap:\s*wrap\s*;/);
   });
 
+  it("ô Ngôn ngữ header theo gutter + avatar 25px, không đè 'Xem website' (BL-050)", () => {
+    const body = ruleBody(source(), /\.app-header__localizer\.localizer\s*\{([^}]*)\}/);
+    expect(body).toMatch(/right:\s*calc\(var\(--gutter-h\)\s*\+\s*25px\)\s*;/);
+    expect(source()).toMatch(/\[dir="rtl"\]\s*&\s*\{[^}]*left:\s*calc\(var\(--gutter-h\)\s*\+\s*25px\)/);
+  });
+
+  it("mục Tổng quan rộng đủ nav (nav__wrap align-items:flex-start) (BL-050)", () => {
+    const body = ruleBody(source(), /\.tami-nav-dashboard\s*\{([^}]*)\}/);
+    expect(body).toMatch(/width:\s*100%\s*;/);
+  });
+
+  it("mục Tổng quan: indicator lùi đúng padding nav, không cộng độ thụt nhóm (BL-050)", () => {
+    const body = ruleBody(source(), /\.tami-nav-dashboard\s*\{[^}]*\.nav__link-indicator\s*\{([^}]*)\}/);
+    expect(body).toMatch(/inset-inline-start:\s*calc\(-1\s*\*\s*var\(--nav-padding-inline-start,\s*20px\)\)\s*;/);
+  });
+
   it("không đặt overflow-x: hidden trên html/body trong style admin", () => {
     const all = [
       source(),

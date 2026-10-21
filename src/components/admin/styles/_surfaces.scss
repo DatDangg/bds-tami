@@ -93,6 +93,20 @@ $group-indent: $group-indent-margin + $group-indent-padding + $group-indent-bord
   }
 }
 
+// Mục "Tổng quan" (BL-050) nằm trên nhóm đầu, không thuộc nhóm nào: vạch ngăn với nhóm đầu như giữa các nhóm,
+// vạch indicator chỉ lùi đúng padding của nav (không cộng độ thụt của nhóm).
+.tami-nav-dashboard {
+  // .nav__wrap là flex column + align-items:flex-start nên không stretch: ép đủ ngang để nền active/hover bằng mục nhóm.
+  width: 100%;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--admin-border-strong);
+
+  .nav__link-indicator {
+    inset-inline-start: calc(-1 * var(--nav-padding-inline-start, 20px));
+  }
+}
+
 .nav__label {
   color: var(--admin-text-subtle);
 }
@@ -259,6 +273,18 @@ $group-indent: $group-indent-margin + $group-indent-padding + $group-indent-bord
 .payload-settings::after {
   width: auto;
   right: calc(var(--gutter-h) * -1);
+}
+
+// Payload 3.91 đặt ô Ngôn ngữ thật `right: base(4.5)` (90px) — số cứng ứng với --gutter-h mặc định 60px. Project override
+// --gutter-h = 32/20/16px (BL-015) nên ô thật lệch trái so với ô giữ chỗ vô hình (`__localizer-spacing`, nằm trước avatar)
+// và đè "Xem website". Đặt lại đúng công thức của ô giữ chỗ: gutter + avatar 25px (SVG Account/Gravatar của Payload).
+.app-header__localizer.localizer {
+  right: calc(var(--gutter-h) + 25px);
+
+  [dir="rtl"] & {
+    right: unset;
+    left: calc(var(--gutter-h) + 25px);
+  }
 }
 
 // Nút "Xem website" ở header admin (BL-041): link mở tab mới, vùng bấm 44px trên mobile (chữ ẩn, còn icon + aria-label).

@@ -49,6 +49,8 @@ export default buildConfig({
       providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse"],
       // Nút "Xem website" ở header (BL-041).
       actions: ["/components/admin/SiteLink#SiteLink"],
+      // Mục "Tổng quan" đầu sidebar: Payload DefaultNav không có lối vào dashboard (BL-050).
+      beforeNavLinks: ["/components/admin/NavDashboardLink#NavDashboardLink"],
       // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
       views: { dashboard: { Component: "/components/admin/dashboard/DashboardView#DashboardView" } },
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },
