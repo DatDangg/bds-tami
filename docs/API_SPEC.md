@@ -190,17 +190,48 @@ Dành cho process `jobs` (`expire-offers`, `close-job-postings`) làm mới cach
 
 Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/internal/revalidate/route.ts`, `src/lib/revalidate/internal-revalidate.ts`.
 
-### 3.9. Tham số URL trang `/du-an` (BL-045, as-built; không phải endpoint JSON)
+### 3.9. Tham số URL trang `/du-an` (BL-045 + BL-052, as-built; không phải endpoint JSON)
 
-Trang danh sách dự án (`/du-an` · `/en/projects`) nhận thêm `?q=&developer=&sort=` ngoài `category`/`province`/`status`/`page`, URL là nguồn sự thật, dùng được không JS (form GET).
+Trang danh sách dự án (`/du-an` · `/en/projects`), URL là nguồn sự thật, dùng được không JS (form GET của cột lọc + nút "Áp dụng"; có JS thì đổi ô là điều hướng ngay, `router.push` không cuộn). Code: `src/lib/projects/project-filters.ts` (`parseProjectFilters` / `projectQueryString` / `hasFilterParams`), `src/components/projects/project-list-data.ts`, `ProjectListPage.tsx`.
 
 | Tham số | Ý nghĩa | Giá trị không hợp lệ |
 |---|---|---|
-| `q` | Từ khoá, không phân biệt hoa/thường/dấu, khớp tên + địa chỉ + phường/xã + tỉnh; tối đa 100 ký tự (ô nhập `maxLength` 100) | Quá dài hoặc rỗng → bỏ tham số |
-| `developer` | Id chủ đầu tư CÓ dự án công khai ở ngôn ngữ đang xem (`/en` chỉ chủ đầu tư có bản EN) | Id lạ → bỏ, không 500 |
-| `sort` | `newest` (mặc định) · `price_asc` · `price_desc` (theo `priceFromVnd`, dự án chưa có giá luôn cuối) | Giá trị lạ → mặc định |
+| `category` | Slug danh mục dự án (tab cấp 1; cấp 1 gồm dự án của danh mục con) | Slug lạ → bỏ (không 404) |
+| `province` | BL-052: nhiều slug tỉnh `a,b` hoặc khoá lặp, **OR**; link cũ một slug vẫn chạy; tối đa 50 slug | Slug lạ → bỏ |
+| `status` | `upcoming` · `selling` · `handed_over` | Giá trị lạ → bỏ |
+| `q` | Từ khoá, không phân biệt hoa/thường/dấu, khớp tên + địa chỉ + phường/xã + tỉnh; tối đa 100 ký tự | Quá dài hoặc rỗng → bỏ |
+| `developer` | Id chủ đầu tư CÓ dự án công khai ở ngôn ngữ đang xem | Id lạ → bỏ, không 500 |
+| `type` | BL-052: loại sản phẩm (`PROPERTY_TYPES`), nhiều giá trị, **OR** | Giá trị lạ → bỏ |
+| `feature` | BL-052: tiện ích nổi bật (`PROJECT_FEATURES`), nhiều giá trị, **AND** | Giá trị lạ → bỏ |
+| `priceMin`, `priceMax` | BL-052: **tỷ đồng**, số nguyên 0–50 (thanh trượt bước 1; 0 = không giới hạn dưới, 50 = "50+" không giới hạn trên — đầu ở mép không lên URL); theo giá "từ" hiệu lực của dự án | Không phải số nguyên → bỏ; > 50 → 50; `min > max` → đổi chỗ |
+| `sort` | `newest` (mặc định, không lên URL) · `price_asc` · `price_desc` (dự án chưa có giá luôn cuối) | Giá trị lạ → mặc định |
+| `page` | Trang lưới (12 dự án); vượt số trang → `404` | |
 
-Có `q`/`developer`/`sort` khác mặc định (cùng `category`, `province`, `status`) → `noindex, follow` + canonical `/du-an`; `page` giữ khi đổi sắp xếp, chip/phân trang mang theo mọi tham số trừ `page`. Có `q` hoặc sắp theo giá thì quét bộ nhớ tối đa 1000 dự án công khai (chạm trần ghi cảnh báo log; hết trần cần cột `searchText` + migration), còn lại là một truy vấn SQL phân trang. Không migration, không endpoint mới.
+Có bất kỳ tham số lọc nào (kể cả giá trị sai; `?province=` rỗng do form gửi "Tất cả" thì không tính) hoặc `sort` khác mặc định → `noindex, follow` + canonical `/du-an`; không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD (`FAQPage`) chỉ phát ở trang sạch (trang 1, không tham số lọc) — cùng điều kiện noindex. Đổi một ô lọc hoặc sắp xếp: giữ mọi tham số khác, **bỏ `page`** (về trang 1); tab / phân trang mang theo mọi tham số (tab bỏ `page`). Dữ liệu: quét ≤ 1000 dự án công khai rồi lọc / đếm / sắp ở bộ nhớ (chạm trần ghi cảnh báo log), MỘT truy vấn lấy trường thẻ; ≤ 5 dự án `isFeatured` khớp lọc là thẻ nổi bật (trang 1) và bị loại khỏi lưới ở mọi trang; số đếm tab / ô tích theo quy tắc "khớp mọi lọc khác trừ chính chiều đó". Không migration, không endpoint mới.
+
+### 3.10. Tham số URL trang `/cho-thue` (BL-052, as-built)
+
+`/cho-thue` · `/en/for-rent` (+ trang danh mục `/cho-thue/danh-muc/[category]`) dùng CÙNG tên khoá với `GET /api/public/rentals` (§3.3: `q`, `category`, `province`, `ward`, `project`, `priceMin`/`priceMax` VNĐ/tháng, `areaMin`/`areaMax`, `bedrooms`, `furnishing`, `amenities`, `sort`, `page`) nhưng khoan dung hơn API: giá trị sai / slug lạ (danh mục, tỉnh, phường, **dự án** — ô "Dự án" chỉ liệt kê dự án công khai có tin còn trống) bị bỏ, `min > max` đảo lại, `ward` thiếu `province` bị bỏ. Thanh trượt Giá thuê 0 – 100+ triệu/tháng (bước 1 triệu, giá trị trên URL vẫn là VNĐ), Diện tích 0 – 300+ m² (bước 5). Trang danh mục: `?category=` bị bỏ qua (danh mục nằm trong đường dẫn). Link cũ `/cho-thue?category=<slug có thật>` vẫn lọc + đánh dấu tab, canonical về trang danh mục. Noindex: `hasNarrowingParams` (trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh vẫn index; tổ hợp sâu hơn hoặc đổi sắp xếp → `noindex, follow` + canonical trang sạch). FAQ JSON-LD chỉ ở `/cho-thue` khi URL không có tham số nào (kể cả slug lạ đã bị trang bỏ); trang danh mục hiện khối FAQ nhưng không phát `FAQPage`. Code: `src/lib/search/url-params.ts`, `src/components/rentals/RentalListPage.tsx`, `rental-list-metadata.ts`.
+
+### 3.11. Tham số URL trang `/tin-bds` (BL-052, as-built)
+
+`/tin-bds` · `/en/property-news` (+ trang danh mục `/tin-bds/danh-muc/[category]`): `?q=&type=&province=&priceMin=&priceMax=&areaMin=&areaMax=&bedrooms=&direction=&handover=&sort=&page=`. Code: `src/lib/posts/post-filters.ts`, `src/components/posts/PostListPage.tsx`, `post-list-metadata.ts`.
+
+| Tham số | Ý nghĩa | Giá trị không hợp lệ |
+|---|---|---|
+| `q` | Từ khoá không phân biệt hoa/thường/dấu, khớp tiêu đề + tóm tắt + địa chỉ + phường + tỉnh; tối đa 100 ký tự | Quá dài / rỗng → bỏ |
+| `type` | Loại hình (`PROPERTY_TYPES`), nhiều giá trị, OR | Giá trị lạ → bỏ |
+| `province` | Nhiều slug tỉnh, OR; tối đa 50 | Slug lạ → bỏ (không lọc thành rỗng) |
+| `priceMin`, `priceMax` | **Tỷ đồng**, số nguyên 0–50 (50 = "50+") | Không phải số nguyên → bỏ; > 50 → 50; `min > max` → đổi chỗ; `priceMax=0` (gõ tay / kéo đầu trên về 0) = không giới hạn trên |
+| `areaMin`, `areaMax` | m², số nguyên 0–500 (500 = "500+") | Như giá; `areaMax=0` = không giới hạn trên |
+| `bedrooms` | `1` · `2` · `3` · `4` (4 = 4+), một giá trị | Giá trị lạ → bỏ |
+| `direction` | Hướng nhà (`DIRECTIONS`: `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`), nhiều giá trị, OR | Giá trị lạ → bỏ |
+| `handover` | Tình trạng bàn giao (`HANDOVER_CONDITIONS`), nhiều giá trị, OR | Giá trị lạ → bỏ |
+| `sort` | `newest` (mặc định, không lên URL) · `price_asc` · `price_desc` (tin không giá cuối) | Giá trị lạ → mặc định |
+| `page` | Trang lưới; vượt số trang → `404` | |
+| `category` | **Link cũ, chỉ ở `/tin-bds`** (route danh mục bỏ qua): slug danh mục tin BĐS theo ngôn ngữ đang xem → lọc theo danh mục đó (+ con) và đánh dấu tab; hero / breadcrumb / đường dẫn form vẫn của `/tin-bds`; "Xoá tất cả" xoá luôn danh mục | Slug lạ → bỏ (không lọc, không 404) |
+
+Metadata: có tham số lọc / `q` / `sort` khác mặc định, hoặc `?category=` (kể cả slug lạ) → `noindex, follow`. Canonical: trang sạch (`/tin-bds` hoặc trang danh mục, không `?page`); riêng `/tin-bds?category=<slug có thật>` → canonical **trang danh mục** `/tin-bds/danh-muc/<slug>` (slug của ngôn ngữ đang xem, không hreflang). Không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD chỉ ở `/tin-bds` sạch (trang 1, cùng điều kiện noindex); trang danh mục không phát. Tin ưu đãi đã kết thúc luôn xếp sau (BR-06); ≤ 5 tin `isFeatured` còn hiệu lực là thẻ nổi bật (trang 1), loại khỏi lưới mọi trang; số đếm ô tích theo quy tắc "trừ chính chiều đó" (chip Phòng ngủ không đếm).
 
 ## 4. Endpoint quản trị
 

@@ -1,9 +1,10 @@
-import type { CollapsibleField, CollectionConfig, DateFieldValidation, GroupField, NumberField } from "payload";
+import type { CollapsibleField, CollectionConfig, DateFieldValidation, GroupField } from "payload";
 import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { withPriceInWords, withSummaryCounter } from "../fields/form-hints";
+import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
@@ -51,9 +52,6 @@ const offerGroup: GroupField = {
     { name: "terms", type: "textarea", label: "Điều kiện áp dụng", localized: true },
   ],
 };
-
-const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) => values.map((value) => ({ label: labels[value], value }));
-const nonNegativeNumber = (name: string, label: string, { index = false } = {}): NumberField => ({ name, type: "number", label, min: 0, index });
 
 /**
  * Thông số bất động sản (BL-052): toàn bộ tuỳ chọn, không localized, không nằm trong `englishRequiredFields` nên tin cũ / tin voucher để

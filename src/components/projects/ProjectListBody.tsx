@@ -8,7 +8,7 @@ import { FilterSheet, FilterSidebar } from "@/components/listing/FilterPanel";
 import type { RawListingParams } from "@/components/listing/listing-params";
 import { RangeSliderFacet, type RangeValue } from "@/components/listing/RangeSliderFacet";
 import { ResultsBar } from "@/components/listing/ResultsBar";
-import { useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
+import { ListingNavigateContext, useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
 import type { SelectOption } from "@/components/ui/option-select";
 import { PROJECT_PRICE_MAX_BILLION } from "@/lib/projects/project-filters";
 
@@ -137,23 +137,25 @@ export function ProjectListBody({ path, current, values, options, preservedParam
   const { navigate, reset, generation } = useListingFilterNav(path, current);
   const fields = <ProjectFilterFields key={generation} values={values} options={options} navigate={navigate} />;
   return (
-    <div className="mx-auto grid w-full max-w-container items-start gap-8 px-gutter pt-8 pb-section-tight lg:grid-cols-[16rem_minmax(0,1fr)] lg:pt-10 xl:grid-cols-[17.5rem_minmax(0,1fr)]">
-      <FilterSidebar action={path} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
-        {fields}
-      </FilterSidebar>
-      <div className="flex min-w-0 flex-col gap-6">
-        {spotlight && <PendingRegion>{spotlight}</PendingRegion>}
-        <ResultsBar
-          countLabel={countLabel}
-          sort={sort}
-          leading={
-            <FilterSheet action={path} activeCount={activeCount} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
-              {fields}
-            </FilterSheet>
-          }
-        />
-        <PendingRegion className="flex flex-col gap-8">{children}</PendingRegion>
+    <ListingNavigateContext value={navigate}>
+      <div className="mx-auto grid w-full max-w-container items-start gap-8 px-gutter pt-8 pb-section-tight lg:grid-cols-[16rem_minmax(0,1fr)] lg:pt-10 xl:grid-cols-[17.5rem_minmax(0,1fr)]">
+        <FilterSidebar action={path} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
+          {fields}
+        </FilterSidebar>
+        <div className="flex min-w-0 flex-col gap-6">
+          {spotlight && <PendingRegion>{spotlight}</PendingRegion>}
+          <ResultsBar
+            countLabel={countLabel}
+            sort={sort}
+            leading={
+              <FilterSheet action={path} activeCount={activeCount} clearHref={clearHref} onClear={reset} preservedParams={preservedParams}>
+                {fields}
+              </FilterSheet>
+            }
+          />
+          <PendingRegion className="flex flex-col gap-8">{children}</PendingRegion>
+        </div>
       </div>
-    </div>
+    </ListingNavigateContext>
   );
 }

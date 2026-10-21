@@ -353,6 +353,8 @@ describe("ProjectDetail: Tin liên quan + CTA tham quan (BL-020 P4-T02)", () => 
     expect(within(block).getByText("Tin BĐS")).toBeInTheDocument();
     expect(within(block).getByRole("heading", { level: 3, name: "Căn 2PN view sông" }).closest("a")).toHaveAttribute("href", "/cho-thue/can-2pn");
     expect(within(block).getByRole("heading", { level: 3, name: "Ưu đãi tháng 10" }).closest("a")).toHaveAttribute("href", "/tin-bds/uu-dai");
+    // Thẻ biến thể danh sách BL-052 (cùng thẻ trang /cho-thue, /tin-bds), không phải thẻ trang chủ (spec-validation r2 N3).
+    expect([...block.querySelectorAll("[data-card-variant]")].map((card) => card.getAttribute("data-card-variant"))).toEqual(["listing", "listing"]);
     const similar = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
     expect(container.querySelector("#documents")!.compareDocumentPosition(block) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(block.compareDocumentPosition(similar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

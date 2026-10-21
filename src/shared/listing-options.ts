@@ -32,7 +32,7 @@ export const PROJECT_FEATURE_ADMIN_LABELS: Record<ProjectFeature, string> = {
   green_park: "Công viên cây xanh",
 };
 
-/** Hướng nhà / ban công: `rentals.houseDirection` / `rentals.balconyDirection`, `property-posts.houseDirection`. Nhãn công khai ở i18n `page.rentalDetail.direction`. */
+/** Hướng nhà / ban công: `rentals.houseDirection` / `rentals.balconyDirection`, `property-posts.houseDirection`. Nhãn công khai ở i18n `listingOptions.direction` (Cho thuê + Tin BĐS). */
 export const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
 

@@ -250,7 +250,11 @@ describe("S04 /cho-thue (BL-052): bố cục", () => {
     const hasFaqJsonLd = (root: HTMLElement) => [...root.querySelectorAll('script[type="application/ld+json"]')].some((script) => script.textContent?.includes("FAQPage"));
     expect(hasFaqJsonLd(container)).toBe(true);
     unmount();
-    expect(hasFaqJsonLd((await render("vi", { bedrooms: "2" })).container)).toBe(false);
+    const filtered = await render("vi", { bedrooms: "2" });
+    expect(hasFaqJsonLd(filtered.container)).toBe(false);
+    filtered.unmount();
+    // Dự án lạ bị trang bỏ nhưng metadata vẫn noindex → không phát FAQ (P3-T03 review r1).
+    expect(hasFaqJsonLd((await render("vi", { project: "khong-co" })).container)).toBe(false);
   });
 
   it("/en: nhãn tiếng Anh, link /en/for-rent, tab chỉ danh mục có EN, 'listing(s)'", async () => {

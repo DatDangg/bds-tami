@@ -2,8 +2,8 @@
 
 ```yaml
 workItem: feature/listing-detail-redesign
-phaseTask: phase-3-task-06
-step: reviewer
+phaseTask: phase-review P3
+step: spec_validator
 agent: change-request
 status: running
 attempt: 0
@@ -31,7 +31,8 @@ committed:
   P3-T02: 59cd5bc
   P3-T05: f001cb9 — backfill --apply DB dev tami 38/37/0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md
   P3-T03: 3d6c598
-remaining: [P3-T06 (gom MINOR, danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
+  P3-T06: 7e39d98
+remaining: [danh sách trong task file), phase-review P3, spec-publish as-built (progress.asBuiltPending), doc reconcile, close-out BACKLOG done + archive change doc]
 next: "P3-T03 builder-strong → reviewer → merge; rồi P3-T06; rồi spec-validator phase review P3; close-out"
 worktrees: "Mọi worktree .claude/worktrees/agent-{a34a728f6fcbd7505,ac1778247aea60dd2,aaa983d02f24e311e,aa441cd64eabae529,af48886477619dfd3,a62860a763ac97eb3,a637a4b9ec6b8f842,a3cf329c1da664252,a5283964a69f97c92} ĐÃ merge vào staging — không dùng lại để code (base cũ), xoá được."
 testDbs: "tami_wt52_p1t01..p1t07, tami_wt52_p2t01, tami_wt52_p2t03 (bản sao dev, đã migrate BL-052; p1t05/p2t01/p2t03 mới nhất, có dữ liệu thử listingPages/rentals) — dùng lại được làm DB worktree cho task sau (chạy pnpm payload migrate), hoặc drop. Redis db đã dùng: 4–9, 11–13."
@@ -77,3 +78,6 @@ lessons: ["Worktree agent phải git merge --ff-only staging trước khi làm",
 - 2026-10-22 ▶ START builder-strong P3-T03 (worktree từ staging 07d3496, DB tami_wt52_p1t05 dùng lại, redis 11) (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE builder-strong P3-T03 — wt agent-a6782d3899146efad (chưa commit); typecheck/lint/test 387/3885/build PASS; i18n page.posts.list; as-built: ?category= cũ lọc + noindex, bỏ PostCard variant=feature, hàng N phù hợp trở lại. ▶ START reviewer r1 P3-T03 STRICT (running — cancel sẽ redo bước này)
 - 2026-10-22 reviewer r1 P3-T03 STRICT PASS (6 MINOR → P3-T06, gồm lỗi sort mất lọc ở cả 3 trang) → 3d6c598 merged + progress, typecheck PASS. ✅ DONE P3-T03. Chờ user: ngày hạn ưu đãi /en (US vs dd/MM/yyyy) — không chặn P3-T06.
+- 2026-10-22 ▶ START builder-strong P3-T06 (worktree từ staging c43f3fd, DB tami_wt52_p2t03, redis 15) (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE builder-strong P3-T06 — wt agent-afed16067ec55c7b8 (chưa commit); sửa sort mất lọc 3 trang, FAQ JSON-LD/noindex, canonical ?category=, step=any, CardSlider tràn ngang 390, regex backfill, gom helper, xoá 5 component + 148 key i18n chết, doc as-built API_SPEC/DESIGN/design-spec/ERD/ARCHITECTURE; typecheck/lint/test 385/3878/build PASS. ▶ START reviewer r1 P3-T06 STRICT (running — cancel sẽ redo bước này)
+- 2026-10-22 reviewer r1 P3-T06 STRICT PASS (drift sạch, build PASS; MINOR-1 noindex/canonical ?category= → openItems; MINOR-2 CardSlider chưa chụp) → 7e39d98 merged + progress, typecheck PASS. ✅ DONE P3-T06 — hết task BL-052. ▶ START spec-validator phase review P3 (running — cancel sẽ redo bước này)

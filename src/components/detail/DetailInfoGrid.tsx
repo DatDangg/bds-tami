@@ -2,17 +2,19 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Giá trị thành link: `internal` = đường dẫn nội bộ (vd dự án của tin cho thuê), mở tại chỗ; `external` = link ngoài đã kiểm http(s)
+ * (vd website chủ đầu tư) mở tab mới, `newTabLabel` là chữ đọc màn hình "(mở tab mới)".
+ */
+export type DetailInfoLink = { kind: "internal"; href: string } | { kind: "external"; href: string; newTabLabel: string };
+
 export interface DetailInfoItem {
   /** Icon Phosphor đã dựng (`aria-hidden` do khung lo). */
   icon: ReactNode;
   label: string;
   /** Trống / null → ô bị bỏ. */
   value?: string | null;
-  /**
-   * Giá trị thành link. Có `newTabLabel` → link ngoài đã kiểm http(s) (vd website chủ đầu tư) mở tab mới, `newTabLabel` là chữ đọc màn hình "(mở tab mới)";
-   * không có → đường dẫn nội bộ (vd dự án của tin cho thuê), mở tại chỗ.
-   */
-  link?: { href: string; newTabLabel?: string } | null;
+  link?: DetailInfoLink | null;
   /** Giá trị là ngày (ISO): bọc `<time dateTime>` (vd ngày đăng tin cho thuê). */
   dateTime?: string | null;
 }
@@ -38,7 +40,7 @@ export function DetailInfoGrid({ items, label, className }: { items: DetailInfoI
             {item.label}
           </dt>
           <dd className="text-small font-semibold break-words text-text">
-            {item.link?.newTabLabel ? (
+            {item.link?.kind === "external" ? (
               <a href={item.link.href} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
                 {item.value}
                 <span className="sr-only"> {item.link.newTabLabel}</span>

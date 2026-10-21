@@ -18,6 +18,11 @@ export function formatArea(squareMeters: number, locale: Locale): string {
   return `${formatNumber(squareMeters, locale)} m²`;
 }
 
+/** Chiều dài (mặt tiền…): `4,5 m` (vi) · `4.5 m` (en). */
+export function formatMeters(meters: number, locale: Locale): string {
+  return `${formatNumber(meters, locale)} m`;
+}
+
 /** Ngày theo locale, luôn tính theo múi giờ Việt Nam (không theo múi giờ máy chủ/trình duyệt). */
 export function formatDate(
   value: Date | string | number,

@@ -6,6 +6,7 @@ import { DetailGalleryGrid } from "@/components/detail/DetailGalleryGrid";
 import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
 import { DetailSection } from "@/components/detail/DetailSection";
+import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
 import { DetailSpecBar, type DetailSpecItem } from "@/components/detail/DetailSpecBar";
 import { SimilarCarousel } from "@/components/detail/SimilarCarousel";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
@@ -25,6 +26,7 @@ import { ProjectHighlights } from "@/components/projects/ProjectHighlights";
 import { ProjectListings, type ProjectListingCards } from "@/components/projects/ProjectListings";
 import { ProjectLocation } from "@/components/projects/ProjectLocation";
 import { ProjectOverview } from "@/components/projects/ProjectOverview";
+import { useHectareText, useProductTypesText } from "@/components/projects/project-labels";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { publicPath } from "@/lib/content/content-paths";
 import { formatVndCompact } from "@/lib/format";
@@ -33,7 +35,6 @@ import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import {
   DOCUMENTS_DOM_ID,
   formatAreaRange,
-  formatHectares,
   SECTION_DOM_ID,
   visibleSections,
   type ProjectDetailView,
@@ -46,8 +47,6 @@ import type { Project } from "@/payload-types";
 
 /** Id tiêu đề thẻ form ở cột phải: nhãn cho `aside` (một thẻ duy nhất mỗi trang). */
 const CONSULT_HEADING_ID = "project-consult-heading";
-
-const ICON_SIZE = 20;
 
 /** Khớp bề rộng slide của `CardSlider`: 82vw < sm, 320px ≥ sm, 272px ≥ lg. */
 const SIMILAR_IMAGE_SIZES = "(min-width: 1024px) 272px, (min-width: 640px) 320px, 82vw";
@@ -74,69 +73,59 @@ interface ProjectDetailProps {
   consultBanner?: ReactNode;
 }
 
-/**
- * Chi tiết Dự án theo design BL-052 (`detail-du-an.webp`) trên `DetailPageShell`: hero ảnh full-bleed (`DetailHeroMosaic`: badge danh mục + tình trạng, `h1`, địa chỉ, mô tả ngắn,
- * nút video khi có `videoUrl`, 3 ảnh nhỏ) → thanh thông số nổi (Giá từ · Quy mô · Diện tích · Chủ đầu tư · Bàn giao · Loại hình; không ô Pháp lý) → tab dính → [Tổng quan | cột
- * phải dính: form "Nhận thông tin dự án" (`#lead-form` duy nhất) + Hotline] → các dải rộng hết khung nền xen kẽ: Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá ·
- * Pháp lý & chính sách (+ tài liệu, neo `#documents`) · Tin liên quan · Hỏi đáp → "Dự án tương tự" → dải Điểm mạnh → banner tư vấn. Khối thiếu dữ liệu ẩn cả khối lẫn tab
- * (`visibleSections`). Server Component; phần tương tác (hero, tab, danh sách mở rộng, mặt bằng, accordion, thanh dính đáy) là client.
- */
-export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath, strengths, consultBanner }: ProjectDetailProps) {
+/** Thanh thông số nổi: Giá từ · Quy mô (ha) · Diện tích · Chủ đầu tư · Bàn giao · Loại hình (không ô Pháp lý); ô trống bị bỏ. */
+function useProjectSpecItems(view: ProjectDetailView): DetailSpecItem[] {
   const locale = useLocale() as Locale;
-  const t = useTranslations("page.projectDetail");
-  const tDetail = useTranslations("page.detail");
-  const tStatus = useTranslations("page.projects.salesStatus");
-  const tType = useTranslations("listingOptions.propertyType");
-  const tNav = useTranslations("layout.nav.items");
-  const tRich = useTranslations("page.richText");
-  const turnstileSiteKey = readTurnstileSiteKey();
-  const hasListings = listings.rentals.length > 0 || listings.posts.length > 0;
-  const sections = visibleSections(view, { hasListings });
-  const shown = new Set<SectionId>(sections);
+  const t = useTranslations("page.projectDetail.v2.spec");
+  return [
+    { icon: <Tag size={ICON_SIZE} />, label: t("priceFrom"), value: view.displayPriceFromVnd ? formatVndCompact(view.displayPriceFromVnd, locale) : t("contact") },
+    { icon: <SquaresFour size={ICON_SIZE} />, label: t("scale"), value: useHectareText(view.scale.landAreaM2) },
+    { icon: <Ruler size={ICON_SIZE} />, label: t("area"), value: formatAreaRange(view.areaFromM2, view.areaToM2, locale) },
+    { icon: <Buildings size={ICON_SIZE} />, label: t("developer"), value: view.developer?.name ?? null },
+    { icon: <CalendarCheck size={ICON_SIZE} />, label: t("handover"), value: view.handoverTime },
+    { icon: <House size={ICON_SIZE} />, label: t("propertyTypes"), value: useProductTypesText(view.productTypes) },
+  ];
+}
 
-  // Pháp lý + Chính sách là MỘT dải và MỘT tab ("Pháp lý & chính sách" khi có cả hai), tab trỏ khối đầu tiên có mặt; `#legal` / `#sales-policy` / `#documents` giữ nguyên.
-  const tabs = sections.flatMap((id) => {
+/** Pháp lý + Chính sách là MỘT dải và MỘT tab ("Pháp lý & chính sách" khi có cả hai), tab trỏ khối đầu tiên có mặt; `#legal` / `#sales-policy` / `#documents` giữ nguyên. */
+function useProjectTabs(sections: SectionId[]) {
+  const t = useTranslations("page.projectDetail.v2.tabs");
+  const shown = new Set<SectionId>(sections);
+  return sections.flatMap((id) => {
     if (id === "policy" && shown.has("legal")) return [];
-    const label = id === "legal" && shown.has("policy") ? t("v2.tabs.legalPolicy") : t(`v2.tabs.${id}`);
+    const label = id === "legal" && shown.has("policy") ? t("legalPolicy") : t(id);
     return [{ id: SECTION_DOM_ID[id], label }];
   });
+}
 
-  const specItems: DetailSpecItem[] = [
-    {
-      icon: <Tag size={ICON_SIZE} />,
-      label: t("v2.spec.priceFrom"),
-      value: view.displayPriceFromVnd ? formatVndCompact(view.displayPriceFromVnd, locale) : t("v2.spec.contact"),
-    },
-    { icon: <SquaresFour size={ICON_SIZE} />, label: t("v2.spec.scale"), value: view.scale.landAreaM2 ? t("v2.spec.hectare", { value: formatHectares(view.scale.landAreaM2, locale) }) : null },
-    { icon: <Ruler size={ICON_SIZE} />, label: t("v2.spec.area"), value: formatAreaRange(view.areaFromM2, view.areaToM2, locale) },
-    { icon: <Buildings size={ICON_SIZE} />, label: t("v2.spec.developer"), value: view.developer?.name ?? null },
-    { icon: <CalendarCheck size={ICON_SIZE} />, label: t("v2.spec.handover"), value: view.handoverTime },
-    { icon: <House size={ICON_SIZE} />, label: t("v2.spec.propertyTypes"), value: view.productTypes.map((type) => tType(type)).join(", ") },
-  ];
+/** Khối Pháp lý (richText + danh sách PDF, neo `#documents`; một trong hai có là đủ) và Chính sách bán hàng — khối nào có trong `shown` thì dựng. */
+function usePolicyBlocks(doc: ProjectDetailProps["doc"], view: ProjectDetailView, shown: ReadonlySet<SectionId>): PolicyBlock[] {
+  const locale = useLocale() as Locale;
+  const t = useTranslations("page.projectDetail.sections");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
+  const tRich = useTranslations("page.richText");
+  const legal: PolicyBlock = {
+    id: SECTION_DOM_ID.legal,
+    anchorIds: [DOCUMENTS_DOM_ID],
+    eyebrow: tEyebrow("legal"),
+    title: t("legal"),
+    content: (
+      <div className="flex flex-col gap-8">
+        {view.hasLegal && <RichText data={doc.legalInfo} locale={locale} tableLabel={tRich("table")} />}
+        <Documents documents={view.documents} />
+      </div>
+    ),
+  };
+  const policy: PolicyBlock = { id: SECTION_DOM_ID.policy, eyebrow: tEyebrow("policy"), title: t("policy"), content: <RichText data={doc.salesPolicy} locale={locale} tableLabel={tRich("table")} /> };
+  return [...(shown.has("legal") ? [legal] : []), ...(shown.has("policy") ? [policy] : [])];
+}
 
-  const policyBlocks: PolicyBlock[] = [
-    ...(shown.has("legal")
-      ? [
-          {
-            id: SECTION_DOM_ID.legal,
-            anchorIds: [DOCUMENTS_DOM_ID],
-            eyebrow: tDetail("eyebrow.legal"),
-            title: t("sections.legal"),
-            // Pháp lý gộp richText + danh sách PDF; một trong hai có là đủ dựng khối.
-            content: (
-              <div className="flex flex-col gap-8">
-                {view.hasLegal && <RichText data={doc.legalInfo} locale={locale} tableLabel={tRich("table")} />}
-                <Documents documents={view.documents} />
-              </div>
-            ),
-          },
-        ]
-      : []),
-    ...(shown.has("policy")
-      ? [{ id: SECTION_DOM_ID.policy, eyebrow: tDetail("eyebrow.policy"), title: t("sections.policy"), content: <RichText data={doc.salesPolicy} locale={locale} tableLabel={tRich("table")} /> }]
-      : []),
-  ];
-
+/** Các dải rộng hết khung theo thứ tự `sections` (Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách · Tin liên quan · Hỏi đáp). */
+function useProjectBands(doc: ProjectDetailProps["doc"], view: ProjectDetailView, sections: SectionId[], listings: ProjectListingCards): DetailBand[] {
+  const t = useTranslations("page.projectDetail");
+  const tEyebrow = useTranslations("page.detail.eyebrow");
+  const shown = new Set<SectionId>(sections);
+  const policyBlocks = usePolicyBlocks(doc, view, shown);
   const bandContent: Partial<Record<SectionId, ReactNode>> = {
     location: <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />,
     amenities: <ProjectAmenities amenities={view.amenities} image={view.amenitiesImage} />,
@@ -147,7 +136,7 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
     ),
     highlights: <ProjectHighlights highlights={view.highlights} />,
     floorPlans: (
-      <DetailSection id={SECTION_DOM_ID.floorPlans} eyebrow={tDetail("eyebrow.floorPlans")} title={t("sections.floorPlans")}>
+      <DetailSection id={SECTION_DOM_ID.floorPlans} eyebrow={tEyebrow("floorPlans")} title={t("sections.floorPlans")}>
         <FloorPlans plans={view.floorPlans} />
       </DetailSection>
     ),
@@ -161,46 +150,89 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
     listings: <ProjectListings {...listings} />,
     faq: <ProjectFaq faqs={view.faqs} />,
   };
-  const bands: DetailBand[] = sections.flatMap((id) => {
+  return sections.flatMap((id) => {
     const content = id === "policy" && !shown.has("legal") ? bandContent.legal : bandContent[id];
     return content ? [{ key: id, content }] : [];
   });
+}
 
+/** Hero ảnh: breadcrumb (Dự án › tên), badge danh mục + tình trạng, `h1`, địa chỉ, mô tả ngắn, nút video khi có `videoUrl`. */
+function ProjectHero({ view, ownPath }: Pick<ProjectDetailProps, "view" | "ownPath">) {
+  const locale = useLocale() as Locale;
+  const tStatus = useTranslations("page.projects.salesStatus");
+  const tNav = useTranslations("layout.nav.items");
+  return (
+    <DetailHeroMosaic
+      images={view.gallery}
+      title={view.title}
+      breadcrumb={
+        <Breadcrumb
+          variant="overlay"
+          items={[
+            { label: tNav("projects"), href: publicPath("/du-an", locale) },
+            { label: view.title, href: ownPath },
+          ]}
+        />
+      }
+      badges={
+        <>
+          {view.categoryName && (
+            <span className="inline-flex items-center rounded-pill border border-on-dark/50 bg-dark-deep/30 px-2.5 py-1 text-xsmall font-medium tracking-[0.06em] text-on-dark uppercase">
+              {view.categoryName}
+            </span>
+          )}
+          <Badge variant={HERO_STATUS_VARIANT[view.salesStatus]} className={cn(view.salesStatus === "handed_over" && "border border-on-dark/40")}>
+            {tStatus(view.salesStatus)}
+          </Badge>
+        </>
+      }
+      address={view.areaLabel ?? view.address}
+      summary={view.summary}
+      videoUrl={view.videoUrl}
+    />
+  );
+}
+
+/** Sau khung: "Dự án tương tự" (slider) → dải Điểm mạnh → banner tư vấn (nút chính cuộn tới form ở cột phải, không nhân đôi form). */
+function ProjectAfter({ related, strengths, consultBanner }: Pick<ProjectDetailProps, "related" | "strengths" | "consultBanner">) {
+  const locale = useLocale() as Locale;
+  const t = useTranslations("page.projectDetail");
   const similarLabels = { slide: t.raw("similar.slide") as string, previous: t("similar.previous"), next: t("similar.next"), dots: t("similar.dots"), goTo: t.raw("similar.goTo") as string };
+  return (
+    <>
+      <SimilarCarousel
+        items={related.map((card) => <ProjectCard key={card.id} data={card} headingLevel="h3" sizes={SIMILAR_IMAGE_SIZES} />)}
+        eyebrow={t("similar.eyebrow")}
+        title={t("similar.title")}
+        titleAccent={t("similar.titleAccent")}
+        viewAll={{ href: publicPath("/du-an", locale), label: t("v2.similarViewAll") }}
+        labels={similarLabels}
+      />
+      {strengths && <StrengthsBlock block={strengths} />}
+      {consultBanner}
+    </>
+  );
+}
+
+/**
+ * Chi tiết Dự án theo design BL-052 (`detail-du-an.webp`) trên `DetailPageShell`: hero ảnh full-bleed (`DetailHeroMosaic`: badge danh mục + tình trạng, `h1`, địa chỉ, mô tả ngắn,
+ * nút video khi có `videoUrl`, 3 ảnh nhỏ) → thanh thông số nổi (Giá từ · Quy mô · Diện tích · Chủ đầu tư · Bàn giao · Loại hình; không ô Pháp lý) → tab dính → [Tổng quan | cột
+ * phải dính: form "Nhận thông tin dự án" (`#lead-form` duy nhất) + Hotline] → các dải rộng hết khung nền xen kẽ: Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá ·
+ * Pháp lý & chính sách (+ tài liệu, neo `#documents`) · Tin liên quan · Hỏi đáp → "Dự án tương tự" → dải Điểm mạnh → banner tư vấn. Khối thiếu dữ liệu ẩn cả khối lẫn tab
+ * (`visibleSections`). Server Component; phần tương tác (hero, tab, danh sách mở rộng, mặt bằng, accordion, thanh dính đáy) là client.
+ */
+export function ProjectDetail({ doc, view, related, listings = { rentals: [], posts: [] }, hotline, ownPath, strengths, consultBanner }: ProjectDetailProps) {
+  const t = useTranslations("page.projectDetail");
+  const turnstileSiteKey = readTurnstileSiteKey();
+  const sections = visibleSections(view, { hasListings: listings.rentals.length > 0 || listings.posts.length > 0 });
+  const tabs = useProjectTabs(sections);
+  const specItems = useProjectSpecItems(view);
+  const bands = useProjectBands(doc, view, sections, listings);
 
   return (
     <article className="pb-16 lg:pb-0">
       <DetailPageShell
-        hero={
-          <DetailHeroMosaic
-            images={view.gallery}
-            title={view.title}
-            breadcrumb={
-              <Breadcrumb
-                variant="overlay"
-                items={[
-                  { label: tNav("projects"), href: publicPath("/du-an", locale) },
-                  { label: view.title, href: ownPath },
-                ]}
-              />
-            }
-            badges={
-              <>
-                {view.categoryName && (
-                  <span className="inline-flex items-center rounded-pill border border-on-dark/50 bg-dark-deep/30 px-2.5 py-1 text-xsmall font-medium tracking-[0.06em] text-on-dark uppercase">
-                    {view.categoryName}
-                  </span>
-                )}
-                <Badge variant={HERO_STATUS_VARIANT[view.salesStatus]} className={cn(view.salesStatus === "handed_over" && "border border-on-dark/40")}>
-                  {tStatus(view.salesStatus)}
-                </Badge>
-              </>
-            }
-            address={view.areaLabel ?? view.address}
-            summary={view.summary}
-            videoUrl={view.videoUrl}
-          />
-        }
+        hero={<ProjectHero view={view} ownPath={ownPath} />}
         specBar={<DetailSpecBar items={specItems} label={t("v2.spec.label")} />}
         subNav={{ items: tabs, label: t("subNavLabel") }}
         asideLabelledBy={CONSULT_HEADING_ID}
@@ -210,21 +242,7 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
           </DetailContactAside>
         }
         bands={bands}
-        after={
-          <>
-            <SimilarCarousel
-              items={related.map((card) => <ProjectCard key={card.id} data={card} headingLevel="h3" sizes={SIMILAR_IMAGE_SIZES} />)}
-              eyebrow={t("similar.eyebrow")}
-              title={t("similar.title")}
-              titleAccent={t("similar.titleAccent")}
-              viewAll={{ href: publicPath("/du-an", locale), label: t("v2.similarViewAll") }}
-              labels={similarLabels}
-            />
-            {strengths && <StrengthsBlock block={strengths} />}
-            {/* Banner cuối trang: nút chính cuộn tới form ở cột phải (form lead duy nhất), không nhân đôi form. */}
-            {consultBanner}
-          </>
-        }
+        after={<ProjectAfter related={related} strengths={strengths} consultBanner={consultBanner} />}
       >
         <ProjectOverview view={view} overview={doc.overview} />
       </DetailPageShell>

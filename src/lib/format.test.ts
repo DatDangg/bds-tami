@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatArea, formatDate, formatFileSize, formatNumber, formatVnd, formatVndCompact } from "./format";
+import { formatArea, formatDate, formatFileSize, formatMeters, formatNumber, formatVnd, formatVndCompact } from "./format";
 
 describe("formatVnd", () => {
   it("vi: dấu chấm phân cách nghìn, hậu tố ₫", () => {
@@ -17,6 +17,8 @@ describe("formatArea / formatNumber", () => {
   it("vi dùng dấu phẩy thập phân, en dùng dấu chấm", () => {
     expect(formatArea(45.5, "vi")).toBe("45,5 m²");
     expect(formatArea(45.5, "en")).toBe("45.5 m²");
+    expect(formatMeters(4.5, "vi")).toBe("4,5 m");
+    expect(formatMeters(4.5, "en")).toBe("4.5 m");
   });
   it("số lớn có phân cách theo locale", () => {
     expect(formatNumber(1234567, "vi")).toBe("1.234.567");

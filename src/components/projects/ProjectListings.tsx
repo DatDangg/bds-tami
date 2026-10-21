@@ -30,7 +30,7 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
 }
 
 /**
- * "Tin liên quan" của chi tiết dự án (BL-020 P4): nhóm Cho thuê + nhóm Tin BĐS thuộc dự án, thẻ trắng dùng chung với trang danh sách (lưới 2 cột ≥ sm
+ * "Tin liên quan" của chi tiết dự án (BL-020 P4): nhóm Cho thuê + nhóm Tin BĐS thuộc dự án, thẻ biến thể `listing` BL-052 dùng chung với `/cho-thue`, `/tin-bds` (lưới 2 cột ≥ sm
  * trong cột chính). Nhóm trống ẩn; cả hai trống thì không render khối (và trang không đưa mục vào thanh mục con). Ảnh thẻ lazy (LCP vẫn là ảnh hero).
  */
 export function ProjectListings({ rentals, posts }: ProjectListingCards) {

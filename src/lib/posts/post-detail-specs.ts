@@ -2,7 +2,8 @@ import { isValidLocation, type LatLng } from "../../components/media/map-geometr
 import type { Locale } from "../../i18n/routing";
 import type { PropertyPost, Province, Ward } from "../../payload-types";
 import { DIRECTIONS, HANDOVER_CONDITIONS, PROPERTY_TYPES, type Direction, type HandoverCondition, type PropertyType } from "../../shared/listing-options";
-import { formatArea, formatNumber, formatVndCompact } from "../format";
+import { formatArea, formatMeters, formatVndCompact } from "../format";
+import { isVoucherPost } from "./post-kind";
 
 const hasText = (value: string | null | undefined): value is string => typeof value === "string" && value.trim() !== "";
 const positive = (value: number | null | undefined): number | null => (typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null);
@@ -47,11 +48,6 @@ function toLatLng(point: PropertyPost["location"]): LatLng | null {
   return isValidLocation(location) ? location : null;
 }
 
-export function isVoucherPost(doc: Pick<PropertyPost, "offer" | "priceVnd" | "areaM2">): boolean {
-  const hasOffer = hasText(doc.offer?.endAt) || hasText(doc.offer?.voucherCode);
-  return hasOffer && positive(doc.priceVnd) === null && positive(doc.areaM2) === null;
-}
-
 export function toPostDetailSpecs(doc: PropertyPost, locale: Locale): PostDetailSpecs {
   const priceVnd = positive(doc.priceVnd);
   const area = positive(doc.areaM2);
@@ -63,7 +59,7 @@ export function toPostDetailSpecs(doc: PropertyPost, locale: Locale): PostDetail
     bedrooms: count(doc.bedrooms),
     bathrooms: count(doc.bathrooms),
     direction: oneOf(DIRECTIONS, doc.houseDirection),
-    frontage: frontage !== null ? `${formatNumber(frontage, locale)} m` : null,
+    frontage: frontage !== null ? formatMeters(frontage, locale) : null,
     floors: positive(doc.floors),
     propertyType: oneOf(PROPERTY_TYPES, doc.propertyType),
     handover: oneOf(HANDOVER_CONDITIONS, doc.handoverCondition),

@@ -52,12 +52,12 @@ describe("DetailInfoGrid", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("link: có newTabLabel → mở tab mới; không có → link nội bộ mở tại chỗ", () => {
+  it("link: external → mở tab mới; internal → link nội bộ mở tại chỗ", () => {
     renderWithIntl(
       <DetailInfoGrid
         items={[
-          { icon, label: "Chủ đầu tư", value: "TAMI", link: { href: "https://tami.example", newTabLabel: "(mở tab mới)" } },
-          { icon, label: "Thuộc dự án", value: "Sông Sài Gòn", link: { href: "/du-an/song-sai-gon" } },
+          { icon, label: "Chủ đầu tư", value: "TAMI", link: { kind: "external", href: "https://tami.example", newTabLabel: "(mở tab mới)" } },
+          { icon, label: "Thuộc dự án", value: "Sông Sài Gòn", link: { kind: "internal", href: "/du-an/song-sai-gon" } },
         ]}
       />,
     );

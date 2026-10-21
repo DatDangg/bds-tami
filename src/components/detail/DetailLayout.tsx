@@ -7,8 +7,10 @@ import { DetailSubNav, type SubNavItem } from "./DetailSubNav";
  * Thẻ vừa viewport → dính dưới thanh mục con; cao hơn → cuộn theo trang tới khi đáy thẻ chạm đáy viewport rồi mới dính (không bị cắt).
  * `--detail-aside-h` do `DetailAsideFit` đo bằng JS (CSS không biết chiều cao chính thẻ); chưa có biến (0px) = dính trên như cũ. Gắn vào phần tử con đầu của `aside`.
  */
-export const DETAIL_ASIDE_CARD_CLASS =
-  "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:sticky lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))] lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
+export const DETAIL_ASIDE_STICKY_CLASS = "lg:sticky lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]";
+
+/** Thẻ phụ trắng dính (BL-031) = khung thẻ + `DETAIL_ASIDE_STICKY_CLASS` + đích cuộn dưới thanh mục con. */
+export const DETAIL_ASIDE_CARD_CLASS = `rounded-[20px] border border-border bg-surface p-6 shadow-md ${DETAIL_ASIDE_STICKY_CLASS} lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]`;
 
 interface DetailLayoutProps {
   /** Hero + breadcrumb phía trên thanh mục con. */

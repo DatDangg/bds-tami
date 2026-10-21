@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "listing-detail-redesign",
-    "phaseTask": "phase-3-task-06",
+    "phaseTask": "phase-review P3",
     "journal": ".context/runs/change-listing-detail-redesign.md"
   },
   "features": [
@@ -2279,13 +2279,17 @@
         {
           "task": "phase-3-task-06",
           "file": "tasks/feature-listing-detail-redesign/phase-3-task-06.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "*"
           ],
           "wave": "3D",
-          "note": "gom MINOR + dọn + doc"
+          "note": "gom MINOR + dọn + doc",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-06-round-1-review.md",
+          "commit": "7e39d98"
         },
         {
           "task": "phase-2-task-04",
@@ -2303,7 +2307,7 @@
           "commit": "dfa0884"
         }
       ],
-      "stage": "2026-10-22: P3-T01..T05 + T03 xong; next P3-T06 (gom MINOR + doc reconcile)",
+      "stage": "2026-10-22: mọi task P1–P3 done; next spec-validator phase review P3 → spec-publish as-built → close-out",
       "asBuiltPending": [
         "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
         "chi tiết cho thuê bỏ neo #details/#video",
@@ -2322,13 +2326,21 @@
         "chi tiết Tin BĐS bỏ neo #content (nội dung vào Tổng quan)",
         "/tin-bds nhận ?category=<slug> cũ (lọc + tab, noindex) — API_SPEC",
         "PostCard chỉ còn variant listing + home (bỏ feature); PostChip thêm countId/slug",
-        "/tin-bds hàng N phù hợp trở lại (bỏ ở BL-045)"
+        "/tin-bds hàng N phù hợp trở lại (bỏ ở BL-045)",
+        "nhãn hướng công khai listingOptions.direction (dùng chung Cho thuê + Tin BĐS)",
+        "/cho-thue FAQ JSON-LD chỉ khi URL không tham số; /tin-bds theo điều kiện noindex"
       ],
       "phaseReview12": {
         "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR)",
         "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-2-phase-review.md",
         "at": "2026-10-22"
-      }
+      },
+      "openItems": [
+        "/tin-bds?category= noindex + canonical sang trang danh mục (tín hiệu trái nhau) — khuyến nghị 308 cho cả /tin-bds và /cho-thue ?category= (P3-T06 r1 MINOR-1)",
+        "CardSlider trang chủ chưa chụp trình duyệt 390/768/1280 (MINOR-2)",
+        "ngày hạn ưu đãi /en MM/DD/YYYY vs spec dd/MM/yyyy — chờ user",
+        "/du-an priceMax=0 vẫn là bộ lọc"
+      ]
     }
   ],
   "bugs": [

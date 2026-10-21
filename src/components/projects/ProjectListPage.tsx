@@ -1,8 +1,6 @@
-import config from "@payload-config";
 import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { getPayload, type Payload } from "payload";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ConsultBanner } from "@/components/layout/ConsultBanner";
@@ -16,28 +14,18 @@ import { countActiveFilters } from "@/components/listing/listing-params";
 import { SpotlightSlider } from "@/components/listing/SpotlightSlider";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectListBody } from "@/components/projects/ProjectListBody";
-import { type ResolvedProjectFilters, toFilterOptions, toFilterParams, toFilterValues, toProjectPageQuery } from "@/components/projects/project-list-state";
+import { loadProjectListData } from "@/components/projects/project-list-data";
+import { toFilterOptions, toFilterParams, toFilterValues } from "@/components/projects/project-list-state";
 import { ProjectSortControl } from "@/components/projects/ProjectSortControl";
 import { ProjectSpotlightContent } from "@/components/projects/ProjectSpotlightContent";
 import { projectCategoryIcon } from "@/components/projects/project-category-icon";
 import { publicPath } from "@/lib/content/content-paths";
-import { loadListingPageContent, type ListingLearnMoreView } from "@/lib/content/load-listing-page";
-import { loadPageHero } from "@/lib/content/load-page-banner";
-import { loadProjectStrengths } from "@/lib/content/load-project-strengths";
+import type { ListingLearnMoreView } from "@/lib/content/load-listing-page";
 import { parsePagination } from "@/lib/content/pagination";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
-import { visibleCategory } from "@/lib/news/news-view";
-import { hasFilterParams, parseProjectFilters, projectQueryString, type RawProjectParams } from "@/lib/projects/project-filters";
-import {
-  findProjectCategoryBySlug,
-  listChildProjectCategories,
-  listDevelopersWithPublicProjects,
-  listProvinces,
-  listPublicProjects,
-  listRootProjectCategories,
-  type ProjectFacets,
-} from "@/lib/projects/project-queries";
-import { toProjectCards } from "@/lib/projects/project-view";
+import { hasFilterParams, projectQueryString, type RawProjectParams } from "@/lib/projects/project-filters";
+import type { ProjectFacets } from "@/lib/projects/project-queries";
+import { type ProjectCardData, toProjectCards } from "@/lib/projects/project-view";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Locale } from "@/i18n/routing";
 import type { Category } from "@/payload-types";
@@ -45,22 +33,6 @@ import type { Category } from "@/payload-types";
 interface ProjectListPageProps {
   locale: Locale;
   searchParams: RawProjectParams;
-}
-
-/** Danh mục đang lọc bằng `?category=`: slug, id tab cấp 1 cần đánh dấu và id dùng để lọc (danh mục + con của nó). */
-interface CategoryContext {
-  slug: string;
-  rootId: string;
-  filterIds: string[];
-}
-
-async function loadCategoryContext(payload: Payload, locale: Locale, slug: string): Promise<CategoryContext | null> {
-  const category = await findProjectCategoryBySlug(payload, locale, slug);
-  if (!category) return null;
-  const parent = visibleCategory(category.parent, locale);
-  // Danh mục cấp 1 gồm cả dự án của danh mục con; cấp 2 không có con và tab được đánh dấu là danh mục cha của nó.
-  const children = parent ? [] : (await listChildProjectCategories(payload, locale, category.id)).docs;
-  return { slug, rootId: parent?.id ?? category.id, filterIds: [category.id, ...children.map((child) => child.id)] };
 }
 
 /** Badge "Bộ lọc": các ô trong thẻ lọc (danh mục là tab, từ khoá là hero, sắp xếp ở hàng kết quả — không tính). */
@@ -98,6 +70,56 @@ function toLearnMoreContent(view: ListingLearnMoreView | null) {
   return { eyebrow: view.eyebrow ?? null, title: view.title, titleAccent: view.titleAccent ?? null, description: view.description ?? null, image: view.image ?? null, videoUrl: view.videoUrl ?? null, cta: view.cta ?? null };
 }
 
+interface ProjectResultsProps {
+  locale: Locale;
+  listPath: string;
+  /** URL có lọc: trạng thái trống "không tìm thấy" + Xoá bộ lọc thay vì "chưa có dự án". */
+  filtered: boolean;
+  /** Tổng dự án khớp lọc (0 → trạng thái trống). */
+  total: number;
+  cards: ProjectCardData[];
+  page: number;
+  totalPages: number;
+  buildHref: (page: number) => string;
+  /** Thẻ đầu là ảnh LCP (hero không có ảnh và không có thẻ nổi bật). */
+  priorityFirst: boolean;
+}
+
+/** Thẻ nổi bật (trang 1, có dự án nổi bật khớp lọc). */
+function ProjectSpotlight({ cards }: { cards: ProjectCardData[] }) {
+  const t = useTranslations("page.projects");
+  return <SpotlightSlider label={t("spotlightLabel")} badge={t("spotlightLabel")} items={cards.map((card) => ({ id: card.id, image: card.cover, content: <ProjectSpotlightContent data={card} /> }))} />;
+}
+
+/** Lưới 3 cột + phân trang, hoặc trạng thái trống (có lọc / chưa có dự án). */
+function ProjectResults({ locale, listPath, filtered, total, cards, page, totalPages, buildHref, priorityFirst }: ProjectResultsProps) {
+  const t = useTranslations("page.projects");
+  if (total === 0) {
+    return filtered ? (
+      <EmptyState variant="filtered" title={t("emptyTitle")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
+    ) : (
+      <EmptyState variant="empty" title={t("noProjects")} />
+    );
+  }
+  return (
+    <>
+      {cards.length > 0 && (
+        <section aria-label={t("gridLabel")}>
+          <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {cards.map((card, index) => (
+              <li key={card.id}>
+                {/* Ảnh LCP là ảnh hero; thẻ đầu chỉ ưu tiên khi hero không có ảnh và không có thẻ nổi bật. */}
+                <ProjectCard data={card} sizes={GRID_CARD_SIZES} priority={priorityFirst && index === 0} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
+    </>
+  );
+}
+
 /**
  * S02 `/du-an` theo design BL-052 (`list-du-an.webp`): hero (ảnh + chữ `pageHeroes.projects`, ô tìm `q`, "Tìm nhanh") → tab danh mục cấp 1 (icon + số) → cột lọc trái
  * (Tình trạng · Tỉnh/thành · Chủ đầu tư · Mức giá · Loại hình · Tiện ích; < lg là Sheet) | thẻ nổi bật (trang 1) → "N dự án phù hợp" + sắp xếp → lưới 3 cột → phân trang
@@ -105,30 +127,12 @@ function toLearnMoreContent(view: ListingLearnMoreView | null) {
  * (`?category=&province=a,b&status=&q=&developer=&sort=&type=&feature=&priceMin=&priceMax=&page=`); slug / id lạ bị bỏ (không 404); trang vượt số trang → `notFound()`.
  */
 export async function ProjectListPage({ locale, searchParams }: ProjectListPageProps) {
-  const { page } = parsePagination(searchParams.page, undefined);
-  const filters = parseProjectFilters(searchParams);
-  const payload = await getPayload({ config });
-  const [context, provinces, developers, t, tNav, tOptions, roots, hero, strengths, content] = await Promise.all([
-    filters.categorySlug ? loadCategoryContext(payload, locale, filters.categorySlug) : null,
-    listProvinces(payload),
-    listDevelopersWithPublicProjects(payload, locale),
+  const { page, filters, context, developers, resolved, listing, roots, hero, strengths, content } = await loadProjectListData(locale, searchParams);
+  const [t, tNav, tOptions] = await Promise.all([
     getTranslations({ locale, namespace: "page.projects" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     getTranslations({ locale, namespace: "listingOptions" }),
-    listRootProjectCategories(payload, locale),
-    loadPageHero(locale, "projects"),
-    loadProjectStrengths(locale),
-    loadListingPageContent(locale, "projects"),
   ]);
-  // Slug tỉnh / id chủ đầu tư lạ bị bỏ (không 500); nhiều tỉnh là OR.
-  const resolved: ResolvedProjectFilters = {
-    filters,
-    provinces: provinces.filter((item) => filters.provinceSlugs?.includes(item.slug)),
-    developer: developers.find((item) => item.id === filters.developerId),
-    categoryIds: context?.filterIds,
-  };
-  const listing = await listPublicProjects(payload, locale, toProjectPageQuery(resolved, page));
-  if (page > 1 && page > listing.totalPages) notFound();
 
   const listPath = publicPath("/du-an", locale);
   const filterParams = toFilterParams(resolved);
@@ -173,42 +177,20 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
         activeCount={countActiveFilters(current, ACTIVE_FILTER_SPEC)}
         clearHref={listPath}
         countLabel={t("resultTotal", { count: listing.totalDocs })}
-        {...(featuredCards.length > 0
-          ? {
-              spotlight: (
-                <SpotlightSlider
-                  label={t("spotlightLabel")}
-                  badge={t("spotlightLabel")}
-                  items={featuredCards.map((card) => ({ id: card.id, image: card.cover, content: <ProjectSpotlightContent data={card} /> }))}
-                />
-              ),
-            }
-          : {})}
-        {...(listing.totalDocs > 0 ? { sort: <ProjectSortControl actionPath={listPath} {...(filters.sort ? { value: filters.sort } : {})} params={{ ...categoryParam, ...filterParams }} /> } : {})}
+        {...(featuredCards.length > 0 ? { spotlight: <ProjectSpotlight cards={featuredCards} /> } : {})}
+        {...(listing.totalDocs > 0 ? { sort: <ProjectSortControl {...(filters.sort ? { value: filters.sort } : {})} /> } : {})}
       >
-        {listing.totalDocs === 0 ? (
-          filtered ? (
-            <EmptyState variant="filtered" title={t("emptyTitle")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
-          ) : (
-            <EmptyState variant="empty" title={t("noProjects")} />
-          )
-        ) : (
-          <>
-            {cards.length > 0 && (
-              <section aria-label={t("gridLabel")}>
-                <ul data-grid-max-cols="3" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {cards.map((card, index) => (
-                    <li key={card.id}>
-                      {/* Ảnh LCP là ảnh hero; thẻ đầu chỉ ưu tiên khi hero không có ảnh và không có thẻ nổi bật. */}
-                      <ProjectCard data={card} sizes={GRID_CARD_SIZES} priority={index === 0 && !hero.image && featuredCards.length === 0} />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-            <Pagination page={page} totalPages={listing.totalPages} buildHref={buildHref} />
-          </>
-        )}
+        <ProjectResults
+          locale={locale}
+          listPath={listPath}
+          filtered={filtered}
+          total={listing.totalDocs}
+          cards={cards}
+          page={page}
+          totalPages={listing.totalPages}
+          buildHref={buildHref}
+          priorityFirst={!hero.image && featuredCards.length === 0}
+        />
       </ProjectListBody>
       <div className="mx-auto w-full max-w-container px-gutter pb-section-tight empty:hidden">
         <LearnMoreFaq learnMore={toLearnMoreContent(content.learnMore)} faqs={content.faqs} emitJsonLd={cleanPage} />

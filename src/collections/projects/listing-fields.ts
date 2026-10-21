@@ -1,5 +1,6 @@
 import type { ArrayField, SelectField } from "payload";
 
+import { selectOptions } from "../../fields/listing-field-helpers";
 import { formRow } from "../../lib/admin/form-layout";
 import { textRowLabel } from "../../lib/admin/row-label";
 import { PROJECT_FEATURE_ADMIN_LABELS, PROJECT_FEATURES, PROPERTY_TYPE_ADMIN_LABELS, PROPERTY_TYPES } from "../../shared/listing-options";
@@ -11,8 +12,6 @@ import { notBelow } from "./market-blocks";
  */
 
 export const MAX_PRODUCTS = 8;
-
-const selectOptions = <T extends string>(values: readonly T[], labels: Record<T, string>) => values.map((value) => ({ label: labels[value], value }));
 
 export const productTypesField: SelectField = {
   name: "productTypes",

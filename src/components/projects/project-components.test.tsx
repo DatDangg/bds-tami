@@ -1,16 +1,9 @@
 import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { chooseOption, fakeMedia, renderWithIntl } from "@/components/media/test-utils";
+import { describe, expect, it } from "vitest";
+import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { ProjectCardData } from "@/lib/projects/project-view";
-const push = vi.hoisted(() => vi.fn());
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
-
 import { ProjectCard } from "./ProjectCard";
 import { ProjectSpotlightContent } from "./ProjectSpotlightContent";
-import { ProjectSortControl } from "./ProjectSortControl";
-
-afterEach(() => push.mockReset());
 
 const card = (overrides: Partial<ProjectCardData> = {}): ProjectCardData => ({
   id: "d1",
@@ -143,23 +136,5 @@ describe("ProjectSpotlightContent (BL-052)", () => {
     expect(screen.getByText("Liên hệ")).toBeInTheDocument();
     expect(screen.queryByText("Căn hộ")).toBeNull();
     expect(screen.getByRole("heading", { level: 3 })).toBeInTheDocument();
-  });
-});
-
-describe("ProjectSortControl", () => {
-  it("đổi sắp xếp: router.push giữ mọi bộ lọc, về trang 1; 'Mới nhất' không lên URL", async () => {
-    const user = userEvent.setup();
-    renderWithIntl(<ProjectSortControl actionPath="/du-an" params={{ category: "can-ho", province: "ha-noi", q: "sông" }} />);
-    expect(screen.getByLabelText("Sắp xếp theo")).toHaveTextContent("Mới nhất");
-    await chooseOption(user, screen.getByLabelText("Sắp xếp theo"), "Giá tăng dần");
-    expect(push).toHaveBeenLastCalledWith("/du-an?category=can-ho&province=ha-noi&q=s%C3%B4ng&sort=price_asc");
-  });
-
-  it("đang sắp xếp theo giá giảm: hiện đúng giá trị, chọn 'Mới nhất' bỏ sort khỏi URL", async () => {
-    const user = userEvent.setup();
-    renderWithIntl(<ProjectSortControl actionPath="/du-an" value="price_desc" params={{}} />);
-    expect(screen.getByLabelText("Sắp xếp theo")).toHaveTextContent("Giá giảm dần");
-    await chooseOption(user, screen.getByLabelText("Sắp xếp theo"), "Mới nhất");
-    expect(push).toHaveBeenLastCalledWith("/du-an");
   });
 });

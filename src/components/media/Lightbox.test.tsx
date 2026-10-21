@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
-import { Gallery } from "./Gallery";
+import { DetailGalleryGrid } from "@/components/detail/DetailGalleryGrid";
 import { Lightbox } from "./Lightbox";
 import { fakeMedia, renderWithIntl } from "./test-utils";
 
@@ -12,12 +12,12 @@ async function openSecondImage(locale: "vi" | "en" = "vi") {
   const user = userEvent.setup();
   renderWithIntl(
     <>
-      <Gallery images={images} />
+      <DetailGalleryGrid images={images} />
       <button type="button">Ngoài</button>
     </>,
     locale,
   );
-  const opener = screen.getByRole("button", { name: locale === "vi" ? "Phóng to ảnh 2 / 4" : "Enlarge photo 2 of 4" });
+  const opener = screen.getByRole("button", { name: locale === "vi" ? "Xem ảnh 2 / 4" : "View photo 2 of 4" });
   await user.click(opener);
   const dialog = await screen.findByRole("dialog");
   return { user, opener, dialog };

@@ -71,13 +71,6 @@
     }
   },
   "media": {
-    "gallery": {
-      "region": "Thư viện ảnh",
-      "open": "Phóng to ảnh {index} / {total}",
-      "counter": "{current}/{total}",
-      "slide": "{index} / {total}",
-      "more": "+{count} ảnh"
-    },
     "lightbox": {
       "title": "Xem ảnh",
       "description": "Dùng phím mũi tên trái, phải để chuyển ảnh; nhấn Esc để đóng.",
@@ -244,15 +237,6 @@
         "noPostsInCategory": "Chưa có tin đăng trong mục này."
       },
       "subNavLabel": "Mục lục tin đăng",
-      "subNav": {
-        "overview": "Tổng quan",
-        "offer": "Ưu đãi",
-        "content": "Nội dung",
-        "gallery": "Hình ảnh"
-      },
-      "sections": {
-        "content": "Nội dung"
-      },
       "endedBadge": "Đã kết thúc",
       "daysLeft": "Còn {count} ngày",
       "endsToday": "Hết hạn hôm nay",
@@ -329,16 +313,11 @@
     "projects": {
       "title": "Dự án",
       "description": "Các dự án bất động sản TAMI phân phối: lọc theo loại hình, tỉnh/thành và tình trạng mở bán.",
-      "filtersLabel": "Bộ lọc dự án",
-      "categoriesLabel": "Loại hình",
       "all": "Tất cả",
       "provinceLabel": "Tỉnh/thành",
       "allProvinces": "Tất cả",
       "statusLabel": "Trạng thái",
       "allStatuses": "Tất cả",
-      "barAllStatuses": "Mọi trạng thái",
-      "clear": "Xoá bộ lọc",
-      "resultCount": "Có {count, number} kết quả",
       "gridLabel": "Danh sách dự án",
       "emptyTitle": "Chưa có dự án phù hợp.",
       "noProjects": "Chưa có dự án nào được xuất bản.",
@@ -350,15 +329,7 @@
       "keywordLabel": "Từ khoá dự án",
       "keywordPlaceholder": "Nhập tên dự án, khu vực…",
       "search": "Tìm kiếm",
-      "moreLabel": "Tùy chọn khác",
-      "sortLabel": "Sắp xếp",
       "resultTotal": "{count, number} dự án",
-      "resultSuffix": "đang hiển thị",
-      "chips": {
-        "province": "Tỉnh/thành",
-        "status": "Tình trạng",
-        "developer": "Chủ đầu tư"
-      },
       "sort": {
         "newest": "Mới nhất",
         "price_asc": "Giá tăng dần",
@@ -388,33 +359,16 @@
       "categoriesLabel": "Loại hình",
       "all": "Tất cả",
       "gridLabel": "Danh sách tin cho thuê",
-      "resultCount": "Có {count, number} kết quả",
       "search": "Tìm kiếm",
-      "searchBarLabel": "Tìm tin cho thuê",
-      "resultsFor": "Kết quả cho “{query}”",
       "fields": {
-        "q": "Từ khoá",
         "qPlaceholder": "Khu vực, dự án, mã tin",
-        "category": "Danh mục",
         "province": "Tỉnh/thành",
         "allProvinces": "Tất cả tỉnh/thành",
         "ward": "Phường/xã",
         "allWards": "Tất cả phường/xã",
-        "wardNeedsProvince": "Chọn tỉnh/thành trước",
-        "price": "Giá/tháng (VNĐ)",
-        "priceFrom": "Giá từ",
-        "priceTo": "Giá đến",
-        "fromPlaceholder": "Từ",
-        "toPlaceholder": "Đến",
-        "area": "Diện tích (m²)",
-        "areaFrom": "Diện tích từ",
-        "areaTo": "Diện tích đến",
         "bedrooms": "Phòng ngủ",
         "furnishing": "Nội thất",
-        "amenities": "Tiện ích",
-        "sort": "Sắp xếp",
-        "anyOption": "Bất kỳ",
-        "priceCustom": "Khoảng giá tuỳ chọn"
+        "amenities": "Tiện ích"
       },
       "amenityOption": {
         "pool": "Hồ bơi",
@@ -452,9 +406,6 @@
         "price_desc": "Giá giảm dần"
       },
       "active": {
-        "label": "Đang lọc",
-        "clearAll": "Xoá tất cả",
-        "remove": "Bỏ lọc {name}",
         "query": "Từ khoá: {value}",
         "price": "Giá: {value}",
         "area": "Diện tích: {value}",
@@ -465,20 +416,8 @@
         "to": "đến {value}",
         "range": "{from} - {to}"
       },
-      "mobile": {
-        "filters": "Bộ lọc",
-        "sheetTitle": "Bộ lọc tin cho thuê",
-        "sheetDescription": "Chọn điều kiện rồi nhấn xem kết quả.",
-        "clear": "Xoá",
-        "show": "Xem {count} tin",
-        "showUnknown": "Xem tin",
-        "close": "Đóng bộ lọc",
-        "counting": "Đang đếm…"
-      },
       "empty": {
         "title": "Không tìm thấy tin phù hợp",
-        "suggestionsLabel": "Thử bớt điều kiện lọc",
-        "suggestion": "Bỏ {name}",
         "noListings": "Chưa có tin cho thuê nào được đăng.",
         "noListingsInCategory": "Chưa có tin cho thuê trong mục này."
       },
@@ -489,23 +428,9 @@
       "card": {
         "available": "Còn trống",
         "bedrooms": "{count} PN",
-        "negotiable": "Thoả thuận",
         "perMonth": "/tháng"
       },
-      "moreLabel": "Tùy chọn khác",
       "resultTotal": "{count, number} căn",
-      "resultSuffix": "phù hợp",
-      "chips": {
-        "province": "Khu vực",
-        "price": "Mức giá",
-        "area": "Diện tích",
-        "areaCustom": "Diện tích tuỳ chọn",
-        "bedrooms": "Phòng ngủ",
-        "bedroomsValue": "{value} phòng ngủ",
-        "furnishing": "Nội thất",
-        "amenities": "Tiện ích",
-        "amenitiesCount": "Tiện ích ({count})"
-      },
       "filterGroups": {
         "project": "Dự án",
         "price": "Giá thuê",
@@ -531,23 +456,11 @@
       }
     },
     "detail": {
-      "gallery": {
-        "region": "Thư viện ảnh",
-        "slide": "Ảnh {index} / {total}",
-        "previous": "Ảnh trước",
-        "next": "Ảnh sau",
-        "thumb": "Xem ảnh {index}",
-        "thumbs": "Ảnh thu nhỏ",
-        "viewAll": "Xem tất cả ảnh",
-        "empty": "Chưa có ảnh"
-      },
       "share": {
         "button": "Chia sẻ",
         "menu": "Chia sẻ trang này"
       },
-      "priceFrom": "Giá từ",
       "eyebrow": {
-        "overview": "Giới thiệu",
         "highlights": "Giá trị",
         "location": "Kết nối",
         "amenities": "Cuộc sống",
@@ -562,9 +475,6 @@
     "projectDetail": {
       "subNavLabel": "Mục lục dự án",
       "sections": {
-        "overview": "Tổng quan",
-        "location": "Vị trí",
-        "amenities": "Tiện ích",
         "floorPlans": "Mặt bằng",
         "legal": "Pháp lý",
         "policy": "Chính sách bán hàng",
@@ -572,46 +482,12 @@
         "pricing": "Bảng giá",
         "faq": "Câu hỏi thường gặp"
       },
-      "subNav": {
-        "overview": "Tổng quan",
-        "location": "Vị trí",
-        "amenities": "Tiện ích",
-        "floorPlans": "Mặt bằng",
-        "legal": "Pháp lý",
-        "policy": "Chính sách",
-        "gallery": "Thư viện",
-        "listings": "Tin liên quan",
-        "highlights": "Nổi bật",
-        "pricing": "Giá",
-        "faq": "Hỏi đáp"
-      },
       "specs": {
-        "label": "Thông số dự án",
-        "developer": "Chủ đầu tư",
-        "scale": "Quy mô",
-        "area": "Diện tích",
-        "handover": "Bàn giao",
-        "units": "{count} căn",
         "blocks": "{count} tòa",
-        "floors": "{count} tầng",
-        "landArea": "Đất {area}",
-        "newTab": "(mở tab mới)"
+        "floors": "{count} tầng"
       },
       "location": {
-        "mapLabel": "Vị trí {name} trên bản đồ",
-        "address": "Địa chỉ"
-      },
-      "nearby": {
-        "title": "Tiện ích xung quanh",
-        "tabs": "Nhóm tiện ích xung quanh",
-        "categories": {
-          "education": "Giáo dục",
-          "healthcare": "Y tế",
-          "shopping": "Mua sắm",
-          "park": "Công viên",
-          "transport": "Giao thông",
-          "other": "Khác"
-        }
+        "mapLabel": "Vị trí {name} trên bản đồ"
       },
       "price": {
         "caption": "Bảng giá tham khảo theo loại căn",
@@ -633,7 +509,6 @@
           "sold_out": "Hết hàng"
         }
       },
-      "amenitiesLabel": "Danh sách tiện ích",
       "floorPlans": {
         "tabs": "Chọn mặt bằng",
         "select": "Chọn mặt bằng",
@@ -646,8 +521,7 @@
         "pdf": "PDF"
       },
       "leadForm": {
-        "title": "Nhận thông tin dự án",
-        "hotline": "Hotline"
+        "title": "Nhận thông tin dự án"
       },
       "listings": {
         "title": "Tin liên quan",
@@ -658,18 +532,12 @@
         "hotline": "Gọi hotline"
       },
       "facts": {
-        "label": "Thông số nổi bật",
-        "scale": "Quy mô",
-        "units": "Số sản phẩm",
-        "developer": "Chủ đầu tư",
-        "handover": "Bàn giao",
         "unitsValue": "{count} căn"
       },
       "similar": {
         "eyebrow": "Có thể bạn quan tâm",
         "title": "Dự án",
         "titleAccent": "tương tự",
-        "description": "Các dự án cùng khu vực hoặc cùng loại hình.",
         "slide": "Dự án {index} / {total}",
         "previous": "Dự án trước",
         "next": "Dự án sau",
@@ -739,46 +607,21 @@
       "code": "Mã tin",
       "postedAt": "Đăng ngày",
       "subNavLabel": "Mục lục tin cho thuê",
-      "subNav": {
-        "overview": "Tổng quan",
-        "details": "Thông tin chi tiết",
-        "amenities": "Tiện ích",
-        "terms": "Điều khoản",
-        "video": "Video",
-        "location": "Vị trí",
-        "legal": "Pháp lý"
-      },
       "rented": {
         "badge": "Đã thuê",
-        "bannerTitle": "Căn này đã được cho thuê",
         "banner": "Căn này đã được cho thuê. Xem các căn tương tự bên dưới hoặc để lại thông tin để TAMI tư vấn.",
         "referencePrice": "Giá tham khảo"
       },
       "specs": {
         "price": "Giá thuê",
         "perMonth": "/tháng",
-        "negotiable": "Thoả thuận",
-        "area": "Diện tích",
-        "bedrooms": "Phòng ngủ",
-        "bathrooms": "WC"
+        "area": "Diện tích"
       },
       "details": {
         "floor": "Tầng",
-        "houseDirection": "Hướng nhà",
         "balconyDirection": "Hướng ban công",
         "furnishing": "Nội thất",
-        "category": "Danh mục",
-        "project": "Dự án"
-      },
-      "direction": {
-        "N": "Bắc",
-        "NE": "Đông Bắc",
-        "E": "Đông",
-        "SE": "Đông Nam",
-        "S": "Nam",
-        "SW": "Tây Nam",
-        "W": "Tây",
-        "NW": "Tây Bắc"
+        "category": "Danh mục"
       },
       "furnishing": {
         "none": "Không nội thất",
@@ -811,10 +654,7 @@
         }
       },
       "sections": {
-        "overview": "Mô tả căn hộ",
-        "details": "Thông tin chi tiết",
         "amenities": "Tiện ích đi kèm",
-        "video": "Video",
         "location": "Vị trí",
         "legal": "Pháp lý"
       },
@@ -823,7 +663,6 @@
       },
       "contact": {
         "saleTitle": "Người phụ trách",
-        "hotlineTitle": "Liên hệ TAMI",
         "callSale": "Gọi {phone}",
         "callHotline": "Gọi hotline {phone}",
         "avatarAlt": "Ảnh {name}"
@@ -838,7 +677,6 @@
         "titleAccent": "tương tự",
         "titleRented": "Căn tương tự",
         "titleRentedAccent": "đang trống",
-        "description": "Cùng khu vực, mức giá gần giống.",
         "slide": "Căn {index} / {total}",
         "previous": "Căn trước",
         "next": "Căn sau",
@@ -848,25 +686,16 @@
       "stickyConsult": "Nhận tư vấn",
       "stickyConsultRented": "Nhận tư vấn căn tương tự",
       "eyebrow": {
-        "overview": "Tổng quan",
-        "details": "Thông tin",
         "amenities": "Tiện ích",
-        "terms": "Điều khoản",
-        "video": "Xem thực tế"
+        "terms": "Điều khoản"
       },
       "facts": {
         "label": "Thông số chính",
         "bedroomsValue": "{count} phòng ngủ",
         "bathroomsValue": "{count} WC",
-        "sanitary": "Vệ sinh",
         "direction": "Hướng"
       },
       "amenitiesLabel": "Tiện ích của căn",
-      "video": {
-        "button": "Video",
-        "title": "Video giới thiệu",
-        "close": "Đóng"
-      },
       "v2": {
         "tabs": {
           "overview": "Tổng quan",
@@ -996,8 +825,6 @@
     },
     "listing": {
       "resultCount": "{count} kết quả",
-      "sortLabel": "Sắp xếp",
-      "moreOptions": "Tuỳ chọn khác",
       "hero": {
         "searchLabel": "Tìm kiếm trong danh sách",
         "keywordLabel": "Từ khoá",
@@ -1146,22 +973,10 @@
       }
     },
     "postDetail": {
-      "eyebrow": {
-        "overview": "Chi tiết",
-        "offer": "Ưu đãi",
-        "content": "Mô tả",
-        "gallery": "Thực tế"
-      },
-      "overview": {
-        "title": "Tổng quan",
-        "category": "Danh mục",
-        "publishedAt": "Ngày đăng"
-      },
       "related": {
         "eyebrow": "Có thể bạn quan tâm",
         "title": "Tin",
         "titleAccent": "liên quan",
-        "description": "Các tin đăng cùng danh mục.",
         "slide": "Tin {index} / {total}",
         "previous": "Tin trước",
         "next": "Tin sau",
@@ -1216,7 +1031,6 @@
   },
   "detailKit": {
     "hero": {
-      "region": "Ảnh giới thiệu",
       "viewAll": "Xem tất cả {count} ảnh",
       "viewPhoto": "Xem ảnh {index}",
       "thumbs": "Ảnh khác",
@@ -1266,6 +1080,16 @@
       "raw": "Bàn giao thô",
       "basic": "Hoàn thiện cơ bản",
       "full": "Nội thất đầy đủ"
+    },
+    "direction": {
+      "N": "Bắc",
+      "NE": "Đông Bắc",
+      "E": "Đông",
+      "SE": "Đông Nam",
+      "S": "Nam",
+      "SW": "Tây Nam",
+      "W": "Tây",
+      "NW": "Tây Bắc"
     }
   },
   "projectCard": {

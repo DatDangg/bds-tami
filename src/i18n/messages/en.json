@@ -71,13 +71,6 @@
     }
   },
   "media": {
-    "gallery": {
-      "region": "Photo gallery",
-      "open": "Enlarge photo {index} of {total}",
-      "counter": "{current}/{total}",
-      "slide": "{index} / {total}",
-      "more": "+{count} photos"
-    },
     "lightbox": {
       "title": "Photo viewer",
       "description": "Use the left and right arrow keys to change photo; press Esc to close.",
@@ -244,15 +237,6 @@
         "noPostsInCategory": "No listings in this category yet."
       },
       "subNavLabel": "Listing contents",
-      "subNav": {
-        "overview": "Overview",
-        "offer": "Offer",
-        "content": "Content",
-        "gallery": "Photos"
-      },
-      "sections": {
-        "content": "Content"
-      },
       "endedBadge": "Ended",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
       "endsToday": "Ends today",
@@ -329,16 +313,11 @@
     "projects": {
       "title": "Projects",
       "description": "Property projects distributed by TAMI: filter by type, province and sales status.",
-      "filtersLabel": "Project filters",
-      "categoriesLabel": "Project type",
       "all": "All",
       "provinceLabel": "Province/city",
       "allProvinces": "All",
       "statusLabel": "Status",
       "allStatuses": "All",
-      "barAllStatuses": "Any status",
-      "clear": "Clear filters",
-      "resultCount": "{count, plural, one {# result} other {# results}}",
       "gridLabel": "Project list",
       "emptyTitle": "No matching projects yet.",
       "noProjects": "No projects have been published yet.",
@@ -350,15 +329,7 @@
       "keywordLabel": "Project keyword",
       "keywordPlaceholder": "Enter a project name or area…",
       "search": "Search",
-      "moreLabel": "More options",
-      "sortLabel": "Sort by",
       "resultTotal": "{count, plural, one {# project} other {# projects}}",
-      "resultSuffix": "shown",
-      "chips": {
-        "province": "Province/city",
-        "status": "Status",
-        "developer": "Developer"
-      },
       "sort": {
         "newest": "Newest",
         "price_asc": "Price: low to high",
@@ -388,33 +359,16 @@
       "categoriesLabel": "Property type",
       "all": "All",
       "gridLabel": "Rental listings",
-      "resultCount": "{count, plural, one {# result} other {# results}}",
       "search": "Search",
-      "searchBarLabel": "Search rental listings",
-      "resultsFor": "Results for “{query}”",
       "fields": {
-        "q": "Keyword",
         "qPlaceholder": "Area, project, listing code",
-        "category": "Category",
         "province": "Province/city",
         "allProvinces": "All provinces/cities",
         "ward": "Ward/commune",
         "allWards": "All wards/communes",
-        "wardNeedsProvince": "Choose a province/city first",
-        "price": "Price/month (VND)",
-        "priceFrom": "Price from",
-        "priceTo": "Price to",
-        "fromPlaceholder": "From",
-        "toPlaceholder": "To",
-        "area": "Floor area (m²)",
-        "areaFrom": "Floor area from",
-        "areaTo": "Floor area to",
         "bedrooms": "Bedrooms",
         "furnishing": "Furnishing",
-        "amenities": "Amenities",
-        "sort": "Sort by",
-        "anyOption": "Any",
-        "priceCustom": "Custom price range"
+        "amenities": "Amenities"
       },
       "amenityOption": {
         "pool": "Swimming pool",
@@ -452,9 +406,6 @@
         "price_desc": "Price: high to low"
       },
       "active": {
-        "label": "Active filters",
-        "clearAll": "Clear all",
-        "remove": "Remove filter {name}",
         "query": "Keyword: {value}",
         "price": "Price: {value}",
         "area": "Floor area: {value}",
@@ -465,20 +416,8 @@
         "to": "to {value}",
         "range": "{from} - {to}"
       },
-      "mobile": {
-        "filters": "Filters",
-        "sheetTitle": "Rental filters",
-        "sheetDescription": "Choose your criteria, then show the results.",
-        "clear": "Clear",
-        "show": "{count, plural, one {Show # listing} other {Show # listings}}",
-        "showUnknown": "Show listings",
-        "close": "Close filters",
-        "counting": "Counting…"
-      },
       "empty": {
         "title": "No matching listings",
-        "suggestionsLabel": "Try removing a filter",
-        "suggestion": "Remove {name}",
         "noListings": "No rental listings have been published yet.",
         "noListingsInCategory": "No rental listings in this category yet."
       },
@@ -489,23 +428,9 @@
       "card": {
         "available": "Available",
         "bedrooms": "{count} BR",
-        "negotiable": "Negotiable",
         "perMonth": "/month"
       },
-      "moreLabel": "More options",
       "resultTotal": "{count, plural, one {# listing} other {# listings}}",
-      "resultSuffix": "available",
-      "chips": {
-        "province": "Area",
-        "price": "Price",
-        "area": "Floor area",
-        "areaCustom": "Custom floor area",
-        "bedrooms": "Bedrooms",
-        "bedroomsValue": "{value} bedrooms",
-        "furnishing": "Furnishing",
-        "amenities": "Amenities",
-        "amenitiesCount": "Amenities ({count})"
-      },
       "filterGroups": {
         "project": "Project",
         "price": "Monthly rent",
@@ -531,23 +456,11 @@
       }
     },
     "detail": {
-      "gallery": {
-        "region": "Photo gallery",
-        "slide": "Photo {index} / {total}",
-        "previous": "Previous photo",
-        "next": "Next photo",
-        "thumb": "View photo {index}",
-        "thumbs": "Thumbnails",
-        "viewAll": "View all photos",
-        "empty": "No photos yet"
-      },
       "share": {
         "button": "Share",
         "menu": "Share this page"
       },
-      "priceFrom": "From",
       "eyebrow": {
-        "overview": "Introduction",
         "highlights": "Value",
         "location": "Connectivity",
         "amenities": "Lifestyle",
@@ -562,9 +475,6 @@
     "projectDetail": {
       "subNavLabel": "Project contents",
       "sections": {
-        "overview": "Overview",
-        "location": "Location",
-        "amenities": "Amenities",
         "floorPlans": "Floor plans",
         "legal": "Legal information",
         "policy": "Sales policy",
@@ -572,46 +482,12 @@
         "pricing": "Price list",
         "faq": "Frequently asked questions"
       },
-      "subNav": {
-        "overview": "Overview",
-        "location": "Location",
-        "amenities": "Amenities",
-        "floorPlans": "Floor plans",
-        "legal": "Legal",
-        "policy": "Policy",
-        "gallery": "Gallery",
-        "listings": "Related listings",
-        "highlights": "Highlights",
-        "pricing": "Pricing",
-        "faq": "FAQ"
-      },
       "specs": {
-        "label": "Project facts",
-        "developer": "Developer",
-        "scale": "Scale",
-        "area": "Area",
-        "handover": "Handover",
-        "units": "{count} units",
         "blocks": "{count} blocks",
-        "floors": "{count} floors",
-        "landArea": "Land {area}",
-        "newTab": "(opens in a new tab)"
+        "floors": "{count} floors"
       },
       "location": {
-        "mapLabel": "{name} location on the map",
-        "address": "Address"
-      },
-      "nearby": {
-        "title": "Nearby amenities",
-        "tabs": "Nearby amenity groups",
-        "categories": {
-          "education": "Education",
-          "healthcare": "Healthcare",
-          "shopping": "Shopping",
-          "park": "Parks",
-          "transport": "Transport",
-          "other": "Other"
-        }
+        "mapLabel": "{name} location on the map"
       },
       "price": {
         "caption": "Reference prices by unit type",
@@ -633,7 +509,6 @@
           "sold_out": "Sold out"
         }
       },
-      "amenitiesLabel": "Amenities list",
       "floorPlans": {
         "tabs": "Choose a floor plan",
         "select": "Choose a floor plan",
@@ -646,8 +521,7 @@
         "pdf": "PDF"
       },
       "leadForm": {
-        "title": "Get project information",
-        "hotline": "Hotline"
+        "title": "Get project information"
       },
       "listings": {
         "title": "Related listings",
@@ -658,18 +532,12 @@
         "hotline": "Call hotline"
       },
       "facts": {
-        "label": "Key facts",
-        "scale": "Scale",
-        "units": "Units",
-        "developer": "Developer",
-        "handover": "Handover",
         "unitsValue": "{count} units"
       },
       "similar": {
         "eyebrow": "You may also like",
         "title": "Similar",
         "titleAccent": "projects",
-        "description": "Projects in the same area or of the same type.",
         "slide": "Project {index} / {total}",
         "previous": "Previous projects",
         "next": "Next projects",
@@ -739,46 +607,21 @@
       "code": "Listing ID",
       "postedAt": "Posted",
       "subNavLabel": "Listing contents",
-      "subNav": {
-        "overview": "Overview",
-        "details": "Details",
-        "amenities": "Amenities",
-        "terms": "Terms",
-        "video": "Video",
-        "location": "Location",
-        "legal": "Legal"
-      },
       "rented": {
         "badge": "Rented",
-        "bannerTitle": "This unit has been rented",
         "banner": "This unit has been rented. See similar units below or leave your details for advice.",
         "referencePrice": "Reference price"
       },
       "specs": {
         "price": "Rent",
         "perMonth": "/month",
-        "negotiable": "Negotiable",
-        "area": "Area",
-        "bedrooms": "Bedrooms",
-        "bathrooms": "Bathrooms"
+        "area": "Area"
       },
       "details": {
         "floor": "Floor",
-        "houseDirection": "House direction",
         "balconyDirection": "Balcony direction",
         "furnishing": "Furnishing",
-        "category": "Category",
-        "project": "Project"
-      },
-      "direction": {
-        "N": "North",
-        "NE": "Northeast",
-        "E": "East",
-        "SE": "Southeast",
-        "S": "South",
-        "SW": "Southwest",
-        "W": "West",
-        "NW": "Northwest"
+        "category": "Category"
       },
       "furnishing": {
         "none": "Unfurnished",
@@ -811,10 +654,7 @@
         }
       },
       "sections": {
-        "overview": "About this home",
-        "details": "Details",
         "amenities": "Included amenities",
-        "video": "Video",
         "location": "Location",
         "legal": "Legal information"
       },
@@ -823,7 +663,6 @@
       },
       "contact": {
         "saleTitle": "Agent in charge",
-        "hotlineTitle": "Contact TAMI",
         "callSale": "Call {phone}",
         "callHotline": "Call hotline {phone}",
         "avatarAlt": "Photo of {name}"
@@ -838,7 +677,6 @@
         "titleAccent": "listings",
         "titleRented": "Similar",
         "titleRentedAccent": "available units",
-        "description": "Same area, similar price.",
         "slide": "Listing {index} / {total}",
         "previous": "Previous listings",
         "next": "Next listings",
@@ -848,25 +686,16 @@
       "stickyConsult": "Get advice",
       "stickyConsultRented": "Find similar units",
       "eyebrow": {
-        "overview": "Overview",
-        "details": "Details",
         "amenities": "Amenities",
-        "terms": "Terms",
-        "video": "See it live"
+        "terms": "Terms"
       },
       "facts": {
         "label": "Key facts",
         "bedroomsValue": "{count, plural, one {# bedroom} other {# bedrooms}}",
         "bathroomsValue": "{count, plural, one {# bath} other {# baths}}",
-        "sanitary": "Bathrooms",
         "direction": "Facing"
       },
       "amenitiesLabel": "Amenities of this home",
-      "video": {
-        "button": "Video",
-        "title": "Property video",
-        "close": "Close"
-      },
       "v2": {
         "tabs": {
           "overview": "Overview",
@@ -996,8 +825,6 @@
     },
     "listing": {
       "resultCount": "{count, plural, one {# result} other {# results}}",
-      "sortLabel": "Sort by",
-      "moreOptions": "More options",
       "hero": {
         "searchLabel": "Search this list",
         "keywordLabel": "Keyword",
@@ -1146,22 +973,10 @@
       }
     },
     "postDetail": {
-      "eyebrow": {
-        "overview": "Details",
-        "offer": "Offer",
-        "content": "Description",
-        "gallery": "In pictures"
-      },
-      "overview": {
-        "title": "Overview",
-        "category": "Category",
-        "publishedAt": "Posted on"
-      },
       "related": {
         "eyebrow": "You may also like",
         "title": "Related",
         "titleAccent": "listings",
-        "description": "Listings in the same category.",
         "slide": "Listing {index} / {total}",
         "previous": "Previous listings",
         "next": "Next listings",
@@ -1216,7 +1031,6 @@
   },
   "detailKit": {
     "hero": {
-      "region": "Featured photos",
       "viewAll": "View all {count} photos",
       "viewPhoto": "View photo {index}",
       "thumbs": "More photos",
@@ -1266,6 +1080,16 @@
       "raw": "Bare shell",
       "basic": "Basic finish",
       "full": "Fully furnished"
+    },
+    "direction": {
+      "N": "North",
+      "NE": "Northeast",
+      "E": "East",
+      "SE": "Southeast",
+      "S": "South",
+      "SW": "Southwest",
+      "W": "West",
+      "NW": "Northwest"
     }
   },
   "projectCard": {

@@ -182,6 +182,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Thành công: panel như §3.3, câu "TAMI đã nhận hồ sơ của anh/chị." Vị trí hết hạn trong lúc mở trang (400): "Vị trí này đã hết hạn nhận hồ sơ." + link danh sách tuyển dụng.
 
 ### 3.5. Bộ lọc Cho thuê (FR-PUB-04)
+- **As-built BL-052:** thay bằng bộ lọc cột trái / Sheet dùng chung cho `/du-an`, `/cho-thue`, `/tin-bds` — xem khối đầu §4 và API_SPEC §3.9–§3.11; các dòng dưới là thiết kế ban đầu.
 - Trường: Từ khoá (`q`) · Danh mục · Tỉnh/thành · Phường/xã (phụ thuộc tỉnh, disabled khi chưa chọn tỉnh) · Giá/tháng (2 ô min-max + gợi ý mốc: < 5tr, 5-10tr, 10-20tr, > 20tr) · Diện tích (min-max) · Phòng ngủ (chip 1, 2, 3, 4+) · Nội thất (chip Không, Cơ bản, Đầy đủ) · Sắp xếp (Mới nhất, Giá tăng dần, Giá giảm dần).
 - **Nguồn sự thật là URL** (query params như API_SPEC §3.3). Đổi bộ lọc → `router.replace` với `scroll: false`, debounce 300ms cho ô số và từ khoá; trang về `page=1`.
 - **Bố cục as-built (BL-020 P3-T01):** thay thanh lọc 2 hàng + thanh dính mobile bằng **băng tìm kiếm gọn** (`ListSearchBar`, thẻ trắng bo 20px, bóng `--shadow-lg`, đè 3rem lên mép dưới banner; một hàng ≥ lg, xếp dọc < lg): ô Từ khoá `q` · **Loại** (= Danh mục, tham số `category`) · **Khoảng giá** (mốc gợi ý + "Mọi mức giá"; ra đúng cặp `priceMin`/`priceMax` của chip mốc giá cũ; khoảng tự nhập không trùng mốc hiện "Khoảng giá tuỳ chọn") · nút "Tìm kiếm" · nút viên thuốc "Bộ lọc" kèm **huy hiệu số lọc phụ đang bật** (Tỉnh, Phường, Diện tích, Phòng ngủ, Nội thất, và **khoảng giá tự nhập** không trùng mốc nào của băng — tính 1 vì trường tự nhập nằm trong Sheet/Popover và "Xoá" dọn nó; mốc giá chọn ở băng, từ khoá, danh mục không tính). Lọc phụ: **Popover modal ≥ lg** (áp dụng ngay, Esc đóng + trả focus về nút) / **Sheet dưới < lg** (như trên). Sắp xếp chuyển xuống hàng kết quả: nhãn chỉ hiện từ `sm` (< sm chỉ còn nhãn cho trình đọc màn hình) để giá trị đọc được ở 375px; dùng chung **một bản nháp** với băng/Popover (context của `RentalListNavigationProvider`) nên đổi sắp xếp luôn kèm mọi lọc đang chờ và từ khoá chưa debounce. Trang danh mục (S05): không có ô Loại. **URL giữ nguyên** (cùng tên khoá/giá trị, "Tất cả" = vắng mặt, lọc mới về trang 1). Băng là **form GET thật** (ô có `name`, ô chọn là `<select>` gốc đã style trước hydrate, tham số khác giữ bằng input ẩn): không JS vẫn tìm theo từ khoá + Loại; riêng đổi Khoảng giá cần JS (một ô không gửi được hai tham số).
@@ -195,6 +196,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Đổi trang: cuộn về đầu lưới (focus tiêu đề kết quả).
 
 ### 3.7. Thư viện ảnh + lightbox
+- **As-built BL-052:** chi tiết dự án / cho thuê / tin BĐS: ảnh ở hero `DetailHeroMosaic` (ảnh 1 nền + ≤ 3 ảnh nhỏ ≥ lg) + dải "Hình ảnh" `DetailGalleryGrid` (1 lớn + 4 nhỏ, ≥ 2 ảnh); mọi ô mở `Lightbox` (bàn phím, bẫy focus, vuốt). `Gallery` / `DetailGalleryHero` cũ đã xoá.
 - Chi tiết tin cho thuê / dự án: lưới bento 1 ảnh lớn + 4 ảnh nhỏ (≥ md), ảnh thứ 5 phủ "+<n> ảnh"; mobile: carousel vuốt (scroll-snap) đếm "1/12" ở góc dưới phải (thông tin thật, được phép).
 - Lightbox: toàn màn hình nền `--color-dark-deep`, phím ← → Esc, vuốt trên mobile, `alt` làm chú thích, ảnh `large` 1600w. Không có ≥ 3 ảnh (dữ liệu lỗi) → hiện ảnh đầu, ẩn lưới.
 
@@ -225,6 +227,13 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 ---
 
 ## 4. Screen specs
+
+> **As-built BL-052 (thay BL-045 cho S02/S03/S04/S05 cho thuê + tin BĐS/S07/S08/S09; ưu tiên hơn mọi chi tiết cũ bên dưới khi mâu thuẫn — design `docs/specs/listing-detail-redesign/`):**
+> - **Khung danh sách chung** (`components/listing/`, S02 · S04 · S05 · S08): hero `ListingHero` (ảnh + chữ `pageHeroes`, breadcrumb kính, ô tìm `q`, chip "Tìm nhanh" `listingPages.*.quickSearch`) → tab danh mục cấp 1 có số đếm (`ListingCategoryTabs`; `/du-an` có icon theo slug) → ≥ lg cột lọc trái `FilterSidebar` 16/17.5rem | < lg nút "Bộ lọc" + badge mở `FilterSheet` (cùng nội dung) → cột phải: thẻ nổi bật `SpotlightSlider` (trang 1, ≤ 5 tin `isFeatured` khớp lọc, không lặp ở lưới mọi trang) → `ResultsBar` "N … phù hợp" + ô Sắp xếp (`OptionSelect` chip; nhãn ẩn < sm) → lưới 3 cột (md 2, < md 1) → phân trang tròn → "Tìm hiểu thêm" + FAQ (`LearnMoreFaq`; `FAQPage` JSON-LD chỉ ở trang sạch, trùng điều kiện noindex) → dải Điểm mạnh (cờ) → `ConsultBanner`.
+> - **Bộ lọc:** URL là nguồn sự thật (API_SPEC §3.9–§3.11). Chưa có JS: form GET + nút "Áp dụng", thanh trượt là hai ô số Từ/Đến (`step=any`, không `max` để link cũ lẻ bước vẫn gửi được). Có JS: đổi ô là `router.push` ngay (không cuộn), các thay đổi chưa về URL được gộp (`useListingFilterNav`; ô Sắp xếp dùng cùng `navigate` qua `ListingNavigateContext` nên đổi lọc rồi đổi sắp xếp nhanh không mất lọc), thanh trượt commit khi thả chuột / 300ms sau phím; "Xoá tất cả" về trang sạch. Ô tích có số đếm "trừ chính chiều đó" (mục 0 mờ nhưng vẫn hiện); chip đơn chọn (Tình trạng, Phòng ngủ, Nội thất) không số. Vùng kết quả mờ + `aria-busy` khi chờ (`PendingRegion`, không `loading.tsx`).
+> - **Khung chi tiết chung** (`components/detail/DetailPageShell`, S03 · S07 · S09): hero full-bleed `DetailHeroMosaic` (ảnh 1 nền LCP `priority` + scrim; breadcrumb kính, badge, `h1`, địa chỉ, mô tả ngắn ≤ 3 dòng, nút "Xem video giới thiệu" khi có `videoUrl`; ≥ lg 3 ảnh nhỏ cột phải, ảnh đầu "Xem tất cả N ảnh"; < lg nút đó trên ảnh; mọi ảnh mở Lightbox) → thanh thông số nổi `DetailSpecBar` đè đáy hero (ô trống bị bỏ) → tab dính `DetailSubNav` → [Tổng quan (`DetailInfoGrid`) | cột phải dính `DetailContactAside`: form lead duy nhất `#lead-form` + khối Hotline] → dải rộng hết khung nền xen kẽ (khối thiếu dữ liệu ẩn cả khối lẫn tab; Hình ảnh `DetailGalleryGrid` chỉ khi ≥ 2 ảnh) → slider tương tự / tin liên quan → dải Điểm mạnh → banner tư vấn (nút chính cuộn tới form, không nhân đôi form); thanh CTA dính đáy < lg. `DetailLayout` giữ cho Dịch vụ / Tuyển dụng (BL-054).
+> - **Thẻ:** `RentalCard` / `PostCard` biến thể `listing` (danh sách, tin liên quan, "Tin liên quan" của chi tiết dự án) và `home` (trang chủ, giữ BL-045). `PostCard` listing chọn thẻ BĐS hoặc thẻ voucher theo `isVoucherPost` (có ưu đãi, không giá lẫn diện tích — cùng quy tắc với chi tiết); thẻ voucher hết hạn: ảnh mờ 0.7, "Đã kết thúc" đọc một lần (badge ảnh `aria-hidden`). Giá cho thuê không có số: "Thương lượng" / "Liên hệ".
+> - **Theo màn:** S02 lọc Tình trạng · Tỉnh/thành (ô tìm + ô tích, 6 + "Xem thêm") · Chủ đầu tư · Mức giá 0 – 50+ tỷ · Loại hình · Tiện ích nổi bật. S03 dải Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách (một dải, một tab) · Tin liên quan · Hỏi đáp; thông số Giá từ · Quy mô (ha) · Diện tích · Chủ đầu tư · Bàn giao · Loại hình; không nút chia sẻ hero. S04/S05 (cho thuê) tab = danh mục (link route, đếm cấp 1; `?category=` cũ vẫn lọc + đánh dấu tab), lọc Tỉnh/thành (radio + số) → Phường · Dự án (dự án có tin còn trống) · Giá thuê 0 – 100+ triệu · Diện tích 0 – 300+ m² · Phòng ngủ · Nội thất · Tiện ích; bỏ hàng chip "Đang lọc"; lỗi truy vấn → khung lỗi + "Thử lại". S07 thông số Giá thuê · Diện tích · Phòng ngủ/tắm · Nội thất · Hướng · Dọn vào từ; dải Vị trí · Tiện ích · Hình ảnh · Điều khoản (đã thuê: accordion đóng) · Pháp lý; bỏ neo `#details`/`#video`; không nút chia sẻ hero. S08 lọc Loại hình · Tỉnh/thành · Mức giá 0 – 50+ tỷ · Diện tích 0 – 500+ m² · Phòng ngủ · Hướng · Tình trạng bàn giao; lưới trộn thẻ BĐS + voucher, tin ưu đãi đã kết thúc xếp sau; `/tin-bds?category=<slug>` lọc + tab, noindex, canonical về trang danh mục. S09 Tổng quan (nội dung + lưới thông tin) · Ưu đãi (`OfferBox`, hết hạn không lộ mã — BR-06) | form `source=property_post`; dải Vị trí · Hình ảnh → Tin liên quan; thông số theo loại tin (BĐS: Giá · Diện tích · Phòng ngủ/tắm · Hướng · Mặt tiền · Số tầng; voucher: Hạn ưu đãi · Trạng thái); tóm tắt chỉ ở hero (tin cũ không nội dung không lặp ở Tổng quan); bỏ neo `#content`; có nút chia sẻ hero.
 
 > **As-built BL-045 (thay đổi toàn site, ưu tiên hơn chi tiết cũ bên dưới khi mâu thuẫn):** S02/S04/S05/S08/S10/S12 dùng hero `PageHero` + thẻ lọc nổi (S02, S04, S05) + hàng "N mục + Sắp xếp" + lưới thẻ + phân trang tròn + dải Điểm mạnh (chỉ S02, cờ `site-settings.showProjectStrengths`) + `ConsultBanner`. `/du-an` thêm `?q=&developer=&sort=` (ô từ khoá `maxLength` 100, sắp theo giá/mới nhất; có tham số lọc → `noindex, follow` + canonical `/du-an`). Thẻ dự án/cho thuê bỏ tim, thẻ dự án bỏ giá. Chi tiết (S03/S07/S09) dùng khung `DetailGalleryHero` (ảnh lớn + bộ đếm + ảnh nhỏ + mũi tên) + khối tiêu đề trắng chứa dải thông số + thẻ mục có eyebrow; S07 bỏ anchor `#description` (neo cũ chỉ về đầu trang); S03 bỏ "Loại hình"/"Giá từ" lặp ở Tổng quan, bỏ mục Thư viện ảnh riêng. S08 `/tin-bds` bỏ dòng "Có N kết quả" (hành vi BL-032 cũ), bài nổi bật chỉ trang 1. S10/S11/S12/S13 canh trái đầu khối (không `text-center`); S12 có dải `careersPerks` (2–6 ý, cấu hình ở site-settings). S14 chi tiết dịch vụ, S15 Liên hệ (`pageBanners.contact`), S16 Pháp lý (`pageBanners.legal`) cùng phong cách hero. Hero 6 trang: vi/en riêng (`pageHeroes`). Seed dev: `pnpm seed:page-heroes`, `pnpm seed:galleries` (task T08).
 
@@ -346,6 +355,8 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 ### S02. Danh sách dự án · `/du-an` · `/en/projects` (FR-PUB-02)
 
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
+
 - **Bố cục as-built (BL-020 P3-T02):** page banner gọn 240px (§2.7 `compact`) + **băng tìm kiếm gọn** `ListSearchBar` đè mép dưới banner: hai ô chọn **Tỉnh/thành** ("Tất cả tỉnh/thành") và **Trạng thái** ("Mọi trạng thái") + nút "Lọc"; **không có ô từ khoá** (danh sách dự án không hỗ trợ `q`, không thêm tham số) và **không có nút "Bộ lọc"** (không có lọc phụ). Không tự gửi khi đổi ô (WCAG 3.2.2); form GET thật (`<select name>` gốc trước hydrate, `category` giữ bằng input ẩn), có JS thì `router.push` cùng query. Dưới breadcrumb: hàng chip Loại hình → dòng "Có N kết quả" (aria-live) + link "Xoá bộ lọc" khi đang lọc → lưới 1/2/3/4 cột (4 ≥ xl); thẻ `ProjectCard` trắng bo 20px viền nhạt như `RentalCard`. **URL không đổi.**
 - Page banner (§2.7) "Dự án / Projects". Breadcrumb.
 - Lọc: hàng chip **Loại hình** (danh mục `scope=project`, chip "Tất cả" đầu); hai select **Tỉnh/thành** và **Trạng thái** (Sắp mở bán / Đang mở bán / Đã bàn giao). URL: `?category=&province=&status=&page=`.
@@ -364,6 +375,8 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 **Eyebrow:** 0. **Watermark:** banner chữ (nếu không có ảnh).
 
 ### S03. Chi tiết dự án · `/du-an/[slug]` · `/en/projects/[slug]` (FR-PUB-03)
+
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
 
 **Cấu trúc:**
 1. **Hero** full màn hình (`100svh`, tối đa 900px) ảnh đại diện + scrim; đáy bo 32px (BL-020 P4-T01); đáy trái: badge `salesStatus` (gradient xanh / vàng), tên `--text-display` độ đậm 500 (không viết hoa), địa chỉ ngắn (phường, tỉnh). Nút Primary **Nhận tư vấn** (cuộn tới form) + nút Outline sáng **Tải tài liệu** (nếu có `documents`).
@@ -398,6 +411,8 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 **SEO:** JSON-LD `RealEstateListing` + `BreadcrumbList`, `inLanguage`; thêm `FAQPage` khi có câu hỏi (mục 8c).
 
 ### S04. Danh sách Cho thuê · `/cho-thue` · `/en/for-rent` (FR-PUB-04) · density 5
+
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
 
 - Page banner §2.7: biến thể Ảnh nếu có `pageBanners.rentals` / `pageBanners.default` (FR-ADM-20), không thì **Chữ** gọn (padding `--space-section-tight` × 0.6): tiêu đề "Cho thuê / For rent" + dòng mô tả. Breadcrumb.
 - **Bố cục (BL-020 P3-T01):** banner compact 240px (§2.7) → băng tìm kiếm đè mép banner (§3.5) → breadcrumb → chip danh mục → hàng "Đang lọc" → hàng "Có N kết quả" + Sắp xếp → lưới thẻ trắng bo 20px (viền `--color-border`).
@@ -463,6 +478,8 @@ Responsive: theo màn cha.
 
 ### S07. Chi tiết tin cho thuê · `/cho-thue/[slug]` · `/en/for-rent/[slug]` (FR-PUB-05)
 
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
+
 **Cấu trúc:**
 1. Breadcrumb (Trang chủ › Cho thuê › <Danh mục> › <Mã tin>).
 2. Thư viện ảnh §3.7 (bento ≥ md, carousel < md) — ảnh LCP, giữ đầu trang (không là mục con). Video là khối riêng `#video` trong thẻ nội dung (facade).
@@ -493,6 +510,8 @@ Responsive: theo màn cha.
 
 ### S08. Danh sách Đăng tin BĐS · `/tin-bds` · `/en/property-news` (FR-PUB-06)
 
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
+
 - **Bố cục as-built (BL-020 P3-T02):** banner gọn 240px; **chưa có băng tìm kiếm** (trang hiện không có từ khoá/lọc/sắp xếp — không thêm); dòng "Có N kết quả" (aria-live, gồm cả bài nổi bật) trên bài nổi bật; lưới 1/2/3/4 cột (4 ≥ xl); thẻ `PostCard` trắng bo 20px viền nhạt, tiêu đề thẻ nổi bật `font-display font-medium lg:text-h2-sm` (Montserrat nạp 400/500/600). Áp cho cả trang danh mục `/tin-bds/danh-muc/[category]`.
 - **BL-032 (thay mục bài nổi bật bên dưới):** đồng bộ `/du-an` + `/cho-thue` — bài nổi bật là **thẻ đầu lưới** (ảnh `priority`), không còn thẻ ngang 7/5; hàng "Có N kết quả" + lưới trong `section[aria-label]`; `PostCard` ảnh 4:3, tiêu đề `font-display text-h4` `line-clamp-2`, thân `gap-1` như RentalCard/ProjectCard; trống: tiêu đề riêng ("Chưa có tin đăng." / "Chưa có tin đăng trong mục này." + về `/tin-bds`).
 - Page banner + breadcrumb. Tab danh mục (link tới S05): "Tất cả" · Tin BĐS · Voucher / Ưu đãi · … (tab cuộn ngang < md).
@@ -510,6 +529,8 @@ Responsive: theo màn cha.
 **States:** đổi chip/trang như S04 (giữ kết quả cũ mờ 50% + `aria-busy`; không skeleton cấp route); trống §3.9; EN theo `hasEnglish`. **Eyebrow:** 0 (nhãn danh mục trên thẻ là metadata).
 
 ### S09. Chi tiết bài Đăng tin BĐS · `/tin-bds/[slug]` · `/en/property-news/[slug]` (FR-PUB-07)
+
+> **As-built BL-052:** xem khối đầu §4 (khung danh sách / chi tiết chung); các mục "as-built" cũ bên dưới chỉ còn là lịch sử khi mâu thuẫn.
 
 > **As-built BL-032 (thay các bước 1–7 về bố cục; nội dung từng khối giữ nguyên):** khung chi tiết chung S03/S07 (`DetailLayout`, nền `--color-primary-subtle`): breadcrumb → ảnh bìa 16:9 trong `max-w-container px-gutter`, bo 20px, `priority`, `pb-8` → thanh mục con Tổng quan · Ưu đãi · Nội dung · Hình ảnh (mục rỗng ẩn; id `overview` / `offer` / `content` / `gallery`) → MỘT thẻ trắng bo 28px: Tổng quan (danh mục, h1 `font-display text-h2`, ngày, `PostShare` < sm 1 nút / ≥ sm hàng ngang — **không còn rail ≥ xl**) · Khối ưu đãi · Nội dung richText 68ch · Thư viện; cột phải ≥ lg thẻ liên hệ `DETAIL_ASIDE_CARD_CLASS` (nút gọi hotline + `LeadFormSlot`/`LeadForm source=property_post`, tiêu đề "Nhận tư vấn"), < lg sau thẻ nội dung + `ProjectStickyCta` "Nhận tư vấn"; Tin liên quan ngoài thẻ nền `bg-bg-alt`. Header ẩn khi cuộn (`data-detail-page`).
 

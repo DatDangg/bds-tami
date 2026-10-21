@@ -6,6 +6,7 @@ import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
 import { DetailSection } from "@/components/detail/DetailSection";
+import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
 import { DetailSpecBar, type DetailSpecItem } from "@/components/detail/DetailSpecBar";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
 import { Armchair, Bed, Buildings, CalendarCheck, ClipboardText, Clock, Compass, House, Info, Ruler, SquaresFour, Tag } from "@/components/icons";
@@ -26,8 +27,6 @@ import { useRentalPrice } from "./RentalPriceText";
 import { RentalTerms } from "./RentalTerms";
 import { RENTAL_CONTACT_HEADING_ID, SaleContactBox } from "./SaleContactBox";
 import { SimilarRentals } from "./SimilarRentals";
-
-const ICON_SIZE = 20;
 
 /** Chip trên hero nền tối (`theme-dark-block`): viền sáng, chữ trắng — cùng kiểu chip danh mục của chi tiết Dự án. */
 const HERO_CHIP_CLASS =
@@ -76,13 +75,14 @@ function useLayoutText({ bedrooms, bathrooms }: Pick<RentalDetailView, "bedrooms
 function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentalDetail");
+  const tOptions = useTranslations("listingOptions");
   const tRich = useTranslations("page.richText");
   const info: DetailInfoItem[] = [
     { icon: <ClipboardText size={ICON_SIZE} />, label: t("code"), value: view.code },
-    { icon: <House size={ICON_SIZE} />, label: t("details.category"), value: view.category?.label ?? null, link: view.category ? { href: view.category.href } : null },
+    { icon: <House size={ICON_SIZE} />, label: t("details.category"), value: view.category?.label ?? null, link: view.category ? { kind: "internal", href: view.category.href } : null },
     { icon: <SquaresFour size={ICON_SIZE} />, label: t("details.floor"), value: view.floor },
-    { icon: <Compass size={ICON_SIZE} />, label: t("details.balconyDirection"), value: view.balconyDirection ? t(`direction.${view.balconyDirection}`) : null },
-    { icon: <Buildings size={ICON_SIZE} />, label: t("v2.info.project"), value: view.project?.label ?? null, link: view.project ? { href: view.project.href } : null },
+    { icon: <Compass size={ICON_SIZE} />, label: t("details.balconyDirection"), value: view.balconyDirection ? tOptions(`direction.${view.balconyDirection}`) : null },
+    { icon: <Buildings size={ICON_SIZE} />, label: t("v2.info.project"), value: view.project?.label ?? null, link: view.project ? { kind: "internal", href: view.project.href } : null },
     { icon: <Clock size={ICON_SIZE} />, label: t("postedAt"), value: view.postedAtLabel, dateTime: view.postedAtIso },
   ];
   return (
@@ -106,6 +106,7 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
 export function RentalDetail({ doc, view, similar, sale, hotline, ownPath, strengths, consultBanner }: RentalDetailProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentalDetail");
+  const tOptions = useTranslations("listingOptions");
   const tDetail = useTranslations("page.detail");
   const tNav = useTranslations("layout.nav.items");
   const priceInput = { rented: view.rented, priceMonthlyVnd: view.priceMonthlyVnd, priceNegotiable: doc.priceNegotiable === true };
@@ -119,7 +120,7 @@ export function RentalDetail({ doc, view, similar, sale, hotline, ownPath, stren
     { icon: <Ruler size={ICON_SIZE} />, label: t("specs.area"), value: formatArea(view.areaM2, locale) },
     { icon: <Bed size={ICON_SIZE} />, label: t("v2.spec.layout"), value: layoutText },
     { icon: <Armchair size={ICON_SIZE} />, label: t("details.furnishing"), value: view.furnishing ? t(`furnishing.${view.furnishing}`) : null },
-    { icon: <Compass size={ICON_SIZE} />, label: t("facts.direction"), value: view.houseDirection ? t(`direction.${view.houseDirection}`) : null },
+    { icon: <Compass size={ICON_SIZE} />, label: t("facts.direction"), value: view.houseDirection ? tOptions(`direction.${view.houseDirection}`) : null },
     { icon: <CalendarCheck size={ICON_SIZE} />, label: t("v2.spec.availableFrom"), value: view.terms.availableFromLabel },
   ];
 

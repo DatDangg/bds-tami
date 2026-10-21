@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { useReportPending } from "@/components/layout/PendingRegion";
 import { type ListingParamPatch, listingHref, type RawListingParams } from "./listing-params";
 
@@ -18,6 +18,21 @@ import { type ListingParamPatch, listingHref, type RawListingParams } from "./li
  * `generation` tăng mỗi lần `reset`: trang dùng làm `key` của nội dung bộ lọc để các ô dựng lại từ URL — huỷ hẹn giờ commit của thanh trượt
  * (không "sống lại" lọc cũ sau "Xoá tất cả") và bỏ giá trị lạc quan khi link xoá về đúng URL hiện tại (P1-T02 review r3 n1 / n3).
  */
+export type ListingNavigate = (patch: ListingParamPatch) => void;
+
+/**
+ * `navigate` của `useListingFilterNav` cho ô nằm ngoài nội dung bộ lọc nhưng trong thân trang (ô "Sắp xếp theo" do server dựng, truyền qua prop `sort`):
+ * thân trang bọc `<ListingNavigateContext value={navigate}>` để đổi sắp xếp gộp cùng thay đổi lọc đang chờ, không đè lọc vừa chọn chưa về URL (P3-T03 review r1).
+ */
+export const ListingNavigateContext = createContext<ListingNavigate | null>(null);
+
+/** `navigate` của thân trang danh sách; gọi ngoài `ListingNavigateContext` là lỗi lập trình (ô sắp xếp chỉ nằm trong `*ListBody`). */
+export function useListingNavigate(): ListingNavigate {
+  const navigate = useContext(ListingNavigateContext);
+  if (!navigate) throw new Error("useListingNavigate: thiếu ListingNavigateContext — ô phải nằm trong *ListBody");
+  return navigate;
+}
+
 export function useListingFilterNav(path: string, current: RawListingParams) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();

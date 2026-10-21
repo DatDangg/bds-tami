@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PropertyPost, Province, Ward } from "../../payload-types";
-import { isVoucherPost, toPostDetailSpecs } from "./post-detail-specs";
+import { toPostDetailSpecs } from "./post-detail-specs";
+import { isVoucherPost } from "./post-kind";
 
 const post = (overrides: Partial<PropertyPost> = {}): PropertyPost => ({ id: "p1", title: "Tin", updatedAt: "", createdAt: "", ...overrides }) as PropertyPost;
 const province = { id: "pv", name: "Thành phố Hồ Chí Minh", shortName: "TP.HCM" } as Province;
@@ -83,5 +84,10 @@ describe("isVoucherPost", () => {
     expect(isVoucherPost(post({ offer: { voucherCode: "TAMI" }, priceVnd: 1_000_000 }))).toBe(false);
     expect(isVoucherPost(post({ offer: { endAt: "2026-10-30T00:00:00.000Z" }, areaM2: 50 }))).toBe(false);
     expect(isVoucherPost(post({ offer: { voucherCode: "  " } }))).toBe(false);
+  });
+
+  it("cùng quy tắc với thẻ danh sách: hạn ưu đãi không parse được không tính là có ưu đãi", () => {
+    expect(isVoucherPost(post({ offer: { endAt: "không-phải-ngày" } }))).toBe(false);
+    expect(toPostDetailSpecs(post({ offer: { endAt: "không-phải-ngày" } }), "vi").isVoucher).toBe(false);
   });
 });
