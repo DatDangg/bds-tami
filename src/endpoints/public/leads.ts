@@ -59,7 +59,7 @@ async function readBoundedText(stream: ReadableStream<Uint8Array>): Promise<stri
 }
 
 /** Đọc body đúng một lần (Turnstile và validate dùng chung). Body hỏng/quá lớn ném lỗi: pipeline đổi thành 400. */
-function createJsonBodyReader(request: LeadRequest) {
+export function createJsonBodyReader(request: LeadRequest) {
   let pending: Promise<unknown> | undefined;
   const state: { parsed?: unknown } = {};
   const parse = async (): Promise<unknown> => {
@@ -81,17 +81,17 @@ function createJsonBodyReader(request: LeadRequest) {
   };
 }
 
-function declaredLocale(body: unknown): ApplicantLocale | undefined {
+export function declaredLocale(body: unknown): ApplicantLocale | undefined {
   const value = typeof body === "object" && body !== null ? (body as { locale?: unknown }).locale : undefined;
   return value === "vi" || value === "en" ? value : undefined;
 }
 
-function failWithKey(status: number, locale: ApplicantLocale, key: ApplicantMessageKey, details: unknown[] = []): Response {
+export function failWithKey(status: number, locale: ApplicantLocale, key: ApplicantMessageKey, details: unknown[] = []): Response {
   return fail(status, applicantMessage(locale, key), details);
 }
 
 /** Pipeline dùng thông điệp tiếng Việt cố định; dịch lại theo ngôn ngữ khách, giữ chữ "captcha" (client nhận lỗi captcha qua chữ này). */
-async function localizePipelineFailure(response: Response, locale: ApplicantLocale): Promise<Response> {
+export async function localizePipelineFailure(response: Response, locale: ApplicantLocale): Promise<Response> {
   if (response.status === 429) {
     const limited = failWithKey(429, locale, "rateLimited");
     const retryAfter = response.headers.get("Retry-After");
