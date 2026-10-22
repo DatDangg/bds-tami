@@ -24,6 +24,7 @@
 3. Export `GET /api/admin/newsletter-subscribers/export` (admin; sale / khách 403): Excel stream cột Email, Ngôn ngữ, Trạng thái, Ngày đăng ký, Ngày đồng ý, Phiên bản chính sách, Trang đăng ký; lọc `status` tuỳ chọn; ghi audit log nếu export lead đang ghi. Nút "Xuất Excel" ở đầu danh sách collection.
 4. Test: endpoint (thiếu consent 400, email sai 400, Turnstile fail, trùng email OK không tạo bản mới, unsubscribed bật lại, rate limit), export (admin OK, sale / khách 403, cột đúng), component (submit thành công / lỗi, a11y).
 5. `docs/API_SPEC.md`.
+6. (P1-T01 review MINOR-1) `newsletter-subscribers`: các field consent (`email`, `locale`, `consentAt`, `privacyPolicyVersion`, `sourcePath`) thêm field-level `access: { update: denyAll }` (như `SiteSettings.ts` privacyPolicyVersion) — admin chỉ đổi `status` qua cả REST; endpoint công khai cập nhật qua Local API `overrideAccess`. Thêm test.
 
 ## Acceptance
 - [ ] Đăng ký được với consent + Turnstile; trùng không tạo bản ghi mới; thông báo thành công / lỗi VI / EN.
