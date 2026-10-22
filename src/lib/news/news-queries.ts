@@ -8,8 +8,6 @@ import type { NewsSortKey } from "./news-filters";
 /** 12 bài/trang (design-spec S10). */
 export const NEWS_PAGE_SIZE = 12;
 export const RELATED_NEWS_COUNT = 3;
-/** Số bài trong thẻ "Bài viết mới" ở cột phải trang bài viết. */
-export const LATEST_NEWS_COUNT = 3;
 
 const NEWS_SORT = ["-publishedAt", "-createdAt"];
 /** `sort` của danh sách tin (BL-054): mới nhất (mặc định) hoặc cũ nhất. */

@@ -202,7 +202,6 @@
       "tabsLabel": "News categories",
       "all": "All",
       "readTime": "{minutes} min read",
-      "readArticle": "Read article",
       "consultTitle": "Get a consultation",
       "tagsLabel": "Tags",
       "tocTitle": "Contents",
@@ -235,15 +234,18 @@
       }
     },
     "newsDetail": {
-      "latestEyebrow": "Just updated",
-      "latestTitle": "Latest articles",
-      "consultEyebrow": "Consultation",
-      "consultTitle": "Looking for the right property?",
-      "consultText": "Leave your details and TAMI HOMES will get in touch.",
-      "consultCta": "Get advice",
-      "relatedEyebrow": "Keep reading",
-      "relatedTitle": "Related",
-      "relatedAccent": "articles"
+      "v2": {
+        "author": "TAMI HOMES Editorial Team",
+        "shareLabel": "Share:",
+        "shareMore": "Share via other apps",
+        "consultEyebrow": "Free consultation",
+        "consultTitle": "Need a project that fits your budget?",
+        "consultText": "A TAMI advisor will give you detailed advice for your needs.",
+        "consultCta": "Get advice",
+        "tags": "Tags:",
+        "related": "Related articles",
+        "viewAll": "View all news"
+      }
     },
     "posts": {
       "title": "Property news",

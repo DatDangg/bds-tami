@@ -39,3 +39,6 @@ batchQueue: [BL-054]
 - 2026-10-22 P2-T05 r1 STRICT PASS → 17259ab merged + progress. P2-T03 r1 STRICT PASS, P2-T01 r1 STRICT PASS (merge kế).
 - 2026-10-22 P2-T03 → e8b02f8 merged + progress (API_SPEC union, careers §3.14; typecheck + 51 file / 418 PASS).
 - 2026-10-22 P2-T01 → 3c52d58 merged + progress (typecheck + 32 file / 313 PASS). next: wave 2B P2-T02 ‖ P2-T04.
+- 2026-10-22 ▶ START [agent: builder-strong] wave 2B: P2-T02 (DB tami_wt54_p2t01 dùng lại, redis 7, :3122) ‖ P2-T04 (tami_wt54_p2t03, redis 8, :3124) — worktree từ staging 2b99a60 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder-strong] wave 2B (P2-T02 .news-prose + TOC dính trái + beacon; P2-T04 hero nhạt + OtherJobs + xoá JobCard, nộp CV thật OK). ▶ START [agent: reviewer] r1 ×2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P2-T02 → 72be45a merged + progress. P2-T04 r1 STRICT PASS (merge kế).
