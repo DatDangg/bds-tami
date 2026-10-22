@@ -1,7 +1,7 @@
 ---
 id: admin-form-ux-polish
 type: modify
-status: in_progress
+status: done
 created: 2026-10-22
 ---
 
@@ -59,14 +59,19 @@ User 2026-10-22 (kèm 3 ảnh chụp màn sửa Tin BĐS / Dự án trong admin)
 - Tasks: `tasks/feature-admin-form-ux-polish/phase-1-task-01..05.md`. Thứ tự: wave 1 = T01 ∥ T02 ∥ T03; wave 2 = T04 (sau T02,
   cùng `importMap.js` / `payload.config.ts` / `custom.scss`); wave 3 = T05 (sau khi user chốt phương án SEO).
 
-### Spec delta (nháp — áp vào `SPECIFICATIONS.md` FR-ADM-19 lúc close-out qua spec-publisher, sau khi chốt SEO)
-1. Mới: admin **không dùng hộp thoại của trình duyệt** (`alert` / `confirm` / `prompt`); xác nhận thao tác dùng modal trong admin
-   (vd "Dịch lại bằng AI": modal xác nhận, Huỷ không gửi yêu cầu).
+### Spec delta (as-built — đã áp vào `SPECIFICATIONS.md` 1.48.0: FR-ADM-19 khối "Form admin … (BL-058)" + F11 "Tab SEO trong admin (BL-058)"; spec-publisher 2026-10-22)
+1. Mới: admin **không dùng hộp thoại của trình duyệt** (`alert` / `confirm` / `prompt`; có test quét code admin); xác nhận thao tác dùng
+   modal trong admin (`ConfirmationModal` Payload) — "Dịch lại bằng AI": modal xác nhận, Huỷ không gửi yêu cầu, chống gửi 2 lần. (T01 `7711bad`)
 2. Thay câu BL-042 "lỗi hiện ngay tại ô (khung báo đỏ của Payload)" → lỗi nhập liệu hiện **ngay dưới từng ô** (viền đỏ + chữ lỗi
-   tiếng Việt), nhãn tab chứa ô lỗi có **số lỗi**, Lưu lỗi thì **tự mở tab + cuộn + focus ô lỗi đầu tiên**; thông báo nổi chỉ còn câu ngắn
-   (không liệt kê danh sách trường).
-3. Thay câu BL-042 "nút thêm nhanh cạnh ô quan hệ có chữ/tooltip 'Thêm mới'" → nút **vuông chỉ icon "+"** tách rời ô (khoảng cách,
-   viền + bo góc riêng), tên đọc / tooltip "Thêm mới", vùng bấm ≥ 36px desktop / ≥ 44px mobile.
-4. Mới: màn **Lịch sử chỉnh sửa** dễ đọc (danh sách theo thời gian, mốc giờ VN, trạng thái bài, số trường đổi, [ai sửa — tuỳ Q2]);
-   màn so sánh mặc định chỉ trường đã đổi, nhãn tiếng Việt.
-5. Tab SEO — theo phương án user chốt (Q1).
+   tiếng Việt, cả màn hẹp); nhãn tab / khối thu gọn chứa ô lỗi có nhãn đếm lỗi (pill sẵn có của Payload, hiện với lỗi server); Lưu lỗi
+   **tự mở tab / khối thu gọn + cuộn + focus ô lỗi đầu tiên**; **bỏ hẳn** toast liệt kê danh sách ô lỗi (lỗi không gắn ô vẫn có toast,
+   toast thành công giữ). Validate server / message API không đổi. (T02 `364e9c7`)
+3. Thay câu BL-042 "nút thêm nhanh cạnh ô quan hệ có chữ/tooltip 'Thêm mới'" → nút **vuông chỉ icon "+"** tách rời ô (cách 8px,
+   viền + bo đủ góc), tên đọc "Thêm mới: <tên mục>", 36px desktop / 44px mobile; chỉ CSS. (T03 `00c48ec`)
+4. Mới: màn **Lịch sử chỉnh sửa** tuỳ biến cho 7 collection có versions — theo thời gian (giờ VN + "x phút trước"), trạng thái bài của
+   phiên bản, nhãn "Phiên bản hiện tại", số trường đã đổi (mọi ngôn ngữ), bấm dòng mở so sánh; màn so sánh ẩn trường kỹ thuật, nhãn
+   "Bản đã lưu"; **không** cột "Ai sửa" (user chốt Q2), không migration. (T04 `d767b30`)
+5. Tab SEO (phương án B, user chốt Q1): bỏ tiêu đề nhóm lặp; câu "để trống = tự lấy từ Tiêu đề / Tóm tắt / Ảnh đại diện"; khung xem
+   trước kết quả Google khớp metadata trang công khai (tên website, đường dẫn theo ngôn ngữ — `/en` chỉ khi có bản dịch, mô tả theo loại
+   trang, Trang chủ lấy tiêu đề/mô tả mặc định của trang chủ); đếm ký tự (tiêu đề ≤ 60, mô tả 120–160); "Ẩn khỏi Google" + "Đường dẫn
+   gốc" gom vào khối thu gọn "Nâng cao"; giữ `seo.*`, không migration. Không làm xem trước chia sẻ (phương án C). (T05 `db437a1`)

@@ -2469,10 +2469,10 @@
       "slug": "admin-form-ux-polish",
       "title": "Admin UX: modal thay hộp thoại trình duyệt, lỗi dưới từng ô + đánh dấu tab, nút \"+\" tách rời ô quan hệ, lịch sử chỉnh sửa dễ đọc, làm rõ tab SEO (BL-058)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-058",
-      "changeDoc": "spec/changes/2026-10-22-admin-form-ux-polish.md",
+      "changeDoc": "spec/changes/archive/2026-10-22-admin-form-ux-polish.md",
       "branch": "claude/admin-form-ux-polish-dc5780",
       "startedAt": "2026-10-22",
       "planApprovedAt": "2026-10-22 (checkpoint: Q1 SEO = B, Q2 Ai sửa = Không/không migration, Q3 toast lỗi = bỏ hẳn; chạy đợt 1)",
@@ -2555,11 +2555,24 @@
           "progressNote": "seoField (label false + preview + 2 bộ đếm + collapsible Nâng cao), SeoPreview/SeoLengthCounter + lib/admin/seo parity với buildPageMetadata (tên website, URL trang theo hasEnglish, mô tả theo route, fallback Trang chủ page.home)",
           "reviewLevel": "NORMAL",
           "reviewerResult": "PASS",
-          "completedAt": "2026-10-22"
+          "completedAt": "2026-10-22",
+          "commit": "db437a1"
         }
       ],
       "wave1DoneAt": "2026-10-22",
-      "next": "T05 done → close-out BL-058 (spec delta, spec-publish, spec-validator, BACKLOG done, archive change doc) → dọn 4 worktree wt/* + DB tami_wt_bl058_t01..t04"
+      "next": "done — chờ user quyết merge/push branch claude/admin-form-ux-polish-dc5780",
+      "completedAt": "2026-10-22",
+      "specVersion": "1.48.0",
+      "scopeVersion": 62,
+      "phaseReview": {
+        "verdict": "PASS",
+        "report": ".context/review-reports/spec-validation-feature-admin-form-ux-polish-phase-1.md",
+        "note": "2 ⚠️: (1) Danh mục có khối SEO nhưng preview chưa mô phỏng — ghi gap spec F11 + follow-up; (2) chữ toast không gắn ô (~0,7s) — đã sửa FR-ADM-19 (2)"
+      },
+      "followUps": [
+        "Khung xem trước SEO cho Danh mục (categories): đọc useAsTitle, URL /<loại>/danh-muc/[slug], mô tả — hoặc ẩn preview ở categories",
+        "Xoá DB tami_wt_bl058_t01..t04 khi Postgres chạy lại"
+      ]
     }
   ],
   "bugs": [
