@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/listing-sticky-filter-aside",
+  "activeWorkItem": "feature/news-list-detail-v2",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2907,6 +2907,36 @@
       "review": "NORMAL PASS",
       "round": 1,
       "specValidation": ".context/review-reports/spec-validation-feature-listing-sticky-filter-aside-phase-1.md (PASS, 0 blocking; residual: khối thiếu data local kiểm trên staging)"
+    },
+    {
+      "slug": "news-list-detail-v2",
+      "title": "Tin tức: \"Đọc nhiều\" → \"Được quan tâm nhiều\", Bản tin lên trên; chi tiết tin tức theo ảnh v2 (hero + chia sẻ, mục lục + tư vấn dính, ✓ mọi ul, khung liên hệ admin, bài liên quan) (BL-062)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-062",
+      "changeDoc": "spec/changes/2026-10-22-news-list-detail-v2.md",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-news-list-detail-v2/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "FAST PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-list-detail-v2-phase-1-task-01-round-1-review.md",
+          "verify": "typecheck PASS · eslint news 0 · test 4406 PASS · build PASS · browser :3000 thứ tự aside (ảnh không lưu — residual)",
+          "completedAt": "2026-10-23"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-news-list-detail-v2/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0
+        }
+      ],
+      "startedAt": "2026-10-23",
+      "specValidationPreBuild": ".context/review-reports/spec-validation-feature-news-list-detail-v2-pre-build.md (PASS, G1/G2/N2-N5 sửa spec)"
     }
   ],
   "bugs": [
@@ -3950,7 +3980,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22",
+  "lastUpdated": "2026-10-22T17:20:02.255Z",
   "approvalMilestones": [
     {
       "id": "M1",

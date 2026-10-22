@@ -44,7 +44,7 @@ function withPage(path: string, page: number): string {
   return page > 1 ? `${path}?page=${page}` : path;
 }
 
-/** Khối phụ của cột phải (Đọc nhiều, Chủ đề) lỗi DB → ẩn khối, không vỡ trang (P1-T03 review); lỗi vẫn vào log. */
+/** Khối phụ của cột phải (Được quan tâm nhiều, Chủ đề) lỗi DB → ẩn khối, không vỡ trang (P1-T03 review); lỗi vẫn vào log. */
 async function orEmpty<T>(payload: Payload, label: string, load: () => Promise<T[]>): Promise<T[]> {
   try {
     return await load();
@@ -65,7 +65,7 @@ async function loadNewsListData(locale: Locale, searchParams: RawNewsParams, cat
     loadNewsListing(payload, locale, { page, filters, ...(context ? { categoryIds: categoryFilterIds(context) } : {}) }),
     loadPageHero(locale, "news"),
     buildNewsChips(payload, locale, allLabel, context),
-    orEmpty<MostReadNewsItem>(payload, "Đọc nhiều", () => loadMostReadNews(locale)),
+    orEmpty<MostReadNewsItem>(payload, "Được quan tâm nhiều", () => loadMostReadNews(locale)),
     orEmpty<string>(payload, "Chủ đề", () => listTopNewsTags(payload, locale)),
   ]);
   if (listing.outOfRange) notFound();
@@ -75,7 +75,7 @@ async function loadNewsListData(locale: Locale, searchParams: RawNewsParams, cat
 /**
  * S10 `/tin-tuc` và S05 `/tin-tuc/danh-muc/[category]` theo design `tin-tuc.webp` (BL-054): hero danh sách (`ListingHero`, ảnh + chữ `pageHeroes.news`; trang danh mục:
  * tên + mô tả danh mục) + ô tìm `q` (không hàng "Tìm nhanh") → chip danh mục (link, `aria-current`) → khối nổi bật (trang 1, không lọc) → "Bài viết mới nhất" + sắp xếp
- * → lưới 3 cột → phân trang | cột phải "Đọc nhiều" / "Bản tin thị trường" / "Chủ đề" (`/en` ẩn) → form "Tư vấn nhu cầu" (chỉ `/tin-tuc`, không ở danh mục) → banner tư vấn.
+ * → lưới 3 cột → phân trang | cột phải "Bản tin thị trường" / "Được quan tâm nhiều" / "Chủ đề" (`/en` ẩn) → form "Tư vấn nhu cầu" (chỉ `/tin-tuc`, không ở danh mục) → banner tư vấn.
  * Có `q` / `tag` / `sort=oldest` → ẩn khối nổi bật, hiện "N bài viết phù hợp" + trạng thái trống có nút xoá lọc. Đọc `searchParams` nên render theo request (không ISR).
  */
 export async function NewsListPage({ locale, searchParams, categorySlug }: NewsListPageProps) {
@@ -132,8 +132,8 @@ export async function NewsListPage({ locale, searchParams, categorySlug }: NewsL
           pagination={<Pagination page={page} totalPages={listing.totalPages} buildHref={(target) => `${ownPath}${newsQueryString(filters, target)}`} />}
           sidebar={
             <>
-              <NewsMostRead items={mostRead} />
               <NewsletterSignup {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
+              <NewsMostRead items={mostRead} />
               <NewsTopics tags={topTags} listPath={listPath} currentTag={filters.tag} />
             </>
           }

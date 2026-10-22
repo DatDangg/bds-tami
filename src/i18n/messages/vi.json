@@ -216,7 +216,7 @@
       "v2": {
         "searchPlaceholder": "Tìm bài viết…",
         "featuredLabel": "Bài viết nổi bật",
-        "brand": "TAMI HOMES",
+        "brand": "TAMI REAL ESTATE",
         "latestTitle": "Bài viết mới nhất",
         "resultTotal": "{count} bài viết",
         "sortBy": "Sắp xếp theo",
@@ -227,7 +227,7 @@
         },
         "emptyTitle": "Chưa có bài viết phù hợp.",
         "emptyDescription": "Thử từ khoá khác hoặc xem tất cả bài viết.",
-        "mostRead": "Đọc nhiều",
+        "mostRead": "Được quan tâm nhiều",
         "topics": "Chủ đề",
         "sidebarLabel": "Đọc thêm"
       }

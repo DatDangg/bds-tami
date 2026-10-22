@@ -212,22 +212,25 @@ describe("S10 /tin-tuc trang 1 (BL-054, design tin-tuc.webp)", () => {
     expect([...all].sort()).toEqual(docs.map((doc) => doc.title).sort());
   });
 
-  it("cột phải: Đọc nhiều (top từ loadMostReadNews) + Bản tin + Chủ đề (#tag → ?tag=)", async () => {
+  it("cột phải: Bản tin → Được quan tâm nhiều (top từ loadMostReadNews) → Chủ đề (#tag → ?tag=)", async () => {
     await render("vi");
     const aside = screen.getByRole("complementary", { name: "Đọc thêm" });
-    const mostRead = within(aside).getByRole("region", { name: "Đọc nhiều" });
+    const mostRead = within(aside).getByRole("region", { name: "Được quan tâm nhiều" });
     expect(within(mostRead).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/tin-tuc/bai-n5", "/tin-tuc/bai-n7"]);
-    expect(aside.querySelector("[data-newsletter]")).not.toBeNull();
+    const newsletter = aside.querySelector("[data-newsletter]");
+    expect(newsletter).not.toBeNull();
     const topics = within(aside).getByRole("region", { name: "Chủ đề" });
+    expect(newsletter!.compareDocumentPosition(mostRead) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(mostRead.compareDocumentPosition(topics) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(topics).getAllByRole("link").map((link) => link.textContent)).toEqual(["#thị trường", "#dự án"]);
     expect(within(topics).getByRole("link", { name: "#dự án" })).toHaveAttribute("href", `/tin-tuc?tag=${encodeURIComponent("dự án").replace("%20", "+")}`);
   });
 
-  it("Đọc nhiều / Chủ đề lỗi DB → ẩn khối, trang vẫn render, lỗi vào log", async () => {
+  it("Được quan tâm nhiều / Chủ đề lỗi DB → ẩn khối, trang vẫn render, lỗi vào log", async () => {
     loadMostReadNews.mockRejectedValue(new Error("db down"));
     listTopNewsTags.mockRejectedValue(new Error("db down"));
     const { container } = await render("vi");
-    expect(screen.queryByRole("region", { name: "Đọc nhiều" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Được quan tâm nhiều" })).toBeNull();
     expect(screen.queryByRole("region", { name: "Chủ đề" })).toBeNull();
     expect(gridTitles(container)).toHaveLength(12);
     expect(logError).toHaveBeenCalledTimes(2);
@@ -305,6 +308,7 @@ describe("/en", () => {
     const tabs = screen.getByRole("navigation", { name: "News categories" });
     expect(within(tabs).queryByRole("link", { name: "Đời sống" })).toBeNull();
     expect(screen.queryByRole("region", { name: "Topics" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Most popular" })).toBeInTheDocument();
     expect(screen.getByRole("search")).toHaveAttribute("action", "/en/news");
   });
 
@@ -323,7 +327,7 @@ describe("S05 trang danh mục + 404", () => {
     expect(gridTitles(container)).toEqual(titlesOf(["n10", "n12", "n14", "n16", "n18", "n20"]));
     expect(screen.queryByRole("form", { name: "Form lead" })).toBeNull();
     expect(container.querySelector("[data-consult-banner]")).not.toBeNull();
-    expect(screen.getByRole("region", { name: "Đọc nhiều" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Được quan tâm nhiều" })).toBeInTheDocument();
     expect(screen.getByRole("search")).toHaveAttribute("action", "/tin-tuc/danh-muc/thi-truong");
   });
 

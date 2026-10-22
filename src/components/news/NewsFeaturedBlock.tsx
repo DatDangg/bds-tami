@@ -12,7 +12,7 @@ const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-4 focus
 
 /**
  * Bài lớn của khối nổi bật: ảnh phủ cả thẻ (LCP, `priority`) + scrim token đậm dần xuống đáy, chữ trắng: badge danh mục → tiêu đề → tóm tắt →
- * nhãn thương hiệu "TAMI HOMES" (i18n, không đọc / hiện tên `staff` — spec-validation F3) · ngày · "N phút đọc", nút mũi tên tròn vàng. Cả thẻ là MỘT link.
+ * nhãn thương hiệu "TAMI REAL ESTATE" (i18n, không đọc / hiện tên `staff` — spec-validation F3) · ngày · "N phút đọc", nút mũi tên tròn vàng. Cả thẻ là MỘT link.
  */
 function LeadArticle({ data }: { data: NewsCardData }) {
   const t = useTranslations("page.news.v2");

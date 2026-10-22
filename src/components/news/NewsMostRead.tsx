@@ -5,7 +5,7 @@ import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import type { MostReadNewsItem } from "@/lib/news/most-read";
 
 /**
- * Khối "Đọc nhiều" ở cột phải `/tin-tuc` (BL-054): top 5 từ `loadMostReadNews`, mỗi hàng là MỘT link — số thứ tự lớn 01–05 màu nhấn (trang trí,
+ * Khối "Được quan tâm nhiều" ở cột phải `/tin-tuc` (BL-054): top 5 từ `loadMostReadNews`, mỗi hàng là MỘT link — số thứ tự lớn 01–05 màu nhấn (trang trí,
  * thứ tự đã có trong `<ol>`), ảnh nhỏ, tiêu đề 2 dòng, ngày. Rỗng → không render. Server Component.
  */
 export function NewsMostRead({ items }: { items: readonly MostReadNewsItem[] }) {

@@ -17,7 +17,7 @@ interface NewsListBodyProps {
   /** Trạng thái trống (thay lưới + phân trang). */
   emptyState?: ReactNode;
   pagination?: ReactNode;
-  /** Cột phải: "Đọc nhiều", "Bản tin thị trường", "Chủ đề" (mỗi khối tự ẩn khi rỗng). */
+  /** Cột phải: "Bản tin thị trường", "Được quan tâm nhiều", "Chủ đề" (mỗi khối tự ẩn khi rỗng). */
   sidebar?: ReactNode;
 }
 

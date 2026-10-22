@@ -216,7 +216,7 @@
       "v2": {
         "searchPlaceholder": "Search articles…",
         "featuredLabel": "Featured articles",
-        "brand": "TAMI HOMES",
+        "brand": "TAMI REAL ESTATE",
         "latestTitle": "Latest articles",
         "resultTotal": "{count, plural, one {# article} other {# articles}}",
         "sortBy": "Sort by",
@@ -227,7 +227,7 @@
         },
         "emptyTitle": "No matching articles yet.",
         "emptyDescription": "Try another keyword or browse all articles.",
-        "mostRead": "Most read",
+        "mostRead": "Most popular",
         "topics": "Topics",
         "sidebarLabel": "More to read"
       }

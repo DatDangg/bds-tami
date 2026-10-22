@@ -112,13 +112,13 @@ describe("NewsCard grid (thẻ lưới /tin-tuc BL-054)", () => {
 });
 
 describe("NewsFeaturedBlock", () => {
-  it("bài lớn (ảnh priority, nhãn TAMI HOMES · ngày · phút đọc) + 3 bài nhỏ; mỗi bài MỘT link, tiêu đề h2", () => {
+  it("bài lớn (ảnh priority, nhãn TAMI REAL ESTATE · ngày · phút đọc) + 3 bài nhỏ; mỗi bài MỘT link, tiêu đề h2", () => {
     const { container } = renderWithIntl(<NewsFeaturedBlock items={[card("1", { readMinutes: 5 }), card("2"), card("3"), card("4")]} />);
     const block = screen.getByRole("region", { name: "Bài viết nổi bật" });
     expect(within(block).getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Bài 1", "Bài 2", "Bài 3", "Bài 4"]);
     const links = within(block).getAllByRole("link");
     expect(links.map((link) => link.getAttribute("href"))).toEqual(["/tin-tuc/bai-1", "/tin-tuc/bai-2", "/tin-tuc/bai-3", "/tin-tuc/bai-4"]);
-    expect(links[0]).toHaveTextContent("TAMI HOMES");
+    expect(links[0]).toHaveTextContent("TAMI REAL ESTATE");
     expect(links[0]).toHaveTextContent("5 phút đọc");
     expect(links[0]?.querySelectorAll("a")).toHaveLength(0);
     expect(container.querySelector("img[fetchpriority=high]")).not.toBeNull();
@@ -136,9 +136,9 @@ describe("NewsFeaturedBlock", () => {
 describe("NewsMostRead / NewsTopics", () => {
   const item = (id: string) => ({ id, title: `Đọc ${id}`, href: `/tin-tuc/${id}`, cover: null, publishedAt: "2026-03-05T03:00:00.000Z", dateLabel: "05/03/2026" });
 
-  it("Đọc nhiều: danh sách có thứ tự, số 01–05 chỉ trang trí, mỗi hàng MỘT link; rỗng → ẩn", () => {
+  it("Được quan tâm nhiều: danh sách có thứ tự, số 01–05 chỉ trang trí, mỗi hàng MỘT link; rỗng → ẩn", () => {
     const { container, unmount } = renderWithIntl(<NewsMostRead items={["a", "b", "c"].map(item)} />);
-    const section = screen.getByRole("region", { name: "Đọc nhiều" });
+    const section = screen.getByRole("region", { name: "Được quan tâm nhiều" });
     expect(section.querySelector("ol")).not.toBeNull();
     expect(within(section).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/tin-tuc/a", "/tin-tuc/b", "/tin-tuc/c"]);
     expect([...container.querySelectorAll("[aria-hidden=true]")].map((node) => node.textContent)).toEqual(["01", "02", "03"]);
