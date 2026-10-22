@@ -2361,7 +2361,7 @@
       "title": "Redesign Tin tức / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ + đếm lượt xem, bản tin, khối soạn bài, văn phòng, Tuyển gấp, quy trình ứng tuyển (BL-054)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 2,
+      "currentPhase": 3,
       "backlog": "BL-054",
       "changeDoc": "spec/changes/2026-10-21-news-careers-contact-redesign.md",
       "startedAt": "2026-10-22",
@@ -2498,8 +2498,27 @@
           "round": 1,
           "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-05-round-1-review.md",
           "commit": "17259ab"
+        },
+        {
+          "task": "phase-3-task-01",
+          "file": "tasks/feature-news-careers-contact-redesign/phase-3-task-01.md",
+          "status": "in_progress",
+          "attempt": 1,
+          "dependsOn": [
+            "phase-2-task-01",
+            "phase-2-task-02",
+            "phase-2-task-03",
+            "phase-2-task-04",
+            "phase-2-task-05"
+          ],
+          "note": "dọn C1–C11 phase review"
         }
-      ]
+      ],
+      "phaseReview12": {
+        "verdict": "GAPS (0 MAJOR, 6 MINOR) — code đủ 10 quyết định, 7/8 acceptance; G2 full test → PASS 407/4159 sau review",
+        "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-2-phase-review.md",
+        "at": "2026-10-22"
+      }
     }
   ],
   "bugs": [
