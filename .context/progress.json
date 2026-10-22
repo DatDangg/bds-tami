@@ -2953,10 +2953,10 @@
       "slug": "seed-english-data",
       "title": "Seed dev đủ data tiếng Anh viết sẵn (seed/english/) cho mọi bản ghi + global, bật hasEnglish, idempotent, chỉ DB dev (BL-064)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-064",
-      "changeDoc": "spec/changes/2026-10-22-seed-english-data.md",
+      "changeDoc": "spec/changes/archive/2026-10-22-seed-english-data.md",
       "startedAt": "2026-10-23",
       "tasks": [
         {
@@ -2992,7 +2992,8 @@
           "round": 2,
           "report": ".context/review-reports/feature-seed-english-data-phase-1-task-03-round-2-review.md",
           "verify": "seed:english rentals property-posts + media x2 (lần 2 ghi 0) · has_english rentals 32/32, property_posts 38/38 · alt 481/481 EN · unit 7/7",
-          "completedAt": "2026-10-23"
+          "completedAt": "2026-10-23",
+          "commit": "ff00d0b"
         },
         {
           "task": "phase-1-task-04",
@@ -3006,7 +3007,16 @@
           "completedAt": "2026-10-23",
           "commit": "906bd1c"
         }
-      ]
+      ],
+      "completedAt": "2026-10-23",
+      "specVersion": "1.54.0",
+      "scopeVersion": 70,
+      "review": "T01 STRICT PASS r2 · T02 NORMAL PASS r1 · T03 NORMAL PASS r2 · T04 NORMAL PASS r1",
+      "specValidation": ".context/review-reports/spec-validation-feature-seed-english-data-phase-1.md (PASS; FU-1 → BL-065)",
+      "enCoverage": {
+        "before": "projects 3/61 · rentals 0/32 · property_posts 0/38 · news 0/24 · services 0/3 · job_postings 3/4 · categories 5/16 · developers 0/29 · pages 0/2 · media alt 7/481",
+        "after": "projects 61/61 · rentals 32/32 · property_posts 38/38 · news 24/24 · services 3/3 · job_postings 4/4 · categories 16/16 · developers 29/29 · pages 2/2 · media alt 481/481"
+      }
     }
   ],
   "bugs": [
@@ -4050,7 +4060,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T20:06:37.909Z",
+  "lastUpdated": "2026-10-22T20:14:32.225Z",
   "approvalMilestones": [
     {
       "id": "M1",

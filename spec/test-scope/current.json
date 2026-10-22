@@ -1,141 +1,99 @@
 {
-  "specVersion": "1.53.0",
-  "scopeVersion": 69,
-  "generatedAt": "2026-10-23T09:00:00+07:00",
+  "specVersion": "1.54.0",
+  "scopeVersion": 70,
+  "generatedAt": "2026-10-23T12:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-062 MODIFY (MINOR 1.52.0 → 1.53.0 — Tin tức v2, user duyệt 2026-10-22; ảnh chuẩn chi-tiet-tin-tuc-v2.webp thay chi-tiet-tin-tuc.webp): (1) danh sách /tin-tuc: 'Đọc nhiều' → 'Được quan tâm nhiều' / 'Most popular', cột phải Bản tin thị trường → Được quan tâm nhiều → Chủ đề, nhãn thẻ nổi bật 'TAMI REAL ESTATE'; (2) chi tiết /tin-tuc/[slug]: hero ảnh bìa full width + scrim, tác giả 'Bài viết bởi TAMI REAL ESTATE', cột trái dính Mục lục + thẻ Tư vấn, ul ✓ vàng, khung liên hệ cuối bài sửa ở admin, tag không #, Bài viết liên quan thẻ ngang; (3) schema additive site-settings.newsDetail.contactNote + migration SAFE_ADDITIVE.",
-  "status": "published — T01 NORMAL PASS (commit 83bb1ec) + T02 STRICT PASS r2 (working tree); spec-validation phase 1 PASS; primary close-out + commit sắp tới trên staging",
-  "workItem": "feature/news-list-detail-v2",
-  "backlog": "BL-062",
+  "triggerNote": "BL-064 MODIFY (MINOR 1.53.0 → 1.54.0 — Dữ liệu dev song ngữ, user 2026-10-22): seed dev có bản EN viết sẵn cố định (seed/english/, không gọi AI) cho mọi bản ghi seed + global public; pnpm seed:english, idempotent, chỉ DB dev. Không đổi schema / API / UI.",
+  "status": "published — T01 STRICT PASS r2, T02 NORMAL PASS r1, T03 NORMAL PASS r2, T04 NORMAL PASS r1; spec-validation phase 1 PASS; primary close-out + commit sắp tới trên staging",
+  "workItem": "feature/seed-english-data",
+  "backlog": "BL-064",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-22-news-list-detail-v2.md",
-  "changeDocStatus": "in_progress → done khi primary close-out (archive sang spec/changes/archive/)",
+  "changeDoc": "spec/changes/archive/2026-10-22-seed-english-data.md",
+  "changeDocStatus": "archive tại close-out",
   "task": [
-    "tasks/feature-news-list-detail-v2/phase-1-task-01.md",
-    "tasks/feature-news-list-detail-v2/phase-1-task-02.md"
+    "tasks/feature-seed-english-data/phase-1-task-01.md",
+    "tasks/feature-seed-english-data/phase-1-task-02.md",
+    "tasks/feature-seed-english-data/phase-1-task-03.md",
+    "tasks/feature-seed-english-data/phase-1-task-04.md"
   ],
   "reviewResults": [
-    "T01 NORMAL PASS r1 — .context/review-reports/feature-news-list-detail-v2-phase-1-task-01-round-1-review.md (commit 83bb1ec)",
-    "T02 STRICT r1 có MAJOR-1 (h2 từ mục 02 thụt đôi) → sửa — .context/review-reports/feature-news-list-detail-v2-phase-1-task-02-round-1-review.md",
-    "T02 STRICT PASS r2 — .context/review-reports/feature-news-list-detail-v2-phase-1-task-02-round-2-review.md",
-    "spec-validator phase 1 PASS — .context/review-reports/spec-validation-feature-news-list-detail-v2-phase-1.md"
+    "T01 STRICT FAIL r1 → PASS r2 (commit 4f9809f)",
+    "T02 NORMAL PASS r1 (commit 4e86e5c)",
+    "T03 NORMAL FAIL r1 (dấu tên riêng) → PASS r2 (commit ff00d0b)",
+    "T04 NORMAL PASS r1 (commit 906bd1c)",
+    "spec-validator phase 1 PASS — .context/review-reports/spec-validation-feature-seed-english-data-phase-1.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.52.0-68.json",
-  "specUpdate": "spec/updates/2026-10-22-news-list-detail-v2.md",
-  "supersedes": "BL-054 S10 / S11 (SPECIFICATIONS.md Danh sách Tin tức mục (3)(5), Chi tiết tin tức, nhãn tác giả — chú thích 'thay bởi BL-062'); design chi-tiet-tin-tuc.webp",
+  "previousScope": "spec/test-scope/archive/test-scope-1.53.0-69.json",
+  "specUpdate": "spec/updates/2026-10-23-seed-english-data.md",
   "specRefs": [
-    "F2 — Danh sách Tin tức v2 (SPECIFICATIONS.md khối 'Tin tức v2 (BL-062' mục Danh sách): 'Được quan tâm nhiều' / 'Most popular', thứ tự cột phải Bản tin → Được quan tâm nhiều → Chủ đề, nhãn thẻ nổi bật 'TAMI REAL ESTATE'",
-    "F2 — Chi tiết Tin tức v2 D1–D10 (cùng khối): hero ảnh bìa, cột trái dính Mục lục + Tư vấn, ✓ mọi ul, khung liên hệ cuối bài, tag không #, Bài viết liên quan thẻ ngang",
-    "F2 — Nhãn tác giả bài tin 'Bài viết bởi TAMI REAL ESTATE' / 'By TAMI REAL ESTATE' (không đọc staff)",
-    "F2 / FR-ADM — Schema: site-settings.newsDetail.contactNote (localized, tự dịch EN) + migration 20261022_172224_news_detail_contact_note",
-    "BL-054 'Đọc nhiều = lượt xem thật' (SPECIFICATIONS.md dòng 68) — nguồn dữ liệu giữ, chỉ đổi tên khối"
+    "F12 — 'Dữ liệu dev song ngữ (BL-064, user 2026-10-22)' trong SPECIFICATIONS.md: bản EN viết sẵn, idempotent, chỉ DB dev, hasEnglish + translation.enSource manual, không gọi AI lúc seed"
   ],
-  "migration": "migrations/20261022_172224_news_detail_contact_note.ts — ADD COLUMN news_detail_contact_note varchar vào site_settings_locales (SAFE_ADDITIVE, không HIGH_RISK_MIGRATION); down DROP COLUMN. Staging chạy khi deploy.",
+  "migration": "none — không đổi schema",
   "changed": {
     "files": [
-      "src/components/news/NewsListPage.tsx",
-      "src/components/news/NewsListBody.tsx",
-      "src/components/news/NewsMostRead.tsx",
-      "src/components/news/NewsFeaturedBlock.tsx",
-      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
-      "src/app/(frontend)/globals.css",
-      "src/components/news/NewsArticle.tsx",
-      "src/components/news/NewsArticleHero.tsx",
-      "src/components/news/NewsArticleContactNote.tsx",
-      "src/components/news/NewsArticleSidebar.tsx",
-      "src/components/news/NewsToc.tsx",
-      "src/components/news/NewsCard.tsx",
-      "src/components/news/ShareButtons.tsx",
-      "src/components/layout/Breadcrumb.tsx",
-      "src/globals/SiteSettings.ts",
-      "src/globals/site-settings/news-detail.ts",
-      "src/lib/content/load-news-contact-note.ts",
-      "src/lib/translation/leaves.ts",
-      "src/lib/translation/prompt.ts",
-      "src/payload-types.ts",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
-      "migrations/20261022_172224_news_detail_contact_note.ts",
-      "migrations/20261022_172224_news_detail_contact_note.json",
-      "migrations/index.ts",
-      ".context/design-spec.md",
-      "docs/DESIGN.md",
-      "docs/ERD.md"
+      "seed/english/** (engine + data: categories, developers, services, job-postings, pages, globals, media, projects.json, rentals.json, property-posts.json, news.json)",
+      "scripts/seed-english.ts",
+      "scripts/seed-english-export.ts",
+      "seed/index.ts",
+      "scripts/seed-scraped.ts",
+      "package.json",
+      "docs/runbooks/deploy.md",
+      "tests/unit/seed-english-format.test.ts",
+      "tests/unit/seed-english-guard.test.ts",
+      "tests/integration/seed-english.test.ts",
+      "tests/integration/seed-english-pages.test.ts"
     ],
     "modules": [
-      "news · danh sách /tin-tuc — đổi tên khối, thứ tự cột phải, nhãn thẻ nổi bật",
-      "news · chi tiết /tin-tuc/[slug] — hero, cột trái dính, khung liên hệ, thẻ tag, bài liên quan, news-prose",
-      "layout · Breadcrumb overlay > 3 mục < md",
-      "site-settings · tab Tin tức → newsDetail.contactNote + loader + tự dịch (leaves / prompt)",
-      "db · migration ADD COLUMN site_settings_locales.news_detail_contact_note",
-      "i18n · vi / en (tác giả, ngày đăng, khung liên hệ mặc định, tên khối)",
-      "doc as-built · design-spec S10 / S11, DESIGN.md, ERD.md"
+      "seed · engine seed/english (ghi locale en, hasEnglish, translation.enSource manual, kiểm trường EN bắt buộc)",
+      "seed · bước cuối pnpm seed --sample và seed-scraped (checkSeedEnvironment)",
+      "data dev · EN cho Dự án, Cho thuê, Tin BĐS, Tin tức, Dịch vụ, Tuyển dụng, Danh mục, Chủ đầu tư, trang pháp lý, global public, alt ảnh",
+      "docs · runbook deploy (cấm seed EN staging/prod)"
     ]
   },
   "screens": [
-    "/tin-tuc, /tin-tuc/danh-muc/[slug] (+ ?q / ?tag), /en/news — danh sách",
-    "/tin-tuc/[slug], /en/news/[slug] — chi tiết",
-    "/admin/globals/site-settings (tab Tin tức)"
+    "/en, /en/projects, /en/projects/[slug], /en/for-rent, /en/for-rent/[slug], /en/property-news, /en/property-news/[slug], /en/news, /en/news/[slug], /en/services/*, /en/contact, /en/privacy-policy (+ trang pháp lý khác) — chỉ trên DB dev"
   ],
   "flows": [
-    "Danh sách: cột phải thứ tự Bản tin thị trường → Được quan tâm nhiều → Chủ đề; < lg cùng thứ tự dưới lưới",
-    "Chi tiết: hero (breadcrumb → chip chuyên mục → h1 → sapo → tác giả + ngày + phút đọc + chia sẻ) → thân bài → khung liên hệ → Thẻ → Bài viết liên quan → banner tư vấn",
-    "Cuộn chi tiết ≥ lg: cột trái (Mục lục + Tư vấn) dính, mục đang đọc đổi theo cuộn, dừng trước Bài viết liên quan",
-    "Admin sửa contactNote (vi / en) → lưu → khung liên hệ trang chi tiết đổi chữ; rỗng → câu mặc định",
-    "Bấm 'TAMI REAL ESTATE' trong khung liên hệ → /lien-he#lead-form"
+    "pnpm seed:english: chạy lần 1 ghi EN; chạy lại ghi 0 (idempotent)",
+    "pnpm seed --sample và seed-scraped: bước EN chạy cuối, bỏ qua khi không phải DB dev",
+    "Staging / production: seed EN bị chặn / bỏ qua"
   ],
   "impact": {
     "direct": [
-      "/tin-tuc + /en/news 1440 / 390: tiêu đề 'Được quan tâm nhiều' / 'Most popular'; khối Bản tin thị trường nằm trên khối này, Chủ đề dưới cùng; nhãn thẻ nổi bật 'TAMI REAL ESTATE'; top 5 vẫn theo lượt xem 30 ngày",
-      "Chi tiết 1440 khớp ảnh v2 D1–D10: hero ảnh bìa full width ≥ ~420px, chữ trắng AA (≥ 3 bài, gồm ảnh sáng), tác giả 'Bài viết bởi TAMI REAL ESTATE' (EN 'By TAMI REAL ESTATE', ngày EN 'Published: MM/DD/YYYY'), ảnh bìa không lặp trong thân, đoạn mở đầu không khung",
-      "Cột trái ≥ lg (1440 / 1024): Mục lục (số tròn 01/02… chỉ h2, h3 thụt không số, active vạch vàng) + thẻ Tư vấn cùng dính, mục lục dài cuộn trong, không đè Bài viết liên quan; bài không h2 → ẩn Mục lục nhưng thẻ Tư vấn vẫn dính",
-      "Thân bài: h2 ≈ 22–24px có số tròn; nội dung sau h2 thụt thẳng chữ h2 ở MỌI mục (≥ md; < md không thụt); mọi ul cấp gốc ✓ vàng, ol giữ số, ảnh chèn + chú thích vẫn hiện",
-      "Khung liên hệ cuối bài mọi bài: chữ từ admin (vi / en), rỗng → mặc định i18n; /en không lấy chữ VI; 'TAMI REAL ESTATE' là link /lien-he#lead-form; chữ admin render văn bản thuần",
-      "Hàng Thẻ: pill không #, link ?tag=, ẩn ở /en, ẩn khi không tag; Bài viết liên quan: 3 thẻ ngang (1 cột 390, 2 cột 768, 3 cột ≥ lg), < 3 → số có, 0 → ẩn khối",
-      "< lg (768 / 390): mục lục gập đầu bài, thẻ Tư vấn sau khung liên hệ, cụm chia sẻ xuống dưới hàng tác giả, không tràn ngang; Breadcrumb overlay > 3 mục < md chỉ '← mục cha'",
-      "Admin /admin/globals/site-settings tab Tin tức: trường contactNote (textarea localized ≤ 500) lưu được; EN tự dịch giữ 'TAMI REAL ESTATE'; migration chạy được trên staging (ADD COLUMN nullable)",
-      "Unit: NewsListPage.test, news-components.test, NewsArticle.test, NewsDetailPage.test, NewsToc.test, Breadcrumb.test, news-detail.test, load-news-contact-note.test, translation-service.test / translatable-fields.test"
+      "/en/* trên DB dev có dữ liệu: danh sách + chi tiết Dự án (61/61), Cho thuê (32/32), Tin BĐS (38/38), Tin tức (24/24), Dịch vụ (3/3), Tuyển dụng (4/4), Danh mục (16/16), Chủ đầu tư (29/29), trang pháp lý (2/2), alt ảnh (481/481), trang chủ + global; không còn trang EN rỗng / rơi về tiếng Việt ở trường localized",
+      "pnpm seed:english chạy lần 2 ghi 0 bản ghi; không nhân bản, không đổi bản vi",
+      "Guard: APP_ENV staging / production → từ chối (seed:english) / bỏ qua (bước cuối seed --sample, seed-scraped)",
+      "Bản ghi seed EN có hasEnglish = true và translation.enSource = manual; không có translationJob AI xếp hàng; bài nháp giữ nháp"
     ],
     "dependents": [
-      "Tuyển dụng (ShareButtons biến thể default + DetailShareButton) — không đổi, ShareButtons chỉ thêm tone=on-dark",
-      "NewsCard variant grid / card / row dùng ở danh sách, trang chủ, trang danh mục — không đổi, chỉ thêm variant related",
-      "Mọi trang dùng Breadcrumb variant=overlay (hero danh sách / chi tiết Dự án, Cho thuê, Tin BĐS, Tuyển dụng): ol đổi inline-flex → flex (w-fit giữ hình), ≤ 3 mục không đổi; > 3 mục < md chỉ '← mục cha'",
-      "Chi tiết 3 màn Dự án / Cho thuê / Tin BĐS (BL-061): dùng chung DetailAsideFit / DETAIL_ASIDE_STICKY_CLASS — không đổi",
-      "Pipeline tự dịch site-settings (TRANSLATABLE_FIELDS, prompt ALWAYS_KEEP) — thêm newsDetail + chuỗi thương hiệu; các trường khác không đổi",
-      "Beacon lượt xem POST /api/public/news-views + top 5 'Được quan tâm nhiều' — chỉ đổi tên hiển thị",
-      "BL-059 cột trái dính chi tiết tin ở lg thấp — xử lý chung trong D4"
+      "Tìm kiếm / lọc /en (có dữ liệu EN, slug EN đúng quy tắc); sitemap + hreflang chỉ liệt kê trang có EN",
+      "Trang pháp lý EN coi như đã duyệt (BR-08) — /en/privacy-policy hiển thị",
+      "Chi tiết tin /en/news/[slug]: khung liên hệ cuối bài (contactNote EN)"
     ],
     "regression": [
-      "Tìm q / lọc tag / sort / phân trang / chip danh mục / canonical + noindex ở /tin-tuc — không đổi",
-      "Form Bản tin (đăng ký email + đồng ý) hoạt động sau khi đổi vị trí",
-      "Chi tiết tin: JSON-LD Article / 1 h1 / hreflang / canonical / ISR / 404 / beacon lượt xem không đổi; ảnh hero priority (LCP)",
-      "/en ẩn Chủ đề + dòng Thẻ + bỏ qua ?tag= (news.tags chưa localized)",
-      "Trang tuyển dụng: nút chia sẻ + breadcrumb overlay hiển thị như cũ",
-      "Mọi trang đọc global site-settings không lỗi sau migration (cột mới nullable)",
-      "typecheck · eslint scope · unit + ui + integration · build PASS trên staging; 5 file integration (leads-public, rentals-reindex-job-migration, jobs-email, news-views, rental-search) hay flake khi chạy cả bộ, chạy riêng PASS"
+      "Nội dung vi không đổi (trang chủ, danh sách, chi tiết) sau khi seed EN",
+      "pnpm seed --sample vẫn chạy trọn vẹn (bước EN ở cuối); seed-scraped vẫn chạy",
+      "Luồng tự dịch AI (khi sửa tay vi) không bị ảnh hưởng; job dịch không xếp hàng cho bản ghi seed EN",
+      "Admin: sửa bản ghi EN thủ công vẫn lưu được; trang pháp lý EN đã duyệt giữ trạng thái"
     ]
   },
   "acceptance": [
-    "/tin-tuc + /en/news: 'Được quan tâm nhiều' / 'Most popular'; Đăng ký bản tin nằm trên khối này",
-    "Chi tiết 1440 khớp D1–D10 cạnh ảnh v2; chữ trắng hero đạt AA (≥ 3 bài)",
-    "Bài không ảnh bìa → hero nền tối không vỡ; không h2 → ẩn Mục lục (thẻ Tư vấn vẫn dính); không tag → ẩn hàng Thẻ; < 3 liên quan → số có, 0 → ẩn",
-    "Cột trái dính từ đầu thân bài tới trước Bài viết liên quan, không đè; mục lục dài tự cuộn; mục đang đọc cập nhật khi cuộn",
-    "Khung liên hệ: chữ admin vi / en, rỗng → mặc định; 'TAMI REAL ESTATE' tới form tư vấn trang Liên hệ",
-    "ol không thành ✓; ảnh chèn trong bài vẫn hiện + chú thích",
-    "1440 / 1024 / 768 / 390, vi + en; không tràn ngang; focus bàn phím rõ"
+    "Sau pnpm seed:english trên DB dev: phủ EN projects 61/61, rentals 32/32, property_posts 38/38, news 24/24, services 3/3, job_postings 4/4, categories 16/16, developers 29/29, pages 2/2, media alt 481/481",
+    "Chạy lại pnpm seed:english: ghi 0, không nhân bản",
+    "Mở các route /en ở mục screens: có nội dung tiếng Anh, tên riêng giữ dấu, giá / diện tích giữ nguyên, không lẫn tiếng Việt ở trường localized",
+    "Staging / production không bị seed EN",
+    "Trang vi không thay đổi"
   ],
   "verification": {
-    "status": "T01: typecheck PASS · eslint scope PASS · pnpm test 4.406 PASS · build PASS. T02: typecheck PASS · eslint scope PASS · vitest news + translation 187/187 · pnpm test đủ bộ 4.410 PASS (5 file integration FAIL khi chạy cả bộ do tải / DB-Redis dùng chung, PASS 83/83 chạy riêng) · build PASS (builder); reviewer r2 tự chạy typecheck + eslint + pnpm test, không chạy build (chung .next với dev server). Migration đã chạy trên DB local. Browser pane (DB local) ảnh .context/review-reports/assets/bl062-p1t02-*: 1440 / 1024 / 768 / 390 vi.",
-    "note": "Chưa kiểm được: /en/news/[slug] bằng mắt, hero không ảnh bìa, lưu contactNote ở admin, contrast lấy mẫu pixel."
+    "status": "Test unit + integration seed-english PASS (builder/reviewer); spec-validation phase 1 PASS; DB dev coverage trước → sau: projects 3/61 → 61/61, rentals 0/32 → 32/32, property_posts 0/38 → 38/38, news 0/24 → 24/24, services 0/3 → 3/3, job_postings 3/4 → 4/4, categories 5/16 → 16/16, developers 0/29 → 29/29, pages 0/2 → 2/2, media alt 7/481 → 481/481; idempotent (chạy lại ghi 0)"
   },
   "unverifiedLocally": [
-    "/en/news/[slug] (DB local không có bài EN): khung liên hệ mặc định EN, 'Published:', ẩn Thẻ, 'By TAMI REAL ESTATE', hero + cột dính ở 1440 / 390",
-    "Hero không ảnh bìa (nền tối thương hiệu) trên bài thật không có coverImage — chữ đọc được, không vỡ",
-    "Admin save flow: /admin/globals/site-settings tab Tin tức → nhập contactNote vi → lưu → trang chi tiết vi đổi chữ (cache tag site-settings); bản EN (tự dịch / sửa tay) giữ 'TAMI REAL ESTATE' thành link",
-    "Chạy migration 20261022_172224_news_detail_contact_note trên DB staging (additive) + đọc global không lỗi",
-    "Contrast chữ trắng hero lấy mẫu trên ảnh bìa sáng thật (≥ 3 bài) — hiện chỉ tính cận 5,07:1",
-    "Focus bàn phím thật trên hero / mục lục / khung liên hệ (mới kiểm class focus-visible)"
+    "Staging / production: chưa chạy (cố ý — seed EN chỉ DB dev, bị chặn)"
   ],
-  "risk": "medium",
-  "riskNote": "Đổi bố cục trang chi tiết tin + CSS news-prose riêng trang tin, tái dùng khung dính BL-061, 1 migration additive nullable và 1 trường admin tự dịch. Reviewer T02 chọn STRICT (schema; MAJOR-1 đã sửa ở r2). Nhiều ca không kiểm được trên DB local (xem unverifiedLocally) → kiểm trên staging trước khi coi là xong. Ưu tiên test: (1) chi tiết tin 1440 / 1024 / 768 / 390 vi + en — hero, cột dính + dừng đúng, thụt nội dung thẳng hàng mọi h2; (2) khung liên hệ + admin lưu vi / en + link; (3) hero không ảnh bìa; (4) danh sách thứ tự cột phải + tên khối; (5) regression tuyển dụng + Breadcrumb overlay."
+  "followUps": [
+    "BL-065 — trường không localized (floor / distance / address) còn tiếng Việt ở /en",
+    "D12 — newsDetail.contactNote vi rỗng → dùng câu mặc định i18n"
+  ],
+  "risk": "low",
+  "riskNote": "Chỉ dữ liệu dev + công cụ seed; không đổi schema / API / UI; có guard chặn staging / prod. Ưu tiên test: (1) duyệt các route /en trên dev, (2) seed:english chạy lại ghi 0, (3) seed --sample còn chạy."
 }

@@ -1,7 +1,7 @@
 ---
 id: seed-english-data
 type: feature
-status: in_progress
+status: done
 created: 2026-10-22
 ---
 

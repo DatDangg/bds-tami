@@ -1,0 +1,2 @@
+# builder — feature-seed-english-data phase-1-task-01
+Engine `seed/english/` (format/apply/media/export/index/README), scripts `seed-english(.ts|-export.ts)`, package.json scripts, wiring seed/index + seed-scraped, data JSON cho categories/developers/services/job-postings/pages/globals/media. Test unit+integration PASS; typecheck/test PASS; dev DB idempotent. Chưa commit (dispatcher). Chi tiết: Verification summary cuối task file.

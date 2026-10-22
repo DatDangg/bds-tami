@@ -6,8 +6,8 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.53.0
-- **updated_at:** 2026-10-22
+- **spec_version:** 1.54.0
+- **updated_at:** 2026-10-23
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
 ## Overview
