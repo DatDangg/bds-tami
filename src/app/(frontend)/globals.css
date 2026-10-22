@@ -398,54 +398,44 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
   }
 }
 
-/* Nội dung bài Tin tức (BL-054, design `chi-tiet-tin-tuc.webp`): CHỈ trang `/tin-tuc/[slug]` gắn lớp `news-prose` lên `RichText` (`NewsArticleBody`), trang dự án /
+/* Nội dung bài Tin tức (BL-054 → BL-062, design `chi-tiet-tin-tuc-v2.webp`): CHỈ trang `/tin-tuc/[slug]` gắn lớp `news-prose` lên `RichText` (`NewsArticleBody`), trang dự án /
    dịch vụ / pháp lý dùng `RichText` không đổi. Viết ngoài @layer để thắng utility mặc định của `RichText` (Tailwind v4 đặt utility trong @layer). Chỉ con TRỰC TIẾP
    của nội dung (cấp gốc Lexical), khối P1-T02 (`ImageText`, `StatHighlights`, `ProjectMention`) giữ style của mình. Chữ trang trí qua `content: "…" / ""` (alt rỗng)
    nên trình đọc màn hình không đọc số / dấu ngoặc; trình duyệt chưa hỗ trợ cú pháp alt dùng khai báo trước (vẫn hiện, có thể bị đọc). */
 .news-prose {
   counter-reset: news-h2;
 }
-@media (min-width: 48rem) {
-  /* Cột chữ thụt vào chừa rãnh cho số tròn của h2 (như design); đoạn mở đầu giãn ra hết rãnh. */
-  .news-prose {
-    padding-inline-start: 3.25rem;
-  }
-}
-.news-prose > p,
-.news-prose > ul.list-disc,
-.news-prose > ol,
-.news-prose > h2,
-.news-prose > h3 {
-  max-width: 46rem;
-}
-/* Đoạn mở đầu = đoạn văn đầu tiên khi nội dung BẮT ĐẦU bằng đoạn văn (đoạn rỗng không được render nên không tính); đóng khung nền nhạt, không lặp ở nơi khác. */
+/* Đoạn mở đầu = đoạn văn đầu tiên khi nội dung BẮT ĐẦU bằng đoạn văn (đoạn rỗng không được render nên không tính): chữ dẫn cỡ --text-lead, không khung, full rộng cột (BL-062 D3). */
 .news-prose > p:first-child {
-  max-width: none;
-  margin-bottom: 2.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  background-color: var(--color-primary-subtle);
-  padding: 1.25rem 1.25rem;
+  margin-bottom: 2rem;
   color: var(--color-text-secondary);
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
 }
-@media (min-width: 48rem) {
-  .news-prose > p:first-child {
-    margin-inline-start: -3.25rem;
-    padding: 1.5rem 2.75rem;
-  }
+/* Ảnh chèn trong bài: bo góc, chú thích nghiêng canh giữa (design v2). Chỉ `figure` cấp gốc; khối P1-T02 giữ style của mình. */
+.news-prose > figure img {
+  border-radius: var(--radius-xl);
 }
-/* h2 cấp gốc: số tròn 01 / 02… tự động (CSS counter); `id` neo + `scroll-mt` do `RichText` gắn, không đổi. */
+.news-prose > figure > figcaption {
+  text-align: center;
+  font-size: var(--text-xsmall);
+  font-style: italic;
+}
+/* h2 cấp gốc: số tròn 01 / 02… tự động (CSS counter) cỡ ~22–24px (--text-h3); `id` neo + `scroll-mt` do `RichText` gắn, không đổi. Số nằm trong rãnh trái 3.25rem của h2 (≥ md). */
 .news-prose > h2 {
   position: relative;
   counter-increment: news-h2;
   padding-inline-start: 3rem;
+  font-size: var(--text-h3);
+  font-weight: 600;
+  line-height: var(--text-h3--line-height);
 }
 .news-prose > h2::before {
   content: counter(news-h2, decimal-leading-zero);
   content: counter(news-h2, decimal-leading-zero) / "";
   position: absolute;
   inset-inline-start: 0;
-  top: 0.1em;
+  top: 0;
   display: flex;
   width: 2.25rem;
   height: 2.25rem;
@@ -462,10 +452,12 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
 }
 @media (min-width: 48rem) {
   .news-prose > h2 {
-    padding-inline-start: 0;
+    padding-inline-start: 3.25rem;
   }
-  .news-prose > h2::before {
-    inset-inline-start: -3.25rem;
+  /* Mọi khối (trừ chính các h2, vốn tự có rãnh số) SAU h2 đầu tiên thụt cùng rãnh số: chữ đoạn / danh sách / ảnh thẳng hàng chữ tiêu đề (BL-062 D5); lead + ảnh trước h2 đầu giữ full rộng. */
+  .news-prose > h2 ~ :not(h2),
+  .news-prose > h2 ~ ul.list-disc {
+    margin-inline-start: 3.25rem;
   }
 }
 /* Trích dẫn: khung nền nhạt bo góc + dấu ngoặc lớn màu nhấn (trang trí). */
@@ -492,7 +484,7 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
   font-weight: 700;
   line-height: 1;
 }
-/* `ul` cấp gốc của Lexical (`list-disc`; khối "Số liệu nổi bật" cũng là `ul` nên phải loại): dấu tích tròn (nền màu nhấn, tích vẽ bằng viền — không ảnh, không mã màu rời); mục chỉ chứa danh sách con thì không có dấu. `ol` giữ số. */
+/* `ul` cấp gốc của Lexical (`list-disc`; khối "Số liệu nổi bật" cũng là `ul` nên phải loại): dấu tích tròn vàng nhạt (nền `primary-soft`, tích màu nhấn đậm vẽ bằng viền — không ảnh, không mã màu rời; danh sách lồng giữ kiểu cũ); mục chỉ chứa danh sách con thì không có dấu. `ol` giữ số. */
 .news-prose > ul.list-disc {
   margin-inline-start: 0;
   list-style: none;
@@ -515,14 +507,14 @@ html:has([data-detail-page]) .site-header[data-scrolled]:not(:has(:focus-visible
   width: 1.375rem;
   height: 1.375rem;
   border-radius: 9999px;
-  background-color: var(--color-primary-deep);
+  background-color: var(--color-primary-soft);
 }
 .news-prose > ul.list-disc > li::after {
   inset-inline-start: 0.5rem;
   top: calc(0.2em + 0.3rem);
   width: 0.375rem;
   height: 0.625rem;
-  border: solid var(--color-surface);
+  border: solid var(--color-accent-text);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }

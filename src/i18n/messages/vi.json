@@ -234,7 +234,10 @@
     },
     "newsDetail": {
       "v2": {
-        "author": "Ban biên tập TAMI HOMES",
+        "author": "Bài viết bởi TAMI REAL ESTATE",
+        "publishedOn": "Ngày đăng: {date}",
+        "contactNote": "Để nhận thông tin chi tiết về dự án và chính sách bán hàng mới nhất, quý khách vui lòng liên hệ TAMI REAL ESTATE qua hotline hoặc để lại thông tin bên dưới.",
+        "contactNoteBrand": "TAMI REAL ESTATE",
         "shareLabel": "Chia sẻ:",
         "shareMore": "Chia sẻ qua ứng dụng khác",
         "consultEyebrow": "Tư vấn miễn phí",

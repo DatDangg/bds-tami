@@ -1,19 +1,19 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Clock } from "@/components/icons";
-import { CARD_IMAGE_ZOOM, CARD_LINK_CLASS, CardFooter } from "@/components/layout/card-parts";
+import { CARD_IMAGE_ZOOM, CARD_LINK_CLASS, CardArrow, CardFooter } from "@/components/layout/card-parts";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import type { NewsCardData } from "@/lib/news/news-view";
 import { cn } from "@/lib/utils";
 
-type NewsCardVariant = "card" | "grid" | "row";
+type NewsCardVariant = "card" | "grid" | "row" | "related";
 type HeadingLevel = "h2" | "h3";
 
 interface NewsCardProps {
   data: NewsCardData;
   /**
    * `card`: thẻ dọc gọn (trang chủ, bài liên quan cũ) · `grid`: thẻ lưới `/tin-tuc` BL-054 (badge danh mục + ngày, tiêu đề 2 dòng, tóm tắt 3 dòng,
-   * "N phút đọc" + mũi tên — cũng dùng cho "Bài viết liên quan") · `row`: hàng nhỏ ảnh 4:3 bên trái.
+   * "N phút đọc" + mũi tên) · `related`: "Bài viết liên quan" chi tiết tin BL-062 (ảnh 16:7, badge + ngày, tiêu đề 2 dòng, tóm tắt 2 dòng + nút mũi tên vàng) · `row`: hàng nhỏ ảnh 4:3 bên trái.
    */
   variant?: NewsCardVariant;
   /** Cấp heading của tiêu đề thẻ, theo vị trí trong trang (không nhảy cấp). */
@@ -32,9 +32,11 @@ const IMAGE_SIZES: Record<NewsCardVariant, string> = {
   // Lưới 3 cột trong cột chính (~70% khung, cạnh cột phải) ≥ lg; 2 cột từ md.
   grid: "(min-width: 1280px) 280px, (min-width: 1024px) 22vw, (min-width: 768px) 50vw, 100vw",
   row: "120px",
+  // Lưới 3 cột trong khung 1200px ≥ lg, 2 cột từ sm.
+  related: "(min-width: 1280px) 384px, (min-width: 1024px) 31vw, (min-width: 640px) 50vw, 100vw",
 };
 
-const IMAGE_RATIO: Record<NewsCardVariant, string> = { card: "16/10", grid: "16/10", row: "4/3" };
+const IMAGE_RATIO: Record<NewsCardVariant, string> = { card: "16/10", grid: "16/10", row: "4/3", related: "16/7" };
 
 /**
  * Badge danh mục của Tin tức (BL-054): viên thuốc nhỏ chữ hoa. Nền sáng: vàng nhạt token (`primary-soft` + chữ `badge-foreground`, 9.7:1); trên ảnh tối (`on-image`):
@@ -75,7 +77,7 @@ interface GridProps {
 
 /**
  * Thẻ lưới `/tin-tuc` (design `tin-tuc.webp`, BL-054): thẻ trắng bo 20px như thẻ Dự án; ảnh 16:10 → badge danh mục + ngày → tiêu đề 2 dòng →
- * tóm tắt 3 dòng → "N phút đọc" + mũi tên tròn. Cả thẻ là MỘT link. Dùng lại cho "Bài viết liên quan" (P2-T02).
+ * tóm tắt 3 dòng → "N phút đọc" + mũi tên tròn. Cả thẻ là MỘT link. ("Bài viết liên quan" dùng biến thể `related` từ BL-062).
  */
 function GridNewsCard({ data, headingLevel: Heading, priority, sizes }: GridProps) {
   return (
@@ -103,11 +105,41 @@ function GridNewsCard({ data, headingLevel: Heading, priority, sizes }: GridProp
 }
 
 /**
+ * Thẻ "Bài viết liên quan" (BL-062 D9, design `chi-tiet-tin-tuc-v2.webp`): thẻ trắng bo 20px; ảnh 16:7 → badge danh mục + ngày → tiêu đề 2 dòng → tóm tắt 2 dòng + nút tròn vàng mũi tên
+ * (trang trí). Cả thẻ là MỘT link (không lồng `a`).
+ */
+function RelatedNewsCard({ data, headingLevel: Heading, sizes }: Omit<GridProps, "priority">) {
+  return (
+    <article className="h-full">
+      <Link href={data.href} className={CARD_LINK_CLASS}>
+        <div className={cn("w-full shrink-0 overflow-hidden bg-surface-muted", CARD_IMAGE_ZOOM)} style={{ aspectRatio: IMAGE_RATIO.related }}>
+          {data.cover && <ResponsiveImage media={data.cover} sizes={sizes ?? IMAGE_SIZES.related} aspectRatio={IMAGE_RATIO.related} decorative />}
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5 p-4">
+          {(data.categoryName || (data.dateLabel && data.publishedAt)) && (
+            <p className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xsmall text-text-muted">
+              {data.categoryName && <NewsCategoryBadge name={data.categoryName} />}
+              {data.dateLabel && data.publishedAt && <time dateTime={data.publishedAt}>{data.dateLabel}</time>}
+            </p>
+          )}
+          <Heading className="line-clamp-2 min-h-[2lh] text-h4 font-semibold transition-colors group-hover:text-accent-text group-focus-visible:text-accent-text">{data.title}</Heading>
+          <div className="mt-auto flex items-end justify-between gap-3">
+            <p className="line-clamp-2 min-h-[2lh] min-w-0 flex-1 text-small text-text-secondary">{data.excerpt}</p>
+            <CardArrow />
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+/**
  * Thẻ Tin tức (design-spec §3.2 "Tin/ưu đãi"): cả thẻ là MỘT link (không lồng link). Danh mục là chữ metadata, không phải link riêng
  * (nên không lồng `<a>`); tiêu đề là heading để người đọc màn hình duyệt theo heading. Server Component.
  */
 export function NewsCard({ data, variant = "card", headingLevel, priority = false, sizes, onDark = false }: NewsCardProps) {
   if (variant === "grid") return <GridNewsCard data={data} headingLevel={headingLevel} priority={priority} sizes={sizes} />;
+  if (variant === "related") return <RelatedNewsCard data={data} headingLevel={headingLevel} sizes={sizes} />;
   const Heading = headingLevel;
   const isRow = variant === "row";
   // Chỉ thẻ lưới `card` trên nền sáng là thẻ trắng viền (như PostCard); row và thẻ trên nền tối giữ phẳng.

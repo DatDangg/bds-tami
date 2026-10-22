@@ -3038,6 +3038,12 @@ export interface SiteSetting {
       showStrengths?: boolean | null;
     };
   };
+  newsDetail?: {
+    /**
+     * Hiện ở cuối mọi bài tin tức. Chữ 'TAMI REAL ESTATE' tự thành link tới trang Liên hệ. Để trống dùng câu mặc định.
+     */
+    contactNote?: string | null;
+  };
   /**
    * Số hiển thị và gọi từ nút liên hệ nổi trên website
    */
@@ -3731,6 +3737,11 @@ export interface SiteSettingsSelect<T extends boolean = true> {
                   };
               showStrengths?: T;
             };
+      };
+  newsDetail?:
+    | T
+    | {
+        contactNote?: T;
       };
   hotline?: T;
   zaloUrl?: T;

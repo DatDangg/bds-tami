@@ -49,7 +49,7 @@ function activeLabels() {
   return screen
     .queryAllByRole("link")
     .filter((link) => link.getAttribute("aria-current") === "location")
-    .map((link) => link.textContent);
+    .map((link) => link.textContent?.replace(/^[0-9]{2}/, ""));
 }
 
 beforeEach(() => {
@@ -68,8 +68,19 @@ describe("NewsTocSidebar (BL-054: cột trái ≥ lg, khôi phục bản dính B
     renderWithTargets(<NewsTocSidebar headings={headings} label="Mục lục" />);
     expect(screen.getByRole("navigation", { name: "Mục lục" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Phần một" })).toHaveAttribute("href", "#mot");
-    expect(screen.getByRole("link", { name: "Mục con" }).className).toContain("pl-6");
-    expect(screen.getByRole("link", { name: "Phần một" }).className).toContain("pl-3");
+    expect(screen.getByRole("link", { name: "Mục con" }).className).toContain("pl-16");
+  });
+
+  it("BL-062: thẻ trắng viền mảnh; số tròn 01 / 02 cho heading cấp 2 (trang trí aria-hidden, đếm không tính cấp 3); cấp 3 không số; tên truy cập không có số", () => {
+    const { container } = renderWithTargets(<NewsTocSidebar headings={headings} label="Mục lục" />);
+    const nav = container.querySelector("nav") as HTMLElement;
+    expect(nav.className).toContain("rounded-xl");
+    expect(nav.className).toContain("border");
+    expect(nav.className).toContain("overflow-y-auto");
+    const badges = [...nav.querySelectorAll("a > span[aria-hidden='true']")].map((badge) => badge.textContent);
+    expect(badges).toEqual(["01", "02"]);
+    expect(screen.getByRole("link", { name: "Mục con" }).querySelector("span")).toBeNull();
+    expect(screen.getByRole("link", { name: "Phần hai" })).toHaveTextContent("02Phần hai");
   });
 
   it("active = heading cuối cùng đã qua vạch; trên heading đầu thì không active; qua heading cuối giữ mục cuối", () => {
@@ -144,7 +155,10 @@ describe("NewsTocSidebar (BL-054: cột trái ≥ lg, khôi phục bản dính B
     expect(nav.className).toContain("print:hidden");
     scrollTo({ mot: 20, con: 420, hai: 820 });
     expect(screen.getByRole("link", { name: "Phần một" }).className).toContain("border-primary-deep");
-    expect(screen.getByRole("link", { name: "Phần hai" }).className).toContain("border-border");
+    expect(screen.getByRole("link", { name: "Phần hai" }).className).toContain("border-transparent");
+    // Số của mục active: nền vàng (primary), mục khác nền kem + vòng viền vàng nhạt.
+    expect(screen.getByRole("link", { name: "Phần một" }).querySelector("span")?.className).toContain("bg-primary");
+    expect(screen.getByRole("link", { name: "Phần hai" }).querySelector("span")?.className).toContain("ring-primary-soft");
   });
 });
 

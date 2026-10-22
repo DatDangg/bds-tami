@@ -33,12 +33,17 @@ function scrollToHeading(id: string): boolean {
   return true;
 }
 
-/** `ol` link `#id` thật (chạy cả khi chưa có JS); heading cấp 3 thụt vào. `activeId` chỉ có ở bản dính ≥ lg (vạch trái tô màu nhấn + chữ đậm). */
-function TocLinks({ headings, activeId, onJump }: { headings: TocHeading[]; activeId?: string; onJump: (event: MouseEvent<HTMLAnchorElement>, id: string) => void }) {
+/**
+ * `ol` link `#id` thật (chạy cả khi chưa có JS); heading cấp 3 thụt vào. `activeId` chỉ có ở bản dính ≥ lg: mục đang đọc vạch trái vàng + chữ đậm + số tròn nền vàng.
+ * `numbered` (bản cột trái, BL-062): mỗi heading cấp 2 có số tròn 01 / 02… (trang trí, `aria-hidden`; khớp bộ đếm `h2` của `news-prose`), heading cấp 3 không số.
+ */
+function TocLinks({ headings, activeId, numbered = false, onJump }: { headings: TocHeading[]; activeId?: string; numbered?: boolean; onJump: (event: MouseEvent<HTMLAnchorElement>, id: string) => void }) {
+  let sectionNumber = 0;
   return (
     <ol className="flex flex-col">
       {headings.map((heading) => {
         const current = heading.id === activeId;
+        const number = numbered && heading.level !== 3 ? String(++sectionNumber).padStart(2, "0") : null;
         return (
           <li key={heading.id}>
             <a
@@ -47,10 +52,18 @@ function TocLinks({ headings, activeId, onJump }: { headings: TocHeading[]; acti
               onClick={(event) => onJump(event, heading.id)}
               className={cn(
                 LINK_BASE,
-                heading.level === 3 ? "pl-6" : "pl-3",
-                current ? "border-primary-deep font-semibold text-text" : "border-border text-text-secondary hover:text-text hover:underline",
+                numbered ? (heading.level === 3 ? "gap-3 pl-16" : "gap-3 pl-[calc(1.25rem-2px)]") : heading.level === 3 ? "pl-6" : "pl-3",
+                current ? "border-primary-deep font-semibold text-text" : numbered ? "border-transparent text-text-secondary hover:text-text hover:underline" : "border-border text-text-secondary hover:text-text hover:underline",
               )}
             >
+              {number && (
+                <span
+                  aria-hidden="true"
+                  className={cn("flex size-7 shrink-0 items-center justify-center rounded-full text-xsmall font-semibold", current ? "bg-primary text-badge-foreground" : "bg-primary-subtle text-accent-text ring-1 ring-primary-soft ring-inset")}
+                >
+                  {number}
+                </span>
+              )}
               {heading.text}
             </a>
           </li>
@@ -71,9 +84,9 @@ function findActiveId(ids: string[]): string {
 }
 
 /**
- * Mục lục cột trái ≥ lg (design `chi-tiet-tin-tuc.webp`, BL-054; khôi phục bản dính BL-033): nhãn "Mục lục" chữ hoa + danh sách có vạch trái, mục đang đọc
- * (`aria-current="location"`) vạch màu nhấn + chữ đậm theo cuộn trang (rAF-throttled, đo mép trên heading) và tự cuộn vào giữa khung (chỉ khung, không cuộn trang).
- * Việc DÍNH do cột chứa (`NewsArticleSidebar`) lo; khung tự giới hạn cao theo viewport và cuộn riêng. Ẩn dưới lg (bản gập `NewsTocDisclosure` thay) và khi in.
+ * Mục lục cột trái ≥ lg (design `chi-tiet-tin-tuc-v2.webp`, BL-062 trên nền BL-054): thẻ trắng viền mảnh, nhãn "Mục lục" chữ hoa + danh sách số tròn 01 / 02…, mục đang đọc
+ * (`aria-current="location"`) vạch vàng trái + số nền vàng + chữ đậm theo cuộn trang (rAF-throttled, đo mép trên heading) và tự cuộn vào giữa khung (chỉ khung, không cuộn trang).
+ * Việc DÍNH do cột chứa (`NewsArticleSidebar`) lo; khung giới hạn cao mềm theo viewport (chừa chỗ cho thẻ tư vấn bên dưới; chiều cao thật do `DetailAsideFit` đo) và cuộn riêng. Ẩn dưới lg (bản gập `NewsTocDisclosure` thay) và khi in.
  */
 export function NewsTocSidebar({ headings, label }: TocProps) {
   const [activeId, setActiveId] = useState("");
@@ -125,15 +138,19 @@ export function NewsTocSidebar({ headings, label }: TocProps) {
   }
 
   return (
-    <nav ref={navRef} aria-label={label} className="relative hidden max-h-[45dvh] overflow-y-auto overscroll-contain lg:block print:hidden">
-      <p className="mb-3 text-eyebrow font-semibold tracking-[0.12em] text-text-muted uppercase">{label}</p>
-      <TocLinks headings={headings} activeId={activeId} onJump={handleJump} />
+    <nav
+      ref={navRef}
+      aria-label={label}
+      className="relative hidden max-h-[max(12rem,calc(100dvh-var(--sticky-top)-24rem))] overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface py-5 pr-4 lg:block print:hidden"
+    >
+      <p className="mb-3 px-5 text-eyebrow font-semibold tracking-[0.12em] text-text-muted uppercase">{label}</p>
+      <TocLinks headings={headings} activeId={activeId} numbered onJump={handleJump} />
     </nav>
   );
 }
 
 /**
- * Mục lục gập < lg (BL-054: mobile / tablet không có design): `<details>` gốc đóng mặc định, thẻ viền bo 20px đầu bài (sau ảnh bìa, trước nội dung);
+ * Mục lục gập < lg (BL-054: mobile / tablet không có design): `<details>` gốc đóng mặc định, thẻ viền bo 20px đầu thân bài (sau hero, trước nội dung — BL-062);
  * bấm một mục thì cuộn tới heading và gập lại. Không có active (khung nhỏ, danh sách đóng). Ẩn từ lg (bản cột trái `NewsTocSidebar` thay) và khi in.
  */
 export function NewsTocDisclosure({ headings, label }: TocProps) {

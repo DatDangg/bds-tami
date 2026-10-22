@@ -2912,10 +2912,10 @@
       "slug": "news-list-detail-v2",
       "title": "Tin tức: \"Đọc nhiều\" → \"Được quan tâm nhiều\", Bản tin lên trên; chi tiết tin tức theo ảnh v2 (hero + chia sẻ, mục lục + tư vấn dính, ✓ mọi ul, khung liên hệ admin, bài liên quan) (BL-062)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-062",
-      "changeDoc": "spec/changes/2026-10-22-news-list-detail-v2.md",
+      "changeDoc": "spec/changes/archive/2026-10-22-news-list-detail-v2.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2926,17 +2926,28 @@
           "round": 1,
           "report": ".context/review-reports/feature-news-list-detail-v2-phase-1-task-01-round-1-review.md",
           "verify": "typecheck PASS · eslint news 0 · test 4406 PASS · build PASS · browser :3000 thứ tự aside (ảnh không lưu — residual)",
-          "completedAt": "2026-10-23"
+          "completedAt": "2026-10-23",
+          "commit": "83bb1ec"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-news-list-detail-v2/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-news-list-detail-v2-phase-1-task-02-round-2-review.md",
+          "verify": "typecheck PASS · eslint scope 0 · test 4430 PASS (reviewer r2 full suite) · build PASS (attempt 2) · migration 20261022_172224_news_detail_contact_note ADD-only migrated local · ảnh bl062-p1t02-*",
+          "completedAt": "2026-10-23"
         }
       ],
       "startedAt": "2026-10-23",
-      "specValidationPreBuild": ".context/review-reports/spec-validation-feature-news-list-detail-v2-pre-build.md (PASS, G1/G2/N2-N5 sửa spec)"
+      "specValidationPreBuild": ".context/review-reports/spec-validation-feature-news-list-detail-v2-pre-build.md (PASS, G1/G2/N2-N5 sửa spec)",
+      "completedAt": "2026-10-23",
+      "specVersion": "1.53.0",
+      "scopeVersion": 69,
+      "review": "T01 FAST PASS r1 · T02 STRICT PASS r2",
+      "specValidation": ".context/review-reports/spec-validation-feature-news-list-detail-v2-phase-1.md (PASS; residual: /en chi tiết, hero không ảnh bìa, lưu admin → kiểm staging)"
     }
   ],
   "bugs": [
@@ -3980,7 +3991,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T17:20:02.255Z",
+  "lastUpdated": "2026-10-22T18:17:17.830Z",
   "approvalMilestones": [
     {
       "id": "M1",

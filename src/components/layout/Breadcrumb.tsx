@@ -61,7 +61,7 @@ export function Breadcrumb({ items, className, jsonLd = true, variant = "default
           <span className={cn(overlay && "truncate")}>{t("backTo", { label: parent.label })}</span>
         </Link>
       )}
-      <ol className={cn("items-center", overlay ? "flex-nowrap" : "flex-wrap", parent ? "hidden md:flex" : "flex", overlay && cn(PILL_CLASS, "w-fit"))}>
+      <ol className={cn("items-center", overlay ? "flex-nowrap" : "flex-wrap", overlay && cn(PILL_CLASS, "w-fit"), parent ? "hidden md:flex" : "flex")}>
         {trail.map((entry, index) => {
           const isLast = index === trail.length - 1;
           return (

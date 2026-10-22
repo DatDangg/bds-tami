@@ -11,6 +11,7 @@ import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
 import { listingPagesField } from "./site-settings/listing-pages";
+import { newsDetailField } from "./site-settings/news-detail";
 import { officesField, workingHoursField } from "./site-settings/contact-offices";
 import { careersPerksField, careersProcessField, pageHeroesField, showProjectStrengthsField } from "./site-settings/page-heroes";
 
@@ -117,6 +118,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
           ],
         },
         { label: "Trang danh sách", fields: [listingPagesField] },
+        { label: "Tin tức", fields: [newsDetailField] },
         {
           label: "Liên hệ & mạng xã hội",
           fields: [

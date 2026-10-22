@@ -1,0 +1,132 @@
+{
+  "specVersion": "1.52.0",
+  "scopeVersion": 68,
+  "generatedAt": "2026-10-23T00:10:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-061 MODIFY (MINOR 1.51.0 → 1.52.0 — bố cục danh sách + chi tiết Dự án / Cho thuê / Tin BĐS, user duyệt 2026-10-22; thay quyết định BL-052 'cột phải cạnh Tổng quan + dải rộng hết khung'): (1) bộ lọc danh sách ≥ lg dính dưới header + cuộn riêng; (2) thẻ nổi bật bấm cả thẻ (stretched link); (3) chi tiết 2 cột — mọi khối nội dung ở cột trái, form + hotline dính tới khối '… tương tự' / 'Tin liên quan'; khối nhiều cột đổi cột theo bề rộng cột (@container/detail); mobile: cột phải sau toàn bộ nội dung; (4) BL-060 Vị trí breakpoint theo bề rộng cột. Không schema / API / i18n / migration.",
+  "status": "published — T01 NORMAL PASS r1 (commit b0fdc6a) + T02 NORMAL PASS r1 (working tree); spec-validation phase 1 PASS; primary close-out + commit sắp tới trên staging",
+  "workItem": "feature/listing-sticky-filter-aside",
+  "backlog": "BL-061",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-22-listing-sticky-filter-aside.md",
+  "changeDocStatus": "in_progress → done khi primary close-out (archive sang spec/changes/archive/)",
+  "task": [
+    "tasks/feature-listing-sticky-filter-aside/phase-1-task-01.md",
+    "tasks/feature-listing-sticky-filter-aside/phase-1-task-02.md"
+  ],
+  "reviewResults": [
+    "T01 NORMAL PASS r1 — .context/review-reports/feature-listing-sticky-filter-aside-phase-1-task-01-round-1-review.md (commit b0fdc6a)",
+    "T02 NORMAL PASS r1 — .context/review-reports/feature-listing-sticky-filter-aside-phase-1-task-02-round-1-review.md",
+    "spec-validator phase 1 PASS — .context/review-reports/spec-validation-feature-listing-sticky-filter-aside-phase-1.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.51.0-67.json",
+  "specUpdate": "spec/updates/2026-10-22-listing-sticky-filter-aside.md",
+  "supersedes": "spec/updates/2026-10-21-listing-detail-redesign.md:44 (cột phải cạnh Tổng quan + dải rộng hết khung nền xen kẽ)",
+  "specRefs": [
+    "F2 / F3 / F4 — Trang danh sách, khung chung, mục (3) (SPECIFICATIONS.md:39, as-built BL-061): ≥ lg cột 'Bộ lọc' dính dưới header (--sticky-top + 1rem), max-h = phần màn hình còn lại, tự cuộn (overscroll-contain), thôi dính ở cuối lưới; < lg Sheet",
+    "F2 / F3 / F4 — Thẻ nổi bật (SPECIFICATIONS.md:43, áp cả 3 màn; :45 / :48): bấm cả thẻ mở chi tiết (stretched link từ 'Xem chi tiết', không lồng <a>); ngoại lệ 'Nhận tư vấn' (#lead-form), mũi tên + chấm; ring focus quanh thẻ",
+    "F2 — Chi tiết Dự án, bố cục 2 cột ≥ lg (SPECIFICATIONS.md:44; Cho thuê :46, Tin BĐS :49 'cùng khung'): mọi khối nội dung thẻ trắng ở cột trái (@container/detail); cột phải form + hotline dính tới '… tương tự' / 'Tin liên quan' (ngoài lưới); < lg cột phải sau toàn bộ nội dung",
+    "F2 — BL-060 mục (5) khối Vị trí 'Kết nối hạ tầng' (SPECIFICATIONS.md:63): 7/5 ở cột ≥ 48rem, 5·4·3 ở cột ≥ 64rem, hẹp hơn xếp dọc; thiếu phần 8/4"
+  ],
+  "specRefNotes": {
+    "Bộ lọc": "FilterPanel.tsx LISTING_FILTER_STICKY_CLASS = lg:sticky lg:top-[calc(var(--sticky-top)+1rem)] lg:max-h-[calc(100dvh-var(--sticky-top)-2rem)] lg:self-start lg:overflow-y-auto lg:overscroll-y-contain, áp lên aside của FilterSidebar dùng chung 3 *ListBody. FAQ / Điểm mạnh / CTA nằm ngoài lưới nên bộ lọc thôi dính ở cuối lưới.",
+    "Thẻ nổi bật": "spotlight-content-classes.ts SPOTLIGHT_STRETCHED_LINK_CLASS (after:absolute after:inset-0, active:translate-none) trên link 'Xem chi tiết', SPOTLIGHT_SECONDARY_LINK_CLASS (relative z-10) cho 'Nhận tư vấn'; li group/spot relative isolate, điều khiển z-10; data-stretched-link; ring focus-visible quanh section. Hệ quả chấp nhận: không bôi chọn chữ trên thẻ bằng chuột.",
+    "Chi tiết 2 cột": "DetailPageShell: bands render sau children trong cột trái cards (@container/detail); after chỉ truyền vào DetailLayout after (ngoài lưới); DETAIL_ASIDE_STICKY_CLASS đọc --detail-aside-top; DetailAsideFit prop as. Thứ tự DOM: Tổng quan → bands → aside → after, nên < lg form nằm SAU toàn bộ nội dung (test không được kỳ vọng form ngay sau Tổng quan).",
+    "Container query": "ProjectLocation @3xl/@5xl, ProjectHighlights @md/@3xl, LegalPolicy @3xl (2 cột), DetailGalleryGrid @md (bento), ProjectListings / RentalTerms / RentalAmenities / DetailFeatureList đổi sang container query; ProjectAmenities -mx-5/-mx-8 + --spacing-gutter cục bộ cho CardSlider; PriceTable giữ cuộn ngang trong khung. FloorPlans / DetailInfoGrid / DetailStatCards còn breakpoint viewport (không tràn)."
+  },
+  "migration": "không — không đổi schema / API / i18n / route",
+  "changed": {
+    "files": [
+      "src/components/listing/FilterPanel.tsx",
+      "src/components/listing/SpotlightSlider.tsx",
+      "src/components/listing/spotlight-content-classes.ts",
+      "src/components/projects/ProjectSpotlightContent.tsx",
+      "src/components/rentals/RentalSpotlightContent.tsx",
+      "src/components/posts/PostSpotlightContent.tsx",
+      "src/components/detail/DetailPageShell.tsx",
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailAsideFit.tsx",
+      "src/components/detail/DetailGalleryGrid.tsx",
+      "src/components/detail/DetailFeatureList.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/ProjectAmenities.tsx",
+      "src/components/projects/ProjectHighlights.tsx",
+      "src/components/projects/ProjectListings.tsx",
+      "src/components/projects/LegalPolicy.tsx",
+      "src/components/rentals/RentalDetail.tsx",
+      "src/components/rentals/RentalTerms.tsx",
+      "src/components/rentals/RentalAmenities.tsx",
+      "src/components/posts/PostDetail.tsx",
+      ".context/design-spec.md",
+      "docs/DESIGN.md"
+    ],
+    "modules": [
+      "listing · FilterSidebar (dùng chung 3 màn) — sticky + cuộn riêng ≥ lg",
+      "listing · SpotlightSlider + 3 *SpotlightContent — stretched link, ring focus, z-index điều khiển",
+      "detail · DetailPageShell / DetailLayout / DetailAsideFit — bands vào cột trái, @container/detail, sticky aside tới 'after'",
+      "projects / rentals / posts · khối chi tiết đổi sang container query theo bề rộng cột",
+      "doc as-built · design-spec (S03 / S07 / S09, khung chi tiết), DESIGN.md :240 :242 :244 :276"
+    ]
+  },
+  "screens": [
+    "/du-an, /cho-thue (+ danh mục), /tin-bds (+ danh mục) — vi + en: bộ lọc dính + thẻ nổi bật",
+    "/du-an/[slug], /cho-thue/[slug], /tin-bds/[slug] — vi + en: chi tiết 2 cột"
+  ],
+  "flows": [
+    "Cuộn danh sách → bộ lọc luôn trong màn hình → cuộn riêng khi dài → thôi dính ở cuối lưới",
+    "Bấm thẻ nổi bật (ảnh / tiêu đề / vùng trống) → trang chi tiết; 'Nhận tư vấn' → #lead-form; mũi tên / chấm → chỉ chuyển slide",
+    "Cuộn chi tiết → form + hotline dính cột phải → dừng ở '… tương tự' / 'Tin liên quan'",
+    "Mobile: thanh CTA dính đáy → #lead-form; sub-nav → scroll tới khối đúng"
+  ],
+  "impact": {
+    "direct": [
+      "Danh sách ≥ lg (1440, 1024) 3 màn: cột Bộ lọc dính cách mép trên header ~1rem (đo /du-an 1440: top 88px, max-h 796); bộ lọc dài hơn màn hình (/cho-thue ~1445px) cuộn bên trong, trang đứng yên (overscroll-contain); hết lưới → aside trôi lên theo lưới, không đè FAQ / Điểm mạnh / CTA / footer",
+      "Danh sách < lg (768, 390): bộ lọc ẩn (display:none), nút 'Bộ lọc' (+ badge) mở Sheet — không đổi",
+      "Thẻ nổi bật 3 màn: bấm ảnh / tiêu đề / mô tả / vùng trống → URL chi tiết; 'Nhận tư vấn' → …#lead-form (không vào chi tiết thường); mũi tên đổi slide (bộ đếm 1/N đổi, URL giữ); chấm không điều hướng; không có <a> lồng <a>; Tab tới thẻ + Enter mở; ring focus quanh thẻ; hover đổi màu tiêu đề; nhấn (active) không làm vùng phủ co lại (active:translate-none)",
+      "Chi tiết ≥ lg (1440, 1024) 3 màn: mọi khối nội dung (Tổng quan, Vị trí, Tiện ích, Hình ảnh, Nổi bật, Mặt bằng, Bảng giá, Pháp lý & chính sách, Tin đăng / Tin liên quan trong cột, Hỏi đáp) là thẻ trắng ở cột trái; form 'Nhận thông tin' + hotline dính cột phải suốt lúc cuộn; dừng ở 'Dự án tương tự' / 'Căn tương tự' / 'Tin liên quan' (không đè); khối đó + Điểm mạnh + banner tư vấn rộng hết khung",
+      "Khối nhiều cột trong cột hẹp (cột ~792px ở 1440, ~571px ở 1024): Vị trí (bản đồ + khoảng cách + thẻ Kết nối hạ tầng) xếp theo bề rộng cột (7/5 khi ≥ 48rem, 5·4·3 khi ≥ 64rem — thực tế không xuất hiện; ở 1024 xếp dọc), thư viện ảnh bento @md, Pháp lý & chính sách 2 cột khi ≥ 48rem cột, Bảng giá cuộn ngang trong khung, Tiện ích slider thẳng mép chữ; document.documentElement.scrollWidth === clientWidth ở 1440 / 1024 / 768 / 390",
+      "Chi tiết < lg (768, 390): 1 cột; form + hotline nằm SAU toàn bộ khối nội dung (không còn ngay sau Tổng quan); CTA dính đáy 'Nhận tư vấn' cuộn tới #lead-form (formTop ~80px)",
+      "Sub-nav + scroll-mt: bấm từng tab cuộn đúng khối (không bị tab che), scroll-spy active đúng; id khối giữ (8 id); #lead-form duy nhất; #documents (Pháp lý) vẫn hoạt động",
+      "Unit: listing-filters.test, SpotlightSlider.test (a a = 0), project-components / post-components / RentalCard test, DetailPageShell / DetailLayout / DetailLists / DetailGalleryGrid test, project-detail / rental-detail / project-detail-blocks / project-market-blocks test"
+    ],
+    "dependents": [
+      "Trang chủ (thẻ dùng chung ProjectCard / RentalCard / PostCard không đổi; SpotlightSlider chỉ ở 3 màn danh sách)",
+      "Trang Cho thuê đã thuê (băng + noindex + căn tương tự trong belowSpecBar) và tin ưu đãi hết hạn (BR-06): bố cục cột + 'after' vẫn đúng",
+      "Dải Điểm mạnh + banner tư vấn + header / footer: nằm ngoài lưới, không bị cột phải đè",
+      "Lightbox thư viện ảnh / VideoFacade (Vị trí, hero): hoạt động trong cột hẹp",
+      "BL-054 trang Tin tức / Tuyển dụng / Liên hệ dùng chung component detail / listing: không đổi bố cục ngoài ý muốn"
+    ],
+    "regression": [
+      "Bộ lọc: đổi ô lọc áp dụng ngay (searchParams), 'Xoá tất cả', chip / tab danh mục, phân trang, canonical + noindex khi lọc — không đổi",
+      "Thẻ trong lưới danh sách + 'tương tự' (không phải thẻ nổi bật) vẫn là 1 link như cũ",
+      "Form lead chi tiết (source=project / rental / property_post, Turnstile, consent) gửi được; hotline tel: hoạt động",
+      "JSON-LD / 1 h1 / hreflang / canonical không đổi; ảnh hero priority giữ (LCP ≤ ~420 ms bản build, BL-055)",
+      "typecheck · eslint scope · unit + ui + integration (420 file / ~4.406) · build PASS trên staging"
+    ]
+  },
+  "acceptance": [
+    "≥ lg, 3 màn danh sách: bộ lọc luôn dưới header, dài hơn màn hình thì cuộn bên trong, cuộn bộ lọc không cuộn trang; hết lưới thì thôi dính, không đè FAQ / CTA / footer; < lg giữ ngăn kéo",
+    "Thẻ nổi bật 3 màn: bấm ảnh / tiêu đề / vùng trống vào chi tiết; 'Nhận tư vấn' giữ hành vi cũ; mũi tên / chấm không điều hướng; không lồng <a>; Tab + Enter mở",
+    "Chi tiết ≥ lg: mọi khối nội dung ở cột trái; form + hotline dính tới '… tương tự' / 'Tin liên quan' rồi dừng, không đè",
+    "Khối rộng vẫn đẹp trong cột hẹp, không tràn ngang ở 1440 / 1024 / 768 / 390",
+    "Sub-nav + scroll-mt đúng; CTA dính đáy mobile + #lead-form hoạt động; < lg form sau toàn bộ nội dung",
+    "Kiểm 1440 / 1024 / 768 / 390, vi + en"
+  ],
+  "verification": {
+    "status": "T01: typecheck PASS · eslint scope PASS · pnpm test 420 file / 4.403 PASS · build PASS. T02: typecheck PASS · eslint scope PASS · pnpm test 420 file / 4.406 PASS · build PASS; reviewer tự chạy typecheck + eslint 20 file + vitest scope 25 file / 289 PASS. Browser pane (DB local) ảnh .context/review-reports/assets/bl061-*: vi đủ 1440 / 1024 / 768 / 390 qua 2 task; click thật thẻ nổi bật chỉ /du-an; Location / Amenities / Gallery đo scrollWidth − clientWidth = 0 ở 4 độ rộng.",
+    "note": "Chưa kiểm được trên DB local: Nổi bật, Mặt bằng, Bảng giá, Pháp lý & chính sách 2 cột, Tin đăng, Hỏi đáp, thẻ Kết nối hạ tầng. en chỉ 1440; /en/projects local không có thẻ nổi bật."
+  },
+  "unverifiedLocally": [
+    "Chi tiết Dự án (cần dữ liệu staging đầy đủ): khối Nổi bật (ProjectHighlights, @md/@3xl) — không tràn, cột đổi đúng theo bề rộng cột",
+    "Mặt bằng (FloorPlans, còn breakpoint viewport) trong cột hẹp — không tràn ngang",
+    "Bảng giá (PriceTable) — cuộn ngang trong khung, không đẩy cột ra ngoài",
+    "Pháp lý & chính sách 2 cột (LegalPolicy @3xl) — 2 cột khi cột ≥ 48rem, 1 cột khi hẹp; nhảy tới #legal / #sales-policy (G3: heading sát thanh tab); #documents + accordion mobile",
+    "Tin đăng (ProjectListings) + Hỏi đáp — lưới 2 cột theo bề rộng cột, FAQ accordion",
+    "Thẻ 'Kết nối hạ tầng' trong khối Vị trí (có ảnh / video) — xếp dọc ở cột hẹp, VideoFacade không tải iframe trước khi bấm, không tràn",
+    "en ở 1024 / 768 / 390 cho cả 3 màn chi tiết + 3 danh sách; thẻ nổi bật ở /en (cần tin isFeatured có bản EN)",
+    "Click thật thẻ nổi bật ở /cho-thue và /tin-bds (mới đo JS + unit); điểm dừng form ở 'Dự án tương tự' / 'Căn tương tự' (đo số, ảnh bị cắt)"
+  ],
+  "risk": "medium",
+  "riskNote": "Đổi bố cục dùng chung 3 màn chi tiết + 3 màn danh sách, nhiều khối chuyển sang container query nhưng nhiều khối không có dữ liệu để kiểm trên DB local (xem unverifiedLocally) → phải kiểm thị giác trên staging trước khi coi là xong. Ưu tiên test: (1) chi tiết dự án đủ khối ở 1440 / 1024 / 768 / 390 vi + en — tràn ngang, form dính / dừng đúng ở '… tương tự'; (2) bộ lọc dính + cuộn riêng, không đè FAQ / footer; (3) thẻ nổi bật bấm cả thẻ, 'Nhận tư vấn' và mũi tên giữ hành vi riêng; (4) thứ tự mobile: form sau toàn bộ nội dung, CTA đáy → #lead-form; (5) sub-nav + scroll-mt. Không migration / API / schema."
+}

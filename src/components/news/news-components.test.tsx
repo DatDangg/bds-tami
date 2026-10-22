@@ -254,3 +254,50 @@ describe("ShareButtons variant=icons (hàng tác giả chi tiết tin tức, BL-
     expect(screen.getByRole("status").className).toContain("sr-only");
   });
 });
+
+describe("ShareButtons tone=on-dark (hero chi tiết tin tức, BL-062)", () => {
+  it("nút tròn viền trắng + icon trắng; focus ring sáng; nhãn 'Chia sẻ:' chữ trắng; biến thể mặc định KHÔNG đổi", () => {
+    vi.stubGlobal("navigator", { clipboard: { writeText: vi.fn() } });
+    const { unmount } = renderWithIntl(<ShareButtons variant="icons" tone="on-dark" url="https://tami.example/tin-tuc/a" title="A" />);
+    const facebook = screen.getByRole("link", { name: "Chia sẻ lên Facebook" });
+    expect(facebook.className).toContain("border-on-dark");
+    expect(facebook.className).toContain("text-on-dark");
+    expect(facebook.className).toContain("focus-visible:outline-on-dark");
+    expect(facebook.className).not.toContain("bg-surface");
+    expect(screen.getByRole("button", { name: "Sao chép liên kết" }).className).toContain("border-on-dark");
+    expect(screen.getByText("Chia sẻ:").className).toContain("text-on-dark");
+    unmount();
+    renderWithIntl(<ShareButtons variant="icons" url="https://tami.example/tin-tuc/a" title="A" />);
+    const light = screen.getByRole("link", { name: "Chia sẻ lên Facebook" });
+    expect(light.className).toContain("bg-surface");
+    expect(light.className).not.toContain("on-dark");
+  });
+
+  it("variant default bỏ qua tone (nút có chữ giữ kiểu viền sáng)", () => {
+    renderWithIntl(<ShareButtons tone="on-dark" url="https://tami.example/tin-tuc/a" title="A" />);
+    expect(screen.getByRole("link", { name: "Chia sẻ lên Facebook" }).className).not.toContain("border-on-dark");
+  });
+});
+
+describe("NewsCard related (Bài viết liên quan chi tiết tin, BL-062 D9)", () => {
+  it("MỘT link thẻ trắng bo 20px: ảnh 16:7, badge + ngày, tiêu đề đúng cấp heading, tóm tắt 2 dòng, mũi tên vàng trang trí", () => {
+    const { container } = renderWithIntl(<NewsCard data={card("1")} variant="related" headingLevel="h3" />);
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", "/tin-tuc/bai-1");
+    expect(link.className).toContain("rounded-xl border border-border bg-surface");
+    expect(within(link).getByRole("heading", { level: 3, name: "Bài 1" })).toBeInTheDocument();
+    expect(link).toHaveTextContent("Thị trường");
+    expect(container.querySelector("time")).toHaveAttribute("datetime", "2026-03-05T03:00:00.000Z");
+    expect(container.querySelector('[style*="16 / 7"], [style*="16/7"]')).not.toBeNull();
+    expect(screen.getByText("Tóm tắt 1").className).toContain("line-clamp-2");
+    expect(container.querySelector('span[aria-hidden="true"].bg-primary-soft svg')).not.toBeNull();
+  });
+
+  it("thiếu danh mục / ngày / ảnh: không render phần đó, vẫn giữ khung tỉ lệ", () => {
+    const { container } = renderWithIntl(<NewsCard data={card("2", { categoryName: null, dateLabel: null, publishedAt: null, cover: null })} variant="related" headingLevel="h3" />);
+    expect(container.querySelector("time")).toBeNull();
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector('[style*="16 / 7"], [style*="16/7"]')).not.toBeNull();
+  });
+});

@@ -234,7 +234,10 @@
     },
     "newsDetail": {
       "v2": {
-        "author": "TAMI HOMES Editorial Team",
+        "author": "By TAMI REAL ESTATE",
+        "publishedOn": "Published: {date}",
+        "contactNote": "For detailed project information and the latest sales policy, please contact TAMI REAL ESTATE via our hotline or leave your details below.",
+        "contactNoteBrand": "TAMI REAL ESTATE",
         "shareLabel": "Share:",
         "shareMore": "Share via other apps",
         "consultEyebrow": "Free consultation",

@@ -104,6 +104,7 @@ describe("TranslationService: dịch", () => {
     expect(calls[0]!.model).toBe("claude-opus-5-5");
     expect(calls[0]!.system).toContain('"Chung cư" => "Apartment building"');
     expect(calls[0]!.system).toContain("TAMI HOMES");
+    expect(calls[0]!.system).toContain("TAMI REAL ESTATE");
     expect(calls[0]!.system).toMatch(/project names/i);
   });
 

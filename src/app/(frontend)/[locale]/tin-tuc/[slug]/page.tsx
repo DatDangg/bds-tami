@@ -9,7 +9,9 @@ import { cache } from "react";
 import { ArrowRight } from "@/components/icons";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ConsultBanner } from "@/components/layout/ConsultBanner";
-import { NewsArticleBody, NewsArticleCover, NewsArticleHeader, NewsArticleTags } from "@/components/news/NewsArticle";
+import { NewsArticleBody, NewsArticleTags } from "@/components/news/NewsArticle";
+import { NewsArticleContactNote } from "@/components/news/NewsArticleContactNote";
+import { NewsArticleHero } from "@/components/news/NewsArticleHero";
 import { NewsArticleSidebar } from "@/components/news/NewsArticleSidebar";
 import { NewsCard } from "@/components/news/NewsCard";
 import { NewsTocDisclosure } from "@/components/news/NewsToc";
@@ -18,6 +20,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT_ROUTES, publicPath } from "@/lib/content/content-paths";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { collectTocHeadings } from "@/lib/content/section-headings";
+import { loadNewsContactNote } from "@/lib/content/load-news-contact-note";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { loadMentionedProjects } from "@/lib/news/mentioned-projects";
 import { findLocalizedSlugs, findPublicNewsBySlug, findRelatedNews } from "@/lib/news/news-queries";
@@ -30,9 +33,6 @@ import { routing, type Locale } from "@/i18n/routing";
 
 /** id đã dùng trên trang chi tiết tin tức, mục lục không được trùng. */
 const PAGE_RESERVED_IDS = ["related-news", "article-consult", "main", "floating-contact-actions"];
-
-/** `sizes` của thẻ "Bài viết liên quan": lưới 3 cột trong khung 1200px ≥ lg, 2 cột từ sm. */
-const RELATED_CARD_SIZES = "(min-width: 1280px) 384px, (min-width: 1024px) 31vw, (min-width: 640px) 50vw, 100vw";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -79,11 +79,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * S11 Chi tiết tin tức theo design `chi-tiet-tin-tuc.webp` (BL-054): KHÔNG dùng `DetailLayout`. Nền `--color-bg`; ≥ lg lưới `[cột trái 13.5rem][bài]`:
- * cột bài = breadcrumb + đầu bài (`NewsArticleHeader`) → ảnh bìa + chú thích → nội dung (`news-prose`) → "Thẻ:" (ẩn ở `/en`); cột trái dính = "Mục lục" (chỉ khi
- * có heading) + thẻ "Tư vấn miễn phí" (`NewsArticleSidebar`). < lg: một cột, mục lục thành khối gập trước nội dung, thẻ tư vấn sau nội dung. Cuối trang
- * "Bài viết liên quan" (≤ 3 thẻ lưới P2-T01 + "Xem tất cả tin tức") rồi banner tư vấn. Gửi lượt xem (`NewsViewBeacon`, client) — trang vẫn ISR
- * (`revalidate = 60` từ layout; lưu bài gọi `revalidatePath`). Bài không có / chưa công khai / thiếu bản EN → 404.
+ * S11 Chi tiết tin tức theo design `chi-tiet-tin-tuc-v2.webp` (BL-062, thay BL-054): KHÔNG dùng `DetailLayout`. Nền `--color-bg`. Hero ảnh bìa toàn chiều ngang
+ * (`NewsArticleHero`: breadcrumb kính, chip danh mục, `h1`, sapo, tác giả + ngày + phút đọc, chia sẻ) → lưới thân bài ≥ lg `[cột trái 15rem][bài]` (KHÔNG `items-start` để ô trái
+ * cao bằng hàng): cột bài = (< lg: mục lục gập) → nội dung (`news-prose`) → khung liên hệ cuối bài (chữ admin / mặc định) → "Thẻ:" (ẩn ở `/en`); cột trái dính =
+ * "Mục lục" (chỉ khi có heading) + thẻ "Tư vấn miễn phí" (`NewsArticleSidebar`, khung dính BL-061). "Bài viết liên quan" (≤ 3 thẻ `related` + "Xem tất cả tin tức") và banner
+ * tư vấn nằm NGOÀI lưới nên cột trái thôi dính trước chúng. Gửi lượt xem (`NewsViewBeacon`, client) — trang vẫn ISR (`revalidate = 60` từ layout; lưu bài gọi `revalidatePath`;
+ * chữ khung liên hệ đi qua cache tag `site-settings`). Bài không có / chưa công khai / thiếu bản EN → 404.
  */
 export default async function NewsDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
@@ -93,7 +94,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [t, tDetail, tRich, tNav, identity, relatedDocs, mentionedProjects] = await Promise.all([
+  const [t, tDetail, tRich, tNav, identity, relatedDocs, mentionedProjects, contactNote] = await Promise.all([
     getTranslations({ locale, namespace: "page.news" }),
     getTranslations({ locale, namespace: "page.newsDetail.v2" }),
     getTranslations({ locale, namespace: "page.richText" }),
@@ -101,6 +102,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
     loadSiteIdentity(locale),
     findRelatedNews(payload, locale, doc),
     loadMentionedProjects(payload, locale, doc.content),
+    loadNewsContactNote(locale),
   ]);
   const title = doc.title ?? "";
   const category = visibleCategory(doc.category, locale);
@@ -122,11 +124,18 @@ export default async function NewsDetailPage({ params }: PageProps) {
   return (
     <article className="bg-bg">
       <NewsViewBeacon newsId={doc.id} />
-      <div className="mx-auto grid w-full max-w-container gap-x-12 px-gutter pt-6 pb-section-tight lg:grid-cols-[13.5rem_minmax(0,1fr)]">
-        <div className="min-w-0 lg:col-start-2">
+      <NewsArticleHero
+        title={title}
+        excerpt={doc.excerpt}
+        cover={cover}
+        category={category ? { name: category.name ?? "", href: categoryHref(category, locale) } : null}
+        publishedAt={doc.publishedAt}
+        readMinutes={estimateReadMinutes(doc.content)}
+        locale={locale}
+        shareUrl={articleUrl ?? undefined}
+        breadcrumb={
           <Breadcrumb
-            variant="plain"
-            className="px-0"
+            variant="overlay"
             items={[
               { label: tNav("news"), href: listPath },
               ...(parentCategory ? [{ label: parentCategory.name ?? "", href: categoryHref(parentCategory, locale) }] : []),
@@ -134,26 +143,19 @@ export default async function NewsDetailPage({ params }: PageProps) {
               { label: title, href: ownPath },
             ]}
           />
-          <NewsArticleHeader
-            title={title}
-            excerpt={doc.excerpt}
-            category={category ? { name: category.name ?? "", href: categoryHref(category, locale) } : null}
-            publishedAt={doc.publishedAt}
-            readMinutes={estimateReadMinutes(doc.content)}
-            locale={locale}
-            shareUrl={articleUrl ?? undefined}
-          />
-        </div>
-        <div className="min-w-0 lg:col-start-2 lg:row-start-2">
-          {cover && <NewsArticleCover cover={cover} title={title} />}
+        }
+      />
+      <div className="mx-auto grid w-full max-w-container gap-x-12 px-gutter pt-8 pb-section-tight lg:grid-cols-[15rem_minmax(0,1fr)] lg:pt-10">
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
           {tocHeadings.length > 0 && <NewsTocDisclosure headings={tocHeadings} label={tocLabel} />}
           <NewsArticleBody content={doc.content} locale={locale} tableLabel={tRich("table")} headingIds={tocHeadings.map((heading) => heading.id)} mentionedProjects={mentionedProjects} />
+          <NewsArticleContactNote text={contactNote} contactHref={`${publicPath("/lien-he", locale)}#lead-form`} />
           <NewsArticleTags tags={tags} listPath={listPath} />
         </div>
-        <NewsArticleSidebar headings={tocHeadings} tocLabel={tocLabel} contactHref={publicPath("/lien-he", locale)} className="mt-10 lg:col-start-1 lg:row-start-2 lg:mt-0" />
+        <NewsArticleSidebar headings={tocHeadings} tocLabel={tocLabel} contactHref={publicPath("/lien-he", locale)} className="mt-10 lg:col-start-1 lg:row-start-1 lg:mt-0" />
       </div>
       {related.length > 0 && (
-        <section aria-labelledby="related-news" className="pb-section-tight">
+        <section aria-labelledby="related-news" className="bg-surface py-section-tight">
           <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter">
             <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-left">
               <h2 id="related-news" className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">
@@ -167,7 +169,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
                 <li key={item.id} className="min-w-0">
-                  <NewsCard data={item} variant="grid" headingLevel="h3" sizes={RELATED_CARD_SIZES} />
+                  <NewsCard data={item} variant="related" headingLevel="h3" />
                 </li>
               ))}
             </ul>

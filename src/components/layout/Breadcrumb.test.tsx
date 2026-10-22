@@ -102,6 +102,15 @@ describe("Breadcrumb", () => {
     expect(jsonLd(container).itemListElement).toHaveLength(4);
   });
 
+  it("overlay + quá 3 mục: danh sách đầy đủ bị ẩn < md (display:none không bị inline-flex của khung kính ghi đè), hiện từ md (BL-062)", () => {
+    const { container } = renderWithIntl(
+      <Breadcrumb variant="overlay" items={[{ label: "Tin tức", href: "/tin-tuc" }, { label: "Thị trường", href: "/tin-tuc/danh-muc/thi-truong" }, { label: "Bài", href: "/tin-tuc/bai" }]} />,
+    );
+    const list = container.querySelector("ol") as HTMLElement;
+    expect(list).toHaveClass("hidden", "md:flex", "crumb-glass");
+    expect(list).not.toHaveClass("inline-flex");
+  });
+
   it("overlay: một dòng (không xuống dòng đè eyebrow), mục cuối dài bị cắt bằng truncate nhưng JSON-LD giữ nhãn đầy đủ", () => {
     const longLabel = "Tuyển chuyên viên tư vấn bất động sản cao cấp khu vực Hà Nội và các tỉnh lân cận";
     const { container } = renderWithIntl(<Breadcrumb variant="overlay" items={[{ label: "Tuyển dụng", href: "/tuyen-dung" }, { label: longLabel, href: "/tuyen-dung/x" }]} />);

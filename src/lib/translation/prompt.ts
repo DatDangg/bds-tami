@@ -12,7 +12,7 @@ const MAX_GLOSSARY_ENTRIES = 200;
 const MAX_GLOSSARY_FIELD_LENGTH = 200;
 
 /** Giữ nguyên trong mọi trường hợp, kể cả khi bảng thuật ngữ trống (BR-08). */
-const ALWAYS_KEEP = ["TAMI HOMES"];
+const ALWAYS_KEEP = ["TAMI HOMES", "TAMI REAL ESTATE"];
 
 /** Một dòng, không xuống dòng/ký tự điều khiển: bảng thuật ngữ do admin nhập, không để nó chen thêm "chỉ dẫn" vào prompt. */
 function oneLine(value: string): string {

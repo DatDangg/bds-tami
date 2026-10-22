@@ -1,7 +1,7 @@
 ---
 id: news-list-detail-v2
 type: feature
-status: in_progress
+status: done
 created: 2026-10-22
 ---
 
