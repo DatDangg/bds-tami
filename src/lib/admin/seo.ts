@@ -43,6 +43,16 @@ export function seoTitleSource(collectionSlug: string | null | undefined): "name
 }
 
 /**
+ * Câu giải thích đầu khối SEO (T07): Danh mục nói đúng nguồn dự phòng của trang danh mục (Tên + Mô tả, không có ảnh
+ * của bản ghi); collection khác và Trang chủ giữ câu chung. Danh mục không có trang công khai dùng `seoNoPublicPageNote`.
+ */
+export function seoIntroNote(collectionSlug: string | null | undefined): string {
+  return collectionSlug === "categories"
+    ? "Không bắt buộc. Để trống thì trang tự lấy từ Tên và Mô tả danh mục."
+    : "Không bắt buộc. Để trống thì trang tự lấy từ Tiêu đề, Tóm tắt và Ảnh đại diện.";
+}
+
+/**
  * Danh mục: `scope` → trang danh mục công khai (khoá `pathnames`), đúng route mà `buildRentalListMetadata` /
  * `buildPostListMetadata` / `buildNewsListMetadata` dựng canonical. Dự án và Tuyển dụng KHÔNG có trang danh mục riêng
  * nên không có ở đây (xem `seoNoPublicPageNote`).

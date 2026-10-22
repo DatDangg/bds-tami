@@ -8,6 +8,7 @@ import {
   publicPageUrl,
   resolveDescriptionValue,
   seoDescriptionSource,
+  seoIntroNote,
   seoNoPublicPageNote,
   seoPagePathKey,
   seoTitleSource,
@@ -18,8 +19,6 @@ import { lexicalPlainText } from "@/lib/news/read-time";
 
 /** Đọc giá trị nguyên thuỷ của một ô theo đường dẫn (chỉ vẽ lại khi chính ô đó đổi, không theo mọi lần gõ). */
 const useFieldValue = (path: string) => useFormFields(([fields]) => fields[path]?.value);
-
-const SEO_NOTE = "Không bắt buộc. Để trống thì trang tự lấy từ Tiêu đề, Tóm tắt và Ảnh đại diện.";
 
 /**
  * Khung xem trước kết quả Google ở đầu khối SEO (BL-058 T05). Mô phỏng tiêu đề + đường dẫn + mô tả theo đúng
@@ -86,7 +85,7 @@ export function SeoPreview({ path }: { path: string }) {
 
   return (
     <section className="tami-seo-preview" aria-label="Xem trước kết quả tìm kiếm trên Google">
-      <p className="tami-seo-preview__note">{SEO_NOTE}</p>
+      <p className="tami-seo-preview__note">{seoIntroNote(collectionSlug)}</p>
       <div className="tami-seo-preview__card">
         <div className="tami-seo-preview__title">{preview.title || "Tiêu đề trang"}</div>
         <div className="tami-seo-preview__url">{preview.url || "Đường dẫn sẽ có sau khi lưu trang"}</div>

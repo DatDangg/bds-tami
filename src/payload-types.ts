@@ -320,9 +320,12 @@ export interface Rental {
   videoUrl?: string | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -416,9 +419,12 @@ export interface Category {
   };
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -724,9 +730,12 @@ export interface Project {
   documents?: (string | Media)[] | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -947,9 +956,12 @@ export interface PropertyPost {
   gallery?: (string | Media)[] | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1063,9 +1075,12 @@ export interface News {
   cover?: (string | null) | Media;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1143,9 +1158,12 @@ export interface Service {
   coverImage?: (string | null) | Media;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1244,9 +1262,12 @@ export interface Page {
   };
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1331,9 +1352,12 @@ export interface JobPosting {
   isUrgent?: boolean | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -3337,9 +3361,12 @@ export interface Homepage {
     | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;

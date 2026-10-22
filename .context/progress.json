@@ -2573,6 +2573,24 @@
           "round": 1,
           "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-06-round-1-review.md",
           "verify": "eslint src tests 0 · typecheck PASS · unit+ui 3365/3365 PASS · build PASS (builder); integration/ảnh BLOCKED",
+          "completedAt": "2026-10-22",
+          "commit": "044d2bd"
+        },
+        {
+          "task": "phase-1-task-07",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-07.md",
+          "status": "done",
+          "attempt": 1,
+          "dependsOn": [
+            "phase-1-task-06"
+          ],
+          "wave": "follow-up",
+          "note": "câu giải thích khối SEO ở Danh mục → Tên và Mô tả danh mục",
+          "reviewLevel": "FAST",
+          "reviewerResult": "PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-07-round-1-review.md",
+          "verify": "eslint src tests 0 · typecheck PASS · unit+ui 3366/3366 PASS",
           "completedAt": "2026-10-22"
         }
       ],
@@ -2587,7 +2605,6 @@
         "note": "2 ⚠️: (1) Danh mục có khối SEO nhưng preview chưa mô phỏng — ghi gap spec F11 + follow-up; (2) chữ toast không gắn ô (~0,7s) — đã sửa FR-ADM-19 (2); ⚠️-1 đã xử lý ở T06"
       },
       "followUps": [
-        "Câu giải thích đầu khối SEO ở Danh mục ghi \"Tiêu đề, Tóm tắt và Ảnh đại diện\" → nên là \"Tên và Mô tả danh mục\" (MINOR T06 r1)",
         "rental-list-metadata.ts:81 đưa paths.en không xét category.hasEnglish (khác posts/news) — task riêng",
         "Xoá DB tami_wt_bl058_t01..t04 khi Postgres chạy lại"
       ]

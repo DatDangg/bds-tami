@@ -2,13 +2,13 @@
 
 ```yaml
 workItem: feature/admin-form-ux-polish
-phaseTask: phase-1-task-06
+phaseTask: phase-1-task-07
 step: done
 agent: change-request
 status: done
 attempt: 1
 interrupted: false
-updatedAt: 2026-10-22T19:20:00+07:00
+updatedAt: 2026-10-22T20:10:00+07:00
 filesTouched: [src/fields/seo.ts, src/collections/_shared/content-defaults.ts, src/collections/_shared/content-defaults.test.ts, src/components/admin/styles/_forms.scss, src/lib/admin/seo.ts, src/lib/admin/seo.test.ts, src/components/admin/SeoPreview.tsx, src/components/admin/SeoPreview.test.tsx, src/components/admin/SeoLengthCounter.tsx, src/components/admin/SeoLengthCounter.test.tsx, src/fields/seo.test.ts, tests/unit/admin-labels.test.ts, "src/app/(payload)/admin/importMap.js"]
 filesNew: [src/lib/admin/seo.ts, src/lib/admin/seo.test.ts, src/components/admin/SeoPreview.tsx, src/components/admin/SeoPreview.test.tsx, src/components/admin/SeoLengthCounter.tsx, src/components/admin/SeoLengthCounter.test.tsx, src/fields/seo.test.ts]
 evidence:
@@ -16,7 +16,7 @@ evidence:
   round: 0
   verdict: null
   verify: "unit+ui 3317/3317 PASS; typecheck PASS; eslint src tests 0 error; integration + build BLOCKED (Postgres 5433 down, docker daemon off)"
-next: "BL-058 + T06 done. Follow-up: câu giải thích SEO Danh mục; rental-list-metadata paths.en; xoá DB tami_wt_bl058_t01..t04; merge/push chỉ khi user yêu cầu"
+next: "BL-058 + T06 + T07 done. Follow-up: rental-list-metadata paths.en; xoá DB tami_wt_bl058_t01..t04; merge/push chỉ khi user yêu cầu"
 loopSignal: "parity-preview (3 vòng FAIL cùng nhóm: mô phỏng metadata trong admin) — đã báo user, user chọn hướng B"
 approvals: [{gate: phase_plan, at: 2026-10-22, ok: true, Q1: B, Q2: no-who, Q3: drop-toast}]
 batchQueue: []
@@ -72,3 +72,9 @@ batchQueue: []
 - 2026-10-22 ▶ START [agent: reviewer] T06 round 1 (cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE [agent: reviewer] T06 round 1 = **PASS** (2 MINOR follow-up); report persist bởi primary
 - 2026-10-22 ✅ DONE close-out T06: spec F11 câu Danh mục as-built (1.48.0, không bump), test-scope riskNote, progress T06 done
+- 2026-10-22 USER APPROVAL (chat): sửa câu giải thích SEO Danh mục → task phase-1-task-07
+- 2026-10-22 ▶ START [agent: builder] T07 (cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder] T07: seoIntroNote (categories → Tên và Mô tả danh mục); eslint 0, typecheck PASS, unit+ui 3366 PASS
+- 2026-10-22 ▶ START [agent: reviewer] T07 round 1 (cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: reviewer] T07 round 1 = **FAST PASS**; report persist bởi primary
+- 2026-10-22 ✅ DONE close-out T07 + commit kèm src/payload-types.ts (chỉ chú thích sinh lại từ mô tả ô SEO T05)

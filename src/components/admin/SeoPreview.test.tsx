@@ -35,7 +35,7 @@ describe("SeoPreview", () => {
     expect(screen.getByText("Tiêu đề bài | Tami Land")).toBeInTheDocument();
     expect(screen.getByText("Tóm tắt bài viết")).toBeInTheDocument();
     expect(screen.getByText(`${ORIGIN}/tin-tuc/bai-viet`)).toBeInTheDocument();
-    expect(screen.getByText(/Không bắt buộc/)).toBeInTheDocument();
+    expect(screen.getByText("Không bắt buộc. Để trống thì trang tự lấy từ Tiêu đề, Tóm tắt và Ảnh đại diện.")).toBeInTheDocument();
   });
 
   it("Dự án dùng summary, Cho thuê dùng description (richText → chữ thuần)", () => {
@@ -128,6 +128,9 @@ describe("SeoPreview", () => {
     expect(screen.getByText("Thị trường | Tami Land")).toBeInTheDocument();
     expect(screen.getByText("Tin thị trường bất động sản.")).toBeInTheDocument();
     expect(screen.getByText(`${ORIGIN}/tin-tuc/danh-muc/thi-truong`)).toBeInTheDocument();
+    // T07: câu giải thích nói đúng nguồn dự phòng của trang danh mục (không nhắc Ảnh đại diện).
+    expect(screen.getByText("Không bắt buộc. Để trống thì trang tự lấy từ Tên và Mô tả danh mục.")).toBeInTheDocument();
+    expect(screen.queryByText(/Ảnh đại diện/)).toBeNull();
     news.unmount();
 
     setValues({ name: "Căn hộ", slug: "can-ho", scope: "rental" });

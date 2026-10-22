@@ -19,6 +19,7 @@ import {
   publicPageUrl,
   resolveDescriptionValue,
   seoDescriptionSource,
+  seoIntroNote,
   seoNoPublicPageNote,
   seoPagePathKey,
   seoTitleSource,
@@ -172,6 +173,16 @@ describe("seoTitleSource: ô làm tiêu đề dự phòng (T06)", () => {
     expect(seoTitleSource("categories")).toBe("name");
     expect(seoTitleSource("news")).toBe("title");
     expect(seoTitleSource(undefined)).toBe("title");
+  });
+});
+
+describe("seoIntroNote: câu giải thích đầu khối SEO (T07)", () => {
+  it("Danh mục nêu Tên và Mô tả danh mục; collection khác và Trang chủ (không có collection) giữ câu chung", () => {
+    expect(seoIntroNote("categories")).toBe("Không bắt buộc. Để trống thì trang tự lấy từ Tên và Mô tả danh mục.");
+    const generic = "Không bắt buộc. Để trống thì trang tự lấy từ Tiêu đề, Tóm tắt và Ảnh đại diện.";
+    expect(seoIntroNote("news")).toBe(generic);
+    expect(seoIntroNote("pages")).toBe(generic);
+    expect(seoIntroNote(undefined)).toBe(generic);
   });
 });
 
