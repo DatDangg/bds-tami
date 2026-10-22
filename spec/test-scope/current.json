@@ -1,119 +1,93 @@
 {
-  "specVersion": "1.50.0",
-  "scopeVersion": 66,
-  "generatedAt": "2026-10-22T21:45:00+07:00",
+  "specVersion": "1.51.0",
+  "scopeVersion": 67,
+  "generatedAt": "2026-10-22T23:30:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-055 MODIFY (+ BUG nhỏ) — việc còn mở sau BL-052 (MINOR 1.49.1 → 1.50.0 vì C-1 đổi hành vi URL công khai): (C-1) link cũ /tin-bds?category=<slug> và /cho-thue?category=<slug> (vi + en) khi URL CHỈ có category và slug có thật ở locale → 308 sang trang danh mục; kèm tham số khác hoặc slug lạ → 200 lọc + tab + canonical như cũ; (C-4) /du-an priceMax=0 = không giới hạn trên; (C-5) đo EXPLAIN ANALYZE 100k tin → KHÔNG thêm index rentals_amenities, thêm test số đếm tiện ích /en; (C-6) GIST location bỏ qua; (C-7) integration hookTimeout 60 s; (C-8) backfill Tin BĐS dùng chung hasPostOffer (tin endAt rác không còn bị bỏ qua); LCP bản build local 6 trang ≤ 420 ms. Không migration, không đổi schema / API shape.",
-  "status": "published — T01 + T02 PASS đã commit trên staging; T03 (đo LCP, không đổi code) FAST PASS r1 commit 0cb9434; spec-validation phase 1 PASS; close-out xong",
-  "statusNote": "T01 attempt 1 PASS · STRICT PASS r1 (commit 33bdce6). T02 attempt 1 PASS · NORMAL PASS r1 (commit e0a61b3). T03 attempt 1 (đo + ghi, không đổi code) · FAST PASS r1 (primary xác nhận) · commit 0cb9434. Verify T01: typecheck PASS · eslint 10 file scope 0 lỗi · test 419 file / 4.389 PASS · build PASS · curl dev server 308/200. T02: typecheck PASS · eslint 4 file scope 0 lỗi · test ×2 419 file / 4.391 PASS không timeout · build PASS. T03: skip, no code change (build PASS tại e0a61b3 để đo). pnpm lint exit 1 chỉ do .local-seed/… git-ignored + warning tools/task-dashboard/server.mjs sẵn có (ngoài scope).",
-  "workItem": "feature/listing-followups",
-  "backlog": "BL-055",
+  "triggerNote": "BL-063 MODIFY (MINOR 1.50.0 → 1.51.0 — đổi hình thức nút chuyển ngôn ngữ FR-PUB-19, user chọn cờ vuông 2026-10-22): chữ `VI | EN` ở header ≥ sm (đầu trang + nổi khi cuộn), menu toàn màn hình, footer thay bằng hai cờ vuông SVG inline VN / UK (chỉ cờ, không chữ, không emoji; khung 24×24 bo 2px, viền mảnh); đang xem aria-current + ring 2px có offset, ngôn ngữ kia mờ 60% hover/focus 100%; aria-label / title / lang / hreflang; vùng bấm ≥ 44×44. Đích link + cookie NEXT_LOCALE không đổi. Không schema / API / i18n, không migration.",
+  "status": "published — T01 NORMAL PASS r1 (3 MINOR không chặn); primary close-out + commit sắp tới trên staging",
+  "statusNote": "T01 attempt 1 PASS (builder dừng trước khi ghi verification; primary redo verify trên đĩa, không tính attempt) · NORMAL PASS r1. Verify: typecheck PASS · eslint 7 file scope 0 lỗi · vitest src/components/layout 22 file / 158 PASS · pnpm test 420 file / 4.398 PASS · build PASS. pnpm lint exit 1 chỉ do .local-seed/* git-ignored (ngoài scope).",
+  "workItem": "feature/language-switcher-flags",
+  "backlog": "BL-063",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/2026-10-22-listing-followups.md",
+  "changeDoc": "spec/changes/2026-10-22-language-switcher-flags.md",
   "changeDocStatus": "pending → done khi primary close-out (archive sang spec/changes/archive/)",
   "task": [
-    "tasks/feature-listing-followups/phase-1-task-01.md",
-    "tasks/feature-listing-followups/phase-1-task-02.md",
-    "tasks/feature-listing-followups/phase-1-task-03.md"
+    "tasks/feature-language-switcher-flags/phase-1-task-01.md"
   ],
   "reviewResults": [
-    "T01 STRICT PASS r1 (0 CRITICAL/MAJOR) — .context/review-reports/feature-listing-followups-phase-1-task-01-round-1-review.md — commit 33bdce6",
-    "T02 NORMAL PASS r1 — .context/review-reports/feature-listing-followups-phase-1-task-02-round-1-review.md — commit e0a61b3",
-    "T03 FAST PASS r1 (không đổi code) — .context/review-reports/feature-listing-followups-phase-1-task-03-round-1-review.md — commit 0cb9434"
+    "T01 NORMAL PASS r1 (0 CRITICAL/MAJOR, 3 MINOR) — .context/review-reports/feature-language-switcher-flags-phase-1-task-01-round-1-review.md — commit close-out sắp tới"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.49.1-65.json",
-  "specUpdate": "spec/updates/2026-10-22-listing-followups.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.50.0-66.json",
+  "specUpdate": "spec/updates/2026-10-22-language-switcher-flags.md",
   "specRefs": [
-    "F3 — `/cho-thue` tab danh mục (SPECIFICATIONS.md:45, khối BL-052 — sửa BL-055): link cũ `/cho-thue?category=<slug>` chỉ có category + slug thật → 308 `/cho-thue/danh-muc/<slug>` (en `/en/for-rent/category/<slug>`); kèm tham số / slug lạ → lọc + tab + canonical như cũ",
-    "F4 — `/tin-bds` tab danh mục (SPECIFICATIONS.md:48 — sửa BL-055): link cũ `/tin-bds?category=<slug>` → 308 `/tin-bds/danh-muc/<slug>` (en `/en/property-news/category/<slug>`); noindex + canonical chỉ còn khi kèm tham số khác",
-    "F2 — `/du-an` Mức giá (SPECIFICATIONS.md:43 + :59): `priceMax=0` gõ tay = không giới hạn trên (đồng bộ `/tin-bds`)",
-    "Giao diện — khối BL-052 \"Việc còn mở sau BL-052 — đã xử lý ở BL-055\" (SPECIFICATIONS.md:59): index rentals_amenities không thêm (số đo), GIST bỏ qua, LCP ≤ 420 ms",
-    "Giao diện — \"As-built BL-055 (khác)\" (SPECIFICATIONS.md:60): backfill Tin BĐS dùng chung hasPostOffer, integration hookTimeout 60 s, số đếm tiện ích /en chỉ tin có bản EN",
-    "NFR-01 — bộ lọc `/cho-thue` p95 ≤ 500 ms (amenityCounts 100k tin ~330 ms, trong ngưỡng)"
+    "F12 / FR-PUB-19 — Nút chuyển ngôn ngữ (SPECIFICATIONS.md:207, as-built BL-063): hai cờ vuông SVG inline VN / UK thay chữ VI | EN; aria-current + ring 2px offset cho ngôn ngữ đang xem, ngôn ngữ kia mờ 60%; aria-label \"Tiếng Việt\" / \"English\", title, lang / hreflang; vùng bấm ≥ 44×44; header ≥ sm, menu toàn màn hình, footer; đích link + cookie NEXT_LOCALE không đổi",
+    "Khung trang (SPECIFICATIONS.md:19): cụm phải header ≥ xl = tìm, cờ VI / EN, nút CTA",
+    "design-spec §2.3 Chuyển ngôn ngữ (as-built BL-063): khung cờ 24×24 rounded-[2px] ring-1 ring-black/20; đang xem ring-2 --color-accent-text ring-offset-2, màu offset theo prop tone (on-light = --color-glass header, on-dark = --color-dark menu + footer); hover/focus --duration-fast, tắt khi reduced motion; §2.1 / §2.2 / §2.4 ghi \"cờ VI / EN\""
   ],
   "specRefNotes": {
-    "C-1 điều kiện 308": "legacyCategoryOnly(searchParams): `category` là giá trị đầu (trim, ≤ 100 ký tự) và KHÔNG có khoá nào khác mang giá trị không rỗng (khoá rỗng `&q=` không tính; `page`/`q`/`sort`/`province`/`utm_source` có giá trị → không redirect). Slug phải tồn tại ở locale (Tin BĐS: tra context link cũ; Cho thuê: findRentalCategory(payload, locale, slug), kể cả danh mục con). Route danh mục `/…/danh-muc/<slug>?category=` → không redirect. Redirect chạy TRƯỚC khi tải dữ liệu (permanentRedirect / NEXT_REDIRECT) → 308 + Location tuyệt đối theo locale.",
-    "C-1 en": "DB dev local chưa có danh mục bản EN nên curl `/en/property-news?category=…` / `/en/for-rent?category=…` trả 200 (đúng quy tắc slug không tồn tại ở locale); nhánh EN chỉ được unit test (`/en/property-news/category/voucher`, `/en/for-rent/category/can-ho`). Test nên kiểm trên môi trường có danh mục EN.",
-    "C-4": "parsePriceRange: `parseBillion(rawMax) || undefined` — {priceMax:'0'} → {}, {priceMin:'5',priceMax:'0'} → {priceMin:5}; priceMax=1 vẫn lọc (/du-an?priceMax=1 → 0 dự án). Thanh trượt UI vốn không đưa đầu ở mép lên URL — chỉ ảnh hưởng URL gõ tay / link cũ.",
-    "C-5": "Ngưỡng 'đáng' = giảm ≥ 30% và trước index ≥ 50 ms. Ca không lọc 326,5 ms trước / 339,3 ms (value,parent_id) / 329,8 ms (parent_id,value) — planner vẫn Seq Scan + Hash Join, bottleneck Sort external merge cho count(DISTINCT). Ca province 31,1 ms (đã dùng rentals_amenities_parent_idx). Không migration; bench + index thử đã dọn (rentals BENCH = 0, rentals_amenities = 122 như trước).",
-    "C-8 hành vi đổi có chủ ý": "Backfill trước: isOfferPost = có chuỗi endAt hoặc voucherCode → bỏ qua. Nay hasPostOffer đòi endAt parse được thành ngày → tin endAt rác (vd 'không phải ngày') không voucher được trích như tin thường (patch propertyType/areaM2/bedrooms). Script dev only, mặc định dry-run.",
-    "LCP": "Local Windows, không throttle, Lighthouse 12.8.2 headless --throttling-method=provided + Browser pane PerformanceObserver; 2 lần mỗi trang × viewport. Max 420 ms (/du-an 390). Hero /tin-bds và /tin-bds/<slug> chỉ có bản 800 px (upload nhỏ → phóng ở 1440) — chất lượng ảnh CMS, không phải LCP."
+    "Cờ": "flag-icons.tsx FlagIcon({ locale }): svg viewBox 0 0 24 24, aria-hidden=\"true\", focusable=\"false\", data-flag=vi|en. VN nền #DA251D + sao 5 cánh #FFFF00 (polygon 10 điểm, tâm 12,12, R 6.5 / r 2.5). UK Union Jack giản lược: nền #012169, chéo trắng (stroke 5) + chéo đỏ #C8102E (stroke 2), thập trắng (stroke 7) + thập đỏ (stroke 4), không counterchange. Màu cố định, không theo token / dark mode.",
+    "Mục link": "Mỗi mục <a hreflang lang aria-label title> min-h-11 min-w-11 rounded-full inline-flex; hai mục gap-1, vi trước en sau; không còn ngăn `|`; link.textContent rỗng. Ngôn ngữ đang xem href = pathname + aria-current=\"true\" + ring-2; ngôn ngữ kia href = localeSwitchHref(pathname, locale) + opacity-60 + onClick ghi cookie buildLocaleCookie(locale) (chỉ ở ngôn ngữ kia — như cũ).",
+    "tone": "Prop mới LanguageSwitcher tone?: 'on-light' | 'on-dark' chỉ đổi lớp ring-offset-glass / ring-offset-dark. Header không truyền (mặc định on-light); MobileMenu.tsx:81 + Footer.tsx:67 truyền on-dark. MINOR reviewer: menu toàn màn hình nền --color-dark-deep (#0a0c10) còn offset dùng --color-dark (#111111) — lệch nhỏ, không thấy ở ảnh.",
+    "Header < sm": "LanguageSwitcher trong Header giữ hidden sm:flex → < 640px chỉ có trong menu toàn màn hình (và footer)."
   },
-  "migration": "không — không đổi schema / API / i18n; C-5 và C-6 quyết KHÔNG tạo index",
+  "migration": "không — không đổi schema / API / i18n / route",
   "changed": {
     "files": [
-      "src/lib/content/legacy-category.ts",
-      "src/lib/content/legacy-category.test.ts",
-      "src/components/posts/PostListPage.tsx",
-      "src/components/posts/PostListPage.test.tsx",
-      "src/components/rentals/RentalListPage.tsx",
-      "src/components/rentals/RentalListPage.test.tsx",
-      "src/lib/projects/project-filters.ts",
-      "src/lib/projects/project-filters.test.ts",
-      "src/lib/posts/post-list-metadata.ts",
-      "src/lib/rentals/rental-list-metadata.ts",
-      "src/lib/backfill/property-posts.ts",
-      "src/lib/backfill/property-posts.test.ts",
-      "vitest.config.ts",
-      "tests/integration/rental-search.test.ts",
-      "docs/API_SPEC.md"
+      "src/components/layout/LanguageSwitcher.tsx",
+      "src/components/layout/flag-icons.tsx",
+      "src/components/layout/LanguageSwitcher.test.tsx",
+      "src/components/layout/flag-icons.test.tsx",
+      "src/components/layout/DesktopNav.test.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/MobileMenu.tsx",
+      ".context/design-spec.md",
+      "docs/DESIGN.md"
     ],
     "modules": [
-      "content · legacy-category (helper mới dùng chung) — legacyCategoryOnly(searchParams): slug khi URL chỉ có `category`, ngược lại null",
-      "posts · PostListPage (/tin-bds + /en/property-news) — loadPostListData: !categorySlug && context link cũ && legacyCategoryOnly → permanentRedirect(postCategoryHref) trước khi tải dữ liệu",
-      "rentals · RentalListPage (/cho-thue + /en/for-rent, S04) — redirectLegacyCategoryOnly đầu loadRentalListData: findRentalCategory có thật → permanentRedirect(categoryPath)",
-      "projects · project-filters.parsePriceRange (/du-an) — max = 0 → không giới hạn trên",
-      "posts/rentals · *-list-metadata — chỉ chú thích: nhánh canonical về trang danh mục còn phòng hờ cho URL kèm tham số khác (không đổi hành vi)",
-      "backfill · property-posts (script dev `pnpm backfill:listing-fields`) — planPropertyPost dùng hasPostOffer; PropertyPostSource.offer kiểu PropertyPost['offer']; toPropertyPostSource truyền doc.offer thẳng",
-      "test infra · vitest.config.ts project integration hookTimeout 60_000",
-      "test · tests/integration/rental-search.test.ts — ca số đếm tiện ích /en chỉ tin hasEnglish",
-      "doc as-built · docs/API_SPEC.md §3.9 priceMax=0, §3.10 / §3.11 308 link cũ ?category="
+      "layout · LanguageSwitcher (client, dùng chung header ≥ sm / menu toàn màn hình / footer) — viết lại JSX: cờ SVG thay chữ, bỏ ngăn `|`, prop tone; localeSwitchHref / cookie / hreflang / lang / aria-label / role=group giữ",
+      "layout · flag-icons (mới) — FlagIcon VN / UK SVG inline tự vẽ, trang trí (aria-hidden), data-flag",
+      "layout · MobileMenu / Footer — chỉ thêm tone=\"on-dark\" (1 dòng mỗi file)",
+      "doc as-built · design-spec §2.1–2.4, DESIGN.md:262 (Language Switcher)"
     ]
   },
   "impact": {
     "direct": [
-      "HTTP: GET /tin-bds?category=<slug thật> → 308, Location /tin-bds/danh-muc/<slug>; GET /cho-thue?category=<slug thật> (kể cả danh mục con) → 308, Location /cho-thue/danh-muc/<slug>; /en/property-news?category=<slug en thật> → 308 /en/property-news/category/<slug>; /en/for-rent?category=<slug en thật> → 308 /en/for-rent/category/<slug> (cần môi trường có danh mục bản EN)",
-      "HTTP: ?category=<slug>&q= (khoá rỗng) → vẫn 308; ?category=<slug>&page=2 / &q=abc / &province=ha-noi / &sort=… → 200, lọc đúng danh mục, tab đánh dấu, canonical (+ noindex ở /tin-bds) về trang danh mục như cũ",
-      "HTTP: ?category=<slug không tồn tại> (vi/en) → 200, không redirect, không 404; /tin-bds/danh-muc/<slug>?category=<slug> và /cho-thue/danh-muc/<slug>?category=… → 200 (route danh mục bỏ qua)",
-      "HTTP: /du-an?priceMax=0 → 200, số dự án = /du-an không lọc; /du-an?priceMax=1 → 0 dự án (lọc trên vẫn chạy); /du-an?priceMin=5&priceMax=0 → chỉ lọc giá từ 5 tỷ",
-      "Unit: src/lib/content/legacy-category.test.ts (4 case) · PostListPage.test.tsx / RentalListPage.test.tsx (308 vi/en, &q=, slug lạ, route danh mục, link cũ + page/province) · project-filters.test.ts (priceMax 0) · property-posts.test.ts (endAt hợp lệ / voucher → skipped; endAt rác → không skip) · rental-search.test.ts (tiện ích /en)",
-      "Backfill dev: `pnpm backfill:listing-fields` (dry-run) trên tin có offer.endAt không parse được + không voucher → tin được trích (không còn 'bỏ qua'); tin có endAt hợp lệ / voucher → vẫn bỏ qua",
-      "Test infra: `pnpm test` đủ bộ chạy 2 lần không có `Hook timed out` ở beforeAll integration"
+      "UI header 1440 đầu trang (thanh phẳng kính sáng) + header nổi khi cuộn: cụm phải hiện 2 cờ vuông 24×24 cạnh nhau (VN trước, UK sau), không chữ VI / EN, không ngăn `|`; cờ đang xem có ring vàng 2px + offset sáng, cờ kia mờ 60%; hover / focus bàn phím cờ kia sáng 100%; vùng bấm ≥ 44×44 (kề nhau, không chồng)",
+      "UI menu toàn màn hình 390 (< xl, nút Menu): 2 cờ trong menu nền tối, ring offset tối (không viền sáng lạ quanh cờ đang xem); cờ UK vẫn nét trên nền tối nhờ thập trắng + viền mảnh",
+      "UI footer 1440 + 390 (hàng cuối, bên phải cạnh 'Cài đặt cookie' nếu có): 2 cờ nền tối như menu; < md hàng cuối xếp dọc vẫn hiện đủ 2 cờ",
+      "Trang vi (/): cờ VN aria-current=\"true\", href = URL hiện tại; cờ UK href = bản /en tương ứng. Trang en (/en…): ngược lại — cờ UK aria-current, cờ VN href bản vi",
+      "Bấm cờ kia: điều hướng đúng URL ngôn ngữ như trước (trang chủ ↔ /en; trang danh sách ↔ route map; trang chi tiết có slug ↔ slug localized qua /api/locale-counterpart; không có bản dịch → trang danh sách / trang chủ của ngôn ngữ kia) và cookie NEXT_LOCALE được ghi theo ngôn ngữ vừa chọn; bấm cờ đang xem → ở lại trang, không ghi cookie",
+      "A11y: mỗi cờ là link tên truy cập 'Tiếng Việt' / 'English' (aria-label + title tooltip chuột), có lang + hreflang; svg aria-hidden (đọc màn hình không đọc 'image'); nhóm role=group aria-label 'Chuyển ngôn ngữ'; focus-visible có vòng focus toàn site (trong header màu chữ); trạng thái đang xem nhận ra khi bỏ màu (ring dày + offset)",
+      "Reduced motion: chuyển mờ → rõ tức thì (motion-reduce:transition-none)",
+      "Không emoji: trên Windows (Chrome / Edge / Firefox) vẫn thấy cờ (SVG), không ô vuông / mã chữ",
+      "Unit: flag-icons.test.tsx (3) · LanguageSwitcher.test.tsx (2 href cũ + 4 mới) · DesktopNav.test.tsx (44×44, aria-current, không text, svg aria-hidden[data-flag]) · PublicShell.test.tsx / Header.test.tsx (tên link, hreflang, lang — không đổi)"
     ],
     "dependents": [
-      "Ô tìm kiếm trang chủ HeroSearch (src/components/home/HeroSearch.tsx:41, tab Cho thuê 'Loại căn hộ') gửi GET /cho-thue?q=&category=&priceMin=…: chỉ chọn Loại căn hộ (các ô khác rỗng) → 308 sang /cho-thue/danh-muc/<slug> (trang danh mục hiện đúng danh mục, tab đánh dấu); chọn thêm giá / diện tích / nội thất / tiện ích / từ khoá → 200 lọc như cũ — kiểm cả không JS (form GET)",
-      "Tab danh mục 2 màn (/tin-bds, /cho-thue) — link tab là route danh mục (không đổi); trang danh mục đích sau 308 giữ bộ lọc / 'Xoá tất cả' / breadcrumb như BL-052",
-      "Canonical + noindex: /tin-bds?category=&page=2 vẫn noindex + canonical về trang danh mục; /cho-thue?category=&province= vẫn index (quy tắc F3) + canonical; buildPostListMetadata / buildRentalListMetadata không đổi hành vi",
-      "Header nút tìm kiếm → /cho-thue?q= (không category) — không redirect",
-      "Thanh trượt Mức giá /du-an (UI không đưa đầu ở mép lên URL) — không đổi; chỉ URL gõ tay / link cũ priceMax=0",
-      "GET /api/public/rentals amenityCounts (số đếm tiện ích) — không đổi SQL / index; /en chỉ đếm tin có bản EN (hành vi sẵn có, nay có test)",
-      "Thẻ / chi tiết Tin BĐS phân loại ưu đãi (hasPostOffer / isVoucherPost) — không đổi; backfill nay dùng cùng helper"
+      "Header (src/components/layout/Header.tsx:64) — LanguageSwitcher hidden sm:flex: < 640px không có cờ ở header (chỉ trong menu toàn màn hình); ≥ sm hiện; cụm phải (tìm, cờ, CTA / Menu) không xô lệch, menu ngang ≥ xl không xuống dòng ở 1280 (VI + EN)",
+      "MobileMenu (menu toàn màn hình, .theme-dark-block) — cột phải ≥ lg / cuối danh sách < lg có 2 cờ; đóng / mở menu không ảnh hưởng cờ; mở ở trang en hiển thị đúng cờ đang xem",
+      "Footer (dùng chung toàn site, BL-044) — hàng cuối: bản quyền trái · cờ + 'Cài đặt cookie' phải; lưới / accordion < md không đổi",
+      "PublicShell (vỏ trang công khai) — header + footer mọi trang công khai (trang chủ, Dự án, Cho thuê, Tin BĐS, Tin tức, Tuyển dụng, Liên hệ, pháp lý, 404) đều hiện cờ; trang chi tiết (header ẩn khi cuộn BL-027) cờ ở header đầu trang + footer",
+      "Header nổi khi cuộn / header ẩn trang chi tiết — cờ nằm trong thanh nổi 52/56px, không tràn chiều cao (vùng bấm 44px < 52px)"
     ],
     "regression": [
-      "BL-052 lọc + phân trang + sắp xếp + FAQ JSON-LD 2 màn /tin-bds và /cho-thue (+ trang danh mục, /en) với URL kèm tham số — 200, tab, canonical, noindex như scope v60–v62",
-      "BL-052 /du-an bộ lọc Mức giá / Tình trạng / Tỉnh / Loại hình / Tiện ích + priceMin/priceMax hợp lệ (vd 5–20 tỷ) — không đổi",
-      "Backfill Tin BĐS dry-run / --apply trên DB dev: báo cáo quét / điền / bỏ qua / mâu thuẫn như BL-052 as-built (chỉ ca endAt rác đổi)",
-      "Bộ integration test (media-upload, session-refresh, jobs-email, access, rental-search…) PASS khi chạy cả bộ, không timeout",
-      "LCP 6 trang danh sách / chi tiết (Dự án / Cho thuê / Tin BĐS) ≤ 2,5 s — bản build local ≤ 420 ms, hero có priority/fetchpriority=high (không đổi code; kiểm lại trên staging có mạng thật)",
-      "Test tự động: typecheck · lint (scope) · unit + ui + integration (419 file / 4.391) · build PASS trên staging"
+      "Chuyển ngôn ngữ trang có slug (chi tiết dự án / cho thuê / tin BĐS / bài viết / tuyển dụng / dịch vụ / danh mục) qua /api/locale-counterpart: bấm cờ → đúng slug localized; chưa có bản dịch (hasEnglish false) → trang danh sách của loại đó ở ngôn ngữ kia",
+      "Trang pháp lý (Chính sách bảo mật / Điều khoản) vi ↔ en: đúng trang tương ứng; bản EN chưa duyệt → về trang chủ /en",
+      "Trang chủ / ↔ /en và trang danh sách (/du-an ↔ /en/projects, /cho-thue ↔ /en/for-rent, /tin-bds ↔ /en/property-news, /tin-tuc, /tuyen-dung, /lien-he) — giữ tham số lọc / phân trang như trước",
+      "Cookie NEXT_LOCALE: sau khi chọn en, vào lại / (không tiền tố) vẫn theo quy tắc middleware hiện có (không đổi)",
+      "hreflang / canonical trong <head> của mọi trang không đổi (LanguageSwitcher không sinh metadata)",
+      "Test tự động: typecheck · eslint (scope) · unit + ui + integration (420 file / 4.398) · build PASS trên staging"
     ]
   },
   "acceptance": [
-    "/tin-bds?category=<slug thật> và /cho-thue?category=<slug thật> (vi + en) trả 308 sang trang danh mục tương ứng khi URL không có tham số khác có giá trị; có test",
-    "URL có thêm tham số khác (page, q, lọc, sort) hoặc slug không tồn tại → hành vi như trước (200, lọc + tab + canonical/noindex), không redirect; route danh mục có ?category= không redirect",
-    "/du-an?priceMax=0 không còn lọc 'giá ≤ 0' (= không giới hạn trên); có test",
-    "C-7: hookTimeout áp cho integration; pnpm test đủ bộ 2 lần không timeout beforeAll",
-    "C-8: backfill dùng hasPostOffer của post-kind.ts; không còn logic trùng; test PASS (+ ca endAt rác)",
-    "C-5: có số đo EXPLAIN ANALYZE ở ≥ 100k tin trước/sau index ghi trong task; quyết định KHÔNG index (dưới ngưỡng); không migration; dữ liệu bench + index thử đã dọn; test locale=en cho số đếm tiện ích PASS",
-    "C-6: ghi lý do bỏ qua GIST (không có lọc bản đồ)",
-    "LCP: có số đo 6 trang (1440 + 390) trên bản pnpm build + start kèm element LCP và cách đo; không trang nào > 2,5 s; không đổi code",
-    "docs/API_SPEC.md cập nhật §3.9 / §3.10 / §3.11; không đụng intent docs",
-    "typecheck + lint (scope) + test + build PASS"
+    "Header (desktop + header nổi khi cuộn), menu mobile, footer: hiện 2 cờ vuông thay chữ; bấm đổi đúng URL ngôn ngữ như hiện tại (giữ đường dẫn tương ứng)",
+    "Cờ là SVG inline/tĩnh (không emoji — emoji cờ không hiện trên Windows), góc vuông (bo rất nhẹ ≤ 2px), kích thước đều nhau, nét trên nền sáng lẫn nền tối/hero",
+    "Trạng thái đang chọn phân biệt không chỉ bằng màu; aria-label \"Tiếng Việt\" / \"English\", aria-current cho ngôn ngữ hiện tại, lang/hreflang giữ nguyên",
+    "Vùng bấm ≥ 24px (mobile ≥ 44px — as-built ≥ 44px mọi breakpoint); test LanguageSwitcher.test.tsx cập nhật"
   ],
   "verification": {
-    "status": "T01: typecheck PASS · eslint 10 file scope 0 lỗi · pnpm test 419 file / 4.389 PASS (294 s) · build PASS · curl dev server 127.0.0.1:3000: /tin-bds?category=tin-bds → 308, /cho-thue?category=can-ho-dich-vu → 308, &q= → 308, &page=2 / &province= → 200, slug lạ → 200, route danh mục → 200, /du-an?priceMax=0 → 61 dự án = không lọc. T02: typecheck PASS · eslint 4 file scope 0 lỗi · pnpm test ×2 419 file / 4.391 PASS (253 s / 238 s, không Hook timed out) · build PASS · không migration. T03: skip, no code change; pnpm build PASS tại e0a61b3; Lighthouse + Browser pane 6 trang × 2 viewport × 2 lần ≤ 420 ms.",
-    "note": "308 ở /en chỉ có unit test (DB local không có danh mục bản EN). LCP local không throttle, chưa đo cold start / /en. Lighthouse mobile mặc định (4G chậm + CPU 4×) sẽ cao hơn số local."
+    "status": "T01: pnpm typecheck PASS · npx eslint 7 file scope 0 lỗi · npx vitest run src/components/layout 22 file / 158 PASS · pnpm test 420 file / 4.398 PASS · pnpm build PASS. Ảnh Browser pane dev server (DB local): .context/review-reports/assets/bl063-p1t01-header-top-1440{.jpg,-zoom.png}, -header-scrolled-1440{.jpg,-zoom.png}, -menu-390.jpg, -footer-1440{.jpg,-zoom.png}, -footer-390{.jpg,-zoom.png}. Reviewer tự chạy lại typecheck + vitest layout + eslint scope PASS.",
+    "note": "Chưa có ảnh hover / focus (chỉ kiểm lớp bằng test) và ảnh 768px. 3 MINOR reviewer mở: ring-offset-dark vs nền --color-dark-deep ở menu; test hình học sao / Union Jack; test cookie onClick. Union Jack giản lược (không counterchange) chấp nhận ở 24px."
   },
-  "risk": "medium",
-  "riskNote": "C-1 đụng SEO công khai (308 vĩnh viễn, cache ở trình duyệt / crawler): sai điều kiện sẽ mất lọc hoặc redirect vòng — đã khoá bằng test (chỉ-có-category, khoá rỗng, slug thật, route danh mục) + curl dev; test nên ưu tiên: (1) 308 vi/en thật trên staging có danh mục EN, (2) HeroSearch chỉ chọn Loại căn hộ (có / không JS), (3) URL kèm tham số không redirect + canonical/noindex như cũ, (4) /du-an priceMax=0 vs priceMax=1, (5) backfill dry-run ca endAt rác. Không migration, không đổi schema / API shape. amenityCounts ~330 ms ở 100k tin (trong NFR ≤ 500 ms) là residual hiệu năng, không phải regression."
+  "risk": "low",
+  "riskNote": "UI thuần, 1 component dùng chung ở 3 chỗ, không đổi logic link / cookie / i18n / schema / API. Test nên ưu tiên: (1) nhìn thấy cờ (không emoji / ô vuông) trên Windows + macOS + Android ở header 1440 đầu trang và khi cuộn, menu 390, footer 1440 / 390, cả vi và en; (2) cờ đang xem có ring + aria-current, cờ kia mờ / hover rõ; (3) bấm cờ kia đổi đúng URL như trước (trang có slug + trang pháp lý + trang chủ) và cookie NEXT_LOCALE; (4) đọc màn hình đọc 'Tiếng Việt' / 'English' link, Tab tới được 2 cờ với vòng focus; (5) vùng bấm 44×44 trên mobile."
 }

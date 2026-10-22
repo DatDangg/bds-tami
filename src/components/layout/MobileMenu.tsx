@@ -78,7 +78,7 @@ export function MobileMenu({ items, contact, logo, cta }: MobileMenuProps) {
             </nav>
             <div className="flex flex-col items-start gap-6">
               {cta && <NavAnchor link={cta} onClick={close} className={cn(buttonVariants(), "min-h-11")} />}
-              <LanguageSwitcher />
+              <LanguageSwitcher tone="on-dark" />
               <MenuContact contact={contact} />
             </div>
           </div>

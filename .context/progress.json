@@ -2832,6 +2832,42 @@
         "amenityCounts ~330 ms ở 100k tin (Sort count(DISTINCT))",
         "ảnh hero /tin-bds chỉ 800 px (CMS)"
       ]
+    },
+    {
+      "slug": "language-switcher-flags",
+      "title": "Nút đổi ngôn ngữ dùng cờ vuông VN / UK (SVG inline, chỉ cờ) thay chữ VI | EN ở header, menu toàn màn hình, footer (BL-063)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-063",
+      "changeDoc": "spec/changes/archive/2026-10-22-language-switcher-flags.md",
+      "branch": "staging",
+      "startedAt": "2026-10-22",
+      "autoProceed": "user 2026-10-22: làm hết 4 backlog 61-64, tự quyết, đừng hỏi; không push",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-language-switcher-flags/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "dependsOn": [],
+          "note": "LanguageSwitcher: cờ SVG inline VN/UK, ring đang chọn, mờ 60% ngôn ngữ kia, vùng bấm 44px; test + design-spec/DESIGN as-built",
+          "reviewLevel": "NORMAL",
+          "review": "NORMAL PASS r1 (3 MINOR không chặn)",
+          "round": 1,
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-language-switcher-flags-phase-1-task-01-round-1-review.md",
+          "verify": "typecheck PASS · eslint 7 file scope 0 lỗi · test 420 file / 4398 PASS · build PASS · ảnh bl063-p1t01-* (header 1440 đầu/cuộn, menu 390, footer 1440/390)",
+          "completedAt": "2026-10-22"
+        }
+      ],
+      "completedAt": "2026-10-22",
+      "specVersion": "1.51.0",
+      "scopeVersion": 67,
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-language-switcher-flags-phase-1-task-01-round-1-review.md",
+      "specValidation": ".context/review-reports/spec-validation-feature-language-switcher-flags-phase-1.md (PASS, 0 blocking)"
     }
   ],
   "bugs": [

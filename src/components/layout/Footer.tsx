@@ -64,7 +64,7 @@ export function Footer({ logo, columns, tagline, copyright, socials, showCookieS
         <div className="flex flex-col gap-4 border-t border-dark-border pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xsmall text-text-muted">{copyright}</p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <LanguageSwitcher />
+            <LanguageSwitcher tone="on-dark" />
             {showCookieSettings && (
               <CookieSettingsButton className="inline-flex min-h-11 cursor-pointer items-center text-small text-text-secondary underline-offset-4 hover:text-text hover:underline" />
             )}

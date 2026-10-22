@@ -124,7 +124,8 @@ describe("LanguageSwitcher: vùng chạm và ngôn ngữ hiện tại", () => {
     expect(current).toHaveAttribute("href", "/du-an");
     expect(other).not.toHaveAttribute("aria-current");
     for (const link of [current, other]) expect(link).toHaveClass("min-h-11", "min-w-11");
-    const separator = document.querySelector('span[aria-hidden="true"]') as HTMLElement;
-    expect(separator).toHaveClass("px-2");
+    // BL-063: cờ SVG thay chữ, không còn ngăn `|`; cờ là trang trí (aria-hidden), tên link đọc từ aria-label.
+    expect(screen.getByRole("group").textContent?.trim()).toBe("");
+    for (const link of [current, other]) expect(link.querySelector('svg[aria-hidden="true"][data-flag]')).not.toBeNull();
   });
 });
