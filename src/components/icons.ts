@@ -68,6 +68,7 @@ export {
   User,
   Users,
   UsersThree,
+  Wallet,
   WarningCircle,
   WashingMachine,
   X,

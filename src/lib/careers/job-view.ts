@@ -4,6 +4,7 @@ import type { JobPosting, Province } from "../../payload-types";
 import { CONTENT_ROUTES } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
 import { formatDate, formatVndCompact } from "../format";
+import { visibleCategory } from "../news/news-view";
 import { lexicalPlainText } from "../news/read-time";
 import { daysUntilDeadline, isPastDeadline } from "./deadline";
 
@@ -18,6 +19,10 @@ export interface JobCardData {
   title: string;
   href: string;
   provinceName: string | null;
+  /** Phòng ban = tên danh mục `job` (BL-054); thiếu / `/en` chưa có bản EN → `null` (không hiện chữ Việt ở `/en`). */
+  categoryName: string | null;
+  /** "Tuyển gấp" (`isUrgent`, BL-054). */
+  isUrgent: boolean;
   employmentType: EmploymentType;
   salary: JobSalary | null;
   /** ISO, cho `<time datetime>`. */
@@ -58,6 +63,8 @@ export function toJobCardData(doc: JobPosting, locale: Locale, now: Date): JobCa
     title: doc.title,
     href: publicDetailPath(CONTENT_ROUTES["job-postings"], locale, doc.slug),
     provinceName: provinceLabel(doc.province),
+    categoryName: visibleCategory(doc.category, locale)?.name ?? null,
+    isUrgent: doc.isUrgent === true,
     employmentType: doc.employmentType,
     salary: toJobSalary(doc, locale),
     deadlineIso: doc.deadline,

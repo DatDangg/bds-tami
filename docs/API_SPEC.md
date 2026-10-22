@@ -233,6 +233,19 @@ Có bất kỳ tham số lọc nào (kể cả giá trị sai; `?province=` rỗ
 
 Metadata: có tham số lọc / `q` / `sort` khác mặc định, hoặc `?category=` (kể cả slug lạ) → `noindex, follow`. Canonical: trang sạch (`/tin-bds` hoặc trang danh mục, không `?page`); riêng `/tin-bds?category=<slug có thật>` → canonical **trang danh mục** `/tin-bds/danh-muc/<slug>` (slug của ngôn ngữ đang xem, không hreflang). Không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD chỉ ở `/tin-bds` sạch (trang 1, cùng điều kiện noindex); trang danh mục không phát. Tin ưu đãi đã kết thúc luôn xếp sau (BR-06); ≤ 5 tin `isFeatured` còn hiệu lực là thẻ nổi bật (trang 1), loại khỏi lưới mọi trang; số đếm ô tích theo quy tắc "trừ chính chiều đó" (chip Phòng ngủ không đếm).
 
+### 3.13. Tham số URL trang `/tuyen-dung` (BL-054, as-built)
+
+`/tuyen-dung` · `/en/careers`: `?category=&province=&q=&page=` (một form GET: ô "Khu vực" + ô tìm + nút "Tìm"; chip phòng ban là link). Code: `src/lib/careers/job-filters.ts` (`parseJobFilters` / `jobQueryString` / `hasJobFilterParams` / `matchesJobKeyword`), `src/lib/careers/job-queries.ts` (`listOpenJobs`), `src/components/careers/JobListPage.tsx`. Chỉ tin `published` + còn hạn (giờ VN), 12 tin/trang, mới đăng trước.
+
+| Tham số | Ý nghĩa | Giá trị không hợp lệ |
+|---|---|---|
+| `category` | Slug danh mục `job` theo ngôn ngữ đang xem → lọc danh mục + con, chip cấp 1 `aria-current` | Slug lạ → bỏ (danh sách không lọc, không 404) |
+| `province` | Slug tỉnh nơi làm việc | Slug lạ → bỏ |
+| `q` | **BL-054:** từ khoá tìm **tên vị trí**, không phân biệt hoa/thường/dấu (`normalizeSearchText`, "đ" = "d"), mọi từ phải có (AND, ≤ 8 từ); tối đa 100 ký tự. Không thêm cột / migration: có `q` thì quét ≤ 500 tin còn hạn (chỉ `title`, chạm trần ghi cảnh báo log) rồi lọc ở bộ nhớ, MỘT truy vấn lấy trường thẻ của trang | Rỗng / quá dài → bỏ |
+| `page` | Trang danh sách; vượt số trang → `404` | `abc` → trang 1 |
+
+Có `category` / `province` / `q` có giá trị (kể cả slug lạ) → `noindex, follow` + canonical `/tuyen-dung` sạch; không lọc → canonical chính nó (kèm `?page=n`). Chip phòng ban + phân trang mang theo `province` + `q` (chip bỏ `page`); form giữ `category` bằng input ẩn. Không endpoint JSON mới.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

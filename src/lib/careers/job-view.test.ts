@@ -59,6 +59,16 @@ describe("thẻ + chi tiết", () => {
     expect(toJobCardData(job(), "vi", NOW)?.href).toBe("/tuyen-dung/tu-van");
   });
 
+  it("BL-054: phòng ban = tên danh mục (/en chỉ khi danh mục có bản EN), Tuyển gấp theo isUrgent, hạn dd/mm/yyyy (vi) · MM/DD/YYYY (en)", () => {
+    const category = { id: "c1", name: "Kinh doanh", slug: "kinh-doanh", scope: "job", hasEnglish: false, createdAt: "", updatedAt: "" } as const;
+    const vi = toJobCardData(job({ category, isUrgent: true, deadline: "2026-11-30T12:00:00.000Z" }), "vi", NOW);
+    expect(vi).toMatchObject({ categoryName: "Kinh doanh", isUrgent: true, deadlineLabel: "30/11/2026" });
+    const en = toJobCardData(job({ category, deadline: "2026-11-30T12:00:00.000Z" }), "en", NOW);
+    expect(en).toMatchObject({ categoryName: null, isUrgent: false, deadlineLabel: "11/30/2026" });
+    expect(toJobCardData(job({ category: { ...category, name: "Sales", hasEnglish: true } }), "en", NOW)?.categoryName).toBe("Sales");
+    expect(toJobCardData(job({ category: "c1" }), "vi", NOW)?.categoryName).toBeNull();
+  });
+
   it("chi tiết: expired theo giờ VN; số lượng < 1 hoặc thiếu → null", () => {
     expect(toJobDetailView(job({ deadline: "2026-10-17T12:00:00.000Z" }), "vi", NOW).expired).toBe(false);
     expect(toJobDetailView(job({ deadline: "2026-10-16T12:00:00.000Z" }), "vi", NOW).expired).toBe(true);

@@ -620,6 +620,34 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
       expect(await titlesOf("en", now)).toContain("Job in other group");
     });
 
+    it("BL-054 q: tìm tên vị trí không dấu (AND mọi từ), vẫn chỉ tin còn hạn + công khai, kết hợp lọc tỉnh; trả isUrgent + phòng ban; phân trang 12/trang", async () => {
+      const now = new Date();
+      const marker = `qz${runId}`;
+      await createJob({ title: `Chuyên viên tư vấn bất động sản ${marker}`, status: "published", isUrgent: true, province: provinceId, deadline: pickerDeadline(10, now) });
+      await createJob({ title: `Tư vấn cho thuê căn hộ ${marker}`, status: "published", deadline: pickerDeadline(10, now) });
+      await createJob({ title: `Tư vấn đã hết hạn ${marker}`, status: "published", deadline: pickerDeadline(-5, now) });
+      await createJob({ title: `Tư vấn nháp ${marker}`, deadline: pickerDeadline(10, now) });
+      const search = (q: string, extra: Record<string, unknown> = {}) => careers.listOpenJobs(payload, "vi", { page: 1, now, q, ...extra });
+
+      const both = await search(`tu van ${marker.toUpperCase()}`);
+      expect(both.docs.map((doc) => doc.title).sort()).toEqual([`Chuyên viên tư vấn bất động sản ${marker}`, `Tư vấn cho thuê căn hộ ${marker}`].sort());
+      expect(both.totalDocs).toBe(2);
+      expect((await search(`bat dong ${marker}`)).docs.map((doc) => doc.title)).toEqual([`Chuyên viên tư vấn bất động sản ${marker}`]);
+      expect((await search(`tu van ${marker}`, { provinceId })).totalDocs).toBe(1);
+      expect((await search(`marketing ${marker}`)).totalDocs).toBe(0);
+      const urgent = (await search(`bat dong ${marker}`)).docs[0];
+      expect(urgent?.isUrgent).toBe(true);
+      expect(typeof urgent?.category === "object" && urgent.category !== null ? urgent.category.id : urgent?.category).toBe(categoryId);
+
+      for (let index = 0; index < 13; index += 1) {
+        await createJob({ title: `Trang ${marker} ${index}`, status: "published", deadline: pickerDeadline(10, now) });
+      }
+      const page1 = await search(`trang ${marker}`);
+      const page2 = await careers.listOpenJobs(payload, "vi", { page: 2, now, q: `trang ${marker}` });
+      expect([page1.docs.length, page2.docs.length, page1.totalDocs, page1.totalPages, page1.hasNextPage, page2.hasPrevPage]).toEqual([12, 1, 13, 2, true, true]);
+      expect(new Set([...page1.docs, ...page2.docs].map((doc) => doc.id)).size).toBe(13);
+    });
+
     it("tin hết hạn không ra ở gợi ý findOtherOpenJobs và không tự đổi status", async () => {
       const now = new Date();
       const gone = await createJob({ title: "CL gợi ý hết hạn", status: "published", deadline: pickerDeadline(-3, now) });
