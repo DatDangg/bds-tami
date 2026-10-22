@@ -24,6 +24,7 @@ const ACTION_LABELS: Record<AuditAction, string> = {
   "content.retranslate": "Dịch lại nội dung",
   "content.approve_translation": "Duyệt bản dịch",
   "system.data_retention": "Dọn dữ liệu hết hạn (hệ thống)",
+  "newsletter.export": "Xuất Excel bản tin",
 };
 
 /**

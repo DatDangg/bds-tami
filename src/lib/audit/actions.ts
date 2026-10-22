@@ -22,6 +22,8 @@ export const AUDIT_ACTIONS = [
   "content.approve_translation",
   // Job `data-retention` (hệ thống, không actor) vừa ẩn danh/xoá dữ liệu hết hạn; meta chỉ có số lượng, không PII.
   "system.data_retention",
+  // BL-054: xuất danh sách email đăng ký bản tin (dữ liệu cá nhân) ra Excel; meta chỉ có bộ lọc + số dòng.
+  "newsletter.export",
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];

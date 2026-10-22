@@ -465,6 +465,8 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 
 As-built (BL-054 P1-T01): `src/collections/NewsletterSubscribers.ts`; `disableDuplicate`; admin chỉ sửa tay được `status` (các trường còn lại `admin.readOnly`, là bằng chứng đồng ý); cột danh sách email · ngôn ngữ · trạng thái · ngày tạo; tìm theo email. Chưa gửi mail định kỳ; chưa nằm trong job `data-retention`.
 
+As-built (BL-054 P1-T04): `email`, `locale`, `consentAt`, `privacyPolicyVersion`, `sourcePath` có field access `update: denyAll` (như `site-settings.privacyPolicyVersion`) — khoá cả REST `PATCH` lẫn Local API không `overrideAccess` (Payload bỏ lặng lẽ giá trị gửi lên, `status` vẫn đổi được); chỉ endpoint `POST /api/public/newsletter` ghi các trường này bằng `overrideAccess` (tạo mới hoặc bật lại bản `unsubscribed`). Nút "Xuất Excel" (`beforeListTable` → `NewsletterExportButton`) gọi `GET /api/admin/newsletter-subscribers/export` (API_SPEC §4). Migration `20261022_031905_newsletter_export_audit` chỉ thêm giá trị enum audit `newsletter.export` (`ADD VALUE IF NOT EXISTS`; `down` cố ý không làm gì — giữ vết xuất dữ liệu cá nhân, như `20261018_130000_data_retention`).
+
 ### 4.11. `leads`, `lead-activities`
 
 **`leads`**
@@ -554,7 +556,7 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `actor` | `rel→staff` | |
-| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `staff.activate` · `staff.delete` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` · `system.data_retention` |
+| `action` | select | `lead.assign` · `lead.export` · `content.delete` · `content.restore` · `content.purge` (xoá hẳn) · `staff.create` · `staff.reset_password` · `staff.update_role` · `staff.deactivate` · `staff.activate` · `staff.delete` · `auth.login_failed` · `application.view_cv` · `content.retranslate` · `content.approve_translation` · `system.data_retention` · `newsletter.export` (BL-054, xuất Excel bản tin) |
 | `collection` | text | |
 | `docId` | text | |
 | `summary` | text | Mô tả ngắn |

@@ -21,6 +21,8 @@ import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
 import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { newsViewsEndpoint } from "./endpoints/public/news-views";
+import { newsletterEndpoint } from "./endpoints/public/newsletter";
+import { newsletterExportEndpoint } from "./endpoints/admin/newsletter-export";
 import { jobsConfig } from "./jobs";
 import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
 import { createRichTextEditor } from "./lib/admin/rich-text-editor";
@@ -66,7 +68,7 @@ export default buildConfig({
   globals: ADMIN_GLOBALS,
   editor: createRichTextEditor(),
   email: createEmailAdapter(env),
-  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint, newsViewsEndpoint],
+  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint, newsViewsEndpoint, newsletterEndpoint, newsletterExportEndpoint],
   jobs: jobsConfig,
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,

@@ -1137,5 +1137,21 @@
     "statsLabel": "Số liệu nổi bật",
     "projectMentionEyebrow": "Dự án được nhắc đến",
     "viewDetail": "Xem chi tiết"
+  },
+  "newsletter": {
+    "eyebrow": "Bản tin thị trường",
+    "title": "Nhận tin tức bất động sản mới nhất mỗi tuần",
+    "email": "Email",
+    "emailPlaceholder": "Email của bạn",
+    "consent": "Tôi đồng ý nhận bản tin qua email và để TAMI xử lý email theo <policy>Chính sách bảo mật</policy>.",
+    "submit": "Đăng ký",
+    "privacyNote": "Chúng tôi cam kết không chia sẻ email của bạn.",
+    "errors": {
+      "email": "Email chưa hợp lệ."
+    },
+    "success": {
+      "title": "Đăng ký thành công!",
+      "description": "Cảm ơn bạn. Bản tin thị trường sẽ được gửi tới email của bạn."
+    }
   }
 }
