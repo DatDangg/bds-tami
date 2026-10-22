@@ -1,6 +1,6 @@
 # feature-project-detail-blocks · phase-1-task-01 — Bản đồ `LazyMap` cao 0px + nền "… tương tự" vàng nhạt
 
-- Nguồn: BL-058 · change doc `spec/changes/2026-10-22-project-detail-blocks.md` (mục 1 + 2).
+- Nguồn: BL-060 · change doc `spec/changes/2026-10-22-project-detail-blocks.md` (mục 1 + 2).
 - Nhánh/worktree: `claude/bl058-project-detail-blocks-5971d4`; DB `tami_bl058` (`.env.local` worktree); dev server cổng **3058** (không dùng 3000 — đang là checkout chính).
 - Không schema, không migration.
 

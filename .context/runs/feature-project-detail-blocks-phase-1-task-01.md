@@ -1,7 +1,7 @@
 # Run Journal — feature/project-detail-blocks · phase-1-task-01
 
 ```yaml
-workItem: feature/project-detail-blocks   # BL-058
+workItem: feature/project-detail-blocks   # BL-060
 phaseTask: phase-1-task-01
 step: done
 agent: null

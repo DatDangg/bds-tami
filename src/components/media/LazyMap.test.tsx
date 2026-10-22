@@ -234,7 +234,7 @@ describe("LazyMap", () => {
     expect(observers).toHaveLength(0);
   });
 
-  it("container truyền cho MapLibre h-full w-full trong wrapper absolute inset-0 (CSS maplibre đè position của chính container → cao 0px, BL-058)", async () => {
+  it("container truyền cho MapLibre h-full w-full trong wrapper absolute inset-0 (CSS maplibre đè position của chính container → cao 0px, BL-060)", async () => {
     renderWithIntl(<LazyMap location={location} />);
     await act(async () => observer().intersect());
     await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(1));

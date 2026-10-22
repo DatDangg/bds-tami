@@ -199,7 +199,7 @@ export function LazyMap({ location, approximate = false, previewImage, markers =
     <div className={className}>
       <div ref={frameRef} role="region" aria-label={label ?? t("region")} className="relative w-full overflow-hidden rounded-sm bg-surface-muted" style={{ aspectRatio }}>
         {showMap ? (
-          // Wrapper định vị + container map h-full w-full: maplibre-gl.css (không nằm trong layer, nạp động) đè utility Tailwind v4 `absolute` trên chính container (`.maplibregl-map{position:relative}`) → cao 0px (BL-058).
+          // Wrapper định vị + container map h-full w-full: maplibre-gl.css (không nằm trong layer, nạp động) đè utility Tailwind v4 `absolute` trên chính container (`.maplibregl-map{position:relative}`) → cao 0px (BL-060).
           <div className="absolute inset-0">
             <div ref={mapRef} className="h-full w-full" />
           </div>

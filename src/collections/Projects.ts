@@ -103,7 +103,7 @@ const amenitiesField: ArrayField = {
   ],
 };
 
-/** Thẻ ảnh/video cạnh bản đồ ở khối Vị trí trang chi tiết (BL-058); không nhập gì thì khối giữ bố cục cũ. */
+/** Thẻ ảnh/video cạnh bản đồ ở khối Vị trí trang chi tiết (BL-060); không nhập gì thì khối giữ bố cục cũ. */
 const locationMediaGroup: GroupField = {
   name: "locationMedia",
   type: "group",

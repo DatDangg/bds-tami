@@ -9,7 +9,7 @@ import { PostCard } from "./PostCard";
 const IMAGE_SIZES = "(min-width: 1024px) 272px, (min-width: 640px) 320px, 82vw";
 
 /**
- * "Tin liên quan" cuối trang chi tiết Đăng tin BĐS (BL-052, cùng `SimilarCarousel` với "Dự án tương tự" / "Căn tương tự"): dải nền `primary-subtle` (BL-058), đầu khối canh trái + "Xem tất cả tin đăng"
+ * "Tin liên quan" cuối trang chi tiết Đăng tin BĐS (BL-052, cùng `SimilarCarousel` với "Dự án tương tự" / "Căn tương tự"): dải nền `primary-subtle` (BL-060), đầu khối canh trái + "Xem tất cả tin đăng"
  * (→ `/tin-bds`), slider `PostCard` như đang có. `id` là đích của tab "Tin liên quan" (bọc ngoài khối, `scroll-mt` dưới thanh tab dính). Rỗng → không dựng gì. Server Component.
  */
 export function RelatedPosts({ posts, id }: { posts: PostCardData[]; id?: string }) {

@@ -5,7 +5,7 @@ status: in_progress
 created: 2026-10-22
 ---
 
-# BL-058 — Chi tiết Dự án: bản đồ Vị trí, thẻ "Kết nối hạ tầng", slider Tiện ích, nền "Dự án tương tự"
+# BL-060 — Chi tiết Dự án: bản đồ Vị trí, thẻ "Kết nối hạ tầng", slider Tiện ích, nền "Dự án tương tự"
 
 ## Yêu cầu
 Chi tiết Dự án (BL-052, design `docs/specs/listing-detail-redesign/detail-du-an.webp` + mô tả design của user) còn 4 điểm:

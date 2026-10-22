@@ -4,7 +4,7 @@ import { VideoFacade } from "@/components/media/VideoFacade";
 import type { LocationMediaView } from "@/lib/projects/project-detail-view";
 
 /**
- * Thẻ "Kết nối hạ tầng" cạnh bản đồ (BL-058, design `detail-du-an`): tiêu đề + video qua `VideoFacade` (ảnh thẻ làm ảnh bìa, iframe chỉ sau khi bấm play) hoặc chỉ ảnh bo góc.
+ * Thẻ "Kết nối hạ tầng" cạnh bản đồ (BL-060, design `detail-du-an`): tiêu đề + video qua `VideoFacade` (ảnh thẻ làm ảnh bìa, iframe chỉ sau khi bấm play) hoặc chỉ ảnh bo góc.
  * Tiêu đề trống → nhãn mặc định theo ngôn ngữ. Server Component (facade là client).
  */
 export function ProjectLocationMedia({ media }: { media: LocationMediaView }) {

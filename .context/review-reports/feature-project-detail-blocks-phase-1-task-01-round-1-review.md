@@ -1,6 +1,6 @@
 Agent: reviewer
 
-# Review: feature-project-detail-blocks · phase-1-task-01 · round 1 (BL-058)
+# Review: feature-project-detail-blocks · phase-1-task-01 · round 1 (BL-060)
 
 > Report do reviewer viết; primary lưu nguyên văn tóm tắt (hook guard chặn Write của reviewer trong path worktree — `.context/review-reports/**` không khớp đường dẫn tuyệt đối worktree).
 
@@ -19,14 +19,14 @@ Agent: reviewer
 |---|---|
 | `pnpm typecheck` | PASS |
 | `pnpm lint` | PASS (0 lỗi; 2 warning cũ ngoài diff) |
-| `pnpm test` (full) | exit 1: 8 file / 2 test fail — timeout (integration `access`, `admin-form-layout`, `content-defaults`, `jobs-email`, `media-upload`, `session-refresh`; UI `HeroSearch`, `Header` 5000ms) khi máy tải nặng, không đụng diff; test LazyMap/PostDetail/BL-058 PASS |
+| `pnpm test` (full) | exit 1: 8 file / 2 test fail — timeout (integration `access`, `admin-form-layout`, `content-defaults`, `jobs-email`, `media-upload`, `session-refresh`; UI `HeroSearch`, `Header` 5000ms) khi máy tải nặng, không đụng diff; test LazyMap/PostDetail/BL-060 PASS |
 | `pnpm build` | PASS |
 
 ## Contrast
 accent-text / primary-subtle 4.63:1 AA; text-muted 4.82, text-secondary 6.75 AA; thẻ giữ trắng, mũi tên `bg-surface`.
 
 ## Findings
-- **[MAJOR-1] `docs/DESIGN.md:240`** — sửa nhầm đoạn lịch sử "Trước BL-052 (BL-045)" (khi đó nền thật là trắng); phần As-built BL-052 chưa ghi nền mới; hàng chi tiết Cho thuê (Căn tương tự) + Tin BĐS (Tin liên quan) chưa cập nhật. Fix: trả "nền trắng" ở BL-045, thêm "`SimilarCarousel` nền `primary-subtle` (BL-058)" vào As-built 3 hàng.
+- **[MAJOR-1] `docs/DESIGN.md:240`** — sửa nhầm đoạn lịch sử "Trước BL-052 (BL-045)" (khi đó nền thật là trắng); phần As-built BL-052 chưa ghi nền mới; hàng chi tiết Cho thuê (Căn tương tự) + Tin BĐS (Tin liên quan) chưa cập nhật. Fix: trả "nền trắng" ở BL-045, thêm "`SimilarCarousel` nền `primary-subtle` (BL-060)" vào As-built 3 hàng.
 - **[MINOR-1] `src/components/media/LazyMap.tsx:202`** — comment sai lý do; đề xuất: "maplibre-gl.css (không layer) đè utility Tailwind (trong layer) trên container → định vị bằng wrapper".
 - **[MINOR-2]** Không có band nào → "… tương tự" dính cùng nền `primary-subtle` với lưới trên (`DetailLayout.tsx:52`, Tin BĐS không toạ độ + < 2 ảnh, `PostDetail.tsx:195`). Không hỏng chức năng; không chặn task.
 - **[MINOR-3]** Docstring cũ "dải nền trắng": `src/components/rentals/SimilarRentals.tsx:12`, `src/components/posts/RelatedPosts.tsx:12`.

@@ -36,7 +36,7 @@ function AmenityCard({ amenity }: { amenity: AmenityView }) {
 
 /**
  * Khối Tiện ích nổi bật (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Không gian sống" + `h2`. Hai chế độ:
- * - Có ≥ 1 tiện ích có ảnh riêng (BL-058) → slider thẻ (`CardSlider` dùng chung, mũi tên hai mép từ md, vuốt ở mobile): ảnh 4:3 + tên + mô tả; mục không ảnh dùng ô nền muted + dấu tích để thẻ đều nhau. `amenitiesImage` chung không dùng.
+ * - Có ≥ 1 tiện ích có ảnh riêng (BL-060) → slider thẻ (`CardSlider` dùng chung, mũi tên hai mép từ md, vuốt ở mobile): ảnh 4:3 + tên + mô tả; mục không ảnh dùng ô nền muted + dấu tích để thẻ đều nhau. `amenitiesImage` chung không dùng.
  * - Không mục nào có ảnh → như cũ: `amenitiesImage` lớn bên trái (không có → rộng hết) + danh sách icon + tên + mô tả, > 5 mục → nút "Khám phá tất cả tiện ích".
  * Trường `icon` của dữ liệu là chữ tự do chưa có bảng ánh xạ tới bộ icon nên danh sách dùng dấu tích chung. Server Component (slider/danh sách là client).
  */

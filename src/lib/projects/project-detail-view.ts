@@ -48,11 +48,11 @@ export interface AmenityView {
   id: string;
   name: string;
   description: string | null;
-  /** Ảnh riêng của tiện ích (BL-058); có ≥ 1 tiện ích có ảnh thì khối Tiện ích hiện slider thẻ ảnh. */
+  /** Ảnh riêng của tiện ích (BL-060); có ≥ 1 tiện ích có ảnh thì khối Tiện ích hiện slider thẻ ảnh. */
   image: MediaImage | null;
 }
 
-/** Thẻ ảnh/video "Kết nối hạ tầng" cạnh bản đồ ở khối Vị trí (BL-058); `null` khi không có ảnh lẫn video hợp lệ. */
+/** Thẻ ảnh/video "Kết nối hạ tầng" cạnh bản đồ ở khối Vị trí (BL-060); `null` khi không có ảnh lẫn video hợp lệ. */
 export interface LocationMediaView {
   title: string | null;
   image: MediaImage | null;

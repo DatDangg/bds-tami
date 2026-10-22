@@ -1,6 +1,6 @@
 Agent: reviewer
 
-# Review: feature-project-detail-blocks · phase-1-task-01 · round 2 (BL-058)
+# Review: feature-project-detail-blocks · phase-1-task-01 · round 2 (BL-060)
 
 > Primary lưu nguyên văn (hook guard chặn reviewer Write trong worktree, cả đường dẫn tương đối).
 
@@ -11,10 +11,10 @@ Agent: reviewer
 ## Kiểm các finding round 1
 | Finding | Trạng thái | Bằng chứng |
 |---|---|---|
-| MAJOR-1 DESIGN.md sửa nhầm đoạn lịch sử | Đã đóng | `git diff --word-diff` chỉ còn 3 thay đổi trong As-built BL-052 ("Dự án tương tự" / "Căn tương tự" / "Tin liên quan" → nền `--color-primary-subtle` (BL-058)); đoạn BL-045 nguyên. |
+| MAJOR-1 DESIGN.md sửa nhầm đoạn lịch sử | Đã đóng | `git diff --word-diff` chỉ còn 3 thay đổi trong As-built BL-052 ("Dự án tương tự" / "Căn tương tự" / "Tin liên quan" → nền `--color-primary-subtle` (BL-060)); đoạn BL-045 nguyên. |
 | MINOR-1 comment LazyMap | Đã đóng | `LazyMap.tsx:202` nêu đúng: maplibre-gl.css không layer đè utility `absolute` Tailwind v4 trên container. |
 | MINOR-2 không band → dính nền | Đã đóng | `SimilarCarousel.tsx:28` thêm `border-t border-border`. |
-| MINOR-3 docstring | Đã đóng | `SimilarRentals.tsx:12`, `RelatedPosts.tsx:12`, `SimilarCarousel.tsx:21` ghi `primary-subtle` (BL-058). |
+| MINOR-3 docstring | Đã đóng | `SimilarRentals.tsx:12`, `RelatedPosts.tsx:12`, `SimilarCarousel.tsx:21` ghi `primary-subtle` (BL-060). |
 
 Không regression mới; test đúng contract (`project-detail.test.tsx:325`, `PostDetail.test.tsx:211`, test mới `LazyMap.test.tsx`). `lien-he/page.tsx` `[&>[role=region]]` vẫn trúng con trực tiếp.
 

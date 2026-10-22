@@ -1,6 +1,6 @@
 # feature-project-detail-blocks · phase-1-task-02 — Ảnh từng tiện ích (slider thẻ) + ảnh/video "Kết nối hạ tầng" ở khối Vị trí
 
-- Nguồn: BL-058 · change doc `spec/changes/2026-10-22-project-detail-blocks.md` (mục 3 + 4).
+- Nguồn: BL-060 · change doc `spec/changes/2026-10-22-project-detail-blocks.md` (mục 3 + 4).
 - Design: `docs/specs/listing-detail-redesign/detail-du-an.webp` + mô tả user: khối Vị trí = bản đồ + danh sách phút/km + **thẻ ảnh/video "Kết nối hạ tầng" có nút play bên phải**; Tiện ích nổi bật = **slider thẻ ảnh từng tiện ích có tên + mô tả ngắn, nút ←/→**.
 - Nhánh/worktree: `claude/bl058-project-detail-blocks-5971d4`; DB `tami_bl058` (`.env.local` worktree — KHÔNG chạy migrate vào DB `tami`); dev server cổng **3058**.
 - Phụ thuộc: T01 (cùng nhánh, đã commit trước).

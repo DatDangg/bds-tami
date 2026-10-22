@@ -1,6 +1,6 @@
 Agent: reviewer
 
-# Review: feature-project-detail-blocks · phase-1-task-02 · round 1 (BL-058)
+# Review: feature-project-detail-blocks · phase-1-task-02 · round 1 (BL-060)
 
 > Primary lưu nội dung report (hook guard chặn reviewer Write trong worktree).
 

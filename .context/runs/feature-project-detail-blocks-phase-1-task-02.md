@@ -1,7 +1,7 @@
 # Run Journal — feature/project-detail-blocks · phase-1-task-02
 
 ```yaml
-workItem: feature/project-detail-blocks   # BL-058
+workItem: feature/project-detail-blocks   # BL-060
 phaseTask: phase-1-task-02
 step: done
 agent: null
@@ -15,7 +15,7 @@ evidence:
   reportPath: .context/review-reports/feature-project-detail-blocks-phase-1-task-02-round-1-review.md
   round: 1
   verdict: PASS
-next: "BL-058 code xong. Lúc merge vào staging sau BL-054: rebase/merge, pnpm payload migrate vào DB tami, bump spec MINOR (1.48.0 dự kiến) + SPECIFICATIONS.md + spec/CHANGELOG.md + spec/updates/ + test-scope/current.json + progress.json + docs/ERD.md, BACKLOG BL-058 done + archive change doc; follow-up MINOR M-1..M-4"
+next: "BL-060 code xong. Lúc merge vào staging sau BL-054: rebase/merge, pnpm payload migrate vào DB tami, bump spec MINOR (1.48.0 dự kiến) + SPECIFICATIONS.md + spec/CHANGELOG.md + spec/updates/ + test-scope/current.json + progress.json + docs/ERD.md, BACKLOG BL-060 done + archive change doc; follow-up MINOR M-1..M-4"
 loopSignal: none
 approvals: []
 batchQueue: [phase-1-task-02, phase-1-task-02]

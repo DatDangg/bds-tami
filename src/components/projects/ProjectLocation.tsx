@@ -45,14 +45,14 @@ interface ProjectLocationProps {
   areaLabel: string | null;
   /** Địa điểm quanh dự án theo nhóm (chỉ nhóm có dòng, đúng thứ tự `NEARBY_CATEGORY_ORDER`). */
   nearby?: NearbyGroupView[];
-  /** Thẻ ảnh/video "Kết nối hạ tầng" (BL-058); có thì thêm cột bên phải, không có thì bố cục như cũ. */
+  /** Thẻ ảnh/video "Kết nối hạ tầng" (BL-060); có thì thêm cột bên phải, không có thì bố cục như cũ. */
   locationMedia?: LocationMediaView | null;
 }
 
 /**
  * Khối Vị trí (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Kết nối" + `h2` + địa chỉ (đoạn mô tả) → ≥ lg bản đồ lười 7 cột (điểm dự án + điểm lân cận có toạ độ)
  * cạnh danh sách "Khoảng cách đến các địa điểm quan trọng" 5 cột (icon theo nhóm, tên, chip khoảng cách; > 8 hàng → "Xem thêm") — thay tab lân cận theo nhóm cũ.
- * Thiếu toạ độ → không bản đồ, danh sách rộng hết; thiếu cả hai → chỉ còn địa chỉ. Có `locationMedia` (BL-058) → thêm thẻ ảnh/video "Kết nối hạ tầng": ≥ xl lưới 5 · 4 · 3 cột (bản đồ · danh sách · thẻ),
+ * Thiếu toạ độ → không bản đồ, danh sách rộng hết; thiếu cả hai → chỉ còn địa chỉ. Có `locationMedia` (BL-060) → thêm thẻ ảnh/video "Kết nối hạ tầng": ≥ xl lưới 5 · 4 · 3 cột (bản đồ · danh sách · thẻ),
  * lg bản đồ + danh sách như cũ và thẻ xuống hàng dưới, < lg xếp dọc; thiếu bản đồ hoặc danh sách thì thẻ nhận phần còn lại (8 · 4 cột). Server Component.
  */
 export function ProjectLocation({ projectName, location, address, areaLabel, nearby = [], locationMedia = null }: ProjectLocationProps) {

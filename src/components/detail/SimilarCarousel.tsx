@@ -18,7 +18,7 @@ interface SimilarCarouselProps {
 }
 
 /**
- * Khối "… tương tự" cuối trang chi tiết (BL-052, design `detail-du-an`; DECISIONS #6): dải nền vàng nhạt `bg-primary-subtle` (BL-058), đầu khối canh trái (eyebrow + `h2` hai màu) + link "Xem tất cả …" bên phải,
+ * Khối "… tương tự" cuối trang chi tiết (BL-052, design `detail-du-an`; DECISIONS #6): dải nền vàng nhạt `bg-primary-subtle` (BL-060), đầu khối canh trái (eyebrow + `h2` hai màu) + link "Xem tất cả …" bên phải,
  * rồi `CardSlider` dùng chung với mũi tên tròn hai mép (`arrows="sides"`, từ md; mobile vuốt). Server Component.
  */
 export function SimilarCarousel({ items, title, titleAccent, eyebrow, viewAll, labels }: SimilarCarouselProps) {

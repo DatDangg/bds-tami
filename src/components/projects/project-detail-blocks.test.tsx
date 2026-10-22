@@ -12,7 +12,7 @@ const nearby: NearbyGroupView[] = [{ category: "education", items: [{ id: "n1", 
 const place = { lat: 21, lng: 105 };
 const video: LocationMediaView = { title: null, image: fakeMedia("poster"), videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" };
 
-describe("ProjectAmenities (BL-058)", () => {
+describe("ProjectAmenities (BL-060)", () => {
   it("có ít nhất 1 tiện ích có ảnh → slider thẻ (ảnh + tên + mô tả); mục không ảnh vẫn là thẻ; không dùng ảnh chung / nút mở rộng", () => {
     renderWithIntl(<ProjectAmenities amenities={[amenity("a", true), amenity("b", false)]} image={fakeMedia("shared")} />);
     const slider = document.querySelector('[aria-roledescription="carousel"]') as HTMLElement;
@@ -33,7 +33,7 @@ describe("ProjectAmenities (BL-058)", () => {
   });
 });
 
-describe("ProjectLocation + thẻ Kết nối hạ tầng (BL-058)", () => {
+describe("ProjectLocation + thẻ Kết nối hạ tầng (BL-060)", () => {
   const renderLocation = (media: LocationMediaView | null, hasMap = true) =>
     renderWithIntl(<ProjectLocation projectName="Dự án A" location={hasMap ? place : null} address="Số 1" areaLabel={null} nearby={nearby} locationMedia={media} />);
 
