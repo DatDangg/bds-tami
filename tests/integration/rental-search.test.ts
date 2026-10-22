@@ -701,6 +701,17 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       }
     });
 
+    it("số đếm Tiện ích /en: chỉ tin hasEnglish (BL-055 C-5)", async () => {
+      // b (gym, không có bản EN) thêm tạm "pool": /vi đếm pool 2, /en chỉ đếm a (pool, gym, elevator).
+      await withDatabase((client) => client.query(`INSERT INTO "rentals_amenities" ("order", "parent_id", "value") VALUES (2, $1, 'pool')`, [ids.b]));
+      try {
+        expect((await listing({ limit: 1 })).facets.amenities).toMatchObject({ pool: 2, gym: 2 });
+        expect((await listing({ locale: "en", limit: 1 })).facets.amenities).toMatchObject({ pool: 1, gym: 1, elevator: 1, kitchen: 0 });
+      } finally {
+        await withDatabase((client) => client.query(`DELETE FROM "rentals_amenities" WHERE "parent_id" = $1 AND "order" = 2`, [ids.b]));
+      }
+    });
+
     it("thẻ có danh mục của tin (danh mục con giữ tên con)", async () => {
       const { items } = await listing({ province: dnSlug, category: "van-phong-bl052", limit: 48 });
       expect(items.map((card) => card.category)).toEqual(items.map(() => ({ name: "Văn phòng chia sẻ BL052", slug: "van-phong-chia-se-bl052" })));

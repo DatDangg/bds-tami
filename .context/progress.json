@@ -2787,21 +2787,28 @@
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-listing-followups/phase-1-task-02.md",
-          "status": "in_progress",
+          "status": "done",
           "attempt": 1,
           "dependsOn": [],
-          "note": "C-5 EXPLAIN ANALYZE + ca EN, C-6 bỏ (không lọc bản đồ), C-7 hookTimeout, C-8 hasPostOffer; task duy nhất được tạo migration"
+          "note": "C-7 hookTimeout 60s integration; C-8 backfill dùng hasPostOffer (endAt rác không còn bị bỏ qua, có test); C-5 EN test; C-5 EXPLAIN ANALYZE 100k tin: index gộp không được planner dùng (326→339/330ms, province 31ms) → KHÔNG migration; C-6 bỏ (không lọc bản đồ)",
+          "review": "NORMAL PASS r1 (1 MINOR không chặn)",
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-listing-followups-phase-1-task-02-round-1-review.md",
+          "verify": "typecheck PASS · eslint 4 file scope 0 lỗi · test 419 file / 4391 PASS ×2 (không timeout) · build PASS · bench dọn sạch (primary kiểm DB: BENCH 0, amenities 122, 3 index gốc)",
+          "completedAt": "2026-10-22"
         },
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-listing-followups/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "in_progress",
+          "attempt": 1,
           "dependsOn": [],
           "note": "đo LCP bản build 6 trang"
         }
       ],
-      "inProgressTask": "phase-1-task-02"
+      "inProgressTask": "phase-1-task-03"
     }
   ],
   "bugs": [

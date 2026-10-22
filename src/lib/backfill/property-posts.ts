@@ -1,14 +1,15 @@
 import type { Payload } from "payload";
 
 import type { PropertyPost } from "../../payload-types";
+import { hasPostOffer } from "../posts/post-kind";
 import { FIELD_PLANNERS, NO_FLOORS_TYPES, NONE, type TextSource } from "./property-post-extract";
 import { richTextToPlain } from "./text";
 import type { BackfillAdapter, DocPlan } from "./types";
 
 /**
  * Bộ trích dữ liệu cũ cho Tin BĐS (BL-052 P3-T05): loại hình, diện tích, phòng ngủ / tắm, hướng nhà, mặt tiền, số tầng, địa chỉ từ
- * tiêu đề ("cao") + tóm tắt / nội dung ("trung bình" → mục cần soát). Chỉ điền ô trống. **Bỏ qua tin ưu đãi / voucher** (`offer.endAt` hoặc
- * `offer.voucherCode`). Giá trị mơ hồ (các nguồn cho nhiều giá trị khác nhau, chỉ có khoảng "75 – 120 m²", hướng ban công…) → không điền,
+ * tiêu đề ("cao") + tóm tắt / nội dung ("trung bình" → mục cần soát). Chỉ điền ô trống. **Bỏ qua tin ưu đãi / voucher** (`hasPostOffer`: `offer.endAt` hợp lệ
+ * hoặc `offer.voucherCode`). Giá trị mơ hồ (các nguồn cho nhiều giá trị khác nhau, chỉ có khoảng "75 – 120 m²", hướng ban công…) → không điền,
  * ghi "cần soát". Không trích `handoverCondition` / `location` (ngoài phạm vi task). Regex + quy tắc từng trường: `property-post-extract.ts`.
  */
 
@@ -18,7 +19,7 @@ export interface PropertyPostSource {
   status?: string | null;
   excerpt?: string | null;
   contentText: string;
-  offer?: { endAt?: string | null; voucherCode?: string | null } | null;
+  offer?: PropertyPost["offer"];
   propertyType?: string | null;
   areaM2?: number | null;
   bedrooms?: number | null;
@@ -37,13 +38,14 @@ const sourcesOf = (post: PropertyPostSource): TextSource[] => [
 
 const hasValue = (value: unknown) => (typeof value === "string" ? value.trim().length > 0 : value !== null && value !== undefined);
 
-/** Tin ưu đãi / voucher (có ngày kết thúc ưu đãi hoặc mã voucher) không mô tả một BĐS cụ thể → bỏ qua cả tin. */
-export const isOfferPost = (post: Pick<PropertyPostSource, "offer">) => hasValue(post.offer?.endAt) || hasValue(post.offer?.voucherCode);
-
-/** Kế hoạch điền cho một tin (thuần, không đọc/ghi DB): chỉ ô trống; giá trị độ tin cậy "trung bình" vào mục cần soát. */
+/**
+ * Kế hoạch điền cho một tin (thuần, không đọc/ghi DB): chỉ ô trống; giá trị độ tin cậy "trung bình" vào mục cần soát.
+ * Tin ưu đãi / voucher không mô tả một BĐS cụ thể → bỏ qua cả tin; phân loại dùng chung `hasPostOffer` (thẻ + chi tiết, BL-055 C-8):
+ * `endAt` không parse được thành ngày thì không tính là ưu đãi.
+ */
 export function planPropertyPost(post: PropertyPostSource): DocPlan {
   const plan: DocPlan = { id: post.id, title: post.title, isPublic: post.status === "published", patch: {}, fieldStates: {}, filled: [], review: [] };
-  if (isOfferPost(post)) return { ...plan, skipped: "tin ưu đãi / voucher" };
+  if (hasPostOffer(post)) return { ...plan, skipped: "tin ưu đãi / voucher" };
   const sources = sourcesOf(post);
   for (const { name, plan: planField } of FIELD_PLANNERS) {
     if (hasValue(post[name])) {
@@ -70,7 +72,7 @@ export function toPropertyPostSource(doc: PropertyPost): PropertyPostSource {
     status: doc.status,
     excerpt: doc.excerpt,
     contentText: richTextToPlain(doc.content),
-    offer: doc.offer ?? null,
+    offer: doc.offer,
     propertyType: doc.propertyType,
     areaM2: doc.areaM2,
     bedrooms: doc.bedrooms,

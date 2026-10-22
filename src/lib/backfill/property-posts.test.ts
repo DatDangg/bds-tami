@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isOfferPost, planPropertyPost, type PropertyPostSource } from "./property-posts";
+import { planPropertyPost, type PropertyPostSource } from "./property-posts";
 
 const post = (over: Partial<PropertyPostSource> = {}): PropertyPostSource => ({ id: "t1", title: "Tin mẫu", status: "published", excerpt: "", contentText: "", ...over });
 const patchOf = (over: Partial<PropertyPostSource>) => planPropertyPost(post(over)).patch;
@@ -159,12 +159,17 @@ describe("planPropertyPost — chỉ ô trống, bỏ qua voucher", () => {
     expect(plan.fieldStates).toMatchObject({ areaM2: "has-value", bedrooms: "has-value", houseDirection: "has-value", address: "not-found" });
   });
 
-  it("tin có offer.endAt hoặc voucherCode → bỏ qua cả tin", () => {
-    expect(isOfferPost({ offer: { endAt: "2026-12-31T00:00:00.000Z" } })).toBe(true);
-    expect(isOfferPost({ offer: { voucherCode: "TAMI10" } })).toBe(true);
-    expect(isOfferPost({ offer: { endAt: null, voucherCode: " " } })).toBe(false);
-    const plan = planPropertyPost(post({ title: "Voucher tri ân khách thuê căn hộ 2PN 70m2", offer: { voucherCode: "TAMI10" } }));
-    expect(plan).toMatchObject({ skipped: "tin ưu đãi / voucher", patch: {}, fieldStates: {}, filled: [], review: [] });
+  it("tin có offer.endAt hợp lệ hoặc voucherCode → bỏ qua cả tin (cùng phân loại hasPostOffer)", () => {
+    const skipped = { skipped: "tin ưu đãi / voucher", patch: {}, fieldStates: {}, filled: [], review: [] };
+    expect(planPropertyPost(post({ title: "Ưu đãi căn hộ 2PN 70m2", offer: { endAt: "2026-12-31T00:00:00.000Z" } }))).toMatchObject(skipped);
+    expect(planPropertyPost(post({ title: "Voucher tri ân khách thuê căn hộ 2PN 70m2", offer: { voucherCode: "TAMI10" } }))).toMatchObject(skipped);
+    expect(planPropertyPost(post({ title: "Bán căn hộ 2PN 70m2", offer: { endAt: null, voucherCode: " " } })).skipped).toBeUndefined();
+  });
+
+  it("offer.endAt không parse được thành ngày → không phải tin ưu đãi, vẫn trích (BL-055 C-8)", () => {
+    const plan = planPropertyPost(post({ title: "Bán căn hộ 2PN 70m2", offer: { endAt: "không phải ngày", voucherCode: null } }));
+    expect(plan.skipped).toBeUndefined();
+    expect(plan.patch).toEqual({ propertyType: "apartment", areaM2: 70, bedrooms: 2 });
   });
 
   it("tin chưa xuất bản đánh dấu isPublic=false", () => {
