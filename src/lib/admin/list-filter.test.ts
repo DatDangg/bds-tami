@@ -106,8 +106,8 @@ const columnVisible = (slug: string, path: string) => !adminOf(leaves(bySlug(slu
 const filterVisible = (slug: string, path: string) => !adminOf(leaves(bySlug(slug).fields).find((leaf) => leaf.path === path)!.field)?.disableListFilter;
 
 describe("Danh sách gọn mọi collection (BL-039)", () => {
-  it("áp cho đủ 21 collection admin", () => {
-    expect(ADMIN_COLLECTIONS).toHaveLength(21);
+  it("áp cho đủ 23 collection admin", () => {
+    expect(ADMIN_COLLECTIONS).toHaveLength(23);
   });
 
   it("mọi collection: SEO/bản dịch/slug/hasEnglish/richText/textarea/json/array/blocks/ui-không-Cell ẩn cả cột lẫn lọc; upload chỉ ẩn lọc", () => {
@@ -145,7 +145,7 @@ describe("Danh sách gọn mọi collection (BL-039)", () => {
 
   it("trường nghiệp vụ mẫu vẫn lọc + hiện cột được", () => {
     const samples: Array<[string, string]> = [
-      ["job-postings", "deadline"], ["job-postings", "status"], ["job-postings", "category"],
+      ["job-postings", "deadline"], ["job-postings", "status"], ["job-postings", "category"], ["job-postings", "isUrgent"],
       ["job-applications", "status"], ["job-applications", "jobPosting"], ["pages", "kind"], ["categories", "scope"],
     ];
     for (const [slug, path] of samples) {

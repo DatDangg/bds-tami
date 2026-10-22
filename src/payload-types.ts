@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     leads: Lead;
     'lead-activities': LeadActivity;
+    'newsletter-subscribers': NewsletterSubscriber;
     projects: Project;
     rentals: Rental;
     'property-posts': PropertyPost;
@@ -88,6 +89,7 @@ export interface Config {
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
+    'news-views-daily': NewsViewsDaily;
     'translation-usage': TranslationUsage;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -103,6 +105,7 @@ export interface Config {
   collectionsSelect: {
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'lead-activities': LeadActivitiesSelect<false> | LeadActivitiesSelect<true>;
+    'newsletter-subscribers': NewsletterSubscribersSelect<false> | NewsletterSubscribersSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     rentals: RentalsSelect<false> | RentalsSelect<true>;
     'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
@@ -122,6 +125,7 @@ export interface Config {
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
+    'news-views-daily': NewsViewsDailySelect<false> | NewsViewsDailySelect<true>;
     'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -1013,6 +1017,23 @@ export interface LeadActivity {
   createdAt: string;
 }
 /**
+ * Email khách đăng ký nhận bản tin thị trường trên website. Chỉ đổi được trạng thái nhận.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers".
+ */
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  locale: 'vi' | 'en';
+  status: 'active' | 'unsubscribed';
+  consentAt?: string | null;
+  privacyPolicyVersion?: string | null;
+  sourcePath?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Bài viết tin tức, kiến thức thị trường; không thu lead.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1304,6 +1325,10 @@ export interface JobPosting {
    */
   salaryText?: string | null;
   deadline: string;
+  /**
+   * Hiện nhãn "Tuyển gấp" cạnh tin trên website.
+   */
+  isUrgent?: boolean | null;
   seo?: {
     /**
      * Để trống thì dùng tiêu đề bài.
@@ -1492,6 +1517,20 @@ export interface ClickStatsDaily {
   createdAt: string;
 }
 /**
+ * Số lượt xem từng tin tức theo ngày (giờ Việt Nam), do hệ thống ghi; dùng cho khối "Đọc nhiều".
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-views-daily".
+ */
+export interface NewsViewsDaily {
+  id: string;
+  news: string | News;
+  day: string;
+  views: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Mức dùng dịch tự động theo tháng (số lần dịch, lượng chữ, chi phí ước tính) để theo dõi hạn mức.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1662,6 +1701,10 @@ export interface PayloadLockedDocument {
         value: string | LeadActivity;
       } | null)
     | ({
+        relationTo: 'newsletter-subscribers';
+        value: string | NewsletterSubscriber;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: string | Project;
       } | null)
@@ -1736,6 +1779,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'click-stats-daily';
         value: string | ClickStatsDaily;
+      } | null)
+    | ({
+        relationTo: 'news-views-daily';
+        value: string | NewsViewsDaily;
       } | null)
     | ({
         relationTo: 'translation-usage';
@@ -1843,6 +1890,20 @@ export interface LeadActivitiesSelect<T extends boolean = true> {
   fromAssignee?: T;
   toAssignee?: T;
   actor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers_select".
+ */
+export interface NewsletterSubscribersSelect<T extends boolean = true> {
+  email?: T;
+  locale?: T;
+  status?: T;
+  consentAt?: T;
+  privacyPolicyVersion?: T;
+  sourcePath?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2241,6 +2302,7 @@ export interface JobPostingsSelect<T extends boolean = true> {
   salaryMaxVnd?: T;
   salaryText?: T;
   deadline?: T;
+  isUrgent?: T;
   seo?:
     | T
     | {
@@ -2556,6 +2618,17 @@ export interface ClickStatsDailySelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-views-daily_select".
+ */
+export interface NewsViewsDailySelect<T extends boolean = true> {
+  news?: T;
+  day?: T;
+  views?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "translation-usage_select".
  */
 export interface TranslationUsageSelect<T extends boolean = true> {
@@ -2773,6 +2846,27 @@ export interface SiteSetting {
       }[]
     | null;
   /**
+   * Tối đa 6 bước, theo thứ tự hiển thị; để trống thì ẩn khối Quy trình ứng tuyển.
+   */
+  careersProcess?:
+    | {
+        icon:
+          | 'map-pin'
+          | 'buildings'
+          | 'headset'
+          | 'file-check'
+          | 'shield-check'
+          | 'clock'
+          | 'users'
+          | 'star'
+          | 'medal'
+          | 'users-three';
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Từ khoá tìm nhanh, khối "Tìm hiểu thêm" và câu hỏi thường gặp của từng trang. Chữ nhập riêng cho tiếng Việt và tiếng Anh; dòng chưa có chữ tiếng Anh thì không hiện ở bản tiếng Anh.
    */
   listingPages?: {
@@ -2910,6 +3004,31 @@ export interface SiteSetting {
     | {
         platform: 'facebook' | 'zalo' | 'youtube' | 'tiktok' | 'instagram' | 'linkedin' | 'x' | 'other';
         url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Hiện ở thẻ Giờ làm việc trang Liên hệ; để trống thì ẩn thẻ.
+   */
+  workingHours?: {
+    hours?: string | null;
+    days?: string | null;
+  };
+  /**
+   * Để trống thì website dùng Địa chỉ / Toạ độ / Hotline / Email ở trên.
+   */
+  offices?:
+    | {
+        name: string;
+        address: string;
+        image?: (string | null) | Media;
+        /**
+         * @minItems 2
+         * @maxItems 2
+         */
+        location?: [number, number] | null;
+        phone?: string | null;
+        email?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -3464,6 +3583,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         description?: T;
         id?: T;
       };
+  careersProcess?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   listingPages?:
     | T
     | {
@@ -3566,6 +3693,23 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         platform?: T;
         url?: T;
+        id?: T;
+      };
+  workingHours?:
+    | T
+    | {
+        hours?: T;
+        days?: T;
+      };
+  offices?:
+    | T
+    | {
+        name?: T;
+        address?: T;
+        image?: T;
+        location?: T;
+        phone?: T;
+        email?: T;
         id?: T;
       };
   notificationEmails?:

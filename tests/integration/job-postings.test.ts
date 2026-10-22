@@ -188,9 +188,10 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
         expect.arrayContaining([
           "title", "slug", "category", "province", "workplace", "employmentType", "salaryMinVnd", "salaryMaxVnd", "salaryText",
           "quantity", "deadline", "description", "requirements", "benefits", "status", "publishedAt", "author", "hasEnglish",
-          "translation", "seo",
+          "translation", "seo", "isUrgent",
         ]),
       );
+      expect(config.flattenedFields.find((field) => field.name === "isUrgent")).toMatchObject({ type: "checkbox", defaultValue: false, label: "Tuyển gấp" });
       expect(names).not.toContain("isFeatured");
       expect(config.trash).toBe(true);
     });
@@ -227,6 +228,9 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
       });
       expect(stored.province).toBe(provinceId);
       expect(Number.isNaN(Date.parse(stored.deadline))).toBe(false);
+      expect(stored.isUrgent).toBe(false);
+      const urgent = await createJob({ title: "Tuyển gấp", isUrgent: true });
+      expect((await payload.findByID({ collection: "job-postings", id: urgent.id, depth: 0, overrideAccess: true })).isUrgent).toBe(true);
     });
 
     it("deadline, employmentType, mô tả, yêu cầu bắt buộc; số âm / khoảng lương ngược / số lượng 0 / loại hình lạ → 400", async () => {
