@@ -233,4 +233,14 @@ describe("LazyMap", () => {
     expect(container).toBeEmptyDOMElement();
     expect(observers).toHaveLength(0);
   });
+
+  it("container truyền cho MapLibre h-full w-full trong wrapper absolute inset-0 (CSS maplibre đè position của chính container → cao 0px, BL-058)", async () => {
+    renderWithIntl(<LazyMap location={location} />);
+    await act(async () => observer().intersect());
+    await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(1));
+    const mapContainer: HTMLElement = maplibre.constructed.mock.lastCall?.[0].container;
+    expect(mapContainer).toHaveClass("h-full", "w-full");
+    expect(mapContainer).not.toHaveClass("absolute");
+    expect(mapContainer.parentElement).toHaveClass("absolute", "inset-0");
+  });
 });

@@ -204,11 +204,11 @@ describe("PostDetail (BL-052, khung chi tiết chung)", () => {
     expect(within(aside).getByRole("link", { name: "Gọi ngay 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
   });
 
-  it("cuối trang: Tin liên quan (#related, nền trắng, 'Xem tất cả tin đăng') → dải Điểm mạnh → banner tư vấn", () => {
+  it("cuối trang: Tin liên quan (#related, nền vàng nhạt, 'Xem tất cả tin đăng') → dải Điểm mạnh → banner tư vấn", () => {
     const { container } = renderPost(fullPost, { related: [post({ id: "p2", title: "Tin khác", slug: "tin-khac" })], withStrengths: true });
     const related = container.querySelector("#related") as HTMLElement;
     const heading = within(related).getByRole("heading", { level: 2, name: "Tin liên quan" });
-    expect(heading.closest("section")?.className).toContain("bg-surface");
+    expect(heading.closest("section")?.className).toContain("bg-primary-subtle");
     expect(within(related).getByRole("heading", { level: 3, name: "Tin khác" })).toBeInTheDocument();
     expect(within(related).getByRole("link", { name: "Xem tất cả tin đăng" })).toHaveAttribute("href", "/tin-bds");
     const strengthsBlock = screen.getByTestId("strengths");

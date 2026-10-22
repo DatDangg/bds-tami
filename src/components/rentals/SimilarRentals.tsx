@@ -9,7 +9,7 @@ import type { Locale } from "@/i18n/routing";
 const IMAGE_SIZES = "(min-width: 1024px) 272px, (min-width: 640px) 320px, 82vw";
 
 /**
- * "Căn tương tự" (BL-052, cùng `SimilarCarousel` với "Dự án tương tự"): dải nền trắng, đầu khối canh trái + "Xem tất cả căn cho thuê" (→ `/cho-thue`), slider `RentalCard`
+ * "Căn tương tự" (BL-052, cùng `SimilarCarousel` với "Dự án tương tự"): dải nền `primary-subtle` (BL-058), đầu khối canh trái + "Xem tất cả căn cho thuê" (→ `/cho-thue`), slider `RentalCard`
  * như đang có (không icon tim). Cùng danh mục + cùng tỉnh, chỉ tin còn trống. Tin đã thuê dùng tiêu đề "Căn tương tự đang trống" (khối được kéo lên ngay sau thanh thông số).
  * Không có thẻ nào thì không render. Server Component.
  */

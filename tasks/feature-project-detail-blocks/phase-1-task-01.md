@@ -27,9 +27,9 @@
 4. Kiểm trình duyệt (cổng 3058): bản đồ phủ khung ở chi tiết Dự án + 1 Cho thuê/Tin BĐS có toạ độ + `/lien-he` (nếu có bản đồ); đo `getBoundingClientRect().height` của `.maplibregl-canvas` > 0 = chiều cao khung.
 
 ## Acceptance
-- [ ] Bản đồ phủ kín khung (canvas cao = khung) ở mọi nơi dùng `LazyMap`; test chống tái phát.
-- [ ] Dải "… tương tự" nền `bg-primary-subtle` ở 3 màn chi tiết, không hex.
-- [ ] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
+- [x] Bản đồ phủ kín khung (canvas cao = khung) ở mọi nơi dùng `LazyMap`; test chống tái phát.
+- [x] Dải "… tương tự" nền `bg-primary-subtle` ở 3 màn chi tiết, không hex.
+- [x] `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm build` PASS.
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
@@ -37,8 +37,13 @@
 ## Repro Verification
 | Mục | Expected | Actual before fix | Actual after fix | Evidence | Status |
 |---|---|---|---|---|---|
-| Bản đồ | canvas cao = khung | canvas 0px | | | |
-| Nền tương tự | `bg-primary-subtle` | `bg-surface` | | | |
+| Bản đồ | canvas cao = khung | canvas 0px (container `.maplibregl-map` position relative, không height) | /du-an/the-crown-dai-hoang-son-bac-ninh 1440: `.maplibregl-canvas` 519px = khung 519.5px, `.maplibregl-map` vẫn relative nhưng nằm trong wrapper absolute inset-0; 35 tile OSM + marker hiện. /lien-he: không có bản đồ (không cấu hình toạ độ văn phòng). Cho thuê / Tin BĐS: DB không có tin published có toạ độ (2 tin cho thuê có toạ độ là draft) → chỉ kiểm vitest (cùng component) | `du-an-crown-vi-1440-map-after-fix.jpg` | PASS |
+| Nền tương tự | `bg-primary-subtle` | `bg-surface` | computed rgb(248,243,235) = #F8F3EB, thẻ trắng nổi trên nền | `du-an-crown-vi-1440-similar-bg.jpg` | PASS |
 
 ## Verification summary
-(điền sau review)
+- Attempt: 2 (r1 STRICT FAIL: MAJOR-1 DESIGN.md sửa nhầm đoạn lịch sử BL-045 + MINOR comment/docstring/không band dính nền) · r2 STRICT PASS.
+- Review: `.context/review-reports/feature-project-detail-blocks-phase-1-task-01-round-1-review.md` (FAIL), `.context/review-reports/feature-project-detail-blocks-phase-1-task-01-round-2-review.md` (PASS). Primary lưu report (hook guard chặn reviewer Write trong worktree).
+- Verify: `pnpm typecheck` PASS · `pnpm lint` 0 lỗi (2 warning cũ tools/task-dashboard) · `pnpm build` PASS · `pnpm test` full (primary): 382/387 file, 3850/3906 test PASS; fail = 4 file integration (access, jobs-email, media-upload, session-refresh — hook timeout 10s) + Header focus-trap timeout 5s. Chạy lại riêng: Header PASS; 4 file integration fail vì container `tami-postgres` crash lần 2 (04:26 UTC, backend exit code 2 lúc checkpoint CREATE/DROP DATABASE của test) → recovery mode. Không liên quan diff (chỉ UI/doc). File test liên quan diff 28 file / 295 test PASS (reviewer r2).
+- Kết quả: `LazyMap` wrapper `absolute inset-0` + container `h-full w-full`; `SimilarCarousel` `bg-primary-subtle` + `border-t border-border`.
+- Doc impact: `docs/DESIGN.md` as-built 3 hàng chi tiết. Không API/schema/migration.
+- Residual: bản đồ Cho thuê / Tin BĐS / Liên hệ chưa kiểm trình duyệt (DB dev không có tin published có toạ độ; /lien-he chưa cấu hình toạ độ văn phòng); integration test cần chạy lại khi Postgres ổn định.
