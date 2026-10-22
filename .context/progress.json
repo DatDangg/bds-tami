@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/news-careers-contact-redesign",
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2360,14 +2360,14 @@
       "slug": "news-careers-contact-redesign",
       "title": "Redesign Tin tức / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ + đếm lượt xem, bản tin, khối soạn bài, văn phòng, Tuyển gấp, quy trình ứng tuyển (BL-054)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 3,
       "backlog": "BL-054",
-      "changeDoc": "spec/changes/2026-10-21-news-careers-contact-redesign.md",
+      "changeDoc": "spec/changes/archive/2026-10-21-news-careers-contact-redesign.md",
       "startedAt": "2026-10-22",
       "planApprovedAt": "2026-10-21 (change doc Chế độ chạy: auto proceed, builder-strong mọi task, commit staging không push)",
-      "specVersion": "1.47.0",
-      "scopeVersion": 61,
+      "specVersion": "1.47.1",
+      "scopeVersion": 62,
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2522,7 +2522,25 @@
         "verdict": "GAPS (0 MAJOR, 6 MINOR) — code đủ 10 quyết định, 7/8 acceptance; G2 full test → PASS 407/4159 sau review",
         "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-2-phase-review.md",
         "at": "2026-10-22"
-      }
+      },
+      "stage": "done — as-built 1.47.1 / scope v62; follow-ups BL-059",
+      "completedAt": "2026-10-22",
+      "migrations": [
+        "20261022_022857_news_careers_contact_redesign SAFE_ADDITIVE",
+        "20261022_031905_newsletter_export_audit SAFE_ADDITIVE (enum ADD VALUE)"
+      ],
+      "verification": {
+        "commit": "d69bcc0",
+        "typecheck": "PASS",
+        "build": "PASS",
+        "lint": "0 lỗi trong code BL-054 (lỗi duy nhất ở .local-seed/seed-sample-project-blocks.ts — không track, session khác)",
+        "test": "407 file / 4165 PASS"
+      },
+      "devDb": {
+        "migrated": true,
+        "backfillOffices": "dry-run skip-no-source (DB dev không có địa chỉ/hotline) — không apply"
+      },
+      "followUps": "BL-059 spec/changes/2026-10-22-news-careers-followups.md"
     }
   ],
   "bugs": [

@@ -2,20 +2,20 @@
 
 ```yaml
 workItem: feature/news-careers-contact-redesign
-phaseTask: change-request
-step: change-request
+phaseTask: done
+step: done
 agent: change-request
-status: running                     # cancel sẽ redo bước này
+status: done
 attempt: 0
 interrupted: false
-updatedAt: 2026-10-22T00:00:00+07:00
+updatedAt: 2026-10-22
 filesTouched: []                    # pre-existing dirty files (không thuộc BL-054): .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md, opencode.jsonc, spec/changes/BACKLOG.md, src/payload-types.ts, .context/runs/bug-admin-nav-dashboard-sitelink-phase-1-task-01.md
 filesNew: []
 evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "change-request xử lý BL-054 (spec/changes/2026-10-21-news-careers-contact-redesign.md) — auto proceed, builder-strong, commit staging không push"
+next: "BL-054 xong (1.47.1 / scope v62). Việc còn mở → BL-059 (spec/changes/2026-10-22-news-careers-followups.md) qua /change"
 loopSignal: none
 approvals: [{gate: auto_proceed, at: 2026-10-21, ok: true}]
 batchQueue: [BL-054]
@@ -51,3 +51,5 @@ batchQueue: [BL-054]
 - 2026-10-22 P3-T01 r2 STRICT FAIL (khối không chữ trước đoạn dẫn bị mất). ▶ START builder-strong attempt 3 (running — cancel sẽ redo bước này)
 - 2026-10-22 P3-T01 attempt 3 DONE. ▶ START [agent: reviewer] r3 (running — cancel sẽ redo bước này)
 - 2026-10-22 P3-T01 r3 STRICT PASS → acaeebd merged + progress. next: full verify + spec-publisher as-built + close-out.
+- 2026-10-22 ▶ START [agent: spec-publisher] as-built BL-054 1.47.1 / scope v62 (running — cancel sẽ redo bước này); full verify staging d69bcc0 chạy nền.
+- 2026-10-22 ✅ DONE [agent: spec-publisher] as-built 1.47.1 / scope v62. Full verify staging d69bcc0: build PASS, test 407 file / 4165 PASS, lint 0 lỗi code BL-054. Close-out: BACKLOG BL-054 done + BL-059 follow-ups, change doc archive, progress done, activeWorkItem null. ✅ DONE [agent: change-request] BL-054.
