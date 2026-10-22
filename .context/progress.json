@@ -2980,7 +2980,8 @@
           "round": 1,
           "report": ".context/review-reports/feature-seed-english-data-phase-1-task-02-round-1-review.md",
           "verify": "seed:english projects x2 (lần 2 ghi 0, missing 0, mismatched 0) · has_english 61/61 · alt ảnh dự án 461/461 EN · vi hash không đổi · unit 7/7",
-          "completedAt": "2026-10-23"
+          "completedAt": "2026-10-23",
+          "commit": "4e86e5c"
         },
         {
           "task": "phase-1-task-03",
@@ -2991,8 +2992,13 @@
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-seed-english-data/phase-1-task-04.md",
-          "status": "in_progress",
-          "attempt": 1
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-seed-english-data-phase-1-task-04-round-1-review.md",
+          "verify": "seed:english news x2 (lần 2 ghi 0) · has_english 24/24 · alt ảnh bìa 22/22 EN · vi checksum + version count không đổi · draft giữ · unit 7/7",
+          "completedAt": "2026-10-23"
         }
       ]
     }
@@ -4038,7 +4044,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T20:00:19.629Z",
+  "lastUpdated": "2026-10-22T20:00:39.433Z",
   "approvalMilestones": [
     {
       "id": "M1",
