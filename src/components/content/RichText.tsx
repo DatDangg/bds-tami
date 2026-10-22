@@ -4,10 +4,13 @@ import { resolveInternalDocHref } from "@/lib/content/doc-link";
 import { isSectionHeading, isTocHeading, sectionHeadingId } from "@/lib/content/section-headings";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
+import type { ProjectCardData } from "@/lib/projects/project-view";
+import { renderNewsBlock } from "./blocks/NewsBlock";
 
 /**
  * Render nội dung Lexical (trường `richText` của Payload) bằng danh sách node ĐƯỢC PHÉP, không dùng HTML thô:
- * mọi chữ đi qua React nên bị escape; node lạ (`html`, `block`, `script`...) bị bỏ cả nhánh chứ không render. Link chỉ nhận
+ * mọi chữ đi qua React nên bị escape; node lạ (`html`, `script`, `relationship`...) bị bỏ cả nhánh chứ không render. Node `block` chỉ
+ * render 3 khối Tin tức theo danh sách cho phép `blockType` (BL-054, `./blocks/NewsBlock`), khối lạ bị bỏ. Link chỉ nhận
  * `http(s)`, `mailto`, `tel` hoặc đường dẫn nội bộ (chặn `javascript:`, `data:`); link ra ngoài luôn `rel="noopener noreferrer"`.
  * Dùng chung cho mọi trang chi tiết có nội dung dài (tin tức, dự án, dịch vụ...). Server Component; khung rộng do nơi dùng đặt.
  */
@@ -223,6 +226,9 @@ function renderNode(node: LexicalNode, key: number, depth: number, ctx: RenderCo
       return <tr key={key}>{renderChildren(node.children, depth + 1, ctx)}</tr>;
     case "tablecell":
       return renderCell(node, key, depth, ctx);
+    case "block":
+      // Chỉ 3 khối Tin tức theo danh sách cho phép `blockType` (BL-054); khối lạ / thiếu dữ liệu → null.
+      return renderNewsBlock(node.fields, key, ctx.projects);
     default:
       // Node không có trong danh sách (html, block, relationship...) bị bỏ cả nhánh: không bao giờ render nội dung tuỳ ý.
       return null;
@@ -241,6 +247,8 @@ interface RenderContext {
   sections: { count: number } | undefined;
   /** Có giá trị khi truyền `headingIds`: `id` gắn lần lượt lên heading cấp gốc có chữ (khớp `collectTocHeadings`). */
   toc: { ids: readonly string[]; count: number } | undefined;
+  /** Thẻ dự án công khai cho khối "Dự án nhắc đến", theo id; thiếu → khối đó ẩn. */
+  projects: ReadonlyMap<string, ProjectCardData> | undefined;
 }
 
 interface RichTextProps {
@@ -255,11 +263,13 @@ interface RichTextProps {
   anchorSections?: boolean;
   /** Gắn `id` lên heading cấp gốc có chữ (h2 + h3) theo thứ tự, từ `collectTocHeadings` (mục lục chi tiết tin tức); thiếu thì không gắn. */
   headingIds?: readonly string[];
+  /** Dự án công khai (theo `locale`) cho khối "Dự án nhắc đến" của bài Tin tức, từ `loadMentionedProjects`; thiếu thì khối đó không hiện. */
+  mentionedProjects?: ReadonlyMap<string, ProjectCardData>;
 }
 
-export function RichText({ data, className, locale, tableLabel, anchorSections = false, headingIds }: RichTextProps) {
+export function RichText({ data, className, locale, tableLabel, anchorSections = false, headingIds, mentionedProjects }: RichTextProps) {
   const root = typeof data === "object" && data !== null ? (data as { root?: LexicalNode }).root : undefined;
   if (!root || typeof root !== "object") return null;
   // `break-words` + `overflow-wrap:anywhere`: URL/chuỗi dài không đẩy trang cuộn ngang ở 375px.
-  return <div className={cn("break-words [overflow-wrap:anywhere]", className)}>{renderChildren(root.children, 0, { locale, tableLabel, sections: anchorSections ? { count: 0 } : undefined, toc: headingIds ? { ids: headingIds, count: 0 } : undefined })}</div>;
+  return <div className={cn("break-words [overflow-wrap:anywhere]", className)}>{renderChildren(root.children, 0, { locale, tableLabel, sections: anchorSections ? { count: 0 } : undefined, toc: headingIds ? { ids: headingIds, count: 0 } : undefined, projects: mentionedProjects })}</div>;
 }

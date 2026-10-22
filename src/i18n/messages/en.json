@@ -1132,5 +1132,10 @@
     "offerEnds": "Offer ends: {date}",
     "offerActive": "Active",
     "offerEnded": "Ended"
+  },
+  "newsBlocks": {
+    "statsLabel": "Key figures",
+    "projectMentionEyebrow": "Featured project",
+    "viewDetail": "View details"
   }
 }

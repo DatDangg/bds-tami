@@ -13,6 +13,11 @@
   color: var(--admin-badge-danger-fg);
 }
 
+// Trường con trong khối chèn của ô soạn thảo (BL-054) nằm trong ô `Nội dung` có dấu * nhưng tự mang dấu * `required` của Payload: không thêm lần nữa.
+.tami-required .rich-text-lexical__wrap label.field-label::after {
+  content: none;
+}
+
 // ---- Ô soạn thảo văn bản: khung viền + nền như input khác, thanh công cụ cố định nằm trong khung ----
 .rich-text-lexical__wrap {
   background: var(--theme-input-bg);
@@ -49,6 +54,24 @@
   // Nút Hoàn tác / Làm lại (feature riêng, không dùng class `.icon` của Payload).
   .toolbar-popup__button.disabled svg {
     opacity: 0.35;
+  }
+
+  // Mục chèn khối (BlocksFeature, chỉ editor Tin tức — BL-054): Payload chỉ vẽ icon khối, thêm chữ "Chèn khối" cho dễ thấy.
+  .toolbar-popup__dropdown-blocks {
+    width: auto;
+    gap: 6px;
+
+    &::after {
+      content: "Chèn khối";
+      order: 1;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .toolbar-popup__dropdown-caret {
+      order: 2;
+    }
   }
 }
 

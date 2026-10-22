@@ -21,6 +21,7 @@ import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { collectTocHeadings } from "@/lib/content/section-headings";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { formatDate } from "@/lib/format";
+import { loadMentionedProjects } from "@/lib/news/mentioned-projects";
 import { findLocalizedSlugs, findPublicNewsBySlug, findRelatedNews, LATEST_NEWS_COUNT, listPublicNews } from "@/lib/news/news-queries";
 import { categoryHref, populatedMedia, toNewsCards, visibleCategory } from "@/lib/news/news-view";
 import { estimateReadMinutes } from "@/lib/news/read-time";
@@ -89,7 +90,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [t, tDetail, tRich, tNav, identity, relatedDocs, latestResult] = await Promise.all([
+  const [t, tDetail, tRich, tNav, identity, relatedDocs, latestResult, mentionedProjects] = await Promise.all([
     getTranslations({ locale, namespace: "page.news" }),
     getTranslations({ locale, namespace: "page.newsDetail" }),
     getTranslations({ locale, namespace: "page.richText" }),
@@ -97,6 +98,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
     loadSiteIdentity(locale),
     findRelatedNews(payload, locale, doc),
     listPublicNews(payload, locale, { page: 1, limit: LATEST_NEWS_COUNT, excludeIds: [doc.id] }),
+    loadMentionedProjects(payload, locale, doc.content),
   ]);
   const title = doc.title ?? "";
   const category = visibleCategory(doc.category, locale);
@@ -149,7 +151,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
             </div>
           )}
           {tocHeadings.length > 0 && <NewsTocDisclosure headings={tocHeadings} label={tocLabel} />}
-          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" headingIds={tocHeadings.map((heading) => heading.id)} />
+          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" headingIds={tocHeadings.map((heading) => heading.id)} mentionedProjects={mentionedProjects} />
           <footer className="mt-8 flex flex-col gap-6">
             {tags.length > 0 && (
               <ul aria-label={t("tagsLabel")} className="flex flex-wrap gap-2">

@@ -15,7 +15,8 @@ import type { RevalidatePaths } from "../../../src/hooks/revalidate-content";
 export function buildNewsTestConfig(databaseUrl: string, revalidatePaths: RevalidatePaths) {
   return buildConfig({
     secret: "test-news-secret-khong-dung-o-production",
-    collections: [Staff, Media, AuditLogs, createCategories(revalidatePaths), createNews(revalidatePaths)],
+    // `projects` rút gọn: khối "Dự án nhắc đến" trong `news.content` (BL-054) quan hệ tới `projects`, Payload bắt collection đích phải có trong config.
+    collections: [Staff, Media, AuditLogs, createCategories(revalidatePaths), createNews(revalidatePaths), { slug: "projects", fields: [{ name: "title", type: "text" }] }],
     plugins: [contentRedirectsPlugin()],
     editor: lexicalEditor(),
     sharp,
