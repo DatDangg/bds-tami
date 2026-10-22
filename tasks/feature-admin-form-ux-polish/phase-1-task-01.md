@@ -61,3 +61,7 @@
 - Ảnh: `.context/review-reports/feature-admin-form-ux-polish/screens/t01-after-1440-light.jpg`, `t01-after-1440-dark.jpg` (khung chụp 800x600 của pane, viewport emulate 1440). Ảnh "trước" = N/A (hộp thoại native).
 - Bấm Huỷ: modal đóng; `read_network_requests` lọc "translations" = không có request; `performance` resource entries tới `/api/admin/translations` = 0. KHÔNG bấm xác nhận.
 - Dev server 3101 đã tắt.
+
+## Review
+- Round 1 — **NORMAL PASS** (có điều kiện ảnh sau → đã bổ sung `t01-after-1440-{light,dark}.jpg`): `.context/review-reports/feature-admin-form-ux-polish-phase-1-task-01-round-1-review.md`. MINOR (chấp nhận): regex quét chưa bắt `window["confirm"]`/`self.`/alias; mock modal chưa có nút Huỷ; `closeModal` trong `finally` trùng Payload.
+- Doc impact: no doc impact (không đổi API/schema/flow). Spec delta mục 1 (change doc) áp lúc close-out BL-058.
