@@ -78,6 +78,25 @@ describe("TranslationService: dịch", () => {
     expect(JSON.stringify(rich).replace(/EN:/g, "")).toBe(JSON.stringify(sampleLexical()));
   });
 
+  it("richText có khối chèn Tin tức (BL-054): gửi chữ trong khối, không gửi id / quan hệ / select; bài dịch không hỏng", async () => {
+    const { service, calls } = setup();
+    const projectId = "11111111-1111-4111-8111-111111111111";
+    const content = sampleLexical();
+    (content.root.children as unknown[]).push(
+      { type: "block", version: 2, format: "", fields: { id: "b1", blockName: "", blockType: "statHighlights", items: [{ id: "r1", value: "+18%", label: "Nguồn cung mới" }] } },
+      { type: "block", version: 2, format: "", fields: { id: "b2", blockName: "", blockType: "projectMention", project: projectId } },
+      { type: "block", version: 2, format: "", fields: { id: "b3", blockName: "", blockType: "imageText", image: "m9", text: "Ảnh dự án\nbên sông", imagePosition: "left" } },
+    );
+    const { values } = await service.translate({ target: news, items: [{ key: "content", kind: "richText", value: content }] });
+    const sent = JSON.parse(calls[0]!.userContent) as { segments: { text: string }[] };
+    expect(sent.segments.map((segment) => segment.text).slice(-3)).toEqual(["+18%", "Nguồn cung mới", "Ảnh dự án\nbên sông"]);
+    expect(calls[0]!.userContent).not.toContain(projectId);
+    expect(calls[0]!.userContent).not.toContain("imagePosition");
+    const rich = values.content as LexicalRoot;
+    expect(JSON.stringify(rich).replace(/EN:/g, "")).toBe(JSON.stringify(content));
+    expect(extractTextNodes(rich).slice(-3)).toEqual(["EN:+18%", "EN:Nguồn cung mới", "EN:Ảnh dự án\nbên sông"]);
+  });
+
   it("áp bảng thuật ngữ và quy tắc giữ nguyên TAMI HOMES/tên dự án vào system prompt; một lần gọi cho mọi trường", async () => {
     const { service, calls } = setup();
     await service.translate({ target: { kind: "collection", slug: "projects" }, items: [item("A"), item("B", "summary")] });

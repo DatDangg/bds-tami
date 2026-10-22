@@ -522,4 +522,58 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(seeded.docs[0]?.tags).toEqual(["tami", "website"]);
     });
   });
+
+  describe("khối chèn trong nội dung (BL-054)", () => {
+    const withBlocks = (...blocks: Record<string, unknown>[]) => {
+      const content = lexical("Mở bài");
+      (content.root.children as unknown[]).push(...blocks.map((fields, index) => ({ type: "block", version: 2, format: "", fields: { id: `blk${index}`, blockName: "", ...fields } })));
+      return content;
+    };
+    const blockFields = (content: unknown) =>
+      ((content as { root: { children: { type: string; fields?: Record<string, unknown> }[] } }).root.children ?? []).filter((node) => node.type === "block").map((node) => node.fields!);
+
+    it("editor của news.content có đúng 3 khối; editor toàn cục (collection khác) không có khối", () => {
+      const content = payload.collections.news!.config.flattenedFields.find((field) => field.name === "content") as { editor?: { editorConfig?: { resolvedFeatureMap?: Map<string, { sanitizedServerFeatureProps?: { blocks?: { slug: string }[] } }> } } };
+      const blocksFeature = content?.editor?.editorConfig?.resolvedFeatureMap?.get("blocks");
+      expect(blocksFeature?.sanitizedServerFeatureProps?.blocks?.map((block) => block.slug)).toEqual(["statHighlights", "projectMention", "imageText"]);
+      const globalEditor = payload.config.editor as { editorConfig?: { resolvedFeatureMap?: Map<string, unknown> } };
+      expect(globalEditor.editorConfig?.resolvedFeatureMap?.has("blocks")).toBe(false);
+    });
+
+    it("lưu 3 khối ở vi và en (theo từng bản), đọc depth 1: ảnh populate, dự án chỉ là id", async () => {
+      const projectId = ((await payload.create({ collection: "projects" as never, data: { title: "Dự án X" } as never, overrideAccess: true, depth: 0 })) as { id: string }).id;
+      const vi = withBlocks(
+        { blockType: "statHighlights", items: [{ value: "+18%", label: "Nguồn cung mới" }] },
+        { blockType: "projectMention", project: projectId },
+        { blockType: "imageText", image: mediaId, text: "Ảnh cạnh chữ", imagePosition: "right" },
+      );
+      const doc = await createNews({ title: "Bài có khối", content: vi });
+      await payload.update({
+        collection: "news",
+        id: doc.id,
+        data: { title: "Article with blocks", excerpt: "S", content: withBlocks({ blockType: "statHighlights", items: [{ value: "+18%", label: "New supply" }] }), hasEnglish: true } as never,
+        locale: "en",
+        overrideAccess: true,
+      });
+      const readVi = await payload.findByID({ collection: "news", id: doc.id, locale: "vi", depth: 1, overrideAccess: true });
+      const [stat, mention, imageText] = blockFields(readVi.content);
+      expect(stat).toMatchObject({ blockType: "statHighlights", items: [{ value: "+18%", label: "Nguồn cung mới" }] });
+      expect(mention).toMatchObject({ blockType: "projectMention", project: projectId });
+      expect(imageText).toMatchObject({ blockType: "imageText", text: "Ảnh cạnh chữ", imagePosition: "right", image: { id: mediaId } });
+      const readEn = await payload.findByID({ collection: "news", id: doc.id, locale: "en", depth: 0, overrideAccess: true });
+      expect(blockFields(readEn.content)).toEqual([expect.objectContaining({ blockType: "statHighlights", items: [expect.objectContaining({ label: "New supply" })] })]);
+    });
+
+    it("khối thiếu dữ liệu bắt buộc / vượt giới hạn → 400 (không lưu bài hỏng)", async () => {
+      const bad = [
+        { blockType: "statHighlights", items: [] },
+        { blockType: "statHighlights", items: [{ value: "12345678901234567", label: "Quá dài" }] },
+        { blockType: "statHighlights", items: Array.from({ length: 5 }, (_, index) => ({ value: String(index), label: "x" })) },
+        { blockType: "imageText", text: "Thiếu ảnh", imagePosition: "left" },
+        { blockType: "imageText", image: pdfMediaId, text: "PDF", imagePosition: "left" },
+        { blockType: "projectMention" },
+      ];
+      for (const fields of bad) expect(await statusOf(createNews({ title: `Khối hỏng ${String(fields.blockType)}`, content: withBlocks(fields) })), JSON.stringify(fields)).toBe(400);
+    });
+  });
 });

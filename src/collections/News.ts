@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { NEWS_CONTENT_BLOCKS } from "../blocks/news";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { withSummaryCounter } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
@@ -8,6 +9,7 @@ import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { createRichTextEditor } from "../lib/admin/rich-text-editor";
 import { formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
@@ -39,7 +41,8 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
               titleField({ placeholder: "VD: Thị trường căn hộ TP.HCM quý 4" }),
               scopedCategoryField("news"),
               withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
-              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
+              // Editor riêng có 3 khối chèn (BL-054: Số liệu nổi bật, Dự án nhắc đến, Ảnh cạnh chữ); collection khác giữ editor toàn cục.
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, editor: createRichTextEditor(undefined, { blocks: NEWS_CONTENT_BLOCKS }), validate: requiredByLocale("Nội dung không được để trống.") }),
               { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
             ],
           },

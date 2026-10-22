@@ -4119,6 +4119,51 @@ export interface TaskReindexRentalsSearch {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatHighlightsBlock".
+ */
+export interface StatHighlightsBlock {
+  /**
+   * Từ 1 đến 4 số liệu, hiện thành các ô số lớn.
+   */
+  items: {
+    value: string;
+    label: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statHighlights';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProjectMentionBlock".
+ */
+export interface ProjectMentionBlock {
+  /**
+   * Web hiện thẻ dự án; dự án chưa xuất bản (hoặc chưa có bản tiếng Anh ở trang EN) thì khối tự ẩn.
+   */
+  project: string | Project;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'projectMention';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  image: string | Media;
+  text: string;
+  /**
+   * Trên điện thoại ảnh luôn nằm trên chữ.
+   */
+  imagePosition: 'left' | 'right';
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {

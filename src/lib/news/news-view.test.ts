@@ -87,4 +87,24 @@ describe("estimateReadMinutes", () => {
     expect(lexicalPlainText(nested)).toBe("a b");
     expect(lexicalPlainText("x")).toBe("");
   });
+
+  it("đếm cả chữ trong khối chèn Tin tức (BL-054); khối Dự án nhắc đến / khối lạ không có chữ", () => {
+    const words = (count: number) => Array.from({ length: count }, () => "chữ").join(" ");
+    const content = {
+      root: {
+        children: [
+          { type: "paragraph", children: [{ type: "text", text: words(150) }] },
+          { type: "block", fields: { blockType: "statHighlights", items: [{ value: "+18%", label: words(9) }] } },
+          { type: "block", fields: { blockType: "imageText", text: words(40), image: "m1", imagePosition: "left" } },
+          { type: "block", fields: { blockType: "projectMention", project: "p1" } },
+          { type: "block", fields: { blockType: "embed", text: words(500) } },
+        ],
+      },
+    };
+    expect(lexicalPlainText(content).split(/\s+/)).toHaveLength(200);
+    expect(estimateReadMinutes(content)).toBe(1);
+    const longer = structuredClone(content);
+    (longer.root.children[2]!.fields as { text: string }).text = words(41);
+    expect(estimateReadMinutes(longer)).toBe(2);
+  });
 });

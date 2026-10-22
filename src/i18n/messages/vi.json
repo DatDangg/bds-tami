@@ -1132,5 +1132,10 @@
     "offerEnds": "Hạn ưu đãi: {date}",
     "offerActive": "Còn hạn",
     "offerEnded": "Đã kết thúc"
+  },
+  "newsBlocks": {
+    "statsLabel": "Số liệu nổi bật",
+    "projectMentionEyebrow": "Dự án được nhắc đến",
+    "viewDetail": "Xem chi tiết"
   }
 }

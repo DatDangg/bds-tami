@@ -30,3 +30,4 @@ batchQueue: [BL-054]
 - 2026-10-22 ▶ START [agent: builder-strong] wave 1A: P1-T01 (DB tami_wt54_p1t01, redis 11, port 3111) ‖ P1-T02 (tami_wt54_p1t02, redis 12, port 3112) — worktree parallel-dispatch từ staging 1272255 (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE [agent: builder-strong] wave 1A — T01 migration 20261022_022857_news_careers_contact_redesign SAFE_ADDITIVE (FK news cascade tay), test 388/3918 PASS; T02 3 block + lexical.ts dịch khối, test 390/3935 + build PASS. ▶ START [agent: reviewer] r1 STRICT ×2 (running — cancel sẽ redo bước này)
 - 2026-10-22 P1-T01 reviewer r1 STRICT PASS → 7cfb59e merged staging + progress. MINOR-1 → P1-T04.
+- 2026-10-22 P1-T02 reviewer r1 STRICT PASS → 76101f2 merged staging + progress (regen types/importmap sạch, typecheck PASS). DB dev tami đã migrate 20261022_022857. Lesson: git update-index --refresh trước merge (payload-types stat dirty).
