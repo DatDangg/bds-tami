@@ -4,6 +4,7 @@ import type { JobPosting, Province } from "../../payload-types";
 import { CONTENT_ROUTES } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
 import { formatDate, formatVndCompact } from "../format";
+import { visibleCategory } from "../news/news-view";
 import { lexicalPlainText } from "../news/read-time";
 import { daysUntilDeadline, isPastDeadline } from "./deadline";
 
@@ -18,6 +19,10 @@ export interface JobCardData {
   title: string;
   href: string;
   provinceName: string | null;
+  /** Phòng ban = tên danh mục `job` (BL-054); thiếu / `/en` chưa có bản EN → `null` (không hiện chữ Việt ở `/en`). */
+  categoryName: string | null;
+  /** "Tuyển gấp" (`isUrgent`, BL-054). */
+  isUrgent: boolean;
   employmentType: EmploymentType;
   salary: JobSalary | null;
   /** ISO, cho `<time datetime>`. */
@@ -58,6 +63,8 @@ export function toJobCardData(doc: JobPosting, locale: Locale, now: Date): JobCa
     title: doc.title,
     href: publicDetailPath(CONTENT_ROUTES["job-postings"], locale, doc.slug),
     provinceName: provinceLabel(doc.province),
+    categoryName: visibleCategory(doc.category, locale)?.name ?? null,
+    isUrgent: doc.isUrgent === true,
     employmentType: doc.employmentType,
     salary: toJobSalary(doc, locale),
     deadlineIso: doc.deadline,
@@ -75,6 +82,15 @@ export function toJobCards(docs: readonly JobPosting[], locale: Locale, now: Dat
 
 export interface JobDetailView {
   title: string;
+  /** Tiêu đề hero tách 2 dòng (`splitJobTitle`); 1 phần tử = 1 dòng. */
+  titleLines: JobTitleLines;
+  /** Mô tả ngắn hero = đoạn dẫn của `description` (`splitDescriptionLead`); không tách được → `null` (ẩn). */
+  intro: string | null;
+  /** Phòng ban = tên danh mục `job` (`/en` chưa có bản EN → `null`). */
+  categoryName: string | null;
+  /** Id danh mục: "Vị trí khác" ưu tiên tin cùng danh mục. */
+  categoryId: string | null;
+  isUrgent: boolean;
   provinceName: string | null;
   workplace: string | null;
   employmentType: EmploymentType;
@@ -87,8 +103,15 @@ export interface JobDetailView {
 }
 
 export function toJobDetailView(doc: JobPosting, locale: Locale, now: Date): JobDetailView {
+  const title = doc.title ?? "";
+  const category = doc.category;
   return {
-    title: doc.title ?? "",
+    title,
+    titleLines: splitJobTitle(title),
+    intro: splitDescriptionLead(doc.description).intro,
+    categoryName: visibleCategory(category, locale)?.name ?? null,
+    categoryId: typeof category === "string" ? category : (category?.id ?? null),
+    isUrgent: doc.isUrgent === true,
     provinceName: provinceLabel(doc.province),
     workplace: doc.workplace?.trim() || null,
     employmentType: doc.employmentType,
@@ -97,6 +120,104 @@ export function toJobDetailView(doc: JobPosting, locale: Locale, now: Date): Job
     deadlineIso: doc.deadline,
     deadlineLabel: formatDate(doc.deadline, locale),
     expired: isPastDeadline(doc.deadline, now),
+  };
+}
+
+export type JobTitleLines = readonly [string] | readonly [string, string];
+
+/** Gạch nối có khoảng trắng hai bên (`–`, `—`, `-`): ranh giới cụm tự nhiên của tên vị trí ("Nhân viên hành chính – nhân sự"). */
+const TITLE_DASH = /\s+[–—-]\s+/;
+/** Từ nối mở đầu cụm bổ nghĩa ("… cho thuê căn hộ", "… for rental apartments"): tách TRƯỚC từ này. */
+const TITLE_CONNECTORS = new Set(["cho", "tại", "về", "mảng", "for", "at", "in", "of"]);
+/** Tách theo từ nối chỉ khi tiêu đề từ ngần này tiếng (tên ngắn để 1 dòng). */
+const TITLE_CONNECTOR_MIN_WORDS = 5;
+/** Không có gạch / từ nối: từ ngần này tiếng trở lên mới chia đôi (ngắn hơn để 1 dòng). */
+const TITLE_SPLIT_MIN_WORDS = 6;
+/** Mỗi dòng giữ ít nhất 2 tiếng (không để dòng mồ côi một tiếng). */
+const TITLE_MIN_LINE_WORDS = 2;
+
+/**
+ * Tách tên vị trí thành 2 dòng cho hero (BL-054, design: dòng 2 màu nhấn) theo quy tắc hiển thị, không thêm trường. Thứ tự: (1) gạch nối có khoảng trắng →
+ * dòng 1 phần trước (giữ gạch ở cuối), dòng 2 phần sau; (2) tiêu đề ≥ 5 tiếng có từ nối (cuối cùng, chừa ≥ 2 tiếng mỗi bên) → dòng 2 bắt đầu từ từ nối; (3) ≥ 6 tiếng →
+ * cắt ở tiếng chẵn gần nửa (tiếng Việt phần lớn là từ ghép 2 tiếng nên cắt chẵn ít tách đôi một từ); còn lại 1 dòng. Ghép 2 dòng bằng một khoảng trắng
+ * luôn ra lại đúng tiêu đề (đã gộp khoảng trắng), nên `h1` vẫn đọc đủ tên.
+ */
+export function splitJobTitle(title: string): JobTitleLines {
+  const flat = title.replace(/\s+/g, " ").trim();
+  const dash = TITLE_DASH.exec(flat);
+  if (dash && dash.index > 0 && dash.index + dash[0].length < flat.length) {
+    return [`${flat.slice(0, dash.index)} ${dash[0].trim()}`, flat.slice(dash.index + dash[0].length)];
+  }
+  const words = flat.split(" ");
+  const lineAt = (cut: number): JobTitleLines => [words.slice(0, cut).join(" "), words.slice(cut).join(" ")];
+  for (let index = words.length - TITLE_MIN_LINE_WORDS; words.length >= TITLE_CONNECTOR_MIN_WORDS && index >= TITLE_MIN_LINE_WORDS; index -= 1) {
+    if (TITLE_CONNECTORS.has((words[index] ?? "").toLocaleLowerCase("vi"))) return lineAt(index);
+  }
+  if (words.length < TITLE_SPLIT_MIN_WORDS) return [flat];
+  return lineAt(Math.min(words.length - TITLE_MIN_LINE_WORDS, 2 * Math.ceil(words.length / 4)));
+}
+
+export interface DescriptionLead {
+  /** Mô tả ngắn hero = đoạn dẫn chữ thuần (khoảng trắng đã gộp); `null` khi không tách được (hero ẩn mô tả ngắn). */
+  intro: string | null;
+  /** Thân mục "Mô tả công việc": mọi khối trừ đúng đoạn dẫn (và các đoạn rỗng trước nó) khi đã đưa lên hero; không tách thì là chính `content`. */
+  body: unknown;
+}
+
+interface LexicalNode {
+  type?: string;
+  format?: number | string;
+  style?: string;
+  indent?: number;
+  text?: string;
+  children?: unknown[];
+}
+
+/**
+ * Đoạn rỗng: `paragraph` mà mọi con chỉ là `text` rỗng/khoảng trắng hoặc `linebreak` (không chữ, không nút nội dung nào khác).
+ * Chỉ loại khối này được bỏ qua khi tìm đoạn dẫn — ảnh/upload, HR, relationship… không có chữ nhưng vẫn là nội dung.
+ */
+function isEmptyParagraph(block: LexicalNode): boolean {
+  if (block.type !== "paragraph") return false;
+  return (block.children ?? []).every((child) => {
+    const node = child as LexicalNode;
+    return node.type === "linebreak" || (node.type === "text" && !(node.text ?? "").trim());
+  });
+}
+
+/**
+ * Đoạn chữ thuần: căn lề mặc định (`format` rỗng), không thụt lề (`indent` 0), mọi con là nút `text` không định dạng (`format` 0 — không
+ * đậm/nghiêng/gạch chân/gạch ngang/code…, không `style` riêng). Có link, xuống dòng, định dạng, căn lề/thụt lề hay nút khác → `false`: hero hiện
+ * chữ thuần căn trái, tách đoạn đó ra sẽ làm mất link / định dạng / trình bày.
+ */
+function isPlainTextParagraph(block: LexicalNode): boolean {
+  if (block.type !== "paragraph" || block.format || block.indent) return false;
+  return (block.children ?? []).every((child) => {
+    const node = child as LexicalNode;
+    return node.type === "text" && !node.format && !node.style;
+  });
+}
+
+/**
+ * Tách đoạn dẫn của `description` cho chi tiết tuyển dụng (BL-054 C11, tiền lệ BL-056 "đoạn dẫn + phần còn lại"). Quy tắc bảo thủ — không có
+ * đường mất nội dung: bỏ qua CHỈ các đoạn rỗng ở đầu (`isEmptyParagraph`); khối đầu tiên còn lại phải là ĐOẠN CHỮ THUẦN (`isPlainTextParagraph`)
+ * và phần sau còn chữ → đoạn đó lên hero (toàn văn, không cắt dòng), thân = các khối sau nó (chỉ bỏ đoạn dẫn + đoạn rỗng trước nó). Khối khác đứng
+ * trước (ảnh/upload, HR, relationship, tiêu đề, danh sách, trích dẫn, block…) / đoạn đầu có link, định dạng, căn lề, thụt lề / chỉ có một khối có
+ * chữ → không tách: thân là chính `content`, hero không hiện mô tả ngắn.
+ * Chỉ dùng cho hiển thị: JSON-LD `description` và meta vẫn đọc `description` đầy đủ.
+ */
+export function splitDescriptionLead(content: unknown): DescriptionLead {
+  const root = (content as { root?: { children?: unknown[] } } | null | undefined)?.root;
+  const blocks = (root?.children ?? []) as LexicalNode[];
+  const leadIndex = blocks.findIndex((block) => !isEmptyParagraph(block));
+  const lead = blocks[leadIndex];
+  if (!lead || !isPlainTextParagraph(lead)) return { intro: null, body: content };
+  // Mọi khối trước leadIndex đều là đoạn rỗng (findIndex) → bỏ cùng đoạn dẫn không mất nội dung.
+  const rest = blocks.slice(leadIndex + 1);
+  if (!hasRichText({ root: { children: rest } })) return { intro: null, body: content };
+  return {
+    intro: lexicalPlainText({ root: lead }).replace(/\s+/g, " ").trim(),
+    body: { ...(content as object), root: { ...root, children: rest } },
   };
 }
 

@@ -1,0 +1,135 @@
+{
+  "specVersion": "1.48.0",
+  "scopeVersion": 63,
+  "generatedAt": "2026-10-22T18:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-058 MODIFY (UI admin, không migration): bỏ hộp thoại trình duyệt trong admin, lỗi nhập liệu hiện dưới từng ô + tự mở tab/cuộn/focus + bỏ toast gom, nút tạo mới cạnh ô quan hệ chỉ icon '+' tách rời, màn Lịch sử chỉnh sửa tuỳ biến cho 7 collection có versions, tab SEO dễ hiểu (phương án B: xem trước Google + đếm ký tự + khối Nâng cao).",
+  "status": "published — build xong, mọi reviewer PASS",
+  "statusNote": "5 task PASS review: T01 7711bad (NORMAL r1) · T02 364e9c7 (STRICT r2) · T03 00c48ec (NORMAL r1) · T04 d767b30 (STRICT r2) · T05 db437a1 (NORMAL r4). Commit trên branch claude/admin-form-ux-polish-dc5780 (worktree), chờ primary close-out/merge staging.",
+  "workItem": "feature/admin-form-ux-polish",
+  "backlog": "BL-058",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-22-admin-form-ux-polish.md",
+  "changeDocStatus": "done",
+  "task": [
+    "tasks/feature-admin-form-ux-polish/phase-1-task-01.md",
+    "tasks/feature-admin-form-ux-polish/phase-1-task-02.md",
+    "tasks/feature-admin-form-ux-polish/phase-1-task-03.md",
+    "tasks/feature-admin-form-ux-polish/phase-1-task-04.md",
+    "tasks/feature-admin-form-ux-polish/phase-1-task-05.md"
+  ],
+  "reviewResults": [
+    "T01 NORMAL PASS r1 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-01-round-1-review.md",
+    "T02 STRICT FAIL r1 → PASS r2 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-02-round-2-review.md",
+    "T03 NORMAL PASS r1 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-03-round-1-review.md",
+    "T04 STRICT FAIL r1 → PASS r2 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-04-round-2-review.md",
+    "T05 NORMAL FAIL r1/r2/r3 → PASS r4 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-4-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.47.1-62.json",
+  "specUpdate": "spec/updates/2026-10-22-admin-form-ux-polish.md",
+  "specRefs": [
+    "FR-ADM-19 — khối \"Form admin — bỏ hộp thoại trình duyệt, lỗi dưới từng ô, nút '+' tách rời, lịch sử chỉnh sửa dễ đọc, tab SEO dễ hiểu (BL-058)\"",
+    "FR-ADM-19 — câu BL-042 \"lỗi hiện ngay dưới từng ô\" (sửa) + \"nút thêm nhanh cạnh ô quan hệ là nút vuông chỉ icon '+'\" (sửa)",
+    "F11 — \"Tab SEO trong admin (BL-058, phương án B)\"",
+    "F10 — lịch sử phiên bản",
+    "FR-ADM-17 — Dịch lại bằng AI (modal xác nhận)"
+  ],
+  "specRefNotes": {
+    "FR-ADM-19 (BL-058)": "5 mục as-built (1)–(5); chỉ đổi thành phần hiển thị / cấu hình admin / CSS; không đổi schema/access/API; không migration.",
+    "F11 (BL-058)": "Tab SEO là ghi đè tuỳ chọn; xem trước Google phải khớp <title>/<meta description> trang công khai; giữ seo.*; không có xem trước chia sẻ.",
+    "FR-ADM-17": "Chỉ đổi cách xác nhận (modal thay window.confirm); endpoint dịch lại, quyền, hành vi job không đổi."
+  },
+  "migration": "không — không đổi schema/DB; đường dẫn dữ liệu seo.* và trường versions giữ nguyên.",
+  "changed": {
+    "files": [
+      "src/components/admin/RetranslateButton.tsx",
+      "src/components/admin/RetranslateButton.test.tsx",
+      "src/components/admin/no-browser-dialogs.test.ts",
+      "src/components/admin/FormErrorFocus.tsx",
+      "src/components/admin/FormErrorFocus.test.tsx",
+      "src/components/admin/form-error-focus.ts",
+      "src/components/admin/field-errors-style.test.ts",
+      "src/components/admin/styles/_field-errors.scss",
+      "src/components/admin/styles/_forms.scss",
+      "src/components/admin/relationship-add-new-style.test.ts",
+      "src/components/admin/VersionHistoryView.tsx",
+      "src/components/admin/styles/_version-history.scss",
+      "src/lib/admin/version-history.ts",
+      "src/lib/admin/version-history.test.ts",
+      "src/lib/admin/payload-vi-overrides.ts",
+      "src/lib/admin/payload-vi-overrides.test.ts",
+      "src/collections/_shared/content-defaults.ts",
+      "src/collections/_shared/content-defaults.test.ts",
+      "src/fields/seo.ts",
+      "src/fields/seo.test.ts",
+      "src/components/admin/SeoPreview.tsx",
+      "src/components/admin/SeoPreview.test.tsx",
+      "src/components/admin/SeoLengthCounter.tsx",
+      "src/components/admin/SeoLengthCounter.test.tsx",
+      "src/lib/admin/seo.ts",
+      "src/lib/admin/seo.test.ts",
+      "src/app/(payload)/custom.scss",
+      "src/app/(payload)/admin/importMap.js",
+      "src/payload.config.ts",
+      "tests/unit/admin-labels.test.ts"
+    ],
+    "modules": [
+      "admin · Dịch lại bằng AI (RetranslateButton → ConfirmationModal Payload; test quét alert/confirm/prompt trong src/components/admin/** + src/app/(payload)/**)",
+      "admin · form mọi collection + global — lỗi dưới ô (CSS _field-errors.scss) + provider FormErrorFocus (admin.components.providers, MutationObserver theo toast FieldErrorsToast, cờ data-field-errors-unmatched)",
+      "admin · ô quan hệ có nút tạo nhanh — CSS _forms.scss (nút '+' tách rời, 36/44px)",
+      "admin · Lịch sử chỉnh sửa — view edit.versions tuỳ biến (VersionHistoryView, withContentDefaults) cho projects / rentals / property-posts / news / job-postings / services / pages; màn so sánh giữ view Payload + CSS ẩn trường kỹ thuật + pill 'Bản đã lưu' (payload-vi-overrides)",
+      "admin · tab SEO 7 collection + global Trang chủ — src/fields/seo.ts (group label:false, mô tả, collapsible 'Nâng cao'), SeoPreview + SeoLengthCounter (beforeInput/afterInput), src/lib/admin/seo.ts mô phỏng buildPageMetadata"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Dịch lại bằng AI (mọi collection/global có bản dịch): bấm → modal xác nhận trong admin (không hộp 'localhost says…'); Huỷ → không gọi API, không đổi trạng thái; Xác nhận → gửi 1 lần dù bấm liên tiếp; chữ đúng màu admin sáng/tối",
+      "Toàn bộ code admin không còn window.alert / window.confirm / window.prompt (test quét PASS)",
+      "Lưu thiếu/sai trường (Tin BĐS, Dự án, Cho thuê, Tin tức, Tuyển dụng, Dịch vụ, Trang pháp lý, Danh mục; global Trang chủ / Cấu hình chung; màn tạo mới; drawer tạo nhanh): mỗi ô lỗi có chữ lỗi tiếng Việt ngay dưới ô + viền đỏ — kiểm đủ loại ô: chữ, textarea, số, select, quan hệ (react-select), upload, ngày, richText, checkbox, ô trong mảng/khối thu gọn",
+      "Màn hẹp (390px): chữ lỗi vẫn hiện (trước đây Payload ẩn tooltip < 768px); không tràn ngang",
+      "Nhãn tab chứa ô lỗi có pill đếm lỗi (vd 'Nội dung 2'); khối thu gọn 'Nâng cao' chứa ô lỗi có pill '1 Lỗi'",
+      "Sau Lưu lỗi khi đang ở tab khác: tự chuyển tới tab chứa ô lỗi đầu tiên (theo thứ tự hiển thị), mở khối thu gọn chứa ô, cuộn tới + focus ô đó; chỉ chạy 1 lần mỗi lần Lưu; sửa hết lỗi rồi Lưu thành công → không nhảy tab / không cuộn",
+      "Lưu lỗi theo ô: KHÔNG còn toast 'Các trường sau chưa hợp lệ (N): …' và không toast loading treo; lỗi không gắn ô (mất quyền, lỗi mạng, 500, hook không path — vd Staff EditMany last-admin-guard) vẫn hiện toast (có thể chậm ~0,7s); toast 'Cập nhật thành công.' giữ nguyên",
+      "Ô quan hệ còn nút tạo nhanh (Danh mục, Chủ đầu tư, Dự án liên quan, Tin cho thuê liên quan…): nút là ô vuông chỉ icon '+', cách ô 8px, viền + bo đủ 4 góc, tên đọc 'Thêm mới: <tên mục>' (trình đọc màn hình / tooltip), 36px desktop / 44px mobile; bấm vẫn mở drawer tạo nhanh; ô Tỉnh/Phường/nhân viên vẫn không có nút (BL-051 A2)",
+      "Lịch sử chỉnh sửa (menu ⋮ / tab Versions) ở 7 collection có versions: danh sách mới nhất trước; mỗi dòng: dd/MM/yyyy HH:mm giờ VN + 'x phút/giờ trước', badge trạng thái bài của phiên bản (Nháp / Đã xuất bản / Ẩn / Đã thuê…), 'Phiên bản hiện tại' ở bản mới nhất, 'N trường đã đổi' so với bản liền trước (phiên bản do job dịch EN tạo phải đếm ≥ 1), bản cũ nhất 'Bản cũ nhất'; bấm cả dòng mở màn so sánh; không cột UUID nổi bật; không cột 'Ai sửa'",
+      "Màn so sánh phiên bản: mặc định 'Chỉ trường đã đổi'; KHÔNG hiện updatedAt / createdAt / deletedAt / translation / searchReindexPending; pill 'Bản đã lưu' (thay 'Đã xuất bản trước đây') và 'Phiên bản hiện tại'; nút 'Khôi phục về phiên bản này' vẫn chạy; nhãn trường tiếng Việt",
+      "Tab SEO (7 collection + Trang chủ): không còn tiêu đề nhóm 'SEO' lặp trong tab; có câu 'để trống = tự lấy từ Tiêu đề / Tóm tắt / Ảnh đại diện'; khung xem trước kết quả Google (tiêu đề + đường dẫn + mô tả) cập nhật theo ô SEO và theo Tiêu đề/Tóm tắt khi ô trống; bộ đếm ký tự tiêu đề (gợi ý ≤ 60) + mô tả (120–160); 'Ẩn khỏi Google' + 'Đường dẫn gốc' trong khối thu gọn 'Nâng cao' đóng mặc định",
+      "Xem trước Google phải KHỚP metadata trang công khai thật: tên website nối đúng, đường dẫn VI; đang sửa EN mà chưa có bản tiếng Anh → vẫn đường dẫn VI (chỉ /en khi có bản dịch); mô tả fallback theo loại trang (summary / excerpt); Trang chủ khi trống lấy tiêu đề/mô tả mặc định page.home.* từ i18n vi/en",
+      "Đường dẫn dữ liệu seo.* không đổi: bài cũ hiện đúng giá trị SEO đã lưu; sitemap / llms.txt / noindex vẫn chạy theo seo.noindex, canonical chỉ nhận http(s)"
+    ],
+    "dependents": [
+      "Khối 'Dịch tự động (AI)' cột phải form (BL-051 A11) — chỉ đổi cách xác nhận nút 'Dịch lại bằng AI'; job dịch, trạng thái dịch, nút 'Duyệt bản tiếng Anh' (Trang pháp lý) không đổi",
+      "Thanh Lưu dính đỉnh + 'Quay lại danh sách' / 'Xem trên website' (BL-051 A7) — cuộn tới ô lỗi không bị thanh che",
+      "Khối thu gọn 'Nâng cao' cột phải (BL-042: Đường dẫn trang) — giờ tự mở khi chứa ô lỗi; pill đếm lỗi",
+      "Ô quan hệ không cho tạo nhanh (Tỉnh/thành, Phường/xã, nhân viên — BL-051 A2) — không được xuất hiện nút '+'",
+      "Màn so sánh + khôi phục phiên bản của Payload — vẫn dùng view gốc; quyền readVersions mặc định (mọi người đăng nhập, sale đọc được phiên bản bài đã xuất bản — hành vi cũ, ghi nhận ngoài phạm vi)",
+      "Metadata công khai (src/lib/seo/metadata.ts), sitemap, llms.txt — KHÔNG sửa; xem trước admin chỉ mô phỏng, lệch = bug admin",
+      "Chuỗi ghi đè tiếng Việt payload-vi-overrides (test khoá chuỗi) — thêm 2 khoá version.previouslyPublished / currentlyPublished",
+      "Global Trang chủ tab 'SEO & Đa ngôn ngữ' (BL-051 A14) — khối SEO bên trong đổi theo phương án B",
+      "Toast Sonner của Payload — toast có marker field-errors bị ẩn bằng CSS; toast khác không đổi"
+    ],
+    "regression": [
+      "Form admin mọi collection / global: Lưu thành công, Lưu bản EN (bắt buộc theo ngôn ngữ), tạo mới, nhân bản, thùng rác — không vỡ bố cục, không cuộn/nhảy tab ngoài ý muốn; 390 / 768 / 1440 sáng + tối không tràn ngang",
+      "Lưu lỗi không gắn ô (vd Staff EditMany last-admin-guard, mất mạng) vẫn báo toast — không im lặng",
+      "Drawer tạo nhanh từ nút '+' (Danh mục, Dự án…): lỗi trong drawer hiện dưới ô của drawer, focus đúng drawer trên cùng",
+      "Dịch lại bằng AI: job dịch chạy như cũ sau khi xác nhận; nhật ký dịch lại + chi phí dịch ghi đúng; Trang pháp lý mất duyệt theo BR-08 không đổi",
+      "Lịch sử chỉnh sửa: maxPerDoc 20, drafts tắt; khôi phục phiên bản tạo bản mới đúng; Danh mục / Chủ đầu tư (versions: false) không có màn lịch sử; sale mở bài không đọc được → không lộ phiên bản",
+      "SEO công khai VI/EN: <title>, <meta description>, og:image, canonical, hreflang, noindex, sitemap, llms.txt không đổi sau khi lưu bài qua tab SEO mới (ô trống → fallback như trước)",
+      "Test quét nhãn admin (admin-labels.test) + ghi đè chuỗi (payload-vi-overrides.test) + cấu hình field seo (seo.test) PASS; lint / typecheck / unit+ui / build PASS trên branch"
+    ]
+  },
+  "acceptance": [
+    "Không còn window.alert / window.confirm / window.prompt trong code admin; 'Dịch lại bằng AI' dùng modal trong admin, Huỷ không gọi API",
+    "Lưu thiếu trường: mỗi ô lỗi có chữ lỗi ngay dưới ô (cả màn hẹp); tab / khối thu gọn chứa ô lỗi được đánh dấu; tự mở tab + cuộn + focus ô lỗi đầu tiên; không còn toast liệt kê danh sách ô lỗi; lỗi không gắn ô vẫn có toast",
+    "Nút tạo mới cạnh ô quan hệ tách rời ô, chỉ icon '+' có tên đọc; không vỡ ở màn hẹp",
+    "Màn lịch sử phiên bản dễ đọc (thời gian giờ VN, trạng thái bài, bản hiện tại, số trường đổi); so sánh ẩn trường kỹ thuật; không cột 'Ai sửa'",
+    "Tab SEO theo phương án B; xem trước Google khớp metadata trang công khai; giữ seo.*",
+    "Không migration; lint + typecheck + test + build PASS"
+  ],
+  "verification": {
+    "status": "builder + reviewer theo từng task (xem reviewResults); verify tổng thể trên branch sau đợt 1 + T04: lint 0 error, typecheck PASS, unit+ui PASS, integration 57 file / 775 test PASS, build PASS",
+    "note": "T05: unit+ui 3341/3341 PASS, build PASS; integration + ảnh 1440/390 BLOCKED (Postgres 5433 worktree down) — bên test ưu tiên kiểm tay tab SEO trên staging. pnpm lint (= eslint .) fail do lỗi pre-existing ngoài src/tests; pnpm exec eslint src tests 0 error."
+  },
+  "risk": "medium",
+  "riskNote": "Không schema / API / quyền. Rủi ro chính là UI dùng chung toàn bộ form admin (CSS lỗi + provider FormErrorFocus chạy ở mọi màn sửa, phụ thuộc marker data-testid toast + class tab/collapsible của Payload 3.91), view Versions thay cho 7 collection (quyền đọc versions giữ theo Payload), và xem trước SEO mô phỏng metadata công khai (lệch = gây hiểu sai cho người nhập). Test nên ưu tiên: Lưu lỗi ở tab khác / khối thu gọn / drawer / màn hẹp; toast lỗi không gắn ô vẫn hiện; lịch sử phiên bản với phiên bản do job dịch EN tạo; xem trước Google đối chiếu <title>/<meta description> thật VI + EN + Trang chủ. Danh mục (T06): xem trước SEO theo loại — Cho thuê/Tin BĐS/Tin tức ra tên + mô tả + đường dẫn trang danh mục; Dự án/Tuyển dụng hiện câu \"không có trang riêng trên website\". Cần kiểm tay khi sửa danh mục đã lưu (ô Loại nội dung chỉ đọc)."
+}

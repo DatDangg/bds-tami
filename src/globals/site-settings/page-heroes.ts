@@ -63,3 +63,18 @@ export const careersPerksField: Field = {
     { name: "description", type: "text", label: "Mô tả ngắn", localized: true },
   ],
 };
+
+/** Quy trình ứng tuyển trang Tuyển dụng (BL-054, Quyết định 8): ≤ 6 bước; 0 bước (có chữ ở ngôn ngữ đang xem) thì ẩn khối. */
+export const careersProcessField: Field = {
+  name: "careersProcess",
+  type: "array",
+  label: "Quy trình ứng tuyển",
+  labels: { singular: "Bước", plural: "Bước" },
+  maxRows: 6,
+  admin: { description: "Tối đa 6 bước, theo thứ tự hiển thị; để trống thì ẩn khối Quy trình ứng tuyển.", components: { RowLabel: textRowLabel({ field: "title", fallback: "Bước" }) } },
+  fields: [
+    strengthIconField(true),
+    { name: "title", type: "text", label: "Tiêu đề", localized: true, required: true },
+    { name: "description", type: "textarea", label: "Mô tả", localized: true },
+  ],
+};

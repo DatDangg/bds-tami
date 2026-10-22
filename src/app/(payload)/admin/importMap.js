@@ -10,6 +10,7 @@ import { LeadHiddenField as LeadHiddenField_b8bb35ac2d9dc4961a1f8f575ea31c42 } f
 import { LeadQuickFilterSlot as LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507 } from '../../../components/admin/LeadQuickFilterSlot'
 import { LeadExportSlot as LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b } from '../../../components/admin/LeadExportSlot'
 import { DocumentNavSlot as DocumentNavSlot_510ee0e0cbbf1ba5fef3afbe88419425 } from '../../../components/admin/DocumentNavSlot'
+import { NewsletterExportButton as NewsletterExportButton_47c4379a36e3aec4279836b6cfc985e2 } from '../../../components/admin/NewsletterExportButton'
 import { SearchReindexPendingWarning as SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd } from '../../../components/admin/SearchReindexPendingWarning'
 import { UnitsSummaryCell as UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { PriceRangeCell as PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
@@ -45,15 +46,20 @@ import { PriceInWords as PriceInWords_e0b2be2f43b038dd1156aa747ad96870 } from '.
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
 import { TodayButton as TodayButton_c9ab6e875d3f646b42dd17ca5bd49331 } from '../../../components/admin/TodayButton'
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
+import { SeoTitleCounter as SeoTitleCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
+import { SeoPreview as SeoPreview_752ed51552c58b98feed87d2595b772d } from '../../../components/admin/SeoPreview'
+import { SeoDescriptionCounter as SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
 import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3 } from '../../../components/admin/TranslationSummary'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { RowActionsCell as RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7 } from '../../../components/admin/RowActionsCell'
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
+import { VersionHistoryView as VersionHistoryView_e58866be2b51986a77c2c0353b2ec55a } from '../../../components/admin/VersionHistoryView'
 import { RentalCodeHiddenField as RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
+import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { JobDeadlineCell as JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
 import { JobDeadlineNotice as JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
@@ -72,6 +78,7 @@ import { NavigationToastGuard as NavigationToastGuard_31611af90d641e01ddbe330b05
 import { NavAdvancedCollapse as NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7 } from '../../../components/admin/NavAdvancedCollapse'
 import { UploadButtonLabel as UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29 } from '../../../components/admin/UploadButtonLabel'
 import { AdminRoleAttribute as AdminRoleAttribute_89c5cab1a0164efb18b678e082e716f6 } from '../../../components/admin/AdminRoleAttribute'
+import { FormErrorFocus as FormErrorFocus_16e6e8326b753563707b3d36fcf6d40d } from '../../../components/admin/FormErrorFocus'
 import { DashboardView as DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f } from '../../../components/admin/dashboard/DashboardView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -90,6 +97,7 @@ export const importMap = {
   "/components/admin/LeadQuickFilterSlot#LeadQuickFilterSlot": LeadQuickFilterSlot_64b6f961b397b6d5ecca88bb8694e507,
   "/components/admin/LeadExportSlot#LeadExportSlot": LeadExportSlot_6d8a58142c8b03b10116a861d2c5c44b,
   "/components/admin/DocumentNavSlot#DocumentNavSlot": DocumentNavSlot_510ee0e0cbbf1ba5fef3afbe88419425,
+  "/components/admin/NewsletterExportButton#NewsletterExportButton": NewsletterExportButton_47c4379a36e3aec4279836b6cfc985e2,
   "/components/admin/SearchReindexPendingWarning#SearchReindexPendingWarning": SearchReindexPendingWarning_4b4918d602f8b1da27eb240af07172dd,
   "/components/admin/ListSummaryCells#UnitsSummaryCell": UnitsSummaryCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/ListSummaryCells#PriceRangeCell": PriceRangeCell_62403afdb557857f9ec056a2cf5b4bd1,
@@ -125,15 +133,20 @@ export const importMap = {
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,
   "/components/admin/TodayButton#TodayButton": TodayButton_c9ab6e875d3f646b42dd17ca5bd49331,
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
+  "/components/admin/SeoLengthCounter#SeoTitleCounter": SeoTitleCounter_1108c6ec6c0551a682deae0661936755,
+  "/components/admin/SeoPreview#SeoPreview": SeoPreview_752ed51552c58b98feed87d2595b772d,
+  "/components/admin/SeoLengthCounter#SeoDescriptionCounter": SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755,
   "/components/admin/TranslationSummary#TranslationSummary": TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/RowActionsCell#RowActionsCell": RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7,
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
+  "/components/admin/VersionHistoryView#VersionHistoryView": VersionHistoryView_e58866be2b51986a77c2c0353b2ec55a,
   "/components/admin/RentalCodeDisplay#RentalCodeHiddenField": RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/ListSummaryCells#RoomsAreaCell": RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
+  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/JobDeadlineDisplay#JobDeadlineCell": JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
   "/components/admin/JobDeadlineDisplay#JobDeadlineNotice": JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
@@ -152,6 +165,7 @@ export const importMap = {
   "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse": NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7,
   "/components/admin/UploadButtonLabel#UploadButtonLabel": UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29,
   "/components/admin/AdminRoleAttribute#AdminRoleAttribute": AdminRoleAttribute_89c5cab1a0164efb18b678e082e716f6,
+  "/components/admin/FormErrorFocus#FormErrorFocus": FormErrorFocus_16e6e8326b753563707b3d36fcf6d40d,
   "/components/admin/dashboard/DashboardView#DashboardView": DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

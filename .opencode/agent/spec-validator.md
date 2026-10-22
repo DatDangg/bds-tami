@@ -1,9 +1,9 @@
 ---
 description: Spec Validator độc lập — cross-check spec/phase với requirements, phát hiện gap và conflict. KHÔNG tự sửa code.
 mode: subagent
+model: openai/gpt-6-luna
 # model set ở /brainstorm (project-config.md models:) → models.spec_validator (họ thứ 3).
 # Để comment = kế thừa model chính.
-# model: <provider>/<model-ho-thu-3>
 temperature: 0.1
 steps: 20
 permission:

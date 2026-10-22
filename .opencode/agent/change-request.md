@@ -1,8 +1,7 @@
 ---
 description: Change Request — agent DUY NHẤT xử lý mọi thay đổi sau initial build (feature mới + fix bug). Đọc spec/changes/*.md, classify ADDITIVE/MODIFY/REMOVE/BUG, spec delta + spec-publish (sinh test-scope handoff), phase/task, builder/reviewer/spec-validator. Dùng cho /change, /bug, /feature.
 mode: subagent
-# model: set từ .context/project-config.md → models.change_request (bỏ comment để dùng).
-# model: <provider>/<model-plan>
+model: opencode-go/deepseek-v4-pro
 temperature: 0.1
 steps: 40
 ---

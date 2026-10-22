@@ -1,5 +1,6 @@
 ---
 description: Spec Publisher — tự động bump version spec + ghi delta + sinh spec/test-scope/current.json bàn giao cho template test. Chạy cuối mỗi bug-fix/feature-update.
+model: opencode-go/deepseek-v4.1-flash
 ---
 
 # Spec Publisher Agent

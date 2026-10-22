@@ -106,12 +106,29 @@ check_commands:
 > Quy tắc: **builder ≠ reviewer** (khác họ provider) để lộ blind spot khác nhau.
 
 ```yaml
+# --- Claude Code runtime (sync-claude.mjs đọc block này để ghi model vào .claude/agents/*.md) ---
 models:
   builder:        sonnet
   builder_strong: opus     # chỉ dùng khi user yêu cầu rõ (§7 gate)
   reviewer:       opus
   spec_validator: opus     # họ thứ 3 nếu có
   change_request: opus          # ⭐ agent hậu-build (classify/spec/task) — cửa vào /change
+```
+
+```yaml
+# --- opencode runtime (ghi thẳng `model:` trong frontmatter .opencode/agent/*.md) ---
+# Đổi ở đây KHÔNG tự áp dụng: sửa frontmatter tương ứng rồi restart opencode.
+# Quy tắc giữ nguyên: builder (DeepSeek) ≠ reviewer/spec (OpenAI) để lộ blind spot khác nhau.
+models_opencode:
+  builder:        opencode-go/deepseek-v4.1-flash
+  builder_strong: opencode-go/deepseek-v4-pro
+  reviewer:       openai/gpt-6-luna
+  spec_validator: openai/gpt-6-luna
+  change_request: opencode-go/deepseek-v4-pro
+  design:         openai/gpt-6-luna
+  graph:          opencode-go/deepseek-v4.1-flash
+  spec_init:      openai/gpt-6-luna
+  spec_publisher: opencode-go/deepseek-v4.1-flash
 ```
 
 ## UI rules (nếu project có UI)

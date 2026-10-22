@@ -20,6 +20,9 @@ import { retranslateEndpoint } from "./endpoints/admin/retranslate";
 import { jobApplicationsEndpoint } from "./endpoints/public/job-applications";
 import { leadsEndpoint } from "./endpoints/public/leads";
 import { rentalsEndpoint } from "./endpoints/public/rentals";
+import { newsViewsEndpoint } from "./endpoints/public/news-views";
+import { newsletterEndpoint } from "./endpoints/public/newsletter";
+import { newsletterExportEndpoint } from "./endpoints/admin/newsletter-export";
 import { jobsConfig } from "./jobs";
 import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
 import { createRichTextEditor } from "./lib/admin/rich-text-editor";
@@ -42,7 +45,7 @@ export default buildConfig({
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
     dateFormat: "dd/MM/yyyy HH:mm",
     components: {
-      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel", "/components/admin/AdminRoleAttribute#AdminRoleAttribute"],
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel", "/components/admin/AdminRoleAttribute#AdminRoleAttribute", "/components/admin/FormErrorFocus#FormErrorFocus"],
       // Nút "Xem website" ở header (BL-041).
       actions: ["/components/admin/SiteLink#SiteLink"],
       // Mục "Tổng quan" đầu sidebar: Payload DefaultNav không có lối vào dashboard (BL-050).
@@ -65,7 +68,7 @@ export default buildConfig({
   globals: ADMIN_GLOBALS,
   editor: createRichTextEditor(),
   email: createEmailAdapter(env),
-  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint],
+  endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint, newsViewsEndpoint, newsletterEndpoint, newsletterExportEndpoint],
   jobs: jobsConfig,
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,

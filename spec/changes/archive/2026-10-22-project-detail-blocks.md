@@ -1,8 +1,9 @@
 ---
 id: project-detail-blocks
 type: feature
-status: in_progress
+status: done
 created: 2026-10-22
+completed: 2026-10-22
 ---
 
 # BL-060 — Chi tiết Dự án: bản đồ Vị trí, thẻ "Kết nối hạ tầng", slider Tiện ích, nền "Dự án tương tự"
@@ -40,3 +41,18 @@ Chi tiết Dự án (BL-052, design `docs/specs/listing-detail-redesign/detail-d
 ## Ghi chú
 - Dữ liệu mẫu (ảnh tiện ích / ảnh Vị trí) chỉ seed vào DB worktree `tami_bl058`, không phải dữ liệu thật.
 - Nhánh: `claude/bl058-project-detail-blocks-5971d4` (worktree), không push / không merge cho tới khi BL-054 commit xong.
+
+## Close-out (2026-10-22)
+- Mã: gốc BL-058, đổi thành **BL-060** ở `043d7fa` (trùng số với admin-form-ux-polish đã lên `staging`); giữ tên nhánh / DB `tami_bl058`.
+- T01 `6ccfc29` — `LazyMap` + dải "… tương tự": STRICT r1 FAIL (DESIGN.md sửa nhầm đoạn BL-045) → r2 PASS
+  `.context/review-reports/feature-project-detail-blocks-phase-1-task-01-round-2-review.md`.
+- T02 `0cfd396` — `amenities[].image` + `locationMedia`: STRICT r1 PASS
+  `.context/review-reports/feature-project-detail-blocks-phase-1-task-02-round-1-review.md`. Migration sinh lại thành
+  `20261022_110146_project_detail_blocks` (cùng SQL `043747`) sau khi gộp `staging` BL-054; SAFE_ADDITIVE + đổi tên 1 index trùng.
+- Acceptance: đủ (xem task file § Repro Verification; ảnh `.context/review-reports/assets/bl-060/`).
+- Spec: **1.49.0** · scope **v64** — `spec/updates/2026-10-22-project-detail-blocks.md`, `SPECIFICATIONS.md` mục BL-060 (khối BL-052),
+  `docs/ERD.md` §4.5 as-built BL-060, `docs/DESIGN.md`, `.context/design-spec.md`.
+- Còn mở (MINOR, không chặn — review T02 r1): M-1 1024–1279 thẻ media một mình hàng 2; M-2 alt fallback trùng `h3` trong slider;
+  M-3 thiếu integration test `locationMedia.videoUrl` ngoài whitelist / trim; M-4 `sr-only` lặp tiêu đề làm nhãn carousel.
+- Residual: bản đồ Cho thuê / Tin BĐS / Liên hệ chỉ kiểm vitest (DB dev không có tin published có toạ độ); bản nháp `_projects_v`
+  với trường mới chưa kiểm UI; DB dev `tami` + staging migrate khi merge/deploy.

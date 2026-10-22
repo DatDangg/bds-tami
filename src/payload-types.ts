@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     leads: Lead;
     'lead-activities': LeadActivity;
+    'newsletter-subscribers': NewsletterSubscriber;
     projects: Project;
     rentals: Rental;
     'property-posts': PropertyPost;
@@ -88,6 +89,7 @@ export interface Config {
     'audit-logs': AuditLog;
     'click-events': ClickEvent;
     'click-stats-daily': ClickStatsDaily;
+    'news-views-daily': NewsViewsDaily;
     'translation-usage': TranslationUsage;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -103,6 +105,7 @@ export interface Config {
   collectionsSelect: {
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'lead-activities': LeadActivitiesSelect<false> | LeadActivitiesSelect<true>;
+    'newsletter-subscribers': NewsletterSubscribersSelect<false> | NewsletterSubscribersSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     rentals: RentalsSelect<false> | RentalsSelect<true>;
     'property-posts': PropertyPostsSelect<false> | PropertyPostsSelect<true>;
@@ -122,6 +125,7 @@ export interface Config {
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'click-events': ClickEventsSelect<false> | ClickEventsSelect<true>;
     'click-stats-daily': ClickStatsDailySelect<false> | ClickStatsDailySelect<true>;
+    'news-views-daily': NewsViewsDailySelect<false> | NewsViewsDailySelect<true>;
     'translation-usage': TranslationUsageSelect<false> | TranslationUsageSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -316,9 +320,12 @@ export interface Rental {
   videoUrl?: string | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -412,9 +419,12 @@ export interface Category {
   };
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -732,9 +742,12 @@ export interface Project {
   documents?: (string | Media)[] | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -955,9 +968,12 @@ export interface PropertyPost {
   gallery?: (string | Media)[] | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1025,6 +1041,23 @@ export interface LeadActivity {
   createdAt: string;
 }
 /**
+ * Email khách đăng ký nhận bản tin thị trường trên website. Chỉ đổi được trạng thái nhận.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers".
+ */
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  locale: 'vi' | 'en';
+  status: 'active' | 'unsubscribed';
+  consentAt?: string | null;
+  privacyPolicyVersion?: string | null;
+  sourcePath?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Bài viết tin tức, kiến thức thị trường; không thu lead.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1054,9 +1087,12 @@ export interface News {
   cover?: (string | null) | Media;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1134,9 +1170,12 @@ export interface Service {
   coverImage?: (string | null) | Media;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1235,9 +1274,12 @@ export interface Page {
   };
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1316,11 +1358,18 @@ export interface JobPosting {
    */
   salaryText?: string | null;
   deadline: string;
+  /**
+   * Hiện nhãn "Tuyển gấp" cạnh tin trên website.
+   */
+  isUrgent?: boolean | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -1454,7 +1503,8 @@ export interface AuditLog {
     | 'application.view_cv'
     | 'content.retranslate'
     | 'content.approve_translation'
-    | 'system.data_retention';
+    | 'system.data_retention'
+    | 'newsletter.export';
   collection?: string | null;
   docId?: string | null;
   summary: string;
@@ -1500,6 +1550,20 @@ export interface ClickStatsDaily {
   refCollection?: string | null;
   refId?: string | null;
   count: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Số lượt xem từng tin tức theo ngày (giờ Việt Nam), do hệ thống ghi; dùng cho khối "Đọc nhiều".
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-views-daily".
+ */
+export interface NewsViewsDaily {
+  id: string;
+  news: string | News;
+  day: string;
+  views: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -1674,6 +1738,10 @@ export interface PayloadLockedDocument {
         value: string | LeadActivity;
       } | null)
     | ({
+        relationTo: 'newsletter-subscribers';
+        value: string | NewsletterSubscriber;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: string | Project;
       } | null)
@@ -1748,6 +1816,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'click-stats-daily';
         value: string | ClickStatsDaily;
+      } | null)
+    | ({
+        relationTo: 'news-views-daily';
+        value: string | NewsViewsDaily;
       } | null)
     | ({
         relationTo: 'translation-usage';
@@ -1855,6 +1927,20 @@ export interface LeadActivitiesSelect<T extends boolean = true> {
   fromAssignee?: T;
   toAssignee?: T;
   actor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers_select".
+ */
+export interface NewsletterSubscribersSelect<T extends boolean = true> {
+  email?: T;
+  locale?: T;
+  status?: T;
+  consentAt?: T;
+  privacyPolicyVersion?: T;
+  sourcePath?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2261,6 +2347,7 @@ export interface JobPostingsSelect<T extends boolean = true> {
   salaryMaxVnd?: T;
   salaryText?: T;
   deadline?: T;
+  isUrgent?: T;
   seo?:
     | T
     | {
@@ -2576,6 +2663,17 @@ export interface ClickStatsDailySelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-views-daily_select".
+ */
+export interface NewsViewsDailySelect<T extends boolean = true> {
+  news?: T;
+  day?: T;
+  views?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "translation-usage_select".
  */
 export interface TranslationUsageSelect<T extends boolean = true> {
@@ -2793,6 +2891,27 @@ export interface SiteSetting {
       }[]
     | null;
   /**
+   * Tối đa 6 bước, theo thứ tự hiển thị; để trống thì ẩn khối Quy trình ứng tuyển.
+   */
+  careersProcess?:
+    | {
+        icon:
+          | 'map-pin'
+          | 'buildings'
+          | 'headset'
+          | 'file-check'
+          | 'shield-check'
+          | 'clock'
+          | 'users'
+          | 'star'
+          | 'medal'
+          | 'users-three';
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Từ khoá tìm nhanh, khối "Tìm hiểu thêm" và câu hỏi thường gặp của từng trang. Chữ nhập riêng cho tiếng Việt và tiếng Anh; dòng chưa có chữ tiếng Anh thì không hiện ở bản tiếng Anh.
    */
   listingPages?: {
@@ -2930,6 +3049,31 @@ export interface SiteSetting {
     | {
         platform: 'facebook' | 'zalo' | 'youtube' | 'tiktok' | 'instagram' | 'linkedin' | 'x' | 'other';
         url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Hiện ở thẻ Giờ làm việc trang Liên hệ; để trống thì ẩn thẻ.
+   */
+  workingHours?: {
+    hours?: string | null;
+    days?: string | null;
+  };
+  /**
+   * Để trống thì website dùng Địa chỉ / Toạ độ / Hotline / Email ở trên.
+   */
+  offices?:
+    | {
+        name: string;
+        address: string;
+        image?: (string | null) | Media;
+        /**
+         * @minItems 2
+         * @maxItems 2
+         */
+        location?: [number, number] | null;
+        phone?: string | null;
+        email?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -3238,9 +3382,12 @@ export interface Homepage {
     | null;
   seo?: {
     /**
-     * Để trống thì dùng tiêu đề bài.
+     * Để trống thì tự lấy Tiêu đề của trang.
      */
     metaTitle?: string | null;
+    /**
+     * Để trống thì tự lấy Tóm tắt hoặc Mô tả ngắn của trang.
+     */
     metaDescription?: string | null;
     ogImage?: (string | null) | Media;
     noindex?: boolean | null;
@@ -3484,6 +3631,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         description?: T;
         id?: T;
       };
+  careersProcess?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   listingPages?:
     | T
     | {
@@ -3586,6 +3741,23 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         platform?: T;
         url?: T;
+        id?: T;
+      };
+  workingHours?:
+    | T
+    | {
+        hours?: T;
+        days?: T;
+      };
+  offices?:
+    | T
+    | {
+        name?: T;
+        address?: T;
+        image?: T;
+        location?: T;
+        phone?: T;
+        email?: T;
         id?: T;
       };
   notificationEmails?:
@@ -3992,6 +4164,51 @@ export interface TaskReindexRentalsSearch {
     rentals: number;
     rows: number;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatHighlightsBlock".
+ */
+export interface StatHighlightsBlock {
+  /**
+   * Từ 1 đến 4 số liệu, hiện thành các ô số lớn.
+   */
+  items: {
+    value: string;
+    label: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statHighlights';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProjectMentionBlock".
+ */
+export interface ProjectMentionBlock {
+  /**
+   * Web hiện thẻ dự án; dự án chưa xuất bản (hoặc chưa có bản tiếng Anh ở trang EN) thì khối tự ẩn.
+   */
+  project: string | Project;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'projectMention';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  image: string | Media;
+  text: string;
+  /**
+   * Trên điện thoại ảnh luôn nằm trên chữ.
+   */
+  imagePosition: 'left' | 'right';
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

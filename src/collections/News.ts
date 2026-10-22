@@ -1,13 +1,17 @@
 import type { CollectionConfig } from "payload";
 
+import { NEWS_CONTENT_BLOCKS } from "../blocks/news";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { withSummaryCounter } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
+import { createRevalidateMostRead } from "../hooks/news/revalidate-most-read";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
+import type { RevalidateTags } from "../hooks/revalidate-global";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { createRichTextEditor } from "../lib/admin/rich-text-editor";
 import { formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
@@ -15,10 +19,11 @@ import { withContentDefaults } from "./_shared/content-defaults";
 /**
  * Tin tức (ERD §4.8, FR-ADM-04): sale tạo và sửa/xoá mềm bài của mình, admin sửa mọi bài và là người duy nhất xoá hẳn/khôi phục
  * (PERMISSION §3.1; access mặc định của `withContentDefaults`). `category` thuộc scope `news`. Không có quan hệ tới `leads`
- * (BR-04: tin tức không thu lead). `revalidate` chỉ để test ghi đè.
+ * (BR-04: tin tức không thu lead). `revalidate` / `revalidateTags` chỉ để test ghi đè.
  */
-export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
+export function createNews(revalidate?: RevalidatePaths, revalidateTags?: RevalidateTags): CollectionConfig {
   const revalidateHomepage = createRevalidateHomepageOnListing({ paths: revalidate });
+  const revalidateMostRead = createRevalidateMostRead(revalidateTags);
   const collection = withContentDefaults(
     {
       slug: "news",
@@ -30,7 +35,10 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
         description: "Bài viết tin tức, kiến thức thị trường; không thu lead.",
       },
       defaultSort: "-publishedAt",
-      hooks: { afterChange: [revalidateHomepage.afterChange], afterDelete: [revalidateHomepage.afterDelete] },
+      hooks: {
+        afterChange: [revalidateHomepage.afterChange, revalidateMostRead.afterChange],
+        afterDelete: [revalidateHomepage.afterDelete, revalidateMostRead.afterDelete],
+      },
       fields: [
         formTabs([
           {
@@ -39,7 +47,8 @@ export function createNews(revalidate?: RevalidatePaths): CollectionConfig {
               titleField({ placeholder: "VD: Thị trường căn hộ TP.HCM quý 4" }),
               scopedCategoryField("news"),
               withSummaryCounter(markRequired({ name: "excerpt", type: "textarea", label: "Tóm tắt", localized: true, validate: requiredByLocale("Tóm tắt không được để trống."), admin: { placeholder: SUMMARY_PLACEHOLDER } })),
-              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
+              // Editor riêng có 3 khối chèn (BL-054: Số liệu nổi bật, Dự án nhắc đến, Ảnh cạnh chữ); collection khác giữ editor toàn cục.
+              markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, editor: createRichTextEditor(undefined, { blocks: NEWS_CONTENT_BLOCKS }), validate: requiredByLocale("Nội dung không được để trống.") }),
               { name: "tags", type: "text", label: "Thẻ (tag)", hasMany: true },
             ],
           },

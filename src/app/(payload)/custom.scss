@@ -10,6 +10,7 @@
 @use "../../components/admin/styles/controls";
 @use "../../components/admin/styles/surfaces";
 @use "../../components/admin/styles/forms";
+@use "../../components/admin/styles/field-errors";
 @use "../../components/admin/styles/lists";
 @use "../../components/admin/styles/list-toolbar";
 @use "../../components/admin/styles/list-actions";
@@ -19,6 +20,7 @@
 @use "../../components/admin/styles/dashboard";
 @use "../../components/admin/styles/dashboard-lists";
 @use "../../components/admin/styles/navigation-guard";
+@use "../../components/admin/styles/version-history";
 //
 // Tỉ lệ tương phản (WCAG 2.2, đã tính):
 //  - Nền sáng: chữ trắng / nút #8C6733 = 5.12:1 (AA 4.5), hover #7A5A2C = 6.31:1;

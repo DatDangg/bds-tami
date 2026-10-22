@@ -6,22 +6,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import { cache } from "react";
-import { RichText } from "@/components/content/RichText";
+import { ArrowRight } from "@/components/icons";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ConsultBanner } from "@/components/layout/ConsultBanner";
-import { SectionHeading } from "@/components/layout/SectionHeading";
-import { ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { NewsArticleBody, NewsArticleCover, NewsArticleHeader, NewsArticleTags } from "@/components/news/NewsArticle";
 import { NewsArticleSidebar } from "@/components/news/NewsArticleSidebar";
 import { NewsCard } from "@/components/news/NewsCard";
 import { NewsTocDisclosure } from "@/components/news/NewsToc";
-import { ShareButtons } from "@/components/news/ShareButtons";
+import { NewsViewBeacon } from "@/components/news/NewsViewBeacon";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT_ROUTES, publicPath } from "@/lib/content/content-paths";
 import { publicDetailPath } from "@/lib/content/redirect-paths";
 import { collectTocHeadings } from "@/lib/content/section-headings";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
-import { formatDate } from "@/lib/format";
-import { findLocalizedSlugs, findPublicNewsBySlug, findRelatedNews, LATEST_NEWS_COUNT, listPublicNews } from "@/lib/news/news-queries";
+import { loadMentionedProjects } from "@/lib/news/mentioned-projects";
+import { findLocalizedSlugs, findPublicNewsBySlug, findRelatedNews } from "@/lib/news/news-queries";
 import { categoryHref, populatedMedia, toNewsCards, visibleCategory } from "@/lib/news/news-view";
 import { estimateReadMinutes } from "@/lib/news/read-time";
 import { buildArticleJsonLd } from "@/lib/seo/json-ld";
@@ -30,7 +29,10 @@ import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
 import { routing, type Locale } from "@/i18n/routing";
 
 /** id đã dùng trên trang chi tiết tin tức, mục lục không được trùng. */
-const PAGE_RESERVED_IDS = ["related-news", "latest-news", "article-consult", "main", "floating-contact-actions"];
+const PAGE_RESERVED_IDS = ["related-news", "article-consult", "main", "floating-contact-actions"];
+
+/** `sizes` của thẻ "Bài viết liên quan": lưới 3 cột trong khung 1200px ≥ lg, 2 cột từ sm. */
+const RELATED_CARD_SIZES = "(min-width: 1280px) 384px, (min-width: 1024px) 31vw, (min-width: 640px) 50vw, 100vw";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -77,9 +79,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * S11 Chi tiết tin tức theo mockup `article` (BL-045): KHÔNG dùng `DetailLayout`. Nền `--color-bg`, breadcrumb `plain`, lưới ≥ lg `[bài][cột phải 22rem]`
- * (đầu bài canh trái → ảnh bìa → mục lục thu gọn → nội dung → tags + chia sẻ; cột phải "Bài viết mới" + thẻ tư vấn dính khi cuộn), cuối trang
- * "Bài viết liên quan" trên nền trắng rồi banner tư vấn. Trang ISR (`revalidate = 60` từ layout; lưu bài gọi `revalidatePath`). Bài không có / chưa công khai / thiếu bản EN → 404.
+ * S11 Chi tiết tin tức theo design `chi-tiet-tin-tuc.webp` (BL-054): KHÔNG dùng `DetailLayout`. Nền `--color-bg`; ≥ lg lưới `[cột trái 13.5rem][bài]`:
+ * cột bài = breadcrumb + đầu bài (`NewsArticleHeader`) → ảnh bìa + chú thích → nội dung (`news-prose`) → "Thẻ:" (ẩn ở `/en`); cột trái dính = "Mục lục" (chỉ khi
+ * có heading) + thẻ "Tư vấn miễn phí" (`NewsArticleSidebar`). < lg: một cột, mục lục thành khối gập trước nội dung, thẻ tư vấn sau nội dung. Cuối trang
+ * "Bài viết liên quan" (≤ 3 thẻ lưới P2-T01 + "Xem tất cả tin tức") rồi banner tư vấn. Gửi lượt xem (`NewsViewBeacon`, client) — trang vẫn ISR
+ * (`revalidate = 60` từ layout; lưu bài gọi `revalidatePath`). Bài không có / chưa công khai / thiếu bản EN → 404.
  */
 export default async function NewsDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
@@ -89,90 +93,81 @@ export default async function NewsDetailPage({ params }: PageProps) {
   if (!loaded) notFound();
   const { payload, doc } = loaded;
 
-  const [t, tDetail, tRich, tNav, identity, relatedDocs, latestResult] = await Promise.all([
+  const [t, tDetail, tRich, tNav, identity, relatedDocs, mentionedProjects] = await Promise.all([
     getTranslations({ locale, namespace: "page.news" }),
-    getTranslations({ locale, namespace: "page.newsDetail" }),
+    getTranslations({ locale, namespace: "page.newsDetail.v2" }),
     getTranslations({ locale, namespace: "page.richText" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     loadSiteIdentity(locale),
     findRelatedNews(payload, locale, doc),
-    listPublicNews(payload, locale, { page: 1, limit: LATEST_NEWS_COUNT, excludeIds: [doc.id] }),
+    loadMentionedProjects(payload, locale, doc.content),
   ]);
   const title = doc.title ?? "";
   const category = visibleCategory(doc.category, locale);
   const parentCategory = category ? visibleCategory(category.parent, locale) : null;
   const cover = populatedMedia(doc.cover);
   const related = toNewsCards(relatedDocs, locale);
-  const latest = toNewsCards(latestResult.docs, locale);
   const ownPath = publicDetailPath(CONTENT_ROUTES.news, locale, doc.slug ?? slug);
+  const listPath = publicPath("/tin-tuc", locale);
   const siteUrl = getSiteUrl();
   const articleUrl = absoluteUrl(ownPath, siteUrl);
   const coverUrl = absoluteUrl(cover?.sizes?.large?.url ?? cover?.url ?? "", siteUrl);
   const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
-  // id có sẵn trên trang (khối Tin liên quan, cột phải + khung chung PublicShell: `main` là đích skip-link, nút liên hệ nổi): heading trùng chữ sẽ được thêm hậu tố.
+  // id có sẵn trên trang (khối Tin liên quan, thẻ tư vấn + khung chung PublicShell: `main` là đích skip-link, nút liên hệ nổi): heading trùng chữ sẽ được thêm hậu tố.
   const tocHeadings = collectTocHeadings(doc.content, PAGE_RESERVED_IDS);
-  const tags = (doc.tags ?? []).filter((tag) => tag.trim() !== "");
+  // Tags chưa có bản EN (spec-validation F2): `/en` ẩn cả dòng "Thẻ:".
+  const tags = locale === "en" ? [] : (doc.tags ?? []).filter((tag) => tag.trim() !== "");
   const tocLabel = t("tocTitle");
 
   return (
     <article className="bg-bg">
-      <Breadcrumb
-        variant="plain"
-        className="pt-6"
-        items={[
-          { label: tNav("news"), href: publicPath("/tin-tuc", locale) },
-          ...(parentCategory ? [{ label: parentCategory.name ?? "", href: categoryHref(parentCategory, locale) }] : []),
-          ...(category ? [{ label: category.name ?? "", href: categoryHref(category, locale) }] : []),
-          { label: title, href: ownPath },
-        ]}
-      />
-      <div className="mx-auto grid w-full max-w-container gap-10 px-gutter pb-section-tight lg:grid-cols-[minmax(0,48rem)_22rem] lg:justify-between lg:gap-12">
-        <div className="min-w-0">
-          <header className="flex flex-col items-start gap-3 pt-8 pb-8 text-left lg:pt-14">
-            {category && (
-              <Link
-                href={categoryHref(category, locale)}
-                className="inline-flex min-h-11 w-fit items-center text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase transition-colors hover:text-text"
-              >
-                {category.name}
-              </Link>
-            )}
-            <h1 className="font-display text-h1 text-balance">{title}</h1>
-            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-small text-text-muted">
-              {doc.publishedAt && <time dateTime={doc.publishedAt}>{formatDate(doc.publishedAt, locale)}</time>}
-              <span>{t("readTime", { minutes: estimateReadMinutes(doc.content) })}</span>
-            </p>
-          </header>
-          {cover && (
-            <div className="mb-8 overflow-hidden rounded-[20px]">
-              <ResponsiveImage media={cover} alt={cover.alt || title} sizes="(min-width: 1280px) 768px, (min-width: 1024px) 60vw, 100vw" aspectRatio="2/1" priority />
-            </div>
-          )}
-          {tocHeadings.length > 0 && <NewsTocDisclosure headings={tocHeadings} label={tocLabel} />}
-          <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" headingIds={tocHeadings.map((heading) => heading.id)} />
-          <footer className="mt-8 flex flex-col gap-6">
-            {tags.length > 0 && (
-              <ul aria-label={t("tagsLabel")} className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <li key={tag} className="rounded-full border border-border px-3 py-1 text-small text-text-secondary">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            )}
-            <ShareButtons title={title} {...(articleUrl ? { url: articleUrl } : {})} />
-          </footer>
+      <NewsViewBeacon newsId={doc.id} />
+      <div className="mx-auto grid w-full max-w-container gap-x-12 px-gutter pt-6 pb-section-tight lg:grid-cols-[13.5rem_minmax(0,1fr)]">
+        <div className="min-w-0 lg:col-start-2">
+          <Breadcrumb
+            variant="plain"
+            className="px-0"
+            items={[
+              { label: tNav("news"), href: listPath },
+              ...(parentCategory ? [{ label: parentCategory.name ?? "", href: categoryHref(parentCategory, locale) }] : []),
+              ...(category ? [{ label: category.name ?? "", href: categoryHref(category, locale) }] : []),
+              { label: title, href: ownPath },
+            ]}
+          />
+          <NewsArticleHeader
+            title={title}
+            excerpt={doc.excerpt}
+            category={category ? { name: category.name ?? "", href: categoryHref(category, locale) } : null}
+            publishedAt={doc.publishedAt}
+            readMinutes={estimateReadMinutes(doc.content)}
+            locale={locale}
+            shareUrl={articleUrl ?? undefined}
+          />
         </div>
-        <NewsArticleSidebar latest={latest} contactHref={publicPath("/lien-he", locale)} />
+        <div className="min-w-0 lg:col-start-2 lg:row-start-2">
+          {cover && <NewsArticleCover cover={cover} title={title} />}
+          {tocHeadings.length > 0 && <NewsTocDisclosure headings={tocHeadings} label={tocLabel} />}
+          <NewsArticleBody content={doc.content} locale={locale} tableLabel={tRich("table")} headingIds={tocHeadings.map((heading) => heading.id)} mentionedProjects={mentionedProjects} />
+          <NewsArticleTags tags={tags} listPath={listPath} />
+        </div>
+        <NewsArticleSidebar headings={tocHeadings} tocLabel={tocLabel} contactHref={publicPath("/lien-he", locale)} className="mt-10 lg:col-start-1 lg:row-start-2 lg:mt-0" />
       </div>
       {related.length > 0 && (
-        <section aria-labelledby="related-news" className="bg-surface py-section-tight">
-          <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter">
-            <SectionHeading id="related-news" eyebrow={tDetail("relatedEyebrow")} title={tDetail("relatedTitle")} titleAccent={tDetail("relatedAccent")} />
+        <section aria-labelledby="related-news" className="pb-section-tight">
+          <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-gutter">
+            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-left">
+              <h2 id="related-news" className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">
+                {tDetail("related")}
+              </h2>
+              <Link href={listPath} className="inline-flex min-h-11 items-center gap-2 text-small font-semibold text-text transition-colors hover:text-accent-text">
+                {tDetail("viewAll")}
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
-                <li key={item.id}>
-                  <NewsCard data={item} headingLevel="h3" />
+                <li key={item.id} className="min-w-0">
+                  <NewsCard data={item} variant="grid" headingLevel="h3" sizes={RELATED_CARD_SIZES} />
                 </li>
               ))}
             </ul>

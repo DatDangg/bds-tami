@@ -14,6 +14,9 @@ export const RATE_LIMITS = {
   "click-events": { limit: 30, windowSeconds: 60 },
   "admin-export-excel": { limit: 10, windowSeconds: 60 * 60 },
   "admin-retranslate": { limit: 30, windowSeconds: 60 * 60 },
+  "news-views": { limit: 30, windowSeconds: 60 },
+  // BL-054: form "Bản tin thị trường", cùng mức chống spam với form lead.
+  newsletter: { limit: 5, windowSeconds: 10 * 60 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitedEndpoint = keyof typeof RATE_LIMITS;

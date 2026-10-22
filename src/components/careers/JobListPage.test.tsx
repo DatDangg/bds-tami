@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import { isPastDeadline } from "@/lib/careers/deadline";
+import { matchesJobKeyword } from "@/lib/careers/job-filters";
 import type { Category, JobPosting, Province } from "@/payload-types";
 
 const now = "2026-01-01T00:00:00.000Z";
@@ -46,7 +47,7 @@ const fixture = (id: string, title: string, deadline: string, categoryDoc: Categ
   } as JobPosting,
 });
 const fixtures: Fixture[] = [
-  fixture("1", "Tư vấn BĐS", "2026-11-30T12:00:00.000Z", sales, hcm, true, { salaryMinVnd: 15_000_000, salaryMaxVnd: 30_000_000 }),
+  fixture("1", "Tư vấn BĐS", "2026-11-30T12:00:00.000Z", sales, hcm, true, { salaryMinVnd: 15_000_000, salaryMaxVnd: 30_000_000, isUrgent: true }),
   fixture("2", "Thực tập Marketing", "2026-10-19T12:00:00.000Z", marketing, hanoi, true, { employmentType: "internship", salaryText: "Thỏa thuận" }),
   fixture("3", "Chăm sóc khách hàng", "2026-10-17T12:00:00.000Z", null, hanoi, false, { employmentType: "part_time" }),
   fixture("4", "Trưởng nhóm đã đóng", "2026-10-16T12:00:00.000Z", sales, hcm, true),
@@ -61,12 +62,14 @@ const notFound = vi.hoisted(() =>
 );
 const loadPageHero = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<Record<string, unknown>>>());
 const loadCareersPerks = vi.hoisted(() => vi.fn<(locale: string) => Promise<unknown>>());
+const loadCareersProcess = vi.hoisted(() => vi.fn<(locale: string) => Promise<unknown>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
 vi.mock("next/navigation", () => ({ notFound }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 vi.mock("@/lib/content/load-page-banner", () => ({ loadPageHero }));
 vi.mock("@/lib/content/load-careers-perks", () => ({ loadCareersPerks }));
+vi.mock("@/lib/content/load-careers-process", () => ({ loadCareersProcess }));
 vi.mock("@/components/layout/ConsultBanner", async () => {
   const { createElement } = await import("react");
   return { ConsultBanner: () => createElement("div", { "data-testid": "consult-banner" }) };
@@ -97,13 +100,14 @@ import { JobListPage, buildJobListMetadata } from "./JobListPage";
 
 /** Mô phỏng `listOpenJobs` thật (đã kiểm bằng DB ở tests/integration/job-postings.test.ts): bỏ tin quá hạn theo `now` trang truyền vào. */
 listOpenJobs.mockImplementation(
-  async (_payload: unknown, locale: string, query: { page: number; now: Date; categoryIds?: string[]; provinceId?: string }) => {
+  async (_payload: unknown, locale: string, query: { page: number; now: Date; categoryIds?: string[]; provinceId?: string; q?: string }) => {
     const matched = fixtures
       .filter((item) => locale === "vi" || item.hasEnglish)
       .map((item) => item.doc)
       .filter((doc) => !isPastDeadline(doc.deadline, query.now))
       .filter((doc) => !query.categoryIds || query.categoryIds.includes((doc.category as Category | null)?.id ?? ""))
-      .filter((doc) => !query.provinceId || (doc.province as Province).id === query.provinceId);
+      .filter((doc) => !query.provinceId || (doc.province as Province).id === query.provinceId)
+      .filter((doc) => matchesJobKeyword(doc.title, query.q));
     return { docs: matched, page: query.page, limit: 12, totalDocs: matched.length, totalPages: Math.max(1, Math.ceil(matched.length / 12)), hasNextPage: false, hasPrevPage: false };
   },
 );
@@ -121,6 +125,7 @@ beforeEach(() => {
   getSiteSettings.mockResolvedValue({ email: "tuyendung@tami.example" });
   loadPageHero.mockImplementation(async (locale) => ({ title: locale === "en" ? "Careers" : "Tuyển dụng", description: "Gia nhập đội ngũ TAMI" }));
   loadCareersPerks.mockResolvedValue(null);
+  loadCareersProcess.mockResolvedValue([]);
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -136,7 +141,7 @@ describe("S12 /tuyen-dung: render", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Tuyển dụng" })).toBeInTheDocument();
     expect(cardTitles()).toEqual(["Tư vấn BĐS", "Thực tập Marketing", "Chăm sóc khách hàng"]);
     expect(screen.queryByText("Trưởng nhóm đã đóng")).toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("3 vị trí đang tuyển");
+    expect(screen.getByRole("status")).toHaveTextContent("3 vị trí");
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
     expect(screen.getByRole("link", { name: /Tư vấn BĐS/ })).toHaveAttribute("href", "/tuyen-dung/slug-1");
     expect(listOpenJobs).toHaveBeenCalledWith({}, "vi", { page: 1, now: NOW });
@@ -147,11 +152,16 @@ describe("S12 /tuyen-dung: render", () => {
     const row = (title: RegExp) => screen.getByRole("link", { name: title });
     expect(row(/Tư vấn BĐS/)).toHaveTextContent("Hồ Chí Minh");
     expect(row(/Tư vấn BĐS/)).toHaveTextContent("Toàn thời gian");
-    // Cả hàng là MỘT link (không link lồng); nút "Ứng tuyển" chỉ là hình thức trong link.
-    expect(row(/Tư vấn BĐS/)).toHaveTextContent("Ứng tuyển");
+    // Cả hàng là MỘT link (không link lồng); nút mũi tên chỉ là hình thức trong link.
     expect(row(/Tư vấn BĐS/).querySelector("a, button")).toBeNull();
     expect(row(/Tư vấn BĐS/)).toHaveTextContent("15 triệu – 30 triệu");
-    expect(row(/Tư vấn BĐS/)).toHaveTextContent("Hạn nộp: 30/11/2026");
+    expect(row(/Tư vấn BĐS/)).toHaveTextContent("Hạn: 30/11/2026");
+    // Phòng ban + "Tuyển gấp" (BL-054): chỉ tin isUrgent; tin không danh mục không có dòng phòng ban.
+    expect(row(/Tư vấn BĐS/)).toHaveTextContent("Kinh doanh");
+    expect(within(row(/Tư vấn BĐS/)).getByText("Tuyển gấp")).toBeInTheDocument();
+    expect(within(row(/Thực tập Marketing/)).queryByText("Tuyển gấp")).toBeNull();
+    expect(row(/Thực tập Marketing/)).toHaveTextContent("Marketing");
+    expect(within(row(/Chăm sóc khách hàng/)).queryByText(/Kinh doanh|Marketing/)).toBeNull();
     expect(within(row(/Tư vấn BĐS/)).queryByText(/Còn \d+ ngày|Hạn nộp hôm nay/)).toBeNull();
     expect(row(/Thực tập Marketing/)).toHaveTextContent("Thỏa thuận");
     expect(within(row(/Thực tập Marketing/)).getByText("Còn 2 ngày")).toBeInTheDocument();
@@ -184,6 +194,25 @@ describe("S12 /tuyen-dung: render", () => {
     expect(screen.queryByRole("link", { name: "Xoá bộ lọc" })).toBeNull();
   });
 
+  it("?q= (BL-054): tìm tên vị trí không dấu, truyền q xuống truy vấn, ô tìm giữ từ khoá, chip + phân trang mang theo q, có nút xoá", async () => {
+    await render("vi", { q: "tu van", province: "ho-chi-minh" });
+    expect(listOpenJobs).toHaveBeenCalledWith({}, "vi", { page: 1, now: NOW, provinceId: "p2", q: "tu van" });
+    expect(cardTitles()).toEqual(["Tư vấn BĐS"]);
+    expect(screen.getByRole("searchbox", { name: "Tìm theo tên vị trí" })).toHaveValue("tu van");
+    expect(within(chipNav()).getAllByRole("link")[1]).toHaveAttribute("href", "/tuyen-dung?category=kinh-doanh&province=ho-chi-minh&q=tu+van");
+    expect(screen.getByRole("link", { name: "Xoá bộ lọc" })).toHaveAttribute("href", "/tuyen-dung");
+  });
+
+  it("form lọc: một form GET chứa ô khu vực + ô tìm + nút Tìm (chạy không JS), nhãn ẩn trực quan vẫn gắn label", async () => {
+    await render("vi", { category: "marketing" });
+    const form = screen.getByRole("form", { name: "Bộ lọc vị trí tuyển dụng" });
+    expect(form).toHaveAttribute("action", "/tuyen-dung");
+    expect(within(form).getByLabelText("Khu vực")).toBeInTheDocument();
+    expect(within(form).getByRole("searchbox", { name: "Tìm theo tên vị trí" })).toHaveAttribute("name", "q");
+    expect(within(form).getByRole("button", { name: "Tìm" })).toHaveAttribute("type", "submit");
+    expect(form.querySelector("input[type=hidden][name=category]")).toHaveAttribute("value", "marketing");
+  });
+
   it("không có vị trí nào, không lọc: 'Hiện TAMI chưa có vị trí đang tuyển.' + Gửi CV tới email (mailto)", async () => {
     listOpenJobs.mockResolvedValueOnce({ docs: [], page: 1, limit: 12, totalDocs: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
     await render("vi");
@@ -211,7 +240,10 @@ describe("S12 /tuyen-dung: render", () => {
     expect(listOpenJobs).toHaveBeenCalledWith({}, "en", { page: 1, now: NOW });
     expect(cardTitles()).toEqual(["Tư vấn BĐS", "Thực tập Marketing"]);
     expect(screen.getByRole("heading", { level: 1, name: "Careers" })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("2 open positions");
+    expect(screen.getByRole("status")).toHaveTextContent("2 positions");
+    // Danh mục "Marketing" chưa có bản EN → không hiện chữ Việt làm phòng ban ở /en; hạn kiểu Mỹ.
+    expect(screen.getByRole("link", { name: /Tư vấn BĐS/ })).toHaveTextContent("Deadline: 11/30/2026");
+    expect(screen.getByRole("link", { name: /Tư vấn BĐS/ })).toHaveTextContent("Urgent");
     expect(within(chipNav()).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/en/careers", "/en/careers?category=kinh-doanh"]);
     expect(screen.getByRole("link", { name: /Tư vấn BĐS/ })).toHaveAttribute("href", "/en/careers/slug-1");
     expect(screen.getByRole("link", { name: /Thực tập Marketing/ })).toHaveTextContent("Internship");
@@ -239,7 +271,7 @@ describe("generateMetadata /tuyen-dung", () => {
   });
 
   it("có bộ lọc (tỉnh hoặc category, hợp lệ hay lạ): noindex, follow và canonical về trang sạch; ?province= rỗng không tính", async () => {
-    for (const searchParams of [{ province: "ha-noi", page: "2" }, { category: "marketing" }, { category: "khong-co" }]) {
+    for (const searchParams of [{ province: "ha-noi", page: "2" }, { category: "marketing" }, { category: "khong-co" }, { q: "sale" }]) {
       const meta = await buildJobListMetadata({ locale: "vi", searchParams });
       expect(meta.robots).toEqual({ index: false, follow: true });
       expect(meta.alternates?.canonical).toBe("https://tami.example/tuyen-dung");
@@ -252,42 +284,76 @@ describe("generateMetadata /tuyen-dung", () => {
 describe("hero + dải ý trang Tuyển dụng (BL-045)", () => {
   afterEach(() => loadPageHero.mockReset());
 
-  it("hero thấp (short), chữ admin + ảnh từ loadPageHero(\"careers\"), breadcrumb trên ảnh, đúng một h1", async () => {
+  it("hero ảnh cỡ danh sách (list, BL-054), chữ admin + ảnh từ loadPageHero(\"careers\"), breadcrumb trên ảnh, đúng một h1", async () => {
     loadPageHero.mockResolvedValue({ title: "Gia nhập", titleAccent: "TAMI HOMES", eyebrow: "Tuyển dụng", image: { url: "/api/media/file/banner.jpg", width: 1600 } });
     const { container } = await render("vi");
     expect(loadPageHero).toHaveBeenCalledWith("vi", "careers");
-    expect(container.querySelector("section[data-hero-size=short] img")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size=list] img")).not.toBeNull();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Gia nhập\s*TAMI HOMES/);
-    expect(container.querySelector("[data-hero-size=short] nav .crumb-glass")).not.toBeNull();
+    expect(container.querySelector("[data-hero-size=list] nav .crumb-glass")).not.toBeNull();
   });
 
   it("không có ảnh → hero nền tối token, vẫn cùng chiều cao", async () => {
     loadPageHero.mockResolvedValue({ title: "Tuyển dụng" });
     const { container } = await render("vi");
     expect(container.querySelector(".bg-banner-scrim")).toBeNull();
-    expect(container.querySelector("section[data-hero-size=short].bg-dark-deep")).not.toBeNull();
+    expect(container.querySelector("section[data-hero-size=list].bg-dark-deep")).not.toBeNull();
   });
 
-  it("có careersPerks (≥ 2 mục) → đầu khối canh trái + dải ý; không có → ẩn cả đầu khối", async () => {
+  it("có careersPerks (≥ 2 mục) → khối 'Môi trường để bạn phát triển' (đầu khối căn giữa, mỗi ý h3); không có → ẩn cả khối", async () => {
     loadCareersPerks.mockResolvedValueOnce([
-      { icon: "star",title: "Thu nhập hấp dẫn", description: "Lương + hoa hồng" },
+      { icon: "star", title: "Thu nhập hấp dẫn", description: "Lương + hoa hồng" },
       { icon: "users", title: "Đội ngũ trẻ", description: null },
     ]);
     const first = await render("vi");
-    expect(screen.getByRole("heading", { level: 2, name: /Môi trường\s+làm việc/ })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "Thu nhập hấp dẫn" })).toBeInTheDocument();
-    // Nhãn vùng riêng của Tuyển dụng; không lề kép: danh sách ý không nằm trong khung container+gutter nào khác (chỉ chính nó có px-gutter), cùng khung với tiêu đề.
-    const region = screen.getByRole("region", { name: "Môi trường làm việc" });
-    const list = within(region).getByRole("list");
-    expect(list).toHaveClass("max-w-container", "px-gutter");
-    expect(region.parentElement?.className ?? "").not.toContain("px-gutter");
-    const headingFrame = screen.getByRole("heading", { level: 2, name: /Môi trường\s+làm việc/ }).parentElement?.parentElement;
-    expect(headingFrame).toHaveClass("max-w-container", "px-gutter");
+    const region = screen.getByRole("region", { name: /Môi trường để bạn\s+phát triển/ });
+    expect(within(region).getByText("Vì sao chọn TAMI")).toBeInTheDocument();
+    expect(within(region).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(["Thu nhập hấp dẫn", "Đội ngũ trẻ"]);
+    expect(within(region).getByText("Lương + hoa hồng")).toBeInTheDocument();
     first.unmount();
     await render("vi");
     expect(screen.queryByText("Vì sao chọn TAMI")).toBeNull();
-    expect(screen.getByRole("heading", { level: 2, name: /Cơ hội\s+nghề nghiệp/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Vị trí đang tuyển" })).toBeInTheDocument();
+  });
+
+  it("nút hero 'Xem vị trí đang tuyển' là link neo #open-positions (chạy không JS) tới đúng khối danh sách", async () => {
+    const { container } = await render("vi");
+    expect(screen.getByRole("link", { name: /Xem vị trí đang tuyển/ })).toHaveAttribute("href", "#open-positions");
+    expect(container.querySelector("section#open-positions")).toHaveAttribute("aria-labelledby", "open-jobs-heading");
+  });
+
+  it("Quy trình ứng tuyển: 'N bước đơn giản' theo số bước, danh sách có thứ tự 01.., rỗng → ẩn cả khối; /en số nhiều", async () => {
+    const steps = [
+      { icon: "file-check", title: "Gửi hồ sơ", description: "Ứng tuyển trực tuyến" },
+      { icon: "users", title: "Phỏng vấn", description: null },
+    ];
+    loadCareersProcess.mockResolvedValueOnce(steps);
+    const first = await render("vi");
+    const region = screen.getByRole("region", { name: "2 bước đơn giản" });
+    expect(within(region).getByText("Quy trình ứng tuyển")).toBeInTheDocument();
+    const items = within(within(region).getByRole("list")).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual(["01Gửi hồ sơỨng tuyển trực tuyến", "02Phỏng vấn"]);
+    expect(region.querySelector("ol")).not.toBeNull();
+    first.unmount();
+    const second = await render("vi");
+    expect(screen.queryByText("Quy trình ứng tuyển")).toBeNull();
+    second.unmount();
+    loadCareersProcess.mockResolvedValueOnce([steps[0]]);
+    await render("en");
+    expect(screen.getByRole("region", { name: "1 simple step" })).toBeInTheDocument();
+  });
+
+  it("banner 'Chưa tìm thấy vị trí phù hợp?' → nút Gửi CV ngay mailto email tuyển dụng; thiếu email → banner không có nút; trước banner tư vấn", async () => {
+    const first = await render("vi");
+    const banner = screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" });
+    expect(within(banner).getByText("Gia nhập TAMI HOMES")).toBeInTheDocument();
+    expect(within(banner).getByRole("link", { name: /Gửi CV ngay/ })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
+    expect(banner.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    first.unmount();
+    getSiteSettings.mockResolvedValue({});
+    await render("vi");
+    expect(within(screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" })).queryByRole("link")).toBeNull();
   });
 
   it("kết thúc bằng banner tư vấn", async () => {

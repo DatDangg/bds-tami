@@ -3,14 +3,15 @@ import type { Payload, Where } from "payload";
 import type { Locale } from "../../i18n/routing";
 import type { Category, News } from "../../payload-types";
 import { findPublicBySlug, findPublicList, type PublicListResult } from "../content/public-queries";
+import type { NewsSortKey } from "./news-filters";
 
 /** 12 bài/trang (design-spec S10). */
 export const NEWS_PAGE_SIZE = 12;
 export const RELATED_NEWS_COUNT = 3;
-/** Số bài trong thẻ "Bài viết mới" ở cột phải trang bài viết. */
-export const LATEST_NEWS_COUNT = 3;
 
 const NEWS_SORT = ["-publishedAt", "-createdAt"];
+/** `sort` của danh sách tin (BL-054): mới nhất (mặc định) hoặc cũ nhất. */
+const NEWS_SORT_BY_KEY: Record<NewsSortKey, string[]> = { newest: NEWS_SORT, oldest: ["publishedAt", "createdAt"] };
 const CATEGORY_SORT = ["sortOrder", "createdAt"];
 /** Số danh mục `news` tối đa lấy một lần: danh mục nền ít, mỗi loại tối đa 2 cấp (ERD §4.3). */
 const CATEGORY_LIMIT = 50;
@@ -48,6 +49,9 @@ export interface NewsPageQuery {
   excludeIds?: readonly string[];
   /** Chỉ bài đánh dấu `isFeatured` (bài nổi bật đầu trang 1 `/tin-tuc`). */
   featuredOnly?: boolean;
+  /** Chỉ các bài này (kết quả tìm `q` / lọc `tag` của `findFilteredNewsIds`); mảng rỗng = không bài nào. */
+  ids?: readonly string[];
+  sort?: NewsSortKey;
   limit?: number;
 }
 
@@ -57,10 +61,11 @@ export function listPublicNews(payload: Payload, locale: Locale, query: NewsPage
     ...(query.categoryIds ? [{ category: { in: [...query.categoryIds] } }] : []),
     ...(query.featuredOnly ? [{ isFeatured: { equals: true } }] : []),
     ...(query.excludeIds?.length ? [{ id: { not_in: [...query.excludeIds] } }] : []),
+    ...(query.ids ? [{ id: { in: [...query.ids] } }] : []),
   ];
   return findPublicList<News>(payload, "news", locale, {
     ...(conditions.length > 0 ? { where: { and: conditions } } : {}),
-    sort: NEWS_SORT,
+    sort: NEWS_SORT_BY_KEY[query.sort ?? "newest"],
     page: query.page,
     limit: query.limit ?? NEWS_PAGE_SIZE,
     depth: 1,

@@ -6,7 +6,7 @@
 
 **Trigger:** feature-update (Change Request **BL-054**, MODIFY + ADDITIVE schema). Change doc `spec/changes/2026-10-21-news-careers-contact-redesign.md`. Design: `docs/specs/listing-detail-redesign/tin-tuc.webp`, `chi-tiet-tin-tuc.webp`, `tuyen-dung.webp`, `chi-tiet-tuyen-dung.webp`, `lien-he.webp`.
 
-**Trạng thái:** planned — spec delta đã ghi, chưa build. Chế độ auto proceed, `builder-strong` mọi task, commit `staging` không push. Làm sau BL-052 (đã xong), tái dùng `src/components/listing/*` + `src/components/detail/*`.
+**Trạng thái:** built (as-built 1.47.1 — `spec/updates/2026-10-22-news-careers-contact-redesign-as-built.md`). Ban đầu: planned — spec delta đã ghi, chưa build. Chế độ auto proceed, `builder-strong` mọi task, commit `staging` không push. Làm sau BL-052 (đã xong), tái dùng `src/components/listing/*` + `src/components/detail/*`.
 
 ## Requirements (SPECIFICATIONS.md)
 

@@ -1,5 +1,6 @@
 ---
 description: Spec Init — dựng spec (reverse-engineer) cho project CŨ đã có code nhưng chưa có spec, rồi bàn giao spec + test-scope cho template test.
+model: openai/gpt-6-luna
 ---
 
 # Spec Init Agent

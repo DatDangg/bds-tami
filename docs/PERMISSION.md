@@ -66,6 +66,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `leads` | **Chỉ tạo** qua endpoint `POST /api/public/leads` | Đọc + sửa **Được giao**; không xoá, không xuất | ✔ (đọc, sửa, phân công, xoá mềm, xuất Excel) |
 | `lead-activities` | — | Đọc + thêm trên lead **Được giao** | Đọc + thêm |
 | `job-applications` | **Chỉ tạo** qua `POST /api/public/job-applications` (endpoint dùng Local API `overrideAccess`; không ai, kể cả admin, tạo được qua REST/admin) | — (403 đọc/sửa/xoá) | Đọc; sửa **chỉ `status` và `note`** (trường khách gửi là chỉ đọc, `ipHash` không bao giờ trả ra); xoá (kèm xoá CV, ghi audit không PII) |
+| `newsletter-subscribers` | **Chỉ tạo** qua `POST /api/public/newsletter` (BL-054 P1-T04; Local API, không ai kể cả admin tạo được qua REST/admin) | — (403 đọc/sửa/xoá; ẩn khỏi menu) | Đọc; sửa (chỉ `status`: các trường consent / nguồn có field access `update: denyAll`, khoá cả form admin lẫn REST `PATCH`); xoá; xuất Excel `GET /api/admin/newsletter-subscribers/export` (audit `newsletter.export`) |
 | `private-files` | — | — | Đọc + xoá + tải qua endpoint kiểm quyền; **không tạo/sửa** qua REST/admin (chỉ endpoint nộp CV bằng Local API `overrideAccess`); chỉ chứa CV |
 
 > As-built (L8-T02): qua API/admin chỉ thêm loại `note`/`call` (cả admin; form admin chỉ liệt kê hai loại này, loại khác gửi qua API bị 403); `status_change`/`assignment`/`merged`/`email_sent` do hệ thống ghi. Sale chỉ thêm trên lead được giao (lead người khác → 403). Sale chỉ đổi `status` + `lostReason` của lead được giao; sửa dữ liệu khách chỉ admin, và lead đã ẩn danh không sửa được dữ liệu khách. Không ai sửa/xoá activity.
@@ -77,6 +78,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `staff` | Đọc + sửa **hồ sơ của chính mình** (tên, SĐT, ảnh, mật khẩu) | ✔ (tạo, khoá, đặt lại mật khẩu, đổi vai trò). Luôn còn ≥ 1 admin hoạt động: chặn khoá / hạ quyền / xoá admin cuối (kể cả `overrideAccess`). Sửa hàng loạt (`where`) đổi `role`/`active` hoặc xoá mà chạm admin đang hoạt động bị từ chối — đổi admin phải làm từng người |
 | `audit-logs` | — | Chỉ đọc (không ai sửa/xoá) |
 | `click-events`, `click-stats-daily` | — | Chỉ đọc |
+| `news-views-daily` (BL-054) | — (403; ẩn khỏi menu) | Chỉ đọc (không ai tạo / sửa / xoá qua API; endpoint `POST /api/public/news-views` ghi bằng Local API / SQL) |
 | `translation-usage` | — | Chỉ đọc |
 
 ## 4. Quyền theo trường (field-level)

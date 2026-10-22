@@ -1,0 +1,131 @@
+{
+  "specVersion": "1.47.0",
+  "scopeVersion": 61,
+  "generatedAt": "2026-10-22T13:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-054 MODIFY + ADDITIVE schema: redesign 5 màn Tin tức (+ danh mục) / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ theo design tin-tuc.webp, chi-tiet-tin-tuc.webp, tuyen-dung.webp, chi-tiet-tuyen-dung.webp, lien-he.webp; 2 collection mới (news-views-daily, newsletter-subscribers), trường mới additive job-postings.isUrgent + site-settings offices / workingHours / careersProcess, 3 endpoint mới, khối mới trong trình soạn bài Tin tức.",
+  "status": "planned — chưa build",
+  "statusNote": "Scope phát hành ngay sau spec delta (trước build) để bên test nắm phạm vi; changed.files sẽ chốt as-built ở close-out. Chế độ auto proceed, builder-strong, commit staging không push.",
+  "workItem": "feature/news-careers-contact-redesign",
+  "backlog": "BL-054",
+  "classification": "MODIFY + ADDITIVE schema",
+  "changeDoc": "spec/changes/2026-10-21-news-careers-contact-redesign.md",
+  "changeDocStatus": "in_progress → archive ở close-out (spec/changes/archive/)",
+  "design": [
+    "docs/specs/listing-detail-redesign/tin-tuc.webp",
+    "docs/specs/listing-detail-redesign/chi-tiet-tin-tuc.webp",
+    "docs/specs/listing-detail-redesign/tuyen-dung.webp",
+    "docs/specs/listing-detail-redesign/chi-tiet-tuyen-dung.webp",
+    "docs/specs/listing-detail-redesign/lien-he.webp"
+  ],
+  "task": [],
+  "reviewResults": [],
+  "previousScope": "spec/test-scope/archive/test-scope-1.46.2-60.json",
+  "specUpdate": "spec/updates/2026-10-22-news-careers-contact-redesign.md",
+  "specRefs": [
+    "Giao diện / Redesign Tin tức / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ (BL-054)",
+    "F5",
+    "F6",
+    "F7",
+    "F9",
+    "BR-07",
+    "API Endpoints (news-views, newsletter, newsletter-subscribers export)",
+    "Database Schema (newsletter-subscribers, news-views-daily)"
+  ],
+  "specRefNotes": {
+    "BL-054": "Khối mới ở mục Giao diện (sau khối BL-052): bố cục 5 màn, Đọc nhiều theo lượt xem, Bản tin thị trường, khối soạn bài mới, Tuyển gấp, Quy trình ứng tuyển, văn phòng + giờ làm việc, schema / migration, doc impact.",
+    "F5": "Tin tức — bố cục danh sách + chi tiết thay bởi BL-054; ô tìm q / lọc tag / sort; form 'Tư vấn nhu cầu' cuối mọi trang /tin-tuc giữ.",
+    "F6": "Tuyển dụng — bố cục danh sách + chi tiết thay bởi BL-054; isUrgent, ô tìm q, careersProcess; form ứng tuyển, hết hạn / noindex / JSON-LD JobPosting giữ.",
+    "F7": "Liên hệ — bố cục thay bởi BL-054; nhiều văn phòng + giờ làm việc; form lead / bản đồ / BR-08 giữ.",
+    "F9": "LeadForm source=contact ở /lien-he + /tin-tuc giữ nguyên hành vi (Turnstile, consent, rate limit).",
+    "BR-07": "i18n vi/en — nhãn mới đủ EN; /en không lấy chữ VI bù (bỏ mục thiếu title EN ở careersProcess / offices)."
+  },
+  "migration": "additive (versioned, chỉ ADD) — bảng news_views_daily (unique (news_id, day)), newsletter_subscribers (email unique), site_settings_offices (+ locales), site_settings_careers_process (+ locales), cột nullable working_hours_* (localized), job_postings.is_urgent DEFAULT false. Không DROP / đổi kiểu / SET NOT NULL → không HIGH_RISK_MIGRATION. Backfill dev: pnpm backfill:offices (dry-run mặc định, --apply chỉ điền khi offices trống).",
+  "changed": {
+    "files": [],
+    "filesNote": "Dự kiến — chốt as-built khi close-out.",
+    "modules": [
+      "news list /tin-tuc (+ /tin-tuc/danh-muc/[category], /en/news) — src/components/news/*, src/lib/news/*",
+      "news detail /tin-tuc/[slug] — NewsToc, chia sẻ, style nội dung (H2 số tròn, trích dẫn, danh sách tích), bài liên quan",
+      "news editor blocks — createRichTextEditor + RichText render: Số liệu nổi bật, Dự án nhắc đến, Ảnh cạnh chữ (news.content)",
+      "careers list /tuyen-dung — src/components/careers/*",
+      "careers detail /tuyen-dung/[slug] — hero nhạt, cột form dính, Vị trí khác",
+      "contact /lien-he — src/components/contact/* (thẻ nổi, văn phòng + bản đồ, banner tuyển dụng)",
+      "src/collections/JobPostings.ts (isUrgent)",
+      "src/collections/NewsViewsDaily.ts (MỚI)",
+      "src/collections/NewsletterSubscribers.ts (MỚI) + nút Xuất Excel admin",
+      "src/globals/SiteSettings.ts + site-settings/* (offices, workingHours, careersProcess)",
+      "endpoint POST /api/public/news-views (MỚI — beacon, lọc bot, HMAC + Redis dedupe)",
+      "endpoint POST /api/public/newsletter (MỚI — Turnstile, consent, rate limit)",
+      "endpoint GET /api/admin/newsletter-subscribers/export (MỚI — xlsx-stream)",
+      "src/components/listing/* + src/components/detail/* (tái dùng BL-052: ListingHero, chip, ResultsBar, phân trang)",
+      "dịch tự động (TRANSLATABLE_FIELDS: offices, workingHours, careersProcess, chữ trong khối soạn bài)",
+      "migrations/*",
+      "scripts backfill (pnpm backfill:offices)",
+      "messages/* (i18n vi/en)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/tin-tuc (+ /en/news): hero ảnh pageHeroes.news + ô tìm q + nút 'Tìm' (form GET, chạy không JS); chip danh mục 'Tất cả' + cấp 1 (link, aria-current)",
+      "/tin-tuc trang 1 không lọc: khối nổi bật 1 bài lớn (ảnh nền, badge, tiêu đề, tóm tắt, nhãn 'TAMI HOMES' (không tên nhân viên) · ngày · 'N phút đọc', cả thẻ là link) + 3 bài nhỏ; isFeatured trước rồi mới nhất; 4 bài không lặp trong lưới trang 1",
+      "/tin-tuc: 'Bài viết mới nhất' + sort newest (mặc định) | oldest → lưới 3 cột ≥ lg + phân trang số; tham số q / tag / sort → noindex",
+      "/tin-tuc cột phải (≥ lg; < lg xuống dưới lưới): 'Đọc nhiều' top 5 (01–05 + ảnh + tiêu đề + ngày), 'Bản tin thị trường' (email + consent + Đăng ký), 'Chủ đề' ≤ 12 tag → ?tag= (/en ẩn khối + bỏ qua ?tag=)",
+      "'Đọc nhiều': top 5 = tổng views 30 ngày bài đã xuất bản cùng ngôn ngữ (/en chỉ bài có EN); thiếu → bù isFeatured rồi mới nhất, không trùng; cache ≤ 1 giờ",
+      "/tin-tuc/[slug]: badge danh mục, h1, sapo, nhãn 'TAMI HOMES' (không tên nhân viên) · ngày · 'N phút đọc' (tự tính), chia sẻ Facebook / Zalo / sao chép link / Web Share; ảnh bìa + chú thích; đoạn mở đầu đóng khung nền nhạt",
+      "/tin-tuc/[slug] ≥ lg: cột trái dính 'Mục lục' (mục đang đọc tô đậm, chỉ khi có heading) + thẻ 'Tư vấn miễn phí' → /lien-he (không form); < lg mục lục thành khối gập đầu bài, thẻ tư vấn sau nội dung",
+      "/tin-tuc/[slug] nội dung: H2 số tròn 01/02/03 (CSS counter, id neo không đổi), trích dẫn dấu ngoặc lớn, danh sách dấu tích tròn; dòng 'Thẻ:' chip → /tin-tuc?tag= (/en ẩn); 'Bài viết liên quan' 3 thẻ + 'Xem tất cả tin tức'",
+      "Đếm lượt xem: chi tiết tin gửi POST /api/public/news-views bằng sendBeacon / fetch keepalive sau khi hiển thị; không chặn render, trang vẫn ISR; bot / UA rỗng / headless / preview không tính; mỗi người · bài · ngày chỉ 1 lượt; bài chưa xuất bản không tính",
+      "Khối soạn bài mới (admin News): 'Số liệu nổi bật' (1–4 value + label), 'Dự án nhắc đến' (thẻ ảnh / tên / vị trí / loại / tình trạng + 'Xem chi tiết'; dự án chưa xuất bản / thiếu EN ở /en → ẩn), 'Ảnh cạnh chữ' (trái / phải, < md xếp dọc); hiển thị đúng VI + EN",
+      "Bản tin: POST /api/public/newsletter — email sai → lỗi; thiếu consent → lỗi; Turnstile; rate limit; email đã có → thành công như nhau; unsubscribed → bật lại; thông báo thành công / lỗi i18n + trạng thái đang gửi",
+      "Admin 'newsletter-subscribers': admin xem / sửa trạng thái / xoá, sale không thấy; nút 'Xuất Excel' (GET /api/admin/newsletter-subscribers/export, chỉ admin)",
+      "/tuyen-dung (+ /en): hero pageHeroes.careers + breadcrumb + nút 'Xem vị trí đang tuyển' (#open-positions); 4 phúc lợi careersPerks; 'Vị trí đang tuyển' + 'N vị trí'; chip phòng ban, ô khu vực province, ô tìm q (form GET)",
+      "/tuyen-dung danh sách hàng: phòng ban + 'Tuyển gấp' (isUrgent), tên, tỉnh, hình thức, lương, 'Hạn: dd/mm/yyyy' (/en MM/DD/YYYY), cả hàng là link; phân trang; tin quá hạn ẩn; lọc / tìm → noindex",
+      "/tuyen-dung: 'Quy trình ứng tuyển — N bước đơn giản' từ careersProcess (0 bước → ẩn; N = số bước hiện có); banner 'Chưa tìm thấy vị trí phù hợp? — Gửi CV ngay' giữ hành vi cũ",
+      "/tuyen-dung/[slug]: hero nhạt (breadcrumb, phòng ban + 'Tuyển gấp', tiêu đề 2 dòng dòng 2 màu nhấn, mô tả ngắn, hàng thông tin icon, 'Ứng tuyển ngay' cuộn tới form + 'Chia sẻ'); thẻ 'Mô tả công việc' / 'Yêu cầu' / 'Quyền lợi' (benefits trống → ẩn); banner tư vấn giữ ở /tuyen-dung và chi tiết",
+      "/tuyen-dung/[slug] cột phải dính: 'Ứng tuyển vị trí này' + 'Phản hồi trong 3 ngày làm việc' + form hiện có (CV kéo-thả + thẻ tệp có nút xoá, 'Lời nhắn' tuỳ chọn, consent, 'Gửi hồ sơ'); < lg form sau nội dung + thanh dính đáy; 'Vị trí khác' 4 thẻ (cùng danh mục trước) + 'Xem tất cả vị trí'",
+      "/lien-he (+ /en/contact): hero pageHeroes.contact; 4 thẻ nổi Hotline (tel:) / Email (mailto:) / Zalo OA (hiện siteName, link zaloUrl) / Giờ làm việc (workingHours) — thiếu dữ liệu → ẩn, lưới co theo số thẻ",
+      "/lien-he: form 'Bạn cần TAMI hỗ trợ điều gì?' (LeadForm source=contact, không chip loại yêu cầu); 'Hệ thống văn phòng' — tab chi nhánh (ẩn khi 1 văn phòng), bản đồ theo toạ độ văn phòng đang chọn, thẻ văn phòng + 'Chỉ đường' (Google Maps, tab mới); banner 'Gia nhập TAMI HOMES' → /tuyen-dung; không banner tư vấn",
+      "Admin site-settings tab 'Liên hệ & mạng xã hội': offices (≤ 10), workingHours (hours + days localized); careersProcess (≤ 6) cạnh careersPerks; job-postings có công tắc 'Tuyển gấp' (mặc định tắt)",
+      "offices trống → web dùng address / mapLocation / hotline / email cũ làm 1 văn phòng (không mất dữ liệu); backfill dev pnpm backfill:offices dry-run mặc định, --apply chỉ điền khi trống, báo cáo docs/reports/"
+    ],
+    "dependents": [
+      "LeadForm source=contact ở /lien-he + cuối mọi trang /tin-tuc (F5/F9) — layout đổi chỗ đặt, hành vi submit / lỗi / consent / Turnstile giữ",
+      "Form ứng tuyển (job-applications): upload CV PDF/DOC/DOCX ≤ 5MB, % tiến trình, kéo-thả — chỉ đổi khung chứa",
+      "Header / footer / ConsultBanner / nút liên hệ nổi dùng site-settings (hotline, email, address, socialLinks) — trường cũ giữ nguyên",
+      "src/components/listing/* + src/components/detail/* của BL-052 (Dự án / Cho thuê / Tin BĐS) — tái dùng, không được đổi hành vi màn BL-052",
+      "RichText render dùng chung (News content + nơi khác) — danh sách khối cho phép mở rộng, khối lạ vẫn bị bỏ",
+      "Dịch tự động AI (TRANSLATABLE_FIELDS) — thêm offices / workingHours / careersProcess + chữ trong khối soạn bài",
+      "Khối Tin tức trang chủ (NewsCard trên nền tối) — nếu thẻ lưới đổi",
+      "JSON-LD JobPosting / NewsArticle / BreadcrumbList, sitemap các trang tin tức / tuyển dụng / liên hệ",
+      "Redis (dedupe lượt xem) — Redis lỗi → không đếm lượt (pipeline 503, beacon bỏ qua; trang không ảnh hưởng)"
+    ],
+    "regression": [
+      "Lead form /lien-he + /tin-tuc (+ /en): gửi thành công, lead nguồn contact + UTM đúng, Turnstile / consent / rate limit như cũ, lỗi dưới ô",
+      "Form ứng tuyển chi tiết tuyển dụng: nộp CV thành công, kiểm đuôi + dung lượng, tiến trình %, admin thấy hồ sơ new; tin hết hạn → băng, ẩn form, noindex, bỏ JSON-LD",
+      "Header / footer / ConsultBanner không đổi trên 5 màn; nút liên hệ nổi + BackToTop như cũ; no-raw-colors.test PASS",
+      "Màn BL-052 (/du-an, /cho-thue, /tin-bds + chi tiết) không đổi sau khi tái dùng component listing / detail",
+      "Dịch tự động: bài Tin tức có khối mới dịch được sang EN; site-settings mới dịch được; không phá dịch trường cũ",
+      "JSON-LD JobPosting hợp lệ (tin còn hạn), NewsArticle + BreadcrumbList chi tiết tin, canonical / hreflang không đổi",
+      "Sitemap vẫn liệt kê /tin-tuc, bài tin, /tuyen-dung, tin tuyển dụng còn hạn, /lien-he; trang có q / tag / sort / lọc không vào sitemap + noindex",
+      "Link cũ /tin-tuc?page=N, /tin-tuc/danh-muc/[category], /tuyen-dung?… (lọc hiện có) vẫn chạy; giá trị lạ bị bỏ, không 400/500",
+      "Mục lục NewsToc + neo heading giữ id; 1 h1 mỗi trang; VI/EN × 390 / 768 / 1440 không tràn ngang",
+      "Dữ liệu cũ (site-settings chưa có offices / workingHours / careersProcess, job-postings chưa có isUrgent) vẫn lưu, xuất bản, hiển thị — khối trống ẩn gọn"
+    ]
+  },
+  "acceptance": [
+    "5 màn khớp bố cục ảnh design ở desktop; responsive mobile/tablet hợp lý (cột phải tin tức xuống dưới, mục lục chi tiết thành nút gập trên mobile)",
+    "Trường/collection mới có trong admin (nhãn tiếng Việt, localized khi là chữ), migration versioned, chỉ ADD, không mất dữ liệu cũ",
+    "Đếm lượt xem không làm chậm trang ISR (ghi bất đồng bộ / qua API), bot không tính; không lưu IP thô",
+    "Đăng ký bản tin: validate email, chống trùng, consent bắt buộc, Turnstile, có thông báo thành công/lỗi",
+    "Khối mới trong trình soạn hiển thị đúng ở web, bản EN dùng được",
+    "Khối trống (Đọc nhiều, Quy trình, Giờ làm việc, tab văn phòng khi chỉ 1…) ẩn gọn",
+    "Bản EN hoạt động như VI (nhãn i18n đủ)",
+    "Test + typecheck + lint + build PASS"
+  ],
+  "verification": {
+    "status": "chưa chạy — planned, sẽ cập nhật ở close-out"
+  },
+  "risk": "high",
+  "riskNote": "Schema additive (2 collection mới + job-postings + site-settings, migration chỉ ADD) + 2 endpoint public mới (news-views: rate limit, lọc bot, dedupe HMAC/Redis, không lưu IP/UA thô; newsletter: Turnstile, consent, không lộ email đã đăng ký) + PII email bản tin (admin-only, xuất Excel) + UI rộng 5 route tái dùng component BL-052 + mở rộng RichText / dịch tự động. Test nên ưu tiên: quyền newsletter-subscribers (sale không thấy, export chỉ admin), chống spam / trùng bản tin, đếm lượt xem không chặn render + bot không tính, lead form + form ứng tuyển không hồi quy."
+}

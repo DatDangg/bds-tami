@@ -159,7 +159,8 @@ async function scanPublicProjects(payload: Payload, locale: Locale): Promise<Pro
 }
 
 /** Lấy đủ trường thẻ của các id (một truy vấn) rồi trả theo đúng thứ tự id. */
-async function cardsByIds(payload: Payload, locale: Locale, ids: readonly string[]): Promise<Map<string, Project>> {
+// Cũng dùng cho khối "Dự án nhắc đến" của bài Tin tức (BL-054): `findPublicList` nên id chưa xuất bản / đã xoá / `/en` thiếu bản EN không có trong map.
+export async function findPublicProjectCardsByIds(payload: Payload, locale: Locale, ids: readonly string[]): Promise<Map<string, Project>> {
   if (ids.length === 0) return new Map();
   const { docs } = await findPublicList<Project>(payload, "projects", locale, {
     where: { id: { in: [...ids] } },
@@ -193,7 +194,7 @@ export async function listPublicProjects(payload: Payload, locale: Locale, query
   const totalPages = Math.ceil(ordered.length / PROJECT_PAGE_SIZE);
   const pageIds = ordered.slice((page - 1) * PROJECT_PAGE_SIZE, page * PROJECT_PAGE_SIZE).map((project) => project.id);
   const shownFeaturedIds = page === 1 ? featuredIds : [];
-  const cards = await cardsByIds(payload, locale, [...shownFeaturedIds, ...pageIds]);
+  const cards = await findPublicProjectCardsByIds(payload, locale, [...shownFeaturedIds, ...pageIds]);
   const inOrder = (ids: readonly string[]) => ids.flatMap((id) => cards.get(id) ?? []);
   return {
     docs: inOrder(pageIds),

@@ -13,6 +13,11 @@
   color: var(--admin-badge-danger-fg);
 }
 
+// Trường con trong khối chèn của ô soạn thảo (BL-054) nằm trong ô `Nội dung` có dấu * nhưng tự mang dấu * `required` của Payload: không thêm lần nữa.
+.tami-required .rich-text-lexical__wrap label.field-label::after {
+  content: none;
+}
+
 // ---- Ô soạn thảo văn bản: khung viền + nền như input khác, thanh công cụ cố định nằm trong khung ----
 .rich-text-lexical__wrap {
   background: var(--theme-input-bg);
@@ -50,6 +55,24 @@
   .toolbar-popup__button.disabled svg {
     opacity: 0.35;
   }
+
+  // Mục chèn khối (BlocksFeature, chỉ editor Tin tức — BL-054): Payload chỉ vẽ icon khối, thêm chữ "Chèn khối" cho dễ thấy.
+  .toolbar-popup__dropdown-blocks {
+    width: auto;
+    gap: 6px;
+
+    &::after {
+      content: "Chèn khối";
+      order: 1;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .toolbar-popup__dropdown-caret {
+      order: 2;
+    }
+  }
 }
 
 // Có lỗi: viền đỏ thay viền thường (Payload tự tô nền đỏ ở màn hẹp).
@@ -57,16 +80,42 @@
   border-color: var(--admin-badge-danger-fg);
 }
 
-// ---- Nút "+" cạnh ô quan hệ: hiện chữ "Thêm mới", vùng bấm cao ≥ 36px ----
-.relationship-add-new__add-button {
+// ---- Nút "+" cạnh ô quan hệ: ô vuông chỉ icon, tách rời ô chọn (BL-058 T03) ----
+// Payload dán nút vào ô (margin-left:-1px + bo trái 0) trong @layer payload-default; ở đây ghi đè ngoài layer.
+// Tên đọc/tooltip "Thêm mới" do Payload cung cấp (Tooltip nằm trong nút), không thay component.
+.relationship-add-new {
+  align-items: flex-start; // ô hasMany cao lên: nút giữ ở trên, không kéo giãn
+
+  .popup__trigger-wrap {
+    height: auto;
+  }
+}
+
+.relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled),
+.relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled).doc-drawer__toggler {
+  box-sizing: border-box;
+  height: 36px;
+  width: 36px;
   min-height: 36px;
   min-width: 36px;
-  gap: 6px;
-  font-size: 0.8125rem;
-  white-space: nowrap;
+  margin-left: 8px;
+  padding: 0;
+  justify-content: center;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  cursor: pointer;
 
-  &::after {
-    content: "Thêm mới";
+  &:hover {
+    background: var(--admin-surface-hover);
+    border-color: var(--admin-text-subtle);
+  }
+
+  &:focus-visible {
+    border-color: var(--admin-accent);
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
   }
 }
 
@@ -86,7 +135,10 @@
 
 // Vùng bấm >= 44px trên màn cảm ứng.
 @media (max-width: 767px) {
-  .relationship-add-new__add-button {
+  .relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled),
+  .relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled).doc-drawer__toggler {
+    height: 44px;
+    width: 44px;
     min-height: 44px;
     min-width: 44px;
   }
@@ -110,6 +162,52 @@
 
   &--warn {
     color: var(--admin-badge-warning-fg, var(--admin-text-subtle));
+  }
+}
+
+// ---- Khung xem trước kết quả Google ở khối SEO (BL-058 T05) ----
+.tami-seo-preview {
+  margin: 0 0 16px;
+}
+
+.tami-seo-preview__note {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  color: var(--admin-text-subtle);
+}
+
+.tami-seo-preview__card {
+  padding: 12px 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-m);
+  background: var(--admin-surface);
+}
+
+.tami-seo-preview__title {
+  color: var(--admin-badge-info-fg);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.tami-seo-preview__url {
+  margin-top: 2px;
+  color: var(--admin-badge-success-fg);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.tami-seo-preview__description {
+  margin-top: 4px;
+  color: var(--admin-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .tami-seo-preview__card {
+    padding: 10px 12px;
   }
 }
 

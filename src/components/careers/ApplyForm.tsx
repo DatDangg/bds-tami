@@ -7,6 +7,7 @@ import { ConsentCheckbox } from "@/components/forms/ConsentCheckbox";
 import { FormField } from "@/components/forms/FormField";
 import { FormErrorSummary, FormStatus } from "@/components/forms/FormStatus";
 import { TurnstileWidget } from "@/components/forms/TurnstileWidget";
+import { EnvelopeSimple, Phone, User } from "@/components/icons";
 import { usePublicForm, type FormFields } from "@/components/forms/use-public-form";
 import { Button } from "@/components/ui/button";
 import { normalizePhone } from "@/lib/phone";
@@ -37,6 +38,7 @@ interface ApplyFormProps {
  */
 export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }: ApplyFormProps) {
   const t = useTranslations("page.careerDetail.applyForm");
+  const tv = useTranslations("page.jobDetail.v2.form");
   const tForm = useTranslations("form");
   const [cv, setCv] = useState<File | null>(null);
   const [cvError, setCvError] = useState<string | undefined>();
@@ -84,13 +86,13 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
   const requiredLabel = tForm("required");
   // Upload 100% nhưng server còn xử lý (lưu/scan file) → về nhãn "Đang gửi…" thay vì đứng ở 100%.
   const showPercent = submitting && uploadPercent !== null;
-  const submitLabel = !submitting ? t("submit") : uploadPercent === null || uploadPercent >= 100 ? tForm("submitting") : t("uploading", { percent: uploadPercent });
+  const submitLabel = !submitting ? tv("submit") : uploadPercent === null || uploadPercent >= 100 ? tForm("submitting") : t("uploading", { percent: uploadPercent });
 
   return (
     <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <FormField name="fullName" label={t("fullName")} required requiredLabel={requiredLabel} autoComplete="name" readOnly={submitting} error={form.fieldErrors.fullName} />
-      <FormField name="phone" type="tel" inputMode="tel" label={t("phone")} required requiredLabel={requiredLabel} autoComplete="tel" readOnly={submitting} error={form.fieldErrors.phone} />
-      <FormField name="email" type="email" label={t("email")} required requiredLabel={requiredLabel} autoComplete="email" readOnly={submitting} error={form.fieldErrors.email} />
+      <FormField name="fullName" label={t("fullName")} icon={<User size={18} />} placeholder={tv("fullNamePlaceholder")} required requiredLabel={requiredLabel} autoComplete="name" readOnly={submitting} error={form.fieldErrors.fullName} />
+      <FormField name="phone" type="tel" inputMode="tel" label={t("phone")} icon={<Phone size={18} />} placeholder={tv("phonePlaceholder")} required requiredLabel={requiredLabel} autoComplete="tel" readOnly={submitting} error={form.fieldErrors.phone} />
+      <FormField name="email" type="email" label={t("email")} icon={<EnvelopeSimple size={18} />} placeholder={tv("emailPlaceholder")} required requiredLabel={requiredLabel} autoComplete="email" readOnly={submitting} error={form.fieldErrors.email} />
       <CvPicker
         name="cv"
         accept={CV_ACCEPT}
@@ -98,7 +100,7 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
         disabled={submitting}
         error={cvError ?? form.fieldErrors.cv}
         labels={{
-          field: t("cv"),
+          field: tv("cv"),
           required: requiredLabel,
           helper: t("cvHelper"),
           chooseFile: t("chooseFile"),
@@ -128,7 +130,7 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
             hotline={hotline && (issue.kind === "rate-limit" || issue.retryable) ? { label: hotline.label, href: hotline.telHref } : undefined}
           />
         ))}
-      <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting} className="relative w-full overflow-hidden sm:w-fit">
+      <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting} className="relative w-full overflow-hidden">
         {/* Dải tô theo % ngay trong nút, không có track nền (taste §9.F). Chỉ thị giác (aria-hidden): con của <button> là presentational theo ARIA. */}
         {showPercent && (
           <span
