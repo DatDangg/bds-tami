@@ -2464,6 +2464,70 @@
           ]
         }
       ]
+    },
+    {
+      "slug": "admin-form-ux-polish",
+      "title": "Admin UX: modal thay hộp thoại trình duyệt, lỗi dưới từng ô + đánh dấu tab, nút \"+\" tách rời ô quan hệ, lịch sử chỉnh sửa dễ đọc, làm rõ tab SEO (BL-058)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-058",
+      "changeDoc": "spec/changes/2026-10-22-admin-form-ux-polish.md",
+      "branch": "claude/admin-form-ux-polish-dc5780",
+      "startedAt": "2026-10-22",
+      "planApprovedAt": "2026-10-22 (checkpoint: Q1 SEO = B, Q2 Ai sửa = Không/không migration, Q3 toast lỗi = bỏ hẳn; chạy đợt 1)",
+      "migration": "none",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-01.md",
+          "status": "in_progress",
+          "attempt": 0,
+          "dependsOn": [],
+          "wave": "1",
+          "note": "modal Dịch lại bằng AI + test chặn window.alert/confirm/prompt"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-02.md",
+          "status": "in_progress",
+          "attempt": 0,
+          "dependsOn": [],
+          "wave": "1",
+          "note": "lỗi dưới ô + tab + tự mở tab/cuộn + bỏ toast lỗi trường"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-03.md",
+          "status": "in_progress",
+          "attempt": 0,
+          "dependsOn": [],
+          "wave": "1",
+          "note": "nút + tách rời ô quan hệ"
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-04.md",
+          "status": "pending",
+          "attempt": 0,
+          "dependsOn": [
+            "phase-1-task-02"
+          ],
+          "wave": "2",
+          "note": "màn lịch sử phiên bản (không Ai sửa)"
+        },
+        {
+          "task": "phase-1-task-05",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-05.md",
+          "status": "pending",
+          "attempt": 0,
+          "dependsOn": [
+            "phase-1-task-04"
+          ],
+          "wave": "3",
+          "note": "tab SEO phương án B"
+        }
+      ]
     }
   ],
   "bugs": [
@@ -3473,7 +3537,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T03:00:53.916Z",
+  "lastUpdated": "2026-10-22T03:22:01.510Z",
   "approvalMilestones": [
     {
       "id": "M1",
