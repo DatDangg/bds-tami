@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { RentalCardData } from "@/lib/rentals/rental-view";
 import { RentalCard } from "./RentalCard";
+import { RentalSpotlightContent } from "./RentalSpotlightContent";
 
 const data: RentalCardData = {
   id: "1",
@@ -131,5 +132,20 @@ describe("RentalCard biến thể listing (mặc định, BL-052)", () => {
     expect(link).toHaveTextContent("1 BA");
     expect(link).toHaveTextContent("8.5 million VND/month");
     expect(screen.getByText("2 bedrooms")).toHaveClass("sr-only");
+  });
+});
+
+describe("RentalSpotlightContent (thẻ nổi bật /cho-thue)", () => {
+  it("BL-061: 'Xem chi tiết' là link phủ cả thẻ (after:inset-0, data-stretched-link); 'Nhận tư vấn' nổi trên (relative z-10) giữ #lead-form; tiêu đề đổi màu khi hover thẻ", () => {
+    renderWithIntl(<RentalSpotlightContent data={data} />);
+    const detail = screen.getByRole("link", { name: "Xem chi tiết: Studio Ba Đình" });
+    expect(detail).toHaveAttribute("href", "/cho-thue/studio-ba-dinh");
+    expect(detail).toHaveAttribute("data-stretched-link");
+    expect(detail).toHaveClass("after:absolute", "after:inset-0");
+    const consult = screen.getByRole("link", { name: "Nhận tư vấn: Studio Ba Đình" });
+    expect(consult).toHaveAttribute("href", "/cho-thue/studio-ba-dinh#lead-form");
+    expect(consult).toHaveClass("relative", "z-10");
+    expect(consult).not.toHaveAttribute("data-stretched-link");
+    expect(screen.getByRole("heading", { level: 2, name: "Studio Ba Đình" })).toHaveClass("group-hover/spot:text-accent-text");
   });
 });

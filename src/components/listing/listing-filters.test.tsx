@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 import { CheckboxFacetList, ChipChoice, FilterGroup, SelectFacet } from "./FilterFacets";
 import { RANGE_COMMIT_DELAY_MS, RangeSliderFacet } from "./RangeSliderFacet";
-import { FilterSheet, FilterSidebar } from "./FilterPanel";
+import { FilterSheet, FilterSidebar, LISTING_FILTER_STICKY_CLASS } from "./FilterPanel";
 import { useListingFilterNav } from "./use-listing-filter-nav";
 
 afterEach(() => push.mockReset());
@@ -252,6 +252,23 @@ describe("FilterSidebar / FilterSheet", () => {
     expect(within(aside).queryByRole("button", { name: "Áp dụng" })).toBeNull();
     // Có JS: gợi ý "cập nhật ngay" gắn vào vùng (WCAG 3.2.2).
     expect(aside).toHaveAccessibleDescription("Chọn tiêu chí, danh sách cập nhật ngay.");
+  });
+
+  it("BL-061: ≥ lg sidebar dính dưới header, cao tối đa phần màn hình còn lại, cuộn riêng (overscroll-contain); < lg vẫn ẩn; Sheet không có các lớp này", () => {
+    const { container, unmount } = renderWithIntl(<FilterSidebar action="/du-an">{body}</FilterSidebar>);
+    const aside = screen.getByRole("complementary", { name: "Bộ lọc" });
+    expect(aside).toHaveClass("lg:sticky", "lg:overflow-y-auto", "lg:overscroll-y-contain", "max-lg:hidden");
+    expect(aside.className).toContain("lg:max-h-[calc(100dvh-");
+    expect(aside.className).toContain("lg:top-[calc(var(--sticky-top)");
+    for (const token of LISTING_FILTER_STICKY_CLASS.split(" ")) expect(aside).toHaveClass(token);
+    expect(container.querySelector("form")).not.toHaveClass("lg:sticky");
+    unmount();
+    const sheet = renderWithIntl(
+      <FilterSheet action="/du-an" activeCount={0}>
+        {body}
+      </FilterSheet>,
+    );
+    expect(sheet.container.querySelector(".lg\\:sticky, .lg\\:overflow-y-auto")).toBeNull();
   });
 
   it("không JS < lg: nút 'Bộ lọc' là details/summary gốc mở form GET có 'Áp dụng' + input ẩn; không có Sheet", () => {

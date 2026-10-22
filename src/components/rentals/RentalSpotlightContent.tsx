@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { MapPin } from "@/components/icons";
+import { SPOTLIGHT_SECONDARY_LINK_CLASS, SPOTLIGHT_STRETCHED_LINK_CLASS, SPOTLIGHT_TITLE_CLASS } from "@/components/listing/spotlight-content-classes";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,7 +39,7 @@ export function RentalSpotlightContent({ data }: { data: RentalCardData }) {
           ))}
         </div>
       )}
-      <h2 className="line-clamp-2 font-display text-h3">{data.title}</h2>
+      <h2 className={SPOTLIGHT_TITLE_CLASS}>{data.title}</h2>
       {data.areaLabel && (
         <p className="flex min-w-0 items-center gap-1.5 text-small text-text-muted">
           <MapPin size={16} aria-hidden="true" className="shrink-0" />
@@ -54,11 +55,11 @@ export function RentalSpotlightContent({ data }: { data: RentalCardData }) {
         ))}
       </dl>
       <div className="mt-auto flex flex-wrap gap-3">
-        <Link href={data.href} className={buttonVariants()}>
+        <Link href={data.href} data-stretched-link className={cn(buttonVariants(), SPOTLIGHT_STRETCHED_LINK_CLASS)}>
           {t("spotlight.viewDetail")}
           <span className="sr-only">: {data.title}</span>
         </Link>
-        <Link href={`${data.href}#lead-form`} className={cn(buttonVariants({ variant: "outline" }))}>
+        <Link href={`${data.href}#lead-form`} className={cn(buttonVariants({ variant: "outline" }), SPOTLIGHT_SECONDARY_LINK_CLASS)}>
           {t("spotlight.consult")}
           <span className="sr-only">: {data.title}</span>
         </Link>

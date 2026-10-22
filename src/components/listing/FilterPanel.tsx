@@ -65,7 +65,15 @@ interface FilterSidebarProps extends FilterFormProps {
 }
 
 /**
- * Thẻ "Bộ lọc" cột trái ≥ lg (BL-052, design `list-du-an`): thẻ trắng, tiêu đề + "Xoá tất cả", các nhóm lọc trong `FilterForm`.
+ * BL-061 — ≥ lg thẻ "Bộ lọc" dính dưới header đang hiện (`--sticky-top` + 1rem lề), cao tối đa = phần màn hình còn lại, cuộn BÊN TRONG thẻ
+ * (thanh cuộn mảnh; `overscroll-contain` để cuộn tới đáy bộ lọc không kéo trang theo). Thẻ là ô lưới `self-start` nên chỉ dính trong hàng lưới
+ * [lọc | kết quả] — hết lưới kết quả (FAQ / Điểm mạnh / CTA nằm ngoài lưới) thì tự thôi dính, không đè. CSS thuần, không đo chiều cao bằng JS.
+ */
+export const LISTING_FILTER_STICKY_CLASS =
+  "lg:sticky lg:top-[calc(var(--sticky-top)+1rem)] lg:max-h-[calc(100dvh-var(--sticky-top)-2rem)] lg:self-start lg:overflow-y-auto lg:overscroll-y-contain lg:[scrollbar-width:thin]";
+
+/**
+ * Thẻ "Bộ lọc" cột trái ≥ lg (BL-052, design `list-du-an`): thẻ trắng, tiêu đề + "Xoá tất cả", các nhóm lọc trong `FilterForm`; dính + cuộn riêng (`LISTING_FILTER_STICKY_CLASS`, BL-061).
  * Có JS: dòng gợi ý (chỉ trình đọc màn hình) báo đổi ô là danh sách cập nhật ngay (WCAG 3.2.2). < lg ẩn — dùng `FilterSheet` cùng nội dung.
  */
 export function FilterSidebar({ action, clearHref, onClear, preservedParams, children, className }: FilterSidebarProps) {
@@ -74,7 +82,11 @@ export function FilterSidebar({ action, clearHref, onClear, preservedParams, chi
   const titleId = useId();
   const hintId = useId();
   return (
-    <aside aria-labelledby={titleId} aria-describedby={hydrated ? hintId : undefined} className={cn("rounded-[20px] border border-border bg-surface p-5 shadow-sm max-lg:hidden", className)}>
+    <aside
+      aria-labelledby={titleId}
+      aria-describedby={hydrated ? hintId : undefined}
+      className={cn("rounded-[20px] border border-border bg-surface p-5 shadow-sm max-lg:hidden", LISTING_FILTER_STICKY_CLASS, className)}
+    >
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 id={titleId} className="text-h4 font-semibold text-text">
           {t("title")}

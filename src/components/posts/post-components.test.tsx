@@ -107,6 +107,18 @@ describe("PostSpotlightContent (thẻ nổi bật /tin-bds, BL-052)", () => {
     expect(screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" })).not.toHaveClass("border-transparent");
   });
 
+  it("BL-061: 'Xem chi tiết' là link phủ cả thẻ (after:inset-0, data-stretched-link); 'Nhận tư vấn' nổi trên (relative z-10) giữ #lead-form; tiêu đề đổi màu khi hover thẻ", () => {
+    renderWithIntl(<PostSpotlightContent data={card("1")} />);
+    const detail = screen.getByRole("link", { name: "Xem chi tiết: Tin 1" });
+    expect(detail).toHaveAttribute("data-stretched-link");
+    expect(detail).toHaveClass("after:absolute", "after:inset-0");
+    const consult = screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" });
+    expect(consult).toHaveClass("relative", "z-10");
+    expect(consult.getAttribute("href")).toMatch(/#lead-form$/);
+    expect(consult).not.toHaveAttribute("data-stretched-link");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("group-hover/spot:text-accent-text");
+  });
+
   it("thẻ BĐS không giá: \"Liên hệ\"; ô trống bị bỏ", () => {
     const { container } = renderWithIntl(<PostSpotlightContent data={card("1")} />);
     expect([...container.querySelectorAll("dt")].map((node) => node.textContent)).toEqual(["Giá"]);

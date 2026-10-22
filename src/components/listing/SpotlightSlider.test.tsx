@@ -32,6 +32,31 @@ describe("SpotlightSlider", () => {
     expect(scrollIntoView).toHaveBeenCalledTimes(1);
   });
 
+  it("BL-061: cả thẻ bấm được bằng link phủ — li là containing block (relative), khung điều khiển nổi trên (z-10), không lồng a trong a, ring focus trên section", () => {
+    const stretched = (id: string) => ({
+      id,
+      image: fakeMedia(id, `Ảnh ${id}`),
+      content: (
+        <>
+          <h3>Dự án {id}</h3>
+          <a href={`/du-an/${id}`} data-stretched-link className="after:absolute after:inset-0">
+            Xem chi tiết
+          </a>
+          <a href={`/du-an/${id}#lead-form`} className="relative z-10">
+            Nhận tư vấn
+          </a>
+        </>
+      ),
+    });
+    const { container } = renderWithIntl(<SpotlightSlider label="Nổi bật" badge="Nổi bật" items={[stretched("a"), stretched("b")]} />);
+    const region = screen.getByRole("region", { name: "Nổi bật" });
+    for (const slide of within(region).getAllByRole("listitem")) expect(slide).toHaveClass("relative", "isolate");
+    expect(container.querySelectorAll("a a")).toHaveLength(0);
+    const controls = within(region).getByRole("button", { name: "Mục nổi bật sau" }).parentElement?.parentElement;
+    expect(controls).toHaveClass("z-10", "pointer-events-none");
+    expect(region.className).toContain("has-[[data-stretched-link]:focus-visible]:ring-2");
+  });
+
   it("1 mục → không mũi tên, không bộ đếm; 0 mục → không render", () => {
     const { unmount } = renderWithIntl(<SpotlightSlider label="Nổi bật" badge="Nổi bật" items={[item("a")]} />);
     expect(screen.queryByRole("button")).toBeNull();

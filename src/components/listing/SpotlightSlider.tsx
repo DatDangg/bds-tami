@@ -35,6 +35,11 @@ const ARROW_CLASS =
 /**
  * Thẻ nổi bật lớn đầu cột kết quả (BL-052, design `list-du-an`): ảnh trái (badge "… nổi bật") + nội dung phải (slot). Nhiều mục → vùng cuộn ngang scroll-snap
  * (vuốt / cuộn gốc, KHÔNG autoplay) + mũi tên tròn có `aria-label` + bộ đếm `1 / N` trên ảnh. 1 mục → không mũi tên, không bộ đếm. Không có mục → không render.
+ *
+ * BL-061 — cả thẻ bấm được bằng **link phủ** (không lồng `<a>`): nút "Xem chi tiết" trong slot mang `data-stretched-link` + `after:absolute after:inset-0`;
+ * mỗi `li` là containing block (`relative isolate` — stacking riêng nên vùng phủ không tràn sang slide khác); khung mũi tên / bộ đếm `z-10` nổi trên vùng phủ
+ * (bấm không điều hướng); link phụ trong slot ("Nhận tư vấn") tự đặt `relative z-10`. Focus bàn phím vào link phủ → ring quanh cả thẻ (`has-[…]` trên `section`,
+ * vì `li` nằm trong vùng `overflow-x-auto` sẽ bị cắt ring). Hover thẻ → slot đổi màu tiêu đề qua `group/spot`.
  */
 export function SpotlightSlider({ label, badge, items, className }: SpotlightSliderProps) {
   const t = useTranslations("page.listing.spotlight");
@@ -44,14 +49,21 @@ export function SpotlightSlider({ label, badge, items, className }: SpotlightSli
   const total = multiple ? pageCount : 1;
 
   return (
-    <section aria-roledescription={t("roleCarousel")} aria-label={label} className={cn("relative overflow-hidden rounded-[20px] border border-border bg-surface shadow-sm", className)}>
+    <section
+      aria-roledescription={t("roleCarousel")}
+      aria-label={label}
+      className={cn(
+        "relative overflow-hidden rounded-[20px] border border-border bg-surface shadow-sm has-[[data-stretched-link]:focus-visible]:ring-2 has-[[data-stretched-link]:focus-visible]:ring-focus-ring has-[[data-stretched-link]:focus-visible]:ring-offset-2",
+        className,
+      )}
+    >
       <ul ref={listRef} className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none]">
         {items.map((item, index) => (
           <li
             key={item.id}
             aria-roledescription={t("roleSlide")}
             aria-label={t("slide", { index: index + 1, total: items.length })}
-            className="grid w-full shrink-0 snap-start lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
+            className="group/spot relative isolate grid w-full shrink-0 snap-start lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
           >
             <div className={cn("relative bg-surface-muted", IMAGE_BOX)}>
               {item.image && <ResponsiveImage media={item.image} sizes="(min-width: 1024px) 40vw, 100vw" className="absolute inset-0" />}
@@ -62,8 +74,8 @@ export function SpotlightSlider({ label, badge, items, className }: SpotlightSli
         ))}
       </ul>
       {multiple && (
-        // Khung phủ cùng chiều cao với ô ảnh (`IMAGE_BOX`; ≥ lg kéo hết chiều cao thẻ) nên điều khiển luôn neo đáy-trái ảnh, không cần số lệch cứng.
-        <div className={cn("pointer-events-none absolute top-0 left-0 lg:bottom-0", IMAGE_BOX)}>
+        // Khung phủ cùng chiều cao với ô ảnh (`IMAGE_BOX`; ≥ lg kéo hết chiều cao thẻ) nên điều khiển luôn neo đáy-trái ảnh, không cần số lệch cứng. `z-10`: nổi trên link phủ của slide.
+        <div className={cn("pointer-events-none absolute top-0 left-0 z-10 lg:bottom-0", IMAGE_BOX)}>
           <div className="pointer-events-auto absolute bottom-4 left-4 flex items-center gap-1 rounded-pill bg-dark-deep/60 p-0.5 backdrop-blur-sm">
             <button type="button" aria-label={t("previous")} onClick={() => scrollToSlide(current - 1)} className={ARROW_CLASS}>
               <CaretLeft size={18} aria-hidden="true" />

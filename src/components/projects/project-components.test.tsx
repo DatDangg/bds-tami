@@ -133,6 +133,21 @@ describe("ProjectSpotlightContent (BL-052)", () => {
     expect(screen.getByRole("link", { name: /Nhận tư vấn/ })).not.toHaveClass("border-transparent");
   });
 
+  it("BL-061: 'Xem chi tiết' là link phủ cả thẻ (after:inset-0, data-stretched-link); 'Nhận tư vấn' nổi trên (relative z-10) giữ #lead-form; tiêu đề đổi màu khi hover thẻ", () => {
+    renderWithIntl(<ProjectSpotlightContent data={card()} />);
+    const detail = screen.getByRole("link", { name: "Xem chi tiết: Dự án Sông Sài Gòn" });
+    expect(detail).toHaveAttribute("data-stretched-link");
+    expect(detail).toHaveClass("after:absolute", "after:inset-0");
+    // Nút có `active:translate-y-px` thì transform lúc nhấn biến link thành containing block của `::after` → vùng phủ co lại, mouseup rơi ra ngoài, click không điều hướng.
+    expect(detail).toHaveClass("active:translate-none");
+    expect(detail).not.toHaveClass("active:translate-y-px");
+    const consult = screen.getByRole("link", { name: "Nhận tư vấn: Dự án Sông Sài Gòn" });
+    expect(consult).toHaveClass("relative", "z-10");
+    expect(consult.getAttribute("href")).toMatch(/#lead-form$/);
+    expect(consult).not.toHaveAttribute("data-stretched-link");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("group-hover/spot:text-accent-text");
+  });
+
   it("thiếu dữ liệu: địa chỉ → tỉnh, giá → 'Liên hệ', ô diện tích / bàn giao trống bị bỏ, không danh mục → chỉ badge tình trạng", () => {
     renderWithIntl(<ProjectSpotlightContent data={card({ categoryName: null })} headingLevel="h3" />);
     expect(screen.getByText("TP. Hồ Chí Minh")).toBeInTheDocument();
