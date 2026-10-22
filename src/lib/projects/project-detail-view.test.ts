@@ -218,6 +218,29 @@ describe("BL-052: trường chi tiết mới", () => {
     expect(toProjectDetailView(project({ amenitiesImage: pdf("x") }), "vi").amenitiesImage).toBeNull();
   });
 
+  it("ảnh từng tiện ích (BL-058): alt thiếu dùng tên tiện ích, PDF/ảnh đã xoá → null", () => {
+    const view = toProjectDetailView(
+      project({ amenities: [{ name: "Hồ bơi", image: image("a1", " ") }, { name: "Gym", image: pdf("a2") }, { name: "Vườn", image: "chi-con-id" as unknown as string }, { name: "Sân", image: image("a3", "Sân tennis") }] }),
+      "vi",
+    );
+    expect(view.amenities.map((item) => item.image?.alt ?? null)).toEqual(["Hồ bơi", null, null, "Sân tennis"]);
+  });
+
+  it("locationMedia (BL-058): rỗng / video ngoài whitelist không ảnh → null; video hợp lệ + ảnh; chỉ ảnh; alt dự phòng; visibleSections tính cả thẻ", () => {
+    const media = (locationMedia: Project["locationMedia"]) => toProjectDetailView(project({ locationMedia }), "vi").locationMedia;
+    expect(media(undefined)).toBeNull();
+    expect(media({ title: "Kết nối", videoUrl: "https://example.com/v.mp4" })).toBeNull();
+    expect(media({ image: pdf("x") })).toBeNull();
+    expect(media({ title: " Hạ tầng ", image: image("l1", " "), videoUrl: " https://www.youtube.com/watch?v=dQw4w9WgXcQ " })).toMatchObject({
+      title: "Hạ tầng",
+      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      image: { alt: "Hạ tầng" },
+    });
+    expect(media({ image: image("l2", " ") })).toMatchObject({ title: null, videoUrl: null, image: { alt: "Dự án A" } });
+    const onlyMedia = toProjectDetailView(project({ locationMedia: { image: image("l3") } }), "vi");
+    expect(visibleSections(onlyMedia)).toContain("location");
+  });
+
   it("video chỉ nhận link qua whitelist YouTube/TikTok", () => {
     expect(toProjectDetailView(project({ videoUrl: " https://www.youtube.com/watch?v=dQw4w9WgXcQ " }), "vi").videoUrl).toBe("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
     expect(toProjectDetailView(project({ videoUrl: "https://evil.example/v.mp4" }), "vi").videoUrl).toBeNull();

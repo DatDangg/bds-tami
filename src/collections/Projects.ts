@@ -96,6 +96,29 @@ const amenitiesField: ArrayField = {
     { name: "name", type: "text", label: "Tên tiện ích", localized: true, required: true, admin: { placeholder: "VD: Hồ bơi" } },
     { name: "icon", type: "text", label: "Biểu tượng (tuỳ chọn)", admin: { description: "Tên biểu tượng hiển thị kèm tiện ích." } },
     { name: "description", type: "textarea", label: "Mô tả ngắn (tuỳ chọn)", localized: true, admin: { placeholder: "VD: Hồ bơi tràn bờ 50m trên tầng thượng" } },
+    {
+      ...mediaUpload("image", "Ảnh tiện ích (tuỳ chọn)", imageMimeType),
+      admin: { description: "Có ảnh thì khối Tiện ích hiện dạng slider thẻ ảnh." },
+    },
+  ],
+};
+
+/** Thẻ ảnh/video cạnh bản đồ ở khối Vị trí trang chi tiết (BL-058); không nhập gì thì khối giữ bố cục cũ. */
+const locationMediaGroup: GroupField = {
+  name: "locationMedia",
+  type: "group",
+  label: "Thẻ Kết nối hạ tầng (khối Vị trí)",
+  fields: [
+    { name: "title", type: "text", label: "Tiêu đề thẻ (tuỳ chọn)", localized: true, admin: { placeholder: "Kết nối hạ tầng" } },
+    mediaUpload("image", "Ảnh thẻ (tuỳ chọn)", imageMimeType),
+    {
+      name: "videoUrl",
+      type: "text",
+      label: "Link video (tuỳ chọn)",
+      validate: validateVideoUrl,
+      hooks: { beforeValidate: [trimText] },
+      admin: { placeholder: "https://www.youtube.com/watch?v=…", description: "Link YouTube hoặc TikTok (https://). Có video thì thẻ hiện nút play; ảnh ở trên làm ảnh bìa." },
+    },
   ],
 };
 
@@ -183,6 +206,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               ),
               { name: "address", type: "text", label: "Địa chỉ", admin: { placeholder: "VD: Phường Long Thạnh Mỹ, TP Thủ Đức" } },
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
+              locationMediaGroup,
               formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),
               formRow(productTypesField, featuredAmenitiesField),
@@ -227,7 +251,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
     { englishRequiredFields: ["title", "slug", "summary", "overview"], revalidate },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): address, scale, priceUpdatedAt, videoUrl ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
-  return hideTechnicalListFields(collection, ["address", "scale", "priceUpdatedAt", "videoUrl"]);
+  return hideTechnicalListFields(collection, ["address", "scale", "priceUpdatedAt", "videoUrl", "locationMedia"]);
 }
 
 export const Projects = createProjects();

@@ -127,7 +127,7 @@ function useProjectBands(doc: ProjectDetailProps["doc"], view: ProjectDetailView
   const shown = new Set<SectionId>(sections);
   const policyBlocks = usePolicyBlocks(doc, view, shown);
   const bandContent: Partial<Record<SectionId, ReactNode>> = {
-    location: <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />,
+    location: <ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} locationMedia={view.locationMedia} />,
     amenities: <ProjectAmenities amenities={view.amenities} image={view.amenitiesImage} />,
     gallery: (
       <DetailSection id={SECTION_DOM_ID.gallery} eyebrow={t("v2.eyebrow.gallery")} title={t("v2.titles.gallery")} description={t("v2.galleryDescription", { name: view.title })}>

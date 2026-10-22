@@ -600,6 +600,14 @@
         },
         "contactDescription": "Sign up to receive the price list, sales policy and detailed advice from our consultants.",
         "distanceTitle": "Distances to key places",
+        "amenitiesSlider": {
+          "slide": "Amenity {index} / {total}",
+          "previous": "Previous amenities",
+          "next": "Next amenities",
+          "dots": "Choose slide position",
+          "goTo": "Go to amenity group {index}"
+        },
+        "locationMedia": { "title": "Infrastructure connections" },
         "amenitiesExpand": "Explore all amenities",
         "similarViewAll": "View all projects"
       }

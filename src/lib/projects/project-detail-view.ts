@@ -48,6 +48,15 @@ export interface AmenityView {
   id: string;
   name: string;
   description: string | null;
+  /** Ảnh riêng của tiện ích (BL-058); có ≥ 1 tiện ích có ảnh thì khối Tiện ích hiện slider thẻ ảnh. */
+  image: MediaImage | null;
+}
+
+/** Thẻ ảnh/video "Kết nối hạ tầng" cạnh bản đồ ở khối Vị trí (BL-058); `null` khi không có ảnh lẫn video hợp lệ. */
+export interface LocationMediaView {
+  title: string | null;
+  image: MediaImage | null;
+  videoUrl: string | null;
 }
 
 /** Thẻ "Sản phẩm" trong Tổng quan (BL-052): số lượng + loại + khoảng diện tích; số 0 / âm coi như chưa nhập. */
@@ -133,6 +142,7 @@ export interface ProjectDetailView {
   hasLegal: boolean;
   hasPolicy: boolean;
   location: LatLng | null;
+  locationMedia: LocationMediaView | null;
   highlights: HighlightView[];
   nearby: NearbyGroupView[];
   priceRows: PriceRowView[];
@@ -196,6 +206,25 @@ function toFloorPlans(items: Project["floorPlans"], projectTitle: string): Floor
     if (!media || !hasText(plan.title)) return [];
     return [{ id: plan.id ?? String(index), title: plan.title, image: { ...media, alt: media.alt?.trim() || `${plan.title} - ${projectTitle}` } }];
   });
+}
+
+function toAmenities(items: Project["amenities"]): AmenityView[] {
+  return (items ?? []).flatMap((item, index) => {
+    if (!hasText(item.name)) return [];
+    const name = item.name.trim();
+    const media = renderableImage(item.image);
+    return [{ id: item.id ?? String(index), name, description: trimmedOrNull(item.description), image: media ? { ...media, alt: media.alt?.trim() || name } : null }];
+  });
+}
+
+/** Video không qua whitelist `parseVideoUrl` coi như không có; không ảnh lẫn video → `null` (khối Vị trí giữ bố cục cũ). */
+function toLocationMedia(group: Project["locationMedia"], projectTitle: string): LocationMediaView | null {
+  const title = trimmedOrNull(group?.title);
+  const media = renderableImage(group?.image);
+  const rawVideo = group?.videoUrl?.trim();
+  const videoUrl = rawVideo && parseVideoUrl(rawVideo) ? rawVideo : null;
+  if (!media && !videoUrl) return null;
+  return { title, image: media ? { ...media, alt: media.alt?.trim() || title || projectTitle } : null, videoUrl };
 }
 
 function toDeveloper(developer: Project["developer"]): DeveloperView | null {
@@ -312,13 +341,14 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     productTypes: toProductTypes(doc.productTypes),
     products: toProducts(doc.products),
     videoUrl: parseVideoUrl(doc.videoUrl) ? (doc.videoUrl?.trim() ?? null) : null,
-    amenities: (doc.amenities ?? []).flatMap((item, index) => (hasText(item.name) ? [{ id: item.id ?? String(index), name: item.name.trim(), description: trimmedOrNull(item.description) }] : [])),
+    amenities: toAmenities(doc.amenities),
     amenitiesImage: amenitiesImage ? { ...amenitiesImage, alt: amenitiesImage.alt?.trim() || title } : null,
     floorPlans: toFloorPlans(doc.floorPlans, title),
     documents: toDocuments(doc.documents, locale),
     hasLegal: lexicalPlainText(doc.legalInfo).trim() !== "",
     hasPolicy: lexicalPlainText(doc.salesPolicy).trim() !== "",
     location: toLocation(doc.location),
+    locationMedia: toLocationMedia(doc.locationMedia, title),
     highlights: toHighlights(doc.highlights),
     nearby: toNearby(doc.nearbyAmenities),
     priceRows: toPriceRows(doc.priceTable),
@@ -342,7 +372,7 @@ export function visibleSections(view: ProjectDetailView, { hasListings = false }
   const present: Record<SectionId, boolean> = {
     overview: true,
     highlights: view.highlights.length > 0,
-    location: view.location !== null || view.address !== null || view.nearby.length > 0,
+    location: view.location !== null || view.address !== null || view.nearby.length > 0 || view.locationMedia !== null,
     amenities: view.amenities.length > 0,
     // 1 ảnh đã là nền hero: khối Hình ảnh chỉ có nghĩa từ 2 ảnh.
     gallery: view.gallery.length > 1,

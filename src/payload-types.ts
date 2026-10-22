@@ -586,6 +586,14 @@ export interface Project {
    * @maxItems 2
    */
   location?: [number, number] | null;
+  locationMedia?: {
+    title?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Link YouTube hoặc TikTok (https://). Có video thì thẻ hiện nút play; ảnh ở trên làm ảnh bìa.
+     */
+    videoUrl?: string | null;
+  };
   priceFromVnd?: number | null;
   priceToVnd?: number | null;
   areaFromM2?: number | null;
@@ -631,6 +639,10 @@ export interface Project {
          */
         icon?: string | null;
         description?: string | null;
+        /**
+         * Có ảnh thì khối Tiện ích hiện dạng slider thẻ ảnh.
+         */
+        image?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -1864,6 +1876,13 @@ export interface ProjectsSelect<T extends boolean = true> {
   ward?: T;
   address?: T;
   location?: T;
+  locationMedia?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        videoUrl?: T;
+      };
   priceFromVnd?: T;
   priceToVnd?: T;
   areaFromM2?: T;
@@ -1894,6 +1913,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         name?: T;
         icon?: T;
         description?: T;
+        image?: T;
         id?: T;
       };
   amenitiesImage?: T;

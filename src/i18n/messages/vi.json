@@ -600,6 +600,14 @@
         },
         "contactDescription": "Đăng ký để nhận bảng giá, chính sách và tư vấn chi tiết từ chuyên viên.",
         "distanceTitle": "Khoảng cách đến các địa điểm quan trọng",
+        "amenitiesSlider": {
+          "slide": "Tiện ích {index} / {total}",
+          "previous": "Tiện ích trước",
+          "next": "Tiện ích sau",
+          "dots": "Chọn vị trí slide",
+          "goTo": "Chuyển tới nhóm tiện ích {index}"
+        },
+        "locationMedia": { "title": "Kết nối hạ tầng" },
         "amenitiesExpand": "Khám phá tất cả tiện ích",
         "similarViewAll": "Xem tất cả dự án"
       }
