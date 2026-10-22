@@ -100,6 +100,8 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
                   components: { Cell: "/components/admin/JobDeadlineDisplay#JobDeadlineCell", afterInput: ["/components/admin/JobDeadlineDisplay#JobDeadlineNotice"] },
                 },
               },
+              // BL-054: nhãn "Tuyển gấp" ở hàng danh sách, hero chi tiết, thẻ "Vị trí khác"; không ảnh hưởng sắp xếp.
+              { name: "isUrgent", type: "checkbox", label: "Tuyển gấp", defaultValue: false, admin: { description: "Hiện nhãn \"Tuyển gấp\" cạnh tin trên website." } },
             ],
           },
         ]),

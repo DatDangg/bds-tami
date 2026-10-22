@@ -12,6 +12,7 @@ export const ADMIN_COLLECTION_LABELS = {
   "audit-logs": { singular: "Nhật ký thao tác", plural: "Nhật ký thao tác" },
   "click-events": { singular: "Lượt bấm liên hệ", plural: "Lượt bấm liên hệ" },
   "click-stats-daily": { singular: "Thống kê liên hệ theo ngày", plural: "Thống kê liên hệ theo ngày" },
+  "news-views-daily": { singular: "Lượt xem tin tức (theo ngày)", plural: "Lượt xem tin tức (theo ngày)" },
   "translation-usage": { singular: "Chi phí dịch tự động", plural: "Chi phí dịch tự động" },
   categories: { singular: "Danh mục", plural: "Danh mục" },
   developers: { singular: "Chủ đầu tư", plural: "Chủ đầu tư" },
@@ -27,6 +28,7 @@ export const ADMIN_COLLECTION_LABELS = {
   "job-applications": { singular: "Hồ sơ ứng tuyển", plural: "Hồ sơ ứng tuyển" },
   leads: { singular: "Lead", plural: "Lead" },
   "lead-activities": { singular: "Hoạt động chăm sóc", plural: "Lịch sử chăm sóc" },
+  "newsletter-subscribers": { singular: "Đăng ký bản tin", plural: "Đăng ký bản tin" },
   redirects: { singular: "Chuyển hướng", plural: "Chuyển hướng đường dẫn" },
 } as const satisfies Record<string, NonNullable<CollectionConfig["labels"]>>;
 

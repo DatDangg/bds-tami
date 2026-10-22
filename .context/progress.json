@@ -2372,16 +2372,24 @@
         {
           "task": "phase-1-task-01",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-01.md",
-          "status": "pending",
-          "attempt": 0,
-          "dependsOn": []
+          "status": "done",
+          "attempt": 1,
+          "dependsOn": [],
+          "wave": "1A",
+          "note": "schema 2 collection + isUrgent + offices/workingHours/careersProcess, migration",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-task-01-round-1-review.md",
+          "commit": "7cfb59e",
+          "migration": "20261022_022857_news_careers_contact_redesign SAFE_ADDITIVE"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0,
-          "dependsOn": []
+          "status": "in_progress",
+          "attempt": 1,
+          "dependsOn": [],
+          "wave": "1A"
         },
         {
           "task": "phase-1-task-03",
@@ -3460,7 +3468,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T02:11:52.897Z",
+  "lastUpdated": "2026-10-22T02:59:19.355Z",
   "approvalMilestones": [
     {
       "id": "M1",

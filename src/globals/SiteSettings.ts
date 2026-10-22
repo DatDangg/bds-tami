@@ -11,7 +11,8 @@ import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
 import { listingPagesField } from "./site-settings/listing-pages";
-import { careersPerksField, pageHeroesField, showProjectStrengthsField } from "./site-settings/page-heroes";
+import { officesField, workingHoursField } from "./site-settings/contact-offices";
+import { careersPerksField, careersProcessField, pageHeroesField, showProjectStrengthsField } from "./site-settings/page-heroes";
 
 const validateHttpUrl: TextFieldSingleValidation = (value) => {
   if (typeof value !== "string" || value.trim() === "") return true;
@@ -112,6 +113,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
             pageHeroesField,
             showProjectStrengthsField,
             careersPerksField,
+            careersProcessField,
           ],
         },
         { label: "Trang danh sách", fields: [listingPagesField] },
@@ -139,6 +141,8 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
                 { name: "url", type: "text", label: "Link trang", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
               ],
             },
+            workingHoursField,
+            officesField,
           ],
         },
         {

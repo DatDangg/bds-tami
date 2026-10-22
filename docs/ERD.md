@@ -103,9 +103,9 @@ erDiagram
 | Tài khoản | `staff` | Tài khoản đăng nhập admin (Admin, Sale) |
 | Danh mục nền | `provinces`, `wards`, `categories`, `developers` | Địa giới, phân loại, chủ đầu tư |
 | Nội dung | `projects`, `rentals`, `property-posts`, `news`, `services`, `job-postings`, `pages` | Nội dung hiển thị trên web |
-| Khách hàng | `leads`, `lead-activities`, `job-applications` | Dữ liệu khách để lại, hồ sơ ứng tuyển |
+| Khách hàng | `leads`, `lead-activities`, `job-applications`, `newsletter-subscribers` | Dữ liệu khách để lại, hồ sơ ứng tuyển, đăng ký bản tin (BL-054) |
 | File | `media`, `private-files` | Ảnh/file công khai; CV ứng viên (chỉ CV) |
-| Hệ thống | `audit-logs`, `click-events`, `click-stats-daily`, `redirects`, `payload-jobs`, `translation-usage` | Nhật ký, thống kê, chuyển hướng, hàng đợi job, chi phí dịch AI |
+| Hệ thống | `audit-logs`, `click-events`, `click-stats-daily`, `news-views-daily`, `redirects`, `payload-jobs`, `translation-usage` | Nhật ký, thống kê (lượt bấm, lượt xem tin), chuyển hướng, hàng đợi job, chi phí dịch AI |
 | Globals | `site-settings`, `homepage`, `header`, `footer` | Cấu hình dùng chung |
 | *(để dành)* | `members` | Tài khoản người đăng bên ngoài, **chưa tạo** (ARCHITECTURE §9.2) |
 
@@ -423,6 +423,7 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 | `status` | select | R, I | |
 | `publishedAt` | date | | |
 | `author` | `rel→staff` | R | |
+| `isUrgent` | checkbox | | BL-054 "Tuyển gấp" (mặc định tắt): nhãn ở hàng danh sách, hero chi tiết, thẻ "Vị trí khác"; không ảnh hưởng sắp xếp. Cột `is_urgent` boolean `DEFAULT false`, nullable (+ `_job_postings_v.version_is_urgent`) |
 | `seo` | group | | |
 
 Đã xây (as-built): không có `isFeatured`; `category` tuỳ chọn (G25; cột nullable, validator chỉ kiểm scope `job` khi có giá trị). Xoá **hẳn** (chỉ admin) tin còn hồ sơ ứng tuyển bị chặn **409** (`job_applications.job_posting_id` NOT NULL nhưng FK `ON DELETE SET NULL`); xoá mềm vẫn được và hồ sơ giữ nguyên. Tin quá hạn chỉ bị loại khỏi danh sách ở query công khai (trang chi tiết vẫn truy cập được, xem DESIGN).
@@ -450,6 +451,19 @@ Không có `author` và `slug`: chỉ admin tạo/sửa (`docs/PERMISSION.md` §
 - `ipHash` không bao giờ trả ra qua API/admin (`read` bị từ chối), chỉ lưu trong DB.
 - Không bật `trash`, `versions`, nhân bản: không sinh thêm bản sao dữ liệu cá nhân. `status` không ép thứ tự chuyển trạng thái.
 - Admin xoá hồ sơ: hook `afterDelete` xoá luôn CV trong `private-files` (cùng transaction; hook `beforeDelete` của `private-files` xoá object S3 và ném nếu S3 lỗi, plugin S3 nuốt lỗi nên không dựa vào nó) và ghi audit `content.purge` chỉ có id, không có PII. Hồ sơ đã ẩn danh (`cv` null) vẫn xoá được. Thứ tự hook: audit trước, xoá CV (không hoàn tác được trên S3) sau cùng; xoá CV lỗi thì rollback cả hồ sơ + audit. `disableBulkDelete: true`: chỉ xoá từng hồ sơ, vì bulk delete không đảm bảo rollback này.
+
+**`newsletter-subscribers`** (BL-054 "Bản tin thị trường"; dữ liệu cá nhân — chỉ admin đọc / sửa / xoá, sale không thấy; create `denyAll` qua REST, form công khai `POST /api/public/newsletter` (P1-T04) ghi bằng Local API)
+
+| Trường | Kiểu | Ràng buộc | Ghi chú |
+|---|---|---|---|
+| `email` | email | R, U, I | Hook `beforeValidate` cắt khoảng trắng + chữ thường trước khi kiểm unique (`newsletter_subscribers_email_idx` UNIQUE) |
+| `locale` | select | R | `vi` · `en` (mặc định `vi`) |
+| `status` | select | R, I | `active` "Đang nhận" (mặc định) · `unsubscribed` "Đã huỷ" |
+| `consentAt` | date | | Thời điểm đồng ý |
+| `privacyPolicyVersion` | text | | Lấy từ `site-settings.privacyPolicyVersion` lúc đăng ký |
+| `sourcePath` | text | | Trang đăng ký |
+
+As-built (BL-054 P1-T01): `src/collections/NewsletterSubscribers.ts`; `disableDuplicate`; admin chỉ sửa tay được `status` (các trường còn lại `admin.readOnly`, là bằng chứng đồng ý); cột danh sách email · ngôn ngữ · trạng thái · ngày tạo; tìm theo email. Chưa gửi mail định kỳ; chưa nằm trong job `data-retention`.
 
 ### 4.11. `leads`, `lead-activities`
 
@@ -551,6 +565,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 **`redirects`**: plugin `@payloadcms/plugin-redirects` (`from`, `to`, `type=301`). Đổi slug của nội dung đã xuất bản thì hook tự tạo redirect cho đúng ngôn ngữ (BR-05): `from` / `to` là đường dẫn đầy đủ, vd `/en/for-rent/old-slug` → `/en/for-rent/new-slug`. As-built (layer-6-task-03): `from` UNIQUE + index, `to` là chuỗi (không phải quan hệ), `type` chỉ `301`; cả hai là đường dẫn nội bộ bắt đầu bằng một `/`; chỉ admin đọc/ghi qua API. Không tạo chuỗi/vòng: đổi slug lần nữa thì redirect cũ trỏ thẳng tới URL mới nhất (A→B, B→C ⇒ A→C), redirect trùng URL đang công khai bị xoá. Code: `src/collections/redirects-plugin.ts`, `src/hooks/create-slug-redirect.ts`.
 
+**`news-views-daily`** (BL-054, chỉ admin đọc; create/update/delete `denyAll`, `disableDuplicate`; ẩn menu với sale): `news` (`rel→news`, R, I), `day` (date, R, I — ngày theo giờ Việt Nam, lưu mốc 00:00 giờ VN), `views` (number, R, ≥ 0, mặc định 0). UNIQUE `(news_id, day)` (`news_day_idx`, khai `indexes` của collection) để endpoint `POST /api/public/news-views` (P1-T03) cộng dồn bằng upsert nguyên tử. FK `news_id` **`ON DELETE CASCADE`** (SQL tuỳ biến trong migration `20261022_022857_news_careers_contact_redesign`: Payload luôn sinh `SET NULL` cho relationship, mâu thuẫn với `NOT NULL` → xoá hẳn tin có lượt xem sẽ lỗi; snapshot `.json` giữ `set null` nên không drift; test integration `news-views-newsletter` khoá hành vi). Không lưu IP / User-Agent. Code: `src/collections/NewsViewsDaily.ts`.
+
 **`payload-jobs`**: bảng hàng đợi do Payload Jobs quản lý.
 
 **`translation-usage`** (chỉ admin đọc; hệ thống ghi): `month` (`YYYY-MM`, U), `inputTokens`, `outputTokens`, `requests`, `estimatedCostUsd`. Job dịch cộng dồn sau mỗi lần gọi; vượt hạn mức tháng (env `TRANSLATION_MONTHLY_BUDGET_USD`) thì dừng dịch và báo admin. As-built: `month` tính theo UTC (cùng chu kỳ tính phí của provider), unique index do DB giữ; `TranslationService` cộng dồn bằng một câu `INSERT ... ON CONFLICT (month) DO UPDATE SET x = x + EXCLUDED.x` nên nhiều lần dịch song song không mất lần cộng nào; `estimatedCostUsd` là ước tính từ `usage` của API theo bảng giá trong `src/lib/translation/budget.ts` (model ngoài bảng tính theo giá cao nhất); chạm hạn mức (`>=`) thì dừng, hạn mức 0 = tắt dịch. Không ai ghi qua API (create/update/delete `denyAll`). Code: `src/collections/TranslationUsage.ts`, `src/lib/translation/`.
@@ -611,6 +627,8 @@ Cỡ ảnh sinh khi upload (WebP): `thumb` 400w · `card` 800w · `large` 1600w 
 
 > **As-built (BL-044, feature-homepage-redesign) — `homepage`:** migration `20261020_103248_homepage_redesign` (T01) thêm `hero.eyebrow`/`hero.caption`/`slides[].titleAccent`, group `strengths`, các trường `about.*` và `featuredProjects.eyebrow`/`description` nêu ở bảng trên; `strengths` vào enum `blockOrder`. Không có data migration: bản ghi cũ giữ `blockOrder` cũ (không có `strengths`, vẫn các khối ngoài mockup) — admin tự chỉnh ở tab "Thứ tự khối". `footer`/`site-settings` không đổi schema (mô tả footer = `footer.contactBlock`, mạng xã hội = `site-settings.socialLinks`; không còn cột Liên hệ ở footer).
 >
+> **As-built (BL-054, feature-news-careers-contact-redesign P1-T01) — `site-settings`:** tab "Liên hệ & mạng xã hội" thêm `workingHours` (group "Giờ làm việc": `hours`, `days` text localized → cột `site_settings_locales.working_hours_hours` / `working_hours_days`; trống → ẩn thẻ Giờ làm việc) và `offices` (array ≤ 10 "Hệ thống văn phòng": `name` R + `address` R localized, `image` upload ảnh, `location` point, `phone`, `email`; bảng `site_settings_offices` + `_locales`; trống → web dùng `address` / `mapLocation` / `hotline` / `email` cũ). Tab "Ảnh banner" thêm `careersProcess` cạnh `careersPerks` (array ≤ 6 "Quy trình ứng tuyển": `icon` R cùng danh sách icon `strengths`, `title` R localized, `description` textarea localized; bảng `site_settings_careers_process` + `_locales`). Field ở `src/globals/site-settings/contact-offices.ts` và `page-heroes.ts`. Ba trường vào `TRANSLATABLE_FIELDS["site-settings"]`. Tên bảng đều < 63 ký tự (không cần `dbName`). Migration `20261022_022857_news_careers_contact_redesign` (additive).
+
 > **As-built (L9-T01) — hiển thị trang chủ** (`src/lib/home/`, `src/components/home/`, `[locale]/page.tsx`): hero luôn đứng đầu, các khối theo `blockOrder` (khối không nằm trong mảng thì không hiện; chưa có `blockOrder` thì thứ tự mặc định). Khối chỉ hiện khi đã bật VÀ có `title` ở ngôn ngữ đang xem (ngoại lệ: `rentals`/`news` có `title` tuỳ chọn — trống thì dùng tiêu đề mặc định i18n) (global đọc `fallbackLocale: false`: `/en` thiếu chữ EN thì ẩn, không lấy chữ Việt; `ctaBanner` mặc định tắt). `/en` bỏ slide hero chưa có `title` EN và mục `about.stats` chưa có nhãn EN. Dự án / ưu đãi: chọn tay (đọc lại như khách theo id, giữ thứ tự chọn) hoặc, khi trống, `isFeatured` mới nhất (tối đa 6; ưu đãi chỉ bài chưa kết thúc theo `offerNotEndedWhere`/`isOfferEnded`); dịch vụ: chỉ các mục đã chọn (tối đa 12, trống thì ẩn khối); khối danh sách rỗng thì ẩn. `partners` (FR-PUB-17) chưa có giao diện nên bỏ qua. Video hero chỉ dựng ở client khi ≥ 1024px, không reduced-motion, không Save-Data. `h1` là `title` slide 1, thiếu thì `h1` ẩn bằng tên site. Header nổi kính mờ (BL-020 P1): hero kéo lên `-mt-(--header-offset)`, cao `100svh`. Guard xoá media đọc bản `vi` qua adapter DB (`req.payload.db.findGlobal`), không đổi `req.locale` của request xoá.
 
 ---
@@ -631,6 +649,7 @@ Payload tạo index cho trường `index: true` và `unique: true`. Các index d
 | `property_posts` | `(status, has_english, category_id, published_at DESC)` (`property_posts_list_idx`), `(status, is_featured, offer_end_at)` (`property_posts_featured_offer_idx`); SQL tuỳ biến trong migration `20261018_075627_property_posts`, không partial. Thêm index đơn `offer_end_at` (`property_posts_offer_offer_end_at_idx`, do `index: true` của field) cho truy vấn job `expire-offers` | Danh sách, khối ưu đãi |
 | `news` | `(status, has_english, category_id, published_at DESC)` (`news_list_idx`, SQL tuỳ biến trong migration `20261017_093650_news`) | Danh sách tin tức |
 | `job_postings` | `(status, has_english, deadline)` (`job_postings_list_idx`, SQL tuỳ biến trong migration `20261017_130625_job_postings`, không partial) | Danh sách tin tuyển dụng còn hạn |
+| `news_views_daily` | UNIQUE `(news_id, day)` (`news_day_idx`, khai `NewsViewsDaily.indexes`, migration `20261022_022857_news_careers_contact_redesign`) | Upsert lượt xem theo ngày + top "Đọc nhiều" 30 ngày (BL-054) |
 | `leads` | `(phone_normalized, source, created_at DESC)` | Chống trùng |
 | `leads` | `(status, assigned_to_id, created_at DESC)` | Danh sách lead trong admin |
 | `leads` | `(status, assigned_to_id, reminded_at, created_at)` (`status_assignedTo_remindedAt_createdAt_idx`, khai `Leads.indexes`, migration `20261018_212611_leads_remind_scan_index`, không partial) | Quét lead `new` chưa giao, chưa nhắc của job `remind-unassigned-leads` (BR-14) |

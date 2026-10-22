@@ -47,10 +47,10 @@ describe("nhóm menu admin (BL-015 T03)", async () => {
     expect(labels).not.toContain("Danh mục");
   });
 
-  it("nhóm \"Nâng cao\" đứng cuối với 6 mục kỹ thuật (BL-041)", () => {
+  it("nhóm \"Nâng cao\" đứng cuối với 7 mục kỹ thuật (BL-041)", () => {
     const last = ADMIN_NAV_GROUPS[ADMIN_NAV_GROUPS.length - 1];
     expect(last?.label).toBe("Nâng cao");
-    expect([...(last?.collections ?? [])]).toEqual(["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "translation-usage"]);
+    expect([...(last?.collections ?? [])]).toEqual(["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "news-views-daily", "translation-usage"]);
   });
 
   it("slug chưa khai báo -> throw (không rơi vào nhóm mặc định)", () => {

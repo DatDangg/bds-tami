@@ -357,6 +357,57 @@ describe.skipIf(!baseUrl)("integration: globals site-settings / header / footer 
     });
   });
 
+  describe("văn phòng, giờ làm việc, quy trình ứng tuyển (BL-054)", () => {
+    it("trống là hợp lệ (dữ liệu cũ vẫn lưu); admin lưu vi + en riêng; /en không rơi về tiếng Việt; khách đọc được", async () => {
+      const blank = await updateSettings({ hotline: "0900000000" }, admin);
+      expect(blank.offices ?? []).toHaveLength(0);
+      expect(blank.careersProcess ?? []).toHaveLength(0);
+
+      const doc = await updateSettings(
+        {
+          offices: [{ name: "Trụ sở Hà Nội", address: "1 Phố Test, Hà Nội", location: [105.85, 21.03], phone: "0241234567", email: "hn@example.test" }],
+          workingHours: { hours: "8:00 – 18:00", days: "Thứ 2 – Chủ nhật" },
+          careersProcess: [{ icon: "file-check", title: "Nộp hồ sơ", description: "Gửi CV" }, { icon: "users", title: "Phỏng vấn" }],
+        },
+        admin,
+      );
+      expect(doc.offices?.[0]).toMatchObject({ name: "Trụ sở Hà Nội", phone: "0241234567", email: "hn@example.test" });
+      expect(doc.offices?.[0]?.location).toEqual([105.85, 21.03]);
+      expect(doc.careersProcess?.map((step) => step.title)).toEqual(["Nộp hồ sơ", "Phỏng vấn"]);
+
+      const enBefore = await readPublicGlobal(payload, "site-settings", "en");
+      expect(enBefore.workingHours?.hours).toBeFalsy();
+      expect(enBefore.offices?.[0]?.name).toBeFalsy();
+
+      await updateSettings(
+        {
+          offices: [{ id: doc.offices?.[0]?.id, name: "Hanoi Head Office", address: "1 Test Street, Hanoi" }],
+          workingHours: { hours: "8:00 AM – 6:00 PM", days: "Monday – Sunday" },
+          careersProcess: [{ id: doc.careersProcess?.[0]?.id, icon: "file-check", title: "Apply" }, { id: doc.careersProcess?.[1]?.id, icon: "users", title: "Interview" }],
+        },
+        admin,
+        "en",
+      );
+      const en = await readPublicGlobal(payload, "site-settings", "en");
+      expect(en.offices?.[0]).toMatchObject({ name: "Hanoi Head Office", address: "1 Test Street, Hanoi", phone: "0241234567" });
+      expect(en.workingHours).toMatchObject({ hours: "8:00 AM – 6:00 PM", days: "Monday – Sunday" });
+      expect(en.careersProcess?.map((step) => step.title)).toEqual(["Apply", "Interview"]);
+      const vi = await readPublicGlobal(payload, "site-settings", "vi");
+      expect(vi.offices?.[0]?.name).toBe("Trụ sở Hà Nội");
+      expect(vi.workingHours?.days).toBe("Thứ 2 – Chủ nhật");
+    });
+
+    it("thiếu tên / địa chỉ văn phòng, thiếu tiêu đề bước, quá 10 văn phòng / 6 bước, email sai → 400; sale ghi → 403", async () => {
+      expect(await statusOf(updateSettings({ offices: [{ address: "Chỉ có địa chỉ" }] }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ offices: [{ name: "Chỉ có tên" }] }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ offices: [{ name: "VP", address: "ĐC", email: "khong-phai-email" }] }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ offices: Array.from({ length: 11 }, (_, i) => ({ name: `VP ${i}`, address: "ĐC" })) }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ careersProcess: [{ icon: "star" }] }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ careersProcess: Array.from({ length: 7 }, (_, i) => ({ icon: "star", title: `Bước ${i}` })) }, admin))).toBe(400);
+      expect(await statusOf(updateSettings({ workingHours: { hours: "9:00" } }, sale))).toBe(403);
+    });
+  });
+
   describe("nội dung trang danh sách (BL-052)", () => {
     it("admin lưu listingPages vi + en riêng; /en không rơi về tiếng Việt; cờ Điểm mạnh mặc định bật", async () => {
       const before = await readPublicGlobal(payload, "site-settings", "vi");

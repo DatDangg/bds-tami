@@ -91,8 +91,8 @@ const redirects = contentRedirectsPlugin()({ collections: [] } as unknown as Con
 const globals = await loadConfigs<GlobalConfig>(path.join(ROOT, "src/globals"));
 
 describe("nhãn tiếng Việt của admin (quét config thô, không cần DB)", () => {
-  it("nạp đủ collection (21 + redirects) và 4 global", () => {
-    expect(collections.map((collection) => collection.slug).sort()).toHaveLength(21);
+  it("nạp đủ collection (23 + redirects) và 4 global", () => {
+    expect(collections.map((collection) => collection.slug).sort()).toHaveLength(23);
     expect(redirects).toBeDefined();
     expect(globals.map((global) => global.slug).sort()).toEqual(["footer", "header", "homepage", "site-settings"]);
   });

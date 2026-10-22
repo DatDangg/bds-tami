@@ -19,6 +19,8 @@ import { LeadActivities } from "./LeadActivities";
 import { Leads } from "./Leads";
 import { Media } from "./Media";
 import { News } from "./News";
+import { NewsletterSubscribers } from "./NewsletterSubscribers";
+import { NewsViewsDaily } from "./NewsViewsDaily";
 import { Pages } from "./Pages";
 import { PrivateFiles } from "./PrivateFiles";
 import { Projects } from "./Projects";
@@ -47,6 +49,7 @@ export const LIST_SEARCHABLE_FIELDS: Readonly<Record<string, readonly string[]>>
   "property-posts": ["title"],
   "job-postings": ["title"],
   "job-applications": ["fullName", "email", "phone"],
+  "newsletter-subscribers": ["email"],
   pages: ["title"],
   services: ["title"],
   developers: ["name"],
@@ -62,7 +65,7 @@ export const LIST_SEARCHABLE_FIELDS: Readonly<Record<string, readonly string[]>>
  * Collection có trường ẩn thêm riêng (Rentals, Projects…) đã gọi `hideTechnicalListFields` kèm tham số trong file của nó; lần gọi này chỉ thêm quy tắc chung.
  */
 export const ADMIN_COLLECTIONS: CollectionConfig[] = [
-  Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities,
+  Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, NewsViewsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities, NewsletterSubscribers,
 ].map((collection) => withDocumentNavSlot(withAdminUxDefaults(withListSearchableFields(hideTechnicalListFields(withRowActionsColumn(collection), [], EXTRA_HIDDEN_COLUMNS[collection.slug])))));
 
 /** Mọi global admin, áp cùng mặc định UX như collection (ẩn nút API, tắt "+ Thêm mới" ô dữ liệu nền — BL-051). */

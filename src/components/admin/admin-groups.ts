@@ -10,7 +10,7 @@ import type { Config, Plugin } from "payload";
 export const ADVANCED_NAV_GROUP_LABEL = "Nâng cao";
 
 export const ADMIN_NAV_GROUPS = [
-  { label: "Khách hàng", collections: ["leads", "lead-activities"], globals: [] },
+  { label: "Khách hàng", collections: ["leads", "lead-activities", "newsletter-subscribers"], globals: [] },
   { label: "Nội dung", collections: ["projects", "rentals", "property-posts", "news", "services", "pages"], globals: [] },
   { label: "Tuyển dụng", collections: ["job-postings", "job-applications"], globals: [] },
   { label: "Thư viện", collections: ["media", "private-files"], globals: [] },
@@ -18,7 +18,7 @@ export const ADMIN_NAV_GROUPS = [
   { label: "Website", collections: ["redirects"], globals: ["site-settings", "homepage", "header", "footer"] },
   { label: "Hệ thống", collections: ["staff"], globals: [] },
   // Mục kỹ thuật/hiếm dùng (BL-041): nhóm cuối, mặc định thu gọn (NavAdvancedCollapse).
-  { label: ADVANCED_NAV_GROUP_LABEL, collections: ["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "translation-usage"], globals: [] },
+  { label: ADVANCED_NAV_GROUP_LABEL, collections: ["provinces", "wards", "audit-logs", "click-events", "click-stats-daily", "news-views-daily", "translation-usage"], globals: [] },
 ] as const satisfies readonly { label: string; collections: readonly string[]; globals: readonly string[] }[];
 
 export type AdminNavGroupLabel = (typeof ADMIN_NAV_GROUPS)[number]["label"];
