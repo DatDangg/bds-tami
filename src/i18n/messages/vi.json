@@ -213,6 +213,25 @@
         "copy": "Sao chép liên kết",
         "copied": "Đã sao chép liên kết",
         "copyFailed": "Không sao chép được"
+      },
+      "v2": {
+        "searchPlaceholder": "Tìm bài viết…",
+        "featuredLabel": "Bài viết nổi bật",
+        "brand": "TAMI HOMES",
+        "latestTitle": "Bài viết mới nhất",
+        "resultTotal": "{count} bài viết",
+        "sortBy": "Sắp xếp theo",
+        "sortApply": "Áp dụng",
+        "sort": {
+          "newest": "Mới nhất",
+          "oldest": "Cũ nhất"
+        },
+        "emptyTitle": "Chưa có bài viết phù hợp.",
+        "emptyDescription": "Thử từ khoá khác hoặc xem tất cả bài viết.",
+        "backToAll": "Xem tất cả bài viết",
+        "mostRead": "Đọc nhiều",
+        "topics": "Chủ đề",
+        "sidebarLabel": "Đọc thêm"
       }
     },
     "newsDetail": {

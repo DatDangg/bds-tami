@@ -250,7 +250,7 @@ Thứ tự xử lý:
 
 Không lưu IP / User-Agent thô ở DB, Redis hay log: pipeline chỉ đưa ra `ipHash` (HMAC), khoá Redis là hex HMAC, bảng `news_views_daily` chỉ có `news_id`, `day`, `views`. Code: `src/endpoints/public/news-views.ts`, `src/lib/news/view-dedupe.ts`.
 
-**Loader "Đọc nhiều"** (`loadMostReadNews(locale, limit = 5)`, `src/lib/news/most-read.ts`; không phải endpoint): tổng `views` 30 ngày theo giờ VN (gồm hôm nay) của bài công khai cùng ngôn ngữ (`/en` chỉ bài `hasEnglish`), giảm dần, hoà → bài mới hơn; bài xếp hạng được đọc lại qua `findPublicList`. Thiếu thì bù bài `isFeatured` mới nhất rồi bài mới nhất, không trùng. Trả `{ id, title, href, cover, publishedAt, dateLabel }`. Cache `unstable_cache` 10 phút, tag `news:most-read`; hook `afterChange` / `afterDelete` của `news` (`src/hooks/news/revalidate-most-read.ts`) làm mới tag khi bài đang hoặc vừa công khai đổi.
+**Loader "Đọc nhiều"** (`loadMostReadNews(locale, limit = 5)`, `src/lib/news/most-read.ts`; không phải endpoint): tổng `views` 30 ngày theo giờ VN (gồm hôm nay) của bài công khai cùng ngôn ngữ (`/en` chỉ bài `hasEnglish`), giảm dần, hoà → bài mới hơn; bài xếp hạng được đọc lại qua `findPublicList`. Thiếu thì bù bài `isFeatured` mới nhất rồi bài mới nhất, không trùng; id xếp hạng và bài bù lấy dư ×2, thẻ không dựng được (thiếu tiêu đề / slug) bị lọc trước khi bù nên vẫn đủ `limit` (P2-T01). Trang `/tin-tuc` bắt lỗi loader → ẩn khối, ghi log. Trả `{ id, title, href, cover, publishedAt, dateLabel }`. Cache `unstable_cache` 10 phút, tag `news:most-read`; hook `afterChange` / `afterDelete` của `news` (`src/hooks/news/revalidate-most-read.ts`) làm mới tag khi bài đang hoặc vừa công khai đổi.
 
 ### 3.13. `POST /api/public/newsletter` (BL-054, as-built P1-T04)
 
@@ -272,6 +272,19 @@ Kết quả `200 { success: true, data: { received: true } }` **giống hệt** 
 | `page` | Trang danh sách; vượt số trang → `404` | `abc` → trang 1 |
 
 Có `category` / `province` / `q` có giá trị (kể cả slug lạ) → `noindex, follow` + canonical `/tuyen-dung` sạch; không lọc → canonical chính nó (kèm `?page=n`). Chip phòng ban + phân trang mang theo `province` + `q` (chip bỏ `page`); form giữ `category` bằng input ẩn. Không endpoint JSON mới.
+
+### 3.15. Tham số URL trang `/tin-tuc` (BL-054, as-built P2-T01)
+
+`/tin-tuc` · `/en/news` (+ trang danh mục `/tin-tuc/danh-muc/[category]` · `/en/news/category/[category]`): `?q=&tag=&sort=&page=`. Không phải endpoint JSON. Code: `src/lib/news/news-filters.ts` (đọc tham số), `src/lib/news/news-search.ts` (`findFilteredNewsIds`, `listTopNewsTags`), `src/lib/news/news-listing.ts`, `src/components/news/NewsListPage.tsx`.
+
+| Tham số | Ý nghĩa | Giá trị không hợp lệ |
+|---|---|---|
+| `q` | Từ khoá trong tiêu đề + tóm tắt của ngôn ngữ đang xem, không phân biệt hoa/thường/dấu; tách từ bằng `searchTerms` (≤ 8 từ), mọi từ phải có (AND, `LIKE` đã thoát `%` `_` `\`); phía cột bỏ dấu bằng `lower(translate(…))` (`src/lib/search/unaccent-sql.ts`) — không cột / migration / extension mới; tối đa 100 ký tự | Rỗng / quá dài → bỏ |
+| `tag` | Một thẻ, khớp đúng chuỗi (đã cắt khoảng trắng). **`/en` bỏ qua** (`news.tags` chưa có bản EN) | Rỗng / > 100 ký tự → bỏ |
+| `sort` | `newest` (mặc định, không lên URL) · `oldest` | Giá trị lạ → mặc định |
+| `page` | Trang lưới 12 bài; vượt số trang → `404` | Như `parsePagination` |
+
+Có `q` / `tag` (≤ 1000 id khớp, mới nhất trước; vượt → log cảnh báo) hoặc `sort=oldest`: ẩn khối nổi bật, không loại bài nào khỏi lưới, hàng "N bài viết phù hợp"; không khớp → trạng thái trống có "Xoá bộ lọc". Metadata: lọc → `noindex, follow` + canonical trang sạch (không `?page`); không lọc → canonical chính nó (kèm `?page=n`), như BL-045. Không lọc: khối nổi bật 4 bài (trang 1) bị loại khỏi lưới ở mọi trang. "Chủ đề": `listTopNewsTags` = ≤ 12 thẻ (đã cắt khoảng trắng) dùng trong nhiều bài công khai nhất (hoà theo chữ), chỉ `/vi`.
 
 ## 4. Endpoint quản trị
 

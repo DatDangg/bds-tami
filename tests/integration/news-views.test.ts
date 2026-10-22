@@ -289,5 +289,13 @@ describe.skipIf(!baseUrl || !hasRedis)("integration: news-views + Đọc nhiều
       const items = await mostRead.findMostReadNews(payload, "vi", { now: later });
       expect(items.map((item) => item.id)).toEqual([ids.featured, ids.newest, ids.old, ids.f, ids.e]);
     });
+
+    it("bài xếp hạng không dựng được thẻ (mất slug) bị lọc TRƯỚC khi bù: vẫn đủ 5 bài (P1-T03 review MINOR-1)", async () => {
+      const broken = await createNews("Broken mất slug", { publishedAt: "2026-09-01T02:00:00.000Z" });
+      await setViews(broken, 0, 9_999);
+      await withDatabase((client) => client.query(`UPDATE news_locales SET slug = NULL WHERE _parent_id = $1`, [broken]));
+      const items = await mostRead.findMostReadNews(payload, "vi", { now });
+      expect(items.map((item) => item.id)).toEqual([ids.a, ids.b, ids.d, ids.c, ids.e]);
+    });
   });
 });

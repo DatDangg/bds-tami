@@ -63,9 +63,13 @@ function toItem(doc: News, locale: Locale): MostReadNewsItem | null {
   return { id, title, href, cover, publishedAt, dateLabel };
 }
 
+/** Lấy dư id xếp hạng (và bài bù) gấp đôi: bài bị loại ở `findPublicList` hoặc không dựng được thẻ (thiếu tiêu đề / slug) không làm hụt suất. */
+const OVERFETCH_FACTOR = 2;
+
 /**
  * Top `limit` bài đọc nhiều (không cache). Bài xếp hạng được đọc lại qua `findPublicList` (đúng quy tắc công khai, `/en` chỉ bài có
- * bản EN) và giữ thứ tự hạng. Thiếu thì bù bài `isFeatured` mới nhất, rồi bài mới nhất, không trùng.
+ * bản EN) và giữ thứ tự hạng. Thiếu thì bù bài `isFeatured` mới nhất, rồi bài mới nhất, không trùng. Thẻ rỗng (`toItem` → `null`) bị lọc
+ * TRƯỚC khi bù (P1-T03 review MINOR-1) nên vẫn đủ `limit` bài khi có đủ bài công khai.
  */
 export async function findMostReadNews(
   payload: Payload,
@@ -73,29 +77,29 @@ export async function findMostReadNews(
   options: { limit?: number; now?: Date } = {},
 ): Promise<MostReadNewsItem[]> {
   const limit = options.limit ?? MOST_READ_LIMIT;
-  const rankedIds = await rankNewsByViews(payload, locale, mostReadWindowStart(options.now ?? new Date()), limit);
-  const docs: News[] = [];
-  if (rankedIds.length > 0) {
-    const ranked = await listCards(payload, locale, { id: { in: rankedIds } }, rankedIds.length);
-    const byId = new Map(ranked.map((doc) => [doc.id, doc]));
-    for (const id of rankedIds) {
-      const doc = byId.get(id);
-      if (doc) docs.push(doc);
+  const items: MostReadNewsItem[] = [];
+  const seen = new Set<string>();
+  const take = (docs: readonly News[]) => {
+    for (const doc of docs) {
+      if (items.length >= limit) return;
+      if (seen.has(doc.id)) continue;
+      seen.add(doc.id);
+      const item = toItem(doc, locale);
+      if (item) items.push(item);
     }
+  };
+  const rankedIds = await rankNewsByViews(payload, locale, mostReadWindowStart(options.now ?? new Date()), limit * OVERFETCH_FACTOR);
+  if (rankedIds.length > 0) {
+    const byId = new Map((await listCards(payload, locale, { id: { in: rankedIds } }, rankedIds.length)).map((doc) => [doc.id, doc]));
+    take(rankedIds.flatMap((id) => byId.get(id) ?? []));
   }
   for (const featuredOnly of [true, false]) {
-    if (docs.length >= limit) break;
-    const conditions: Where[] = [
-      ...(featuredOnly ? [{ isFeatured: { equals: true } }] : []),
-      ...(docs.length > 0 ? [{ id: { not_in: docs.map((doc) => doc.id) } }] : []),
-    ];
+    if (items.length >= limit) break;
+    const conditions: Where[] = [...(featuredOnly ? [{ isFeatured: { equals: true } }] : []), ...(seen.size > 0 ? [{ id: { not_in: [...seen] } }] : [])];
     const where: Where | undefined = conditions.length > 0 ? { and: conditions } : undefined;
-    docs.push(...(await listCards(payload, locale, where, limit - docs.length, NEWEST_SORT)));
+    take(await listCards(payload, locale, where, (limit - items.length) * OVERFETCH_FACTOR, NEWEST_SORT));
   }
-  return docs.flatMap((doc) => {
-    const item = toItem(doc, locale);
-    return item ? [item] : [];
-  });
+  return items;
 }
 
 /** Khối "Đọc nhiều" cho trang công khai: cache theo (locale, limit), tag `NEWS_MOST_READ_TAG`, tối đa 10 phút. */

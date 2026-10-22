@@ -38,3 +38,4 @@ batchQueue: [BL-054]
 - 2026-10-22 P2-T05 r1 STRICT PASS (4 MINOR). P2-T03 builder DONE. ▶ START [agent: builder-strong] P2-T01 (tami_wt54_p2t01, redis 6, :3121, worktree ff staging 223620b) ‖ [agent: reviewer] P2-T03 r1 (running — cancel sẽ redo bước này)
 - 2026-10-22 P2-T05 r1 STRICT PASS → 17259ab merged + progress. P2-T03 r1 STRICT PASS, P2-T01 r1 STRICT PASS (merge kế).
 - 2026-10-22 P2-T03 → e8b02f8 merged + progress (API_SPEC union, careers §3.14; typecheck + 51 file / 418 PASS).
+- 2026-10-22 P2-T01 → 3c52d58 merged + progress (typecheck + 32 file / 313 PASS). next: wave 2B P2-T02 ‖ P2-T04.
