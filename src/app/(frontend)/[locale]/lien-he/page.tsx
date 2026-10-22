@@ -2,24 +2,26 @@ import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { ContactDetails } from "@/components/contact/ContactDetails";
+import { ContactCards } from "@/components/contact/ContactCards";
+import { JoinTeamBanner } from "@/components/contact/JoinTeamBanner";
+import { OfficeSystem } from "@/components/contact/OfficeSystem";
 import { LeadFormSlot } from "@/components/forms/LeadFormSlot";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { PageHero } from "@/components/layout/PageHero";
-import { SectionHeading } from "@/components/layout/SectionHeading";
-import { LazyMap } from "@/components/media/LazyMap";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { publicPath } from "@/lib/content/content-paths";
 import { buildContactPageView } from "@/lib/content/contact-view";
 import { getSiteSettings } from "@/lib/content/get-globals";
 import { loadPageHero } from "@/lib/content/load-page-banner";
+import { resolvePageBanner } from "@/lib/content/page-banner";
 import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { readTurnstileSiteKey } from "@/lib/leads/turnstile-site-key";
 import { logger } from "@/lib/logger";
 import { buildOrganizationJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
+import { cn } from "@/lib/utils";
 import { routing, type Locale } from "@/i18n/routing";
 import type { SiteSetting } from "@/payload-types";
 
@@ -53,8 +55,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * S15 Liên hệ: thông tin từ `site-settings`, vùng chừa form lead, bản đồ lười (ẩn khi chưa có `mapLocation`).
- * Trang không đọc `searchParams` (form tự đọc `?service=` ở client khi được ráp) nên giữ ISR; `site-settings` đổi thì tag làm mới.
+ * S15 Liên hệ (BL-054, design `lien-he`): hero `pageHeroes.contact` → 4 thẻ nổi đè mép dưới hero (Hotline / Email / Zalo OA / Giờ làm việc, thẻ thiếu dữ liệu ẩn)
+ * → [form lead `source=contact` | "Hệ thống văn phòng" (tab + bản đồ + thẻ văn phòng; `offices` trống → 1 văn phòng từ trường cũ)] → banner "Gia nhập TAMI HOMES".
+ * Không banner tư vấn (BL-045). Trang không đọc `searchParams` nên giữ ISR; `site-settings` đổi thì tag làm mới.
  */
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
@@ -62,13 +65,15 @@ export default async function ContactPage({ params }: PageProps) {
   setRequestLocale(locale);
 
   const [t, tNav, settings, identity, hero] = await Promise.all([
-    getTranslations({ locale, namespace: "page.contact" }),
+    getTranslations({ locale, namespace: "page.contact.v2" }),
     getTranslations({ locale, namespace: "layout.nav.items" }),
     readSettings(locale),
     loadSiteIdentity(locale),
     loadPageHero(locale, "contact"),
   ]);
-  const { contact, socials, mapLocation } = buildContactPageView(settings);
+  const { contact, socials, cards, offices } = buildContactPageView(settings, t("fallbackOfficeName", { siteName: identity.siteName }));
+  const hasCards = Object.keys(cards).length > 0;
+  const careersImage = resolvePageBanner(settings, "careers");
   const siteUrl = getSiteUrl();
   const turnstileSiteKey = readTurnstileSiteKey();
   const logoUrl = identity.logo?.url ? absoluteUrl(identity.logo.url, siteUrl) : undefined;
@@ -77,6 +82,7 @@ export default async function ContactPage({ params }: PageProps) {
     <>
       <PageHero
         size="short"
+        overlap={hasCards}
         title={hero.title}
         {...(hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
         {...(hero.eyebrow ? { eyebrow: hero.eyebrow } : {})}
@@ -84,18 +90,20 @@ export default async function ContactPage({ params }: PageProps) {
         {...(hero.image ? { image: hero.image } : {})}
         breadcrumb={<Breadcrumb variant="overlay" items={[{ label: tNav("contact"), href: publicPath("/lien-he", locale) }]} />}
       />
-      {/* Mockup `.contact`: thông tin trái, thẻ form trắng nổi phải (1 : 1,2); bản đồ bo 20px dưới cả hai. Thứ tự DOM = thứ tự đọc/Tab: thông tin → form → bản đồ. */}
-      <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter py-section-tight">
-        <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.2fr]">
-          <div className="flex flex-col gap-8">
-            <SectionHeading eyebrow={t("officeEyebrow")} title={t("officeTitle")} titleAccent={t("officeTitleAccent")} />
-            <ContactDetails contact={contact} socials={socials} />
-          </div>
-          <LeadFormSlot title={t("formTitle")} className="rounded-xl bg-surface p-6 shadow-md md:p-8 lg:p-8">
-            <LeadForm source="contact" {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
-          </LeadFormSlot>
+      {hasCards && (
+        <div className="relative z-10 mx-auto -mt-16 w-full max-w-container px-gutter md:-mt-[88px]">
+          <ContactCards cards={cards} />
         </div>
-        {mapLocation && <LazyMap location={mapLocation} label={t("mapLabel")} aspectRatio="16/7" className="[&>[role=region]]:rounded-xl" />}
+      )}
+      {/* Thứ tự DOM = thứ tự đọc/Tab: form → văn phòng; < lg văn phòng xuống sau form. */}
+      <div className={cn("mx-auto grid w-full max-w-container items-start gap-6 px-gutter pb-section-tight lg:gap-8", hasCards ? "pt-8 md:pt-10" : "pt-section-tight", offices.length > 0 && "lg:grid-cols-2")}>
+        <LeadFormSlot eyebrow={t("formEyebrow")} title={t("formTitle")} className="rounded-xl bg-surface p-5 shadow-md md:p-8 lg:p-8">
+          <LeadForm source="contact" layout="contact" submitLabel={t("formSubmit")} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
+        </LeadFormSlot>
+        {offices.length > 0 && <OfficeSystem offices={offices} />}
+      </div>
+      <div className="pb-section-tight">
+        <JoinTeamBanner href={publicPath("/tuyen-dung", locale)} {...(careersImage ? { image: careersImage } : {})} />
       </div>
       {siteUrl && (
         <JsonLd

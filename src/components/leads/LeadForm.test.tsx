@@ -204,3 +204,22 @@ describe("LeadForm layout compact (BL-056)", () => {
     expect(screen.queryByRole("button", { name: "Nhận tư vấn ngay" })).toBeNull();
   });
 });
+
+describe("LeadForm layout contact (BL-054 /lien-he)", () => {
+  it("nhãn hiển thị + icon trong ô, Họ tên / SĐT chung một hàng, nút theo submitLabel; payload như mặc định", async () => {
+    const fetchMock = stubFetch(jsonResponse(200, { success: true, data: { received: true } }));
+    const user = userEvent.setup();
+    const { container } = renderWithIntl(<LeadForm layout="contact" source="contact" submitLabel="Gửi yêu cầu" turnstileSiteKey="site" />, "vi");
+    const name = screen.getByLabelText(/Họ và tên/);
+    expect(name).not.toHaveAttribute("placeholder");
+    expect(container.querySelector(`label[for="${name.id}"]`)).not.toHaveClass("sr-only");
+    expect(container.querySelectorAll("form span[aria-hidden='true'] > svg").length).toBeGreaterThanOrEqual(4);
+    expect(name.closest(".grid")).toContainElement(screen.getByLabelText(/Số điện thoại/));
+    expect(screen.queryByRole("button", { name: "Nhận tư vấn" })).toBeNull();
+    await fillAndSubmit(user, "Gửi yêu cầu");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const body = sentBody(fetchMock);
+    expect(Object.keys(body).sort()).toEqual(["consent", "fullName", "locale", "pageUrl", "phone", "source", "turnstileToken"].sort());
+    expect(body).toMatchObject({ source: "contact", fullName: "Nguyễn Văn A", phone: "0901234567", consent: true });
+  });
+});

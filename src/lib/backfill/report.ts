@@ -12,25 +12,25 @@ import type { DocPlan } from "./types";
 /**
  * Tên file theo chế độ + thời điểm (giờ VN, tới phút): `backfill-listing-fields-<YYYY-MM-DD>-<HHmm>-<apply|dry-run>.md`.
  * Lần chạy sau (kể cả dry-run kiểm tra) KHÔNG đè báo cáo `--apply` — danh sách "cần soát" của giá trị đã ghi luôn còn.
- * Trùng phút → script thêm hậu tố `-2`, `-3`... (`attempt`).
+ * Trùng phút → script thêm hậu tố `-2`, `-3`... (`attempt`). `prefix`: tên script (vd `backfill-offices`, BL-054).
  */
-export function backfillReportFileName(now: Date, apply: boolean, attempt = 1): string {
+export function backfillReportFileName(now: Date, apply: boolean, attempt = 1, prefix = "backfill-listing-fields"): string {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
       .formatToParts(now)
       .map((p) => [p.type, p.value]),
   );
   const suffix = attempt > 1 ? `-${attempt}` : "";
-  return `backfill-listing-fields-${parts.year}-${parts.month}-${parts.day}-${parts.hour}${parts.minute}-${apply ? "apply" : "dry-run"}${suffix}.md`;
+  return `${prefix}-${parts.year}-${parts.month}-${parts.day}-${parts.hour}${parts.minute}-${apply ? "apply" : "dry-run"}${suffix}.md`;
 }
 
 const MAX_SAME_MINUTE = 50;
 
 /** Ghi báo cáo vào FILE MỚI trong `dir` (cờ `wx`: tồn tại → thử hậu tố kế tiếp, không bao giờ ghi đè). Trả đường dẫn đã ghi. */
-export async function writeBackfillReport(dir: string, now: Date, apply: boolean, content: string): Promise<string> {
+export async function writeBackfillReport(dir: string, now: Date, apply: boolean, content: string, prefix?: string): Promise<string> {
   await mkdir(dir, { recursive: true });
   for (let attempt = 1; attempt <= MAX_SAME_MINUTE; attempt += 1) {
-    const file = path.join(dir, backfillReportFileName(now, apply, attempt));
+    const file = path.join(dir, backfillReportFileName(now, apply, attempt, prefix));
     try {
       await writeFile(file, content, { encoding: "utf8", flag: "wx" });
       return file;

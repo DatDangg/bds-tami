@@ -24,8 +24,14 @@ interface LeadFormProps {
   /** Site key Turnstile (công khai); thiếu thì form báo không tải được bước xác minh khi gửi. */
   turnstileSiteKey?: string;
   hotline?: { label: string; telHref: string };
-  /** `compact` (cột liên hệ trang chi tiết, BL-056): nhãn chỉ cho trình đọc màn hình, icon + placeholder trong ô, nút "Nhận tư vấn ngay" full-width. Mặc định giữ form đầy đủ (/lien-he, /tin-tuc). */
-  layout?: "default" | "compact";
+  /**
+   * `compact` (cột liên hệ trang chi tiết, BL-056): nhãn chỉ cho trình đọc màn hình, icon + placeholder trong ô, nút "Nhận tư vấn ngay" full-width.
+   * `contact` (/lien-he, BL-054): nhãn hiển thị + icon trong ô, Họ tên / SĐT chung một hàng ≥ sm, nút có mũi tên. Mặc định giữ form đầy đủ (/tin-tuc).
+   * Mọi layout cùng trường / payload.
+   */
+  layout?: "default" | "compact" | "contact";
+  /** Nhãn nút gửi thay "Nhận tư vấn" của layout `default` / `contact` (vd "Gửi yêu cầu" ở /lien-he). */
+  submitLabel?: string;
 }
 
 const ICON_SIZE = 18;
@@ -43,23 +49,29 @@ export function buildLeadExtra(source: LeadSource, sourceId: string | undefined)
 }
 
 interface LeadFieldsProps {
-  compact: boolean;
+  layout: NonNullable<LeadFormProps["layout"]>;
   submitting: boolean;
   errors: Record<string, string | undefined>;
 }
 
 /**
- * Bốn ô nhập của form lead. `compact`: nhãn `sr-only` (vẫn `htmlFor`) + icon trong ô + placeholder = nhãn (ô bắt buộc thêm " *"); mặc định: nhãn hiển thị, không icon / placeholder.
+ * Bốn ô nhập của form lead. `compact`: nhãn `sr-only` (vẫn `htmlFor`) + icon trong ô + placeholder = nhãn (ô bắt buộc thêm " *");
+ * `contact`: nhãn hiển thị + icon trong ô, Họ tên / SĐT một hàng ≥ sm; mặc định: nhãn hiển thị, không icon / placeholder.
  */
-function LeadFields({ compact, submitting, errors }: LeadFieldsProps) {
+function LeadFields({ layout, submitting, errors }: LeadFieldsProps) {
   const t = useTranslations("form.lead");
   const requiredLabel = useTranslations("form")("required");
-  const look = (key: "fullName" | "phone" | "email" | "message", icon: ReactNode, required = false) =>
-    compact ? { icon, labelHidden: true, placeholder: required ? `${t(key)} *` : t(key) } : {};
+  const look = (key: "fullName" | "phone" | "email" | "message", icon: ReactNode, required = false) => {
+    if (layout === "compact") return { icon, labelHidden: true, placeholder: required ? `${t(key)} *` : t(key) };
+    return layout === "contact" ? { icon } : {};
+  };
   return (
     <>
-      <FormField name="fullName" label={t("fullName")} required requiredLabel={requiredLabel} autoComplete="name" {...look("fullName", <User size={ICON_SIZE} />, true)} readOnly={submitting} error={errors.fullName} />
-      <FormField name="phone" type="tel" inputMode="tel" label={t("phone")} required requiredLabel={requiredLabel} autoComplete="tel" {...look("phone", <Phone size={ICON_SIZE} />, true)} readOnly={submitting} error={errors.phone} />
+      {/* `contents`: hai ô vẫn là con trực tiếp của lưới form (khoảng cách như cũ); `contact` gom thành một hàng 2 cột. */}
+      <div className={layout === "contact" ? "grid gap-5 sm:grid-cols-2" : "contents"}>
+        <FormField name="fullName" label={t("fullName")} required requiredLabel={requiredLabel} autoComplete="name" {...look("fullName", <User size={ICON_SIZE} />, true)} readOnly={submitting} error={errors.fullName} />
+        <FormField name="phone" type="tel" inputMode="tel" label={t("phone")} required requiredLabel={requiredLabel} autoComplete="tel" {...look("phone", <Phone size={ICON_SIZE} />, true)} readOnly={submitting} error={errors.phone} />
+      </div>
       <FormField name="email" type="email" label={t("email")} autoComplete="email" {...look("email", <EnvelopeSimple size={ICON_SIZE} />)} readOnly={submitting} error={errors.email} />
       <FormField as="textarea" name="message" label={t("message")} maxLength={1000} {...look("message", <ChatText size={ICON_SIZE} />)} readOnly={submitting} error={errors.message} />
     </>
@@ -71,7 +83,7 @@ function LeadFields({ compact, submitting, errors }: LeadFieldsProps) {
  * JSON tới `POST /api/public/leads`; cảm ơn `role="status"` thay form khi xong, lỗi field map vào ô. Là client island nên HTML trang không đổi
  * theo trạng thái form. `locale` do `usePublicForm` gắn theo ngôn ngữ đang xem.
  */
-export function LeadForm({ source, sourceId, turnstileSiteKey, hotline, layout = "default" }: LeadFormProps) {
+export function LeadForm({ source, sourceId, turnstileSiteKey, hotline, layout = "default", submitLabel }: LeadFormProps) {
   const t = useTranslations("form.lead");
   const tForm = useTranslations("form");
 
@@ -102,7 +114,7 @@ export function LeadForm({ source, sourceId, turnstileSiteKey, hotline, layout =
 
   return (
     <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <LeadFields compact={compact} submitting={submitting} errors={form.fieldErrors} />
+      <LeadFields layout={layout} submitting={submitting} errors={form.fieldErrors} />
       <ConsentCheckbox {...form.consent} disabled={submitting} />
       <TurnstileWidget siteKey={turnstileSiteKey} {...form.turnstile} />
       {issue && (
@@ -115,8 +127,8 @@ export function LeadForm({ source, sourceId, turnstileSiteKey, hotline, layout =
         />
       )}
       <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting} className={compact ? "w-full" : "w-full sm:w-fit"}>
-        {submitting ? tForm("submitting") : compact ? t("submitNow") : t("submit")}
-        {compact && !submitting && <ArrowRight size={18} aria-hidden="true" />}
+        {submitting ? tForm("submitting") : compact ? t("submitNow") : (submitLabel ?? t("submit"))}
+        {layout !== "default" && !submitting && <ArrowRight size={18} aria-hidden="true" />}
       </Button>
     </form>
   );

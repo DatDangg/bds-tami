@@ -247,7 +247,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 | Tuyển dụng | `/tuyen-dung` · `/en/careers` | **As-built BL-045:** hero + dải `careersPerks` (2–6 ý, ẩn khi < 2) + danh sách vị trí dạng hàng canh trái + `ConsultBanner`. *Trước BL-045:* Banner + danh sách vị trí dạng hàng (tên, nơi làm, hạn nộp) |
 | Chi tiết tuyển dụng | `/tuyen-dung/[slug]` · `/en/careers/[slug]` | Nội dung + form ứng tuyển kèm CV |
 | Dịch vụ | `/dich-vu/[slug]` · `/en/services/[slug]` | Hero ảnh + nội dung xen ảnh + CTA liên hệ |
-| Liên hệ | `/lien-he` · `/en/contact` | **As-built BL-045:** hero (`pageBanners.contact`) → thông tin văn phòng trái + form trắng phải. *Trước BL-045:* 2 cột: thông tin + bản đồ / form |
+| Liên hệ | `/lien-he` · `/en/contact` | **As-built BL-054:** hero `pageHeroes.contact` → 4 thẻ nổi (Hotline / Email / Zalo OA = `siteName` / Giờ làm việc `workingHours`; thiếu dữ liệu ẩn) → form lead `source=contact` (layout `contact`, không chip loại yêu cầu) + "Hệ thống văn phòng" (tab khi ≥ 2, bản đồ lười theo văn phòng, thẻ văn phòng + "Chỉ đường"; `site-settings.offices`, trống → 1 văn phòng từ `address`/`mapLocation`/`hotline`/`email` cũ) → banner "Gia nhập TAMI HOMES" → `/tuyen-dung`. Script dev `pnpm backfill:offices`. *Trước BL-054 (BL-045):* hero (`pageBanners.contact`) → thông tin văn phòng trái + form trắng phải. *Trước BL-045:* 2 cột: thông tin + bản đồ / form |
 | Pháp lý | `/chinh-sach-bao-mat`, `/dieu-khoan-su-dung` · `/en/privacy-policy`, `/en/terms-of-use` | 1 cột văn bản |
 | 404 | — | Thông báo + link về trang chủ, đúng ngôn ngữ đang xem |
 
