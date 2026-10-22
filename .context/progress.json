@@ -2802,13 +2802,20 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-listing-followups/phase-1-task-03.md",
-          "status": "in_progress",
+          "status": "done",
           "attempt": 1,
           "dependsOn": [],
-          "note": "đo LCP bản build 6 trang"
+          "note": "LCP bản build local (Lighthouse 12.8.2 + Browser pane) 6 trang × 1440/390 ≤ 420 ms; element hero đã priority; không đổi code",
+          "review": "FAST PASS r1 (2 MINOR không chặn)",
+          "round": 1,
+          "reviewLevel": "FAST",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-listing-followups-phase-1-task-03-round-1-review.md",
+          "verify": "skip, no code change (pnpm build PASS để đo)",
+          "completedAt": "2026-10-22"
         }
       ],
-      "inProgressTask": "phase-1-task-03"
+      "inProgressTask": null
     }
   ],
   "bugs": [
