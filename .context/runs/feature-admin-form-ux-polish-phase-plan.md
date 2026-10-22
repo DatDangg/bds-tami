@@ -15,7 +15,7 @@ evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "HUMAN CHECKPOINT: duyệt plan (T01-T05, wave 1 = T01∥T02∥T03, wave 2 = T04, wave 3 = T05) + Q1 phương án SEO (A/B/C/D) + Q2 Ai sửa ở lịch sử (migration?) + Q3 toast. Sau ok → builder wave 1. progress.json chưa ghi (tránh xung đột với BL-054 ở staging) — ghi entry feature lúc dispatch."
+next: "CHECKPOINT sau đợt 1 (T01 7711bad, T02 364e9c7, T03 00c48ec). Chờ user duyệt chạy đợt 2 = T04. Worktree task-01..03 + DB tami_wt_bl058_t01..t03 còn giữ."
 loopSignal: none
 approvals: [{gate: phase_plan, at: 2026-10-22, ok: true, Q1: B, Q2: no-who, Q3: drop-toast}]
 batchQueue: []
@@ -29,3 +29,4 @@ batchQueue: []
 - 2026-10-22 ✅ DONE [agent: change-request] phase-plan → checkpoint
 - 2026-10-22 USER APPROVAL (AskUserQuestion): plan ok, chạy đợt 1; Q1 SEO = B; Q2 Ai sửa = Không (không migration); Q3 toast = Bỏ hẳn
 - 2026-10-22 ▶ START [agent: change-request] wave 1 (T01∥T02∥T03) builder→reviewer→close-out (cancel sẽ redo bước này)
+- 2026-10-22 đợt 1 xong: 3 task PASS + commit; verify tổng thể trên branch: eslint (bỏ .worktrees) 0 error, typecheck PASS, unit+ui 3240 test PASS (4 file cần .env.local → PASS khi có), build PASS; integration không chạy (Postgres dùng chung từng crash khi chạy song song)
