@@ -1,8 +1,7 @@
 ---
 description: Design — sinh design spec (screen specs) + design tokens cho project có UI, trước khi chia layer/code. Chạy tự động sau brainstorm trong /start; dùng tay qua /design.
 mode: subagent
-# model: set từ .context/project-config.md → models.spec_validator (bỏ comment để dùng). Fallback: model chính.
-# model: <provider>/<model-ho-thu-3>
+model: openai/gpt-6-luna
 temperature: 0.2
 steps: 30
 ---

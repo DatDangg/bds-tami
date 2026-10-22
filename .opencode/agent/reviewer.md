@@ -1,9 +1,9 @@
 ---
 description: Reviewer độc lập — tìm defect trong code/test của 1 task hoặc 1 phase. KHÔNG tự sửa code.
 mode: subagent
+model: openai/gpt-6-luna
 # model set ở /brainstorm (project-config.md models:) → models.reviewer (khác họ builder).
 # Để comment = kế thừa model chính.
-# model: <provider>/<model-khac-ho>
 temperature: 0.1
 steps: 30
 permission:

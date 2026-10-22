@@ -1,8 +1,7 @@
 ---
 description: Graph — chia spec/design thành các layer + task theo dependency order, sinh tasks/<slug>/layer-N-task-NN.md + layer-plan diagram. Chạy tự động sau brainstorm (project start) hoặc tay qua /graph.
 mode: subagent
-# model: set từ .context/project-config.md → models.change_request (bỏ comment để dùng). Fallback: model chính.
-# model: <provider>/<model-plan>
+model: opencode-go/deepseek-v4.1-flash
 temperature: 0.1
 steps: 20
 ---
