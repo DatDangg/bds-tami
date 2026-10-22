@@ -202,7 +202,6 @@
       "tabsLabel": "News categories",
       "all": "All",
       "readTime": "{minutes} min read",
-      "readArticle": "Read article",
       "consultTitle": "Get a consultation",
       "tagsLabel": "Tags",
       "tocTitle": "Contents",
@@ -213,18 +212,39 @@
         "copy": "Copy link",
         "copied": "Link copied",
         "copyFailed": "Could not copy"
+      },
+      "v2": {
+        "searchPlaceholder": "Search articles…",
+        "featuredLabel": "Featured articles",
+        "brand": "TAMI HOMES",
+        "latestTitle": "Latest articles",
+        "resultTotal": "{count, plural, one {# article} other {# articles}}",
+        "sortBy": "Sort by",
+        "sortApply": "Apply",
+        "sort": {
+          "newest": "Newest",
+          "oldest": "Oldest"
+        },
+        "emptyTitle": "No matching articles yet.",
+        "emptyDescription": "Try another keyword or browse all articles.",
+        "mostRead": "Most read",
+        "topics": "Topics",
+        "sidebarLabel": "More to read"
       }
     },
     "newsDetail": {
-      "latestEyebrow": "Just updated",
-      "latestTitle": "Latest articles",
-      "consultEyebrow": "Consultation",
-      "consultTitle": "Looking for the right property?",
-      "consultText": "Leave your details and TAMI HOMES will get in touch.",
-      "consultCta": "Get advice",
-      "relatedEyebrow": "Keep reading",
-      "relatedTitle": "Related",
-      "relatedAccent": "articles"
+      "v2": {
+        "author": "TAMI HOMES Editorial Team",
+        "shareLabel": "Share:",
+        "shareMore": "Share via other apps",
+        "consultEyebrow": "Free consultation",
+        "consultTitle": "Need a project that fits your budget?",
+        "consultText": "A TAMI advisor will give you detailed advice for your needs.",
+        "consultCta": "Get advice",
+        "tags": "Tags:",
+        "related": "Related articles",
+        "viewAll": "View all news"
+      }
     },
     "posts": {
       "title": "Property news",
@@ -735,17 +755,12 @@
       "filtersLabel": "Job filters",
       "categoriesLabel": "Job categories",
       "all": "All",
-      "provinceLabel": "Location",
-      "allProvinces": "All",
-      "apply": "Filter",
       "clear": "Clear filters",
-      "resultCount": "{count, plural, one {# open position} other {# open positions}}",
       "listLabel": "Open positions",
       "emptyTitle": "No matching positions.",
       "noJobs": "TAMI has no open positions right now.",
       "noJobsDescription": "You can still send us your CV and we will get in touch when a suitable role opens.",
       "sendCv": "Send your CV to {email}",
-      "deadline": "Apply by: {date}",
       "deadlineToday": "Closes today",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
       "salaryFrom": "From {amount}",
@@ -756,33 +771,33 @@
         "internship": "Internship",
         "contract": "Contract"
       },
-      "perksRegion": "Working at TAMI",
-      "perksEyebrow": "Why TAMI",
-      "perksTitle": "Working",
-      "perksTitleAccent": "environment",
-      "jobsEyebrow": "Open positions",
-      "jobsTitle": "Career",
-      "jobsTitleAccent": "opportunities",
-      "applyCta": "Apply"
+      "v2": {
+        "heroCta": "View open positions",
+        "perksEyebrow": "Why TAMI",
+        "perksTitle": "A place for you to",
+        "perksTitleAccent": "grow",
+        "jobsEyebrow": "Career opportunities",
+        "jobsTitle": "Open positions",
+        "positionCount": "{count, plural, one {# position} other {# positions}}",
+        "provinceLabel": "Location",
+        "allProvinces": "All locations",
+        "searchLabel": "Search by job title",
+        "searchPlaceholder": "Search by job title…",
+        "submit": "Search",
+        "urgent": "Urgent",
+        "deadline": "Deadline: {date}",
+        "processEyebrow": "Application process",
+        "processTitle": "{count, plural, one {# simple step} other {# simple steps}}",
+        "cvEyebrow": "Join TAMI HOMES",
+        "cvTitle": "Haven't found the right role?",
+        "cvDescription": "Send us your CV and we will get in touch when a suitable opportunity opens.",
+        "cvCta": "Send your CV"
+      }
     },
     "careerDetail": {
-      "summaryTitle": "Job summary",
-      "location": "Location",
-      "employmentType": "Employment type",
-      "quantity": "Openings",
-      "quantityValue": "{count}",
-      "salary": "Salary",
-      "deadline": "Application deadline",
-      "applyCta": "Apply now",
       "stickyApply": "Apply now",
-      "sections": {
-        "description": "Job description",
-        "requirements": "Requirements",
-        "benefits": "Benefits"
-      },
       "expiredTitle": "This position is closed",
       "expiredBody": "Sorry, this position is no longer accepting applications. You can browse our other open positions.",
-      "otherTitle": "Other open positions",
       "viewAll": "View all positions",
       "applyForm": {
         "title": "Apply for this position",
@@ -790,14 +805,12 @@
         "fullName": "Full name",
         "phone": "Phone number",
         "email": "Email",
-        "cv": "CV",
         "cvHelper": "PDF, DOC or DOCX, up to 5MB.",
         "chooseFile": "Choose file",
         "dropHint": "Drag and drop your CV here or",
         "uploading": "Sending… {percent}%",
         "uploadProgress": "CV upload progress",
         "message": "Message",
-        "submit": "Apply",
         "removeFile": "Remove file {name}",
         "success": "We have received your application.",
         "expired": "This position is no longer accepting applications.",
@@ -811,8 +824,7 @@
           "cvTooLarge": "The CV must be 5MB or less, please choose a smaller file."
         },
         "orContact": "Or contact us directly:"
-      },
-      "sectionLabel": "Section {number}"
+      }
     },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
@@ -875,17 +887,35 @@
     "contact": {
       "title": "Contact",
       "description": "The TAMI team is ready to help. Call our hotline or leave your details and we will reply as soon as possible.",
-      "infoTitle": "Contact information",
-      "hotline": "Hotline",
-      "email": "Email",
-      "address": "Address",
-      "hours": "Working hours",
-      "hoursValue": "8:00 AM - 5:30 PM, Mon - Sat",
-      "mapLabel": "TAMI office on the map",
-      "formTitle": "Send an enquiry",
-      "officeEyebrow": "Information",
-      "officeTitle": "TAMI",
-      "officeTitleAccent": "office"
+      "v2": {
+        "cardsLabel": "Contact channels",
+        "hotline": "Hotline",
+        "callNow": "Call now",
+        "callNowAria": "Call now {number}",
+        "email": "Email",
+        "sendEmail": "Send email",
+        "sendEmailAria": "Send email to {email}",
+        "zalo": "Zalo OA",
+        "zaloAction": "Message us",
+        "zaloAria": "Message us on Zalo OA {name} (opens in a new tab)",
+        "hours": "Working hours",
+        "formEyebrow": "Send a request",
+        "formTitle": "How can TAMI help you?",
+        "formSubmit": "Send request",
+        "officesTitle": "Our offices",
+        "officesDescription": "Choose an office to see its location on the map.",
+        "officesTabs": "Choose an office",
+        "mapLabel": "{name} on the map",
+        "address": "Address",
+        "phone": "Phone",
+        "directions": "Directions",
+        "directionsAria": "Directions to {name} on Google Maps (opens in a new tab)",
+        "fallbackOfficeName": "{siteName} office",
+        "joinEyebrow": "Join TAMI HOMES",
+        "joinTitle": "Build lasting value with us",
+        "joinDescription": "If you are interested in a career at TAMI HOMES, browse our open positions or send us your CV and we will contact you when a suitable opportunity comes up.",
+        "joinAction": "View open positions"
+      }
     },
     "legal": {
       "version": "Version {version} · Effective {date}",
@@ -1028,6 +1058,30 @@
         },
         "similarViewAll": "View all listings"
       }
+    },
+    "jobDetail": {
+      "v2": {
+        "applyNow": "Apply now",
+        "share": "Share",
+        "infoLabel": "Position details",
+        "deadline": "Deadline: <time>{date}</time>",
+        "sections": {
+          "description": "Job description",
+          "requirements": "Requirements",
+          "benefits": "Benefits"
+        },
+        "formSubtitle": "We reply within 3 working days.",
+        "form": {
+          "cv": "Your CV",
+          "submit": "Send application",
+          "fullNamePlaceholder": "Nguyen Van A",
+          "phonePlaceholder": "0901 234 567",
+          "emailPlaceholder": "name@example.com"
+        },
+        "otherTitle": "Other positions",
+        "viewAll": "View all positions",
+        "expiredCvPrompt": "Send us your CV and TAMI will contact you when a suitable position opens."
+      }
     }
   },
   "detailKit": {
@@ -1137,5 +1191,21 @@
     "statsLabel": "Key figures",
     "projectMentionEyebrow": "Featured project",
     "viewDetail": "View details"
+  },
+  "newsletter": {
+    "eyebrow": "Market newsletter",
+    "title": "Get the latest real estate news every week",
+    "email": "Email",
+    "emailPlaceholder": "Your email",
+    "consent": "I agree to receive the newsletter by email and to let TAMI process my email under the <policy>Privacy Policy</policy>.",
+    "submit": "Subscribe",
+    "privacyNote": "We will never share your email.",
+    "errors": {
+      "email": "Please enter a valid email."
+    },
+    "success": {
+      "title": "You are subscribed!",
+      "description": "Thank you. Our market newsletter will be sent to your email."
+    }
   }
 }

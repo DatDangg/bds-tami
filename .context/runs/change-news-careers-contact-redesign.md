@@ -2,20 +2,20 @@
 
 ```yaml
 workItem: feature/news-careers-contact-redesign
-phaseTask: change-request
-step: change-request
+phaseTask: done
+step: done
 agent: change-request
-status: running                     # cancel sẽ redo bước này
+status: done
 attempt: 0
 interrupted: false
-updatedAt: 2026-10-22T00:00:00+07:00
+updatedAt: 2026-10-22
 filesTouched: []                    # pre-existing dirty files (không thuộc BL-054): .claude/hooks/guard.mjs, .claude/settings.json, CLAUDE.md, opencode.jsonc, spec/changes/BACKLOG.md, src/payload-types.ts, .context/runs/bug-admin-nav-dashboard-sitelink-phase-1-task-01.md
 filesNew: []
 evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "change-request xử lý BL-054 (spec/changes/2026-10-21-news-careers-contact-redesign.md) — auto proceed, builder-strong, commit staging không push"
+next: "BL-054 xong (1.47.1 / scope v62). Việc còn mở → BL-059 (spec/changes/2026-10-22-news-careers-followups.md) qua /change"
 loopSignal: none
 approvals: [{gate: auto_proceed, at: 2026-10-21, ok: true}]
 batchQueue: [BL-054]
@@ -31,3 +31,25 @@ batchQueue: [BL-054]
 - 2026-10-22 ✅ DONE [agent: builder-strong] wave 1A — T01 migration 20261022_022857_news_careers_contact_redesign SAFE_ADDITIVE (FK news cascade tay), test 388/3918 PASS; T02 3 block + lexical.ts dịch khối, test 390/3935 + build PASS. ▶ START [agent: reviewer] r1 STRICT ×2 (running — cancel sẽ redo bước này)
 - 2026-10-22 P1-T01 reviewer r1 STRICT PASS → 7cfb59e merged staging + progress. MINOR-1 → P1-T04.
 - 2026-10-22 P1-T02 reviewer r1 STRICT PASS → 76101f2 merged staging + progress (regen types/importmap sạch, typecheck PASS). DB dev tami đã migrate 20261022_022857. Lesson: git update-index --refresh trước merge (payload-types stat dirty).
+- 2026-10-22 ▶ START [agent: builder-strong] wave 1B+2A: P1-T03 (tami_wt54_p1t03, redis 13, :3113) ‖ P1-T04 (p1t04, 14, :3114) ‖ P2-T03 (p2t03, 4, :3123) ‖ P2-T05 (p2t05, 5, :3125) — worktree từ staging f7936d4 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder-strong] P1-T03 (news-views, 88 test mới PASS), P1-T04 (newsletter + migration thứ 2 20261022_031905_newsletter_export_audit enum ADD VALUE — additive), P2-T05 (liên hệ, backfill worktree 1 văn phòng). P2-T03 dừng giữa chừng chờ Postgres. Sự cố: tami-postgres quá tải 4 worktree test song song → crash recovery (fsync data dir lâu do nhiều DB test sót). Bài học: ≤ 2 task chạy integration cùng lúc. next: chờ Postgres → reviewer ×3 + resume P2-T03.
+- 2026-10-22 Postgres phục hồi. P1-T03 r1 STRICT PASS → 632919b merged + progress (MINOR-1 + bọc lỗi loader → P2-T01). P1-T04 r1 STRICT PASS (merge kế tiếp). P2-T03 resume builder.
+- 2026-10-22 P1-T04 r1 STRICT PASS → 6500139 merged + progress; conflict union; typecheck + vitest security/endpoints/news 17 file 203 PASS; migrate DB dev tami 20261022_031905 OK. Phase 1 code xong (spec-validator phase review gộp cuối).
+- 2026-10-22 P2-T05 r1 STRICT PASS (4 MINOR). P2-T03 builder DONE. ▶ START [agent: builder-strong] P2-T01 (tami_wt54_p2t01, redis 6, :3121, worktree ff staging 223620b) ‖ [agent: reviewer] P2-T03 r1 (running — cancel sẽ redo bước này)
+- 2026-10-22 P2-T05 r1 STRICT PASS → 17259ab merged + progress. P2-T03 r1 STRICT PASS, P2-T01 r1 STRICT PASS (merge kế).
+- 2026-10-22 P2-T03 → e8b02f8 merged + progress (API_SPEC union, careers §3.14; typecheck + 51 file / 418 PASS).
+- 2026-10-22 P2-T01 → 3c52d58 merged + progress (typecheck + 32 file / 313 PASS). next: wave 2B P2-T02 ‖ P2-T04.
+- 2026-10-22 ▶ START [agent: builder-strong] wave 2B: P2-T02 (DB tami_wt54_p2t01 dùng lại, redis 7, :3122) ‖ P2-T04 (tami_wt54_p2t03, redis 8, :3124) — worktree từ staging 2b99a60 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder-strong] wave 2B (P2-T02 .news-prose + TOC dính trái + beacon; P2-T04 hero nhạt + OtherJobs + xoá JobCard, nộp CV thật OK). ▶ START [agent: reviewer] r1 ×2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P2-T02 → 72be45a merged + progress. P2-T04 r1 STRICT PASS (merge kế).
+- 2026-10-22 P2-T04 → a2a31a3 merged + progress (typecheck + 27 file / 252 PASS). Hết task P1+P2. next: verify tổng thể staging → spec-validator phase review.
+- 2026-10-22 Verify staging 8326e98: typecheck PASS, build PASS, lint chỉ lỗi ở file không thuộc BL-054 (.local-seed/seed-sample-project-blocks.ts — session khác, không track) + 2 warning cũ; full pnpm test chạy nền. ▶ START [agent: spec-validator] phase review P1+P2 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: spec-validator] phase review P1+P2 — GAPS (0 MAJOR, 6 MINOR). G2 đóng: full pnpm test staging 8326e98 407 file / 4159 PASS, build PASS. G6 sai (DB dev tami đã migrate 2 migration; backfill:offices dry-run = skip-no-source vì DB dev không có địa chỉ/hotline — không cần apply). G4 change-request quyết (a) theo tiền lệ BL-056. NEEDS_USER-2 (chính sách bảo mật + retention bản tin) → báo user, backlog. Task mới phase-3-task-01 (C1–C11). ▶ START [agent: builder-strong] P3-T01 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder-strong] P3-T01. ▶ START [agent: reviewer] P3-T01 r1 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r1 STRICT FAIL (MAJOR-1 C11 cắt đoạn dẫn). ▶ START builder-strong attempt 2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 attempt 2 DONE. ▶ START [agent: reviewer] r2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r2 STRICT FAIL (khối không chữ trước đoạn dẫn bị mất). ▶ START builder-strong attempt 3 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 attempt 3 DONE. ▶ START [agent: reviewer] r3 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r3 STRICT PASS → acaeebd merged + progress. next: full verify + spec-publisher as-built + close-out.
+- 2026-10-22 ▶ START [agent: spec-publisher] as-built BL-054 1.47.1 / scope v62 (running — cancel sẽ redo bước này); full verify staging d69bcc0 chạy nền.
+- 2026-10-22 ✅ DONE [agent: spec-publisher] as-built 1.47.1 / scope v62. Full verify staging d69bcc0: build PASS, test 407 file / 4165 PASS, lint 0 lỗi code BL-054. Close-out: BACKLOG BL-054 done + BL-059 follow-ups, change doc archive, progress done, activeWorkItem null. ✅ DONE [agent: change-request] BL-054.

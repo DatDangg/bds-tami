@@ -1,6 +1,6 @@
 {
   "specVersion": "1.48.0",
-  "scopeVersion": 62,
+  "scopeVersion": 63,
   "generatedAt": "2026-10-22T18:30:00+07:00",
   "trigger": "feature-update",
   "triggerNote": "BL-058 MODIFY (UI admin, không migration): bỏ hộp thoại trình duyệt trong admin, lỗi nhập liệu hiện dưới từng ô + tự mở tab/cuộn/focus + bỏ toast gom, nút tạo mới cạnh ô quan hệ chỉ icon '+' tách rời, màn Lịch sử chỉnh sửa tuỳ biến cho 7 collection có versions, tab SEO dễ hiểu (phương án B: xem trước Google + đếm ký tự + khối Nâng cao).",
@@ -25,7 +25,7 @@
     "T04 STRICT FAIL r1 → PASS r2 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-04-round-2-review.md",
     "T05 NORMAL FAIL r1/r2/r3 → PASS r4 — .context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-4-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.47.0-61.json",
+  "previousScope": "spec/test-scope/archive/test-scope-1.47.1-62.json",
   "specUpdate": "spec/updates/2026-10-22-admin-form-ux-polish.md",
   "specRefs": [
     "FR-ADM-19 — khối \"Form admin — bỏ hộp thoại trình duyệt, lỗi dưới từng ô, nút '+' tách rời, lịch sử chỉnh sửa dễ đọc, tab SEO dễ hiểu (BL-058)\"",

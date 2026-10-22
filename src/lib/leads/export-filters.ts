@@ -148,7 +148,7 @@ export const UNSUPPORTED_FILTER_MESSAGE =
  * Payload WhereBuilder luôn ghi `{ or: [ { and: [...] } ] }`; chấp nhận đúng 1 nhánh `or`, `and` lồng nhau, điều kiện đơn.
  * Trả `false` nếu gặp thứ không ánh xạ được (nhiều nhánh `or`, giá trị lạ) để người gọi chặn thay vì xuất toàn bộ.
  */
-function collectConditions(where: unknown, into: PlainRecord[]): boolean {
+export function collectConditions(where: unknown, into: PlainRecord[]): boolean {
   if (where === undefined || where === null) return true;
   if (!isRecord(where)) return false;
   for (const [key, value] of Object.entries(where)) {

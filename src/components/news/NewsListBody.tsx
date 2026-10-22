@@ -1,29 +1,76 @@
 import { useTranslations } from "next-intl";
+import { type ReactNode, useId } from "react";
+import { PendingRegion } from "@/components/layout/PendingRegion";
+import { ResultsBar } from "@/components/listing/ResultsBar";
 import { NewsCard } from "@/components/news/NewsCard";
+import { NewsFeaturedBlock } from "@/components/news/NewsFeaturedBlock";
 import type { NewsCardData } from "@/lib/news/news-view";
 
+interface NewsListBodyProps {
+  /** Khối nổi bật (trang 1, không lọc); rỗng → ẩn. */
+  featured: readonly NewsCardData[];
+  items: readonly NewsCardData[];
+  /** Đang lọc / tìm / sắp khác mặc định: thay tiêu đề "Bài viết mới nhất" bằng "N bài viết phù hợp" (đã định dạng). */
+  resultLabel?: string | undefined;
+  /** Ô "Sắp xếp theo" (`NewsSortControl`). */
+  sort?: ReactNode;
+  /** Trạng thái trống (thay lưới + phân trang). */
+  emptyState?: ReactNode;
+  pagination?: ReactNode;
+  /** Cột phải: "Đọc nhiều", "Bản tin thị trường", "Chủ đề" (mỗi khối tự ẩn khi rỗng). */
+  sidebar?: ReactNode;
+}
+
 /**
- * Thân danh sách tin (trang 1 và 2+ của `/tin-tuc`, trang danh mục; BL-045): bài nổi bật ngang (chỉ trang 1 `/tin-tuc`, ảnh LCP) rồi lưới thẻ 1/2/3 cột (3 ≥ lg).
- * Tiêu đề thẻ là `h2` ngay dưới `h1` của hero; `section` có nhãn để dễ nhảy vùng. Server Component.
+ * Thân danh sách tin `/tin-tuc` + trang danh mục (BL-054, design `tin-tuc.webp`): khối nổi bật → hai cột ≥ lg: trái "Bài viết mới nhất" (hoặc "N bài viết phù hợp")
+ * + sắp xếp → lưới thẻ 1 / 2 (md) / 3 (lg) cột → phân trang; phải cột phụ rộng cố định. < lg cột phụ xuống dưới lưới. Tiêu đề thẻ: `h3` dưới `h2` "Bài viết mới nhất";
+ * khi lọc không có `h2` đó nên thẻ là `h2`. Server Component.
  */
-export function NewsListBody({ featured = null, items }: { featured?: NewsCardData | null; items: NewsCardData[] }) {
-  const t = useTranslations("page.news");
+export function NewsListBody({ featured, items, resultLabel, sort, emptyState, pagination, sidebar }: NewsListBodyProps) {
+  const t = useTranslations("page.news.v2");
+  const headingId = useId();
+  const filtered = resultLabel !== undefined;
+  const showList = items.length > 0 || emptyState !== undefined;
   return (
-    <section aria-label={t("title")} className="flex flex-col gap-8">
-      {featured && (
-        <div data-news-featured="true">
-          <NewsCard data={featured} variant="feature" headingLevel="h2" priority />
-        </div>
-      )}
-      {items.length > 0 && (
-        <ul data-grid-max-cols="4" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((item) => (
-            <li key={item.id}>
-              <NewsCard data={item} headingLevel="h2" />
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <div className="flex flex-col gap-10">
+      <NewsFeaturedBlock items={featured} />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_21rem]">
+        {showList ? (
+          <section {...(filtered ? { "aria-label": t("latestTitle") } : { "aria-labelledby": headingId })} className="flex min-w-0 flex-col gap-6">
+            {filtered ? (
+              <ResultsBar countLabel={resultLabel} sort={sort} />
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 id={headingId} className="font-display text-h3">
+                  {t("latestTitle")}
+                </h2>
+                {sort}
+              </div>
+            )}
+            <PendingRegion className="flex flex-col gap-8">
+              {emptyState ?? (
+                <>
+                  <ul data-grid-max-cols="3" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {items.map((item) => (
+                      <li key={item.id}>
+                        <NewsCard data={item} variant="grid" headingLevel={filtered ? "h2" : "h3"} />
+                      </li>
+                    ))}
+                  </ul>
+                  {pagination}
+                </>
+              )}
+            </PendingRegion>
+          </section>
+        ) : (
+          <div className="hidden lg:block" />
+        )}
+        {sidebar && (
+          <aside aria-label={t("sidebarLabel")} className="flex min-w-0 flex-col gap-6 empty:hidden">
+            {sidebar}
+          </aside>
+        )}
+      </div>
+    </div>
   );
 }

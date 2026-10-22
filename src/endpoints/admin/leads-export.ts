@@ -17,7 +17,7 @@ const log = logger.child({ component: "leads-export" });
 /** Trần số dòng một lần xuất: vượt thì từ chối và bảo thu hẹp bộ lọc, thay vì kéo cả bảng lead qua một request. */
 export const MAX_EXPORT_ROWS = 20_000;
 const PAGE_SIZE = 500;
-const XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+export const XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 const COLUMNS = [
   "Mã lead",
@@ -56,7 +56,7 @@ type ExportedLead = Pick<Lead, "id" | "code" | "fullName" | "phone" | "email" | 
 
 const vietnamTime = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "short", timeStyle: "short", hourCycle: "h23" });
 
-function formatTime(value: string | null | undefined): string {
+export function formatTime(value: string | null | undefined): string {
   if (!value) return "";
   const time = new Date(value);
   return Number.isNaN(time.getTime()) ? "" : vietnamTime.format(time);
@@ -104,7 +104,7 @@ async function lookupAssigneeNames(req: PayloadRequest, leads: ExportedLead[], k
 }
 
 /** Điều kiện "sau" bản ghi cuối của trang trước, theo thứ tự `(createdAt, id)`. */
-function afterCursor(cursor: { createdAt: string; id: string }): Where {
+export function afterCursor(cursor: { createdAt: string; id: string }): Where {
   return {
     or: [{ createdAt: { greater_than: cursor.createdAt } }, { and: [{ createdAt: { equals: cursor.createdAt } }, { id: { greater_than: cursor.id } }] }],
   };
@@ -153,7 +153,7 @@ function exportFileName(now: Date): string {
 export type LeadsExportRateLimit = typeof checkEndpointRateLimit;
 
 /** Trả `Response` lỗi (429/503) nếu không được xuất, `null` nếu còn lượt. Chạy TRƯỚC mọi truy vấn lead. */
-async function checkExportRateLimit(rateLimit: LeadsExportRateLimit, userId: string): Promise<Response | null> {
+export async function checkExportRateLimit(rateLimit: LeadsExportRateLimit, userId: string): Promise<Response | null> {
   let limit: Awaited<ReturnType<LeadsExportRateLimit>>;
   try {
     limit = await rateLimit("admin-export-excel", userId);

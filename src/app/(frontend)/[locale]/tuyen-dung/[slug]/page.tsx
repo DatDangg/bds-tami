@@ -92,7 +92,7 @@ async function loadContact(locale: Locale) {
 }
 
 /**
- * S13 Chi tiết tuyển dụng. ISR (`revalidate = 60` từ layout; lưu tin gọi `revalidatePath`). Không có / chưa công khai / thiếu bản EN → 404 (chặn sớm
+ * S13 Chi tiết tuyển dụng (bố cục BL-054: `JobDetail`; "Vị trí khác" ở cả tin còn hạn lẫn hết hạn, cùng danh mục trước). ISR (`revalidate = 60` từ layout; lưu tin gọi `revalidatePath`). Không có / chưa công khai / thiếu bản EN → 404 (chặn sớm
  * ở proxy cho nội dung SSR đầy đủ, `resolve-missing-page.ts`; `notFound()` là lưới an toàn); slug cũ → 301 ở proxy. Tin quá hạn VẪN mở (200): băng
  * "hết hạn", không form, `noindex, follow`, KHÔNG JSON-LD `JobPosting` — theo SPECIFICATIONS F6; Google cũng coi trang noindex là không đủ điều kiện hiển thị việc làm,
  * nên bỏ hẳn tốt hơn để `validThrough` quá khứ.
@@ -109,9 +109,9 @@ export default async function JobDetailPage({ params }: PageProps) {
   const view = toJobDetailView(doc, locale, now);
   const [contact, t, identity, otherDocs, heroImage] = await Promise.all([
     loadContact(locale),
-    getTranslations({ locale, namespace: "page.careerDetail.sections" }),
+    getTranslations({ locale, namespace: "page.jobDetail.v2.sections" }),
     loadSiteIdentity(locale),
-    view.expired ? findOtherOpenJobs(payload, locale, doc.id, now) : [],
+    findOtherOpenJobs(payload, locale, { currentId: doc.id, categoryId: view.categoryId }, now),
     loadPageBanner(locale, "careers"),
   ]);
   const ownPath = publicDetailPath(CONTENT_ROUTES["job-postings"], locale, doc.slug ?? slug);

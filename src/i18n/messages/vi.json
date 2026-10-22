@@ -202,7 +202,6 @@
       "tabsLabel": "Danh mục tin tức",
       "all": "Tất cả",
       "readTime": "{minutes} phút đọc",
-      "readArticle": "Đọc bài",
       "consultTitle": "Tư vấn nhu cầu",
       "tagsLabel": "Từ khoá",
       "tocTitle": "Mục lục",
@@ -213,18 +212,39 @@
         "copy": "Sao chép liên kết",
         "copied": "Đã sao chép liên kết",
         "copyFailed": "Không sao chép được"
+      },
+      "v2": {
+        "searchPlaceholder": "Tìm bài viết…",
+        "featuredLabel": "Bài viết nổi bật",
+        "brand": "TAMI HOMES",
+        "latestTitle": "Bài viết mới nhất",
+        "resultTotal": "{count} bài viết",
+        "sortBy": "Sắp xếp theo",
+        "sortApply": "Áp dụng",
+        "sort": {
+          "newest": "Mới nhất",
+          "oldest": "Cũ nhất"
+        },
+        "emptyTitle": "Chưa có bài viết phù hợp.",
+        "emptyDescription": "Thử từ khoá khác hoặc xem tất cả bài viết.",
+        "mostRead": "Đọc nhiều",
+        "topics": "Chủ đề",
+        "sidebarLabel": "Đọc thêm"
       }
     },
     "newsDetail": {
-      "latestEyebrow": "Mới cập nhật",
-      "latestTitle": "Bài viết mới",
-      "consultEyebrow": "Tư vấn",
-      "consultTitle": "Đang tìm bất động sản phù hợp?",
-      "consultText": "Để lại thông tin, TAMI HOMES sẽ liên hệ tư vấn cho bạn.",
-      "consultCta": "Nhận tư vấn",
-      "relatedEyebrow": "Đọc tiếp",
-      "relatedTitle": "Bài viết",
-      "relatedAccent": "liên quan"
+      "v2": {
+        "author": "Ban biên tập TAMI HOMES",
+        "shareLabel": "Chia sẻ:",
+        "shareMore": "Chia sẻ qua ứng dụng khác",
+        "consultEyebrow": "Tư vấn miễn phí",
+        "consultTitle": "Cần chọn dự án phù hợp với ngân sách?",
+        "consultText": "Chuyên viên TAMI sẽ tư vấn chi tiết theo nhu cầu của bạn.",
+        "consultCta": "Nhận tư vấn",
+        "tags": "Thẻ:",
+        "related": "Bài viết liên quan",
+        "viewAll": "Xem tất cả tin tức"
+      }
     },
     "posts": {
       "title": "Đăng tin BĐS",
@@ -735,17 +755,12 @@
       "filtersLabel": "Bộ lọc vị trí tuyển dụng",
       "categoriesLabel": "Nhóm công việc",
       "all": "Tất cả",
-      "provinceLabel": "Nơi làm việc",
-      "allProvinces": "Tất cả",
-      "apply": "Lọc",
       "clear": "Xoá bộ lọc",
-      "resultCount": "{count} vị trí đang tuyển",
       "listLabel": "Danh sách vị trí tuyển dụng",
       "emptyTitle": "Chưa có vị trí phù hợp.",
       "noJobs": "Hiện TAMI chưa có vị trí đang tuyển.",
       "noJobsDescription": "Bạn vẫn có thể gửi CV để TAMI liên hệ khi có vị trí phù hợp.",
       "sendCv": "Gửi CV tới {email}",
-      "deadline": "Hạn nộp: {date}",
       "deadlineToday": "Hạn nộp hôm nay",
       "daysLeft": "Còn {count} ngày",
       "salaryFrom": "Từ {amount}",
@@ -756,33 +771,33 @@
         "internship": "Thực tập",
         "contract": "Hợp đồng"
       },
-      "perksRegion": "Môi trường làm việc",
-      "perksEyebrow": "Vì sao chọn TAMI",
-      "perksTitle": "Môi trường",
-      "perksTitleAccent": "làm việc",
-      "jobsEyebrow": "Vị trí đang tuyển",
-      "jobsTitle": "Cơ hội",
-      "jobsTitleAccent": "nghề nghiệp",
-      "applyCta": "Ứng tuyển"
+      "v2": {
+        "heroCta": "Xem vị trí đang tuyển",
+        "perksEyebrow": "Vì sao chọn TAMI",
+        "perksTitle": "Môi trường để bạn",
+        "perksTitleAccent": "phát triển",
+        "jobsEyebrow": "Cơ hội nghề nghiệp",
+        "jobsTitle": "Vị trí đang tuyển",
+        "positionCount": "{count} vị trí",
+        "provinceLabel": "Khu vực",
+        "allProvinces": "Mọi khu vực",
+        "searchLabel": "Tìm theo tên vị trí",
+        "searchPlaceholder": "Tìm theo tên vị trí…",
+        "submit": "Tìm",
+        "urgent": "Tuyển gấp",
+        "deadline": "Hạn: {date}",
+        "processEyebrow": "Quy trình ứng tuyển",
+        "processTitle": "{count} bước đơn giản",
+        "cvEyebrow": "Gia nhập TAMI HOMES",
+        "cvTitle": "Chưa tìm thấy vị trí phù hợp?",
+        "cvDescription": "Gửi CV của bạn, chúng tôi sẽ liên hệ khi có cơ hội phù hợp.",
+        "cvCta": "Gửi CV ngay"
+      }
     },
     "careerDetail": {
-      "summaryTitle": "Thông tin tuyển dụng",
-      "location": "Nơi làm việc",
-      "employmentType": "Hình thức",
-      "quantity": "Số lượng",
-      "quantityValue": "{count} người",
-      "salary": "Mức lương",
-      "deadline": "Hạn nộp hồ sơ",
-      "applyCta": "Ứng tuyển",
       "stickyApply": "Ứng tuyển",
-      "sections": {
-        "description": "Mô tả công việc",
-        "requirements": "Yêu cầu ứng viên",
-        "benefits": "Quyền lợi"
-      },
       "expiredTitle": "Vị trí đã hết hạn nhận hồ sơ",
       "expiredBody": "Rất tiếc, vị trí này đã đóng nhận hồ sơ. Bạn có thể xem các vị trí đang tuyển khác.",
-      "otherTitle": "Vị trí đang tuyển khác",
       "viewAll": "Xem tất cả vị trí",
       "applyForm": {
         "title": "Ứng tuyển vị trí này",
@@ -790,14 +805,12 @@
         "fullName": "Họ và tên",
         "phone": "Số điện thoại",
         "email": "Email",
-        "cv": "CV",
         "cvHelper": "PDF, DOC hoặc DOCX, tối đa 5MB.",
         "chooseFile": "Chọn tệp",
         "dropHint": "Kéo thả CV vào đây hoặc",
         "uploading": "Đang gửi… {percent}%",
         "uploadProgress": "Tiến trình tải CV",
         "message": "Lời nhắn",
-        "submit": "Ứng tuyển",
         "removeFile": "Xoá tệp {name}",
         "success": "TAMI đã nhận hồ sơ của anh/chị.",
         "expired": "Vị trí này đã hết hạn nhận hồ sơ.",
@@ -811,8 +824,7 @@
           "cvTooLarge": "CV tối đa 5MB, vui lòng chọn tệp nhỏ hơn."
         },
         "orContact": "Hoặc liên hệ trực tiếp với chúng tôi:"
-      },
-      "sectionLabel": "Mục {number}"
+      }
     },
     "richText": {
       "table": "Bảng nội dung, cuộn ngang để xem đủ"
@@ -875,17 +887,35 @@
     "contact": {
       "title": "Liên hệ",
       "description": "Đội ngũ TAMI sẵn sàng tư vấn. Gọi hotline hoặc để lại thông tin, chúng tôi sẽ phản hồi sớm nhất.",
-      "infoTitle": "Thông tin liên hệ",
-      "hotline": "Hotline",
-      "email": "Email",
-      "address": "Địa chỉ",
-      "hours": "Giờ làm việc",
-      "hoursValue": "08:00 - 17:30, thứ 2 - thứ 7",
-      "mapLabel": "Văn phòng TAMI trên bản đồ",
-      "formTitle": "Gửi yêu cầu tư vấn",
-      "officeEyebrow": "Thông tin",
-      "officeTitle": "Văn phòng",
-      "officeTitleAccent": "TAMI"
+      "v2": {
+        "cardsLabel": "Kênh liên hệ",
+        "hotline": "Hotline",
+        "callNow": "Gọi ngay",
+        "callNowAria": "Gọi ngay {number}",
+        "email": "Email",
+        "sendEmail": "Gửi email",
+        "sendEmailAria": "Gửi email tới {email}",
+        "zalo": "Zalo OA",
+        "zaloAction": "Nhắn tin",
+        "zaloAria": "Nhắn tin Zalo OA {name} (mở tab mới)",
+        "hours": "Giờ làm việc",
+        "formEyebrow": "Gửi yêu cầu",
+        "formTitle": "Bạn cần TAMI hỗ trợ điều gì?",
+        "formSubmit": "Gửi yêu cầu",
+        "officesTitle": "Hệ thống văn phòng",
+        "officesDescription": "Lựa chọn chi nhánh để xem vị trí trên bản đồ.",
+        "officesTabs": "Chọn văn phòng",
+        "mapLabel": "{name} trên bản đồ",
+        "address": "Địa chỉ",
+        "phone": "Điện thoại",
+        "directions": "Chỉ đường",
+        "directionsAria": "Chỉ đường tới {name} trên Google Maps (mở tab mới)",
+        "fallbackOfficeName": "Văn phòng {siteName}",
+        "joinEyebrow": "Gia nhập TAMI HOMES",
+        "joinTitle": "Cùng chúng tôi kiến tạo những giá trị bền vững",
+        "joinDescription": "Nếu bạn quan tâm đến cơ hội nghề nghiệp tại TAMI HOMES, hãy xem các vị trí đang tuyển dụng hoặc gửi hồ sơ để chúng tôi liên hệ khi có cơ hội phù hợp.",
+        "joinAction": "Xem vị trí đang tuyển"
+      }
     },
     "legal": {
       "version": "Phiên bản {version} · Hiệu lực từ {date}",
@@ -1028,6 +1058,30 @@
         },
         "similarViewAll": "Xem tất cả tin đăng"
       }
+    },
+    "jobDetail": {
+      "v2": {
+        "applyNow": "Ứng tuyển ngay",
+        "share": "Chia sẻ",
+        "infoLabel": "Thông tin vị trí",
+        "deadline": "Hạn nộp: <time>{date}</time>",
+        "sections": {
+          "description": "Mô tả công việc",
+          "requirements": "Yêu cầu",
+          "benefits": "Quyền lợi"
+        },
+        "formSubtitle": "Phản hồi trong 3 ngày làm việc.",
+        "form": {
+          "cv": "CV của bạn",
+          "submit": "Gửi hồ sơ",
+          "fullNamePlaceholder": "Nguyễn Văn A",
+          "phonePlaceholder": "0901 234 567",
+          "emailPlaceholder": "nguyenvana@gmail.com"
+        },
+        "otherTitle": "Vị trí khác",
+        "viewAll": "Xem tất cả vị trí",
+        "expiredCvPrompt": "Gửi CV để TAMI liên hệ khi có vị trí phù hợp."
+      }
     }
   },
   "detailKit": {
@@ -1137,5 +1191,21 @@
     "statsLabel": "Số liệu nổi bật",
     "projectMentionEyebrow": "Dự án được nhắc đến",
     "viewDetail": "Xem chi tiết"
+  },
+  "newsletter": {
+    "eyebrow": "Bản tin thị trường",
+    "title": "Nhận tin tức bất động sản mới nhất mỗi tuần",
+    "email": "Email",
+    "emailPlaceholder": "Email của bạn",
+    "consent": "Tôi đồng ý nhận bản tin qua email và để TAMI xử lý email theo <policy>Chính sách bảo mật</policy>.",
+    "submit": "Đăng ký",
+    "privacyNote": "Chúng tôi cam kết không chia sẻ email của bạn.",
+    "errors": {
+      "email": "Email chưa hợp lệ."
+    },
+    "success": {
+      "title": "Đăng ký thành công!",
+      "description": "Cảm ơn bạn. Bản tin thị trường sẽ được gửi tới email của bạn."
+    }
   }
 }

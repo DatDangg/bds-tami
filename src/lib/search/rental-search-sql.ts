@@ -14,7 +14,7 @@ export const rentalFrom = (locale: string): SqlFragment =>
   sql`FROM "rentals" r JOIN "rentals_locales" rl ON rl."_parent_id" = r."id" AND rl."_locale" = ${locale}`;
 
 /** Thoát `\`, `%`, `_` để từ khoá người dùng nhập là chữ thường, không phải ký tự đại diện của `LIKE`. */
-const escapeLike = (term: string): string => term.replace(/[\\%_]/g, (char) => `\\${char}`);
+export const escapeLike = (term: string): string => term.replace(/[\\%_]/g, (char) => `\\${char}`);
 
 /** Từ khoá chuẩn hoá giống `searchText` (ERD §6), tách theo khoảng trắng; mọi từ phải xuất hiện (AND). */
 export function searchTerms(query: string | undefined): string[] {

@@ -338,53 +338,102 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(related.map((doc) => doc.title)).toEqual(["Article D2"]);
     });
 
-    it("trang danh mục: lọc theo danh mục + con, 12 bài/trang, phân trang không trùng", async () => {
+    it("trang danh mục: lọc theo danh mục + con, khối nổi bật 4 bài + 12 bài/trang, phân trang không trùng", async () => {
       const parent = await createCategory("Mục cha", "news");
       const child = await payload.create({ collection: "categories", data: { name: "Mục con", scope: "news", parent: parent.id } as never, locale: "vi", overrideAccess: true, depth: 0 });
-      for (let index = 1; index <= 13; index += 1) await publish(`Tin mục cha ${index}`, { category: parent.id });
+      for (let index = 1; index <= 17; index += 1) await publish(`Tin mục cha ${index}`, { category: parent.id });
       await publish("Tin mục con", { category: child.id });
       await publish("Tin ngoài mục", { category: categoryId });
 
-      // Trang 1 danh mục có bài nổi bật (không cờ isFeatured → bài mới nhất của danh mục), bị loại khỏi lưới nên 13 bài = 1 + 12.
+      // Trang 1 danh mục có khối nổi bật (không cờ isFeatured → 4 bài mới nhất của danh mục), bị loại khỏi lưới nên 17 bài = 4 + 12 + 1.
       const parentOnly = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id] });
       expect(parentOnly.items).toHaveLength(12);
-      expect(parentOnly.featured?.title).toMatch(/^Tin mục cha /);
-      expect(parentOnly.items.map((item) => item.id)).not.toContain(parentOnly.featured?.id);
+      expect(parentOnly.featured).toHaveLength(4);
+      for (const card of parentOnly.featured) expect(card.title).toMatch(/^Tin mục cha /);
+      expect(parentOnly.items.map((item) => item.id)).not.toEqual(expect.arrayContaining([parentOnly.featured[0]?.id]));
+      expect(parentOnly.featured[0]?.readMinutes).toBe(1);
       const withChildren = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
       const page2 = await listing.loadNewsListing(payload, "vi", { page: 2, categoryIds: [parent.id, child.id] });
       expect(withChildren.totalPages).toBe(2);
-      expect(page2.items).toHaveLength(1);
-      expect(page2.featured).toBeNull();
-      const titles = [...(withChildren.featured ? [withChildren.featured] : []), ...withChildren.items, ...page2.items].map((item) => item.title);
-      expect(new Set(titles).size).toBe(14);
+      expect(page2.items).toHaveLength(2);
+      expect(page2.featured).toEqual([]);
+      const titles = [...withChildren.featured, ...withChildren.items, ...page2.items].map((item) => item.title);
+      expect(new Set(titles).size).toBe(18);
       expect(titles).toContain("Tin mục con");
       expect(titles).not.toContain("Tin ngoài mục");
-      const flaggedChild = await publish("Tin mục con nổi bật", { category: child.id, isFeatured: true });
+      const flaggedChild = await publish("Tin mục con nổi bật", { category: child.id });
+      await updateNews(flaggedChild.id, { isFeatured: true });
+      await setPublishedAt(flaggedChild.id, "2025-01-01T00:00:00.000Z");
       const flaggedListing = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [parent.id, child.id] });
-      expect(flaggedListing.featured?.id).toBe(flaggedChild.id);
+      // `isFeatured` đứng đầu dù cũ hơn, rồi 3 bài mới nhất.
+      expect(flaggedListing.featured.map((card) => card.id)[0]).toBe(flaggedChild.id);
+      expect(flaggedListing.featured).toHaveLength(4);
       const beyond = await listing.loadNewsListing(payload, "vi", { page: 3, categoryIds: [parent.id, child.id] });
       expect(beyond.outOfRange).toBe(true);
       const emptyCategory = await createCategory("Mục trống", "news");
       const empty = await listing.loadNewsListing(payload, "vi", { page: 1, categoryIds: [emptyCategory.id] });
-      expect(empty).toMatchObject({ isEmpty: true, outOfRange: false, items: [], featured: null });
+      expect(empty).toMatchObject({ isEmpty: true, outOfRange: false, items: [], featured: [] });
     });
 
-    it("/tin-tuc trang 1: 1 bài nổi bật + lưới 12 bài; trang 2 không lặp bài nổi bật; đủ mọi bài, không trùng", async () => {
-      const loadAll = async () => {
-        const first = await listing.loadNewsListing(payload, "vi", { page: 1 });
-        const seen = [...(first.featured ? [first.featured] : []), ...first.items];
-        for (let page = 2; page <= first.totalPages; page += 1) seen.push(...(await listing.loadNewsListing(payload, "vi", { page })).items);
-        return { first, seen };
-      };
-      const { first, seen } = await loadAll();
-      expect(first.featured).not.toBeNull();
+    it("/tin-tuc trang 1: khối nổi bật 4 bài + lưới 12 bài; trang 2 không lặp; đủ mọi bài, không trùng", async () => {
+      const first = await listing.loadNewsListing(payload, "vi", { page: 1 });
+      const seen = [...first.featured, ...first.items];
+      for (let page = 2; page <= first.totalPages; page += 1) seen.push(...(await listing.loadNewsListing(payload, "vi", { page })).items);
+      expect(first.featured).toHaveLength(4);
       expect(first.items.length).toBeLessThanOrEqual(12);
       expect(new Set(seen.map((card) => card.id)).size).toBe(seen.length);
       const total = (await publicQueries.findPublicList(payload, "news", "vi", { limit: 50 })).totalDocs;
       expect(seen).toHaveLength(total);
       const page2 = await listing.loadNewsListing(payload, "vi", { page: 2 });
-      expect(page2.featured).toBeNull();
-      expect(page2.items.map((card) => card.id)).not.toContain(first.featured?.id);
+      expect(page2.featured).toEqual([]);
+      expect(page2.items.map((card) => card.id)).not.toContain(first.featured[0]?.id);
+    });
+
+    it("q không dấu (tiêu đề + tóm tắt, mọi từ), tag khớp đúng, sort=oldest; lọc → không nổi bật, không loại bài; chỉ bài công khai", async () => {
+      const scope = await createCategory("Tìm kiếm BL054", "news");
+      const a = await publish("Đông Anh lên quận zq54", { category: scope.id, excerpt: "Hạ tầng phía Bắc", tags: ["quy hoạch", "đông anh"] });
+      const b = await publish("Thị trường căn hộ zq54", { category: scope.id, excerpt: "Nguồn cung ĐÔNG ANH tăng mạnh", tags: ["thị trường zq54"] });
+      const c = await publish("Pháp lý zq54", { category: scope.id, tags: [" quy hoạch "] });
+      await createNews({ title: "Đông Anh nháp zq54", category: scope.id, tags: ["chỉ nháp zq54"] });
+      await setPublishedAt(a.id, "2026-02-03T00:00:00.000Z");
+      await setPublishedAt(b.id, "2026-02-02T00:00:00.000Z");
+      await setPublishedAt(c.id, "2026-02-01T00:00:00.000Z");
+      const load = (filters: { q?: string; tag?: string; sort?: "newest" | "oldest" }, locale: Locale = "vi", categoryIds?: string[]) =>
+        listing.loadNewsListing(payload, locale, { page: 1, filters: { sort: "newest", ...filters }, ...(categoryIds ? { categoryIds } : {}) });
+      const ids = (result: Awaited<ReturnType<typeof load>>) => result.items.map((item) => item.id);
+
+      const byQ = await load({ q: "dong ANH zq54" });
+      expect(ids(byQ)).toEqual([a.id, b.id]);
+      expect(byQ).toMatchObject({ featured: [], totalDocs: 2, isEmpty: false });
+      expect(ids(await load({ q: "zq54", sort: "oldest" }))).toEqual([c.id, b.id, a.id]);
+      expect(ids(await load({ q: "zq54" }, "vi", [categoryId]))).toEqual([]);
+      // Ký tự đại diện của LIKE / chuỗi SQL là chữ thường, không lỗi.
+      expect(await load({ q: "zq54 %" })).toMatchObject({ isEmpty: true, items: [] });
+      expect(await load({ q: "' OR 1=1 --" })).toMatchObject({ isEmpty: true });
+      expect(ids(await load({ tag: "quy hoạch" }))).toEqual([a.id, c.id]);
+      expect(ids(await load({ tag: "quy hoach" }))).toEqual([]);
+      expect(ids(await load({ tag: "quy hoạch", q: "dong anh" }))).toEqual([a.id]);
+      const sortedOnly = await load({ sort: "oldest" });
+      expect(sortedOnly.featured).toEqual([]);
+
+      await makeEnglish(a.id, "Dong Anh becomes a district zq54");
+      expect(ids(await load({ q: "district zq54" }, "en"))).toEqual([a.id]);
+      expect(ids(await load({ q: "district zq54" }))).toEqual([]);
+
+      const search = await import("../../src/lib/news/news-search");
+      // C10 (P3-T01): danh mục lọc ngay trong SQL tìm id (trước trần NEWS_FILTER_MAX_IDS) — id trả về chỉ thuộc danh mục truyền vào.
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [scope.id] })).toEqual([a.id, b.id, c.id]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [categoryId] })).toEqual([]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { tag: "quy hoạch", categoryIds: [categoryId, scope.id] })).toEqual([a.id, c.id]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [] })).toEqual([]);
+      expect(ids(await load({ q: "dong anh zq54" }, "vi", [scope.id]))).toEqual([a.id, b.id]);
+      const tags = await search.listTopNewsTags(payload, "vi");
+      expect(tags.length).toBeLessThanOrEqual(12);
+      expect(tags).toContain("quy hoạch");
+      expect(tags.indexOf("quy hoạch")).toBeLessThan(tags.indexOf("thị trường zq54"));
+      expect(tags).not.toContain("chỉ nháp zq54");
+      expect(tags).not.toContain(" quy hoạch ");
+      expect(await search.listTopNewsTags(payload, "en")).toEqual([]);
     });
 
     it("/en: lưới và danh mục chỉ gồm nội dung đã có bản EN", async () => {

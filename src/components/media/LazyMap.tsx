@@ -41,6 +41,8 @@ type LazyMapProps = {
   label?: string;
   /** Tỉ lệ cố định để CLS = 0; mặc định 4:3 (design-spec §3.8). */
   aspectRatio?: string;
+  /** `false`: bỏ link "Mở Google Maps" dưới bản đồ khi nơi gọi đã có nút riêng (vd "Chỉ đường" ở trang Liên hệ, BL-054). */
+  showGoogleMapsLink?: boolean;
   className?: string;
 };
 
@@ -109,7 +111,7 @@ async function mountMap(container: HTMLElement, { location, approximate, locale,
   return () => map.remove();
 }
 
-export function LazyMap({ location, approximate = false, previewImage, markers = [], label, aspectRatio = "4/3", className }: LazyMapProps) {
+export function LazyMap({ location, approximate = false, previewImage, markers = [], label, aspectRatio = "4/3", showGoogleMapsLink = true, className }: LazyMapProps) {
   const t = useTranslations("media.map");
   const [phase, setPhase] = useState<Phase>("idle");
   // Số lần yêu cầu tải (0 = chưa). Effect dựng map chỉ phụ thuộc giá trị này: đổi `phase` không được gỡ map.
@@ -229,14 +231,16 @@ export function LazyMap({ location, approximate = false, previewImage, markers =
         )}
       </div>
       {approximate && <p className="mt-2 text-small text-text-secondary">{t("approximateNote")}</p>}
-      <a
-        href={googleMapsUrl(shown, approximate)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2 inline-flex min-h-11 items-center text-small font-semibold text-accent-text underline underline-offset-4"
-      >
-        {t("openGoogleMaps")}
-      </a>
+      {showGoogleMapsLink && (
+        <a
+          href={googleMapsUrl(shown, approximate)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex min-h-11 items-center text-small font-semibold text-accent-text underline underline-offset-4"
+        >
+          {t("openGoogleMaps")}
+        </a>
+      )}
     </div>
   );
 }

@@ -1491,7 +1491,8 @@ export interface AuditLog {
     | 'application.view_cv'
     | 'content.retranslate'
     | 'content.approve_translation'
-    | 'system.data_retention';
+    | 'system.data_retention'
+    | 'newsletter.export';
   collection?: string | null;
   docId?: string | null;
   summary: string;

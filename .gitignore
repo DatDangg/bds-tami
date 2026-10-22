@@ -32,3 +32,4 @@ seed/scraped-extra/
 
 # Báo cáo chạy thử backfill (BL-052): chỉ để xem, không commit; báo cáo --apply được commit cho admin soát
 docs/reports/backfill-listing-fields-*-dry-run*.md
+docs/reports/backfill-offices-*-dry-run*.md

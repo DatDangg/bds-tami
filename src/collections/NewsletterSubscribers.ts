@@ -11,7 +11,11 @@ export const NEWSLETTER_STATUS_LABELS: Record<NewsletterStatus, string> = {
   unsubscribed: "Đã huỷ",
 };
 
-const LOCALE_LABELS = { vi: "Tiếng Việt", en: "Tiếng Anh" } as const;
+/** Bằng chứng đồng ý: không ai sửa tay sau khi tạo (kể cả admin). Payload bỏ giá trị gửi lên cho field này khi update không `overrideAccess`. */
+const lockedAfterCreate = { update: denyAll };
+
+/** Nhãn ngôn ngữ đăng ký: dùng chung cho ô chọn trong admin và cột "Ngôn ngữ" của file Excel (`newsletter-export`). */
+export const LOCALE_LABELS = { vi: "Tiếng Việt", en: "Tiếng Anh" } as const;
 
 /** Email lưu dạng đã cắt khoảng trắng + chữ thường để unique chặn được bản trùng khác hoa/thường. */
 export const normalizeEmail: FieldHook = ({ value }) => (typeof value === "string" ? value.trim().toLowerCase() : value);
@@ -19,7 +23,8 @@ export const normalizeEmail: FieldHook = ({ value }) => (typeof value === "strin
 /**
  * Người đăng ký "Bản tin thị trường" (BL-054). Dữ liệu cá nhân: chỉ admin đọc / sửa trạng thái / xoá; sale không thấy.
  * Không ai tạo qua REST: form công khai `POST /api/public/newsletter` (P1-T04) ghi bằng Local API sau khi kiểm consent + Turnstile.
- * Trường consent / nguồn chỉ đọc ở admin (bằng chứng đồng ý), chỉ `status` sửa tay.
+ * Trường consent / nguồn là bằng chứng đồng ý: field access `update: denyAll` (khoá cả REST lẫn Local API không `overrideAccess`,
+ * như `site-settings.privacyPolicyVersion`), admin chỉ đổi được `status`; endpoint công khai cập nhật bằng `overrideAccess`.
  */
 export const NewsletterSubscribers: CollectionConfig = {
   slug: "newsletter-subscribers",
@@ -29,6 +34,8 @@ export const NewsletterSubscribers: CollectionConfig = {
     defaultColumns: ["email", "locale", "status", "createdAt"],
     hidden: ({ user }) => user?.role !== ROLES.admin,
     description: "Email khách đăng ký nhận bản tin thị trường trên website. Chỉ đổi được trạng thái nhận.",
+    // Nút "Xuất Excel" theo bộ lọc trạng thái đang áp (chỉ admin; collection không có thùng rác nên không cần slot server như lead).
+    components: { beforeListTable: ["/components/admin/NewsletterExportButton#NewsletterExportButton"] },
   },
   access: { read: isAdmin, create: denyAll, update: isAdmin, delete: isAdmin },
   disableDuplicate: true,
@@ -41,6 +48,7 @@ export const NewsletterSubscribers: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
+      access: lockedAfterCreate,
       hooks: { beforeValidate: [normalizeEmail] },
       admin: { readOnly: true },
     },
@@ -50,6 +58,7 @@ export const NewsletterSubscribers: CollectionConfig = {
       label: "Ngôn ngữ",
       required: true,
       defaultValue: "vi",
+      access: lockedAfterCreate,
       options: (["vi", "en"] as const).map((value) => ({ label: LOCALE_LABELS[value], value })),
       admin: { readOnly: true },
     },
@@ -62,8 +71,8 @@ export const NewsletterSubscribers: CollectionConfig = {
       index: true,
       options: NEWSLETTER_STATUSES.map((value) => ({ label: NEWSLETTER_STATUS_LABELS[value], value })),
     },
-    { name: "consentAt", type: "date", label: "Thời điểm đồng ý", admin: { readOnly: true, date: { pickerAppearance: "dayAndTime" } } },
-    { name: "privacyPolicyVersion", type: "text", label: "Phiên bản chính sách bảo mật", admin: { readOnly: true } },
-    { name: "sourcePath", type: "text", label: "Trang đăng ký", admin: { readOnly: true } },
+    { name: "consentAt", type: "date", label: "Thời điểm đồng ý", access: lockedAfterCreate, admin: { readOnly: true, date: { pickerAppearance: "dayAndTime" } } },
+    { name: "privacyPolicyVersion", type: "text", label: "Phiên bản chính sách bảo mật", access: lockedAfterCreate, admin: { readOnly: true } },
+    { name: "sourcePath", type: "text", label: "Trang đăng ký", access: lockedAfterCreate, admin: { readOnly: true } },
   ],
 };

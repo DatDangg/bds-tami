@@ -43,8 +43,46 @@
 
 ## Quyết định (builder)
 
+Builder: `builder-strong`.
+
+1. **Thứ tự xử lý endpoint:** pipeline công khai (rate limit → validate) chạy TRƯỚC lọc bot, để mọi request (kể cả bot) bị rate limit như nhau và body sai luôn 400. Sau pipeline: bot / prefetch → bài công khai → chống trùng → upsert. Mọi nhánh bỏ qua trả 204 giống nhau.
+2. **Khoá chống trùng dùng `ipHash` thay cho IP thô:** `HMAC_SHA256(PAYLOAD_SECRET, "news-view:v1:" + ipHash + "|" + ua + "|" + ngàyVN + "|" + newsId)`. `ipHash` là HMAC cố định của IP chuẩn hoá nên phân biệt người như dùng IP, nhưng IP thô không ra khỏi pipeline. UA cắt 512 ký tự trước khi băm. Không cần secret mới trong `src/lib/env.ts` (dẫn xuất từ `PAYLOAD_SECRET`, tiền tố mục đích riêng).
+3. **Redis lỗi ở bước `SET NX`** (rate limit đã qua): không cộng, trả **503** cho giống pipeline (spec-validation F1). Log `warn` chỉ ghi tên lỗi.
+4. **`day`** = mốc 00:00 giờ VN dạng instant (17:00 UTC hôm trước), đúng ERD / mô tả collection (khác `click-stats-daily` vốn lưu 00:00 UTC). Cửa sổ "Đọc nhiều" = 30 ngày gồm hôm nay (`day >= hôm nay − 29 ngày`).
+5. **Bộ lọc bot:** regex tự viết (không thêm dependency); không chặn trình duyệt trong app (Zalo, Messenger, Slack desktop); `(?<!cu)bot\b` để máy Cubot không bị coi là bot. Prefetch: `Sec-Purpose` / `Purpose` / `X-Moz` chứa `prefetch|prerender`.
+6. **Loader:** SQL gộp `SUM(views)` có JOIN `news` lọc sơ bộ (`PUBLIC_STATUSES.default`, `deleted_at IS NULL`, `/en` `has_english`) để bài ẩn không chiếm suất; rồi đọc lại bài qua `findPublicList` (nơi duy nhất dựng điều kiện công khai) và giữ thứ tự hạng. `select` chỉ `title/slug/cover/publishedAt` (không kéo `content`). Trả thêm `dateLabel` (ngoài id/title/href/cover/publishedAt) để P2-T02 khỏi format lại.
+7. **Cache:** `unstable_cache` 600 s, khoá `(locale, limit)`, tag `news:most-read` (`src/lib/news/news-cache-tags.ts`, file không import gì để `payload.config` không kéo `next/cache`). **Thêm ngoài danh sách file:** hook `src/hooks/news/revalidate-most-read.ts` gắn vào `src/collections/News.ts` (`afterChange`/`afterDelete`, chỉ khi bài đang hoặc vừa công khai) — cần để "xuất bản / ẩn bài làm mới" như scope §2; `createNews` nhận thêm tham số tuỳ chọn `revalidateTags` (chỉ cho test).
+8. **Rate limit** `"news-views": 30/60s` thêm **cuối** `RATE_LIMITS`; endpoint thêm **cuối** mảng `endpoints` của `payload.config.ts` (song song P1-T04 — primary gộp).
+9. Không migration, không đổi schema → không regen `payload-types.ts`. Không thêm key i18n.
+
 ## Verification summary (Builder)
+
+Chạy trong worktree, `DATABASE_URL_TEST` = DB worktree `tami_wt54_p1t03` (test tạo DB tạm con rồi DROP), Redis db 13. Không đụng DB `tami`. Không bật dev server (không cần).
+
+- `pnpm typecheck` — PASS.
+- `pnpm lint` — PASS (0 error; 2 warning có sẵn ở `tools/task-dashboard/server.mjs`, không thuộc task).
+- `pnpm build` — PASS.
+- Test mới của task — PASS:
+  - `src/lib/news/view-dedupe.test.ts` (44): bot regex (crawler, headless, Lighthouse/PageSpeed, preview link, thư viện HTTP; người thật gồm Zalo / Messenger in-app, Cubot, Slack desktop), prefetch header, ngày VN + TTL, khoá HMAC không chứa dữ liệu thô, `SET NX EX`, Redis lỗi.
+  - `src/endpoints/public/news-views.test.ts` (20): lần đầu +1, trùng trong ngày không cộng, người khác cộng, bot / UA rỗng / prefetch bỏ qua, bài không công khai 204 không cộng, Redis lỗi ở dedupe 503 không cộng + log không chứa IP/UA, Redis lỗi ở rate limit 503, 429, body sai / quá lớn 400.
+  - `src/components/news/NewsViewBeacon.test.tsx` (6): gửi đúng 1 lần sau trễ, không gửi khi webdriver, chờ tab hiện, rời trang trước trễ không gửi, fallback `fetch keepalive`.
+  - `src/hooks/news/revalidate-most-read.test.ts` (6).
+  - `tests/integration/news-views.test.ts` (12, DB tạm + migration thật + Redis thật): 2 lần cùng người → +1, bot → 0, nháp / xoá mềm / không tồn tại → 0, 400, rate limit 31 lần → 429, bảng không có cột IP/UA + khoá Redis không chứa IP, 25 người đồng thời → 25, 50 upsert song song → 50 (1 dòng), loader top 5 + hoà + cửa sổ 30 ngày + bài ẩn bị loại, `/en` chỉ bài EN + bù, bù featured → mới nhất, không lượt xem → toàn phần bù.
+- `pnpm test` (toàn bộ) — 3982 pass / 1 fail / 55 skip; 5 file fail, **không liên quan task**:
+  - `src/components/layout/Header.test.tsx` "bẫy focus" — timeout 5s khi máy tải nặng; chạy riêng với `--test-timeout 60000` → 17/17 PASS.
+  - `tests/integration/access`, `jobs-email`, `media-upload`, `session-refresh` — `beforeAll` không khai timeout nên dùng 10s mặc định, trong khi import `payload.config` lạnh trong worktree đo được ~21s. Thêm vào đó Postgres dùng chung `tami-postgres` sập trong lúc chạy ("too many clients" khi nhiều worktree chạy test song song → process exit 2 → recovery fsync ~25 phút). Sau khi DB hồi phục, chạy lại 4 file + `news-views.test.ts` với config tạm `hookTimeout: 120_000` (file tạm đã xoá) → **5/5 file, 67/67 PASS**.
+
+**Residual risk**
+- 4 file integration trên phụ thuộc thời gian import (hook 10s mặc định): không do task gây ra, nhưng có thể lại fail khi máy chạy chậm.
+- Khách không xác định được IP (`UNKNOWN_CLIENT_IP`, thiếu cấu hình proxy) dùng chung `ipHash`: chống trùng khi đó chỉ còn theo UA (đếm thiếu, không đếm thừa).
+- Bộ lọc bot là regex tự duy trì: bot giả UA trình duyệt thật vẫn được đếm (giới hạn bởi rate limit 30/phút/IP + 1 lượt/người/bài/ngày).
+- `loadMostReadNews` ném lỗi khi DB lỗi: P2-T02 khi gắn khối nên bọc (vd trả `[]`) để trang không hỏng.
 
 ## Review
 
 ## Doc impact
+
+- `docs/API_SPEC.md`: thêm dòng bảng §3 + mục **§3.12 `POST /api/public/news-views`** (body, thứ tự xử lý, chống trùng, upsert, không PII) + loader "Đọc nhiều" (cache / tag / hook làm mới). Primary gộp với mục bản tin của P1-T04 nếu trùng số mục.
+- `docs/ERD.md`: no doc impact (schema `news-views-daily` đã ghi ở P1-T01; không đổi schema).
+- `docs/PERMISSION.md`: no doc impact (đã ghi endpoint ghi `news-views-daily` ở P1-T01).
+- Intent docs (`SPECIFICATIONS.md`): không đổi.

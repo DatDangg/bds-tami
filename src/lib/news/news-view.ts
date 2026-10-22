@@ -4,6 +4,7 @@ import type { Category, Media, News } from "../../payload-types";
 import { formatDate } from "../format";
 import { CONTENT_ROUTES, publicPath } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
+import { estimateReadMinutes } from "./read-time";
 
 export interface NewsCardData {
   id: string;
@@ -15,6 +16,8 @@ export interface NewsCardData {
   dateLabel: string | null;
   categoryName: string | null;
   cover: MediaImage | null;
+  /** "N phút đọc" (BL-054) ước từ `content`; không có khi bài được đọc không kèm `content` (vd `select` của "Đọc nhiều"). */
+  readMinutes?: number;
 }
 
 /**
@@ -50,6 +53,7 @@ export function toNewsCardData(doc: News, locale: Locale): NewsCardData | null {
     dateLabel: published ? formatDate(published, locale) : null,
     categoryName: visibleCategory(doc.category, locale)?.name ?? null,
     cover: populatedMedia(doc.cover),
+    ...(doc.content ? { readMinutes: estimateReadMinutes(doc.content) } : {}),
   };
 }
 

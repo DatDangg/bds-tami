@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/news-careers-contact-redesign",
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2360,14 +2360,14 @@
       "slug": "news-careers-contact-redesign",
       "title": "Redesign Tin tức / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ + đếm lượt xem, bản tin, khối soạn bài, văn phòng, Tuyển gấp, quy trình ứng tuyển (BL-054)",
       "type": "MODIFY",
-      "status": "in_progress",
-      "currentPhase": 1,
+      "status": "done",
+      "currentPhase": 3,
       "backlog": "BL-054",
-      "changeDoc": "spec/changes/2026-10-21-news-careers-contact-redesign.md",
+      "changeDoc": "spec/changes/archive/2026-10-21-news-careers-contact-redesign.md",
       "startedAt": "2026-10-22",
       "planApprovedAt": "2026-10-21 (change doc Chế độ chạy: auto proceed, builder-strong mọi task, commit staging không push)",
-      "specVersion": "1.47.0",
-      "scopeVersion": 61,
+      "specVersion": "1.47.1",
+      "scopeVersion": 62,
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2399,71 +2399,148 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
-          ]
+          ],
+          "note": "POST /api/public/news-views + loader Đọc nhiều + beacon",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-task-03-round-1-review.md",
+          "commit": "632919b"
         },
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
-          ]
+          ],
+          "note": "POST /api/public/newsletter + NewsletterSignup + export Excel + khoá consent",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-task-04-round-1-review.md",
+          "commit": "6500139",
+          "migration": "20261022_031905_newsletter_export_audit SAFE_ADDITIVE (enum ADD VALUE)"
         },
         {
           "task": "phase-2-task-01",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-01.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-03",
             "phase-1-task-04"
-          ]
+          ],
+          "note": "/tin-tuc design + q/tag/sort + Đọc nhiều/Bản tin/Chủ đề",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-01-round-1-review.md",
+          "commit": "3c52d58"
         },
         {
           "task": "phase-2-task-02",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-02.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-02",
             "phase-1-task-03",
             "phase-2-task-01"
-          ]
+          ],
+          "note": "/tin-tuc/[slug] design + .news-prose + beacon",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-02-round-1-review.md",
+          "commit": "72be45a"
         },
         {
           "task": "phase-2-task-03",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-03.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
-          ]
+          ],
+          "note": "/tuyen-dung design + q + Tuyển gấp + quy trình",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-03-round-1-review.md",
+          "commit": "e8b02f8"
         },
         {
           "task": "phase-2-task-04",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01",
             "phase-2-task-03"
-          ]
+          ],
+          "note": "/tuyen-dung/[slug] design + OtherJobs",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-04-round-1-review.md",
+          "commit": "a2a31a3"
         },
         {
           "task": "phase-2-task-05",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-05.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
-          ]
+          ],
+          "note": "/lien-he design + offices/workingHours fallback + backfill:offices",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-2-task-05-round-1-review.md",
+          "commit": "17259ab"
+        },
+        {
+          "task": "phase-3-task-01",
+          "file": "tasks/feature-news-careers-contact-redesign/phase-3-task-01.md",
+          "status": "done",
+          "attempt": 3,
+          "dependsOn": [
+            "phase-2-task-01",
+            "phase-2-task-02",
+            "phase-2-task-03",
+            "phase-2-task-04",
+            "phase-2-task-05"
+          ],
+          "note": "dọn C1–C11 phase review",
+          "review": "STRICT PASS",
+          "round": 3,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-3-task-01-round-3-review.md",
+          "commit": "acaeebd"
         }
-      ]
+      ],
+      "phaseReview12": {
+        "verdict": "GAPS (0 MAJOR, 6 MINOR) — code đủ 10 quyết định, 7/8 acceptance; G2 full test → PASS 407/4159 sau review",
+        "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-2-phase-review.md",
+        "at": "2026-10-22"
+      },
+      "stage": "done — as-built 1.47.1 / scope v62; follow-ups BL-059",
+      "completedAt": "2026-10-22",
+      "migrations": [
+        "20261022_022857_news_careers_contact_redesign SAFE_ADDITIVE",
+        "20261022_031905_newsletter_export_audit SAFE_ADDITIVE (enum ADD VALUE)"
+      ],
+      "verification": {
+        "commit": "d69bcc0",
+        "typecheck": "PASS",
+        "build": "PASS",
+        "lint": "0 lỗi trong code BL-054 (lỗi duy nhất ở .local-seed/seed-sample-project-blocks.ts — không track, session khác)",
+        "test": "407 file / 4165 PASS"
+      },
+      "devDb": {
+        "migrated": true,
+        "backfillOffices": "dry-run skip-no-source (DB dev không có địa chỉ/hotline) — không apply"
+      },
+      "followUps": "BL-059 spec/changes/2026-10-22-news-careers-followups.md"
     },
     {
       "slug": "admin-form-ux-polish",
