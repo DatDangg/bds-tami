@@ -1,0 +1,110 @@
+// Màn "Lịch sử chỉnh sửa" (BL-058): danh sách do VersionHistoryView render + dọn nhiễu ở màn so sánh của Payload (selector theo 3.91).
+
+.version-history {
+  &__wrap {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__head,
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1.4fr) minmax(8rem, 1fr) minmax(10rem, 1.2fr) 11rem;
+    align-items: center;
+    column-gap: 1rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  &__head {
+    color: var(--admin-text-subtle);
+    font-size: 0.9375rem;
+    border-bottom: 1px solid var(--admin-border);
+  }
+
+  &__row {
+    position: relative;
+    border-bottom: 1px solid var(--admin-border);
+    color: var(--admin-text);
+
+    &:hover {
+      background: var(--admin-accent-soft, transparent);
+    }
+  }
+
+  &__time {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-height: 44px;
+    justify-content: center;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--admin-accent);
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    // Stretched link: vùng bấm phủ cả dòng (li là relative).
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+  }
+
+  &__ago {
+    font-weight: 400;
+    font-size: 0.9375rem;
+    color: var(--admin-text-subtle);
+  }
+
+  &__empty {
+    color: var(--admin-text-subtle);
+  }
+
+  // Màn hẹp: bỏ hàng tiêu đề, mỗi phiên bản là một thẻ nhiều dòng (không cuộn ngang).
+  @media (max-width: 768px) {
+    &__head {
+      display: none;
+    }
+
+    &__row {
+      grid-template-columns: 1fr auto;
+      row-gap: 0.375rem;
+    }
+
+    &__time {
+      grid-column: 1 / -1;
+    }
+
+    &__current {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    &__changes {
+      grid-column: 1 / -1;
+      color: var(--admin-text-subtle);
+      font-size: 0.9375rem;
+    }
+  }
+}
+
+// Màn so sánh: ẩn trường hệ thống không có nghĩa với người dùng (mốc thời gian tự sinh, trạng thái dịch kỹ thuật, cờ job nền).
+// Danh sách này phải khớp VERSION_HIDDEN_FIELDS trong src/lib/admin/version-history.ts (số "trường đã đổi" bỏ qua cùng nhóm này).
+.render-field-diffs__field {
+  &[data-field-path="updatedAt"],
+  &[data-field-path="createdAt"],
+  &[data-field-path="deletedAt"],
+  &[data-field-path="translation"],
+  &[data-field-path="searchReindexPending"] {
+    display: none;
+  }
+}

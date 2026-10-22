@@ -143,6 +143,9 @@ export const PAYLOAD_VI_OVERRIDES: DeepPartial<typeof viTranslations> = {
     versionID: "Mã phiên bản",
     changedFieldsCount_one: "{{count}} trường đã thay đổi",
     currentPublishedVersion: "Phiên bản hiện tại",
+    // Nhãn trên màn so sánh: collection không dùng bản nháp của Payload nên mọi bản là "bản đã lưu" (mặc định ghi "Đã xuất bản trước đây" gây hiểu nhầm).
+    previouslyPublished: "Bản đã lưu",
+    currentlyPublished: "Phiên bản hiện tại",
     previousVersion: "Phiên bản trước",
     noLabelGroup: "Nhóm chưa có tên",
     modifiedOnly: "Chỉ trường đã đổi",

@@ -50,6 +50,7 @@ import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624
 import { RowActionsCell as RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7 } from '../../../components/admin/RowActionsCell'
 import { CollectionQuickFilterSlot as CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d } from '../../../components/admin/CollectionQuickFilterSlot'
 import { TranslationStatusFilter as TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147 } from '../../../components/admin/TranslationStatusFilter'
+import { VersionHistoryView as VersionHistoryView_e58866be2b51986a77c2c0353b2ec55a } from '../../../components/admin/VersionHistoryView'
 import { RentalCodeHiddenField as RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from '../../../components/admin/ListSummaryCells'
 import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
@@ -132,6 +133,7 @@ export const importMap = {
   "/components/admin/RowActionsCell#RowActionsCell": RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7,
   "/components/admin/CollectionQuickFilterSlot#CollectionQuickFilterSlot": CollectionQuickFilterSlot_d9de1ae5ea9594af993fb3f84172c79d,
   "/components/admin/TranslationStatusFilter#TranslationStatusFilter": TranslationStatusFilter_916a0fb3001268a078cf6f3898d9e147,
+  "/components/admin/VersionHistoryView#VersionHistoryView": VersionHistoryView_e58866be2b51986a77c2c0353b2ec55a,
   "/components/admin/RentalCodeDisplay#RentalCodeHiddenField": RentalCodeHiddenField_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/ListSummaryCells#RoomsAreaCell": RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1,
   "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,

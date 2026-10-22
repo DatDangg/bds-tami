@@ -19,6 +19,7 @@ import { detectManualEnglish } from "../../hooks/translation/detect-manual-en";
 import { enqueueTranslation } from "../../hooks/translation/enqueue-translation";
 import { CONTENT_ROUTES, type ContentRoute } from "../../lib/content/content-paths";
 
+const VERSION_HISTORY_VIEW = "/components/admin/VersionHistoryView#VersionHistoryView";
 const TRANSLATION_FILTER_COMPONENT = "/components/admin/TranslationStatusFilter#TranslationStatusFilter";
 
 /** Số bản phiên bản giữ lại mỗi bản ghi (ERD §7). */
@@ -178,6 +179,15 @@ function placeSharedFields(own: Field[], shared: Field[]): Field[] {
   return [...own.slice(0, tabsIndex), withSharedTabs, ...own.slice(tabsIndex + 1), ...sidebar];
 }
 
+type CollectionViews = NonNullable<NonNullable<CollectionConfig["admin"]>["components"]>["views"];
+
+/** Giữ view tuỳ biến của collection (nếu có); chỉ gắn view lịch sử khi collection chưa tự khai `edit.versions`. */
+function withVersionHistoryView(views: CollectionViews): CollectionViews {
+  // `edit` là union có nhánh `root` (thay cả màn) loại trừ `versions`; collection nội dung không dùng `root` nên ép về dạng khoá-chuỗi.
+  const edit: Record<string, unknown> = { ...views?.edit };
+  return { ...views, edit: { ...edit, versions: edit.versions ?? { Component: VERSION_HISTORY_VIEW } } } as CollectionViews;
+}
+
 /**
  * Bọc cấu hình collection nội dung bằng quy tắc dùng chung: các trường chung, access (PERMISSION §3.1, §4),
  * phiên bản, thùng rác + audit, chặn bật `hasEnglish` khi thiếu EN, làm mới cache vi/en, tự dịch VI → EN (nhận diện sửa tay EN + xếp job `translate-content`). Cấu hình riêng của
@@ -200,7 +210,15 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
     ...collection,
     trash: true,
     // Lọc theo trạng thái dịch (FR-ADM-18) cho mọi collection có nhóm `translation`.
-    admin: { ...collection.admin, components: { ...collection.admin?.components, beforeListTable: [...(collection.admin?.components?.beforeListTable ?? []), ...(omitsTranslation ? [] : [TRANSLATION_FILTER_COMPONENT])] } },
+    admin: {
+      ...collection.admin,
+      components: {
+        ...collection.admin?.components,
+        beforeListTable: [...(collection.admin?.components?.beforeListTable ?? []), ...(omitsTranslation ? [] : [TRANSLATION_FILTER_COMPONENT])],
+        // Màn "Lịch sử chỉnh sửa" dễ đọc (BL-058); collection `versions: false` không có màn này nên không gắn.
+        views: collection.versions === false ? collection.admin?.components?.views : withVersionHistoryView(collection.admin?.components?.views),
+      },
+    },
     // Job dịch đọc lại danh sách này để quyết định bật `hasEnglish` bằng đúng vị từ của hook `requireEnglishFields`.
     custom: { ...collection.custom, englishRequiredFields: options.englishRequiredFields ?? ["title", "slug"] },
     versions: collection.versions ?? { maxPerDoc: MAX_VERSIONS_PER_DOC, drafts: false },

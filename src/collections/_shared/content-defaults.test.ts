@@ -163,3 +163,22 @@ describe("withContentDefaults: vị trí ô lọc dịch (BL-021 T6)", () => {
     expect(config.admin?.components?.beforeListTable ?? []).toEqual([]);
   });
 });
+
+describe("withContentDefaults: màn lịch sử chỉnh sửa (BL-058)", () => {
+  const VIEW = { Component: "/components/admin/VersionHistoryView#VersionHistoryView" };
+
+  it("gắn view lịch sử cho collection có versions mặc định", () => {
+    expect(withContentDefaults(base).admin?.components?.views?.edit?.versions).toEqual(VIEW);
+  });
+
+  it("collection versions: false không có màn này nên không gắn view", () => {
+    expect(withContentDefaults({ ...base, versions: false }).admin?.components?.views).toBeUndefined();
+  });
+
+  it("giữ view edit khác và không đè edit.versions do collection tự khai", () => {
+    const own = { Component: "/x#Own" };
+    const kept = withContentDefaults({ ...base, admin: { components: { views: { edit: { api: { Component: "/y#Api" }, versions: own } } } } });
+    expect(kept.admin?.components?.views?.edit?.versions).toBe(own);
+    expect(kept.admin?.components?.views?.edit?.api).toEqual({ Component: "/y#Api" });
+  });
+});

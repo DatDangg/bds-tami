@@ -105,6 +105,8 @@ const EXPECTED: Record<string, string> = {
   "version.versionID": "Mã phiên bản",
   "version.changedFieldsCount_one": "{{count}} trường đã thay đổi",
   "version.currentPublishedVersion": "Phiên bản hiện tại",
+  "version.previouslyPublished": "Bản đã lưu",
+  "version.currentlyPublished": "Phiên bản hiện tại",
   "version.previousVersion": "Phiên bản trước",
   "version.noLabelGroup": "Nhóm chưa có tên",
   "version.modifiedOnly": "Chỉ trường đã đổi",

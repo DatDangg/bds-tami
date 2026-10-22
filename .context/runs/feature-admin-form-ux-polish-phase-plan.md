@@ -15,7 +15,7 @@ evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "CHECKPOINT sau đợt 1 (T01 7711bad, T02 364e9c7, T03 00c48ec). Chờ user duyệt chạy đợt 2 = T04. Worktree task-01..03 + DB tami_wt_bl058_t01..t03 còn giữ."
+next: "CHECKPOINT sau đợt 2 (T04 đã commit, SHA xem git log). Chờ user duyệt đợt 3 = T05 tab SEO phương án B. Worktree task-01..04 + DB tami_wt_bl058_t01..t04 còn giữ."
 loopSignal: none
 approvals: [{gate: phase_plan, at: 2026-10-22, ok: true, Q1: B, Q2: no-who, Q3: drop-toast}]
 batchQueue: []
@@ -30,3 +30,6 @@ batchQueue: []
 - 2026-10-22 USER APPROVAL (AskUserQuestion): plan ok, chạy đợt 1; Q1 SEO = B; Q2 Ai sửa = Không (không migration); Q3 toast = Bỏ hẳn
 - 2026-10-22 ▶ START [agent: change-request] wave 1 (T01∥T02∥T03) builder→reviewer→close-out (cancel sẽ redo bước này)
 - 2026-10-22 đợt 1 xong: 3 task PASS + commit; verify tổng thể trên branch: eslint (bỏ .worktrees) 0 error, typecheck PASS, unit+ui 3240 test PASS (4 file cần .env.local → PASS khi có), build PASS; integration không chạy (Postgres dùng chung từng crash khi chạy song song)
+- 2026-10-22 USER APPROVAL (chat "ok, chạy t04"): chạy đợt 2 T04 màn lịch sử phiên bản
+- 2026-10-22 ▶ START [agent: change-request] wave 2 T04 builder→reviewer→close-out (cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: change-request] đợt 2: T04 STRICT FAIL r1 → PASS r2; integration 1 lần trên branch 57 file / 775 test PASS; commit T04

@@ -2520,13 +2520,16 @@
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-admin-form-ux-polish/phase-1-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 2,
           "dependsOn": [
             "phase-1-task-02"
           ],
           "wave": "2",
-          "note": "màn lịch sử phiên bản (không Ai sửa)"
+          "note": "màn lịch sử phiên bản (không Ai sửa)",
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-04-round-2-review.md"
         },
         {
           "task": "phase-1-task-05",
@@ -2541,7 +2544,7 @@
         }
       ],
       "wave1DoneAt": "2026-10-22",
-      "next": "checkpoint sau đợt 1 → đợt 2 T04 (lịch sử phiên bản, không migration)"
+      "next": "checkpoint sau đợt 2 → đợt 3 T05 (tab SEO phương án B)"
     }
   ],
   "bugs": [
@@ -3551,7 +3554,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T05:54:45.348Z",
+  "lastUpdated": "2026-10-22T07:30:57.613Z",
   "approvalMilestones": [
     {
       "id": "M1",
