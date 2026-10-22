@@ -60,6 +60,7 @@ Lỗi:       { "success": false, "error": "<message>", "details": [...], "code"?
 | `POST` | `/api/public/job-applications` | Nộp hồ sơ ứng tuyển (multipart) | 3 lần / giờ / IP | FR-PUB-09; BR-20, 21 |
 | `GET` | `/api/public/rentals` | Tìm & lọc tin cho thuê | 60 lần / phút / IP | FR-PUB-04 |
 | `POST` | `/api/public/click-events` | Ghi lượt bấm Hotline/Zalo/Fanpage | 30 lần / phút / IP | FR-PUB-12 |
+| `POST` | `/api/public/news-views` | Đếm lượt xem bài tin tức (khối "Đọc nhiều", §3.12) | 30 lần / phút / IP | BL-054 |
 | `GET` | `/api/health` | Health check cho deploy & giám sát | — | ARCHITECTURE §6.4 |
 
 ### 3.1. `POST /api/public/leads`
@@ -232,6 +233,23 @@ Có bất kỳ tham số lọc nào (kể cả giá trị sai; `?province=` rỗ
 | `category` | **Link cũ, chỉ ở `/tin-bds`** (route danh mục bỏ qua): slug danh mục tin BĐS theo ngôn ngữ đang xem → lọc theo danh mục đó (+ con) và đánh dấu tab; hero / breadcrumb / đường dẫn form vẫn của `/tin-bds`; "Xoá tất cả" xoá luôn danh mục | Slug lạ → bỏ (không lọc, không 404) |
 
 Metadata: có tham số lọc / `q` / `sort` khác mặc định, hoặc `?category=` (kể cả slug lạ) → `noindex, follow`. Canonical: trang sạch (`/tin-bds` hoặc trang danh mục, không `?page`); riêng `/tin-bds?category=<slug có thật>` → canonical **trang danh mục** `/tin-bds/danh-muc/<slug>` (slug của ngôn ngữ đang xem, không hreflang). Không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD chỉ ở `/tin-bds` sạch (trang 1, cùng điều kiện noindex); trang danh mục không phát. Tin ưu đãi đã kết thúc luôn xếp sau (BR-06); ≤ 5 tin `isFeatured` còn hiệu lực là thẻ nổi bật (trang 1), loại khỏi lưới mọi trang; số đếm ô tích theo quy tắc "trừ chính chiều đó" (chip Phòng ngủ không đếm).
+
+### 3.12. `POST /api/public/news-views` (BL-054, as-built phase-1-task-03)
+
+Đếm lượt xem bài tin tức cho khối "Đọc nhiều". Trang chi tiết gửi bằng `NewsViewBeacon` (`src/components/news/NewsViewBeacon.tsx`, client): một lần mỗi lần mở trang, ~1,5 giây sau khi tab hiện, `navigator.sendBeacon` (Blob `text/plain;charset=UTF-8`; fallback `fetch keepalive`); không gửi khi `navigator.webdriver`. Trang vẫn ISR, không phụ thuộc endpoint.
+
+Body: `{ newsId }` — UUID (`z.uuid()`); JSON, nhận cả `Content-Type: text/plain`, tối đa 500 ký tự. Không Turnstile. Luôn trả `204` rỗng khi request hợp lệ, **kể cả khi không đếm** (không lộ lý do).
+
+Thứ tự xử lý:
+
+1. Pipeline công khai (`runPublicPipeline`, như `click-events`): rate limit 30 lần / phút / IP băm → `429` (kèm `Retry-After`); Redis lỗi → `503` (fail closed); body sai → `400`.
+2. Không đếm (`204`): User-Agent rỗng hoặc khớp danh sách bot (crawler, headless / tự động hoá, công cụ xem trước link, thư viện HTTP — `isBotUserAgent`, `src/lib/news/view-dedupe.ts`); request tải trước (`Sec-Purpose` / `Purpose` / `X-Moz` chứa `prefetch` / `prerender`); bài không tồn tại / chưa xuất bản / đã xoá mềm (đọc như khách qua `findPublicList`).
+3. Chống đếm trùng mỗi người · mỗi bài · mỗi ngày giờ VN: khoá `nv:` + `HMAC-SHA256(PAYLOAD_SECRET, "news-view:v1:" + ipHash + "|" + UA + "|" + ngày VN + "|" + newsId)` → Redis `SET key 1 EX <giây tới 24:00 VN> NX`. Đã có khoá → `204` không cộng. Redis lỗi ở bước này → **không cộng**, `503` (log cảnh báo chỉ có tên lỗi).
+4. Cộng dồn bằng một câu SQL nguyên tử: `INSERT INTO news_views_daily (news_id, day, views) VALUES (…, 1) ON CONFLICT (news_id, day) DO UPDATE SET views = views + 1` (`day` = mốc 00:00 giờ VN; unique index `news_day_idx`).
+
+Không lưu IP / User-Agent thô ở DB, Redis hay log: pipeline chỉ đưa ra `ipHash` (HMAC), khoá Redis là hex HMAC, bảng `news_views_daily` chỉ có `news_id`, `day`, `views`. Code: `src/endpoints/public/news-views.ts`, `src/lib/news/view-dedupe.ts`.
+
+**Loader "Đọc nhiều"** (`loadMostReadNews(locale, limit = 5)`, `src/lib/news/most-read.ts`; không phải endpoint): tổng `views` 30 ngày theo giờ VN (gồm hôm nay) của bài công khai cùng ngôn ngữ (`/en` chỉ bài `hasEnglish`), giảm dần, hoà → bài mới hơn; bài xếp hạng được đọc lại qua `findPublicList`. Thiếu thì bù bài `isFeatured` mới nhất rồi bài mới nhất, không trùng. Trả `{ id, title, href, cover, publishedAt, dateLabel }`. Cache `unstable_cache` 10 phút, tag `news:most-read`; hook `afterChange` / `afterDelete` của `news` (`src/hooks/news/revalidate-most-read.ts`) làm mới tag khi bài đang hoặc vừa công khai đổi.
 
 ## 4. Endpoint quản trị
 
