@@ -3,9 +3,9 @@
 ```yaml
 workItem: feature/admin-form-ux-polish
 phaseTask: phase-plan
-step: change_request
+step: checkpoint
 agent: change-request
-status: running
+status: awaiting
 attempt: 0
 interrupted: false
 updatedAt: 2026-10-22T12:00:00+07:00
@@ -15,7 +15,7 @@ evidence:
   reportPath: null
   round: 0
   verdict: null
-next: "CHECKPOINT sau đợt 2 (T04 đã commit, SHA xem git log). Chờ user duyệt đợt 3 = T05 tab SEO phương án B. Worktree task-01..04 + DB tami_wt_bl058_t01..t04 còn giữ."
+next: "HUMAN CHECKPOINT đợt 3: user chưa duyệt T05 (tab SEO phương án B). Sau T05 → close-out BL-058 (spec delta, spec-publish test-scope, bổ sung SHA d767b30 vào progress.json, archive change). Dọn 4 worktree con/branch wt/*/DB tami_wt_bl058_t01..t04 khi user đồng ý."
 loopSignal: none
 approvals: [{gate: phase_plan, at: 2026-10-22, ok: true, Q1: B, Q2: no-who, Q3: drop-toast}]
 batchQueue: []
@@ -33,3 +33,5 @@ batchQueue: []
 - 2026-10-22 USER APPROVAL (chat "ok, chạy t04"): chạy đợt 2 T04 màn lịch sử phiên bản
 - 2026-10-22 ▶ START [agent: change-request] wave 2 T04 builder→reviewer→close-out (cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE [agent: change-request] đợt 2: T04 STRICT FAIL r1 → PASS r2; integration 1 lần trên branch 57 file / 775 test PASS; commit T04
+- 2026-10-22 ✅ DONE [agent: change-request] wave 2 T04 STRICT PASS r2, commit d767b30; checkpoint trước đợt 3 T05
+- 2026-10-22 user dừng session, sẽ /resume ở session mới (T05 chưa duyệt)
