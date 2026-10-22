@@ -1,0 +1,61 @@
+// Lỗi nhập liệu hiện dưới từng ô (BL-058). Selector lấy từ @payloadcms/ui 3.91; CSS ngoài @layer thắng lớp payload-default.
+// Payload gắn lỗi theo ô dạng Tooltip đỏ nhỏ (`aside.tooltip.field-error`) nằm TRƯỚC input trong `.field-type__wrap`:
+// đổi thành dòng chữ tĩnh nằm dưới ô. Chỉ đụng `.field-error`, không đụng tooltip khác của Payload.
+
+// Phần tử chứa trực tiếp lỗi (wrap của ô, hoặc chính ô với richText/checkbox/radio/array/blocks, hoặc .upload__wrap): cột dọc để dòng lỗi
+// (order 2) nằm sau input/select/editor dù Payload đặt nó trước trong DOM.
+.field-type:has(> .field-error),
+.field-type__wrap:has(> .field-error),
+.upload__wrap:has(> .field-error) {
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    order: 1;
+  }
+
+  > .field-error {
+    order: 2;
+  }
+}
+
+.field-error.tooltip {
+  // Payload ẩn mọi `.tooltip` ở màn hẹp (display: none): lỗi theo ô phải hiện ở mọi cỡ màn.
+  display: block;
+  position: static;
+  transform: none;
+  max-width: 100%;
+  margin-top: 0.3rem;
+  padding: 0;
+  background: transparent;
+  color: var(--admin-badge-danger-fg);
+  // Gốc admin 13px: 0.9375rem ≈ 12px, ngang chữ mô tả dưới ô.
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: normal;
+  // Tooltip mặc định ẩn bằng opacity/visibility cho tới khi `--show`: lỗi luôn hiện.
+  opacity: 1;
+  visibility: visible;
+
+  &::after {
+    content: none;
+  }
+}
+
+// Viền đỏ cho ô lỗi (Payload chỉ tô viền ở một số loại ô; ô soạn thảo đã có ở _forms.scss).
+.field-type.error {
+  input:not([type="checkbox"], [type="radio"]),
+  textarea,
+  .rs__control {
+    border-color: var(--admin-badge-danger-fg);
+  }
+}
+
+// ---- Thông báo gom danh sách lỗi: bỏ hẳn (lỗi đã ở dưới từng ô + số lỗi ở nhãn tab) ----
+// Toast "Các trường sau chưa hợp lệ (N): …" có markup riêng (data-testid) nên chỉ ẩn đúng loại này;
+// lỗi không gắn ô (quyền/mạng/500) và toast thành công không có marker → vẫn hiện; toast có marker nhưng không ô nào hiện lỗi
+// được FormErrorFocus gắn `data-field-errors-unmatched` (mặc định ẩn để khỏi nháy ca thường gặp) → hiện lại. Phần tử còn trong DOM để FormErrorFocus nhận biết.
+.payload-toast-container [data-sonner-toast]:not([data-field-errors-unmatched]):has([data-testid="field-errors"], [data-testid="field-error"]) {
+  display: none;
+}

@@ -1,0 +1,2 @@
+# builder — BL-058 phase-1-task-02 (attempt 1)
+Xong. Provider `FormErrorFocus` (DOM + MutationObserver, tín hiệu = toast FieldErrorsToast) + `form-error-focus.ts` (logic thuần) + `_field-errors.scss` (lỗi dưới ô, ẩn toast lỗi theo ô bằng :has) + đăng ký config/importMap/custom.scss + 2 file test. Lint/typecheck/build PASS; full test có 3 fail môi trường (health, geo-seed, Header flaky). Chi tiết: tasks/feature-admin-form-ux-polish/phase-1-task-02.md (cuối file). Chưa commit (dispatcher). Không stage src/payload-types.ts (chỉ đổi EOL).
