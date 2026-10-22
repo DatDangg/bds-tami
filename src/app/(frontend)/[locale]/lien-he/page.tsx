@@ -29,6 +29,12 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
+/**
+ * Kéo hàng thẻ liên hệ lên đè mép dưới hero. GHÉP CẶP với đệm đáy `PageHero` khi `overlap` (`pb-24 md:pb-[120px]` = 96 / 120px):
+ * kéo 64 / 88px → thẻ chồm vào hero, còn 32px nền tối phía trên thẻ ở mọi khổ. Đổi một bên thì đổi bên kia.
+ */
+const CARDS_OVERLAP_PULL = "-mt-16 md:-mt-[88px]";
+
 async function readSettings(locale: Locale): Promise<SiteSetting | null> {
   try {
     return await getSiteSettings(locale);
@@ -91,7 +97,7 @@ export default async function ContactPage({ params }: PageProps) {
         breadcrumb={<Breadcrumb variant="overlay" items={[{ label: tNav("contact"), href: publicPath("/lien-he", locale) }]} />}
       />
       {hasCards && (
-        <div className="relative z-10 mx-auto -mt-16 w-full max-w-container px-gutter md:-mt-[88px]">
+        <div className={cn("relative z-10 mx-auto w-full max-w-container px-gutter", CARDS_OVERLAP_PULL)}>
           <ContactCards cards={cards} />
         </div>
       )}

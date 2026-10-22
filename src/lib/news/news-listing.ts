@@ -43,7 +43,8 @@ export async function loadNewsListing(
   const filters = options.filters ?? EMPTY_FILTERS;
   const scope = categoryIds ? { categoryIds } : {};
   if (isFilteredNews(filters)) {
-    const ids = await findFilteredNewsIds(payload, locale, filters);
+    // Danh mục lọc ngay trong SQL tìm id (trước trần `NEWS_FILTER_MAX_IDS`); `listPublicNews` vẫn kèm `categoryIds` như lớp chặn thứ hai.
+    const ids = await findFilteredNewsIds(payload, locale, categoryIds ? { ...filters, categoryIds } : filters);
     if (ids && ids.length === 0) return { featured: [], items: [], totalDocs: 0, totalPages: 0, outOfRange: page > 1, isEmpty: true };
     const grid = await listPublicNews(payload, locale, { page, ...scope, sort: filters.sort, ...(ids ? { ids } : {}) });
     return { featured: [], items: toNewsCards(grid.docs, locale), totalDocs: grid.totalDocs, totalPages: grid.totalPages, outOfRange: page > 1 && page > grid.totalPages, isEmpty: grid.totalDocs === 0 };

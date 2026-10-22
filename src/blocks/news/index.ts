@@ -3,7 +3,7 @@ import type { Block } from "payload";
 /**
  * Khối chèn trong trình soạn `news.content` (BL-054 Quyết định 3). Dữ liệu nằm trong JSON Lexical của bài (đã localized theo bài), không
  * có bảng DB riêng. `slug` là `blockType` lưu trong JSON: KHÔNG đổi (bài cũ sẽ mất khối); `RichText` và bộ dịch (`translation/lexical.ts`)
- * nhận khối theo đúng các slug này. Thêm trường chữ mới vào khối thì phải thêm vào `BLOCK_TEXT_FIELDS` của bộ dịch (test buộc khớp).
+ * nhận khối theo đúng các slug này. Thêm trường chữ mới vào khối thì phải thêm vào `NEWS_BLOCK_TEXT_FIELDS` trong `./text-fields.ts` (bộ dịch đọc danh sách này; `index.test.ts` buộc khớp).
  */
 export const NEWS_BLOCK_SLUGS = {
   statHighlights: "statHighlights",

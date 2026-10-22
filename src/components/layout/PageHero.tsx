@@ -16,7 +16,7 @@ interface PageHeroProps {
   image?: MediaImage;
   /** Breadcrumb `variant="overlay"`: đặt góc trên-trái hero. */
   breadcrumb?: ReactNode;
-  /** Chừa đáy cho thẻ lọc nổi đè lên mép dưới (mockup `.fcard`, `-mt-*`). Mặc định có ở `list`, không ở `short`. */
+  /** Chừa đáy cho thẻ lọc nổi đè lên mép dưới (mockup `.fcard`, `-mt-*`). Mặc định có ở `list`, không ở `short`. Đệm `pb-24 md:pb-[120px]` ghép cặp với độ kéo của nơi dùng (`CARDS_OVERLAP_PULL` trang Liên hệ, `OVERLAP_CLASS` của `CategoryListTemplate`): đổi thì đổi cả hai. */
   overlap?: boolean;
   /** Khu vực dưới mô tả (vd nút). */
   children?: ReactNode;

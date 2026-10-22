@@ -12,7 +12,7 @@ interface ApplyFormSlotProps {
   children?: ReactNode;
   email?: string;
   hotline?: { label: string; telHref: string };
-  /** Dòng phụ ngay dưới tiêu đề (BL-054: "Phản hồi trong 3 ngày làm việc."). */
+  /** Dòng phụ dưới tiêu đề, cùng `<header>` với `h2` (BL-054: "Phản hồi trong 3 ngày làm việc."). */
   subtitle?: string;
 }
 
@@ -30,10 +30,10 @@ export function ApplyFormSlot({ children, email, hotline, subtitle }: ApplyFormS
       id={APPLY_FORM_DOM_ID}
       headingId={APPLY_FORM_HEADING_ID}
       title={t("title")}
+      {...(subtitle ? { subtitle } : {})}
       className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] bg-transparent p-0 lg:p-0"
     >
       <div className="flex flex-col gap-3">
-        {subtitle && <p className="-mt-3 mb-2 text-small text-text-muted">{subtitle}</p>}
         {children ?? <p className="max-w-[60ch] text-body text-text-secondary">{t("fallback")}</p>}
         {children && hasContact && <p className="mt-2 border-t border-border pt-4 text-small text-text-secondary">{t("orContact")}</p>}
         {email && (

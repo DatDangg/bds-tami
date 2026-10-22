@@ -26,14 +26,23 @@ function publicNewsSql(locale: Locale) {
 /**
  * Id bài khớp từ khoá `q` (tiêu đề + tóm tắt của ngôn ngữ đang xem, không dấu; mọi từ phải có — cùng `searchTerms` / `LIKE` của tìm kiếm cho thuê,
  * phía cột bỏ dấu bằng `unaccentSql`, không thêm cột / migration) VÀ có thẻ `tag` (khớp đúng chuỗi). Không có `q` lẫn `tag` → `null` (không lọc).
+ * `categoryIds` (trang danh mục: danh mục + con) lọc ngay trong SQL, TRƯỚC trần, để bài ngoài danh mục không chiếm chỗ trong `NEWS_FILTER_MAX_IDS`.
+ * Thứ tự trả về: (1) không có `q` lẫn `tag` → `null` (kể cả khi có `categoryIds`; nơi gọi tự lọc danh mục qua `listPublicNews`); (2) có lọc và
+ * `categoryIds` là mảng rỗng → `[]` (danh mục không có bài, không truy vấn); (3) còn lại → id khớp.
  * Mới nhất trước, tối đa `NEWS_FILTER_MAX_IDS`. Mọi giá trị người dùng đi qua tham số SQL.
  */
-export async function findFilteredNewsIds(payload: Payload, locale: Locale, filters: { q?: string | undefined; tag?: string | undefined }): Promise<string[] | null> {
+export async function findFilteredNewsIds(
+  payload: Payload,
+  locale: Locale,
+  filters: { q?: string | undefined; tag?: string | undefined; categoryIds?: readonly string[] | undefined },
+): Promise<string[] | null> {
   const terms = searchTerms(filters.q);
   if (terms.length === 0 && !filters.tag) return null;
+  if (filters.categoryIds?.length === 0) return [];
   const haystack = unaccentSql(sql`coalesce(nl."title", '') || ' ' || coalesce(nl."excerpt", '')`);
   const conditions = [
     publicNewsSql(locale),
+    ...(filters.categoryIds ? [sql`n."category_id"::text IN (${sql.join(filters.categoryIds.map((id) => sql`${id}`), sql`, `)})`] : []),
     ...terms.map((term) => sql`${haystack} LIKE ${`%${escapeLike(term)}%`}`),
     ...(filters.tag ? [sql`EXISTS (SELECT 1 FROM "news_texts" t WHERE t."parent_id" = n."id" AND t."path" = 'tags' AND btrim(t."text") = ${filters.tag})`] : []),
   ];
