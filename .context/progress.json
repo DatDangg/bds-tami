@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": "feature/listing-followups",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2756,6 +2756,52 @@
         "M-4 ProjectAmenities <p sr-only> lặp tiêu đề h2 làm nhãn carousel → trỏ labelledBy vào heading DetailSection",
         "Bản đồ Cho thuê / Tin BĐS / Liên hệ chưa kiểm trình duyệt (DB dev không có tin published có toạ độ); bản nháp _projects_v với trường mới chưa kiểm UI"
       ]
+    },
+    {
+      "slug": "listing-followups",
+      "title": "Việc còn mở sau BL-052: 308 link cũ ?category= (/tin-bds, /cho-thue), /du-an priceMax=0, đo index đếm tiện ích + ca EN, GIST location, hookTimeout integration, gom isOfferPost, đo LCP (BL-055)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-055",
+      "changeDoc": "spec/changes/2026-10-22-listing-followups.md",
+      "branch": "staging",
+      "startedAt": "2026-10-22",
+      "autoProceed": "user 2026-10-22: tự quyết, không hỏi; không push; không đụng BL-059",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-listing-followups/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "dependsOn": [],
+          "note": "C-1 308 ?category= chỉ-có-category (/tin-bds, /cho-thue, vi+en) + C-4 /du-an priceMax=0 = không giới hạn",
+          "reviewLevel": "STRICT",
+          "review": "STRICT PASS r1 (2 MINOR không chặn)",
+          "round": 1,
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-listing-followups-phase-1-task-01-round-1-review.md",
+          "verify": "typecheck PASS · eslint 10 file scope 0 lỗi · test 419 file / 4389 PASS · build PASS · curl dev 308/200 đúng (vi); /en chỉ unit test",
+          "completedAt": "2026-10-22"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-listing-followups/phase-1-task-02.md",
+          "status": "in_progress",
+          "attempt": 1,
+          "dependsOn": [],
+          "note": "C-5 EXPLAIN ANALYZE + ca EN, C-6 bỏ (không lọc bản đồ), C-7 hookTimeout, C-8 hasPostOffer; task duy nhất được tạo migration"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-listing-followups/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0,
+          "dependsOn": [],
+          "note": "đo LCP bản build 6 trang"
+        }
+      ],
+      "inProgressTask": "phase-1-task-02"
     }
   ],
   "bugs": [

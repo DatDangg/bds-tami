@@ -43,7 +43,8 @@ function withPage(path: string, page: number): string {
 /**
  * `generateMetadata` của hai trang danh sách. Có tham số lọc / `q` / `sort` khác mặc định (`hasPostFilterParams`) hoặc `?category=` của link cũ → `noindex, follow`
  * + canonical về trang sạch (`/tin-bds` hoặc trang danh mục, không `?page`). `/tin-bds?category=<slug có thật>` → canonical về TRANG DANH MỤC `/tin-bds/danh-muc/<slug>`
- * (slug của ngôn ngữ đang xem, không hreflang — như `/cho-thue?category=`; vẫn noindex). Không lọc: canonical chính nó (kèm `?page=n` ở trang ≥ 2).
+ * (slug của ngôn ngữ đang xem, không hreflang — như `/cho-thue?category=`; vẫn noindex). BL-055: URL CHỈ có `category` đã 308 ở `PostListPage` trước khi render
+ * nên nhánh canonical này chỉ còn là phòng hờ cho URL kèm tham số khác. Không lọc: canonical chính nó (kèm `?page=n` ở trang ≥ 2).
  * Danh mục không có → metadata rỗng (trang tự `notFound()`).
  */
 export async function buildPostListMetadata({ locale, searchParams, categorySlug }: PostListPageProps): Promise<Metadata> {

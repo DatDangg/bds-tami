@@ -71,6 +71,12 @@ const notFound = vi.hoisted(() =>
     throw new Error("NEXT_NOT_FOUND");
   }),
 );
+// Như Next: `permanentRedirect` ném để dừng render (308).
+const permanentRedirect = vi.hoisted(() =>
+  vi.fn(() => {
+    throw new Error("NEXT_REDIRECT");
+  }),
+);
 interface HeroStub {
   title: string;
   description: string | undefined;
@@ -83,7 +89,7 @@ const loadListingPageContent = vi.hoisted(() => vi.fn());
 const loadListingStrengths = vi.hoisted(() => vi.fn<(locale: string, key: string) => Promise<unknown>>());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({ find: wardsFind, findByID }) }));
-vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
+vi.mock("next/navigation", () => ({ notFound, permanentRedirect, useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 vi.mock("@/lib/content/load-page-banner", () => ({ loadPageHero }));
 vi.mock("@/lib/content/load-listing-page", () => ({ loadListingPageContent }));
@@ -151,6 +157,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllEnvs();
   for (const mock of [search, wardsFind, findPublicList, findPublicBySlug, findByID, notFound, loadPageHero, loadListingPageContent, loadListingStrengths]) mock.mockReset();
+  permanentRedirect.mockClear();
 });
 
 async function render(locale: "vi" | "en", searchParams: Record<string, string | string[]> = {}, categorySlug?: string) {
@@ -367,8 +374,27 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     expect(within(aside).getByRole("radio", { name: "2" }).closest("label")).toHaveTextContent(/^2$/);
   });
 
-  it("link cũ /cho-thue?category=<slug> (ô tìm kiếm trang chủ): lọc đúng danh mục, tab đó aria-current; tab giữ lọc khác, bỏ danh mục + trang; form giữ category", async () => {
+  it("BL-055 C-1: link cũ CHỈ có ?category=<slug có thật> → 308 (permanentRedirect) sang trang danh mục theo ngôn ngữ; không truy vấn tin", async () => {
+    await expect(render("vi", { category: "can-ho" })).rejects.toThrow("NEXT_REDIRECT");
+    expect(permanentRedirect).toHaveBeenCalledWith("/cho-thue/danh-muc/can-ho");
+    expect(search).not.toHaveBeenCalled();
+    await expect(render("en", { category: "can-ho" })).rejects.toThrow("NEXT_REDIRECT");
+    expect(permanentRedirect).toHaveBeenLastCalledWith("/en/for-rent/category/can-ho");
+    // Danh mục con cũng về trang danh mục của chính nó; khoá khác nhưng rỗng coi như không có.
+    await expect(render("vi", { category: "can-ho-dich-vu", q: "" })).rejects.toThrow("NEXT_REDIRECT");
+    expect(permanentRedirect).toHaveBeenLastCalledWith("/cho-thue/danh-muc/can-ho-dich-vu");
+  });
+
+  it("BL-055 C-1: ?category=<slug lạ>, slug chưa có bản EN ở /en, hoặc trang danh mục có ?category= → không redirect", async () => {
+    (await render("vi", { category: "khong-co" })).unmount();
+    (await render("en", { category: "nha-pho" })).unmount();
+    (await render("vi", { category: "nha-pho" }, "can-ho")).unmount();
+    expect(permanentRedirect).not.toHaveBeenCalled();
+  });
+
+  it("link cũ /cho-thue?category=<slug> kèm tham số khác (ô tìm kiếm trang chủ): không redirect, lọc đúng danh mục, tab đó aria-current; tab giữ lọc khác, bỏ danh mục + trang; form giữ category", async () => {
     await render("vi", { category: "can-ho", province: "ha-noi", page: "1" });
+    expect(permanentRedirect).not.toHaveBeenCalled();
     expect(lastParams()).toMatchObject({ category: "can-ho", province: "ha-noi" });
     expect(currentTabs().map((tab) => tab.getAttribute("href"))).toEqual(["/cho-thue/danh-muc/can-ho?province=ha-noi"]);
     expect(tabs().map((tab) => tab.getAttribute("href"))).toEqual(["/cho-thue?province=ha-noi", "/cho-thue/danh-muc/can-ho?province=ha-noi", "/cho-thue/danh-muc/nha-pho?province=ha-noi"]);
@@ -376,10 +402,10 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     expect([...sidebar().querySelectorAll<HTMLInputElement>("form > input[type=hidden]")].map((input) => `${input.name}=${input.value}`)).toEqual(["category=can-ho"]);
   });
 
-  it("link cũ ?category=<danh mục con>: tab của cha được đánh dấu", async () => {
-    await render("vi", { category: "can-ho-dich-vu" });
+  it("link cũ ?category=<danh mục con> kèm lọc khác: tab của cha được đánh dấu", async () => {
+    await render("vi", { category: "can-ho-dich-vu", province: "ha-noi" });
     expect(lastParams()).toMatchObject({ category: "can-ho-dich-vu" });
-    expect(currentTabs().map((tab) => tab.getAttribute("href"))).toEqual(["/cho-thue/danh-muc/can-ho"]);
+    expect(currentTabs().map((tab) => tab.getAttribute("href"))).toEqual(["/cho-thue/danh-muc/can-ho?province=ha-noi"]);
   });
 
   it("?q= rỗng (nút tìm kiếm của header): danh sách không lọc và con trỏ vào ô từ khoá; ?q=studio thì không tự focus", async () => {

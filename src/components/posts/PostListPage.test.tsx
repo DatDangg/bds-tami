@@ -11,13 +11,19 @@ const notFound = vi.hoisted(() =>
     throw new Error("NEXT_NOT_FOUND");
   }),
 );
+// Như Next: `permanentRedirect` ném để dừng render (308).
+const permanentRedirect = vi.hoisted(() =>
+  vi.fn(() => {
+    throw new Error("NEXT_REDIRECT");
+  }),
+);
 const loadPostListing = vi.hoisted(() => vi.fn());
 const loadPostCategoryContext = vi.hoisted(() => vi.fn());
 const loadListingPageContent = vi.hoisted(() => vi.fn());
 const loadListingStrengths = vi.hoisted(() => vi.fn());
 vi.mock("@payload-config", () => ({ default: {} }));
 vi.mock("payload", () => ({ getPayload: async () => ({}) }));
-vi.mock("next/navigation", () => ({ notFound, useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
+vi.mock("next/navigation", () => ({ notFound, permanentRedirect, useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 vi.mock("@/lib/content/site-identity", () => ({ loadSiteIdentity: async () => ({ siteName: "TAMI", logo: null }) }));
 vi.mock("@/lib/content/load-page-banner", () => ({
   loadPageHero: async () => ({
@@ -124,6 +130,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllEnvs();
   for (const mock of [loadPostListing, loadPostCategoryContext, loadListingPageContent, loadListingStrengths, notFound]) mock.mockReset();
+  permanentRedirect.mockClear();
 });
 
 async function render(locale: "vi" | "en", searchParams: Record<string, string> = {}, categorySlug?: string) {
@@ -206,10 +213,28 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
     expect([...form.querySelectorAll<HTMLInputElement>(":scope > input[type=hidden]")].map((input) => `${input.name}=${input.value}`)).toEqual(["q=Láng", "sort=price_asc"]);
   });
 
-  it("link cũ /tin-bds?category=voucher: lọc theo danh mục đó + tab Voucher aria-current; hero vẫn của /tin-bds; category giữ trong form không JS", async () => {
-    await render("vi", { category: "voucher" });
+  it("BL-055 C-1: link cũ CHỈ có ?category=<slug có thật> → 308 (permanentRedirect) sang trang danh mục theo ngôn ngữ; không tải danh sách", async () => {
+    await expect(PostListPage({ locale: "vi", searchParams: { category: "voucher" } })).rejects.toThrow("NEXT_REDIRECT");
+    expect(permanentRedirect).toHaveBeenCalledWith("/tin-bds/danh-muc/voucher");
+    expect(loadPostListing).not.toHaveBeenCalled();
+    await expect(PostListPage({ locale: "en", searchParams: { category: "voucher" } })).rejects.toThrow("NEXT_REDIRECT");
+    expect(permanentRedirect).toHaveBeenLastCalledWith("/en/property-news/category/voucher");
+    // Khoá khác nhưng rỗng coi như không có → vẫn 308.
+    await expect(PostListPage({ locale: "vi", searchParams: { category: "voucher", q: "" } })).rejects.toThrow("NEXT_REDIRECT");
+  });
+
+  it("BL-055 C-1: ?category=<slug lạ> hoặc trang danh mục có ?category= → không redirect", async () => {
+    await render("vi", { category: "khong-co" });
+    expect(permanentRedirect).not.toHaveBeenCalled();
+    (await render("vi", { category: "ban-nha" }, "voucher")).unmount();
+    expect(permanentRedirect).not.toHaveBeenCalled();
+  });
+
+  it("link cũ /tin-bds?category=voucher kèm tham số khác (page): không redirect, lọc theo danh mục đó + tab Voucher aria-current; hero vẫn của /tin-bds; category giữ trong form không JS", async () => {
+    await render("vi", { category: "voucher", page: "2" });
+    expect(permanentRedirect).not.toHaveBeenCalled();
     expect(loadPostCategoryContext).toHaveBeenCalledWith({}, "vi", "voucher");
-    expect(lastOptions().categoryIds).toEqual(["c2"]);
+    expect(lastOptions()).toMatchObject({ page: 2, categoryIds: ["c2"] });
     expect(tabs().filter((tab) => tab.getAttribute("aria-current") === "page").map((tab) => tab.textContent)).toEqual(["Voucher7 tin"]);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tin bất động sản");
     expect([...sidebar().querySelectorAll<HTMLInputElement>("form > input[type=hidden]")].map((input) => `${input.name}=${input.value}`)).toEqual(["category=voucher"]);

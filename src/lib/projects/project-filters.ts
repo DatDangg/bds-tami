@@ -94,11 +94,12 @@ function parseBillion(value: string | string[] | undefined): number | undefined 
 
 /**
  * Khoảng giá (tỷ) từ URL: kẹp về 0–50, `priceMin > priceMax` thì ĐỔI CHỖ (người dùng sửa tay URL vẫn ra khoảng hợp lý thay vì rỗng),
- * rồi bỏ đầu ở mép (min 0, max 50) vì đó là "không giới hạn".
+ * rồi bỏ đầu ở mép (min 0, max 50) vì đó là "không giới hạn". `max = 0` (gõ tay, hoặc kéo đầu trên về 0) cũng coi là không giới hạn trên —
+ * lọc "giá ≤ 0" vô nghĩa và ra trang trống (cùng quy tắc `/tin-bds` `post-filters.ts`; BL-055 C-4).
  */
 export function parsePriceRange(rawMin: string | string[] | undefined, rawMax: string | string[] | undefined): { priceMin?: number; priceMax?: number } {
   let min = parseBillion(rawMin);
-  let max = parseBillion(rawMax);
+  let max = parseBillion(rawMax) || undefined;
   if (min !== undefined && max !== undefined && min > max) [min, max] = [max, min];
   return {
     ...(min !== undefined && min > 0 ? { priceMin: min } : {}),

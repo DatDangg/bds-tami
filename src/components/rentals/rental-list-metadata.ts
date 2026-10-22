@@ -86,7 +86,8 @@ async function categoryPageMetadata({ common, t, noindex, query }: MetadataConte
 /**
  * `generateMetadata` của `/cho-thue` (design-spec S04) và trang danh mục (S05).
  * S04: trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh: index; tổ hợp lọc sâu hơn hoặc đổi sắp xếp: `noindex, follow` và canonical về trang gốc sạch.
- * `?category=<slug đã có>`: canonical về TRANG DANH MỤC (quyết định: canonical chứ không 301, vì URL cũ/chia sẻ vẫn mở được và bộ lọc khác vẫn dùng được);
+ * `?category=<slug đã có>`: canonical về TRANG DANH MỤC. BL-055: URL CHỈ có `category` đã 308 sang trang danh mục ở `RentalListPage` trước khi render, nên nhánh
+ * canonical này chỉ còn là phòng hờ cho URL kèm tham số khác (bộ lọc khác vẫn dùng được trên URL cũ/chia sẻ);
  * slug lạ bị trang bỏ qua nên coi như không có danh mục. S05: indexable, canonical chính nó (kèm `?page=n`), title/meta/`seo.noindex` từ danh mục,
  * hreflang chỉ khi danh mục có bản EN; thêm bộ lọc ngoài `page` → noindex + canonical về trang danh mục sạch.
  */

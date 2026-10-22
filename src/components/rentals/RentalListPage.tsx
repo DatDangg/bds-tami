@@ -1,7 +1,7 @@
 import config from "@payload-config";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getPayload } from "payload";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
@@ -23,6 +23,7 @@ import { categoryPath, type RentalListPageProps, withoutCategory } from "@/compo
 import { buildCategoryTabs, RENTAL_ACTIVE_FILTER_SPEC, toCurrentParams, toFilterOptions, toFilterValues, toPreservedParams } from "@/components/rentals/rental-list-state";
 import { useActiveFilterChips } from "@/components/rentals/use-active-filter-chips";
 import { publicPath } from "@/lib/content/content-paths";
+import { legacyCategoryOnly } from "@/lib/content/legacy-category";
 import { loadListingPageContent, type ListingLearnMoreView } from "@/lib/content/load-listing-page";
 import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { loadPageHero } from "@/lib/content/load-page-banner";
@@ -81,8 +82,18 @@ function toLearnMoreContent(view: ListingLearnMoreView | null) {
   return { eyebrow: view.eyebrow ?? null, title: view.title, titleAccent: view.titleAccent ?? null, description: view.description ?? null, image: view.image ?? null, videoUrl: view.videoUrl ?? null, cta: view.cta ?? null };
 }
 
+/** BL-055 C-1: S04 có link cũ CHỈ `?category=<slug có thật>` (đúng scope `rental`, ngôn ngữ đang xem) → 308 sang trang danh mục S05. Slug lạ / có thêm tham số → không. */
+async function redirectLegacyCategoryOnly(locale: Locale, searchParams: RawRentalParams, categorySlug: string | undefined) {
+  const slug = categorySlug ? null : legacyCategoryOnly(searchParams);
+  if (!slug) return;
+  const payload = await getPayload({ config });
+  const category = await findRentalCategory(payload, locale, slug);
+  if (category) permanentRedirect(categoryPath(locale, category.slug ?? slug));
+}
+
 /** Đọc + đối chiếu tham số, tải bộ lọc / danh mục / kết quả / hero / Tìm hiểu thêm / Điểm mạnh. Danh mục (S05) không có hoặc trang vượt số trang → `notFound()`. */
 async function loadRentalListData(locale: Locale, searchParams: RawRentalParams, categorySlug: string | undefined) {
+  await redirectLegacyCategoryOnly(locale, searchParams, categorySlug);
   const parsed = parseRentalFilters(searchParams);
   const [{ payload, options, filters }, hero, content, strengths] = await Promise.all([
     loadFilterContext(locale, categorySlug ? withoutCategory(parsed) : parsed),
@@ -102,7 +113,8 @@ async function loadRentalListData(locale: Locale, searchParams: RawRentalParams,
  * S04 `/cho-thue` (`/en/for-rent`) và S05 trang danh mục (`categorySlug`) theo khung danh sách BL-052 (cùng `/du-an`): hero (ảnh + chữ `pageHeroes.rentals`; trang danh mục:
  * eyebrow "Cho thuê", tiêu đề + mô tả của danh mục) + ô tìm `q` + "Tìm nhanh" (`listingPages.rentals`) → tab danh mục cấp 1 (link route danh mục, số đếm) → cột lọc trái
  * (< lg là Sheet) | thẻ nổi bật (trang 1) → "N căn phù hợp" + sắp xếp → lưới 3 cột → phân trang → "Tìm hiểu thêm" + FAQ → dải Điểm mạnh (cờ `showStrengths`) → banner tư vấn.
- * Link cũ `/cho-thue?category=<slug>` (ô tìm kiếm trang chủ) vẫn lọc theo danh mục đó và đánh dấu tab của nó. Slug danh mục/tỉnh/phường/dự án lạ bị bỏ; trang vượt số trang
+ * Link cũ `/cho-thue?category=<slug có thật>` CHỈ có `category` → 308 sang trang danh mục (BL-055); kèm tham số khác (ô tìm kiếm trang chủ) vẫn lọc theo danh mục đó
+ * và đánh dấu tab của nó. Slug danh mục/tỉnh/phường/dự án lạ bị bỏ; trang vượt số trang
  * → `notFound()`. Trang danh mục: danh mục không có / xoá mềm / chưa có bản EN → `notFound()`. Đọc `searchParams` nên render theo request (không ISR).
  */
 export async function RentalListPage({ locale, searchParams, categorySlug }: RentalListPageProps) {

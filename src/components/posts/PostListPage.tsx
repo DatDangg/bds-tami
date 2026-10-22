@@ -1,7 +1,7 @@
 import config from "@payload-config";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getPayload, type Payload } from "payload";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
@@ -21,6 +21,7 @@ import { PostSpotlightContent } from "@/components/posts/PostSpotlightContent";
 import { isFilteredList, legacyCategorySlug, type PostListPageProps, type RawPostListParams } from "@/components/posts/post-list-metadata";
 import { buildPostTabs, POST_ACTIVE_FILTER_SPEC, toCurrentParams, toFilterOptions, toFilterValues, toPreservedParams, toQueryString } from "@/components/posts/post-list-state";
 import { publicPath } from "@/lib/content/content-paths";
+import { legacyCategoryOnly } from "@/lib/content/legacy-category";
 import { loadListingPageContent, type ListingLearnMoreView } from "@/lib/content/load-listing-page";
 import { loadListingStrengths } from "@/lib/content/load-listing-strengths";
 import { loadPageHero } from "@/lib/content/load-page-banner";
@@ -131,6 +132,8 @@ async function loadPostListData(locale: Locale, searchParams: RawPostListParams,
   const payload = await getPayload({ config });
   const context = await loadContext(payload, locale, categorySlug, legacyCategorySlug(searchParams, categorySlug));
   if (categorySlug && !context) notFound();
+  // BL-055 C-1: link cũ CHỈ có `?category=<slug có thật>` → 308 sang trang danh mục của ngôn ngữ đang xem (slug lạ / có thêm tham số → lọc như cũ).
+  if (!categorySlug && context && legacyCategoryOnly(searchParams)) permanentRedirect(postCategoryHref(context.category, locale));
   const [listing, hero, content, strengths] = await Promise.all([
     loadPostListing(payload, locale, { page, now: new Date(), filters: parsePostFilters(searchParams), ...(context ? { categoryIds: postCategoryFilterIds(context) } : {}) }),
     loadPageHero(locale, "propertyPosts"),
@@ -147,7 +150,8 @@ async function loadPostListData(locale: Locale, searchParams: RawPostListParams,
  * `pageHeroes.propertyPosts`; trang danh mục: eyebrow "Đăng tin BĐS", tên + mô tả danh mục) + ô tìm `q` + "Tìm nhanh" (`listingPages.propertyPosts`) → tab danh mục
  * (link route danh mục, số đếm) → cột lọc trái (< lg là Sheet) | thẻ nổi bật (trang 1, ≤ 5 tin `isFeatured` còn hiệu lực khớp lọc) → "N tin phù hợp" + sắp xếp
  * → lưới 3 cột thẻ BĐS / voucher → phân trang → "Tìm hiểu thêm" + FAQ → dải Điểm mạnh (cờ `showStrengths`) → banner tư vấn. Không form lead.
- * Link cũ `/tin-bds?category=<slug>` vẫn lọc theo danh mục đó + đánh dấu tab. Giá trị lạ bị bỏ (không 400/500); danh mục không có / chưa có bản EN ở `/en`
+ * Link cũ `/tin-bds?category=<slug có thật>` CHỈ có `category` → 308 sang trang danh mục (BL-055); kèm tham số khác thì vẫn lọc theo danh mục đó + đánh dấu tab.
+ * Giá trị lạ bị bỏ (không 400/500); danh mục không có / chưa có bản EN ở `/en`
  * và trang vượt số trang → `notFound()`. Đọc `searchParams` nên render theo request (không ISR); "bây giờ" là lúc render (nhãn "Đã kết thúc" đúng `isOfferEnded`).
  */
 export async function PostListPage({ locale, searchParams, categorySlug }: PostListPageProps) {

@@ -45,7 +45,12 @@ describe("parseProjectFilters", () => {
     expect(parseProjectFilters({ priceMin: "60", priceMax: "10" })).toEqual({ priceMin: 10 });
     expect(parseProjectFilters({ priceMin: "1.5", priceMax: "-3" })).toEqual({});
     expect(parseProjectFilters({ priceMin: "abc", priceMax: "1e3" })).toEqual({});
-    expect(parseProjectFilters({ priceMax: "0" })).toEqual({ priceMax: 0 });
+  });
+
+  it("BL-055 C-4: `priceMax=0` (gõ tay / kéo đầu trên về 0) = không giới hạn trên như /tin-bds, không lọc 'giá ≤ 0'", () => {
+    expect(parseProjectFilters({ priceMax: "0" })).toEqual({});
+    expect(parseProjectFilters({ priceMin: "5", priceMax: "0" })).toEqual({ priceMin: 5 });
+    expect(parseProjectFilters({ priceMin: "0", priceMax: "0" })).toEqual({});
   });
 
   it("đủ ba trạng thái mở bán của collection", () => {
