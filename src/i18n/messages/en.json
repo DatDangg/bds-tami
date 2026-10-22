@@ -213,6 +213,25 @@
         "copy": "Copy link",
         "copied": "Link copied",
         "copyFailed": "Could not copy"
+      },
+      "v2": {
+        "searchPlaceholder": "Search articles…",
+        "featuredLabel": "Featured articles",
+        "brand": "TAMI HOMES",
+        "latestTitle": "Latest articles",
+        "resultTotal": "{count, plural, one {# article} other {# articles}}",
+        "sortBy": "Sort by",
+        "sortApply": "Apply",
+        "sort": {
+          "newest": "Newest",
+          "oldest": "Oldest"
+        },
+        "emptyTitle": "No matching articles yet.",
+        "emptyDescription": "Try another keyword or browse all articles.",
+        "backToAll": "View all articles",
+        "mostRead": "Most read",
+        "topics": "Topics",
+        "sidebarLabel": "More to read"
       }
     },
     "newsDetail": {

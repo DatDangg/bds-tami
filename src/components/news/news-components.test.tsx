@@ -4,7 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeMedia, renderWithIntl } from "@/components/media/test-utils";
 import type { NewsCardData } from "@/lib/news/news-view";
 import { NewsCard } from "./NewsCard";
+import { NewsFeaturedBlock } from "./NewsFeaturedBlock";
 import { NewsListBody } from "./NewsListBody";
+import { NewsMostRead } from "./NewsMostRead";
+import { NewsTopics } from "./NewsTopics";
 import { ShareButtons } from "./ShareButtons";
 
 const card = (id: string, overrides: Partial<NewsCardData> = {}): NewsCardData => ({
@@ -82,56 +85,112 @@ describe("NewsCard bề mặt thẻ", () => {
   });
 });
 
-describe("NewsCard feature (bài nổi bật ngang)", () => {
-  it("MỘT link, ảnh trái + chữ phải ≥ lg, danh mục + tiêu đề + tóm tắt + ngày + nút 'Đọc bài' (không link lồng)", () => {
-    const { container } = renderWithIntl(<NewsCard data={card("1")} variant="feature" headingLevel="h2" priority />);
+describe("NewsCard grid (thẻ lưới /tin-tuc BL-054)", () => {
+  it("MỘT link thẻ trắng: badge danh mục + ngày, tiêu đề 2 dòng, tóm tắt 3 dòng, 'N phút đọc' + mũi tên trang trí", () => {
+    const { container } = renderWithIntl(<NewsCard data={card("1", { readMinutes: 7 })} variant="grid" headingLevel="h3" />);
     expect(container.querySelectorAll("a")).toHaveLength(1);
     const link = screen.getByRole("link");
-    expect(link).toHaveClass("lg:grid-cols-[1.3fr_1fr]", "rounded-xl", "bg-surface");
-    expect(within(link).getByRole("heading", { level: 2, name: "Bài 1" })).toBeInTheDocument();
-    expect(link).toHaveTextContent("Thị trường");
-    expect(link).toHaveTextContent("Tóm tắt 1");
-    expect(link).toHaveTextContent("Đọc bài");
-    expect(container.querySelector("button")).toBeNull();
+    expect(link).toHaveClass("bg-surface", "border", "rounded-xl");
+    expect(within(link).getByRole("heading", { level: 3, name: "Bài 1" })).toHaveClass("line-clamp-2");
+    expect(screen.getByText("Tóm tắt 1")).toHaveClass("line-clamp-3");
+    expect(screen.getByText("Thị trường")).toHaveClass("uppercase", "bg-primary-soft", "text-badge-foreground");
+    expect(link).toHaveTextContent("7 phút đọc");
     expect(container.querySelector("time")).toHaveAttribute("datetime", "2026-03-05T03:00:00.000Z");
-    expect(container.querySelector("img")).toHaveAttribute("alt", "");
+    expect(container.querySelector("[aria-hidden=true].rounded-full")).not.toBeNull();
+    expect(container.querySelector("button")).toBeNull();
   });
 
-  it("đầu khối canh trái: không text-center / mx-auto ở khối chữ", () => {
-    const { container } = renderWithIntl(<NewsCard data={card("1")} variant="feature" headingLevel="h2" />);
-    expect(container.innerHTML).not.toContain("text-center");
-    expect(container.querySelector("a div:last-of-type")?.className).not.toContain("mx-auto");
+  it("thiếu danh mục / ngày / số phút: không render phần đó; /en 'N min read'", () => {
+    const { container, unmount } = renderWithIntl(<NewsCard data={card("1", { categoryName: null, dateLabel: null, publishedAt: null })} variant="grid" headingLevel="h2" />);
+    expect(container.querySelector("time")).toBeNull();
+    expect(screen.queryByText("Thị trường")).toBeNull();
+    expect(screen.getByRole("link")).not.toHaveTextContent(/phút đọc/);
+    unmount();
+    renderWithIntl(<NewsCard data={card("1", { readMinutes: 3 })} variant="grid" headingLevel="h2" />, "en");
+    expect(screen.getByRole("link")).toHaveTextContent("3 min read");
+  });
+});
+
+describe("NewsFeaturedBlock", () => {
+  it("bài lớn (ảnh priority, nhãn TAMI HOMES · ngày · phút đọc) + 3 bài nhỏ; mỗi bài MỘT link, tiêu đề h2", () => {
+    const { container } = renderWithIntl(<NewsFeaturedBlock items={[card("1", { readMinutes: 5 }), card("2"), card("3"), card("4")]} />);
+    const block = screen.getByRole("region", { name: "Bài viết nổi bật" });
+    expect(within(block).getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Bài 1", "Bài 2", "Bài 3", "Bài 4"]);
+    const links = within(block).getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/tin-tuc/bai-1", "/tin-tuc/bai-2", "/tin-tuc/bai-3", "/tin-tuc/bai-4"]);
+    expect(links[0]).toHaveTextContent("TAMI HOMES");
+    expect(links[0]).toHaveTextContent("5 phút đọc");
+    expect(links[0]?.querySelectorAll("a")).toHaveLength(0);
+    expect(container.querySelector("img[fetchpriority=high]")).not.toBeNull();
   });
 
-  it("/en: nút 'Read article'", () => {
-    renderWithIntl(<NewsCard data={card("1")} variant="feature" headingLevel="h2" />, "en");
-    expect(screen.getByRole("link")).toHaveTextContent("Read article");
+  it("rỗng → không render; chỉ 1 bài → không cột phải", () => {
+    const empty = renderWithIntl(<NewsFeaturedBlock items={[]} />);
+    expect(empty.container.innerHTML).toBe("");
+    empty.unmount();
+    const { container } = renderWithIntl(<NewsFeaturedBlock items={[card("1")]} />);
+    expect(container.querySelector("ul")).toBeNull();
+  });
+});
+
+describe("NewsMostRead / NewsTopics", () => {
+  const item = (id: string) => ({ id, title: `Đọc ${id}`, href: `/tin-tuc/${id}`, cover: null, publishedAt: "2026-03-05T03:00:00.000Z", dateLabel: "05/03/2026" });
+
+  it("Đọc nhiều: danh sách có thứ tự, số 01–05 chỉ trang trí, mỗi hàng MỘT link; rỗng → ẩn", () => {
+    const { container, unmount } = renderWithIntl(<NewsMostRead items={["a", "b", "c"].map(item)} />);
+    const section = screen.getByRole("region", { name: "Đọc nhiều" });
+    expect(section.querySelector("ol")).not.toBeNull();
+    expect(within(section).getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/tin-tuc/a", "/tin-tuc/b", "/tin-tuc/c"]);
+    expect([...container.querySelectorAll("[aria-hidden=true]")].map((node) => node.textContent)).toEqual(["01", "02", "03"]);
+    unmount();
+    expect(renderWithIntl(<NewsMostRead items={[]} />).container.innerHTML).toBe("");
+  });
+
+  it("Chủ đề: chip #tag là link ?tag= (mã hoá), thẻ đang lọc aria-current; rỗng → ẩn", () => {
+    const { unmount } = renderWithIntl(<NewsTopics tags={["Thị trường", "Pháp lý"]} listPath="/tin-tuc" currentTag="Pháp lý" />);
+    const section = screen.getByRole("region", { name: "Chủ đề" });
+    const links = within(section).getAllByRole("link");
+    expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
+      ["#Thị trường", `/tin-tuc?tag=${encodeURIComponent("Thị trường").replaceAll("%20", "+")}`],
+      ["#Pháp lý", `/tin-tuc?tag=${encodeURIComponent("Pháp lý").replaceAll("%20", "+")}`],
+    ]);
+    expect(links[1]).toHaveAttribute("aria-current", "true");
+    expect(links[0]).not.toHaveAttribute("aria-current");
+    unmount();
+    expect(renderWithIntl(<NewsTopics tags={[]} listPath="/tin-tuc" />).container.innerHTML).toBe("");
   });
 });
 
 describe("NewsListBody", () => {
-  it("lưới 1/2/3 cột (3 ≥ lg): mọi tiêu đề thẻ là h2, vùng mang tên trang", () => {
-    const { container } = renderWithIntl(<NewsListBody items={[card("5"), card("6")]} />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Bài 5", "Bài 6"]);
-    expect(screen.getByRole("region", { name: "Tin tức" })).toBeInTheDocument();
-    expect(container.querySelector("ul")).toHaveAttribute("data-grid-max-cols", "4");
-    expect(container.querySelector("[data-news-featured]")).toBeNull();
-  });
-
-  it("có bài nổi bật: thẻ ngang đứng trước lưới; không hàng danh mục / 'Tin khác'", () => {
-    const { container } = renderWithIntl(<NewsListBody featured={card("1")} items={[card("2"), card("3")]} />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(["Bài 1", "Bài 2", "Bài 3"]);
+  it("không lọc: khối nổi bật trước, h2 'Bài viết mới nhất' + thẻ h3 lưới 3 cột, phân trang + cột phải", () => {
+    const { container } = renderWithIntl(
+      <NewsListBody featured={[card("1")]} items={[card("2"), card("3")]} pagination={<nav aria-label="Phân trang" />} sidebar={<p>Cột phải</p>} />,
+    );
     const featured = container.querySelector("[data-news-featured]") as HTMLElement;
-    expect(featured.querySelector("a")).toHaveAttribute("href", "/tin-tuc/bai-1");
-    expect(featured.compareDocumentPosition(container.querySelector("ul") as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(container.querySelectorAll("ul > li")).toHaveLength(2);
-    expect(container.querySelector("[data-news-row], [data-news-more]")).toBeNull();
-    expect(screen.queryByText("Tin khác")).toBeNull();
+    const latest = screen.getByRole("region", { name: "Bài viết mới nhất" });
+    expect(featured.compareDocumentPosition(latest) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(latest).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(["Bài 2", "Bài 3"]);
+    expect(latest.querySelector("ul")).toHaveAttribute("data-grid-max-cols", "3");
+    expect(within(latest).getByRole("navigation", { name: "Phân trang" })).toBeInTheDocument();
+    expect(screen.getByRole("complementary", { name: "Đọc thêm" })).toHaveTextContent("Cột phải");
   });
 
-  it("chỉ có bài nổi bật: không lưới rỗng", () => {
-    const { container } = renderWithIntl(<NewsListBody featured={card("1")} items={[]} />);
+  it("lọc: 'N bài viết phù hợp' thay tiêu đề, thẻ h2; trạng thái trống thay lưới + phân trang", () => {
+    const { unmount } = renderWithIntl(<NewsListBody featured={[]} items={[card("2")]} resultLabel="1 bài viết" />);
+    expect(screen.queryByRole("heading", { name: "Bài viết mới nhất" })).toBeNull();
+    expect(screen.getByText("1 bài viết")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Bài 2" })).toBeInTheDocument();
+    unmount();
+    const { container } = renderWithIntl(<NewsListBody featured={[]} items={[]} resultLabel="0 bài viết" emptyState={<p>Trống</p>} pagination={<nav aria-label="Phân trang" />} />);
+    expect(screen.getByText("Trống")).toBeInTheDocument();
     expect(container.querySelector("ul")).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Phân trang" })).toBeNull();
+  });
+
+  it("chỉ có bài nổi bật (≤ 4 bài): không lưới rỗng, không tiêu đề 'Bài viết mới nhất'", () => {
+    const { container } = renderWithIntl(<NewsListBody featured={[card("1")]} items={[]} />);
+    expect(container.querySelector("ul[data-grid-max-cols]")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Bài viết mới nhất" })).toBeNull();
   });
 });
 
