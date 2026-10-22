@@ -12,6 +12,8 @@ interface ApplyFormSlotProps {
   children?: ReactNode;
   email?: string;
   hotline?: { label: string; telHref: string };
+  /** Dòng phụ ngay dưới tiêu đề (BL-054: "Phản hồi trong 3 ngày làm việc."). */
+  subtitle?: string;
 }
 
 /**
@@ -19,7 +21,7 @@ interface ApplyFormSlotProps {
  * (`DETAIL_ASIDE_CARD_CLASS`, BL-045 Q5) do `JobDetail` bọc. `children` là `ApplyForm`. Luôn kèm kênh dự phòng (email + hotline) dưới form để ứng viên vẫn nộp được khi
  * form lỗi; chưa có form thì chỉ hiện hướng dẫn gửi CV. Chỉ render ở tin còn hạn: tin hết hạn ẩn cả vùng này. Server Component.
  */
-export function ApplyFormSlot({ children, email, hotline }: ApplyFormSlotProps) {
+export function ApplyFormSlot({ children, email, hotline, subtitle }: ApplyFormSlotProps) {
   const t = useTranslations("page.careerDetail.applyForm");
   const tCareers = useTranslations("page.careers");
   const hasContact = Boolean(email || hotline);
@@ -31,6 +33,7 @@ export function ApplyFormSlot({ children, email, hotline }: ApplyFormSlotProps) 
       className="scroll-mt-[calc(var(--sticky-top)+4.5rem)] bg-transparent p-0 lg:p-0"
     >
       <div className="flex flex-col gap-3">
+        {subtitle && <p className="-mt-3 mb-2 text-small text-text-muted">{subtitle}</p>}
         {children ?? <p className="max-w-[60ch] text-body text-text-secondary">{t("fallback")}</p>}
         {children && hasContact && <p className="mt-2 border-t border-border pt-4 text-small text-text-secondary">{t("orContact")}</p>}
         {email && (

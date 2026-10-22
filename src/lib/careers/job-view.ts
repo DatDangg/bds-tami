@@ -82,6 +82,15 @@ export function toJobCards(docs: readonly JobPosting[], locale: Locale, now: Dat
 
 export interface JobDetailView {
   title: string;
+  /** Tiêu đề hero tách 2 dòng (`splitJobTitle`); 1 phần tử = 1 dòng. */
+  titleLines: JobTitleLines;
+  /** Mô tả ngắn hero = khối đầu có chữ của `description` (khoảng trắng đã gộp); không có → `null`. */
+  intro: string | null;
+  /** Phòng ban = tên danh mục `job` (`/en` chưa có bản EN → `null`). */
+  categoryName: string | null;
+  /** Id danh mục: "Vị trí khác" ưu tiên tin cùng danh mục. */
+  categoryId: string | null;
+  isUrgent: boolean;
   provinceName: string | null;
   workplace: string | null;
   employmentType: EmploymentType;
@@ -94,8 +103,15 @@ export interface JobDetailView {
 }
 
 export function toJobDetailView(doc: JobPosting, locale: Locale, now: Date): JobDetailView {
+  const title = doc.title ?? "";
+  const category = doc.category;
   return {
-    title: doc.title ?? "",
+    title,
+    titleLines: splitJobTitle(title),
+    intro: firstBlockText(doc.description),
+    categoryName: visibleCategory(category, locale)?.name ?? null,
+    categoryId: typeof category === "string" ? category : (category?.id ?? null),
+    isUrgent: doc.isUrgent === true,
     provinceName: provinceLabel(doc.province),
     workplace: doc.workplace?.trim() || null,
     employmentType: doc.employmentType,
@@ -105,6 +121,50 @@ export function toJobDetailView(doc: JobPosting, locale: Locale, now: Date): Job
     deadlineLabel: formatDate(doc.deadline, locale),
     expired: isPastDeadline(doc.deadline, now),
   };
+}
+
+export type JobTitleLines = readonly [string] | readonly [string, string];
+
+/** Gạch nối có khoảng trắng hai bên (`–`, `—`, `-`): ranh giới cụm tự nhiên của tên vị trí ("Nhân viên hành chính – nhân sự"). */
+const TITLE_DASH = /\s+[–—-]\s+/;
+/** Từ nối mở đầu cụm bổ nghĩa ("… cho thuê căn hộ", "… for rental apartments"): tách TRƯỚC từ này. */
+const TITLE_CONNECTORS = new Set(["cho", "tại", "về", "mảng", "for", "at", "in", "of"]);
+/** Tách theo từ nối chỉ khi tiêu đề từ ngần này tiếng (tên ngắn để 1 dòng). */
+const TITLE_CONNECTOR_MIN_WORDS = 5;
+/** Không có gạch / từ nối: từ ngần này tiếng trở lên mới chia đôi (ngắn hơn để 1 dòng). */
+const TITLE_SPLIT_MIN_WORDS = 6;
+/** Mỗi dòng giữ ít nhất 2 tiếng (không để dòng mồ côi một tiếng). */
+const TITLE_MIN_LINE_WORDS = 2;
+
+/**
+ * Tách tên vị trí thành 2 dòng cho hero (BL-054, design: dòng 2 màu nhấn) theo quy tắc hiển thị, không thêm trường. Thứ tự: (1) gạch nối có khoảng trắng →
+ * dòng 1 phần trước (giữ gạch ở cuối), dòng 2 phần sau; (2) tiêu đề ≥ 5 tiếng có từ nối (cuối cùng, chừa ≥ 2 tiếng mỗi bên) → dòng 2 bắt đầu từ từ nối; (3) ≥ 6 tiếng →
+ * cắt ở tiếng chẵn gần nửa (tiếng Việt phần lớn là từ ghép 2 tiếng nên cắt chẵn ít tách đôi một từ); còn lại 1 dòng. Ghép 2 dòng bằng một khoảng trắng
+ * luôn ra lại đúng tiêu đề (đã gộp khoảng trắng), nên `h1` vẫn đọc đủ tên.
+ */
+export function splitJobTitle(title: string): JobTitleLines {
+  const flat = title.replace(/\s+/g, " ").trim();
+  const dash = TITLE_DASH.exec(flat);
+  if (dash && dash.index > 0 && dash.index + dash[0].length < flat.length) {
+    return [`${flat.slice(0, dash.index)} ${dash[0].trim()}`, flat.slice(dash.index + dash[0].length)];
+  }
+  const words = flat.split(" ");
+  const lineAt = (cut: number): JobTitleLines => [words.slice(0, cut).join(" "), words.slice(cut).join(" ")];
+  for (let index = words.length - TITLE_MIN_LINE_WORDS; words.length >= TITLE_CONNECTOR_MIN_WORDS && index >= TITLE_MIN_LINE_WORDS; index -= 1) {
+    if (TITLE_CONNECTORS.has((words[index] ?? "").toLocaleLowerCase("vi"))) return lineAt(index);
+  }
+  if (words.length < TITLE_SPLIT_MIN_WORDS) return [flat];
+  return lineAt(Math.min(words.length - TITLE_MIN_LINE_WORDS, 2 * Math.ceil(words.length / 4)));
+}
+
+/** Chữ của khối đầu tiên có chữ trong một richText (đoạn hoặc danh sách), khoảng trắng đã gộp; không có → `null`. */
+export function firstBlockText(content: unknown): string | null {
+  const blocks = (content as { root?: { children?: unknown[] } } | null | undefined)?.root?.children ?? [];
+  for (const block of blocks) {
+    const text = lexicalPlainText({ root: block }).replace(/\s+/g, " ").trim();
+    if (text) return text;
+  }
+  return null;
 }
 
 /** richText có chữ thật không (khối trống không render `h2` mồ côi). */

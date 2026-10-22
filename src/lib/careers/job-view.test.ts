@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { JobPosting } from "../../payload-types";
-import { formatJobSalary, hasRichText, jobDescriptionHtml, toJobCardData, toJobCards, toJobDetailView, toJobSalary } from "./job-view";
+import { firstBlockText, formatJobSalary, hasRichText, jobDescriptionHtml, splitJobTitle, toJobCardData, toJobCards, toJobDetailView, toJobSalary } from "./job-view";
 import { toJobPostingJsonLdInput } from "./job-json-ld";
 
 const NOW = new Date("2026-10-17T10:00:00.000Z");
@@ -129,5 +129,42 @@ describe("toJobPostingJsonLdInput", () => {
     expect(toJobPostingJsonLdInput(job({ deadline: "hong" }), context)).toBeNull();
     expect(toJobPostingJsonLdInput(job({ publishedAt: null, createdAt: "" }), context)).toBeNull();
     expect(toJobPostingJsonLdInput(job({ title: null }), context)).toBeNull();
+  });
+});
+
+describe("hero chi tiết (BL-054)", () => {
+  it("splitJobTitle: gạch nối → từ nối → ≥ 6 tiếng cắt chẵn gần nửa → 1 dòng; mỗi dòng ≥ 2 tiếng; ghép lại đúng tiêu đề", () => {
+    expect(splitJobTitle("Nhân viên hành chính – nhân sự")).toEqual(["Nhân viên hành chính –", "nhân sự"]);
+    expect(splitJobTitle("Sales - Hà Nội")).toEqual(["Sales -", "Hà Nội"]);
+    expect(splitJobTitle("Chuyên viên tư vấn cho thuê căn hộ")).toEqual(["Chuyên viên tư vấn", "cho thuê căn hộ"]);
+    expect(splitJobTitle("Rental consultant for serviced apartments")).toEqual(["Rental consultant", "for serviced apartments"]);
+    expect(splitJobTitle("Trưởng nhóm kinh doanh dự án")).toEqual(["Trưởng nhóm kinh doanh", "dự án"]);
+    expect(splitJobTitle("Chuyên viên tư vấn bất động sản")).toEqual(["Chuyên viên tư vấn", "bất động sản"]);
+    expect(splitJobTitle("Nhân viên chăm sóc khách hàng")).toEqual(["Nhân viên chăm sóc", "khách hàng"]);
+    expect(splitJobTitle("Thực tập sinh kế toán")).toEqual(["Thực tập sinh kế toán"]);
+    expect(splitJobTitle("Tư vấn cho thuê")).toEqual(["Tư vấn cho thuê"]);
+    expect(splitJobTitle("Chuyên viên tư vấn")).toEqual(["Chuyên viên tư vấn"]);
+    expect(splitJobTitle("Full-stack developer")).toEqual(["Full-stack developer"]);
+    expect(splitJobTitle("– Kế toán")).toEqual(["– Kế toán"]);
+    expect(splitJobTitle("  Kế   toán  ")).toEqual(["Kế toán"]);
+    for (const title of ["Nhân viên hành chính – nhân sự", "Chuyên viên tư vấn cho thuê căn hộ", "Kế toán"]) {
+      expect(splitJobTitle(title).join(" ")).toBe(title);
+    }
+  });
+
+  it("firstBlockText: khối đầu có chữ (bỏ khối rỗng, nhận cả danh sách); không có chữ → null", () => {
+    expect(firstBlockText(richText(paragraph(""), paragraph("Gia nhập  đội ngũ TAMI."), paragraph("Đoạn 2")))).toBe("Gia nhập đội ngũ TAMI.");
+    expect(firstBlockText(richText(list("Ý 1", "Ý 2")))).toBe("Ý 1 Ý 2");
+    expect(firstBlockText(richText(paragraph(" ")))).toBeNull();
+    expect(firstBlockText(null)).toBeNull();
+  });
+
+  it("toJobDetailView: phòng ban + id danh mục, Tuyển gấp, mô tả ngắn, tiêu đề 2 dòng; /en ẩn danh mục chưa có bản EN", () => {
+    const category = { id: "c1", name: "Kinh doanh", slug: "kinh-doanh", scope: "job", hasEnglish: false, createdAt: "", updatedAt: "" } as never;
+    const view = toJobDetailView(job({ title: "Chuyên viên tư vấn cho thuê căn hộ", category, isUrgent: true }), "vi", NOW);
+    expect(view).toMatchObject({ categoryName: "Kinh doanh", categoryId: "c1", isUrgent: true, intro: "Mô tả", titleLines: ["Chuyên viên tư vấn", "cho thuê căn hộ"] });
+    expect(toJobDetailView(job({ category }), "en", NOW)).toMatchObject({ categoryName: null, categoryId: "c1" });
+    expect(toJobDetailView(job({ category: "c9" }), "vi", NOW)).toMatchObject({ categoryName: null, categoryId: "c9", isUrgent: false });
+    expect(toJobDetailView(job({ category: null }), "vi", NOW).categoryId).toBeNull();
   });
 });

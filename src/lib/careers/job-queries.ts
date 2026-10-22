@@ -155,17 +155,29 @@ export function findPublicJobBySlug(payload: Payload, locale: Locale, slug: stri
   return findPublicBySlug<JobPosting>(payload, "job-postings", locale, slug, { depth: 1 });
 }
 
-/** Số vị trí gợi ý cuối trang chi tiết hết hạn. */
-export const OTHER_OPEN_JOBS_COUNT = 3;
+/** Số thẻ "Vị trí khác" cuối trang chi tiết (BL-054: 4 thẻ). */
+export const OTHER_OPEN_JOBS_COUNT = 4;
 
-/** Tối đa 3 vị trí khác đang tuyển (mới đăng trước, loại vị trí hiện tại): gợi ý ở trang chi tiết đã hết hạn. */
-export async function findOtherOpenJobs(payload: Payload, locale: Locale, currentId: string, now: Date = new Date()): Promise<JobPosting[]> {
-  const { docs } = await findPublicList<JobPosting>(payload, "job-postings", locale, {
-    where: { and: [{ deadline: { greater_than_equal: startOfVietnamDay(now).toISOString() } }, { id: { not_equals: currentId } }] },
-    sort: JOB_SORT,
-    limit: OTHER_OPEN_JOBS_COUNT,
-    depth: 1,
-    select: JOB_CARD_FIELDS,
-  });
-  return docs;
+/** Vị trí đang xem: loại khỏi gợi ý; `categoryId` (có thể trống) để ưu tiên tin cùng danh mục. */
+export interface OtherJobsContext {
+  currentId: string;
+  categoryId?: string | null;
+}
+
+/**
+ * "Vị trí khác" (BL-054): tối đa 4 tin còn hạn khác cùng ngôn ngữ (qua `findPublicList`: công khai, `/en` cần `hasEnglish`), loại tin đang xem —
+ * tin cùng danh mục trước (mới đăng trước), thiếu thì bù bằng tin mới nhất các danh mục khác (không trùng). Tối đa 2 truy vấn nhỏ. Dùng cho cả tin còn hạn
+ * lẫn hết hạn (gợi ý thay thế).
+ */
+export async function findOtherOpenJobs(payload: Payload, locale: Locale, context: OtherJobsContext, now: Date = new Date()): Promise<JobPosting[]> {
+  const open: Where = { deadline: { greater_than_equal: startOfVietnamDay(now).toISOString() } };
+  const find = async (where: Where, limit: number) =>
+    (await findPublicList<JobPosting>(payload, "job-postings", locale, { where, sort: JOB_SORT, limit, depth: 1, select: JOB_CARD_FIELDS })).docs;
+  const sameCategory = context.categoryId
+    ? await find({ and: [open, { id: { not_equals: context.currentId } }, { category: { equals: context.categoryId } }] }, OTHER_OPEN_JOBS_COUNT)
+    : [];
+  if (sameCategory.length >= OTHER_OPEN_JOBS_COUNT) return sameCategory;
+  const exclude = [context.currentId, ...sameCategory.map((doc) => doc.id)];
+  const rest = await find({ and: [open, { id: { not_in: exclude } }] }, OTHER_OPEN_JOBS_COUNT - sameCategory.length);
+  return [...sameCategory, ...rest];
 }
