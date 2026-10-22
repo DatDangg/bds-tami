@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/news-list-detail-v2",
+  "activeWorkItem": "feature/seed-english-data",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2948,6 +2948,47 @@
       "scopeVersion": 69,
       "review": "T01 FAST PASS r1 · T02 STRICT PASS r2",
       "specValidation": ".context/review-reports/spec-validation-feature-news-list-detail-v2-phase-1.md (PASS; residual: /en chi tiết, hero không ảnh bìa, lưu admin → kiểm staging)"
+    },
+    {
+      "slug": "seed-english-data",
+      "title": "Seed dev đủ data tiếng Anh viết sẵn (seed/english/) cho mọi bản ghi + global, bật hasEnglish, idempotent, chỉ DB dev (BL-064)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-064",
+      "changeDoc": "spec/changes/2026-10-22-seed-english-data.md",
+      "startedAt": "2026-10-23",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-seed-english-data/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-seed-english-data-phase-1-task-01-round-2-review.md",
+          "verify": "typecheck PASS · eslint seed tests 0 · test 4449 PASS · seed:english x2 idempotent (writes 0) · APP_ENV=staging refused · coverage categories 16/16 developers 29/29 services 3/3 job_postings 4/4 pages 2/2",
+          "completedAt": "2026-10-23"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-seed-english-data/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-seed-english-data/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-04",
+          "file": "tasks/feature-seed-english-data/phase-1-task-04.md",
+          "status": "pending",
+          "attempt": 0
+        }
+      ]
     }
   ],
   "bugs": [
@@ -3991,7 +4032,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T18:17:17.830Z",
+  "lastUpdated": "2026-10-22T19:46:03.821Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,0 +1,33 @@
+{
+  "Chuyên viên tư vấn bất động sản": {
+    "title": "Real estate consultant",
+    "description": [
+      "Advise customers on projects and apartments for rent.",
+      "Look after customers after the transaction."
+    ],
+    "requirements": [
+      "Good communication skills and a willingness to learn.",
+      "Real estate experience is an advantage."
+    ],
+    "salaryText": "VND 15–30 million + commission"
+  },
+  "Thực tập sinh Marketing": {
+    "title": "Marketing intern",
+    "description": ["Help create post content and manage social media channels."],
+    "requirements": [
+      "Final-year student in Marketing or a related field.",
+      "Strong Vietnamese writing skills."
+    ],
+    "salaryText": "Negotiable"
+  },
+  "Nhân viên chăm sóc khách hàng bán thời gian": {
+    "title": "Part-time customer care officer",
+    "description": ["Answer customers by phone and Zalo and record their needs."],
+    "requirements": ["Clear speaking voice and willingness to work in shifts."]
+  },
+  "Trưởng nhóm kinh doanh (đã đóng)": {
+    "title": "Sales team lead (closed)",
+    "description": ["Manage the consulting team and sales targets."],
+    "requirements": ["At least 3 years of experience managing a sales team."]
+  }
+}

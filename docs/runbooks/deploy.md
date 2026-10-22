@@ -271,7 +271,7 @@ Nginx host dùng chung (nginx 1.24, đã đọc `nginx -T`): chưa site nào dù
    Bind mount postgres: sau lần deploy thứ hai, `docker inspect tami-staging-postgres --format '{{.Id}} {{.State.StartedAt}}'` không đổi và `--format '{{json .Mounts}}'` có `Source` chứa `/releases/staging/current/`.
    Nếu Compose resolve symlink (postgres bị tạo lại mỗi deploy) thì chuyển các bind `./postgres/init.sql` sang đường dẫn cố định (L4-T05 MINOR-2).
 10. `[XÁC NHẬN]` Seed (trong container app, **chỉ staging**, idempotent): `docker exec tami-staging-app pnpm seed` (34 tỉnh/thành, danh mục, trang pháp lý nháp), sau đó
-    `docker exec tami-staging-app pnpm seed --sample` (menu/footer, dịch vụ, tin, dự án, tuyển dụng, cho thuê mẫu; bị chặn khi `APP_ENV=production`).
+    `docker exec tami-staging-app pnpm seed --sample` (menu/footer, dịch vụ, tin, dự án, tuyển dụng, cho thuê mẫu; bị chặn khi `APP_ENV=production`; bước cuối "dữ liệu tiếng Anh viết sẵn" (`seed/english/`) chỉ chạy trên DB dev nên ở staging tự bỏ qua với log "bỏ qua: không phải DB dev"; xem `seed/english/README.md`).
     Trước khi **xuất bản** Chính sách bảo mật: vào admin điền `site-settings.siteName` (bản vi); thiếu thì xuất bản trả lỗi 400 nêu rõ. Email chỉ tới `EMAIL_ALLOWLIST`.
 11. `[XÁC NHẬN]` Smoke test rate limit theo IP: gửi form ứng tuyển/liên hệ từ 2 IP khác nhau → mỗi IP một bucket (không cùng 429). Cột đầu log `/var/log/nginx/tami-staging.access.log` là IP thật.
 12. `[XÁC NHẬN]` Diễn tập rollback (cần ít nhất một release staging đã deploy thành công trước đó): deploy một **image lỗi thật** — commit có chủ đích làm

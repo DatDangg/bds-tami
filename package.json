@@ -28,6 +28,8 @@
     "seed:galleries": "payload run scripts/seed-galleries.ts",
     "seed:sample-news": "payload run scripts/seed-sample-news.ts",
     "seed:shell": "payload run scripts/seed-shell-globals.ts",
+    "seed:english": "payload run scripts/seed-english.ts",
+    "seed:english:export": "payload run scripts/seed-english-export.ts",
     "backfill:listing-fields": "payload run scripts/backfill-listing-fields.ts --",
     "backfill:offices": "payload run scripts/backfill-offices.ts --",
     "e2e:revalidate": "payload run tests/e2e/revalidate-globals.ts",

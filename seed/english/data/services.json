@@ -1,0 +1,17 @@
+{
+  "Phân phối": {
+    "title": "Distribution",
+    "summary": "Distribution of real estate products from developers.",
+    "content": ["Distribution of real estate products from developers."]
+  },
+  "Môi giới": {
+    "title": "Brokerage",
+    "summary": "Brokerage for buying, selling and leasing real estate.",
+    "content": ["Brokerage for buying, selling and leasing real estate."]
+  },
+  "Khai thác căn hộ dịch vụ": {
+    "title": "Serviced apartment management",
+    "summary": "Operating and managing serviced apartments on behalf of owners.",
+    "content": ["Operating and managing serviced apartments on behalf of owners."]
+  }
+}

@@ -8,6 +8,7 @@ import path from "node:path";
 import { getPayload, type Payload } from "payload";
 
 import config from "../src/payload.config";
+import { englishSeedBlockReason, runSeedEnglish } from "../seed/english";
 import { TRANSLATION_JOB_CONTEXT_KEY } from "../src/hooks/translation/translation-targets";
 
 type Block = { type: "p" | "h" | "li"; text: string };
@@ -550,6 +551,10 @@ try {
     payload.logger.info(`Đăng tin BĐS: tạo ${sales.created}/${sales.total}`);
     const news = await seedNews(payload, bundle.news, authorId);
     payload.logger.info(`Tin tức: tạo ${news.created}/${news.total}`);
+    // Bản EN viết sẵn (BL-064): nguồn vi của dữ liệu cào chỉ còn trong DB nên dữ liệu EN commit theo tiêu đề vi.
+    const blocked = englishSeedBlockReason(process.env);
+    if (blocked) payload.logger.info(`Seed EN: bỏ qua, không phải DB dev (${blocked})`);
+    else await runSeedEnglish(payload);
   }
 } finally {
   await payload.destroy();

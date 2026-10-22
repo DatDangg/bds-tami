@@ -1,6 +1,7 @@
 import type { Payload } from "payload";
 
 import { seedDefaultCategories } from "./categories";
+import { englishSeedBlockReason, runSeedEnglish } from "./english";
 import { seedGeo } from "./geo";
 import { seedLegalPages } from "./pages";
 import { seedSampleHomepage } from "./sample/homepage";
@@ -102,6 +103,17 @@ const SAMPLE_STEPS: readonly SeedStep[] = [
     async run(payload) {
       const { created } = await seedSampleHomepage(payload);
       return created ? "tạo" : "đã có";
+    },
+  },
+  {
+    // Cuối cùng: ghi bản EN viết sẵn lên mọi bản ghi/global/ảnh vừa được các bước trên tạo (BL-064). Bản vi không bị đụng.
+    name: "dữ liệu tiếng Anh viết sẵn",
+    async run(payload) {
+      // Staging/prod: bỏ qua (không ném) để phần còn lại của seed --sample vẫn hoàn tất; spec BL-064 chỉ cho DB dev.
+      const blocked = englishSeedBlockReason(process.env);
+      if (blocked) return `bỏ qua: không phải DB dev (${blocked})`;
+      const { problems } = await runSeedEnglish(payload);
+      return problems > 0 ? `${problems} bản ghi lệch/lỗi (xem log cảnh báo)` : "xong";
     },
   },
 ];

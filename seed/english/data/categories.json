@@ -1,0 +1,47 @@
+{
+  "Căn hộ dịch vụ": {
+    "name": "Serviced apartments"
+  },
+  "Căn hộ chung cư": {
+    "name": "Apartments"
+  },
+  "Studio": {
+    "name": "Studios"
+  },
+  "Nhà nguyên căn": {
+    "name": "Entire houses"
+  },
+  "Văn phòng": {
+    "name": "Offices"
+  },
+  "Mặt bằng kinh doanh": {
+    "name": "Commercial premises"
+  },
+  "Tin BĐS": {
+    "name": "Property listings"
+  },
+  "Voucher / Ưu đãi": {
+    "name": "Vouchers / Offers"
+  },
+  "Thị trường": {
+    "name": "Market"
+  },
+  "Tin TAMI": {
+    "name": "TAMI news"
+  },
+  "Đời sống": {
+    "name": "Lifestyle"
+  },
+  "Khu đô thị": {
+    "name": "Urban areas"
+  },
+  "Nhà phố, biệt thự": {
+    "name": "Townhouses and villas"
+  },
+  "Kinh doanh": {
+    "name": "Sales"
+  },
+  "Nghỉ dưỡng": {
+    "name": "Resorts"
+  }
+}
