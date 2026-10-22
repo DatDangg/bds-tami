@@ -27,7 +27,7 @@ export function RentalAmenities({ amenities }: { amenities: RentalAmenity[] }) {
   const tAmenity = useTranslations("page.rentals.amenityOption");
   if (amenities.length === 0) return null;
   return (
-    <ul aria-label={t("amenitiesLabel")} className="grid grid-cols-2 gap-3 md:grid-cols-3">
+    <ul aria-label={t("amenitiesLabel")} className="grid grid-cols-2 gap-3 @md/detail:grid-cols-3">
       {amenities.map((amenity) => {
         const Icon = AMENITY_ICONS[amenity];
         return (

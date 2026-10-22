@@ -5,7 +5,7 @@ import { DetailContactAside } from "@/components/detail/DetailContactAside";
 import { DetailGalleryGrid } from "@/components/detail/DetailGalleryGrid";
 import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
-import { DetailSection } from "@/components/detail/DetailSection";
+import { DETAIL_SECTION_FRAME_CLASS, DetailSection } from "@/components/detail/DetailSection";
 import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
 import { DetailSpecBar, type DetailSpecItem } from "@/components/detail/DetailSpecBar";
 import { SimilarCarousel } from "@/components/detail/SimilarCarousel";
@@ -120,7 +120,7 @@ function usePolicyBlocks(doc: ProjectDetailProps["doc"], view: ProjectDetailView
   return [...(shown.has("legal") ? [legal] : []), ...(shown.has("policy") ? [policy] : [])];
 }
 
-/** Các dải rộng hết khung theo thứ tự `sections` (Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách · Tin liên quan · Hỏi đáp). */
+/** Các khối trong cột trái (sau Tổng quan, thẻ trắng) theo thứ tự `sections` (Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá · Pháp lý & chính sách · Tin liên quan · Hỏi đáp). */
 function useProjectBands(doc: ProjectDetailProps["doc"], view: ProjectDetailView, sections: SectionId[], listings: ProjectListingCards): DetailBand[] {
   const t = useTranslations("page.projectDetail");
   const tEyebrow = useTranslations("page.detail.eyebrow");
@@ -141,9 +141,9 @@ function useProjectBands(doc: ProjectDetailProps["doc"], view: ProjectDetailView
       </DetailSection>
     ),
     pricing: <PriceTable rows={view.priceRows} updatedAt={view.priceUpdatedAt} />,
-    // Một dải cho cả Pháp lý lẫn Chính sách (≥ xl hai cột như trước); dải tự chừa lề dọc vì `LegalPolicy` dựng `section` riêng, không qua `DetailSection`.
+    // Một thẻ cho cả Pháp lý lẫn Chính sách (hai cột khi cột nội dung ≥ 48rem); `LegalPolicy` dựng `section` riêng, không qua `DetailSection` nên bọc khung thẻ ở đây.
     legal: (
-      <div className="py-section-tight">
+      <div className={DETAIL_SECTION_FRAME_CLASS}>
         <LegalPolicy blocks={policyBlocks} />
       </div>
     ),
@@ -216,8 +216,8 @@ function ProjectAfter({ related, strengths, consultBanner }: Pick<ProjectDetailP
 
 /**
  * Chi tiết Dự án theo design BL-052 (`detail-du-an.webp`) trên `DetailPageShell`: hero ảnh full-bleed (`DetailHeroMosaic`: badge danh mục + tình trạng, `h1`, địa chỉ, mô tả ngắn,
- * nút video khi có `videoUrl`, 3 ảnh nhỏ) → thanh thông số nổi (Giá từ · Quy mô · Diện tích · Chủ đầu tư · Bàn giao · Loại hình; không ô Pháp lý) → tab dính → [Tổng quan | cột
- * phải dính: form "Nhận thông tin dự án" (`#lead-form` duy nhất) + Hotline] → các dải rộng hết khung nền xen kẽ: Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá ·
+ * nút video khi có `videoUrl`, 3 ảnh nhỏ) → thanh thông số nổi (Giá từ · Quy mô · Diện tích · Chủ đầu tư · Bàn giao · Loại hình; không ô Pháp lý) → tab dính → [cột trái: Tổng quan
+ * + mọi khối bên dưới (thẻ trắng) | cột phải dính suốt cột trái: form "Nhận thông tin dự án" (`#lead-form` duy nhất) + Hotline]: Vị trí · Tiện ích · Hình ảnh · Nổi bật · Mặt bằng · Bảng giá ·
  * Pháp lý & chính sách (+ tài liệu, neo `#documents`) · Tin liên quan · Hỏi đáp → "Dự án tương tự" → dải Điểm mạnh → banner tư vấn. Khối thiếu dữ liệu ẩn cả khối lẫn tab
  * (`visibleSections`). Server Component; phần tương tác (hero, tab, danh sách mở rộng, mặt bằng, accordion, thanh dính đáy) là client.
  */

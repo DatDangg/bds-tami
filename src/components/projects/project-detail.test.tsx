@@ -154,7 +154,7 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     expect(screen.getByText("Nội dung tổng quan")).toBeInTheDocument();
   });
 
-  it("bố cục: cột phải chỉ cạnh Tổng quan (dính), các khối sau là dải rộng hết khung nền xen kẽ ngoài lưới; MỘT form #lead-form; Hotline Gọi ngay tel:", () => {
+  it("bố cục: mọi khối ở cột trái (thẻ trắng), cột phải dính tới hết lưới (BL-061); MỘT form #lead-form; Hotline Gọi ngay tel:", () => {
     const { container } = renderDetail(richProject);
     expect(container.querySelectorAll("#lead-form")).toHaveLength(1);
     expect(container.querySelectorAll("form")).toHaveLength(1);
@@ -164,20 +164,19 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     expect(sticky.className).toContain("--detail-aside-h");
     expect(sticky.querySelector("#lead-form form")).not.toBeNull();
     expect(within(aside).getByRole("link", { name: "Gọi ngay 0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    // Lưới [Tổng quan | aside]: chỉ Tổng quan nằm cạnh aside, dạng thẻ trắng.
+    // Lưới [cột trái | aside]: cột trái có Tổng quan rồi mọi khối sau (BL-061), thẻ trắng, container query.
     const grid = aside.parentElement as HTMLElement;
     expect(grid.className).toContain("lg:grid-cols-");
     const column = grid.firstElementChild as HTMLElement;
     expect(column.getAttribute("data-section-style")).toBe("cards");
-    expect(Array.from(column.querySelectorAll("section[id]")).map((section) => section.id)).toEqual(["overview"]);
+    expect(column).toHaveClass("@container/detail");
+    expect(Array.from(column.querySelectorAll(":scope > section[id]")).map((section) => section.id)).toEqual(["overview"]);
     expect(container.querySelector("#overview")?.className).toContain("rounded-[20px]");
-    // Các khối sau: mỗi khối một dải ngoài lưới, nền xen kẽ bắt đầu bằng trắng.
+    // Các khối sau: mỗi khối một phần tử trong cột trái (thẻ trắng), không còn dải nền xen kẽ.
     const bands = Array.from(container.querySelectorAll<HTMLElement>("[data-detail-band]"));
     expect(bands.map((band) => band.querySelector("section[id]")?.id)).toEqual(["location", "amenities", "gallery", "floor-plans", "pricing", "legal"]);
-    expect(bands.map((band) => band.className)).toEqual(["bg-surface", "bg-bg-alt", "bg-surface", "bg-bg-alt", "bg-surface", "bg-bg-alt"]);
-    for (const band of bands) expect(grid.contains(band)).toBe(false);
-    // Ngoài `group/detail[data-section-style=cards]` → biến thể thẻ của DetailSection không áp (dải phẳng như design).
-    expect(container.querySelector("#location")?.closest("[data-section-style]")).toBeNull();
+    for (const band of bands) expect(column.contains(band)).toBe(true);
+    expect(container.querySelector("#location")?.closest("[data-section-style]")).toBe(column);
     for (const id of ["overview", "location", "amenities", "gallery", "floor-plans", "pricing", "legal", "sales-policy"]) {
       expect(container.querySelector(`#${id}`)?.className, id).toContain("scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
     }

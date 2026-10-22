@@ -17,7 +17,7 @@ describe("DetailGalleryGrid", () => {
     const { container } = renderWithIntl(<DetailGalleryGrid images={images(9)} />);
     const cells = screen.getAllByRole("button", { name: /^Xem ảnh \d \/ 9$/ });
     expect(cells).toHaveLength(5);
-    expect(cells[0]?.closest("li")).toHaveClass("md:row-span-2", "col-span-2");
+    expect(cells[0]?.closest("li")).toHaveClass("@md/detail:row-span-2", "col-span-2");
     expect(container.querySelectorAll('img[fetchpriority="high"]')).toHaveLength(0);
     await user.click(cells[3]!);
     expect(await screen.findByRole("dialog", { name: "Xem ảnh" })).toHaveTextContent("Ảnh 4 / 9");
@@ -31,8 +31,8 @@ describe("DetailGalleryGrid", () => {
     renderWithIntl(<DetailGalleryGrid images={images(4)} />);
     const items = screen.getAllByRole("listitem");
     expect(items).toHaveLength(4);
-    expect(items[1]).toHaveClass("md:col-span-2");
-    expect(items[3]).toHaveClass("col-span-2", "md:col-span-1");
+    expect(items[1]).toHaveClass("@md/detail:col-span-2");
+    expect(items[3]).toHaveClass("col-span-2", "@md/detail:col-span-1");
   });
 
   it("1 ảnh: một ô, không nút Xem tất cả", () => {

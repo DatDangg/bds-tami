@@ -60,16 +60,16 @@ describe("ProjectLocation + thẻ Kết nối hạ tầng (BL-060)", () => {
   it("không locationMedia → bản đồ 7 cột + danh sách 5 cột như cũ, không thẻ", () => {
     renderLocation(null);
     expect(screen.queryByText("Kết nối hạ tầng")).toBeNull();
-    expect(screen.getByTestId("lazy-map").parentElement).toHaveClass("lg:col-span-7");
-    expect(screen.getByTestId("lazy-map").parentElement).not.toHaveClass("xl:col-span-5");
+    expect(screen.getByTestId("lazy-map").parentElement).toHaveClass("@3xl/detail:col-span-7");
+    expect(screen.getByTestId("lazy-map").parentElement).not.toHaveClass("@5xl/detail:col-span-5");
   });
 
   it("có thẻ + đủ bản đồ + danh sách → xl 5/4/3; thiếu bản đồ → danh sách + thẻ 8/4 (không ô trống)", () => {
     const { unmount } = renderLocation(video);
-    expect(screen.getByTestId("lazy-map").parentElement).toHaveClass("xl:col-span-5");
+    expect(screen.getByTestId("lazy-map").parentElement).toHaveClass("@5xl/detail:col-span-5");
     unmount();
     renderLocation(video, false);
     expect(screen.queryByTestId("lazy-map")).toBeNull();
-    expect(screen.getByText("Trường A").closest("div[class*='lg:col-span-8']")).not.toBeNull();
+    expect(screen.getByText("Trường A").closest("div[class*='@3xl/detail:col-span-8']")).not.toBeNull();
   });
 });

@@ -30,13 +30,13 @@ describe("DetailFeatureList", () => {
     const { container } = renderWithIntl(<DetailFeatureList items={features(3)} image={fakeMedia("am", "Hồ bơi")} />);
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.getByRole("img", { name: "Hồ bơi" })).toBeInTheDocument();
-    expect(container.firstElementChild).toHaveClass("md:grid-cols-2");
+    expect(container.firstElementChild).toHaveClass("@md/detail:grid-cols-2");
   });
 
-  it("BL-056 A4: không ảnh → danh sách rộng hết, sm:2 / lg:3 cột; đúng 1 mục → 1 cột (không co thành nửa ô)", () => {
+  it("BL-056 A4: không ảnh → danh sách rộng hết, @md:2 / @2xl:3 cột; đúng 1 mục → 1 cột (không co thành nửa ô)", () => {
     const many = renderWithIntl(<DetailFeatureList items={features(3)} />);
-    expect(many.container.querySelector("ul")).toHaveClass("sm:grid-cols-2", "lg:grid-cols-3");
-    expect(many.container.firstElementChild).not.toHaveClass("md:grid-cols-2");
+    expect(many.container.querySelector("ul")).toHaveClass("@md/detail:grid-cols-2", "@2xl/detail:grid-cols-3");
+    expect(many.container.firstElementChild).not.toHaveClass("@md/detail:grid-cols-2");
     const single = renderWithIntl(<DetailFeatureList items={features(1)} />);
     expect(single.container.querySelector("ul")?.className).not.toMatch(/grid-cols-/);
   });

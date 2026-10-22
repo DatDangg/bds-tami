@@ -115,8 +115,8 @@ describe("Khối market của chi tiết dự án (BL-020 P5)", () => {
     const { container } = renderDetail(marketProject);
     const section = container.querySelector("#highlights") as HTMLElement;
     const list = within(section).getByRole("list");
-    expect(list.className).toContain("sm:grid-cols-2");
-    expect(list.className).toContain("xl:grid-cols-3");
+    expect(list.className).toContain("@md/detail:grid-cols-2");
+    expect(list.className).toContain("@3xl/detail:grid-cols-3");
     const cards = within(list).getAllByRole("listitem");
     expect(cards).toHaveLength(2);
     expect(within(cards[0]!).getByRole("heading", { level: 3, name: "Gần metro" })).toBeInTheDocument();

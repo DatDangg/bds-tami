@@ -123,7 +123,7 @@ export function LegalPolicy({ blocks }: { blocks: PolicyBlock[] }) {
   }
 
   return (
-    <div className="grid gap-8 xl:grid-cols-2 xl:gap-12">
+    <div className="grid gap-8 @3xl/detail:grid-cols-2 @3xl/detail:gap-12">
       {blocks.map((block) => (
         <PolicyBlockView key={block.id} block={block} open={openIds.has(block.id)} onToggle={() => toggle(block.id)} isLg={isLg} />
       ))}

@@ -12,7 +12,7 @@ export interface ProjectListingCards {
   posts: PostCardData[];
 }
 
-const GRID_CLASS = "grid gap-x-6 gap-y-8 sm:grid-cols-2";
+const GRID_CLASS = "grid gap-x-6 gap-y-8 @md/detail:grid-cols-2";
 
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   const labelId = useId();

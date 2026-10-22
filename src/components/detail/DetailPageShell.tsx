@@ -2,14 +2,11 @@ import type { ReactNode } from "react";
 import { DetailLayout } from "./DetailLayout";
 import type { SubNavItem } from "./DetailSubNav";
 
-/** Một dải rộng hết khung sau lưới đầu trang; `key` ổn định (thường là mã mục). */
+/** Một khối trong cột trái sau khối đầu (BL-061: thẻ trắng như Tổng quan); `key` ổn định (thường là mã mục). */
 export interface DetailBand {
   key: string;
   content: ReactNode;
 }
-
-/** Nền xen kẽ của dải, bắt đầu bằng trắng (lưới đầu trang nền `primary-subtle`). `bg-alt` khác `primary-subtle` nên chip / vòng icon `primary-subtle` trong dải vẫn tách nền. */
-const BAND_TONES = ["bg-surface", "bg-bg-alt"] as const;
 
 interface DetailPageShellProps {
   /** `DetailHeroMosaic` đã dựng (chứa `h1`). */
@@ -20,39 +17,30 @@ interface DetailPageShellProps {
   belowSpecBar?: ReactNode;
   /** Thanh tab dính (viên thuốc, scroll-spy BL-027/028/029); bỏ trống thì không dựng. */
   subNav?: { items: SubNavItem[]; label: string };
-  /** Khối cạnh cột phải (design: chỉ Tổng quan) — mỗi `DetailSection` là một thẻ trắng bo 20px. */
+  /** Khối đầu của cột trái, cạnh cột phải — mỗi `DetailSection` là một thẻ trắng bo 20px. */
   children: ReactNode;
-  /** Cột phải (thường `DetailContactAside`), dính ≥ lg trong phạm vi `children`; < lg xuống ngay sau `children`. */
+  /** Cột phải (thường `DetailContactAside`), dính ≥ lg suốt chiều cao cột trái (`children` + `bands`); < lg xuống ngay sau cột trái. */
   aside?: ReactNode;
   /** `id` tiêu đề trong `aside`, làm nhãn cho `<aside>`. */
   asideLabelledBy?: string;
   /**
-   * Các khối sau lưới (Vị trí, Tiện ích, Hình ảnh, khối giữ lại…; quyết định sau review P1-T03): mỗi phần tử một dải rộng hết khung, nền xen kẽ trắng / `bg-alt`,
-   * nội dung trong `max-w-container px-gutter`. `DetailSection` trong dải nằm ngoài `group/detail` nên dựng kiểu thường (không thẻ). Thanh tab vẫn theo dõi các khối này
-   * (scroll-spy tìm theo `id` trong cả trang).
+   * Các khối sau khối đầu (Vị trí, Tiện ích, Hình ảnh, khối giữ lại…; BL-061): nằm TRONG cột trái `group/detail`, sau `children`, nên `DetailSection` của chúng là thẻ trắng
+   * như Tổng quan và form ở cột phải dính suốt các khối này. Thanh tab theo dõi bằng `id` trong cả trang (scroll-spy).
    */
   bands?: DetailBand[];
-  /** Khối cuối trang sau các dải (`SimilarCarousel`, dải Điểm mạnh, banner tư vấn) — tự lo nền. */
+  /** Khối cuối trang NGOÀI lưới (`SimilarCarousel`, dải Điểm mạnh, banner tư vấn) — tự lo nền; cột phải thôi dính đúng khi cuộn tới đây. */
   after?: ReactNode;
 }
 
 /**
- * Khung trang chi tiết BL-052 (Dự án, Cho thuê, Tin BĐS; BL-054 tái dùng): hero → thanh thông số → khoảng 32px → [tab dính + khối đầu | cột phải dính] → dải rộng nền xen kẽ → slot cuối trang.
+ * Khung trang chi tiết BL-052 (Dự án, Cho thuê, Tin BĐS; BL-054 tái dùng; BL-061 hai cột): hero → thanh thông số → khoảng 32px → tab dính → [cột trái: khối đầu + `bands` (thẻ trắng) | cột phải dính] → slot cuối trang (`after`).
  * Dựng trên `DetailLayout sectionStyle="cards"` nên giữ nguyên `data-detail-page` (header ẩn khi cuộn, `--sticky-top`), nền `bg-primary-subtle`, lưới 2 cột,
- * `DetailAsideFit` và thẻ trắng từng `DetailSection` trong lưới. CTA dính đáy < lg do trang tự đặt như hiện tại. Server Component.
+ * `DetailAsideFit` và thẻ trắng từng `DetailSection`. CTA dính đáy < lg do trang tự đặt như hiện tại. Server Component.
+ *
+ * Công thức "cột dính tới hết khối liên quan" (tái dùng, vd chi tiết Tin tức BL-062): cột phải là ô lưới cao bằng hàng (lưới KHÔNG `items-start`) → phần tử con đầu của `aside`
+ * `sticky` theo `DETAIL_ASIDE_STICKY_CLASS`; mọi khối cần form đi kèm nằm TRONG lưới (cột trái); khối sau lưới (`after`) đứng ngoài → thẻ thôi dính đúng khi tới khối đó.
  */
 export function DetailPageShell({ hero, specBar, belowSpecBar, subNav, children, aside, asideLabelledBy, bands = [], after }: DetailPageShellProps) {
-  const tail =
-    bands.length > 0 || after ? (
-      <>
-        {bands.map((band, index) => (
-          <div key={band.key} data-detail-band="" className={BAND_TONES[index % BAND_TONES.length]}>
-            <div className="mx-auto w-full max-w-container px-gutter">{band.content}</div>
-          </div>
-        ))}
-        {after}
-      </>
-    ) : undefined;
   return (
     <DetailLayout
       sectionStyle="cards"
@@ -68,9 +56,14 @@ export function DetailPageShell({ hero, specBar, belowSpecBar, subNav, children,
       {...(subNav ? { subNav } : {})}
       {...(aside ? { aside } : {})}
       {...(asideLabelledBy ? { asideLabelledBy } : {})}
-      {...(tail ? { after: tail } : {})}
+      {...(after ? { after } : {})}
     >
       {children}
+      {bands.map((band) => (
+        <div key={band.key} data-detail-band="">
+          {band.content}
+        </div>
+      ))}
     </DetailLayout>
   );
 }

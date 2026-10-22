@@ -33,7 +33,7 @@ describe("DetailPageShell", () => {
     expect(container.querySelector('[data-section-style="cards"]')).not.toBeNull();
   });
 
-  it("bands: dải rộng hết khung ngoài lưới, sau aside và trước after, nền xen kẽ trắng / bg-alt; khối trong dải không phải thẻ", () => {
+  it("bands: nằm TRONG cột trái (thẻ) sau children, trước aside; không còn dải nền xen kẽ; after vẫn ngoài lưới sau aside", () => {
     const { container } = renderWithIntl(
       <DetailPageShell
         hero={<h1>Hero</h1>}
@@ -47,15 +47,31 @@ describe("DetailPageShell", () => {
         </DetailSection>
       </DetailPageShell>,
     );
+    const column = container.querySelector<HTMLElement>('[data-section-style="cards"]')!;
     const bands = Array.from(container.querySelectorAll<HTMLElement>("[data-detail-band]"));
-    expect(bands.map((band) => band.className)).toEqual(["bg-surface", "bg-bg-alt", "bg-surface"]);
+    expect(bands).toHaveLength(3);
+    for (const band of bands) {
+      expect(column.contains(band)).toBe(true);
+      expect(band.className).not.toMatch(/bg-surface|bg-bg-alt/);
+      expect(band.querySelector(".max-w-container")).toBeNull();
+    }
+    const overview = screen.getByRole("region", { name: "Tổng quan" });
     const aside = screen.getByRole("complementary", { name: "Liên hệ" });
-    expect(aside.compareDocumentPosition(bands[0]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(bands[2]!.compareDocumentPosition(screen.getByTestId("after")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // Dải nằm ngoài cột `group/detail` (thẻ) và ngoài lưới có aside.
-    expect(container.querySelector('[data-section-style="cards"] #location')).toBeNull();
-    expect(aside.parentElement?.contains(bands[0]!)).toBe(false);
-    expect(bands[0]!.firstElementChild).toHaveClass("max-w-container", "px-gutter");
+    expect(overview.compareDocumentPosition(bands[0]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(bands[2]!.compareDocumentPosition(aside) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(aside.compareDocumentPosition(screen.getByTestId("after")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(aside.parentElement?.contains(screen.getByTestId("after"))).toBe(false);
+    // `DetailSection` trong band là thẻ trắng (biến thể group/detail), không phải dải kẻ trên.
+    expect(container.querySelector("section#location")?.className).toContain("group-data-[section-style=cards]/detail:bg-surface");
+  });
+
+  it("cột trái là container query @container/detail để khối con đổi cột theo bề rộng cột", () => {
+    const { container } = renderWithIntl(
+      <DetailPageShell hero={<h1>Hero</h1>}>
+        <p>x</p>
+      </DetailPageShell>,
+    );
+    expect(container.querySelector('[data-section-style="cards"]')).toHaveClass("@container/detail");
   });
 
   it("không specBar / subNav / aside: vẫn dựng nội dung", () => {

@@ -97,8 +97,8 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
 /**
  * Chi tiết Cho thuê theo khung chi tiết BL-052 (cùng `DetailPageShell` với chi tiết Dự án, design `detail-du-an.webp`): hero ảnh full-bleed (`DetailHeroMosaic`: chip danh mục
  * + badge "Đã thuê" + mã tin, `h1`, vị trí theo quy tắc địa chỉ chính xác, nút video khi có `videoUrl`, 3 ảnh nhỏ) → thanh thông số nổi (Giá thuê · Diện tích · Phòng ngủ/tắm ·
- * Nội thất · Hướng · Dọn vào từ; ô trống bị bỏ) → [tin đã thuê: băng + "Căn tương tự đang trống"] → tab dính → [Tổng quan | cột phải dính: giá + người phụ trách / hotline +
- * form lead `source=rental` duy nhất (`#lead-form`)] → các dải rộng hết khung nền xen kẽ: Vị trí · Tiện ích · Hình ảnh · Điều khoản thuê (tin đã thuê: accordion đóng) · Pháp lý
+ * Nội thất · Hướng · Dọn vào từ; ô trống bị bỏ) → [tin đã thuê: băng + "Căn tương tự đang trống"] → tab dính → [cột trái: Tổng quan + mọi khối bên dưới (thẻ trắng) | cột phải dính suốt cột trái: giá + người phụ trách / hotline +
+ * form lead `source=rental` duy nhất (`#lead-form`)]: Vị trí · Tiện ích · Hình ảnh · Điều khoản thuê (tin đã thuê: accordion đóng) · Pháp lý
  * → "Căn tương tự" (tin còn trống) → dải Điểm mạnh → banner tư vấn. Khối thiếu dữ liệu ẩn cả khối lẫn tab (`visibleRentalSections`). Tin đã thuê KHÔNG có JSON-LD (kể cả
  * breadcrumb) vì noindex. Server Component; phần tương tác (hero, tab, bản đồ, slider, accordion, thanh dính đáy) là client.
  */

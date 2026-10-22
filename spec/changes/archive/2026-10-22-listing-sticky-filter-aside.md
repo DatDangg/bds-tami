@@ -1,8 +1,9 @@
 ---
 id: listing-sticky-filter-aside
 type: feature
-status: in_progress
+status: done
 created: 2026-10-22
+completed: 2026-10-23
 ---
 
 # Dự án / Cho thuê / Tin BĐS — bộ lọc dính cuộn riêng, thẻ nổi bật bấm cả thẻ, chi tiết 2 cột + form tư vấn dính tới "liên quan"

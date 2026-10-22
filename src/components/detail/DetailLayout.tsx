@@ -3,11 +3,12 @@ import { DetailAsideFit } from "./DetailAsideFit";
 import { DetailSubNav, type SubNavItem } from "./DetailSubNav";
 
 /**
- * Thẻ phụ dính ở cột phải (≥ lg), KHÔNG cuộn riêng: `top` = min(dưới thanh mục con = `--sticky-top` + 4.5rem, đáy viewport − chiều cao thẻ − 1rem).
+ * Thẻ phụ dính ở cột phải (≥ lg), KHÔNG cuộn riêng: `top` = min(`--detail-aside-top` (mặc định dưới thanh mục con = `--sticky-top` + 4.5rem), đáy viewport − chiều cao thẻ − 1rem).
+ * Trang không có thanh tab chỉ cần đặt `[--detail-aside-top:calc(var(--sticky-top)+1.5rem)]` trên `aside`/cột (BL-061, tái dùng cho BL-062).
  * Thẻ vừa viewport → dính dưới thanh mục con; cao hơn → cuộn theo trang tới khi đáy thẻ chạm đáy viewport rồi mới dính (không bị cắt).
  * `--detail-aside-h` do `DetailAsideFit` đo bằng JS (CSS không biết chiều cao chính thẻ); chưa có biến (0px) = dính trên như cũ. Gắn vào phần tử con đầu của `aside`.
  */
-export const DETAIL_ASIDE_STICKY_CLASS = "lg:sticky lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]";
+export const DETAIL_ASIDE_STICKY_CLASS = "lg:sticky lg:top-[min(var(--detail-aside-top,calc(var(--sticky-top)_+_4.5rem)),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]";
 
 /** Thẻ phụ trắng dính (BL-031) = khung thẻ + `DETAIL_ASIDE_STICKY_CLASS` + đích cuộn dưới thanh mục con. */
 export const DETAIL_ASIDE_CARD_CLASS = `rounded-[20px] border border-border bg-surface p-6 shadow-md ${DETAIL_ASIDE_STICKY_CLASS} lg:p-6 scroll-mt-[calc(var(--sticky-top)+4.5rem)]`;
@@ -17,7 +18,7 @@ interface DetailLayoutProps {
   before?: ReactNode;
   /** Thanh mục con dính; bỏ trống thì không dựng thanh. */
   subNav?: { items: SubNavItem[]; label: string };
-  /** Các `DetailSection` của cột chính: nằm trong MỘT thẻ trắng bo lớn. */
+  /** Các `DetailSection` của cột chính: nằm trong MỘT thẻ trắng bo lớn (`single`) hoặc mỗi khối một thẻ (`cards`; cột này là `@container/detail`). */
   children: ReactNode;
   /** Thẻ phụ (vd. Tư vấn 1:1) nằm cột phải ≥ lg, sau thẻ nội dung khi < lg. */
   aside?: ReactNode;
@@ -56,7 +57,7 @@ export function DetailLayout({ before, subNav, children, aside, asideLabelledBy,
         {leading && <div className="hidden min-w-0 lg:block print:hidden">{leading}</div>}
         {sectionStyle === "cards" ? (
           // `group/detail` + `data-section-style`: `DetailSection` (lồng sâu trong các khối dự án) đổi sang thẻ bằng biến thể group, không cần truyền prop qua từng khối.
-          <div data-section-style="cards" className="group/detail flex min-w-0 flex-col gap-6">
+          <div data-section-style="cards" className="group/detail @container/detail flex min-w-0 flex-col gap-6">
             {children}
           </div>
         ) : (

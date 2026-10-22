@@ -35,7 +35,7 @@ function AmenityCard({ amenity }: { amenity: AmenityView }) {
 }
 
 /**
- * Khối Tiện ích nổi bật (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Không gian sống" + `h2`. Hai chế độ:
+ * Khối Tiện ích nổi bật (BL-052, design `detail-du-an`; BL-061 thẻ trong cột trái): eyebrow "Không gian sống" + `h2`. Hai chế độ:
  * - Có ≥ 1 tiện ích có ảnh riêng (BL-060) → slider thẻ (`CardSlider` dùng chung, mũi tên hai mép từ md, vuốt ở mobile): ảnh 4:3 + tên + mô tả; mục không ảnh dùng ô nền muted + dấu tích để thẻ đều nhau. `amenitiesImage` chung không dùng.
  * - Không mục nào có ảnh → như cũ: `amenitiesImage` lớn bên trái (không có → rộng hết) + danh sách icon + tên + mô tả, > 5 mục → nút "Khám phá tất cả tiện ích".
  * Trường `icon` của dữ liệu là chữ tự do chưa có bảng ánh xạ tới bộ icon nên danh sách dùng dấu tích chung. Server Component (slider/danh sách là client).
@@ -51,8 +51,8 @@ export function ProjectAmenities({ amenities, image }: { amenities: AmenityView[
           <p id={sliderLabelId} className="sr-only">
             {t("titles.amenities")}
           </p>
-          {/* `CardSlider` tự đệm `px-gutter`: kéo ra hai bên đúng bấy nhiêu để thẻ đầu thẳng hàng với cột nội dung. */}
-          <div className="-mx-gutter">
+          {/* `CardSlider` tự đệm `px-gutter` (+ scroll-padding): trong thẻ `DetailSection` (p-5 / md:p-8) đặt lại `--spacing-gutter` đúng bằng đệm thẻ và kéo ra hai bên bấy nhiêu để thẻ đầu thẳng hàng với chữ. */}
+          <div className="-mx-5 [--spacing-gutter:1.25rem] md:-mx-8 md:[--spacing-gutter:2rem]">
             <CardSlider
               items={amenities.map((amenity) => (
                 <AmenityCard key={amenity.id} amenity={amenity} />

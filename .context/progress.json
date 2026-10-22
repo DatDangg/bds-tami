@@ -2873,10 +2873,10 @@
       "slug": "listing-sticky-filter-aside",
       "title": "Dự án / Cho thuê / Tin BĐS: bộ lọc danh sách dính + cuộn riêng; thẻ nổi bật bấm cả thẻ; chi tiết 2 cột — mọi khối ở cột trái, form tư vấn dính tới khối liên quan (BL-061)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-061",
-      "changeDoc": "spec/changes/2026-10-22-listing-sticky-filter-aside.md",
+      "changeDoc": "spec/changes/archive/2026-10-22-listing-sticky-filter-aside.md",
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -2885,16 +2885,28 @@
           "attempt": 1,
           "review": "NORMAL PASS",
           "round": 1,
-          "report": ".context/review-reports/feature-listing-sticky-filter-aside-phase-1-task-01-round-1-review.md"
+          "report": ".context/review-reports/feature-listing-sticky-filter-aside-phase-1-task-01-round-1-review.md",
+          "completedAt": "2026-10-22"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-listing-sticky-filter-aside/phase-1-task-02.md",
-          "status": "in_progress",
-          "attempt": 1
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-listing-sticky-filter-aside-phase-1-task-02-round-1-review.md",
+          "verify": "typecheck PASS · eslint scope 0 lỗi · test 420 file / 4406 PASS · build PASS · ảnh bl061-p1t02-* (du-an 1440/1024/768/390, en 1440, cho-thue 1440, tin-bds 1440)",
+          "completedAt": "2026-10-23"
         }
       ],
-      "startedAt": "2026-10-22"
+      "startedAt": "2026-10-22",
+      "completedAt": "2026-10-23",
+      "specVersion": "1.52.0",
+      "scopeVersion": 68,
+      "review": "NORMAL PASS",
+      "round": 1,
+      "specValidation": ".context/review-reports/spec-validation-feature-listing-sticky-filter-aside-phase-1.md (PASS, 0 blocking; residual: khối thiếu data local kiểm trên staging)"
     }
   ],
   "bugs": [

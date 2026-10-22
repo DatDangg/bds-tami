@@ -11,18 +11,18 @@ import { cn } from "@/lib/utils";
 const VISIBLE = 5;
 
 /**
- * Bố cục theo số ảnh hiện (n ≤ 5). ≥ md: lưới 4×2, ảnh đầu 2×2; 3 ảnh → hai ô còn lại mỗi ô 2 cột, 4 ảnh → ô thứ hai 2 cột (không ô trống).
- * < md: 2 cột, ảnh đầu rộng hết; ô lẻ cuối rộng hết. 1–2 ảnh: một hàng, không ảnh lớn.
+ * Bố cục theo số ảnh hiện (n ≤ 5). cột nội dung ≥ 28rem (`@md/detail`): lưới 4×2, ảnh đầu 2×2; 3 ảnh → hai ô còn lại mỗi ô 2 cột, 4 ảnh → ô thứ hai 2 cột (không ô trống).
+ * Hẹp hơn: 2 cột, ảnh đầu rộng hết; ô lẻ cuối rộng hết. 1–2 ảnh: một hàng, không ảnh lớn.
  */
 function layout(position: number, shown: number): string {
   if (shown <= 2) return "aspect-16/10";
   const rest = shown - 1;
   const lastOdd = position === shown - 1 && rest % 2 === 1;
   return cn(
-    "aspect-4/3 md:aspect-auto",
-    position === 0 && "col-span-2 aspect-16/10 md:row-span-2",
-    lastOdd && position !== 0 && "col-span-2 aspect-16/10 md:col-span-1",
-    position > 0 && (shown === 3 || (shown === 4 && position === 1)) && "md:col-span-2",
+    "aspect-4/3 @md/detail:aspect-auto",
+    position === 0 && "col-span-2 aspect-16/10 @md/detail:row-span-2",
+    lastOdd && position !== 0 && "col-span-2 aspect-16/10 @md/detail:col-span-1",
+    position > 0 && (shown === 3 || (shown === 4 && position === 1)) && "@md/detail:col-span-2",
   );
 }
 
@@ -46,7 +46,7 @@ export function DetailGalleryGrid({ images }: { images: MediaImage[] }) {
 
   return (
     <div>
-      <ul className={cn("grid gap-3", shown.length === 1 ? "grid-cols-1" : "grid-cols-2", bento && "md:aspect-[2.2/1] md:grid-cols-4 md:grid-rows-2")}>
+      <ul className={cn("grid gap-3", shown.length === 1 ? "grid-cols-1" : "grid-cols-2", bento && "@md/detail:aspect-[2.2/1] @md/detail:grid-cols-4 @md/detail:grid-rows-2")}>
         {shown.map((image, position) => (
           <li key={position} className={cn("relative min-w-0 overflow-hidden rounded-[16px] bg-surface-muted", layout(position, shown.length))}>
             <button

@@ -1,7 +1,8 @@
 import { screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
-import { DETAIL_ASIDE_CARD_CLASS, DetailLayout } from "./DetailLayout";
+import { DETAIL_ASIDE_CARD_CLASS, DETAIL_ASIDE_STICKY_CLASS, DetailLayout } from "./DetailLayout";
+import { DetailAsideFit } from "./DetailAsideFit";
 import { DetailSection } from "./DetailSection";
 
 function renderLayout(props: Partial<Parameters<typeof DetailLayout>[0]> = {}) {
@@ -47,8 +48,29 @@ describe("DetailLayout", () => {
     expect(DETAIL_ASIDE_CARD_CLASS).not.toMatch(/max-h|overflow-y/);
     expect(DETAIL_ASIDE_CARD_CLASS).toContain("lg:sticky");
     expect(DETAIL_ASIDE_CARD_CLASS).toContain(
-      "lg:top-[min(calc(var(--sticky-top)_+_4.5rem),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]",
+      "lg:top-[min(var(--detail-aside-top,calc(var(--sticky-top)_+_4.5rem)),calc(100dvh_-_var(--detail-aside-h,0px)_-_1rem))]",
     );
+  });
+
+  it("DETAIL_ASIDE_STICKY_CLASS đọc --detail-aside-top (mặc định dưới thanh tab) để trang không có tab tái dùng", () => {
+    expect(DETAIL_ASIDE_STICKY_CLASS).toContain("var(--detail-aside-top,");
+  });
+
+  it("DetailAsideFit: mặc định là aside; as=div dựng div không aria-labelledby", () => {
+    const { container } = renderWithIntl(
+      <>
+        <DetailAsideFit aria-labelledby="x">
+          <p>a</p>
+        </DetailAsideFit>
+        <DetailAsideFit as="div" aria-labelledby="x">
+          <p>b</p>
+        </DetailAsideFit>
+      </>,
+    );
+    expect(container.querySelector("aside")?.getAttribute("aria-labelledby")).toBe("x");
+    const div = container.querySelector("div") as HTMLElement;
+    expect(div.tagName).toBe("DIV");
+    expect(div).not.toHaveAttribute("aria-labelledby");
   });
 
   describe("DetailAsideFit (ResizeObserver)", () => {

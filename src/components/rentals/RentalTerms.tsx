@@ -27,7 +27,7 @@ export function RentalTerms({ id, terms, eyebrow, collapsed = false }: RentalTer
     ...(terms.availableFromLabel ? [{ label: t("terms.availableFrom"), value: terms.availableFromLabel, iso: terms.availableFromIso }] : []),
   ];
   const body = (
-    <dl className="grid gap-x-8 md:grid-cols-2">
+    <dl className="grid gap-x-8 @md/detail:grid-cols-2">
       {items.map((item) => (
         <div key={item.label} className="flex min-w-0 items-baseline justify-between gap-4 border-b border-border py-3">
           <dt className="text-small text-text-muted">{item.label}</dt>
@@ -35,7 +35,7 @@ export function RentalTerms({ id, terms, eyebrow, collapsed = false }: RentalTer
         </div>
       ))}
       {terms.services.length > 0 && (
-        <div className="flex flex-col gap-2 md:col-span-2">
+        <div className="flex flex-col gap-2 @md/detail:col-span-2">
           <dt className="text-small text-text-muted">{t("terms.services")}</dt>
           <dd>
             <ul className="flex flex-wrap gap-2">

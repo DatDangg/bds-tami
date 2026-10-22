@@ -36,10 +36,10 @@ export function DetailFeatureList({ items, initialCount = 5, expandLabel, image 
   const collapsible = items.length > initialCount;
 
   return (
-    <div className={cn("grid gap-6", image && "md:grid-cols-2 md:items-start")}>
+    <div className={cn("grid gap-6", image && "@md/detail:grid-cols-2 @md/detail:items-start")}>
       {image && <ResponsiveImage media={image} sizes="(min-width: 1024px) 420px, (min-width: 768px) 50vw, 100vw" aspectRatio="4 / 3" className="rounded-[20px]" />}
       <div className="min-w-0">
-        <ul id={listId} className={cn("grid gap-3", !image && items.length > 1 && "sm:grid-cols-2 lg:grid-cols-3")}>
+        <ul id={listId} className={cn("grid gap-3", !image && items.length > 1 && "@md/detail:grid-cols-2 @2xl/detail:grid-cols-3")}>
           {items.map((item, position) => (
             <li key={`${item.title}-${position}`} hidden={collapsible && !expanded && position >= initialCount} className="flex gap-3 rounded-[14px] border border-border p-3">
               <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-subtle text-accent-text">

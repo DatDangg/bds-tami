@@ -122,18 +122,18 @@ describe("RentalDetail (BL-052, khung chi tiết chung)", () => {
     expect(bar.getAllByRole("term").map((term) => term.textContent)).toEqual(["Giá thuê", "Diện tích"]);
   });
 
-  it("bố cục: chỉ Tổng quan (thẻ trắng) cạnh cột liên hệ; các khối sau là dải rộng hết khung nền xen kẽ", () => {
+  it("bố cục: chỉ Tổng quan (thẻ trắng) cạnh cột liên hệ; các khối sau cũng nằm trong cột trái (thẻ trắng, BL-061)", () => {
     const { container } = renderRental(fullRental);
     const aside = screen.getByRole("complementary", { name: "Nhận tư vấn" });
     const grid = aside.parentElement as HTMLElement;
     const cards = grid.firstElementChild as HTMLElement;
     expect(cards).toHaveAttribute("data-section-style", "cards");
-    expect(cards.querySelectorAll("section[id]")).toHaveLength(1);
+    expect(cards).toHaveClass("@container/detail");
+    expect(cards.querySelectorAll(":scope > section[id]")).toHaveLength(1);
     expect((cards.querySelector("#overview") as HTMLElement).className).toContain("group-data-[section-style=cards]/detail:bg-surface");
     const bands = Array.from(container.querySelectorAll<HTMLElement>("[data-detail-band]"));
     expect(bands.map((band) => band.querySelector("[id]")?.id)).toEqual(["location", "amenities", "gallery", "terms", "legal"]);
-    expect(bands.map((band) => band.className)).toEqual(["bg-surface", "bg-bg-alt", "bg-surface", "bg-bg-alt", "bg-surface"]);
-    for (const band of bands) expect(follows(aside, band)).toBe(true);
+    for (const band of bands) expect(cards.contains(band)).toBe(true);
     // Cột liên hệ dính trong phạm vi Tổng quan, không cuộn riêng.
     const sticky = aside.firstElementChild as HTMLElement;
     expect(sticky.className).toContain("lg:sticky");

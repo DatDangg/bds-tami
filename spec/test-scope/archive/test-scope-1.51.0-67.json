@@ -1,0 +1,93 @@
+{
+  "specVersion": "1.51.0",
+  "scopeVersion": 67,
+  "generatedAt": "2026-10-22T23:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-063 MODIFY (MINOR 1.50.0 → 1.51.0 — đổi hình thức nút chuyển ngôn ngữ FR-PUB-19, user chọn cờ vuông 2026-10-22): chữ `VI | EN` ở header ≥ sm (đầu trang + nổi khi cuộn), menu toàn màn hình, footer thay bằng hai cờ vuông SVG inline VN / UK (chỉ cờ, không chữ, không emoji; khung 24×24 bo 2px, viền mảnh); đang xem aria-current + ring 2px có offset, ngôn ngữ kia mờ 60% hover/focus 100%; aria-label / title / lang / hreflang; vùng bấm ≥ 44×44. Đích link + cookie NEXT_LOCALE không đổi. Không schema / API / i18n, không migration.",
+  "status": "published — T01 NORMAL PASS r1 (3 MINOR không chặn); primary close-out + commit sắp tới trên staging",
+  "statusNote": "T01 attempt 1 PASS (builder dừng trước khi ghi verification; primary redo verify trên đĩa, không tính attempt) · NORMAL PASS r1. Verify: typecheck PASS · eslint 7 file scope 0 lỗi · vitest src/components/layout 22 file / 158 PASS · pnpm test 420 file / 4.398 PASS · build PASS. pnpm lint exit 1 chỉ do .local-seed/* git-ignored (ngoài scope).",
+  "workItem": "feature/language-switcher-flags",
+  "backlog": "BL-063",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-22-language-switcher-flags.md",
+  "changeDocStatus": "pending → done khi primary close-out (archive sang spec/changes/archive/)",
+  "task": [
+    "tasks/feature-language-switcher-flags/phase-1-task-01.md"
+  ],
+  "reviewResults": [
+    "T01 NORMAL PASS r1 (0 CRITICAL/MAJOR, 3 MINOR) — .context/review-reports/feature-language-switcher-flags-phase-1-task-01-round-1-review.md — commit close-out sắp tới"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.50.0-66.json",
+  "specUpdate": "spec/updates/2026-10-22-language-switcher-flags.md",
+  "specRefs": [
+    "F12 / FR-PUB-19 — Nút chuyển ngôn ngữ (SPECIFICATIONS.md:207, as-built BL-063): hai cờ vuông SVG inline VN / UK thay chữ VI | EN; aria-current + ring 2px offset cho ngôn ngữ đang xem, ngôn ngữ kia mờ 60%; aria-label \"Tiếng Việt\" / \"English\", title, lang / hreflang; vùng bấm ≥ 44×44; header ≥ sm, menu toàn màn hình, footer; đích link + cookie NEXT_LOCALE không đổi",
+    "Khung trang (SPECIFICATIONS.md:19): cụm phải header ≥ xl = tìm, cờ VI / EN, nút CTA",
+    "design-spec §2.3 Chuyển ngôn ngữ (as-built BL-063): khung cờ 24×24 rounded-[2px] ring-1 ring-black/20; đang xem ring-2 --color-accent-text ring-offset-2, màu offset theo prop tone (on-light = --color-glass header, on-dark = --color-dark menu + footer); hover/focus --duration-fast, tắt khi reduced motion; §2.1 / §2.2 / §2.4 ghi \"cờ VI / EN\""
+  ],
+  "specRefNotes": {
+    "Cờ": "flag-icons.tsx FlagIcon({ locale }): svg viewBox 0 0 24 24, aria-hidden=\"true\", focusable=\"false\", data-flag=vi|en. VN nền #DA251D + sao 5 cánh #FFFF00 (polygon 10 điểm, tâm 12,12, R 6.5 / r 2.5). UK Union Jack giản lược: nền #012169, chéo trắng (stroke 5) + chéo đỏ #C8102E (stroke 2), thập trắng (stroke 7) + thập đỏ (stroke 4), không counterchange. Màu cố định, không theo token / dark mode.",
+    "Mục link": "Mỗi mục <a hreflang lang aria-label title> min-h-11 min-w-11 rounded-full inline-flex; hai mục gap-1, vi trước en sau; không còn ngăn `|`; link.textContent rỗng. Ngôn ngữ đang xem href = pathname + aria-current=\"true\" + ring-2; ngôn ngữ kia href = localeSwitchHref(pathname, locale) + opacity-60 + onClick ghi cookie buildLocaleCookie(locale) (chỉ ở ngôn ngữ kia — như cũ).",
+    "tone": "Prop mới LanguageSwitcher tone?: 'on-light' | 'on-dark' chỉ đổi lớp ring-offset-glass / ring-offset-dark. Header không truyền (mặc định on-light); MobileMenu.tsx:81 + Footer.tsx:67 truyền on-dark. MINOR reviewer: menu toàn màn hình nền --color-dark-deep (#0a0c10) còn offset dùng --color-dark (#111111) — lệch nhỏ, không thấy ở ảnh.",
+    "Header < sm": "LanguageSwitcher trong Header giữ hidden sm:flex → < 640px chỉ có trong menu toàn màn hình (và footer)."
+  },
+  "migration": "không — không đổi schema / API / i18n / route",
+  "changed": {
+    "files": [
+      "src/components/layout/LanguageSwitcher.tsx",
+      "src/components/layout/flag-icons.tsx",
+      "src/components/layout/LanguageSwitcher.test.tsx",
+      "src/components/layout/flag-icons.test.tsx",
+      "src/components/layout/DesktopNav.test.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/MobileMenu.tsx",
+      ".context/design-spec.md",
+      "docs/DESIGN.md"
+    ],
+    "modules": [
+      "layout · LanguageSwitcher (client, dùng chung header ≥ sm / menu toàn màn hình / footer) — viết lại JSX: cờ SVG thay chữ, bỏ ngăn `|`, prop tone; localeSwitchHref / cookie / hreflang / lang / aria-label / role=group giữ",
+      "layout · flag-icons (mới) — FlagIcon VN / UK SVG inline tự vẽ, trang trí (aria-hidden), data-flag",
+      "layout · MobileMenu / Footer — chỉ thêm tone=\"on-dark\" (1 dòng mỗi file)",
+      "doc as-built · design-spec §2.1–2.4, DESIGN.md:262 (Language Switcher)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "UI header 1440 đầu trang (thanh phẳng kính sáng) + header nổi khi cuộn: cụm phải hiện 2 cờ vuông 24×24 cạnh nhau (VN trước, UK sau), không chữ VI / EN, không ngăn `|`; cờ đang xem có ring vàng 2px + offset sáng, cờ kia mờ 60%; hover / focus bàn phím cờ kia sáng 100%; vùng bấm ≥ 44×44 (kề nhau, không chồng)",
+      "UI menu toàn màn hình 390 (< xl, nút Menu): 2 cờ trong menu nền tối, ring offset tối (không viền sáng lạ quanh cờ đang xem); cờ UK vẫn nét trên nền tối nhờ thập trắng + viền mảnh",
+      "UI footer 1440 + 390 (hàng cuối, bên phải cạnh 'Cài đặt cookie' nếu có): 2 cờ nền tối như menu; < md hàng cuối xếp dọc vẫn hiện đủ 2 cờ",
+      "Trang vi (/): cờ VN aria-current=\"true\", href = URL hiện tại; cờ UK href = bản /en tương ứng. Trang en (/en…): ngược lại — cờ UK aria-current, cờ VN href bản vi",
+      "Bấm cờ kia: điều hướng đúng URL ngôn ngữ như trước (trang chủ ↔ /en; trang danh sách ↔ route map; trang chi tiết có slug ↔ slug localized qua /api/locale-counterpart; không có bản dịch → trang danh sách / trang chủ của ngôn ngữ kia) và cookie NEXT_LOCALE được ghi theo ngôn ngữ vừa chọn; bấm cờ đang xem → ở lại trang, không ghi cookie",
+      "A11y: mỗi cờ là link tên truy cập 'Tiếng Việt' / 'English' (aria-label + title tooltip chuột), có lang + hreflang; svg aria-hidden (đọc màn hình không đọc 'image'); nhóm role=group aria-label 'Chuyển ngôn ngữ'; focus-visible có vòng focus toàn site (trong header màu chữ); trạng thái đang xem nhận ra khi bỏ màu (ring dày + offset)",
+      "Reduced motion: chuyển mờ → rõ tức thì (motion-reduce:transition-none)",
+      "Không emoji: trên Windows (Chrome / Edge / Firefox) vẫn thấy cờ (SVG), không ô vuông / mã chữ",
+      "Unit: flag-icons.test.tsx (3) · LanguageSwitcher.test.tsx (2 href cũ + 4 mới) · DesktopNav.test.tsx (44×44, aria-current, không text, svg aria-hidden[data-flag]) · PublicShell.test.tsx / Header.test.tsx (tên link, hreflang, lang — không đổi)"
+    ],
+    "dependents": [
+      "Header (src/components/layout/Header.tsx:64) — LanguageSwitcher hidden sm:flex: < 640px không có cờ ở header (chỉ trong menu toàn màn hình); ≥ sm hiện; cụm phải (tìm, cờ, CTA / Menu) không xô lệch, menu ngang ≥ xl không xuống dòng ở 1280 (VI + EN)",
+      "MobileMenu (menu toàn màn hình, .theme-dark-block) — cột phải ≥ lg / cuối danh sách < lg có 2 cờ; đóng / mở menu không ảnh hưởng cờ; mở ở trang en hiển thị đúng cờ đang xem",
+      "Footer (dùng chung toàn site, BL-044) — hàng cuối: bản quyền trái · cờ + 'Cài đặt cookie' phải; lưới / accordion < md không đổi",
+      "PublicShell (vỏ trang công khai) — header + footer mọi trang công khai (trang chủ, Dự án, Cho thuê, Tin BĐS, Tin tức, Tuyển dụng, Liên hệ, pháp lý, 404) đều hiện cờ; trang chi tiết (header ẩn khi cuộn BL-027) cờ ở header đầu trang + footer",
+      "Header nổi khi cuộn / header ẩn trang chi tiết — cờ nằm trong thanh nổi 52/56px, không tràn chiều cao (vùng bấm 44px < 52px)"
+    ],
+    "regression": [
+      "Chuyển ngôn ngữ trang có slug (chi tiết dự án / cho thuê / tin BĐS / bài viết / tuyển dụng / dịch vụ / danh mục) qua /api/locale-counterpart: bấm cờ → đúng slug localized; chưa có bản dịch (hasEnglish false) → trang danh sách của loại đó ở ngôn ngữ kia",
+      "Trang pháp lý (Chính sách bảo mật / Điều khoản) vi ↔ en: đúng trang tương ứng; bản EN chưa duyệt → về trang chủ /en",
+      "Trang chủ / ↔ /en và trang danh sách (/du-an ↔ /en/projects, /cho-thue ↔ /en/for-rent, /tin-bds ↔ /en/property-news, /tin-tuc, /tuyen-dung, /lien-he) — giữ tham số lọc / phân trang như trước",
+      "Cookie NEXT_LOCALE: sau khi chọn en, vào lại / (không tiền tố) vẫn theo quy tắc middleware hiện có (không đổi)",
+      "hreflang / canonical trong <head> của mọi trang không đổi (LanguageSwitcher không sinh metadata)",
+      "Test tự động: typecheck · eslint (scope) · unit + ui + integration (420 file / 4.398) · build PASS trên staging"
+    ]
+  },
+  "acceptance": [
+    "Header (desktop + header nổi khi cuộn), menu mobile, footer: hiện 2 cờ vuông thay chữ; bấm đổi đúng URL ngôn ngữ như hiện tại (giữ đường dẫn tương ứng)",
+    "Cờ là SVG inline/tĩnh (không emoji — emoji cờ không hiện trên Windows), góc vuông (bo rất nhẹ ≤ 2px), kích thước đều nhau, nét trên nền sáng lẫn nền tối/hero",
+    "Trạng thái đang chọn phân biệt không chỉ bằng màu; aria-label \"Tiếng Việt\" / \"English\", aria-current cho ngôn ngữ hiện tại, lang/hreflang giữ nguyên",
+    "Vùng bấm ≥ 24px (mobile ≥ 44px — as-built ≥ 44px mọi breakpoint); test LanguageSwitcher.test.tsx cập nhật"
+  ],
+  "verification": {
+    "status": "T01: pnpm typecheck PASS · npx eslint 7 file scope 0 lỗi · npx vitest run src/components/layout 22 file / 158 PASS · pnpm test 420 file / 4.398 PASS · pnpm build PASS. Ảnh Browser pane dev server (DB local): .context/review-reports/assets/bl063-p1t01-header-top-1440{.jpg,-zoom.png}, -header-scrolled-1440{.jpg,-zoom.png}, -menu-390.jpg, -footer-1440{.jpg,-zoom.png}, -footer-390{.jpg,-zoom.png}. Reviewer tự chạy lại typecheck + vitest layout + eslint scope PASS.",
+    "note": "Chưa có ảnh hover / focus (chỉ kiểm lớp bằng test) và ảnh 768px. 3 MINOR reviewer mở: ring-offset-dark vs nền --color-dark-deep ở menu; test hình học sao / Union Jack; test cookie onClick. Union Jack giản lược (không counterchange) chấp nhận ở 24px."
+  },
+  "risk": "low",
+  "riskNote": "UI thuần, 1 component dùng chung ở 3 chỗ, không đổi logic link / cookie / i18n / schema / API. Test nên ưu tiên: (1) nhìn thấy cờ (không emoji / ô vuông) trên Windows + macOS + Android ở header 1440 đầu trang và khi cuộn, menu 390, footer 1440 / 390, cả vi và en; (2) cờ đang xem có ring + aria-current, cờ kia mờ / hover rõ; (3) bấm cờ kia đổi đúng URL như trước (trang có slug + trang pháp lý + trang chủ) và cookie NEXT_LOCALE; (4) đọc màn hình đọc 'Tiếng Việt' / 'English' link, Tab tới được 2 cờ với vòng focus; (5) vùng bấm 44×44 trên mobile."
+}

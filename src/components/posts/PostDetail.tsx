@@ -162,8 +162,8 @@ function PostOverview({ doc, view, specs, offer }: Pick<PostDetailProps, "doc" |
 /**
  * Chi tiết Tin BĐS theo khung chi tiết BL-052 (cùng `DetailPageShell` với chi tiết Dự án / Cho thuê): hero ảnh full-bleed (`DetailHeroMosaic`: ảnh bìa + thư viện làm ảnh nhỏ,
  * chip danh mục + badge ưu đãi, `h1`, địa chỉ / khu vực, tóm tắt, nút chia sẻ; không video) → thanh thông số theo loại tin → tab dính → [Tổng quan · Ưu đãi (`OfferBox`: hạn,
- * trạng thái, mã voucher + điều kiện; hết hạn → "Đã kết thúc", không mã — BR-06) | cột phải dính: form lead `source=property_post` duy nhất + hotline] → dải Vị trí (bản đồ khi
- * có toạ độ, không thì dòng địa chỉ) · Hình ảnh → "Tin liên quan" → dải Điểm mạnh → banner tư vấn. Khối trống ẩn cả khối lẫn tab. Server Component; phần tương tác (hero,
+ * trạng thái, mã voucher + điều kiện; hết hạn → "Đã kết thúc", không mã — BR-06) | cột phải dính suốt cột trái: form lead `source=property_post` duy nhất + hotline; sau Tổng quan là khối Vị trí (bản đồ khi
+ * có toạ độ, không thì dòng địa chỉ) · Hình ảnh (thẻ trắng, BL-061)] → "Tin liên quan" → dải Điểm mạnh → banner tư vấn. Khối trống ẩn cả khối lẫn tab. Server Component; phần tương tác (hero,
  * tab, chia sẻ, sao chép mã, bản đồ, slider, thanh dính đáy) là client.
  */
 export function PostDetail({ doc, view, specs, offer, related, hotline, ownPath, shareUrl, strengths, consultBanner }: PostDetailProps) {
