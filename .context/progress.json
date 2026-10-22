@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/listing-followups",
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -2761,10 +2761,10 @@
       "slug": "listing-followups",
       "title": "Việc còn mở sau BL-052: 308 link cũ ?category= (/tin-bds, /cho-thue), /du-an priceMax=0, đo index đếm tiện ích + ca EN, GIST location, hookTimeout integration, gom isOfferPost, đo LCP (BL-055)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-055",
-      "changeDoc": "spec/changes/2026-10-22-listing-followups.md",
+      "changeDoc": "spec/changes/archive/2026-10-22-listing-followups.md",
       "branch": "staging",
       "startedAt": "2026-10-22",
       "autoProceed": "user 2026-10-22: tự quyết, không hỏi; không push; không đụng BL-059",
@@ -2782,7 +2782,8 @@
           "reviewerResult": "PASS",
           "report": ".context/review-reports/feature-listing-followups-phase-1-task-01-round-1-review.md",
           "verify": "typecheck PASS · eslint 10 file scope 0 lỗi · test 419 file / 4389 PASS · build PASS · curl dev 308/200 đúng (vi); /en chỉ unit test",
-          "completedAt": "2026-10-22"
+          "completedAt": "2026-10-22",
+          "commit": "33bdce6"
         },
         {
           "task": "phase-1-task-02",
@@ -2797,7 +2798,8 @@
           "reviewerResult": "PASS",
           "report": ".context/review-reports/feature-listing-followups-phase-1-task-02-round-1-review.md",
           "verify": "typecheck PASS · eslint 4 file scope 0 lỗi · test 419 file / 4391 PASS ×2 (không timeout) · build PASS · bench dọn sạch (primary kiểm DB: BENCH 0, amenities 122, 3 index gốc)",
-          "completedAt": "2026-10-22"
+          "completedAt": "2026-10-22",
+          "commit": "e0a61b3"
         },
         {
           "task": "phase-1-task-03",
@@ -2812,10 +2814,24 @@
           "reviewerResult": "PASS",
           "report": ".context/review-reports/feature-listing-followups-phase-1-task-03-round-1-review.md",
           "verify": "skip, no code change (pnpm build PASS để đo)",
-          "completedAt": "2026-10-22"
+          "completedAt": "2026-10-22",
+          "commit": "0cb9434"
         }
       ],
-      "inProgressTask": null
+      "inProgressTask": null,
+      "completedAt": "2026-10-22",
+      "specVersion": "1.50.0",
+      "scopeVersion": 66,
+      "review": "STRICT PASS r1 (T01) · NORMAL PASS r1 (T02) · FAST PASS r1 (T03)",
+      "specValidation": "PASS — .context/review-reports/spec-validation-feature-listing-followups-phase-1.md",
+      "migration": "none (C-5 đo không đáng, C-6 bỏ qua)",
+      "docImpact": "API_SPEC §3.9/3.10/3.11; DESIGN.md + design-spec.md (as-built 308 ?category=); SPECIFICATIONS 1.50.0",
+      "followUps": [
+        "kiểm 308 thật /en trên staging có danh mục EN",
+        "hợp nhất legacyCategorySlug với firstText",
+        "amenityCounts ~330 ms ở 100k tin (Sort count(DISTINCT))",
+        "ảnh hero /tin-bds chỉ 800 px (CMS)"
+      ]
     }
   ],
   "bugs": [

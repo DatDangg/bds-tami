@@ -1,0 +1,87 @@
+{
+  "specVersion": "1.49.1",
+  "scopeVersion": 65,
+  "generatedAt": "2026-10-22T20:40:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-057 BUG (follow-up BL-056 n-1 / n-2, PATCH as-built, không đổi requirement / schema / API): (1) node upload mà media đã xoá / không có URL / không phải ảnh không còn tính là nội dung thêm → Tổng quan 3 màn chi tiết không hiện nút 'Xem thêm' mở ra trống (helper dùng chung renderableUploadImage cho RichText + rich-text-lead); (2) buttonVariants trả class đã gộp Tailwind (cn(cva(...))) → gọi trần secondary / outline / chip không còn border-transparent (chặn tái phát viền vô hình A5 BL-056). Không migration.",
+  "status": "published — build xong, reviewer STRICT PASS round 1, chờ close-out + commit trên staging",
+  "statusNote": "T01 attempt 1 PASS (builder) · STRICT PASS r1 (.context/review-reports/bug-button-variants-merge-and-empty-upload-phase-1-task-01-round-1-review.md, 2 MINOR mở không chặn). Verify: typecheck PASS · lint 7 file scope 0 lỗi (pnpm lint exit 1 chỉ do .local-seed/… git-ignored có sẵn) · test 418/418 file, 4380/4380 PASS · build PASS. CHƯA kiểm bằng trình duyệt (chỉ unit test: n-1 cần xoá media trong DB; n-2 đã đo border-top-color ở BL-056 r1).",
+  "workItem": "bug/button-variants-merge-and-empty-upload",
+  "backlog": "BL-057",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-22-button-variants-merge-and-empty-upload.md",
+  "changeDocStatus": "done",
+  "task": [
+    "tasks/bug-button-variants-merge-and-empty-upload/phase-1-task-01.md"
+  ],
+  "reviewResults": [
+    "T01 STRICT PASS r1 (2 MINOR không chặn) — .context/review-reports/bug-button-variants-merge-and-empty-upload-phase-1-task-01-round-1-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.49.0-64.json",
+  "specUpdate": "spec/updates/2026-10-22-button-variants-merge-and-empty-upload.md",
+  "specRefs": [
+    "Giao diện — \"As-built khung chi tiết (bug-fix BL-056)\" (2) Tổng quan: đoạn dẫn + <details> \"Xem thêm / Thu gọn\" — làm rõ 'không còn gì ngoài đoạn dẫn thì không có nút' = không còn nội dung hiển thị được",
+    "Giao diện — mục mới \"As-built bug-fix BL-057\" (1) upload rỗng không tính là nội dung thêm, (2) buttonVariants trả class đã gộp",
+    "F2 / F3 / F4 — chi tiết Dự án / Cho thuê / Tin BĐS, khối Tổng quan (DetailOverviewIntro dùng chung)",
+    "Giao diện — biến thể nút (buttonVariants: primary / secondary / outline / chip; size sm / md / lg) dùng ở mọi nút/link public"
+  ],
+  "specRefNotes": {
+    "BL-057 (1) upload rỗng": "Node upload chỉ tính là nội dung hiển thị được khi relationTo === 'media', media đã populate và có url, mimeType trống hoặc image/* — đúng 3 điều kiện renderUpload của RichText. Upload hợp lệ render y như cũ.",
+    "BL-057 (2) buttonVariants": "buttonVariants(props) = cn(cva(props)) (cn = extendTailwindMerge của dự án); primary giữ border-transparent; secondary → border-border, outline → border-text, chip → border-on-dark/30; size sm chỉ còn text-button-sm. Button và cn(buttonVariants(), extra) không đổi, extra vẫn ghi đè."
+  },
+  "migration": "không — không đổi schema / API / i18n",
+  "changed": {
+    "files": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/button.test.tsx",
+      "src/lib/content/rich-text-upload.ts",
+      "src/components/content/RichText.tsx",
+      "src/lib/content/rich-text-lead.ts",
+      "src/lib/content/rich-text-lead.test.ts",
+      "src/components/detail/DetailOverviewIntro.test.tsx",
+      ".context/design-spec.md"
+    ],
+    "modules": [
+      "ui · button (shared) — cva giữ làm nguồn class (const nội bộ buttonClassVariants); export buttonVariants bọc cn() → chuỗi đã gộp Tailwind; Button giữ cn(buttonVariants(...), className)",
+      "content · rich-text-upload (helper mới dùng chung) — renderableUploadImage(node): media hợp lệ có url + mimeType trống/image/* → MediaImage, ngược lại null",
+      "content · RichText (mọi rich text public: chi tiết Dự án / Cho thuê / Tin BĐS, tin tức, tuyển dụng, trang pháp lý…) — renderUpload dùng helper, hành vi render không đổi",
+      "content · rich-text-lead → DetailOverviewIntro (3 màn chi tiết) — isVisibleBlock: upload chỉ tính khi renderableUploadImage !== null → rest null khi chỉ còn upload rỗng → không nút 'Xem thêm'",
+      "doc · .context/design-spec.md:245 — câu as-built BL-057 (bỏ cần workaround bọc cn của BL-056)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Unit: src/components/ui/button.test.tsx › 'buttonVariants (gọi trần, không bọc cn)' — secondary / outline / chip không chứa border-transparent và có class viền biến thể; primary vẫn border-transparent; cn(buttonVariants(), extra) cho extra ghi đè; Button className='h-14' giữ",
+      "Unit: src/lib/content/rich-text-lead.test.ts › 'upload rỗng (…) → rest null' 6 case (value id string / null / không url / mimeType không ảnh / relationTo khác / chưa populate); upload hợp lệ vẫn tính là nội dung thêm",
+      "Unit: src/components/detail/DetailOverviewIntro.test.tsx (fixture ảnh = media hợp lệ) + src/components/content/RichText.test.tsx upload test (:151) PASS",
+      "Tay (n-1): chi tiết /du-an/<slug>, /cho-thue/<slug>, /tin-bds/<slug> (+ /en) có overview/description/content = 1 đoạn văn + 1 ảnh, rồi xoá media đó trong admin → KHÔNG còn nút 'Xem thêm' / 'Read more'; còn ảnh hợp lệ hoặc đoạn văn thứ 2 → nút vẫn hiện và mở ra có nội dung",
+      "Tay (n-1): overview = 1 đoạn + upload là tệp không phải ảnh (PDF) → không nút; = 1 đoạn + ảnh media chưa populate (depth 0) → không nút",
+      "Tay (n-2): link dùng className={buttonVariants({ variant: 'outline' })} trần (không cn) → đo border-top-color = màu text (không rgba(0,0,0,0)); tương tự secondary = border, chip = on-dark/30; primary viền trong suốt như cũ"
+    ],
+    "dependents": [
+      "Mọi nơi dùng buttonVariants (gọi trần hoặc bọc cn): Button (form, admin-facing public), header CTA (header.ctaButton), menu mobile toàn màn hình, FilterPanel (nút tóm tắt / chip bộ lọc), ListingHero chips, trang tuyển dụng (CTA ứng tuyển, 'Vị trí khác'), thẻ nổi bật danh sách (ProjectSpotlightContent / RentalSpotlightContent / PostSpotlightContent — 'Xem chi tiết' primary + 'Nhận tư vấn' outline), NewsCard / NewsArticleSidebar (primary), DetailShareButton, LeadForm (nút gửi default + compact 'Nhận tư vấn ngay') — hiển thị y như trước, không đổi màu/viền/kích cỡ",
+      "RichText ở mọi trang chi tiết / tin tức / tuyển dụng / pháp lý: ảnh upload hợp lệ (ResponsiveImage, caption) render y như cũ; upload rỗng vẫn không render gì (không lỗi runtime)",
+      "DetailOverviewIntro 3 màn chi tiết: đoạn dẫn (summary / excerpt → đoạn văn đầu có chữ) không đổi; chỉ đổi điều kiện hiện nút 'Xem thêm'"
+    ],
+    "regression": [
+      "BL-056 A5 / A8: thẻ nổi bật 3 trang danh sách (/du-an, /cho-thue, /tin-bds) — 'Nhận tư vấn' viền outline hiện đúng màu text, 'Xem chi tiết' primary không đổi",
+      "BL-056 (2) Tổng quan 3 màn chi tiết VI/EN × 390/768/1440: đoạn dẫn + 'Xem thêm / Thu gọn' với rich text có nhiều đoạn + ảnh hợp lệ (mở ra có nội dung, <details> trong HTML)",
+      "BL-054 chi tiết tin tức (/tin-tuc/<slug>) + BL-060 chi tiết Dự án: ảnh trong rich text (upload hợp lệ) hiện đúng, caption/alt giữ",
+      "Header CTA, menu mobile, FilterPanel chip, ListingHero chip, LeadForm compact / default, DetailShareButton, CTA tuyển dụng — không đổi hiển thị ở 390 / 1440",
+      "Test tự động: typecheck · lint · unit+ui (418 file / 4380) · build PASS trên staging"
+    ]
+  },
+  "acceptance": [
+    "buttonVariants(...) gọi trần (không cn) cho secondary / outline / chip không còn border-transparent trong chuỗi class; có unit test cho 3 biến thể",
+    "Button và mọi chỗ đang dùng cn(buttonVariants(...), extra) hiển thị không đổi (extra vẫn ghi đè được)",
+    "Node upload không có media / không có URL không tính là nội dung thêm → không có nút 'Xem thêm' nếu chỉ còn node đó; có unit test",
+    "RichText và rich-text-lead dùng chung 1 hàm kiểm tra upload hiển thị được (renderableUploadImage)",
+    "Test + typecheck + lint + build PASS"
+  ],
+  "verification": {
+    "status": "T01: pnpm typecheck PASS · eslint 7 file scope 0 problem (pnpm lint exit 1 chỉ do .local-seed/seed-sample-project-blocks.ts git-ignored có sẵn, ngoài scope) · pnpm test 418/418 file, 4380/4380 PASS · pnpm build PASS (builder attempt 1 + reviewer STRICT r1 xác nhận).",
+    "note": "Chưa kiểm bằng trình duyệt — chỉ unit test: n-1 cần tạo bài có ảnh rồi xoá media trong DB dev; n-2 đã đo border-top-color = rgba(0,0,0,0) ở BL-056 r1 trước fix, sau fix chỉ kiểm chuỗi class. Bên test nên kiểm tay 2 kịch bản này + soát nhanh các nút dùng buttonVariants. Chưa commit (chờ close-out change-request)."
+  },
+  "risk": "low",
+  "riskNote": "Không đổi schema / API / i18n; diff nhỏ, có test chống tái phát. Rủi ro còn lại nằm ở blast radius: buttonVariants là shared cho mọi nút/link public (tailwind-merge có thể gộp khác class trùng nhóm — test đã khoá primary / size sm) và RichText dùng cho mọi rich text public (helper giữ nguyên 3 điều kiện cũ). Test nên ưu tiên: 2 kịch bản tay n-1 / n-2, thẻ nổi bật 3 trang danh sách (A5), Tổng quan 3 màn chi tiết với ảnh hợp lệ, soát nhanh header CTA / menu mobile / FilterPanel / LeadForm. MINOR mở: chưa có test cấp component DetailOverviewIntro cho upload rỗng; type node cục bộ lặp relationTo?/value? ở RichText.tsx + rich-text-lead.ts."
+}
