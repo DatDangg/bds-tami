@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import type { SiteSetting } from "@/payload-types";
@@ -42,51 +42,88 @@ afterEach(() => {
   getSiteSettings.mockReset();
 });
 
-describe("trang Liên hệ (S15)", () => {
-  it("chưa có mapLocation → ẩn cả khối bản đồ; vẫn có hotline gọi được, email, địa chỉ, giờ làm việc và vùng form", async () => {
-    getSiteSettings.mockResolvedValue(settings);
-    await renderContact("vi");
-    expect(screen.queryByRole("region", { name: "Văn phòng TAMI trên bản đồ" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Xem bản đồ" })).toBeNull();
-    expect(screen.getByRole("link", { name: "Hotline: 0900 123 456" })).toHaveAttribute("href", "tel:0900123456");
-    expect(screen.getByRole("link", { name: "lienhe@tami.example" })).toHaveAttribute("href", "mailto:lienhe@tami.example");
-    expect(screen.getByText("1 Lê Lợi, Quận 1")).toBeInTheDocument();
-    expect(screen.getByText("08:00 - 17:30, thứ 2 - thứ 7")).toBeInTheDocument();
-    const slot = document.getElementById("lead-form");
-    expect(slot).toHaveAccessibleName("Gửi yêu cầu tư vấn");
-    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-  });
-
-  it("bố cục mockup: hero thấp, đầu khối canh trái \"Văn phòng TAMI\", form trong thẻ trắng nổi, không banner tư vấn", async () => {
+describe("trang Liên hệ (S15, BL-054)", () => {
+  it("chưa có offices → 1 văn phòng từ trường cũ; thẻ Hotline/Email gọi được; thiếu workingHours/Zalo → ẩn 2 thẻ đó; form + không banner tư vấn", async () => {
     getSiteSettings.mockResolvedValue(settings);
     const { container } = await renderContact("vi");
+    const cards = screen.getByRole("list", { name: "Kênh liên hệ" });
+    expect(within(cards).getAllByRole("listitem")).toHaveLength(2);
+    expect(within(cards).getByRole("link", { name: "Gọi ngay 0900 123 456" })).toHaveAttribute("href", "tel:0900123456");
+    expect(within(cards).getByRole("link", { name: "Gửi email tới lienhe@tami.example" })).toHaveAttribute("href", "mailto:lienhe@tami.example");
+    expect(screen.queryByText("Giờ làm việc")).toBeNull();
+    expect(screen.queryByText("Zalo OA")).toBeNull();
+    const offices = screen.getByRole("region", { name: "Hệ thống văn phòng" });
+    expect(within(offices).getByRole("heading", { level: 3, name: "Văn phòng TAMI" })).toBeInTheDocument();
+    expect(within(offices).getByText("1 Lê Lợi, Quận 1")).toBeInTheDocument();
+    expect(within(offices).queryByRole("tablist")).toBeNull();
+    expect(within(offices).queryByRole("region", { name: "Văn phòng TAMI trên bản đồ" })).toBeNull();
+    const slot = document.getElementById("lead-form");
+    expect(slot).toHaveAccessibleName("Bạn cần TAMI hỗ trợ điều gì?");
+    expect(slot).toHaveClass("bg-surface", "shadow-md");
+    expect(within(slot!).getByRole("button", { name: "Gửi yêu cầu" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(container.querySelector("section[data-hero-size=short]")).not.toBeNull();
-    expect(screen.getByRole("heading", { level: 2, name: /Văn phòng\s+TAMI/ })).toBeInTheDocument();
-    expect(document.getElementById("lead-form")).toHaveClass("bg-surface", "shadow-md");
     expect(container.querySelector("[data-testid=consult-banner]")).toBeNull();
+    expect(screen.getByRole("link", { name: "Xem vị trí đang tuyển" })).toHaveAttribute("href", "/tuyen-dung");
   });
 
-  it("có mapLocation ([kinh độ, vĩ độ]) → bản đồ lười có nhãn, chưa tải cho tới khi vào viewport/bấm", async () => {
+  it("đủ workingHours + Zalo → 4 thẻ; Zalo hiện siteName, mở tab mới an toàn", async () => {
+    getSiteSettings.mockResolvedValue({ ...settings, zaloUrl: "https://zalo.me/123", workingHours: { hours: "8:00 – 18:00", days: "Thứ 2 – Chủ nhật" } });
+    await renderContact("vi");
+    const cards = screen.getByRole("list", { name: "Kênh liên hệ" });
+    expect(within(cards).getAllByRole("listitem")).toHaveLength(4);
+    expect(cards).toHaveClass("lg:grid-cols-4");
+    const zalo = within(cards).getByRole("link", { name: "Nhắn tin Zalo OA TAMI (mở tab mới)" });
+    expect(zalo).toHaveAttribute("href", "https://zalo.me/123");
+    expect(zalo).toHaveAttribute("target", "_blank");
+    expect(zalo).toHaveAttribute("rel", "noopener noreferrer");
+    expect(within(cards).getByText("8:00 – 18:00")).toBeInTheDocument();
+    expect(within(cards).getByText("Thứ 2 – Chủ nhật")).toBeInTheDocument();
+  });
+
+  it("có mapLocation ([kinh độ, vĩ độ]) → bản đồ lười của văn phòng dự phòng + nút Chỉ đường theo toạ độ", async () => {
     getSiteSettings.mockResolvedValue({ ...settings, mapLocation: [106.7, 10.78] });
     await renderContact("vi");
     expect(screen.getByRole("region", { name: "Văn phòng TAMI trên bản đồ" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Xem bản đồ" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Mở Google Maps" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Chỉ đường tới Văn phòng TAMI trên Google Maps (mở tab mới)" })).toHaveAttribute(
+      "href",
+      "https://www.google.com/maps/dir/?api=1&destination=10.78%2C106.7",
+    );
   });
 
-  it("settings đọc lỗi (DB tắt) → trang vẫn dựng, không có hotline/bản đồ", async () => {
+  it("≥ 2 văn phòng → tab chi nhánh; văn phòng đầu đang chọn", async () => {
+    getSiteSettings.mockResolvedValue({
+      ...settings,
+      offices: [
+        { id: "hn", name: "Hà Nội", address: "Tây Hồ, Hà Nội", location: [105.81, 21.07] },
+        { id: "hcm", name: "TP.HCM", address: "Quận 1, TP.HCM" },
+      ],
+    });
+    await renderContact("vi");
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Hà Nội", "TP.HCM"]);
+    expect(tabs[0]).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Tây Hồ, Hà Nội");
+  });
+
+  it("settings đọc lỗi (DB tắt) → trang vẫn dựng, không thẻ / văn phòng; form vẫn có", async () => {
     getSiteSettings.mockRejectedValue(new Error("db down"));
     await renderContact("vi");
     expect(screen.getByRole("heading", { level: 1, name: "Liên hệ" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Hotline/ })).toBeNull();
-    expect(screen.queryByRole("region", { name: "Văn phòng TAMI trên bản đồ" })).toBeNull();
+    expect(screen.queryByRole("list", { name: "Kênh liên hệ" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Hệ thống văn phòng" })).toBeNull();
+    expect(document.getElementById("lead-form")).not.toBeNull();
   });
 
-  it("/en không lẫn tiếng Việt; giờ làm việc theo i18n", async () => {
-    getSiteSettings.mockResolvedValue({ ...settings, address: "1 Le Loi Street", mapLocation: [106.7, 10.78] });
+  it("/en không lẫn tiếng Việt; hàng offices thiếu EN bị bỏ → văn phòng dự phòng EN; nút tuyển dụng → /en/careers", async () => {
+    getSiteSettings.mockResolvedValue({ ...settings, address: "1 Le Loi Street", mapLocation: [106.7, 10.78], offices: [{ id: "hn", name: null as unknown as string, address: null as unknown as string }] });
     const { container } = await renderContact("en");
     expect(screen.getByRole("heading", { level: 1, name: "Contact" })).toBeInTheDocument();
-    expect(screen.getByText("8:00 AM - 5:30 PM, Mon - Sat")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "TAMI office" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "TAMI office on the map" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View open positions" })).toHaveAttribute("href", "/en/careers");
     expect(container.textContent).not.toMatch(/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i);
   });
 

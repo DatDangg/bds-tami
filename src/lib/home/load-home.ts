@@ -5,7 +5,7 @@ import { getPayload } from "payload";
 
 import type { Locale } from "../../i18n/routing";
 import type { Homepage, SiteSetting } from "../../payload-types";
-import { buildContactPageView } from "../content/contact-view";
+import { buildContact, buildSocialLinks } from "../../components/layout/shell-data";
 import { publicPath } from "../content/content-paths";
 import { getHomepage, getSiteSettings } from "../content/get-globals";
 import { loadSiteIdentity } from "../content/site-identity";
@@ -38,7 +38,8 @@ function buildStructuredData(locale: Locale, siteName: string, logoUrl: string |
   const siteUrl = getSiteUrl();
   const homeUrl = absoluteUrl(publicPath("/", locale), siteUrl);
   if (!siteUrl || !homeUrl) return [];
-  const { contact, socials } = buildContactPageView(settings);
+  const contact = buildContact(settings);
+  const socials = buildSocialLinks(settings?.socialLinks);
   const logo = logoUrl ? absoluteUrl(logoUrl, siteUrl) : undefined;
   return [
     buildOrganizationJsonLd({
