@@ -104,43 +104,55 @@ afterEach(() => {
 });
 
 describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
-  it("một h1; Mô tả / Yêu cầu / Quyền lợi là h2; vùng form ứng tuyển #apply-form kèm email + hotline; nút Ứng tuyển và thanh dính cuộn tới form", async () => {
+  it("một h1; Mô tả / Yêu cầu / Quyền lợi là h2; vùng form ứng tuyển #apply-form kèm email + hotline; nút Ứng tuyển ngay và thanh dính cuộn tới form", async () => {
     findPublicJobBySlug.mockResolvedValue(job());
     const { container } = await renderJob();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Chuyên viên tư vấn" })).toBeInTheDocument();
     const h2s = screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
-    expect(h2s).toEqual(["Thông tin tuyển dụng", "Mô tả công việc", "Yêu cầu ứng viên", "Quyền lợi", "Ứng tuyển vị trí này"]);
+    expect(h2s).toEqual(["Mô tả công việc", "Yêu cầu", "Quyền lợi", "Ứng tuyển vị trí này"]);
     const form = container.querySelector("#apply-form") as HTMLElement;
     expect(form).not.toBeNull();
     // Form ứng tuyển thật (S13) nằm trong vùng này; email + hotline là kênh dự phòng dưới form.
     expect(within(form).getByLabelText(/Họ và tên/)).toBeInTheDocument();
     expect(within(form).getByLabelText(/CV/)).toBeInTheDocument();
-    expect(within(form).getByRole("button", { name: "Ứng tuyển" })).toBeInTheDocument();
+    expect(within(form).getByRole("button", { name: "Gửi hồ sơ" })).toBeInTheDocument();
+    expect(within(form).getByText("Phản hồi trong 3 ngày làm việc.")).toBeInTheDocument();
+    expect(within(form).getByLabelText(/Lời nhắn/)).toBeInTheDocument();
     expect(within(form).getByRole("link", { name: "Gửi CV tới tuyendung@tami.example" })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
     expect(within(form).getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
-    for (const link of screen.getAllByRole("link", { name: "Ứng tuyển" })) expect(link).toHaveAttribute("href", "#apply-form");
+    expect(screen.getByRole("link", { name: "Ứng tuyển ngay" })).toHaveAttribute("href", "#apply-form");
+    for (const link of screen.queryAllByRole("link", { name: /^Ứng tuyển/ })) expect(link).toHaveAttribute("href", "#apply-form");
     expect(screen.queryByText("Vị trí đã hết hạn nhận hồ sơ")).toBeNull();
   });
 
-  it("tóm tắt hiện nơi làm, hình thức, số lượng, lương và hạn nộp theo ngày", async () => {
-    findPublicJobBySlug.mockResolvedValue(job());
-    await renderJob();
-    const summary = screen.getByRole("heading", { level: 2, name: "Thông tin tuyển dụng" }).closest("section") as HTMLElement;
-    expect(within(summary).getByText("Văn phòng TAMI, Quận 1, Hà Nội")).toBeInTheDocument();
-    expect(within(summary).getByText("Toàn thời gian")).toBeInTheDocument();
-    expect(within(summary).getByText("5 người")).toBeInTheDocument();
-    expect(within(summary).getByText("15 triệu – 30 triệu")).toBeInTheDocument();
-    expect(within(summary).getByText("20/10/2026")).toBeInTheDocument();
-  });
-
-  it("hero thấp có ảnh banner + eyebrow, mô tả = nơi làm · hạn nộp; form ứng tuyển nằm trong thẻ phải dính; banner tư vấn cuối trang (BL-045 Q5)", async () => {
+  it("hàng thông tin hero: tỉnh/thành, hình thức, lương, 'Hạn nộp: …' (<time>); không còn khối tóm tắt cũ", async () => {
     findPublicJobBySlug.mockResolvedValue(job());
     const { container } = await renderJob();
-    const hero = container.querySelector("section[data-hero-size=short]") as HTMLElement;
+    const info = screen.getByRole("list", { name: "Thông tin vị trí" });
+    expect(within(info).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Hà Nội", "Toàn thời gian", "15 triệu – 30 triệu", "Hạn nộp: 20/10/2026"]);
+    expect(within(info).getByText("20/10/2026").tagName).toBe("TIME");
+    expect(within(info).getByText("20/10/2026")).toHaveAttribute("datetime", OPEN_DEADLINE);
+    expect(screen.queryByRole("heading", { name: "Thông tin tuyển dụng" })).toBeNull();
+    expect(container.querySelector("section[data-hero=job-detail]")).not.toBeNull();
+  });
+
+  it("hero sáng (BL-054): ảnh, breadcrumb, phòng ban + Tuyển gấp, h1 2 dòng (dòng 2 màu nhấn), mô tả ngắn = đoạn đầu mô tả, nút Chia sẻ; form trong thẻ phải dính; banner tư vấn", async () => {
+    const category = { id: "c1", name: "Kinh doanh", slug: "kinh-doanh", scope: "job", createdAt: now, updatedAt: now } as never;
+    findPublicJobBySlug.mockResolvedValue(
+      job({ title: "Chuyên viên tư vấn cho thuê căn hộ", category, isUrgent: true, description: lexical("Gia nhập đội ngũ TAMI.", "Đoạn hai.") }),
+    );
+    const { container } = await renderJob();
+    const hero = container.querySelector("section[data-hero=job-detail]") as HTMLElement;
     expect(hero.querySelector("img")).not.toBeNull();
-    expect(within(hero).getByText("Tuyển dụng", { selector: "p" })).toBeInTheDocument();
-    expect(within(hero).getByText("Văn phòng TAMI, Quận 1, Hà Nội · Hạn nộp: 20/10/2026")).toBeInTheDocument();
+    expect(within(hero).getByRole("navigation")).toHaveTextContent("Trang chủ›Tuyển dụng›Chuyên viên tư vấn cho thuê căn hộ");
+    expect(within(hero).getByText("Kinh doanh")).toBeInTheDocument();
+    expect(within(hero).getByText("Tuyển gấp")).toBeInTheDocument();
+    const h1 = within(hero).getByRole("heading", { level: 1, name: "Chuyên viên tư vấn cho thuê căn hộ" });
+    expect(h1.querySelector("span")?.textContent).toBe("cho thuê căn hộ");
+    expect(within(hero).getByText("Gia nhập đội ngũ TAMI.")).toBeInTheDocument();
+    expect(within(hero).queryByText("Đoạn hai.")).toBeNull();
+    expect(within(hero).getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
     expect(container.querySelector("aside #apply-form")).not.toBeNull();
     expect(container.querySelector("aside [class*='lg:sticky']")).not.toBeNull();
     expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
@@ -162,7 +174,7 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
       baseSalary: { currency: "VND", value: { minValue: 15_000_000, maxValue: 30_000_000, unitText: "MONTH" } },
     });
     expect(posting?.description).toBe(
-      "<h2>Mô tả công việc</h2><p>Tư vấn khách hàng.</p><h2>Yêu cầu ứng viên</h2><p>Giao tiếp tốt.</p><h2>Quyền lợi</h2><p>Hoa hồng cao.</p>",
+      "<h2>Mô tả công việc</h2><p>Tư vấn khách hàng.</p><h2>Yêu cầu</h2><p>Giao tiếp tốt.</p><h2>Quyền lợi</h2><p>Hoa hồng cao.</p>",
     );
     expect(items.find((item) => item["@type"] === "BreadcrumbList")).toBeDefined();
     expect(container.querySelectorAll("script")).toHaveLength(items.length);
@@ -192,8 +204,13 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
     expect(posting?.jobLocation).toEqual({ "@type": "Place", address: { "@type": "PostalAddress", addressCountry: "VN" } });
   });
 
-  it("richText khối quyền lợi rỗng → không có h2 mồ côi", async () => {
+  it("richText khối quyền lợi rỗng / không có → ẩn mục (không h2 mồ côi)", async () => {
     findPublicJobBySlug.mockResolvedValue(job({ benefits: lexical("") }));
+    const { unmount } = await renderJob();
+    expect(screen.queryByRole("heading", { level: 2, name: "Quyền lợi" })).toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Yêu cầu" })).toBeInTheDocument();
+    unmount();
+    findPublicJobBySlug.mockResolvedValue(job({ benefits: null }));
     await renderJob();
     expect(screen.queryByRole("heading", { level: 2, name: "Quyền lợi" })).toBeNull();
   });
@@ -225,6 +242,36 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
   });
 });
 
+describe("trang chi tiết tuyển dụng (BL-054): Vị trí khác", () => {
+  it("tin còn hạn: truy vấn theo danh mục tin đang xem; thẻ h3 là link (phòng ban, Tuyển gấp, tỉnh, lương) + 'Xem tất cả vị trí' → /tuyen-dung", async () => {
+    const category = { id: "c1", name: "Kinh doanh", slug: "kinh-doanh", scope: "job", createdAt: now, updatedAt: now } as never;
+    findPublicJobBySlug.mockResolvedValue(job({ category }));
+    findOtherOpenJobs.mockResolvedValue([
+      job({ id: "j2", title: "Trưởng nhóm kinh doanh", slug: "truong-nhom", category, isUrgent: true }),
+      job({ id: "j3", title: "Chuyên viên Content", slug: "content", salaryMinVnd: null, salaryMaxVnd: null, salaryText: "12 – 18 triệu", province: null }),
+    ]);
+    await renderJob();
+    expect(findOtherOpenJobs).toHaveBeenCalledWith({}, "vi", { currentId: "j1", categoryId: "c1" }, expect.any(Date));
+    const others = screen.getByRole("heading", { level: 2, name: "Vị trí khác" }).closest("section") as HTMLElement;
+    const cards = within(others).getAllByRole("article");
+    expect(cards).toHaveLength(2);
+    const [first, second] = cards as [HTMLElement, HTMLElement];
+    expect(within(first).getByRole("link")).toHaveAttribute("href", "/tuyen-dung/truong-nhom");
+    expect(within(first).getByRole("heading", { level: 3, name: "Trưởng nhóm kinh doanh" })).toBeInTheDocument();
+    expect(first).toHaveTextContent("Kinh doanhTuyển gấp");
+    expect(first).toHaveTextContent("Hà Nội15 triệu – 30 triệu");
+    expect(second).toHaveTextContent("12 – 18 triệu");
+    expect(second).not.toHaveTextContent("Hà Nội");
+    expect(within(others).getByRole("link", { name: "Xem tất cả vị trí" })).toHaveAttribute("href", "/tuyen-dung");
+  });
+
+  it("tin chưa có danh mục → categoryId null", async () => {
+    findPublicJobBySlug.mockResolvedValue(job({ category: null }));
+    await renderJob();
+    expect(findOtherOpenJobs).toHaveBeenCalledWith({}, "vi", { currentId: "j1", categoryId: null }, expect.any(Date));
+  });
+});
+
 describe("trang chi tiết tuyển dụng (S13): tin hết hạn vẫn mở", () => {
   const expiredJob = (overrides: Partial<JobPosting> = {}) => job({ deadline: EXPIRED_DEADLINE, ...overrides });
 
@@ -236,7 +283,11 @@ describe("trang chi tiết tuyển dụng (S13): tin hết hạn vẫn mở", ()
     expect(banner).not.toBeNull();
     expect(within(banner).getByRole("link", { name: "Xem tất cả vị trí" })).toHaveAttribute("href", "/tuyen-dung");
     expect(container.querySelector("#apply-form")).toBeNull();
-    expect(screen.queryByRole("link", { name: "Ứng tuyển" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Ứng tuyển/ })).toBeNull();
+    expect(screen.getByRole("button", { name: "Chia sẻ" })).toBeInTheDocument();
+    const aside = container.querySelector("aside") as HTMLElement;
+    expect(within(aside).getByRole("link", { name: "Gửi CV tới tuyendung@tami.example" })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
+    expect(within(aside).getByRole("link", { name: "Xem tất cả vị trí" })).toHaveAttribute("href", "/tuyen-dung");
     expect(screen.queryByRole("heading", { name: "Ứng tuyển vị trí này" })).toBeNull();
     expect(container.querySelectorAll("script")).toHaveLength(0);
     expect(screen.getByText("10/10/2026")).toBeInTheDocument();
@@ -253,24 +304,16 @@ describe("trang chi tiết tuyển dụng (S13): tin hết hạn vẫn mở", ()
     expect((await generateMetadata(params("vi"))).robots).toMatchObject({ index: false, follow: false });
   });
 
-  it("gợi ý vị trí đang tuyển khác bằng thẻ h3 là link; không gợi ý khi không có", async () => {
+  it("tin hết hạn vẫn có 'Vị trí khác' (gợi ý thay thế); không có thì ẩn khối", async () => {
     findPublicJobBySlug.mockResolvedValue(expiredJob());
     findOtherOpenJobs.mockResolvedValue([job({ id: "j2", title: "Thực tập Marketing", slug: "thuc-tap-marketing", employmentType: "internship" })]);
     const { unmount } = await renderJob();
-    const others = screen.getByRole("heading", { level: 2, name: "Vị trí đang tuyển khác" }).closest("section") as HTMLElement;
+    const others = screen.getByRole("heading", { level: 2, name: "Vị trí khác" }).closest("section") as HTMLElement;
     expect(within(others).getByRole("heading", { level: 3, name: "Thực tập Marketing" })).toBeInTheDocument();
-    expect(within(others).getByRole("link")).toHaveAttribute("href", "/tuyen-dung/thuc-tap-marketing");
-    expect(findOtherOpenJobs).toHaveBeenCalledWith({}, "vi", "j1", expect.any(Date));
     unmount();
     findOtherOpenJobs.mockResolvedValue([]);
     await renderJob();
-    expect(screen.queryByRole("heading", { name: "Vị trí đang tuyển khác" })).toBeNull();
-  });
-
-  it("tin còn hạn không truy vấn gợi ý vị trí khác", async () => {
-    findPublicJobBySlug.mockResolvedValue(job());
-    await renderJob();
-    expect(findOtherOpenJobs).not.toHaveBeenCalled();
+    expect(screen.queryByRole("heading", { name: "Vị trí khác" })).toBeNull();
   });
 });
 

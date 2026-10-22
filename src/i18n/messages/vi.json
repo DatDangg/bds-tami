@@ -754,17 +754,12 @@
       "filtersLabel": "Bộ lọc vị trí tuyển dụng",
       "categoriesLabel": "Nhóm công việc",
       "all": "Tất cả",
-      "provinceLabel": "Nơi làm việc",
-      "allProvinces": "Tất cả",
-      "apply": "Lọc",
       "clear": "Xoá bộ lọc",
-      "resultCount": "{count} vị trí đang tuyển",
       "listLabel": "Danh sách vị trí tuyển dụng",
       "emptyTitle": "Chưa có vị trí phù hợp.",
       "noJobs": "Hiện TAMI chưa có vị trí đang tuyển.",
       "noJobsDescription": "Bạn vẫn có thể gửi CV để TAMI liên hệ khi có vị trí phù hợp.",
       "sendCv": "Gửi CV tới {email}",
-      "deadline": "Hạn nộp: {date}",
       "deadlineToday": "Hạn nộp hôm nay",
       "daysLeft": "Còn {count} ngày",
       "salaryFrom": "Từ {amount}",
@@ -775,14 +770,6 @@
         "internship": "Thực tập",
         "contract": "Hợp đồng"
       },
-      "perksRegion": "Môi trường làm việc",
-      "perksEyebrow": "Vì sao chọn TAMI",
-      "perksTitle": "Môi trường",
-      "perksTitleAccent": "làm việc",
-      "jobsEyebrow": "Vị trí đang tuyển",
-      "jobsTitle": "Cơ hội",
-      "jobsTitleAccent": "nghề nghiệp",
-      "applyCta": "Ứng tuyển",
       "v2": {
         "heroCta": "Xem vị trí đang tuyển",
         "perksEyebrow": "Vì sao chọn TAMI",
@@ -807,23 +794,9 @@
       }
     },
     "careerDetail": {
-      "summaryTitle": "Thông tin tuyển dụng",
-      "location": "Nơi làm việc",
-      "employmentType": "Hình thức",
-      "quantity": "Số lượng",
-      "quantityValue": "{count} người",
-      "salary": "Mức lương",
-      "deadline": "Hạn nộp hồ sơ",
-      "applyCta": "Ứng tuyển",
       "stickyApply": "Ứng tuyển",
-      "sections": {
-        "description": "Mô tả công việc",
-        "requirements": "Yêu cầu ứng viên",
-        "benefits": "Quyền lợi"
-      },
       "expiredTitle": "Vị trí đã hết hạn nhận hồ sơ",
       "expiredBody": "Rất tiếc, vị trí này đã đóng nhận hồ sơ. Bạn có thể xem các vị trí đang tuyển khác.",
-      "otherTitle": "Vị trí đang tuyển khác",
       "viewAll": "Xem tất cả vị trí",
       "applyForm": {
         "title": "Ứng tuyển vị trí này",
@@ -831,14 +804,12 @@
         "fullName": "Họ và tên",
         "phone": "Số điện thoại",
         "email": "Email",
-        "cv": "CV",
         "cvHelper": "PDF, DOC hoặc DOCX, tối đa 5MB.",
         "chooseFile": "Chọn tệp",
         "dropHint": "Kéo thả CV vào đây hoặc",
         "uploading": "Đang gửi… {percent}%",
         "uploadProgress": "Tiến trình tải CV",
         "message": "Lời nhắn",
-        "submit": "Ứng tuyển",
         "removeFile": "Xoá tệp {name}",
         "success": "TAMI đã nhận hồ sơ của anh/chị.",
         "expired": "Vị trí này đã hết hạn nhận hồ sơ.",
@@ -852,8 +823,7 @@
           "cvTooLarge": "CV tối đa 5MB, vui lòng chọn tệp nhỏ hơn."
         },
         "orContact": "Hoặc liên hệ trực tiếp với chúng tôi:"
-      },
-      "sectionLabel": "Mục {number}"
+      }
     },
     "richText": {
       "table": "Bảng nội dung, cuộn ngang để xem đủ"
@@ -1086,6 +1056,30 @@
           "publishedAt": "Ngày đăng"
         },
         "similarViewAll": "Xem tất cả tin đăng"
+      }
+    },
+    "jobDetail": {
+      "v2": {
+        "applyNow": "Ứng tuyển ngay",
+        "share": "Chia sẻ",
+        "infoLabel": "Thông tin vị trí",
+        "deadline": "Hạn nộp: <time>{date}</time>",
+        "sections": {
+          "description": "Mô tả công việc",
+          "requirements": "Yêu cầu",
+          "benefits": "Quyền lợi"
+        },
+        "formSubtitle": "Phản hồi trong 3 ngày làm việc.",
+        "form": {
+          "cv": "CV của bạn",
+          "submit": "Gửi hồ sơ",
+          "fullNamePlaceholder": "Nguyễn Văn A",
+          "phonePlaceholder": "0901 234 567",
+          "emailPlaceholder": "nguyenvana@gmail.com"
+        },
+        "otherTitle": "Vị trí khác",
+        "viewAll": "Xem tất cả vị trí",
+        "expiredCvPrompt": "Gửi CV để TAMI liên hệ khi có vị trí phù hợp."
       }
     }
   },

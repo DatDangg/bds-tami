@@ -2,17 +2,16 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { ApplyForm } from "@/components/careers/ApplyForm";
 import { APPLY_FORM_DOM_ID, APPLY_FORM_HEADING_ID, ApplyFormSlot } from "@/components/careers/ApplyFormSlot";
-import { JobCard } from "@/components/careers/JobCard";
+import { JobDetailHero } from "@/components/careers/JobDetailHero";
+import { OtherJobs } from "@/components/careers/OtherJobs";
 import { RichText } from "@/components/content/RichText";
 import { DETAIL_ASIDE_CARD_CLASS, DetailLayout } from "@/components/detail/DetailLayout";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
-import { PageHero } from "@/components/layout/PageHero";
-import { SectionHeading } from "@/components/layout/SectionHeading";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
-import { ShareButtons } from "@/components/news/ShareButtons";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
-import { formatJobSalary, hasRichText, type JobCardData, type JobDetailView } from "@/lib/careers/job-view";
+import { buttonVariants } from "@/components/ui/button";
+import { hasRichText, type JobCardData, type JobDetailView } from "@/lib/careers/job-view";
 import { publicPath } from "@/lib/content/content-paths";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
@@ -21,68 +20,56 @@ import type { JobPosting } from "@/payload-types";
 interface JobDetailProps {
   doc: Pick<JobPosting, "id" | "description" | "requirements" | "benefits">;
   view: JobDetailView;
-  /** Ảnh hero (`pageBanners.careers` → mặc định); thiếu thì hero nền tối token cùng chiều cao. */
+  /** Ảnh hero (`pageBanners.careers` → mặc định); thiếu thì hero nền sáng trơn. */
   heroImage?: MediaImage;
-  /** Vị trí đang tuyển khác: chỉ dùng khi tin đã hết hạn (gợi ý thay thế). */
+  /** "Vị trí khác" (≤ 4, cùng danh mục trước); rỗng → ẩn khối. */
   others: JobCardData[];
   contact: { email?: string; hotline?: { label: string; telHref: string } };
   /** Site key Turnstile (công khai) cho form ứng tuyển; thiếu thì form báo không tải được bước xác minh. */
   turnstileSiteKey?: string;
   /** Đường dẫn công khai của chính trang (mục cuối breadcrumb). */
   ownPath: string;
-  /** URL tuyệt đối để chia sẻ; thiếu (chưa cấu hình URL gốc) thì nút sao chép dùng URL trang hiện tại. */
+  /** URL tuyệt đối để chia sẻ; thiếu (chưa cấu hình URL gốc) thì nút chia sẻ dùng URL trang hiện tại. */
   shareUrl?: string;
 }
 
 const SECTION_KEYS = ["description", "requirements", "benefits"] as const;
 
 /**
- * Bố cục S13 (BL-045 Q5) trên `DetailLayout`: hero thấp (ảnh banner Tuyển dụng, eyebrow, tên vị trí, "nơi làm · hạn nộp") + breadcrumb trên ảnh → (băng hết hạn) →
- * nền vàng nhạt, MỘT thẻ trắng nội dung (tóm tắt + Mô tả / Yêu cầu / Quyền lợi mỗi mục có eyebrow + `h2`) và thẻ trắng dính cột phải = form ứng tuyển
- * (< lg nằm sau thẻ nội dung, kèm thanh dính đáy "Ứng tuyển"). Tin hết hạn: băng thông báo, KHÔNG form/thanh dính, KHÔNG JSON-LD (kể cả breadcrumb), cột phải chỉ có
- * chia sẻ, thay vào đó gợi ý vị trí khác. Banner tư vấn cuối trang do route render sau component này. Server Component; chỉ thanh dính đáy và nút chia sẻ là client.
+ * Danh sách trong nội dung tin (chỉ trang này, BL-054): bỏ chấm mặc định, mỗi ý có vòng tròn viền màu nhấn bên trái (trang trí, `::before`).
+ * Đứng ở thẻ bọc nên thắng `ml-6 list-disc` của `RichText` (độ đặc hiệu cao hơn).
+ */
+const ACCENT_LIST_CLASS =
+  "[&_ul]:ml-0 [&_ul]:list-none [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-3 [&_ul>li]:relative [&_ul>li]:pl-7 [&_ul>li]:before:absolute [&_ul>li]:before:top-[0.4em] [&_ul>li]:before:left-0 [&_ul>li]:before:size-3.5 [&_ul>li]:before:rounded-full [&_ul>li]:before:border-2 [&_ul>li]:before:border-primary [&_ul>li]:before:content-['']";
+
+/**
+ * Chi tiết tuyển dụng (BL-054, design `chi-tiet-tuyen-dung.webp`) trên `DetailLayout`: hero sáng (`JobDetailHero`) → (băng hết hạn) → cột trái MỘT thẻ trắng
+ * "Mô tả công việc" / "Yêu cầu" / "Quyền lợi" (`h2`; mục trống ẩn) · cột phải thẻ trắng dính = form ứng tuyển (< lg nằm sau nội dung, kèm thanh dính đáy
+ * "Ứng tuyển") → "Vị trí khác". Tin hết hạn: băng thông báo, KHÔNG form / nút ứng tuyển / thanh dính, KHÔNG JSON-LD (kể cả breadcrumb); cột phải chỉ còn thẻ
+ * gợi ý gửi CV + xem vị trí khác. Banner tư vấn cuối trang do route render sau component này. Server Component.
  */
 export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shareUrl, turnstileSiteKey }: JobDetailProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.careerDetail");
+  const tv = useTranslations("page.jobDetail.v2");
   const tCareers = useTranslations("page.careers");
   const tNav = useTranslations("layout.nav.items");
   const tRich = useTranslations("page.richText");
-  const tShare = useTranslations("page.news.share");
   const listPath = publicPath("/tuyen-dung", locale);
-  const salary = view.salary
-    ? formatJobSalary(view.salary, { from: (amount) => tCareers("salaryFrom", { amount }), upTo: (amount) => tCareers("salaryUpTo", { amount }) })
-    : null;
-  const place = [view.workplace, view.provinceName].filter(Boolean).join(", ");
-  const summary: { label: string; value: string }[] = [
-    ...(place ? [{ label: t("location"), value: place }] : []),
-    { label: t("employmentType"), value: tCareers(`employmentType.${view.employmentType}`) },
-    ...(view.quantity ? [{ label: t("quantity"), value: t("quantityValue", { count: view.quantity }) }] : []),
-    ...(salary ? [{ label: t("salary"), value: salary }] : []),
-  ];
   const sections = SECTION_KEYS.filter((key) => hasRichText(doc[key]));
-  const heroDescription = [place, tCareers("deadline", { date: view.deadlineLabel })].filter(Boolean).join(" · ");
-  const share = (
-    <div className="flex flex-col gap-2">
-      <p className="text-small text-text-muted">{tShare("label")}</p>
-      <ShareButtons title={view.title} {...(shareUrl ? { url: shareUrl } : {})} />
-    </div>
-  );
 
   return (
     <article className="pb-16 lg:pb-0">
       <DetailLayout
         before={
           <>
-            <PageHero
-              size="short"
-              eyebrow={tNav("careers")}
-              title={view.title}
-              description={heroDescription}
+            <JobDetailHero
+              view={view}
               {...(heroImage ? { image: heroImage } : {})}
+              {...(shareUrl ? { shareUrl } : {})}
               breadcrumb={
                 <Breadcrumb
-                  variant="overlay"
+                  variant="plain"
                   jsonLd={!view.expired}
                   items={[
                     { label: tNav("careers"), href: listPath },
@@ -108,11 +95,21 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
         }
         {...(view.expired ? {} : { asideLabelledBy: APPLY_FORM_HEADING_ID })}
         aside={
-          <div className={cn("flex flex-col gap-6", DETAIL_ASIDE_CARD_CLASS)}>
-            {view.expired ? (
-              share
-            ) : (
-              <ApplyFormSlot {...(contact.email ? { email: contact.email } : {})} {...(contact.hotline ? { hotline: contact.hotline } : {})}>
+          view.expired ? (
+            <div className={cn("flex flex-col gap-4", DETAIL_ASIDE_CARD_CLASS)}>
+              <p className="text-body text-text-secondary">{tv("expiredCvPrompt")}</p>
+              {contact.email && (
+                <a href={`mailto:${contact.email}`} className="inline-flex min-h-11 w-fit items-center font-semibold break-all text-accent-text underline underline-offset-4">
+                  {tCareers("sendCv", { email: contact.email })}
+                </a>
+              )}
+              <Link href={listPath} className={cn(buttonVariants({ variant: "primary" }), "w-full")}>
+                {tv("viewAll")}
+              </Link>
+            </div>
+          ) : (
+            <div className={DETAIL_ASIDE_CARD_CLASS}>
+              <ApplyFormSlot subtitle={tv("formSubtitle")} {...(contact.email ? { email: contact.email } : {})} {...(contact.hotline ? { hotline: contact.hotline } : {})}>
                 <ApplyForm
                   jobPostingId={doc.id}
                   listPath={listPath}
@@ -120,53 +117,22 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
                   {...(contact.hotline ? { hotline: contact.hotline } : {})}
                 />
               </ApplyFormSlot>
-            )}
-          </div>
+            </div>
+          )
         }
+        after={<OtherJobs jobs={others} listPath={listPath} />}
       >
         <div className="flex flex-col gap-10">
-          <section aria-labelledby="job-summary-title" className="flex flex-col gap-5">
-            <h2 id="job-summary-title" className="font-display text-h3">
-              {t("summaryTitle")}
-            </h2>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-3">
-              {summary.map((item) => (
-                <div key={item.label} className="flex min-w-0 flex-col gap-1">
-                  <dt className="text-small text-text-muted">{item.label}</dt>
-                  <dd className="font-semibold break-words">{item.value}</dd>
-                </div>
-              ))}
-              <div className="flex min-w-0 flex-col gap-1">
-                <dt className="text-small text-text-muted">{t("deadline")}</dt>
-                <dd className="font-semibold">
-                  <time dateTime={view.deadlineIso}>{view.deadlineLabel}</time>
-                </dd>
-              </div>
-            </dl>
-            {!view.expired && share}
-          </section>
-          {sections.map((key, index) => (
-            <section key={key} aria-labelledby={`job-${key}`} className="flex flex-col gap-4 border-t border-border pt-10">
-              <SectionHeading id={`job-${key}`} eyebrow={t("sectionLabel", { number: index + 1 })} title={t(`sections.${key}`)} />
-              <RichText data={doc[key]} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
+          {sections.map((key) => (
+            <section key={key} aria-labelledby={`job-${key}`} className="flex flex-col gap-4">
+              <h2 id={`job-${key}`} className="font-display text-h3">
+                {tv(`sections.${key}`)}
+              </h2>
+              <RichText data={doc[key]} locale={locale} tableLabel={tRich("table")} className={cn("max-w-[68ch] text-text-secondary", ACCENT_LIST_CLASS)} />
             </section>
           ))}
         </div>
       </DetailLayout>
-      {view.expired && others.length > 0 && (
-        <section aria-labelledby="other-jobs" className="bg-surface py-section-tight">
-          <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-gutter">
-            <SectionHeading id="other-jobs" title={t("otherTitle")} />
-            <ul className="grid gap-4">
-              {others.map((card) => (
-                <li key={card.id}>
-                  <JobCard data={card} headingLevel="h3" />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
       <ClickRefMarker collection="job-postings" id={doc.id} />
       {!view.expired && <ProjectStickyCta targetId={APPLY_FORM_DOM_ID} label={t("stickyApply")} />}
     </article>

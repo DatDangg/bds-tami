@@ -84,7 +84,7 @@ describe("ApplyForm: chọn file CV", () => {
     expect(screen.getByLabelText(/CV/)).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByText("CV tối đa 5MB, vui lòng chọn tệp nhỏ hơn.")).toBeInTheDocument();
     expect(screen.queryByText("big.pdf")).toBeNull();
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     expect(Xhr.sent).not.toHaveBeenCalled();
   });
 
@@ -123,7 +123,7 @@ describe("ApplyForm: chọn file CV", () => {
     renderForm();
     await fillText(user);
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     expect(Xhr.sent).not.toHaveBeenCalled();
     expect(screen.getByText("Vui lòng đính kèm CV.")).toBeInTheDocument();
     // Focus ô lỗi đầu tiên phải rơi vào nút Chọn tệp (nhìn thấy được), không phải input file sr-only (WCAG 2.4.7).
@@ -196,7 +196,7 @@ describe("ApplyForm: kéo-thả CV", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user, pdf("cv-an.pdf"));
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     dropFile(pdf("khac.pdf"));
     expect(screen.queryByText("khac.pdf")).toBeNull();
     expect(screen.getByText("cv-an.pdf")).toBeInTheDocument();
@@ -209,7 +209,7 @@ describe("ApplyForm: kéo-thả CV", () => {
     await fillText(user);
     dropFile(pdf("cv-tha.pdf"));
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     await screen.findByRole("status");
     const [, body] = Xhr.sent.mock.calls[0]!;
     expect((body.get("cv") as File).name).toBe("cv-tha.pdf");
@@ -222,7 +222,7 @@ describe("ApplyForm: tiến trình upload", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    const submit = screen.getByRole("button", { name: "Ứng tuyển" });
+    const submit = screen.getByRole("button", { name: "Gửi hồ sơ" });
     await user.click(submit);
     expect(submit).toBeDisabled();
     expect(submit).toHaveTextContent("Đang gửi…");
@@ -257,7 +257,7 @@ describe("ApplyForm: tiến trình upload", () => {
     await user.type(screen.getByLabelText(/Email/), "a@example.com");
     await user.upload(screen.getByLabelText(/CV/), pdf());
     await user.click(screen.getByRole("checkbox"));
-    const submit = screen.getByRole("button", { name: "Apply" });
+    const submit = screen.getByRole("button", { name: "Send application" });
     await user.click(submit);
     Xhr.last.progress(7, 10);
     expect(submit).toHaveTextContent("Sending… 70%");
@@ -269,12 +269,12 @@ describe("ApplyForm: tiến trình upload", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     Xhr.last.progress(900, 1000);
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
     Xhr.last.respond(503, { success: false, error: "x" });
     expect(await screen.findByRole("alert")).toHaveTextContent("Hệ thống tạm thời không khả dụng");
-    const submit = screen.getByRole("button", { name: "Ứng tuyển" });
+    const submit = screen.getByRole("button", { name: "Gửi hồ sơ" });
     expect(submit).toBeEnabled();
     expect(submit).not.toHaveTextContent("%");
     expect(screen.queryByRole("progressbar")).toBeNull();
@@ -285,7 +285,7 @@ describe("ApplyForm: tiến trình upload", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     Xhr.last.progress(100, 1000);
     Xhr.last.fail();
     expect(await screen.findByRole("alert")).toHaveTextContent("kiểm tra kết nối mạng");
@@ -300,7 +300,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user, pdf("cv-an.pdf"));
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     const status = await screen.findByRole("status");
     expect(status).toHaveTextContent("TAMI đã nhận hồ sơ của anh/chị.");
     const [url, body] = Xhr.sent.mock.calls[0]!;
@@ -322,7 +322,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     await user.type(screen.getByLabelText(/Email/), "a@example.com");
     await user.upload(screen.getByLabelText(/CV/), pdf());
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Apply" }));
+    await user.click(screen.getByRole("button", { name: "Send application" }));
     expect(await screen.findByRole("status")).toHaveTextContent("We have received your application.");
     expect(Xhr.sent.mock.calls[0]![1].get("locale")).toBe("en");
   });
@@ -332,7 +332,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     await waitFor(() => expect(screen.getByLabelText(/Email/)).toHaveAttribute("aria-invalid", "true"));
     await waitFor(() => expect(screen.getByLabelText(/Email/)).toHaveFocus());
     expect(screen.getByLabelText(/Họ và tên/)).toHaveValue("Nguyễn Văn A");
@@ -343,7 +343,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("10 phút");
     expect(alert).toHaveTextContent("0901 234 567");
@@ -355,7 +355,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Vị trí này đã hết hạn nhận hồ sơ.");
     expect(screen.getByRole("link", { name: "Xem các vị trí đang tuyển" })).toHaveAttribute("href", "/tuyen-dung");
@@ -366,7 +366,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Dữ liệu không hợp lệ");
     expect(screen.queryByText("Vị trí này đã hết hạn nhận hồ sơ.")).toBeNull();
   });
@@ -377,7 +377,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     await waitFor(() => expect(screen.getByLabelText(/CV/)).toHaveAttribute("aria-invalid", "true"));
     expect(screen.getByText(message)).toBeInTheDocument();
     expect(screen.queryByText("Vị trí này đã hết hạn nhận hồ sơ.")).toBeNull();
@@ -388,7 +388,7 @@ describe("ApplyForm: gửi hồ sơ", () => {
     const user = userEvent.setup();
     renderForm();
     await fillAll(user);
-    await user.click(screen.getByRole("button", { name: "Ứng tuyển" }));
+    await user.click(screen.getByRole("button", { name: "Gửi hồ sơ" }));
     await waitFor(() => expect(screen.getByLabelText(/CV/)).toHaveAttribute("aria-invalid", "true"));
   });
 });

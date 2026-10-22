@@ -754,17 +754,12 @@
       "filtersLabel": "Job filters",
       "categoriesLabel": "Job categories",
       "all": "All",
-      "provinceLabel": "Location",
-      "allProvinces": "All",
-      "apply": "Filter",
       "clear": "Clear filters",
-      "resultCount": "{count, plural, one {# open position} other {# open positions}}",
       "listLabel": "Open positions",
       "emptyTitle": "No matching positions.",
       "noJobs": "TAMI has no open positions right now.",
       "noJobsDescription": "You can still send us your CV and we will get in touch when a suitable role opens.",
       "sendCv": "Send your CV to {email}",
-      "deadline": "Apply by: {date}",
       "deadlineToday": "Closes today",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
       "salaryFrom": "From {amount}",
@@ -775,14 +770,6 @@
         "internship": "Internship",
         "contract": "Contract"
       },
-      "perksRegion": "Working at TAMI",
-      "perksEyebrow": "Why TAMI",
-      "perksTitle": "Working",
-      "perksTitleAccent": "environment",
-      "jobsEyebrow": "Open positions",
-      "jobsTitle": "Career",
-      "jobsTitleAccent": "opportunities",
-      "applyCta": "Apply",
       "v2": {
         "heroCta": "View open positions",
         "perksEyebrow": "Why TAMI",
@@ -807,23 +794,9 @@
       }
     },
     "careerDetail": {
-      "summaryTitle": "Job summary",
-      "location": "Location",
-      "employmentType": "Employment type",
-      "quantity": "Openings",
-      "quantityValue": "{count}",
-      "salary": "Salary",
-      "deadline": "Application deadline",
-      "applyCta": "Apply now",
       "stickyApply": "Apply now",
-      "sections": {
-        "description": "Job description",
-        "requirements": "Requirements",
-        "benefits": "Benefits"
-      },
       "expiredTitle": "This position is closed",
       "expiredBody": "Sorry, this position is no longer accepting applications. You can browse our other open positions.",
-      "otherTitle": "Other open positions",
       "viewAll": "View all positions",
       "applyForm": {
         "title": "Apply for this position",
@@ -831,14 +804,12 @@
         "fullName": "Full name",
         "phone": "Phone number",
         "email": "Email",
-        "cv": "CV",
         "cvHelper": "PDF, DOC or DOCX, up to 5MB.",
         "chooseFile": "Choose file",
         "dropHint": "Drag and drop your CV here or",
         "uploading": "Sending… {percent}%",
         "uploadProgress": "CV upload progress",
         "message": "Message",
-        "submit": "Apply",
         "removeFile": "Remove file {name}",
         "success": "We have received your application.",
         "expired": "This position is no longer accepting applications.",
@@ -852,8 +823,7 @@
           "cvTooLarge": "The CV must be 5MB or less, please choose a smaller file."
         },
         "orContact": "Or contact us directly:"
-      },
-      "sectionLabel": "Section {number}"
+      }
     },
     "richText": {
       "table": "Content table, scroll horizontally to see all"
@@ -1086,6 +1056,30 @@
           "publishedAt": "Posted on"
         },
         "similarViewAll": "View all listings"
+      }
+    },
+    "jobDetail": {
+      "v2": {
+        "applyNow": "Apply now",
+        "share": "Share",
+        "infoLabel": "Position details",
+        "deadline": "Deadline: <time>{date}</time>",
+        "sections": {
+          "description": "Job description",
+          "requirements": "Requirements",
+          "benefits": "Benefits"
+        },
+        "formSubtitle": "We reply within 3 working days.",
+        "form": {
+          "cv": "Your CV",
+          "submit": "Send application",
+          "fullNamePlaceholder": "Nguyen Van A",
+          "phonePlaceholder": "0901 234 567",
+          "emailPlaceholder": "name@example.com"
+        },
+        "otherTitle": "Other positions",
+        "viewAll": "View all positions",
+        "expiredCvPrompt": "Send us your CV and TAMI will contact you when a suitable position opens."
       }
     }
   },
