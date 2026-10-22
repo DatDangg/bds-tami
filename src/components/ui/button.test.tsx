@@ -1,6 +1,43 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Button } from "./button";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "./button";
+
+// BL-057 n-2: `buttonVariants` gọi trần (link không qua `Button`) phải trả chuỗi đã gộp Tailwind — không còn
+// `border-transparent` của lớp nền cạnh viền của biến thể (viền vô hình đo ở BL-056 r1).
+describe("buttonVariants (gọi trần, không bọc cn)", () => {
+  it.each([
+    ["secondary", "border-border"],
+    ["chip", "border-on-dark/30"],
+    ["outline", "border-text"],
+  ] as const)("variant %s chỉ còn viền của biến thể, không còn border-transparent", (variant, borderClass) => {
+    const classes = buttonVariants({ variant }).split(" ");
+    expect(classes).toContain("border");
+    expect(classes).toContain(borderClass);
+    expect(classes).not.toContain("border-transparent");
+  });
+
+  it("primary (không có viền riêng) vẫn giữ border-transparent", () => {
+    expect(buttonVariants({ variant: "primary" }).split(" ")).toContain("border-transparent");
+  });
+
+  it("giữ token cỡ chữ text-button / text-button-sm cạnh màu chữ của biến thể (không dùng twMerge mặc định)", () => {
+    const primary = buttonVariants().split(" ");
+    expect(primary).toContain("text-button");
+    expect(primary).toContain("text-primary-foreground");
+    const outlineSm = buttonVariants({ variant: "outline", size: "sm" }).split(" ");
+    expect(outlineSm).toContain("text-button-sm");
+    expect(outlineSm).not.toContain("text-button");
+    expect(outlineSm).toContain("text-text");
+    expect(outlineSm).toContain("h-9");
+  });
+
+  it("cn(buttonVariants(), extra) vẫn cho extra ghi đè", () => {
+    const classes = cn(buttonVariants(), "h-9").split(" ");
+    expect(classes).toContain("h-9");
+    expect(classes).not.toContain("h-11");
+  });
+});
 
 describe("Button", () => {
   it("mặc định là primary md, type=button", () => {

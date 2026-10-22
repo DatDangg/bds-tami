@@ -6,7 +6,9 @@ const paragraph = (...children: unknown[]) => ({ type: "paragraph", children });
 const p = (value: string) => paragraph(text(value));
 const heading = (value: string) => ({ type: "heading", tag: "h2", children: [text(value)] });
 const list = (...items: string[]) => ({ type: "list", children: items.map((item) => ({ type: "listitem", children: [text(item)] })) });
-const upload = { type: "upload", value: { id: "1" } };
+// Ảnh hợp lệ theo tiêu chí `RichText.renderUpload` (media đã populate, có url, mimeType ảnh).
+const media = { id: "1", url: "/api/media/file/a.jpg", mimeType: "image/jpeg" };
+const upload = { type: "upload", relationTo: "media", value: media };
 const doc = (...children: unknown[]) => ({ root: { type: "root", children } });
 
 describe("firstParagraphText", () => {
@@ -65,6 +67,24 @@ describe("splitOverview", () => {
   it("richText rỗng / block lạ không hiển thị → rest null", () => {
     expect(splitOverview(null, "Tóm tắt")).toEqual({ lead: "Tóm tắt", rest: null });
     expect(splitOverview(doc(p("  "), { type: "block", fields: {} }), null)).toEqual({ lead: null, rest: null });
+  });
+
+  // BL-057 n-1: upload mà `RichText` không dựng được (media đã xoá / chưa populate / không phải ảnh / collection khác)
+  // không tính là nội dung thêm — tránh nút "Xem thêm" mở ra trống.
+  it.each([
+    ["value là id string (chưa populate)", { type: "upload", relationTo: "media", value: "1" }],
+    ["media đã xoá (value null)", { type: "upload", relationTo: "media", value: null }],
+    ["media không có url", { type: "upload", relationTo: "media", value: { id: "1" } }],
+    ["mimeType không phải ảnh", { type: "upload", relationTo: "media", value: { ...media, mimeType: "application/pdf" } }],
+    ["relationTo khác media", { type: "upload", relationTo: "private-files", value: media }],
+    ["không có relationTo", { type: "upload", value: media }],
+  ])("upload rỗng (%s) → rest null, cả khi có tóm tắt lẫn khi lead lấy từ richText", (_label, emptyUpload) => {
+    expect(splitOverview(doc(emptyUpload), "Tóm tắt").rest).toBeNull();
+    expect(splitOverview(doc(p("Đoạn"), emptyUpload))).toEqual({ lead: "Đoạn", rest: null });
+  });
+
+  it("upload hợp lệ không có mimeType vẫn tính là nội dung thêm (như RichText)", () => {
+    expect(splitOverview(doc({ type: "upload", relationTo: "media", value: { id: "1", url: "/a.jpg" } }), "T").rest).not.toBeNull();
   });
 
   it("heading đứng trước đoạn dẫn vẫn nằm trong phần mở rộng", () => {

@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 // Kích thước theo tokens §10: sm 36px (chỉ desktop), md 44px (đủ touch target), lg 52px.
-export const buttonVariants = cva(
+const buttonClassVariants = cva(
   "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-pill border border-transparent font-sans text-button font-semibold uppercase transition-colors duration-(--duration-fast) ease-(--ease-standard) active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:shrink-0",
   {
     variants: {
@@ -29,6 +29,13 @@ export const buttonVariants = cva(
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
+
+/**
+ * Class của nút, đã gộp Tailwind (BL-057): `cva` chỉ nối chuỗi nên `border-transparent` của lớp nền đứng cạnh viền của
+ * biến thể (`border-border` / `border-text` / `border-on-dark/30`) và có thể thắng trong CSS → viền vô hình khi link gọi
+ * trần không qua `Button`. Phải gộp bằng `cn` (twMerge đã mở rộng), vì twMerge mặc định coi `text-button` là màu chữ và xoá nhầm.
+ */
+export const buttonVariants = (props?: VariantProps<typeof buttonClassVariants>): string => cn(buttonClassVariants(props));
 
 type ButtonProps = ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & { asChild?: boolean };

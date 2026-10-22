@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
-import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveImage";
+import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { resolveInternalDocHref } from "@/lib/content/doc-link";
+import { renderableUploadImage } from "@/lib/content/rich-text-upload";
 import { isSectionHeading, isTocHeading, sectionHeadingId } from "@/lib/content/section-headings";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
@@ -18,6 +19,9 @@ import { renderNewsBlock } from "./blocks/NewsBlock";
 interface LexicalNode {
   type?: unknown;
   children?: unknown;
+  /** Node `upload`: collection + media (đã populate hoặc id). */
+  relationTo?: unknown;
+  value?: unknown;
   [key: string]: unknown;
 }
 
@@ -111,12 +115,11 @@ function resolveInternalTarget(node: LexicalNode, ctx: RenderContext): { href: s
   return href ? { href, external: false } : null;
 }
 
-/** Ảnh upload từ `media` đã populate (depth ≥ 1); id chưa populate hoặc không phải ảnh thì bỏ qua. */
+/** Ảnh upload từ `media` đã populate (depth ≥ 1); id chưa populate hoặc không phải ảnh thì bỏ qua (tiêu chí ở `renderableUploadImage`). */
 function renderUpload(node: LexicalNode, key: number): ReactNode {
-  const value = node.value as (MediaImage & { caption?: string | null; mimeType?: string | null }) | string | null | undefined;
-  if (node.relationTo !== "media" || !value || typeof value !== "object" || !value.url) return null;
-  if (value.mimeType && !value.mimeType.startsWith("image/")) return null;
-  const aspectRatio = value.width && (value as { height?: number | null }).height ? `${value.width}/${(value as { height?: number | null }).height}` : undefined;
+  const value = renderableUploadImage(node);
+  if (!value) return null;
+  const aspectRatio = value.width && value.height ? `${value.width}/${value.height}` : undefined;
   return (
     <figure key={key} className={TEXT_CLASS.figure}>
       <ResponsiveImage media={value} sizes="(min-width: 1024px) 768px, 100vw" aspectRatio={aspectRatio ?? "16/9"} />

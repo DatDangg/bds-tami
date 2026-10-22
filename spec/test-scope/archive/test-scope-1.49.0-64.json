@@ -1,0 +1,122 @@
+{
+  "specVersion": "1.49.0",
+  "scopeVersion": 64,
+  "generatedAt": "2026-10-22T18:20:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-060 MODIFY (gốc BL-058, đổi mã 043d7fa): chi tiết Dự án — bug LazyMap canvas 0px (component dùng chung 4 màn), dải '… tương tự' nền primary-subtle + viền trên (3 màn chi tiết), trường mới amenities[].image → khối Tiện ích slider thẻ ảnh, group locationMedia (title/image/videoUrl) → thẻ 'Kết nối hạ tầng' cạnh bản đồ khối Vị trí. Migration SAFE_ADDITIVE 20261022_110146_project_detail_blocks (+ đổi tên 1 index trùng).",
+  "status": "published — build xong, mọi reviewer PASS, đã gộp staging (BL-054 + BL-058) vào nhánh",
+  "statusNote": "T01 6ccfc29 (STRICT r1 FAIL → r2 PASS) · T02 0cfd396 (STRICT r1 PASS, 4 MINOR mở) · đổi mã 043d7fa. Nhánh claude/bl058-project-detail-blocks-5971d4 (worktree, DB tami_bl058); spec-validator phase 1 PASS (.context/review-reports/feature-project-detail-blocks-phase-1-spec-validation.md, 1 ⚠️ doc: hàng DESIGN.md Chi tiết dự án chỉ ghi nền tương tự); verify sau merge PASS (typecheck/lint/build; test 416/418 file + 2 integration timeout beforeAll chạy lại riêng 45/45 PASS); merge vào staging 2026-10-22. DB dev tami / staging chưa migrate.",
+  "workItem": "feature/project-detail-blocks",
+  "backlog": "BL-060",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-22-project-detail-blocks.md",
+  "changeDocStatus": "done",
+  "task": [
+    "tasks/feature-project-detail-blocks/phase-1-task-01.md",
+    "tasks/feature-project-detail-blocks/phase-1-task-02.md"
+  ],
+  "reviewResults": [
+    "T01 STRICT FAIL r1 → PASS r2 — .context/review-reports/feature-project-detail-blocks-phase-1-task-01-round-2-review.md",
+    "T02 STRICT PASS r1 (MINOR M-1..M-4 không chặn) — .context/review-reports/feature-project-detail-blocks-phase-1-task-02-round-1-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.48.0-63.json",
+  "specUpdate": "spec/updates/2026-10-22-project-detail-blocks.md",
+  "specRefs": [
+    "Giao diện — khối \"Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS (BL-052)\" → mục mới \"Chi tiết Dự án — khối Vị trí / Tiện ích / dải '… tương tự' (BL-060)\" (1)–(5)",
+    "Giao diện — BL-052 \"Chi tiết Dự án\" (Vị trí, Tiện ích nổi bật, \"Dự án tương tự\") — đổi hành vi theo mục BL-060",
+    "Giao diện — BL-056 as-built (5) Tiện ích không ảnh — vẫn áp khi không mục nào có ảnh riêng",
+    "ERD §4.5 projects — `amenities[].image`, group `locationMedia` (as-built BL-060)"
+  ],
+  "specRefNotes": {
+    "BL-060 (1) LazyMap": "Bug fix component dùng chung (Dự án / Cho thuê / Tin BĐS / Liên hệ): canvas MapLibre phải cao = khung bất kể thứ tự nạp CSS; không đổi API.",
+    "BL-060 (2) SimilarCarousel": "Dải '… tương tự' 3 màn chi tiết: nền --color-primary-subtle (#F8F3EB) + viền trên; thẻ trắng; link 'Xem tất cả' accent-text AA.",
+    "BL-060 (3) schema": "amenities[].image + locationMedia {title localized, image, videoUrl https YouTube/TikTok}; tuỳ chọn, không backfill; locationMedia vào TRANSLATABLE_FIELDS.projects (dịch AI title).",
+    "BL-060 (4) Tiện ích": "≥ 1 mục có ảnh → slider CardSlider (ảnh 4:3 + h3 + mô tả ≤ 3 dòng; mục không ảnh thẻ ô muted + tích; amenitiesImage bỏ qua); 0 mục có ảnh → kiểu cũ.",
+    "BL-060 (5) Vị trí": "Có ảnh hoặc video hợp lệ → thẻ 'Kết nối hạ tầng' (VideoFacade, không iframe trước khi bấm, youtube-nocookie); ≥ xl 5·4·3, lg 7/5 + thẻ hàng dưới, < lg dọc; thiếu bản đồ/danh sách → 8/4; không media → DOM cũ. Video sai whitelist = không có."
+  },
+  "migration": "20261022_110146_project_detail_blocks — SAFE_ADDITIVE, không HIGH_RISK: cột nullable projects_amenities.image_id, projects.location_media_image_id, projects.location_media_video_url, projects_locales.location_media_title (+ 4 cột _projects_v*), 4 FK media ON DELETE SET NULL, 5 index; DROP INDEX projects_amenities_image_idx (index cũ của projects.amenities_image_id) → tạo lại projects_amenities_image_1_idx. Đã migrate tami_bl058; tami / staging chưa.",
+  "changed": {
+    "files": [
+      "src/components/media/LazyMap.tsx",
+      "src/components/media/LazyMap.test.tsx",
+      "src/components/detail/SimilarCarousel.tsx",
+      "src/components/posts/RelatedPosts.tsx",
+      "src/components/rentals/SimilarRentals.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/collections/Projects.ts",
+      "migrations/20261022_110146_project_detail_blocks.ts",
+      "migrations/20261022_110146_project_detail_blocks.json",
+      "migrations/index.ts",
+      "src/payload-types.ts",
+      "src/lib/projects/project-detail-view.ts",
+      "src/lib/projects/project-detail-view.test.ts",
+      "src/components/projects/ProjectAmenities.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/ProjectLocationMedia.tsx",
+      "src/components/projects/project-detail-blocks.test.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/components/posts/PostDetail.test.tsx",
+      "src/lib/translation/leaves.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json"
+    ],
+    "modules": [
+      "public · LazyMap (bản đồ MapLibre lazy) — wrapper absolute inset-0 bọc container h-full w-full; dùng ở ProjectLocation, RentalDetail, PostDetail, /lien-he",
+      "public · SimilarCarousel (dải 'Dự án / Cho thuê / Tin BĐS tương tự') — bg-primary-subtle + border-t border-border",
+      "cms · collection projects — amenities[].image (mediaUpload) + group locationMedia (title localized / image / videoUrl validateVideoUrl + trimText), tab Thông tin dự án sau Toạ độ bản đồ; locationMedia ẩn khỏi cột danh sách admin; TRANSLATABLE_FIELDS.projects + locationMedia",
+      "db · migration 20261022_110146_project_detail_blocks (projects, projects_locales, projects_amenities, _projects_v, _projects_v_locales, _projects_v_version_amenities)",
+      "public · view model project-detail-view — AmenityView.image (alt fallback tên), LocationMediaView (null khi không ảnh lẫn video hợp lệ), khối Vị trí hiện khi có locationMedia",
+      "public · ProjectAmenities — 2 chế độ: slider CardSlider arrows=sides (AmenityCard ảnh 4:3 + h3 + mô tả line-clamp-3; mục không ảnh ô muted + tích) / DetailFeatureList + amenitiesImage",
+      "public · ProjectLocation + ProjectLocationMedia — lưới 12 cột (xl 5·4·3; lg 7/5 + thẻ dưới; < lg dọc; thiếu phần → 8/4); thẻ 'Kết nối hạ tầng' VideoFacade (poster ảnh) / ResponsiveImage",
+      "i18n · page.projectDetail.v2.amenitiesSlider.{slide,previous,next,dots,goTo} + page.projectDetail.v2.locationMedia.title (VI/EN)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Chi tiết Dự án có toạ độ (/du-an/<slug>, VI + /en): khối Vị trí — bản đồ phủ kín khung 4:3 (đo .maplibregl-canvas height = khung, > 0), tile + marker hiện; 1440 / 1024 / 390",
+      "Chi tiết Cho thuê / Tin BĐS có toạ độ (tin published) và /lien-he khi cấu hình toạ độ văn phòng: bản đồ phủ kín khung (cùng LazyMap) — bên build chỉ kiểm vitest, test cần kiểm tay",
+      "Dải '… tương tự' cuối 3 màn chi tiết (Dự án / Cho thuê / Tin BĐS): nền vàng nhạt rgb(248,243,235) + viền trên, thẻ trắng nổi, link 'Xem tất cả …' đọc được (AA), mũi tên tròn nền trắng giữ",
+      "Admin Dự án › tab Thông tin dự án: mỗi hàng Tiện ích có ô 'Ảnh tiện ích (tuỳ chọn)' (chỉ ảnh); group 'Thẻ Kết nối hạ tầng (khối Vị trí)' ngay sau Toạ độ bản đồ: Tiêu đề thẻ (VI/EN), Ảnh thẻ, Link video (chỉ https YouTube/TikTok — link khác bị từ chối, khoảng trắng được trim); lưu/xuất bản dự án cũ để trống vẫn OK",
+      "Tiện ích nổi bật — ≥ 1 mục có ảnh: slider thẻ (ảnh 4:3 + tên h3 + mô tả ≤ 3 dòng), mũi tên hai mép ≥ md, mobile vuốt + chấm (thẻ ~82% lộ thẻ kế), mục không ảnh = thẻ cùng cỡ ô muted + dấu tích; ảnh chung amenitiesImage KHÔNG hiện ở chế độ này; đúng 1 mục có ảnh → slider 1 thẻ",
+      "Tiện ích nổi bật — 0 mục có ảnh: giữ kiểu cũ (amenitiesImage trái + danh sách tích / danh sách rộng hết khi không ảnh chung — BL-056 (5))",
+      "Khối Vị trí có ảnh hoặc video: thẻ 'Kết nối hạ tầng' (tiêu đề = Tiêu đề thẻ, trống → 'Kết nối hạ tầng' / 'Infrastructure connections') bên phải: ≥ xl 1440 bản đồ · danh sách khoảng cách · thẻ (5/4/3 cột), 1024–1279 bản đồ 7 / danh sách 5 + thẻ hàng dưới (M-1: thẻ một mình, trống 7 cột — chấp nhận), 390 xếp dọc bản đồ → danh sách → thẻ; không tràn ngang",
+      "Thẻ video: trước khi bấm KHÔNG có iframe (0 iframe trong DOM), poster = Ảnh thẻ nếu có, nút 'Phát video: <tiêu đề>'; bấm → 1 iframe youtube-nocookie.com/embed/<id> (TikTok tương tự theo VideoFacade sẵn có)",
+      "Thẻ chỉ ảnh (không video): ảnh 4:3 bo góc, không nút play; alt = alt media → tiêu đề thẻ → tên dự án",
+      "Khối Vị trí thiếu bản đồ (không toạ độ) hoặc thiếu danh sách khoảng cách nhưng có thẻ media: phần còn lại 8/4, không ô trống; có locationMedia nhưng không địa chỉ/toạ độ/khoảng cách → khối + tab 'Vị trí' vẫn hiện",
+      "Khối Vị trí không ảnh lẫn video (hoặc video sai whitelist): bố cục cũ y nguyên (bản đồ + danh sách), không thẻ, DOM không đổi; không có gì cả → khối + tab Vị trí ẩn như cũ",
+      "EN (/en/projects/<slug>): 'Key amenities', 'Infrastructure connections', nhãn mũi tên/chấm slider dịch; Tiêu đề thẻ EN do dịch AI (locationMedia trong TRANSLATABLE_FIELDS)"
+    ],
+    "dependents": [
+      "Chi tiết Cho thuê / Tin BĐS: DetailFeatureList, DetailDistanceList, RentalDetail/PostDetail không đổi hành vi — chỉ bản đồ (LazyMap) và dải tương tự (SimilarCarousel) đổi",
+      "/lien-he: bản đồ văn phòng (LazyMap) — chỉ khi site-settings có toạ độ văn phòng (BL-054 offices / mapLocation)",
+      "Tab dính chi tiết Dự án (scroll-spy BL-027/028/029): tab 'Vị trí' hiện thêm khi chỉ có locationMedia; tab 'Tiện ích' không đổi",
+      "CardSlider dùng chung ('Dự án tương tự', trang chủ…): ProjectAmenities dùng arrows=sides + nhãn ARIA riêng — slider khác không đổi",
+      "VideoFacade / parseVideoUrl / validateVideoUrl dùng chung (videoUrl dự án, cho thuê, listingPages.learnMore, homepage.about) — không sửa, chỉ dùng lại",
+      "Dịch AI (TRANSLATABLE_FIELDS.projects + locationMedia): job dịch dự án phải dịch Tiêu đề thẻ, không lỗi khi group trống",
+      "Lịch sử phiên bản Dự án (BL-058 T04): bản nháp/phiên bản có amenities[].image + locationMedia lưu ở _projects_v* — so sánh phiên bản hiện trường mới (chưa kiểm UI)",
+      "Thùng rác / xoá media: FK ON DELETE SET NULL — xoá ảnh đang gắn làm ảnh tiện ích / ảnh thẻ không chặn, trường về null, trang chi tiết tự về chế độ cũ"
+    ],
+    "regression": [
+      "Chi tiết Dự án đủ khối (BL-052 + BL-056): hero, thanh thông số, Tổng quan + cột phải form/hotline, Hình ảnh ≥ 2 ảnh, Nổi bật / Mặt bằng / Bảng giá / Pháp lý / Tin liên quan / Hỏi đáp, Điểm mạnh, banner tư vấn — không vỡ sau khi Vị trí/Tiện ích đổi",
+      "Dự án mẫu không ảnh tiện ích + không locationMedia (vd sample-hanoi-central-apartments): trang chi tiết y hệt trước BL-060 (trừ nền dải tương tự)",
+      "Chi tiết Cho thuê / Tin BĐS: khối Vị trí / Tiện ích / Tổng quan / dải tương tự (nền mới) — không lỗi, không tràn ngang 390 / 1440",
+      "Admin Dự án: lưu / xuất bản / nhân bản / Lưu bản EN (englishRequiredFields không đổi) / lịch sử phiên bản / khôi phục phiên bản với và không có trường mới; lỗi dưới ô (BL-058) cho Link video sai",
+      "Migration: pnpm payload migrate trên DB có dữ liệu BL-052 (index projects_amenities_image_idx cũ tồn tại) chạy sạch; migrate:status OK; down/up không mất dữ liệu; DB staging migrate trước deploy",
+      "Test tự động: typecheck · lint · unit+ui · integration projects.test.ts · build PASS trên nhánh sau merge staging (full integration cần Postgres ổn định)"
+    ]
+  },
+  "acceptance": [
+    "Bản đồ phủ kín khung aspect-ratio ở mọi nơi dùng LazyMap (Dự án, Cho thuê, Tin BĐS, Liên hệ) bất kể thứ tự nạp CSS MapLibre; có test chống tái phát",
+    "Dải '… tương tự' nền --color-primary-subtle (bg-primary-subtle, không hex) ở 3 màn chi tiết; link/chữ đạt AA",
+    "amenities[].image + locationMedia (title/image/videoUrl) trong admin; migration versioned SAFE_ADDITIVE (chỉ ADD COLUMN nullable + FK + index; đổi tên 1 index trùng)",
+    "≥ 1 tiện ích có ảnh → slider thẻ ảnh (ảnh + tên + mô tả), ←/→ ≥ md, vuốt mobile, mục không ảnh vẫn hiện không vỡ layout; không ảnh → kiểu cũ",
+    "Có ảnh/video Vị trí → thẻ bên phải cạnh bản đồ + danh sách; video qua facade (không iframe trước khi bấm); thiếu → layout cũ",
+    "VI/EN; 1440 + 390 không tràn ngang; typecheck · lint · test · build PASS"
+  ],
+  "verification": {
+    "status": "T01: typecheck PASS · lint 0 lỗi · build PASS · test liên quan 28 file / 295 PASS (reviewer r2). T02: typecheck PASS · lint 0 lỗi · unit+ui 332 file / 3153 PASS · integration projects.test.ts 36/36 · build PASS · migrate:status OK (reviewer r1); trình duyệt 1440 + 390 VI/EN PASS (.context/review-reports/assets/bl-060/).",
+    "note": "Full pnpm test không chạy trọn (Postgres dùng chung crash khi chạy integration full — 4 file integration fail không liên quan diff). Bản đồ Cho thuê / Tin BĐS / Liên hệ chỉ kiểm vitest (DB dev không có tin published có toạ độ; /lien-he chưa cấu hình toạ độ). Bản nháp _projects_v với trường mới chưa kiểm UI. Verify tổng thể trên nhánh sau merge staging + spec-validator phase 1 còn chờ."
+  },
+  "risk": "medium",
+  "riskNote": "Schema + migration additive (có DROP/CREATE lại 1 index trùng tên — không mất dữ liệu nhưng phải chạy sạch trên DB có BL-052); LazyMap và SimilarCarousel là component dùng chung 3–4 màn công khai; khối Vị trí/Tiện ích thay đổi bố cục theo dữ liệu (nhiều nhánh: có/không ảnh, có/không video, thiếu bản đồ/danh sách). Test nên ưu tiên: bản đồ ở Cho thuê / Tin BĐS / Liên hệ có toạ độ thật; ma trận dữ liệu Vị trí (ảnh / video / cả hai / video sai / không) × khổ 390 / 1024 / 1440; slider tiện ích với mục không ảnh xen kẽ + đúng 1 mục có ảnh; migrate DB staging; dịch AI + lịch sử phiên bản với trường mới. MINOR mở M-1..M-4 (xem followUps progress.json)."
+}

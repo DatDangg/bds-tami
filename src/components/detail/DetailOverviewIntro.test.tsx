@@ -5,6 +5,8 @@ import { DetailOverviewIntro } from "./DetailOverviewIntro";
 
 const paragraph = (value: string) => ({ type: "paragraph", children: [{ type: "text", text: value }] });
 const content = (...blocks: unknown[]) => ({ root: { type: "root", children: blocks } });
+// Ảnh `RichText` dựng được (BL-057: upload không media / không url không còn tính là nội dung thêm — xem rich-text-lead.test).
+const image = { type: "upload", relationTo: "media", value: { id: "m1", url: "/api/media/file/a.jpg", mimeType: "image/jpeg" } };
 
 describe("DetailOverviewIntro (BL-056)", () => {
   it("ưu tiên tóm tắt làm đoạn dẫn; rich text đầy đủ có trong HTML (details) cùng nút Xem thêm / Thu gọn", () => {
@@ -39,14 +41,14 @@ describe("DetailOverviewIntro (BL-056)", () => {
   });
 
   it("BL-056 M-1: đoạn dẫn + ảnh (block không chữ) → vẫn có nút; mở ra không lặp đoạn dẫn", () => {
-    const { container } = renderWithIntl(<DetailOverviewIntro content={content(paragraph("Đoạn dẫn"), { type: "upload", value: null })} locale="vi" />);
+    const { container } = renderWithIntl(<DetailOverviewIntro content={content(paragraph("Đoạn dẫn"), image)} locale="vi" />);
     const details = container.querySelector("details")!;
     expect(details).not.toBeNull();
     expect(details).not.toHaveTextContent("Đoạn dẫn");
   });
 
   it("BL-056 M-1: có tóm tắt + rich text chỉ có ảnh → vẫn có nút", () => {
-    const { container } = renderWithIntl(<DetailOverviewIntro summary="Tóm tắt" content={content({ type: "upload", value: null })} locale="vi" />);
+    const { container } = renderWithIntl(<DetailOverviewIntro summary="Tóm tắt" content={content(image)} locale="vi" />);
     expect(container.querySelector("details")).not.toBeNull();
   });
 
