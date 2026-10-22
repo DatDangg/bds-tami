@@ -358,7 +358,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `category` | `rel→categories` (scope=`news`) | R, I | |
 | `cover` | upload `rel→media` | R khi `published` | Ảnh thẻ danh sách và hero bài viết; bản nháp được thiếu (as-built L5-T03) |
 | `excerpt` | textarea | R | |
-| `content` | richText | R | |
+| `content` | richText | R | Localized. BL-054 P1-T02: editor có thêm node `block` (Lexical `BlocksFeature`, `NEWS_CONTENT_BLOCKS` ở `src/blocks/news/index.ts`) — `statHighlights` (Số liệu nổi bật, `items[] {value, label}` ≤ 4), `projectMention` (Dự án nhắc đến, `project` = id dự án), `imageText` (Ảnh cạnh chữ, `image` = id media, `text`, `imagePosition` `left`/`right`). Khối nằm TRONG JSON `content` (không bảng / cột / migration riêng); web chỉ render 3 `blockType` này (khối lạ bị bỏ), dự án chưa công khai / chưa có EN thì ẩn khối |
 | `tags` | text hasMany | | Không localized; lưu ở bảng `news_texts` (as-built L5-T03) |
 | `status` | select | R, I | |
 | `publishedAt` | date | I | Cho phép hẹn giờ (FR-ADM-16) |

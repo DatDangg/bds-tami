@@ -202,7 +202,6 @@
       "tabsLabel": "Danh mục tin tức",
       "all": "Tất cả",
       "readTime": "{minutes} phút đọc",
-      "readArticle": "Đọc bài",
       "consultTitle": "Tư vấn nhu cầu",
       "tagsLabel": "Từ khoá",
       "tocTitle": "Mục lục",
@@ -235,15 +234,18 @@
       }
     },
     "newsDetail": {
-      "latestEyebrow": "Mới cập nhật",
-      "latestTitle": "Bài viết mới",
-      "consultEyebrow": "Tư vấn",
-      "consultTitle": "Đang tìm bất động sản phù hợp?",
-      "consultText": "Để lại thông tin, TAMI HOMES sẽ liên hệ tư vấn cho bạn.",
-      "consultCta": "Nhận tư vấn",
-      "relatedEyebrow": "Đọc tiếp",
-      "relatedTitle": "Bài viết",
-      "relatedAccent": "liên quan"
+      "v2": {
+        "author": "Ban biên tập TAMI HOMES",
+        "shareLabel": "Chia sẻ:",
+        "shareMore": "Chia sẻ qua ứng dụng khác",
+        "consultEyebrow": "Tư vấn miễn phí",
+        "consultTitle": "Cần chọn dự án phù hợp với ngân sách?",
+        "consultText": "Chuyên viên TAMI sẽ tư vấn chi tiết theo nhu cầu của bạn.",
+        "consultCta": "Nhận tư vấn",
+        "tags": "Thẻ:",
+        "related": "Bài viết liên quan",
+        "viewAll": "Xem tất cả tin tức"
+      }
     },
     "posts": {
       "title": "Đăng tin BĐS",

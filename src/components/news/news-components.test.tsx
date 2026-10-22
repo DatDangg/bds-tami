@@ -221,3 +221,36 @@ describe("ShareButtons", () => {
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Could not copy"));
   });
 });
+
+describe("ShareButtons variant=icons (hàng tác giả chi tiết tin tức, BL-054)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("nhãn 'Chia sẻ:' + nút tròn chỉ icon có tên truy cập; không có Web Share → không có nút 'thêm'", () => {
+    vi.stubGlobal("navigator", { clipboard: { writeText: vi.fn() } });
+    renderWithIntl(<ShareButtons variant="icons" url="https://tami.example/tin-tuc/a" title="A" />);
+    const group = screen.getByRole("group", { name: "Chia sẻ bài viết" });
+    expect(group).toHaveTextContent("Chia sẻ:");
+    const facebook = within(group).getByRole("link", { name: "Chia sẻ lên Facebook" });
+    expect(facebook.className).toContain("rounded-full");
+    expect(facebook).not.toHaveTextContent("Facebook");
+    expect(within(group).getByRole("link", { name: "Chia sẻ qua Zalo" })).toBeInTheDocument();
+    expect(within(group).getByRole("button", { name: "Sao chép liên kết" })).not.toHaveTextContent("Sao chép");
+    expect(within(group).queryByRole("button", { name: "Chia sẻ qua ứng dụng khác" })).toBeNull();
+  });
+
+  it("có navigator.share: nút 'thêm' gọi Web Share với tiêu đề + URL; huỷ (AbortError) không ném lỗi", async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException("cancel", "AbortError"));
+    vi.stubGlobal("navigator", { clipboard: { writeText: vi.fn() }, share });
+    renderWithIntl(<ShareButtons variant="icons" url="https://tami.example/tin-tuc/a" title="Bài A" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Chia sẻ qua ứng dụng khác" }));
+    expect(share).toHaveBeenCalledWith({ title: "Bài A", url: "https://tami.example/tin-tuc/a" });
+  });
+
+  it("sao chép: vùng status (chỉ cho trình đọc màn hình) báo đã chép", async () => {
+    vi.stubGlobal("navigator", { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+    renderWithIntl(<ShareButtons variant="icons" url="https://tami.example/tin-tuc/a" title="A" />);
+    fireEvent.click(screen.getByRole("button", { name: "Sao chép liên kết" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Đã sao chép liên kết"));
+    expect(screen.getByRole("status").className).toContain("sr-only");
+  });
+});
