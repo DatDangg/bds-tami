@@ -80,16 +80,42 @@
   border-color: var(--admin-badge-danger-fg);
 }
 
-// ---- Nút "+" cạnh ô quan hệ: hiện chữ "Thêm mới", vùng bấm cao ≥ 36px ----
-.relationship-add-new__add-button {
+// ---- Nút "+" cạnh ô quan hệ: ô vuông chỉ icon, tách rời ô chọn (BL-058 T03) ----
+// Payload dán nút vào ô (margin-left:-1px + bo trái 0) trong @layer payload-default; ở đây ghi đè ngoài layer.
+// Tên đọc/tooltip "Thêm mới" do Payload cung cấp (Tooltip nằm trong nút), không thay component.
+.relationship-add-new {
+  align-items: flex-start; // ô hasMany cao lên: nút giữ ở trên, không kéo giãn
+
+  .popup__trigger-wrap {
+    height: auto;
+  }
+}
+
+.relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled),
+.relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled).doc-drawer__toggler {
+  box-sizing: border-box;
+  height: 36px;
+  width: 36px;
   min-height: 36px;
   min-width: 36px;
-  gap: 6px;
-  font-size: 0.8125rem;
-  white-space: nowrap;
+  margin-left: 8px;
+  padding: 0;
+  justify-content: center;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-s);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  cursor: pointer;
 
-  &::after {
-    content: "Thêm mới";
+  &:hover {
+    background: var(--admin-surface-hover);
+    border-color: var(--admin-text-subtle);
+  }
+
+  &:focus-visible {
+    border-color: var(--admin-accent);
+    outline: 2px solid var(--admin-focus);
+    outline-offset: 2px;
   }
 }
 
@@ -109,7 +135,10 @@
 
 // Vùng bấm >= 44px trên màn cảm ứng.
 @media (max-width: 767px) {
-  .relationship-add-new__add-button {
+  .relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled),
+  .relationship-add-new__add-button:not(.relationship-add-new__add-button--unstyled).doc-drawer__toggler {
+    height: 44px;
+    width: 44px;
     min-height: 44px;
     min-width: 44px;
   }

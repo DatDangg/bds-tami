@@ -2505,11 +2505,14 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-admin-form-ux-polish/phase-1-task-03.md",
-          "status": "in_progress",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [],
           "wave": "1",
-          "note": "nút + tách rời ô quan hệ"
+          "note": "nút + tách rời ô quan hệ",
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-03-round-1-review.md"
         },
         {
           "task": "phase-1-task-04",
@@ -3543,7 +3546,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T05:31:59.595Z",
+  "lastUpdated": "2026-10-22T05:32:13.454Z",
   "approvalMilestones": [
     {
       "id": "M1",

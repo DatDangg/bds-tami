@@ -74,3 +74,7 @@
 - Chưa kiểm bằng mắt: ô hasMany có nút tạo mới, nhánh Popup nhiều collection, tooltip hiện khi hover (không mô phỏng hover).
 - `src/payload-types.ts` hiện báo modified chỉ do dev server ghi lại khác kết thúc dòng (không khác nội dung); KHÔNG stage file này.
 - Đầu lượt `rm screens/*.png` để dọn ảnh nháp của tôi; ảnh jpg của T01/T02 còn nguyên (nếu T01/T02 từng có png trong thư mục này thì đã bị xoá — chụp lại nếu cần).
+
+## Review
+- Round 1 — **NORMAL PASS** (`.context/review-reports/feature-admin-form-ux-polish-phase-1-task-03-round-1-review.md`). MINOR (chấp nhận): selector `.doc-drawer__toggler` thừa (rule ngoài layer luôn thắng); regex test `height:44px` khớp cả `min-height`; chưa có ảnh nhánh Popup nhiều collection / hasMany có nút / tooltip hover / 768–1280.
+- Doc impact: no doc impact. Spec delta mục 3 (change doc) áp lúc close-out BL-058.
