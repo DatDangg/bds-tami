@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.46.1
+- **spec_version:** 1.46.2
 - **updated_at:** 2026-10-22
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -57,6 +57,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
   - **Backfill:** bỏ qua mọi tin có ưu đãi (kể cả tin bán có ưu đãi); giá trị mâu thuẫn không điền mà đưa vào danh sách soát trong báo cáo. Đã chạy `--apply` trên DB dev (Dự án; Tin BĐS 38 quét / 37 điền / 1 bỏ qua / 0 lỗi); staging / prod chỉ khi user bảo.
   - **Migration** `20261021_135620_listing_detail_redesign` + `20261021_173246_property_post_specs` đều SAFE_ADDITIVE. Ba khoá ngoại `site_settings_listing_pages_*_learn_more_image_id_media_id_fk` dài > 63 ký tự nên Postgres cắt tên — chấp nhận, không đổi hành vi.
   - **Còn mở (backlog, không chặn):** `/du-an` `priceMax=0` vẫn là bộ lọc (chưa đồng bộ "0 = không giới hạn" như `/tin-bds`); `?category=` cũ ở `/tin-bds` / `/cho-thue` vừa `noindex` vừa canonical sang trang danh mục — đề xuất 308; index `rentals_amenities.value`; GIST `property_posts.location` khi có lọc bản đồ. LCP chưa đo (residual).
+- **As-built khung chi tiết (bug-fix BL-056, 2026-10-22 — spec 1.46.2; khớp ảnh `detail-du-an.webp` / `list-du-an.webp`; không đổi requirement / schema / API):** (1) **thanh thông số nổi** ≥ xl mỗi giá trị **1 dòng** (cắt `…`, `title` = giá trị đầy đủ, chữ vẫn đủ cho trình đọc màn hình); < xl lưới 2/3 cột, giá trị tối đa 2 dòng + `title`, không tràn ngang. (2) **Tổng quan** (Dự án / Cho thuê / Tin BĐS, component chung `DetailOverviewIntro`): **đoạn dẫn** = tóm tắt (Dự án `summary`, Tin BĐS `excerpt`) — không có thì **đoạn văn đầu tiên có chữ** của rich text (`overview` / `description` / `content`) dạng text thuần; phần còn lại nằm trong `<details>` native với nút **"Xem thêm" / "Thu gọn"** (EN "Read more" / "Show less"), luôn có trong HTML (SEO); không còn gì ngoài đoạn dẫn thì không có nút; không có cả tóm tắt lẫn rich text → chỉ lưới thông tin. (3) **Tổng quan Dự án** ≥ xl hai cột ~55/45: lưới thông tin **2 cột** + thẻ sản phẩm **3 cột** (ô lẻ cuối kéo hết hàng); không có sản phẩm → lưới thông tin rộng hết; Cho thuê / Tin BĐS giữ lưới thông tin như cũ. (4) **Form lead ở cột liên hệ chi tiết** (3 màn) dạng **compact**: icon trong ô + placeholder (nhãn ẩn trực quan, vẫn gắn `label`), nút full-width "Nhận tư vấn ngay" / "Get advice now"; validate, lỗi, consent, Turnstile như cũ; form `/lien-he`, `/tin-tuc` giữ dạng mặc định. (5) **Tiện ích không ảnh** → danh sách rộng hết (≥ 2 mục: `sm` 2 cột / `lg` 3 cột; 1 mục: 1 cột); có ảnh giữ ảnh trái + danh sách phải. (6) **Thẻ nổi bật trang danh sách** (3 màn): "Nhận tư vấn" là **nút viền (outline)** cạnh "Xem chi tiết". Delta: `spec/updates/2026-10-22-listing-detail-design-match.md`.
 - **Doc impact:** `.context/design-spec.md` (phần Dự án / Cho thuê / Tin BĐS), `docs/DESIGN.md`, `docs/ERD.md` (projects, property-posts, site-settings `listingPages`), `docs/API_SPEC.md` (`/api/public/rentals?project=`; tham số mới `/du-an`, `/tin-bds`).
 
 ## Tech Stack

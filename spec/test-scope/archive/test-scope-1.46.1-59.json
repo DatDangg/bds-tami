@@ -1,0 +1,340 @@
+{
+  "specVersion": "1.46.1",
+  "scopeVersion": 59,
+  "generatedAt": "2026-10-22T03:45:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "Close-out as-built BL-052 (change-request): build xong 17 task / 3 phase trên staging (HEAD 838606c). Spec 1.46.1 PATCH ghi as-built + 2 quyết định user (chip đơn chọn không đếm; /en ngày en-US). Thay scope planned v58.",
+  "status": "built — chờ commit close-out (primary)",
+  "workItem": "feature/listing-detail-redesign",
+  "backlog": "BL-052",
+  "classification": "MODIFY + ADDITIVE schema",
+  "changeDoc": "spec/changes/2026-10-21-listing-detail-redesign.md",
+  "changeDocStatus": "done → archive ở close-out (spec/changes/archive/)",
+  "design": [
+    "docs/specs/listing-detail-redesign/list-du-an.webp",
+    "docs/specs/listing-detail-redesign/detail-du-an.webp"
+  ],
+  "task": [
+    {
+      "task": "phase-1-task-01",
+      "note": "schema dự án + listingPages + loader, migration",
+      "commit": "cb25807",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-01-round-1-review.md",
+      "migration": "20261021_135620_listing_detail_redesign SAFE_ADDITIVE"
+    },
+    {
+      "task": "phase-1-task-02",
+      "note": "component listing dùng chung",
+      "commit": "6e810c0",
+      "review": "STRICT PASS r3",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-02-round-3-review.md"
+    },
+    {
+      "task": "phase-1-task-03",
+      "note": "component detail dùng chung",
+      "commit": "eaee66a",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-03-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-04",
+      "note": "dữ liệu /du-an + ProjectCard",
+      "commit": "acb2cac",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-04-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-06",
+      "note": "chi tiết dự án",
+      "commit": "a995b58",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-06-round-1-review.md"
+    },
+    {
+      "task": "phase-1-task-07",
+      "note": "backfill dự án",
+      "commit": "ae9f77a",
+      "review": "STRICT PASS r2",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-07-round-2-review.md"
+    },
+    {
+      "task": "phase-1-task-05",
+      "note": "trang /du-an",
+      "commit": "5c540ce",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-task-05-round-1-review.md"
+    },
+    {
+      "task": "phase-2-task-01",
+      "note": "dữ liệu cho thuê + project param + RentalCard",
+      "commit": "3d9c2e4",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-2-task-01-round-1-review.md"
+    },
+    {
+      "task": "phase-2-task-03",
+      "note": "chi tiết cho thuê",
+      "commit": "0d82e5d",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-2-task-03-round-1-review.md"
+    },
+    {
+      "task": "phase-2-task-02",
+      "note": "trang /cho-thue",
+      "commit": "926f5e3",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-2-task-02-round-1-review.md"
+    },
+    {
+      "task": "phase-3-task-01",
+      "note": "schema tin BĐS, migration",
+      "commit": "65f4cf0",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-01-round-1-review.md",
+      "migration": "20261021_173246_property_post_specs SAFE_ADDITIVE, đã migrate DB dev tami 2026-10-22"
+    },
+    {
+      "task": "phase-3-task-02",
+      "note": "dữ liệu /tin-bds + PostCard",
+      "commit": "59cd5bc",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-02-round-1-review.md"
+    },
+    {
+      "task": "phase-3-task-04",
+      "note": "chi tiết tin BĐS",
+      "commit": "32f5d44",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-04-round-1-review.md"
+    },
+    {
+      "task": "phase-3-task-05",
+      "note": "backfill tin BĐS",
+      "commit": "f001cb9",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-05-round-1-review.md"
+    },
+    {
+      "task": "phase-3-task-03",
+      "note": "trang /tin-bds",
+      "commit": "3d6c598",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-03-round-1-review.md"
+    },
+    {
+      "task": "phase-3-task-06",
+      "note": "gom MINOR + dọn + doc",
+      "commit": "7e39d98",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-task-06-round-1-review.md"
+    },
+    {
+      "task": "phase-2-task-04",
+      "note": "fix G1 phase review: số đếm Tiện ích /cho-thue",
+      "commit": "dfa0884",
+      "review": "STRICT PASS r1",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-2-task-04-round-1-review.md"
+    }
+  ],
+  "reviewResults": [
+    {
+      "phase": "1+2",
+      "verdict": "GAPS (phase 1 COMPLETE, phase 2 G1 MAJOR) → G1 đóng bởi phase-2-task-04 (dfa0884)",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-1-2-phase-review.md"
+    },
+    {
+      "phase": "3",
+      "verdict": "GAPS (code PASS; P-1 task summary, P-2 browser evidence, P-3 as-built) → P-1/P-2/P-3 đã xử lý (233630a, 838606c)",
+      "report": ".context/review-reports/feature-listing-detail-redesign-phase-3-phase-review.md"
+    }
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.46.0-58.json",
+  "specUpdate": "spec/updates/2026-10-22-listing-detail-redesign-as-built.md",
+  "specUpdatePlanned": "spec/updates/2026-10-21-listing-detail-redesign.md",
+  "specRefs": [
+    "Giao diện / Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS (BL-052)",
+    "F2",
+    "F3",
+    "F4",
+    "FR-PUB-02",
+    "FR-PUB-03",
+    "FR-PUB-04",
+    "FR-PUB-05",
+    "FR-PUB-06",
+    "FR-PUB-07",
+    "FR-PUB-16",
+    "FR-ADM-01",
+    "FR-ADM-02",
+    "FR-ADM-03",
+    "BR-06",
+    "BR-07"
+  ],
+  "specRefNotes": {
+    "BL-052": "Khối mới ở mục Giao diện (sau 'Doc impact khi build' của BL-045): khung danh sách chung, admin listingPages, trường mới Dự án / Tin BĐS, giá 'Giá từ', lọc /du-an /cho-thue /tin-bds, chi tiết Dự án / Cho thuê / Tin BĐS, backfill dev.",
+    "F2": "Dự án — bố cục thay bởi BL-052; trường productTypes / featuredAmenities / products / videoUrl / amenities[].description / amenitiesImage; lọc type / feature / province nhiều / giá tỷ.",
+    "F3": "Cho thuê — bố cục thay bởi BL-052; tham số mới project (URL + GET /api/public/rentals).",
+    "F4": "Tin BĐS — bố cục thay bởi BL-052; trường có cấu trúc mới; thẻ voucher riêng trong cùng lưới.",
+    "BR-06": "Ưu đãi hết hạn — thẻ voucher hiện Còn hạn / Đã kết thúc.",
+    "BR-07": "i18n vi/en — nhãn mới đủ EN; chữ EN thiếu thì bỏ hàng; /en ngày en-US MM/DD/YYYY (kể cả hạn ưu đãi thẻ voucher) — user chốt 2026-10-22.",
+    "BL-052 as-built": "Khối BL-052 thêm mục 'As-built (close-out BL-052, 2026-10-22 — spec 1.46.1)' + sửa tại chỗ câu số đếm / FAQ JSON-LD / Hình ảnh ≥ 2 ảnh / ô Dự án /cho-thue / lọc /tin-bds / tên báo cáo backfill."
+  },
+  "userDecisions": [
+    "B1 (2026-10-22): chip đơn chọn (Phòng ngủ / Nội thất /cho-thue, Tình trạng /du-an, Phòng ngủ /tin-bds) KHÔNG hiện số đếm; ô tích + tab vẫn đếm",
+    "2026-10-22: /en hiện ngày en-US MM/DD/YYYY như toàn site, kể cả hạn ưu đãi trên thẻ voucher"
+  ],
+  "asBuilt": [
+    "bỏ nút chia sẻ hero chi tiết dự án + cho thuê",
+    "chi tiết cho thuê bỏ neo #details/#video",
+    "giá cho thuê Thương lượng/Liên hệ thay Thoả thuận (thẻ thống nhất ở P2-T02)",
+    "nhãn Hồ bơi, gym, spa (i18n cấm gạch dài)",
+    "3 FK site_settings_listing_pages_*_learn_more_image_id_media_id_fk > 63 ký tự (Postgres cắt)",
+    "ô Dự án /cho-thue chỉ dự án có tin còn trống",
+    "/cho-thue bỏ hàng chip Đang lọc (ActiveFilters) — sidebar/Sheet đã hiện",
+    "FAQ JSON-LD chỉ phát ở /cho-thue sạch (trang 1, không lọc); trang danh mục không phát",
+    "slider Giá thuê theo VNĐ, kẹp 0–100 triệu (>100tr hiển thị 100+)",
+    "tên báo cáo backfill backfill-listing-fields-<date>-<time>-<mode>.md",
+    "dải Hình ảnh chi tiết chỉ hiện khi ≥ 2 ảnh",
+    "tab danh mục cho thuê đếm theo danh mục cấp 1",
+    "Xoá tất cả trên link cũ ?category= xoá luôn danh mục",
+    "chip đơn chọn (Phòng ngủ/Nội thất /cho-thue, Tình trạng /du-an, /tin-bds) không hiện số đếm — theo design, user duyệt 2026-10-22; ô tích vẫn đếm",
+    "chi tiết Tin BĐS bỏ neo #content (nội dung vào Tổng quan)",
+    "/tin-bds nhận ?category=<slug> cũ (lọc + tab, noindex, canonical → /tin-bds/danh-muc/<slug>) — API_SPEC",
+    "PostCard chỉ còn variant listing + home (bỏ feature); PostChip thêm countId/slug",
+    "/tin-bds hàng N phù hợp trở lại (bỏ ở BL-045)",
+    "nhãn hướng công khai listingOptions.direction (dùng chung Cho thuê + Tin BĐS)",
+    "/cho-thue FAQ JSON-LD chỉ khi URL không tham số; /tin-bds theo điều kiện noindex",
+    "/tin-bds Hướng + Tình trạng bàn giao là ô tích nhiều lựa chọn (OR) có số đếm, không phải chip",
+    "/tin-bds priceMax=0 / areaMax=0 = không giới hạn trên",
+    "backfill bỏ qua mọi tin có ưu đãi (kể cả tin bán có ưu đãi); giá trị mâu thuẫn không điền → danh sách soát",
+    "chi tiết Tin BĐS giữ nút chia sẻ ở hero (ngoại lệ — Dự án/Cho thuê đã bỏ)",
+    "tab danh mục Tin BĐS đếm theo danh mục cấp 1 (gồm con)",
+    "/tin-bds q tìm trong tiêu đề + tóm tắt + địa chỉ + phường + tỉnh (không dấu)",
+    "/en ngày (kể cả hạn ưu đãi thẻ voucher) theo định dạng en-US MM/DD/YYYY như toàn site — user chốt 2026-10-22"
+  ],
+  "migration": "20261021_135620_listing_detail_redesign (projects + site-settings listingPages) và 20261021_173246_property_post_specs (property-posts) — SAFE_ADDITIVE, chỉ ADD. 3 FK site_settings_listing_pages_*_learn_more_image_id_media_id_fk > 63 ký tự (Postgres cắt tên). Không HIGH_RISK_MIGRATION.",
+  "changed": {
+    "files": [
+      "migrations/20261021_135620_listing_detail_redesign.{ts,json}",
+      "migrations/20261021_173246_property_post_specs.{ts,json}",
+      "scripts/backfill-listing-fields.ts",
+      "src/collections/Projects.ts",
+      "src/collections/projects/listing-fields.ts",
+      "src/collections/PropertyPosts.ts",
+      "src/globals/SiteSettings.ts",
+      "src/globals/site-settings/listing-pages.ts",
+      "src/app/(frontend)/[locale]/du-an/[slug]/page.tsx",
+      "src/app/(frontend)/[locale]/cho-thue/[slug]/page.tsx",
+      "src/app/(frontend)/[locale]/tin-bds/page.tsx",
+      "src/app/(frontend)/[locale]/tin-bds/[slug]/page.tsx",
+      "src/app/(frontend)/[locale]/tin-bds/danh-muc/[category]/page.tsx",
+      "src/lib/projects/project-filters.ts",
+      "src/lib/projects/project-list-facets.ts",
+      "src/lib/posts/post-filters.ts",
+      "src/lib/posts/post-list-facets.ts",
+      "src/lib/content/load-listing-page.ts",
+      "src/lib/search/url-params.ts",
+      "src/components/posts/post-list-metadata.ts",
+      "src/i18n/messages/{vi,en}.json"
+    ],
+    "filesNote": "280 file đổi từ c26d69e (plan) tới 838606c (gồm task/report/doc) — danh sách đầy đủ: git diff --name-only c26d69e 838606c. Trên đây là file chính.",
+    "modules": [
+      "src/components/listing/* (MỚI — hero, tab, cột/Sheet bộ lọc, thanh trượt, SpotlightSlider, ResultsBar, LearnMoreFaq)",
+      "src/components/detail/* (DetailHeroMosaic, DetailSpecBar, DetailPageShell, DetailContactAside, DetailGalleryGrid, SimilarCarousel …)",
+      "src/components/projects/*",
+      "src/components/rentals/*",
+      "src/components/posts/*",
+      "src/components/home/* (ProjectsSlider, OffersSlider, RentalsTabs — thẻ trang chủ giữ biến thể cũ)",
+      "src/components/layout/CardSlider.tsx",
+      "src/lib/projects/*",
+      "src/lib/posts/*",
+      "src/lib/backfill/* (MỚI)",
+      "src/lib/content/*",
+      "src/lib/format.ts",
+      "src/collections/{Projects,PropertyPosts,Rentals}.ts",
+      "src/globals/SiteSettings.ts + site-settings/listing-pages.ts",
+      "migrations/*",
+      "src/i18n/messages/*"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/du-an + /en/projects: hero ảnh + ô q + chip \"Tìm nhanh\" (link ?q=, trống → ẩn); tab danh mục icon + số đếm, aria-current; cột \"Bộ lọc\" ≥ lg (Tình trạng chip KHÔNG số, Tỉnh/thành ô tích nhiều OR + số + \"Xem thêm\", Chủ đầu tư Select, Mức giá thanh trượt 0–50+ tỷ, Loại hình ô tích OR + số, Tiện ích nổi bật ô tích AND + số) + \"Xoá tất cả\"; thẻ nổi bật ≤ 5 isFeatured (trang 1, không lặp lưới); \"N dự án phù hợp\" + Sắp xếp; lưới 3/2/1; phân trang số",
+      "/du-an/[slug] + /en/projects/[slug]: hero full-bleed + 3 thumbnail + \"Xem tất cả N ảnh\" (Lightbox); nút video chỉ khi có videoUrl; KHÔNG nút chia sẻ hero; thanh thông số ≤ 6 ô, KHÔNG ô Pháp lý; tab dính Tổng quan · Vị trí · Tiện ích · Hình ảnh (Hình ảnh chỉ khi ≥ 2 ảnh) + khối giữ (Nổi bật, Mặt bằng, Bảng giá, Pháp lý & chính sách #documents, Tin liên quan, Hỏi đáp); thẻ Sản phẩm; cột phải cạnh Tổng quan: form \"Nhận thông tin dự án\" (#lead-form, source=project) + Hotline \"Gọi ngay\" (ẩn khi không có hotline); khoảng cách > 8 hàng → \"Xem thêm\"; tiện ích > 5 → \"Khám phá tất cả tiện ích\"; \"Dự án tương tự\" carousel",
+      "/cho-thue + /cho-thue/danh-muc/[category] + /en/for-rent: tab = danh mục (đếm theo cấp 1); lọc Tỉnh radio + số → Phường; Dự án (project — chỉ dự án có tin còn trống); Giá thuê slider VNĐ 0–100+ triệu (kẹp, > 100tr hiện \"100+\"); Diện tích 0–300+ bước 5; Phòng ngủ + Nội thất chip KHÔNG số; Tiện ích ô tích AND có số; KHÔNG hàng chip \"Đang lọc\"; ?category= cũ lọc + đánh dấu tab, \"Xoá tất cả\" xoá luôn danh mục",
+      "GET /api/public/rentals?project=<slug>: lọc theo dự án; slug lạ bị bỏ ở trang; client cũ không truyền vẫn chạy",
+      "Thẻ cho thuê: giá/tháng hoặc \"Thương lượng\" / \"Liên hệ\" (không còn \"Thoả thuận\"), diện tích · PN · PT, tag danh mục + nội thất, badge Đã thuê",
+      "/cho-thue/[slug]: KHÔNG nút chia sẻ hero; thanh thông số Giá thuê · Diện tích · PN/PT · Nội thất · Hướng · Dọn vào từ; tab Tổng quan · Vị trí · Tiện ích · Hình ảnh + Điều khoản thuê + Pháp lý (khi có legalNote); neo cũ #details / #video rơi về đầu trang; form lead source=rental; \"Căn tương tự\"",
+      "/tin-bds + /tin-bds/danh-muc/[category] + /en/property-news: tab danh mục (đếm cấp 1 gồm con); lọc type (ô tích OR + số), province (nhiều OR + số), giá 0–50+ tỷ, diện tích 0–500+ bước 10, bedrooms chip KHÔNG số, direction + handover ô tích nhiều OR CÓ số, q (tiêu đề + tóm tắt + địa chỉ + phường + tỉnh, không dấu), sort; priceMax=0 / areaMax=0 = không giới hạn trên; hàng \"N … phù hợp\" có lại; ?category=<slug> cũ ở /tin-bds lọc + tab, noindex, canonical → /tin-bds/danh-muc/<slug>",
+      "Thẻ voucher (có ưu đãi + không priceVnd lẫn areaM2): hạn ưu đãi + Còn hạn / Đã kết thúc (BR-06) thay giá / diện tích; tin bán có ưu đãi = thẻ BĐS + badge ưu đãi; /en ngày MM/DD/YYYY",
+      "/tin-bds/[slug]: GIỮ nút chia sẻ ở hero; thanh thông số BĐS (Giá · Diện tích · PN/PT · Hướng · Mặt tiền · Số tầng) hoặc voucher (Hạn · Trạng thái + Giá nếu có); tab Tổng quan (nội dung + lưới thông tin Tình trạng bàn giao, Loại hình) · Ưu đãi (OfferBox) · Vị trí (khi có toạ độ/địa chỉ) · Hình ảnh (≥ 2 ảnh) · Tin liên quan; neo cũ #content rơi về đầu trang; form source=property_post + hotline",
+      "Khối \"Tìm hiểu thêm\" + FAQ cuối danh sách riêng từng màn (listingPages); trống → ẩn; FAQPage JSON-LD: /du-an và /tin-bds khi trang sạch (= điều kiện noindex), /cho-thue chỉ URL không tham số; trang danh mục hiện FAQ nhưng KHÔNG phát FAQPage",
+      "Admin Dự án: Loại sản phẩm, Tiện ích nổi bật (nhãn \"Hồ bơi, gym, spa\"), Sản phẩm (≤ 8, đến ≥ từ), Link video (YouTube/TikTok), mô tả tiện ích (localized), Ảnh khối tiện ích; Dịch AI dịch các chữ localized mới",
+      "Admin Tin BĐS tab \"Thông tin tin đăng\": propertyType, areaM2, bedrooms, bathrooms, houseDirection, frontageM, floors, handoverCondition, address, location (số ≥ 0); tin cũ để trống vẫn lưu / xuất bản",
+      "Admin Cài đặt website tab \"Trang danh sách\": listingPages.{projects,rentals,propertyPosts} — quickSearch ≤ 8, learnMore (ảnh, video, CTA nội bộ/https), faqs ≤ 10, showStrengths (rentals/propertyPosts); EN thiếu chữ → bỏ hàng",
+      "Mobile < lg: nút \"Bộ lọc\" + badge mở Sheet; cột phải chi tiết xuống sau nội dung + thanh CTA dính đáy; không tràn ngang ở 390",
+      "Không JS: form GET cột lọc + nút \"Áp dụng\" chạy; có JS đổi ô → điều hướng ngay, bỏ page; sắp xếp không làm mất lọc đang chờ",
+      "Backfill dev: pnpm backfill:listing-fields dry-run mặc định, --apply chỉ điền ô trống, từ chối NODE_ENV=production / DB không phải dev, bỏ qua mọi tin có ưu đãi, giá trị mâu thuẫn → danh sách soát; báo cáo docs/reports/backfill-listing-fields-<ngày>-<giờ>-<dry-run|apply>.md"
+    ],
+    "dependents": [
+      "Trang chủ: ProjectsSlider / OffersSlider / RentalsTabs giữ biến thể thẻ cũ (không tag/giá mới); CardSlider (slider dự án nổi bật) không tràn ngang mobile",
+      "DetailLayout + component chi tiết dùng chung — mọi trang chi tiết khác",
+      "GET /api/public/rentals (tham số project mới) + đếm tìm kiếm",
+      "Sitemap / JSON-LD (RealEstateListing, Article, FAQPage, BreadcrumbList) các trang danh sách + chi tiết",
+      "Admin form Projects / PropertyPosts / Site settings + Dịch AI TRANSLATABLE_FIELDS.projects",
+      "BL-054 (Tin tức / Tuyển dụng / Liên hệ) sẽ tái dùng src/components/listing/*"
+    ],
+    "regression": [
+      "Link lọc cũ /du-an (province 1 slug, status, developer, q, sort, page) và /cho-thue (danh mục, tỉnh, phường, giá VNĐ, diện tích, phòng ngủ, nội thất, tiện ích) chạy đúng; /du-an?category= và /cho-thue?category= từ ô tìm kiếm trang chủ đánh dấu tab",
+      "SEO: có lọc / sort / q → noindex, follow + canonical trang sạch (/cho-thue giữ quy tắc F3: chỉ 1 danh mục hoặc 1 tỉnh vẫn index); ?category= cũ noindex + canonical trang danh mục; trang sạch index; hreflang đúng",
+      "Số đếm: tab + ô tích = khớp mọi lọc khác trừ chính chiều đó, mục 0 hiện mờ, tỉnh chỉ liệt kê tỉnh có ≥ 1 tin; chip đơn chọn không có số",
+      "Sort + lọc: đổi sắp xếp giữ mọi lọc (kể cả lọc đang chờ chưa áp), bỏ page; tin/dự án không giá xếp cuối; thẻ nổi bật không lặp lưới ở mọi trang",
+      "BR-06: ưu đãi hết hạn → \"Đã kết thúc\", xếp sau, rời khối Ưu đãi nổi bật; thẻ voucher đúng trạng thái theo offer.endAt",
+      "Lead form: source đúng (project / rental / property_post), Turnstile, consent, gửi thành công; 1 LeadForm duy nhất mỗi trang chi tiết; #lead-form, #documents giữ",
+      "Tin cho thuê đã thuê: băng \"Đã thuê\", noindex, \"Căn tương tự đang trống\"",
+      "Bản EN mọi màn: nhãn i18n đủ, chữ EN thiếu thì bỏ hàng không rơi về VI, ngày en-US MM/DD/YYYY",
+      "Dự án / tin cũ không có trường mới vẫn hiển thị (ô trống ẩn, không khung rỗng); giá thiếu → \"Liên hệ\"",
+      "Header, footer, ConsultBanner, StrengthsBlock (cờ showProjectStrengths / listingPages.*.showStrengths), breadcrumb trên ảnh; no-raw-colors.test PASS; 1 h1/trang; scroll-spy tab chi tiết",
+      "p95 danh sách ≤ 500ms (lọc/đếm trong bộ nhớ có trần 1000 dự án, chạm trần log cảnh báo)"
+    ]
+  },
+  "acceptance": [
+    "/du-an + /du-an/[slug] khớp bố cục 2 ảnh design ở desktop; responsive mobile/tablet hợp lý (bộ lọc trái thành sheet trên mobile)",
+    "/cho-thue, /cho-thue/[slug], /tin-bds, /tin-bds/[slug] (+ trang danh mục danh-muc/[category]) dùng cùng layout với trường theo 'Quyết định'",
+    "Trường mới có trong admin (nhãn tiếng Việt, localized khi là chữ), migration versioned, không phá dữ liệu cũ (chỉ ADD)",
+    "Bộ lọc mới chạy qua searchParams, giữ được khi chia sẻ link; số đếm đúng theo bộ lọc khác đang chọn (hoặc ghi rõ cách đếm)",
+    "Ô Pháp lý không hiện trên thanh thông số dự án",
+    "Không có icon yêu thích",
+    "Khối trống (video, sản phẩm, tiện ích, FAQ…) ẩn, không để khung rỗng",
+    "Bản EN hoạt động như bản VI (nhãn i18n đủ)",
+    "Test + typecheck + lint + build PASS",
+    "Chip đơn chọn không hiện số đếm; ô tích + tab có số đúng (B1, user 2026-10-22)",
+    "/en hiện ngày en-US MM/DD/YYYY (kể cả hạn ưu đãi thẻ voucher)",
+    "FAQPage JSON-LD chỉ ở trang sạch theo quy tắc từng màn; trang danh mục không phát",
+    "Chi tiết Dự án / Cho thuê không có nút chia sẻ ở hero; chi tiết Tin BĐS có",
+    "Backfill từ chối production, chỉ điền ô trống, bỏ qua tin có ưu đãi"
+  ],
+  "verification": {
+    "status": "PASS tại HEAD 838606c",
+    "typecheck": "PASS",
+    "lint": "PASS (0 lỗi; 2 warning có sẵn tools/task-dashboard)",
+    "test": "PASS 385 file / 3878 test",
+    "build": "PASS (worktree P3-T06, trước merge)",
+    "browser": "11 URL (VI/EN, 6 màn + trang chủ) × 1440/768/390 = 33 lượt: không tràn ngang, 1 h1/trang; slider trang chủ 390 OK",
+    "backfillDev": "Dự án: docs/reports/backfill-listing-fields-2026-10-21-2238-apply.md; Tin BĐS: 38 quét / 37 điền / 1 bỏ qua / 0 lỗi → docs/reports/backfill-listing-fields-2026-10-22-0134-apply.md",
+    "residual": [
+      "LCP chưa đo (dev mode)",
+      "pnpm build không chạy lại tại HEAD (merge sau chỉ đổi progress/doc)"
+    ]
+  },
+  "openItems": [
+    "C-1 308 redirect ?category= cho /tin-bds + /cho-thue",
+    "C-4 /du-an priceMax=0 = không giới hạn (đồng bộ /tin-bds)",
+    "C-5 index rentals_amenities.value + ca EN đếm tiện ích",
+    "C-6 GIST index property_posts.location (khi có lọc bản đồ)",
+    "C-7 integration hookTimeout",
+    "C-8 backfill isOfferPost trùng hasPostOffer"
+  ],
+  "risk": "high",
+  "riskNote": "UI rộng (6 route + danh mục, VI/EN, component dùng chung trang chủ / DetailLayout) + schema additive 3 collection/global + tham số URL/API mới + SEO noindex/canonical + số đếm bộ lọc. Migration SAFE_ADDITIVE. Ưu tiên test: BR-06 thẻ voucher, SEO noindex/canonical (kể cả ?category= cũ), số đếm theo chiều, sort giữ lọc, EN fallback."
+}
