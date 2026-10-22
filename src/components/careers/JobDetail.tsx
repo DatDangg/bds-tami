@@ -11,7 +11,7 @@ import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { buttonVariants } from "@/components/ui/button";
-import { hasRichText, type JobCardData, type JobDetailView } from "@/lib/careers/job-view";
+import { hasRichText, type JobCardData, type JobDetailView, splitDescriptionLead } from "@/lib/careers/job-view";
 import { publicPath } from "@/lib/content/content-paths";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/routing";
@@ -57,6 +57,8 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
   const tRich = useTranslations("page.richText");
   const listPath = publicPath("/tuyen-dung", locale);
   const sections = SECTION_KEYS.filter((key) => hasRichText(doc[key]));
+  // Đoạn dẫn đã lên hero (`view.intro`) thì thân "Mô tả công việc" bỏ đoạn đó (C11); JSON-LD vẫn đọc `doc.description` đầy đủ ở route.
+  const sectionContent = { description: splitDescriptionLead(doc.description).body, requirements: doc.requirements, benefits: doc.benefits };
 
   return (
     <article className="pb-16 lg:pb-0">
@@ -128,7 +130,7 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
               <h2 id={`job-${key}`} className="font-display text-h3">
                 {tv(`sections.${key}`)}
               </h2>
-              <RichText data={doc[key]} locale={locale} tableLabel={tRich("table")} className={cn("max-w-[68ch] text-text-secondary", ACCENT_LIST_CLASS)} />
+              <RichText data={sectionContent[key]} locale={locale} tableLabel={tRich("table")} className={cn("max-w-[68ch] text-text-secondary", ACCENT_LIST_CLASS)} />
             </section>
           ))}
         </div>

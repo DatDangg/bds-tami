@@ -118,6 +118,10 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
     expect(within(form).getByLabelText(/CV/)).toBeInTheDocument();
     expect(within(form).getByRole("button", { name: "Gửi hồ sơ" })).toBeInTheDocument();
     expect(within(form).getByText("Phản hồi trong 3 ngày làm việc.")).toBeInTheDocument();
+    // C5: dòng phụ nằm trong cùng <header> với h2 (không còn bù lề âm -mt-3).
+    const formHeader = within(form).getByRole("heading", { level: 2, name: "Ứng tuyển vị trí này" }).closest("header") as HTMLElement;
+    expect(formHeader).not.toBeNull();
+    expect(within(formHeader).getByText("Phản hồi trong 3 ngày làm việc.")).not.toHaveClass("-mt-3");
     expect(within(form).getByLabelText(/Lời nhắn/)).toBeInTheDocument();
     expect(within(form).getByRole("link", { name: "Gửi CV tới tuyendung@tami.example" })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
     expect(within(form).getByRole("link", { name: "0901 234 567" })).toHaveAttribute("href", "tel:0901234567");
@@ -156,6 +160,73 @@ describe("trang chi tiết tuyển dụng (S13): tin còn hạn", () => {
     expect(container.querySelector("aside #apply-form")).not.toBeNull();
     expect(container.querySelector("aside [class*='lg:sticky']")).not.toBeNull();
     expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
+  });
+
+  it("C11: đoạn dẫn lên hero thì 'Mô tả công việc' bỏ đoạn đó (không lặp), JSON-LD vẫn đủ; mô tả chỉ 1 đoạn → giữ trong thân, hero không có mô tả ngắn", async () => {
+    findPublicJobBySlug.mockResolvedValue(job({ description: lexical("Gia nhập đội ngũ TAMI.", "Đoạn hai.") }));
+    const { container, unmount } = await renderJob();
+    const hero = container.querySelector("section[data-hero=job-detail]") as HTMLElement;
+    const section = screen.getByRole("heading", { level: 2, name: "Mô tả công việc" }).closest("section") as HTMLElement;
+    expect(screen.getAllByText("Gia nhập đội ngũ TAMI.")).toHaveLength(1);
+    expect(within(hero).getByText("Gia nhập đội ngũ TAMI.")).toBeInTheDocument();
+    expect(within(section).queryByText("Gia nhập đội ngũ TAMI.")).toBeNull();
+    expect(within(section).getByText("Đoạn hai.")).toBeInTheDocument();
+    const posting = jsonLdItems(container).find((item) => item["@type"] === "JobPosting");
+    expect(posting?.description).toContain("<h2>Mô tả công việc</h2><p>Gia nhập đội ngũ TAMI.</p><p>Đoạn hai.</p>");
+    unmount();
+
+    findPublicJobBySlug.mockResolvedValue(job({ description: lexical("Chỉ một đoạn mô tả.") }));
+    const single = await renderJob();
+    const singleHero = single.container.querySelector("section[data-hero=job-detail]") as HTMLElement;
+    expect(within(singleHero).queryByText("Chỉ một đoạn mô tả.")).toBeNull();
+    const singleSection = screen.getByRole("heading", { level: 2, name: "Mô tả công việc" }).closest("section") as HTMLElement;
+    expect(within(singleSection).getByText("Chỉ một đoạn mô tả.")).toBeInTheDocument();
+  });
+
+  it("C11 attempt 2: đoạn dẫn dài hiện toàn văn ở hero (không line-clamp) và không có trong thân; đoạn dẫn có link → không tách, link giữ trong thân", async () => {
+    const longLead = "Gia nhập đội ngũ TAMI, trở thành một phần của hành trình kiến tạo giá trị bền vững trong lĩnh vực bất động sản cho thuê. ".repeat(3).trim();
+    findPublicJobBySlug.mockResolvedValue(job({ description: lexical(longLead, "Đoạn hai.") }));
+    const { container, unmount } = await renderJob();
+    const hero = container.querySelector("section[data-hero=job-detail]") as HTMLElement;
+    const intro = within(hero).getByText(longLead);
+    expect(intro.className).not.toMatch(/line-clamp/);
+    const section = screen.getByRole("heading", { level: 2, name: "Mô tả công việc" }).closest("section") as HTMLElement;
+    expect(section.textContent).not.toContain("Gia nhập đội ngũ TAMI");
+    unmount();
+
+    const linked = lexical("Đoạn hai.");
+    const leadWithLink = {
+      type: "paragraph",
+      version: 1,
+      direction: "ltr" as const,
+      format: "" as const,
+      indent: 0,
+      children: [
+        { type: "text", version: 1, text: "Xem thêm tại " },
+        { type: "link", version: 1, fields: { url: "https://tami.example/gioi-thieu", linkType: "custom" }, children: [{ type: "text", version: 1, text: "trang giới thiệu" }] },
+      ],
+    };
+    findPublicJobBySlug.mockResolvedValue(job({ description: { root: { ...linked.root, children: [leadWithLink, ...linked.root.children] } } as never }));
+    const withLink = await renderJob();
+    const linkHero = withLink.container.querySelector("section[data-hero=job-detail]") as HTMLElement;
+    expect(linkHero.textContent).not.toContain("Xem thêm tại");
+    const linkSection = screen.getByRole("heading", { level: 2, name: "Mô tả công việc" }).closest("section") as HTMLElement;
+    expect(within(linkSection).getByRole("link", { name: "trang giới thiệu" })).toHaveAttribute("href", "https://tami.example/gioi-thieu");
+    expect(within(linkSection).getByText("Đoạn hai.")).toBeInTheDocument();
+  });
+
+  it("C11 attempt 3: ảnh đứng trước đoạn dẫn → không tách, ảnh + đoạn dẫn vẫn render trong 'Mô tả công việc', hero không có mô tả ngắn", async () => {
+    const base = lexical("Gia nhập đội ngũ TAMI.", "Đoạn hai.");
+    const media = { id: "m1", url: "/api/media/file/a.jpg", alt: "Ảnh văn phòng", mimeType: "image/jpeg", width: 1600, height: 900 };
+    const upload = { type: "upload", version: 1, relationTo: "media", value: media };
+    findPublicJobBySlug.mockResolvedValue(job({ description: { root: { ...base.root, children: [upload, ...base.root.children] } } as never }));
+    const { container } = await renderJob();
+    const hero = container.querySelector("section[data-hero=job-detail]") as HTMLElement;
+    expect(hero.textContent).not.toContain("Gia nhập đội ngũ TAMI.");
+    const section = screen.getByRole("heading", { level: 2, name: "Mô tả công việc" }).closest("section") as HTMLElement;
+    expect(within(section).getByRole("img", { name: "Ảnh văn phòng" })).toBeInTheDocument();
+    expect(within(section).getByText("Gia nhập đội ngũ TAMI.")).toBeInTheDocument();
+    expect(within(section).getByText("Đoạn hai.")).toBeInTheDocument();
   });
 
   it("JSON-LD JobPosting: validThrough cuối ngày hạn giờ VN, baseSalary min/max theo tháng, inLanguage, URL tuyệt đối, mô tả HTML; kèm BreadcrumbList", async () => {

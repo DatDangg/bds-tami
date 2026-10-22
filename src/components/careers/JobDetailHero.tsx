@@ -33,7 +33,7 @@ function InfoItem({ icon, children }: { icon: ReactNode; children: ReactNode }) 
 /**
  * Hero chi tiết tuyển dụng (BL-054, design `chi-tiet-tuyen-dung.webp`): ảnh Tuyển dụng phủ scrim SÁNG bằng token nền (`bg-bg` dày bên trái, nhạt dần sang
  * phải ≥ lg; < lg phủ gần kín để chữ tối luôn đạt AA) → breadcrumb → phòng ban + "Tuyển gấp" → `h1` 2 dòng (dòng 2 màu nhấn, `splitJobTitle`) → mô tả ngắn
- * (≤ 2 dòng) → hàng thông tin có icon (tỉnh/thành · hình thức · lương · hạn nộp) → "Ứng tuyển ngay" (neo `#apply-form`, chạy không JS) + "Chia sẻ".
+ * (đoạn dẫn chữ thuần, toàn văn) → hàng thông tin có icon (tỉnh/thành · hình thức · lương · hạn nộp) → "Ứng tuyển ngay" (neo `#apply-form`, chạy không JS) + "Chia sẻ".
  * Tin hết hạn: không có nút ứng tuyển. Server Component; chỉ nút chia sẻ là client.
  */
 export function JobDetailHero({ view, image, breadcrumb, shareUrl }: JobDetailHeroProps) {
@@ -62,7 +62,8 @@ export function JobDetailHero({ view, image, breadcrumb, shareUrl }: JobDetailHe
               </>
             )}
           </h1>
-          {view.intro && <p className="line-clamp-2 max-w-[56ch] text-body text-text-secondary">{view.intro}</p>}
+          {/* Đoạn dẫn đã bỏ khỏi thân "Mô tả công việc" (C11) nên hiện toàn văn, không `line-clamp`. */}
+          {view.intro && <p className="max-w-[56ch] text-body text-text-secondary">{view.intro}</p>}
           <ul aria-label={t("infoLabel")} className="mt-2 flex flex-wrap items-center gap-x-8 gap-y-3">
             {view.provinceName && <InfoItem icon={<MapPin size={20} />}>{view.provinceName}</InfoItem>}
             <InfoItem icon={<Briefcase size={20} />}>{tCareers(`employmentType.${view.employmentType}`)}</InfoItem>

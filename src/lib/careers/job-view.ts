@@ -84,7 +84,7 @@ export interface JobDetailView {
   title: string;
   /** Tiêu đề hero tách 2 dòng (`splitJobTitle`); 1 phần tử = 1 dòng. */
   titleLines: JobTitleLines;
-  /** Mô tả ngắn hero = khối đầu có chữ của `description` (khoảng trắng đã gộp); không có → `null`. */
+  /** Mô tả ngắn hero = đoạn dẫn của `description` (`splitDescriptionLead`); không tách được → `null` (ẩn). */
   intro: string | null;
   /** Phòng ban = tên danh mục `job` (`/en` chưa có bản EN → `null`). */
   categoryName: string | null;
@@ -108,7 +108,7 @@ export function toJobDetailView(doc: JobPosting, locale: Locale, now: Date): Job
   return {
     title,
     titleLines: splitJobTitle(title),
-    intro: firstBlockText(doc.description),
+    intro: splitDescriptionLead(doc.description).intro,
     categoryName: visibleCategory(category, locale)?.name ?? null,
     categoryId: typeof category === "string" ? category : (category?.id ?? null),
     isUrgent: doc.isUrgent === true,
@@ -157,14 +157,68 @@ export function splitJobTitle(title: string): JobTitleLines {
   return lineAt(Math.min(words.length - TITLE_MIN_LINE_WORDS, 2 * Math.ceil(words.length / 4)));
 }
 
-/** Chữ của khối đầu tiên có chữ trong một richText (đoạn hoặc danh sách), khoảng trắng đã gộp; không có → `null`. */
-export function firstBlockText(content: unknown): string | null {
-  const blocks = (content as { root?: { children?: unknown[] } } | null | undefined)?.root?.children ?? [];
-  for (const block of blocks) {
-    const text = lexicalPlainText({ root: block }).replace(/\s+/g, " ").trim();
-    if (text) return text;
-  }
-  return null;
+export interface DescriptionLead {
+  /** Mô tả ngắn hero = đoạn dẫn chữ thuần (khoảng trắng đã gộp); `null` khi không tách được (hero ẩn mô tả ngắn). */
+  intro: string | null;
+  /** Thân mục "Mô tả công việc": mọi khối trừ đúng đoạn dẫn (và các đoạn rỗng trước nó) khi đã đưa lên hero; không tách thì là chính `content`. */
+  body: unknown;
+}
+
+interface LexicalNode {
+  type?: string;
+  format?: number | string;
+  style?: string;
+  indent?: number;
+  text?: string;
+  children?: unknown[];
+}
+
+/**
+ * Đoạn rỗng: `paragraph` mà mọi con chỉ là `text` rỗng/khoảng trắng hoặc `linebreak` (không chữ, không nút nội dung nào khác).
+ * Chỉ loại khối này được bỏ qua khi tìm đoạn dẫn — ảnh/upload, HR, relationship… không có chữ nhưng vẫn là nội dung.
+ */
+function isEmptyParagraph(block: LexicalNode): boolean {
+  if (block.type !== "paragraph") return false;
+  return (block.children ?? []).every((child) => {
+    const node = child as LexicalNode;
+    return node.type === "linebreak" || (node.type === "text" && !(node.text ?? "").trim());
+  });
+}
+
+/**
+ * Đoạn chữ thuần: căn lề mặc định (`format` rỗng), không thụt lề (`indent` 0), mọi con là nút `text` không định dạng (`format` 0 — không
+ * đậm/nghiêng/gạch chân/gạch ngang/code…, không `style` riêng). Có link, xuống dòng, định dạng, căn lề/thụt lề hay nút khác → `false`: hero hiện
+ * chữ thuần căn trái, tách đoạn đó ra sẽ làm mất link / định dạng / trình bày.
+ */
+function isPlainTextParagraph(block: LexicalNode): boolean {
+  if (block.type !== "paragraph" || block.format || block.indent) return false;
+  return (block.children ?? []).every((child) => {
+    const node = child as LexicalNode;
+    return node.type === "text" && !node.format && !node.style;
+  });
+}
+
+/**
+ * Tách đoạn dẫn của `description` cho chi tiết tuyển dụng (BL-054 C11, tiền lệ BL-056 "đoạn dẫn + phần còn lại"). Quy tắc bảo thủ — không có
+ * đường mất nội dung: bỏ qua CHỈ các đoạn rỗng ở đầu (`isEmptyParagraph`); khối đầu tiên còn lại phải là ĐOẠN CHỮ THUẦN (`isPlainTextParagraph`)
+ * và phần sau còn chữ → đoạn đó lên hero (toàn văn, không cắt dòng), thân = các khối sau nó (chỉ bỏ đoạn dẫn + đoạn rỗng trước nó). Khối khác đứng
+ * trước (ảnh/upload, HR, relationship, tiêu đề, danh sách, trích dẫn, block…) / đoạn đầu có link, định dạng, căn lề, thụt lề / chỉ có một khối có
+ * chữ → không tách: thân là chính `content`, hero không hiện mô tả ngắn.
+ * Chỉ dùng cho hiển thị: JSON-LD `description` và meta vẫn đọc `description` đầy đủ.
+ */
+export function splitDescriptionLead(content: unknown): DescriptionLead {
+  const root = (content as { root?: { children?: unknown[] } } | null | undefined)?.root;
+  const blocks = (root?.children ?? []) as LexicalNode[];
+  const leadIndex = blocks.findIndex((block) => !isEmptyParagraph(block));
+  const lead = blocks[leadIndex];
+  if (!lead || !isPlainTextParagraph(lead)) return { intro: null, body: content };
+  // Mọi khối trước leadIndex đều là đoạn rỗng (findIndex) → bỏ cùng đoạn dẫn không mất nội dung.
+  const rest = blocks.slice(leadIndex + 1);
+  if (!hasRichText({ root: { children: rest } })) return { intro: null, body: content };
+  return {
+    intro: lexicalPlainText({ root: lead }).replace(/\s+/g, " ").trim(),
+    body: { ...(content as object), root: { ...root, children: rest } },
+  };
 }
 
 /** richText có chữ thật không (khối trống không render `h2` mồ côi). */

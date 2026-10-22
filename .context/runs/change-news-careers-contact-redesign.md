@@ -45,3 +45,9 @@ batchQueue: [BL-054]
 - 2026-10-22 P2-T04 → a2a31a3 merged + progress (typecheck + 27 file / 252 PASS). Hết task P1+P2. next: verify tổng thể staging → spec-validator phase review.
 - 2026-10-22 Verify staging 8326e98: typecheck PASS, build PASS, lint chỉ lỗi ở file không thuộc BL-054 (.local-seed/seed-sample-project-blocks.ts — session khác, không track) + 2 warning cũ; full pnpm test chạy nền. ▶ START [agent: spec-validator] phase review P1+P2 (running — cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE [agent: spec-validator] phase review P1+P2 — GAPS (0 MAJOR, 6 MINOR). G2 đóng: full pnpm test staging 8326e98 407 file / 4159 PASS, build PASS. G6 sai (DB dev tami đã migrate 2 migration; backfill:offices dry-run = skip-no-source vì DB dev không có địa chỉ/hotline — không cần apply). G4 change-request quyết (a) theo tiền lệ BL-056. NEEDS_USER-2 (chính sách bảo mật + retention bản tin) → báo user, backlog. Task mới phase-3-task-01 (C1–C11). ▶ START [agent: builder-strong] P3-T01 (running — cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder-strong] P3-T01. ▶ START [agent: reviewer] P3-T01 r1 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r1 STRICT FAIL (MAJOR-1 C11 cắt đoạn dẫn). ▶ START builder-strong attempt 2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 attempt 2 DONE. ▶ START [agent: reviewer] r2 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r2 STRICT FAIL (khối không chữ trước đoạn dẫn bị mất). ▶ START builder-strong attempt 3 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 attempt 3 DONE. ▶ START [agent: reviewer] r3 (running — cancel sẽ redo bước này)
+- 2026-10-22 P3-T01 r3 STRICT PASS → acaeebd merged + progress. next: full verify + spec-publisher as-built + close-out.

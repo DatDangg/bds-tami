@@ -421,6 +421,12 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(ids(await load({ q: "district zq54" }))).toEqual([]);
 
       const search = await import("../../src/lib/news/news-search");
+      // C10 (P3-T01): danh mục lọc ngay trong SQL tìm id (trước trần NEWS_FILTER_MAX_IDS) — id trả về chỉ thuộc danh mục truyền vào.
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [scope.id] })).toEqual([a.id, b.id, c.id]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [categoryId] })).toEqual([]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { tag: "quy hoạch", categoryIds: [categoryId, scope.id] })).toEqual([a.id, c.id]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [] })).toEqual([]);
+      expect(ids(await load({ q: "dong anh zq54" }, "vi", [scope.id]))).toEqual([a.id, b.id]);
       const tags = await search.listTopNewsTags(payload, "vi");
       expect(tags.length).toBeLessThanOrEqual(12);
       expect(tags).toContain("quy hoạch");

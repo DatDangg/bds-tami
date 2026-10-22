@@ -114,6 +114,9 @@ export async function runOfficesBackfill(payload: GlobalApi, options: { apply: b
 
 const cell = (value: string | undefined) => (value ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ").trim() || "—";
 
+/** Đường tới danh sách văn phòng trong admin: nhóm "Cài đặt website" → global "Cấu hình chung" → tab → mảng. */
+const OFFICES_ADMIN_PATH = "\"Cài đặt website → Cấu hình chung → Liên hệ & mạng xã hội → Hệ thống văn phòng\"";
+
 export function renderOfficesReport(result: OfficesBackfillResult, ranAt: string): string {
   const { plan, apply, written, errors } = result;
   const head = [
@@ -152,7 +155,11 @@ export function renderOfficesReport(result: OfficesBackfillResult, ranAt: string
     "## Cần admin soát",
     "",
     ...(errors.length > 0 ? errors.map((e) => `- ${cell(e)}`) : []),
-    "- Ảnh văn phòng chưa có — tải ảnh trong \"Cấu hình chung → Liên hệ & mạng xã hội → Hệ thống văn phòng\".",
+    // VI đã ghi mà bước EN lỗi: chạy lại script sẽ bỏ qua (offices đã có hàng) nên bản EN phải nhập tay.
+    ...(apply && en && written.vi && !written.en
+      ? [`- Bản EN chưa ghi được — nhập EN tay trong admin (${OFFICES_ADMIN_PATH}, chuyển ngôn ngữ sang English). Chạy lại script sẽ bỏ qua vì văn phòng đã có.`]
+      : []),
+    `- Ảnh văn phòng chưa có — tải ảnh trong ${OFFICES_ADMIN_PATH}.`,
     ...(en ? [] : ["- Tên / địa chỉ EN chưa có — `/en` vẫn dựng văn phòng dự phòng từ trường cũ cho tới khi nhập bản EN của văn phòng."]),
     "",
   ].join("\n");

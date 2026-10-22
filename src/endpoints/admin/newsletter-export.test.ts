@@ -1,6 +1,7 @@
 import type { PayloadRequest } from "payload";
 import { describe, expect, it, vi } from "vitest";
 
+import { LOCALE_LABELS } from "@/collections/NewsletterSubscribers";
 import { handleNewsletterExport, NEWSLETTER_EXPORT_COLUMNS, toNewsletterExportRow } from "./newsletter-export";
 
 const allowed = vi.fn(async () => ({ allowed: true as const, remaining: 9 }));
@@ -80,5 +81,8 @@ describe("handleNewsletterExport", () => {
       sourcePath: "/en/news",
     });
     expect(row).toEqual(["khach@example.test", "Tiếng Anh", "Đã huỷ", "10:00 22/10/26", "10:05 22/10/26", "2026-10", "/en/news"]);
+    // C8: cột "Ngôn ngữ" dùng chung nhãn với ô chọn của collection (không còn bản sao riêng).
+    expect(row[1]).toBe(LOCALE_LABELS.en);
+    expect(toNewsletterExportRow({ id: "y", email: "a@b.test", locale: "vi", status: "active", createdAt: "2026-10-22T03:00:00.000Z", consentAt: "2026-10-22T03:00:00.000Z", privacyPolicyVersion: "v", sourcePath: "/" })[1]).toBe(LOCALE_LABELS.vi);
   });
 });

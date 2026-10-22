@@ -151,6 +151,12 @@ describe("ApplyForm: chọn file CV", () => {
     await user.click(screen.getByRole("button", { name: "Chọn tệp" }));
     expect(click).toHaveBeenCalledTimes(1);
   });
+
+  it("C1: nút Chọn tệp giữ vùng chạm ≥ 44px ở mọi khổ (h-11 < md; md:min-h-11 khi thành chữ nhấn md:h-auto)", () => {
+    renderForm();
+    const classes = screen.getByRole("button", { name: "Chọn tệp" }).className.split(/\s+/);
+    expect(classes).toEqual(expect.arrayContaining(["h-11", "md:h-auto", "md:min-h-11"]));
+  });
 });
 
 describe("ApplyForm: kéo-thả CV", () => {

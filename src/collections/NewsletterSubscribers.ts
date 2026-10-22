@@ -14,7 +14,8 @@ export const NEWSLETTER_STATUS_LABELS: Record<NewsletterStatus, string> = {
 /** Bằng chứng đồng ý: không ai sửa tay sau khi tạo (kể cả admin). Payload bỏ giá trị gửi lên cho field này khi update không `overrideAccess`. */
 const lockedAfterCreate = { update: denyAll };
 
-const LOCALE_LABELS = { vi: "Tiếng Việt", en: "Tiếng Anh" } as const;
+/** Nhãn ngôn ngữ đăng ký: dùng chung cho ô chọn trong admin và cột "Ngôn ngữ" của file Excel (`newsletter-export`). */
+export const LOCALE_LABELS = { vi: "Tiếng Việt", en: "Tiếng Anh" } as const;
 
 /** Email lưu dạng đã cắt khoảng trắng + chữ thường để unique chặn được bản trùng khác hoa/thường. */
 export const normalizeEmail: FieldHook = ({ value }) => (typeof value === "string" ? value.trim().toLowerCase() : value);

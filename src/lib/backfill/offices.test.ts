@@ -61,6 +61,7 @@ describe("runOfficesBackfill", () => {
     expect(viCall).toMatchObject({ locale: "vi", context: { [TRANSLATION_JOB_CONTEXT_KEY]: true }, data: { offices: [{ name: "Văn phòng TAMI HOMES", address: "Lô A, Tây Hồ", location: [105.81, 21.07] }] } });
     expect(enCall).toMatchObject({ locale: "en", data: { offices: [{ id: "row-0", name: "TAMI HOMES office", address: "Lot A, Tay Ho", phone: "1900 0000", email: "info@tami.vn" }] } });
     expect(state.vi.offices).toHaveLength(1);
+    expect(renderOfficesReport(first, "x")).not.toContain("nhập EN tay");
 
     const second = await runOfficesBackfill(payload, { apply: true }, NAMES);
     expect(second.plan).toEqual({ status: "skip-has-offices", count: 1 });
@@ -74,7 +75,11 @@ describe("runOfficesBackfill", () => {
     const result = await runOfficesBackfill(payload, { apply: true }, NAMES);
     expect(result.written).toEqual({ vi: true, en: false });
     expect(result.errors).toEqual(["Ghi EN lỗi (VI đã ghi): siteName required"]);
-    expect(renderOfficesReport(result, "x")).toContain("| Lỗi khi ghi | 1 |");
+    const report = renderOfficesReport(result, "x");
+    expect(report).toContain("| Lỗi khi ghi | 1 |");
+    // C4: chỉ dẫn nhập EN tay trong admin khi VI đã ghi mà EN lỗi.
+    expect(report).toContain("nhập EN tay trong admin");
+    expect(report).toContain("Cài đặt website → Cấu hình chung → Liên hệ & mạng xã hội → Hệ thống văn phòng");
   });
 
   it("tên báo cáo theo tiền tố script", () => {

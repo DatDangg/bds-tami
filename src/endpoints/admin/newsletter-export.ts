@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadRequest, Where } from "payload";
 
 import { isAdmin } from "@/access";
-import { NEWSLETTER_STATUS_LABELS, NEWSLETTER_STATUSES, type NewsletterStatus } from "@/collections/NewsletterSubscribers";
+import { LOCALE_LABELS, NEWSLETTER_STATUS_LABELS, NEWSLETTER_STATUSES, type NewsletterStatus } from "@/collections/NewsletterSubscribers";
 import { writeAuditLog } from "@/lib/audit/write-audit-log";
 import { createXlsxStream, type CellValue } from "@/lib/export/xlsx-stream";
 import { buildAttachmentDisposition } from "@/lib/http/content-disposition";
@@ -20,8 +20,6 @@ const PAGE_SIZE = 500;
 
 export const NEWSLETTER_EXPORT_COLUMNS = ["Email", "Ngôn ngữ", "Trạng thái", "Ngày đăng ký", "Ngày đồng ý", "Phiên bản chính sách", "Trang đăng ký"] as const;
 
-const LOCALE_NAMES: Record<string, string> = { vi: "Tiếng Việt", en: "Tiếng Anh" };
-
 const SUBSCRIBER_SELECT = { email: true, locale: true, status: true, createdAt: true, consentAt: true, privacyPolicyVersion: true, sourcePath: true } as const;
 
 type ExportedSubscriber = Pick<NewsletterSubscriber, "id" | "email" | "locale" | "status" | "createdAt" | "consentAt" | "privacyPolicyVersion" | "sourcePath">;
@@ -29,7 +27,7 @@ type ExportedSubscriber = Pick<NewsletterSubscriber, "id" | "email" | "locale" |
 export function toNewsletterExportRow(subscriber: ExportedSubscriber): CellValue[] {
   return [
     subscriber.email,
-    LOCALE_NAMES[subscriber.locale] ?? subscriber.locale,
+    LOCALE_LABELS[subscriber.locale] ?? subscriber.locale,
     NEWSLETTER_STATUS_LABELS[subscriber.status] ?? subscriber.status,
     formatTime(subscriber.createdAt),
     formatTime(subscriber.consentAt),
