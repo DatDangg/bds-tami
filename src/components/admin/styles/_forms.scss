@@ -165,6 +165,52 @@
   }
 }
 
+// ---- Khung xem trước kết quả Google ở khối SEO (BL-058 T05) ----
+.tami-seo-preview {
+  margin: 0 0 16px;
+}
+
+.tami-seo-preview__note {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  color: var(--admin-text-subtle);
+}
+
+.tami-seo-preview__card {
+  padding: 12px 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-m);
+  background: var(--admin-surface);
+}
+
+.tami-seo-preview__title {
+  color: var(--admin-badge-info-fg);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.tami-seo-preview__url {
+  margin-top: 2px;
+  color: var(--admin-badge-success-fg);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.tami-seo-preview__description {
+  margin-top: 4px;
+  color: var(--admin-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .tami-seo-preview__card {
+    padding: 10px 12px;
+  }
+}
+
 // ---- Nút "Hôm nay" cạnh ô ngày ----
 .tami-today-button {
   margin-top: 8px;

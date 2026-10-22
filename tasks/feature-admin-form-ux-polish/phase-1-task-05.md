@@ -2,7 +2,7 @@
 
 - Change doc: `spec/changes/2026-10-22-admin-form-ux-polish.md` (BACKLOG BL-058, mục 5)
 - Spec: F11 SEO (FR-PUB-15, NFR-03), FR-ADM-19 (ngữ nghĩa chữ admin BL-040: không lộ "canonical"/"noindex"/"OG" trong nhãn)
-- Status: approved — **phương án B** (user 2026-10-22) — chưa chạy, sau đợt 2 · Wave 3 (sau T04; chung `importMap.js` / `custom.scss` nếu có component mới)
+- Status: **done** (PASS r4) — phương án B
 
 ## Hiện trạng (change-request đã kiểm)
 - `src/fields/seo.ts:9-22`: group `seo` (localized, nhãn "SEO") gồm `metaTitle` ("Tiêu đề hiện trên Google", mô tả "Để trống thì dùng tiêu đề bài."),
@@ -44,3 +44,13 @@
 ## Decision log
 - (change-request) Đưa 4 phương án, khuyến nghị B. Chờ user chốt.
 - (user 2026-10-22, checkpoint) Q1 = **B**: bỏ tiêu đề nhóm lặp; câu "để trống = tự lấy từ Tiêu đề / Tóm tắt / Ảnh đại diện"; gom "Ẩn khỏi Google" + "Đường dẫn gốc" vào khối thu gọn "Nâng cao"; khung xem trước kết quả Google theo đúng fallback `metadata.ts` + placeholder giá trị sẽ dùng + đếm ký tự. Không migration, giữ `seo.*`. Không làm phần C.
+- (user 2026-10-22) Review vượt 2 vòng: user cho phép r3, rồi chọn hướng B cho finding r3 (fallback Trang chủ lấy `page.home.title/description` từ `src/i18n/messages/{vi,en}.json`) + r4.
+- (builder r3) Placeholder ô SEO giữ chuỗi tĩnh (Payload chỉ nhận placeholder tĩnh trong config); giá trị sẽ dùng hiện ở khung xem trước ngay trên ô. Reviewer r4 chấp nhận (MINOR).
+
+## Verification summary
+- Status: **done** — NORMAL FAIL r1 (preview thiếu tên website/URL trang/parity) → FAIL r2 (URL `/en` khi chưa có bản dịch) → FAIL r3 (fallback Trang chủ) → **PASS r4**.
+- Thay đổi: `src/fields/seo.ts` (group `label:false`, mô tả "để trống = tự lấy…", khung xem trước + 2 bộ đếm ký tự qua `beforeInput`/`afterInput`, collapsible "Nâng cao" chứa Ẩn khỏi Google + Đường dẫn gốc), `src/lib/admin/seo.ts` (hàm thuần mô phỏng `buildPageMetadata`: nối tên website, URL trang theo locale + `hasEnglish`, mô tả theo route, fallback Trang chủ), `SeoPreview.tsx`, `SeoLengthCounter.tsx`, `_forms.scss`, `importMap.js`, `content-defaults.ts` (giữ nhãn "SEO" khi collection không có bộ tab).
+- Verify: `pnpm exec eslint src tests` 0 error · `pnpm typecheck` PASS · vitest unit+ui **3341/3341** PASS · `pnpm build` PASS. `pnpm lint` (= `eslint .`) fail do lỗi pre-existing ngoài src/tests (chuẩn các task trước). Integration + ảnh 1440/390 **BLOCKED** (Postgres 5433 down) — residual risk.
+- Đường dẫn dữ liệu `seo.*` không đổi (test `src/fields/seo.test.ts`), không migration.
+- Reports: `.context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-{1,2,3,4}-review.md`.
+- Doc impact: no doc impact (UI admin, không đổi API/schema/behavior công khai); spec delta F11/FR-ADM ghi ở close-out BL-058.

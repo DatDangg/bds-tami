@@ -45,6 +45,9 @@ import { PriceInWords as PriceInWords_e0b2be2f43b038dd1156aa747ad96870 } from '.
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
 import { TodayButton as TodayButton_c9ab6e875d3f646b42dd17ca5bd49331 } from '../../../components/admin/TodayButton'
 import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from '../../../components/admin/ThumbnailCell'
+import { SeoTitleCounter as SeoTitleCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
+import { SeoPreview as SeoPreview_752ed51552c58b98feed87d2595b772d } from '../../../components/admin/SeoPreview'
+import { SeoDescriptionCounter as SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
 import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3 } from '../../../components/admin/TranslationSummary'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { RowActionsCell as RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7 } from '../../../components/admin/RowActionsCell'
@@ -128,6 +131,9 @@ export const importMap = {
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,
   "/components/admin/TodayButton#TodayButton": TodayButton_c9ab6e875d3f646b42dd17ca5bd49331,
   "/components/admin/ThumbnailCell#ThumbnailCell": ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957,
+  "/components/admin/SeoLengthCounter#SeoTitleCounter": SeoTitleCounter_1108c6ec6c0551a682deae0661936755,
+  "/components/admin/SeoPreview#SeoPreview": SeoPreview_752ed51552c58b98feed87d2595b772d,
+  "/components/admin/SeoLengthCounter#SeoDescriptionCounter": SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755,
   "/components/admin/TranslationSummary#TranslationSummary": TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/RowActionsCell#RowActionsCell": RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7,

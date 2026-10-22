@@ -57,6 +57,27 @@ describe("withContentDefaults: fieldAccess (n2)", () => {
   });
 });
 
+describe("withContentDefaults: vị trí nhóm SEO (BL-058 T05)", () => {
+  it("không có bộ tab: nhóm SEO ở cấp gốc và giữ nhãn 'SEO' làm tiêu đề khối", () => {
+    const config = withContentDefaults(base);
+    const seo = config.fields.find((field) => "name" in field && field.name === "seo") as { label?: unknown };
+    expect(seo.label).toBe("SEO");
+  });
+
+  it("có bộ tab: nhóm SEO vào tab 'SEO' với nhãn bỏ (tab đã là tiêu đề, không lặp)", () => {
+    const withTabs: CollectionConfig = {
+      slug: "news",
+      fields: [{ type: "tabs", tabs: [{ label: "Nội dung", fields: [{ name: "title", type: "text", label: "Tiêu đề" }] }] }],
+    };
+    const config = withContentDefaults(withTabs);
+    const tabs = config.fields.find((field) => field.type === "tabs") as { tabs: { label?: string; fields: Field[] }[] };
+    const seoTab = tabs.tabs.find((tab) => tab.label === "SEO");
+    expect(seoTab).toBeDefined();
+    expect((seoTab!.fields[0] as { label?: unknown }).label).toBe(false);
+    expect(fieldNames(config)).toContain("seo");
+  });
+});
+
 describe("withContentDefaults: omit (G7)", () => {
   it("mặc định có đủ trường dùng chung", () => {
     expect(fieldNames(withContentDefaults(base))).toEqual(

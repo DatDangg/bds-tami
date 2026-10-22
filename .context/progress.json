@@ -2529,22 +2529,37 @@
           "note": "màn lịch sử phiên bản (không Ai sửa)",
           "review": "STRICT PASS",
           "round": 2,
-          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-04-round-2-review.md"
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-04-round-2-review.md",
+          "commit": "d767b30"
         },
         {
           "task": "phase-1-task-05",
           "file": "tasks/feature-admin-form-ux-polish/phase-1-task-05.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-04"
           ],
           "wave": "3",
-          "note": "tab SEO phương án B"
+          "note": "tab SEO phương án B",
+          "review": "NORMAL FAIL r1/r2/r3 → PASS r4 (r1 preview thiếu tên website + URL thật + test parity; r2 URL /en khi chưa có bản dịch EN; r3 fallback Trang chủ page.home; r4 PASS, 2 MINOR chấp nhận)",
+          "round": 4,
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-4-review.md",
+          "reports": [
+            ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-1-review.md",
+            ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-2-review.md",
+            ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-3-review.md",
+            ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-05-round-4-review.md"
+          ],
+          "verify": "eslint src tests 0 error · typecheck PASS · unit+ui 3341/3341 PASS · build PASS; integration + ảnh admin 1440/390 BLOCKED (Postgres 5433 down)",
+          "progressNote": "seoField (label false + preview + 2 bộ đếm + collapsible Nâng cao), SeoPreview/SeoLengthCounter + lib/admin/seo parity với buildPageMetadata (tên website, URL trang theo hasEnglish, mô tả theo route, fallback Trang chủ page.home)",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "completedAt": "2026-10-22"
         }
       ],
       "wave1DoneAt": "2026-10-22",
-      "next": "checkpoint sau đợt 2 → đợt 3 T05 (tab SEO phương án B)"
+      "next": "T05 done → close-out BL-058 (spec delta, spec-publish, spec-validator, BACKLOG done, archive change doc) → dọn 4 worktree wt/* + DB tami_wt_bl058_t01..t04"
     }
   ],
   "bugs": [

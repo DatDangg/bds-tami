@@ -1,4 +1,4 @@
-import type { Access, CollapsibleField, CollectionConfig, CollectionSlug, Field, FieldAccess, TabsField } from "payload";
+import type { Access, CollapsibleField, CollectionConfig, CollectionSlug, Field, FieldAccess, GroupField, TabsField } from "payload";
 
 import { isAdmin, isAuthorOrAdmin, isStaff, makePublishedOnly, PUBLIC_STATUSES } from "../../access";
 import { authorField } from "../../fields/author";
@@ -170,8 +170,12 @@ function gatherTranslationBlock(resolved: Field[], actions: readonly Field[]): F
  */
 function placeSharedFields(own: Field[], shared: Field[]): Field[] {
   const tabsIndex = own.findIndex((field) => field.type === "tabs");
-  if (tabsIndex === -1) return [...own, ...shared];
   const seo = shared.find((field) => isNamed(field, "seo"));
+  if (tabsIndex === -1) {
+    // Không có bộ tab: nhóm `seo` đứng riêng ở cấp gốc nên cần nhãn "SEO" làm tiêu đề khối
+    // (trong tab thì tab đã mang nhãn nên nhóm để `label: false`, xem `seoField`).
+    return seo ? [...own, ...shared.map((field) => (field === seo ? ({ ...(field as GroupField), label: "SEO" } as Field) : field))] : [...own, ...shared];
+  }
   const tabs = own[tabsIndex] as TabsField;
   const sharedTabs = seo ? [{ label: "SEO", fields: [seo] }] : [];
   const withSharedTabs: TabsField = { ...tabs, tabs: [...tabs.tabs, ...sharedTabs] };
