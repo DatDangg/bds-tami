@@ -140,6 +140,7 @@
       "email": "Email",
       "message": "What would you like advice on?",
       "submit": "Get advice",
+      "submitNow": "Get advice now",
       "errors": {
         "fullName": "Please enter your name (at least 2 characters).",
         "phone": "Please enter a valid phone number.",
@@ -1054,6 +1055,10 @@
       "showMore": "Show more",
       "showLess": "Show less",
       "showAll": "Show all"
+    },
+    "overview": {
+      "showMore": "Read more",
+      "showLess": "Show less"
     }
   },
   "listingOptions": {

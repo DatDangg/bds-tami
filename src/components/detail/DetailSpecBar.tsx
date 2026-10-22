@@ -15,7 +15,7 @@ const MAX_ITEMS = 6;
 /**
  * Thanh thông số nổi đè mép dưới hero chi tiết (BL-052): thẻ trắng bo 20px + bóng, ≤ 6 ô (icon tròn + nhãn nhỏ + giá trị đậm), ô trống bị bỏ, rỗng → không dựng.
  * `dl` ngữ nghĩa (mỗi ô `div > dt + dd`). < sm lưới 2 cột, sm–lg 3 cột (1024–1279px 6 ô chung một hàng thì chữ gãy giữa từ — review P1-T03), ≥ xl một hàng chia đều
- * ngăn bằng đường kẻ dọc; giá trị dài tự xuống dòng (không tràn ngang).
+ * ngăn bằng đường kẻ dọc. Giá trị dài: < xl cắt sau 2 dòng, ≥ xl cắt sau 1 dòng (`…`) — cả hai có `title` hiện đủ khi rê chuột, `dd` vẫn chứa đủ chữ cho trình đọc màn hình (BL-056).
  */
 export function DetailSpecBar({ items, label }: { items: DetailSpecItem[]; label?: string }) {
   const t = useTranslations("detailKit.specBar");
@@ -28,7 +28,7 @@ export function DetailSpecBar({ items, label }: { items: DetailSpecItem[]; label
       >
         {shown.map((item, index) => (
           // `dl > div` chỉ được chứa `dt`/`dd`: icon nằm trong `dt`, định vị tuyệt đối theo ô (lề trái chừa chỗ). Index trong key: hai ô có thể trùng nhãn.
-          <div key={`${item.label}-${index}`} className="relative flex min-h-10 min-w-0 flex-col justify-center pl-13 xl:flex-1 xl:border-l xl:border-border xl:pr-3 xl:pl-[4.25rem] xl:first:border-l-0">
+          <div key={`${item.label}-${index}`} className="relative flex min-h-10 min-w-0 flex-col justify-center pl-13 xl:flex-1 xl:border-l xl:border-border xl:pr-2 xl:pl-[3.75rem] xl:first:border-l-0">
             <dt className="text-xsmall text-text-muted">
               <span
                 aria-hidden="true"
@@ -38,7 +38,9 @@ export function DetailSpecBar({ items, label }: { items: DetailSpecItem[]; label
               </span>
               {item.label}
             </dt>
-            <dd className="font-semibold break-words text-text">{item.value}</dd>
+            <dd title={item.value ?? undefined} className="line-clamp-2 font-semibold break-words text-text xl:line-clamp-1">
+              {item.value}
+            </dd>
           </div>
         ))}
       </dl>

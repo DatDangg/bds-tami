@@ -35,6 +35,42 @@ describe("DetailSpecBar", () => {
   });
 });
 
+describe("DetailSpecBar giá trị dài (BL-056)", () => {
+  it("dd có title đủ chữ + cắt dòng (< xl 2 dòng, ≥ xl 1 dòng); chữ đầy đủ vẫn trong DOM", () => {
+    const long = "Công ty Cổ phần Đầu tư và Phát triển Bất động sản Rất Dài";
+    renderWithIntl(<DetailSpecBar items={[{ icon, label: "Chủ đầu tư", value: long }]} />);
+    const dd = screen.getByText(long);
+    expect(dd).toHaveAttribute("title", long);
+    expect(dd).toHaveClass("line-clamp-2", "xl:line-clamp-1");
+  });
+});
+
+describe("DetailInfoGrid columns / DetailStatCards columns (BL-056)", () => {
+  it("columns={2} → 2 cột cố định; mặc định giữ auto-fill", () => {
+    const items = [{ icon, label: "A", value: "1" }];
+    const { container } = renderWithIntl(<DetailInfoGrid items={items} columns={2} />);
+    expect(container.querySelector("dl")).toHaveClass("sm:grid-cols-2");
+    const auto = renderWithIntl(<DetailInfoGrid items={items} />);
+    expect(auto.container.querySelector("dl")?.className).toContain("auto-fill");
+  });
+
+  it("StatCards columns={3}: 4 thẻ → ô cuối kéo dài hết hàng; 3 thẻ thì không", () => {
+    const four = ["a", "b", "c", "d"].map((label) => ({ label, value: "1" }));
+    const { container } = renderWithIntl(<DetailStatCards items={four} columns={3} />);
+    expect(container.querySelector("ul")).toHaveClass("xl:grid-cols-3");
+    const cells = container.querySelectorAll("li");
+    expect(cells[3]).toHaveClass("xl:col-span-3");
+    expect(cells[2]).not.toHaveClass("xl:col-span-3");
+    // Số lớn thu cỡ theo số ký tự để không tràn thẻ ~97px (đo ở 1280 / 1440).
+    const nums = renderWithIntl(<DetailStatCards items={[{ label: "x", value: "227" }, { label: "y", value: "12.500" }]} columns={3} />);
+    const spans = nums.container.querySelectorAll("li span.font-display");
+    expect(spans[0]).toHaveClass("xl:text-h2-sm");
+    expect(spans[1]).toHaveClass("xl:text-h3");
+    const three = renderWithIntl(<DetailStatCards items={four.slice(0, 3)} columns={3} />);
+    expect(three.container.querySelector("li:last-child")).not.toHaveClass("xl:col-span-3");
+  });
+});
+
 describe("DetailInfoGrid", () => {
   it("bỏ ô trống; rỗng → không dựng", () => {
     renderWithIntl(

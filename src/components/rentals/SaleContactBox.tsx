@@ -64,7 +64,7 @@ export function SaleContactBox({ view, rentalId, sale, hotline }: SaleContactBox
       header={header}
       hotline={sale ? null : (hotline ?? null)}
     >
-      <LeadForm source="rental" sourceId={rentalId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+      <LeadForm layout="compact" source="rental" sourceId={rentalId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
     </DetailContactAside>
   );
 }

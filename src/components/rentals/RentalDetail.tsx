@@ -1,9 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { RichText } from "@/components/content/RichText";
 import { DetailGalleryGrid } from "@/components/detail/DetailGalleryGrid";
 import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
+import { DetailOverviewIntro } from "@/components/detail/DetailOverviewIntro";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
@@ -76,7 +76,6 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
   const locale = useLocale() as Locale;
   const t = useTranslations("page.rentalDetail");
   const tOptions = useTranslations("listingOptions");
-  const tRich = useTranslations("page.richText");
   const info: DetailInfoItem[] = [
     { icon: <ClipboardText size={ICON_SIZE} />, label: t("code"), value: view.code },
     { icon: <House size={ICON_SIZE} />, label: t("details.category"), value: view.category?.label ?? null, link: view.category ? { kind: "internal", href: view.category.href } : null },
@@ -88,7 +87,7 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
   return (
     <DetailSection id={RENTAL_SECTION_DOM_ID.overview} eyebrow={t("v2.eyebrow.overview")} title={t("v2.titles.overview")}>
       <div className="flex flex-col gap-8">
-        {view.hasDescription && <RichText data={doc.description} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />}
+        <DetailOverviewIntro content={doc.description} locale={locale} />
         <DetailInfoGrid items={info} label={t("v2.info.label")} />
       </div>
     </DetailSection>

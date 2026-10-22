@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MapPin } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { SALES_STATUS_BADGE_VARIANT, type ProjectCardData } from "@/lib/projects/project-view";
 
 interface ProjectSpotlightContentProps {
@@ -53,7 +54,7 @@ export function ProjectSpotlightContent({ data, headingLevel = "h2" }: ProjectSp
           {t("viewDetail")}
           <span className="sr-only">: {data.title}</span>
         </Link>
-        <Link href={`${data.href}#lead-form`} className={buttonVariants({ variant: "secondary" })}>
+        <Link href={`${data.href}#lead-form`} className={cn(buttonVariants({ variant: "outline" }))}>
           {t("consult")}
           <span className="sr-only">: {data.title}</span>
         </Link>

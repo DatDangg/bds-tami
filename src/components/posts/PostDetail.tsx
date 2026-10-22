@@ -1,9 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { RichText } from "@/components/content/RichText";
 import { DetailGalleryGrid } from "@/components/detail/DetailGalleryGrid";
 import { DetailHeroMosaic } from "@/components/detail/DetailHeroMosaic";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
+import { DetailOverviewIntro } from "@/components/detail/DetailOverviewIntro";
 import { DetailPageShell, type DetailBand } from "@/components/detail/DetailPageShell";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
@@ -16,7 +16,6 @@ import { LazyMap } from "@/components/media/LazyMap";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { Badge } from "@/components/ui/badge";
-import { hasRichText } from "@/lib/careers/job-view";
 import { publicPath } from "@/lib/content/content-paths";
 import { formatNumber } from "@/lib/format";
 import type { StrengthsView } from "@/lib/home/home-view";
@@ -139,7 +138,6 @@ function PostOverview({ doc, view, specs, offer }: Pick<PostDetailProps, "doc" |
   const locale = useLocale() as Locale;
   const t = useTranslations("page.postDetail.v2");
   const tOptions = useTranslations("listingOptions");
-  const tRich = useTranslations("page.richText");
   const relatedTarget = (kind: "project" | "rental") => offer?.related.find((target) => target.kind === kind) ?? null;
   const project = relatedTarget("project");
   const rental = relatedTarget("rental");
@@ -154,7 +152,7 @@ function PostOverview({ doc, view, specs, offer }: Pick<PostDetailProps, "doc" |
   return (
     <DetailSection id={POST_SECTION_DOM_ID.overview} eyebrow={t("eyebrow.overview")} title={t("titles.overview")}>
       <div className="flex flex-col gap-8">
-        {hasRichText(doc.content) && <RichText data={doc.content} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />}
+        <DetailOverviewIntro summary={doc.excerpt} content={doc.content} locale={locale} />
         <DetailInfoGrid items={info} label={t("info.label")} />
       </div>
     </DetailSection>

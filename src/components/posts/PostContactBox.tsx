@@ -21,7 +21,7 @@ export function PostContactBox({ postId, hotline }: PostContactBoxProps) {
   const turnstileSiteKey = readTurnstileSiteKey();
   return (
     <DetailContactAside title={t("title")} headingId={POST_CONTACT_HEADING_ID} hotline={hotline ?? null}>
-      <LeadForm source="property_post" sourceId={postId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+      <LeadForm layout="compact" source="property_post" sourceId={postId} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
     </DetailContactAside>
   );
 }

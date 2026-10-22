@@ -8,7 +8,7 @@ import { SECTION_DOM_ID, type AmenityView } from "@/lib/projects/project-detail-
 const INITIAL_AMENITIES = 5;
 
 /**
- * Khối Tiện ích nổi bật (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Không gian sống" + `h2` → `amenitiesImage` lớn bên trái (không có → danh sách rộng hết, 2 cột)
+ * Khối Tiện ích nổi bật (BL-052, design `detail-du-an`; dải rộng hết khung): eyebrow "Không gian sống" + `h2` → `amenitiesImage` lớn bên trái (không có → danh sách rộng hết, 2–3 cột)
  * + danh sách tiện ích (icon + tên + mô tả), > 5 mục → nút "Khám phá tất cả tiện ích" mở phần còn lại. Trường `icon` của dữ liệu là chữ tự do chưa có bảng ánh xạ tới bộ icon
  * nên mọi mục dùng dấu tích chung (mặc định của `DetailFeatureList`) thay vì đoán theo tên. Server Component (danh sách là client).
  */

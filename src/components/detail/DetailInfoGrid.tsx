@@ -19,17 +19,21 @@ export interface DetailInfoItem {
   dateTime?: string | null;
 }
 
+const COLUMNS_AUTO_CLASS = "grid-cols-[repeat(auto-fill,minmax(min(100%,13rem),1fr))]";
+/** 2 cột cố định từ sm (Tổng quan Dự án ≥ xl: lưới chỉ chiếm ~55% bề rộng nên auto-fill sẽ ra 1 cột — BL-056). */
+const COLUMNS_FIXED_2_CLASS = "grid-cols-1 sm:grid-cols-2";
+
 const LINK_CLASS = "text-accent-text underline underline-offset-4 hover:text-text";
 
 /**
  * Lưới thông tin trong khối Tổng quan (BL-052, design `detail-du-an`: Tên thương mại, Chủ đầu tư, Vị trí…): icon vuông viền mảnh + nhãn nhỏ + giá trị;
- * số cột theo bề rộng khung (ô ≥ 13rem — 1 cột ở mobile, 2+ cột khi đủ chỗ, kể cả trong cột hẹp cạnh thẻ khác); ô trống bị bỏ, rỗng → không dựng. `dl` ngữ nghĩa — icon nằm trong `dt` (định vị tuyệt đối) vì `dl > div` chỉ chứa `dt`/`dd`.
+ * `columns="auto"` (mặc định): số cột theo bề rộng khung (ô ≥ 13rem — 1 cột ở mobile, 2+ cột khi đủ chỗ, kể cả trong cột hẹp cạnh thẻ khác); `columns={2}`: 2 cột cố định từ sm; ô trống bị bỏ, rỗng → không dựng. `dl` ngữ nghĩa — icon nằm trong `dt` (định vị tuyệt đối) vì `dl > div` chỉ chứa `dt`/`dd`.
  */
-export function DetailInfoGrid({ items, label, className }: { items: DetailInfoItem[]; label?: string; className?: string }) {
+export function DetailInfoGrid({ items, label, className, columns = "auto" }: { items: DetailInfoItem[]; label?: string; className?: string; columns?: "auto" | 2 }) {
   const shown = items.filter((item) => item.value?.trim());
   if (shown.length === 0) return null;
   return (
-    <dl aria-label={label} className={cn("grid grid-cols-[repeat(auto-fill,minmax(min(100%,13rem),1fr))] gap-x-6 gap-y-5 rounded-[16px] border border-border p-5", className)}>
+    <dl aria-label={label} className={cn("grid gap-x-6 gap-y-5 rounded-[16px] border border-border p-5", columns === 2 ? COLUMNS_FIXED_2_CLASS : COLUMNS_AUTO_CLASS, className)}>
       {shown.map((item, index) => (
         // Index trong key: hai ô có thể trùng nhãn.
         <div key={`${item.label}-${index}`} className="relative min-h-10 min-w-0 pl-13">

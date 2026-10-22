@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
-import { RichText } from "@/components/content/RichText";
 import { DetailInfoGrid, type DetailInfoItem } from "@/components/detail/DetailInfoGrid";
+import { DetailOverviewIntro } from "@/components/detail/DetailOverviewIntro";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { DetailStatCards } from "@/components/detail/DetailStatCards";
 import { DETAIL_ICON_SIZE as ICON_SIZE } from "@/components/detail/detail-icon-size";
@@ -38,7 +38,6 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("page.projectDetail.v2");
   const productTypesText = useProductTypesText(view.productTypes);
-  const tRich = useTranslations("page.richText");
   const scaleText = useScaleText(view);
   const info: DetailInfoItem[] = [
     { icon: <Buildings size={ICON_SIZE} />, label: t("info.name"), value: view.title },
@@ -61,14 +60,10 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
   return (
     <DetailSection id={SECTION_DOM_ID.overview} eyebrow={t("eyebrow.overview")} title={t("titles.overview")}>
       <div className="flex flex-col gap-8">
-        {view.hasOverview ? (
-          <RichText data={overview} locale={locale} tableLabel={tRich("table")} className="max-w-[68ch]" />
-        ) : (
-          view.summary && <p className="max-w-[68ch] text-body text-text-secondary">{view.summary}</p>
-        )}
-        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
-          <DetailInfoGrid items={info} label={t("info.label")} className={stats.length === 0 ? "xl:col-span-2" : undefined} />
-          <DetailStatCards items={stats} label={t("products.label")} />
+        <DetailOverviewIntro summary={view.summary} content={overview} locale={locale} />
+        <div className={stats.length === 0 ? "grid gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] xl:items-start"}>
+          <DetailInfoGrid items={info} label={t("info.label")} columns={stats.length === 0 ? "auto" : 2} />
+          <DetailStatCards items={stats} label={t("products.label")} columns={3} />
         </div>
       </div>
     </DetailSection>

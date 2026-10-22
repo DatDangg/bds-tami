@@ -127,6 +127,10 @@ describe("ProjectSpotlightContent (BL-052)", () => {
     ]);
     expect(screen.getByRole("link", { name: /Xem chi tiết/ })).toHaveAttribute("href", "/du-an/song-sai-gon");
     expect(screen.getByRole("link", { name: /Nhận tư vấn/ })).toHaveAttribute("href", "/du-an/song-sai-gon#lead-form");
+    // BL-056: nút phụ là outline (viền + chữ màu text), không phải viền xám nhạt của `secondary`.
+    expect(screen.getByRole("link", { name: /Nhận tư vấn/ })).toHaveClass("border-text", "text-text");
+    // `buttonVariants` dùng thẳng (không qua `Button`) mà không gộp class thì `border-transparent` của lớp nền thắng `border-text` → viền vô hình (nguyên nhân gốc A5).
+    expect(screen.getByRole("link", { name: /Nhận tư vấn/ })).not.toHaveClass("border-transparent");
   });
 
   it("thiếu dữ liệu: địa chỉ → tỉnh, giá → 'Liên hệ', ô diện tích / bàn giao trống bị bỏ, không danh mục → chỉ badge tình trạng", () => {

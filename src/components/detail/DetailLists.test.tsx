@@ -32,6 +32,19 @@ describe("DetailFeatureList", () => {
     expect(screen.getByRole("img", { name: "Hồ bơi" })).toBeInTheDocument();
     expect(container.firstElementChild).toHaveClass("md:grid-cols-2");
   });
+
+  it("BL-056 A4: không ảnh → danh sách rộng hết, sm:2 / lg:3 cột; đúng 1 mục → 1 cột (không co thành nửa ô)", () => {
+    const many = renderWithIntl(<DetailFeatureList items={features(3)} />);
+    expect(many.container.querySelector("ul")).toHaveClass("sm:grid-cols-2", "lg:grid-cols-3");
+    expect(many.container.firstElementChild).not.toHaveClass("md:grid-cols-2");
+    const single = renderWithIntl(<DetailFeatureList items={features(1)} />);
+    expect(single.container.querySelector("ul")?.className).not.toMatch(/grid-cols-/);
+  });
+
+  it("BL-056 A4: có ảnh → danh sách bên phải không dùng lớp cột của danh sách rộng", () => {
+    const { container } = renderWithIntl(<DetailFeatureList items={features(3)} image={fakeMedia("am", "Hồ bơi")} />);
+    expect(container.querySelector("ul")?.className).not.toMatch(/grid-cols-/);
+  });
 });
 
 describe("DetailDistanceList", () => {

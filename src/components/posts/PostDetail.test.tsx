@@ -140,9 +140,10 @@ describe("PostDetail (BL-052, khung chi tiết chung)", () => {
     expect(screen.queryByRole("group", { name: "Thông số tin đăng" })).toBeNull();
     expect(tabLabels()).toEqual(["Tổng quan"]);
     expect(container.querySelector("[data-detail-band]")).toBeNull();
-    // Không có nội dung → tóm tắt chỉ ở hero, không lặp lại trong Tổng quan (P3-T04 review r1).
+    // BL-056: không có nội dung → tóm tắt vừa ở hero vừa làm đoạn dẫn của Tổng quan (user chốt "ưu tiên tóm tắt"), không có nút "Xem thêm".
     expect(container.querySelector("[data-detail-hero]")).toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
-    expect(container.querySelector("#overview")).not.toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
+    expect(container.querySelector("#overview")).toHaveTextContent("Nhà mặt tiền, sổ hồng riêng");
+    expect(container.querySelector("#overview details")).toBeNull();
   });
 
   it("Vị trí: có toạ độ → bản đồ; chỉ địa chỉ / khu vực → dòng địa chỉ, không bản đồ", () => {

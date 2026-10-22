@@ -3,6 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { MapPin } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { formatArea } from "@/lib/format";
 import type { PostCardData } from "@/lib/posts/post-view";
 import type { Locale } from "@/i18n/routing";
@@ -80,7 +81,7 @@ export function PostSpotlightContent({ data }: { data: PostCardData }) {
           {t("viewDetail")}
           <span className="sr-only">: {data.title}</span>
         </Link>
-        <Link href={`${data.href}#lead-form`} className={buttonVariants({ variant: "secondary" })}>
+        <Link href={`${data.href}#lead-form`} className={cn(buttonVariants({ variant: "outline" }))}>
           {t("list.spotlight.consult")}
           <span className="sr-only">: {data.title}</span>
         </Link>

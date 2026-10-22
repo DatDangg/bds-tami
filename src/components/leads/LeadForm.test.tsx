@@ -168,3 +168,39 @@ describe("LeadForm: kết quả", () => {
     expect(screen.getByRole("checkbox")).toHaveAttribute("aria-invalid", "true");
   });
 });
+
+describe("LeadForm layout compact (BL-056)", () => {
+  it("nhãn sr-only gắn đúng ô, placeholder = nhãn (bắt buộc thêm *), icon aria-hidden, nút Nhận tư vấn ngay full-width", () => {
+    const { container } = renderWithIntl(<LeadForm layout="compact" source="project" sourceId={SOURCE_ID} turnstileSiteKey="site" />, "vi");
+    const name = screen.getByLabelText(/Họ và tên/);
+    expect(name).toHaveAttribute("placeholder", "Họ và tên *");
+    expect(screen.getByLabelText(/Số điện thoại/)).toHaveAttribute("placeholder", "Số điện thoại *");
+    expect(screen.getByLabelText("Email")).toHaveAttribute("placeholder", "Email");
+    expect(screen.getByLabelText(/Nội dung cần tư vấn/)).toHaveAttribute("placeholder", "Nội dung cần tư vấn");
+    expect(container.querySelector(`label[for="${name.id}"]`)).toHaveClass("sr-only");
+    expect(container.querySelectorAll("form span[aria-hidden='true'] > svg").length).toBeGreaterThanOrEqual(4);
+    const submit = screen.getByRole("button", { name: "Nhận tư vấn ngay" });
+    expect(submit).toHaveClass("w-full");
+    expect(submit).not.toHaveClass("sm:w-fit");
+  });
+
+  it("compact vẫn validate như cũ (SĐT sai → aria-invalid, không gọi API)", async () => {
+    const fetchMock = stubFetch(jsonResponse(200, {}));
+    const user = userEvent.setup();
+    renderWithIntl(<LeadForm layout="compact" source="contact" turnstileSiteKey="site" />, "vi");
+    await user.type(screen.getByLabelText(/Họ và tên/), "Nguyễn Văn A");
+    await user.type(screen.getByLabelText(/Số điện thoại/), "123");
+    await user.click(screen.getByRole("button", { name: "Nhận tư vấn ngay" }));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/Số điện thoại/)).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("mặc định giữ nhãn hiển thị + nút Nhận tư vấn, không placeholder", () => {
+    const { container } = renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, "vi");
+    const name = screen.getByLabelText(/Họ và tên/);
+    expect(name).not.toHaveAttribute("placeholder");
+    expect(container.querySelector(`label[for="${name.id}"]`)).not.toHaveClass("sr-only");
+    expect(screen.getByRole("button", { name: "Nhận tư vấn" })).toHaveClass("sm:w-fit");
+    expect(screen.queryByRole("button", { name: "Nhận tư vấn ngay" })).toBeNull();
+  });
+});

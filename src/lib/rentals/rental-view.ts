@@ -8,7 +8,6 @@ import { CONTENT_ROUTES, publicPath } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
 import { formatDate } from "../format";
 import { visibleCategory } from "../news/news-view";
-import { lexicalPlainText } from "../news/read-time";
 import { renderableImage } from "../projects/project-detail-view";
 import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
 import type { SaleContact } from "./rental-queries";
@@ -59,7 +58,6 @@ export interface RentalDetailView {
   videoUrl: string | null;
   terms: RentalTermsView;
   hasTerms: boolean;
-  hasDescription: boolean;
   legalNote: string | null;
   /**
    * Toạ độ ĐƯỢC PHÉP đưa vào props Client Component (`LazyMap`): tin ẩn địa chỉ thì đã làm tròn (`approximateLocation`, contract
@@ -174,7 +172,6 @@ export function toRentalDetailView(doc: Rental, locale: Locale, hiddenLocation?:
     videoUrl: rawVideo && parseVideoUrl(rawVideo) ? rawVideo : null,
     terms,
     hasTerms: hasAnyTerm(terms),
-    hasDescription: lexicalPlainText(doc.description).trim() !== "",
     legalNote: hasText(doc.legalNote) ? doc.legalNote.trim() : null,
     map: toMap(doc, hiddenLocation),
   };

@@ -125,7 +125,6 @@ export interface ProjectDetailView {
   products: ProductView[];
   /** Link video đã qua whitelist YouTube/TikTok (`parseVideoUrl`); khác → `null`, không nút video. */
   videoUrl: string | null;
-  hasOverview: boolean;
   amenities: AmenityView[];
   /** Ảnh lớn khối Tiện ích nổi bật; thiếu / đã xoá → `null` (danh sách rộng hết). */
   amenitiesImage: MediaImage | null;
@@ -313,7 +312,6 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     productTypes: toProductTypes(doc.productTypes),
     products: toProducts(doc.products),
     videoUrl: parseVideoUrl(doc.videoUrl) ? (doc.videoUrl?.trim() ?? null) : null,
-    hasOverview: lexicalPlainText(doc.overview).trim() !== "",
     amenities: (doc.amenities ?? []).flatMap((item, index) => (hasText(item.name) ? [{ id: item.id ?? String(index), name: item.name.trim(), description: trimmedOrNull(item.description) }] : [])),
     amenitiesImage: amenitiesImage ? { ...amenitiesImage, alt: amenitiesImage.alt?.trim() || title } : null,
     floorPlans: toFloorPlans(doc.floorPlans, title),

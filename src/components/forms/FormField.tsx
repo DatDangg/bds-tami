@@ -1,4 +1,4 @@
-import { useId, type ComponentProps } from "react";
+import { useId, type ComponentProps, type ReactNode } from "react";
 import { WarningCircle } from "@/components/icons";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/components/ui/option-select";
@@ -15,6 +15,10 @@ type Chrome = {
   /** Nhãn "bắt buộc" cho trình đọc màn hình (đi kèm dấu *). */
   requiredLabel?: string;
   className?: string;
+  /** Icon đặt trái trong ô nhập (`input`/`textarea`; `aria-hidden`) — layout form gọn (BL-056). */
+  icon?: ReactNode;
+  /** Nhãn vẫn gắn `htmlFor` nhưng chỉ cho trình đọc màn hình (`sr-only`); dùng cùng `placeholder` + `icon`. */
+  labelHidden?: boolean;
 };
 
 type Reserved = Exclude<keyof Chrome, "name"> | "id" | "aria-invalid" | "aria-describedby";
@@ -51,10 +55,12 @@ function withoutKind<T extends { as?: unknown }>(control: T): Omit<T, "as"> {
   return copy;
 }
 
-function Control({ control, shared }: { control: ControlProps; shared: Shared }) {
+const ICON_INSET_CLASS = "pl-11";
+
+function Control({ control, shared, inset }: { control: ControlProps; shared: Shared; inset: boolean }) {
   if (control.as === "textarea") {
     const attrs = withoutKind(control);
-    return <textarea rows={4} {...attrs} {...shared} className={cn(controlBase, "min-h-28 px-4 py-3")} />;
+    return <textarea rows={4} {...attrs} {...shared} className={cn(controlBase, "min-h-28 px-4 py-3", inset && ICON_INSET_CLASS)} />;
   }
   if (control.as === "select") {
     const { options, name, disabled, placeholder, onValueChange } = control;
@@ -79,11 +85,11 @@ function Control({ control, shared }: { control: ControlProps; shared: Shared })
     return <input {...attrs} {...shared} type="file" className={cn(controlBase, fileClasses)} />;
   }
   const attrs = withoutKind(control);
-  return <Input {...attrs} {...shared} />;
+  return <Input {...attrs} {...shared} className={inset ? ICON_INSET_CLASS : undefined} />;
 }
 
 /** Một ô form đầy đủ: label thật, `*` + chữ ẩn, helper và lỗi nối bằng aria-describedby, aria-invalid. */
-export function FormField({ label, required, helper, error, requiredLabel, className, ...control }: FormFieldProps) {
+export function FormField({ label, required, helper, error, requiredLabel, className, icon, labelHidden, ...control }: FormFieldProps) {
   const reactId = useId();
   const id = `${reactId}-${control.name}`;
   const helperId = helper ? `${id}-helper` : undefined;
@@ -95,9 +101,12 @@ export function FormField({ label, required, helper, error, requiredLabel, class
     "aria-required": required ? true : undefined,
   };
 
+  const withIcon = icon !== undefined && (control.as === undefined || control.as === "input" || control.as === "textarea");
+  const controlNode = <Control control={control as ControlProps} shared={shared} inset={withIcon} />;
+
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-small font-semibold text-text">
+      <label htmlFor={id} className={cn("text-small font-semibold text-text", labelHidden && "sr-only")}>
         {label}
         {required && (
           <>
@@ -108,7 +117,16 @@ export function FormField({ label, required, helper, error, requiredLabel, class
           </>
         )}
       </label>
-      <Control control={control as ControlProps} shared={shared} />
+      {withIcon ? (
+        <div className="relative">
+          <span aria-hidden="true" className={cn("pointer-events-none absolute left-3.5 flex text-text-muted", control.as === "textarea" ? "top-3.5" : "top-1/2 -translate-y-1/2")}>
+            {icon}
+          </span>
+          {controlNode}
+        </div>
+      ) : (
+        controlNode
+      )}
       {helper && (
         <p id={helperId} className="text-small text-text-muted">
           {helper}

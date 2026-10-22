@@ -238,7 +238,7 @@ export function ProjectDetail({ doc, view, related, listings = { rentals: [], po
         asideLabelledBy={CONSULT_HEADING_ID}
         aside={
           <DetailContactAside title={t("leadForm.title")} headingId={CONSULT_HEADING_ID} description={t("v2.contactDescription")} hotline={hotline ?? null}>
-            <LeadForm source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
+            <LeadForm layout="compact" source="project" sourceId={doc.id} {...(turnstileSiteKey ? { turnstileSiteKey } : {})} {...(hotline ? { hotline } : {})} />
           </DetailContactAside>
         }
         bands={bands}

@@ -184,6 +184,8 @@ describe("S04 /cho-thue (BL-052): bố cục", () => {
     const spotlight = screen.getByRole("region", { name: "Tin cho thuê nổi bật" });
     expect(within(spotlight).getByRole("heading", { level: 2, name: "Penthouse nổi bật" })).toBeInTheDocument();
     expect(within(spotlight).getByRole("link", { name: /Nhận tư vấn/ })).toHaveAttribute("href", "/cho-thue/slug-9#lead-form");
+    expect(within(spotlight).getByRole("link", { name: /Nhận tư vấn/ })).toHaveClass("border-text", "text-text"); // BL-056: outline
+    expect(within(spotlight).getByRole("link", { name: /Nhận tư vấn/ })).not.toHaveClass("border-transparent");
     expect(spotlight).toHaveTextContent("45 triệu/tháng");
     expect(spotlight).toHaveTextContent("3 phòng ngủ · 2 phòng tắm");
     // "N phù hợp" gồm cả tin nổi bật; tin nổi bật không lặp trong lưới.

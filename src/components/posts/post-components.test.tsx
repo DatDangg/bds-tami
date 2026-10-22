@@ -103,6 +103,8 @@ describe("PostSpotlightContent (thẻ nổi bật /tin-bds, BL-052)", () => {
     expect(container.querySelector("dl")).toHaveTextContent("5,4 tỷ");
     expect(screen.getByRole("link", { name: "Xem chi tiết: Tin 1" })).toHaveAttribute("href", "/tin-bds/tin-1");
     expect(screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" })).toHaveAttribute("href", "/tin-bds/tin-1#lead-form");
+    expect(screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" })).toHaveClass("border-text", "text-text"); // BL-056: outline
+    expect(screen.getByRole("link", { name: "Nhận tư vấn: Tin 1" })).not.toHaveClass("border-transparent");
   });
 
   it("thẻ BĐS không giá: \"Liên hệ\"; ô trống bị bỏ", () => {

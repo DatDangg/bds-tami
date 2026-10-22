@@ -112,7 +112,6 @@ describe("toProjectDetailView", () => {
       }),
       "vi",
     );
-    expect(view.hasOverview).toBe(true);
     expect(visibleSections(view)).toEqual(["overview", "location", "amenities", "gallery", "floorPlans", "legal", "policy"]);
     expect(visibleSections(view, { hasListings: true })).toEqual(["overview", "location", "amenities", "gallery", "floorPlans", "legal", "policy", "listings"]);
   });
@@ -171,7 +170,7 @@ describe("toProjectDetailView", () => {
   });
 
   it("richText chỉ có đoạn rỗng không tính là có nội dung", () => {
-    expect(toProjectDetailView(project({ overview: lexical("  ") as never, legalInfo: lexical("") as never }), "vi")).toMatchObject({ hasOverview: false, hasLegal: false });
+    expect(toProjectDetailView(project({ overview: lexical("  ") as never, legalInfo: lexical("") as never }), "vi")).toMatchObject({ hasLegal: false });
   });
 
   it("toạ độ Payload [kinh độ, vĩ độ] thành {lat, lng}; sai miền → null (không dựng bản đồ); chỉ có địa chỉ vẫn có mục Vị trí", () => {
