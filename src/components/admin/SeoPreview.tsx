@@ -2,7 +2,17 @@
 
 import { useDocumentInfo, useLocale, usePayloadAPI, useFormFields } from "@payloadcms/ui";
 
-import { buildSeoPreview, homepageSeoFallback, publicPageUrl, resolveDescriptionValue, seoDescriptionSource, seoPagePathKey, type SeoPreviewResult } from "@/lib/admin/seo";
+import {
+  buildSeoPreview,
+  homepageSeoFallback,
+  publicPageUrl,
+  resolveDescriptionValue,
+  seoDescriptionSource,
+  seoNoPublicPageNote,
+  seoPagePathKey,
+  seoTitleSource,
+  type SeoPreviewResult,
+} from "@/lib/admin/seo";
 import type { Locale } from "@/i18n/routing";
 import { lexicalPlainText } from "@/lib/news/read-time";
 
@@ -14,7 +24,8 @@ const SEO_NOTE = "Không bắt buộc. Để trống thì trang tự lấy từ 
 /**
  * Khung xem trước kết quả Google ở đầu khối SEO (BL-058 T05). Mô phỏng tiêu đề + đường dẫn + mô tả theo đúng
  * quy tắc của `buildPageMetadata`: ô SEO trống thì lấy Tiêu đề / mô tả của route / URL trang, tiêu đề nối tên website.
- * Chỉ hiển thị, không ghi dữ liệu.
+ * Danh mục (T06): tiêu đề từ ô Tên, URL là trang danh mục theo `scope`; scope không có trang công khai (Dự án, Tuyển dụng)
+ * thì thay khung bằng một câu báo. Chỉ hiển thị, không ghi dữ liệu.
  *
  * `path` do Payload truyền vào theo ô đang gắn (`seo.metaTitle`) → nhóm cha suy ra từ chính đường dẫn đó.
  */
@@ -30,9 +41,11 @@ export function SeoPreview({ path }: { path: string }) {
   const metaTitle = useFieldValue(`${groupPath}.metaTitle`);
   const metaDescription = useFieldValue(`${groupPath}.metaDescription`);
   const canonical = useFieldValue(`${groupPath}.canonical`);
-  const title = useFieldValue("title");
+  const title = useFieldValue(seoTitleSource(collectionSlug));
   const slug = useFieldValue("slug");
   const kind = useFieldValue("kind");
+  // Danh mục: loại nội dung quyết định trang danh mục công khai (hoặc không có trang).
+  const scope = useFieldValue("scope");
   // Bản ghi chưa bật bản dịch EN thì trang công khai không có URL EN (global Trang chủ luôn có cả hai ngôn ngữ).
   const hasEnglish = useFieldValue("hasEnglish");
   const descriptionSource = seoDescriptionSource(collectionSlug);
@@ -45,7 +58,7 @@ export function SeoPreview({ path }: { path: string }) {
   const pageUrl = publicPageUrl({
     origin: typeof window === "undefined" ? "" : window.location.origin,
     locale,
-    pathKey: seoPagePathKey({ collectionSlug, globalSlug, kind }),
+    pathKey: seoPagePathKey({ collectionSlug, globalSlug, kind, scope }),
     slug,
     // Payload để trống (undefined) với bản ghi chưa từng bật EN ⇒ coi như chưa có bản dịch; global luôn có.
     hasEnglish: globalSlug ? true : hasEnglish === true,
@@ -60,6 +73,16 @@ export function SeoPreview({ path }: { path: string }) {
     description: homeFallback?.description ?? description,
     pageUrl,
   });
+
+  // Không có trang công khai để xem trước → chỉ một câu báo (hook ở trên vẫn gọi đủ, không gọi có điều kiện).
+  const noPublicPageNote = seoNoPublicPageNote({ collectionSlug, scope });
+  if (noPublicPageNote) {
+    return (
+      <section className="tami-seo-preview" aria-label="Trang này không có trên website">
+        <p className="tami-seo-preview__note">{noPublicPageNote}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="tami-seo-preview" aria-label="Xem trước kết quả tìm kiếm trên Google">

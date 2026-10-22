@@ -1,13 +1,15 @@
 import { createTranslator } from "next-intl";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import enMessages from "../../i18n/messages/en.json";
 import viMessages from "../../i18n/messages/vi.json";
 import type { Locale } from "../../i18n/routing";
+import { publicPath } from "../content/content-paths";
 import { buildPageMetadata } from "../seo/metadata";
 import {
   buildSeoPreview,
   buildSeoTitle,
+  CATEGORY_PAGE_ROUTES,
   describeSeoDescriptionLength,
   describeSeoTitleLength,
   flattenMetaDescription,
@@ -17,7 +19,9 @@ import {
   publicPageUrl,
   resolveDescriptionValue,
   seoDescriptionSource,
+  seoNoPublicPageNote,
   seoPagePathKey,
+  seoTitleSource,
   SEO_DESCRIPTION_MAX,
   SEO_DESCRIPTION_MIN,
   SEO_TITLE_MAX,
@@ -139,17 +143,35 @@ describe("seoDescriptionSource: bảng route → trường mô tả dự phòng"
     expect(seoDescriptionSource("property-posts")).toBe("excerpt");
     expect(seoDescriptionSource("rentals")).toBe("description");
     expect(seoDescriptionSource("job-postings")).toBe("description");
+    expect(seoDescriptionSource("categories")).toBe("description");
     expect(seoDescriptionSource("pages")).toBeUndefined();
     expect(seoDescriptionSource("homepage")).toBeUndefined();
     expect(seoDescriptionSource(null)).toBeUndefined();
   });
 
   it("richText đổi sang chữ thuần rồi cắt 160; textarea/text giữ nguyên, rỗng → undefined", () => {
-    const rich = (value: unknown) => (typeof value === "string" ? value : "");
-    expect(resolveDescriptionValue("description", "Nhà 3 phòng   ngủ", rich)).toBe("Nhà 3 phòng ngủ");
+    const rich = (value: unknown) => (typeof value === "object" && value !== null && "text" in value ? String(value.text) : "");
+    expect(resolveDescriptionValue("description", { text: "Nhà 3 phòng   ngủ" }, rich)).toBe("Nhà 3 phòng ngủ");
+    expect(resolveDescriptionValue("description", { text: "w ".repeat(120) }, rich)?.endsWith("…")).toBe(true);
     expect(resolveDescriptionValue("summary", "Mô tả ngắn", rich)).toBe("Mô tả ngắn");
     expect(resolveDescriptionValue("excerpt", "   ", rich)).toBeUndefined();
     expect(resolveDescriptionValue(undefined, "bỏ qua", rich)).toBeUndefined();
+  });
+
+  it("Danh mục: `description` là textarea (chuỗi) → dùng nguyên văn như trang danh mục, KHÔNG cắt 160 (T06)", () => {
+    const rich = () => "";
+    const long = "m".repeat(200);
+    expect(resolveDescriptionValue("description", long, rich)).toBe(long);
+    expect(resolveDescriptionValue("description", "  Mô tả danh mục  ", rich)).toBe("Mô tả danh mục");
+    expect(resolveDescriptionValue("description", "", rich)).toBeUndefined();
+  });
+});
+
+describe("seoTitleSource: ô làm tiêu đề dự phòng (T06)", () => {
+  it("Danh mục dùng `name` (useAsTitle), còn lại dùng `title`", () => {
+    expect(seoTitleSource("categories")).toBe("name");
+    expect(seoTitleSource("news")).toBe("title");
+    expect(seoTitleSource(undefined)).toBe("title");
   });
 });
 
@@ -165,6 +187,35 @@ describe("seoPagePathKey: bản ghi → khoá đường dẫn công khai", () =>
     expect(seoPagePathKey({ globalSlug: "homepage" })).toBe("/");
     expect(seoPagePathKey({ collectionSlug: "leads" })).toBeUndefined();
     expect(seoPagePathKey({ collectionSlug: "pages" })).toBeUndefined();
+  });
+
+  it("Danh mục: theo `scope` — 3 scope có trang danh mục công khai, Dự án/Tuyển dụng/chưa chọn → không có (T06)", () => {
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "rental" })).toBe("/cho-thue/danh-muc/[category]");
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "property_post" })).toBe("/tin-bds/danh-muc/[category]");
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "news" })).toBe("/tin-tuc/danh-muc/[category]");
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "project" })).toBeUndefined();
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "job" })).toBeUndefined();
+    expect(seoPagePathKey({ collectionSlug: "categories" })).toBeUndefined();
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: 42 })).toBeUndefined();
+  });
+});
+
+describe("seoNoPublicPageNote: Danh mục không có trang riêng (T06)", () => {
+  it("Dự án / Tuyển dụng → câu tiếng Việt có nhãn loại nội dung, không lộ thuật ngữ dev", () => {
+    const project = seoNoPublicPageNote({ collectionSlug: "categories", scope: "project" });
+    expect(project).toContain("Dự án");
+    expect(project).toMatch(/không có trang riêng/);
+    expect(project).not.toMatch(/scope|slug|route|seo/i);
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "job" })).toContain("Tuyển dụng");
+  });
+
+  it("scope có trang, chưa chọn scope, scope lạ, hoặc collection khác → undefined (vẫn hiện khung xem trước)", () => {
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "news" })).toBeUndefined();
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "rental" })).toBeUndefined();
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "property_post" })).toBeUndefined();
+    expect(seoNoPublicPageNote({ collectionSlug: "categories" })).toBeUndefined();
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "la" })).toBeUndefined();
+    expect(seoNoPublicPageNote({ collectionSlug: "news", scope: "project" })).toBeUndefined();
   });
 });
 
@@ -202,6 +253,86 @@ describe("publicPageUrl: URL công khai thay cho canonical khi ô trống", () =
     expect(publicPageUrl({ origin: ORIGIN, locale: "vi", pathKey: "/tin-tuc/[slug]" })).toBe("");
     expect(publicPageUrl({ origin: ORIGIN, locale: "vi", pathKey: undefined, slug: "x" })).toBe("");
     expect(publicPageUrl({ origin: "", locale: "vi", pathKey: "/tin-tuc/[slug]", slug: "x" })).toBe("/tin-tuc/x");
+  });
+
+  it.each([
+    ["rental", "https://tami.vn/cho-thue/danh-muc/can-ho", "https://tami.vn/en/for-rent/category/apartment"],
+    ["property_post", "https://tami.vn/tin-bds/danh-muc/can-ho", "https://tami.vn/en/property-news/category/apartment"],
+    ["news", "https://tami.vn/tin-tuc/danh-muc/can-ho", "https://tami.vn/en/news/category/apartment"],
+  ])("Danh mục scope %s: tham số `[category]` điền slug của ngôn ngữ đang sửa; EN chỉ khi có bản EN (T06)", (scope, viUrl, enUrl) => {
+    const pathKey = seoPagePathKey({ collectionSlug: "categories", scope });
+    expect(publicPageUrl({ origin: ORIGIN, locale: "vi", pathKey, slug: "can-ho" })).toBe(viUrl);
+    expect(publicPageUrl({ origin: ORIGIN, locale: "en", pathKey, slug: "apartment", hasEnglish: true })).toBe(enUrl);
+    expect(publicPageUrl({ origin: ORIGIN, locale: "en", pathKey, slug: "can-ho", hasEnglish: false })).toBe(viUrl);
+    expect(publicPageUrl({ origin: ORIGIN, locale: "vi", pathKey })).toBe("");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Danh mục (T06): đối chiếu với metadata THẬT của trang danh mục. Ba hàm `generateMetadata` đều truyền cùng một bộ
+// tham số vào `buildPageMetadata` (không gọi được trực tiếp vì cần Payload/DB + next-intl server):
+//   - Cho thuê  `src/components/rentals/rental-list-metadata.ts:75-83` (seo: category.seo, title: category.name ?? t("title"),
+//                description: category.description, paths vi/en qua `publicPath("/cho-thue/danh-muc/[category]")`)
+//   - Tin BĐS   `src/components/posts/post-list-metadata.ts:78-85`  (cùng bộ, route `/tin-bds/danh-muc/[category]`)
+//   - Tin tức   `src/components/news/NewsListPage.tsx:129-136`      (cùng bộ, route `/tin-tuc/danh-muc/[category]`)
+// `paths.en` chỉ có khi danh mục có bản EN (hasEnglish && slug EN); `?page=n` / bộ lọc không áp cho khung xem trước.
+// ---------------------------------------------------------------------------
+
+describe("Danh mục: preview khớp buildPageMetadata với đúng input của 3 trang danh mục", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  const siteName = "Tami Land";
+  const category = { name: "Căn hộ", description: "Danh mục căn hộ cho thuê tại TP.HCM.", slug: { vi: "can-ho", en: "apartment" } };
+
+  const scopes = Object.keys(CATEGORY_PAGE_ROUTES) as Array<keyof typeof CATEGORY_PAGE_ROUTES>;
+  const cases = scopes.flatMap((scope) => (["vi", "en"] as const).flatMap((locale) => [true, false].map((hasEnglish) => [scope, locale, hasEnglish] as const)));
+
+  it.each(cases)("scope %s · locale %s · hasEnglish %s: tiêu đề + mô tả + canonical giống metadata thật", (scope, locale, hasEnglish) => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", ORIGIN);
+    const route = CATEGORY_PAGE_ROUTES[scope];
+    const seo = { metaTitle: "", metaDescription: "   " };
+    // Y hệt 3 hàm metadata: title = name, description = description, paths.en chỉ khi có bản EN.
+    const metadata = buildPageMetadata({
+      locale,
+      seo,
+      title: category.name,
+      description: category.description,
+      siteName,
+      paths: { vi: publicPath(route, "vi", { category: category.slug.vi }), ...(hasEnglish ? { en: publicPath(route, "en", { category: category.slug.en }) } : {}) },
+      hasEnglish,
+    });
+
+    // Admin đang sửa locale `locale`: ô slug của form mang slug của locale đó (EN chưa bật thì trang EN không tồn tại → URL vi).
+    const slug = locale === "en" && hasEnglish ? category.slug.en : category.slug.vi;
+    const pathKey = seoPagePathKey({ collectionSlug: "categories", scope });
+    const preview = buildSeoPreview({
+      ...seo,
+      title: category.name,
+      description: resolveDescriptionValue(seoDescriptionSource("categories"), category.description, () => ""),
+      siteName,
+      pageUrl: publicPageUrl({ origin: ORIGIN, locale, pathKey, slug, hasEnglish }),
+    });
+
+    expect(preview.title).toBe(metadata.title as string);
+    expect(preview.description).toBe(metadata.description as string);
+    expect(preview.url).toBe(metadata.alternates?.canonical as string);
+    // Giá trị cụ thể (không chỉ tự khớp).
+    expect(preview.title).toBe("Căn hộ | Tami Land");
+    expect(preview.description).toBe(category.description);
+    const expectedPath = locale === "en" && hasEnglish ? publicPath(route, "en", { category: "apartment" }) : publicPath(route, "vi", { category: "can-ho" });
+    expect(preview.url).toBe(`${ORIGIN}${expectedPath}`);
+    if (locale === "en" && hasEnglish) expect(preview.url).toMatch(/^https:\/\/tami\.vn\/en\/.+\/category\/apartment$/);
+    else expect(preview.url).toMatch(/^https:\/\/tami\.vn\/[a-z-]+\/danh-muc\/can-ho$/);
+  });
+
+  it("ô SEO có giá trị thì thắng Tên/Mô tả danh mục ở cả preview lẫn metadata thật", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", ORIGIN);
+    const seo = { metaTitle: "Thuê căn hộ giá tốt", metaDescription: "Mô tả SEO danh mục." };
+    const metadata = buildPageMetadata({ locale: "vi", seo, title: category.name, description: category.description, siteName, paths: { vi: "/cho-thue/danh-muc/can-ho" }, hasEnglish: false });
+    const preview = buildSeoPreview({ ...seo, title: category.name, description: category.description, siteName, pageUrl: `${ORIGIN}/cho-thue/danh-muc/can-ho` });
+    expect(preview.title).toBe(metadata.title as string);
+    expect(preview.title).toBe("Thuê căn hộ giá tốt | Tami Land");
+    expect(preview.description).toBe("Mô tả SEO danh mục.");
   });
 });
 

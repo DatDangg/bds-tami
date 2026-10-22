@@ -119,6 +119,61 @@ describe("SeoPreview", () => {
     expect(screen.getByText(`${ORIGIN}/en`)).toBeInTheDocument();
   });
 
+  it("Danh mục (T06): tiêu đề lấy ô Tên, mô tả lấy ô Mô tả, URL = trang danh mục theo scope + slug", () => {
+    state.doc = { collectionSlug: "categories", globalSlug: undefined };
+    state.siteName = "Tami Land";
+    state.locale = "vi";
+    setValues({ name: "Thị trường", description: "Tin thị trường bất động sản.", slug: "thi-truong", scope: "news" });
+    const news = render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText("Thị trường | Tami Land")).toBeInTheDocument();
+    expect(screen.getByText("Tin thị trường bất động sản.")).toBeInTheDocument();
+    expect(screen.getByText(`${ORIGIN}/tin-tuc/danh-muc/thi-truong`)).toBeInTheDocument();
+    news.unmount();
+
+    setValues({ name: "Căn hộ", slug: "can-ho", scope: "rental" });
+    const rental = render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText(`${ORIGIN}/cho-thue/danh-muc/can-ho`)).toBeInTheDocument();
+    rental.unmount();
+
+    setValues({ name: "Voucher", slug: "voucher", scope: "property_post", "seo.metaTitle": "Voucher ưu đãi" });
+    render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText("Voucher ưu đãi | Tami Land")).toBeInTheDocument();
+    expect(screen.getByText(`${ORIGIN}/tin-bds/danh-muc/voucher`)).toBeInTheDocument();
+  });
+
+  it("Danh mục tiếng Anh: đường dẫn dịch + /en chỉ khi đã có bản EN", () => {
+    state.doc = { collectionSlug: "categories", globalSlug: undefined };
+    state.siteName = "Tami Land";
+    state.locale = "en";
+    setValues({ name: "Market", slug: "market", scope: "news", hasEnglish: true });
+    const en = render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText("Market | Tami Land")).toBeInTheDocument();
+    expect(screen.getByText(`${ORIGIN}/en/news/category/market`)).toBeInTheDocument();
+    en.unmount();
+
+    setValues({ name: "Thị trường", slug: "thi-truong", scope: "news", hasEnglish: false });
+    render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText(`${ORIGIN}/tin-tuc/danh-muc/thi-truong`)).toBeInTheDocument();
+    expect(screen.queryByText(/\/en\//)).toBeNull();
+  });
+
+  it("Danh mục Dự án / Tuyển dụng: không có trang riêng → câu báo ngắn thay khung xem trước", () => {
+    state.doc = { collectionSlug: "categories", globalSlug: undefined };
+    state.siteName = "Tami Land";
+    state.locale = "vi";
+    setValues({ name: "Chung cư", slug: "chung-cu", scope: "project" });
+    const project = render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText(/Danh mục Dự án không có trang riêng/)).toBeInTheDocument();
+    expect(screen.queryByText("Chung cư | Tami Land")).toBeNull();
+    expect(screen.queryByText("Đường dẫn sẽ có sau khi lưu trang")).toBeNull();
+    expect(screen.queryByText(/Không bắt buộc/)).toBeNull();
+    project.unmount();
+
+    setValues({ name: "Kỹ sư", slug: "ky-su", scope: "job" });
+    render(<SeoPreview path="seo.metaTitle" />);
+    expect(screen.getByText(/Danh mục Tuyển dụng không có trang riêng/)).toBeInTheDocument();
+  });
+
   it("chưa có dữ liệu (Cài đặt chung chưa tải, chưa nhập slug) thì hiện câu mẫu, không bịa tên website/URL", () => {
     state.doc = { collectionSlug: "news", globalSlug: undefined };
     state.siteName = undefined;

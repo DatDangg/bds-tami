@@ -2,13 +2,13 @@
 
 ```yaml
 workItem: feature/admin-form-ux-polish
-phaseTask: phase-plan
+phaseTask: phase-1-task-06
 step: done
 agent: change-request
 status: done
 attempt: 1
 interrupted: false
-updatedAt: 2026-10-22T18:10:00+07:00
+updatedAt: 2026-10-22T19:20:00+07:00
 filesTouched: [src/fields/seo.ts, src/collections/_shared/content-defaults.ts, src/collections/_shared/content-defaults.test.ts, src/components/admin/styles/_forms.scss, src/lib/admin/seo.ts, src/lib/admin/seo.test.ts, src/components/admin/SeoPreview.tsx, src/components/admin/SeoPreview.test.tsx, src/components/admin/SeoLengthCounter.tsx, src/components/admin/SeoLengthCounter.test.tsx, src/fields/seo.test.ts, tests/unit/admin-labels.test.ts, "src/app/(payload)/admin/importMap.js"]
 filesNew: [src/lib/admin/seo.ts, src/lib/admin/seo.test.ts, src/components/admin/SeoPreview.tsx, src/components/admin/SeoPreview.test.tsx, src/components/admin/SeoLengthCounter.tsx, src/components/admin/SeoLengthCounter.test.tsx, src/fields/seo.test.ts]
 evidence:
@@ -16,7 +16,7 @@ evidence:
   round: 0
   verdict: null
   verify: "unit+ui 3317/3317 PASS; typecheck PASS; eslint src tests 0 error; integration + build BLOCKED (Postgres 5433 down, docker daemon off)"
-next: "BL-058 done. Follow-up: xem trước SEO cho Danh mục; xoá DB tami_wt_bl058_t01..t04 khi Postgres chạy; merge/push branch chỉ khi user yêu cầu"
+next: "BL-058 + T06 done. Follow-up: câu giải thích SEO Danh mục; rental-list-metadata paths.en; xoá DB tami_wt_bl058_t01..t04; merge/push chỉ khi user yêu cầu"
 loopSignal: "parity-preview (3 vòng FAIL cùng nhóm: mô phỏng metadata trong admin) — đã báo user, user chọn hướng B"
 approvals: [{gate: phase_plan, at: 2026-10-22, ok: true, Q1: B, Q2: no-who, Q3: drop-toast}]
 batchQueue: []
@@ -66,3 +66,9 @@ batchQueue: []
 - 2026-10-22 ▶ START [agent: spec-validator] phase 1 BL-058 (cancel sẽ redo bước này)
 - 2026-10-22 ✅ DONE [agent: spec-validator] phase 1 = **PASS** (2 ⚠️: Danh mục có khối SEO nhưng preview chưa mô phỏng → ghi gap F11 + follow-up; chữ toast ~0,7s → sửa FR-ADM-19 (2)); report persist bởi primary
 - 2026-10-22 ✅ DONE close-out BL-058: BACKLOG done, change doc archive, progress done (T04 d767b30, T05 db437a1), test-scope v62 riskNote + changeDoc path
+- 2026-10-22 USER APPROVAL (chat): sửa luôn khung xem trước SEO cho Danh mục (builder → reviewer → commit) → task phase-1-task-06
+- 2026-10-22 ▶ START [agent: builder] T06 (cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: builder] T06: seo.ts (seoTitleSource, CATEGORY_PAGE_ROUTES 3 scope, câu báo scope không có trang), SeoPreview đọc name/scope; parity 12 case với buildPageMetadata; eslint 0, typecheck PASS, unit+ui 3365 PASS, build PASS
+- 2026-10-22 ▶ START [agent: reviewer] T06 round 1 (cancel sẽ redo bước này)
+- 2026-10-22 ✅ DONE [agent: reviewer] T06 round 1 = **PASS** (2 MINOR follow-up); report persist bởi primary
+- 2026-10-22 ✅ DONE close-out T06: spec F11 câu Danh mục as-built (1.48.0, không bump), test-scope riskNote, progress T06 done

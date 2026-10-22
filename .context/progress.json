@@ -2557,6 +2557,23 @@
           "reviewerResult": "PASS",
           "completedAt": "2026-10-22",
           "commit": "db437a1"
+        },
+        {
+          "task": "phase-1-task-06",
+          "file": "tasks/feature-admin-form-ux-polish/phase-1-task-06.md",
+          "status": "done",
+          "attempt": 1,
+          "dependsOn": [
+            "phase-1-task-05"
+          ],
+          "wave": "follow-up",
+          "note": "xem trước SEO cho Danh mục (spec-validation ⚠️-1)",
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-admin-form-ux-polish-phase-1-task-06-round-1-review.md",
+          "verify": "eslint src tests 0 · typecheck PASS · unit+ui 3365/3365 PASS · build PASS (builder); integration/ảnh BLOCKED",
+          "completedAt": "2026-10-22"
         }
       ],
       "wave1DoneAt": "2026-10-22",
@@ -2567,10 +2584,11 @@
       "phaseReview": {
         "verdict": "PASS",
         "report": ".context/review-reports/spec-validation-feature-admin-form-ux-polish-phase-1.md",
-        "note": "2 ⚠️: (1) Danh mục có khối SEO nhưng preview chưa mô phỏng — ghi gap spec F11 + follow-up; (2) chữ toast không gắn ô (~0,7s) — đã sửa FR-ADM-19 (2)"
+        "note": "2 ⚠️: (1) Danh mục có khối SEO nhưng preview chưa mô phỏng — ghi gap spec F11 + follow-up; (2) chữ toast không gắn ô (~0,7s) — đã sửa FR-ADM-19 (2); ⚠️-1 đã xử lý ở T06"
       },
       "followUps": [
-        "Khung xem trước SEO cho Danh mục (categories): đọc useAsTitle, URL /<loại>/danh-muc/[slug], mô tả — hoặc ẩn preview ở categories",
+        "Câu giải thích đầu khối SEO ở Danh mục ghi \"Tiêu đề, Tóm tắt và Ảnh đại diện\" → nên là \"Tên và Mô tả danh mục\" (MINOR T06 r1)",
+        "rental-list-metadata.ts:81 đưa paths.en không xét category.hasEnglish (khác posts/news) — task riêng",
         "Xoá DB tami_wt_bl058_t01..t04 khi Postgres chạy lại"
       ]
     }

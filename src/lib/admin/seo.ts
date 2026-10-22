@@ -5,6 +5,7 @@
 
 import enMessages from "../../i18n/messages/en.json";
 import viMessages from "../../i18n/messages/vi.json";
+import { CATEGORY_SCOPE_LABELS, type CategoryScope } from "../../hooks/categories/scope-collections";
 import type { Locale } from "../../i18n/routing";
 import { pathnames } from "../../i18n/routing";
 import { CONTENT_ROUTES, LEGAL_PAGE_ROUTES, type LegalPageKind } from "../content/content-paths";
@@ -23,7 +24,8 @@ export const META_DESCRIPTION_LENGTH = 160;
 /**
  * Trường lấy mô tả dự phòng của từng collection — khớp đúng tham số `description` mà trang công khai truyền vào
  * `buildPageMetadata`: Dự án/Dịch vụ = `summary`, Tin tức/Tin BĐS = `excerpt`, Cho thuê/Tuyển dụng = `description` (richText),
- * Trang pháp lý (`pages`) và Trang chủ không có trường mô tả (chữ lấy từ bản dịch).
+ * Danh mục = `description` (textarea, trang danh mục truyền nguyên văn — T06). Trang pháp lý (`pages`) và Trang chủ
+ * không có trường mô tả (chữ lấy từ bản dịch).
  */
 export const SEO_DESCRIPTION_SOURCE = {
   news: "excerpt",
@@ -32,7 +34,38 @@ export const SEO_DESCRIPTION_SOURCE = {
   services: "summary",
   rentals: "description",
   "job-postings": "description",
+  categories: "description",
 } as const satisfies Record<string, "excerpt" | "summary" | "description">;
+
+/** Ô làm tiêu đề dự phòng: Danh mục dùng `name` (`useAsTitle`), các collection còn lại dùng `title`. */
+export function seoTitleSource(collectionSlug: string | null | undefined): "name" | "title" {
+  return collectionSlug === "categories" ? "name" : "title";
+}
+
+/**
+ * Danh mục: `scope` → trang danh mục công khai (khoá `pathnames`), đúng route mà `buildRentalListMetadata` /
+ * `buildPostListMetadata` / `buildNewsListMetadata` dựng canonical. Dự án và Tuyển dụng KHÔNG có trang danh mục riêng
+ * nên không có ở đây (xem `seoNoPublicPageNote`).
+ */
+export const CATEGORY_PAGE_ROUTES = {
+  rental: "/cho-thue/danh-muc/[category]",
+  property_post: "/tin-bds/danh-muc/[category]",
+  news: "/tin-tuc/danh-muc/[category]",
+} as const satisfies Partial<Record<CategoryScope, keyof typeof pathnames>>;
+
+function categoryPagePathKey(scope: unknown): string | undefined {
+  return typeof scope === "string" ? (CATEGORY_PAGE_ROUTES as Record<string, string | undefined>)[scope] : undefined;
+}
+
+/**
+ * Câu báo thay cho khung xem trước khi bản ghi không có trang công khai nào để xem trước: Danh mục scope Dự án / Tuyển dụng
+ * (scope đã chọn và là scope thật nhưng không có route). Trả `undefined` khi có trang hoặc chưa đủ dữ liệu để kết luận.
+ */
+export function seoNoPublicPageNote(input: { collectionSlug?: string | null; scope?: unknown }): string | undefined {
+  if (input.collectionSlug !== "categories" || typeof input.scope !== "string" || categoryPagePathKey(input.scope)) return undefined;
+  const label = (CATEGORY_SCOPE_LABELS as Record<string, string | undefined>)[input.scope];
+  return label ? `Danh mục ${label} không có trang riêng trên website, nên phần này không cần điền.` : undefined;
+}
 
 export type SeoDescriptionSource = (typeof SEO_DESCRIPTION_SOURCE)[keyof typeof SEO_DESCRIPTION_SOURCE];
 
@@ -65,10 +98,13 @@ export function flattenMetaDescription(text: string): string | undefined {
   return `${flat.slice(0, META_DESCRIPTION_LENGTH).replace(/\s+\S*$/, "")}…`;
 }
 
-/** Mô tả dự phòng từ giá trị form: richText thì đổi sang chữ thuần (cắt 160), textarea/text thì dùng nguyên. */
+/**
+ * Mô tả dự phòng từ giá trị form: richText (Cho thuê / Tuyển dụng, giá trị là object Lexical) thì đổi sang chữ thuần và
+ * cắt 160; textarea/text (kể cả `description` của Danh mục, giá trị là chuỗi) thì dùng nguyên như trang công khai.
+ */
 export function resolveDescriptionValue(source: SeoDescriptionSource | undefined, value: unknown, plainText: (rich: unknown) => string): string | undefined {
   if (!source) return undefined;
-  if (source === "description") return flattenMetaDescription(plainText(value));
+  if (source === "description" && typeof value !== "string") return flattenMetaDescription(plainText(value));
   return nonEmptySeo(value);
 }
 
@@ -92,20 +128,28 @@ export function describeSeoDescriptionLength(value: unknown): SeoLengthHint {
   return { text: base, outOfRange: false };
 }
 
-/** Khoá `pathnames` của trang công khai tương ứng bản ghi đang sửa; `undefined` = không xác định được. */
-export function seoPagePathKey(input: { collectionSlug?: string | null; globalSlug?: string | null; kind?: unknown }): string | undefined {
+/**
+ * Khoá `pathnames` của trang công khai tương ứng bản ghi đang sửa; `undefined` = không xác định được (hoặc không có trang:
+ * Danh mục scope Dự án / Tuyển dụng, chưa chọn scope).
+ */
+export function seoPagePathKey(input: { collectionSlug?: string | null; globalSlug?: string | null; kind?: unknown; scope?: unknown }): string | undefined {
   if (input.globalSlug) return "/";
   if (input.collectionSlug === "pages") {
     if (typeof input.kind !== "string") return undefined;
     return (LEGAL_PAGE_ROUTES as Record<string, string | undefined>)[input.kind as LegalPageKind];
   }
+  if (input.collectionSlug === "categories") return categoryPagePathKey(input.scope);
   return input.collectionSlug ? (CONTENT_ROUTES as Record<string, { detail: string } | undefined>)[input.collectionSlug]?.detail : undefined;
 }
+
+/** Tham số động của khoá `pathnames` (`[slug]`, `[category]`) — mỗi khoá tối đa một, như `publicPath` của content-paths. */
+const DYNAMIC_SEGMENT = /\[[a-z]+\]/;
 
 /**
  * URL công khai của trang đang sửa, dựng theo `pathnames` (EN có đường dẫn dịch riêng) — chính là canonical mà
  * `buildPageMetadata` tự sinh khi ô "Đường dẫn gốc" để trống. Bản ghi CHƯA có bản dịch EN (`hasEnglish=false`) thì
  * luôn dùng đường dẫn tiếng Việt (y `paths.en ?? paths.vi` của metadata, không khai URL EN không tồn tại).
+ * `slug` điền vào tham số động của khoá (`[slug]` ở trang chi tiết, `[category]` ở trang danh mục).
  * Thiếu slug hoặc không xác định được đường dẫn → chuỗi rỗng.
  */
 export function publicPageUrl(input: { origin: string; locale: Locale; pathKey?: string; slug?: unknown; hasEnglish?: boolean }): string {
@@ -115,8 +159,8 @@ export function publicPageUrl(input: { origin: string; locale: Locale; pathKey?:
   const localized = (pathnames as Record<string, Record<Locale, string>>)[pathKey]?.[locale];
   if (!localized) return "";
   const slug = typeof input.slug === "string" ? input.slug.trim() : "";
-  if (localized.includes("[slug]") && !slug) return ""; // chưa nhập slug → chưa có URL thật
-  const withSlug = localized.replace("[slug]", slug ? encodeURIComponent(slug) : "");
+  if (DYNAMIC_SEGMENT.test(localized) && !slug) return ""; // chưa nhập slug → chưa có URL thật
+  const withSlug = localized.replace(DYNAMIC_SEGMENT, encodeURIComponent(slug));
   const prefix = locale === "vi" ? "" : `/${locale}`;
   return `${origin}${prefix}${withSlug === "/" ? "" : withSlug}`;
 }
