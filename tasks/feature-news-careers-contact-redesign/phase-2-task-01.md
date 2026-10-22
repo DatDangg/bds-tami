@@ -31,7 +31,8 @@
 7. Giữ form "Tư vấn nhu cầu" cuối mọi trang `/tin-tuc` (không ở trang danh mục — như hiện tại) → banner tư vấn.
 8. Responsive: 375 / 768 / 1280 / 1440 không tràn; < lg cột phải xuống dưới lưới.
 9. NewsCard: biến thể trang chủ / nền tối / thẻ liên quan hiện có giữ hoạt động (P2-T02 dùng lại thẻ lưới mới cho "Bài viết liên quan").
-10. Test: queries (q / tag / sort / top tags, EN), view (nổi bật không trùng, phân trang), metadata (noindex / canonical), component (rỗng ẩn, a11y); chụp trình duyệt 1440 + 390 lưu `.context/review-reports/assets/bl054-p2t01-*`.
+10. (P1-T03 review) `loadMostReadNews` ném lỗi khi DB lỗi → trang bọc lỗi (ẩn khối, không vỡ trang); sửa `src/lib/news/most-read.ts` MINOR-1: lấy dư id xếp hạng + lọc thẻ null **trước** khi bù để đủ 5 bài.
+11. Test: queries (q / tag / sort / top tags, EN), view (nổi bật không trùng, phân trang), metadata (noindex / canonical), component (rỗng ẩn, a11y); chụp trình duyệt 1440 + 390 lưu `.context/review-reports/assets/bl054-p2t01-*`.
 
 ## Acceptance
 - [ ] Bố cục khớp `tin-tuc.webp` ở 1440; mobile hợp lý.

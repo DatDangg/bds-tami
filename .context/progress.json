@@ -2361,7 +2361,7 @@
       "title": "Redesign Tin tức / Chi tiết tin tức / Tuyển dụng / Chi tiết tuyển dụng / Liên hệ + đếm lượt xem, bản tin, khối soạn bài, văn phòng, Tuyển gấp, quy trình ứng tuyển (BL-054)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 1,
+      "currentPhase": "1-2",
       "backlog": "BL-054",
       "changeDoc": "spec/changes/2026-10-21-news-careers-contact-redesign.md",
       "startedAt": "2026-10-22",
@@ -2399,17 +2399,22 @@
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "done",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
-          ]
+          ],
+          "note": "POST /api/public/news-views + loader Đọc nhiều + beacon",
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-careers-contact-redesign-phase-1-task-03-round-1-review.md",
+          "commit": "632919b"
         },
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-news-careers-contact-redesign/phase-1-task-04.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "in_progress",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
           ]
@@ -2438,8 +2443,8 @@
         {
           "task": "phase-2-task-03",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-03.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "in_progress",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
           ]
@@ -2457,8 +2462,8 @@
         {
           "task": "phase-2-task-05",
           "file": "tasks/feature-news-careers-contact-redesign/phase-2-task-05.md",
-          "status": "pending",
-          "attempt": 0,
+          "status": "in_progress",
+          "attempt": 1,
           "dependsOn": [
             "phase-1-task-01"
           ]
@@ -3473,7 +3478,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T03:00:53.916Z",
+  "lastUpdated": "2026-10-22T04:41:21.591Z",
   "approvalMilestones": [
     {
       "id": "M1",
