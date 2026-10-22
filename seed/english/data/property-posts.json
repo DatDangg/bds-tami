@@ -1,0 +1,669 @@
+{
+  "Mở bán đợt cuối căn hộ ven sông": {
+    "title": "Final release of riverside apartments",
+    "excerpt": "The last remaining units of the riverside apartment project, with a flexible payment schedule.",
+    "content": [
+      "The last remaining units of the riverside apartment project, with a flexible payment schedule. This is a sample post for previewing the layout; it has no cover image yet, so it is not published."
+    ],
+    "priceNote": "From only 2.1 billion VND"
+  },
+  "Voucher tri ân khách thuê căn hộ": {
+    "title": "Thank-you voucher for apartment tenants",
+    "excerpt": "First-month rent discount for tenants who sign a lease of 12 months or more.",
+    "content": [
+      "First-month rent discount for tenants who sign a lease of 12 months or more. This is a sample post for previewing the layout; it has no cover image yet, so it is not published."
+    ],
+    "offer.terms": "Applies to leases of 12 months or more; cannot be combined with other offers."
+  },
+  "Bán căn Kosmo 3 ngủ căn góc siêu đẹp": {
+    "title": "Kosmo 3-bedroom corner apartment for sale - stunning unit",
+    "excerpt": "Kosmo 3-bedroom corner apartment for sale - stunning unit, 126 m².",
+    "content": [
+      "Kosmo 3-bedroom corner apartment for sale - stunning unit.",
+      "Key information",
+      "Area: 126 m²",
+      "Bedrooms: 3",
+      "Bathrooms: 2",
+      "Floor: High floor",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "16 billion VND"
+  },
+  "Bán chung cư D'Eldorado Nguyễn Hoàng Tôn diện tích 38m2/1PN/1WC ban công Đông Bắc view nội khu": {
+    "title": "D'Eldorado Nguyễn Hoàng Tôn apartment for sale - 38 m², 1 bedroom/1 bathroom, northeast-facing balcony, internal view",
+    "excerpt": "D'Eldorado Tower E1 high-floor apartment for sale, 38 m², 1 bedroom, northeast-facing balcony, priced at 5.4 billion VND",
+    "content": [
+      "D'Eldorado Tower E1 high-floor apartment for sale, 38 m², 1 bedroom, northeast-facing balcony, priced at 5.4 billion VND",
+      "Location: High floor, Tower E1.",
+      "Area: 38 m².",
+      "Layout: 1 bedroom, 1 living room.",
+      "Northeast-facing balcony.",
+      "Sale price: 5.4 billion VND.",
+      "Key information",
+      "Area: 38 m²",
+      "Bedrooms: 1",
+      "Bathrooms: 1",
+      "View: Internal landscape view",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "5.4 billion VND"
+  },
+  "Bán căn hộ Starlake The Prime 2 phòng ngủ 1WC 85 m² tầng thấp hướng Tây tứ trạch": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 85 m², low floor, west-facing (Tứ Trạch direction)",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 85 m², low floor, west-facing (Tứ Trạch direction)",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 85 m², low floor, west-facing (Tứ Trạch direction)",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 85 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: West (Tứ Trạch)",
+      "View: Park",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ Starlake The Prime 2PN–1WC 83 m² tầng cao cửa hướng Đông tứ trạch nhìn hồ": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 83 m², high floor, east-facing door (Tứ Trạch direction), lake view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 83 m², high floor, east-facing door (Tứ Trạch direction), lake view",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 83 m², high floor, east-facing door (Tứ Trạch direction), lake view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 83 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: East (Tứ Trạch)",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán chung cư Starlake The Prime 2 phòng ngủ 1WC 79 m² tầng trung ban công hướng Tây Nam": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 79 m², mid-floor, southwest-facing balcony",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 79 m², mid-floor, southwest-facing balcony",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 79 m², mid-floor, southwest-facing balcony",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 79 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: Southwest",
+      "View: Park",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ 2PN–1WC Starlake The Prime 77 m² tầng thấp cửa hướng Tây Bắc view nội khu": {
+    "title": "2-bedroom/1-bathroom Starlake The Prime apartment for sale - 77 m², low floor, northwest-facing door, internal view",
+    "excerpt": "2-bedroom/1-bathroom Starlake The Prime apartment for sale - 77 m², low floor, northwest-facing door, internal view",
+    "content": [
+      "2-bedroom/1-bathroom Starlake The Prime apartment for sale - 77 m², low floor, northwest-facing door, internal view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 77 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Floor: High floor",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ Starlake The Prime 2 phòng ngủ 1WC 86 m² tầng cao ban công hướng Đông Nam nhìn hồ": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 86 m², high floor, southeast-facing balcony, lake view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 86 m², high floor, southeast-facing balcony, lake view",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 86 m², high floor, southeast-facing balcony, lake view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 86 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: Southeast",
+      "View: Lake",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán chung cư Starlake The Prime 2PN–1WC 84 m² tầng trung ban công hướng Đông Bắc nhìn công viên": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 84 m², mid-floor, northeast-facing balcony, park view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 84 m², mid-floor, northeast-facing balcony, park view",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 84 m², mid-floor, northeast-facing balcony, park view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 84 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: Northeast",
+      "View: Park",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ 2 phòng ngủ 1WC Starlake The Prime 82 m² tầng cao cửa hướng Nam view nội khu": {
+    "title": "Starlake The Prime 2-bedroom, 1-bathroom apartment for sale - 82 m², high floor, south-facing door, internal view",
+    "excerpt": "Starlake The Prime 2-bedroom, 1-bathroom apartment for sale - 82 m², high floor, south-facing door, internal view",
+    "content": [
+      "Starlake The Prime 2-bedroom, 1-bathroom apartment for sale - 82 m², high floor, south-facing door, internal view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 82 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Floor: High floor",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ Starlake The Prime 2PN–1WC 80m2 tầng thấp ban công hướng Tây nhìn hồ": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 80 m², low floor, west-facing balcony, lake view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 80 m², low floor, west-facing balcony, lake view, area 80 m².",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 80 m², low floor, west-facing balcony, lake view.",
+      "Key information",
+      "Area: 80 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Floor: High floor",
+      "Direction: West",
+      "View: Lake",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán chung cư Starlake The Prime 2 phòng ngủ 1WC 78 m² tầng trung cửa hướng Bắc nhìn công viên": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 78 m², mid-floor, north-facing door, park view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 78 m², mid-floor, north-facing door, park view",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms, 1 bathroom, 78 m², mid-floor, north-facing door, park view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 78 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: North",
+      "View: Park",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn hộ Starlake The Prime 2PN–1WC 76 m² tầng cao ban công hướng Đông view nội khu": {
+    "title": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 76 m², high floor, east-facing balcony, internal view",
+    "excerpt": "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 76 m², high floor, east-facing balcony, internal view",
+    "content": [
+      "Starlake The Prime apartment for sale - 2 bedrooms/1 bathroom, 76 m², high floor, east-facing balcony, internal view",
+      "The apartment has 2 bedrooms with a modern, comfortable design.",
+      "A spacious, airy living room.",
+      "The kitchen area is neatly arranged and convenient for daily living.",
+      "Two separate bedrooms, suitable for a small family.",
+      "The bathroom and toilet are fully equipped.",
+      "Windows let in natural light, creating a comfortable feel.",
+      "Furniture is sensibly arranged to make the most of the usable area.",
+      "A clean, quiet and private living space.",
+      "Suitable for families, couples or long-term tenants.",
+      "A convenient location for getting around and daily life.",
+      "Key information",
+      "Area: 76 m²",
+      "Bedrooms: 2",
+      "Bathrooms: 1",
+      "Direction: East",
+      "View: Park",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự đơn lập Tây Tứ Trạch Elegant Park Thạch Bàn sân vườn rộng - Xây thô 3.5 tầng có hầm": {
+    "title": "Detached villa for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), large garden - shell-only build, 3.5 floors with basement",
+    "excerpt": "Detached villa for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), large garden - shell-only build, 3.5 floors with basement",
+    "content": [
+      "Detached villa for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), large garden - shell-only build, 3.5 floors with basement",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Cần bán biệt thự song lập Đông Tứ Trạch Elegant Park Thạch Bàn kế vườn hoa - Hoàn thiện ngoài": {
+    "title": "Semi-detached villa for sale at Elegant Park Thạch Bàn - east-facing (Tứ Trạch), next to the flower garden - exterior finished",
+    "excerpt": "Semi-detached villa for sale at Elegant Park Thạch Bàn - east-facing (Tứ Trạch), next to the flower garden - exterior finished",
+    "content": [
+      "Semi-detached villa for sale at Elegant Park Thạch Bàn - east-facing (Tứ Trạch), next to the flower garden - exterior finished",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự đơn lập Elegant Park Thạch Bàn - Tây Nam mặt tiền 11m xây thô 3 tầng 1 tum": {
+    "title": "Detached villa for sale at Elegant Park Thạch Bàn - southwest-facing, 11 m frontage, shell-only build, 3 floors plus rooftop room",
+    "excerpt": "Detached villa for sale at Elegant Park Thạch Bàn - southwest-facing, 11 m frontage, shell-only build, 3 floors plus rooftop room",
+    "content": [
+      "Detached villa for sale at Elegant Park Thạch Bàn - southwest-facing, 11 m frontage, shell-only build, 3 floors plus rooftop room",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự song lập hướng Tây Bắc Elegant Park Thạch Bàn nhìn ra công viên 3.5 tầng nổi": {
+    "title": "Northwest-facing semi-detached villa for sale at Elegant Park Thạch Bàn - park view, 3.5 above-ground floors",
+    "excerpt": "Northwest-facing semi-detached villa for sale at Elegant Park Thạch Bàn - park view, 3.5 above-ground floors",
+    "content": [
+      "Northwest-facing semi-detached villa for sale at Elegant Park Thạch Bàn - park view, 3.5 above-ground floors",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự căn góc Elegant Park Thạch Bàn - Đông Nam bàn giao mặt ngoài 3.5 tầng nổi có hầm riêng": {
+    "title": "Corner villa for sale at Elegant Park Thạch Bàn - southeast-facing, exterior-finished handover, 3.5 above-ground floors with private basement",
+    "excerpt": "Corner villa for sale at Elegant Park Thạch Bàn - southeast-facing, exterior-finished handover, 3.5 above-ground floors with private basement",
+    "content": [
+      "Corner villa for sale at Elegant Park Thạch Bàn - southeast-facing, exterior-finished handover, 3.5 above-ground floors with private basement",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự đơn lập Elegant Park Thạch Bàn - Đông Bắc xây thô mặt trong x 3.5 tầng nổi có sân rộng": {
+    "title": "Detached villa for sale at Elegant Park Thạch Bàn - northeast-facing, shell-only interior, 3.5 above-ground floors, large yard",
+    "excerpt": "Detached villa for sale at Elegant Park Thạch Bàn - northeast-facing, shell-only interior, 3.5 above-ground floors, large yard",
+    "content": [
+      "Detached villa for sale at Elegant Park Thạch Bàn - northeast-facing, shell-only interior, 3.5 above-ground floors, large yard",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn góc biệt thự Elegant Park Thạch Bàn - Đơn lập chính Nam MT: 11m đối diện công viên": {
+    "title": "Corner villa for sale at Elegant Park Thạch Bàn - detached, due south, 11 m frontage, facing the park",
+    "excerpt": "Corner villa for sale at Elegant Park Thạch Bàn - detached, due south, 11 m frontage, facing the park",
+    "content": [
+      "Corner villa for sale at Elegant Park Thạch Bàn - detached, due south, 11 m frontage, facing the park",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự Elegant Park Thạch Bàn - Song lập hướng Tây xây thô 3 tầng 1 tum - MT: 10m": {
+    "title": "Villa for sale at Elegant Park Thạch Bàn - semi-detached, west-facing, shell-only build, 3 floors plus rooftop room - 10 m frontage",
+    "excerpt": "Villa for sale at Elegant Park Thạch Bàn - semi-detached, west-facing, shell-only build, 3 floors plus rooftop room - 10 m frontage",
+    "content": [
+      "Villa for sale at Elegant Park Thạch Bàn - semi-detached, west-facing, shell-only build, 3 floors plus rooftop room - 10 m frontage",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự hướng Bắc bàn giao mặt ngoài Elegant Park Thạch Bàn sân vườn rộng": {
+    "title": "North-facing villa for sale with exterior-finished handover at Elegant Park Thạch Bàn, large garden",
+    "excerpt": "North-facing villa for sale with exterior-finished handover at Elegant Park Thạch Bàn, large garden",
+    "content": [
+      "North-facing villa for sale with exterior-finished handover at Elegant Park Thạch Bàn, large garden",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán biệt thự song lập hướng Đông Elegant Park Thạch Bàn bàn giao mặt ngoài kế công viên": {
+    "title": "East-facing semi-detached villa for sale at Elegant Park Thạch Bàn, exterior-finished handover, next to the park",
+    "excerpt": "East-facing semi-detached villa for sale at Elegant Park Thạch Bàn, exterior-finished handover, next to the park",
+    "content": [
+      "East-facing semi-detached villa for sale at Elegant Park Thạch Bàn, exterior-finished handover, next to the park",
+      "The villa offers generous space and a harmonious design that suits family living.",
+      "The rooms are sensibly arranged and let in natural light for an airy feel.",
+      "The garden grounds provide a relaxing space close to nature.",
+      "A quiet area with convenient access to everyday amenities.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán Vinhomes Olympic Ngọc Hồi - Biệt thự sinh thái đẳng cấp, không gian sống xanh phía Nam Hà Nội": {
+    "title": "Vinhomes Olympic Ngọc Hồi villas for sale - premium eco villas, green living in southern Hanoi",
+    "excerpt": "Vinhomes Olympic Ngọc Hồi villas for sale - a choice for buyers who love private living close to nature and want to own a home in an international-scale sports mega urban area. The villas are planned in eco zones with lakeside and riverside landscapes and a premium amenity system…",
+    "content": [
+      "Vinhomes Olympic Ngọc Hồi villas for sale - a choice for buyers who love private living close to nature and want to own a home in an international-scale sports mega urban area. The villas are planned in eco zones with lakeside and riverside landscapes and a premium amenity system.",
+      "Type: Detached and semi-detached villas",
+      "Expected area: 200 - 600 m²",
+      "Location: Eco zones of Vinhomes Global Sportia Hanoi",
+      "Sale price: Being updated",
+      "Legal status: As officially announced by the developer",
+      "Highlights: Low-rise living, low construction density, and quick access to sports facilities, shopping centres and key roads such as Ring Road 3.5, Ring Road 4 and National Highway 1A.",
+      "If you are interested in Vinhomes Olympic Ngọc Hồi villas for sale, please contact TAMI to receive the inventory list, the latest sales policy and advice on choosing a suitable product.",
+      "Key information",
+      "Area: 200 m²",
+      "Floor: High floor",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Chính chủ bán biệt thự Vinhomes Olympic Ngọc Hồi 250m2 hướng Đông Nam, gần công viên thể thao": {
+    "title": "Owner selling Vinhomes Olympic Ngọc Hồi villa, 250 m², southeast-facing, near the sports park",
+    "excerpt": "Vinhomes Olympic Ngọc Hồi villa for sale, for buyers looking for a premium home in a large-scale sports mega urban area in southern Hanoi. The property has a prime location, a green living environment and strong appreciation potential as local infrastructure is gradually completed.",
+    "content": [
+      "Vinhomes Olympic Ngọc Hồi villa for sale, for buyers looking for a premium home in a large-scale sports mega urban area in southern Hanoi. The property has a prime location, a green living environment and strong appreciation potential as local infrastructure is gradually completed.",
+      "Type: Villa",
+      "Area: 250 m² (for reference)",
+      "House direction: Southeast (for reference)",
+      "Sale price: Contact for price",
+      "Legal status: As officially announced by the developer",
+      "Highlights: Close to the sports park, landscaped areas and major roads; suitable for long-term living or investing ahead of the master plan.",
+      "Key information",
+      "Area: 250 m²",
+      "Floor: High floor",
+      "Direction: Southeast",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn góc liền kề Elegant Thạch Bàn - Đông Tứ Trạch vừa ở, vừa kinh doanh hoàn thiện bên ngoài": {
+    "title": "Corner adjoining townhouse for sale at Elegant Thạch Bàn - east-facing (Tứ Trạch), for living and business, exterior finished",
+    "excerpt": "Corner adjoining townhouse for sale at Elegant Thạch Bàn - east-facing (Tứ Trạch), for living and business, exterior finished",
+    "content": [
+      "Corner adjoining townhouse for sale at Elegant Thạch Bàn - east-facing (Tứ Trạch), for living and business, exterior finished",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán liền kề Elegant Park Thạch Bàn - Hướng Tây Nam bàn giao nguyên bản - Kinh doanh thuận lợi": {
+    "title": "Adjoining townhouse for sale at Elegant Park Thạch Bàn - southwest-facing, original handover condition - convenient for business",
+    "excerpt": "Adjoining townhouse for sale at Elegant Park Thạch Bàn - southwest-facing, original handover condition - convenient for business",
+    "content": [
+      "Adjoining townhouse for sale at Elegant Park Thạch Bàn - southwest-facing, original handover condition - convenient for business",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán nhà liền kề Tây Bắc vị trí đẹp kinh doanh Elegant Park Thạc Bàn xây thô mặt trong 4 tầng": {
+    "title": "Northwest-facing adjoining townhouse for sale in a prime business location at Elegant Park Thạch Bàn, shell-only interior, 4 floors",
+    "excerpt": "Northwest-facing adjoining townhouse for sale in a prime business location at Elegant Park Thạch Bàn, shell-only interior, 4 floors",
+    "content": [
+      "Northwest-facing adjoining townhouse for sale in a prime business location at Elegant Park Thạch Bàn, shell-only interior, 4 floors",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán liền kề Đông Nam Elegant Park Thạch Bàn hoàn thiện bên ngoài MT: 5m kinh doanh thuận lợi": {
+    "title": "Southeast-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, exterior finished, 5 m frontage, convenient for business",
+    "excerpt": "Southeast-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, exterior finished, 5 m frontage, convenient for business",
+    "content": [
+      "Southeast-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, exterior finished, 5 m frontage, convenient for business",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán nhà liền kề hướng Đông Bắc bàn giao nguyên bản - VT đẹp kinh doanh Elegant Park Thạch Bàn": {
+    "title": "Northeast-facing adjoining townhouse for sale, original handover condition - prime business location at Elegant Park Thạch Bàn",
+    "excerpt": "Northeast-facing adjoining townhouse for sale, original handover condition - prime business location at Elegant Park Thạch Bàn",
+    "content": [
+      "Northeast-facing adjoining townhouse for sale, original handover condition - prime business location at Elegant Park Thạch Bàn",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán căn góc liền kề chính Nam Elegant Park Thạch Bàn - Vị trí đẹp kinh doanh đối diện công viên": {
+    "title": "Due-south corner adjoining townhouse for sale at Elegant Park Thạch Bàn - prime business location facing the park",
+    "excerpt": "Due-south corner adjoining townhouse for sale at Elegant Park Thạch Bàn - prime business location facing the park",
+    "content": [
+      "Due-south corner adjoining townhouse for sale at Elegant Park Thạch Bàn - prime business location facing the park",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán nhà liền kề Elegant Park Thạch Bàn - Hướng Tây hoàn thiện bên ngoài - Vừa ở, vừa kinh doanh": {
+    "title": "Adjoining townhouse for sale at Elegant Park Thạch Bàn - west-facing, exterior finished - for living and business",
+    "excerpt": "Adjoining townhouse for sale at Elegant Park Thạch Bàn - west-facing, exterior finished - for living and business",
+    "content": [
+      "Adjoining townhouse for sale at Elegant Park Thạch Bàn - west-facing, exterior finished - for living and business",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán liền kề hướng Bắc - Elegant Park Thạch Bàn xây thô 4 tầng mặt tiền 5m vừa ở, vừa kinh doanh": {
+    "title": "North-facing adjoining townhouse for sale - Elegant Park Thạch Bàn, shell-only build, 4 floors, 5 m frontage, for living and business",
+    "excerpt": "North-facing adjoining townhouse for sale - Elegant Park Thạch Bàn, shell-only build, 4 floors, 5 m frontage, for living and business",
+    "content": [
+      "North-facing adjoining townhouse for sale - Elegant Park Thạch Bàn, shell-only build, 4 floors, 5 m frontage, for living and business",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán nhà liền kề Elegant Park Thạch Bàn hướng Đông mặt tiền 5m xây thô 4 tầng gần công viên": {
+    "title": "East-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, 5 m frontage, shell-only build, 4 floors, near the park",
+    "excerpt": "East-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, 5 m frontage, shell-only build, 4 floors, near the park",
+    "content": [
+      "East-facing adjoining townhouse for sale at Elegant Park Thạch Bàn, 5 m frontage, shell-only build, 4 floors, near the park",
+      "The space is easy to furnish to suit the family's style and needs.",
+      "The floors can be divided flexibly into a living room, bedrooms and shared living areas.",
+      "A private, standalone type of home that gives you control over daily living.",
+      "Key information",
+      "View: Internal landscape view",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán Vinhomes Olympic Ngọc Hồi - Nhà liền kề vị trí đẹp, quy hoạch đồng bộ, tiềm năng tăng giá": {
+    "title": "Vinhomes Olympic Ngọc Hồi adjoining townhouses for sale - prime location, coordinated planning, strong appreciation potential",
+    "excerpt": "Vinhomes Olympic Ngọc Hồi adjoining townhouses for sale, for buyers who want a low-rise product in an international-scale sports mega urban area in southern Hanoi. With modern planning, a green living environment and convenient connectivity, the townhouses are expected to be an attractive choice for both living and investment…",
+    "content": [
+      "Vinhomes Olympic Ngọc Hồi adjoining townhouses for sale, for buyers who want a low-rise product in an international-scale sports mega urban area in southern Hanoi. With modern planning, a green living environment and convenient connectivity, the townhouses are expected to be an attractive choice for both living and investment.",
+      "Type: Adjoining townhouse",
+      "Expected area: 75 - 120 m²",
+      "Location: Low-rise zones of Vinhomes Global Sportia Hanoi",
+      "Sale price: Being updated",
+      "Legal status: As officially announced by the developer",
+      "Highlights: Planned close to commercial routes, the sports park and central amenities, with easy access to National Highway 1A, Ngọc Hồi station, Ring Road 3.5 and Ring Road 4.",
+      "If you are interested in Vinhomes Olympic Ngọc Hồi adjoining townhouses for sale, please contact TAMI to receive the inventory list, the sales policy and advice on choosing a suitable product.",
+      "Key information",
+      "Floor: High floor",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Chính chủ bán nhà liền kề Vinhomes Olympic Ngọc Hồi 96m2 hướng Đông Nam, vị trí đẹp, giá tốt": {
+    "title": "Owner selling 96 m² Vinhomes Olympic Ngọc Hồi adjoining townhouse, southeast-facing, prime location, great price",
+    "excerpt": "Vinhomes Olympic Ngọc Hồi adjoining townhouse for sale, a good fit for buyers looking for a home to live in that can also be used for business in the future. Located in the Vinhomes Global Sportia Hanoi mega urban area, the townhouse benefits from coordinated planning, sports amenities and modern transport infrastructure.",
+    "content": [
+      "Vinhomes Olympic Ngọc Hồi adjoining townhouse for sale, a good fit for buyers looking for a home to live in that can also be used for business in the future. Located in the Vinhomes Global Sportia Hanoi mega urban area, the townhouse benefits from coordinated planning, sports amenities and modern transport infrastructure.",
+      "Type: Adjoining townhouse",
+      "Area: 96 m² (for reference)",
+      "House direction: Northwest (for reference)",
+      "Sale price: Contact for price",
+      "Legal status: As officially announced by the developer",
+      "Highlights: Modern design, close to the sports park, quick access to Ngọc Hồi station, Ring Road 3.5 and Ring Road 4; suitable for living or long-term investment.",
+      "Key information",
+      "Area: 96 m²",
+      "Floor: High floor",
+      "Direction: Northwest",
+      "Furnishing: Fully furnished",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  },
+  "Bán nhà phố shophouse Elegant Park Thạch Bàn - Tây Tứ Trạch hoàn thiện bên ngoài KD thuận lợi": {
+    "title": "Shophouse townhouse for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), exterior finished, convenient for business",
+    "excerpt": "Shophouse townhouse for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), exterior finished, convenient for business",
+    "content": [
+      "Shophouse townhouse for sale at Elegant Park Thạch Bàn - west-facing (Tứ Trạch), exterior finished, convenient for business",
+      "Shophouse with an open, easily recognisable frontage that is convenient for business.",
+      "Flexible design suited to a shop, showroom or office, or a combination with living space.",
+      "Spacious interior that is easy to furnish according to your needs.",
+      "Easy access to amenities and regional transport links.",
+      "Contact TAMI for the detailed price list and to arrange a site visit."
+    ],
+    "priceNote": "Negotiable"
+  }
+}

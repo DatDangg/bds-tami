@@ -27,3 +27,34 @@
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
+
+## Verification summary (builder, 2026-10-23)
+
+**Đã làm** (không commit/stage; không đụng `.ts` của bộ máy): `seed/english/data/rentals.json` (32 bản ghi: title + description, giữ đúng số ô chữ mỗi mảng) và `seed/english/data/property-posts.json` (38 bản ghi: title, excerpt, content, priceNote, `offer.terms` của voucher). Bản dịch viết tay từng đợt trong scratch rồi ghép bằng script nhỏ (script chỉ ghép + kiểm số phần tử; câu mẫu lặp lại của các tin Starlake / Elegant Park dùng chung một bản dịch viết tay). Đã kiểm: không còn dấu tiếng Việt trong dữ liệu EN.
+
+**Quy ước dịch đã chọn**: "tỷ/triệu" → "billion/million VND"; "Hướng Tây Tứ Trạch" → "west-facing (Tu Trach)"; "xây thô" = shell-only build; "bàn giao mặt ngoài / hoàn thiện bên ngoài" = exterior finished; "tum" = rooftop room; liền kề = adjoining townhouse, song lập = semi-detached villa, đơn lập = detached villa; địa danh/tên dự án không dấu trong tiêu đề giữ như bản vi (Elegant Park Thach Ban...), "[hotline TAMI]" giữ. priceNote "Giá thỏa thuận" → "Negotiable".
+
+**Chạy `pnpm seed:english rentals property-posts` (DB dev)**: lần 1 property-posts `ghi 38, không đổi 0, thiếu 0, lệch/lỗi 0` (rentals ghi 32, dòng log bị tràn nên xác nhận qua coverage); lần 2 và 3: rentals `ghi 0, không đổi 32`, property-posts `ghi 0, không đổi 38`, 0 thiếu bản vi, 0 lệch/lỗi. Không ghi `vi`.
+
+**Media alt**: alt theo mẫu chỉ sinh khi chạy nhóm `media`, nên đã chạy thêm `pnpm seed:english rentals property-posts media` (ngoài lệnh lọc dặn, an toàn: chỉ ghi alt EN, idempotent): lần 1 `ghi 244`, lần 2 `ghi 0, không đổi 264`. Ảnh có alt vi theo mẫu của cho thuê/tin BĐS: 244, thiếu EN = 0 (vd "… - ảnh 4" → "Kosmo 3-bedroom corner apartment for sale - stunning unit - photo 4"). Còn 217 ảnh "chưa có EN" thuộc dự án/tin tức (T02/T04).
+
+**Coverage hasEnglish / tổng (trước → sau)**: rentals 0/32 → 32/32 · property_posts 0/38 → 38/38. Slug EN sinh bởi hook (32/32 rentals có slug EN).
+
+**/en (dev :3000, tự start rồi dừng)**: `/en/for-rent` 200 — "27 listings" Tất cả, Serviced apartments 11 / Apartments 8 / Studios 2 / Offices 6 (các nhóm cộng khớp 27 tin đã xuất bản); `/en/property-news` 200 — 36 listings, Apartment 11 / Townhouse 11 / Villa 12 / Shophouse 1; chi tiết `/en/for-rent/studio-for-rent-at-d-eldorado-43-m2-...` và `/en/property-news/vinhomes-olympic-ngoc-hoi-villas-for-sale-...` 200, tiêu đề/mô tả/nhãn tiếng Anh. Chữ Việt còn lại chỉ là tên địa danh/địa chỉ ("Phường Ba Đình, Hà Nội", "Xã Ngọc Hồi", "Hà Nội", "Hưng Yên"): trường không localized/ngoài allowlist dịch, không thuộc dữ liệu seed này. Không chụp ảnh (kiểm bằng text HTML).
+
+**Mẫu vi → en**
+- "Cho thuê Studio D'Eldorado diện tích 43m2 đầy đủ nội thất - Tầng trung view thành phố" → "Studio for rent at D'Eldorado, 43 m², fully furnished - mid-floor with city view"
+- "Thanh toán 3 cọc 1." → "Payment: 3 months' rent plus 1 month deposit."
+- "Bán biệt thự đơn lập Elegant Park Thạch Bàn - Tây Nam mặt tiền 11m xây thô 3 tầng 1 tum" → "Detached villa for sale at Elegant Park Thach Ban - southwest-facing, 11 m frontage, shell-only build, 3 floors plus rooftop room"
+
+**Verify**: `pnpm vitest run tests/unit/seed-english-format.test.ts` PASS (7); JSON parse hợp lệ (script ghép đọc lại). Không đổi `.ts` → không typecheck/build.
+
+**Residual**: giá thuê hiển thị "Negotiable" trên trang là logic hiển thị của app (không phải dữ liệu seed). Địa chỉ/tỉnh còn tiếng Việt (ngoài phạm vi). Tên đường viết tắt "Ng Hoang Ton" giữ như tiêu đề vi.
+
+### Fix round 1 (builder, 2026-10-23) — reviewer r1 FAIL (M1 + m1)
+
+- **Đính chính**: ghi chú "địa danh/tên dự án không dấu như bản vi" ở trên là SAI (tiêu đề vi có dấu). Theo README ("giữ nguyên dấu tiếng Việt trong tên riêng") và `projects.json`/`news.json` (dùng "Hanoi" cho Hà Nội, tên riêng giữ dấu).
+- **M1**: khôi phục dấu cho mọi tên riêng trong `rentals.json` + `property-posts.json`, đúng chính tả bản vi (xuất từ DB): Tây Hồ, Kosmo Tây Hồ, Xuân Diệu, Từ Hoa, Yên Hoa (đúng như vi), Nguyễn Hoàng Tôn / Ng Hoàng Tôn, Nguyễn Khắc Hiếu, Ngoại Giao Đoàn, Tô Ngọc Vân, Đặng Thai Mai (vi viết "Thai"), Trịnh Công Sơn, Võ Chí Công, Trấn Vũ, Ba Đình, Bắc Từ Liêm, Long Biên, Hạ Long, Cổ Loa, Thạch Bàn, Ngọc Hồi, Tứ Trạch. Dùng script map cụm không dấu → có dấu (cụm đầy đủ, không đụng từ thường); quét lại bằng so khớp từ vi có dấu ↔ EN không dấu: chỉ còn từ tiếng Anh (the, so, can, an, that, long, day) và "VND" (giữ). "Hanoi" giữ nguyên (khớp T02/T04).
+- **m1**: "Direction: Cool" → "Orientation: well-ventilated (cool)".
+- **DB dev** (127.0.0.1:5433/tami): `pnpm seed:english rentals property-posts` ghi lại bản sửa; `pnpm seed:english media` → `ghi 186, không đổi 295, chưa có EN 0` (làm mới alt EN; gồm cả alt của collection khác đã có tiêu đề EN). Chạy lại: rentals `ghi 0, không đổi 32` · property-posts `ghi 0, không đổi 38` · media `ghi 0, không đổi 481`. Coverage vẫn rentals 32/32, property_posts 38/38. Slug EN: 0 slug không-ASCII; engine không gửi lại slug (vd `…kosmo-tay-ho…` giữ nguyên); bản vi không bị ghi (engine chỉ ghi locale en).
+- Cảnh báo `revalidatePath … ngoài ngữ cảnh Next` trong log seed là nhiễu hook cache khi chạy script (không ảnh hưởng dữ liệu), như các lần trước.
