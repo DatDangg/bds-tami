@@ -1,0 +1,138 @@
+{
+  "specVersion": "1.46.2",
+  "scopeVersion": 60,
+  "generatedAt": "2026-10-22T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-056 (change-request class BUG): khung chi tiết + thẻ nổi bật danh sách BL-052 khớp ảnh design. Spec 1.46.2 PATCH ghi as-built, không đổi requirement/schema/API.",
+  "status": "built — reviewer r2 STRICT PASS, chờ commit close-out (change-request)",
+  "workItem": "bug/listing-detail-design-match",
+  "backlog": "BL-056",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-22-listing-detail-design-match.md",
+  "task": [
+    {
+      "task": "phase-1-task-01",
+      "file": "tasks/bug-listing-detail-design-match/phase-1-task-01.md",
+      "note": "A1 thanh thông số, A2 bố cục Tổng quan Dự án, A3 form lead compact, A4 tiện ích không ảnh, A5 nút outline thẻ nổi bật, A8 Tổng quan đoạn dẫn + Xem thêm",
+      "review": "STRICT PASS r2",
+      "report": ".context/review-reports/bug-listing-detail-design-match-phase-1-task-01-round-2-review.md"
+    }
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.46.1-59.json",
+  "specUpdate": "spec/updates/2026-10-22-listing-detail-design-match.md",
+  "specRefs": [
+    "Giao diện / Redesign danh sách + chi tiết Dự án / Cho thuê / Tin BĐS (BL-052) — As-built khung chi tiết (BL-056)",
+    "F2",
+    "F3",
+    "F4",
+    "F9",
+    "FR-PUB-13",
+    "BR-07"
+  ],
+  "specRefNotes": "Không thêm/sửa requirement; F9/FR-PUB-13 vì form lead (LeadForm) đổi giao diện ở cột liên hệ chi tiết, validate/submit giữ nguyên. BR-07 vì nhãn i18n mới VI/EN.",
+  "design": [
+    "docs/specs/listing-detail-redesign/detail-du-an.webp",
+    "docs/specs/listing-detail-redesign/list-du-an.webp"
+  ],
+  "changed": {
+    "files": [
+      "src/components/detail/DetailBlocks.test.tsx",
+      "src/components/detail/DetailFeatureList.tsx",
+      "src/components/detail/DetailInfoGrid.tsx",
+      "src/components/detail/DetailLists.test.tsx",
+      "src/components/detail/DetailOverviewIntro.test.tsx",
+      "src/components/detail/DetailOverviewIntro.tsx",
+      "src/components/detail/DetailSpecBar.tsx",
+      "src/components/detail/DetailStatCards.tsx",
+      "src/components/forms/FormField.tsx",
+      "src/components/icons.ts",
+      "src/components/leads/LeadForm.test.tsx",
+      "src/components/leads/LeadForm.tsx",
+      "src/components/posts/PostContactBox.tsx",
+      "src/components/posts/PostDetail.test.tsx",
+      "src/components/posts/PostDetail.tsx",
+      "src/components/posts/PostSpotlightContent.tsx",
+      "src/components/posts/post-components.test.tsx",
+      "src/components/projects/ProjectAmenities.tsx",
+      "src/components/projects/ProjectDetail.tsx",
+      "src/components/projects/ProjectOverview.tsx",
+      "src/components/projects/ProjectSpotlightContent.tsx",
+      "src/components/projects/project-components.test.tsx",
+      "src/components/rentals/RentalDetail.tsx",
+      "src/components/rentals/RentalListPage.test.tsx",
+      "src/components/rentals/RentalSpotlightContent.tsx",
+      "src/components/rentals/SaleContactBox.tsx",
+      "src/i18n/messages/en.json",
+      "src/i18n/messages/vi.json",
+      "src/lib/content/rich-text-lead.test.ts",
+      "src/lib/content/rich-text-lead.ts",
+      "src/lib/projects/project-detail-view.test.ts",
+      "src/lib/projects/project-detail-view.ts",
+      "src/lib/rentals/rental-view.ts"
+    ],
+    "modules": [
+      "detail-kit (DetailSpecBar, DetailInfoGrid, DetailStatCards, DetailFeatureList, DetailOverviewIntro mới)",
+      "forms/FormField (icon, labelHidden)",
+      "leads/LeadForm (layout compact)",
+      "projects detail + spotlight",
+      "rentals detail + spotlight + SaleContactBox",
+      "posts detail + spotlight + PostContactBox",
+      "lib/content/rich-text-lead (mới)",
+      "i18n vi/en (detailKit.overview.showMore/showLess, form.lead.submitNow)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Chi tiết Dự án /du-an/[slug] + /en/projects/[slug]: thanh thông số ≥ xl giá trị 1 dòng (cắt …, title đủ); < xl tối đa 2 dòng, không tràn ngang",
+      "Chi tiết Cho thuê /cho-thue/[slug] + /en/for-rent/[slug], chi tiết Tin BĐS /tin-bds/[slug] + /en/property-news/[slug]: thanh thông số như trên",
+      "Tổng quan 3 màn chi tiết: đoạn dẫn = summary (Dự án) / excerpt (Tin BĐS), fallback đoạn văn đầu có chữ của rich text; <details> 'Xem thêm'/'Thu gọn' (EN 'Read more'/'Show less') chứa phần còn lại, có trong HTML khi đóng; không còn nội dung thêm → không nút; không có tóm tắt lẫn rich text → không đoạn dẫn",
+      "Tổng quan Dự án ≥ xl: lưới thông tin 2 cột + thẻ sản phẩm 3 cột (4 thẻ → 3 + 1 rộng); không sản phẩm → lưới thông tin rộng hết; 768 / 390 xếp dọc",
+      "Form lead cột liên hệ chi tiết (3 màn): icon trong ô + placeholder (* với ô bắt buộc), nhãn sr-only gắn đúng input, nút full-width 'Nhận tư vấn ngay' / 'Get advice now'; validate, lỗi dưới ô, consent, Turnstile, gửi lead thành công như cũ",
+      "Tiện ích Dự án không ảnh: danh sách rộng hết (≥ 2 mục sm 2 cột / lg 3 cột; 1 mục 1 cột); có ảnh giữ ảnh trái + danh sách phải",
+      "Thẻ nổi bật /du-an, /cho-thue, /tin-bds (+ /en): 'Nhận tư vấn' là nút outline có viền tối thấy được, cạnh 'Xem chi tiết'"
+    ],
+    "dependents": [
+      "/lien-he + /en/contact: LeadForm layout mặc định — nhãn hiển thị trên ô, nút như cũ, submit/lỗi/captcha không đổi",
+      "/tin-tuc (+ /en/news, chi tiết tin tức nếu có form): LeadForm mặc định không đổi",
+      "DetailInfoGrid / DetailStatCards / DetailFeatureList ở chi tiết Cho thuê + Tin BĐS: lưới giữ hành vi cũ (prop columns mặc định)",
+      "FormField dùng ở các form khác (không truyền icon/labelHidden): hiển thị như cũ"
+    ],
+    "regression": [
+      "Chi tiết 3 màn VI/EN × 390/768/1440: không tràn ngang, đúng 1 h1, tab dính + neo mục con, header ẩn khi cuộn (BL-027/BL-032)",
+      "SEO chi tiết: nội dung rich text đầy đủ vẫn có trong HTML (view-source), JSON-LD/meta không đổi",
+      "Gửi lead từ chi tiết Dự án / Cho thuê / Tin BĐS: lead tạo đúng nguồn + UTM (F9/BR-10)",
+      "Trang danh sách 3 màn: thẻ nổi bật, lưới thẻ, bộ lọc BL-052 không đổi"
+    ]
+  },
+  "acceptance": [
+    "A1: ở ≥ xl mọi ô thanh thông số giữ 1 dòng giá trị (cắt … + title), thanh không cao hơn ô 1 dòng; mobile/tablet không tràn ngang",
+    "A8: Tổng quan hiện tóm tắt, không có thì đoạn đầu của rich text; có nội dung đầy đủ thì có 'Xem thêm' / 'Thu gọn' (VI/EN), nội dung đầy đủ có trong HTML; không có nội dung dài thì không hiện nút",
+    "A8 áp cho Dự án, Cho thuê, Tin BĐS",
+    "A2: ở ≥ xl lưới thông tin 2 cột, thẻ sản phẩm bên phải theo design; không có sản phẩm thì lưới thông tin chiếm full chiều ngang",
+    "A3: form có icon trong ô + placeholder, nút full-width; vẫn có nhãn cho trình đọc màn hình; submit/lỗi/captcha chạy như cũ",
+    "A4: thiếu ảnh tiện ích thì danh sách tiện ích không bị co trong ô hẹp",
+    "A5: 'NHẬN TƯ VẤN' trên thẻ nổi bật là nút outline ở cả 3 màn danh sách",
+    "Bằng chứng trình duyệt VI/EN × mobile/tablet/desktop cho các màn trên",
+    "Test + typecheck + lint + build PASS"
+  ],
+  "verification": {
+    "status": "PASS (reviewer r2 tự chạy)",
+    "typecheck": "PASS",
+    "lint": "PASS (0 lỗi; 2 warning có sẵn tools/task-dashboard)",
+    "test": "PASS 3905/3905",
+    "build": "PASS",
+    "browser": "Repro Verification PASS: 3 màn chi tiết + 3 danh sách × 1440/768/390, /en/projects + /en/projects/sample-hanoi-central-apartments; ảnh .context/review-reports/assets/bl-056/"
+  },
+  "openItems": [
+    "n-1 (MINOR): rich text có upload không dựng được (media đã xoá / value null / relationTo khác media) vẫn tính là nội dung thêm → nút 'Xem thêm' mở ra rỗng (src/lib/content/rich-text-lead.ts)",
+    "n-2 (MINOR, follow-up): buttonVariants trả chuỗi chưa merge qua cn — gọi thẳng variant có viền dễ lặp lỗi viền vô hình (src/components/ui/button.tsx)"
+  ],
+  "residual": [
+    "EN của chi tiết Cho thuê / Tin BĐS (/en/for-rent, /en/property-news) chỉ kiểm bằng vitest — DB local không có tin EN",
+    "Thẻ nổi bật /cho-thue (A5) chỉ kiểm bằng vitest — dữ liệu local không có thẻ nổi bật",
+    "Tin BĐS: excerpt hiện cả ở hero và đoạn dẫn Tổng quan (chấp nhận trùng theo quyết định ưu tiên tóm tắt)",
+    "Upload null → nút 'Xem thêm' rỗng (n-1); buttonVariants chưa merge (n-2)"
+  ],
+  "risk": "medium",
+  "riskNote": "Sửa component dùng chung khung chi tiết + FormField/LeadForm (dùng ở /lien-he, /tin-tuc). Không đổi schema/API/quyền, không migration. Test nên ưu tiên form lead (cả dạng mặc định) và Tổng quan Xem thêm trên dữ liệu thật."
+}
