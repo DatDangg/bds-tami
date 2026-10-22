@@ -2968,25 +2968,31 @@
           "round": 2,
           "report": ".context/review-reports/feature-seed-english-data-phase-1-task-01-round-2-review.md",
           "verify": "typecheck PASS · eslint seed tests 0 · test 4449 PASS · seed:english x2 idempotent (writes 0) · APP_ENV=staging refused · coverage categories 16/16 developers 29/29 services 3/3 job_postings 4/4 pages 2/2",
-          "completedAt": "2026-10-23"
+          "completedAt": "2026-10-23",
+          "commit": "4f9809f"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-seed-english-data/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-seed-english-data-phase-1-task-02-round-1-review.md",
+          "verify": "seed:english projects x2 (lần 2 ghi 0, missing 0, mismatched 0) · has_english 61/61 · alt ảnh dự án 461/461 EN · vi hash không đổi · unit 7/7",
+          "completedAt": "2026-10-23"
         },
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-seed-english-data/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "in_progress",
+          "attempt": 1
         },
         {
           "task": "phase-1-task-04",
           "file": "tasks/feature-seed-english-data/phase-1-task-04.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "in_progress",
+          "attempt": 1
         }
       ]
     }
@@ -4032,7 +4038,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T19:46:03.821Z",
+  "lastUpdated": "2026-10-22T20:00:19.629Z",
   "approvalMilestones": [
     {
       "id": "M1",
