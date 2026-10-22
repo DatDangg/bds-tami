@@ -763,7 +763,29 @@
       "jobsEyebrow": "Open positions",
       "jobsTitle": "Career",
       "jobsTitleAccent": "opportunities",
-      "applyCta": "Apply"
+      "applyCta": "Apply",
+      "v2": {
+        "heroCta": "View open positions",
+        "perksEyebrow": "Why TAMI",
+        "perksTitle": "A place for you to",
+        "perksTitleAccent": "grow",
+        "jobsEyebrow": "Career opportunities",
+        "jobsTitle": "Open positions",
+        "positionCount": "{count, plural, one {# position} other {# positions}}",
+        "provinceLabel": "Location",
+        "allProvinces": "All locations",
+        "searchLabel": "Search by job title",
+        "searchPlaceholder": "Search by job title…",
+        "submit": "Search",
+        "urgent": "Urgent",
+        "deadline": "Deadline: {date}",
+        "processEyebrow": "Application process",
+        "processTitle": "{count, plural, one {# simple step} other {# simple steps}}",
+        "cvEyebrow": "Join TAMI HOMES",
+        "cvTitle": "Haven't found the right role?",
+        "cvDescription": "Send us your CV and we will get in touch when a suitable opportunity opens.",
+        "cvCta": "Send your CV"
+      }
     },
     "careerDetail": {
       "summaryTitle": "Job summary",

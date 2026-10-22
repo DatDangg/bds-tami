@@ -260,6 +260,19 @@ Thứ tự (như §3.1): rate limit `newsletter` 5/10 phút/IP (Redis lỗi → 
 
 Kết quả `200 { success: true, data: { received: true } }` **giống hệt** cho mọi trường hợp đăng ký được (mới / đã có / bật lại / đua nhau): không lộ email đã đăng ký. Lỗi bất ngờ → 500 chung theo `locale`, log chỉ có tên lỗi (không email). Code: `src/endpoints/public/newsletter.ts` (dùng lại `createJsonBodyReader` / `localizePipelineFailure` của `leads.ts`). Form: `src/components/news/NewsletterSignup.tsx` (client, `usePublicForm`; gửi `sourcePath` = `location.pathname`, không query/hash). Chưa gửi mail định kỳ.
 
+### 3.14. Tham số URL trang `/tuyen-dung` (BL-054, as-built)
+
+`/tuyen-dung` · `/en/careers`: `?category=&province=&q=&page=` (một form GET: ô "Khu vực" + ô tìm + nút "Tìm"; chip phòng ban là link). Code: `src/lib/careers/job-filters.ts` (`parseJobFilters` / `jobQueryString` / `hasJobFilterParams` / `matchesJobKeyword`), `src/lib/careers/job-queries.ts` (`listOpenJobs`), `src/components/careers/JobListPage.tsx`. Chỉ tin `published` + còn hạn (giờ VN), 12 tin/trang, mới đăng trước.
+
+| Tham số | Ý nghĩa | Giá trị không hợp lệ |
+|---|---|---|
+| `category` | Slug danh mục `job` theo ngôn ngữ đang xem → lọc danh mục + con, chip cấp 1 `aria-current` | Slug lạ → bỏ (danh sách không lọc, không 404) |
+| `province` | Slug tỉnh nơi làm việc | Slug lạ → bỏ |
+| `q` | **BL-054:** từ khoá tìm **tên vị trí**, không phân biệt hoa/thường/dấu (`normalizeSearchText`, "đ" = "d"), mọi từ phải có (AND, ≤ 8 từ); tối đa 100 ký tự. Không thêm cột / migration: có `q` thì quét ≤ 500 tin còn hạn (chỉ `title`, chạm trần ghi cảnh báo log) rồi lọc ở bộ nhớ, MỘT truy vấn lấy trường thẻ của trang | Rỗng / quá dài → bỏ |
+| `page` | Trang danh sách; vượt số trang → `404` | `abc` → trang 1 |
+
+Có `category` / `province` / `q` có giá trị (kể cả slug lạ) → `noindex, follow` + canonical `/tuyen-dung` sạch; không lọc → canonical chính nó (kèm `?page=n`). Chip phòng ban + phân trang mang theo `province` + `q` (chip bỏ `page`); form giữ `category` bằng input ẩn. Không endpoint JSON mới.
+
 ## 4. Endpoint quản trị
 
 | Method | Path | Quyền | Mục đích | BRD |

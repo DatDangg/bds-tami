@@ -6,7 +6,7 @@ import { JobListPage, buildJobListMetadata } from "@/components/careers/JobListP
 import { routing } from "@/i18n/routing";
 import type { RawJobParams } from "@/lib/careers/job-filters";
 
-// Lọc + phân trang bằng `searchParams` (`?category=&province=&page=`) nên trang đọc tham số lúc chạy: không ISR (layout đặt `revalidate = 60` +
+// Lọc + phân trang bằng `searchParams` (`?category=&province=&q=&page=`) nên trang đọc tham số lúc chạy: không ISR (layout đặt `revalidate = 60` +
 // `generateStaticParams` khiến đọc `searchParams` ném DYNAMIC_SERVER_USAGE). Nhờ vậy bộ lọc `deadline >= hôm nay` được tính lại mỗi lần CDN
 // hết `s-maxage=60` (next.config.ts), không dính HTML cũ qua nửa đêm.
 export const dynamic = "force-dynamic";

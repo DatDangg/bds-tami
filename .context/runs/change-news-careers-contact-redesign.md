@@ -37,3 +37,4 @@ batchQueue: [BL-054]
 - 2026-10-22 P1-T04 r1 STRICT PASS → 6500139 merged + progress; conflict union; typecheck + vitest security/endpoints/news 17 file 203 PASS; migrate DB dev tami 20261022_031905 OK. Phase 1 code xong (spec-validator phase review gộp cuối).
 - 2026-10-22 P2-T05 r1 STRICT PASS (4 MINOR). P2-T03 builder DONE. ▶ START [agent: builder-strong] P2-T01 (tami_wt54_p2t01, redis 6, :3121, worktree ff staging 223620b) ‖ [agent: reviewer] P2-T03 r1 (running — cancel sẽ redo bước này)
 - 2026-10-22 P2-T05 r1 STRICT PASS → 17259ab merged + progress. P2-T03 r1 STRICT PASS, P2-T01 r1 STRICT PASS (merge kế).
+- 2026-10-22 P2-T03 → e8b02f8 merged + progress (API_SPEC union, careers §3.14; typecheck + 51 file / 418 PASS).

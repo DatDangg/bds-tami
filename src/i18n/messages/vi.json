@@ -763,7 +763,29 @@
       "jobsEyebrow": "Vị trí đang tuyển",
       "jobsTitle": "Cơ hội",
       "jobsTitleAccent": "nghề nghiệp",
-      "applyCta": "Ứng tuyển"
+      "applyCta": "Ứng tuyển",
+      "v2": {
+        "heroCta": "Xem vị trí đang tuyển",
+        "perksEyebrow": "Vì sao chọn TAMI",
+        "perksTitle": "Môi trường để bạn",
+        "perksTitleAccent": "phát triển",
+        "jobsEyebrow": "Cơ hội nghề nghiệp",
+        "jobsTitle": "Vị trí đang tuyển",
+        "positionCount": "{count} vị trí",
+        "provinceLabel": "Khu vực",
+        "allProvinces": "Mọi khu vực",
+        "searchLabel": "Tìm theo tên vị trí",
+        "searchPlaceholder": "Tìm theo tên vị trí…",
+        "submit": "Tìm",
+        "urgent": "Tuyển gấp",
+        "deadline": "Hạn: {date}",
+        "processEyebrow": "Quy trình ứng tuyển",
+        "processTitle": "{count} bước đơn giản",
+        "cvEyebrow": "Gia nhập TAMI HOMES",
+        "cvTitle": "Chưa tìm thấy vị trí phù hợp?",
+        "cvDescription": "Gửi CV của bạn, chúng tôi sẽ liên hệ khi có cơ hội phù hợp.",
+        "cvCta": "Gửi CV ngay"
+      }
     },
     "careerDetail": {
       "summaryTitle": "Thông tin tuyển dụng",
