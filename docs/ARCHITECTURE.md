@@ -138,7 +138,7 @@ Một repo, một app Next.js có nhúng Payload:
 │   └── sample/                # Dữ liệu mẫu chỉ staging/dev (`--sample`): dự án, tin tức, dịch vụ, cho thuê, tuyển dụng + images/
 ├── docker/                    # Dockerfile, docker-compose.prod.yml, docker-compose.staging.yml
 │   ├── backup/                # image postgres + pgBackRest, sidecar backup (pgBackRest + restic), e2e test
-│   └── nginx/                 # tami.conf, tami-staging.conf (bản Cloudflare), tami-staging-sslip{,-http}.conf (staging tạm sslip.io + basic auth), tami-cloudflare-ips.conf (copy vào /etc/nginx/sites-available trên server)
+│   └── nginx/                 # tami.conf, tami-staging.conf (bản Cloudflare), tami-staging-sslip{,-http}.conf (staging tạm sslip.io + basic auth), tami-prod-direct{,-http}.conf (prod chưa Cloudflare, Let's Encrypt), tami-cloudflare-ips.conf (copy vào /etc/nginx/sites-available trên server)
 ├── docs/runbooks/             # deploy.md, restore.md
 └── .github/                   # workflows/ (ci.yml, deploy.yml), actions/ssh-deploy
 ```
@@ -264,7 +264,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 
 | Service | Production | Staging | RAM ước tính |
 |---|---|---|---|
-| nginx (host) | có sẵn, thêm `tami.conf` | thêm `tami-staging.conf` | — |
+| nginx (host) | có sẵn, thêm `tami-prod-direct{,-http}.conf` (chưa Cloudflare, 2026-10-23) / `tami.conf` (sau Cloudflare) | thêm `tami-staging-sslip{,-http}.conf` / `tami-staging.conf` (sau Cloudflare) | — |
 | `app` | **đúng 1 bản** (chạy 2+ bản cần cache handler dùng chung trước — §9.1, G9) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
 | `postgres` | riêng (prod: `tami-postgres:17-3.5-bookworm-pgbackrest2.59` = `postgres:17.11-bookworm` + PostGIS 3.5.2 + pgbackrest, build từ `docker/backup/Dockerfile` target `postgres`; bật `archive_mode`, `archive_timeout=300`) | riêng (`tami-postgis:17-3.5-bookworm`, cùng Dockerfile target `postgis`, không pgbackrest) | `mem_limit` 2g / 512m |
@@ -286,7 +286,7 @@ Tổng trần `mem_limit` as-built: prod ≈ 4,2GB (app 1g + jobs 384m + postgre
 
 | | Production | Staging |
 |---|---|---|
-| Tên miền | `<domain>` (điền) | `staging.<domain>` |
+| Tên miền | `tami.genieplatform.cloud` (DNS A thẳng về server, chưa Cloudflare — 2026-10-23) | `187-52-119-50.sslip.io` (sau này `staging.<domain>`) |
 | DB | `DATABASE_URL_PROD` | `DATABASE_URL_STAGING` |
 | Truy cập | Công khai | Cloudflare Access hoặc mật khẩu, `noindex` |
 | Email | Gửi thật | Chỉ gửi tới danh sách email nội bộ |
@@ -297,14 +297,16 @@ Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
 |---|---|---|---|
 | `APP_ENV` | `production` (**bắt buộc**) | `staging` | Khác `production` thì email chỉ gửi tới `EMAIL_ALLOWLIST` |
 | `EMAIL_ALLOWLIST` | — | danh sách email nội bộ | Rỗng ở môi trường không phải production → runner log lỗi |
-| `TRUST_CF_CONNECTING_IP` | `true` | `false` (sslip.io) / `true` (sau Cloudflare) | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu cả hai cờ IP → mọi khách chung 1 bucket rate limit |
-| `TRUST_X_REAL_IP` | `false` | `true` (sslip.io) / `false` (sau Cloudflare) | Chỉ bật khi Nginx cùng host ghi đè `X-Real-IP` và app bind `127.0.0.1`; không bật cùng `TRUST_CF_CONNECTING_IP` |
+| `TRUST_CF_CONNECTING_IP` | `false` (chưa Cloudflare) / `true` (sau Cloudflare) — **bắt buộc khai** trong `prod.env` | `false` (sslip.io) / `true` (sau Cloudflare) | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu cả hai cờ IP → mọi khách chung 1 bucket rate limit |
+| `TRUST_X_REAL_IP` | `true` (chưa Cloudflare) / `false` (sau Cloudflare) — **bắt buộc khai** trong `prod.env` | `true` (sslip.io) / `false` (sau Cloudflare) | Chỉ bật khi Nginx cùng host ghi đè `X-Real-IP` và app bind `127.0.0.1`; không bật cùng `TRUST_CF_CONNECTING_IP` |
 | `SMTP_PORT`, `EMAIL_FROM_ADDRESS` | Brevo (587) | Brevo | Mặc định 587 |
 | `GLITCHTIP_DSN`, `GLITCHTIP_PUBLIC_DSN` | DSN dự án prod | DSN dự án staging | Server / trình duyệt; để trống thì không gửi lỗi. Trình duyệt lấy giá trị **lúc chạy** qua `/api/monitoring-config`, nên cùng một image promote staging → prod không cần build-arg riêng |
 | `METRICS_TOKEN` | ≥ 32 ký tự | ≥ 32 ký tự | Bearer cho `/api/metrics`; chưa đặt thì endpoint trả 404 |
 | `LOG_LEVEL` | `info` | `info` | Mặc định `info` (`silent` khi test) |
 
-**Ngoại lệ staging (as-built, 2026-10-18): chưa có tên miền/Cloudflare.** Staging chạy tại `https://187-52-119-50.sslip.io`, HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-staging-sslip*.conf`), basic auth + `noindex`, không CDN; IP khách lấy từ `X-Real-IP` do Nginx đặt (`TRUST_X_REAL_IP=true`). Production vẫn cần tên miền thật + Cloudflare (không đổi). Runbook: `docs/runbooks/deploy.md` §9.
+**Ngoại lệ staging (as-built, 2026-10-18): chưa có tên miền/Cloudflare.** Staging chạy tại `https://187-52-119-50.sslip.io`, HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-staging-sslip*.conf`), basic auth + `noindex`, không CDN; IP khách lấy từ `X-Real-IP` do Nginx đặt (`TRUST_X_REAL_IP=true`). Runbook: `docs/runbooks/deploy.md` §9.
+
+**Ngoại lệ production (quyết định user 2026-10-23): chưa dùng Cloudflare.** Production chạy tại `https://tami.genieplatform.cloud` (DNS A thẳng về server; tên miền này gắn tạm cho staging từ 2026-10-21, nay chuyển hẳn sang production), HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-prod-direct{,-http}.conf`, chứng chỉ dùng chung với staging sslip), không CDN/WAF; IP khách lấy từ `X-Real-IP` (`prod.env`: `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`). Hệ quả chưa có Cloudflare: không có cache CDN (header `s-maxage` không tác dụng, mọi request tới app), không WAF/chống DDoS, **chưa có lớp xác thực thứ 2 cho `/admin`** (Cloudflare Access ở §9) — chỉ còn mật khẩu mạnh + khoá tạm sau 5 lần sai. Khi bật Cloudflare: đổi sang `tami.conf` + origin cert + đảo hai cờ `TRUST_*`. Production DB khởi đầu trống (không clone dữ liệu staging), nội dung nhập lại qua admin. Runbook: `docs/runbooks/deploy.md` §10.
 
 Staging cũng **không backup** (compose staging: image `tami-postgis:17-3.5-bookworm` — Dockerfile `docker/backup` target `postgis`, không pgbackrest — `archive_mode=off`, không dịch vụ `backup`, không cần `BACKUP_ENV_DIR`), **không alert** tới M3 và **tắt dịch AI** (`TRANSLATION_MONTHLY_BUDGET_USD=0`, `ANTHROPIC_API_KEY` để trống) theo quyết định user 2026-10-18; production giữ backup + WAL archive như §8. Dữ liệu staging là dữ liệu mẫu, mất thì migrate + seed lại.
 

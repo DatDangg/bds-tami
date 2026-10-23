@@ -28,9 +28,11 @@ x-logging: &default-logging
 
 x-app-environment: &app-environment
   APP_ENV: production
-  # Nginx chỉ nhận IP Cloudflare nên tin header CF-Connecting-IP (thiếu cờ này mọi khách chung 1 bucket rate limit).
-  TRUST_CF_CONNECTING_IP: "true"
-  TRUST_X_REAL_IP: "false"
+  # Nguồn IP khách cho rate limit, BẮT BUỘC khai trong prod.env theo biến thể Nginx đang bật (thiếu thì mọi khách chung 1 bucket):
+  #   không Cloudflare (tami-prod-direct.conf, Nginx ghi đè X-Real-IP): TRUST_CF_CONNECTING_IP=false, TRUST_X_REAL_IP=true
+  #   sau Cloudflare (tami.conf, chỉ nhận IP Cloudflare):              TRUST_CF_CONNECTING_IP=true,  TRUST_X_REAL_IP=false
+  TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:?TRUST_CF_CONNECTING_IP bắt buộc trong prod.env (xem runbook deploy §10)}
+  TRUST_X_REAL_IP: ${TRUST_X_REAL_IP:?TRUST_X_REAL_IP bắt buộc trong prod.env (xem runbook deploy §10)}
   NODE_OPTIONS: "--max-old-space-size=768"
   DATABASE_URL: ${DATABASE_URL_PROD:?DATABASE_URL_PROD bắt buộc}
   PAYLOAD_SECRET: ${PAYLOAD_SECRET:?}

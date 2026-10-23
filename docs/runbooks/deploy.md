@@ -102,6 +102,7 @@ Sao `.env.example` (khối Docker Compose staging/prod) → điền giá trị t
 
 ### 3.4 Nginx / Cloudflare
 Theo `docker/nginx/` và ARCHITECTURE §6 (không thuộc pipeline này). Staging chưa có tên miền: dùng biến thể sslip.io không Cloudflare, xem mục 9.
+Production chưa dùng Cloudflare (2026-10-23): `tami.genieplatform.cloud` trỏ thẳng về server, biến thể Let's Encrypt, xem mục 10.
 
 ## 4. Migration
 
@@ -211,7 +212,7 @@ Mục đích: stack lỗi trình duyệt trên GlitchTip hiện đúng file/dòn
 
 Quyết định của user (2026-10-18): chưa có tên miền và chưa dùng Cloudflare. Staging = `https://187-52-119-50.sslip.io` (IP server 187.52.119.50),
 HTTPS bằng Let's Encrypt trên Nginx host, bảo vệ bằng HTTP basic auth + `X-Robots-Tag: noindex` + robots `Disallow` (app trả khi `APP_ENV=staging`), không CDN.
-Đây là **ngoại lệ tạm thời của staging**; production vẫn theo mục 3.4 (tên miền thật + Cloudflare, `docker/nginx/tami.conf`, `TRUST_CF_CONNECTING_IP=true`) và không đổi.
+Đây là **ngoại lệ tạm thời của staging**. Production cũng chưa Cloudflare từ 2026-10-23: xem mục 10.
 Biến thể Cloudflare của staging (`docker/nginx/tami-staging.conf`) giữ nguyên để dùng khi có tên miền.
 
 > **Mọi bước dưới đây chạm server thật hoặc GitHub: chỉ làm sau khi user xác nhận trong chat từng bước (đánh dấu `[XÁC NHẬN]`).**
@@ -296,3 +297,39 @@ Email Let's Encrypt, tên/mật khẩu basic auth, `EMAIL_ALLOWLIST`, `NEXT_PUBL
   chuyển sang image bookworm theo `docs/runbooks/postgres-base-image.md` (deploy bị guard chặn cho tới khi làm xong). `deploy.sh` chỉ `up` dịch vụ `backup` khi compose của môi trường có khai báo (prod có, staging không). Dữ liệu staging là dữ liệu mẫu: mất thì chạy lại migrate + seed. Prod giữ nguyên cấu hình backup. Muốn bật lại cho staging: chép khối `postgres`/`backup` và volume từ `docker-compose.prod.yml`.
 - **Không alert tới M3:** không tạo rule/Uptime Kuma cho staging; xem log bằng `docker logs`.
 - **Dịch AI tắt:** `TRANSLATION_MONTHLY_BUDGET_USD=0`, không cần `ANTHROPIC_API_KEY` (`src/lib/env.ts` chấp nhận khoá rỗng; test `env.test.ts`).
+
+## 10. Production không Cloudflare (tami.genieplatform.cloud)
+
+Quyết định user 2026-10-23: production lên trước Cloudflare, tại `https://tami.genieplatform.cloud` (DNS A thẳng về 187.52.119.50). Tên miền này gắn tạm cho staging
+từ 2026-10-21; nay **chỉ production** dùng, staging còn `https://187-52-119-50.sslip.io`. Production DB khởi đầu **trống** (không clone dữ liệu staging, AGENTS.md),
+nội dung nhập lại qua admin.
+
+> Mọi bước chạm server/GitHub: chỉ làm sau khi user xác nhận trong chat từng bước `[XÁC NHẬN]`. Nguyên tắc host dùng chung ở 9.2 giữ nguyên
+> (không cài/restart nginx/certbot/docker; chỉ `nginx -t` rồi `systemctl reload nginx`; không sửa site khác).
+
+| Hạng mục | Production không Cloudflare |
+|---|---|
+| Nginx | `docker/nginx/tami-prod-direct-http.conf` (80: ACME + 301) + `tami-prod-direct.conf` (443 → `127.0.0.1:3010`), không `http2`, không `default_server`, không `noindex` |
+| Chứng chỉ | Let's Encrypt `--cert-name tami.genieplatform.cloud` (đã cấp 2026-10-21, SAN gồm cả sslip) **dùng chung** với staging; gia hạn webroot cần cả hai site cổng 80 phục vụ `/.well-known/acme-challenge/` |
+| IP khách | `prod.env`: `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true` — compose prod **bắt buộc khai** (thiếu thì `compose config` lỗi, `deploy.sh` dừng trước khi đổi gì) |
+| Cache ảnh | giữ header của app (`public, immutable`), không CDN |
+| Thiếu so với Cloudflare | cache CDN, WAF/DDoS, lớp xác thực thứ 2 cho `/admin` (Cloudflare Access) |
+
+### 10.1 Thứ tự
+1. `[XÁC NHẬN]` GitHub Environment `production`: **Required reviewers trước** (thiếu thì mỗi lần push staging tự deploy production), deployment branch `staging`,
+   rồi mới thêm secret `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (mục 2.2–2.3).
+2. `[XÁC NHẬN]` Kiểm (chỉ đọc): `ss -ltnp | grep ':3010'` trống, `df -h /`, `docker ps --format '{{.Names}}' | grep '^tami-'` (chỉ thấy `tami-staging-*`).
+3. `[XÁC NHẬN]` `/opt/tami/prod.env` (`chmod 600`, chủ `deploy`; giá trị sinh trên server, không dán vào chat/log). Tên biến như 9.2 bước 3 nhưng giá trị RIÊNG production, cộng:
+   `DATABASE_URL_PROD` (host `postgres`), `S3_BUCKET_PUBLIC=tami-prod-public`, `S3_BUCKET_PRIVATE=tami-prod-private`, `NEXT_PUBLIC_SITE_URL=https://tami.genieplatform.cloud`,
+   `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`, `BACKUP_ENV_DIR=/opt/tami/backup/production`; không đặt `APP_ENV` (compose ép `production`), không `EMAIL_ALLOWLIST`.
+   Turnstile: site key phải cho phép hostname `tami.genieplatform.cloud`.
+4. `[XÁC NHẬN]` Backup: `docs/runbooks/restore.md` §2 bước 1 với `E=production` (kho ngoài server, mật khẩu mã hoá cất bản sao ngoài server).
+5. `[XÁC NHẬN]` Deploy: push `staging` → staging tự deploy → job `Deploy production` *Waiting* → reviewer duyệt. Lần đầu: migrate trên DB trống, không có image trước để rollback (G24).
+   Sau đó restore.md §2 bước 4–5 (stanza-create, check, restic init, full đầu tiên), rồi `docker exec tami-app pnpm seed` (chỉ phần nền; `--sample` bị chặn ở production).
+   Admin đầu tiên: user tự tạo ở `/admin`. Trên server: `curl -s http://127.0.0.1:3010/api/health` → 200.
+6. `[XÁC NHẬN]` Chuyển tên miền (một lần reload, chọn giờ ít người dùng):
+   copy `tami-staging-sslip{,-http}.conf` mới (server_name chỉ còn sslip) đè bản trong `sites-available/`, copy `tami-prod-direct{,-http}.conf` vào `sites-available/` + symlink `sites-enabled/`,
+   `sudo nginx -t` PASS rồi `sudo systemctl reload nginx`. Không bật `tami.conf` (Cloudflare, có `http2`).
+   Rollback: gỡ symlink `tami-prod-direct*`, chép lại hai file staging cũ (giữ bản sao trước khi đè), `nginx -t` + reload.
+7. Kiểm: `curl -sI https://tami.genieplatform.cloud/` → 200, **không** có `X-Robots-Tag`; `/robots.txt` không `Disallow: /`; `curl -sI https://187-52-119-50.sslip.io/` → có `X-Robots-Tag: noindex`;
+   `sudo certbot renew --dry-run --cert-name tami.genieplatform.cloud` PASS; gửi form liên hệ thử, log `/var/log/nginx/tami.access.log` cột đầu là IP thật.
