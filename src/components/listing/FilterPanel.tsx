@@ -92,7 +92,7 @@ export function FilterSidebar({ action, clearHref, onClear, preservedParams, chi
           {t("title")}
         </h2>
         {clearHref && (
-          <PendingLink href={clearHref} scroll={false} onClick={onClear} className="inline-flex min-h-11 items-center text-small text-text-secondary underline-offset-4 hover:text-text hover:underline lg:min-h-9">
+          <PendingLink href={clearHref} scroll={false} onClick={onClear} className="inline-flex min-h-11 items-center text-small text-text-secondary transition-colors duration-(--duration-fast) hover:text-text lg:min-h-9">
             {t("clearAll")}
           </PendingLink>
         )}

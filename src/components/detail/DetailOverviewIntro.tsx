@@ -27,7 +27,7 @@ export function DetailOverviewIntro({ summary, content, locale }: DetailOverview
       {lead && <p className="text-body text-text-secondary">{lead}</p>}
       {rest !== null && (
         <details className="group mt-3">
-          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-small font-semibold text-accent-text marker:hidden hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring [&::-webkit-details-marker]:hidden">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-small font-semibold text-accent-text marker:hidden transition-colors duration-(--duration-fast) hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring [&::-webkit-details-marker]:hidden">
             <span className="group-open:hidden">{t("showMore")}</span>
             <span className="hidden group-open:inline">{t("showLess")}</span>
             <CaretDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />

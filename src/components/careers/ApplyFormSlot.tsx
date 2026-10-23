@@ -37,12 +37,12 @@ export function ApplyFormSlot({ children, email, hotline, subtitle }: ApplyFormS
         {children ?? <p className="max-w-[60ch] text-body text-text-secondary">{t("fallback")}</p>}
         {children && hasContact && <p className="mt-2 border-t border-border pt-4 text-small text-text-secondary">{t("orContact")}</p>}
         {email && (
-          <a href={`mailto:${email}`} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text underline underline-offset-4">
+          <a href={`mailto:${email}`} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
             {tCareers("sendCv", { email })}
           </a>
         )}
         {hotline && (
-          <a href={hotline.telHref} className="inline-flex min-h-11 w-fit items-center font-display text-h3 text-accent-text underline underline-offset-4">
+          <a href={hotline.telHref} className="inline-flex min-h-11 w-fit items-center font-display text-h3 text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
             {hotline.label}
           </a>
         )}

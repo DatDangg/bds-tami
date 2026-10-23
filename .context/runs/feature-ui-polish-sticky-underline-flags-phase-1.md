@@ -3,8 +3,8 @@
 ```yaml
 workItem: feature/ui-polish-sticky-underline-flags
 phaseTask: phase-1
-step: review_t01
-agent: reviewer
+step: build_t03
+agent: builder
 status: running                     # cancel sẽ redo bước này
 attempt: 0
 interrupted: false
@@ -12,10 +12,10 @@ updatedAt: 2026-10-24T00:20:00+07:00
 filesTouched: [spec/changes/BACKLOG.md, SPECIFICATIONS.md]
 filesNew: [tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-01.md, tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-02.md, tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-03.md]
 evidence:
-  reportPath: null
-  round: 0
-  verdict: null
-next: "reviewer STRICT T01 round 1"
+  reportPath: .context/review-reports/feature-ui-polish-sticky-underline-flags-phase-1-task-02-round-2-review.md
+  round: 2
+  verdict: PASS (T02 r2)
+next: "commit T02 → builder T03 (cờ)"
 loopSignal: none
 approvals: [{gate: phase_plan, at: 2026-10-24, ok: "auto proceed (user)"}]
 ```
@@ -28,3 +28,8 @@ approvals: [{gate: phase_plan, at: 2026-10-24, ok: "auto proceed (user)"}]
 - 2026-10-24 classify + root cause + spec delta + task files; ▶ START spec-publisher
 - spec-publisher DONE: 1.58.0 / scope v77; ▶ START builder T01
 - builder T01 DONE (lint/typecheck/test PASS 4591; gap < lg ≥ 40px); ▶ START reviewer T01 r1
+- reviewer T01 STRICT PASS r1; commit 541dc36; ▶ START builder T02
+- builder T02 DONE (lint/typecheck/test PASS 4592; grep chỉ còn RichText link); ▶ START reviewer T02 r1
+- reviewer T02 r1 FAIL (2 MAJOR: accent-text trên error-subtle 4.40:1 ở FormStatus:76, RentalListPage:290); ▶ START builder T02 fix (attempt 2)
+- builder T02 attempt 2 DONE (FormStatus + ListError text-text; lint/typecheck/test PASS); ▶ START reviewer T02 r2
+- reviewer T02 r2 STRICT PASS; design-spec reconcile; commit T02

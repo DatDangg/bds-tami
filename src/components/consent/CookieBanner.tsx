@@ -141,7 +141,7 @@ function Banner({ onChoose, onPreferences }: { onChoose: (analytics: boolean) =>
         {t("message")}{" "}
         <Link
           href="/chinh-sach-bao-mat"
-          className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:text-primary-hover"
+          className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text"
         >
           {t("privacyLink")}
         </Link>
@@ -157,7 +157,7 @@ function Banner({ onChoose, onPreferences }: { onChoose: (analytics: boolean) =>
       <button
         type="button"
         onClick={onPreferences}
-        className="inline-flex min-h-11 cursor-pointer items-center self-start text-small font-semibold underline underline-offset-4 hover:text-primary-hover"
+        className="inline-flex min-h-11 cursor-pointer items-center self-start text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text"
       >
         {t("preferences")}
       </button>

@@ -31,7 +31,7 @@ export function SimilarCarousel({ items, title, titleAccent, eyebrow, viewAll, l
         {viewAll && (
           <Link
             href={viewAll.href}
-            className="inline-flex min-h-11 items-center gap-2 text-small font-semibold text-accent-text hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+            className="inline-flex min-h-11 items-center gap-2 text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
           >
             {viewAll.label}
             <ArrowRight size={16} aria-hidden="true" />

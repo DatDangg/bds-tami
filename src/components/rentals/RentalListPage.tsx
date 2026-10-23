@@ -273,7 +273,7 @@ function EmptyResults({ filters, options, listPath, locale, inCategory, rentalsP
       <ul className="flex flex-wrap justify-center gap-3" data-testid="empty-suggestions">
         {chips.map((chip) => (
           <li key={chip.kind}>
-            <PendingLink href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+            <PendingLink href={chip.href} scroll={false} className="inline-flex min-h-11 items-center text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
               {chip.name}
             </PendingLink>
           </li>
@@ -287,7 +287,7 @@ function ListError({ retryHref, title, retry }: { retryHref: string; title: stri
   return (
     <div role="alert" className="flex flex-col items-start gap-3 rounded-sm bg-error-subtle p-6">
       <p className="font-semibold">{title}</p>
-      <PendingLink href={retryHref} className="inline-flex min-h-11 items-center text-small font-semibold underline underline-offset-4">
+      <PendingLink href={retryHref} className="inline-flex min-h-11 items-center text-small font-semibold rounded-sm px-1 text-text transition-colors duration-(--duration-fast) hover:bg-text/6">
         {retry}
       </PendingLink>
     </div>

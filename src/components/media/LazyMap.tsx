@@ -239,7 +239,7 @@ export function LazyMap({ location, approximate = false, previewImage, markers =
           href={googleMapsUrl(shown, approximate)}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-flex min-h-11 items-center text-small font-semibold text-accent-text underline underline-offset-4"
+          className="mt-2 inline-flex min-h-11 items-center text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text"
         >
           {t("openGoogleMaps")}
         </a>

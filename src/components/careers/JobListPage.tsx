@@ -122,7 +122,7 @@ function NoJobsPanel({ title, description, mailto }: { title: string; descriptio
       <h3 className="text-h3 font-semibold">{title}</h3>
       <p className="max-w-[60ch] text-body text-text-secondary">{description}</p>
       {mailto && (
-        <a href={`mailto:${mailto.email}`} className="inline-flex min-h-11 items-center font-semibold text-accent-text underline underline-offset-4">
+        <a href={`mailto:${mailto.email}`} className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
           {mailto.label}
         </a>
       )}

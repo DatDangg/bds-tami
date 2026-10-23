@@ -23,7 +23,7 @@ const COLUMNS_AUTO_CLASS = "grid-cols-[repeat(auto-fill,minmax(min(100%,13rem),1
 /** 2 cột cố định từ sm (Tổng quan Dự án ≥ xl: lưới chỉ chiếm ~55% bề rộng nên auto-fill sẽ ra 1 cột — BL-056). */
 const COLUMNS_FIXED_2_CLASS = "grid-cols-1 sm:grid-cols-2";
 
-const LINK_CLASS = "text-accent-text underline underline-offset-4 hover:text-text";
+const LINK_CLASS = "font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text";
 
 /**
  * Lưới thông tin trong khối Tổng quan (BL-052, design `detail-du-an`: Tên thương mại, Chủ đầu tư, Vị trí…): icon vuông viền mảnh + nhãn nhỏ + giá trị;

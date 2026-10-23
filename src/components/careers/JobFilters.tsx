@@ -72,7 +72,7 @@ export function JobFilters({ actionPath, provinces, selectedProvince, keyword, h
           {tv("submit")}
         </Button>
         {active && (
-          <PendingLink href={actionPath} className="inline-flex min-h-11 items-center px-2 text-small font-semibold whitespace-nowrap underline underline-offset-4">
+          <PendingLink href={actionPath} className="inline-flex min-h-11 items-center px-2 text-small font-semibold whitespace-nowrap text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
             {t("clear")}
           </PendingLink>
         )}

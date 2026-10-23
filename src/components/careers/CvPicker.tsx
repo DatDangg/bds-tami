@@ -106,7 +106,7 @@ export function CvPicker({ name, accept, file, disabled, error, labels, onPick, 
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className="w-full sm:w-fit md:h-auto md:min-h-11 md:border-0 md:bg-transparent md:px-0 md:text-small md:normal-case md:text-accent-text md:underline md:underline-offset-4 md:hover:bg-transparent md:hover:text-text aria-invalid:border-error aria-invalid:focus:outline-2 aria-invalid:focus:outline-offset-2 aria-invalid:focus:outline-focus-ring"
+          className="w-full sm:w-fit md:h-auto md:min-h-11 md:border-0 md:bg-transparent md:px-0 md:text-small md:normal-case md:text-accent-text md:hover:bg-transparent md:hover:text-text aria-invalid:border-error aria-invalid:focus:outline-2 aria-invalid:focus:outline-offset-2 aria-invalid:focus:outline-focus-ring"
         >
           {labels.chooseFile}
         </Button>

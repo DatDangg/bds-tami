@@ -129,3 +129,17 @@ describe("LanguageSwitcher: vùng chạm và ngôn ngữ hiện tại", () => {
     for (const link of [current, other]) expect(link.querySelector('svg[aria-hidden="true"][data-flag]')).not.toBeNull();
   });
 });
+
+describe("DesktopNav: chỉ báo mục đang xem (BL-074)", () => {
+  it("mục đang xem có aria-current=page + nền token, không có vạch dưới chữ; mục khác hover bằng nền", () => {
+    renderWithIntl(<DesktopNav items={items} />);
+    const current = screen.getByText("Dự án", { selector: "a" });
+    expect(current).toHaveAttribute("aria-current", "page");
+    expect(current.className).toContain("aria-[current=page]:bg-text/10");
+    expect(current.className).not.toMatch(/border-b|underline/);
+    const other = screen.getByText("Liên hệ", { selector: "a" });
+    expect(other).not.toHaveAttribute("aria-current");
+    expect(other).toHaveClass("hover:bg-text/6");
+    expect(other).toHaveClass("min-h-11");
+  });
+});

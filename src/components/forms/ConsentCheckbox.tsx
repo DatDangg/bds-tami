@@ -48,7 +48,7 @@ export function ConsentCheckbox({ checked, onCheckedChange, error, disabled, lab
               target="_blank"
               rel="noopener noreferrer"
               aria-describedby={newTabId}
-              className="inline-block min-h-6 font-semibold text-accent-text underline underline-offset-4"
+              className="inline-block min-h-6 font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text"
             >
               {chunks}
             </Link>

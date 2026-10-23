@@ -70,7 +70,7 @@ export function DetailGalleryGrid({ images }: { images: MediaImage[] }) {
           <button
             type="button"
             onClick={(event) => open(0, event.currentTarget)}
-            className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-small font-semibold text-accent-text hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+            className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
           >
             {t("viewAll")}
             <ArrowRight size={16} aria-hidden="true" />

@@ -37,7 +37,7 @@ export default function NotFoundPage() {
         <ul className="flex flex-wrap gap-x-6">
           {QUICK_LINKS.map((key) => (
             <li key={key}>
-              <Link href={href(key)} className="inline-flex min-h-11 min-w-11 items-center justify-center text-small text-text-secondary hover:text-text hover:underline">
+              <Link href={href(key)} className="inline-flex min-h-11 min-w-11 items-center justify-center text-small text-text-secondary transition-colors duration-(--duration-fast) hover:text-text">
                 {tNav(key)}
               </Link>
             </li>

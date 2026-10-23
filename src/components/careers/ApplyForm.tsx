@@ -117,7 +117,7 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
         (expired ? (
           <div role="alert" className="flex flex-col gap-2 rounded-md border border-warning bg-warning-subtle p-4 text-small text-text">
             <p className="font-semibold">{t("expired")}</p>
-            <a href={listPath} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text underline underline-offset-4">
+            <a href={listPath} className="inline-flex min-h-11 w-fit items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
               {t("viewOpenJobs")}
             </a>
           </div>

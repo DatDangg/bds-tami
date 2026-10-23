@@ -28,7 +28,7 @@ export function NewsArticleContactNote({ text, contactHref }: NewsArticleContact
           // Chỉ chèn link GIỮA các đoạn (split cho n+1 đoạn khi gặp n lần thương hiệu); đoạn trùng chữ nên key theo vị trí là ổn định.
           <span key={index}>
             {index > 0 && (
-              <Link href={contactHref} className="font-semibold text-accent-text underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+              <Link href={contactHref} className="font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
                 {brand}
               </Link>
             )}

@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import type { SectionHeading } from "@/lib/content/section-headings";
 
-const LINK_CLASS = "inline-flex min-h-11 items-center text-small text-text-secondary hover:text-text hover:underline";
+const LINK_CLASS = "inline-flex min-h-11 items-center text-small text-text-secondary transition-colors duration-(--duration-fast) hover:text-text";
 
 function Links({ headings }: { headings: SectionHeading[] }) {
   return (

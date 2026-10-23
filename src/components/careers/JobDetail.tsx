@@ -87,7 +87,7 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
                     <p className="font-semibold">{t("expiredTitle")}</p>
                     <p className="text-small">{t("expiredBody")}</p>
                   </div>
-                  <Link href={listPath} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 transition-colors hover:text-accent-text hover:no-underline">
+                  <Link href={listPath} className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
                     {t("viewAll")}
                   </Link>
                 </div>
@@ -101,7 +101,7 @@ export function JobDetail({ doc, view, heroImage, others, contact, ownPath, shar
             <div className={cn("flex flex-col gap-4", DETAIL_ASIDE_CARD_CLASS)}>
               <p className="text-body text-text-secondary">{tv("expiredCvPrompt")}</p>
               {contact.email && (
-                <a href={`mailto:${contact.email}`} className="inline-flex min-h-11 w-fit items-center font-semibold break-all text-accent-text underline underline-offset-4">
+                <a href={`mailto:${contact.email}`} className="inline-flex min-h-11 w-fit items-center font-semibold break-all text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
                   {tCareers("sendCv", { email: contact.email })}
                 </a>
               )}

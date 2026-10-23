@@ -65,7 +65,7 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementVi
             <Link
               href={href}
               {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground"
+              className="rounded-sm px-1 font-semibold transition-colors duration-(--duration-fast) hover:bg-primary-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground"
             >
               {text}
             </Link>

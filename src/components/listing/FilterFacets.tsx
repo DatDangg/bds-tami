@@ -173,7 +173,7 @@ export function CheckboxFacetList({ name, label, options, value, onChange, searc
           aria-expanded={expanded}
           aria-controls={listId}
           onClick={() => setExpanded((open) => !open)}
-          className="inline-flex min-h-11 cursor-pointer items-center self-start text-small font-semibold text-accent-text underline-offset-4 hover:underline lg:min-h-9"
+          className="inline-flex min-h-11 cursor-pointer items-center self-start text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text lg:min-h-9"
         >
           {expanded ? t("showLess") : t("showMore")}
         </button>

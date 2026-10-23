@@ -59,7 +59,7 @@ function TocLinks({ headings, activeId, numbered = false, onJump }: { headings: 
                 numbered ? LINK_SIZE_COMPACT : LINK_SIZE_TOUCH,
                 // Cấp 3 thụt thẳng mép chữ cấp 2 = 1rem + số 1.5rem + gap 0.625rem (trừ vạch 2px).
                 numbered ? (heading.level === 3 ? "gap-2.5 pl-[calc(1rem-2px+1.5rem+0.625rem)]" : "gap-2.5 pl-[calc(1rem-2px)]") : heading.level === 3 ? "pl-6" : "pl-3",
-                current ? "border-primary-deep font-semibold text-text" : numbered ? "border-transparent text-text-secondary hover:text-text hover:underline" : "border-border text-text-secondary hover:text-text hover:underline",
+                current ? "border-primary-deep font-semibold text-text" : numbered ? "border-transparent text-text-secondary transition-colors duration-(--duration-fast) hover:text-text" : "border-border text-text-secondary transition-colors duration-(--duration-fast) hover:text-text",
               )}
             >
               {number && (

@@ -73,7 +73,7 @@ export function FormErrorSummary({ message, details, tone = "error", onRetry, ho
             </Button>
           )}
           {hotline && (
-            <a href={hotline.href} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">
+            <a href={hotline.href} className="inline-flex min-h-11 items-center font-semibold rounded-sm px-1 text-text transition-colors duration-(--duration-fast) hover:bg-text/6">
               {t("hotline")}: {hotline.label}
             </a>
           )}

@@ -41,7 +41,7 @@ export function FooterLinkColumn({ column }: { column: FooterColumnView }) {
       <ul id={listId} className={cn("flex flex-col", !isMd && !open && "max-md:hidden")}>
         {column.links.map((link) => (
           <li key={link.href + link.label}>
-            <NavAnchor link={link} className="inline-flex min-h-11 min-w-11 items-center text-small text-text-secondary hover:text-text hover:underline" />
+            <NavAnchor link={link} className="inline-flex min-h-11 min-w-11 items-center text-small text-text-secondary transition-colors duration-(--duration-fast) hover:text-text" />
           </li>
         ))}
       </ul>

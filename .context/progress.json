@@ -4,7 +4,7 @@
     "type": "feature",
     "slug": "ui-polish-sticky-underline-flags",
     "phase": 1,
-    "task": "phase-1-task-02",
+    "task": "phase-1-task-03",
     "journal": ".context/runs/feature-ui-polish-sticky-underline-flags-phase-1.md"
   },
   "features": [
@@ -3205,13 +3205,19 @@
           "round": 1,
           "report": ".context/review-reports/feature-ui-polish-sticky-underline-flags-phase-1-task-01-round-1-review.md",
           "verify": "lint PASS · typecheck PASS · test 436 files/4591 PASS · dev 390/768/1024/1440: khe thanh→thẻ form < lg ≥ 40px (trước âm tới −562), mép/khe thanh không đổi",
-          "completedAt": "2026-10-24"
+          "completedAt": "2026-10-24",
+          "commit": "541dc36"
         },
         {
           "task": "phase-1-task-02",
           "file": "tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-02.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-ui-polish-sticky-underline-flags-phase-1-task-02-round-2-review.md",
+          "verify": "lint PASS · typecheck PASS · test 436 files/4592 PASS · grep underline chỉ còn RichText link · r1 FAIL contrast accent-text trên error-subtle 4.40:1 → text-text (15.7:1)",
+          "completedAt": "2026-10-24"
         },
         {
           "task": "phase-1-task-03",

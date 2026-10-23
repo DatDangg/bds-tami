@@ -19,7 +19,7 @@ export function DetailExpandButton({ expanded, onToggle, controls, moreLabel, le
       aria-expanded={expanded}
       aria-controls={controls}
       onClick={onToggle}
-      className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-small font-semibold text-accent-text hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+      className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-small font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
     >
       {expanded ? lessLabel : moreLabel}
       <Icon size={16} aria-hidden="true" />

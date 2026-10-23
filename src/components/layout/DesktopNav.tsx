@@ -34,8 +34,8 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
 
   return (
     <nav aria-label={t("main")} className="hidden xl:block">
-      {/* Chữ 12px giãn .04em + gap 24px như mockup site redesign (BL-046); 1280px vẫn đủ chỗ logo + 7 mục + tìm/VI|EN/CTA (BL-001). */}
-      <ul ref={listRef} className="flex items-center gap-6 2xl:gap-8">
+      {/* Chữ 12px giãn .04em + khoảng cách 24px = gap 4px + padding viên thuốc 2×10px, không vạch dưới chữ, hover/đang xem = nền token (BL-074) như mockup site redesign (BL-046); 1280px vẫn đủ chỗ logo + 7 mục + tìm/VI|EN/CTA (BL-001). */}
+      <ul ref={listRef} className="flex items-center gap-1 2xl:gap-2">
         {items.map((item) => {
           const key = item.href + item.label;
           const hasChildren = item.children.length > 0;
@@ -62,7 +62,7 @@ export function DesktopNav({ items }: { items: NavItemView[] }) {
               <NavAnchor
                 link={item}
                 aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
-                className="inline-flex min-h-11 items-center border-b-2 border-transparent text-xsmall font-semibold tracking-[0.04em] whitespace-nowrap text-text uppercase hover:border-text/40 aria-[current=page]:border-text"
+                className="inline-flex min-h-11 items-center rounded-pill px-2.5 text-xsmall font-semibold tracking-[0.04em] whitespace-nowrap text-text uppercase transition-colors duration-(--duration-fast) hover:bg-text/6 aria-[current=page]:bg-text/10 2xl:px-3"
               />
               {hasChildren && (
                 <>
