@@ -1,6 +1,6 @@
 # Runbook: Deploy TAMI (staging → production)
 
-Phạm vi: `.github/workflows/deploy.yml`, `.github/actions/ssh-deploy/action.yml`, `scripts/deploy/deploy.sh` + `scripts/deploy/lib/*.sh`.
+Phạm vi: `.github/workflows/deploy.yml`, `.github/workflows/deploy-production.yml`, `.github/actions/ssh-deploy/action.yml`, `scripts/deploy/deploy.sh` + `scripts/deploy/lib/*.sh`.
 Kiến trúc: `docs/ARCHITECTURE.md` §6.4. Quyết định: `.context/decisions.md` Decision 4.
 
 ## 1. Luồng
@@ -9,7 +9,10 @@ Kiến trúc: `docs/ARCHITECTURE.md` §6.4. Quyết định: `.context/decisions
 push staging → CI (ci.yml) PASS → [workflow_run] Deploy:
   build   : GitHub runner build image, tag = commit SHA, push GHCR, lấy DIGEST
   staging : (tự động, Environment `staging`) SSH → deploy.sh staging  --image <repo>@<digest>
-  production: (Environment `production`, DỪNG chờ reviewer duyệt) SSH → deploy.sh production --image <repo>@<CÙNG digest>
+  (job summary in commit + digest vừa qua staging)
+
+chạy TAY: Actions → Deploy production → Run workflow (nhánh staging) → nhập commit SHA  [deploy-production.yml]
+  production: kiểm SHA thuộc nhánh staging → lấy digest của image tag = SHA (không build lại) → SSH → deploy.sh production --image <repo>@<digest>
 ```
 
 - Chỉ chạy khi CI PASS cho **push vào `staging` của chính repo** (không `main`, không PR, không fork).
@@ -40,10 +43,11 @@ push staging → CI (ci.yml) PASS → [workflow_run] Deploy:
 | Environment | Cấu hình |
 |---|---|
 | `staging` | Không cần reviewer. Deployment branches: `staging`. |
-| `production` | **Required reviewers** (ít nhất 1 người có trách nhiệm duyệt), bật *Prevent self-review* nếu đủ người. Deployment branches: `staging`. Tuỳ chọn *Wait timer*. |
+| `production` | Chỉ chứa secret SSH (2.3). **Không có required reviewers**: repo private gói Free không hỗ trợ (API trả 422, 2026-10-23). |
 
-Required reviewers là cách duy nhất ép "duyệt tay" cho production; thiếu cấu hình này thì job production chạy tự động. Kiểm tra: lần chạy đầu phải thấy job
-`Deploy production` ở trạng thái *Waiting*.
+Cổng duyệt production = **thao tác bấm tay** workflow `Deploy production` (`workflow_dispatch`, chỉ người có quyền write trên repo), vì push `staging` không còn kích hoạt production.
+Trên server, `deploy.sh production` vẫn chỉ nhận cặp digest + SHA đã deploy staging thành công và từ chối bản cũ hơn (mục 1). Nâng gói GitHub Pro/Team sau này thì có thể
+thêm required reviewers cho Environment `production` làm lớp thứ hai (không cần sửa workflow).
 
 ### 2.3 Secret / variable
 Tạo **Environment secret** ở cả `staging` và `production` (giá trị có thể giống nhau nếu cùng server, nhưng nên dùng key riêng):
@@ -184,9 +188,8 @@ Khoá: 1 `flock` chung (`/opt/tami/state/deploy.lock`) cho cả hai môi trườ
 - Cache build GitHub Actions (`type=gha`) do GitHub tự dọn theo hạn mức repo.
 
 ## 7. Giới hạn đã biết
-- Job production đang *Waiting* chiếm nhóm `tami-deploy-production`; lần chạy mới hơn cùng đợi, GitHub huỷ bản chờ cũ hơn
-  (`cancel-in-progress: false` giữ deploy đang chạy). Duyệt production bản mới nhất, từ chối bản cũ.
-- Duyệt production sau khi staging đã deploy commit mới hơn vẫn deploy digest cũ (được phép vì còn trong `staging.history`); DB staging khi đó có thể đã
+- Hai lần bấm `Deploy production` liền nhau xếp hàng trong nhóm `tami-deploy-production` (`cancel-in-progress: false` giữ deploy đang chạy).
+- Bấm production cho commit cũ hơn commit staging mới nhất vẫn deploy được (nếu còn trong `staging.history` và không cũ hơn `production.current`) (được phép vì còn trong `staging.history`); DB staging khi đó có thể đã
   migrate xa hơn production — migration production chạy theo thứ tự tên, không bỏ sót.
 - Action đã pin theo commit SHA đầy đủ (comment ghi version, SHA tra bằng `git ls-remote ... refs/tags/<tag>`); Dependabot đề xuất cập nhật.
 - Rollback tự động cũng đọc compose qua `releases/<env>/current` (đã trả về release trước) nên đường dẫn bind mount không đổi giữa deploy và rollback (có assert trong `deploy.test.sh`).
@@ -265,7 +268,7 @@ Nginx host dùng chung (nginx 1.24, đã đọc `nginx -T`): chưa site nào dù
    Không bật cùng `tami-staging.conf` (biến thể Cloudflare) cho cùng server_name/upstream.
 8. `[XÁC NHẬN]` GitHub. Environment `staging`: secret `DEPLOY_HOST` (187.52.119.50), `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (đối chiếu fingerprint); variable `DEPLOY_SSH_PORT` (nếu khác 22).
    **Repository variables** (job `build` không gắn Environment nên không đọc được var của Environment): `NEXT_PUBLIC_HOTLINE`; tuỳ chọn `GLITCHTIP_URL/ORG/PROJECT` + secret `GLITCHTIP_AUTH_TOKEN`.
-   Environment `production`: required reviewers (mục 2.2). Nhánh mặc định = `staging` (mục 2.1). Gói GHCR cho phép repo pull (mục 2.4).
+   Environment `production`: secret SSH (mục 2.2–2.3; không có reviewers ở gói Free). Nhánh mặc định = `staging` (mục 2.1). Gói GHCR cho phép repo pull (mục 2.4).
 9. `[XÁC NHẬN]` Lần deploy đầu: push lên `staging` → CI → Deploy. Lần đầu **không có image trước nên không thử rollback tự động** (G24). Theo dõi log `deploy.sh`;
    migration chạy toàn bộ trên DB trống (kiểm danh sách migration trước; cấm `db push`/reset).
    Kiểm: `curl -sI https://187-52-119-50.sslip.io/` → 401; có `-u` → 200 + `X-Robots-Tag`; `/robots.txt` có `Disallow: /`; trên server `curl -s http://127.0.0.1:3011/api/health` → 200.
@@ -316,15 +319,14 @@ nội dung nhập lại qua admin.
 | Thiếu so với Cloudflare | cache CDN, WAF/DDoS, lớp xác thực thứ 2 cho `/admin` (Cloudflare Access) |
 
 ### 10.1 Thứ tự
-1. `[XÁC NHẬN]` GitHub Environment `production`: **Required reviewers trước** (thiếu thì mỗi lần push staging tự deploy production), deployment branch `staging`,
-   rồi mới thêm secret `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (mục 2.2–2.3).
+1. `[XÁC NHẬN]` GitHub Environment `production` (gói Free: không có required reviewers, production chỉ chạy khi bấm tay `Deploy production`): thêm secret `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (mục 2.2–2.3).
 2. `[XÁC NHẬN]` Kiểm (chỉ đọc): `ss -ltnp | grep ':3010'` trống, `df -h /`, `docker ps --format '{{.Names}}' | grep '^tami-'` (chỉ thấy `tami-staging-*`).
 3. `[XÁC NHẬN]` `/opt/tami/prod.env` (`chmod 600`, chủ `deploy`; giá trị sinh trên server, không dán vào chat/log). Tên biến như 9.2 bước 3 nhưng giá trị RIÊNG production, cộng:
    `DATABASE_URL_PROD` (host `postgres`), `S3_BUCKET_PUBLIC=tami-prod-public`, `S3_BUCKET_PRIVATE=tami-prod-private`, `NEXT_PUBLIC_SITE_URL=https://tami.genieplatform.cloud`,
    `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`, `BACKUP_ENV_DIR=/opt/tami/backup/production`; không đặt `APP_ENV` (compose ép `production`), không `EMAIL_ALLOWLIST`.
    Turnstile: site key phải cho phép hostname `tami.genieplatform.cloud`.
 4. `[XÁC NHẬN]` Backup: `docs/runbooks/restore.md` §2 bước 1 với `E=production` (kho ngoài server, mật khẩu mã hoá cất bản sao ngoài server).
-5. `[XÁC NHẬN]` Deploy: push `staging` → staging tự deploy → job `Deploy production` *Waiting* → reviewer duyệt. Lần đầu: migrate trên DB trống, không có image trước để rollback (G24).
+5. `[XÁC NHẬN]` Deploy: push `staging` → staging tự deploy (summary in commit) → Actions → **Deploy production** → Run workflow → nhập commit đó. Lần đầu: migrate trên DB trống, không có image trước để rollback (G24).
    Sau đó restore.md §2 bước 4–5 (stanza-create, check, restic init, full đầu tiên), rồi `docker exec tami-app pnpm seed` (chỉ phần nền; `--sample` bị chặn ở production).
    Admin đầu tiên: user tự tạo ở `/admin`. Trên server: `curl -s http://127.0.0.1:3010/api/health` → 200.
 6. `[XÁC NHẬN]` Chuyển tên miền (một lần reload, chọn giờ ít người dùng):

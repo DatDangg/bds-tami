@@ -1,8 +1,9 @@
 name: Deploy
 
 # CD (ARCHITECTURE §6.4, .context/decisions.md Decision 4): runner GitHub build image tag = commit SHA -> GHCR -> SSH vào server chạy
-# scripts/deploy/deploy.sh.  build -> staging (tự động) -> production (GitHub Environment `production`, required reviewers,
-# CÙNG digest đã chạy ở staging).
+# scripts/deploy/deploy.sh.  build -> staging (tự động). File này KHÔNG deploy production: production chạy tay qua
+# .github/workflows/deploy-production.yml (workflow_dispatch nhập commit SHA đã qua staging) — repo private gói Free không có
+# required reviewers cho Environment (GitHub trả 422, 2026-10-23).
 # Chỉ chạy sau khi workflow CI PASS cho một lần PUSH vào nhánh `staging` của chính repo này. Không có trigger nào từ `main`,
 # từ pull_request hay từ fork. Thiết lập trên GitHub (secret, Environment, reviewer): docs/runbooks/deploy.md.
 #
@@ -102,8 +103,6 @@ jobs:
     permissions:
       contents: read
       packages: read
-    outputs:
-      digest: ${{ steps.record.outputs.digest }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -124,44 +123,15 @@ jobs:
           deploy-root: ${{ env.TAMI_DEPLOY_ROOT }}
           release-sha: ${{ github.event.workflow_run.head_sha }}
 
-      # Chỉ chạy khi bước deploy ở trên thành công: đây là digest production được phép nhận.
-      - name: Ghi digest đã qua staging
-        id: record
+      # Chỉ chạy khi bước deploy ở trên thành công: cặp SHA + digest này là thứ production được phép nhận (deploy-production.yml).
+      - name: Ghi SHA đã qua staging (dùng cho Deploy production)
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
-        run: echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
-  deploy-production:
-    name: Deploy production (cần duyệt)
-    needs: [build, deploy-staging]
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    # Required reviewers cấu hình trên GitHub Environment `production`: job dừng ở trạng thái waiting đến khi được duyệt.
-    environment: production
-    concurrency:
-      group: tami-deploy-production
-      cancel-in-progress: false
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          persist-credentials: false
-
-      # Không build lại, không tag lại: dùng đúng digest staging đã chạy (output của deploy-staging).
-      # deploy.sh trên server còn tự kiểm digest này có trong staging.history.
-      - uses: ./.github/actions/ssh-deploy
-        with:
-          environment: production
-          image: ${{ needs.build.outputs.image }}@${{ needs.deploy-staging.outputs.digest }}
-          host: ${{ secrets.DEPLOY_HOST }}
-          user: ${{ secrets.DEPLOY_USER }}
-          port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
-          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
-          known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
-          registry-user: ${{ github.actor }}
-          registry-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-root: ${{ env.TAMI_DEPLOY_ROOT }}
-          release-sha: ${{ github.event.workflow_run.head_sha }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          {
+            echo "### Staging đã deploy"
+            echo "- commit: \`$SHA\`"
+            echo "- digest: \`$DIGEST\`"
+            echo "Lên production: Actions → **Deploy production** → Run workflow → nhập commit trên."
+          } >> "$GITHUB_STEP_SUMMARY"

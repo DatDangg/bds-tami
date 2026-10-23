@@ -1,0 +1,91 @@
+name: Deploy production
+
+# Production chạy TAY (Actions → Deploy production → Run workflow → nhập commit SHA). Repo private gói Free không có required reviewers
+# cho Environment (GitHub trả 422, 2026-10-23) nên cổng duyệt = chính thao tác bấm tay; chỉ người có quyền write trên repo bấm được.
+# Push `staging` chỉ deploy staging (deploy.yml); job summary của nó in commit + digest vừa qua staging.
+#
+# Không build lại, không tag lại: lấy digest của image GHCR tag = <sha> mà deploy.yml đã build. Lớp bảo vệ thật nằm ở server:
+# `deploy.sh production` chỉ nhận cặp digest + SHA có trong /opt/tami/state/staging.history (do lần deploy staging THÀNH CÔNG ghi)
+# và từ chối digest cũ hơn production.current (rollback có chủ đích: chạy tay trên server với --allow-older, runbook §5).
+# Thiết lập GitHub (secret Environment `production`): docs/runbooks/deploy.md §2.3, §10.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit SHA đầy đủ (40 hex) đã deploy staging thành công
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  TAMI_DEPLOY_ROOT: /opt/tami
+
+jobs:
+  deploy-production:
+    name: Deploy production
+    # Chỉ chạy từ file workflow trên nhánh staging (không chọn nhánh khác ở ô "Use workflow from").
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: tami-deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Kiểm tra SHA
+        env:
+          SHA: ${{ inputs.sha }}
+        run: '[[ "$SHA" =~ ^[a-f0-9]{40}$ ]] || { echo "sha phải là commit SHA đầy đủ 40 hex (chữ thường)"; exit 1; }'
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: SHA phải nằm trên nhánh staging
+        env:
+          SHA: ${{ inputs.sha }}
+        run: git merge-base --is-ancestor "$SHA" origin/staging || { echo "commit không thuộc nhánh staging"; exit 1; }
+
+      - name: Tên image (GHCR bắt buộc chữ thường)
+        id: name
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # deploy.yml build với provenance: false => manifest đơn, digest của tag chính là digest image đã deploy staging.
+      - name: Lấy digest của image tag = SHA
+        id: digest
+        env:
+          IMAGE: ${{ steps.name.outputs.image }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          digest="$(docker buildx imagetools inspect "$IMAGE:$SHA" --format '{{.Manifest.Digest}}')"
+          [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]] || { echo "không lấy được digest hợp lệ cho $IMAGE:$SHA"; exit 1; }
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Deploy production: commit \`$SHA\`, digest \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: ./.github/actions/ssh-deploy
+        with:
+          environment: production
+          image: ${{ steps.name.outputs.image }}@${{ steps.digest.outputs.digest }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          user: ${{ secrets.DEPLOY_USER }}
+          port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          registry-user: ${{ github.actor }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-root: ${{ env.TAMI_DEPLOY_ROOT }}
+          release-sha: ${{ inputs.sha }}
