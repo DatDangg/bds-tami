@@ -1,6 +1,12 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "ui-polish-sticky-underline-flags",
+    "phase": 1,
+    "task": "phase-1-task-02",
+    "journal": ".context/runs/feature-ui-polish-sticky-underline-flags-phase-1.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3177,6 +3183,43 @@
       "phase1": "done (T01 adff25a, T02 2d24916, T03 commit này); phase 2 staging/prod chờ deploy + user ok từng lần ghi",
       "phase2": "done (T01 staging 046323c, T02 production commit này)",
       "completedAt": "2026-10-23"
+    },
+    {
+      "slug": "ui-polish-sticky-underline-flags",
+      "title": "Chỉnh UI: thanh mục con < lg không đè thẻ \"Nhận thông tin dự án\"; bỏ gạch chân link/nút/menu site công khai (giữ link trong RichText); cờ đổi ngôn ngữ 3:2 nhỏ hơn (BL-074)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-074",
+      "changeDoc": "spec/changes/2026-10-23-ui-polish-sticky-underline-flags.md",
+      "startedAt": "2026-10-24",
+      "specVersion": "1.58.0",
+      "scopeVersion": 77,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-ui-polish-sticky-underline-flags-phase-1-task-01-round-1-review.md",
+          "verify": "lint PASS · typecheck PASS · test 436 files/4591 PASS · dev 390/768/1024/1440: khe thanh→thẻ form < lg ≥ 40px (trước âm tới −562), mép/khe thanh không đổi",
+          "completedAt": "2026-10-24"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-02.md",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-ui-polish-sticky-underline-flags/phase-1-task-03.md",
+          "status": "pending",
+          "attempt": 0
+        }
+      ]
     }
   ],
   "bugs": [
@@ -4313,7 +4356,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T10:28:04.836Z",
+  "lastUpdated": "2026-10-24",
   "approvalMilestones": [
     {
       "id": "M1",

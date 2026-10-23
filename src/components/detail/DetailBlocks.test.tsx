@@ -160,6 +160,9 @@ describe("DetailContactAside", () => {
     const call = screen.getByRole("link", { name: "Gọi ngay 1900 0000" });
     expect(call).toHaveAttribute("href", "tel:19000000");
     expect(card.parentElement?.className).toContain("lg:sticky");
+    // < lg thanh mục con đã hết dính trước thẻ → chỉ chừa lề header nổi; ≥ lg chừa thêm chiều cao thanh.
+    expect(card.className).toContain("scroll-mt-[calc(var(--sticky-top)+1rem)]");
+    expect(card.className).toContain("lg:scroll-mt-[calc(var(--sticky-top)+4.5rem)]");
   });
 
   it("không hotline → ẩn khối Gọi ngay", () => {

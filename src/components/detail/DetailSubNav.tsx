@@ -17,6 +17,9 @@ const OBSERVER_MARGIN = `-${OBSERVER_TOP_PX}px 0px -45% 0px`;
 // khối đứng cạnh nhau ở desktop như Pháp lý / Chính sách vẫn chọn được mục thứ hai: theo thứ tự trang, mục đầu luôn thắng khi cả hai cùng hiện).
 const SCROLL_LOCK_MS = 1000;
 
+// Khung ngang khi thanh đứng riêng (ngoài lưới). Trong `DetailLayout` thanh nằm TRONG lưới nên truyền khung khác (không cần lề/độ rộng riêng).
+const DEFAULT_FRAME_CLASS = "mx-auto w-full max-w-container px-gutter";
+
 function prefersReducedMotion(): boolean {
   return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
@@ -27,7 +30,7 @@ function prefersReducedMotion(): boolean {
  * Bề rộng thanh = khung nội dung bên dưới (BL-028): cùng `max-w-container` + `px-gutter` với lưới thẻ nội dung + thẻ phụ nên hai mép thẳng hàng; thanh `w-full`, nút căn trái, cả lúc chưa dính lẫn dính đỉnh.
  * Link là neo `#id` thật nên chạy cả khi chưa có JS. < lg cuộn ngang và mục đang xem tự cuộn vào giữa.
  */
-export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: string }) {
+export function DetailSubNav({ items, label, frameClassName = DEFAULT_FRAME_CLASS }: { items: SubNavItem[]; label: string; frameClassName?: string }) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
   const listRef = useRef<HTMLUListElement>(null);
   const scrollLocked = useRef(false);
@@ -88,7 +91,7 @@ export function DetailSubNav({ items, label }: { items: SubNavItem[]; label: str
   }
 
   return (
-    <nav aria-label={label} className="pointer-events-none sticky top-(--sticky-top) z-(--z-sticky) mx-auto w-full max-w-container px-gutter print:hidden">
+    <nav aria-label={label} className={cn("pointer-events-none sticky top-(--sticky-top) z-(--z-sticky) print:hidden", frameClassName)}>
       <ul
         ref={listRef}
         className="pointer-events-auto relative flex w-full gap-1 overflow-x-auto rounded-pill border border-border bg-surface p-1 whitespace-nowrap shadow-md [scrollbar-width:none]"

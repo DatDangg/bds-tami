@@ -23,19 +23,38 @@ function renderLayout(props: Partial<Parameters<typeof DetailLayout>[0]> = {}) {
 }
 
 describe("DetailLayout", () => {
-  it("gốc data-detail-page + nền primary-subtle; thứ tự before → thanh mục con → lưới → after", () => {
+  it("gốc data-detail-page + nền primary-subtle; thứ tự before → lưới (chứa thanh mục con) → after", () => {
     const { container } = renderLayout();
     const root = container.querySelector("[data-detail-page]") as HTMLElement;
     expect(root.className).toContain("bg-primary-subtle");
     const kids = Array.from(root.children).map((el) => el.textContent ?? "");
     expect(kids[0]).toBe("Đầu trang");
-    expect(root.children[1]?.tagName).toBe("NAV");
+    expect(root.querySelector(":scope > nav")).toBeNull();
     expect(kids.at(-1)).toBe("Cuối trang");
     expect(screen.getByRole("navigation", { name: "Mục lục thử" })).toBeInTheDocument();
   });
 
-  it("cột chính là một thẻ trắng bo lớn; aside là phần tử kế sau (< lg nằm sau thẻ)", () => {
+  it("có subNav: thanh + cột chính cùng một khối lg:contents TRONG lưới; aside đứng ngoài khối đó (thanh hết dính khi hết cột trái < lg)", () => {
     const { container } = renderLayout();
+    const nav = screen.getByRole("navigation", { name: "Mục lục thử" });
+    const group = nav.parentElement as HTMLElement;
+    const grid = group.parentElement as HTMLElement;
+    expect(group.className).toBe("lg:contents");
+    expect(group.firstElementChild).toBe(nav);
+    expect(group.lastElementChild?.querySelector("section#a")).not.toBeNull();
+    expect(group.nextElementSibling?.tagName).toBe("ASIDE");
+    expect(grid.parentElement).toBe(container.querySelector("[data-detail-page]"));
+    // Khe trên lưới chuyển sang mb của thanh; thanh trải 2 cột ≥ lg, không còn khung riêng (mx-auto/max-w/px) vì lưới đã có.
+    expect(grid.className).toContain("pb-4 lg:pb-8");
+    expect(grid.className).not.toMatch(/\bpy-4\b/);
+    expect(nav.className).toContain("lg:col-span-2");
+    expect(nav.className).toContain("mb-4");
+    expect(nav.className).toContain("lg:mb-8");
+    expect(nav.className).not.toContain("max-w-container");
+  });
+
+  it("cột chính là một thẻ trắng bo lớn; aside đứng sau (< lg nằm sau thẻ)", () => {
+    const { container } = renderLayout({ subNav: undefined });
     const card = container.querySelector("section#a")?.parentElement as HTMLElement;
     expect(card.className).toContain("bg-surface");
     expect(card.className).toContain("rounded-[28px]");
@@ -132,13 +151,13 @@ describe("DetailLayout", () => {
     expect(grid.className).not.toContain("22rem");
   });
 
-  it("không có leading: lưới và DOM giữ nguyên như cũ (thẻ là con đầu, cột phải 22rem/24rem)", () => {
-    const { container } = renderLayout();
+  it("không có leading/subNav: lưới và DOM giữ nguyên như cũ (thẻ là con đầu, cột phải 22rem/24rem)", () => {
+    const { container } = renderLayout({ subNav: undefined });
     const card = container.querySelector("section#a")?.parentElement as HTMLElement;
     const grid = card.parentElement as HTMLElement;
     expect(grid.firstElementChild).toBe(card);
     expect(grid.className).toBe(
-      "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10",
+      "mx-auto w-full max-w-container px-gutter lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10 py-4 lg:py-8",
     );
   });
 });

@@ -86,6 +86,8 @@ class FakeIntersectionObserver {
 
 const follows = (a: Node, b: Node) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
 const tabs = () => screen.getByRole("navigation", { name: "Mục lục tin cho thuê" });
+// Thanh tab nằm TRONG lưới (BL-074): khối ngay trên nó = phần tử đứng trước lưới.
+const beforeTabs = () => tabs().parentElement?.parentElement?.previousElementSibling;
 
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://tami.example");
@@ -125,8 +127,7 @@ describe("RentalDetail (BL-052, khung chi tiết chung)", () => {
   it("bố cục: chỉ Tổng quan (thẻ trắng) cạnh cột liên hệ; các khối sau cũng nằm trong cột trái (thẻ trắng, BL-061)", () => {
     const { container } = renderRental(fullRental);
     const aside = screen.getByRole("complementary", { name: "Nhận tư vấn" });
-    const grid = aside.parentElement as HTMLElement;
-    const cards = grid.firstElementChild as HTMLElement;
+    const cards = (aside.previousElementSibling as HTMLElement).lastElementChild as HTMLElement;
     expect(cards).toHaveAttribute("data-section-style", "cards");
     expect(cards).toHaveClass("@container/detail");
     expect(cards.querySelectorAll(":scope > section[id]")).toHaveLength(1);
@@ -233,8 +234,8 @@ describe("RentalDetail (BL-052, khung chi tiết chung)", () => {
     expect(follows(screen.getByRole("status"), similarHeading)).toBe(true);
     expect(follows(similarHeading, tabs())).toBe(true);
     // Khoảng 32px trước thanh tab (BL-031): cùng khối `pb-8` với thanh thông số.
-    expect(tabs().previousElementSibling?.contains(similarHeading)).toBe(true);
-    expect(tabs().previousElementSibling?.className).toContain("pb-8");
+    expect(beforeTabs()?.contains(similarHeading)).toBe(true);
+    expect(beforeTabs()?.className).toContain("pb-8");
     expect(within(bar).getByText("Giá tham khảo")).toBeInTheDocument();
     // Không lặp "Căn tương tự" ở cuối trang.
     expect(screen.queryByRole("heading", { level: 2, name: "Căn tương tự" })).toBeNull();

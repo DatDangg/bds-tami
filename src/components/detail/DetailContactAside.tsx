@@ -25,8 +25,8 @@ interface DetailContactAsideProps {
 }
 
 const CARD_CLASS = "rounded-[20px] border border-border bg-surface p-6 shadow-md lg:p-6";
-/** Đích cuộn của `#lead-form`: dưới thanh tab dính. */
-const SCROLL_MT_CLASS = "scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
+/** Đích cuộn của `#lead-form`: ≥ lg dưới thanh tab dính; < lg thanh đã hết dính trước thẻ (cùng khối chứa với cột trái) nên chỉ chừa lề header nổi. */
+const SCROLL_MT_CLASS = "scroll-mt-[calc(var(--sticky-top)+1rem)] lg:scroll-mt-[calc(var(--sticky-top)+4.5rem)]";
 
 /**
  * Cột liên hệ trang chi tiết (BL-052, design `detail-du-an`): thẻ trắng bo 20px chứa tiêu đề + mô tả + form (neo `#lead-form` của `LeadFormSlot`, đích của CTA dính đáy

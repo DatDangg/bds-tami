@@ -1,91 +1,111 @@
 {
-  "specVersion": "1.57.0",
-  "scopeVersion": 76,
-  "generatedAt": "2026-10-23T23:30:00+07:00",
+  "specVersion": "1.58.0",
+  "scopeVersion": 77,
+  "generatedAt": "2026-10-24T09:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-072 ADDITIVE (MINOR 1.56.2 → 1.57.0): công cụ nhập nội dung thật + gói EN (dry-run mặc định, confirm env) và gói EN viết tay cho 3 dự án phân phối + 8 tin tức. Phase 2 (áp staging/prod) chưa chạy — việc vận hành, cần user ok từng lần ghi.",
-  "status": "published — phase 1 (T01, T02, T03) xong; phase 2 apply staging/prod pending ops",
-  "workItem": "feature/new-content-english",
-  "backlog": "BL-072",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/2026-10-23-new-content-english.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.56.2-75.json",
-  "specUpdate": "spec/updates/2026-10-23-new-content-english.md",
+  "triggerNote": "BL-074 MODIFY (MINOR 1.57.0 → 1.58.0), UI only: thanh mục con chi tiết < lg không đè thẻ form; bỏ gạch chân link/nút/menu site công khai (trừ link RichText); cờ đổi ngôn ngữ chữ nhật 3:2 nhỏ hơn. Không đổi schema/API/i18n/migration.",
+  "status": "published — phase 1 (T01–T03) đang build",
+  "workItem": "feature/ui-polish-sticky-underline-flags",
+  "backlog": "BL-074",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-23-ui-polish-sticky-underline-flags.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.57.0-76.json",
+  "specUpdate": "spec/updates/2026-10-24-ui-polish-sticky-underline-flags.md",
   "specRefs": [
-    "F12 — bullet \"Nội dung thật + gói EN cho staging/prod (BL-072, user 2026-10-23)\" trong SPECIFICATIONS.md",
-    "F12 — bullet BL-064 (seed:english chỉ DB dev) — không đổi"
+    "Overview — bullet \"Chỉnh UI BL-074\" trong SPECIFICATIONS.md",
+    "F12 — bullet FR-PUB-19 (as-built BL-063 + BL-074): cờ chữ nhật 3:2"
   ],
   "changed": {
     "files": [
-      "scripts/import-content.ts",
-      "scripts/apply-english-pack.ts",
-      "seed/content/**",
-      "seed/english/pack.ts",
-      "seed/english/pack-plan.ts",
-      "seed/english/apply.ts",
-      "seed/english/media.ts",
-      "seed/english/README.md",
-      "seed/english/packs/2026-10-23-real-content/*.json",
-      "docs/runbooks/english-pack.md",
-      "package.json",
-      ".gitignore",
-      ".dockerignore",
-      "eslint.config.mjs",
-      "tests/unit/english-pack-plan.test.ts",
-      "tests/unit/import-content-plan.test.ts",
-      "tests/integration/english-pack.test.ts",
-      "tests/integration/import-content.test.ts"
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/detail/DetailContactAside.tsx",
+      "src/components/detail/DetailPageShell.tsx",
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/LanguageSwitcher.tsx",
+      "src/components/layout/flag-icons.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/FooterLinkColumn.tsx",
+      "src/app/(frontend)/not-found.tsx",
+      "src/components/careers/ApplyForm.tsx",
+      "src/components/careers/ApplyFormSlot.tsx",
+      "src/components/careers/CvPicker.tsx",
+      "src/components/careers/JobDetail.tsx",
+      "src/components/careers/JobFilters.tsx",
+      "src/components/careers/JobListPage.tsx",
+      "src/components/consent/CookieBanner.tsx",
+      "src/components/detail/DetailExpandButton.tsx",
+      "src/components/detail/DetailGalleryGrid.tsx",
+      "src/components/detail/DetailInfoGrid.tsx",
+      "src/components/detail/DetailOverviewIntro.tsx",
+      "src/components/detail/SimilarCarousel.tsx",
+      "src/components/forms/ConsentCheckbox.tsx",
+      "src/components/forms/FormStatus.tsx",
+      "src/components/legal/TableOfContents.tsx",
+      "src/components/listing/FilterFacets.tsx",
+      "src/components/listing/FilterPanel.tsx",
+      "src/components/media/LazyMap.tsx",
+      "src/components/news/NewsArticleContactNote.tsx",
+      "src/components/news/NewsToc.tsx",
+      "src/components/rentals/RadioFacetList.tsx",
+      "src/components/rentals/RentalListPage.tsx",
+      "tests/unit/DetailLayout.test.tsx",
+      "tests/unit/DetailPageShell.test.tsx",
+      "tests/unit/DesktopNav.test.tsx",
+      "tests/unit/flag-icons.test.tsx",
+      "tests/unit/LanguageSwitcher.test.tsx",
+      "tests/unit/** (test khẳng định underline / scroll-mt / cấu trúc detail — theo task)"
     ],
     "modules": [
-      "CLI nhập nội dung thật (content:import)",
-      "CLI áp gói EN (english:pack)",
-      "Gói EN 2026-10-23-real-content (projects, developers, categories, news, media alt)",
-      "seed:english engine (dùng chung, hành vi BL-064 không đổi)"
+      "Chi tiết Dự án / Cho thuê / Tin BĐS (DetailPageShell → DetailLayout + DetailSubNav + DetailContactAside)",
+      "Header menu ngang (DesktopNav)",
+      "Footer, 404, cookie banner, form consent / FormStatus, filter, mục lục, tuyển dụng (bỏ gạch chân)",
+      "Chuyển ngôn ngữ (LanguageSwitcher, flag-icons) ở header, menu toàn màn hình, footer"
     ]
   },
   "screens": [
-    "/en/projects",
-    "/en/projects/maison-privee",
-    "/en/projects/astor-1",
-    "/en/projects/the-windsor-collection",
-    "/en/news",
-    "/en/news/<slug EN sinh từ tiêu đề EN> cho 8 tin (slug vi: bang-gia-dat-he-so-k-2026-nguoi-mua-nha-can-biet, du-thao-luat-dat-dai-sua-doi-2026, luat-kinh-doanh-bat-dong-san-sua-doi-2026, luat-quy-hoach-do-thi-va-nong-thon-tra-cuu-quy-hoach-truoc-khi-mua, mua-nha-hinh-thanh-trong-tuong-lai-5-dieu-can-kiem-tra, nghi-dinh-54-2026-nd-cp-diem-moi-nha-o-xa-hoi-san-giao-dich, nghi-quyet-254-2025-qh15-thay-doi-dat-dai-tu-2026, quy-hoach-tong-the-thu-do-ha-noi-tam-nhin-100-nam)",
-    "/du-an/maison-privee, /du-an/astor-1, /du-an/the-windsor-collection (vi, hồi quy)",
-    "/tin-tuc và 8 bài vi (hồi quy)"
+    "/du-an/<slug> (vd /du-an/astor-1), /cho-thue/<slug>, /tin-bds/<slug> (vi + /en)",
+    "Header + menu toàn màn hình + footer mọi trang (vi + /en)",
+    "/du-an, /cho-thue, /tuyen-dung (+ chi tiết), 404",
+    "Chi tiết tin tức, trang pháp lý (link trong bài còn gạch chân)"
   ],
-  "viewports": [
-    375,
-    1440
-  ],
+  "viewports": [390, 768, 1024, 1440],
   "impact": {
     "direct": [
-      "CLI content:import và english:pack: mặc định dry-run chỉ đọc, in kế hoạch; apply cần tham số + env xác nhận khớp tên đợt/gói (sai → không ghi)",
-      "english:pack: khoá trùng ≥ 2 bản ghi → không ghi, NGOẠI LỆ nhóm categories (cùng tên nhiều scope, vd \"Căn hộ chung cư\" project + rental → ghi từng bản, mỗi bản vẫn qua luật không ghi đè); EN đã có khác gói → bỏ qua (trừ overwrite); chạy lại không đổi (idempotent)",
-      "Sau khi áp: /en của 3 dự án và 8 tin tức hiển thị tiếng Anh, alt ảnh EN, hasEnglish bật; văn bản dự thảo ghi rõ \"draft\"; giá/số/tên riêng giữ như bản vi (tỷ → billion VND, \"expected\" cho CSBH/giá dự kiến)"
+      "Chi tiết Dự án / Cho thuê / Tin BĐS < lg (390, 768, 1023): thanh mục con không chạm/đè thẻ form liên hệ ở mọi mức cuộn, kể cả lúc chưa dính; thẻ top ≥ thanh bottom + 16px khi thanh còn trên màn",
+      "Thanh CTA dính đáy / nút banner tư vấn → `#lead-form` hiện đầu màn, không bị thanh che (< lg scroll-mt = --sticky-top + 1rem; ≥ lg + 4.5rem)",
+      "Thanh mục con vẫn dính top --sticky-top trong cột trái; scroll-spy + bấm mục cuộn đúng; < lg mục đang xem tự cuộn vào giữa; ≥ lg thôi dính ở cuối lưới cùng thẻ phụ",
+      "Không còn gạch chân (thường + hover) trên link/nút/menu/thẻ/footer/breadcrumb/mục lục/404/cookie banner/form site công khai; hover đổi màu/nền, focus-visible giữ; header ≥ xl không vạch dưới mục menu, mục đang xem = nền + aria-current, không tràn 1280 vi/en",
+      "Link giữa câu ngoài RichText (consent \"Chính sách bảo mật\", cookie banner, email/hotline tuyển dụng) đậm + màu nhấn, phân biệt không chỉ bằng màu",
+      "Cờ VN/UK chữ nhật 3:2 (viewBox 30×20), ~21×14, sao VN cân giữa, ring đang chọn mảnh hơn, cờ kia mờ 60%, vùng bấm ≥ 44×44"
     ],
     "dependents": [
-      "pnpm seed:english (BL-064) không đổi hành vi, vẫn chỉ DB dev",
-      "Job dịch AI không được xếp cho bản ghi trong gói (enSource = manual)",
-      "Cổng hasEnglish: bản ghi chỉ lên /en khi đủ trường EN bắt buộc"
+      "DetailLayout không subNav (Dịch vụ, Tuyển dụng): DOM/class giữ nguyên",
+      "Mép thanh mục con thẳng mép thẻ trắng trái + thẻ phụ phải ở ≥ lg (BL-028); khe trên/dưới thanh không đổi (±0–2px)",
+      "LanguageSwitcher dùng ở header, menu toàn màn hình, footer (tone sáng/tối)",
+      "`aria-label`/`title`/`lang`/`hreflang`/`aria-current` của nút ngôn ngữ, đích link và cookie NEXT_LOCALE không đổi"
     ],
     "regression": [
-      "Trang /vi (không tiền tố) của các bản ghi này không đổi",
-      "Bản ghi ngoài gói không bị đụng; EN đã có của bản ghi khác không bị đè",
-      "seed:english và test BL-064 vẫn PASS",
-      "Sitemap / hreflang /en chỉ gồm bản ghi có hasEnglish"
+      "3 trang chi tiết vi/en ở 390/768/1024/1440",
+      "Header/footer/menu toàn site (vi + en)",
+      "Form consent, filter (dự án/cho thuê/tuyển dụng), 404, cookie banner",
+      "Tin tức / pháp lý: link trong bài (RichText) vẫn gạch chân; chữ gạch chân do biên tập đặt giữ nguyên",
+      "Tab bar danh mục trang danh sách (ListingCategoryTabs) giữ chỉ báo border-b-2",
+      "Admin Payload không đổi",
+      "Dải \"… tương tự\" / Điểm mạnh / banner tư vấn không còn thanh mục con dính ≥ lg (chấp nhận, đã ghi spec)"
     ]
   },
   "acceptance": [
-    "pnpm english:pack <gói> dry-run không ghi DB; apply cần confirm khớp tên gói; chạy lại sẽ ghi 0",
-    "content:import chạy lại được từ repo + IMPORT_IMG_DIR; dry-run mặc định; apply cần IMPORT_CONFIRM; chỉ tạo mới vi",
-    "3 dự án + chủ đầu tư: EN đủ trường, hasEnglish = true, alt ảnh EN, CSBH/giá dự kiến ghi \"expected\", vi không đổi",
-    "8 tin: title/excerpt/content EN đủ đoạn, hasEnglish = true, danh mục tin có EN, tin dự thảo ghi \"draft\", số hiệu/ngày đúng bản vi",
-    "typecheck + lint + test PASS",
-    "Phase 2 (sau user ok): /en trên staging/prod hiển thị EN không lẫn tiếng Việt cho các bản ghi trên"
+    "390 / 768 / 1023: thanh mục con (dính và không dính) không chạm/đè thẻ \"Nhận thông tin dự án\" / thẻ liên hệ; có khoảng cách theo token spacing; kiểm các khối liền kề dùng cùng thanh dính",
+    "Không còn `underline` (mặc định hoặc hover) trên link/nút/mục điều hướng site công khai; hover/focus vẫn nhìn thấy (đổi màu/nền), focus-visible giữ, đạt a11y",
+    "Ngoại lệ: link trong đoạn văn bài viết (RichText tin tức/pháp lý) giữ gạch chân (WCAG 1.4.1)",
+    "Cờ VN/EN hình chữ nhật ~3:2, nhỏ hơn trước; trạng thái đang chọn phân biệt được (viền mảnh hơn); vùng bấm ≥ 24×24 (thực tế 44×44)",
+    "design-spec §2.3 (cờ) + test flag-icons.test.tsx / LanguageSwitcher.test.tsx cập nhật theo viewBox/kích thước",
+    "pnpm lint + typecheck + test PASS"
   ],
   "unverifiedLocally": [
-    "Chưa áp lên staging/prod (phase 2 pending ops) — /en trên staging/prod chỉ hiện tiếng Anh sau phase 2"
+    "Chưa có build/verify (phase 1 đang build) — scope phát hành trước khi code xong theo quy trình change-request"
   ],
-  "risk": "high",
-  "riskNote": "Công cụ ghi DB staging/prod. Giảm rủi ro: dry-run mặc định, env confirm khớp tên, chỉ bản ghi trong gói, không đè EN, backup trước theo runbook. Ưu tiên test: cổng dry-run/confirm, idempotent, /vi không đổi."
+  "risk": "medium",
+  "riskNote": "Component dùng chung (DetailLayout/DetailSubNav/DetailContactAside, header/footer, form consent, filter) + sticky/scroll-spy/anchor + a11y (1.4.1, 1.4.3, 2.5.8). Không đổi dữ liệu/API. Ưu tiên test: không đè thẻ form < lg, scroll-spy, header không tràn 1280, link RichText còn gạch chân."
 }

@@ -167,7 +167,7 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     // Lưới [cột trái | aside]: cột trái có Tổng quan rồi mọi khối sau (BL-061), thẻ trắng, container query.
     const grid = aside.parentElement as HTMLElement;
     expect(grid.className).toContain("lg:grid-cols-");
-    const column = grid.firstElementChild as HTMLElement;
+    const column = (aside.previousElementSibling as HTMLElement).lastElementChild as HTMLElement;
     expect(column.getAttribute("data-section-style")).toBe("cards");
     expect(column).toHaveClass("@container/detail");
     expect(Array.from(column.querySelectorAll(":scope > section[id]")).map((section) => section.id)).toEqual(["overview"]);

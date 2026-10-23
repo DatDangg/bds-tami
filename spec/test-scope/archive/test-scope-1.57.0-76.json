@@ -1,0 +1,91 @@
+{
+  "specVersion": "1.57.0",
+  "scopeVersion": 76,
+  "generatedAt": "2026-10-23T23:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-072 ADDITIVE (MINOR 1.56.2 → 1.57.0): công cụ nhập nội dung thật + gói EN (dry-run mặc định, confirm env) và gói EN viết tay cho 3 dự án phân phối + 8 tin tức. Phase 2 (áp staging/prod) chưa chạy — việc vận hành, cần user ok từng lần ghi.",
+  "status": "published — phase 1 (T01, T02, T03) xong; phase 2 apply staging/prod pending ops",
+  "workItem": "feature/new-content-english",
+  "backlog": "BL-072",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/2026-10-23-new-content-english.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.56.2-75.json",
+  "specUpdate": "spec/updates/2026-10-23-new-content-english.md",
+  "specRefs": [
+    "F12 — bullet \"Nội dung thật + gói EN cho staging/prod (BL-072, user 2026-10-23)\" trong SPECIFICATIONS.md",
+    "F12 — bullet BL-064 (seed:english chỉ DB dev) — không đổi"
+  ],
+  "changed": {
+    "files": [
+      "scripts/import-content.ts",
+      "scripts/apply-english-pack.ts",
+      "seed/content/**",
+      "seed/english/pack.ts",
+      "seed/english/pack-plan.ts",
+      "seed/english/apply.ts",
+      "seed/english/media.ts",
+      "seed/english/README.md",
+      "seed/english/packs/2026-10-23-real-content/*.json",
+      "docs/runbooks/english-pack.md",
+      "package.json",
+      ".gitignore",
+      ".dockerignore",
+      "eslint.config.mjs",
+      "tests/unit/english-pack-plan.test.ts",
+      "tests/unit/import-content-plan.test.ts",
+      "tests/integration/english-pack.test.ts",
+      "tests/integration/import-content.test.ts"
+    ],
+    "modules": [
+      "CLI nhập nội dung thật (content:import)",
+      "CLI áp gói EN (english:pack)",
+      "Gói EN 2026-10-23-real-content (projects, developers, categories, news, media alt)",
+      "seed:english engine (dùng chung, hành vi BL-064 không đổi)"
+    ]
+  },
+  "screens": [
+    "/en/projects",
+    "/en/projects/maison-privee",
+    "/en/projects/astor-1",
+    "/en/projects/the-windsor-collection",
+    "/en/news",
+    "/en/news/<slug EN sinh từ tiêu đề EN> cho 8 tin (slug vi: bang-gia-dat-he-so-k-2026-nguoi-mua-nha-can-biet, du-thao-luat-dat-dai-sua-doi-2026, luat-kinh-doanh-bat-dong-san-sua-doi-2026, luat-quy-hoach-do-thi-va-nong-thon-tra-cuu-quy-hoach-truoc-khi-mua, mua-nha-hinh-thanh-trong-tuong-lai-5-dieu-can-kiem-tra, nghi-dinh-54-2026-nd-cp-diem-moi-nha-o-xa-hoi-san-giao-dich, nghi-quyet-254-2025-qh15-thay-doi-dat-dai-tu-2026, quy-hoach-tong-the-thu-do-ha-noi-tam-nhin-100-nam)",
+    "/du-an/maison-privee, /du-an/astor-1, /du-an/the-windsor-collection (vi, hồi quy)",
+    "/tin-tuc và 8 bài vi (hồi quy)"
+  ],
+  "viewports": [
+    375,
+    1440
+  ],
+  "impact": {
+    "direct": [
+      "CLI content:import và english:pack: mặc định dry-run chỉ đọc, in kế hoạch; apply cần tham số + env xác nhận khớp tên đợt/gói (sai → không ghi)",
+      "english:pack: khoá trùng ≥ 2 bản ghi → không ghi, NGOẠI LỆ nhóm categories (cùng tên nhiều scope, vd \"Căn hộ chung cư\" project + rental → ghi từng bản, mỗi bản vẫn qua luật không ghi đè); EN đã có khác gói → bỏ qua (trừ overwrite); chạy lại không đổi (idempotent)",
+      "Sau khi áp: /en của 3 dự án và 8 tin tức hiển thị tiếng Anh, alt ảnh EN, hasEnglish bật; văn bản dự thảo ghi rõ \"draft\"; giá/số/tên riêng giữ như bản vi (tỷ → billion VND, \"expected\" cho CSBH/giá dự kiến)"
+    ],
+    "dependents": [
+      "pnpm seed:english (BL-064) không đổi hành vi, vẫn chỉ DB dev",
+      "Job dịch AI không được xếp cho bản ghi trong gói (enSource = manual)",
+      "Cổng hasEnglish: bản ghi chỉ lên /en khi đủ trường EN bắt buộc"
+    ],
+    "regression": [
+      "Trang /vi (không tiền tố) của các bản ghi này không đổi",
+      "Bản ghi ngoài gói không bị đụng; EN đã có của bản ghi khác không bị đè",
+      "seed:english và test BL-064 vẫn PASS",
+      "Sitemap / hreflang /en chỉ gồm bản ghi có hasEnglish"
+    ]
+  },
+  "acceptance": [
+    "pnpm english:pack <gói> dry-run không ghi DB; apply cần confirm khớp tên gói; chạy lại sẽ ghi 0",
+    "content:import chạy lại được từ repo + IMPORT_IMG_DIR; dry-run mặc định; apply cần IMPORT_CONFIRM; chỉ tạo mới vi",
+    "3 dự án + chủ đầu tư: EN đủ trường, hasEnglish = true, alt ảnh EN, CSBH/giá dự kiến ghi \"expected\", vi không đổi",
+    "8 tin: title/excerpt/content EN đủ đoạn, hasEnglish = true, danh mục tin có EN, tin dự thảo ghi \"draft\", số hiệu/ngày đúng bản vi",
+    "typecheck + lint + test PASS",
+    "Phase 2 (sau user ok): /en trên staging/prod hiển thị EN không lẫn tiếng Việt cho các bản ghi trên"
+  ],
+  "unverifiedLocally": [
+    "Chưa áp lên staging/prod (phase 2 pending ops) — /en trên staging/prod chỉ hiện tiếng Anh sau phase 2"
+  ],
+  "risk": "high",
+  "riskNote": "Công cụ ghi DB staging/prod. Giảm rủi ro: dry-run mặc định, env confirm khớp tên, chỉ bản ghi trong gói, không đè EN, backup trước theo runbook. Ưu tiên test: cổng dry-run/confirm, idempotent, /vi không đổi."
+}

@@ -39,9 +39,12 @@ interface DetailLayoutProps {
 }
 
 const GRID_WITH_ASIDE =
-  "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10";
+  "mx-auto w-full max-w-container px-gutter lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-8 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-10";
 const GRID_WITH_LEADING =
-  "mx-auto w-full max-w-container px-gutter py-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-8 lg:py-8 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-x-10";
+  "mx-auto w-full max-w-container px-gutter lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-8 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-x-10";
+const GRID_PADDING_FULL = "py-4 lg:py-8";
+// Có thanh mục con: khe trên lưới thành `mb` của thanh (cùng 16/32px) để thanh vẫn đứng sát `before` và khe thanh → nội dung không đổi.
+const GRID_PADDING_BELOW_SUBNAV = "pb-4 lg:pb-8";
 
 /**
  * Khung chi tiết dùng chung (BL-027, design-spec S03): gốc đánh dấu `data-detail-page` để `globals.css` (a) ẩn hẳn header khi cuộn và (b) đặt
@@ -49,19 +52,34 @@ const GRID_WITH_LEADING =
  * thẻ phụ tách riêng. Server Component; chỉ thanh mục con và vỏ `aside` đo chiều cao (`DetailAsideFit`) là client.
  */
 export function DetailLayout({ before, subNav, children, aside, asideLabelledBy, after, leading, sectionStyle = "single" }: DetailLayoutProps) {
+  const mainColumn =
+    sectionStyle === "cards" ? (
+      // `group/detail` + `data-section-style`: `DetailSection` (lồng sâu trong các khối dự án) đổi sang thẻ bằng biến thể group, không cần truyền prop qua từng khối.
+      <div data-section-style="cards" className="group/detail @container/detail flex min-w-0 flex-col gap-6">
+        {children}
+      </div>
+    ) : (
+      <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
+    );
+  const leadingColumn = leading && <div className="hidden min-w-0 lg:block print:hidden">{leading}</div>;
+  const baseGrid = leading ? GRID_WITH_LEADING : GRID_WITH_ASIDE;
   return (
     <div data-detail-page="" className="bg-primary-subtle">
       {before}
-      {subNav && <DetailSubNav items={subNav.items} label={subNav.label} />}
-      <div className={leading ? GRID_WITH_LEADING : GRID_WITH_ASIDE}>
-        {leading && <div className="hidden min-w-0 lg:block print:hidden">{leading}</div>}
-        {sectionStyle === "cards" ? (
-          // `group/detail` + `data-section-style`: `DetailSection` (lồng sâu trong các khối dự án) đổi sang thẻ bằng biến thể group, không cần truyền prop qua từng khối.
-          <div data-section-style="cards" className="group/detail @container/detail flex min-w-0 flex-col gap-6">
-            {children}
+      <div className={subNav ? `${baseGrid} ${GRID_PADDING_BELOW_SUBNAV}` : `${baseGrid} ${GRID_PADDING_FULL}`}>
+        {subNav ? (
+          // Thanh mục con nằm TRONG lưới, cùng khối `lg:contents` với cột chính: < lg khối chứa của thanh dính = hết cột trái nên thanh không bao giờ trượt lên thẻ phụ
+          // (xếp sau cột trái); ≥ lg `contents` trả thanh + cột chính về làm item của lưới (thanh trải 2 cột, hàng đầu).
+          <div className="lg:contents">
+            <DetailSubNav items={subNav.items} label={subNav.label} frameClassName="mb-4 lg:col-span-2 lg:mb-8" />
+            {leadingColumn}
+            {mainColumn}
           </div>
         ) : (
-          <div className="min-w-0 rounded-[28px] bg-surface p-5 md:p-8 xl:p-10">{children}</div>
+          <>
+            {leadingColumn}
+            {mainColumn}
+          </>
         )}
         {aside && (
           <DetailAsideFit {...(asideLabelledBy ? { "aria-labelledby": asideLabelledBy } : {})} className="pt-6 lg:pt-0">
