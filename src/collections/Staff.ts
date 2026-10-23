@@ -166,6 +166,8 @@ export const Staff: CollectionConfig = {
       label: "Ảnh đại diện",
       relationTo: "media",
       filterOptions: { mimeType: { contains: "image/" } },
+      // Ẩn ở /admin/create-first-user (chưa đăng nhập): Media.create cần isStaff nên tải ảnh ở đó luôn 403.
+      admin: { condition: (_data, _siblingData, { user }) => Boolean(user) },
     },
     {
       name: "lastLoginAt",

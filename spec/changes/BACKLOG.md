@@ -76,7 +76,7 @@
 | BL-066 | Popup form "Nhận tư vấn" tự hiện ở mọi trang public khi khách ở lại 30s, tối đa 1 lần / lượt truy cập — user 2026-10-23 | ADDITIVE | done (T01 STRICT PASS r2; spec **1.55.0 / scope v71**; migration additive `20261023_020647_leads_source_popup` — chạy trước deploy) | `spec/changes/archive/2026-10-23-consult-popup-30s.md` | 2026-10-23 | 2026-10-23 |
 | BL-067 | Mục lục chi tiết tin tức quá hẹp (cột 15rem, mục 44px + số tròn) → wrap nhiều dòng, dài, phải cuộn → làm gọn — user 2026-10-23 | MODIFY | done (T01 6f66ea4 NORMAL PASS r1; spec 1.55.1 / scope v72) | `spec/changes/archive/2026-10-23-news-toc-compact.md` | 2026-10-23 | 2026-10-23 |
 | BL-068 | Dự án cho phép **tải file video** (mp4/webm) ngoài link YouTube/TikTok — chủ đầu tư thường chỉ gửi file mp4; chốt giới hạn dung lượng khi xử lý — user 2026-10-23 | ADDITIVE | pending (tạm hoãn — chờ chuyển sang hạ tầng của khách sau test, user 2026-10-23) | `spec/changes/2026-10-23-project-video-upload.md` | 2026-10-23 | — |
-| BL-069 | Màn tạo admin đầu tiên (`/admin/create-first-user`): thêm "Ảnh đại diện" bị từ chối (Media.create cần đăng nhập) + form bị xoá trắng → ẩn trường avatar khi chưa đăng nhập — gặp khi dựng production, user 2026-10-23 | BUG | pending | `spec/changes/2026-10-23-first-user-avatar-upload.md` | 2026-10-23 | — |
+| BL-069 | Màn tạo admin đầu tiên (`/admin/create-first-user`): thêm "Ảnh đại diện" bị từ chối (Media.create cần đăng nhập) + form bị xoá trắng → ẩn trường avatar khi chưa đăng nhập — gặp khi dựng production, user 2026-10-23 | BUG | done | `spec/changes/archive/2026-10-23-first-user-avatar-upload.md` | 2026-10-23 | 2026-10-23 |
 
 ## Quy tắc tracking
 

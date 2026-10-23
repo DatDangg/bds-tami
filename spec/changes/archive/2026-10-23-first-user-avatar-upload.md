@@ -1,7 +1,7 @@
 ---
 id: first-user-avatar-upload
 type: bug
-status: pending
+status: done
 created: 2026-10-23
 ---
 
@@ -20,9 +20,9 @@ created: 2026-10-23
 `src/collections/Staff.ts:164` — trường `avatar` (upload → media) hiện cả ở màn create-first-user, trong khi tạo media yêu cầu `isStaff` (`src/access/isStaff.ts:8`, `user?.active === true`) mà lúc đó chưa có user.
 
 ## Acceptance (bắt buộc)
-- [ ] Màn `/admin/create-first-user` không còn ô "Ảnh đại diện" (vd `admin.condition` theo `user` đăng nhập); form sửa/tạo staff khi đã đăng nhập vẫn có trường này như cũ.
-- [ ] Không nới quyền tạo media cho người chưa đăng nhập.
-- [ ] Test cho điều kiện hiển thị trường.
+- [x] Màn `/admin/create-first-user` không còn ô "Ảnh đại diện" (vd `admin.condition` theo `user` đăng nhập); form sửa/tạo staff khi đã đăng nhập vẫn có trường này như cũ.
+- [x] Không nới quyền tạo media cho người chưa đăng nhập.
+- [x] Test cho điều kiện hiển thị trường.
 
 ## Ghi chú
 Mức ưu tiên thấp: màn này chỉ dùng 1 lần/môi trường (staging + production đều đã tạo xong admin). Thêm ảnh đại diện sau khi đăng nhập hoạt động bình thường.

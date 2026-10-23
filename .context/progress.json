@@ -3494,6 +3494,41 @@
       "round": 1,
       "report": ".context/review-reports/bug-button-variants-merge-and-empty-upload-phase-1-task-01-round-1-review.md",
       "residual": "Chỉ kiểm bằng unit test (n-1 cần xoá media trong DB, n-2 đã đo ở BL-056 r1); 2 MINOR mở: chưa có test cấp component DetailOverviewIntro cho upload rỗng; relationTo?/value? lặp ở 2 kiểu node cục bộ (có thể gom về rich-text-upload.ts). Chưa bỏ cn(buttonVariants()) thừa ở 3 spotlight + JobDetailHero (tuỳ chọn)."
+    },
+    {
+      "slug": "first-user-avatar-upload",
+      "title": "Màn tạo admin đầu tiên: ô Ảnh đại diện tải lên bị từ chối (Media.create cần isStaff) + form bị xoá — ẩn avatar khi chưa đăng nhập (BL-069)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-069",
+      "changeDoc": "spec/changes/archive/2026-10-23-first-user-avatar-upload.md",
+      "startedAt": "2026-10-23",
+      "planApprovedAt": "2026-10-23 (user: auto proceed; 1 phase/1 task)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-first-user-avatar-upload/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-first-user-avatar-upload-phase-1-task-01-round-1-review.md",
+          "note": "Staff.avatar thêm admin.condition ({user}) => Boolean(user): ẩn ở create-first-user, đăng nhập vẫn hiện; không đổi access Media/Staff. +4 test. STRICT PASS r1 (3 MINOR).",
+          "commit": "(close-out commit BL-069)"
+        }
+      ],
+      "completedAt": "2026-10-23",
+      "specVersion": "1.56.1",
+      "scopeVersion": 74,
+      "specUpdate": "spec/updates/2026-10-23-first-user-avatar-upload.md",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-first-user-avatar-upload-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact",
+      "residual": "Chỉ kiểm bằng unit test + đọc nguồn Payload (iterateFields truyền req.user=null ở create-first-user); chưa xem trình duyệt (cần DB trống). 3 MINOR mở: không có user → validate avatar bị bỏ qua (rủi ro rất thấp); pnpm lint quét .local-seed/ gitignored (8 lỗi có sẵn ngoài scope) — đề xuất task riêng. Form create-first-user bị xoá sau lỗi mật khẩu ngắn = hành vi mặc định Payload, ngoài acceptance."
     }
   ],
   "projectName": "tami-website",
@@ -4147,7 +4182,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T22:30:00+07:00",
+  "lastUpdated": "2026-10-23T08:09:32.631Z",
   "approvalMilestones": [
     {
       "id": "M1",
