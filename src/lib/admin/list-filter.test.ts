@@ -29,7 +29,7 @@ describe("Thêm bộ lọc: chỉ còn trường nghiệp vụ (BL-021 #06)", ()
   it("rentals", () => {
     expect(filterable(createRentals())).toEqual(
       [
-        "amenities", "areaM2", "author", "balconyDirection", "bathrooms", "bedrooms", "category", "code", "floor", "furnishing", "houseDirection",
+        "amenities", "areaM2", "author", "balconyDirection", "bathrooms", "bedrooms", "category", "code", "floor", "floorLevel", "floorNumber", "furnishing", "houseDirection",
         "isFeatured", "priceMonthlyVnd", "priceNegotiable", "project", "province", "publishedAt", "rentalTerms.availableFrom", "rentalTerms.depositMonths",
         "rentalTerms.minLeaseMonths", "rentalTerms.paymentCycle", "rentedAt", "status", "title", "ward",
       ].sort(),

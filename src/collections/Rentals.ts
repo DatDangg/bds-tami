@@ -1,4 +1,4 @@
-import type { CollectionConfig, DateField, FieldAccess, GroupField, SelectField, TextField } from "payload";
+import type { CollectionConfig, DateField, FieldAccess, GroupField, NumberField, SelectField, TextField } from "payload";
 
 import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
 import { withPriceInWords } from "../fields/form-hints";
@@ -11,6 +11,7 @@ import { assignRentalCode } from "../hooks/rentals/generate-code";
 import { buildRentalSearchText, refreshOtherLocaleSearchText } from "../hooks/rentals/build-search-text";
 import {
   validateAreaM2,
+  validateFloorNumber,
   validateGallery,
   validatePriceMonthly,
   validateVideoUrl,
@@ -24,6 +25,7 @@ import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withContentDefaults } from "./_shared/content-defaults";
+import { FLOOR_LEVELS, type FloorLevel } from "../lib/units/legacy-parse";
 import { RENTAL_AMENITIES } from "../shared/types/api";
 import { DIRECTION_ADMIN_LABELS, DIRECTIONS } from "../shared/listing-options";
 
@@ -60,6 +62,23 @@ const SERVICE_LABELS: Record<(typeof INCLUDED_SERVICES)[number], string> = {
   parking: "Giữ xe",
   management_fee: "Phí quản lý",
   security: "An ninh",
+};
+
+/**
+ * Tầng chuẩn hoá (BL-065): mức tầng + số tầng, nhãn công khai dựng theo ngôn ngữ ở trang chi tiết. `floor` (text cũ) giữ nguyên cột để không mất dữ liệu:
+ * chỉ hiện khi tin còn giá trị cũ chưa chuyển được và chưa có mức/số tầng, để admin nhập lại (ô tự ẩn sau khi có giá trị mới).
+ */
+const FLOOR_LEVEL_LABELS: Record<FloorLevel, string> = { high: "Tầng cao", mid: "Tầng trung", low: "Tầng thấp" };
+const floorLevelField: SelectField = { name: "floorLevel", type: "select", label: "Mức tầng", options: selectOptions(FLOOR_LEVELS, FLOOR_LEVEL_LABELS) };
+const floorNumberField: NumberField = { name: "floorNumber", type: "number", label: "Số tầng", min: 0, validate: validateFloorNumber };
+const legacyFloorField: TextField = {
+  name: "floor",
+  type: "text",
+  label: "Tầng (giá trị cũ)",
+  admin: {
+    description: "Giá trị cũ chưa chuyển được tự động — chọn Mức tầng / nhập Số tầng; ô này tự ẩn sau khi có giá trị mới.",
+    condition: (data) => typeof data?.floor === "string" && data.floor.trim() !== "" && !data.floorLevel && typeof data.floorNumber !== "number",
+  },
 };
 
 const directionField = (name: string, label: string): SelectField => ({ name, type: "select", label, options: selectOptions(DIRECTIONS, DIRECTION_ADMIN_LABELS) });
@@ -185,8 +204,10 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
               ),
               formRow(
                 { name: "areaM2", type: "number", label: "Diện tích (m²)", required: true, min: 0, validate: validateAreaM2 },
-                { name: "floor", type: "text", label: "Tầng" },
+                floorLevelField,
+                floorNumberField,
               ),
+              legacyFloorField,
               formRow(nonNegativeNumber("bedrooms", "Số phòng ngủ"), nonNegativeNumber("bathrooms", "Số phòng tắm")),
               formRow(directionField("houseDirection", "Hướng nhà"), directionField("balconyDirection", "Hướng ban công")),
               { name: "furnishing", type: "select", label: "Nội thất", index: true, options: selectOptions(FURNISHINGS, FURNISHING_LABELS) },

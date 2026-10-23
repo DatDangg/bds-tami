@@ -7,6 +7,7 @@ import { PROPERTY_TYPES, type PropertyType } from "../../shared/listing-options"
 import { formatArea, formatFileSize, formatNumber } from "../format";
 import { lexicalPlainText } from "../news/read-time";
 import { populatedMedia } from "../news/news-view";
+import { toDistanceView, type DistanceView } from "../units/floor-distance-view";
 import { effectivePriceFromVnd } from "./project-price";
 
 const SQUARE_METERS_PER_HECTARE = 10_000;
@@ -81,7 +82,8 @@ export const NEARBY_CATEGORY_ORDER: readonly NearbyCategory[] = ["education", "h
 export interface NearbyItemView {
   id: string;
   name: string;
-  distance: string | null;
+  /** Khoảng cách chuẩn hoá (BL-065); chữ hiển thị dựng theo ngôn ngữ bằng `formatDistance`. */
+  distance: DistanceView | null;
   location: LatLng | null;
 }
 
@@ -251,9 +253,9 @@ function toHighlights(items: Project["highlights"]): HighlightView[] {
   return (items ?? []).flatMap((item, index) => (hasText(item.title) ? [{ id: item.id ?? String(index), title: item.title.trim(), description: trimmedOrNull(item.description) }] : []));
 }
 
-function toNearby(items: Project["nearbyAmenities"]): NearbyGroupView[] {
+function toNearby(items: Project["nearbyAmenities"], locale: Locale): NearbyGroupView[] {
   const rows = (items ?? []).flatMap((item, index) =>
-    hasText(item.name) ? [{ category: item.category, view: { id: item.id ?? String(index), name: item.name.trim(), distance: trimmedOrNull(item.distance), location: toLocation(item.location) } }] : [],
+    hasText(item.name) ? [{ category: item.category, view: { id: item.id ?? String(index), name: item.name.trim(), distance: toDistanceView(item, locale), location: toLocation(item.location) } }] : [],
   );
   return NEARBY_CATEGORY_ORDER.flatMap((category) => {
     const groupItems = rows.filter((row) => row.category === category).map((row) => row.view);
@@ -350,7 +352,7 @@ export function toProjectDetailView(doc: Project, locale: Locale): ProjectDetail
     location: toLocation(doc.location),
     locationMedia: toLocationMedia(doc.locationMedia, title),
     highlights: toHighlights(doc.highlights),
-    nearby: toNearby(doc.nearbyAmenities),
+    nearby: toNearby(doc.nearbyAmenities, locale),
     priceRows: toPriceRows(doc.priceTable),
     priceUpdatedAt: trimmedOrNull(doc.priceUpdatedAt),
     faqs: toFaqs(doc.faqs),

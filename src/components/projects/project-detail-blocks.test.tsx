@@ -8,7 +8,7 @@ import { ProjectLocation } from "./ProjectLocation";
 vi.mock("@/components/media/LazyMap", () => ({ LazyMap: () => <div data-testid="lazy-map" /> }));
 
 const amenity = (id: string, withImage: boolean): AmenityView => ({ id, name: `Tiện ích ${id}`, description: `Mô tả ${id}`, image: withImage ? fakeMedia(id) : null });
-const nearby: NearbyGroupView[] = [{ category: "education", items: [{ id: "n1", name: "Trường A", distance: "500 m", location: null }] }];
+const nearby: NearbyGroupView[] = [{ category: "education", items: [{ id: "n1", name: "Trường A", distance: { kind: "measured", value: 500, unit: "m" }, location: null }] }];
 const place = { lat: 21, lng: 105 };
 const video: LocationMediaView = { title: null, image: fakeMedia("poster"), videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" };
 

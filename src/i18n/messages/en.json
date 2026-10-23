@@ -502,6 +502,11 @@
       }
     },
     "projectDetail": {
+      "distanceUnit": {
+        "km": "km",
+        "m": "m",
+        "min": "min"
+      },
       "subNavLabel": "Project contents",
       "sections": {
         "floorPlans": "Floor plans",
@@ -653,6 +658,14 @@
         "price": "Rent",
         "perMonth": "/month",
         "area": "Area"
+      },
+      "floorValue": {
+        "number": "Floor {n}",
+        "level": {
+          "high": "High floor",
+          "mid": "Mid floor",
+          "low": "Low floor"
+        }
       },
       "details": {
         "floor": "Floor",

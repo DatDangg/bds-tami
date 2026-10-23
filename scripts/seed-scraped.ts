@@ -9,6 +9,7 @@ import { getPayload, type Payload } from "payload";
 
 import config from "../src/payload.config";
 import { englishSeedBlockReason, runSeedEnglish } from "../seed/english";
+import { parseLegacyFloor } from "../src/lib/units/legacy-parse";
 import { TRANSLATION_JOB_CONTEXT_KEY } from "../src/hooks/translation/translation-targets";
 
 type Block = { type: "p" | "h" | "li"; text: string };
@@ -121,6 +122,14 @@ interface WardDoc {
   legacyNames?: { name: string }[] | null;
 }
 const geoCache = new Map<string, { provinceId: string; wards: WardDoc[] }>();
+/** "Tầng cao/trung/thấp" và "Tầng <số>" → trường chuẩn hoá (BL-065); dạng khác giữ ở `floor` cũ để admin thấy và sửa, không đoán. */
+function floorFields(text: string | undefined): { floorLevel?: "high" | "mid" | "low"; floorNumber?: number; floor?: string } {
+  const parsed = parseLegacyFloor(text);
+  if (parsed.kind === "level") return { floorLevel: parsed.level };
+  if (parsed.kind === "number") return { floorNumber: parsed.number };
+  return parsed.kind === "unparsed" ? { floor: text?.trim() } : {};
+}
+
 async function loadProvince(payload: Payload, slug: string) {
   const cached = geoCache.get(slug);
   if (cached) return cached;
@@ -407,7 +416,7 @@ async function seedRentals(payload: Payload, items: Listing[], authorId: string,
         areaM2: r.areaM2,
         bedrooms: r.bedrooms ?? undefined,
         bathrooms: r.bathrooms ?? undefined,
-        floor: r.info["Tầng"] || undefined,
+        ...floorFields(r.info["Tầng"]),
         houseDirection: direction(r.info["Hướng"]) ?? direction(r.title.match(/hướng\s+([^\s,-]+(?:\s+(?:bắc|nam))?)/i)?.[1]),
         furnishing: furnishing(r.info, r.title),
         rentalTerms: {

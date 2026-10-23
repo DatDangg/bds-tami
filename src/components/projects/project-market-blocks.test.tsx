@@ -45,9 +45,9 @@ const marketProject = project({
     { title: "Hồ trung tâm" },
   ],
   nearbyAmenities: [
-    { category: "education", name: "Trường A", distance: "500 m", location: [105.81, 21.04] },
-    { category: "healthcare", name: "Bệnh viện B", distance: "1,2 km" },
-    { category: "transport", name: "Ga C", distance: "5 phút" },
+    { category: "education", name: "Trường A", distanceValue: 500, distanceUnit: "m", location: [105.81, 21.04] },
+    { category: "healthcare", name: "Bệnh viện B", distanceValue: 1.2, distanceUnit: "km" },
+    { category: "transport", name: "Ga C", distanceValue: 5, distanceUnit: "min" },
   ],
   priceTable: [
     { unitType: "Căn 2PN", areaFrom: 60, areaTo: 75, priceFrom: 3_000_000_000, priceTo: 4_000_000_000, availability: "available", note: "Giá chưa VAT" },
@@ -160,11 +160,26 @@ describe("ProjectLocation + khoảng cách lân cận (BL-052)", () => {
     expect(rows.every((row) => row.querySelector("svg"))).toBe(true);
   });
 
+  it("chip khoảng cách theo ngôn ngữ: /en dùng dấu chấm + 'min'; giá trị cũ chưa chuyển chỉ hiện ở /vi (BL-065)", () => {
+    const nearby = [
+      { category: "education" as const, name: "Trường A", distanceValue: 1.2, distanceUnit: "km" as const },
+      { category: "education" as const, name: "Ga C", distanceValue: 5, distanceUnit: "min" as const },
+      { category: "education" as const, name: "Chợ D", distance: "gần chợ" },
+    ];
+    for (const [locale, expected] of [["vi", ["Trường A1,2 km", "Ga C5 phút", "Chợ Dgần chợ"]], ["en", ["Trường A1.2 km", "Ga C5 min", "Chợ D"]]] as const) {
+      const view = toProjectDetailView(project({ nearbyAmenities: nearby }), locale);
+      const { unmount } = renderWithIntl(<ProjectLocation projectName="X" location={null} address={null} areaLabel={null} nearby={view.nearby} />, locale);
+      const rows = within(screen.getByRole("list")).getAllByRole("listitem");
+      expect(rows.map((row) => row.textContent)).toEqual(expected);
+      unmount();
+    }
+  });
+
   it("tiện ích có toạ độ → điểm phụ truyền cho bản đồ (tiện ích không toạ độ thì không); chỉ có tiện ích quanh vẫn render khối, không dựng bản đồ", () => {
     const view = toProjectDetailView(marketProject, "vi");
     renderWithIntl(<ProjectLocation projectName={view.title} location={view.location} address={view.address} areaLabel={view.areaLabel} nearby={view.nearby} />);
     expect(lazyMapProps.calls[0]?.markers).toEqual([{ lat: 21.04, lng: 105.81, label: "Trường A" }]);
-    const nearbyOnly = toProjectDetailView(project({ nearbyAmenities: [{ category: "park", name: "Công viên A", distance: "1 km" }] }), "vi");
+    const nearbyOnly = toProjectDetailView(project({ nearbyAmenities: [{ category: "park", name: "Công viên A", distanceValue: 1, distanceUnit: "km" }] }), "vi");
     lazyMapProps.calls.length = 0;
     renderWithIntl(<ProjectLocation projectName="X" location={nearbyOnly.location} address={nearbyOnly.address} areaLabel={nearbyOnly.areaLabel} nearby={nearbyOnly.nearby} />);
     expect(lazyMapProps.calls).toHaveLength(0);

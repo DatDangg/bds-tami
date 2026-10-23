@@ -1,8 +1,10 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ComponentType } from "react";
 import { DetailDistanceList } from "@/components/detail/DetailDistanceList";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { Bus, FirstAid, GraduationCap, MapPin, ShoppingBag, Tree } from "@/components/icons";
+import type { Locale } from "@/i18n/routing";
+import { formatDistance } from "@/lib/units/floor-distance-view";
 import { cn } from "@/lib/utils";
 import { LazyMap, type MapMarker } from "@/components/media/LazyMap";
 import type { LatLng } from "@/components/media/map-geometry";
@@ -57,10 +59,11 @@ interface ProjectLocationProps {
  */
 export function ProjectLocation({ projectName, location, address, areaLabel, nearby = [], locationMedia = null }: ProjectLocationProps) {
   const t = useTranslations("page.projectDetail");
+  const locale = useLocale() as Locale;
   const addressText = [address, areaLabel].filter(Boolean).join(", ");
   const items = nearby.flatMap((group) => {
     const Icon = CATEGORY_ICON[group.category];
-    return group.items.map((item) => ({ icon: <Icon size={16} />, name: item.name, distance: item.distance }));
+    return group.items.map((item) => ({ icon: <Icon size={16} />, name: item.name, distance: formatDistance(item.distance, t, locale) }));
   });
   // Điểm lân cận có toạ độ thành điểm phụ trên bản đồ (bản đồ dựng một lần cho mọi nhóm).
   const markers: MapMarker[] = nearby.flatMap((group) => group.items.flatMap((item) => (item.location ? [{ ...item.location, label: item.name }] : [])));

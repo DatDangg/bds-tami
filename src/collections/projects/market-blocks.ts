@@ -1,6 +1,8 @@
-import type { ArrayField, DateField, Field, NumberField, NumberFieldSingleValidation, SelectField } from "payload";
-import { number } from "payload/shared";
+import type { ArrayField, DateField, Field, NumberField, NumberFieldSingleValidation, SelectField, SelectFieldSingleValidation, TextField } from "payload";
+import { number, select } from "payload/shared";
 
+import { selectOptions } from "../../fields/listing-field-helpers";
+import { DISTANCE_UNITS, type DistanceUnit } from "../../lib/units/legacy-parse";
 import { withPriceInWords, withTodayButton } from "../../fields/form-hints";
 import { formRow } from "../../lib/admin/form-layout";
 import { textRowLabel } from "../../lib/admin/row-label";
@@ -73,6 +75,40 @@ const nearbyCategoryField: SelectField = {
   options: NEARBY_CATEGORIES.map((value) => ({ label: NEARBY_CATEGORY_LABELS[value], value })),
 };
 
+const DISTANCE_UNIT_LABELS: Record<DistanceUnit, string> = { km: "Ki-lô-mét (km)", m: "Mét (m)", min: "Phút" };
+
+/** Khoảng cách chuẩn hoá (BL-065): số + đơn vị, nhãn công khai dựng theo ngôn ngữ (không dịch tay). Có số mà thiếu đơn vị (hoặc ngược lại) là lỗi nhập. */
+const requireBoth = (otherName: string, message: string) => (value: unknown, options: { siblingData?: unknown }) => {
+  const other = (options.siblingData as Record<string, unknown> | undefined)?.[otherName];
+  const hasValue = value !== undefined && value !== null && value !== "";
+  const hasOther = other !== undefined && other !== null && other !== "";
+  return hasValue !== hasOther ? message : true;
+};
+
+export const validateDistanceValue: NumberFieldSingleValidation = (value, options) => {
+  const base = number(value, options);
+  if (base !== true) return base;
+  return requireBoth("distanceUnit", "Chọn đơn vị cho khoảng cách (hoặc xoá số).")(value, options);
+};
+
+export const validateDistanceUnit: SelectFieldSingleValidation = (value, options) => {
+  const base = select(value, options);
+  if (base !== true) return base;
+  return requireBoth("distanceValue", "Nhập số cho khoảng cách (hoặc xoá đơn vị).")(value, options);
+};
+
+const distanceValueField: NumberField = { name: "distanceValue", type: "number", label: "Khoảng cách", min: 0, validate: validateDistanceValue, admin: { description: "Ví dụ: 1,2 (km) hoặc 15 (phút). Không cần dịch." } };
+const distanceUnitField: SelectField = { name: "distanceUnit", type: "select", label: "Đơn vị", options: selectOptions(DISTANCE_UNITS, DISTANCE_UNIT_LABELS), validate: validateDistanceUnit };
+const legacyDistanceField: TextField = {
+  name: "distance",
+  type: "text",
+  label: "Khoảng cách (giá trị cũ)",
+  admin: {
+    description: "Giá trị cũ chưa chuyển được tự động — nhập Khoảng cách + Đơn vị; ô này tự ẩn sau khi có giá trị mới.",
+    condition: (_data, siblingData) => typeof siblingData?.distance === "string" && siblingData.distance.trim() !== "" && typeof siblingData.distanceValue !== "number",
+  },
+};
+
 const nearbyAmenitiesField: ArrayField = {
   name: "nearbyAmenities",
   type: "array",
@@ -86,7 +122,8 @@ const nearbyAmenitiesField: ArrayField = {
   fields: [
     nearbyCategoryField,
     { name: "name", type: "text", label: "Tên địa điểm", localized: true, required: true },
-    { name: "distance", type: "text", label: "Khoảng cách", admin: { description: "Ví dụ: 1,2 km hoặc 5 phút. Không dịch." } },
+    formRow(distanceValueField, distanceUnitField),
+    legacyDistanceField,
     { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Tuỳ chọn, dùng để hiện điểm trên bản đồ." } },
   ],
 };

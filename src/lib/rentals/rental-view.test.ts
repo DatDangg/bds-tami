@@ -39,6 +39,16 @@ const rental = (overrides: Partial<Rental> = {}): Rental =>
     ...overrides,
   }) as Rental;
 
+describe("toRentalDetailView — tầng (BL-065)", () => {
+  it("số tầng / mức tầng / giá trị cũ (chỉ /vi)", () => {
+    expect(toRentalDetailView(rental({ floorNumber: 7 }), "en").floor).toEqual({ kind: "number", number: 7 });
+    expect(toRentalDetailView(rental({ floorLevel: "high" }), "vi").floor).toEqual({ kind: "level", level: "high" });
+    expect(toRentalDetailView(rental({ floor: "3.4.5.6" }), "vi").floor).toEqual({ kind: "legacy", text: "3.4.5.6" });
+    expect(toRentalDetailView(rental({ floor: "3.4.5.6" }), "en").floor).toBeNull();
+    expect(toRentalDetailView(rental(), "vi").floor).toBeNull();
+  });
+});
+
 describe("toRentalDetailView", () => {
   it("giá: có giá → số; tick thoả thuận hoặc chưa nhập giá → null", () => {
     expect(toRentalDetailView(rental(), "vi").priceMonthlyVnd).toBe(12_000_000);

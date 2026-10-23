@@ -20,6 +20,7 @@
     "jobs": "payload run scripts/jobs-runner.ts",
     "seed:categories": "payload run scripts/seed-categories.ts",
     "seed:rental-amenities": "payload run scripts/seed-rental-amenities.ts",
+    "report:legacy-units": "payload run scripts/report-legacy-floor-distance.ts",
     "reindex:rentals-search": "payload run scripts/reindex-rental-search-text.ts",
     "bench:rentals-search": "payload run scripts/bench/rentals-search.ts",
     "seed:pages": "payload run scripts/seed-pages.ts",

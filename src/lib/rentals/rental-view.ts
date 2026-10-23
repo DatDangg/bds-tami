@@ -8,6 +8,7 @@ import { CONTENT_ROUTES, publicPath } from "../content/content-paths";
 import { publicDetailPath } from "../content/redirect-paths";
 import { formatDate } from "../format";
 import { visibleCategory } from "../news/news-view";
+import { toFloorView, type FloorView } from "../units/floor-distance-view";
 import { renderableImage } from "../projects/project-detail-view";
 import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
 import type { SaleContact } from "./rental-queries";
@@ -42,7 +43,8 @@ export interface RentalDetailView {
   areaM2: number;
   bedrooms: number | null;
   bathrooms: number | null;
-  floor: string | null;
+  /** Tầng chuẩn hoá (BL-065); chữ hiển thị dựng theo ngôn ngữ bằng `formatFloor`. */
+  floor: FloorView | null;
   houseDirection: RentalDirection | null;
   balconyDirection: RentalDirection | null;
   furnishing: RentalFurnishing | null;
@@ -158,7 +160,7 @@ export function toRentalDetailView(doc: Rental, locale: Locale, hiddenLocation?:
     areaM2: doc.areaM2,
     bedrooms: nonNegative(doc.bedrooms),
     bathrooms: nonNegative(doc.bathrooms),
-    floor: hasText(doc.floor) ? doc.floor.trim() : null,
+    floor: toFloorView(doc, locale),
     houseDirection: doc.houseDirection ?? null,
     balconyDirection: doc.balconyDirection ?? null,
     furnishing: doc.furnishing ?? null,

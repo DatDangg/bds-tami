@@ -502,6 +502,11 @@
       }
     },
     "projectDetail": {
+      "distanceUnit": {
+        "km": "km",
+        "m": "m",
+        "min": "phút"
+      },
       "subNavLabel": "Mục lục dự án",
       "sections": {
         "floorPlans": "Mặt bằng",
@@ -653,6 +658,14 @@
         "price": "Giá thuê",
         "perMonth": "/tháng",
         "area": "Diện tích"
+      },
+      "floorValue": {
+        "number": "Tầng {n}",
+        "level": {
+          "high": "Tầng cao",
+          "mid": "Tầng trung",
+          "low": "Tầng thấp"
+        }
       },
       "details": {
         "floor": "Tầng",

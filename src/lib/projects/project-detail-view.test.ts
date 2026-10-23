@@ -144,7 +144,7 @@ describe("toProjectDetailView", () => {
       project({
         highlights: [{ title: "" , description: "x" }, { title: "Gần metro", description: " " }],
         nearbyAmenities: [
-          { category: "transport", name: "Ga A", distance: "500 m" },
+          { category: "transport", name: "Ga A", distanceValue: 500, distanceUnit: "m" },
           { category: "education", name: "Trường B", location: [105.81, 21.04] },
           { category: "education", name: "  " },
           { category: "transport", name: "Ga C", location: [200, 100] },
@@ -159,6 +159,7 @@ describe("toProjectDetailView", () => {
     expect(view.nearby.map((group) => group.category)).toEqual(["education", "transport"]);
     expect(view.nearby[0]?.items).toEqual([{ id: "1", name: "Trường B", distance: null, location: { lat: 21.04, lng: 105.81 } }]);
     expect(view.nearby[1]?.items.map((item) => [item.name, item.location])).toEqual([["Ga A", null], ["Ga C", null]]);
+    expect(view.nearby[1]?.items[0]?.distance).toEqual({ kind: "measured", value: 500, unit: "m" });
     expect(view.priceRows).toEqual([{ id: "1", unitType: "2PN", areaFrom: 60, areaTo: null, priceFrom: 3_000_000_000, priceTo: null, availability: "few_left", note: null }]);
     expect(view.priceUpdatedAt).toBe("2026-10-01T00:00:00.000Z");
     expect(view.faqs).toEqual([{ id: "2", question: "Q3", answer: "A3" }]);

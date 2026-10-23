@@ -68,7 +68,7 @@ const rental = (overrides: Partial<Rental> = {}): Partial<Rental> => ({
   areaM2: 55,
   bedrooms: 2,
   bathrooms: 1,
-  floor: "Tầng 12",
+  floorNumber: 12,
   houseDirection: "SE",
   furnishing: "full",
   priceMonthlyVnd: 12_000_000,

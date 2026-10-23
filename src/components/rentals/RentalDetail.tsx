@@ -15,6 +15,7 @@ import { ClickRefMarker } from "@/components/layout/ClickRefMarker";
 import { LazyMap } from "@/components/media/LazyMap";
 import { ProjectStickyCta } from "@/components/projects/ProjectStickyCta";
 import { Badge } from "@/components/ui/badge";
+import { formatFloor } from "@/lib/units/floor-distance-view";
 import { publicPath } from "@/lib/content/content-paths";
 import { formatArea } from "@/lib/format";
 import type { StrengthsView } from "@/lib/home/home-view";
@@ -79,7 +80,7 @@ function RentalOverview({ doc, view }: Pick<RentalDetailProps, "doc" | "view">) 
   const info: DetailInfoItem[] = [
     { icon: <ClipboardText size={ICON_SIZE} />, label: t("code"), value: view.code },
     { icon: <House size={ICON_SIZE} />, label: t("details.category"), value: view.category?.label ?? null, link: view.category ? { kind: "internal", href: view.category.href } : null },
-    { icon: <SquaresFour size={ICON_SIZE} />, label: t("details.floor"), value: view.floor },
+    { icon: <SquaresFour size={ICON_SIZE} />, label: t("details.floor"), value: formatFloor(view.floor, t) },
     { icon: <Compass size={ICON_SIZE} />, label: t("details.balconyDirection"), value: view.balconyDirection ? tOptions(`direction.${view.balconyDirection}`) : null },
     { icon: <Buildings size={ICON_SIZE} />, label: t("v2.info.project"), value: view.project?.label ?? null, link: view.project ? { kind: "internal", href: view.project.href } : null },
     { icon: <Clock size={ICON_SIZE} />, label: t("postedAt"), value: view.postedAtLabel, dateTime: view.postedAtIso },

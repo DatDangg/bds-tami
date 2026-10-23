@@ -28,10 +28,32 @@ describe("projects: khối nội dung mở rộng (BL-020 P5-T01)", () => {
     expect(TRANSLATABLE_FIELDS.projects).toEqual(expect.arrayContaining(["highlights", "nearbyAmenities", "priceTable", "faqs"]));
     expect((subfield(arrayOf("highlights"), "title") as { localized?: boolean }).localized).toBe(true);
     expect((subfield(arrayOf("nearbyAmenities"), "name") as { localized?: boolean }).localized).toBe(true);
-    expect((subfield(arrayOf("nearbyAmenities"), "distance") as { localized?: boolean }).localized).toBeFalsy();
+    for (const name of ["distance", "distanceValue", "distanceUnit"]) expect((subfield(arrayOf("nearbyAmenities"), name) as { localized?: boolean }).localized).toBeFalsy();
     expect((subfield(arrayOf("priceTable"), "unitType") as { localized?: boolean }).localized).toBe(true);
     expect((subfield(arrayOf("faqs"), "answer") as { localized?: boolean }).localized).toBe(true);
     expect((subfield(arrayOf("priceTable"), "priceFrom") as { localized?: boolean }).localized).toBeFalsy();
+  });
+
+  it("khoảng cách chuẩn hoá: số ≥ 0 + đơn vị km/m/phút; có số thiếu đơn vị (hoặc ngược lại) là lỗi; ô 'giá trị cũ' chỉ hiện khi chưa có số (BL-065)", () => {
+    const amenities = arrayOf("nearbyAmenities");
+    expect((subfield(amenities, "distanceValue") as NumberField).min).toBe(0);
+    expect((subfield(amenities, "distanceUnit") as { options: unknown }).options).toEqual([
+      { label: "Ki-lô-mét (km)", value: "km" },
+      { label: "Mét (m)", value: "m" },
+      { label: "Phút", value: "min" },
+    ]);
+    expect(runValidate(amenities, "distanceValue", 1.2, { distanceUnit: "km" })).toBe(true);
+    expect(runValidate(amenities, "distanceValue", 1.2, {})).toBe("Chọn đơn vị cho khoảng cách (hoặc xoá số).");
+    const validateUnit = (subfield(amenities, "distanceUnit") as { validate: (v: unknown, o: unknown) => unknown }).validate;
+    const ctx = (siblingData: Record<string, unknown>) => ({ siblingData, req: { t: (key: string) => key }, required: false, options: [{ value: "km" }, { value: "m" }, { value: "min" }] });
+    expect(validateUnit("km", ctx({ distanceValue: 2 }))).toBe(true);
+    expect(validateUnit("km", ctx({}))).toBe("Nhập số cho khoảng cách (hoặc xoá đơn vị).");
+    expect(validateUnit(undefined, ctx({}))).toBe(true);
+    const legacy = subfield(amenities, "distance") as unknown as { label: string; admin: { condition: (d: unknown, s: Record<string, unknown>) => boolean } };
+    expect(legacy.label).toBe("Khoảng cách (giá trị cũ)");
+    expect(legacy.admin.condition({}, { distance: "gần chợ" })).toBe(true);
+    expect(legacy.admin.condition({}, { distance: "gần chợ", distanceValue: 3 })).toBe(false);
+    expect(legacy.admin.condition({}, {})).toBe(false);
   });
 
   it("không bắt buộc cả mảng (không chặn xuất bản EN của dự án cũ)", () => {

@@ -284,6 +284,11 @@ export interface Rental {
   priceMonthlyVnd?: number | null;
   priceNegotiable?: boolean | null;
   areaM2: number;
+  floorLevel?: ('high' | 'mid' | 'low') | null;
+  floorNumber?: number | null;
+  /**
+   * Giá trị cũ chưa chuyển được tự động — chọn Mức tầng / nhập Số tầng; ô này tự ẩn sau khi có giá trị mới.
+   */
   floor?: string | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
@@ -682,7 +687,12 @@ export interface Project {
         category: 'education' | 'healthcare' | 'shopping' | 'park' | 'transport' | 'other';
         name: string;
         /**
-         * Ví dụ: 1,2 km hoặc 5 phút. Không dịch.
+         * Ví dụ: 1,2 (km) hoặc 15 (phút). Không cần dịch.
+         */
+        distanceValue?: number | null;
+        distanceUnit?: ('km' | 'm' | 'min') | null;
+        /**
+         * Giá trị cũ chưa chuyển được tự động — nhập Khoảng cách + Đơn vị; ô này tự ẩn sau khi có giá trị mới.
          */
         distance?: string | null;
         /**
@@ -2016,6 +2026,8 @@ export interface ProjectsSelect<T extends boolean = true> {
     | {
         category?: T;
         name?: T;
+        distanceValue?: T;
+        distanceUnit?: T;
         distance?: T;
         location?: T;
         id?: T;
@@ -2099,6 +2111,8 @@ export interface RentalsSelect<T extends boolean = true> {
   priceMonthlyVnd?: T;
   priceNegotiable?: T;
   areaM2?: T;
+  floorLevel?: T;
+  floorNumber?: T;
   floor?: T;
   bedrooms?: T;
   bathrooms?: T;

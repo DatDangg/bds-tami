@@ -37,7 +37,7 @@ const baseRental = (overrides: Partial<Rental> = {}): Rental =>
 const fullRental = baseRental({
   category,
   project,
-  floor: "12",
+  floorNumber: 12,
   bedrooms: 2,
   bathrooms: 1,
   furnishing: "full",
@@ -183,6 +183,7 @@ describe("RentalDetail (BL-052, khung chi tiết chung)", () => {
     const projectLink = info.getByRole("link", { name: "Sông Sài Gòn" });
     expect(projectLink).toHaveAttribute("href", "/du-an/song-sai-gon");
     expect(projectLink).not.toHaveAttribute("target");
+    expect(info.getByText("Tầng 12")).toBeInTheDocument();
     expect(info.getByText("Bắc")).toBeInTheDocument();
     expect(info.getByText("03/02/2026")).toBeInTheDocument();
   });

@@ -31,6 +31,13 @@ export const validateAreaM2: NumberFieldSingleValidation = (value, options) => {
   return typeof value === "number" && value <= 0 ? "Diện tích phải lớn hơn 0." : true;
 };
 
+/** Số tầng (BL-065): số nguyên không âm; `min` của Payload không chặn số lẻ nên kiểm thêm sau validator `number` mặc định. */
+export const validateFloorNumber: NumberFieldSingleValidation = (value, options) => {
+  const base = number(value, options);
+  if (base !== true) return base;
+  return typeof value === "number" && !Number.isInteger(value) ? "Số tầng phải là số nguyên." : true;
+};
+
 const VIDEO_HOSTS = ["youtube.com", "youtu.be", "tiktok.com"];
 
 /**
