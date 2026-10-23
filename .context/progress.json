@@ -3104,6 +3104,64 @@
       "specVersion": "1.56.0",
       "scopeVersion": 73,
       "review": "T01 STRICT FAIL r1 → PASS r2"
+    },
+    {
+      "slug": "new-content-english",
+      "title": "Nội dung thật lên staging/prod + gói EN viết tay: 3 dự án (Maison Privée / Astor 1 / The Windsor Collection) + 8 tin pháp lý; content:import + english:pack dry-run mặc định, apply cần confirm (BL-072)",
+      "type": "ADDITIVE",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-072",
+      "changeDoc": "spec/changes/2026-10-23-new-content-english.md",
+      "startedAt": "2026-10-23",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-new-content-english/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 3,
+          "report": ".context/review-reports/feature-new-content-english-phase-1-task-01-round-3-review.md",
+          "verify": "typecheck PASS · lint PASS · test 436 files/4590 PASS (r3: 1 flaky content-redirects date-fns load, rerun PASS) · dev dry-run content:import 16 đã có, english:pack exit 0",
+          "completedAt": "2026-10-23"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-new-content-english/phase-1-task-02.md",
+          "status": "in_review",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-new-content-english-phase-1-task-02-round-1-review.md",
+          "note": "minor wording fixes applied after PASS"
+        },
+        {
+          "task": "phase-1-task-03",
+          "file": "tasks/feature-new-content-english/phase-1-task-03.md",
+          "status": "in_review",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-new-content-english-phase-1-task-03-round-1-review.md",
+          "note": "minor wording fixes applied after PASS"
+        },
+        {
+          "task": "phase-2-task-01",
+          "file": "tasks/feature-new-content-english/phase-2-task-01.md",
+          "status": "pending",
+          "note": "staging apply — cần deploy + user ok từng lần ghi"
+        },
+        {
+          "task": "phase-2-task-02",
+          "file": "tasks/feature-new-content-english/phase-2-task-02.md",
+          "status": "pending",
+          "note": "prod import vi + EN pack — cần deploy + backup + user ok từng lần ghi"
+        }
+      ],
+      "specValidation": ".context/review-reports/spec-validation-feature-new-content-english-phase-1.md (PASS; M1/L1/L2/L3 đã bổ sung vào spec + scope)",
+      "specVersion": "1.57.0",
+      "scopeVersion": 76
     }
   ],
   "bugs": [
@@ -4240,7 +4298,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T09:41:50.543Z",
+  "lastUpdated": "2026-10-23T10:26:45.733Z",
   "approvalMilestones": [
     {
       "id": "M1",

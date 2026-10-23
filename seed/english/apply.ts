@@ -5,6 +5,7 @@ import { computeSourceHash } from "../../src/hooks/translation/compute-source-ha
 import { leavesOfDoc, TRANSLATION_JOB_CONTEXT_KEY, type TranslationTargetRef } from "../../src/hooks/translation/translation-targets";
 import { buildEnglishWrite, readAtPath } from "../../src/lib/translation/leaves";
 import { type EnglishEntry, type EnglishFile, missingRequired, resolveEntry, type ResolvedEntry, sameLeafValue } from "./format";
+import { existingEnglishConflicts } from "./pack-plan";
 
 type Doc = Record<string, unknown>;
 
@@ -17,6 +18,14 @@ export interface ApplyStats {
   missing: string[];
   /** Bản ghi bị bỏ vì dữ liệu lệch bản vi hoặc DB từ chối. */
   mismatched: string[];
+}
+
+/** Tuỳ chọn của gói EN (BL-072); mặc định `{}` = hành vi BL-064 (`seed:english`) không đổi. */
+export interface WriteOptions {
+  /** Chỉ lập kế hoạch + kiểm, không ghi DB. */
+  dryRun?: boolean;
+  /** Bỏ cả bản ghi khi EN hiện tại đã có chữ khác dữ liệu (không ghi đè biên tập viên). */
+  protectExisting?: boolean;
 }
 
 export const newStats = (): ApplyStats => ({ applied: 0, unchanged: 0, missing: [], mismatched: [] });
@@ -73,9 +82,19 @@ export function missingBeforeWrite(required: readonly string[], en: Doc, transla
 }
 
 /** Lá nào của bản `vi` có dữ liệu mà bản `en` hiện tại chưa khớp; `null` + `problems` khi dữ liệu không ghép được. */
-function planWrite(payload: Payload, target: TranslationTargetRef, vi: Doc, en: Doc, entry: EnglishEntry, required: readonly string[] = []): { write: Doc | null; problems: string[] } {
+function planWrite(
+  payload: Payload,
+  target: TranslationTargetRef,
+  vi: Doc,
+  en: Doc,
+  entry: EnglishEntry,
+  required: readonly string[] = [],
+  protectExisting = false,
+): { write: Doc | null; problems: string[] } {
   const { translated, problems } = resolveEntry(leavesOfDoc(payload, target, vi), entry);
   if (problems.length > 0) return { write: null, problems };
+  const conflicts = protectExisting ? existingEnglishConflicts(translated, en, false) : [];
+  if (conflicts.length > 0) return { write: null, problems: [`EN đã có, khác gói: ${conflicts.join(", ")} (thêm "overwrite" nếu muốn ghi đè)`] };
   const missing = en.hasEnglish === true ? [] : missingBeforeWrite(required, en, translated);
   if (missing.length > 0) return { write: null, problems: [`thiếu trường EN bắt buộc: ${missing.join(", ")}`] };
   const changed = translated.filter(({ leaf, value }) => !sameLeafValue(readAtPath(en, leaf.path), value));
@@ -84,17 +103,18 @@ function planWrite(payload: Payload, target: TranslationTargetRef, vi: Doc, en: 
   return write ? { write, problems } : { write: null, problems: ["hàng array không còn khớp bản vi"] };
 }
 
-/** Trả `applied`/`unchanged`, hoặc ném lỗi (bên gọi gom vào `mismatched`). */
-async function applyToCollectionDoc(payload: Payload, slug: EnglishCollection, vi: Doc, entry: EnglishEntry): Promise<"applied" | "unchanged"> {
+/** Trả `applied`/`unchanged`, hoặc ném lỗi (bên gọi gom vào `mismatched`). `dryRun`: `applied` = SẼ ghi, không ghi gì. */
+export async function applyToCollectionDoc(payload: Payload, slug: EnglishCollection, vi: Doc, entry: EnglishEntry, options: WriteOptions = {}): Promise<"applied" | "unchanged"> {
   const target: TranslationTargetRef = { kind: "collection", slug };
   const id = vi.id as string;
   const en = (await payload.findByID({ collection: slug, id, locale: "en", ...READ })) as unknown as Doc;
-  const { write, problems } = planWrite(payload, target, vi, en, entry, requiredFields(payload, slug));
+  const { write, problems } = planWrite(payload, target, vi, en, entry, requiredFields(payload, slug), options.protectExisting);
   if (!write) throw new Error(problems.join("; "));
 
   let saved = en;
   const common = { collection: slug, id, locale: "en", ...READ, context: WRITE_CONTEXT } as const;
   const hasContentChange = Object.keys(write).length > 0;
+  if (options.dryRun) return dryRunResult(payload, slug, en, hasContentChange);
   if (hasContentChange) {
     saved = (await payload.update({ ...common, data: { ...write, translation: translationMeta(payload, target, vi) } as never })) as unknown as Doc;
   }
@@ -104,6 +124,15 @@ async function applyToCollectionDoc(payload: Payload, slug: EnglishCollection, v
   const missing = missingRequired(requiredFields(payload, slug), saved);
   if (missing.length > 0) throw new Error(`thiếu trường EN bắt buộc: ${missing.join(", ")}`);
   await payload.update({ ...common, data: { hasEnglish: true, translation: translationMeta(payload, target, vi) } as never });
+  return "applied";
+}
+
+/** Dry-run: kết quả như khi ghi thật, trừ bước hậu kiểm slug EN (do hook sinh khi ghi). */
+function dryRunResult(payload: Payload, slug: EnglishCollection, en: Doc, hasContentChange: boolean): "applied" | "unchanged" {
+  if (hasContentChange) return "applied";
+  if (en.hasEnglish === true) return "unchanged";
+  const missing = missingRequired(requiredFields(payload, slug), en);
+  if (missing.length > 0) throw new Error(`thiếu trường EN bắt buộc: ${missing.join(", ")}`);
   return "applied";
 }
 
@@ -156,13 +185,14 @@ export async function applyGlobals(payload: Payload, file: EnglishFile): Promise
   return stats;
 }
 
-async function applyToGlobal(payload: Payload, slug: GlobalSlug, entry: EnglishEntry): Promise<"applied" | "unchanged"> {
+export async function applyToGlobal(payload: Payload, slug: GlobalSlug, entry: EnglishEntry, options: WriteOptions = {}): Promise<"applied" | "unchanged"> {
   const target: TranslationTargetRef = { kind: "global", slug };
   const vi = (await payload.findGlobal({ slug, locale: "vi", ...READ })) as unknown as Doc;
   const en = (await payload.findGlobal({ slug, locale: "en", ...READ })) as unknown as Doc;
-  const { write, problems } = planWrite(payload, target, vi, en, entry);
+  const { write, problems } = planWrite(payload, target, vi, en, entry, [], options.protectExisting);
   if (!write) throw new Error(problems.join("; "));
   if (Object.keys(write).length === 0) return "unchanged";
+  if (options.dryRun) return "applied";
   await payload.updateGlobal({ slug, locale: "en", ...READ, context: WRITE_CONTEXT, data: { ...write, translation: translationMeta(payload, target, vi) } as never });
   return "applied";
 }

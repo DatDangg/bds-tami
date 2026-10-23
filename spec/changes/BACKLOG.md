@@ -78,6 +78,7 @@
 | BL-068 | Dự án cho phép **tải file video** (mp4/webm) ngoài link YouTube/TikTok — chủ đầu tư thường chỉ gửi file mp4; chốt giới hạn dung lượng khi xử lý — user 2026-10-23 | ADDITIVE | pending (tạm hoãn — chờ chuyển sang hạ tầng của khách sau test, user 2026-10-23) | `spec/changes/2026-10-23-project-video-upload.md` | 2026-10-23 | — |
 | BL-069 | Màn tạo admin đầu tiên (`/admin/create-first-user`): thêm "Ảnh đại diện" bị từ chối (Media.create cần đăng nhập) + form bị xoá trắng → ẩn trường avatar khi chưa đăng nhập — gặp khi dựng production, user 2026-10-23 | BUG | done | `spec/changes/archive/2026-10-23-first-user-avatar-upload.md` | 2026-10-23 | 2026-10-23 |
 | BL-071 | Chi tiết dự án: thẻ Sản phẩm 3 cột co chữ dọc / cắt giữa từ với tên dài; ảnh khối Tiện ích kéo cao theo độ dài danh sách; nền khối "Dự án tương tự" trùng màu phần nội dung, không tách biệt — user 2026-10-23 (ảnh chụp staging Windsor) | BUG | done (T02 b3f1f10 / T01 d81b118 / T03 close-out — 3 task NORMAL PASS r1; spec 1.56.2 / scope v75; kiểm 3 dự án thật staging sau deploy) | `spec/changes/archive/2026-10-23-project-detail-layout-fixes.md` | 2026-10-23 | 2026-10-23 |
+| BL-072 | Bản tiếng Anh cho data mới nhập staging (3 dự án Maison Privée / Astor 1 / Windsor + 8 tin tức thật) — script nhập chỉ ghi `vi`, `seed:english` chặn ngoài dev — user 2026-10-23 | ADDITIVE | in_progress | `spec/changes/2026-10-23-new-content-english.md` | 2026-10-23 | — |
 
 ## Quy tắc tracking
 

@@ -33,3 +33,6 @@ seed/scraped-extra/
 # Báo cáo chạy thử backfill (BL-052): chỉ để xem, không commit; báo cáo --apply được commit cho admin soát
 docs/reports/backfill-listing-fields-*-dry-run*.md
 docs/reports/backfill-offices-*-dry-run*.md
+
+# Dữ liệu/script nhập nội dung một lần (ảnh 184 MB, script phụ); bản chính thức: scripts/import-content.ts + seed/content/ (BL-072)
+.import-tmp/

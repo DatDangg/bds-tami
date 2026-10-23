@@ -9,6 +9,8 @@ const eslintConfig = [
       "node_modules/",
       "migrations/",
       "seed/scraped/", // dữ liệu/script dev cục bộ, gitignore
+      ".import-tmp/", // script/ảnh nhập nội dung một lần, gitignore (bản chính thức: scripts/import-content.ts, BL-072)
+      ".local-seed/", // script seed cục bộ, git exclude
       "coverage/",
       "skills/",
       ".agent/",

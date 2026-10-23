@@ -2,6 +2,7 @@ import type { Payload } from "payload";
 
 import { TRANSLATION_JOB_CONTEXT_KEY } from "../../src/hooks/translation/translation-targets";
 import { parseTemplatedAlt, templatedAltEn } from "./format";
+import { classifyKeyMatches, decideMediaAlt, type PackLine } from "./pack-plan";
 
 export interface MediaAltStats {
   applied: number;
@@ -61,4 +62,41 @@ function templatedTarget(altVi: string, titles: Map<string, string>): string | n
   const parsed = parseTemplatedAlt(altVi);
   const titleEn = parsed ? titles.get(parsed.titleVi) : undefined;
   return parsed && titleEn ? templatedAltEn(titleEn, parsed.suffixEn) : null;
+}
+
+export interface ExplicitMediaOptions {
+  dryRun: boolean;
+  overwrite: boolean;
+}
+
+/**
+ * Alt EN của gói (BL-072): CHỈ các alt `vi` liệt kê trong `media.json` của gói (không sinh theo mẫu, không quét cả DB).
+ * Mỗi alt phải khớp đúng 1 media; alt EN đang có khác gói → bỏ qua trừ `overwrite`.
+ */
+export async function applyExplicitMediaAlts(payload: Payload, explicit: Record<string, string>, options: ExplicitMediaOptions): Promise<PackLine[]> {
+  const lines: PackLine[] = [];
+  const line = (key: string, status: PackLine["status"], reason?: string) => lines.push({ group: "media", key, status, ...(reason ? { reason } : {}) });
+  for (const [altVi, altEn] of Object.entries(explicit)) {
+    const target = typeof altEn === "string" ? altEn.trim() : "";
+    if (!target) {
+      line(altVi, "skip", "alt EN rỗng");
+      continue;
+    }
+    const found = (await payload.find({ collection: "media", locale: "vi", where: { alt: { equals: altVi } }, select: { alt: true } as never, depth: 0, overrideAccess: true, fallbackLocale: false, limit: 5, pagination: false })).docs as unknown as Array<{ id: string }>;
+    const match = classifyKeyMatches(found.length);
+    if (match === "missing") line(altVi, "missing");
+    else if (match === "duplicate") line(altVi, "skip", `alt trùng ${found.length}+ media, không ghi bản nào`);
+    else {
+      const id = found[0]!.id;
+      const current = (await payload.findByID({ collection: "media", id, locale: "en", select: { alt: true } as never, depth: 0, overrideAccess: true, fallbackLocale: false })) as unknown as { alt?: string | null };
+      const decision = decideMediaAlt(current.alt ?? "", target, options.overwrite);
+      if (decision === "unchanged") line(altVi, "unchanged");
+      else if (decision === "conflict") line(altVi, "skip", `EN đã có, khác gói ("${current.alt}")`);
+      else {
+        if (!options.dryRun) await payload.update({ collection: "media", id, locale: "en", data: { alt: target }, depth: 0, overrideAccess: true, context: { [TRANSLATION_JOB_CONTEXT_KEY]: true } });
+        line(altVi, "write");
+      }
+    }
+  }
+  return lines;
 }

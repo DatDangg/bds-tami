@@ -31,6 +31,8 @@
     "seed:shell": "payload run scripts/seed-shell-globals.ts",
     "seed:english": "payload run scripts/seed-english.ts",
     "seed:english:export": "payload run scripts/seed-english-export.ts",
+    "english:pack": "payload run scripts/apply-english-pack.ts",
+    "content:import": "payload run scripts/import-content.ts",
     "backfill:listing-fields": "payload run scripts/backfill-listing-fields.ts --",
     "backfill:offices": "payload run scripts/backfill-offices.ts --",
     "e2e:revalidate": "payload run tests/e2e/revalidate-globals.ts",

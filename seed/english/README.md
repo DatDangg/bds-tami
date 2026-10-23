@@ -84,6 +84,23 @@ select (select count(*) from media_locales where _locale = 'en' and coalesce(alt
 
 (Bản ghi đã xoá mềm (`deleted_at is not null`) nên loại khỏi cả hai vế khi đếm.)
 
+## Gói EN (staging/prod) — BL-072
+
+`pnpm seed:english` chỉ chạy trên DB dev. Để đưa EN viết sẵn cho **nội dung thật** lên staging/production dùng **gói**: `seed/english/packs/<tên-gói>/` có cùng định dạng tệp như `data/` (`projects.json`, `news.json`, `media.json`, … khoá = tiêu đề/tên `vi`, `media.json` = `{ alt vi: alt en }`). Gói **không** nằm trong `data/` nên `seed:english` không đụng tới. Tên tệp lạ (`project.json`) → lỗi, không bị bỏ qua lặng lẽ.
+
+```bash
+pnpm english:pack <tên-gói>                 # dry-run (mặc định): chỉ đọc, in kế hoạch từng bản ghi, exit 1 nếu có bản bị bỏ/thiếu
+ENGLISH_PACK_CONFIRM=<tên-gói> pnpm english:pack <tên-gói> apply            # ghi thật
+ENGLISH_PACK_CONFIRM=<tên-gói> pnpm english:pack <tên-gói> apply overwrite  # cho phép ghi đè EN đã có
+```
+
+(`payload run` nuốt cờ `--x` nên `apply`/`overwrite` là tham số vị trí.) Quy tắc:
+
+- `apply` chỉ chạy khi `ENGLISH_PACK_CONFIRM` bằng đúng tên gói (thiếu/sai → từ chối trước khi mở DB); in `APP_ENV` + `host:port/tên-db` (không mật khẩu). Chạy được ở dev/staging/production; quy trình bắt buộc (backup → dry-run → apply → chạy lại → kiểm `/en`): `docs/runbooks/english-pack.md`.
+- **Chỉ ghi bản ghi có khoá trong gói**; mỗi khoá phải khớp **đúng 1** bản ghi `vi` chưa xoá mềm: 0 → `thiếu bản vi`; ≥ 2 → `bỏ qua: khoá trùng`, không ghi bản nào. **Ngoại lệ chỉ cho `categories`:** cùng tên ở nhiều scope (vd "Căn hộ chung cư" của dự án + cho thuê) là thiết kế, nên một mục gói áp cho **mọi** bản khớp; mỗi bản vẫn qua kiểm không-ghi-đè riêng (bản có EN khác gói bị bỏ riêng, trừ `overwrite`) và có một dòng riêng `<tên> [<scope>]`.
+- **Không ghi đè EN đang có:** lá EN hiện tại đã có chữ mà khác gói → bỏ **cả bản ghi** + `bỏ qua: EN đã có, khác gói: <trường>`, trừ khi thêm `overwrite`. EN trống hoặc đã bằng gói → ghi / `không đổi`. Media: chỉ alt có trong `media.json` của gói, cùng quy tắc.
+- Phần còn lại dùng lại engine BL-064 (cùng `resolveEntry`, kiểm trường bắt buộc trước khi ghi, `enSource: manual`, bật `hasEnglish`, không xếp job dịch AI, không bao giờ ghi `vi`); lỗi dữ liệu → bỏ cả bản ghi, không ghi nửa vời. Chạy lại phải ra toàn `không đổi`.
+
 ## Cấu trúc code
 
 - `format.ts` — định dạng dữ liệu, hàm thuần (khoá lá, ghép richText, so sánh, alt) · test `tests/unit/seed-english-format.test.ts`.
@@ -91,3 +108,4 @@ select (select count(*) from media_locales where _locale = 'en' and coalesce(alt
 - `media.ts` — alt EN của media. `export.ts` — xuất định dạng dữ liệu. `index.ts` — `runSeedEnglish` (đọc tệp, log, chặn môi trường không phải dev).
 - Test tích hợp trên DB tạm với collection `projects` thật: `tests/integration/seed-english.test.ts`.
 - Dựa trên `collectLeaves` / `buildEnglishWrite` của job dịch (`src/lib/translation/leaves.ts`) nên "trường nào dịch được" chỉ định nghĩa ở một nơi.
+- Gói EN (BL-072): `pack-plan.ts` (quyết định thuần: confirm, khoá trùng, không ghi đè, báo cáo) · `pack.ts` (`runEnglishPack`: đọc gói, dry-run/apply) · `apply.ts` `WriteOptions` (`dryRun`, `protectExisting`; mặc định `{}` = hành vi BL-064) · `media.ts` `applyExplicitMediaAlts` · `scripts/apply-english-pack.ts`. Test: `tests/unit/english-pack-plan.test.ts`, `tests/integration/english-pack.test.ts`.

@@ -34,3 +34,7 @@ docker
 
 # Dashboard agent (template) — không thuộc app
 tools
+
+# Script/ảnh nhập nội dung cục bộ (184 MB), không đưa vào image (BL-072)
+.import-tmp
+.local-seed
