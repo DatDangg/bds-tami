@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/consult-popup-30s",
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3045,6 +3045,34 @@
       "scopeVersion": 71,
       "review": "spec-validation phase 1 PASS",
       "reviewReport": ".context/review-reports/spec-validation-feature-consult-popup-30s-phase-1.md"
+    },
+    {
+      "slug": "news-toc-compact",
+      "title": "Mục lục chi tiết tin tức gọn: cột 16rem/18rem, mục 32px, số tròn 24px, mục lục chiếm phần cao còn lại (BL-067)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-067",
+      "changeDoc": "spec/changes/archive/2026-10-23-news-toc-compact.md",
+      "startedAt": "2026-10-23",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-news-toc-compact/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "NORMAL PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-news-toc-compact-phase-1-task-01-round-1-review.md",
+          "verify": "vitest src/components/news 8 files/98 PASS · typecheck PASS · eslint sạch · đo dev: bài 5 heading 1440x900 & 1280x800 nav 333=333 không cuộn; giả lập 10 mục → tự cuộn",
+          "completedAt": "2026-10-23",
+          "commit": "6f66ea4"
+        }
+      ],
+      "completedAt": "2026-10-23",
+      "specVersion": "1.55.1",
+      "scopeVersion": 72,
+      "review": "T01 NORMAL PASS r1"
     }
   ],
   "bugs": [

@@ -74,7 +74,7 @@
 | BL-064 | Seed dev đủ data tiếng Anh viết sẵn (hiện EN: Dự án 3/61, Cho thuê 0/30, Tin BĐS 0/36, Tin tức 0/22, Dịch vụ 0/3) cho mọi bản ghi + global, bật `hasEnglish`, idempotent — user 2026-10-22 | MODIFY | done (T01 `4f9809f` STRICT PASS r2 · T02 `4e86e5c` · T03 `ff00d0b` PASS r2 · T04 `906bd1c`; EN dev 100% mọi collection + alt 481/481; spec **1.54.0 / scope v70**; follow-up BL-065) | `spec/changes/archive/2026-10-22-seed-english-data.md` | 2026-10-22 | 2026-10-23 |
 | BL-065 | `/en` còn chữ Việt ở trường không localized: `rentals.floor` ("Tầng cao/trung/thấp"), `projects.nearbyAmenities.distance` ("15 phút"), địa chỉ — follow-up FU-1 spec-validation BL-064, chờ user chốt cách làm (localized / chuẩn hoá select+i18n / giữ địa chỉ) | MODIFY | pending | `spec/changes/2026-10-23-en-non-localized-fields.md` | 2026-10-23 | |
 | BL-066 | Popup form "Nhận tư vấn" tự hiện ở mọi trang public khi khách ở lại 30s, tối đa 1 lần / lượt truy cập — user 2026-10-23 | ADDITIVE | done (T01 STRICT PASS r2; spec **1.55.0 / scope v71**; migration additive `20261023_020647_leads_source_popup` — chạy trước deploy) | `spec/changes/archive/2026-10-23-consult-popup-30s.md` | 2026-10-23 | 2026-10-23 |
-| BL-067 | Mục lục chi tiết tin tức quá hẹp (cột 15rem, mục 44px + số tròn) → wrap nhiều dòng, dài, phải cuộn → làm gọn — user 2026-10-23 | MODIFY | pending | `spec/changes/2026-10-23-news-toc-compact.md` | 2026-10-23 | |
+| BL-067 | Mục lục chi tiết tin tức quá hẹp (cột 15rem, mục 44px + số tròn) → wrap nhiều dòng, dài, phải cuộn → làm gọn — user 2026-10-23 | MODIFY | done (T01 6f66ea4 NORMAL PASS r1; spec 1.55.1 / scope v72) | `spec/changes/archive/2026-10-23-news-toc-compact.md` | 2026-10-23 | 2026-10-23 |
 
 ## Quy tắc tracking
 

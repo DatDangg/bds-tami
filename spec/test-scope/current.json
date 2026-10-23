@@ -1,111 +1,82 @@
 {
-  "specVersion": "1.55.0",
-  "scopeVersion": 71,
-  "generatedAt": "2026-10-23T18:00:00+07:00",
+  "specVersion": "1.55.1",
+  "scopeVersion": 72,
+  "generatedAt": "2026-10-23T20:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-066 ADDITIVE (MINOR 1.54.0 → 1.55.0 — Popup \"Nhận tư vấn\" sau 30 giây, user 2026-10-23): island client trong khung trang công khai; đếm 30s theo phiên (sessionStorage), 1 lần/phiên; không ở /lien-he, /en/contact, /admin; hoãn khi focus trong form khác / modal khác mở; tái dùng LeadForm với nguồn lead mới popup (migration enum additive).",
-  "status": "published — T01 STRICT FAIL r1 (M1) → PASS r2; spec-validation phase 1 PASS; primary close-out + commit sắp tới trên staging",
-  "workItem": "feature/consult-popup-30s",
-  "backlog": "BL-066",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/2026-10-23-consult-popup-30s.md",
-  "changeDocStatus": "archive tại close-out",
-  "task": ["tasks/feature-consult-popup-30s/phase-1-task-01.md"],
+  "triggerNote": "BL-067 MODIFY (PATCH 1.55.0 → 1.55.1 — mục lục gọn chi tiết tin tức, user 2026-10-23): UI only; cột trái 16rem (≥ xl 18rem), mục ≥ 32px, số tròn 24px, cấp 3 thẳng chữ cấp 2, mục lục chiếm phần cao còn lại của cột dính.",
+  "status": "published — T01 NORMAL PASS r1; commit 6f66ea4",
+  "workItem": "feature/news-toc-compact",
+  "backlog": "BL-067",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-23-news-toc-compact.md",
+  "changeDocStatus": "archived",
+  "task": [
+    "tasks/feature-news-toc-compact/phase-1-task-01.md"
+  ],
   "reviewResults": [
-    "T01 STRICT FAIL r1 (M1 hoãn khi focus trong form) → PASS r2 — .context/review-reports/feature-consult-popup-30s-phase-1-task-01-round-2-review.md",
-    "spec-validator phase 1 PASS — .context/review-reports/spec-validation-feature-consult-popup-30s-phase-1.md"
+    "T01 NORMAL PASS r1 — .context/review-reports/feature-news-toc-compact-phase-1-task-01-round-1-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.54.0-70.json",
-  "specUpdate": "spec/updates/2026-10-23-consult-popup-30s.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.55.0-71.json",
+  "specUpdate": "spec/updates/2026-10-23-news-toc-compact.md",
   "specRefs": [
-    "F9 — khối 'Popup \"Nhận tư vấn\" (BL-066)' trong SPECIFICATIONS.md: popup lead 30s/phiên, nguồn lead popup, a11y, hoãn khi đang gõ form khác"
+    "F2 — khối \"Tin tức v2\" (BL-062) trong SPECIFICATIONS.md, dòng \"As-built BL-067\": mục lục cột trái chi tiết tin tức"
   ],
-  "migration": "migrations/20261023_020647_leads_source_popup.ts — ALTER TYPE enum_leads_source ADD VALUE IF NOT EXISTS 'popup' (additive, down no-op). Chạy migrate staging/prod TRƯỚC deploy code",
+  "migration": "none",
   "changed": {
     "files": [
-      "src/components/leads/ConsultPopup.tsx (mới)",
-      "src/components/leads/ConsultPopup.test.tsx (mới)",
-      "src/components/layout/PublicShell.tsx",
-      "src/components/leads/LeadForm.tsx",
-      "src/lib/leads/lead-values.ts",
-      "src/lib/leads/dedupe.ts",
-      "src/lib/leads/create-or-merge.ts",
-      "src/collections/Leads.ts",
-      "src/shared/types/api.ts",
-      "src/endpoints/public/leads.ts",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
-      "migrations/20261023_020647_leads_source_popup.ts",
-      "migrations/20261023_020647_leads_source_popup.json",
-      "migrations/index.ts",
-      "src/payload-types.ts",
-      "docs/API_SPEC.md",
-      "docs/ERD.md",
+      "src/components/news/NewsToc.tsx",
+      "src/components/news/NewsArticleSidebar.tsx",
+      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
+      "src/components/news/NewsToc.test.tsx",
+      "src/components/news/NewsArticleSidebar.test.tsx",
+      ".context/design-spec.md",
       "docs/DESIGN.md"
     ],
     "modules": [
-      "public shell · island ConsultPopup (mọi trang công khai VI/EN)",
-      "leads · nguồn mới popup (enum DB, zod, endpoint công khai, dedupe, create-or-merge, helper hasSourceRecord)",
-      "admin · Leads: nhãn nguồn 'Popup tư vấn', lọc / xuất Excel theo nguồn",
-      "i18n · chuỗi popup vi/en",
-      "DB · migration enum additive"
+      "public news detail · cột trái mục lục + thẻ tư vấn dính"
     ]
   },
   "screens": [
-    "Mọi trang công khai VI/EN (/, /du-an, /cho-thue, /tin-bds, /tin-tuc, /tuyen-dung, trang chi tiết, 404 … và bản /en)",
-    "KHÔNG hiện: /lien-he, /en/contact, /admin",
-    "Admin: danh sách / chi tiết Lead (nguồn 'Popup tư vấn')"
+    "/tin-tuc/[slug]",
+    "/en/news/[slug]"
   ],
   "flows": [
-    "Ở lại 30s → popup mở → điền form → gửi → lời cảm ơn → lead nguồn popup trong admin",
-    "Chuyển trang trước 30s → đồng hồ không reset; sau khi hiện (đóng hoặc gửi) → không hiện lại trong phiên",
-    "Mở tab mới / vào lại sau khi đóng hết tab → phiên mới → hiện lại sau 30s",
-    "Tới 30s đang ở /lien-he → chưa hiện; sang trang khác → hiện",
-    "Tới 30s khi focus trong ô form khác → hoãn tới khi rời hẳn form (kể cả Tab sang nút gửi cùng form); khi modal khác mở → hoãn tới khi đóng"
+    "Bài ~5–8 heading ở ≥ lg: mục lục đọc trọn, không cuộn riêng",
+    "Bài dài: mục lục tự cuộn trong khung và theo mục active",
+    "Thẻ \"Nhận tư vấn\" luôn thấy trong cột dính",
+    "< lg: mục lục gập đầu bài vẫn mở/đóng và cuộn tới heading"
   ],
   "impact": {
     "direct": [
-      "ConsultPopup: 30s theo phiên, 1 lần/phiên, tab mới = phiên mới, sessionStorage lỗi không crash",
-      "Không hiện ở /lien-he, /en/contact, /admin",
-      "Hoãn khi focus trong form khác (kể cả nút gửi / Turnstile cùng form, đang nhấn chuột trong form) và khi modal khác mở",
-      "Dialog: ×, Esc, bấm nền; focus trap; trả focus phần tử trước đó; aria-labelledby",
-      "Gửi lead source=popup: không sourceId, validate zod, Turnstile, consent, rate limit, chống trùng 7 ngày theo (SĐT, popup), email thông báo",
-      "Admin: lead nguồn 'Popup tư vấn' hiện đúng, lọc + xuất Excel theo nguồn",
-      "vi/en, responsive 390 / 768 / 1440, dark mode"
+      "Cột lưới 16rem (≥ xl 18rem); mục min-h 32px, số tròn 24px, cấp 3 thụt thẳng chữ cấp 2",
+      "Khối dính ≥ lg: mục lục chiếm phần cao còn lại, thẻ tư vấn shrink-0",
+      "Mục lục tự cuộn theo mục active khi bài dài"
     ],
     "dependents": [
-      "LeadForm (thêm nguồn popup, buildLeadExtra không gửi sourceId cho popup)",
-      "Endpoint POST lead công khai + dedupe + create-or-merge (hasSourceRecord thay so sánh === contact)",
-      "Giao sale tự động cho lead không có bản ghi nguồn (như contact)",
-      "PublicShell: các island khác (CookieBanner, FloatingDock, BackToTop, UtmCapture) không bị che / chồng"
+      "DetailAsideFit / DETAIL_ASIDE_STICKY_CLASS dùng chung (không sửa)",
+      "Bản gập NewsTocDisclosure < lg (không đổi, mục 44px)"
     ],
     "regression": [
-      "Mọi form lead hiện có: contact, rental, property_post, project (vẫn cần sourceId đúng, validate, gửi thành công)",
-      "Trang Liên hệ: form tư vấn hoạt động bình thường, không có popup",
-      "Admin lọc / xuất Excel Lead theo nguồn các giá trị cũ",
-      "CookieBanner / FloatingDock / BackToTop: hiển thị, bấm được, không bị popup chặn sai",
-      "Route công khai vẫn SSG/ISR (không thành dynamic)",
-      "Migration: db trống + db đã có dữ liệu chạy được; enum cũ giữ nguyên giá trị"
+      "Chi tiết dự án / cho thuê / tin đăng (khung dính chung)",
+      "Thân bài news-prose không bị hẹp ở 1024",
+      "Link #id, aria-current, scroll-margin, reduced-motion"
     ]
   },
   "acceptance": [
-    "Ở lại trang công khai 30 giây → popup tự mở; chuyển trang trong lúc đếm không reset đồng hồ",
-    "Mỗi phiên chỉ hiện 1 lần: đã hiện / đóng / gửi → không hiện lại; tab mới = phiên mới → hiện lại sau 30s",
-    "Không hiện ở /lien-he, /en/contact, /admin; đang ở /lien-he lúc 30s → sang trang khác thì hiện",
-    "Focus trong ô form khác lúc 30s → hoãn tới khi rời hẳn form (Tab sang nút gửi cùng form vẫn hoãn); modal khác mở → hoãn tới khi đóng",
-    "Đóng bằng ×, Esc, bấm nền; focus trap trong dialog; đóng xong focus về phần tử trước đó; dialog có nhãn (tiêu đề)",
-    "Gửi form: thành công hiện lời cảm ơn; lead tạo với nguồn 'Popup tư vấn' trong admin (lọc + xuất Excel được); gửi trùng SĐT trong 7 ngày được gộp như form khác",
-    "vi và en đúng chuỗi; 390 / 768 / 1440 không vỡ; dark mode đạt tương phản",
-    "Các form lead khác và CookieBanner / FloatingDock / BackToTop không hồi quy"
+    "1440×900, 1280×800, 1024×768 — /tin-tuc/[slug] + /en/news/[slug]: bài ~5–8 heading → mục lục không cuộn riêng",
+    "Bài dài → mục lục tự cuộn trong khung và theo mục active",
+    "Nút \"Nhận tư vấn\" luôn thấy trong cột dính",
+    "< lg: mục lục gập vẫn chạy (mở/đóng, bấm cuộn tới heading)",
+    "Tiêu đề mục ít wrap hơn rõ rệt so với trước (cột 15rem)"
   ],
   "verification": {
-    "status": "pnpm typecheck PASS; pnpm test 427 file / 4472 test PASS (gồm ConsultPopup.test.tsx 21 test, leads-migration); pnpm build PASS (route [locale] vẫn ●); eslint file đổi 0 lỗi; reviewer STRICT PASS r2; spec-validator PASS. pnpm lint toàn repo fail do file ngoài scope có sẵn (.local-seed/…, tools/task-dashboard/server.mjs)"
+    "status": "vitest src/components/news 8 file / 98 test PASS; typecheck PASS; eslint sạch; reviewer NORMAL PASS r1. Đo dev (primary): bài 5 heading 1440×900 và 1280×800 nav scrollHeight=clientHeight=333 (không cuộn); giả lập 10 mục 2 dòng 1440×900 → 681 > 527 → tự cuộn (đúng thiết kế)"
   },
   "unverifiedLocally": [
-    "Staging / production: migration enum popup chưa chạy (phải migrate trước deploy code)",
-    "Hành vi Safari / thiết bị cảm ứng thật cho nhánh pointerdown trong form (chỉ test jsdom)"
+    "1024×768 và bản EN chưa đo trên trình duyệt",
+    "Bài rất dài với nhiều heading cấp 3"
   ],
   "followUps": [],
-  "risk": "medium",
-  "riskNote": "Migration enum additive (migrate trước deploy); island trong khung trang chung của mọi trang công khai; form lead công khai (spam / consent). Ưu tiên test: (1) 30s + 1 lần/phiên + không ở /lien-he, (2) hoãn khi gõ form khác, (3) gửi lead nguồn popup + admin, (4) hồi quy các form lead và CookieBanner."
+  "risk": "low",
+  "riskNote": "UI only, một màn. Ưu tiên test: (1) mục lục không cuộn với bài thường ở 1440/1280, (2) bài dài tự cuộn + theo active, (3) thẻ tư vấn luôn thấy, (4) < lg gập vẫn chạy."
 }
