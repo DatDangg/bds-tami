@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 import { FlagIcon } from "./flag-icons";
 
 /**
- * Hai cờ vuông VN / UK (BL-063, design-spec §2.3: mỗi mục là `<a hreflang lang aria-label title>` — tên truy cập "Tiếng Việt" / "English"
+ * Hai cờ chữ nhật 3:2 (21×14px) VN / UK (BL-063, design-spec §2.3: mỗi mục là `<a hreflang lang aria-label title>` — tên truy cập "Tiếng Việt" / "English"
  * đọc được vì là `<a>`, không phải `aria-label` trên phần tử generic; cờ SVG là trang trí `aria-hidden`). Mỗi mục ≥ 44×44, hai mục kề nhau `gap-1`.
- * Ngôn ngữ đang xem: link về chính trang này, `aria-current` + ring 2px có offset (phân biệt bằng hình học, không chỉ màu).
+ * Ngôn ngữ đang xem: link về chính trang này, `aria-current` + ring mảnh 1.5px có offset 1px (phân biệt bằng hình học, không chỉ màu).
  * Ngôn ngữ kia: mờ 60% (hover/focus 100%), link tới TRANG TƯƠNG ỨNG (`localeSwitchHref`: trang luôn có hai bản link thẳng; trang có slug hoặc pháp lý
  * qua `/api/locale-counterpart`, chưa có bản dịch thì về danh sách/trang chủ) và ghi cookie `NEXT_LOCALE` để UI nhớ lựa chọn.
  * Cookie KHÔNG được đọc để redirect: mỗi URL một ngôn ngữ (SPEC F12), nên link vẫn hoạt động khi chặn cookie.
@@ -46,12 +46,12 @@ export function LanguageSwitcher({ className, tone = "on-light" }: { className?:
             {/* Viền mảnh ring-black/20 để cờ nét trên nền sáng lẫn tối (cờ đã đậm màu, không cần đổi viền theo nền). */}
             <span
               className={cn(
-                "inline-flex size-6 overflow-hidden rounded-[2px] ring-1 ring-black/20",
-                isCurrent && "ring-2 ring-accent-text ring-offset-2",
+                "inline-flex h-3.5 w-[21px] overflow-hidden rounded-[2px] ring-1 ring-black/20",
+                isCurrent && "ring-[1.5px] ring-accent-text ring-offset-1",
                 isCurrent && (tone === "on-dark" ? "ring-offset-dark" : "ring-offset-glass"),
               )}
             >
-              <FlagIcon locale={locale} className="size-6" />
+              <FlagIcon locale={locale} className="h-3.5 w-[21px]" />
             </span>
           </a>
         );

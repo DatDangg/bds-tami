@@ -1,0 +1,1 @@
+Builder phase-1-task-03: cờ 3:2 (viewBox 30x20), hiển thị 21x14, ring chọn ring-[1.5px] offset-1. Sửa flag-icons.tsx, LanguageSwitcher.tsx + 2 test. lint/typecheck/test PASS. Chưa commit (chờ reviewer STRICT). Task file đã ghi decision log + verification.

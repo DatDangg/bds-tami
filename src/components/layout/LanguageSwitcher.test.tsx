@@ -60,12 +60,13 @@ describe("LanguageSwitcher: cờ vuông thay chữ VI | EN (BL-063)", () => {
     expect(screen.getByRole("group").textContent?.trim()).toBe("");
   });
 
-  it("ngôn ngữ đang xem: aria-current + ring đậm; ngôn ngữ kia mờ 60%, không aria-current", () => {
+  it("ngôn ngữ đang xem: aria-current + ring mảnh 1.5px; ngôn ngữ kia mờ 60%, không aria-current", () => {
     renderSwitcher("en", "/en");
     const current = screen.getByRole("link", { name: "English" });
     const other = screen.getByRole("link", { name: "Tiếng Việt" });
     expect(current).toHaveAttribute("aria-current", "true");
-    expect(current.querySelector("[data-flag]")?.parentElement).toHaveClass("ring-2");
+    expect(current.querySelector("[data-flag]")?.parentElement).toHaveClass("ring-[1.5px]", "ring-offset-1");
+    expect(current.querySelector("[data-flag]")?.parentElement).toHaveClass("h-3.5", "w-[21px]");
     expect(current).not.toHaveClass("opacity-60");
     expect(other).not.toHaveAttribute("aria-current");
     expect(other).toHaveClass("opacity-60", "hover:opacity-100", "focus-visible:opacity-100");
