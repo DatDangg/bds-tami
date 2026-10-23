@@ -3073,6 +3073,37 @@
       "specVersion": "1.55.1",
       "scopeVersion": 72,
       "review": "T01 NORMAL PASS r1"
+    },
+    {
+      "slug": "en-non-localized-fields",
+      "title": "/en không còn chữ Việt ở trường dùng chung: tầng tin cho thuê (mức + số tầng) + khoảng cách tiện ích dự án (số + đơn vị) hiện theo ngôn ngữ; địa chỉ giữ tiếng Việt (BL-065)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-065",
+      "changeDoc": "spec/changes/archive/2026-10-23-en-non-localized-fields.md",
+      "startedAt": "2026-10-23",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-en-non-localized-fields/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-en-non-localized-fields-phase-1-task-01-round-2-review.md",
+          "verify": "typecheck PASS · eslint sạch · vitest 68 files/731 liên quan PASS (full 4528) · migration dev: rentals 18 chuyển/1 không parse (3.4.5.6), _rentals_v 89/5, nearby 488/488, _projects_v nearby 1672/1672",
+          "migration": "20261023_030506_floor_distance_normalized",
+          "highRiskMigration": "backfill-only — chạy + verify staging (đo thời gian backfill) trước promote prod",
+          "completedAt": "2026-10-23",
+          "commit": "bf0b410"
+        }
+      ],
+      "specValidation": ".context/review-reports/spec-validation-feature-en-non-localized-fields-phase-1.md (PASS)",
+      "completedAt": "2026-10-23",
+      "specVersion": "1.56.0",
+      "scopeVersion": 73,
+      "review": "T01 STRICT FAIL r1 → PASS r2"
     }
   ],
   "bugs": [
@@ -4116,7 +4147,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T02:44:16.748Z",
+  "lastUpdated": "2026-10-23T22:30:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

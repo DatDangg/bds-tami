@@ -1,0 +1,82 @@
+{
+  "specVersion": "1.55.1",
+  "scopeVersion": 72,
+  "generatedAt": "2026-10-23T20:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-067 MODIFY (PATCH 1.55.0 → 1.55.1 — mục lục gọn chi tiết tin tức, user 2026-10-23): UI only; cột trái 16rem (≥ xl 18rem), mục ≥ 32px, số tròn 24px, cấp 3 thẳng chữ cấp 2, mục lục chiếm phần cao còn lại của cột dính.",
+  "status": "published — T01 NORMAL PASS r1; commit 6f66ea4",
+  "workItem": "feature/news-toc-compact",
+  "backlog": "BL-067",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-23-news-toc-compact.md",
+  "changeDocStatus": "archived",
+  "task": [
+    "tasks/feature-news-toc-compact/phase-1-task-01.md"
+  ],
+  "reviewResults": [
+    "T01 NORMAL PASS r1 — .context/review-reports/feature-news-toc-compact-phase-1-task-01-round-1-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.55.0-71.json",
+  "specUpdate": "spec/updates/2026-10-23-news-toc-compact.md",
+  "specRefs": [
+    "F2 — khối \"Tin tức v2\" (BL-062) trong SPECIFICATIONS.md, dòng \"As-built BL-067\": mục lục cột trái chi tiết tin tức"
+  ],
+  "migration": "none",
+  "changed": {
+    "files": [
+      "src/components/news/NewsToc.tsx",
+      "src/components/news/NewsArticleSidebar.tsx",
+      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
+      "src/components/news/NewsToc.test.tsx",
+      "src/components/news/NewsArticleSidebar.test.tsx",
+      ".context/design-spec.md",
+      "docs/DESIGN.md"
+    ],
+    "modules": [
+      "public news detail · cột trái mục lục + thẻ tư vấn dính"
+    ]
+  },
+  "screens": [
+    "/tin-tuc/[slug]",
+    "/en/news/[slug]"
+  ],
+  "flows": [
+    "Bài ~5–8 heading ở ≥ lg: mục lục đọc trọn, không cuộn riêng",
+    "Bài dài: mục lục tự cuộn trong khung và theo mục active",
+    "Thẻ \"Nhận tư vấn\" luôn thấy trong cột dính",
+    "< lg: mục lục gập đầu bài vẫn mở/đóng và cuộn tới heading"
+  ],
+  "impact": {
+    "direct": [
+      "Cột lưới 16rem (≥ xl 18rem); mục min-h 32px, số tròn 24px, cấp 3 thụt thẳng chữ cấp 2",
+      "Khối dính ≥ lg: mục lục chiếm phần cao còn lại, thẻ tư vấn shrink-0",
+      "Mục lục tự cuộn theo mục active khi bài dài"
+    ],
+    "dependents": [
+      "DetailAsideFit / DETAIL_ASIDE_STICKY_CLASS dùng chung (không sửa)",
+      "Bản gập NewsTocDisclosure < lg (không đổi, mục 44px)"
+    ],
+    "regression": [
+      "Chi tiết dự án / cho thuê / tin đăng (khung dính chung)",
+      "Thân bài news-prose không bị hẹp ở 1024",
+      "Link #id, aria-current, scroll-margin, reduced-motion"
+    ]
+  },
+  "acceptance": [
+    "1440×900, 1280×800, 1024×768 — /tin-tuc/[slug] + /en/news/[slug]: bài ~5–8 heading → mục lục không cuộn riêng",
+    "Bài dài → mục lục tự cuộn trong khung và theo mục active",
+    "Nút \"Nhận tư vấn\" luôn thấy trong cột dính",
+    "< lg: mục lục gập vẫn chạy (mở/đóng, bấm cuộn tới heading)",
+    "Tiêu đề mục ít wrap hơn rõ rệt so với trước (cột 15rem)"
+  ],
+  "verification": {
+    "status": "vitest src/components/news 8 file / 98 test PASS; typecheck PASS; eslint sạch; reviewer NORMAL PASS r1. Đo dev (primary): bài 5 heading 1440×900 và 1280×800 nav scrollHeight=clientHeight=333 (không cuộn); giả lập 10 mục 2 dòng 1440×900 → 681 > 527 → tự cuộn (đúng thiết kế)"
+  },
+  "unverifiedLocally": [
+    "1024×768 và bản EN chưa đo trên trình duyệt",
+    "Bài rất dài với nhiều heading cấp 3"
+  ],
+  "followUps": [],
+  "risk": "low",
+  "riskNote": "UI only, một màn. Ưu tiên test: (1) mục lục không cuộn với bài thường ở 1440/1280, (2) bài dài tự cuộn + theo active, (3) thẻ tư vấn luôn thấy, (4) < lg gập vẫn chạy."
+}

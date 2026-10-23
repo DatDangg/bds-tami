@@ -1,82 +1,118 @@
 {
-  "specVersion": "1.55.1",
-  "scopeVersion": 72,
-  "generatedAt": "2026-10-23T20:00:00+07:00",
+  "specVersion": "1.56.0",
+  "scopeVersion": 73,
+  "generatedAt": "2026-10-23T21:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-067 MODIFY (PATCH 1.55.0 → 1.55.1 — mục lục gọn chi tiết tin tức, user 2026-10-23): UI only; cột trái 16rem (≥ xl 18rem), mục ≥ 32px, số tròn 24px, cấp 3 thẳng chữ cấp 2, mục lục chiếm phần cao còn lại của cột dính.",
-  "status": "published — T01 NORMAL PASS r1; commit 6f66ea4",
-  "workItem": "feature/news-toc-compact",
-  "backlog": "BL-067",
+  "triggerNote": "BL-065 MODIFY (MINOR 1.55.1 → 1.56.0 — trường không localized hiện theo ngôn ngữ, user 2026-10-23): tầng tin cho thuê và khoảng cách tiện ích dự án chuẩn hoá (mã chọn + số), web dựng nhãn vi/en; địa chỉ giữ tiếng Việt ở /en. Có migration additive + backfill.",
+  "status": "published — T01 STRICT FAIL r1 → PASS r2; commit bf0b410",
+  "workItem": "feature/en-non-localized-fields",
+  "backlog": "BL-065",
   "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-23-news-toc-compact.md",
+  "changeDoc": "spec/changes/archive/2026-10-23-en-non-localized-fields.md",
   "changeDocStatus": "archived",
   "task": [
-    "tasks/feature-news-toc-compact/phase-1-task-01.md"
+    "tasks/feature-en-non-localized-fields/phase-1-task-01.md"
   ],
   "reviewResults": [
-    "T01 NORMAL PASS r1 — .context/review-reports/feature-news-toc-compact-phase-1-task-01-round-1-review.md"
+    "T01 STRICT FAIL r1 (M1 thiếu tag HIGH_RISK_MIGRATION) — .context/review-reports/feature-en-non-localized-fields-phase-1-task-01-round-1-review.md",
+    "T01 STRICT PASS r2 — .context/review-reports/feature-en-non-localized-fields-phase-1-task-01-round-2-review.md",
+    "spec-validation phase 1 PASS — .context/review-reports/spec-validation-feature-en-non-localized-fields-phase-1.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.55.0-71.json",
-  "specUpdate": "spec/updates/2026-10-23-news-toc-compact.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.55.1-72.json",
+  "specUpdate": "spec/updates/2026-10-23-en-non-localized-fields.md",
   "specRefs": [
-    "F2 — khối \"Tin tức v2\" (BL-062) trong SPECIFICATIONS.md, dòng \"As-built BL-067\": mục lục cột trái chi tiết tin tức"
+    "F2 — khối dự án, dòng \"Khoảng cách tiện ích xung quanh (BL-065)\" trong SPECIFICATIONS.md",
+    "F3 — tin cho thuê, dòng \"Tầng (BL-065)\" trong SPECIFICATIONS.md",
+    "F12 — dòng \"Trường dùng chung hiện theo ngôn ngữ (BL-065)\" (địa chỉ giữ tiếng Việt ở /en)"
   ],
-  "migration": "none",
+  "migration": "20261023_030506_floor_distance_normalized — additive (4 CREATE TYPE + 8 ADD COLUMN nullable) + backfill cột mới; cột cũ giữ nguyên; down drop cột/enum mới",
+  "migrationRisk": "HIGH_RISK_MIGRATION chỉ do backfill 4 bảng (rentals, _rentals_v, projects_nearby_amenities, _projects_v_version_nearby_amenities): chạy + verify staging (đo thời gian backfill) trước khi promote prod",
   "changed": {
     "files": [
-      "src/components/news/NewsToc.tsx",
-      "src/components/news/NewsArticleSidebar.tsx",
-      "src/app/(frontend)/[locale]/tin-tuc/[slug]/page.tsx",
-      "src/components/news/NewsToc.test.tsx",
-      "src/components/news/NewsArticleSidebar.test.tsx",
-      ".context/design-spec.md",
-      "docs/DESIGN.md"
+      "src/collections/Rentals.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/hooks/rentals/field-validators.ts",
+      "src/lib/units/legacy-parse.ts",
+      "src/lib/units/floor-distance-view.ts",
+      "src/lib/rentals/rental-view.ts",
+      "src/lib/projects/project-detail-view.ts",
+      "src/components/rentals/RentalDetail.tsx",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/payload-types.ts",
+      "migrations/20261023_030506_floor_distance_normalized.ts",
+      "scripts/report-legacy-floor-distance.ts",
+      "scripts/seed-scraped.ts",
+      "docs/ERD.md"
     ],
     "modules": [
-      "public news detail · cột trái mục lục + thẻ tư vấn dính"
+      "admin Tin cho thuê · Mức tầng + Số tầng",
+      "admin Dự án · tiện ích xung quanh (Khoảng cách + Đơn vị)",
+      "public chi tiết cho thuê (dòng Tầng) vi/en",
+      "public chi tiết dự án (chip khoảng cách) vi/en",
+      "migration + backfill + script report:legacy-units"
     ]
   },
   "screens": [
-    "/tin-tuc/[slug]",
-    "/en/news/[slug]"
+    "/cho-thue/[slug]",
+    "/en/rentals/[slug]",
+    "/du-an/[slug]",
+    "/en/projects/[slug]",
+    "/admin/collections/rentals",
+    "/admin/collections/projects"
   ],
   "flows": [
-    "Bài ~5–8 heading ở ≥ lg: mục lục đọc trọn, không cuộn riêng",
-    "Bài dài: mục lục tự cuộn trong khung và theo mục active",
-    "Thẻ \"Nhận tư vấn\" luôn thấy trong cột dính",
-    "< lg: mục lục gập đầu bài vẫn mở/đóng và cuộn tới heading"
+    "Admin nhập Mức tầng + Số tầng (nguyên ≥ 0) → chi tiết tin hiện theo ngôn ngữ",
+    "Admin nhập Khoảng cách + Đơn vị (thiếu 1 trong 2 → lỗi) → chip dự án theo ngôn ngữ",
+    "Tin/dự án dữ liệu cũ chưa chuyển: /vi hiện giá trị cũ, /en ẩn",
+    "Chạy pnpm report:legacy-units liệt kê giá trị cũ chưa parse"
   ],
   "impact": {
     "direct": [
-      "Cột lưới 16rem (≥ xl 18rem); mục min-h 32px, số tròn 24px, cấp 3 thụt thẳng chữ cấp 2",
-      "Khối dính ≥ lg: mục lục chiếm phần cao còn lại, thẻ tư vấn shrink-0",
-      "Mục lục tự cuộn theo mục active khi bài dài"
+      "/en chi tiết cho thuê hiện \"Floor N\" / \"High|Mid|Low floor\", không còn \"Tầng\"; /vi hiện \"Tầng N\" / \"Tầng cao\"",
+      "Tin giá trị cũ không parse (vd \"3.4.5.6\") hiện ở vi, ẩn ở en",
+      "Dự án /en chip \"1.2 km\" / \"800 m\" / \"15 min\"; vi \"1,2 km\" / \"15 phút\"",
+      "Admin: Mức tầng + Số tầng (nguyên ≥ 0); Khoảng cách + Đơn vị (thiếu 1 trong 2 → lỗi validate)",
+      "Ô \"giá trị cũ\" (floor / distance) chỉ hiện khi chưa có giá trị mới",
+      "pnpm report:legacy-units liệt kê giá trị cũ chưa chuyển",
+      "Địa chỉ vẫn tiếng Việt ở /en (đúng quy ước, không phải lỗi)"
     ],
     "dependents": [
-      "DetailAsideFit / DETAIL_ASIDE_STICKY_CLASS dùng chung (không sửa)",
-      "Bản gập NewsTocDisclosure < lg (không đổi, mục 44px)"
+      "rental-view / project-detail-view (mapper dùng chung)",
+      "seed-scraped dùng parser legacy-parse",
+      "Bản versions/draft của rentals và projects: _rentals_v, _projects_v đã backfill",
+      "payload-types.ts sinh lại"
     ],
     "regression": [
-      "Chi tiết dự án / cho thuê / tin đăng (khung dính chung)",
-      "Thân bài news-prose không bị hẹp ở 1024",
-      "Link #id, aria-current, scroll-margin, reduced-motion"
+      "Chi tiết cho thuê vi + en (các dòng thông tin khác, JSON-LD, metadata)",
+      "Chi tiết dự án vi + en (khối vị trí/tiện ích)",
+      "Admin form Rentals và Projects (lưu, publish, bản nháp, versions)",
+      "seed-scraped",
+      "Tìm kiếm/lọc cho thuê và dự án không bị ảnh hưởng bởi cột mới"
     ]
   },
   "acceptance": [
-    "1440×900, 1280×800, 1024×768 — /tin-tuc/[slug] + /en/news/[slug]: bài ~5–8 heading → mục lục không cuộn riêng",
-    "Bài dài → mục lục tự cuộn trong khung và theo mục active",
-    "Nút \"Nhận tư vấn\" luôn thấy trong cột dính",
-    "< lg: mục lục gập vẫn chạy (mở/đóng, bấm cuộn tới heading)",
-    "Tiêu đề mục ít wrap hơn rõ rệt so với trước (cột 15rem)"
+    "/en/rentals/[slug] có số tầng: hiện \"Floor N\"; chỉ có mức: \"High|Mid|Low floor\"; không có chữ \"Tầng\"",
+    "/cho-thue/[slug]: \"Tầng N\" / \"Tầng cao|trung|thấp\"; tin không có tầng → không hiện dòng",
+    "Tin có floor cũ không parse (\"3.4.5.6\") và chưa có giá trị mới: hiện ở /vi, ẩn ở /en",
+    "/en/projects/[slug]: chip \"1.2 km\", \"800 m\", \"15 min\"; /du-an/[slug]: \"1,2 km\", \"15 phút\"",
+    "Admin Tin cho thuê: Số tầng chỉ nhận số nguyên ≥ 0; Admin Dự án: nhập thiếu Khoảng cách hoặc Đơn vị → báo lỗi",
+    "Ô \"giá trị cũ\" ẩn khi đã có giá trị mới",
+    "pnpm report:legacy-units chạy được và liệt kê đúng giá trị chưa chuyển",
+    "Địa chỉ ở /en vẫn tiếng Việt"
   ],
   "verification": {
-    "status": "vitest src/components/news 8 file / 98 test PASS; typecheck PASS; eslint sạch; reviewer NORMAL PASS r1. Đo dev (primary): bài 5 heading 1440×900 và 1280×800 nav scrollHeight=clientHeight=333 (không cuộn); giả lập 10 mục 2 dòng 1440×900 → 681 > 527 → tự cuộn (đúng thiết kế)"
+    "status": "typecheck PASS; eslint PASS; vitest 68 file / 731 liên quan PASS (full 4528 PASS); reviewer STRICT FAIL r1 → PASS r2; spec-validation PASS. Dev backfill: rentals 18 chuyển / 1 không parse; _rentals_v 89 / 5; nearby 488/488; _projects_v nearby 1672/1672"
   },
   "unverifiedLocally": [
-    "1024×768 và bản EN chưa đo trên trình duyệt",
-    "Bài rất dài với nhiều heading cấp 3"
+    "Migration + backfill chưa chạy trên staging (đo thời gian backfill)",
+    "Hiển thị trình duyệt /en và /vi chưa kiểm thủ công đủ các tổ hợp"
   ],
-  "followUps": [],
-  "risk": "low",
-  "riskNote": "UI only, một màn. Ưu tiên test: (1) mục lục không cuộn với bài thường ở 1440/1280, (2) bài dài tự cuộn + theo active, (3) thẻ tư vấn luôn thấy, (4) < lg gập vẫn chạy."
+  "followUps": [
+    "Chạy migrate + verify staging trước prod (HIGH_RISK_MIGRATION do backfill)",
+    "Admin sửa tay các giá trị cũ không parse (xem pnpm report:legacy-units)"
+  ],
+  "risk": "medium",
+  "riskNote": "Có migration schema + backfill 4 bảng (additive, cột cũ giữ, có down). Ưu tiên test: (1) /en không còn chữ \"Tầng\" ở chi tiết cho thuê, (2) chip khoảng cách vi/en đúng định dạng, (3) tin giá trị cũ không parse ẩn ở en, (4) admin validate Số tầng và cặp Khoảng cách + Đơn vị, (5) form Rentals/Projects lưu/publish/versions."
 }
