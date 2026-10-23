@@ -1,0 +1,1 @@
+T04 builder: AboutBlock default eyebrow/videoLabel via i18n (page.home.about), spacing About pb-6 + Featured pt-4 after about (40px @1440), ERD 4.15 fields, tests updated. Verify all PASS. Not committed.

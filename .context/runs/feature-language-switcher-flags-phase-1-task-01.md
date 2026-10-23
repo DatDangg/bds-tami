@@ -3,9 +3,9 @@
 ```yaml
 workItem: feature/language-switcher-flags
 phaseTask: phase-1-task-01
-step: closeout
+step: done
 agent: change-request
-status: awaiting
+status: done
 attempt: 1
 interrupted: false
 updatedAt: 2026-10-22T22:10:00+07:00
@@ -36,3 +36,4 @@ batchQueue: []
 - 2026-10-22T23:05 ✅ DONE spec-publisher [agent: spec-publisher] — spec 1.51.0, scope v67 (archive v66)
 - 2026-10-22T23:05 ▶ START spec-validator phase 1 [agent: spec-validator] (status=running; cancel sẽ redo bước này)
 - 2026-10-22T23:12 ✅ DONE spec-validator phase 1 [agent: spec-validator] — PASS, 0 blocking; gap non-blocking SPECIFICATIONS.md:19 (footer `VI | EN`, "đậm") đã sửa + ghi spec/updates. progress.json done, change doc → archive, BACKLOG BL-063 done. next: commit close-out staging (không push)
+- 2026-10-22T23:15 ✅ DONE close-out — commit 918dbf2 trên staging (không push)

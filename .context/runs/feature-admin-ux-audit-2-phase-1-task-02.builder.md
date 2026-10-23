@@ -1,0 +1,2 @@
+# Builder T02 (BL-051 A4/A5/A13 + UploadButtonLabel carry-over)
+Done: AdminRoleAttribute provider (+test), _list-toolbar.scss, LeadExportButton restructure, UploadButtonLabel fix (+tests), style test. typecheck/lint/test PASS (access.test.ts flaky timeout when full suite runs, passes alone). Browser verified admin/sale, 375/1280, light/dark. Test accounts deleted. Not committed (dispatcher). Report in tasks/feature-admin-ux-audit-2/phase-1-task-02.md.

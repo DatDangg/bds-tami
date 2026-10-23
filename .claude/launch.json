@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tami-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "port": 3000
+    },
+    {
+      "name": "task-dashboard",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/task-dashboard/server.mjs", "--repo", ".", "--port", "7788"],
+      "port": 7788
+    },
+    {
+      "name": "site-mockup",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve@14.2.4", "docs/specs/site-redesign-mockup", "-l", "4600"],
+      "port": 4600
+    }
+  ]
+}

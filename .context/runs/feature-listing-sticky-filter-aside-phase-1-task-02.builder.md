@@ -1,0 +1,2 @@
+# builder — feature-listing-sticky-filter-aside phase-1-task-02 (BL-061)
+Done: bands vào cột trái DetailPageShell, @container/detail, --detail-aside-top, DetailAsideFit as, container-query cho các khối, test cập nhật, doc as-built, verify (typecheck/eslint/test 4406/build) PASS, ảnh bl061-p1t02-*. Chưa commit (theo yêu cầu). Còn lại: reviewer, close-out. Residual: xem Verification summary trong task file.
