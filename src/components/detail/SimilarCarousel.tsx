@@ -18,14 +18,14 @@ interface SimilarCarouselProps {
 }
 
 /**
- * Khối "… tương tự" cuối trang chi tiết (BL-052, design `detail-du-an`; DECISIONS #6): dải nền vàng nhạt `bg-primary-subtle` (BL-060), đầu khối canh trái (eyebrow + `h2` hai màu) + link "Xem tất cả …" bên phải,
+ * Khối "… tương tự" cuối trang chi tiết (BL-052, design `detail-du-an`; DECISIONS #6): dải nền trắng `bg-surface` + viền trên (BL-071: trước là `bg-primary-subtle` trùng nền gốc trang `data-detail-page` nên dính liền khối nội dung), đầu khối canh trái (eyebrow + `h2` hai màu) + link "Xem tất cả …" bên phải,
  * rồi `CardSlider` dùng chung với mũi tên tròn hai mép (`arrows="sides"`, từ md; mobile vuốt). Server Component.
  */
 export function SimilarCarousel({ items, title, titleAccent, eyebrow, viewAll, labels }: SimilarCarouselProps) {
   const headingId = useId();
   if (items.length === 0) return null;
   return (
-    <section aria-labelledby={headingId} className="border-t border-border bg-primary-subtle py-section-tight">
+    <section aria-labelledby={headingId} className="border-t border-border bg-surface py-section-tight">
       <div className="mx-auto mb-8 flex w-full max-w-container flex-wrap items-end justify-between gap-x-6 gap-y-3 px-gutter">
         <SectionHeading id={headingId} {...(eyebrow ? { eyebrow } : {})} title={title} {...(titleAccent ? { titleAccent } : {})} />
         {viewAll && (

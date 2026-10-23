@@ -1,0 +1,74 @@
+{
+  "specVersion": "1.56.1",
+  "scopeVersion": 74,
+  "generatedAt": "2026-10-23T22:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-069 BUG (PATCH 1.56.0 → 1.56.1, as-built, không đổi requirement): ẩn trường Ảnh đại diện staff ở /admin/create-first-user khi chưa đăng nhập.",
+  "status": "published — T01 STRICT PASS r1; chưa commit",
+  "workItem": "bug/first-user-avatar-upload",
+  "backlog": "BL-069",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-23-first-user-avatar-upload.md",
+  "task": ["tasks/bug-first-user-avatar-upload/phase-1-task-01.md"],
+  "reviewResults": [
+    "T01 STRICT PASS r1 — .context/review-reports/bug-first-user-avatar-upload-phase-1-task-01-round-1-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.56.0-73.json",
+  "specUpdate": "spec/updates/2026-10-23-first-user-avatar-upload.md",
+  "specRefs": [
+    "F10 — Quản trị: tài khoản nhân sự `staff` (admin | sale), đoạn \"As-built bug-fix BL-069\" trong SPECIFICATIONS.md",
+    "Tài khoản: `staff` (`admin` | `sale`) — Payload auth trên collection `staff`",
+    "F10 — thư viện ảnh (media): tạo media chỉ staff đăng nhập (Media.access.create = isStaff) — không đổi"
+  ],
+  "changed": {
+    "files": [
+      "src/collections/Staff.ts",
+      "src/collections/staff-avatar-condition.test.ts"
+    ],
+    "modules": [
+      "admin Nhân sự (staff) · trường Ảnh đại diện (admin.condition theo user đăng nhập)",
+      "admin /admin/create-first-user"
+    ]
+  },
+  "screens": [
+    "/admin/create-first-user",
+    "/admin/collections/staff",
+    "/admin/collections/staff/create",
+    "/admin/collections/staff/[id]"
+  ],
+  "flows": [
+    "DB trống → mở /admin/create-first-user → không thấy ô Ảnh đại diện → tạo admin đầu tiên thành công",
+    "Admin/sale đã đăng nhập → tạo/sửa staff → vẫn thấy và tải được Ảnh đại diện",
+    "Đã đăng nhập → upload ảnh vào thư viện media vẫn hoạt động"
+  ],
+  "impact": {
+    "direct": [
+      "/admin/create-first-user không hiện trường \"Ảnh đại diện\"; các trường khác (email, mật khẩu, họ tên, vai trò...) vẫn nhập và gửi được",
+      "Form tạo/sửa staff khi đã đăng nhập (admin và sale) vẫn có trường \"Ảnh đại diện\", chọn/tải ảnh như cũ (chỉ nhận image/*)"
+    ],
+    "dependents": [
+      "Media.access.create vẫn = isStaff: người chưa đăng nhập POST /api/media vẫn bị từ chối (không nới quyền)",
+      "Hiển thị avatar staff ở nơi khác (danh sách staff, dashboard, thông tin sale phụ trách) không đổi"
+    ],
+    "regression": [
+      "Đăng nhập admin/sale bình thường, đổi/xoá avatar staff, lưu form staff",
+      "Upload media (thư viện ảnh) khi đăng nhập",
+      "Phân quyền staff: sale không tự nâng vai trò, không sửa staff khác như trước",
+      "Test config admin quét nhãn tiếng Việt (nhãn \"Ảnh đại diện\" giữ nguyên)"
+    ]
+  },
+  "acceptance": [
+    "/admin/create-first-user không còn ô \"Ảnh đại diện\"; nhập form và tạo admin đầu tiên không bị lỗi quyền, form không bị xoá",
+    "Form tạo/sửa staff khi đã đăng nhập (admin/sale) vẫn có trường \"Ảnh đại diện\" như cũ",
+    "Không nới quyền tạo media cho người chưa đăng nhập (Media.create vẫn isStaff)",
+    "Có test cho điều kiện hiển thị trường (src/collections/staff-avatar-condition.test.ts): chưa user → ẩn; admin/sale → hiện; giữ upload → media, chỉ ảnh"
+  ],
+  "verification": {
+    "status": "reviewer STRICT PASS r1; test mới staff-avatar-condition.test.ts"
+  },
+  "unverifiedLocally": [
+    "Hiển thị thật ở /admin/create-first-user trên DB trống chưa kiểm thủ công trong trình duyệt (kiểm khi dựng môi trường mới)"
+  ],
+  "risk": "low",
+  "riskNote": "Chỉ thêm admin.condition cho 1 field; không đổi schema/API/quyền/migration. Ưu tiên test: (1) create-first-user không có ô avatar, (2) form staff khi đăng nhập vẫn có avatar."
+}

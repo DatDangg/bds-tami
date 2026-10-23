@@ -3535,10 +3535,10 @@
       "title": "Chi tiết dự án: thẻ Sản phẩm co chữ dọc, ảnh khối Tiện ích kéo cao theo danh sách, dải Dự án tương tự trùng nền (BL-071)",
       "type": "BUG",
       "severity": "medium",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-071",
-      "changeDoc": "spec/changes/2026-10-23-project-detail-layout-fixes.md",
+      "changeDoc": "spec/changes/archive/2026-10-23-project-detail-layout-fixes.md",
       "startedAt": "2026-10-23",
       "planApprovedAt": "2026-10-23 (user: ok BL-071: T01-A, T03-A, thứ tự T02→T01→T03)",
       "tasks": [
@@ -3563,15 +3563,30 @@
           "reviewLevel": "NORMAL",
           "reviewerResult": "PASS",
           "report": ".context/review-reports/bug-project-detail-layout-fixes-phase-1-task-01-round-1-review.md",
-          "note": "Phương án A: Tổng quan ≥ xl xếp dọc (bỏ 11fr/9fr), DetailStatCards bỏ columns={3}, auto-fill 8.5rem (<sm) / 11rem (≥sm); formatAreaRange NBSP trước m². 1440/1920 3 thẻ ~235px. NORMAL PASS r1 (4 MINOR)."
+          "note": "Phương án A: Tổng quan ≥ xl xếp dọc (bỏ 11fr/9fr), DetailStatCards bỏ columns={3}, auto-fill 8.5rem (<sm) / 11rem (≥sm); formatAreaRange NBSP trước m². 1440/1920 3 thẻ ~235px. NORMAL PASS r1 (4 MINOR).",
+          "commit": "d81b118"
         },
         {
           "task": "phase-1-task-03",
           "file": "tasks/bug-project-detail-layout-fixes/phase-1-task-03.md",
-          "status": "pending",
-          "attempt": 0
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-project-detail-layout-fixes-phase-1-task-03-round-1-review.md",
+          "note": "SimilarCarousel bg-primary-subtle → bg-surface (+ border-t), chung Dự án/Cho thuê/Tin BĐS; AA accent 5.12:1. NORMAL PASS r1 (2 MINOR).",
+          "commit": "(close-out commit BL-071)"
         }
-      ]
+      ],
+      "completedAt": "2026-10-23",
+      "specVersion": "1.56.2",
+      "scopeVersion": 75,
+      "specUpdate": "spec/updates/2026-10-23-project-detail-layout-fixes.md",
+      "review": "NORMAL PASS ×3",
+      "round": 1,
+      "docImpact": ".context/design-spec.md + docs/DESIGN.md as-built (BL-071 thay BL-056 thẻ 3 cột, BL-060 nền dải tương tự); SPECIFICATIONS as-built PATCH",
+      "residual": "Chưa pnpm build (dev server khác giữ .next); chưa kiểm 3 dự án thật staging Maison Privée/Astor 1/Windsor (sau deploy) — local chỉ DB dev Astor 1; ảnh chụp thiếu nhiều cặp viewport (có số đo); MINOR: sticky top lệch vài px < lg, 768 nay 3 thẻ/hàng, khoảng diện tích có thể ngắt quanh –, dải trắng sát dải Điểm mạnh #f7f5f4 (1.09:1)."
     }
   ],
   "projectName": "tami-website",
@@ -4225,7 +4240,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T09:23:55.474Z",
+  "lastUpdated": "2026-10-23T09:41:50.543Z",
   "approvalMilestones": [
     {
       "id": "M1",

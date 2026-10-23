@@ -1,74 +1,87 @@
 {
-  "specVersion": "1.56.1",
-  "scopeVersion": 74,
-  "generatedAt": "2026-10-23T22:00:00+07:00",
+  "specVersion": "1.56.2",
+  "scopeVersion": 75,
+  "generatedAt": "2026-10-23T23:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-069 BUG (PATCH 1.56.0 → 1.56.1, as-built, không đổi requirement): ẩn trường Ảnh đại diện staff ở /admin/create-first-user khi chưa đăng nhập.",
-  "status": "published — T01 STRICT PASS r1; chưa commit",
-  "workItem": "bug/first-user-avatar-upload",
-  "backlog": "BL-069",
+  "triggerNote": "BL-071 BUG (PATCH 1.56.1 → 1.56.2, as-built UI, không đổi requirement): thẻ Sản phẩm / ảnh Tiện ích / nền dải tương tự trang chi tiết.",
+  "status": "published — T01, T02, T03 Reviewer NORMAL PASS r1; T01 d81b118, T02 b3f1f10, T03 commit kèm close-out",
+  "workItem": "bug/project-detail-layout-fixes",
+  "backlog": "BL-071",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-23-first-user-avatar-upload.md",
-  "task": ["tasks/bug-first-user-avatar-upload/phase-1-task-01.md"],
-  "reviewResults": [
-    "T01 STRICT PASS r1 — .context/review-reports/bug-first-user-avatar-upload-phase-1-task-01-round-1-review.md"
-  ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.56.0-73.json",
-  "specUpdate": "spec/updates/2026-10-23-first-user-avatar-upload.md",
+  "changeDoc": "spec/changes/2026-10-23-project-detail-layout-fixes.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.56.1-74.json",
+  "specUpdate": "spec/updates/2026-10-23-project-detail-layout-fixes.md",
   "specRefs": [
-    "F10 — Quản trị: tài khoản nhân sự `staff` (admin | sale), đoạn \"As-built bug-fix BL-069\" trong SPECIFICATIONS.md",
-    "Tài khoản: `staff` (`admin` | `sale`) — Payload auth trên collection `staff`",
-    "F10 — thư viện ảnh (media): tạo media chỉ staff đăng nhập (Media.access.create = isStaff) — không đổi"
+    "F2 — Dự án, đoạn \"As-built bug-fix BL-071\" trong SPECIFICATIONS.md",
+    "F2 — chi tiết Dự án: Tổng quan / Tiện ích (BL-056, BL-060 — bị thay một phần)",
+    "Dải \"… tương tự\" dùng chung Dự án / Cho thuê / Tin BĐS"
   ],
   "changed": {
     "files": [
-      "src/collections/Staff.ts",
-      "src/collections/staff-avatar-condition.test.ts"
+      "src/components/projects/ProjectOverview.tsx",
+      "src/components/detail/DetailStatCards.tsx",
+      "src/components/detail/DetailFeatureList.tsx",
+      "src/lib/projects/project-detail-view.ts",
+      "src/components/detail/SimilarCarousel.tsx"
     ],
     "modules": [
-      "admin Nhân sự (staff) · trường Ảnh đại diện (admin.condition theo user đăng nhập)",
-      "admin /admin/create-first-user"
+      "Chi tiết Dự án · Tổng quan + thẻ Sản phẩm",
+      "Khối Tiện ích (ảnh 4:3, dính)",
+      "SimilarCarousel (3 màn chi tiết)"
     ]
   },
   "screens": [
-    "/admin/create-first-user",
-    "/admin/collections/staff",
-    "/admin/collections/staff/create",
-    "/admin/collections/staff/[id]"
+    "/du-an/<slug>",
+    "/en/du-an/<slug>",
+    "/cho-thue/<slug>",
+    "/en/cho-thue/<slug>",
+    "/tin-bds/<slug>",
+    "/en/tin-bds/<slug>"
+  ],
+  "viewports": [
+    375,
+    768,
+    1440,
+    1920
   ],
   "flows": [
-    "DB trống → mở /admin/create-first-user → không thấy ô Ảnh đại diện → tạo admin đầu tiên thành công",
-    "Admin/sale đã đăng nhập → tạo/sửa staff → vẫn thấy và tải được Ảnh đại diện",
-    "Đã đăng nhập → upload ảnh vào thư viện media vẫn hoạt động"
+    "Mở chi tiết dự án có loại sản phẩm tên dài ~45 ký tự ở 1440/1920 → thẻ đọc được, không cắt giữa từ",
+    "Dự án không mục tiện ích nào có ảnh riêng: ảnh tiện ích 4:3 với 3 và 12 mục, và sau khi bấm \"Khám phá tất cả tiện ích\"; ≥ md ảnh dính khi cuộn",
+    "Cuối trang chi tiết Dự án / Cho thuê / Tin BĐS: dải tương tự nền trắng, khác nền trang"
   ],
   "impact": {
     "direct": [
-      "/admin/create-first-user không hiện trường \"Ảnh đại diện\"; các trường khác (email, mật khẩu, họ tên, vai trò...) vẫn nhập và gửi được",
-      "Form tạo/sửa staff khi đã đăng nhập (admin và sale) vẫn có trường \"Ảnh đại diện\", chọn/tải ảnh như cũ (chỉ nhận image/*)"
+      "Thẻ Sản phẩm: lưới auto-fill, tên dài không cắt giữa từ/dọc từng chữ ở 1440 và 1920; 375/768 vẫn ổn",
+      "Tổng quan dự án ≥ xl xếp dọc (lưới thông tin rồi thẻ Sản phẩm)",
+      "Ô Diện tích: \"m²\" không tách khỏi số (NBSP)",
+      "Ảnh Tiện ích 4:3 bất kể số mục; dính dưới thanh mục con ≥ md",
+      "SimilarCarousel nền trắng, tách khỏi nền trang ở 375 và 1440"
     ],
     "dependents": [
-      "Media.access.create vẫn = isStaff: người chưa đăng nhập POST /api/media vẫn bị từ chối (không nới quyền)",
-      "Hiển thị avatar staff ở nơi khác (danh sách staff, dashboard, thông tin sale phụ trách) không đổi"
+      "Cho thuê / Tin BĐS dùng SimilarCarousel chung (đổi nền)",
+      "formatAreaRange dùng ở thanh thông số nổi",
+      "DetailFeatureList / DetailStatCards dùng chung cho màn khác"
     ],
     "regression": [
-      "Đăng nhập admin/sale bình thường, đổi/xoá avatar staff, lưu form staff",
-      "Upload media (thư viện ảnh) khi đăng nhập",
-      "Phân quyền staff: sale không tự nâng vai trò, không sửa staff khác như trước",
-      "Test config admin quét nhãn tiếng Việt (nhãn \"Ảnh đại diện\" giữ nguyên)"
+      "Tổng quan dự án không có sản phẩm: lưới thông tin rộng hết",
+      "Tiện ích có ≥ 1 mục có ảnh riêng: vẫn slider thẻ ảnh",
+      "Link \"Xem tất cả …\" trong dải tương tự vẫn đạt AA trên nền trắng",
+      "Thanh thông số nổi ≥ xl giá trị 1 dòng, không tràn",
+      "Trang EN (/en/...) cùng bố cục"
     ]
   },
   "acceptance": [
-    "/admin/create-first-user không còn ô \"Ảnh đại diện\"; nhập form và tạo admin đầu tiên không bị lỗi quyền, form không bị xoá",
-    "Form tạo/sửa staff khi đã đăng nhập (admin/sale) vẫn có trường \"Ảnh đại diện\" như cũ",
-    "Không nới quyền tạo media cho người chưa đăng nhập (Media.create vẫn isStaff)",
-    "Có test cho điều kiện hiển thị trường (src/collections/staff-avatar-condition.test.ts): chưa user → ẩn; admin/sale → hiện; giữ upload → media, chỉ ảnh"
+    "Dải tương tự phân biệt rõ nền trang chi tiết ở 375 và 1440",
+    "Thẻ Sản phẩm tên ~45 ký tự không cắt giữa từ ở 1440 và 1920; 375/768 ổn",
+    "Ảnh Tiện ích giữ 4:3 với 3 hay 12 mục, kể cả sau mở rộng",
+    "Kiểm 3 dự án thật staging sau deploy: Maison Privée, Astor 1, The Windsor Collection"
   ],
   "verification": {
-    "status": "reviewer STRICT PASS r1; test mới staff-avatar-condition.test.ts"
+    "status": "3 task Reviewer NORMAL PASS r1; test đơn vị cập nhật (DetailBlocks, DetailLists, project-detail, project-detail-view)"
   },
   "unverifiedLocally": [
-    "Hiển thị thật ở /admin/create-first-user trên DB trống chưa kiểm thủ công trong trình duyệt (kiểm khi dựng môi trường mới)"
+    "Chưa kiểm 3 dự án thật trên staging (Maison Privée, Astor 1, The Windsor Collection) — kiểm sau deploy"
   ],
-  "risk": "low",
-  "riskNote": "Chỉ thêm admin.condition cho 1 field; không đổi schema/API/quyền/migration. Ưu tiên test: (1) create-first-user không có ô avatar, (2) form staff khi đăng nhập vẫn có avatar."
+  "risk": "medium",
+  "riskNote": "Chỉ CSS/bố cục + helper định dạng; SimilarCarousel chung 3 màn nên rủi ro nhìn thấy trên Cho thuê / Tin BĐS. Ưu tiên: thẻ Sản phẩm tên dài ở 1440/1920, ảnh Tiện ích trước/sau mở rộng, nền dải tương tự."
 }

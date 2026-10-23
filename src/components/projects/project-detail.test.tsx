@@ -329,7 +329,10 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     const similar = screen.getByRole("heading", { level: 2, name: /Dự án tương tự/ }).closest("section") as HTMLElement;
     expect(within(similar).getByRole("heading", { level: 3, name: "Dự án B" })).toBeInTheDocument();
     expect(within(similar).getByRole("link", { name: "Xem tất cả dự án" })).toHaveAttribute("href", "/du-an");
-    expect(similar.className).toContain("bg-primary-subtle");
+    // BL-071: dải nền trắng, khác nền gốc trang chi tiết (bg-primary-subtle) để không dính liền với khối nội dung.
+    expect(similar).toHaveClass("bg-surface", "border-t");
+    expect(similar).not.toHaveClass("bg-primary-subtle");
+    expect(document.querySelector("[data-detail-page]")?.className).toContain("bg-primary-subtle");
     const strengthsRegion = screen.getByRole("heading", { level: 3, name: "Uy tín" }).closest("section") as HTMLElement;
     const banner = screen.getByTestId("consult-banner");
     expect(similar.compareDocumentPosition(strengthsRegion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
