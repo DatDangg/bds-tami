@@ -33,6 +33,19 @@ describe("DetailFeatureList", () => {
     expect(container.firstElementChild).toHaveClass("@md/detail:grid-cols-2");
   });
 
+  it("BL-071: ảnh bọc trong div riêng (grid item height auto) để aspect-ratio 4/3 có hiệu lực; div dính ≥ md", () => {
+    const { container } = renderWithIntl(<DetailFeatureList items={features(12)} image={fakeMedia("am", "Hồ bơi")} />);
+    const gridItem = container.firstElementChild?.firstElementChild as HTMLElement;
+    const ratioBox = container.querySelector<HTMLElement>("[style*='aspect-ratio']");
+    expect(ratioBox).not.toBeNull();
+    expect(gridItem).not.toBe(ratioBox);
+    expect(gridItem).toContainElement(ratioBox);
+    expect(ratioBox?.style.aspectRatio.replace(/\s/g, "")).toBe("4/3");
+    expect(gridItem).toHaveClass("@md/detail:sticky");
+    expect(gridItem.className).not.toMatch(/size-full|h-full/);
+    expect(gridItem).not.toContainElement(container.querySelector("ul"));
+  });
+
   it("BL-056 A4: không ảnh → danh sách rộng hết, @md:2 / @2xl:3 cột; đúng 1 mục → 1 cột (không co thành nửa ô)", () => {
     const many = renderWithIntl(<DetailFeatureList items={features(3)} />);
     expect(many.container.querySelector("ul")).toHaveClass("@md/detail:grid-cols-2", "@2xl/detail:grid-cols-3");
