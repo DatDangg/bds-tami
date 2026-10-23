@@ -21,7 +21,7 @@
 | tool `usage()` (plugin `loop-guard`) | Hook `.claude/hooks/session-handoff.mjs usage` tự chèn dòng `usage: …` sau mỗi lần gọi `Agent` **khi ≥ threshold**. Không thấy dòng đó = dưới ngưỡng, khỏi hỏi |
 | Compaction reminder (plugin `loop-guard`) | Hook `SessionStart` (matcher `compact`) → nhắc re-read Run Journal |
 | `opencode.jsonc → permission.bash` (deny git push main/force/reset, DB destructive) | **Hook `.claude/hooks/guard.mjs`** (PreToolUse, gate cứng — chạy cả ở bypass mode) + `.claude/settings.json → permissions.deny` (lớp phụ) |
-| `permission.task."builder-strong": "ask"` | Hook `guard.mjs` trả `ask` mỗi lần gọi `Agent` với `subagent_type: "builder-strong"` (+ `permissions.ask: ["Agent(builder-strong)"]` dự phòng) — vẫn **chỉ dùng khi user yêu cầu rõ** |
+| `permission.task."builder-strong": "allow"` | Gọi `Agent` với `subagent_type: "builder-strong"` **không** prompt duyệt (auto allow, user 2026-10-21) |
 | Cài skill ngoài: `npx skills use <repo>@<skill> --agent opencode` (vd archify) | Đổi `--agent opencode` → `--agent claude-code`; MCP server (vd `blitzstrike`) khai trong `.mcp.json` / `claude mcp add` thay vì config opencode |
 | Per-agent bash/edit permission (reviewer, spec-validator, builder) | Hook `guard.mjs` đọc `agent_type`: builder/builder-strong/reviewer/spec-validator **không** `git commit`/`push`; reviewer/spec-validator chỉ `Write`/`Edit` trong `.context/review-reports/**`. reviewer/spec-validator còn bị giới hạn `tools:` |
 | Allow verify command cho reviewer (`# verify-commands` block) | `node scripts/apply-verify-permissions.mjs --write` ghi cả `.claude/settings.json → permissions.allow` (`Bash(<cmd>)` exact) |

@@ -13,7 +13,6 @@
  *    Ngoại lệ: builder/builder-strong được `git commit` khi thư mục làm việc nằm trong `<project>/.worktrees/`
  *    (chạy song song worktree-per-task, .agent/loop.md § Parallel Execution Model). Push vẫn cấm.
  *  - reviewer, spec-validator: chỉ được Write/Edit trong `.context/review-reports/**`.
- *  - Gọi subagent builder-strong → luôn hỏi user (permissionDecision: ask).
  * forbidden_branch đọc từ `.context/project-config.md` (mặc định `main`).
  * Lỗi parse input → cho qua (exit 0, không output) để không làm hỏng session.
  */
@@ -123,11 +122,6 @@ try {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd()
   const agentType = input.agent_type || ''
   const toolInput = input.tool_input || {}
-  // builder-strong là opt-in: luôn bắt user duyệt (thay `permission.task."builder-strong": "ask"` của opencode).
-  if ((input.tool_name === 'Agent' || input.tool_name === 'Task') && toolInput.subagent_type === 'builder-strong') {
-    decide('ask', '[guard] builder-strong (model mạnh) chỉ dùng khi user yêu cầu rõ — duyệt để tiếp tục.')
-    process.exit(0)
-  }
   let reason = null
   if (input.tool_name === 'Bash') reason = bashViolation(String(toolInput.command || ''), agentType, readForbiddenBranch(projectDir), input.cwd || projectDir, projectDir)
   else reason = writeViolation(toolInput.file_path || toolInput.notebook_path, agentType, projectDir)

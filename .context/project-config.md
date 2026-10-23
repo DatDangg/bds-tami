@@ -111,8 +111,10 @@ models:
   builder:        sonnet
   builder_strong: opus     # chỉ dùng khi user yêu cầu rõ (§7 gate)
   reviewer:       opus
-  spec_validator: opus     # họ thứ 3 nếu có
-  change_request: opus          # ⭐ agent hậu-build (classify/spec/task) — cửa vào /change
+  spec_validator: opus     # họ thứ 3 nếu có (cũng dùng cho design)
+  change_request: opus          # ⭐ agent hậu-build (classify/spec/task) — cửa vào /change (cũng dùng cho graph)
+  spec_init:      opus
+  spec_publisher: sonnet
 ```
 
 ```yaml
