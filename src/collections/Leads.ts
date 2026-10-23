@@ -17,7 +17,7 @@ import { LEAD_LIST_SEARCHABLE_FIELDS, LEAD_LOCALES, LEAD_SOURCES, LEAD_STATUSES,
 import { isUuid } from "../lib/uuid";
 import type { Lead } from "../payload-types";
 
-export const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Tin bất động sản", project: "Dự án", contact: "Liên hệ" };
+export const SOURCE_LABELS: Record<LeadSource, string> = { rental: "Tin cho thuê", property_post: "Tin bất động sản", project: "Dự án", contact: "Liên hệ", popup: "Popup tư vấn" };
 export const STATUS_LABELS: Record<LeadStatus, string> = {
   new: "Mới",
   contacted: "Đã liên hệ",

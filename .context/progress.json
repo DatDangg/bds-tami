@@ -1,6 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": "feature/seed-english-data",
+  "activeWorkItem": "feature/consult-popup-30s",
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3017,6 +3017,34 @@
         "before": "projects 3/61 · rentals 0/32 · property_posts 0/38 · news 0/24 · services 0/3 · job_postings 3/4 · categories 5/16 · developers 0/29 · pages 0/2 · media alt 7/481",
         "after": "projects 61/61 · rentals 32/32 · property_posts 38/38 · news 24/24 · services 3/3 · job_postings 4/4 · categories 16/16 · developers 29/29 · pages 2/2 · media alt 481/481"
       }
+    },
+    {
+      "slug": "consult-popup-30s",
+      "title": "Popup \"Nhận tư vấn\" tự hiện sau 30s ở mọi trang công khai, 1 lần / phiên, nguồn lead popup (BL-066)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-066",
+      "changeDoc": "spec/changes/archive/2026-10-23-consult-popup-30s.md",
+      "startedAt": "2026-10-23",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-consult-popup-30s/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "review": "STRICT PASS",
+          "round": 2,
+          "report": ".context/review-reports/feature-consult-popup-30s-phase-1-task-01-round-2-review.md",
+          "verify": "typecheck PASS · test 427 files/4472 PASS · build PASS ([locale] vẫn ●) · eslint file task 0 · lint repo fail chỉ do .local-seed/ + tools/task-dashboard/server.mjs ngoài scope · migrate dev OK",
+          "completedAt": "2026-10-23"
+        }
+      ],
+      "completedAt": "2026-10-23",
+      "specVersion": "1.55.0",
+      "scopeVersion": 71,
+      "review": "spec-validation phase 1 PASS",
+      "reviewReport": ".context/review-reports/spec-validation-feature-consult-popup-30s-phase-1.md"
     }
   ],
   "bugs": [
@@ -4060,7 +4088,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-22T20:14:32.225Z",
+  "lastUpdated": "2026-10-23T02:44:16.748Z",
   "approvalMilestones": [
     {
       "id": "M1",

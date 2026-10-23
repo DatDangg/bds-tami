@@ -1,0 +1,99 @@
+{
+  "specVersion": "1.54.0",
+  "scopeVersion": 70,
+  "generatedAt": "2026-10-23T12:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-064 MODIFY (MINOR 1.53.0 → 1.54.0 — Dữ liệu dev song ngữ, user 2026-10-22): seed dev có bản EN viết sẵn cố định (seed/english/, không gọi AI) cho mọi bản ghi seed + global public; pnpm seed:english, idempotent, chỉ DB dev. Không đổi schema / API / UI.",
+  "status": "published — T01 STRICT PASS r2, T02 NORMAL PASS r1, T03 NORMAL PASS r2, T04 NORMAL PASS r1; spec-validation phase 1 PASS; primary close-out + commit sắp tới trên staging",
+  "workItem": "feature/seed-english-data",
+  "backlog": "BL-064",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-22-seed-english-data.md",
+  "changeDocStatus": "archive tại close-out",
+  "task": [
+    "tasks/feature-seed-english-data/phase-1-task-01.md",
+    "tasks/feature-seed-english-data/phase-1-task-02.md",
+    "tasks/feature-seed-english-data/phase-1-task-03.md",
+    "tasks/feature-seed-english-data/phase-1-task-04.md"
+  ],
+  "reviewResults": [
+    "T01 STRICT FAIL r1 → PASS r2 (commit 4f9809f)",
+    "T02 NORMAL PASS r1 (commit 4e86e5c)",
+    "T03 NORMAL FAIL r1 (dấu tên riêng) → PASS r2 (commit ff00d0b)",
+    "T04 NORMAL PASS r1 (commit 906bd1c)",
+    "spec-validator phase 1 PASS — .context/review-reports/spec-validation-feature-seed-english-data-phase-1.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.53.0-69.json",
+  "specUpdate": "spec/updates/2026-10-23-seed-english-data.md",
+  "specRefs": [
+    "F12 — 'Dữ liệu dev song ngữ (BL-064, user 2026-10-22)' trong SPECIFICATIONS.md: bản EN viết sẵn, idempotent, chỉ DB dev, hasEnglish + translation.enSource manual, không gọi AI lúc seed"
+  ],
+  "migration": "none — không đổi schema",
+  "changed": {
+    "files": [
+      "seed/english/** (engine + data: categories, developers, services, job-postings, pages, globals, media, projects.json, rentals.json, property-posts.json, news.json)",
+      "scripts/seed-english.ts",
+      "scripts/seed-english-export.ts",
+      "seed/index.ts",
+      "scripts/seed-scraped.ts",
+      "package.json",
+      "docs/runbooks/deploy.md",
+      "tests/unit/seed-english-format.test.ts",
+      "tests/unit/seed-english-guard.test.ts",
+      "tests/integration/seed-english.test.ts",
+      "tests/integration/seed-english-pages.test.ts"
+    ],
+    "modules": [
+      "seed · engine seed/english (ghi locale en, hasEnglish, translation.enSource manual, kiểm trường EN bắt buộc)",
+      "seed · bước cuối pnpm seed --sample và seed-scraped (checkSeedEnvironment)",
+      "data dev · EN cho Dự án, Cho thuê, Tin BĐS, Tin tức, Dịch vụ, Tuyển dụng, Danh mục, Chủ đầu tư, trang pháp lý, global public, alt ảnh",
+      "docs · runbook deploy (cấm seed EN staging/prod)"
+    ]
+  },
+  "screens": [
+    "/en, /en/projects, /en/projects/[slug], /en/for-rent, /en/for-rent/[slug], /en/property-news, /en/property-news/[slug], /en/news, /en/news/[slug], /en/services/*, /en/contact, /en/privacy-policy (+ trang pháp lý khác) — chỉ trên DB dev"
+  ],
+  "flows": [
+    "pnpm seed:english: chạy lần 1 ghi EN; chạy lại ghi 0 (idempotent)",
+    "pnpm seed --sample và seed-scraped: bước EN chạy cuối, bỏ qua khi không phải DB dev",
+    "Staging / production: seed EN bị chặn / bỏ qua"
+  ],
+  "impact": {
+    "direct": [
+      "/en/* trên DB dev có dữ liệu: danh sách + chi tiết Dự án (61/61), Cho thuê (32/32), Tin BĐS (38/38), Tin tức (24/24), Dịch vụ (3/3), Tuyển dụng (4/4), Danh mục (16/16), Chủ đầu tư (29/29), trang pháp lý (2/2), alt ảnh (481/481), trang chủ + global; không còn trang EN rỗng / rơi về tiếng Việt ở trường localized",
+      "pnpm seed:english chạy lần 2 ghi 0 bản ghi; không nhân bản, không đổi bản vi",
+      "Guard: APP_ENV staging / production → từ chối (seed:english) / bỏ qua (bước cuối seed --sample, seed-scraped)",
+      "Bản ghi seed EN có hasEnglish = true và translation.enSource = manual; không có translationJob AI xếp hàng; bài nháp giữ nháp"
+    ],
+    "dependents": [
+      "Tìm kiếm / lọc /en (có dữ liệu EN, slug EN đúng quy tắc); sitemap + hreflang chỉ liệt kê trang có EN",
+      "Trang pháp lý EN coi như đã duyệt (BR-08) — /en/privacy-policy hiển thị",
+      "Chi tiết tin /en/news/[slug]: khung liên hệ cuối bài (contactNote EN)"
+    ],
+    "regression": [
+      "Nội dung vi không đổi (trang chủ, danh sách, chi tiết) sau khi seed EN",
+      "pnpm seed --sample vẫn chạy trọn vẹn (bước EN ở cuối); seed-scraped vẫn chạy",
+      "Luồng tự dịch AI (khi sửa tay vi) không bị ảnh hưởng; job dịch không xếp hàng cho bản ghi seed EN",
+      "Admin: sửa bản ghi EN thủ công vẫn lưu được; trang pháp lý EN đã duyệt giữ trạng thái"
+    ]
+  },
+  "acceptance": [
+    "Sau pnpm seed:english trên DB dev: phủ EN projects 61/61, rentals 32/32, property_posts 38/38, news 24/24, services 3/3, job_postings 4/4, categories 16/16, developers 29/29, pages 2/2, media alt 481/481",
+    "Chạy lại pnpm seed:english: ghi 0, không nhân bản",
+    "Mở các route /en ở mục screens: có nội dung tiếng Anh, tên riêng giữ dấu, giá / diện tích giữ nguyên, không lẫn tiếng Việt ở trường localized",
+    "Staging / production không bị seed EN",
+    "Trang vi không thay đổi"
+  ],
+  "verification": {
+    "status": "Test unit + integration seed-english PASS (builder/reviewer); spec-validation phase 1 PASS; DB dev coverage trước → sau: projects 3/61 → 61/61, rentals 0/32 → 32/32, property_posts 0/38 → 38/38, news 0/24 → 24/24, services 0/3 → 3/3, job_postings 3/4 → 4/4, categories 5/16 → 16/16, developers 0/29 → 29/29, pages 0/2 → 2/2, media alt 7/481 → 481/481; idempotent (chạy lại ghi 0)"
+  },
+  "unverifiedLocally": [
+    "Staging / production: chưa chạy (cố ý — seed EN chỉ DB dev, bị chặn)"
+  ],
+  "followUps": [
+    "BL-065 — trường không localized (floor / distance / address) còn tiếng Việt ở /en",
+    "D12 — newsDetail.contactNote vi rỗng → dùng câu mặc định i18n"
+  ],
+  "risk": "low",
+  "riskNote": "Chỉ dữ liệu dev + công cụ seed; không đổi schema / API / UI; có guard chặn staging / prod. Ưu tiên test: (1) duyệt các route /en trên dev, (2) seed:english chạy lại ghi 0, (3) seed --sample còn chạy."
+}

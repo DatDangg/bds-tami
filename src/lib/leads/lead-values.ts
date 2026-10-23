@@ -1,6 +1,12 @@
 /** Giá trị cố định của lead và lịch sử chăm sóc (ERD §4.11). Nguồn duy nhất cho select, hook và test. */
-export const LEAD_SOURCES = ["rental", "property_post", "project", "contact"] as const;
+export const LEAD_SOURCES = ["rental", "property_post", "project", "contact", "popup"] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number];
+
+/** Nguồn có bản ghi gốc (tin cho thuê / tin BĐS / dự án). `contact` (form Liên hệ) và `popup` (popup tư vấn) không có: không `sourceId`, không tra bản ghi, không tự giao. */
+export type LeadSourceWithRecord = Exclude<LeadSource, "contact" | "popup">;
+export function hasSourceRecord(source: LeadSource): source is LeadSourceWithRecord {
+  return source !== "contact" && source !== "popup";
+}
 
 /** BR-11: Mới → Đã liên hệ → Đang tư vấn → Đã chốt | Không thành (bắt buộc lý do) | Spam. */
 export const LEAD_STATUSES = ["new", "contacted", "consulting", "won", "lost", "spam"] as const;

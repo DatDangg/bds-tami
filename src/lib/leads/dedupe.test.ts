@@ -30,6 +30,9 @@ describe("dedupe (BR-15)", () => {
     expect(refOf({ ...rentalKey, source: "project" })).toContain('"project":{"equals"');
     const contact = refOf({ phoneNormalized: rentalKey.phoneNormalized, source: "contact", sourceId: null });
     expect(contact).not.toMatch(/rental|propertyPost|"project"/);
+    const popup = refOf({ phoneNormalized: rentalKey.phoneNormalized, source: "popup", sourceId: null });
+    expect(popup).toContain('"source":{"equals":"popup"}');
+    expect(popup).not.toMatch(/rental|propertyPost|"project"/);
   });
 
   it("won/lost/spam là vụ việc đã đóng", () => {

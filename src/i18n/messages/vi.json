@@ -150,6 +150,11 @@
     "success": {
       "title": "Cảm ơn anh/chị!",
       "description": "Chuyên viên TAMI sẽ liên hệ trong giờ làm việc."
+    },
+    "consultPopup": {
+      "title": "Nhận tư vấn miễn phí",
+      "description": "Để lại thông tin, chuyên viên TAMI sẽ liên hệ tư vấn trong giờ làm việc.",
+      "close": "Đóng"
     }
   },
   "page": {

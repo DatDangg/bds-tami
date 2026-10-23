@@ -10,7 +10,7 @@ import { TurnstileWidget } from "@/components/forms/TurnstileWidget";
 import { usePublicForm, type FormFields } from "@/components/forms/use-public-form";
 import { Button } from "@/components/ui/button";
 import { readUtm } from "@/lib/leads/utm";
-import type { LeadSource } from "@/lib/leads/lead-values";
+import { hasSourceRecord, type LeadSource } from "@/lib/leads/lead-values";
 import { normalizePhone } from "@/lib/phone";
 
 const ENDPOINT = "/api/public/leads";
@@ -19,7 +19,7 @@ const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface LeadFormProps {
   source: LeadSource;
-  /** Id bản ghi nguồn (tin cho thuê/tin BĐS/dự án); bỏ qua khi `source = "contact"`. Tin đã thuê vẫn gửi id tin đó (FR-PUB-13). */
+  /** Id bản ghi nguồn (tin cho thuê/tin BĐS/dự án); bỏ qua khi `source` là `contact` / `popup`. Tin đã thuê vẫn gửi id tin đó (FR-PUB-13). */
   sourceId?: string;
   /** Site key Turnstile (công khai); thiếu thì form báo không tải được bước xác minh khi gửi. */
   turnstileSiteKey?: string;
@@ -41,7 +41,7 @@ export function buildLeadExtra(source: LeadSource, sourceId: string | undefined)
   const { origin, pathname, search } = window.location;
   return {
     source,
-    ...(source !== "contact" && sourceId ? { sourceId } : {}),
+    ...(hasSourceRecord(source) && sourceId ? { sourceId } : {}),
     utm: readUtm(),
     pageUrl: `${origin}${pathname}${search}`,
     referrer: document.referrer || undefined,

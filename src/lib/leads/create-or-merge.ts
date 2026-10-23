@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import type { LeadInput } from "@/shared/types/api";
 
 import { resolveAutoAssignee } from "./assign";
+import { hasSourceRecord } from "./lead-values";
 import { type DedupeKey, dedupeLockKey, duplicateLeadWhere, SOURCE_REF_FIELD } from "./dedupe";
 
 const log = logger.child({ component: "lead-create-or-merge" });
@@ -65,7 +66,7 @@ async function createLead(
   context: LeadRequestContext,
 ): Promise<{ id: string }> {
   const assignedTo = await resolveAutoAssignee(payload, { source: input.source, sourceId: input.sourceId ?? null, req });
-  const sourceRef = input.source === "contact" || !input.sourceId ? {} : { [SOURCE_REF_FIELD[input.source]]: input.sourceId };
+  const sourceRef = !hasSourceRecord(input.source) || !input.sourceId ? {} : { [SOURCE_REF_FIELD[input.source]]: input.sourceId };
   const created = await payload.create({
     collection: "leads",
     data: {

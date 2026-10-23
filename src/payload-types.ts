@@ -207,7 +207,7 @@ export interface Lead {
   email?: string | null;
   message?: string | null;
   locale: 'vi' | 'en';
-  source: 'rental' | 'property_post' | 'project' | 'contact';
+  source: 'rental' | 'property_post' | 'project' | 'contact' | 'popup';
   rental?: (string | null) | Rental;
   propertyPost?: (string | null) | PropertyPost;
   project?: (string | null) | Project;

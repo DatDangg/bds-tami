@@ -477,7 +477,7 @@ As-built (BL-054 P1-T04): `email`, `locale`, `consentAt`, `privacyPolicyVersion`
 | Trường | Kiểu | Ràng buộc | Ghi chú |
 |---|---|---|---|
 | `code` | text | R, U | `LD-000001` |
-| `source` | select | R, I | `rental` · `property_post` · `project` · `contact` |
+| `source` | select | R, I | `rental` · `property_post` · `project` · `contact` · `popup` (popup "Nhận tư vấn", BL-066; không có bản ghi nguồn như `contact`) |
 | `rental` | `rel→rentals` | I | Có giá trị khi `source=rental` |
 | `propertyPost` | `rel→property-posts` | I | Khi `source=property_post` |
 | `project` | `rel→projects` | I | Khi `source=project` |

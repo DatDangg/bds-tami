@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { LEAD_SOURCES } from "@/lib/leads/lead-values";
+import { hasSourceRecord, LEAD_SOURCES } from "@/lib/leads/lead-values";
 import { normalizePhone } from "@/lib/phone";
 
 /** Khung response API tuỳ biến (API_SPEC §2). Helper dựng response nằm ở `src/lib/http/response.ts`. */
@@ -72,7 +72,7 @@ const leadUtmSchema = z.object({
 
 /**
  * Body JSON của `POST /api/public/leads` (API_SPEC §3.1). `turnstileToken` do pipeline kiểm trước nên không có trong kết quả.
- * `sourceId` bắt buộc trừ khi `source = contact` (khi đó bỏ qua nếu có). `consent` phải là boolean `true` (BR-30).
+ * `sourceId` bắt buộc trừ khi `source` là `contact` / `popup` (khi đó bỏ qua nếu có). `consent` phải là boolean `true` (BR-30).
  */
 export const leadInputSchema = z
   .object({
@@ -96,8 +96,8 @@ export const leadInputSchema = z
     referrer: clipped(2000),
     locale: applicantLocaleSchema.default("vi"),
   })
-  .refine((value) => value.source === "contact" || value.sourceId !== undefined, { path: ["sourceId"], message: "Thiếu sourceId" })
-  .transform((value) => (value.source === "contact" ? { ...value, sourceId: undefined } : value));
+  .refine((value) => !hasSourceRecord(value.source) || value.sourceId !== undefined, { path: ["sourceId"], message: "Thiếu sourceId" })
+  .transform((value) => (hasSourceRecord(value.source) ? value : { ...value, sourceId: undefined }));
 
 export type LeadInput = z.infer<typeof leadInputSchema>;
 

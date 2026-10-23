@@ -63,6 +63,7 @@ describe("LeadForm: payload theo source", () => {
     ["property_post", SOURCE_ID],
     ["project", SOURCE_ID],
     ["contact", undefined],
+    ["popup", undefined],
   ])("source=%s gửi đúng source/sourceId/locale/pageUrl/consent", async (source, sourceId) => {
     const fetchMock = stubFetch(jsonResponse(200, { success: true, data: { received: true } }));
     const user = userEvent.setup();

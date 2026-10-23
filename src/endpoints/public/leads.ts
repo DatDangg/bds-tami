@@ -4,7 +4,7 @@ import { publicWhere } from "@/lib/content/public-queries";
 import { getEnv } from "@/lib/env";
 import { fail, ok } from "@/lib/http/response";
 import { createOrMergeLead } from "@/lib/leads/create-or-merge";
-import type { LeadSource } from "@/lib/leads/lead-values";
+import { hasSourceRecord, type LeadSource } from "@/lib/leads/lead-values";
 import { logger } from "@/lib/logger";
 import { leadInputSchema, type ApplicantLocale, type LeadInput } from "@/shared/types/api";
 
@@ -116,7 +116,7 @@ async function validateBody(reader: ReturnType<typeof createJsonBodyReader>, fal
 
 /** Bản ghi nguồn phải đang công khai (không nháp, không xoá mềm; tin cho thuê `rented` vẫn nhận). Một truy vấn, không kéo dữ liệu về. */
 async function isPublicSource(payload: Payload, input: LeadInput): Promise<boolean> {
-  if (input.source === "contact" || !input.sourceId) return true;
+  if (!hasSourceRecord(input.source) || !input.sourceId) return true;
   const collection = SOURCE_COLLECTION[input.source];
   const found = await payload.find({
     collection,

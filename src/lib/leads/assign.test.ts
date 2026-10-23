@@ -14,7 +14,7 @@ function fakePayload(post: { author?: unknown } | null, staff: { role?: string; 
 
 describe("resolveAutoAssignee (BR-12)", () => {
   it("chỉ rental và property_post tự giao", () => {
-    expect(["rental", "property_post", "project", "contact"].map((source) => isAutoAssignSource(source as never))).toEqual([true, true, false, false]);
+    expect(["rental", "property_post", "project", "contact", "popup"].map((source) => isAutoAssignSource(source as never))).toEqual([true, true, false, false, false]);
   });
 
   it("author là sale đang hoạt động -> giao cho author (đọc tin ở đúng collection)", async () => {

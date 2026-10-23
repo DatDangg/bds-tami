@@ -203,6 +203,18 @@ describe("POST /api/public/leads (handler)", () => {
     expect(input.pageUrl).toHaveLength(2000);
   });
 
+  it("popup (BL-066) đi như contact: không cần sourceId (bỏ qua nếu có), không tra bản ghi nguồn", async () => {
+    const withoutId = await submit({ ...baseBody, source: "popup", sourceId: undefined });
+    expect(withoutId.response.status).toBe(200);
+    expect(withoutId.find).not.toHaveBeenCalled();
+    expect(createOrMerge.mock.calls[0]![1]).toMatchObject({ source: "popup", sourceId: undefined });
+    createOrMerge.mockClear();
+    const withId = await submit({ ...baseBody, source: "popup" });
+    expect(withId.response.status).toBe(200);
+    expect(withId.find).not.toHaveBeenCalled();
+    expect(createOrMerge.mock.calls[0]![1]).toMatchObject({ source: "popup", sourceId: undefined });
+  });
+
   it("nguồn không công khai (nháp, đã xoá, không tồn tại) -> 400 trên sourceId, không tạo/gộp", async () => {
     const { response, body } = await submit(baseBody, { sourceFound: false });
     expect(response.status).toBe(400);

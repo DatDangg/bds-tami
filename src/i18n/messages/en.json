@@ -150,6 +150,11 @@
     "success": {
       "title": "Thank you!",
       "description": "A TAMI advisor will contact you during business hours."
+    },
+    "consultPopup": {
+      "title": "Get free advice",
+      "description": "Leave your details and a TAMI advisor will get back to you during business hours.",
+      "close": "Close"
     }
   },
   "page": {
