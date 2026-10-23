@@ -3110,7 +3110,7 @@
       "title": "Nội dung thật lên staging/prod + gói EN viết tay: 3 dự án (Maison Privée / Astor 1 / The Windsor Collection) + 8 tin pháp lý; content:import + english:pack dry-run mặc định, apply cần confirm (BL-072)",
       "type": "ADDITIVE",
       "status": "in_progress",
-      "currentPhase": 1,
+      "currentPhase": 2,
       "backlog": "BL-072",
       "changeDoc": "spec/changes/2026-10-23-new-content-english.md",
       "startedAt": "2026-10-23",
@@ -3137,17 +3137,20 @@
           "report": ".context/review-reports/feature-new-content-english-phase-1-task-02-round-1-review.md",
           "completedAt": "2026-10-23",
           "verify": "JSON hợp lệ · vitest pack/format 34 PASS · dev apply 89 + fix r1 overwrite 12 → dry-run gói thật không đổi 100, bỏ qua 0, exit 0 · has_english 3/3 dự án, 3/3 CĐT, 82 alt",
-          "fixAfterPass": "6 nhóm MINOR wording đã sửa (change-request kiểm grep)"
+          "fixAfterPass": "6 nhóm MINOR wording đã sửa (change-request kiểm grep)",
+          "commit": "2d24916"
         },
         {
           "task": "phase-1-task-03",
           "file": "tasks/feature-new-content-english/phase-1-task-03.md",
-          "status": "in_review",
+          "status": "done",
           "attempt": 1,
           "review": "NORMAL PASS",
           "round": 1,
           "report": ".context/review-reports/feature-new-content-english-phase-1-task-03-round-1-review.md",
-          "note": "minor wording fixes applied after PASS"
+          "completedAt": "2026-10-23",
+          "verify": "JSON hợp lệ · số ô richText 137/85/97/104/108/128/141/115 khớp vi · vitest pack/format 34 PASS · dev apply 8 → dry-run gói thật không đổi 100, exit 0 · has_english 8/8",
+          "fixAfterPass": "5 MINOR wording (pháp lý) đã sửa, change-request kiểm grep"
         },
         {
           "task": "phase-2-task-01",
@@ -3164,7 +3167,8 @@
       ],
       "specValidation": ".context/review-reports/spec-validation-feature-new-content-english-phase-1.md (PASS; M1/L1/L2/L3 đã bổ sung vào spec + scope)",
       "specVersion": "1.57.0",
-      "scopeVersion": 76
+      "scopeVersion": 76,
+      "phase1": "done (T01 adff25a, T02 2d24916, T03 commit này); phase 2 staging/prod chờ deploy + user ok từng lần ghi"
     }
   ],
   "bugs": [
@@ -4301,7 +4305,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-23T10:27:52.413Z",
+  "lastUpdated": "2026-10-23T10:28:04.836Z",
   "approvalMilestones": [
     {
       "id": "M1",
