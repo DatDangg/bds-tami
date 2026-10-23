@@ -68,7 +68,25 @@ describe("NewsTocSidebar (BL-054: cột trái ≥ lg, khôi phục bản dính B
     renderWithTargets(<NewsTocSidebar headings={headings} label="Mục lục" />);
     expect(screen.getByRole("navigation", { name: "Mục lục" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Phần một" })).toHaveAttribute("href", "#mot");
-    expect(screen.getByRole("link", { name: "Mục con" }).className).toContain("pl-16");
+    const child = screen.getByRole("link", { name: "Mục con" }).className;
+    expect(child).toContain("pl-[calc(");
+    expect(child).not.toContain("pl-16");
+  });
+
+  it("BL-067: mục thấp (min-h-8, không min-h-11), số tròn size-6; nav cuộn riêng không còn max-h cứng 12rem", () => {
+    const { container } = renderWithTargets(<NewsTocSidebar headings={headings} label="Mục lục" />);
+    const link = screen.getByRole("link", { name: "Phần một" });
+    expect(link.className).toContain("min-h-8");
+    expect(link.className).not.toContain("min-h-11");
+    expect(link.querySelector("span")?.className).toContain("size-6");
+    expect(link.querySelector("span")?.className).not.toContain("size-7");
+    const nav = container.querySelector("nav") as HTMLElement;
+    expect(nav.className).not.toContain("max-h-[max(12rem");
+    expect(nav.className).toContain("overflow-y-auto");
+    expect(nav.className).toContain("lg:min-h-0");
+    const labelClasses = (nav.querySelector("p") as HTMLElement).className.split(/\s+/);
+    expect(labelClasses).toContain("px-4");
+    expect(labelClasses).toContain("text-eyebrow");
   });
 
   it("BL-062: thẻ trắng viền mảnh; số tròn 01 / 02 cho heading cấp 2 (trang trí aria-hidden, đếm không tính cấp 3); cấp 3 không số; tên truy cập không có số", () => {
@@ -173,6 +191,7 @@ describe("NewsTocDisclosure (< lg: khối gập đầu bài)", () => {
     expect(screen.getAllByRole("link")).toHaveLength(3);
     expect(screen.getByRole("link", { name: "Phần một" })).toHaveAttribute("href", "#mot");
     expect(screen.getByRole("link", { name: "Mục con" }).className).toContain("pl-6");
+    expect(screen.getByRole("link", { name: "Phần một" }).className).toContain("min-h-11");
   });
 
   it("bấm mục: gập lại, cuộn mượt tới heading, focus heading, đặt hash", () => {

@@ -11,7 +11,11 @@ const ACTIVE_LINE_PX = 112;
 const SCROLL_LOCK_MS = 1000;
 
 const LINK_BASE =
-  "flex min-h-11 items-center border-l-2 py-2 pr-2 text-small break-words [overflow-wrap:anywhere] transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
+  "flex items-center border-l-2 pr-2 text-small break-words [overflow-wrap:anywhere] transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
+
+// Kích thước theo nhánh: bản cột trái (≥ lg, con trỏ) gọn 32px (≥ 24px WCAG 2.5.8); bản gập < lg (màn chạm) giữ 44px.
+const LINK_SIZE_COMPACT = "min-h-8 py-1.5 leading-snug";
+const LINK_SIZE_TOUCH = "min-h-11 py-2";
 
 interface TocProps {
   headings: TocHeading[];
@@ -52,14 +56,16 @@ function TocLinks({ headings, activeId, numbered = false, onJump }: { headings: 
               onClick={(event) => onJump(event, heading.id)}
               className={cn(
                 LINK_BASE,
-                numbered ? (heading.level === 3 ? "gap-3 pl-16" : "gap-3 pl-[calc(1.25rem-2px)]") : heading.level === 3 ? "pl-6" : "pl-3",
+                numbered ? LINK_SIZE_COMPACT : LINK_SIZE_TOUCH,
+                // Cấp 3 thụt thẳng mép chữ cấp 2 = 1rem + số 1.5rem + gap 0.625rem (trừ vạch 2px).
+                numbered ? (heading.level === 3 ? "gap-2.5 pl-[calc(1rem-2px+1.5rem+0.625rem)]" : "gap-2.5 pl-[calc(1rem-2px)]") : heading.level === 3 ? "pl-6" : "pl-3",
                 current ? "border-primary-deep font-semibold text-text" : numbered ? "border-transparent text-text-secondary hover:text-text hover:underline" : "border-border text-text-secondary hover:text-text hover:underline",
               )}
             >
               {number && (
                 <span
                   aria-hidden="true"
-                  className={cn("flex size-7 shrink-0 items-center justify-center rounded-full text-xsmall font-semibold", current ? "bg-primary text-badge-foreground" : "bg-primary-subtle text-accent-text ring-1 ring-primary-soft ring-inset")}
+                  className={cn("flex size-6 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-semibold", current ? "bg-primary text-badge-foreground" : "bg-primary-subtle text-accent-text ring-1 ring-primary-soft ring-inset")}
                 >
                   {number}
                 </span>
@@ -86,7 +92,7 @@ function findActiveId(ids: string[]): string {
 /**
  * Mục lục cột trái ≥ lg (design `chi-tiet-tin-tuc-v2.webp`, BL-062 trên nền BL-054): thẻ trắng viền mảnh, nhãn "Mục lục" chữ hoa + danh sách số tròn 01 / 02…, mục đang đọc
  * (`aria-current="location"`) vạch vàng trái + số nền vàng + chữ đậm theo cuộn trang (rAF-throttled, đo mép trên heading) và tự cuộn vào giữa khung (chỉ khung, không cuộn trang).
- * Việc DÍNH do cột chứa (`NewsArticleSidebar`) lo; khung giới hạn cao mềm theo viewport (chừa chỗ cho thẻ tư vấn bên dưới; chiều cao thật do `DetailAsideFit` đo) và cuộn riêng. Ẩn dưới lg (bản gập `NewsTocDisclosure` thay) và khi in.
+ * Việc DÍNH do cột chứa (`NewsArticleSidebar`) lo; khung mục lục co theo phần cao còn lại của khối dính (`NewsArticleSidebar` giới hạn cao theo viewport, thẻ tư vấn `shrink-0`; BL-067) và chỉ cuộn riêng khi bài quá dài. Ẩn dưới lg (bản gập `NewsTocDisclosure` thay) và khi in.
  */
 export function NewsTocSidebar({ headings, label }: TocProps) {
   const [activeId, setActiveId] = useState("");
@@ -141,9 +147,9 @@ export function NewsTocSidebar({ headings, label }: TocProps) {
     <nav
       ref={navRef}
       aria-label={label}
-      className="relative hidden max-h-[max(12rem,calc(100dvh-var(--sticky-top)-24rem))] overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface py-5 pr-4 lg:block print:hidden"
+      className="relative hidden overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface py-4 pr-3 lg:block lg:min-h-0 lg:shrink print:hidden"
     >
-      <p className="mb-3 px-5 text-eyebrow font-semibold tracking-[0.12em] text-text-muted uppercase">{label}</p>
+      <p className="mb-3 px-4 text-eyebrow font-semibold tracking-[0.12em] text-text-muted uppercase">{label}</p>
       <TocLinks headings={headings} activeId={activeId} numbered onJump={handleJump} />
     </nav>
   );

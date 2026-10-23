@@ -28,9 +28,10 @@ export function NewsArticleSidebar({ headings, tocLabel, contactHref, className 
   const t = useTranslations("page.newsDetail.v2");
   return (
     <DetailAsideFit as="div" className={cn("[--detail-aside-top:calc(var(--sticky-top)+1.5rem)]", className)}>
-      <div className={cn("flex flex-col gap-6", DETAIL_ASIDE_STICKY_CLASS)}>
+      {/* BL-067: từ lg khối cao tối đa phần viewport còn lại dưới đỉnh dính (≥ 26rem; thấp hơn thì dính theo đáy như cũ) → mục lục co/cuộn riêng, thẻ tư vấn luôn thấy. */}
+      <div className={cn("flex flex-col gap-6 lg:max-h-[max(26rem,calc(100dvh-var(--detail-aside-top)-1rem))]", DETAIL_ASIDE_STICKY_CLASS)}>
         {headings.length > 0 && <NewsTocSidebar headings={headings} label={tocLabel} />}
-        <section aria-labelledby="article-consult" className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5">
+        <section aria-labelledby="article-consult" className="flex shrink-0 flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5">
           <p className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{t("consultEyebrow")}</p>
           <h2 id="article-consult" className="font-display text-h4">
             {t("consultTitle")}

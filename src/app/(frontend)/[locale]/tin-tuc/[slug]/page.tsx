@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * S11 Chi tiết tin tức theo design `chi-tiet-tin-tuc-v2.webp` (BL-062, thay BL-054): KHÔNG dùng `DetailLayout`. Nền `--color-bg`. Hero ảnh bìa toàn chiều ngang
- * (`NewsArticleHero`: breadcrumb kính, chip danh mục, `h1`, sapo, tác giả + ngày + phút đọc, chia sẻ) → lưới thân bài ≥ lg `[cột trái 15rem][bài]` (KHÔNG `items-start` để ô trái
+ * (`NewsArticleHero`: breadcrumb kính, chip danh mục, `h1`, sapo, tác giả + ngày + phút đọc, chia sẻ) → lưới thân bài ≥ lg `[cột trái 16rem (≥ xl 18rem)][bài]` (KHÔNG `items-start` để ô trái
  * cao bằng hàng): cột bài = (< lg: mục lục gập) → nội dung (`news-prose`) → khung liên hệ cuối bài (chữ admin / mặc định) → "Thẻ:" (ẩn ở `/en`); cột trái dính =
  * "Mục lục" (chỉ khi có heading) + thẻ "Tư vấn miễn phí" (`NewsArticleSidebar`, khung dính BL-061). "Bài viết liên quan" (≤ 3 thẻ `related` + "Xem tất cả tin tức") và banner
  * tư vấn nằm NGOÀI lưới nên cột trái thôi dính trước chúng. Gửi lượt xem (`NewsViewBeacon`, client) — trang vẫn ISR (`revalidate = 60` từ layout; lưu bài gọi `revalidatePath`;
@@ -145,7 +145,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
           />
         }
       />
-      <div className="mx-auto grid w-full max-w-container gap-x-12 px-gutter pt-8 pb-section-tight lg:grid-cols-[15rem_minmax(0,1fr)] lg:pt-10">
+      <div className="mx-auto grid w-full max-w-container gap-x-12 px-gutter pt-8 pb-section-tight lg:grid-cols-[16rem_minmax(0,1fr)] lg:pt-10 xl:grid-cols-[18rem_minmax(0,1fr)]">
         <div className="min-w-0 lg:col-start-2 lg:row-start-1">
           {tocHeadings.length > 0 && <NewsTocDisclosure headings={tocHeadings} label={tocLabel} />}
           <NewsArticleBody content={doc.content} locale={locale} tableLabel={tRich("table")} headingIds={tocHeadings.map((heading) => heading.id)} mentionedProjects={mentionedProjects} />
