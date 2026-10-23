@@ -18,6 +18,7 @@ const eslintConfig = [
       "docs/",
       "spec/",
       "tasks/",
+      "tools/vibe-studio/", // dashboard agent (template), có package/tsconfig riêng
       "scripts/",
       "assets/",
       "src/payload-types.ts",

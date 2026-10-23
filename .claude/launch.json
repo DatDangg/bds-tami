@@ -4,19 +4,32 @@
     {
       "name": "tami-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": [
+        "dev"
+      ],
       "port": 3000
     },
     {
-      "name": "task-dashboard",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["tools/task-dashboard/server.mjs", "--repo", ".", "--port", "7788"],
-      "port": 7788
+      "name": "vibe-studio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "tools/vibe-studio",
+        "run",
+        "dev"
+      ],
+      "port": 5173
     },
     {
       "name": "site-mockup",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["-y", "serve@14.2.4", "docs/specs/site-redesign-mockup", "-l", "4600"],
+      "runtimeArgs": [
+        "-y",
+        "serve@14.2.4",
+        "docs/specs/site-redesign-mockup",
+        "-l",
+        "4600"
+      ],
       "port": 4600
     }
   ]

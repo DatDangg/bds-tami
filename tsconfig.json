@@ -47,6 +47,7 @@
     "scripts",
     ".agent",
     ".claude",
-    ".opencode"
+    ".opencode",
+    "tools/vibe-studio"
   ]
 }

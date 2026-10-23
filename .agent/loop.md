@@ -67,13 +67,13 @@
                      chỉ touch file trong scope; commit trong worktree;
                      KHÔNG ghi .context/progress.json; báo PASS/BLOCKED về."
         ngay TRƯỚC khi spawn, đánh dấu agent đang sống (display-only):
-        node tools/task-dashboard/agent-live.mjs enter --agent builder-<n> --role builder \
+        node tools/agent-live.mjs enter --agent builder-<n> --role builder \
           --task <layer-N/task-NN> --title "<task title>" --phase building \
           --worktree <worktree>
         (n = số thứ tự builder trong wave; lỗi ở lệnh này KHÔNG được chặn build)
    c. Đợi TẤT CẢ builder trong wave xong (PASS hoặc BLOCKED).
-      • builder PASS → node tools/task-dashboard/agent-live.mjs leave --agent builder-<n>
-        rồi node tools/task-dashboard/agent-live.mjs enter --agent reviewer-<n> \
+      • builder PASS → node tools/agent-live.mjs leave --agent builder-<n>
+        rồi node tools/agent-live.mjs enter --agent reviewer-<n> \
           --role reviewer --task <layer-N/task-NN> --title "<task title>" --phase review
         (gọi ngay trước khi spawn subagent reviewer; reviewer PASS → leave reviewer-<n>)
       • builder BLOCKED → leave builder-<n> (task quay về TODO)
@@ -87,7 +87,7 @@
 > `scripts/parallel-dispatch.mjs merge` + `cleanup`, không phải một subagent riêng.
 ```
 1. node scripts/parallel-dispatch.mjs merge --layer N
-   → trước khi bắt đầu: node tools/task-dashboard/agent-live.mjs enter --agent merger --role merger --phase merging
+   → trước khi bắt đầu: node tools/agent-live.mjs enter --agent merger --role merger --phase merging
      (nhãn HIỂN THỊ cho dashboard biết đang ở bước merge — dispatcher tự gọi, không spawn agent)
    → gom mọi branch wt/layer-N__* về integration branch layer-N-integration.
    → NẾU CONFLICT: script DỪNG + in task gây conflict.
@@ -97,16 +97,16 @@
    từng task pass riêng KHÔNG đảm bảo ghép lại pass.
    → FAIL: gọi error-analyzer, fix trên integration branch, commit, verify lại.
 3. Update `.context/progress.json` 1 LẦN — DÙNG HELPER, đừng tự viết JSON tay:
-     node tools/task-dashboard/progress-write.mjs complete --task <layer-N/task-NN> \
+     node tools/progress-write.mjs complete --task <layer-N/task-NN> \
           --review "STRICT PASS" --round <R> [--report <review-report path>]
-     node tools/task-dashboard/progress-write.mjs block --task <id> --reason "..."
-     node tools/task-dashboard/progress-write.mjs set-layer --current <N+1> --total <M>
+     node tools/progress-write.mjs block --task <id> --reason "..."
+     node tools/progress-write.mjs set-layer --current <N+1> --total <M>
    Helper ghi atomic + dedupe theo task + tự xoá task khỏi inProgressTask/blockedTasks.
    (Schema `completedTasks` = mảng object `{task, review?, round?, report?, completedAt?}`.)
 4. Merge integration branch về nhánh chính của project (theo DevOps/git policy).
 5. node scripts/parallel-dispatch.mjs cleanup --layer N  (xoá worktree + branch tạm)
    → nếu khai `worktree_teardown_cmd`, script chạy hook đó TRƯỚC khi xoá (drop DB tạm / dọn .env.local riêng)
-   → node tools/task-dashboard/agent-live.mjs clear   (resets agents-live.json về rỗng)
+   → node tools/agent-live.mjs clear   (resets agents-live.json về rỗng)
 6. → context-manager compact (bước 7 cũ) → HUMAN CHECKPOINT → layer N+1.
 ```
 
@@ -322,10 +322,10 @@ git commit -m "feat(<feature|bug>-<slug>): phase-<N>-task-<NN> {short descriptio
 
 Ghi bằng helper (atomic, dedupe, đúng schema — không tự viết JSON tay):
 ```bash
-node tools/task-dashboard/progress-write.mjs complete --task layer-1/task-02 \
+node tools/progress-write.mjs complete --task layer-1/task-02 \
      --review "STRICT PASS" --round 1 --report .context/review-reports/<...>.md
-node tools/task-dashboard/progress-write.mjs block --task layer-1/task-03 --reason "..."
-node tools/task-dashboard/progress-write.mjs set-layer --current 2 --total 5
+node tools/progress-write.mjs block --task layer-1/task-03 --reason "..."
+node tools/progress-write.mjs set-layer --current 2 --total 5
 ```
 ```json
 // .context/progress.json — schema: features[] / bugs[], activeWorkItem
