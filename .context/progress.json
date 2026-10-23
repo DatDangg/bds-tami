@@ -3155,8 +3155,11 @@
         {
           "task": "phase-2-task-01",
           "file": "tasks/feature-new-content-english/phase-2-task-01.md",
-          "status": "pending",
-          "note": "staging apply — cần deploy + user ok từng lần ghi"
+          "status": "done",
+          "attempt": 1,
+          "review": "ops — không reviewer (user duyệt dry-run trực tiếp)",
+          "completedAt": "2026-10-23",
+          "verify": "deploy staging fa4c519 (rerun sau SSH timeout) · dry-run sẽ ghi 98/không đổi 2/bỏ qua 0 · backup tami-pre-english-pack-2026-10-23-1440.dump 1.6MB · apply đã ghi 98 exit 0 (warn revalidate ngoài Next) · dry-run lại không đổi 100 · /en 3 dự án + 8 tin + /en/news hiển thị EN"
         },
         {
           "task": "phase-2-task-02",
@@ -3168,7 +3171,8 @@
       "specValidation": ".context/review-reports/spec-validation-feature-new-content-english-phase-1.md (PASS; M1/L1/L2/L3 đã bổ sung vào spec + scope)",
       "specVersion": "1.57.0",
       "scopeVersion": 76,
-      "phase1": "done (T01 adff25a, T02 2d24916, T03 commit này); phase 2 staging/prod chờ deploy + user ok từng lần ghi"
+      "phase1": "done (T01 adff25a, T02 2d24916, T03 commit này); phase 2 staging/prod chờ deploy + user ok từng lần ghi",
+      "phase2": "T01 staging done; T02 production chờ user ok"
     }
   ],
   "bugs": [
