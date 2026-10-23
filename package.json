@@ -89,6 +89,9 @@
     "vitest": "^5.0.5"
   },
   "pnpm": {
+    "overrides": {
+      "dompurify": "3.4.17"
+    },
     "auditConfig": {
       "ignoreGhsas": [
         "GHSA-vfj7-8cjw-p6xm"
