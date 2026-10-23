@@ -1,7 +1,7 @@
 ---
 id: new-content-english
 type: feature
-status: pending
+status: done
 created: 2026-10-23
 ---
 
@@ -16,11 +16,11 @@ created: 2026-10-23
 - Dữ liệu EN dev nằm ở `seed/english/data/*.json`, khoá = tiêu đề vi.
 
 ## Acceptance (bắt buộc)
-- [ ] 3 dự án: tiêu đề, mô tả ngắn, overview, sản phẩm, tiện ích, pháp lý, CSBH, bàn giao… có bản EN; `hasEnglish` bật; alt ảnh EN.
-- [ ] 8 tin tức: tiêu đề, sapo, nội dung EN đủ đoạn; văn bản dự thảo vẫn ghi rõ "draft".
-- [ ] Giá/số/tên riêng giữ như bản vi (tỷ → billion VND), thuật ngữ BĐS thống nhất với BL-064.
-- [ ] `/en` các trang trên staging hiển thị EN, không lẫn tiếng Việt; chạy lại không ghi đè/nhân đôi.
-- [ ] Cách đưa lên production được chốt (script nhập có EN, hoặc mở `seed:english` có kiểm soát cho collection cụ thể).
+- [x] 3 dự án: tiêu đề, mô tả ngắn, overview, sản phẩm, tiện ích, pháp lý, CSBH, bàn giao… có bản EN; `hasEnglish` bật; alt ảnh EN.
+- [x] 8 tin tức: tiêu đề, sapo, nội dung EN đủ đoạn; văn bản dự thảo vẫn ghi rõ "draft".
+- [x] Giá/số/tên riêng giữ như bản vi (tỷ → billion VND), thuật ngữ BĐS thống nhất với BL-064.
+- [x] `/en` các trang trên staging hiển thị EN, không lẫn tiếng Việt; chạy lại không ghi đè/nhân đôi.
+- [x] Cách đưa lên production được chốt (script nhập có EN, hoặc mở `seed:english` có kiểm soát cho collection cụ thể).
 
 ## Ghi chú
 Nên làm cùng/sau khi commit script nhập trong `.import-tmp/` (hiện untracked). Liên quan BL-064, BL-065, BL-071.

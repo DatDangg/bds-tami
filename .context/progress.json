@@ -3109,10 +3109,10 @@
       "slug": "new-content-english",
       "title": "Nội dung thật lên staging/prod + gói EN viết tay: 3 dự án (Maison Privée / Astor 1 / The Windsor Collection) + 8 tin pháp lý; content:import + english:pack dry-run mặc định, apply cần confirm (BL-072)",
       "type": "ADDITIVE",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 2,
       "backlog": "BL-072",
-      "changeDoc": "spec/changes/2026-10-23-new-content-english.md",
+      "changeDoc": "spec/changes/archive/2026-10-23-new-content-english.md",
       "startedAt": "2026-10-23",
       "tasks": [
         {
@@ -3164,15 +3164,19 @@
         {
           "task": "phase-2-task-02",
           "file": "tasks/feature-new-content-english/phase-2-task-02.md",
-          "status": "pending",
-          "note": "prod import vi + EN pack — cần deploy + backup + user ok từng lần ghi"
+          "status": "done",
+          "attempt": 1,
+          "review": "ops — không reviewer (user duyệt từng lần ghi)",
+          "completedAt": "2026-10-23",
+          "verify": "deploy-production fa4c519 · backup pg_dump + pgBackRest full 20261023-215037F · tạo 4 danh mục project · content:import 16 + 82 ảnh (lần 1 OOM tami-app 1g → 2g chạy lại) · english:pack đã ghi 100, dry-run lại không đổi 100 · /en + /vi prod 200"
         }
       ],
       "specValidation": ".context/review-reports/spec-validation-feature-new-content-english-phase-1.md (PASS; M1/L1/L2/L3 đã bổ sung vào spec + scope)",
       "specVersion": "1.57.0",
       "scopeVersion": 76,
       "phase1": "done (T01 adff25a, T02 2d24916, T03 commit này); phase 2 staging/prod chờ deploy + user ok từng lần ghi",
-      "phase2": "T01 staging done; T02 production chờ user ok"
+      "phase2": "done (T01 staging 046323c, T02 production commit này)",
+      "completedAt": "2026-10-23"
     }
   ],
   "bugs": [
