@@ -17,11 +17,16 @@ export function formatHectares(squareMeters: number, locale: Locale): string {
   return formatNumber(squareMeters / SQUARE_METERS_PER_HECTARE, locale);
 }
 
-/** Khoảng diện tích "55 – 136 m²"; một đầu hoặc hai đầu bằng nhau → "55 m²"; không có → `null`. */
+/** `formatArea` với NBSP trước "m²" để đơn vị không rơi xuống dòng riêng trong thẻ hẹp (BL-071). */
+function formatAreaUnbreakable(squareMeters: number, locale: Locale): string {
+  return formatArea(squareMeters, locale).replace(/ m²$/, " m²");
+}
+
+/** Khoảng diện tích "55 – 136 m²" (NBSP trước "m²"); một đầu hoặc hai đầu bằng nhau → "55 m²"; không có → `null`. */
 export function formatAreaRange(from: number | null, to: number | null, locale: Locale): string | null {
   const [low, high] = [from, to].filter((value): value is number => value !== null).sort((a, b) => a - b);
   if (low === undefined) return null;
-  return high === undefined || high === low ? formatArea(low, locale) : `${formatNumber(low, locale)} – ${formatArea(high, locale)}`;
+  return high === undefined || high === low ? formatAreaUnbreakable(low, locale) : `${formatNumber(low, locale)} – ${formatAreaUnbreakable(high, locale)}`;
 }
 
 export const PDF_MIME_TYPE = "application/pdf";

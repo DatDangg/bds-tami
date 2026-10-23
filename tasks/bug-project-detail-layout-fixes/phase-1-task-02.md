@@ -2,7 +2,7 @@
 
 - Nguồn: BL-071 · change doc `spec/changes/2026-10-23-project-detail-layout-fixes.md` (Lỗi 2).
 - Không đổi schema, không migration, không đổi requirement (as-built PATCH).
-- Trạng thái: **pending — chờ duyệt plan**.
+- Trạng thái: **done** — NORMAL PASS r1 (`.context/review-reports/bug-project-detail-layout-fixes-phase-1-task-02-round-1-review.md`), commit `b3f1f10`.
 
 ## Classification / Risk
 - Type: **BUG** · severity **medium** (ảnh bị crop/kéo dọc ở mọi dự án có ảnh khối Tiện ích nhưng tiện ích không có ảnh riêng).
@@ -23,8 +23,8 @@
 - Token: giữ `rounded-[20px]`, `sizes` hiện có.
 
 ## Acceptance (từ change doc)
-- [ ] Ảnh khối Tiện ích giữ tỉ lệ 4:3 bất kể 3 hay 12 mục, kể cả sau khi bấm "Khám phá tất cả tiện ích".
-- [ ] < md: ảnh trên, danh sách dưới như cũ. Khi không có `image`: danh sách 2–3 cột như cũ.
+- [x] Ảnh khối Tiện ích giữ tỉ lệ 4:3 bất kể 3 hay 12 mục, kể cả sau khi bấm "Khám phá tất cả tiện ích".
+- [x] < md: ảnh trên, danh sách dưới như cũ. Khi không có `image`: danh sách 2–3 cột như cũ.
 
 ## Scope
 1. Sửa `DetailFeatureList.tsx` theo hướng trên (+ cập nhật JSDoc dòng 27-30).

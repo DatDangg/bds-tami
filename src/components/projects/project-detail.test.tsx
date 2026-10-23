@@ -214,7 +214,7 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     expect(cells).toEqual([
       ["Giá từ", "3 tỷ"],
       ["Quy mô", "36,21 ha"],
-      ["Diện tích", "50 – 120 m²"],
+      ["Diện tích", "50 – 120 m²"],
       ["Chủ đầu tư", "Vinhomes"],
       ["Bàn giao", "Quý 4/2027"],
       ["Loại hình", "Căn hộ, Biệt thự"],
@@ -250,7 +250,15 @@ describe("ProjectDetail (BL-052, design detail-du-an)", () => {
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
     const products = within(overview).getByRole("list", { name: "Sản phẩm của dự án" });
-    expect(within(products).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["96Biệt thự đơn lập200 – 360 m²", "Shophouse xây thô90 m²"]);
+    expect(within(products).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["96Biệt thự đơn lập200 – 360 m²", "Shophouse xây thô90 m²"]);
+  });
+
+  it("Tổng quan (BL-071): lưới thông tin và thẻ Sản phẩm xếp dọc ở mọi bề rộng (không chia cột ≥ xl)", () => {
+    const { container } = renderDetail(richProject);
+    const overview = container.querySelector("#overview") as HTMLElement;
+    const wrapper = within(overview).getByRole("list", { name: "Sản phẩm của dự án" }).parentElement as HTMLElement;
+    expect(wrapper.className).not.toContain("xl:grid-cols");
+    expect(within(wrapper).getByLabelText("Thông tin dự án")).toBeInTheDocument();
   });
 
   it("Tiện ích: ảnh tiện ích + 5 mục đầu (tên + mô tả), nút Khám phá tất cả tiện ích mở phần còn lại", async () => {

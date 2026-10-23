@@ -251,8 +251,9 @@ describe("BL-052: trường chi tiết mới", () => {
   it("định dạng ha và khoảng diện tích theo ngôn ngữ", () => {
     expect(formatHectares(362_100, "vi")).toBe("36,21");
     expect(formatHectares(362_100, "en")).toBe("36.21");
-    expect(formatAreaRange(136, 55, "vi")).toBe("55 – 136 m²");
-    expect(formatAreaRange(null, 90, "vi")).toBe("90 m²");
+    // NBSP trước "m²" (BL-071): đơn vị không rơi xuống dòng riêng trong thẻ hẹp.
+    expect(formatAreaRange(136, 55, "vi")).toBe("55 – 136 m²");
+    expect(formatAreaRange(null, 90, "vi")).toBe("90 m²");
     expect(formatAreaRange(null, null, "vi")).toBeNull();
   });
 });

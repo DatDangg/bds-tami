@@ -31,7 +31,7 @@ function useScaleText({ scale }: Pick<ProjectDetailView, "scale">): string | nul
 
 /**
  * Khối Tổng quan (BL-052, design `detail-du-an`; nằm cạnh cột liên hệ ≥ lg): eyebrow "Giới thiệu" + `h2` → `overview` richText (chưa có thì `summary`)
- * → lưới thông tin (Tên thương mại, Chủ đầu tư — link website khi có, Vị trí, Quy mô, Loại hình, Bàn giao; ô trống bị bỏ) cạnh thẻ Sản phẩm (≥ xl hai cột; không có sản phẩm → lưới rộng hết).
+ * → lưới thông tin (Tên thương mại, Chủ đầu tư — link website khi có, Vị trí, Quy mô, Loại hình, Bàn giao; ô trống bị bỏ) rồi thẻ Sản phẩm xếp dưới, rộng hết cột (BL-071: không chia 2 cột ≥ xl vì thẻ chỉ ~99px, tên dài vỡ dọc; không có sản phẩm → lưới thông tin tự chia cột).
  * Server Component, không đọc DB.
  */
 export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
@@ -61,9 +61,9 @@ export function ProjectOverview({ view, overview }: ProjectOverviewProps) {
     <DetailSection id={SECTION_DOM_ID.overview} eyebrow={t("eyebrow.overview")} title={t("titles.overview")}>
       <div className="flex flex-col gap-8">
         <DetailOverviewIntro summary={view.summary} content={overview} locale={locale} />
-        <div className={stats.length === 0 ? "grid gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] xl:items-start"}>
+        <div className="grid gap-4">
           <DetailInfoGrid items={info} label={t("info.label")} columns={stats.length === 0 ? "auto" : 2} />
-          <DetailStatCards items={stats} label={t("products.label")} columns={3} />
+          <DetailStatCards items={stats} label={t("products.label")} />
         </div>
       </div>
     </DetailSection>
