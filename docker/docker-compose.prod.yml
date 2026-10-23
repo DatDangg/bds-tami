@@ -53,7 +53,8 @@ x-app-environment: &app-environment
   # Tuỳ chọn: chuỗi rỗng làm validate email lỗi nên không đặt giá trị mặc định; thiếu trong env file thì không truyền.
   EMAIL_FROM_ADDRESS:
   EMAIL_ALLOWLIST: ${EMAIL_ALLOWLIST:-}   # production gửi email thật, biến này không có tác dụng
-  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+  # Tuỳ chọn: prod tắt dịch AI lúc đầu (TRANSLATION_MONTHLY_BUDGET_USD=0, user 2026-10-23); env.ts coi chuỗi rỗng = chưa đặt.
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   TRANSLATION_MODEL: ${TRANSLATION_MODEL:?}
   TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:?}
   NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://<domain>)}
