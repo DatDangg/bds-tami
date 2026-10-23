@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Test nhỏ cho deploy.sh + lib/*.sh, không cần Docker/server: `bash scripts/deploy/deploy.test.sh` (phần symlink chỉ chạy trên Linux).
-# Phủ: cổng HIGH_RISK_MIGRATION, kiểm tra tham số (cấm tag/latest, --release-sha), thứ tự --dry-run, chọn đúng release theo env+SHA
+# Phủ: cổng HIGH_RISK_MIGRATION (kể cả DB đích trống không chặn), kiểm tra tham số (cấm tag/latest, --release-sha), thứ tự --dry-run, chọn đúng release theo env+SHA
 # (từ chối SHA/env lệch), production chỉ nhận digest+SHA đã qua staging và không cũ hơn, rollback khi `compose up` lỗi (exit 1/3),
 # jobs ổn định, container tạm luôn bị xoá, guard image postgres (container chạy image khác compose => die, không tự đổi image trên volume cũ;
 # không container nhưng volume postgres-data đã có => die trừ PG_IMAGE_SWITCH_CONFIRMED=1).
@@ -62,6 +62,44 @@ test_gate() {
   expect "staging chỉ cảnh báo (không chặn)" check_high_risk_gate staging "$WORK/migrations" "$WORK/applied.txt" 2> /dev/null
   rm "$WORK/migrations/20260102_000000_pending_risky.ts" "$WORK/migrations/20260103_000000_pending_sql_marker.ts"
   expect "production qua khi không còn HIGH_RISK chưa apply" check_high_risk_gate production "$WORK/migrations" "$WORK/applied.txt"
+  expect "production + DB đích trống: HIGH_RISK chưa apply KHÔNG chặn" check_high_risk_gate production "$WORK/migrations" "$WORK/applied_none.txt" true 2> /dev/null
+  if check_high_risk_gate production "$WORK/migrations" "$WORK/applied_none.txt" false 2> /dev/null; then
+    fail "production + DB không trống (tham số false): vẫn chặn"
+  else
+    pass "production + DB không trống (tham số false): vẫn chặn"
+  fi
+}
+
+# --- DB đích trống (deploy production đầu, 2026-10-23): list_applied_migrations đặt TARGET_DB_EMPTY ---
+applied_scenario() { # applied_scenario <cid | ""> <volume có: yes|no> <bảng payload_migrations: yes|no> ; in TARGET_DB_EMPTY
+  (
+    CID="$1" VOLUME_EXISTS="$2" HAS_TABLE="$3"
+    compose() {
+      case "$*" in
+        "ps -q postgres") printf '%s\n' "$CID" ;;
+        config) printf 'name: tami\nservices: {}\n' ;;
+      esac
+    }
+    docker() {
+      echo "docker $*" >> "$WORK/calls"
+      case "$1" in
+        volume) [[ $VOLUME_EXISTS == yes ]] ;;
+        exec) if [[ "$*" == *to_regclass* ]]; then if [[ $HAS_TABLE == yes ]]; then echo payload_migrations; fi; else echo 20260101_000000_applied_risky; fi ;;
+      esac
+    }
+    list_applied_migrations "$WORK/applied-scn.txt" 2> /dev/null
+    printf '%s\n' "$TARGET_DB_EMPTY"
+  )
+}
+
+test_target_db_empty() {
+  : > "$WORK/calls"
+  expect "không container + không volume => DB trống" test "$(applied_scenario "" no no)" = true
+  expect "không container => kiểm volume tami_postgres-data theo name: của compose config" grep -qx 'docker volume inspect tami_postgres-data' "$WORK/calls"
+  expect "không container nhưng volume còn => KHÔNG trống" test "$(applied_scenario "" yes no)" = false
+  expect "postgres chạy, chưa có bảng payload_migrations => DB trống" test "$(applied_scenario cid1 no no)" = true
+  expect "postgres chạy, có bảng payload_migrations => KHÔNG trống" test "$(applied_scenario cid1 no yes)" = false
+  expect "có bảng => đọc danh sách migration đã apply" grep -qx '20260101_000000_applied_risky' "$WORK/applied-scn.txt"
 }
 
 test_args() {
@@ -421,6 +459,7 @@ test_gate_removes_temp_container() {
 make_migrations
 test_find_high_risk
 test_gate
+test_target_db_empty
 test_args
 test_args_release_sha
 test_dry_run_order staging

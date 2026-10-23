@@ -130,7 +130,10 @@ bulk transform/backfill) **phải** được tác giả đánh dấu bằng mộ
 `deploy.sh` so tên migration trong image (`/app/migrations`) với bảng `payload_migrations` của DB đích để tìm migration **chưa apply**:
 - **staging**: chỉ cảnh báo trong log, vẫn chạy (đây là nơi kiểm thử).
 - **production**: có migration chưa apply mang dấu → **dừng sau khi pull, trước khi up/migrate/đổi container nào**, exit 1, không có cờ bỏ qua.
-- Không đọc được DB để biết đã apply gì → dừng (fail-closed). Postgres chưa chạy / chưa có bảng (deploy đầu) → coi như chưa apply gì.
+- Không đọc được DB để biết đã apply gì → dừng (fail-closed). Postgres chưa chạy / chưa có bảng → coi như chưa apply gì.
+- **DB đích trống → không chặn** (2026-10-23, lần deploy production đầu bị chặn vì mọi migration đều "chưa apply"): chưa có container postgres **và** chưa có volume
+  `<project>_postgres-data`, hoặc postgres chạy nhưng chưa có bảng `payload_migrations`. Không có dữ liệu thì không có gì để DROP/backfill làm mất; log ghi
+  `DB production TRỐNG ... không chặn` kèm danh sách. Không container nhưng **volume còn** ⇒ vẫn coi là có dữ liệu và chặn như thường. Test: `deploy.test.sh` (`test_target_db_empty`).
 
 Quy trình khi bị chặn:
 1. Báo cáo ghi rõ thao tác phá huỷ, bảng/cột, tương thích dữ liệu, backfill, kế hoạch rollback, kết quả verify trên staging (AGENTS.md).
