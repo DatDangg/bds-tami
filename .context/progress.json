@@ -1,12 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "ui-polish-sticky-underline-flags",
-    "phase": 1,
-    "task": "phase-1-task-03",
-    "journal": ".context/runs/feature-ui-polish-sticky-underline-flags-phase-1.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3188,13 +3182,13 @@
       "slug": "ui-polish-sticky-underline-flags",
       "title": "Chỉnh UI: thanh mục con < lg không đè thẻ \"Nhận thông tin dự án\"; bỏ gạch chân link/nút/menu site công khai (giữ link trong RichText); cờ đổi ngôn ngữ 3:2 nhỏ hơn (BL-074)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-074",
-      "changeDoc": "spec/changes/2026-10-23-ui-polish-sticky-underline-flags.md",
+      "changeDoc": "spec/changes/archive/2026-10-23-ui-polish-sticky-underline-flags.md",
       "startedAt": "2026-10-24",
       "specVersion": "1.58.0",
-      "scopeVersion": 77,
+      "scopeVersion": 78,
       "tasks": [
         {
           "task": "phase-1-task-01",
@@ -3229,9 +3223,13 @@
           "round": 1,
           "report": ".context/review-reports/feature-ui-polish-sticky-underline-flags-phase-1-task-03-round-1-review.md",
           "verify": "lint PASS · typecheck PASS · test 436 files/4592 PASS · dev: cờ 21×14, vùng bấm 44×44, 375 không tràn ngang",
-          "completedAt": "2026-10-24"
+          "completedAt": "2026-10-24",
+          "commit": "34d1cdb"
         }
-      ]
+      ],
+      "specValidation": ".context/review-reports/spec-validation-feature-ui-polish-sticky-underline-flags-phase-1.md (PASS; G1/G2 test-scope v78 as-built, G3 design-spec §2.3 ring đã sửa; G4/G5 LOW để lại)",
+      "phase1": "done (T01 541dc36, T02 82979e4, T03 34d1cdb — đều STRICT PASS)",
+      "completedAt": "2026-10-24"
     }
   ],
   "bugs": [
@@ -4368,7 +4366,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-24",
+  "lastUpdated": "2026-10-24T10:40:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",
