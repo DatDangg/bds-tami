@@ -1,68 +1,53 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 79,
-  "generatedAt": "2026-10-24T12:00:00+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-075 MODIFY (spec 1.59.0), UI only. v79 = as-built sau phase 1 (T01 5b0b6cf STRICT PASS r1; spec-validation phase 1 PASS) — danh sách file khớp commit, không đổi scopeVersion. Không đổi schema/API/i18n/migration.",
-  "status": "published — phase 1 done (as-built)",
-  "workItem": "feature/home-featured-projects-container",
-  "backlog": "BL-075",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-10-24-home-featured-projects-container.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.58.0-78.json",
-  "specUpdate": "spec/updates/2026-10-24-home-featured-projects-container.md",
-  "specRefs": [
-    "Overview/F1 trang chủ — bullet \"Dự án nổi bật (ĐỔI thẻ + đầu khối)\", đoạn \"Khung + căn giữa (BL-075 ...)\" trong SPECIFICATIONS.md",
-    "design-spec S01 khối 3 \"Dự án nổi bật\" + bảng breakpoint 1536"
-  ],
+  "scopeVersion": 80,
+  "generatedAt": "2026-10-26T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-079 BUG (dependency/CI, không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG). CI `pnpm audit --audit-level high` fail do 2 advisory mức high mới: undici 7.29.1 (GHSA-xjj6-f33q-929c) và happy-dom 20.14.6 (GHSA-834v-8h66-3h79). Fix: pnpm.overrides thêm \"happy-dom\": \"21.0.4\" và \"payload>undici\": \"7.30.1\" + pnpm-lock.yaml. Reviewer STRICT PASS r1. Không đổi UI/schema/API/i18n/migration.",
+  "status": "published",
+  "workItem": "bug/ci-audit-undici-happy-dom",
+  "backlog": "BL-079",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-26-ci-audit-undici-happy-dom.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-79.json",
+  "specUpdate": null,
+  "specRefs": [],
   "changed": {
     "files": [
-      "src/components/home/FeaturedProjects.tsx",
-      "src/components/home/ProjectsSlider.tsx",
-      "src/components/layout/CardSlider.tsx",
-      "src/components/home/FeaturedProjects.test.tsx",
-      "src/components/home/ProjectsSlider.test.tsx",
-      "src/components/layout/CardSlider.test.tsx"
+      "package.json",
+      "pnpm-lock.yaml"
     ],
     "modules": [
-      "Trang chủ — khối Dự án nổi bật (FeaturedProjects + ProjectsSlider)",
-      "CardSlider dùng chung (chỉ thêm tuỳ chọn cho khối trang chủ; hành vi mặc định không đổi)"
+      "Dependency overrides: undici (client HTTP của payload, ghim 7.30.1 qua payload>undici)",
+      "Dependency overrides: happy-dom 21.0.4 (dùng bởi @lexical/headless withDOM và môi trường vitest tuỳ chọn)"
     ]
   },
-  "screens": [
-    "/ và /en (khối Dự án nổi bật)"
-  ],
-  "viewports": [
-    390,
-    768,
-    1024,
-    1440,
-    1920
-  ],
+  "screens": [],
+  "viewports": [],
   "impact": {
     "direct": [
-      "/ và /en khối Dự án nổi bật ≥ lg: mép trái/phải vùng thẻ trùng khung max-w-container của tiêu đề khối / Về TAMI (đo getBoundingClientRect)",
-      "Số thẻ vừa hết một hàng ở breakpoint đang xem (vd 3 dự án ở 1440) → hàng thẻ căn giữa, không mũi tên/chấm",
-      "Số thẻ nhiều hơn một hàng → slider như cũ: thẻ đầu thẳng mép khung, mũi tên ≥ md, chấm, kéo/vuốt",
-      "Không vỡ layout 390 / 768 / 1024 / 1440 / 1920; /en giống /vi"
+      "CI bước `pnpm audit --audit-level high` phải PASS (không còn advisory high undici/happy-dom)",
+      "Build (`next build`) và toàn bộ unit test chạy được với undici 7.30.1 + happy-dom 21.0.4"
     ],
     "dependents": [
-      "Các consumer của CardSlider phải KHÔNG đổi: SimilarCarousel trên /du-an/<slug>, /cho-thue/<slug>, /tin-bds/<slug>; ProjectAmenities; RelatedPosts; SimilarRentals"
+      "Admin richtext (Lexical): soạn và lưu nội dung (qua @lexical/headless + happy-dom)",
+      "Mọi chỗ chuyển HTML → Lexical (seed, import nội dung, bản dịch)",
+      "HTTP gọi ra ngoài của payload (email, API dịch AI Claude)"
     ],
     "regression": [
-      "Điều khiển slider BL-038 (mũi tên, chấm, trạng thái disabled, cuộn theo trang)",
-      "A11y carousel (role/aria-roledescription, nhãn mũi tên, phím mũi tên, không autoplay)",
-      "Vuốt ngang < md",
-      "Thẻ dự án (BL-037 giữ chỗ 2 dòng tên, link cả thẻ, hover tên) và nút \"Xem tất cả dự án\" không đổi"
+      "Chạy full unit suite",
+      "Build production",
+      "Admin: sửa và lưu trường richtext (trang pháp lý, bài tin tức, mô tả dự án), mở lại thấy đúng nội dung",
+      "Seed / `content:import` / `english:pack` (chuyển HTML → Lexical) cho kết quả như trước",
+      "Luồng dịch AI và gửi email (HTTP ra ngoài qua undici) còn hoạt động"
     ]
   },
   "acceptance": [
-    "≥ lg: mép trái/phải vùng thẻ trùng khung max-w-container của các khối khác",
-    "Số thẻ < số thẻ vừa một hàng ở breakpoint đang xem → hàng thẻ căn giữa, không hiện mũi tên/điều khiển slider thừa",
-    "Số thẻ ≥ một hàng → slider cuộn như cũ (mũi tên, kéo/vuốt, a11y carousel giữ nguyên); < md vẫn vuốt ngang được",
-    "Không vỡ layout 390 / 768 / 1024 / 1440 / 1920; /en giống /vi",
-    "design-spec S01.3 cập nhật (bỏ \"tràn viền\", ghi quy tắc căn giữa khi ít thẻ)"
+    "`pnpm audit --audit-level high` thoát mã 0",
+    "Full unit suite và build PASS",
+    "Richtext admin sửa/lưu và chuyển HTML → Lexical hoạt động như trước",
+    "Không có thay đổi UI/schema/API/i18n/migration"
   ],
   "risk": "medium",
-  "riskNote": "CardSlider là component dùng chung nhiều trang chi tiết; ưu tiên test: consumer khác không đổi, điều khiển slider BL-038, a11y carousel, căn giữa đúng theo breakpoint (phụ thuộc số thẻ vừa hàng)."
+  "riskNote": "Chỉ nâng phiên bản phụ thuộc (override); happy-dom nhảy major 20 → 21 và undici minor. Ưu tiên test: Lexical headless/HTML→Lexical, HTTP ra ngoài của payload, build."
 }

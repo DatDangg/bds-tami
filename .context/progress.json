@@ -3742,6 +3742,40 @@
       "round": 1,
       "docImpact": ".context/design-spec.md + docs/DESIGN.md as-built (BL-071 thay BL-056 thẻ 3 cột, BL-060 nền dải tương tự); SPECIFICATIONS as-built PATCH",
       "residual": "Chưa pnpm build (dev server khác giữ .next); chưa kiểm 3 dự án thật staging Maison Privée/Astor 1/Windsor (sau deploy) — local chỉ DB dev Astor 1; ảnh chụp thiếu nhiều cặp viewport (có số đo); MINOR: sticky top lệch vài px < lg, 768 nay 3 thẻ/hàng, khoảng diện tích có thể ngắt quanh –, dải trắng sát dải Điểm mạnh #f7f5f4 (1.09:1)."
+    },
+    {
+      "slug": "ci-audit-undici-happy-dom",
+      "title": "CI \"Audit phụ thuộc\" fail: advisory high mới undici 7.29.1 (GHSA-xjj6-f33q-929c) + happy-dom 20.14.6 (GHSA-834v-8h66-3h79) → nâng qua pnpm.overrides (BL-079)",
+      "type": "BUG",
+      "severity": "high",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-079",
+      "changeDoc": "spec/changes/archive/2026-10-26-ci-audit-undici-happy-dom.md",
+      "startedAt": "2026-10-26",
+      "planApprovedAt": "2026-10-26 (user: nâng cả hai qua pnpm.overrides, không allowlist; auto proceed)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 80,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-ci-audit-undici-happy-dom/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-ci-audit-undici-happy-dom-phase-1-task-01-round-1-review.md",
+          "note": "pnpm.overrides happy-dom 21.0.4 + payload>undici 7.30.1 (scoped: jsdom@30 giữ undici 8.12.2). Làm trong worktree sạch từ 83c8552 để tách phần Playwright dirty. 2 MINOR (pin exact bump tay; ghi lý do scoped override).",
+          "verify": "audit --audit-level high exit 0 (2 low | 6 moderate) · why undici 7.30.1 (payload) / 8.12.2 (jsdom) · why happy-dom 21.0.4 mọi đường · typecheck 0 · test 436 files/4595 PASS · lint 0 · build 0 · smoke @lexical/headless withDOM happy-dom 21 HTML→Lexical→HTML OK · install --frozen-lockfile --offline 0",
+          "completedAt": "2026-10-26"
+        }
+      ],
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-ci-audit-undici-happy-dom-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (bug thuần, giữ 1.59.0)",
+      "completedAt": "2026-10-26"
     }
   ],
   "projectName": "tami-website",
@@ -4395,7 +4429,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-24T10:40:00+07:00",
+  "lastUpdated": "2026-10-26T12:00:00+07:00",
   "approvalMilestones": [
     {
       "id": "M1",

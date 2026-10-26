@@ -1,0 +1,68 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 79,
+  "generatedAt": "2026-10-24T12:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-075 MODIFY (spec 1.59.0), UI only. v79 = as-built sau phase 1 (T01 5b0b6cf STRICT PASS r1; spec-validation phase 1 PASS) — danh sách file khớp commit, không đổi scopeVersion. Không đổi schema/API/i18n/migration.",
+  "status": "published — phase 1 done (as-built)",
+  "workItem": "feature/home-featured-projects-container",
+  "backlog": "BL-075",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-24-home-featured-projects-container.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.58.0-78.json",
+  "specUpdate": "spec/updates/2026-10-24-home-featured-projects-container.md",
+  "specRefs": [
+    "Overview/F1 trang chủ — bullet \"Dự án nổi bật (ĐỔI thẻ + đầu khối)\", đoạn \"Khung + căn giữa (BL-075 ...)\" trong SPECIFICATIONS.md",
+    "design-spec S01 khối 3 \"Dự án nổi bật\" + bảng breakpoint 1536"
+  ],
+  "changed": {
+    "files": [
+      "src/components/home/FeaturedProjects.tsx",
+      "src/components/home/ProjectsSlider.tsx",
+      "src/components/layout/CardSlider.tsx",
+      "src/components/home/FeaturedProjects.test.tsx",
+      "src/components/home/ProjectsSlider.test.tsx",
+      "src/components/layout/CardSlider.test.tsx"
+    ],
+    "modules": [
+      "Trang chủ — khối Dự án nổi bật (FeaturedProjects + ProjectsSlider)",
+      "CardSlider dùng chung (chỉ thêm tuỳ chọn cho khối trang chủ; hành vi mặc định không đổi)"
+    ]
+  },
+  "screens": [
+    "/ và /en (khối Dự án nổi bật)"
+  ],
+  "viewports": [
+    390,
+    768,
+    1024,
+    1440,
+    1920
+  ],
+  "impact": {
+    "direct": [
+      "/ và /en khối Dự án nổi bật ≥ lg: mép trái/phải vùng thẻ trùng khung max-w-container của tiêu đề khối / Về TAMI (đo getBoundingClientRect)",
+      "Số thẻ vừa hết một hàng ở breakpoint đang xem (vd 3 dự án ở 1440) → hàng thẻ căn giữa, không mũi tên/chấm",
+      "Số thẻ nhiều hơn một hàng → slider như cũ: thẻ đầu thẳng mép khung, mũi tên ≥ md, chấm, kéo/vuốt",
+      "Không vỡ layout 390 / 768 / 1024 / 1440 / 1920; /en giống /vi"
+    ],
+    "dependents": [
+      "Các consumer của CardSlider phải KHÔNG đổi: SimilarCarousel trên /du-an/<slug>, /cho-thue/<slug>, /tin-bds/<slug>; ProjectAmenities; RelatedPosts; SimilarRentals"
+    ],
+    "regression": [
+      "Điều khiển slider BL-038 (mũi tên, chấm, trạng thái disabled, cuộn theo trang)",
+      "A11y carousel (role/aria-roledescription, nhãn mũi tên, phím mũi tên, không autoplay)",
+      "Vuốt ngang < md",
+      "Thẻ dự án (BL-037 giữ chỗ 2 dòng tên, link cả thẻ, hover tên) và nút \"Xem tất cả dự án\" không đổi"
+    ]
+  },
+  "acceptance": [
+    "≥ lg: mép trái/phải vùng thẻ trùng khung max-w-container của các khối khác",
+    "Số thẻ < số thẻ vừa một hàng ở breakpoint đang xem → hàng thẻ căn giữa, không hiện mũi tên/điều khiển slider thừa",
+    "Số thẻ ≥ một hàng → slider cuộn như cũ (mũi tên, kéo/vuốt, a11y carousel giữ nguyên); < md vẫn vuốt ngang được",
+    "Không vỡ layout 390 / 768 / 1024 / 1440 / 1920; /en giống /vi",
+    "design-spec S01.3 cập nhật (bỏ \"tràn viền\", ghi quy tắc căn giữa khi ít thẻ)"
+  ],
+  "risk": "medium",
+  "riskNote": "CardSlider là component dùng chung nhiều trang chi tiết; ưu tiên test: consumer khác không đổi, điều khiển slider BL-038, a11y carousel, căn giữa đúng theo breakpoint (phụ thuộc số thẻ vừa hàng)."
+}
