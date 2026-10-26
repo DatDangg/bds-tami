@@ -1,0 +1,1 @@
+BL-075 p1t01 builder: wrapper max-w-container in FeaturedProjects; CardSlider prop centerWhenFits (justify-center-safe); ProjectsSlider passes it; tests added; verify + measurements in task file. Not committed.

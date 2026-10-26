@@ -1,6 +1,12 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "home-featured-projects-container",
+    "phase": 1,
+    "step": "close-out",
+    "journal": ".context/runs/feature-home-featured-projects-container-phase-1.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3230,6 +3236,31 @@
       "specValidation": ".context/review-reports/spec-validation-feature-ui-polish-sticky-underline-flags-phase-1.md (PASS; G1/G2 test-scope v78 as-built, G3 design-spec §2.3 ring đã sửa; G4/G5 LOW để lại)",
       "phase1": "done (T01 541dc36, T02 82979e4, T03 34d1cdb — đều STRICT PASS)",
       "completedAt": "2026-10-24"
+    },
+    {
+      "slug": "home-featured-projects-container",
+      "title": "Trang chủ: Dự án nổi bật theo khung nội dung max-w-container (bỏ tràn viền), ít thẻ vừa một hàng thì căn giữa an toàn (BL-075)",
+      "type": "MODIFY",
+      "status": "in_progress",
+      "currentPhase": 1,
+      "backlog": "BL-075",
+      "changeDoc": "spec/changes/2026-10-24-home-featured-projects-container.md",
+      "startedAt": "2026-10-24",
+      "specVersion": "1.59.0",
+      "scopeVersion": 79,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-home-featured-projects-container/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "review": "STRICT PASS",
+          "round": 1,
+          "report": ".context/review-reports/feature-home-featured-projects-container-phase-1-task-01-round-1-review.md",
+          "verify": "typecheck PASS · test 438 files/4606 PASS · eslint src/components/{layout,home} clean (pnpm lint toàn repo FAIL chỉ do playwright-report/ sinh ra, ngoài phạm vi) · dev 6 dự án: ul = khung tiêu đề (1440 [73,1353], 1920 [313,1593]; trước [0,1425]/[0,1905]), thẻ đầu = khung + gutter; fit 3 thẻ (mô phỏng DOM) trái = phải 216/184/53 ở 1440/1920/1024; không cuộn ngang 390–1920",
+          "completedAt": "2026-10-26"
+        }
+      ]
     }
   ],
   "bugs": [

@@ -24,9 +24,11 @@ interface CardSliderProps {
   labels: CardSliderLabels;
   /** Vị trí mũi tên: `below` (mặc định) cạnh chấm dưới slider; `sides` (BL-052 "Dự án tương tự") tròn nền trắng đè hai mép danh sách (từ md), chấm vẫn ở dưới. */
   arrows?: "below" | "sides";
+  /** BL-075: ít thẻ hơn một hàng thì căn giữa hàng thẻ (`safe center`: khi tràn tự rơi về căn trái nên thẻ đầu vẫn cuộn tới được). Mặc định tắt, consumer khác giữ nguyên. */
+  centerWhenFits?: boolean;
 }
 
-/** 82% < sm (lộ thẻ kế), 320px ≥ sm, 272px ≥ lg (~5 thẻ/khung desktop, BL-044). */
+/** 82% < sm (lộ thẻ kế), 320px ≥ sm, 272px ≥ lg (khung 1280 vừa 4 thẻ). */
 const SLIDE_WIDTH = "w-[82%] sm:w-[320px] lg:w-[272px]";
 
 /** Mũi tên hai mép: giữa chiều cao danh sách (trừ hàng chấm 44px + khe 24px bên dưới), nền trắng + bóng để nổi trên thẻ. */
@@ -39,7 +41,7 @@ const fill = (template: string, values: Record<string, number>) => template.repl
  * mũi tên tròn (từ md) + chấm giữa dưới. Số chấm = số vị trí cuộn thật (`pageCount`, BL-038), không phải số thẻ; mũi tên/chấm chỉ hiện khi `pageCount > 1`.
  * Slider không biết loại thẻ: nhận thẻ qua `items`.
  */
-export function CardSlider({ items, labelledBy, labels, arrows = "below" }: CardSliderProps) {
+export function CardSlider({ items, labelledBy, labels, arrows = "below", centerWhenFits = false }: CardSliderProps) {
   const count = items.length;
   const { listRef, current, pageCount, scrollToSlide } = useSnapSlider(count, true);
   const sides = arrows === "sides";
@@ -55,7 +57,10 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below" }: Card
         // `tabIndex=0`: vùng cuộn ngang dùng được bằng bàn phím (mũi tên) khi chưa có điều khiển nào nhận focus.
         tabIndex={0}
         aria-labelledby={labelledBy}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-gutter pt-1 pb-2 [scroll-padding-inline:var(--spacing-gutter)] [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden"
+        className={cn(
+          "flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-gutter pt-1 pb-2 [scroll-padding-inline:var(--spacing-gutter)] [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden",
+          centerWhenFits && "justify-center-safe",
+        )}
       >
         {items.map((item, position) => (
           <li

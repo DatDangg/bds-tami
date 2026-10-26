@@ -25,5 +25,5 @@ export function ProjectsSlider({ slides, labelledBy }: { slides: ProjectSlideVie
   ));
   // `raw`: giữ nguyên `{index}` / `{total}` để CardSlider thay (nhãn truyền được từ Server Component).
   const labels = { slide: t.raw("slide") as string, previous: t("previous"), next: t("next"), dots: t("dots"), goTo: t.raw("goTo") as string };
-  return <CardSlider items={items} labelledBy={labelledBy} labels={labels} />;
+  return <CardSlider items={items} labelledBy={labelledBy} labels={labels} centerWhenFits />;
 }

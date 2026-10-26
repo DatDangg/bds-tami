@@ -16,7 +16,7 @@ interface FeaturedProjectsProps {
   slides: ProjectSlideView[];
 }
 
-/** Dự án nổi bật (design-spec S01.3, mockup BL-044): đầu khối căn giữa (eyebrow, tiêu đề, gạch ngắn, mô tả), slider tràn viền (client), "Xem tất cả" → danh sách dự án. */
+/** Dự án nổi bật (design-spec S01.3, mockup BL-044): đầu khối căn giữa (eyebrow, tiêu đề, gạch ngắn, mô tả), slider trong khung nội dung `max-w-container` (BL-075; ít thẻ thì căn giữa, client), "Xem tất cả" → danh sách dự án. */
 export function FeaturedProjects({ title, eyebrow, description, slides }: FeaturedProjectsProps) {
   const t = useTranslations("page.home.projects");
   const locale = useLocale() as Locale;
@@ -31,7 +31,9 @@ export function FeaturedProjects({ title, eyebrow, description, slides }: Featur
         <span aria-hidden="true" className="h-0.5 w-12 bg-primary" />
         {description && <p className="max-w-[80ch] text-lead text-text-secondary">{description}</p>}
       </div>
-      <ProjectsSlider slides={slides} labelledBy={headingId} />
+      <div className="mx-auto w-full max-w-container">
+        <ProjectsSlider slides={slides} labelledBy={headingId} />
+      </div>
       <div className="mx-auto mt-4 flex w-full max-w-container justify-center px-gutter">
         <Button asChild variant="ghost">
           <Link href={resolveNavLink("projects", locale)?.href ?? "/"}>

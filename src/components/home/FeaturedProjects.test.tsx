@@ -25,6 +25,13 @@ describe("FeaturedProjects (BL-044)", () => {
     expect(screen.getByRole("link", { name: "Xem tất cả dự án" })).toHaveAttribute("href", "/du-an");
   });
 
+  it("BL-075: slider nằm trong khung nội dung max-w-container (không tràn viền)", () => {
+    renderWithIntl(<FeaturedProjects title="Dự án nổi bật" slides={[slide]} />);
+    const wrapper = screen.getByRole("region", { name: "Dự án nổi bật" }).parentElement;
+    expect(wrapper).toHaveClass("mx-auto", "w-full", "max-w-container");
+    expect(wrapper?.className).not.toMatch(/px-gutter/);
+  });
+
   it("thiếu eyebrow/mô tả (vd chưa có bản EN) → ẩn, không lấy chữ Việt", () => {
     renderWithIntl(<FeaturedProjects title="Featured" eyebrow={null} description={null} slides={[slide]} />, "en");
     expect(screen.queryByText("Dự án nổi bật nhất")).toBeNull();

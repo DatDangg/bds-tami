@@ -112,6 +112,11 @@ describe("ProjectsSlider", () => {
     expect(screen.getByRole("button", { name: "Chuyển tới dự án 1" })).toHaveAttribute("aria-current", "true");
   });
 
+  it("BL-075: bật căn giữa khi ít thẻ (ul có justify-center-safe)", () => {
+    renderWithIntl(<><h2 id="h">Dự án nổi bật</h2><ProjectsSlider slides={[slide(1), slide(2)]} labelledBy="h" /></>);
+    expect(screen.getByRole("list", { name: "Dự án nổi bật" })).toHaveClass("justify-center-safe");
+  });
+
   it("BL-037: tên dự án giữ chỗ 2 dòng (min-h-[2lh] + line-clamp-2)", () => {
     renderWithIntl(<><h2 id="h">Dự án nổi bật</h2><ProjectsSlider slides={[slide(1)]} labelledBy="h" /></>);
     expect(screen.getByRole("heading", { level: 3 })).toHaveClass("min-h-[2lh]", "line-clamp-2");

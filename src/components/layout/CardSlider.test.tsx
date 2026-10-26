@@ -75,6 +75,22 @@ describe("CardSlider", () => {
     expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 296 }));
   });
 
+  it("BL-075: centerWhenFits bật → ul có justify-center-safe (không justify-center thường); mặc định không có", () => {
+    const { unmount } = renderSlider(3);
+    expect(screen.getByRole("list", { name: "Tiêu đề" })).not.toHaveClass("justify-center-safe");
+    expect(screen.getByRole("list", { name: "Tiêu đề" }).className).not.toMatch(/justify-center/);
+    unmount();
+    render(
+      <>
+        <h2 id="h">Tiêu đề</h2>
+        <CardSlider centerWhenFits labelledBy="h" labels={labels} items={[1, 2, 3].map((n) => <a key={n} href={`/x/${n}`}>Thẻ {n}</a>)} />
+      </>,
+    );
+    const list = screen.getByRole("list", { name: "Tiêu đề" });
+    expect(list).toHaveClass("justify-center-safe");
+    expect(list.className.split(/\s+/)).not.toContain("justify-center");
+  });
+
   it("một thẻ: không mũi tên, không chấm", () => {
     renderSlider(1);
     expect(screen.queryByRole("button")).toBeNull();
