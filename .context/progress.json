@@ -1,12 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "home-featured-projects-container",
-    "phase": 1,
-    "step": "close-out",
-    "journal": ".context/runs/feature-home-featured-projects-container-phase-1.md"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3241,10 +3235,10 @@
       "slug": "home-featured-projects-container",
       "title": "Trang chủ: Dự án nổi bật theo khung nội dung max-w-container (bỏ tràn viền), ít thẻ vừa một hàng thì căn giữa an toàn (BL-075)",
       "type": "MODIFY",
-      "status": "in_progress",
+      "status": "done",
       "currentPhase": 1,
       "backlog": "BL-075",
-      "changeDoc": "spec/changes/2026-10-24-home-featured-projects-container.md",
+      "changeDoc": "spec/changes/archive/2026-10-24-home-featured-projects-container.md",
       "startedAt": "2026-10-24",
       "specVersion": "1.59.0",
       "scopeVersion": 79,
@@ -3258,9 +3252,13 @@
           "round": 1,
           "report": ".context/review-reports/feature-home-featured-projects-container-phase-1-task-01-round-1-review.md",
           "verify": "typecheck PASS · test 438 files/4606 PASS · eslint src/components/{layout,home} clean (pnpm lint toàn repo FAIL chỉ do playwright-report/ sinh ra, ngoài phạm vi) · dev 6 dự án: ul = khung tiêu đề (1440 [73,1353], 1920 [313,1593]; trước [0,1425]/[0,1905]), thẻ đầu = khung + gutter; fit 3 thẻ (mô phỏng DOM) trái = phải 216/184/53 ở 1440/1920/1024; không cuộn ngang 390–1920",
-          "completedAt": "2026-10-26"
+          "completedAt": "2026-10-26",
+          "commit": "5b0b6cf"
         }
-      ]
+      ],
+      "specValidation": ".context/review-reports/spec-validation-feature-home-featured-projects-container-phase-1-post-build.md (PASS; G1 test-scope v79 as-built, G2 docs/DESIGN.md reconcile ở close-out; G3/G4 INFO)",
+      "phase1": "done (T01 5b0b6cf STRICT PASS r1)",
+      "completedAt": "2026-10-26"
     }
   ],
   "bugs": [

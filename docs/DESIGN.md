@@ -289,7 +289,7 @@ Logo chính thức **TAMI HOMES** (biểu tượng mái nhà ghép chữ "T" + c
 - **UI Library:** Tailwind CSS + shadcn/ui (tuỳ biến lại thang bo góc (2/12/16/20px/pill), font, màu theo token trên).
 - **Animation level:** Subtle — hero chữ hiện dần, ảnh phóng nhẹ khi hover, nội dung trượt lên khi cuộn tới (tắt khi `prefers-reduced-motion`). Không dùng parallax nặng làm hỏng LCP/CLS (NFR-01).
 - **Ảnh:** ảnh lớn chất lượng cao là trung tâm; tỉ lệ cố định (16:9 hero/slider, 4:3 thẻ) để không nhảy layout.
-- **Khoảng cách section:** rộng (`64–120px` theo màn hình), nội dung tối đa ~1280px, slider/hero tràn viền.
+- **Khoảng cách section:** rộng (`64–120px` theo màn hình), nội dung tối đa ~1280px, hero tràn viền; slider (kể cả "Dự án nổi bật" trang chủ, BL-075) nằm trong khung nội dung — ít thẻ vừa một hàng thì căn giữa.
 - **Song ngữ:** cùng một bố cục cho VI và EN; không chèn chữ vào ảnh (để dịch được).
 
 ---

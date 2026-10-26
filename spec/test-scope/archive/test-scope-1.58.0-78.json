@@ -1,0 +1,119 @@
+{
+  "specVersion": "1.58.0",
+  "scopeVersion": 78,
+  "generatedAt": "2026-10-24T10:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-074 MODIFY (spec 1.58.0, không bump thêm — T02/T03 không đổi requirement), UI only. v78 = as-built sau phase 1 (T01 541dc36, T02 82979e4, T03 34d1cdb, đều STRICT PASS; spec-validation PASS): sửa danh sách file theo commit thật, thêm trang chủ (AnnouncementBar). Không đổi schema/API/i18n/migration.",
+  "status": "published — phase 1 done (as-built)",
+  "workItem": "feature/ui-polish-sticky-underline-flags",
+  "backlog": "BL-074",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/2026-10-23-ui-polish-sticky-underline-flags.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.58.0-77.json",
+  "specUpdate": "spec/updates/2026-10-24-ui-polish-sticky-underline-flags.md",
+  "specRefs": [
+    "Overview — bullet \"Chỉnh UI BL-074\" trong SPECIFICATIONS.md",
+    "F12 — bullet FR-PUB-19 (as-built BL-063 + BL-074): cờ chữ nhật 3:2"
+  ],
+  "changed": {
+    "files": [
+      "src/components/detail/DetailLayout.tsx",
+      "src/components/detail/DetailSubNav.tsx",
+      "src/components/detail/DetailContactAside.tsx",
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/LanguageSwitcher.tsx",
+      "src/components/layout/flag-icons.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/FooterLinkColumn.tsx",
+      "src/app/(frontend)/[locale]/not-found.tsx",
+      "src/components/home/AnnouncementBar.tsx",
+      "src/components/careers/ApplyForm.tsx",
+      "src/components/careers/ApplyFormSlot.tsx",
+      "src/components/careers/CvPicker.tsx",
+      "src/components/careers/JobDetail.tsx",
+      "src/components/careers/JobFilters.tsx",
+      "src/components/careers/JobListPage.tsx",
+      "src/components/consent/CookieBanner.tsx",
+      "src/components/detail/DetailExpandButton.tsx",
+      "src/components/detail/DetailGalleryGrid.tsx",
+      "src/components/detail/DetailInfoGrid.tsx",
+      "src/components/detail/DetailOverviewIntro.tsx",
+      "src/components/detail/SimilarCarousel.tsx",
+      "src/components/forms/ConsentCheckbox.tsx",
+      "src/components/forms/FormStatus.tsx",
+      "src/components/legal/TableOfContents.tsx",
+      "src/components/listing/FilterFacets.tsx",
+      "src/components/listing/FilterPanel.tsx",
+      "src/components/media/LazyMap.tsx",
+      "src/components/news/NewsArticleContactNote.tsx",
+      "src/components/news/NewsToc.tsx",
+      "src/components/rentals/RadioFacetList.tsx",
+      "src/components/rentals/RentalListPage.tsx",
+      "src/components/detail/DetailLayout.test.tsx",
+      "src/components/detail/DetailBlocks.test.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/components/rentals/rental-detail.test.tsx",
+      "src/components/layout/DesktopNav.test.tsx",
+      "src/components/layout/flag-icons.test.tsx",
+      "src/components/layout/LanguageSwitcher.test.tsx"
+    ],
+    "modules": [
+      "Chi tiết Dự án / Cho thuê / Tin BĐS (DetailLayout + DetailSubNav + DetailContactAside; DetailPageShell không đổi)",
+      "Header menu ngang (DesktopNav)",
+      "Footer, 404, cookie banner, thanh thông báo trang chủ (AnnouncementBar), form consent / FormStatus, filter, mục lục, tuyển dụng (bỏ gạch chân)",
+      "Chuyển ngôn ngữ (LanguageSwitcher, flag-icons) ở header, menu toàn màn hình, footer"
+    ]
+  },
+  "screens": [
+    "/du-an/<slug> (vd /du-an/astor-1), /cho-thue/<slug>, /tin-bds/<slug> (vi + /en)",
+    "Trang chủ / và /en (thanh thông báo AnnouncementBar)",
+    "Header + menu toàn màn hình + footer mọi trang (vi + /en)",
+    "/du-an, /cho-thue, /tuyen-dung (+ chi tiết), 404",
+    "Chi tiết tin tức, trang pháp lý (link trong bài còn gạch chân)"
+  ],
+  "viewports": [
+    390,
+    768,
+    1024,
+    1440
+  ],
+  "impact": {
+    "direct": [
+      "Chi tiết Dự án / Cho thuê / Tin BĐS < lg (390, 768, 1023): thanh mục con không chạm/đè thẻ form liên hệ ở mọi mức cuộn, kể cả lúc chưa dính; thẻ top ≥ thanh bottom + 16px khi thanh còn trên màn",
+      "Thanh CTA dính đáy / nút banner tư vấn → `#lead-form` hiện đầu màn, không bị thanh che (< lg scroll-mt = --sticky-top + 1rem; ≥ lg + 4.5rem)",
+      "Thanh mục con vẫn dính top --sticky-top trong cột trái; scroll-spy + bấm mục cuộn đúng; < lg mục đang xem tự cuộn vào giữa; ≥ lg thôi dính ở cuối lưới cùng thẻ phụ",
+      "Không còn gạch chân (thường + hover) trên link/nút/menu/thẻ/footer/breadcrumb/mục lục/404/cookie banner/form site công khai; hover đổi màu/nền, focus-visible giữ; header ≥ xl không vạch dưới mục menu, mục đang xem = nền + aria-current, không tràn 1280 vi/en",
+      "Link giữa câu ngoài RichText (consent \"Chính sách bảo mật\", cookie banner, email/hotline tuyển dụng) đậm + màu nhấn, phân biệt không chỉ bằng màu",
+      "Cờ VN/UK chữ nhật 3:2 (viewBox 30×20), ~21×14, sao VN cân giữa, ring đang chọn mảnh hơn, cờ kia mờ 60%, vùng bấm ≥ 44×44"
+    ],
+    "dependents": [
+      "DetailLayout không subNav (Dịch vụ, Tuyển dụng): DOM/class giữ nguyên",
+      "Mép thanh mục con thẳng mép thẻ trắng trái + thẻ phụ phải ở ≥ lg (BL-028); khe trên/dưới thanh không đổi (±0–2px)",
+      "LanguageSwitcher dùng ở header, menu toàn màn hình, footer (tone sáng/tối)",
+      "`aria-label`/`title`/`lang`/`hreflang`/`aria-current` của nút ngôn ngữ, đích link và cookie NEXT_LOCALE không đổi"
+    ],
+    "regression": [
+      "3 trang chi tiết vi/en ở 390/768/1024/1440",
+      "Header/footer/menu toàn site (vi + en)",
+      "Form consent, filter (dự án/cho thuê/tuyển dụng), 404, cookie banner",
+      "Tin tức / pháp lý: link trong bài (RichText) vẫn gạch chân; chữ gạch chân do biên tập đặt giữ nguyên",
+      "Tab bar danh mục trang danh sách (ListingCategoryTabs) giữ chỉ báo border-b-2",
+      "Admin Payload không đổi",
+      "Dải \"… tương tự\" / Điểm mạnh / banner tư vấn không còn thanh mục con dính ≥ lg (chấp nhận, đã ghi spec)"
+    ]
+  },
+  "acceptance": [
+    "390 / 768 / 1023: thanh mục con (dính và không dính) không chạm/đè thẻ \"Nhận thông tin dự án\" / thẻ liên hệ; có khoảng cách theo token spacing; kiểm các khối liền kề dùng cùng thanh dính",
+    "Không còn `underline` (mặc định hoặc hover) trên link/nút/mục điều hướng site công khai; hover/focus vẫn nhìn thấy (đổi màu/nền), focus-visible giữ, đạt a11y",
+    "Ngoại lệ: link trong đoạn văn bài viết (RichText tin tức/pháp lý) giữ gạch chân (WCAG 1.4.1)",
+    "Cờ VN/EN hình chữ nhật ~3:2, nhỏ hơn trước; trạng thái đang chọn phân biệt được (viền mảnh hơn); vùng bấm ≥ 24×24 (thực tế 44×44)",
+    "design-spec §2.3 (cờ) + test flag-icons.test.tsx / LanguageSwitcher.test.tsx cập nhật theo viewBox/kích thước",
+    "pnpm lint + typecheck + test PASS"
+  ],
+  "unverifiedLocally": [
+    "Sticky ≥ lg chỉ đo trên Chromium — Firefox/Safari chưa kiểm (residual T01)",
+    "Reviewer T02/T03 không có browser: contrast/ring tính theo token; ring 1.5px ở DPR 1 có thể hơi mờ (MINOR T03); accent-text trên warning-subtle 4.57:1 sát ngưỡng AA"
+  ],
+  "risk": "medium",
+  "riskNote": "Component dùng chung (DetailLayout/DetailSubNav/DetailContactAside, header/footer, form consent, filter) + sticky/scroll-spy/anchor + a11y (1.4.1, 1.4.3, 2.5.8). Không đổi dữ liệu/API. Ưu tiên test: không đè thẻ form < lg, scroll-spy, header không tràn 1280, link RichText còn gạch chân."
+}
