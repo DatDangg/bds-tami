@@ -3,8 +3,8 @@ import Form from "next/form";
 import { MagnifyingGlass, MapPin } from "@/components/icons";
 import { FormPendingMarker, PendingLink } from "@/components/layout/PendingRegion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/components/ui/option-select";
+import { JobKeywordInput } from "./JobKeywordInput";
 
 export interface JobProvinceOption {
   slug: string;
@@ -27,13 +27,13 @@ interface JobFiltersProps {
 /**
  * Ô "Khu vực" + ô tìm theo tên vị trí (BL-054, design `tuyen-dung.webp`): MỘT `<Form>` (next/form, GET) nên chia sẻ được qua URL, chạy không cần JS
  * (rơi về form GET thường) và bằng bàn phím (ô chọn TAMI, trước khi hydrate là `select` gốc đã style; không tự gửi khi đổi giá trị, WCAG 3.2.2 → nút "Tìm").
- * Nhãn ẩn trực quan (design chỉ có icon + placeholder) nhưng vẫn gắn `label`. Gửi form luôn về trang 1. Server Component.
+ * Nhãn ẩn trực quan (design chỉ có icon + placeholder) nhưng vẫn gắn `label`. Gửi form luôn về trang 1, KHÔNG cuộn về đầu trang (`scroll={false}`, BL-089). Server Component.
  */
 export function JobFilters({ actionPath, provinces, selectedProvince, keyword, hiddenCategory, active }: JobFiltersProps) {
   const t = useTranslations("page.careers");
   const tv = useTranslations("page.careers.v2");
   return (
-    <Form action={actionPath} aria-label={t("filtersLabel")} className="grid w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_auto] sm:items-center xl:w-auto xl:grid-cols-[13rem_18rem_auto]">
+    <Form action={actionPath} scroll={false} aria-label={t("filtersLabel")} className="grid w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_auto] sm:items-center xl:w-auto xl:grid-cols-[13rem_18rem_auto]">
       {hiddenCategory && <input type="hidden" name="category" value={hiddenCategory} />}
       <div className="relative min-w-0">
         <label htmlFor="job-filter-province" className="sr-only">
@@ -54,16 +54,14 @@ export function JobFilters({ actionPath, provinces, selectedProvince, keyword, h
           {tv("searchLabel")}
         </label>
         <MagnifyingGlass size={18} aria-hidden="true" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-text-muted" />
-        {/* `key` theo từ khoá trên URL: back / chip đổi `q` thì ô nạp lại giá trị mới. */}
-        <Input
-          key={keyword ?? ""}
+        <JobKeywordInput
+          keyword={keyword ?? ""}
           id="job-filter-q"
           name="q"
           type="search"
           maxLength={100}
           autoComplete="off"
           placeholder={tv("searchPlaceholder")}
-          defaultValue={keyword ?? ""}
           className="rounded-pill pl-11 text-small"
         />
       </div>

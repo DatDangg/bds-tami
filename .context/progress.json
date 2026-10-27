@@ -4048,6 +4048,40 @@
       "report": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
       "docImpact": ".context/design-spec.md §2.1 Mục đang xem (as-built BL-087); no spec change (giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "careers-search-scroll-top",
+      "title": "Tuyển dụng: bấm \"TÌM\" không cuộn về đầu trang, giữ focus ô tìm (BL-089, QA bug 11)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-089",
+      "changeDoc": "spec/changes/archive/2026-10-27-careers-search-scroll-top.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user: \"Chạy change cho BL-088, BL-089, BL-090, BL-091\" — auto proceed)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 89,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-careers-search-scroll-top/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-careers-search-scroll-top-phase-1-task-01-round-1-review.md",
+          "note": "r1 PASS + 3 MINOR: MINOR-1 (effect lúc mount ghi đè chữ gõ trước hydrate) sửa trước commit bằng lastKeyword ref; MINOR-2 chấp nhận; MINOR-3 build PASS theo builder. ListingHero cùng root cause (scroll + key remount mất focus) → đề xuất change riêng.",
+          "verify": "typecheck 0 · vitest careers 50/50 · pnpm test unit PASS (84 FAIL chỉ tests/integration do Redis/S3 không chạy) · eslint file đổi 0 · build 0 · Playwright Edge 1920/390: scrollY 207→207 / 1252→1252 (trước →0), Enter giữ focus #job-filter-q (trước BODY)",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-careers-search-scroll-top-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (giữ 1.59.0)",
+      "completedAt": "2026-10-28"
     }
   ],
   "projectName": "tami-website",
@@ -4701,7 +4735,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-27T08:35:42.353Z",
+  "lastUpdated": "2026-10-27T17:06:07.385Z",
   "approvalMilestones": [
     {
       "id": "M1",

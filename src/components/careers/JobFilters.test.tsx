@@ -1,11 +1,24 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { chooseOption, renderWithIntl } from "@/components/media/test-utils";
 import vi_ from "@/i18n/messages/vi.json";
 import { JobFilters } from "./JobFilters";
+
+const formProps = vi.hoisted(() => ({ last: undefined as Record<string, unknown> | undefined }));
+vi.mock("next/form", () => ({
+  default: (props: Record<string, unknown>) => {
+    formProps.last = props;
+    const { children, className, action, 'aria-label': label } = props as { children: React.ReactNode; className?: string; action: string; "aria-label"?: string };
+    return (
+      <form className={className} action={action} aria-label={label}>
+        {children}
+      </form>
+    );
+  },
+}));
 
 const provinces = [
   { slug: "ha-noi", name: "Hà Nội" },
@@ -35,5 +48,26 @@ describe("JobFilters", () => {
     expect(container.querySelector("input[type=hidden][name=province]")).toHaveValue("");
     expect(screen.getByRole("searchbox", { name: "Tìm theo tên vị trí" })).toHaveValue("");
     expect(screen.queryByRole("link", { name: "Xoá bộ lọc" })).toBeNull();
+  });
+
+  it("BL-089: form không cuộn về đầu trang sau khi tìm (scroll=false)", () => {
+    renderWithIntl(<JobFilters actionPath="/tuyen-dung" provinces={provinces} active={false} />);
+    expect(formProps.last?.scroll).toBe(false);
+  });
+
+  it("BL-089: keyword trên URL đổi → ô q nạp lại giá trị mới nhưng KHÔNG remount (focus giữ)", () => {
+    const { rerender } = renderWithIntl(<JobFilters actionPath="/tuyen-dung" provinces={provinces} keyword="tu van" active />);
+    const input = screen.getByRole("searchbox", { name: "Tìm theo tên vị trí" });
+    act(() => input.focus());
+    expect(input).toHaveValue("tu van");
+    rerender(
+      <NextIntlClientProvider locale="vi" messages={vi_}>
+        <JobFilters actionPath="/tuyen-dung" provinces={provinces} keyword="sale" active />
+      </NextIntlClientProvider>,
+    );
+    const after = screen.getByRole("searchbox", { name: "Tìm theo tên vị trí" });
+    expect(after).toBe(input);
+    expect(after).toHaveValue("sale");
+    expect(after).toHaveFocus();
   });
 });

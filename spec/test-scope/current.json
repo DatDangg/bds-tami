@@ -1,59 +1,56 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 88,
-  "generatedAt": "2026-10-27T16:00:00+07:00",
+  "scopeVersion": 89,
+  "generatedAt": "2026-10-28T10:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-087 BUG UI: menu ngang header (>= xl) — mục đang xem (aria-current=page) và mục hover đổi từ viên thuốc nền xám (BL-074 T02) sang gạch chân vàng 2px --color-accent-text #8c6733 (border-b-2); không còn nền viên thuốc; khoảng cách chữ giữ 24/32px (ul gap-6 2xl:gap-8); transition fast, tắt khi reduced motion; chỉ menu header. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer PASS r1.",
+  "triggerNote": "BL-089 BUG UI: /tuyen-dung bấm TÌM / Enter trong ô 'Tìm theo tên vị trí' làm trang nhảy lên đầu (next/form mặc định scroll=true). Sửa: JobFilters điều hướng giữ vị trí cuộn, focus giữ ở nút/ô q; ô q tách thành JobKeywordInput (mới) đồng bộ lại khi back/forward. No-JS vẫn form GET. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer PASS r1.",
   "status": "published",
-  "workItem": "bug/header-nav-gold-underline",
-  "backlog": "BL-087",
+  "workItem": "bug/careers-search-scroll-top",
+  "backlog": "BL-089",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-header-nav-gold-underline.md",
-  "task": "tasks/bug-header-nav-gold-underline/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-87.json",
+  "changeDoc": "spec/changes/2026-10-27-careers-search-scroll-top.md",
+  "task": "tasks/bug-careers-search-scroll-top/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-careers-search-scroll-top-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-88.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/layout/DesktopNav.tsx",
-      "src/components/layout/DesktopNav.test.tsx",
-      ".context/design-spec.md"
+      "src/components/careers/JobFilters.tsx",
+      "src/components/careers/JobKeywordInput.tsx",
+      "src/components/careers/JobFilters.test.tsx"
     ],
     "modules": [
-      "DesktopNav: anchor menu ngang header >= xl dùng vạch dưới 2px vàng accent-text cho mục đang xem và hover, bỏ viên thuốc nền xám; ul gap-6 2xl:gap-8"
+      "JobFilters: submit tìm kiếm không cuộn về đầu trang; giữ focus",
+      "JobKeywordInput (mới): ô q đồng bộ với URL khi back/forward"
     ]
   },
   "screens": [
-    "Header desktop (>= xl) trên mọi trang công khai VI/EN ở 1280/1440/1920"
+    "/tuyen-dung (VI) và trang tương ứng /en/... (EN): bộ lọc danh sách vị trí"
   ],
   "impact": {
     "direct": [
-      "Mục đang xem (aria-current=page) có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
-      "Hover mục khác hiện vạch vàng 2px, không nền viên thuốc",
-      "Tương phản vạch vàng (rgb 140,103,51) so với nền header >= 3:1 (đầu trang đè hero, đã cuộn qua ảnh tối/sáng, nền đặc khi reduced-transparency)",
-      "focus-visible bàn phím trên mục menu vẫn thấy rõ",
-      "prefers-reduced-motion: không transition đổi màu vạch",
-      "Khoảng cách giữa các mục 24px (xl) / 32px (2xl), chiều cao header 72px, không tràn ngang"
+      "Bấm TÌM hoặc Enter trong ô 'Tìm theo tên vị trí' -> URL có q/province, danh sách lọc đúng, scrollY không về 0",
+      "Focus giữ ở nút TÌM (bấm) hoặc ô q (Enter) sau khi tìm",
+      "Back/forward của trình duyệt nạp lại đúng giá trị ô q theo URL",
+      "Không bật JS: form GET vẫn lọc (/tuyen-dung?q=...&province=...)"
     ],
     "dependents": [
-      "Dropdown menu con: nút caret (hover nền tròn) và panel mở/đóng đúng, không đổi",
-      "Nút CTA header, logo, bộ chuyển ngôn ngữ không bị lệch bố cục"
+      "Đổi tỉnh/thành trong bộ lọc vẫn lọc và giữ hành vi cuộn như trước",
+      "Phân trang/danh sách kết quả và trạng thái rỗng /tuyen-dung"
     ],
     "regression": [
-      "Menu toàn màn hình < xl không có gạch chân vàng, không đổi",
-      "Link/nút khác (footer, nội dung, card) không có gạch chân (regression BL-074)",
-      "Không cuộn ngang toàn trang ở 1280/1440/1920"
+      "Chuyển ngôn ngữ VI/EN giữ bộ lọc hợp lệ",
+      "Trang chi tiết vị trí và form ứng tuyển không đổi",
+      "Không cuộn ngang toàn trang ở 390/1440/1920"
     ]
   },
   "acceptance": [
-    "Mục đang xem có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
-    "Hover mục khác có vạch vàng, không nền",
-    "Tương phản vạch >= 3:1 trên mọi nền header",
-    "focus-visible giữ nguyên; reduced motion tắt transition",
-    "Menu < xl và các link khác không có gạch chân",
-    "Dropdown menu con mở đúng, caret không đổi"
+    "Sau TÌM/Enter, kết quả cập nhật và khu vực tìm kiếm vẫn trong khung nhìn (scrollY không về 0)",
+    "URL giữ tham số q/province; tải lại/chia sẻ được",
+    "Không JS vẫn tìm được (form GET)",
+    "Focus không bị mất; back nạp lại ô q"
   ],
   "risk": "low",
-  "riskNote": "UI cục bộ ở DesktopNav; không đổi API/schema. Lưu ý dữ liệu nav live không có mục con nên dropdown chỉ kiểm bằng unit test/dữ liệu giả."
+  "riskNote": "UI cục bộ ở bộ lọc tuyển dụng; không đổi API/schema."
 }

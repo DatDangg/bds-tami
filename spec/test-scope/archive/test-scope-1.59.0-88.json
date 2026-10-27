@@ -1,0 +1,59 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 88,
+  "generatedAt": "2026-10-27T16:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-087 BUG UI: menu ngang header (>= xl) — mục đang xem (aria-current=page) và mục hover đổi từ viên thuốc nền xám (BL-074 T02) sang gạch chân vàng 2px --color-accent-text #8c6733 (border-b-2); không còn nền viên thuốc; khoảng cách chữ giữ 24/32px (ul gap-6 2xl:gap-8); transition fast, tắt khi reduced motion; chỉ menu header. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer PASS r1.",
+  "status": "published",
+  "workItem": "bug/header-nav-gold-underline",
+  "backlog": "BL-087",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-header-nav-gold-underline.md",
+  "task": "tasks/bug-header-nav-gold-underline/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-87.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/DesktopNav.test.tsx",
+      ".context/design-spec.md"
+    ],
+    "modules": [
+      "DesktopNav: anchor menu ngang header >= xl dùng vạch dưới 2px vàng accent-text cho mục đang xem và hover, bỏ viên thuốc nền xám; ul gap-6 2xl:gap-8"
+    ]
+  },
+  "screens": [
+    "Header desktop (>= xl) trên mọi trang công khai VI/EN ở 1280/1440/1920"
+  ],
+  "impact": {
+    "direct": [
+      "Mục đang xem (aria-current=page) có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
+      "Hover mục khác hiện vạch vàng 2px, không nền viên thuốc",
+      "Tương phản vạch vàng (rgb 140,103,51) so với nền header >= 3:1 (đầu trang đè hero, đã cuộn qua ảnh tối/sáng, nền đặc khi reduced-transparency)",
+      "focus-visible bàn phím trên mục menu vẫn thấy rõ",
+      "prefers-reduced-motion: không transition đổi màu vạch",
+      "Khoảng cách giữa các mục 24px (xl) / 32px (2xl), chiều cao header 72px, không tràn ngang"
+    ],
+    "dependents": [
+      "Dropdown menu con: nút caret (hover nền tròn) và panel mở/đóng đúng, không đổi",
+      "Nút CTA header, logo, bộ chuyển ngôn ngữ không bị lệch bố cục"
+    ],
+    "regression": [
+      "Menu toàn màn hình < xl không có gạch chân vàng, không đổi",
+      "Link/nút khác (footer, nội dung, card) không có gạch chân (regression BL-074)",
+      "Không cuộn ngang toàn trang ở 1280/1440/1920"
+    ]
+  },
+  "acceptance": [
+    "Mục đang xem có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
+    "Hover mục khác có vạch vàng, không nền",
+    "Tương phản vạch >= 3:1 trên mọi nền header",
+    "focus-visible giữ nguyên; reduced motion tắt transition",
+    "Menu < xl và các link khác không có gạch chân",
+    "Dropdown menu con mở đúng, caret không đổi"
+  ],
+  "risk": "low",
+  "riskNote": "UI cục bộ ở DesktopNav; không đổi API/schema. Lưu ý dữ liệu nav live không có mục con nên dropdown chỉ kiểm bằng unit test/dữ liệu giả."
+}
