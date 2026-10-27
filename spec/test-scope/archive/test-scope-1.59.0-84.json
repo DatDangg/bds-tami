@@ -1,0 +1,62 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 84,
+  "generatedAt": "2026-10-27T11:57:17+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-081 BUG (địa chỉ bị lặp phường/tỉnh: chi tiết dự án mục 'Vị trí dự án', JSON-LD địa chỉ dự án và dòng địa chỉ chi tiết cho thuê ghép thêm phường/tỉnh dù address đã chứa sẵn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: helper dùng chung joinAddress — phần nào đã có trong address (không dấu, không phân biệt hoa thường) thì không ghép lại, thiếu phần nào thêm phần đó. Reviewer NORMAL PASS r2.",
+  "status": "published",
+  "workItem": "bug/project-location-address-dedupe",
+  "backlog": "BL-081",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-project-location-address-dedupe.md",
+  "task": "tasks/bug-project-location-address-dedupe/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-83.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/lib/address/join-address.ts",
+      "src/lib/address/join-address.test.ts",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/project-location-address.test.tsx",
+      "src/lib/rentals/rental-view.ts",
+      "src/lib/rentals/rental-view.test.ts",
+      "src/app/(frontend)/[locale]/du-an/[slug]/page.tsx"
+    ],
+    "modules": [
+      "src/lib/address/join-address (mới): helper ghép địa chỉ có khử trùng phường/tỉnh",
+      "ProjectLocation: dòng địa chỉ mục 'Vị trí dự án' ở chi tiết dự án",
+      "du-an/[slug] page: JSON-LD address của dự án",
+      "rental-view: dòng địa chỉ chi tiết cho thuê (khi showExactAddress)"
+    ]
+  },
+  "screens": [
+    "/du-an/[slug] (vi/en) — mục Vị trí dự án + JSON-LD (vd /du-an/astor-1)",
+    "/cho-thue/[slug] (vi/en) — dòng địa chỉ khi showExactAddress = true"
+  ],
+  "impact": {
+    "direct": [
+      "Chi tiết dự án: mục 'Vị trí dự án' không còn lặp phường/tỉnh khi address đã chứa",
+      "Chi tiết dự án: JSON-LD address khớp dòng hiển thị",
+      "Chi tiết cho thuê: dòng địa chỉ không lặp phường/tỉnh khi showExactAddress = true"
+    ],
+    "dependents": [
+      "Địa chỉ thiếu phường hoặc tỉnh vẫn được bổ sung phần thiếu",
+      "Phường trùng tên đường (vd '123 Lê Lợi' + 'Phường Lê Lợi') vẫn giữ phường"
+    ],
+    "regression": [
+      "showExactAddress = false: không lộ số nhà, chỉ hiện phường/tỉnh như cũ",
+      "Địa chỉ không chứa phường/tỉnh vẫn ghép đủ 'địa chỉ, phường, tỉnh'",
+      "Tên có dấu/không dấu, hoa/thường vẫn nhận ra là đã chứa"
+    ]
+  },
+  "acceptance": [
+    "address đã chứa phường/tỉnh (không dấu, không phân biệt hoa thường) thì không ghép lại; thiếu phần nào thêm phần đó",
+    "/du-an/astor-1 hiển thị 'Lô đất IA25, KĐT Nam Thăng Long (Ciputra), phường Phú Thượng, Hà Nội'",
+    "'123 Lê Lợi' + 'Phường Lê Lợi' vẫn giữ phường",
+    "showExactAddress=false không lộ số nhà"
+  ],
+  "risk": "low",
+  "riskNote": "Residual: không có bảng bí danh tên tỉnh (TP.HCM vs Thành phố Hồ Chí Minh vẫn ghép trùng); tên tỉnh không tiền tố trùng tên đường (vd '12 đường Bình Định') có thể bị bỏ tỉnh; chưa kiểm tay trên trang."
+}

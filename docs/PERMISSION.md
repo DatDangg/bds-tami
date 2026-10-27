@@ -85,7 +85,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 
 | Collection | Trường | Quy tắc |
 |---|---|---|
-| Mọi nội dung | `author` | Tự gán người tạo; **chỉ admin đổi** |
+| Mọi nội dung | `author` | Tự gán người tạo; **chỉ admin đổi**. Sale không đọc được hồ sơ staff khác nên cột/ô "Người tạo" lấy tên (`fullName`, thiếu thì email) từ trường ảo `authorName` (chỉ staff đang hoạt động đọc được; khách/API công khai không có; không mở hồ sơ staff — BL-082) |
 | Mọi nội dung | `isFeatured` | **Chỉ admin** (khối nổi bật trên trang chủ do admin quyết) |
 | `rentals`, `leads` | `code` | Chỉ đọc với tất cả (hệ thống sinh; `rentals`: đã làm, hook từ sequence) |
 | `rentals` | `rentedAt` | Chỉ đọc với tất cả (hệ thống ghi khi chuyển `rented`) |

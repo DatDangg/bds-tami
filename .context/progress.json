@@ -3912,6 +3912,40 @@
       "report": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
       "docImpact": "no doc impact; no spec change (bug thuần, giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "admin-author-name-for-sale",
+      "title": "Admin: cột \"Người tạo\" hiện \"Chưa đặt tên - ID\" khi Sale xem tin của người khác — hiện tên/email, không mở hồ sơ (BL-082)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-082",
+      "changeDoc": "spec/changes/archive/2026-10-27-admin-author-name-for-sale.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user: ok sửa 1,6,7,8,9; quyết định hiện tên/email không mở hồ sơ; sửa importMap.js tách hunk: \"ok làm đi\")",
+      "specVersion": "1.59.0",
+      "scopeVersion": 85,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-author-name-for-sale/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-admin-author-name-for-sale-phase-1-task-01-round-2-review.md",
+          "note": "r1 FAIL MAJOR: cache lưu giá trị, afterRead song song → N+1; r2 cache Promise + test spy. GraphQL tắt trong config (test khẳng định). importMap commit tách hunk qua update-index.",
+          "verify": "typecheck 0 · vitest admin/fields/lib-admin/collections 800 PASS · integration author-name + access 33 PASS (DB 5433) · eslint 0 · build 0 · migrate:create không sinh file · trình duyệt: sale thấy tên 10/10 dòng + form, admin giữ ô chọn",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/bug-admin-author-name-for-sale-phase-1-task-01-round-2-review.md",
+      "docImpact": "docs/PERMISSION.md §4 hàng author (as-built); no spec change (giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",

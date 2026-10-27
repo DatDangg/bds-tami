@@ -1,62 +1,70 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 84,
-  "generatedAt": "2026-10-27T11:57:17+07:00",
+  "scopeVersion": 85,
+  "generatedAt": "2026-10-27T12:30:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-081 BUG (địa chỉ bị lặp phường/tỉnh: chi tiết dự án mục 'Vị trí dự án', JSON-LD địa chỉ dự án và dòng địa chỉ chi tiết cho thuê ghép thêm phường/tỉnh dù address đã chứa sẵn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: helper dùng chung joinAddress — phần nào đã có trong address (không dấu, không phân biệt hoa thường) thì không ghép lại, thiếu phần nào thêm phần đó. Reviewer NORMAL PASS r2.",
+  "triggerNote": "BL-082 BUG (admin: cột/ô 'Người tạo' hiện 'Chưa đặt tên - ID: …' khi Sale xem tin của người khác, vì Staff.read = selfOrAdmin nên Payload không populate được author). Quyết định user: giữ PERMISSION (Staff.read selfOrAdmin KHÔNG nới); chỉ thêm hiển thị tên/email người tạo cho staff qua field ảo authorName. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG (SPECIFICATIONS chỉ nói 'Người tạo tự điền người đang đăng nhập, chỉ admin đổi' — vẫn đúng). Reviewer STRICT PASS r2 (r1 FAIL N+1).",
   "status": "published",
-  "workItem": "bug/project-location-address-dedupe",
-  "backlog": "BL-081",
+  "workItem": "bug/admin-author-name-for-sale",
+  "backlog": "BL-082",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-project-location-address-dedupe.md",
-  "task": "tasks/bug-project-location-address-dedupe/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-83.json",
+  "changeDoc": "spec/changes/2026-10-27-admin-author-name-for-sale.md",
+  "task": "tasks/bug-admin-author-name-for-sale/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-author-name-for-sale-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-84.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/lib/address/join-address.ts",
-      "src/lib/address/join-address.test.ts",
-      "src/components/projects/ProjectLocation.tsx",
-      "src/components/projects/project-location-address.test.tsx",
-      "src/lib/rentals/rental-view.ts",
-      "src/lib/rentals/rental-view.test.ts",
-      "src/app/(frontend)/[locale]/du-an/[slug]/page.tsx"
+      "src/fields/author.ts",
+      "src/collections/_shared/content-defaults.ts",
+      "src/components/admin/AuthorCell.tsx",
+      "src/components/admin/AuthorCell.test.tsx",
+      "src/components/admin/AuthorField.tsx",
+      "src/components/admin/AuthorField.test.tsx",
+      "src/app/(payload)/admin/importMap.js",
+      "src/payload-types.ts",
+      "src/lib/admin/form-layout.test.ts",
+      "tests/integration/author-name.test.ts",
+      "docs/PERMISSION.md"
     ],
     "modules": [
-      "src/lib/address/join-address (mới): helper ghép địa chỉ có khử trùng phường/tỉnh",
-      "ProjectLocation: dòng địa chỉ mục 'Vị trí dự án' ở chi tiết dự án",
-      "du-an/[slug] page: JSON-LD address của dự án",
-      "rental-view: dòng địa chỉ chi tiết cho thuê (khi showExactAddress)"
+      "authorField(): thêm field ảo authorName (đọc tên/email người tạo; chỉ staff active đọc được)",
+      "Admin UI: AuthorCell (cột Người tạo ở danh sách) + AuthorField (ô Người tạo ở form sửa)",
+      "Áp cho mọi collection có author: rentals, projects, property-posts, news, job-postings",
+      "docs/PERMISSION.md §4: ghi nhận authorName, Staff.read vẫn selfOrAdmin"
     ]
   },
   "screens": [
-    "/du-an/[slug] (vi/en) — mục Vị trí dự án + JSON-LD (vd /du-an/astor-1)",
-    "/cho-thue/[slug] (vi/en) — dòng địa chỉ khi showExactAddress = true"
+    "/admin/collections/{rentals,projects,property-posts,news,job-postings} — cột Người tạo (Sale + Admin)",
+    "màn sửa các collection trên — ô Người tạo"
   ],
   "impact": {
     "direct": [
-      "Chi tiết dự án: mục 'Vị trí dự án' không còn lặp phường/tỉnh khi address đã chứa",
-      "Chi tiết dự án: JSON-LD address khớp dòng hiển thị",
-      "Chi tiết cho thuê: dòng địa chỉ không lặp phường/tỉnh khi showExactAddress = true"
+      "Sale: danh sách + màn sửa hiển thị tên (fallback email) người tạo, không còn 'Chưa đặt tên - ID'",
+      "Admin vẫn chọn/đổi author như cũ",
+      "Field ảo authorName có trong payload-types"
     ],
     "dependents": [
-      "Địa chỉ thiếu phường hoặc tỉnh vẫn được bổ sung phần thiếu",
-      "Phường trùng tên đường (vd '123 Lê Lợi' + 'Phường Lê Lợi') vẫn giữ phường"
+      "Tin của chính Sale vẫn hiện đúng tên/email",
+      "Staff bị khoá (inactive) không nhận authorName",
+      "Tin không có author -> ô trống '—' không lỗi"
     ],
     "regression": [
-      "showExactAddress = false: không lộ số nhà, chỉ hiện phường/tỉnh như cũ",
-      "Địa chỉ không chứa phường/tỉnh vẫn ghép đủ 'địa chỉ, phường, tỉnh'",
-      "Tên có dấu/không dấu, hoa/thường vẫn nhận ra là đã chứa"
+      "Sale KHÔNG mở được /admin/collections/staff/<id khác> (403/404)",
+      "Sale KHÔNG GET /api/staff/<id khác> (403/404); không lộ trường staff khác ngoài tên/email hiển thị",
+      "Khách/API công khai (rentals, projects, news…) KHÔNG thấy authorName/tên/email staff",
+      "Danh sách nhiều dòng không N+1 truy vấn staff (r1 FAIL đã sửa)",
+      "Bộ lọc/sắp xếp/Hiển thị cột theo Người tạo ở admin vẫn chạy"
     ]
   },
   "acceptance": [
-    "address đã chứa phường/tỉnh (không dấu, không phân biệt hoa thường) thì không ghép lại; thiếu phần nào thêm phần đó",
-    "/du-an/astor-1 hiển thị 'Lô đất IA25, KĐT Nam Thăng Long (Ciputra), phường Phú Thượng, Hà Nội'",
-    "'123 Lê Lợi' + 'Phường Lê Lợi' vẫn giữ phường",
-    "showExactAddress=false không lộ số nhà"
+    "Sale thấy tên (fallback email) người tạo ở danh sách + màn sửa mọi collection có author, không còn 'Chưa đặt tên - ID: …'",
+    "Sale vẫn không mở /admin/collections/staff/<id khác> hay GET /api/staff/<id khác>",
+    "Khách/API công khai không thấy authorName/tên/email staff",
+    "Admin vẫn chọn/đổi author như cũ",
+    "Staff bị khoá không nhận authorName"
   ],
-  "risk": "low",
-  "riskNote": "Residual: không có bảng bí danh tên tỉnh (TP.HCM vs Thành phố Hồ Chí Minh vẫn ghép trùng); tên tỉnh không tiền tố trùng tên đường (vd '12 đường Bình Định') có thể bị bỏ tỉnh; chưa kiểm tay trên trang."
+  "risk": "high",
+  "riskNote": "RBAC (lộ thông tin staff). Residual: chưa kiểm trash/versions view + dashboard trong trình duyệt; importMap.js commit tách hunk (dòng WardField BL-077 vẫn ở working tree)."
 }

@@ -347,6 +347,7 @@ export interface Rental {
    */
   publishedAt?: string | null;
   author: string | Staff;
+  authorName?: string | null;
   isFeatured?: boolean | null;
   /**
    * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
@@ -772,6 +773,7 @@ export interface Project {
    */
   publishedAt?: string | null;
   author: string | Staff;
+  authorName?: string | null;
   isFeatured?: boolean | null;
   /**
    * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
@@ -998,6 +1000,7 @@ export interface PropertyPost {
    */
   publishedAt?: string | null;
   author: string | Staff;
+  authorName?: string | null;
   isFeatured?: boolean | null;
   /**
    * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
@@ -1117,6 +1120,7 @@ export interface News {
    */
   publishedAt?: string | null;
   author: string | Staff;
+  authorName?: string | null;
   isFeatured?: boolean | null;
   /**
    * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
@@ -1394,6 +1398,7 @@ export interface JobPosting {
    */
   publishedAt?: string | null;
   author: string | Staff;
+  authorName?: string | null;
   /**
    * Tự tạo từ tiêu đề. Chỉ sửa khi cần đổi địa chỉ trang.
    */
@@ -2074,6 +2079,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   author?: T;
+  authorName?: T;
   isFeatured?: T;
   slug?: T;
   hasEnglish?: T;
@@ -2145,6 +2151,7 @@ export interface RentalsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   author?: T;
+  authorName?: T;
   isFeatured?: T;
   slug?: T;
   hasEnglish?: T;
@@ -2210,6 +2217,7 @@ export interface PropertyPostsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   author?: T;
+  authorName?: T;
   isFeatured?: T;
   slug?: T;
   hasEnglish?: T;
@@ -2251,6 +2259,7 @@ export interface NewsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   author?: T;
+  authorName?: T;
   isFeatured?: T;
   slug?: T;
   hasEnglish?: T;
@@ -2374,6 +2383,7 @@ export interface JobPostingsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   author?: T;
+  authorName?: T;
   slug?: T;
   hasEnglish?: T;
   translation?:

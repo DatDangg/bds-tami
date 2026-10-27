@@ -1,7 +1,7 @@
 import type { Access, CollapsibleField, CollectionConfig, CollectionSlug, Field, FieldAccess, GroupField, TabsField } from "payload";
 
 import { isAdmin, isAuthorOrAdmin, isStaff, makePublishedOnly, PUBLIC_STATUSES } from "../../access";
-import { authorField } from "../../fields/author";
+import { authorField, authorNameField } from "../../fields/author";
 import { isFeaturedField } from "../../fields/is-featured";
 import { publishedAtField } from "../../fields/published-at";
 import { scopeSlugField } from "../../fields/scope-slug";
@@ -95,7 +95,7 @@ function buildSharedFields(options: ContentOptions): Array<[SharedFieldName, Fie
   return [
     ["status", [statusField(options.statuses ?? CONTENT_STATUSES)]],
     ["publishedAt", [publishedAtField()]],
-    ["author", [authorField()]],
+    ["author", [authorField(), authorNameField()]],
     ["isFeatured", [isFeaturedField()]],
     ["slug", [slugField({ sourceField: options.slugSource, scopeField: options.scopeField }), ...(options.scopeField ? [scopeSlugField(options.scopeField)] : [])]],
     ["hasEnglish", part("hasEnglish")],

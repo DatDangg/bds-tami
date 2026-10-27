@@ -45,14 +45,14 @@ describe("withContentDefaults: bố cục tab", () => {
     expect(tabList.map((tab) => tab.label)).toEqual(["Nội dung", "SEO"]);
     expect(namesOf(tabList[1]!.fields)).toEqual(["seo"]);
     // Cột phải theo thứ tự: trạng thái · ngày xuất bản · tác giả · nổi bật · khối "Nâng cao" (slug) · khối "Bản dịch tiếng Anh" (công tắc EN + tóm tắt + nút).
-    expect(namesOf(rest)).toEqual(["status", "publishedAt", "author", "isFeatured", "(collapsible)", "(collapsible)"]);
-    expect(namesOf(flattenLayoutFields(rest))).toEqual(["status", "publishedAt", "author", "isFeatured", "slug", "hasEnglish", "translation", "translationSummary", "retranslateAction"]);
+    expect(namesOf(rest)).toEqual(["status", "publishedAt", "author", "authorName", "isFeatured", "(collapsible)", "(collapsible)"]);
+    expect(namesOf(flattenLayoutFields(rest))).toEqual(["status", "publishedAt", "author", "authorName", "isFeatured", "slug", "hasEnglish", "translation", "translationSummary", "retranslateAction"]);
     for (const field of rest) expect((field as { admin?: { position?: string } }).admin?.position).toBe("sidebar");
   });
 
   it("không có bộ tab: nối trường dùng chung vào cuối như cũ", () => {
     const config = withContentDefaults(base([{ name: "title", type: "text", localized: true }]));
-    expect(namesOf(config.fields)).toEqual(["title", "status", "publishedAt", "author", "isFeatured", "(collapsible)", "(collapsible)", "seo"]);
+    expect(namesOf(config.fields)).toEqual(["title", "status", "publishedAt", "author", "authorName", "isFeatured", "(collapsible)", "(collapsible)", "seo"]);
   });
 
   it("khối bản dịch cột phải: công tắc chỉ đọc + nhóm translation ẩn (đường dẫn dữ liệu giữ) + tóm tắt + nút Dịch lại + nút riêng của collection", () => {

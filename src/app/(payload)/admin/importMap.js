@@ -49,6 +49,8 @@ import { ThumbnailCell as ThumbnailCell_836c0ba6aedf8d8f975a2ab1531ba957 } from 
 import { SeoTitleCounter as SeoTitleCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
 import { SeoPreview as SeoPreview_752ed51552c58b98feed87d2595b772d } from '../../../components/admin/SeoPreview'
 import { SeoDescriptionCounter as SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755 } from '../../../components/admin/SeoLengthCounter'
+import { AuthorCell as AuthorCell_3af6e36a0d7990416a12ad8a3982a255 } from '../../../components/admin/AuthorCell'
+import { AuthorField as AuthorField_3d3bb2f7dd5116a3666d4bec733851f9 } from '../../../components/admin/AuthorField'
 import { TranslationSummary as TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3 } from '../../../components/admin/TranslationSummary'
 import { RetranslateButton as RetranslateButton_e8761799b867275cb51da4d0b62a7624 } from '../../../components/admin/RetranslateButton'
 import { RowActionsCell as RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7 } from '../../../components/admin/RowActionsCell'
@@ -136,6 +138,8 @@ export const importMap = {
   "/components/admin/SeoLengthCounter#SeoTitleCounter": SeoTitleCounter_1108c6ec6c0551a682deae0661936755,
   "/components/admin/SeoPreview#SeoPreview": SeoPreview_752ed51552c58b98feed87d2595b772d,
   "/components/admin/SeoLengthCounter#SeoDescriptionCounter": SeoDescriptionCounter_1108c6ec6c0551a682deae0661936755,
+  "/components/admin/AuthorCell#AuthorCell": AuthorCell_3af6e36a0d7990416a12ad8a3982a255,
+  "/components/admin/AuthorField#AuthorField": AuthorField_3d3bb2f7dd5116a3666d4bec733851f9,
   "/components/admin/TranslationSummary#TranslationSummary": TranslationSummary_0c2b65938e242e609d13c0e3ad0bc8e3,
   "/components/admin/RetranslateButton#RetranslateButton": RetranslateButton_e8761799b867275cb51da4d0b62a7624,
   "/components/admin/RowActionsCell#RowActionsCell": RowActionsCell_087b8dfa511f415fa07e26a4729cb0f7,
