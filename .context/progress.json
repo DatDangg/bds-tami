@@ -4014,6 +4014,40 @@
       "report": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
       "docImpact": ".context/design-spec.md 1 dòng hành vi tràn (as-built); no spec change (giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "header-nav-gold-underline",
+      "title": "Header: mục menu đang xem + hover dùng gạch chân vàng thay viên thuốc xám — chỉ menu header (BL-087, regression BL-074)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-087",
+      "changeDoc": "spec/changes/archive/2026-10-27-header-nav-gold-underline.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user chat: \"gạch chân vàng vừa để cho active vừa để là hover, nhưng chỉ mỗi header thôi\" — không checkpoint lại)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 88,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-header-nav-gold-underline/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
+          "note": "r1 PASS + 3 MINOR: MINOR-1 regex test (^|s) và MINOR-2 số tương phản nền đặc 5.12 sửa trước commit; MINOR-3 chữ nhích lên ~1px do border trong min-h-11 (chấp nhận).",
+          "verify": "typecheck 0 · vitest 4669 PASS · eslint file đổi 0 · build 0 · Playwright Edge 1280/1440/1920: vạch rgb(140,103,51) 2px, header 72px, không tràn ngang; tương phản vạch/kính đo 3.33–4.88:1 (lý thuyết xấu nhất 3.0:1 kính trên đen, nền đặc 5.12:1)",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
+      "docImpact": ".context/design-spec.md §2.1 Mục đang xem (as-built BL-087); no spec change (giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",
@@ -4667,7 +4701,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-27T08:07:49.034Z",
+  "lastUpdated": "2026-10-27T08:35:42.353Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,0 +1,60 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 87,
+  "generatedAt": "2026-10-27T14:30:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-086 BUG: thanh tab danh mục danh sách (/cho-thue, /du-an, /tin-bds + trang con danh mục) — khi tràn, nút mũi tên (>= md) từng đè lên tab. Fix: mũi tên nằm ở làn riêng ngoài vùng cuộn nên không che tab; fade ở mép trong vùng cuộn; mũi tên ở đầu/cuối giữ mounted với aria-disabled (giữ focus); tab được focus bằng bàn phím được đẩy ra khỏi vùng fade (chỉ bàn phím, click chuột vào tab lấp ló vẫn điều hướng ngay lần đầu); không tràn thì không có làn; < md vuốt + fade như cũ. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r2 (r1 FAIL).",
+  "status": "published",
+  "workItem": "bug/listing-tabs-arrow-overlap",
+  "backlog": "BL-086",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-listing-tabs-arrow-overlap.md",
+  "task": "tasks/bug-listing-tabs-arrow-overlap/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-86.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/listing/ListingTabsScroller.test.tsx",
+      "src/components/layout/use-snap-slider.tsx",
+      ".context/design-spec.md"
+    ],
+    "modules": [
+      "ListingTabsScroller: mũi tên >= md ở làn riêng ngoài vùng cuộn, fade ở mép trong, mũi tên đầu/cuối giữ mounted + aria-disabled, đẩy tab focus bàn phím ra khỏi fade",
+      "SliderArrow (use-snap-slider): thêm prop disabled optional -> aria-disabled; không truyền thì như cũ"
+    ]
+  },
+  "screens": [
+    "/cho-thue, /du-an, /tin-bds và các trang con danh mục — thanh tab danh mục ở 1920/1440/1280/768/390"
+  ],
+  "impact": {
+    "direct": [
+      "Tab bar tràn ở >= md: mũi tên nằm ở làn riêng, không bao giờ che tab nào",
+      "Fade ở mép trong của vùng cuộn, chỉ phía còn nội dung",
+      "Mũi tên ở đầu/cuối vẫn mounted với aria-disabled (không mất focus), bấm không cuộn thêm",
+      "Tab được focus bằng bàn phím tự được đẩy ra khỏi vùng fade; click chuột vào tab lấp ló điều hướng ngay lần đầu",
+      "Không tràn -> không có làn mũi tên; < md vuốt + fade như cũ"
+    ],
+    "dependents": [
+      "Tab đang chọn vẫn căn giữa khi tải trang (chỉ scrollLeft, không cuộn dọc)",
+      "Tab là link render server, điều hướng đúng"
+    ],
+    "regression": [
+      "Các consumer SliderArrow khác không đổi: CardSlider, RentalsTabs, OffersSlider",
+      "Không có cuộn ngang toàn trang ở 390/768",
+      "reduced-motion cuộn tức thì"
+    ]
+  },
+  "acceptance": [
+    "Mũi tên không che tab nào ở >= md khi tràn",
+    "Mũi tên đầu/cuối aria-disabled nhưng vẫn focus được",
+    "Focus bàn phím vào tab sát mép: tab hiện rõ ngoài fade",
+    "Click chuột vào tab lấp ló điều hướng ngay lần đầu",
+    "Không tràn: không có làn mũi tên; < md không đổi",
+    "CardSlider, RentalsTabs, OffersSlider không đổi"
+  ],
+  "risk": "medium",
+  "riskNote": "UI cục bộ ở thanh tab danh mục; SliderArrow dùng chung nhưng prop mới opt-in. Cần retest các consumer SliderArrow và responsive 390-1920."
+}

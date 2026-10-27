@@ -1,60 +1,59 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 87,
-  "generatedAt": "2026-10-27T14:30:00+07:00",
+  "scopeVersion": 88,
+  "generatedAt": "2026-10-27T16:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-086 BUG: thanh tab danh mục danh sách (/cho-thue, /du-an, /tin-bds + trang con danh mục) — khi tràn, nút mũi tên (>= md) từng đè lên tab. Fix: mũi tên nằm ở làn riêng ngoài vùng cuộn nên không che tab; fade ở mép trong vùng cuộn; mũi tên ở đầu/cuối giữ mounted với aria-disabled (giữ focus); tab được focus bằng bàn phím được đẩy ra khỏi vùng fade (chỉ bàn phím, click chuột vào tab lấp ló vẫn điều hướng ngay lần đầu); không tràn thì không có làn; < md vuốt + fade như cũ. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r2 (r1 FAIL).",
+  "triggerNote": "BL-087 BUG UI: menu ngang header (>= xl) — mục đang xem (aria-current=page) và mục hover đổi từ viên thuốc nền xám (BL-074 T02) sang gạch chân vàng 2px --color-accent-text #8c6733 (border-b-2); không còn nền viên thuốc; khoảng cách chữ giữ 24/32px (ul gap-6 2xl:gap-8); transition fast, tắt khi reduced motion; chỉ menu header. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer PASS r1.",
   "status": "published",
-  "workItem": "bug/listing-tabs-arrow-overlap",
-  "backlog": "BL-086",
+  "workItem": "bug/header-nav-gold-underline",
+  "backlog": "BL-087",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-listing-tabs-arrow-overlap.md",
-  "task": "tasks/bug-listing-tabs-arrow-overlap/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-86.json",
+  "changeDoc": "spec/changes/2026-10-27-header-nav-gold-underline.md",
+  "task": "tasks/bug-header-nav-gold-underline/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-header-nav-gold-underline-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-87.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/listing/ListingTabsScroller.tsx",
-      "src/components/listing/ListingTabsScroller.test.tsx",
-      "src/components/layout/use-snap-slider.tsx",
+      "src/components/layout/DesktopNav.tsx",
+      "src/components/layout/DesktopNav.test.tsx",
       ".context/design-spec.md"
     ],
     "modules": [
-      "ListingTabsScroller: mũi tên >= md ở làn riêng ngoài vùng cuộn, fade ở mép trong, mũi tên đầu/cuối giữ mounted + aria-disabled, đẩy tab focus bàn phím ra khỏi fade",
-      "SliderArrow (use-snap-slider): thêm prop disabled optional -> aria-disabled; không truyền thì như cũ"
+      "DesktopNav: anchor menu ngang header >= xl dùng vạch dưới 2px vàng accent-text cho mục đang xem và hover, bỏ viên thuốc nền xám; ul gap-6 2xl:gap-8"
     ]
   },
   "screens": [
-    "/cho-thue, /du-an, /tin-bds và các trang con danh mục — thanh tab danh mục ở 1920/1440/1280/768/390"
+    "Header desktop (>= xl) trên mọi trang công khai VI/EN ở 1280/1440/1920"
   ],
   "impact": {
     "direct": [
-      "Tab bar tràn ở >= md: mũi tên nằm ở làn riêng, không bao giờ che tab nào",
-      "Fade ở mép trong của vùng cuộn, chỉ phía còn nội dung",
-      "Mũi tên ở đầu/cuối vẫn mounted với aria-disabled (không mất focus), bấm không cuộn thêm",
-      "Tab được focus bằng bàn phím tự được đẩy ra khỏi vùng fade; click chuột vào tab lấp ló điều hướng ngay lần đầu",
-      "Không tràn -> không có làn mũi tên; < md vuốt + fade như cũ"
+      "Mục đang xem (aria-current=page) có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
+      "Hover mục khác hiện vạch vàng 2px, không nền viên thuốc",
+      "Tương phản vạch vàng (rgb 140,103,51) so với nền header >= 3:1 (đầu trang đè hero, đã cuộn qua ảnh tối/sáng, nền đặc khi reduced-transparency)",
+      "focus-visible bàn phím trên mục menu vẫn thấy rõ",
+      "prefers-reduced-motion: không transition đổi màu vạch",
+      "Khoảng cách giữa các mục 24px (xl) / 32px (2xl), chiều cao header 72px, không tràn ngang"
     ],
     "dependents": [
-      "Tab đang chọn vẫn căn giữa khi tải trang (chỉ scrollLeft, không cuộn dọc)",
-      "Tab là link render server, điều hướng đúng"
+      "Dropdown menu con: nút caret (hover nền tròn) và panel mở/đóng đúng, không đổi",
+      "Nút CTA header, logo, bộ chuyển ngôn ngữ không bị lệch bố cục"
     ],
     "regression": [
-      "Các consumer SliderArrow khác không đổi: CardSlider, RentalsTabs, OffersSlider",
-      "Không có cuộn ngang toàn trang ở 390/768",
-      "reduced-motion cuộn tức thì"
+      "Menu toàn màn hình < xl không có gạch chân vàng, không đổi",
+      "Link/nút khác (footer, nội dung, card) không có gạch chân (regression BL-074)",
+      "Không cuộn ngang toàn trang ở 1280/1440/1920"
     ]
   },
   "acceptance": [
-    "Mũi tên không che tab nào ở >= md khi tràn",
-    "Mũi tên đầu/cuối aria-disabled nhưng vẫn focus được",
-    "Focus bàn phím vào tab sát mép: tab hiện rõ ngoài fade",
-    "Click chuột vào tab lấp ló điều hướng ngay lần đầu",
-    "Không tràn: không có làn mũi tên; < md không đổi",
-    "CardSlider, RentalsTabs, OffersSlider không đổi"
+    "Mục đang xem có vạch vàng 2px ở 1280/1440/1920, không nền viên thuốc",
+    "Hover mục khác có vạch vàng, không nền",
+    "Tương phản vạch >= 3:1 trên mọi nền header",
+    "focus-visible giữ nguyên; reduced motion tắt transition",
+    "Menu < xl và các link khác không có gạch chân",
+    "Dropdown menu con mở đúng, caret không đổi"
   ],
-  "risk": "medium",
-  "riskNote": "UI cục bộ ở thanh tab danh mục; SliderArrow dùng chung nhưng prop mới opt-in. Cần retest các consumer SliderArrow và responsive 390-1920."
+  "risk": "low",
+  "riskNote": "UI cục bộ ở DesktopNav; không đổi API/schema. Lưu ý dữ liệu nav live không có mục con nên dropdown chỉ kiểm bằng unit test/dữ liệu giả."
 }

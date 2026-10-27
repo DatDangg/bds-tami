@@ -130,16 +130,17 @@ describe("LanguageSwitcher: vùng chạm và ngôn ngữ hiện tại", () => {
   });
 });
 
-describe("DesktopNav: chỉ báo mục đang xem (BL-074)", () => {
-  it("mục đang xem có aria-current=page + nền token, không có vạch dưới chữ; mục khác hover bằng nền", () => {
+describe("DesktopNav: chỉ báo mục đang xem (BL-087)", () => {
+  it("mục đang xem + hover dùng vạch vàng accent-text 2px, không có nền viên thuốc", () => {
     renderWithIntl(<DesktopNav items={items} />);
     const current = screen.getByText("Dự án", { selector: "a" });
     expect(current).toHaveAttribute("aria-current", "page");
-    expect(current.className).toContain("aria-[current=page]:bg-text/10");
-    expect(current.className).not.toMatch(/border-b|underline/);
+    expect(current).toHaveClass("border-b-2", "border-transparent", "aria-[current=page]:border-accent-text");
     const other = screen.getByText("Liên hệ", { selector: "a" });
     expect(other).not.toHaveAttribute("aria-current");
-    expect(other).toHaveClass("hover:bg-text/6");
-    expect(other).toHaveClass("min-h-11");
+    expect(other).toHaveClass("hover:border-accent-text", "min-h-11", "motion-reduce:transition-none");
+    for (const link of [current, other]) {
+      expect(link.className).not.toMatch(/bg-text|rounded-pill|(^|\s)(2xl:)?px-/);
+    }
   });
 });
