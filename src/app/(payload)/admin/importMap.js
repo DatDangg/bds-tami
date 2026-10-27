@@ -79,6 +79,7 @@ import { SessionKeepAlive as SessionKeepAlive_739be204eef6d8fda1df751cccf17193 }
 import { NavigationToastGuard as NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf } from '../../../components/admin/NavigationToastGuard'
 import { NavAdvancedCollapse as NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7 } from '../../../components/admin/NavAdvancedCollapse'
 import { UploadButtonLabel as UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29 } from '../../../components/admin/UploadButtonLabel'
+import { UploadSizeGuard as UploadSizeGuard_e064435401d60be22e776aff206aa239 } from '../../../components/admin/UploadSizeGuard'
 import { AdminRoleAttribute as AdminRoleAttribute_89c5cab1a0164efb18b678e082e716f6 } from '../../../components/admin/AdminRoleAttribute'
 import { FormErrorFocus as FormErrorFocus_16e6e8326b753563707b3d36fcf6d40d } from '../../../components/admin/FormErrorFocus'
 import { DashboardView as DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f } from '../../../components/admin/dashboard/DashboardView'
@@ -168,6 +169,7 @@ export const importMap = {
   "/components/admin/NavigationToastGuard#NavigationToastGuard": NavigationToastGuard_31611af90d641e01ddbe330b05bafbaf,
   "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse": NavAdvancedCollapse_96d60d653354fc7f720e9613236a6fb7,
   "/components/admin/UploadButtonLabel#UploadButtonLabel": UploadButtonLabel_ee8d10b5e0a9548d600ba90f97d24b29,
+  "/components/admin/UploadSizeGuard#UploadSizeGuard": UploadSizeGuard_e064435401d60be22e776aff206aa239,
   "/components/admin/AdminRoleAttribute#AdminRoleAttribute": AdminRoleAttribute_89c5cab1a0164efb18b678e082e716f6,
   "/components/admin/FormErrorFocus#FormErrorFocus": FormErrorFocus_16e6e8326b753563707b3d36fcf6d40d,
   "/components/admin/dashboard/DashboardView#DashboardView": DashboardView_90d94a8a05a7cf2177ecc4e95646ec1f,

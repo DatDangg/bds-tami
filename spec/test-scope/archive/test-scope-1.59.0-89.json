@@ -1,0 +1,56 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 89,
+  "generatedAt": "2026-10-28T10:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-089 BUG UI: /tuyen-dung bấm TÌM / Enter trong ô 'Tìm theo tên vị trí' làm trang nhảy lên đầu (next/form mặc định scroll=true). Sửa: JobFilters điều hướng giữ vị trí cuộn, focus giữ ở nút/ô q; ô q tách thành JobKeywordInput (mới) đồng bộ lại khi back/forward. No-JS vẫn form GET. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer PASS r1.",
+  "status": "published",
+  "workItem": "bug/careers-search-scroll-top",
+  "backlog": "BL-089",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-careers-search-scroll-top.md",
+  "task": "tasks/bug-careers-search-scroll-top/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-careers-search-scroll-top-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-88.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/careers/JobFilters.tsx",
+      "src/components/careers/JobKeywordInput.tsx",
+      "src/components/careers/JobFilters.test.tsx"
+    ],
+    "modules": [
+      "JobFilters: submit tìm kiếm không cuộn về đầu trang; giữ focus",
+      "JobKeywordInput (mới): ô q đồng bộ với URL khi back/forward"
+    ]
+  },
+  "screens": [
+    "/tuyen-dung (VI) và trang tương ứng /en/... (EN): bộ lọc danh sách vị trí"
+  ],
+  "impact": {
+    "direct": [
+      "Bấm TÌM hoặc Enter trong ô 'Tìm theo tên vị trí' -> URL có q/province, danh sách lọc đúng, scrollY không về 0",
+      "Focus giữ ở nút TÌM (bấm) hoặc ô q (Enter) sau khi tìm",
+      "Back/forward của trình duyệt nạp lại đúng giá trị ô q theo URL",
+      "Không bật JS: form GET vẫn lọc (/tuyen-dung?q=...&province=...)"
+    ],
+    "dependents": [
+      "Đổi tỉnh/thành trong bộ lọc vẫn lọc và giữ hành vi cuộn như trước",
+      "Phân trang/danh sách kết quả và trạng thái rỗng /tuyen-dung"
+    ],
+    "regression": [
+      "Chuyển ngôn ngữ VI/EN giữ bộ lọc hợp lệ",
+      "Trang chi tiết vị trí và form ứng tuyển không đổi",
+      "Không cuộn ngang toàn trang ở 390/1440/1920"
+    ]
+  },
+  "acceptance": [
+    "Sau TÌM/Enter, kết quả cập nhật và khu vực tìm kiếm vẫn trong khung nhìn (scrollY không về 0)",
+    "URL giữ tham số q/province; tải lại/chia sẻ được",
+    "Không JS vẫn tìm được (form GET)",
+    "Focus không bị mất; back nạp lại ô q"
+  ],
+  "risk": "low",
+  "riskNote": "UI cục bộ ở bộ lọc tuyển dụng; không đổi API/schema."
+}

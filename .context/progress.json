@@ -4082,6 +4082,40 @@
       "report": ".context/review-reports/bug-careers-search-scroll-top-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact; no spec change (giữ 1.59.0)",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "admin-upload-oversize-toast",
+      "title": "Admin: ảnh > 10 MB hiện cùng lúc \"An unknown error occurred\" + \"Successfully saved 1 files\" (BL-088, QA bug 10)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-088",
+      "changeDoc": "spec/changes/archive/2026-10-27-admin-upload-oversize-toast.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-27 (user: \"Chạy change cho BL-088, BL-089, BL-090, BL-091\" — auto proceed)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-upload-oversize-toast/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-admin-upload-oversize-toast-phase-1-task-01-round-2-review.md",
+          "note": "r1 FAIL (MAJOR-1 dropzone kẹt khi thả toàn tệp quá cỡ + 4 MINOR) → attempt 2 sửa (redispatch drop rỗng, paste, toạ độ, làm tròn lên); r2 PASS + 2 MINOR chấp nhận. Follow-up: APIError/Forbidden khác mất message ở build prod (cùng cơ chế name rỗng) → change riêng.",
+          "verify": "typecheck 0 · vitest src/lib/upload + UploadSizeGuard 30/30 · pnpm test 446 files/4680 PASS (attempt 1, integration chạy được) · eslint file đổi 0 · build 0 · Playwright Edge build prod 1920: 11 MB → 1 toast tiếng Việt, không POST upload, không Successfully saved; small.jpg OK; drop/mixed/media create/tài liệu dự án; REST prod 413 \"File vượt quá 10MB.\"",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specVersion": "1.59.0",
+      "scopeVersion": 90,
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/bug-admin-upload-oversize-toast-phase-1-task-01-round-2-review.md",
+      "completedAt": "2026-10-28",
+      "docImpact": "no doc impact"
     }
   ],
   "projectName": "tami-website",
@@ -4735,7 +4769,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-27T17:06:07.385Z",
+  "lastUpdated": "2026-10-27T17:45:16.003Z",
   "approvalMilestones": [
     {
       "id": "M1",

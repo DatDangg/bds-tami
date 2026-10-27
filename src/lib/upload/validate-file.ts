@@ -4,30 +4,10 @@ import { APIError } from "payload";
 import type { CollectionBeforeOperationHook } from "payload";
 
 import { ORIGINAL_UPLOAD_NAME_KEY } from "./alt-from-filename";
+import { MAX_UPLOAD_BYTES, MB, MEDIA_POLICY, type UploadPolicy } from "./media-limits";
 
-const MB = 1024 * 1024;
-
-interface AllowedType {
-  /** Đuôi file lưu trữ: lấy theo nội dung đã nhận diện, không theo tên khách gửi. */
-  extension: string;
-  maxBytes: number;
-  /** MIME ghi vào DB và gửi kèm S3; khác MIME nhận diện khi định dạng có nhiều MIME. */
-  storedMime?: string;
-}
-
-/** Chính sách theo MIME THẬT (nhận diện bằng magic bytes). Thiếu trong bảng = từ chối. */
-export type UploadPolicy = Readonly<Record<string, AllowedType>>;
-
-/** ERD §4.12. SVG/HTML không có trong bảng nên luôn bị từ chối (chống XSS). */
-export const MEDIA_POLICY: UploadPolicy = {
-  "image/jpeg": { extension: "jpg", maxBytes: 10 * MB },
-  "image/png": { extension: "png", maxBytes: 10 * MB },
-  "image/webp": { extension: "webp", maxBytes: 10 * MB },
-  "image/avif": { extension: "avif", maxBytes: 10 * MB },
-  "application/pdf": { extension: "pdf", maxBytes: 20 * MB },
-  "video/mp4": { extension: "mp4", maxBytes: 15 * MB },
-  "video/webm": { extension: "webm", maxBytes: 15 * MB },
-};
+export { MAX_UPLOAD_BYTES, MEDIA_POLICY };
+export type { UploadPolicy };
 
 /**
  * CV ứng viên: PDF/DOC/DOCX ≤ 5MB (ERD §4.11). `.doc` cũ nhận diện là `application/x-cfb` (OLE2);
@@ -40,9 +20,6 @@ export const PRIVATE_FILE_POLICY: UploadPolicy = {
   "application/x-cfb": { extension: "doc", maxBytes: 5 * MB, storedMime: "application/msword" },
 };
 
-/** Trần dung lượng một request upload cho Payload (busboy cắt và trả 413 khi vượt). */
-export const MAX_UPLOAD_BYTES = 20 * MB;
-
 export interface InspectedUpload {
   mime: string;
   extension: string;
@@ -54,7 +31,10 @@ const HTTP_UNSUPPORTED_MEDIA_TYPE = 415;
 
 /** `isPublic: true` để thông báo hiện cho người dùng; mã 413/415 theo AC task media. */
 function reject(message: string, status: number): never {
-  throw new APIError(message, status, undefined, true);
+  const error = new APIError(message, status, undefined, true);
+  // Build production minify làm `constructor.name` rỗng → payload `formatErrors` rơi về "An unknown error occurred.".
+  error.name = "APIError";
+  throw error;
 }
 
 /** Nhận diện kiểu file bằng nội dung, rồi kiểm tra danh sách cho phép + dung lượng của kiểu đó. */

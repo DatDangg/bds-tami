@@ -45,7 +45,7 @@ export default buildConfig({
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
     dateFormat: "dd/MM/yyyy HH:mm",
     components: {
-      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel", "/components/admin/AdminRoleAttribute#AdminRoleAttribute", "/components/admin/FormErrorFocus#FormErrorFocus"],
+      providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel", "/components/admin/UploadSizeGuard#UploadSizeGuard", "/components/admin/AdminRoleAttribute#AdminRoleAttribute", "/components/admin/FormErrorFocus#FormErrorFocus"],
       // Nút "Xem website" ở header (BL-041).
       actions: ["/components/admin/SiteLink#SiteLink"],
       // Mục "Tổng quan" đầu sidebar: Payload DefaultNav không có lối vào dashboard (BL-050).
