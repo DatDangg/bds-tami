@@ -867,6 +867,10 @@
     },
     "listing": {
       "resultCount": "{count, plural, one {# result} other {# results}}",
+      "tabs": {
+        "previous": "Previous categories",
+        "next": "Next categories"
+      },
       "hero": {
         "searchLabel": "Search this list",
         "keywordLabel": "Keyword",

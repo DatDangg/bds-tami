@@ -1,58 +1,63 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 82,
-  "generatedAt": "2026-10-27T15:00:00+07:00",
+  "scopeVersion": 83,
+  "generatedAt": "2026-10-27T16:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-083 BUG (khu tìm kiếm hero trang chủ: hàng \"Tùy chọn khác\" — mở một dropdown rồi bấm chip khác thì hai listbox cùng mở/chồng nhau). Không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: bấm chip khác khi một dropdown đang mở thì dropdown đầu đóng, không bao giờ 2 listbox cùng mở (bấm lần nữa mới mở cái mới — chuẩn Radix click-outside). Reviewer NORMAL PASS r1. Không đổi schema/API/i18n.",
+  "triggerNote": "BL-084 BUG (thanh tab danh mục dưới hero ở /cho-thue, /du-an, /tin-bds: nhiều mục bị tràn khung, không cuộn/không biết còn mục ẩn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: thanh tab cuộn ngang trong khung với fade mép phía còn nội dung + nút mũi tên 44px từ md; tab đang chọn được cuộn vào giữa tầm nhìn khi tải. Reviewer STRICT PASS r1. Thêm khoá i18n page.listing.tabs.previous/next.",
   "status": "published",
-  "workItem": "bug/hero-search-dropdown-overlap",
-  "backlog": "BL-083",
+  "workItem": "bug/listing-category-tabs-overflow",
+  "backlog": "BL-084",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-hero-search-dropdown-overlap.md",
-  "task": "tasks/bug-hero-search-dropdown-overlap/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-hero-search-dropdown-overlap-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-81.json",
+  "changeDoc": "spec/changes/2026-10-27-listing-category-tabs-overflow.md",
+  "task": "tasks/bug-listing-category-tabs-overflow/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-listing-category-tabs-overflow-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-82.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/home/HeroSearch.tsx",
-      "src/components/home/HeroSearch.test.tsx"
+      "src/components/listing/ListingCategoryTabs.tsx",
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/listing/ListingTabsScroller.test.tsx",
+      "src/components/listing/listing-layout.test.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      ".context/design-spec.md"
     ],
     "modules": [
-      "HeroSearch (trang chủ): hàng \"Tùy chọn khác\" — quản lý đóng/mở dropdown chip (Mức giá, Diện tích, Loại căn hộ, Nội thất, Tiện ích)"
+      "ListingCategoryTabs + ListingTabsScroller (mới): thanh tab danh mục dưới hero, cuộn ngang trong khung",
+      "i18n: khoá page.listing.tabs.previous / page.listing.tabs.next (vi, en)"
     ]
   },
   "screens": [
-    "/ và /en (trang chủ, khu tìm kiếm hero — hàng \"Tùy chọn khác\")"
+    "/cho-thue và /cho-thue/danh-muc/* (vi/en)",
+    "/du-an (vi/en)",
+    "/tin-bds (vi/en)"
   ],
-  "viewports": [
-    "1920",
-    "390"
-  ],
+  "viewports": ["1920", "1440", "1280", "768", "390"],
   "impact": {
     "direct": [
-      "Mở một dropdown (vd Mức giá) rồi bấm chip khác (vd Diện tích): dropdown đầu đóng, không bao giờ có 2 listbox cùng mở",
-      "Sau khi dropdown đầu đóng, bấm chip lần nữa mới mở dropdown mới (hành vi chuẩn Radix click-outside)",
-      "Áp dụng cho cả 5 chip: Mức giá, Diện tích, Loại căn hộ, Nội thất, Tiện ích; cả vi và en"
+      "Thanh tab danh mục dưới hero: mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (từ md); < md vuốt ngang + fade",
+      "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải trang",
+      "Nút mũi tên trước/sau có aria-label i18n (vi/en)"
     ],
     "dependents": [
-      "Hàng chip trên mobile 390: dropdown không chồng lên nhau, không che sai chỗ",
-      "Giá trị đã chọn của từng chip vẫn giữ và hiển thị đúng sau khi đóng/mở"
+      "Điều hướng giữa các tab danh mục (link) vẫn đúng URL/trạng thái active",
+      "Bố cục khung trang không bị đẩy rộng; không xuất hiện cuộn trang ngang"
     ],
     "regression": [
-      "Bấm xuyên gutter (vùng trống quanh khu tìm kiếm) tới HeroSlider phía dưới vẫn hoạt động",
-      "Chọn option bằng chuột và bằng bàn phím (mũi tên + Enter) vẫn hoạt động",
-      "Esc đóng dropdown đang mở",
-      "Không-JS: gửi form tìm kiếm vẫn hoạt động",
-      "Submit tìm kiếm hero mang đúng tham số sang trang kết quả"
+      "Không JS: tab vẫn là link, vẫn cuộn ngang được",
+      "Điều hướng bàn phím Tab qua các link tab",
+      "Khối hero và bộ lọc/kết quả bên dưới không đổi",
+      "Tab không căn giữa lại sau điều hướng client cùng route (residual đã biết)"
     ]
   },
   "acceptance": [
-    "Mở một dropdown rồi bấm chip khác → dropdown đầu đóng, không bao giờ 2 listbox cùng mở; bấm lần nữa mới mở cái mới",
-    "Đúng ở viewport 1920 và 390, bản vi và en",
-    "Không làm hỏng chọn option chuột/bàn phím, Esc, bấm xuyên gutter tới HeroSlider, không-JS gửi form"
+    "Ở 1920/1440/1280/768/390: hoặc mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (>= md); < md vuốt + fade",
+    "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải",
+    "Không cuộn trang ngang",
+    "Không JS vẫn là link cuộn được"
   ],
-  "risk": "low-medium",
-  "riskNote": "Fix phụ thuộc thuộc tính data-scroll-locked của react-remove-scroll (Radix). Residual: chưa có e2e tự động; chưa test chạm thật trên thiết bị."
+  "risk": "medium",
+  "riskNote": "Residual: chưa test vuốt trên thiết bị cảm ứng thật; nút mũi tên biến mất khi tới mép làm mất focus bàn phím (MINOR follow-up); tab không căn giữa lại sau điều hướng client cùng route."
 }

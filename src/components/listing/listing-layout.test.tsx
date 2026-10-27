@@ -71,7 +71,7 @@ describe("ListingCategoryTabs", () => {
   it("vùng chạm ≥ 44px (min-h-11), cuộn ngang khi tràn", () => {
     renderWithIntl(<ListingCategoryTabs label="Loại dự án" tabs={tabs} />);
     expect(screen.getAllByRole("link")[0]).toHaveClass("min-h-11");
-    expect(screen.getByRole("list")).toHaveClass("overflow-x-auto");
+    expect(screen.getByRole("list").parentElement).toHaveClass("overflow-x-auto");
   });
 
   it("không có tab → không render", () => {

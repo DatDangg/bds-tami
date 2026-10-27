@@ -867,6 +867,10 @@
     },
     "listing": {
       "resultCount": "{count} kết quả",
+      "tabs": {
+        "previous": "Danh mục trước",
+        "next": "Danh mục sau"
+      },
       "hero": {
         "searchLabel": "Tìm kiếm trong danh sách",
         "keywordLabel": "Từ khoá",
