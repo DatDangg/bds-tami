@@ -1,36 +1,30 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 81,
-  "generatedAt": "2026-10-27T12:00:00+07:00",
+  "scopeVersion": 82,
+  "generatedAt": "2026-10-27T15:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-080 BUG (tìm kiếm Cho thuê khớp chuỗi con, không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG). `/cho-thue?q=can ho` trả tin không liên quan vì mỗi từ khớp LIKE '%term%' (\"ho\" trong \"cho\", \"can\" trong \"cần\") và sort mặc định không có độ liên quan. Fix: khớp theo đầu từ (vẫn không dấu, giữ LIKE indexable cho trigram), ưu tiên tin khớp nguyên cụm khi sort mặc định toàn cục, sort giá giữ nguyên, đếm/facet dùng cùng điều kiện WHERE, mã tin (CT-0000xx) vẫn tìm được. Reviewer STRICT PASS r2. Không đổi schema/migration/UI/i18n.",
+  "triggerNote": "BL-083 BUG (khu tìm kiếm hero trang chủ: hàng \"Tùy chọn khác\" — mở một dropdown rồi bấm chip khác thì hai listbox cùng mở/chồng nhau). Không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: bấm chip khác khi một dropdown đang mở thì dropdown đầu đóng, không bao giờ 2 listbox cùng mở (bấm lần nữa mới mở cái mới — chuẩn Radix click-outside). Reviewer NORMAL PASS r1. Không đổi schema/API/i18n.",
   "status": "published",
-  "workItem": "bug/rental-search-word-match",
-  "backlog": "BL-080",
+  "workItem": "bug/hero-search-dropdown-overlap",
+  "backlog": "BL-083",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-rental-search-word-match.md",
-  "task": "tasks/bug-rental-search-word-match/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-rental-search-word-match-phase-1-task-01-round-2-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-80.json",
+  "changeDoc": "spec/changes/2026-10-27-hero-search-dropdown-overlap.md",
+  "task": "tasks/bug-hero-search-dropdown-overlap/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-hero-search-dropdown-overlap-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-81.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/lib/search/rental-search-sql.ts",
-      "src/lib/search/search-service.ts",
-      "src/lib/search/rental-search-sql.test.ts",
-      "src/lib/search/search-service.test.ts",
-      "tests/integration/rental-search.test.ts",
-      "docs/API_SPEC.md"
+      "src/components/home/HeroSearch.tsx",
+      "src/components/home/HeroSearch.test.tsx"
     ],
     "modules": [
-      "Tìm kiếm Cho thuê: điều kiện `q` (khớp đầu từ) + ORDER BY độ liên quan (rental-search-sql)",
-      "search-service: truyền `q` cho ORDER BY, đếm tổng, facet"
+      "HeroSearch (trang chủ): hàng \"Tùy chọn khác\" — quản lý đóng/mở dropdown chip (Mức giá, Diện tích, Loại căn hộ, Nội thất, Tiện ích)"
     ]
   },
   "screens": [
-    "/cho-thue (danh sách + đếm + facet)",
-    "Sheet lọc mobile (số đếm kết quả)"
+    "/ và /en (trang chủ, khu tìm kiếm hero — hàng \"Tùy chọn khác\")"
   ],
   "viewports": [
     "1920",
@@ -38,31 +32,27 @@
   ],
   "impact": {
     "direct": [
-      "/cho-thue?q=can ho và q=căn hộ: không còn tin chỉ chứa \"cần\"/\"cho\" mà không có từ bắt đầu bằng \"can\"+\"ho\"; khớp đầu từ, vẫn không dấu",
-      "Sort mặc định (newest/không truyền) với q ≥ 2 từ: tin khớp nguyên cụm (liền nhau đúng thứ tự) xếp trước tin khớp rời, rồi mới mới-nhất + id",
-      "Sort giá (price_asc/price_desc) giữ nguyên thứ tự theo giá",
-      "Tìm theo mã tin (CT-0000xx) vẫn ra đúng tin",
-      "GET /api/public/rentals?q=... cùng hành vi (đếm tổng và facet khớp danh sách)"
+      "Mở một dropdown (vd Mức giá) rồi bấm chip khác (vd Diện tích): dropdown đầu đóng, không bao giờ có 2 listbox cùng mở",
+      "Sau khi dropdown đầu đóng, bấm chip lần nữa mới mở dropdown mới (hành vi chuẩn Radix click-outside)",
+      "Áp dụng cho cả 5 chip: Mức giá, Diện tích, Loại căn hộ, Nội thất, Tiện ích; cả vi và en"
     ],
     "dependents": [
-      "Sheet lọc mobile /cho-thue: số kết quả đếm khớp danh sách",
-      "Phân trang (kể cả nhánh alias `page`): không lặp/sót tin giữa các trang",
-      "Kết hợp q với các bộ lọc khác (tỉnh/phường, loại hình, khoảng giá, diện tích) và facet"
+      "Hàng chip trên mobile 390: dropdown không chồng lên nhau, không che sai chỗ",
+      "Giá trị đã chọn của từng chip vẫn giữ và hiển thị đúng sau khi đóng/mở"
     ],
     "regression": [
-      "Tìm kiếm Cho thuê không có q: thứ tự, đếm, facet như trước",
-      "Từ khoá 1 từ, từ có dấu câu/ký tự đặc biệt (`(`, `,`, `-`, `/`, `%`, `_`, dấu gạch chéo ngược) không gây lỗi SQL/regex",
-      "Từ khoá không dấu vs có dấu cho cùng kết quả",
-      "Hiệu năng truy vấn có q trên dữ liệu lớn (index trigram còn được dùng)",
-      "Trang Mua bán/Dự án (không đổi) vẫn tìm kiếm bình thường"
+      "Bấm xuyên gutter (vùng trống quanh khu tìm kiếm) tới HeroSlider phía dưới vẫn hoạt động",
+      "Chọn option bằng chuột và bằng bàn phím (mũi tên + Enter) vẫn hoạt động",
+      "Esc đóng dropdown đang mở",
+      "Không-JS: gửi form tìm kiếm vẫn hoạt động",
+      "Submit tìm kiếm hero mang đúng tham số sang trang kết quả"
     ]
   },
   "acceptance": [
-    "`can ho` / `căn hộ` không trả tin chỉ chứa \"cần\", \"cho\" mà không có \"căn hộ\"; khớp theo đầu từ, vẫn không dấu",
-    "Sort mặc định toàn cục: tin khớp nguyên cụm xếp trước tin khớp rời; sort giá vẫn theo giá",
-    "Vẫn dùng index trigram; đếm tổng/facet khớp danh sách; mã tin (CT-0000xx) vẫn tìm được",
-    "Unit + integration test cho các ca trên PASS; typecheck/test/lint/build PASS"
+    "Mở một dropdown rồi bấm chip khác → dropdown đầu đóng, không bao giờ 2 listbox cùng mở; bấm lần nữa mới mở cái mới",
+    "Đúng ở viewport 1920 và 390, bản vi và en",
+    "Không làm hỏng chọn option chuột/bàn phím, Esc, bấm xuyên gutter tới HeroSlider, không-JS gửi form"
   ],
-  "risk": "medium-high",
-  "riskNote": "Truy vấn SQL công khai dùng chung cho danh sách + đếm + facet /cho-thue; input người dùng đi vào SQL (đã tham số hoá/escape). Residual: collation DB staging chưa kiểm chứng (regex `[[:alnum:]]` phụ thuộc locale), chưa kiểm trên browser/staging."
+  "risk": "low-medium",
+  "riskNote": "Fix phụ thuộc thuộc tính data-scroll-locked của react-remove-scroll (Radix). Residual: chưa có e2e tự động; chưa test chạm thật trên thiết bị."
 }

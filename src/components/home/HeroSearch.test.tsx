@@ -189,6 +189,15 @@ describe("HeroSearch", () => {
     expect(screen.getByRole("region", { name: "Tìm kiếm nhanh" })).toHaveAttribute("data-hero-search");
   });
 
+  it("BL-083: thẻ không ghi đè `pointer-events` khi Radix Select khoá body (`data-scroll-locked`) — nếu không, bấm chip thứ hai mở dropdown thứ hai chồng lên dropdown đầu; ngoài lúc khoá vẫn `auto` để vùng gutter của section còn bấm xuyên", () => {
+    renderWithIntl(<HeroSearch {...props} />);
+    const section = screen.getByRole("region", { name: "Tìm kiếm nhanh" });
+    const card = section.firstElementChild;
+    expect(section).toHaveClass("pointer-events-none");
+    expect(card).not.toHaveClass("pointer-events-auto");
+    expect(card).toHaveClass("not-in-data-[scroll-locked]:pointer-events-auto");
+  });
+
   it("chip: danh sách có nhãn, link tới chi tiết dự án, vuốt ngang trên mobile; không có chip thì không dựng hàng chip", () => {
     const withChips = renderWithIntl(<HeroSearch {...props} />);
     const list = screen.getByRole("list", { name: "Dự án được quan tâm" });

@@ -3810,6 +3810,40 @@
       "report": ".context/review-reports/bug-rental-search-word-match-phase-1-task-01-round-2-review.md",
       "docImpact": "docs/API_SPEC.md §3.3 as-built (khớp đầu từ + ưu tiên cụm); no spec change (bug thuần, giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "hero-search-dropdown-overlap",
+      "title": "Trang chủ: dropdown \"Tùy chọn khác\" mở đồng thời, chồng nhau (BL-083)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-083",
+      "changeDoc": "spec/changes/archive/2026-10-27-hero-search-dropdown-overlap.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user: ok sửa 1,6,7,8,9 — batch QA sheet, không hỏi lại thứ tự)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 82,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-hero-search-dropdown-overlap/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-hero-search-dropdown-overlap-phase-1-task-01-round-1-review.md",
+          "note": "Root cause debug trên staging (click thật). Fix 1 class HeroSearch.tsx. MINOR: thêm comment (đã làm), e2e Playwright tự động + pointer-events-auto ở header/slider/BackToTop/FloatingContact → follow-up.",
+          "verify": "typecheck 0 · vitest unit+ui 375 files/3801 PASS · src/components/home 113 PASS · eslint file đổi 0 · build 0 (CSS `:not(:where([data-scroll-locked]) *)`) · Playwright msedge click thật 1920/390",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "NORMAL PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-hero-search-dropdown-overlap-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (bug thuần, giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",

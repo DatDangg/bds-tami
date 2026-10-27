@@ -181,7 +181,8 @@ export function HeroSearch({ placeholder, chips, rentalsHref, projectsHref, prov
   return (
     <section aria-label={t("region")} data-hero-search="" className="pointer-events-none relative z-10 scroll-mt-(--header-offset) px-gutter pt-6 pb-2 md:-mt-24 md:pt-0 md:pb-4">
       {/* Chip "Dự án được quan tâm" dùng chung 2 tab nhưng phải nằm GIỮA hàng tìm kiếm và hàng "Tùy chọn khác" (trong form Cho thuê) → dựng bằng `renderChips` ở cả hai panel (panel ẩn không vào a11y tree); không dùng `display: contents` để role tabpanel/search giữ nguyên trong cây a11y. */}
-      <div className="pointer-events-auto mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-lg md:p-6">
+      {/* BL-083: KHÔNG đổi lại `pointer-events-auto` trần — khi Select (Radix, modal) mở, body có `data-scroll-locked` + `pointer-events: none`; thẻ phải kế thừa `none` để bấm chip khác là "click ngoài" (đóng dropdown đang mở) thay vì mở chồng dropdown thứ hai. */}
+      <div className="not-in-data-[scroll-locked]:pointer-events-auto mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-lg md:p-6">
         <div role="tablist" aria-label={t("tabs")} className="flex gap-2">
           {TABS.map((key) => (
             <button
