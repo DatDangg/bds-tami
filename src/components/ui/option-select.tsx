@@ -42,6 +42,9 @@ interface OptionSelectProps {
    * "Tùy chọn khác" của ô tìm kiếm trang chủ (BL-044); dropdown vẫn là Select TAMI. Mặc định: ô chọn 48px của form.
    */
   variant?: "default" | "chip";
+  /** Opt-in controlled mở/đóng (truyền thẳng xuống Radix Select Root) để cha giữ "chỉ 1 dropdown mở" (BL-085). Không truyền → uncontrolled như cũ. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /** Lớp chip ghép từ token (không kiểu mới): bo viên thuốc, viền `border`, chữ nhỏ; chọn rồi thì nền `primary-soft`. */
@@ -63,6 +66,8 @@ export function OptionSelect({
   className,
   progressive = false,
   variant = "default",
+  open,
+  onOpenChange,
   ...aria
 }: OptionSelectProps) {
   const [inner, setInner] = useState(defaultValue);
@@ -98,7 +103,7 @@ export function OptionSelect({
 
   return (
     <>
-      <Select value={radixValue} onValueChange={(next) => change(fromRadix(next))} disabled={disabled}>
+      <Select value={radixValue} open={open} onOpenChange={onOpenChange} onValueChange={(next) => change(fromRadix(next))} disabled={disabled}>
         <SelectTrigger id={id} className={cn(variantClass, className)} {...aria}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

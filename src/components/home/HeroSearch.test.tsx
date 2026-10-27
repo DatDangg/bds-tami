@@ -189,13 +189,33 @@ describe("HeroSearch", () => {
     expect(screen.getByRole("region", { name: "Tìm kiếm nhanh" })).toHaveAttribute("data-hero-search");
   });
 
-  it("BL-083: thẻ không ghi đè `pointer-events` khi Radix Select khoá body (`data-scroll-locked`) — nếu không, bấm chip thứ hai mở dropdown thứ hai chồng lên dropdown đầu; ngoài lúc khoá vẫn `auto` để vùng gutter của section còn bấm xuyên", () => {
+  it("BL-083/BL-085: thẻ không ghi đè `pointer-events` khi Radix Select khoá body (gutter bấm xuyên khi không mở), nhưng hàng chip tự `pointer-events-auto` để trigger chip khác nhận pointerdown khi đang khoá", () => {
     renderWithIntl(<HeroSearch {...props} />);
     const section = screen.getByRole("region", { name: "Tìm kiếm nhanh" });
     const card = section.firstElementChild;
     expect(section).toHaveClass("pointer-events-none");
     expect(card).not.toHaveClass("pointer-events-auto");
     expect(card).toHaveClass("not-in-data-[scroll-locked]:pointer-events-auto");
+    const chipRow = within(screen.getByRole("group", { name: "Tùy chọn khác" })).getAllByRole("combobox")[0]?.parentElement;
+    expect(chipRow).toHaveClass("pointer-events-auto");
+  });
+
+  it("BL-085: bấm chip khác khi một dropdown đang mở = đóng cái cũ + mở cái mới trong 1 click; không bao giờ 2 listbox cùng mở; Esc đóng", async () => {
+    // jsdom không có CSS tailwind nên `pointer-events` kế thừa `none` từ body khoá bị userEvent chặn; trình duyệt thật có `pointer-events-auto` ở hàng chip.
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    renderWithIntl(<HeroSearch {...props} />);
+    const price = screen.getByRole("combobox", { name: "Mức giá" });
+    const area = screen.getByRole("combobox", { name: "Diện tích" });
+    await user.click(price);
+    expect(price).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+    await user.click(area);
+    expect(price).toHaveAttribute("aria-expanded", "false");
+    expect(area).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+    await user.keyboard("{Escape}");
+    expect(area).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("listbox")).toBeNull();
   });
 
   it("chip: danh sách có nhãn, link tới chi tiết dự án, vuốt ngang trên mobile; không có chip thì không dựng hàng chip", () => {

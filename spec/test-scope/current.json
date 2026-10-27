@@ -1,70 +1,56 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 85,
-  "generatedAt": "2026-10-27T12:30:00+07:00",
+  "scopeVersion": 86,
+  "generatedAt": "2026-10-27T13:30:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-082 BUG (admin: cột/ô 'Người tạo' hiện 'Chưa đặt tên - ID: …' khi Sale xem tin của người khác, vì Staff.read = selfOrAdmin nên Payload không populate được author). Quyết định user: giữ PERMISSION (Staff.read selfOrAdmin KHÔNG nới); chỉ thêm hiển thị tên/email người tạo cho staff qua field ảo authorName. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG (SPECIFICATIONS chỉ nói 'Người tạo tự điền người đang đăng nhập, chỉ admin đổi' — vẫn đúng). Reviewer STRICT PASS r2 (r1 FAIL N+1).",
+  "triggerNote": "BL-085 BUG (follow-up BL-083): trang chủ khu 'Tùy chọn khác' — đang mở 1 dropdown mà bấm chip khác thì lần 1 chỉ đóng dropdown cũ, phải bấm lần 2 mới mở. Fix: nâng state open lên HeroSearch (OptionSelect nhận open/onOpenChange opt-in), 1 click chip khác = đóng cái đang mở + mở cái vừa bấm, tối đa 1 listbox mở. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
   "status": "published",
-  "workItem": "bug/admin-author-name-for-sale",
-  "backlog": "BL-082",
+  "workItem": "bug/hero-search-dropdown-one-click",
+  "backlog": "BL-085",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-admin-author-name-for-sale.md",
-  "task": "tasks/bug-admin-author-name-for-sale/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-admin-author-name-for-sale-phase-1-task-01-round-2-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-84.json",
+  "changeDoc": "spec/changes/2026-10-27-hero-search-dropdown-one-click.md",
+  "task": "tasks/bug-hero-search-dropdown-one-click/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-85.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/fields/author.ts",
-      "src/collections/_shared/content-defaults.ts",
-      "src/components/admin/AuthorCell.tsx",
-      "src/components/admin/AuthorCell.test.tsx",
-      "src/components/admin/AuthorField.tsx",
-      "src/components/admin/AuthorField.test.tsx",
-      "src/app/(payload)/admin/importMap.js",
-      "src/payload-types.ts",
-      "src/lib/admin/form-layout.test.ts",
-      "tests/integration/author-name.test.ts",
-      "docs/PERMISSION.md"
+      "src/components/home/HeroSearch.tsx",
+      "src/components/home/HeroSearch.test.tsx",
+      "src/components/ui/option-select.tsx",
+      "src/components/ui/option-select.test.tsx"
     ],
     "modules": [
-      "authorField(): thêm field ảo authorName (đọc tên/email người tạo; chỉ staff active đọc được)",
-      "Admin UI: AuthorCell (cột Người tạo ở danh sách) + AuthorField (ô Người tạo ở form sửa)",
-      "Áp cho mọi collection có author: rentals, projects, property-posts, news, job-postings",
-      "docs/PERMISSION.md §4: ghi nhận authorName, Staff.read vẫn selfOrAdmin"
+      "HeroSearch: state dropdown đang mở nâng lên cấp nhóm 'Tùy chọn khác' (tối đa 1 mở)",
+      "OptionSelect: thêm prop open/onOpenChange opt-in (controlled); không truyền thì hành vi cũ"
     ]
   },
   "screens": [
-    "/admin/collections/{rentals,projects,property-posts,news,job-postings} — cột Người tạo (Sale + Admin)",
-    "màn sửa các collection trên — ô Người tạo"
+    "/ và /en — khu 'Tùy chọn khác' (Mức giá, Diện tích, ...) ở 1920 và 390"
   ],
   "impact": {
     "direct": [
-      "Sale: danh sách + màn sửa hiển thị tên (fallback email) người tạo, không còn 'Chưa đặt tên - ID'",
-      "Admin vẫn chọn/đổi author như cũ",
-      "Field ảo authorName có trong payload-types"
+      "Đang mở dropdown A, bấm 1 lần chip B: A đóng, B mở ngay",
+      "Luôn tối đa 1 listbox mở",
+      "Esc / click ra ngoài vẫn đóng; bàn phím (mở, mũi tên, Enter) dùng được"
     ],
     "dependents": [
-      "Tin của chính Sale vẫn hiện đúng tên/email",
-      "Staff bị khoá (inactive) không nhận authorName",
-      "Tin không có author -> ô trống '—' không lỗi"
+      "Trước hydrate (select gốc) không đổi",
+      "Chọn giá trị rồi tìm kiếm vẫn ra đúng query"
     ],
     "regression": [
-      "Sale KHÔNG mở được /admin/collections/staff/<id khác> (403/404)",
-      "Sale KHÔNG GET /api/staff/<id khác> (403/404); không lộ trường staff khác ngoài tên/email hiển thị",
-      "Khách/API công khai (rentals, projects, news…) KHÔNG thấy authorName/tên/email staff",
-      "Danh sách nhiều dòng không N+1 truy vấn staff (r1 FAIL đã sửa)",
-      "Bộ lọc/sắp xếp/Hiển thị cột theo Người tạo ở admin vẫn chạy"
+      "BL-083: không bao giờ 2 dropdown chồng nhau ở trang chủ",
+      "Slider hero vẫn nhận click ở vùng gutter ngoài card khi không có dropdown mở",
+      "OptionSelect ở FilterFacets /cho-thue, ProjectFilters /du-an, JobFilters, FormField, sort controls, FloorPlans không đổi hành vi"
     ]
   },
   "acceptance": [
-    "Sale thấy tên (fallback email) người tạo ở danh sách + màn sửa mọi collection có author, không còn 'Chưa đặt tên - ID: …'",
-    "Sale vẫn không mở /admin/collections/staff/<id khác> hay GET /api/staff/<id khác>",
-    "Khách/API công khai không thấy authorName/tên/email staff",
-    "Admin vẫn chọn/đổi author như cũ",
-    "Staff bị khoá không nhận authorName"
+    "1 click vào chip khác đóng cái đang mở và mở cái vừa bấm, tối đa 1 danh sách mở",
+    "Click ngoài / Esc vẫn đóng; bàn phím dùng được",
+    "Slider hero vẫn nhận click ở gutter khi không có dropdown mở",
+    "Các consumer OptionSelect khác không đổi"
   ],
-  "risk": "high",
-  "riskNote": "RBAC (lộ thông tin staff). Residual: chưa kiểm trash/versions view + dashboard trong trình duyệt; importMap.js commit tách hunk (dòng WardField BL-077 vẫn ở working tree)."
+  "risk": "medium",
+  "riskNote": "Thay đổi UI cục bộ, OptionSelect dùng chung nhưng prop mới opt-in. Regression cần retest các consumer OptionSelect."
 }

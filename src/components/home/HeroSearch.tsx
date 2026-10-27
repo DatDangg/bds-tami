@@ -84,6 +84,8 @@ export function HeroSearch({ placeholder, chips, rentalsHref, projectsHref, prov
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("rentals");
   const [chipsExpanded, setChipsExpanded] = useState(false);
+  // BL-085: tên ô "Tùy chọn khác" đang mở (tối đa 1). Nâng lên đây để bấm chip khác = đóng cái cũ + mở cái mới trong 1 click.
+  const [openOption, setOpenOption] = useState<string | null>(null);
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
   const uid = useId();
   const inputId = `${uid}-keyword`;
@@ -181,7 +183,7 @@ export function HeroSearch({ placeholder, chips, rentalsHref, projectsHref, prov
   return (
     <section aria-label={t("region")} data-hero-search="" className="pointer-events-none relative z-10 scroll-mt-(--header-offset) px-gutter pt-6 pb-2 md:-mt-24 md:pt-0 md:pb-4">
       {/* Chip "Dự án được quan tâm" dùng chung 2 tab nhưng phải nằm GIỮA hàng tìm kiếm và hàng "Tùy chọn khác" (trong form Cho thuê) → dựng bằng `renderChips` ở cả hai panel (panel ẩn không vào a11y tree); không dùng `display: contents` để role tabpanel/search giữ nguyên trong cây a11y. */}
-      {/* BL-083: KHÔNG đổi lại `pointer-events-auto` trần — khi Select (Radix, modal) mở, body có `data-scroll-locked` + `pointer-events: none`; thẻ phải kế thừa `none` để bấm chip khác là "click ngoài" (đóng dropdown đang mở) thay vì mở chồng dropdown thứ hai. */}
+      {/* BL-083: thẻ chỉ `pointer-events-auto` khi body chưa khoá (Radix Select modal đặt `data-scroll-locked` + `pointer-events: none`) để gutter section bấm xuyên tới slider; hàng chip tự bật lại auto (BL-085). */}
       <div className="not-in-data-[scroll-locked]:pointer-events-auto mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-lg md:p-6">
         <div role="tablist" aria-label={t("tabs")} className="flex gap-2">
           {TABS.map((key) => (
@@ -223,9 +225,20 @@ export function HeroSearch({ placeholder, chips, rentalsHref, projectsHref, prov
               <p id={moreOptionsId} className={ROW_LABEL}>
                 {t("moreOptions.label")}
               </p>
-              <div className="grid min-w-0 grid-cols-2 gap-2 md:flex-1 md:grid-cols-5">
+              {/* BL-085: `pointer-events-auto` riêng cho hàng chip để khi Select khoá body (`pointer-events: none`) trigger chip khác vẫn nhận pointerdown → mở ngay; state đơn nhất `openOption` đảm bảo không bao giờ 2 listbox cùng mở (nguyên nhân BL-083). */}
+              <div className="pointer-events-auto grid min-w-0 grid-cols-2 gap-2 md:flex-1 md:grid-cols-5">
                 {moreOptions.map((field) => (
-                  <OptionSelect key={field.name} progressive variant="chip" name={field.name} aria-label={field.label} options={field.options} className="w-full min-w-0" />
+                  <OptionSelect
+                    key={field.name}
+                    progressive
+                    variant="chip"
+                    name={field.name}
+                    open={openOption === field.name}
+                    onOpenChange={(next) => setOpenOption((current) => (next ? field.name : current === field.name ? null : current))}
+                    aria-label={field.label}
+                    options={field.options}
+                    className="w-full min-w-0"
+                  />
                 ))}
               </div>
             </div>

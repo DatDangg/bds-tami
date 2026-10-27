@@ -3946,6 +3946,40 @@
       "report": ".context/review-reports/bug-admin-author-name-for-sale-phase-1-task-01-round-2-review.md",
       "docImpact": "docs/PERMISSION.md §4 hàng author (as-built); no spec change (giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "hero-search-dropdown-one-click",
+      "title": "Trang chủ: bấm chip \"Tùy chọn khác\" khác chỉ cần 1 click — đóng cái đang mở và mở cái mới (BL-085, follow-up BL-083)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-085",
+      "changeDoc": "spec/changes/archive/2026-10-27-hero-search-dropdown-one-click.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user chat: feedback BL-083, qua checkpoint, không hỏi lại thứ tự)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 86,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-hero-search-dropdown-one-click/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
+          "note": "OptionSelect thêm open/onOpenChange opt-in; HeroSearch state openOption đơn nhất + hàng 5 chip pointer-events-auto. 3 MINOR follow-up (test wiring, ảnh/tap 390).",
+          "verify": "typecheck 0 · vitest 4661 PASS · eslint file đổi 0 (repo-wide 239 lỗi có sẵn) · build 0 (reviewer) · Playwright click thật 1920/390: 1 click đóng cũ + mở mới, Esc/click ngoài đóng, bàn phím chọn được",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",
@@ -4599,7 +4633,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-27T12:00:00+07:00",
+  "lastUpdated": "2026-10-27T07:27:03.146Z",
   "approvalMilestones": [
     {
       "id": "M1",
