@@ -2,7 +2,7 @@ import { sql } from "@payloadcms/db-postgres";
 import type { Payload } from "payload";
 
 import { RENTAL_AMENITIES, type RentalAmenity, type RentalCard, type RentalSearchParams, type RentalSearchResult } from "../../shared/types/api";
-import { allOf, filterConditions, type RentalConditions, rentalConditions, rentalFrom, rentalOrderBy, rentalWhere, type SqlFragment } from "./rental-search-sql";
+import { allOf, filterConditions, type RentalConditions, phraseMatchExpression, rentalConditions, rentalFrom, rentalOrderBy, rentalWhere, type SqlFragment } from "./rental-search-sql";
 
 /**
  * Cổng tìm kiếm (ERD §6, ARCHITECTURE §9.1): chỉ đổi implementation khi chuyển sang OpenSearch, không đổi chỗ gọi.
@@ -106,7 +106,7 @@ export class PostgresRentalSearch implements RentalSearchService {
 
   async search(params: RentalSearchParams): Promise<RentalSearchResult> {
     const where = rentalWhere(params);
-    const [{ total }, items] = await Promise.all([this.count(params, where), this.fetchRows(params, where, params.sort)]);
+    const [{ total }, items] = await Promise.all([this.count(params, where), this.fetchRows(params, where, params.sort, params.q)]);
     return { items, total, page: params.page, totalPages: Math.ceil(total / params.limit) };
   }
 
@@ -121,7 +121,7 @@ export class PostgresRentalSearch implements RentalSearchService {
     const featuredWhere = sql`${where} AND r."is_featured" = true`;
     const [{ total, featured: featuredCount }, items, featured, facets] = await Promise.all([
       this.count(params, where),
-      this.fetchRows(params, gridWhere, params.sort),
+      this.fetchRows(params, gridWhere, params.sort, params.q),
       params.page === 1 ? this.fetchRows({ ...params, page: 1, limit: RENTAL_FEATURED_LIMIT }, featuredWhere, "newest") : Promise.resolve([]),
       this.facets(params),
     ]);
@@ -178,17 +178,23 @@ export class PostgresRentalSearch implements RentalSearchService {
     return toAmenityCounts(result.rows);
   }
 
-  /** Thẻ của các tin khớp `where`, một trang theo `params.page`/`limit`, sắp theo `sort`. */
-  private async fetchRows(params: RentalSearchParams, where: SqlFragment, sort: RentalSearchParams["sort"]): Promise<RentalCard[]> {
+  /**
+   * Thẻ của các tin khớp `where`, một trang theo `params.page`/`limit`, sắp theo `sort`. `relevanceQuery` (BL-080): từ khoá để sort mặc định ưu tiên khớp nguyên cụm;
+   * thẻ nổi bật không truyền (phải cùng thứ tự với `featuredIdsQuery` đã loại khỏi lưới).
+   */
+  private async fetchRows(params: RentalSearchParams, where: SqlFragment, sort: RentalSearchParams["sort"], relevanceQuery?: string): Promise<RentalCard[]> {
     const { locale, limit, page } = params;
     const offset = (page - 1) * limit;
+    const phrase = sort === "newest" ? phraseMatchExpression(relevanceQuery) : undefined;
+    const phraseColumn = phrase === undefined ? sql`` : sql`, ${phrase} AS "phrase_match"`;
+    const relevantQuery = phrase === undefined ? undefined : relevanceQuery;
     const englishCategory = locale === "en" ? sql` AND c."has_english" = true` : sql``;
     const result = await this.db.execute(sql`
       WITH page AS (
         SELECT r."id", r."code", r."status", r."price_monthly_vnd", r."price_negotiable", r."area_m2", r."bedrooms", r."bathrooms",
                r."furnishing", r."province_id", r."ward_id", r."category_id", r."published_at", rl."title", rl."slug",
-               CASE WHEN r."show_exact_address" THEN r."address" END AS "address"
-        ${rentalFrom(locale)} ${where} ${rentalOrderBy(sort, "r")} LIMIT ${limit} OFFSET ${offset}
+               CASE WHEN r."show_exact_address" THEN r."address" END AS "address"${phraseColumn}
+        ${rentalFrom(locale)} ${where} ${rentalOrderBy(sort, "r", relevantQuery)} LIMIT ${limit} OFFSET ${offset}
       )
       SELECT page.*, p."name" AS province_name, p."slug" AS province_slug, w."name" AS ward_name, w."slug" AS ward_slug,
              cat."name" AS category_name, cat."slug" AS category_slug,
@@ -210,7 +216,7 @@ export class PostgresRentalSearch implements RentalSearchService {
         WHERE rr."parent_id" = page."id" AND rr."path" = 'gallery'
         ORDER BY rr."order" ASC LIMIT 1
       ) cover ON true
-      ${rentalOrderBy(sort, "page")}`);
+      ${rentalOrderBy(sort, "page", relevantQuery)}`);
     return result.rows.map(toCard);
   }
 }

@@ -735,4 +735,62 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(((await unknown.json()) as { data: { total: number } }).data.total).toBe(0);
     });
   });
+  describe("BL-080: khớp đầu từ + ưu tiên khớp nguyên cụm (DB thật)", () => {
+    let province = "";
+    const phraseKeys = ["w80p1", "w80p2"];
+    const looseKeys = ["w80l1", "w80l2", "w80l3"];
+    const inProvince = (params: Record<string, unknown> = {}) => search({ province, limit: 48, ...params });
+
+    beforeAll(async () => {
+      const hue = await payload.create({ collection: "provinces", data: { code: "46", name: "Thành phố Huế", slug: "hue-bl080" }, overrideAccess: true });
+      province = hue.slug;
+      const ward = await payload.create({ collection: "wards", data: { province: hue.id, code: "19778", name: "Phường Vĩnh Ninh", type: "phuong", slug: "vinh-ninh-bl080" }, overrideAccess: true });
+      const place = { province: hue.id, ward: ward.id };
+      // Khớp nguyên cụm tạo TRƯỚC (cũ hơn); khớp rời tạo SAU (mới hơn) để newest thuần sẽ đặt chúng lên đầu.
+      await createRental("w80p1", "Căn hộ Huế một phòng ngủ", place);
+      await createRental("w80p2", "Chung cư, căn-hộ view sông", place);
+      await createRental("w80l1", "Hộ kinh doanh cần thuê căn góc", place);
+      await createRental("w80l2", "Hộ gia đình tìm căn nhỏ", place);
+      await createRental("w80l3", "Hộ nghèo căn nhà cấp bốn", place);
+      // Chỉ chứa "cần", "cho": "can" là đầu từ nhưng không từ nào bắt đầu bằng "ho" → không khớp.
+      await createRental("w80n1", "Cần cho thuê mặt bằng", place);
+    });
+
+    it("'can ho' không khớp tin chỉ chứa 'cần…cho'; 'ho' không khớp giữa từ 'cho'", async () => {
+      const titlesFound = await titlesOf({ province, limit: 48, q: "can ho" });
+      expect(titlesFound).not.toContain("Cần cho thuê mặt bằng");
+      expect(titlesFound).toHaveLength(5);
+      expect(await titlesOf({ province, q: "ho thue" })).not.toContain("Cần cho thuê mặt bằng");
+    });
+
+    it("sort mặc định: tin khớp nguyên cụm đứng trước TOÀN CỤC (limit nhỏ hơn số tin khớp); ghép các trang không lặp/sót", async () => {
+      const first = await inProvince({ q: "can ho", limit: 2, page: 1 });
+      expect(first.total).toBe(5);
+      expect(first.items.map((card) => card.id).sort()).toEqual(phraseKeys.map((key) => ids[key]).sort());
+      const pages = [first, await inProvince({ q: "can ho", limit: 2, page: 2 }), await inProvince({ q: "can ho", limit: 2, page: 3 })];
+      const all = pages.flatMap((page) => page.items.map((card) => card.id));
+      expect(all).toHaveLength(5);
+      expect(new Set(all).size).toBe(5);
+      expect(new Set(all)).toEqual(new Set([...phraseKeys, ...looseKeys].map((key) => ids[key])));
+    });
+
+    it("sort giá vẫn theo giá (không ưu tiên cụm); đếm tổng khớp danh sách", async () => {
+      const asc = await inProvince({ q: "can ho", sort: "price_asc" });
+      const prices = asc.items.map((card) => card.priceMonthlyVnd ?? Infinity);
+      expect(prices).toEqual([...prices].sort((a, b) => a - b));
+      expect(asc.total).toBe(asc.items.length);
+    });
+
+    it("listing: lưới và số đếm cùng điều kiện đầu từ", async () => {
+      const listing = await service.listing(rentalSearchParamsSchema.parse({ province, q: "can ho", limit: 2 }));
+      expect(listing.total).toBe(5);
+      expect(listing.items.map((card) => card.id).sort()).toEqual(phraseKeys.map((key) => ids[key]).sort());
+    });
+
+    it("mã tin CT-xxxxxx vẫn tìm được (đầy đủ và tách 'ct 000012')", async () => {
+      const code = (await payload.findByID({ collection: "rentals", id: ids.w80p1!, depth: 0, overrideAccess: true })).code;
+      expect(await titlesOf({ q: code })).toEqual(["Căn hộ Huế một phòng ngủ"]);
+      expect(await titlesOf({ q: code.toLowerCase().replace("-", " ") })).toEqual(["Căn hộ Huế một phòng ngủ"]);
+    });
+  });
 });

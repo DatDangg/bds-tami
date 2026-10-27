@@ -1,53 +1,68 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 80,
-  "generatedAt": "2026-10-26T12:00:00+07:00",
+  "scopeVersion": 81,
+  "generatedAt": "2026-10-27T12:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-079 BUG (dependency/CI, không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG). CI `pnpm audit --audit-level high` fail do 2 advisory mức high mới: undici 7.29.1 (GHSA-xjj6-f33q-929c) và happy-dom 20.14.6 (GHSA-834v-8h66-3h79). Fix: pnpm.overrides thêm \"happy-dom\": \"21.0.4\" và \"payload>undici\": \"7.30.1\" + pnpm-lock.yaml. Reviewer STRICT PASS r1. Không đổi UI/schema/API/i18n/migration.",
+  "triggerNote": "BL-080 BUG (tìm kiếm Cho thuê khớp chuỗi con, không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG). `/cho-thue?q=can ho` trả tin không liên quan vì mỗi từ khớp LIKE '%term%' (\"ho\" trong \"cho\", \"can\" trong \"cần\") và sort mặc định không có độ liên quan. Fix: khớp theo đầu từ (vẫn không dấu, giữ LIKE indexable cho trigram), ưu tiên tin khớp nguyên cụm khi sort mặc định toàn cục, sort giá giữ nguyên, đếm/facet dùng cùng điều kiện WHERE, mã tin (CT-0000xx) vẫn tìm được. Reviewer STRICT PASS r2. Không đổi schema/migration/UI/i18n.",
   "status": "published",
-  "workItem": "bug/ci-audit-undici-happy-dom",
-  "backlog": "BL-079",
+  "workItem": "bug/rental-search-word-match",
+  "backlog": "BL-080",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-26-ci-audit-undici-happy-dom.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-79.json",
+  "changeDoc": "spec/changes/2026-10-27-rental-search-word-match.md",
+  "task": "tasks/bug-rental-search-word-match/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-rental-search-word-match-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-80.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "package.json",
-      "pnpm-lock.yaml"
+      "src/lib/search/rental-search-sql.ts",
+      "src/lib/search/search-service.ts",
+      "src/lib/search/rental-search-sql.test.ts",
+      "src/lib/search/search-service.test.ts",
+      "tests/integration/rental-search.test.ts",
+      "docs/API_SPEC.md"
     ],
     "modules": [
-      "Dependency overrides: undici (client HTTP của payload, ghim 7.30.1 qua payload>undici)",
-      "Dependency overrides: happy-dom 21.0.4 (dùng bởi @lexical/headless withDOM và môi trường vitest tuỳ chọn)"
+      "Tìm kiếm Cho thuê: điều kiện `q` (khớp đầu từ) + ORDER BY độ liên quan (rental-search-sql)",
+      "search-service: truyền `q` cho ORDER BY, đếm tổng, facet"
     ]
   },
-  "screens": [],
-  "viewports": [],
+  "screens": [
+    "/cho-thue (danh sách + đếm + facet)",
+    "Sheet lọc mobile (số đếm kết quả)"
+  ],
+  "viewports": [
+    "1920",
+    "390"
+  ],
   "impact": {
     "direct": [
-      "CI bước `pnpm audit --audit-level high` phải PASS (không còn advisory high undici/happy-dom)",
-      "Build (`next build`) và toàn bộ unit test chạy được với undici 7.30.1 + happy-dom 21.0.4"
+      "/cho-thue?q=can ho và q=căn hộ: không còn tin chỉ chứa \"cần\"/\"cho\" mà không có từ bắt đầu bằng \"can\"+\"ho\"; khớp đầu từ, vẫn không dấu",
+      "Sort mặc định (newest/không truyền) với q ≥ 2 từ: tin khớp nguyên cụm (liền nhau đúng thứ tự) xếp trước tin khớp rời, rồi mới mới-nhất + id",
+      "Sort giá (price_asc/price_desc) giữ nguyên thứ tự theo giá",
+      "Tìm theo mã tin (CT-0000xx) vẫn ra đúng tin",
+      "GET /api/public/rentals?q=... cùng hành vi (đếm tổng và facet khớp danh sách)"
     ],
     "dependents": [
-      "Admin richtext (Lexical): soạn và lưu nội dung (qua @lexical/headless + happy-dom)",
-      "Mọi chỗ chuyển HTML → Lexical (seed, import nội dung, bản dịch)",
-      "HTTP gọi ra ngoài của payload (email, API dịch AI Claude)"
+      "Sheet lọc mobile /cho-thue: số kết quả đếm khớp danh sách",
+      "Phân trang (kể cả nhánh alias `page`): không lặp/sót tin giữa các trang",
+      "Kết hợp q với các bộ lọc khác (tỉnh/phường, loại hình, khoảng giá, diện tích) và facet"
     ],
     "regression": [
-      "Chạy full unit suite",
-      "Build production",
-      "Admin: sửa và lưu trường richtext (trang pháp lý, bài tin tức, mô tả dự án), mở lại thấy đúng nội dung",
-      "Seed / `content:import` / `english:pack` (chuyển HTML → Lexical) cho kết quả như trước",
-      "Luồng dịch AI và gửi email (HTTP ra ngoài qua undici) còn hoạt động"
+      "Tìm kiếm Cho thuê không có q: thứ tự, đếm, facet như trước",
+      "Từ khoá 1 từ, từ có dấu câu/ký tự đặc biệt (`(`, `,`, `-`, `/`, `%`, `_`, dấu gạch chéo ngược) không gây lỗi SQL/regex",
+      "Từ khoá không dấu vs có dấu cho cùng kết quả",
+      "Hiệu năng truy vấn có q trên dữ liệu lớn (index trigram còn được dùng)",
+      "Trang Mua bán/Dự án (không đổi) vẫn tìm kiếm bình thường"
     ]
   },
   "acceptance": [
-    "`pnpm audit --audit-level high` thoát mã 0",
-    "Full unit suite và build PASS",
-    "Richtext admin sửa/lưu và chuyển HTML → Lexical hoạt động như trước",
-    "Không có thay đổi UI/schema/API/i18n/migration"
+    "`can ho` / `căn hộ` không trả tin chỉ chứa \"cần\", \"cho\" mà không có \"căn hộ\"; khớp theo đầu từ, vẫn không dấu",
+    "Sort mặc định toàn cục: tin khớp nguyên cụm xếp trước tin khớp rời; sort giá vẫn theo giá",
+    "Vẫn dùng index trigram; đếm tổng/facet khớp danh sách; mã tin (CT-0000xx) vẫn tìm được",
+    "Unit + integration test cho các ca trên PASS; typecheck/test/lint/build PASS"
   ],
-  "risk": "medium",
-  "riskNote": "Chỉ nâng phiên bản phụ thuộc (override); happy-dom nhảy major 20 → 21 và undici minor. Ưu tiên test: Lexical headless/HTML→Lexical, HTTP ra ngoài của payload, build."
+  "risk": "medium-high",
+  "riskNote": "Truy vấn SQL công khai dùng chung cho danh sách + đếm + facet /cho-thue; input người dùng đi vào SQL (đã tham số hoá/escape). Residual: collation DB staging chưa kiểm chứng (regex `[[:alnum:]]` phụ thuộc locale), chưa kiểm trên browser/staging."
 }

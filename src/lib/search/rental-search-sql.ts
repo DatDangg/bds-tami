@@ -22,6 +22,24 @@ export function searchTerms(query: string | undefined): string[] {
   return normalizeSearchText(query).split(" ").filter(Boolean).slice(0, MAX_SEARCH_TERMS);
 }
 
+/** Thoát ký tự đặc biệt của regex POSIX (ARE) để từ khoá người dùng là chữ thường; `\` trước ký tự không phải chữ/số luôn nghĩa là chính ký tự đó. */
+const escapeRegex = (term: string): string => term.replace(/[\\^$.|?*+()[\]{}]/g, "\\$&");
+
+/** Ký tự đứng trước một từ: đầu chuỗi hoặc bất kỳ ký tự không phải chữ/số (khoảng trắng, `(`, `,`, `-`, `/`…). */
+const WORD_START = "(^|[^[:alnum:]])";
+
+/**
+ * Regex "từ khoá là ĐẦU một từ" của `search_text` (BL-080): "ho" khớp "hoang" nhưng không khớp "cho". Luôn đi kèm `LIKE '%term%'`
+ * (indexable bằng GIN trigram) để planner thu hẹp bằng index rồi mới lọc ranh giới từ trên tập đã nhỏ.
+ */
+export const wordStartRegex = (term: string): string => `${WORD_START}${escapeRegex(term)}`;
+
+/** Regex cụm: các từ liền nhau đúng thứ tự (cách nhau bởi ký tự không phải chữ/số), mỗi từ ở đầu từ. Cần ≥ 2 từ mới có nghĩa. */
+export function phraseRegex(terms: readonly string[]): string | undefined {
+  if (terms.length < 2) return undefined;
+  return `${WORD_START}${terms.map(escapeRegex).join("[^[:alnum:]]+")}`;
+}
+
 /** Danh mục theo slug của `locale` cùng danh mục con của nó (tối đa 2 cấp, ERD §4.3); chỉ tính danh mục scope `rental` chưa xoá mềm. */
 function categoryCondition(slug: string, locale: string): SqlFragment {
   const matched = sql`SELECT cl."_parent_id" FROM "categories_locales" cl JOIN "categories" t ON t."id" = cl."_parent_id" AND t."scope" = 'rental' AND t."deleted_at" IS NULL WHERE cl."_locale" = ${locale} AND cl."slug" = ${slug}`;
@@ -99,7 +117,9 @@ export function rentalConditions(params: RentalSearchParams): RentalConditions {
   if (params.province) province.push(sql`r."province_id" IN (SELECT "id" FROM "provinces" WHERE "slug" = ${params.province})`);
   if (params.ward) province.push(wardCondition(params.ward, params.province));
   const other: SqlFragment[] = [];
-  for (const term of searchTerms(params.q)) other.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`);
+  for (const term of searchTerms(params.q)) {
+    other.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`, sql`rl."search_text" ~ ${wordStartRegex(term)}`);
+  }
   if (params.project) other.push(projectCondition(params.project, locale));
   if (params.priceMin !== undefined) other.push(sql`r."price_monthly_vnd" >= ${params.priceMin}`);
   if (params.priceMax !== undefined) other.push(sql`r."price_monthly_vnd" <= ${params.priceMax}`);
@@ -130,14 +150,23 @@ export function rentalWhere(params: RentalSearchParams): SqlFragment {
   return sql`WHERE ${allOf([...conditions.scope, ...filterConditions(conditions)])}`;
 }
 
+/** Biểu thức "tin chứa nguyên cụm `query`" (≥ 2 từ) trên `rl."search_text"`; undefined khi không có cụm. Cũng là cột `phrase_match` của CTE trang. */
+export function phraseMatchExpression(query: string | undefined): SqlFragment | undefined {
+  const regex = phraseRegex(searchTerms(query));
+  return regex === undefined ? undefined : sql`(rl."search_text" ~ ${regex})`;
+}
+
 /**
  * ORDER BY theo `sort` (giá trị đã kiểm bởi zod, chọn từ bảng cố định). Tin thương lượng không có giá nên xếp cuối ở cả hai chiều giá;
  * `id` chốt thứ tự để phân trang không lặp/sót. `alias` là hằng nội bộ ("r" hoặc "page"), không phải đầu vào người dùng.
+ * Sort mặc định (`newest`) có `query` ≥ 2 từ thì tin chứa nguyên cụm xếp trước (BL-080): alias "r" tính trực tiếp, "page" đọc cột `phrase_match` của CTE.
  */
-export function rentalOrderBy(sort: RentalSort, alias: "r" | "page"): SqlFragment {
+export function rentalOrderBy(sort: RentalSort, alias: "r" | "page", query?: string): SqlFragment {
   const col = (name: string) => sql.raw(`${alias}."${name}"`);
   const newest = sql`${col("published_at")} DESC NULLS LAST, ${col("id")} DESC`;
   if (sort === "price_asc") return sql`ORDER BY ${col("price_monthly_vnd")} ASC NULLS LAST, ${newest}`;
   if (sort === "price_desc") return sql`ORDER BY ${col("price_monthly_vnd")} DESC NULLS LAST, ${newest}`;
-  return sql`ORDER BY ${newest}`;
+  const phrase = phraseMatchExpression(query);
+  if (phrase === undefined) return sql`ORDER BY ${newest}`;
+  return sql`ORDER BY ${alias === "r" ? phrase : col("phrase_match")} DESC, ${newest}`;
 }

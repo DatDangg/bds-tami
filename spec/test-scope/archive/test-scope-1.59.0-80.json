@@ -1,0 +1,53 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 80,
+  "generatedAt": "2026-10-26T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-079 BUG (dependency/CI, không đổi requirement → không bump spec_version, không có spec/updates/ và dòng CHANGELOG). CI `pnpm audit --audit-level high` fail do 2 advisory mức high mới: undici 7.29.1 (GHSA-xjj6-f33q-929c) và happy-dom 20.14.6 (GHSA-834v-8h66-3h79). Fix: pnpm.overrides thêm \"happy-dom\": \"21.0.4\" và \"payload>undici\": \"7.30.1\" + pnpm-lock.yaml. Reviewer STRICT PASS r1. Không đổi UI/schema/API/i18n/migration.",
+  "status": "published",
+  "workItem": "bug/ci-audit-undici-happy-dom",
+  "backlog": "BL-079",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-26-ci-audit-undici-happy-dom.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-79.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "package.json",
+      "pnpm-lock.yaml"
+    ],
+    "modules": [
+      "Dependency overrides: undici (client HTTP của payload, ghim 7.30.1 qua payload>undici)",
+      "Dependency overrides: happy-dom 21.0.4 (dùng bởi @lexical/headless withDOM và môi trường vitest tuỳ chọn)"
+    ]
+  },
+  "screens": [],
+  "viewports": [],
+  "impact": {
+    "direct": [
+      "CI bước `pnpm audit --audit-level high` phải PASS (không còn advisory high undici/happy-dom)",
+      "Build (`next build`) và toàn bộ unit test chạy được với undici 7.30.1 + happy-dom 21.0.4"
+    ],
+    "dependents": [
+      "Admin richtext (Lexical): soạn và lưu nội dung (qua @lexical/headless + happy-dom)",
+      "Mọi chỗ chuyển HTML → Lexical (seed, import nội dung, bản dịch)",
+      "HTTP gọi ra ngoài của payload (email, API dịch AI Claude)"
+    ],
+    "regression": [
+      "Chạy full unit suite",
+      "Build production",
+      "Admin: sửa và lưu trường richtext (trang pháp lý, bài tin tức, mô tả dự án), mở lại thấy đúng nội dung",
+      "Seed / `content:import` / `english:pack` (chuyển HTML → Lexical) cho kết quả như trước",
+      "Luồng dịch AI và gửi email (HTTP ra ngoài qua undici) còn hoạt động"
+    ]
+  },
+  "acceptance": [
+    "`pnpm audit --audit-level high` thoát mã 0",
+    "Full unit suite và build PASS",
+    "Richtext admin sửa/lưu và chuyển HTML → Lexical hoạt động như trước",
+    "Không có thay đổi UI/schema/API/i18n/migration"
+  ],
+  "risk": "medium",
+  "riskNote": "Chỉ nâng phiên bản phụ thuộc (override); happy-dom nhảy major 20 → 21 và undici minor. Ưu tiên test: Lexical headless/HTML→Lexical, HTTP ra ngoài của payload, build."
+}

@@ -101,6 +101,45 @@ describe("PostgresRentalSearch.listing (BL-052)", () => {
   });
 });
 
+describe("PostgresRentalSearch: độ liên quan từ khoá (BL-080)", () => {
+  const pageQuery = (queries: string[]) => queries.find((sql) => sql.includes("WITH page AS") && !sql.includes("NOT IN"))!;
+
+  it("q ≥ 2 từ + sort mặc định: CTE trả cột phrase_match, ORDER BY ngoài ưu tiên nó; đếm dùng cùng điều kiện đầu từ", async () => {
+    const { executor, queries } = fakeExecutor({ total: 1, featuredCount: 0, featured: [], grid: ["a"] });
+    await new PostgresRentalSearch(executor).search(parse({ q: "can ho" }));
+    const page = pageQuery(queries);
+    expect(page).toContain(`AS "phrase_match"`);
+    expect(page).toMatch(/ORDER BY page."phrase_match" DESC, page."published_at" DESC NULLS LAST, page."id" DESC$/);
+    const count = queries.find((sql) => sql.includes("count(*)::int AS total"))!;
+    expect(count.match(/rl\."search_text" ~ \$/g)).toHaveLength(2);
+  });
+
+  it("ORDER BY TRONG CTE (trước LIMIT/OFFSET) cũng ưu tiên cụm — nếu không, trang cắt theo newest rồi mới sắp lại", async () => {
+    const { executor, queries } = fakeExecutor({ total: 1, featuredCount: 0, featured: [], grid: ["a"] });
+    await new PostgresRentalSearch(executor).search(parse({ q: "can ho", page: 2, limit: 12 }));
+    const query = pageQuery(queries);
+    const inner = query.slice(0, query.indexOf("SELECT page.*"));
+    expect(inner).toMatch(/ORDER BY \(rl\."search_text" ~ \$\d+\) DESC, r\."published_at" DESC NULLS LAST, r\."id" DESC LIMIT \$\d+ OFFSET \$\d+/);
+  });
+
+  it("sort giá hoặc q 1 từ: không thêm phrase_match, thứ tự giá giữ nguyên", async () => {
+    const byPrice = fakeExecutor({ total: 1, featuredCount: 0, featured: [], grid: ["a"] });
+    await new PostgresRentalSearch(byPrice.executor).search(parse({ q: "can ho", sort: "price_asc" }));
+    expect(pageQuery(byPrice.queries)).not.toContain("phrase_match");
+    const oneWord = fakeExecutor({ total: 1, featuredCount: 0, featured: [], grid: ["a"] });
+    await new PostgresRentalSearch(oneWord.executor).search(parse({ q: "can" }));
+    expect(pageQuery(oneWord.queries)).not.toContain("phrase_match");
+  });
+
+  it("listing: lưới ưu tiên cụm, thẻ nổi bật vẫn theo newest thuần (cùng thứ tự với truy vấn con loại khỏi lưới)", async () => {
+    const { executor, queries } = fakeExecutor({ total: 2, featuredCount: 1, featured: ["f"], grid: ["a"] });
+    await new PostgresRentalSearch(executor).listing(parse({ q: "can ho", page: 1 }));
+    expect(queries.find((sql) => sql.includes("NOT IN"))).toContain(`ORDER BY page."phrase_match" DESC`);
+    const featured = queries.find((sql) => sql.includes("WITH page AS") && !sql.includes("NOT IN"))!;
+    expect(featured).not.toContain("phrase_match");
+  });
+});
+
 describe("toFacets", () => {
   it("hàng GROUPING SETS → số đếm tab theo danh mục cấp 1, tổng 'Tất cả', tỉnh (count theo lọc, total không lọc)", () => {
     const facets = toFacets([
