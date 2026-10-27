@@ -1,0 +1,56 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 86,
+  "generatedAt": "2026-10-27T13:30:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-085 BUG (follow-up BL-083): trang chủ khu 'Tùy chọn khác' — đang mở 1 dropdown mà bấm chip khác thì lần 1 chỉ đóng dropdown cũ, phải bấm lần 2 mới mở. Fix: nâng state open lên HeroSearch (OptionSelect nhận open/onOpenChange opt-in), 1 click chip khác = đóng cái đang mở + mở cái vừa bấm, tối đa 1 listbox mở. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
+  "status": "published",
+  "workItem": "bug/hero-search-dropdown-one-click",
+  "backlog": "BL-085",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-hero-search-dropdown-one-click.md",
+  "task": "tasks/bug-hero-search-dropdown-one-click/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-85.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/home/HeroSearch.tsx",
+      "src/components/home/HeroSearch.test.tsx",
+      "src/components/ui/option-select.tsx",
+      "src/components/ui/option-select.test.tsx"
+    ],
+    "modules": [
+      "HeroSearch: state dropdown đang mở nâng lên cấp nhóm 'Tùy chọn khác' (tối đa 1 mở)",
+      "OptionSelect: thêm prop open/onOpenChange opt-in (controlled); không truyền thì hành vi cũ"
+    ]
+  },
+  "screens": [
+    "/ và /en — khu 'Tùy chọn khác' (Mức giá, Diện tích, ...) ở 1920 và 390"
+  ],
+  "impact": {
+    "direct": [
+      "Đang mở dropdown A, bấm 1 lần chip B: A đóng, B mở ngay",
+      "Luôn tối đa 1 listbox mở",
+      "Esc / click ra ngoài vẫn đóng; bàn phím (mở, mũi tên, Enter) dùng được"
+    ],
+    "dependents": [
+      "Trước hydrate (select gốc) không đổi",
+      "Chọn giá trị rồi tìm kiếm vẫn ra đúng query"
+    ],
+    "regression": [
+      "BL-083: không bao giờ 2 dropdown chồng nhau ở trang chủ",
+      "Slider hero vẫn nhận click ở vùng gutter ngoài card khi không có dropdown mở",
+      "OptionSelect ở FilterFacets /cho-thue, ProjectFilters /du-an, JobFilters, FormField, sort controls, FloorPlans không đổi hành vi"
+    ]
+  },
+  "acceptance": [
+    "1 click vào chip khác đóng cái đang mở và mở cái vừa bấm, tối đa 1 danh sách mở",
+    "Click ngoài / Esc vẫn đóng; bàn phím dùng được",
+    "Slider hero vẫn nhận click ở gutter khi không có dropdown mở",
+    "Các consumer OptionSelect khác không đổi"
+  ],
+  "risk": "medium",
+  "riskNote": "Thay đổi UI cục bộ, OptionSelect dùng chung nhưng prop mới opt-in. Regression cần retest các consumer OptionSelect."
+}

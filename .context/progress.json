@@ -3980,6 +3980,40 @@
       "report": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact; no spec change (giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "listing-tabs-arrow-overlap",
+      "title": "Thanh danh mục danh sách: nút mũi tên đè lên mục cuối — tách làn riêng, không che tab (BL-086, follow-up BL-084)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-086",
+      "changeDoc": "spec/changes/archive/2026-10-27-listing-tabs-arrow-overlap.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user chat: feedback BL-084 kèm ảnh, qua checkpoint)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 87,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-listing-tabs-arrow-overlap/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 2,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
+          "note": "r1 FAIL MAJOR-1: nudge focus chạy cả khi focus chuột → click mép có thể trượt; r2 chỉ :focus-visible. Gộp MINOR-1/2 BL-084 (mất focus khi nút unmount; link focus dưới fade).",
+          "verify": "typecheck 0 · vitest 4669 PASS · eslint file đổi 0 · build 0 · Playwright Edge: rect nút ∩ vùng cuộn = ∅ ở mọi vị trí cuộn 1920/1440/1320/1280/768, 390 không nút; click chuột lần đầu vào tab hở một phần điều hướng (1320/1280)",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "STRICT PASS",
+      "round": 2,
+      "report": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
+      "docImpact": ".context/design-spec.md 1 dòng hành vi tràn (as-built); no spec change (giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",
@@ -4633,7 +4667,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-27T07:27:03.146Z",
+  "lastUpdated": "2026-10-27T08:07:49.034Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -1,56 +1,60 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 86,
-  "generatedAt": "2026-10-27T13:30:00+07:00",
+  "scopeVersion": 87,
+  "generatedAt": "2026-10-27T14:30:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-085 BUG (follow-up BL-083): trang chủ khu 'Tùy chọn khác' — đang mở 1 dropdown mà bấm chip khác thì lần 1 chỉ đóng dropdown cũ, phải bấm lần 2 mới mở. Fix: nâng state open lên HeroSearch (OptionSelect nhận open/onOpenChange opt-in), 1 click chip khác = đóng cái đang mở + mở cái vừa bấm, tối đa 1 listbox mở. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
+  "triggerNote": "BL-086 BUG: thanh tab danh mục danh sách (/cho-thue, /du-an, /tin-bds + trang con danh mục) — khi tràn, nút mũi tên (>= md) từng đè lên tab. Fix: mũi tên nằm ở làn riêng ngoài vùng cuộn nên không che tab; fade ở mép trong vùng cuộn; mũi tên ở đầu/cuối giữ mounted với aria-disabled (giữ focus); tab được focus bằng bàn phím được đẩy ra khỏi vùng fade (chỉ bàn phím, click chuột vào tab lấp ló vẫn điều hướng ngay lần đầu); không tràn thì không có làn; < md vuốt + fade như cũ. Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r2 (r1 FAIL).",
   "status": "published",
-  "workItem": "bug/hero-search-dropdown-one-click",
-  "backlog": "BL-085",
+  "workItem": "bug/listing-tabs-arrow-overlap",
+  "backlog": "BL-086",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-hero-search-dropdown-one-click.md",
-  "task": "tasks/bug-hero-search-dropdown-one-click/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-hero-search-dropdown-one-click-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-85.json",
+  "changeDoc": "spec/changes/2026-10-27-listing-tabs-arrow-overlap.md",
+  "task": "tasks/bug-listing-tabs-arrow-overlap/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-listing-tabs-arrow-overlap-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-86.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/home/HeroSearch.tsx",
-      "src/components/home/HeroSearch.test.tsx",
-      "src/components/ui/option-select.tsx",
-      "src/components/ui/option-select.test.tsx"
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/listing/ListingTabsScroller.test.tsx",
+      "src/components/layout/use-snap-slider.tsx",
+      ".context/design-spec.md"
     ],
     "modules": [
-      "HeroSearch: state dropdown đang mở nâng lên cấp nhóm 'Tùy chọn khác' (tối đa 1 mở)",
-      "OptionSelect: thêm prop open/onOpenChange opt-in (controlled); không truyền thì hành vi cũ"
+      "ListingTabsScroller: mũi tên >= md ở làn riêng ngoài vùng cuộn, fade ở mép trong, mũi tên đầu/cuối giữ mounted + aria-disabled, đẩy tab focus bàn phím ra khỏi fade",
+      "SliderArrow (use-snap-slider): thêm prop disabled optional -> aria-disabled; không truyền thì như cũ"
     ]
   },
   "screens": [
-    "/ và /en — khu 'Tùy chọn khác' (Mức giá, Diện tích, ...) ở 1920 và 390"
+    "/cho-thue, /du-an, /tin-bds và các trang con danh mục — thanh tab danh mục ở 1920/1440/1280/768/390"
   ],
   "impact": {
     "direct": [
-      "Đang mở dropdown A, bấm 1 lần chip B: A đóng, B mở ngay",
-      "Luôn tối đa 1 listbox mở",
-      "Esc / click ra ngoài vẫn đóng; bàn phím (mở, mũi tên, Enter) dùng được"
+      "Tab bar tràn ở >= md: mũi tên nằm ở làn riêng, không bao giờ che tab nào",
+      "Fade ở mép trong của vùng cuộn, chỉ phía còn nội dung",
+      "Mũi tên ở đầu/cuối vẫn mounted với aria-disabled (không mất focus), bấm không cuộn thêm",
+      "Tab được focus bằng bàn phím tự được đẩy ra khỏi vùng fade; click chuột vào tab lấp ló điều hướng ngay lần đầu",
+      "Không tràn -> không có làn mũi tên; < md vuốt + fade như cũ"
     ],
     "dependents": [
-      "Trước hydrate (select gốc) không đổi",
-      "Chọn giá trị rồi tìm kiếm vẫn ra đúng query"
+      "Tab đang chọn vẫn căn giữa khi tải trang (chỉ scrollLeft, không cuộn dọc)",
+      "Tab là link render server, điều hướng đúng"
     ],
     "regression": [
-      "BL-083: không bao giờ 2 dropdown chồng nhau ở trang chủ",
-      "Slider hero vẫn nhận click ở vùng gutter ngoài card khi không có dropdown mở",
-      "OptionSelect ở FilterFacets /cho-thue, ProjectFilters /du-an, JobFilters, FormField, sort controls, FloorPlans không đổi hành vi"
+      "Các consumer SliderArrow khác không đổi: CardSlider, RentalsTabs, OffersSlider",
+      "Không có cuộn ngang toàn trang ở 390/768",
+      "reduced-motion cuộn tức thì"
     ]
   },
   "acceptance": [
-    "1 click vào chip khác đóng cái đang mở và mở cái vừa bấm, tối đa 1 danh sách mở",
-    "Click ngoài / Esc vẫn đóng; bàn phím dùng được",
-    "Slider hero vẫn nhận click ở gutter khi không có dropdown mở",
-    "Các consumer OptionSelect khác không đổi"
+    "Mũi tên không che tab nào ở >= md khi tràn",
+    "Mũi tên đầu/cuối aria-disabled nhưng vẫn focus được",
+    "Focus bàn phím vào tab sát mép: tab hiện rõ ngoài fade",
+    "Click chuột vào tab lấp ló điều hướng ngay lần đầu",
+    "Không tràn: không có làn mũi tên; < md không đổi",
+    "CardSlider, RentalsTabs, OffersSlider không đổi"
   ],
   "risk": "medium",
-  "riskNote": "Thay đổi UI cục bộ, OptionSelect dùng chung nhưng prop mới opt-in. Regression cần retest các consumer OptionSelect."
+  "riskNote": "UI cục bộ ở thanh tab danh mục; SliderArrow dùng chung nhưng prop mới opt-in. Cần retest các consumer SliderArrow và responsive 390-1920."
 }
