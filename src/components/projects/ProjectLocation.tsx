@@ -4,6 +4,7 @@ import { DetailDistanceList } from "@/components/detail/DetailDistanceList";
 import { DetailSection } from "@/components/detail/DetailSection";
 import { Bus, FirstAid, GraduationCap, MapPin, ShoppingBag, Tree } from "@/components/icons";
 import type { Locale } from "@/i18n/routing";
+import { joinAddress } from "@/lib/address/join-address";
 import { formatDistance } from "@/lib/units/floor-distance-view";
 import { cn } from "@/lib/utils";
 import { LazyMap, type MapMarker } from "@/components/media/LazyMap";
@@ -60,7 +61,8 @@ interface ProjectLocationProps {
 export function ProjectLocation({ projectName, location, address, areaLabel, nearby = [], locationMedia = null }: ProjectLocationProps) {
   const t = useTranslations("page.projectDetail");
   const locale = useLocale() as Locale;
-  const addressText = [address, areaLabel].filter(Boolean).join(", ");
+  // `address` admin nhập tay thường đã gồm phường/tỉnh: chỉ thêm phần chưa có (BL-081).
+  const addressText = joinAddress(address, areaLabel);
   const items = nearby.flatMap((group) => {
     const Icon = CATEGORY_ICON[group.category];
     return group.items.map((item) => ({ icon: <Icon size={16} />, name: item.name, distance: formatDistance(item.distance, t, locale) }));

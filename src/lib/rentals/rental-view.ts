@@ -1,3 +1,4 @@
+import { joinAddress } from "../address/join-address";
 import { toTelHref } from "../../components/layout/shell-data";
 import { approximateLocation, isValidLocation, type LatLng } from "../../components/media/map-geometry";
 import type { MediaImage } from "../../components/media/ResponsiveImage";
@@ -80,8 +81,8 @@ function placeNames(ward: Rental["ward"], province: Rental["province"]): string[
 
 function addressLine(doc: Rental): string {
   // `address` bị chặn ở cấp trường với khách khi `showExactAddress = false` (undefined) nên chỉ in khi tin cho phép.
-  const street = doc.showExactAddress === true && hasText(doc.address) ? [doc.address.trim()] : [];
-  return [...street, ...placeNames(doc.ward, doc.province)].join(", ");
+  const street = doc.showExactAddress === true && hasText(doc.address) ? doc.address : null;
+  return joinAddress(street, placeNames(doc.ward, doc.province));
 }
 
 function categoryLink(category: Category | null, locale: Locale): RentalLink | null {

@@ -1,63 +1,62 @@
 {
   "specVersion": "1.59.0",
-  "scopeVersion": 83,
-  "generatedAt": "2026-10-27T16:00:00+07:00",
+  "scopeVersion": 84,
+  "generatedAt": "2026-10-27T11:57:17+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-084 BUG (thanh tab danh mục dưới hero ở /cho-thue, /du-an, /tin-bds: nhiều mục bị tràn khung, không cuộn/không biết còn mục ẩn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: thanh tab cuộn ngang trong khung với fade mép phía còn nội dung + nút mũi tên 44px từ md; tab đang chọn được cuộn vào giữa tầm nhìn khi tải. Reviewer STRICT PASS r1. Thêm khoá i18n page.listing.tabs.previous/next.",
+  "triggerNote": "BL-081 BUG (địa chỉ bị lặp phường/tỉnh: chi tiết dự án mục 'Vị trí dự án', JSON-LD địa chỉ dự án và dòng địa chỉ chi tiết cho thuê ghép thêm phường/tỉnh dù address đã chứa sẵn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: helper dùng chung joinAddress — phần nào đã có trong address (không dấu, không phân biệt hoa thường) thì không ghép lại, thiếu phần nào thêm phần đó. Reviewer NORMAL PASS r2.",
   "status": "published",
-  "workItem": "bug/listing-category-tabs-overflow",
-  "backlog": "BL-084",
+  "workItem": "bug/project-location-address-dedupe",
+  "backlog": "BL-081",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-27-listing-category-tabs-overflow.md",
-  "task": "tasks/bug-listing-category-tabs-overflow/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-listing-category-tabs-overflow-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-82.json",
+  "changeDoc": "spec/changes/2026-10-27-project-location-address-dedupe.md",
+  "task": "tasks/bug-project-location-address-dedupe/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-83.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/listing/ListingCategoryTabs.tsx",
-      "src/components/listing/ListingTabsScroller.tsx",
-      "src/components/listing/ListingTabsScroller.test.tsx",
-      "src/components/listing/listing-layout.test.tsx",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
-      ".context/design-spec.md"
+      "src/lib/address/join-address.ts",
+      "src/lib/address/join-address.test.ts",
+      "src/components/projects/ProjectLocation.tsx",
+      "src/components/projects/project-location-address.test.tsx",
+      "src/lib/rentals/rental-view.ts",
+      "src/lib/rentals/rental-view.test.ts",
+      "src/app/(frontend)/[locale]/du-an/[slug]/page.tsx"
     ],
     "modules": [
-      "ListingCategoryTabs + ListingTabsScroller (mới): thanh tab danh mục dưới hero, cuộn ngang trong khung",
-      "i18n: khoá page.listing.tabs.previous / page.listing.tabs.next (vi, en)"
+      "src/lib/address/join-address (mới): helper ghép địa chỉ có khử trùng phường/tỉnh",
+      "ProjectLocation: dòng địa chỉ mục 'Vị trí dự án' ở chi tiết dự án",
+      "du-an/[slug] page: JSON-LD address của dự án",
+      "rental-view: dòng địa chỉ chi tiết cho thuê (khi showExactAddress)"
     ]
   },
   "screens": [
-    "/cho-thue và /cho-thue/danh-muc/* (vi/en)",
-    "/du-an (vi/en)",
-    "/tin-bds (vi/en)"
+    "/du-an/[slug] (vi/en) — mục Vị trí dự án + JSON-LD (vd /du-an/astor-1)",
+    "/cho-thue/[slug] (vi/en) — dòng địa chỉ khi showExactAddress = true"
   ],
-  "viewports": ["1920", "1440", "1280", "768", "390"],
   "impact": {
     "direct": [
-      "Thanh tab danh mục dưới hero: mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (từ md); < md vuốt ngang + fade",
-      "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải trang",
-      "Nút mũi tên trước/sau có aria-label i18n (vi/en)"
+      "Chi tiết dự án: mục 'Vị trí dự án' không còn lặp phường/tỉnh khi address đã chứa",
+      "Chi tiết dự án: JSON-LD address khớp dòng hiển thị",
+      "Chi tiết cho thuê: dòng địa chỉ không lặp phường/tỉnh khi showExactAddress = true"
     ],
     "dependents": [
-      "Điều hướng giữa các tab danh mục (link) vẫn đúng URL/trạng thái active",
-      "Bố cục khung trang không bị đẩy rộng; không xuất hiện cuộn trang ngang"
+      "Địa chỉ thiếu phường hoặc tỉnh vẫn được bổ sung phần thiếu",
+      "Phường trùng tên đường (vd '123 Lê Lợi' + 'Phường Lê Lợi') vẫn giữ phường"
     ],
     "regression": [
-      "Không JS: tab vẫn là link, vẫn cuộn ngang được",
-      "Điều hướng bàn phím Tab qua các link tab",
-      "Khối hero và bộ lọc/kết quả bên dưới không đổi",
-      "Tab không căn giữa lại sau điều hướng client cùng route (residual đã biết)"
+      "showExactAddress = false: không lộ số nhà, chỉ hiện phường/tỉnh như cũ",
+      "Địa chỉ không chứa phường/tỉnh vẫn ghép đủ 'địa chỉ, phường, tỉnh'",
+      "Tên có dấu/không dấu, hoa/thường vẫn nhận ra là đã chứa"
     ]
   },
   "acceptance": [
-    "Ở 1920/1440/1280/768/390: hoặc mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (>= md); < md vuốt + fade",
-    "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải",
-    "Không cuộn trang ngang",
-    "Không JS vẫn là link cuộn được"
+    "address đã chứa phường/tỉnh (không dấu, không phân biệt hoa thường) thì không ghép lại; thiếu phần nào thêm phần đó",
+    "/du-an/astor-1 hiển thị 'Lô đất IA25, KĐT Nam Thăng Long (Ciputra), phường Phú Thượng, Hà Nội'",
+    "'123 Lê Lợi' + 'Phường Lê Lợi' vẫn giữ phường",
+    "showExactAddress=false không lộ số nhà"
   ],
-  "risk": "medium",
-  "riskNote": "Residual: chưa test vuốt trên thiết bị cảm ứng thật; nút mũi tên biến mất khi tới mép làm mất focus bàn phím (MINOR follow-up); tab không căn giữa lại sau điều hướng client cùng route."
+  "risk": "low",
+  "riskNote": "Residual: không có bảng bí danh tên tỉnh (TP.HCM vs Thành phố Hồ Chí Minh vẫn ghép trùng); tên tỉnh không tiền tố trùng tên đường (vd '12 đường Bình Định') có thể bị bỏ tỉnh; chưa kiểm tay trên trang."
 }

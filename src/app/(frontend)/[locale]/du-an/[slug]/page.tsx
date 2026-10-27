@@ -27,6 +27,7 @@ import { buildRealEstateListingJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata, toOgImage } from "@/lib/seo/metadata";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
 import { routing, type Locale } from "@/i18n/routing";
+import { joinAddress } from "@/lib/address/join-address";
 import type { Media, Project } from "@/payload-types";
 
 interface PageProps {
@@ -137,7 +138,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             description: view.summary,
             imageUrls,
             datePosted: doc.publishedAt,
-            address: [view.address, view.areaLabel].filter(Boolean).join(", ") || null,
+            address: joinAddress(view.address, view.areaLabel) || null,
             // G26: đơn vị đăng tin (Organization).
             publisher: { name: identity.siteName, siteUrl, ...(logoUrl ? { logoUrl } : {}) },
           })}

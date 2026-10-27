@@ -92,6 +92,11 @@ describe("toRentalDetailView", () => {
     });
   });
 
+  it("showExactAddress = true và address đã gồm phường/tỉnh: không ghép lặp (BL-081)", () => {
+    const view = toRentalDetailView(rental({ showExactAddress: true, address: "12 Lê Lợi, phường Sài Gòn, TP.HCM" }), "vi");
+    expect(view.addressLine).toBe("12 Lê Lợi, phường Sài Gòn, TP.HCM");
+  });
+
   it("showExactAddress = true: in địa chỉ đầy đủ và ghim chính xác theo toạ độ của doc", () => {
     const view = toRentalDetailView(rental({ showExactAddress: true, address: "12 Lê Lợi", location: [106.700981, 10.776889] }), "vi");
     expect(view.addressLine).toBe("12 Lê Lợi, Phường Sài Gòn, TP.HCM");

@@ -3878,6 +3878,40 @@
       "report": ".context/review-reports/bug-listing-category-tabs-overflow-phase-1-task-01-round-1-review.md",
       "docImpact": ".context/design-spec.md (hành vi tràn thanh tab danh mục); no spec change (bug thuần, giữ 1.59.0)",
       "completedAt": "2026-10-27"
+    },
+    {
+      "slug": "project-location-address-dedupe",
+      "title": "Chi tiết dự án: địa chỉ \"Vị trí dự án\" lặp phường/tỉnh (address + areaLabel) (BL-081)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-081",
+      "changeDoc": "spec/changes/archive/2026-10-27-project-location-address-dedupe.md",
+      "startedAt": "2026-10-27",
+      "planApprovedAt": "2026-10-27 (user: ok sửa 1,6,7,8,9 — batch QA sheet, không hỏi lại thứ tự)",
+      "specVersion": "1.59.0",
+      "scopeVersion": 84,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-project-location-address-dedupe/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
+          "note": "r1 PASS + MINOR (phường trùng tên đường bị bỏ sai) sửa trước commit → r2 PASS. Giới hạn: không bí danh tên tỉnh; tỉnh không tiền tố trùng tên đường.",
+          "verify": "typecheck 0 · vitest unit+ui 3816 PASS · address/rentals/projects 147 PASS · eslint file đổi 0 · build 0",
+          "completedAt": "2026-10-27"
+        }
+      ],
+      "review": "NORMAL PASS",
+      "round": 2,
+      "report": ".context/review-reports/bug-project-location-address-dedupe-phase-1-task-01-round-2-review.md",
+      "docImpact": "no doc impact; no spec change (bug thuần, giữ 1.59.0)",
+      "completedAt": "2026-10-27"
     }
   ],
   "projectName": "tami-website",

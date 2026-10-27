@@ -1,0 +1,63 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 83,
+  "generatedAt": "2026-10-27T16:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-084 BUG (thanh tab danh mục dưới hero ở /cho-thue, /du-an, /tin-bds: nhiều mục bị tràn khung, không cuộn/không biết còn mục ẩn). Không đổi requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Fix: thanh tab cuộn ngang trong khung với fade mép phía còn nội dung + nút mũi tên 44px từ md; tab đang chọn được cuộn vào giữa tầm nhìn khi tải. Reviewer STRICT PASS r1. Thêm khoá i18n page.listing.tabs.previous/next.",
+  "status": "published",
+  "workItem": "bug/listing-category-tabs-overflow",
+  "backlog": "BL-084",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-27-listing-category-tabs-overflow.md",
+  "task": "tasks/bug-listing-category-tabs-overflow/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-listing-category-tabs-overflow-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-82.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/listing/ListingCategoryTabs.tsx",
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/listing/ListingTabsScroller.test.tsx",
+      "src/components/listing/listing-layout.test.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      ".context/design-spec.md"
+    ],
+    "modules": [
+      "ListingCategoryTabs + ListingTabsScroller (mới): thanh tab danh mục dưới hero, cuộn ngang trong khung",
+      "i18n: khoá page.listing.tabs.previous / page.listing.tabs.next (vi, en)"
+    ]
+  },
+  "screens": [
+    "/cho-thue và /cho-thue/danh-muc/* (vi/en)",
+    "/du-an (vi/en)",
+    "/tin-bds (vi/en)"
+  ],
+  "viewports": ["1920", "1440", "1280", "768", "390"],
+  "impact": {
+    "direct": [
+      "Thanh tab danh mục dưới hero: mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (từ md); < md vuốt ngang + fade",
+      "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải trang",
+      "Nút mũi tên trước/sau có aria-label i18n (vi/en)"
+    ],
+    "dependents": [
+      "Điều hướng giữa các tab danh mục (link) vẫn đúng URL/trạng thái active",
+      "Bố cục khung trang không bị đẩy rộng; không xuất hiện cuộn trang ngang"
+    ],
+    "regression": [
+      "Không JS: tab vẫn là link, vẫn cuộn ngang được",
+      "Điều hướng bàn phím Tab qua các link tab",
+      "Khối hero và bộ lọc/kết quả bên dưới không đổi",
+      "Tab không căn giữa lại sau điều hướng client cùng route (residual đã biết)"
+    ]
+  },
+  "acceptance": [
+    "Ở 1920/1440/1280/768/390: hoặc mọi mục vừa khung, hoặc có fade mép phía còn nội dung + nút mũi tên 44px (>= md); < md vuốt + fade",
+    "Tab đang chọn được cuộn vào giữa tầm nhìn khi tải",
+    "Không cuộn trang ngang",
+    "Không JS vẫn là link cuộn được"
+  ],
+  "risk": "medium",
+  "riskNote": "Residual: chưa test vuốt trên thiết bị cảm ứng thật; nút mũi tên biến mất khi tới mép làm mất focus bàn phím (MINOR follow-up); tab không căn giữa lại sau điều hướng client cùng route."
+}
