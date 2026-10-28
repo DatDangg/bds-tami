@@ -35,6 +35,31 @@ describe("media-grid.scss", () => {
   });
 });
 
+describe("media-grid.scss — BL-099 cột bật thêm ở 'Hiển thị cột'", () => {
+  const labels = (cls: string) => new RegExp(`td\\.cell-${cls}::before\\s*\\{[^}]*content:\\s*"([^"]*)"`).exec(source)?.[1];
+
+  it("ô ngoài 4 ô thẻ không còn bị display: none", () => {
+    expect(source).not.toMatch(/td:not\([^)]*\)\s*\{[^}]*display:\s*none/);
+    expect(source).not.toMatch(/tbody tr td:not\(\.cell-_select, \.cell-filename, \.cell-alt, \.cell-mimeType\)\s*\{[^}]*display:\s*none/);
+  });
+
+  it("ô phụ hiện thành dòng thông tin 12px, xuống dòng được, đệm 12px", () => {
+    const meta = body(/tbody tr td:not\(\.cell-_select, \.cell-filename, \.cell-alt, \.cell-mimeType\)\s*\{([^}]*)\}/);
+    expect(meta).toMatch(/grid-column:\s*1\s*;/);
+    expect(meta).toMatch(/font-size:\s*12px\s*;/);
+    expect(meta).toMatch(/overflow-wrap:\s*anywhere\s*;/);
+    expect(meta).toMatch(/padding:[^;]*12px/);
+  });
+
+  it("có nhãn ::before cho các cột Media/upload bật được, không nhãn cho id", () => {
+    expect(labels("uploadedBy")).toMatch(/^Người tải lên/);
+    expect(labels("caption")).toMatch(/^Chú thích/);
+    expect(labels("createdAt")).toMatch(/^Ngày tạo/);
+    expect(labels("updatedAt")).toMatch(/^Ngày cập nhật/);
+    expect(source).not.toMatch(/cell-id::before/);
+  });
+});
+
 describe("Media — ô Loại tệp", () => {
   it("dùng MediaTypeCell, không đổi tên/kiểu trường", () => {
     const field = Media.fields.find((entry) => "name" in entry && entry.name === "mimeType") as { type: string; admin?: { components?: { Cell?: string } } };

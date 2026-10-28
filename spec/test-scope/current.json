@@ -1,54 +1,57 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 102,
-  "generatedAt": "2026-10-29T01:00:00+00:00",
+  "scopeVersion": 103,
+  "generatedAt": "2026-10-29T00:56:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-098 BUG layout: trang /tin-tuc và /en/news, thẻ form 'Tư vấn nhu cầu' (LeadForm, source=contact) lệch trái so với khung nội dung. Fix: thẻ canh giữa (mx-auto) trong khung, vẫn tối đa 42rem (672px). Chỉ đổi layout — requirement/API/schema không đổi, hành vi submit LeadForm không đổi -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG. Chỉ thêm ghi chú as-built vào design-spec S10. Review FAST PASS round 1.",
+  "triggerNote": "BL-099 BUG: admin /admin/collections/media (lưới thẻ A9, BL-051) ẩn mọi cột trừ chọn/tên tệp/alt/loại tệp bằng CSS nên các cột bật trong 'Hiển thị cột' (Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo) không bao giờ hiện. Fix chỉ CSS: cột bật thêm hiện dạng dòng nhãn/giá trị nhỏ, mờ ở cuối mỗi thẻ (nhãn qua ::before; ô ID đã là 'ID: …'); thẻ 4 ô mặc định không đổi trừ 'Người tải lên' (cột mặc định) nay hiện; drawer chọn ảnh trong form giữ bảng Payload; collection khác không đổi. Khôi phục hành vi 'Hiển thị cột' đúng kỳ vọng; SPECIFICATIONS A9 không bắt buộc ẩn cột -> không mâu thuẫn, không đổi requirement/API/schema/access -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098). Review NORMAL PASS round 1 (2 MINOR chấp nhận: thiếu đệm đáy nếu admin sắp xếp cột phụ lên trên Loại tệp; regex test rộng).",
   "status": "published",
-  "workItem": "bug/news-consult-form-layout",
-  "backlog": "BL-098",
+  "workItem": "bug/admin-media-list-columns",
+  "backlog": "BL-099",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-28-news-consult-form-layout.md",
-  "task": "tasks/bug-news-consult-form-layout/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-news-consult-form-layout-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-101.json",
+  "changeDoc": "spec/changes/archive/2026-10-28-admin-media-list-columns.md",
+  "task": "tasks/bug-admin-media-list-columns/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-media-list-columns-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-102.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/news/NewsListPage.tsx",
-      "src/components/news/NewsListPage.test.tsx",
-      ".context/design-spec.md"
+      "src/components/admin/styles/_media-grid.scss",
+      "src/components/admin/media-grid-style.test.ts"
     ],
-    "note": "Thẻ form 'Tư vấn nhu cầu' ở S10 canh giữa (mx-auto), giữ max-width 42rem. Design-spec S10 thêm ghi chú as-built.",
+    "note": "Chỉ CSS lưới thẻ media admin: cột phụ được bật trong 'Hiển thị cột' hiện dạng dòng nhãn/giá trị nhỏ mờ ở đáy thẻ. Không đổi API/schema/access.",
     "modules": [
-      "Public Tin tức (S10) — NewsListPage, khối form Tư vấn nhu cầu (LeadForm source=contact)"
+      "Admin Thư viện ảnh (media) — danh sách dạng lưới thẻ (A9) và bộ chọn 'Hiển thị cột'"
     ]
   },
   "screens": [
-    "/tin-tuc (1920, 1440, 768, 390)",
-    "/en/news (1920, 1440, 768, 390)"
+    "/admin/collections/media?depth=1&columns=[\"filename\",\"alt\",\"mimeType\",\"uploadedBy\",\"id\",\"caption\",\"updatedAt\",\"createdAt\"]&limit=5 (1920, 390)",
+    "/admin/collections/media (cột mặc định)",
+    "Drawer chọn ảnh (image picker) trong form"
   ],
   "impact": {
     "direct": [
-      "Thẻ form 'Tư vấn nhu cầu' ở /tin-tuc và /en/news nằm giữa khung nội dung (khoảng trống hai bên bằng nhau)"
+      "Bật đủ 8 cột trong 'Hiển thị cột' ở lưới media: Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo hiện dạng nhãn + giá trị ở đáy mỗi thẻ",
+      "Cột mặc định: thẻ vẫn gồm ảnh, tên tệp, alt, loại tệp; thêm 'Người tải lên' (cột mặc định)"
     ],
     "dependents": [
-      "Trang danh mục /tin-tuc/danh-muc/* dùng chung NewsListPage nhưng không có form Tư vấn nhu cầu"
+      "Drawer chọn ảnh trong form giữ bảng Payload (không chuyển sang lưới thẻ)"
     ],
     "regression": [
-      "Gửi form vẫn tạo lead với source contact",
-      "Lưới bài viết, tab danh mục, phân trang của S10 không đổi bố cục"
+      "Các collection admin khác (bảng danh sách) không đổi",
+      "Lưới thẻ A9 vẫn đúng: ảnh thu nhỏ ≥ 120px, chọn thẻ, thanh thao tác hàng loạt A6, không cuộn ngang ở 390",
+      "Tắt cột trong 'Hiển thị cột' thì dòng tương ứng biến mất khỏi thẻ"
     ]
   },
   "acceptance": [
-    "Thẻ form canh giữa: khoảng trống trái/phải bằng nhau ở 1920/1440/768",
-    "Chiều rộng thẻ không quá 672px; ở 390 thẻ rộng full khung",
-    "Không có cuộn ngang ở mọi viewport",
-    "Gửi form vẫn tạo lead có source contact",
-    "/tin-tuc/danh-muc/* không có form Tư vấn nhu cầu"
+    "URL QA với 8 cột ở 1920: mỗi thẻ hiện đủ Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo (nhãn tiếng Việt) và nhãn không bị cắt",
+    "Cùng URL ở 390: thẻ hiển thị đủ dòng, không tràn ngang, không chồng chữ",
+    "Cột mặc định: thẻ chỉ có tên tệp, alt, loại tệp, Người tải lên; không dòng thừa",
+    "Tắt một cột phụ thì dòng đó biến mất; bật lại thì hiện",
+    "Drawer chọn ảnh trong form vẫn là bảng Payload, chọn ảnh bình thường",
+    "Collection khác (vd Dự án, Bài viết) không đổi giao diện danh sách"
   ],
-  "testNotes": "Chỉ kiểm bố cục (đo khoảng cách hai bên thẻ và width). Kiểm cả bản vi và en. Gửi thử 1 form để xác nhận lead source contact.",
+  "testNotes": "Chỉ kiểm hiển thị (CSS). Mở URL QA ở 1920 và 390, đối chiếu từng nhãn; sau đó bỏ/bật cột trong 'Hiển thị cột'. Mở drawer chọn ảnh từ 1 form để xác nhận vẫn là bảng. Lưu ý đã biết (MINOR): nếu sắp xếp cột phụ lên trên Loại tệp thì thiếu đệm đáy thẻ.",
   "risk": "low",
-  "riskNote": "Low: chỉ đổi class layout của 1 khối UI, không đổi logic/API/schema; review FAST PASS."
+  "riskNote": "Low: chỉ đổi CSS admin cho 1 collection, không đổi logic/API/schema/access; review NORMAL PASS round 1."
 }

@@ -1,0 +1,54 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 102,
+  "generatedAt": "2026-10-29T01:00:00+00:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-098 BUG layout: trang /tin-tuc và /en/news, thẻ form 'Tư vấn nhu cầu' (LeadForm, source=contact) lệch trái so với khung nội dung. Fix: thẻ canh giữa (mx-auto) trong khung, vẫn tối đa 42rem (672px). Chỉ đổi layout — requirement/API/schema không đổi, hành vi submit LeadForm không đổi -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG. Chỉ thêm ghi chú as-built vào design-spec S10. Review FAST PASS round 1.",
+  "status": "published",
+  "workItem": "bug/news-consult-form-layout",
+  "backlog": "BL-098",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-28-news-consult-form-layout.md",
+  "task": "tasks/bug-news-consult-form-layout/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-news-consult-form-layout-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-101.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/news/NewsListPage.tsx",
+      "src/components/news/NewsListPage.test.tsx",
+      ".context/design-spec.md"
+    ],
+    "note": "Thẻ form 'Tư vấn nhu cầu' ở S10 canh giữa (mx-auto), giữ max-width 42rem. Design-spec S10 thêm ghi chú as-built.",
+    "modules": [
+      "Public Tin tức (S10) — NewsListPage, khối form Tư vấn nhu cầu (LeadForm source=contact)"
+    ]
+  },
+  "screens": [
+    "/tin-tuc (1920, 1440, 768, 390)",
+    "/en/news (1920, 1440, 768, 390)"
+  ],
+  "impact": {
+    "direct": [
+      "Thẻ form 'Tư vấn nhu cầu' ở /tin-tuc và /en/news nằm giữa khung nội dung (khoảng trống hai bên bằng nhau)"
+    ],
+    "dependents": [
+      "Trang danh mục /tin-tuc/danh-muc/* dùng chung NewsListPage nhưng không có form Tư vấn nhu cầu"
+    ],
+    "regression": [
+      "Gửi form vẫn tạo lead với source contact",
+      "Lưới bài viết, tab danh mục, phân trang của S10 không đổi bố cục"
+    ]
+  },
+  "acceptance": [
+    "Thẻ form canh giữa: khoảng trống trái/phải bằng nhau ở 1920/1440/768",
+    "Chiều rộng thẻ không quá 672px; ở 390 thẻ rộng full khung",
+    "Không có cuộn ngang ở mọi viewport",
+    "Gửi form vẫn tạo lead có source contact",
+    "/tin-tuc/danh-muc/* không có form Tư vấn nhu cầu"
+  ],
+  "testNotes": "Chỉ kiểm bố cục (đo khoảng cách hai bên thẻ và width). Kiểm cả bản vi và en. Gửi thử 1 form để xác nhận lead source contact.",
+  "risk": "low",
+  "riskNote": "Low: chỉ đổi class layout của 1 khối UI, không đổi logic/API/schema; review FAST PASS."
+}

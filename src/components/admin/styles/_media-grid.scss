@@ -2,7 +2,8 @@
 // Selector từ @payloadcms/ui 3.91: views/List (`.collection-list--<slug>`), elements/Table (`.table`), cell tên tệp
 // (`td.cell-filename > a > .file > .thumbnail + .file__filename`). Không áp trong list drawer (picker ảnh có `.list-drawer__header`)
 // để drawer chọn ảnh trong form giữ nguyên bảng gốc. Không dùng !important; nằm ngoài @layer payload-default nên thắng style gốc.
-// Thẻ: ảnh (thumb 400px, tỉ lệ giữ nguyên — contain) → mô tả (alt) tối đa 2 dòng → tên tệp rút gọn → loại tệp. Cả thẻ là liên kết tới màn sửa
+// Thẻ: ảnh (thumb 400px, tỉ lệ giữ nguyên — contain) → mô tả (alt) tối đa 2 dòng → tên tệp rút gọn → loại tệp → (BL-099) dòng phụ "Nhãn: giá trị"
+// cho mỗi cột khác admin bật ở "Hiển thị cột" (Người tải lên, ID, Chú thích, Ngày tạo/cập nhật). Cả thẻ là liên kết tới màn sửa
 // (pseudo-element phủ thẻ); checkbox chọn nhiều nằm góc trái trên, vùng bấm 44px, nổi trên liên kết.
 
 .collection-list--media:not(:has(.list-drawer__header)) {
@@ -188,9 +189,48 @@
     padding: 8px 12px 12px;
   }
 
-  // Chỉ giữ 4 ô: chọn, tên tệp, mô tả, loại tệp — mọi ô khác (uploadedBy, cột người dùng thêm...) ẩn khỏi thẻ.
+  // Ô còn lại (cột người dùng bật ở "Hiển thị cột": uploadedBy, id, caption, updatedAt, createdAt...) hiện thành dòng thông tin phụ
+  // ở cuối thẻ — "Nhãn: giá trị", tự xuống hàng lưới phía sau 4 hàng thẻ. Cột lạ chưa có nhãn vẫn hiện giá trị.
   tbody tr td:not(.cell-_select, .cell-filename, .cell-alt, .cell-mimeType) {
-    display: none;
+    grid-column: 1;
+    padding: 2px 12px 0;
+    color: var(--admin-text-muted);
+    font-size: 12px;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+
+    &:last-child {
+      padding-bottom: 12px;
+    }
+
+    // Ô ID của Payload là <code style="white-space:nowrap"> (inline style, không ghi đè được nếu không !important) → cho span bên trong
+    // tự xuống dòng để UUID dài không bị cắt ở mép thẻ.
+    code span {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  // Có dòng phụ phía sau thì hàng loại tệp bớt đệm đáy (đệm đáy 12px chuyển sang dòng phụ cuối).
+  td.cell-mimeType:not(:last-child) {
+    padding-bottom: 6px;
+  }
+
+  // Tiêu đề cột đã ẩn → gắn nhãn bằng ::before, đúng chữ tiêu đề Payload. `id` không nhãn: ô của Payload đã tự hiện "ID: …".
+  td.cell-uploadedBy::before {
+    content: "Người tải lên: ";
+  }
+
+  td.cell-caption::before {
+    content: "Chú thích: ";
+  }
+
+  td.cell-createdAt::before {
+    content: "Ngày tạo: ";
+  }
+
+  td.cell-updatedAt::before {
+    content: "Ngày cập nhật: ";
   }
 
   // Chọn nhiều: góc trái trên ảnh, nền đặc để thấy được trên mọi ảnh; input phủ kín ô 44px.
