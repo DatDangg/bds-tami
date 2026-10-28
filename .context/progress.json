@@ -4359,6 +4359,41 @@
       "report": ".context/review-reports/bug-admin-date-format-vi-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "lead-status-history",
+      "title": "Lead: dòng lịch sử \"Đổi trạng thái\" hiện trạng thái trước → sau (Mới → Đã liên hệ) (BL-078)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-078",
+      "changeDoc": "spec/changes/archive/2026-10-26-lead-status-history.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-28 (user chat: \"dở thì làm nốt đi, rồi làm tiếp mấy cái 73 76 78\")",
+      "rootCause": "Không phải test sai selector: hook recordStatusChange (src/hooks/leads/status-activity.ts:24) lưu đúng fromStatus/toStatus, nhưng join \"Lịch sử chăm sóc\" (src/collections/Leads.ts:214) không khai admin.defaultColumns nên dùng cột mặc định của lead-activities (lead,type,content,actor,createdAt) — không có trạng thái trước/sau; content chỉ có khi lost.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-lead-status-history/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
+          "note": "join activities + admin.defaultColumns [type, fromStatus, toStatus, content, actor, createdAt], bỏ cột lead; access không đổi; unit test cột + tên field có thật (MINOR-2 sửa trước commit). Kèm: CV khách chưa đăng nhập = báo nhầm (anon 401, admin 200 PDF) — không tạo BL-095. MINOR-1 (e2e :135 chưa kiểm \"Mới\") đề xuất sửa test ngoài commit.",
+          "verify": "e2e inbox test 20 Lead :3100 trước FAILED (:135) → sau PASS; test 20 Hồ sơ ứng tuyển PASS (anon-cv 401); pnpm lint toàn repo exit 0, typecheck exit 0, pnpm test 456 files/4808 PASS; generate:types không đổi",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 98,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-28"
     }
   ],
   "projectName": "tami-website",

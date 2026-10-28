@@ -211,7 +211,18 @@ const trackingFields: Field[] = [
 ];
 
 // Cột ảo (không có trong DB): lịch sử chăm sóc hiện ngay trong trang lead; quyền đọc theo `lead-activities`.
-const activitiesField: Field = { name: "activities", type: "join", label: "Lịch sử chăm sóc", collection: "lead-activities", on: "lead", defaultSort: "-createdAt", defaultLimit: 50 };
+// Cột bảng lịch sử: bỏ `lead` (đang ở trang chính lead đó), thêm trạng thái trước/sau để dòng "Đổi trạng thái" cho biết Mới → Đã liên hệ (BL-078).
+const LEAD_ACTIVITIES_JOIN_COLUMNS = ["type", "fromStatus", "toStatus", "content", "actor", "createdAt"];
+const activitiesField: Field = {
+  name: "activities",
+  type: "join",
+  label: "Lịch sử chăm sóc",
+  collection: "lead-activities",
+  on: "lead",
+  defaultSort: "-createdAt",
+  defaultLimit: 50,
+  admin: { defaultColumns: LEAD_ACTIVITIES_JOIN_COLUMNS },
+};
 
 /** Trường kỹ thuật/định danh ẩn khỏi "Thêm bộ lọc" (BL-021 #06): tên/SĐT/email đã có ô tìm kiếm riêng; còn lại là dấu hệ thống ghi. Giữ: trạng thái, nguồn, sale, các mốc ngày, UTM. */
 const LEAD_HIDDEN_FILTER_PATHS = ["fullName", "phone", "phoneNormalized", "email", "locale", "consentAt", "consentVersion", "pageUrl", "referrer", "mergedCount", "remindedAt", "anonymizedAt"];

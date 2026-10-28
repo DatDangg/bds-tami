@@ -1,77 +1,52 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 97,
-  "generatedAt": "2026-10-28T16:00:00+07:00",
+  "scopeVersion": 98,
+  "generatedAt": "2026-10-28T07:53:13+00:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-076 BUG: ô ngày trong admin (form + sidebar) hiện định dạng Mỹ/Anh (\"Oct 19, 2026 10:26 AM\", \"Oct 17\") vì Payload 3.91 DatePicker bỏ qua admin.dateFormat toàn cục. Fix: helper dùng chung src/fields/admin-date.ts adminDate(pickerAppearance) -> displayFormat dd/MM/yyyy HH:mm (dayAndTime, timeFormat HH:mm), dd/MM/yyyy (dayOnly/mặc định), HH:mm (timeOnly), MM/yyyy (monthOnly); áp cho mọi field type:\"date\" của ClickEvents, ClickStatsDaily, JobApplications, JobPostings, Leads, NewsViewsDaily, NewsletterSubscribers, Pages, PropertyPosts, Rentals, Staff, projects/market-blocks, fields/published-at, fields/translation; payload.config admin.dateFormat dùng hằng chung. Unit test src/fields/admin-date.test.ts quét mọi ADMIN_COLLECTIONS/GLOBALS. Không đổi schema/DB/API. Cột ngày ở list nay dùng displayFormat của field (cột dayOnly hiện dd/MM/yyyy không kèm giờ). Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "triggerNote": "BL-078 BUG: tab \"Lịch sử chăm sóc\" trong form Lead (join `activities`) không hiện Trạng thái trước / Trạng thái sau cho dòng \"Đổi trạng thái\". Fix: join `activities` thêm admin.defaultColumns [type, fromStatus, toStatus, content, actor, createdAt], bỏ cột lead. Unit test tests/unit/lead-activities-join-columns.test.ts. Không đổi schema/DB/API/quyền. Nghi vấn \"khách chưa đăng nhập tải được CV\" là báo nhầm: rerun 2026-10-28 anon -> 401, admin -> 200 PDF. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
   "status": "published",
-  "workItem": "bug/admin-date-format-vi",
-  "backlog": "BL-076",
+  "workItem": "bug/lead-status-history",
+  "backlog": "BL-078",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-26-admin-date-format-vi.md",
-  "task": "tasks/bug-admin-date-format-vi/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-admin-date-format-vi-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-96.json",
+  "changeDoc": "spec/changes/archive/2026-10-26-lead-status-history.md",
+  "task": "tasks/bug-lead-status-history/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-97.json",
   "specUpdate": null,
-  "specRefs": [],
+  "specRefs": [
+    "ERD §4.11 lead-activities (status_change fromStatus/toStatus)",
+    "BR-11"
+  ],
   "changed": {
     "files": [
-      "src/fields/admin-date.ts",
-      "src/fields/admin-date.test.ts",
-      "src/fields/published-at.ts",
-      "src/fields/translation.ts",
-      "src/payload.config.ts",
-      "src/collections/ClickEvents.ts",
-      "src/collections/ClickStatsDaily.ts",
-      "src/collections/JobApplications.ts",
-      "src/collections/JobPostings.ts",
       "src/collections/Leads.ts",
-      "src/collections/NewsViewsDaily.ts",
-      "src/collections/NewsletterSubscribers.ts",
-      "src/collections/Pages.ts",
-      "src/collections/PropertyPosts.ts",
-      "src/collections/Rentals.ts",
-      "src/collections/Staff.ts",
-      "src/collections/projects/market-blocks.ts"
+      "tests/unit/lead-activities-join-columns.test.ts"
     ],
     "modules": [
-      "admin-date: helper adminDate(pickerAppearance) + hằng định dạng ngày Việt dùng chung",
-      "Mọi field type:\"date\" trong admin gắn displayFormat/timeFormat Việt (24h)",
-      "payload.config: admin.dateFormat dùng hằng chung",
-      "published-at (gồm Tin tức hẹn giờ BL-091) và translation translatedAt dùng định dạng Việt"
+      "Leads: join activities admin.defaultColumns thêm fromStatus/toStatus, bỏ cột lead"
     ]
   },
   "screens": [
-    "/admin/collections/* (form + sidebar + list có ô/cột ngày): projects, rentals, property-posts, news, pages, job-postings, job-applications, leads, staff, newsletter-subscribers, click-events, click-stats-daily, news-views-daily"
+    "/admin/collections/leads/:id (tab Lịch sử chăm sóc)"
   ],
   "impact": {
     "direct": [
-      "Mọi ô nhập ngày trong admin hiện số kiểu Việt: dd/MM/yyyy HH:mm (ngày+giờ), dd/MM/yyyy (chỉ ngày), HH:mm, MM/yyyy; không còn tên tháng EN, không AM/PM",
-      "Danh sách giờ trong picker dạng 24h",
-      "Gõ tay dd/MM/yyyy HH:mm được parse đúng",
-      "Tin tức: ô Ngày xuất bản (hẹn giờ) vẫn sửa được và lưu được; nhãn \"Đã hẹn giờ · dd/MM/yyyy HH:mm\" không đổi",
-      "e2e admin test \"07 mở bản ghi có sẵn\" pass cho Dự án, Cho thuê, Tin BĐS, Tin tức, Trang pháp lý, Tuyển dụng"
+      "Form Lead tab \"Lịch sử chăm sóc\": dòng \"Đổi trạng thái\" hiện Trạng thái trước / Trạng thái sau với nhãn Việt"
     ],
     "dependents": [
-      "Cột ngày ở trang danh sách admin (cột dayOnly nay hiện dd/MM/yyyy không kèm giờ)",
-      "Ngày trong sidebar của Lead (consentAt, v.v.) và Nhân viên (lastLoginAt)",
-      "Ô Hạn nộp (deadline) của Tuyển dụng",
-      "Ô startAt/endAt của Tin BĐS (validate ưu đãi), rentedAt/availableFrom của Cho thuê"
+      "Sale xem lead được giao: quyền đọc activity không đổi, chỉ thấy lịch sử lead của mình"
     ],
     "regression": [
-      "Giá trị ngày đã lưu không đổi (không đổi schema/DB/API) — mở bản ghi cũ không đổi dữ liệu khi lưu lại",
-      "Badge hạn nộp Tuyển dụng hiển thị đúng",
-      "Validate ngày ưu đãi Tin BĐS (startAt <= endAt) vẫn hoạt động",
-      "Tin tức hẹn giờ BL-091: khách chỉ thấy tin published có publishedAt trống hoặc <= now"
+      "Thêm ghi chú / cuộc gọi trong tab vẫn hoạt động",
+      "Đổi trạng thái sang Không thành + lý do",
+      "Phân công lead",
+      "CV private: khách chưa đăng nhập 401, admin 200 PDF (giữ case regression)"
     ]
   },
   "acceptance": [
-    "Mọi ô ngày trong admin (form + sidebar) hiện định dạng số Việt, không có tên tháng EN / AM-PM; danh sách giờ 24h",
-    "Gõ dd/MM/yyyy HH:mm được nhận đúng",
-    "Tin tức: Ngày xuất bản hẹn giờ vẫn sửa/lưu được, nhãn \"Đã hẹn giờ\" không đổi",
-    "e2e admin \"07 mở bản ghi có sẵn\" pass cho Dự án, Cho thuê, Tin BĐS, Tin tức, Trang pháp lý, Tuyển dụng",
-    "Không đổi schema/DB/API"
+    "Đổi Mới -> Đã liên hệ: bảng lịch sử có dòng Đổi trạng thái với \"Mới\" và \"Đã liên hệ\"",
+    "Sale chỉ thấy lịch sử của lead được giao"
   ],
   "risk": "medium",
-  "riskNote": "Medium: thay đổi hiển thị/nhập liệu của mọi field ngày trong admin (shared helper trên ~15 file); không đổi schema/API/requirement."
+  "riskNote": "Medium: chỉ đổi cột hiển thị của join trong admin Lead; không đổi schema/API/quyền/requirement."
 }
