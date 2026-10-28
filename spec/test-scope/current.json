@@ -1,70 +1,64 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 94,
-  "generatedAt": "2026-10-28T11:05:00+07:00",
+  "scopeVersion": 95,
+  "generatedAt": "2026-10-28T12:30:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-092 BUG (follow-up BL-089): ô tìm hero trang danh sách (ListingHero) bấm Tìm / Enter bị cuộn về đầu trang và Enter làm mất focus ô q (next/form scroll mặc định true + input có key theo q nên remount). Sửa: <Form scroll={false}>; JobKeywordInput chuyển thành KeywordSearchInput dùng chung (ListingHero + JobFilters). Không đổi requirement/API -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
+  "triggerNote": "BL-093 BUG (follow-up BL-088): ở build production mọi new APIError(...) do repo ném (guard-delete 409 Tỉnh/Phường/Danh mục/Tin tuyển dụng/Media, Staff reset-password 400, slug 400, privacy 400, upload 413/415) trả \"An unknown error occurred.\" vì minify làm name rỗng -> payload formatErrors rơi về fallback. Sửa chung: hook config.hooks.afterError restorePublicErrorMessage khôi phục message cho APIError public, không data, name rỗng (không đổi mã HTTP); validate-file reject() bỏ vá name riêng. Không đổi requirement/API -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
   "status": "published",
-  "workItem": "bug/listing-hero-search-scroll-focus",
-  "backlog": "BL-092",
+  "workItem": "bug/api-error-name-minified",
+  "backlog": "BL-093",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-28-listing-hero-search-scroll-focus.md",
-  "task": "tasks/bug-listing-hero-search-scroll-focus/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-listing-hero-search-scroll-focus-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-93.json",
+  "changeDoc": "spec/changes/archive/2026-10-28-api-error-name-minified.md",
+  "task": "tasks/bug-api-error-name-minified/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-api-error-name-minified-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-94.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/listing/ListingHero.tsx",
-      "src/components/listing/KeywordSearchInput.tsx",
-      "src/components/careers/JobFilters.tsx",
-      "src/components/listing/ListingHero.search.test.tsx"
+      "src/hooks/restore-public-error-message.ts",
+      "src/hooks/restore-public-error-message.test.ts",
+      "src/payload.config.ts",
+      "src/lib/upload/validate-file.ts",
+      "src/lib/upload/validate-file-prod-name.test.ts"
     ],
     "modules": [
-      "ListingHero: Form scroll={false} + ô q dùng KeywordSearchInput (bỏ key theo q)",
-      "KeywordSearchInput (đổi từ careers/JobKeywordInput): input từ khoá dùng chung, nạp lại giá trị khi q trên URL đổi mà không remount",
-      "JobFilters (/tuyen-dung): đổi import sang KeywordSearchInput"
+      "restorePublicErrorMessage: hook afterError toàn cục (REST) khôi phục message lỗi APIError công khai bị mất name do minify",
+      "payload.config: hooks.afterError",
+      "validate-file reject(): bỏ gán name riêng (dùng cách chung)"
     ]
   },
   "screens": [
-    "/du-an",
-    "/du-an/danh-muc/[category]",
-    "/cho-thue",
-    "/tin-bds",
-    "/tin-tuc",
-    "/en/projects",
-    "/en/projects/category/[category]",
-    "/en/for-rent",
-    "/en/property-news",
-    "/en/news",
-    "/tuyen-dung"
+    "/admin (toast lỗi khi thao tác bị chặn)",
+    "REST /api/**"
   ],
   "impact": {
     "direct": [
-      "Ô tìm hero các trang danh sách: bấm Tìm / Enter không cuộn về đầu trang (scrollY giữ nguyên) trên /du-an, /du-an/danh-muc/*, /cho-thue, /tin-bds, /tin-tuc và bản /en, ở desktop và mobile 390",
-      "Enter giữ focus ở ô q; bấm nút Tìm giữ focus ở nút",
-      "URL giữ q và các tham số được giữ lại (preservedParams)",
-      "Back trình duyệt / chip 'Tìm nhanh' đổi q -> ô tìm nạp lại đúng giá trị (back về trang gốc -> ô rỗng)"
+      "Build production: xoá Tỉnh/thành đang có phường/tin -> toast/REST 409 \"Không xoá được tỉnh/thành đang có N …\"",
+      "Xoá danh mục đang có danh mục con / nội dung -> 409 chữ Việt",
+      "Xoá hẳn phường/xã đang có tin, tin tuyển dụng có hồ sơ, ảnh/video đang dùng ở trang chủ -> 409 chữ Việt",
+      "Staff reset-password thiếu mật khẩu -> 400 \"Thiếu mật khẩu mới.\"",
+      "Slug ghi với locale all -> 400 chữ Việt; Trang pháp lý thiếu tên site -> 400 chữ Việt",
+      "Upload > giới hạn REST -> 413 \"File vượt quá 10MB.\" (và 415 định dạng)"
     ],
     "dependents": [
-      "/cho-thue?q=... từ ô tìm header vẫn tự focus ô q (FocusListingSearch chọn form[role=search] input[name=q])",
-      "/tuyen-dung: JobFilters dùng chung KeywordSearchInput (BL-089) — Enter/TÌM không cuộn về đầu, giữ focus #job-filter-q, URL giữ q/province/category",
-      "SSR/no-JS: form GET + input name=q + giá trị ban đầu vẫn có trong HTML"
+      "Mọi phản hồi lỗi REST /api/** đi qua hook (chỉ đổi đúng ca APIError public, không data, name rỗng)",
+      "Đăng nhập sai (401), không quyền (403), không tìm thấy (404), ValidationError có data (field errors) giữ nguyên",
+      "Nộp CV công khai (job-applications) dùng instanceof + status, không đổi"
     ],
     "regression": [
-      "Lọc/sắp xếp/phân trang các trang danh sách sau khi tìm (tham số giữ nguyên)",
-      "Chip 'Tìm nhanh' và liên kết danh mục trên hero",
-      "Ô tìm header toàn site (không đổi, chỉ kiểm không bị ảnh hưởng)"
+      "Admin xoá/xoá mềm Danh mục, Phường/xã, Tỉnh/thành, Tin tuyển dụng, Ảnh/tệp: hành vi chặn và mã HTTP không đổi, dữ liệu còn nguyên",
+      "Lỗi 500/không công khai vẫn không lộ message",
+      "Tải ảnh trong admin (UploadSizeGuard BL-088) vẫn 1 toast tiếng Việt"
     ]
   },
   "acceptance": [
-    "Cuộn 150px, gõ 'ha noi', Enter hoặc bấm Tìm: scrollY giữ nguyên trên /du-an, /cho-thue, /tin-tuc, /tin-bds, /en/projects (và 1 trang danh mục dự án nếu có), 1920 + 390",
-    "Enter: document.activeElement là input[name=q]; bấm nút: focus ở nút",
-    "URL ?q=ha+noi đúng, preservedParams giữ; back -> ô rỗng; chip đổi q -> ô nạp lại",
-    "/cho-thue?q=... từ header vẫn tự focus ô q",
-    "/tuyen-dung không hồi quy (test BL-089 PASS)"
+    "Trên build production (staging): DELETE /api/provinces/<tỉnh có phường> -> 409 + message tiếng Việt (không còn \"An unknown error occurred.\")",
+    "DELETE /api/categories/<đang dùng> -> 409 tiếng Việt; admin xoá danh mục đang dùng -> toast tiếng Việt",
+    "POST /api/staff/reset-password thiếu password -> 400 \"Thiếu mật khẩu mới.\"",
+    "401/403/404 và ValidationError (data.errors) không đổi",
+    "Mã HTTP không đổi, không bản ghi nào bị xoá khi bị chặn"
   ],
   "risk": "medium",
-  "riskNote": "ListingHero là component dùng chung 5 loại trang + bản /en, và KeywordSearchInput dùng chung với /tuyen-dung; không đổi API/schema/requirement. Reviewer STRICT PASS r1."
+  "riskNote": "Hook afterError toàn cục chạm mọi phản hồi lỗi REST nhưng điều kiện hẹp (APIError, isPublic true, data null, name rỗng); không đổi status/API/schema/requirement. Đo trên build production trước/sau. Reviewer STRICT PASS r1."
 }

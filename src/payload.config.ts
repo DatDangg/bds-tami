@@ -23,6 +23,7 @@ import { rentalsEndpoint } from "./endpoints/public/rentals";
 import { newsViewsEndpoint } from "./endpoints/public/news-views";
 import { newsletterEndpoint } from "./endpoints/public/newsletter";
 import { newsletterExportEndpoint } from "./endpoints/admin/newsletter-export";
+import { restorePublicErrorMessage } from "./hooks/restore-public-error-message";
 import { jobsConfig } from "./jobs";
 import { PAYLOAD_VI_OVERRIDES } from "./lib/admin/payload-vi-overrides";
 import { createRichTextEditor } from "./lib/admin/rich-text-editor";
@@ -70,6 +71,8 @@ export default buildConfig({
   email: createEmailAdapter(env),
   endpoints: [clickEventsEndpoint, jobApplicationsEndpoint, leadAssignEndpoint, leadsExportEndpoint, leadsEndpoint, privateFileDownloadEndpoint, rentalsEndpoint, retranslateEndpoint, approveEnglishEndpoint, newsViewsEndpoint, newsletterEndpoint, newsletterExportEndpoint],
   jobs: jobsConfig,
+  // Build production minify làm `APIError.name` rỗng -> khôi phục message tiếng Việt cho lỗi REST công khai (BL-093).
+  hooks: { afterError: [restorePublicErrorMessage] },
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,
   // Pool pg của adapter -> metrics kết nối DB (/api/metrics).

@@ -13,13 +13,15 @@ vi.mock("payload", async (importOriginal) => {
 });
 
 import { formatErrors } from "payload";
+import type { AfterErrorHookArgs } from "payload";
 
+import { restorePublicErrorMessage } from "../../hooks/restore-public-error-message";
 import { inspectUpload, MEDIA_POLICY } from "./validate-file";
 
 const MB = 1024 * 1024;
 
 describe("reject() ở build production (name rỗng do minify)", () => {
-  it("gán name = 'APIError' để formatErrors giữ thông báo tiếng Việt", async () => {
+  it("hook afterError toàn cục giữ thông báo tiếng Việt và mã 413", async () => {
     // JPEG magic bytes + đệm > 10 MB.
     const big = new Uint8Array(11 * MB);
     big.set([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01]);
@@ -29,7 +31,11 @@ describe("reject() ở build production (name rỗng do minify)", () => {
     } catch (error) {
       caught = error;
     }
-    expect((caught as Error).name).toBe("APIError");
-    expect(formatErrors(caught as Parameters<typeof formatErrors>[0]).errors[0]?.message).toBe("File vượt quá 10MB.");
+    const error = caught as Error & { status: number };
+    expect(error.status).toBe(413);
+    const result = formatErrors(error as Parameters<typeof formatErrors>[0]);
+    expect(result.errors[0]?.message).toBe("An unknown error occurred.");
+    const hookResult = await restorePublicErrorMessage({ error, result } as unknown as AfterErrorHookArgs);
+    expect(hookResult?.response?.errors?.[0]?.message).toBe("File vượt quá 10MB.");
   });
 });

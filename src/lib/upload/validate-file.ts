@@ -31,10 +31,7 @@ const HTTP_UNSUPPORTED_MEDIA_TYPE = 415;
 
 /** `isPublic: true` để thông báo hiện cho người dùng; mã 413/415 theo AC task media. */
 function reject(message: string, status: number): never {
-  const error = new APIError(message, status, undefined, true);
-  // Build production minify làm `constructor.name` rỗng → payload `formatErrors` rơi về "An unknown error occurred.".
-  error.name = "APIError";
-  throw error;
+  throw new APIError(message, status, undefined, true);
 }
 
 /** Nhận diện kiểu file bằng nội dung, rồi kiểm tra danh sách cho phép + dung lượng của kiểu đó. */
