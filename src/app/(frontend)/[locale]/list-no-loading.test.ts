@@ -12,6 +12,7 @@ const LIST_PAGES = [
   "cho-thue/page.tsx",
   "cho-thue/danh-muc/[category]/page.tsx",
   "du-an/page.tsx",
+  "du-an/danh-muc/[category]/page.tsx",
   "tin-tuc/page.tsx",
   "tin-tuc/danh-muc/[category]/page.tsx",
   "tin-bds/page.tsx",

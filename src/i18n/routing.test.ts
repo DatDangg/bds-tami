@@ -15,6 +15,7 @@ describe("routing", () => {
   it("có đủ các cặp đường dẫn theo BRD §2.1", () => {
     const expected: Record<string, string> = {
       "/du-an": "/projects",
+      "/du-an/danh-muc/[category]": "/projects/category/[category]",
       "/du-an/[slug]": "/projects/[slug]",
       "/cho-thue": "/for-rent",
       "/cho-thue/danh-muc/[category]": "/for-rent/category/[category]",

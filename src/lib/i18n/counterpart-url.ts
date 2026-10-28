@@ -19,6 +19,7 @@ export const LOCALE_COUNTERPART_ENDPOINT = "/api/locale-counterpart";
  */
 const LIST_FALLBACK: Partial<Record<PathnameKey, PathnameKey>> = {
   "/du-an/[slug]": "/du-an",
+  "/du-an/danh-muc/[category]": "/du-an",
   "/cho-thue/[slug]": "/cho-thue",
   "/cho-thue/danh-muc/[category]": "/cho-thue",
   "/cho-thue/khu-vuc/[province]": "/cho-thue",

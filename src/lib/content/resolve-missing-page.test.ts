@@ -104,6 +104,17 @@ describe("resolveMissingPage", () => {
     expect(await resolveMissingPage("/cho-thue/danh-muc/can-ho")).toBeNull();
   });
 
+  it("danh mục Dự án (S05, BL-090): khớp vi/en, tra categories scope project; `/du-an/danh-muc` (1 đoạn) vẫn là slug dự án", async () => {
+    expect(matchDynamicPage("/du-an/danh-muc/khu-do-thi")).toMatchObject({ locale: "vi", slug: "khu-do-thi", rule: { collection: "categories" } });
+    expect(matchDynamicPage("/en/projects/category/urban-areas")).toMatchObject({ locale: "en", slug: "urban-areas", rule: { collection: "categories" } });
+    expect(matchDynamicPage("/du-an/danh-muc")).toMatchObject({ slug: "danh-muc", rule: { collection: "projects" } });
+    findPublicBySlug.mockResolvedValue(null);
+    expect(await resolveMissingPage("/en/projects/category/khong-co")).toBe("en");
+    expect(findPublicBySlug).toHaveBeenCalledWith({}, "categories", "en", "khong-co", { depth: 0, where: { scope: { equals: "project" } } });
+    findPublicBySlug.mockResolvedValue({ id: "c1" });
+    expect(await resolveMissingPage("/du-an/danh-muc/khu-do-thi")).toBeNull();
+  });
+
   it("Đăng tin BĐS (G27): khớp chi tiết + danh mục vi/en, tra property-posts / categories (scope property_post); danh sách /tin-bds không bị khớp", async () => {
     expect(matchDynamicPage("/tin-bds/uu-dai-a")).toMatchObject({ locale: "vi", slug: "uu-dai-a", rule: { collection: "property-posts" } });
     expect(matchDynamicPage("/en/property-news/offer-a")).toMatchObject({ locale: "en", slug: "offer-a", rule: { collection: "property-posts" } });

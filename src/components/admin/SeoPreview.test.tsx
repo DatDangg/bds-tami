@@ -160,21 +160,24 @@ describe("SeoPreview", () => {
     expect(screen.queryByText(/\/en\//)).toBeNull();
   });
 
-  it("Danh mục Dự án / Tuyển dụng: không có trang riêng → câu báo ngắn thay khung xem trước", () => {
+  it("Danh mục Dự án (BL-090) có trang danh mục → khung xem trước + URL; Tuyển dụng: không có trang riêng → câu báo ngắn thay khung xem trước", () => {
     state.doc = { collectionSlug: "categories", globalSlug: undefined };
     state.siteName = "Tami Land";
     state.locale = "vi";
     setValues({ name: "Chung cư", slug: "chung-cu", scope: "project" });
     const project = render(<SeoPreview path="seo.metaTitle" />);
-    expect(screen.getByText(/Danh mục Dự án không có trang riêng/)).toBeInTheDocument();
-    expect(screen.queryByText("Chung cư | Tami Land")).toBeNull();
-    expect(screen.queryByText("Đường dẫn sẽ có sau khi lưu trang")).toBeNull();
-    expect(screen.queryByText(/Không bắt buộc/)).toBeNull();
+    expect(screen.getByText("Chung cư | Tami Land")).toBeInTheDocument();
+    expect(screen.getByText(`${ORIGIN}/du-an/danh-muc/chung-cu`)).toBeInTheDocument();
+    expect(screen.queryByText(/không có trang riêng/)).toBeNull();
     project.unmount();
 
     setValues({ name: "Kỹ sư", slug: "ky-su", scope: "job" });
-    render(<SeoPreview path="seo.metaTitle" />);
+    const job = render(<SeoPreview path="seo.metaTitle" />);
     expect(screen.getByText(/Danh mục Tuyển dụng không có trang riêng/)).toBeInTheDocument();
+    expect(screen.queryByText("Kỹ sư | Tami Land")).toBeNull();
+    expect(screen.queryByText("Đường dẫn sẽ có sau khi lưu trang")).toBeNull();
+    expect(screen.queryByText(/Không bắt buộc/)).toBeNull();
+    job.unmount();
   });
 
   it("chưa có dữ liệu (Cài đặt chung chưa tải, chưa nhập slug) thì hiện câu mẫu, không bịa tên website/URL", () => {

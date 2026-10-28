@@ -17,6 +17,14 @@ export interface SlugFieldOptions {
   scopeField?: string;
 }
 
+/**
+ * Slug dành riêng theo collection + locale: trùng đoạn cố định của route danh mục (`/du-an/danh-muc/[category]` · `/en/projects/category/[category]`, BL-090),
+ * nên `/du-an/danh-muc` không được là trang chi tiết dự án trông như trang danh mục rỗng. Coi như "đã bị chiếm" → ra `danh-muc-2` / `category-2`.
+ */
+const RESERVED_SLUGS: Record<string, Partial<Record<string, readonly string[]>>> = {
+  projects: { vi: ["danh-muc"], en: ["category"] },
+};
+
 /** Ứng viên thứ `n` của `base`: n = 1 là chính `base`, từ 2 là `base-n`. */
 function candidateAt(base: string, n: number): string {
   return n === 1 ? base : suffixedSlug(base, n);
@@ -91,7 +99,8 @@ function makeSlugHook(sourceField: string, scopeField: string | undefined): Fiel
           req,
         }),
       );
-      return result.docs.map((doc) => (doc as { slug?: string | null }).slug ?? "");
+      const reserved = (RESERVED_SLUGS[collection.slug]?.[req.locale ?? ""] ?? []).filter((slug) => candidates.includes(slug));
+      return [...result.docs.map((doc) => (doc as { slug?: string | null }).slug ?? ""), ...reserved];
     };
     return findFreeSlug(base, findTaken);
   };

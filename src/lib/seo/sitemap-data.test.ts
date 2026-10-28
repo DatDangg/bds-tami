@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Payload } from "payload";
 
-import { countSectionChunks, docUrls, isSitemapSection, loadSectionUrls, parseSitemapFile } from "./sitemap-data";
+import { countSectionChunks, docUrls, isSitemapSection, loadSectionUrls, parseSitemapFile, SITEMAP_SECTIONS } from "./sitemap-data";
 
 const SITE = "https://tami.example";
 const base = { slug: { vi: "du-an-a", en: "project-a" }, updatedAt: "2026-10-02T03:04:05.000Z" };
@@ -65,6 +65,33 @@ describe("nhóm categories-rentals (trang danh mục Cho thuê S05)", () => {
   it("đếm số file theo cùng điều kiện", async () => {
     expect(await countSectionChunks(payload, "categories-rentals", now)).toBe(1);
     expect(JSON.stringify((count.mock.calls[0]![0] as { where: unknown }).where)).toContain('"scope":{"equals":"rental"}');
+  });
+});
+
+describe("nhóm categories-projects (trang danh mục Dự án S05, BL-090)", () => {
+  const now = new Date("2026-10-28T00:00:00.000Z");
+  const docs = [
+    { slug: { vi: "can-ho-chung-cu", en: "apartments" }, hasEnglish: true, updatedAt: "2026-10-01T00:00:00.000Z" },
+    { slug: { vi: "khu-do-thi", en: "urban-areas" }, hasEnglish: false },
+  ];
+  const find = vi.fn<(args: unknown) => Promise<{ docs: typeof docs }>>(async () => ({ docs }));
+  const count = vi.fn<(args: unknown) => Promise<{ totalDocs: number }>>(async () => ({ totalDocs: 2 }));
+  const payload = { find, count } as unknown as Payload;
+
+  it("là nhóm hợp lệ (có trong sitemap index); truy vấn scope project", async () => {
+    expect(isSitemapSection("categories-projects")).toBe(true);
+    expect(SITEMAP_SECTIONS).toContain("categories-projects");
+    expect(parseSitemapFile("categories-projects-1.xml")).toEqual({ section: "categories-projects", chunk: 1 });
+    await loadSectionUrls(payload, "categories-projects", 1, SITE, now);
+    const args = find.mock.calls[0]![0] as { collection: string; where: unknown };
+    expect(args.collection).toBe("categories");
+    expect(JSON.stringify(args.where)).toContain('"scope":{"equals":"project"}');
+  });
+
+  it("URL: vi luôn có, en chỉ khi hasEnglish", async () => {
+    const urls = await loadSectionUrls(payload, "categories-projects", 1, SITE, now);
+    expect(urls.map((url) => url.loc)).toEqual([`${SITE}/du-an/danh-muc/can-ho-chung-cu`, `${SITE}/en/projects/category/apartments`, `${SITE}/du-an/danh-muc/khu-do-thi`]);
+    expect(await countSectionChunks(payload, "categories-projects", now)).toBe(1);
   });
 });
 

@@ -33,6 +33,7 @@ export const MISSING_PAGE_RULES: readonly MissingPageRule[] = [
   { key: "/tin-bds/[slug]", param: "slug", collection: "property-posts" },
   { key: "/cho-thue/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "rental" } } },
   { key: "/tin-bds/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "property_post" } } },
+  { key: "/du-an/danh-muc/[category]", param: "category", collection: "categories", where: { scope: { equals: "project" } } },
   { key: "/dich-vu/[slug]", param: "slug", collection: "services" },
   { key: "/du-an/[slug]", param: "slug", collection: "projects" },
   // Tin cho thuê ĐÃ THUÊ (`rented`) vẫn công khai (`publicWhere` của rentals): chỉ slug lạ / nháp / ẩn / thiếu bản EN mới 404.

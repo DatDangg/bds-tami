@@ -16,8 +16,11 @@ describe("categoryPaths (spec-validation layer 4, G13)", () => {
     expect(paths).toContain("/vi/tin-tuc/danh-muc/cu");
   });
 
-  it("scope chưa có trang danh mục (project, job) chỉ làm mới danh sách", () => {
-    expect(categoryPaths("project", { vi: ["x"], en: ["y"] }).sort()).toEqual(["/en/du-an", "/vi/du-an"]);
+  it("project: danh sách + trang danh mục dự án (BL-090) của cả vi và en", () => {
+    expect(categoryPaths("project", { vi: ["x"], en: ["y"] }).sort()).toEqual(["/en/du-an", "/en/du-an/danh-muc/y", "/vi/du-an", "/vi/du-an/danh-muc/x"]);
+  });
+
+  it("scope chưa có trang danh mục (job) chỉ làm mới danh sách", () => {
     expect(categoryPaths("job", { vi: [], en: [] }).sort()).toEqual(["/en/tuyen-dung", "/vi/tuyen-dung"]);
   });
 

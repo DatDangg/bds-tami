@@ -11,6 +11,10 @@ export const defaultLocale: Locale = "vi";
 export const pathnames = {
   "/": { vi: "/", en: "/" },
   "/du-an": { vi: "/du-an", en: "/projects" },
+  "/du-an/danh-muc/[category]": {
+    vi: "/du-an/danh-muc/[category]",
+    en: "/projects/category/[category]",
+  },
   "/du-an/[slug]": { vi: "/du-an/[slug]", en: "/projects/[slug]" },
   "/cho-thue": { vi: "/cho-thue", en: "/for-rent" },
   "/cho-thue/danh-muc/[category]": {

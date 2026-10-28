@@ -192,13 +192,13 @@ Dành cho process `jobs` (`expire-offers`, `close-job-postings`) làm mới cach
 
 Header `Cache-Control: no-store`. Code: `src/app/(payload)/api/internal/revalidate/route.ts`, `src/lib/revalidate/internal-revalidate.ts`.
 
-### 3.9. Tham số URL trang `/du-an` (BL-045 + BL-052, as-built; không phải endpoint JSON)
+### 3.9. Tham số URL trang `/du-an` + trang danh mục `/du-an/danh-muc/[category]` (BL-045 + BL-052 + BL-090, as-built; không phải endpoint JSON)
 
-Trang danh sách dự án (`/du-an` · `/en/projects`), URL là nguồn sự thật, dùng được không JS (form GET của cột lọc + nút "Áp dụng"; có JS thì đổi ô là điều hướng ngay, `router.push` không cuộn). Code: `src/lib/projects/project-filters.ts` (`parseProjectFilters` / `projectQueryString` / `hasFilterParams`), `src/components/projects/project-list-data.ts`, `ProjectListPage.tsx`.
+Trang danh sách dự án (`/du-an` · `/en/projects`), URL là nguồn sự thật, dùng được không JS (form GET của cột lọc + nút "Áp dụng"; có JS thì đổi ô là điều hướng ngay, `router.push` không cuộn). BL-090: trang danh mục `/du-an/danh-muc/[category]` · `/en/projects/category/[category]` nhận ĐỦ mọi tham số dưới đây trừ `category` (danh mục nằm trong đường dẫn, `?category=` bị bỏ qua — `withoutCategoryParam`); slug danh mục không có / EN chưa dịch / vượt số trang → `404`. Code: `src/lib/projects/project-filters.ts` (`parseProjectFilters` / `projectQueryString` / `hasFilterParams` / `withoutCategoryParam`), `src/components/projects/project-list-data.ts`, `ProjectListPage.tsx`, `project-list-metadata.ts` (BL-090).
 
 | Tham số | Ý nghĩa | Giá trị không hợp lệ |
 |---|---|---|
-| `category` | Slug danh mục dự án (tab cấp 1; cấp 1 gồm dự án của danh mục con) | Slug lạ → bỏ (không 404) |
+| `category` | **Link cũ, chỉ ở `/du-an` (BL-090):** slug có thật (scope `project`, đúng locale) → **308** sang trang danh mục `/du-an/danh-muc/<slug>`, giữ NGUYÊN mọi tham số khác (kể cả khoá lặp, `utm_*`, `page`; redirect trước khi chạy truy vấn danh sách). Khác §3.10/§3.11 (BL-055: Cho thuê/Tin BĐS chỉ 308 khi URL chỉ có `category`). Trang danh mục bỏ qua `?category=` | Slug lạ / rỗng → bỏ (không redirect, không 404; vẫn tính là tham số lọc → noindex) |
 | `province` | BL-052: nhiều slug tỉnh `a,b` hoặc khoá lặp, **OR**; link cũ một slug vẫn chạy; tối đa 50 slug | Slug lạ → bỏ |
 | `status` | `upcoming` · `selling` · `handed_over` | Giá trị lạ → bỏ |
 | `q` | Từ khoá, không phân biệt hoa/thường/dấu, khớp tên + địa chỉ + phường/xã + tỉnh; tối đa 100 ký tự | Quá dài hoặc rỗng → bỏ |
@@ -209,7 +209,7 @@ Trang danh sách dự án (`/du-an` · `/en/projects`), URL là nguồn sự th�
 | `sort` | `newest` (mặc định, không lên URL) · `price_asc` · `price_desc` (dự án chưa có giá luôn cuối) | Giá trị lạ → mặc định |
 | `page` | Trang lưới (12 dự án); vượt số trang → `404` | |
 
-Có bất kỳ tham số lọc nào (kể cả giá trị sai; `?province=` rỗng do form gửi "Tất cả" thì không tính) hoặc `sort` khác mặc định → `noindex, follow` + canonical `/du-an`; không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD (`FAQPage`) chỉ phát ở trang sạch (trang 1, không tham số lọc) — cùng điều kiện noindex. Đổi một ô lọc hoặc sắp xếp: giữ mọi tham số khác, **bỏ `page`** (về trang 1); tab / phân trang mang theo mọi tham số (tab bỏ `page`). Dữ liệu: quét ≤ 1000 dự án công khai rồi lọc / đếm / sắp ở bộ nhớ (chạm trần ghi cảnh báo log), MỘT truy vấn lấy trường thẻ; ≤ 5 dự án `isFeatured` khớp lọc là thẻ nổi bật (trang 1) và bị loại khỏi lưới ở mọi trang; số đếm tab / ô tích theo quy tắc "khớp mọi lọc khác trừ chính chiều đó". Không migration, không endpoint mới.
+Có bất kỳ tham số lọc nào (kể cả giá trị sai; `?province=` rỗng do form gửi "Tất cả" thì không tính) hoặc `sort` khác mặc định → `noindex, follow` + canonical `/du-an` (trang danh mục: canonical trang danh mục sạch); không lọc → canonical chính nó (kèm `?page=n`). FAQ JSON-LD (`FAQPage`) chỉ phát ở `/du-an` sạch (trang 1, không tham số lọc) — cùng điều kiện noindex; trang danh mục vẫn hiện khối FAQ nhưng không phát `FAQPage`. Trang danh mục (BL-090): `<title>` "<Tên danh mục> – Dự án | TAMI", meta description = `categories.description` (không có → mô tả `/du-an`), `categories.seo` ghi đè, hreflang vi/en chỉ khi danh mục có bản EN; sitemap nhóm `categories-projects`. Đổi một ô lọc hoặc sắp xếp: giữ mọi tham số khác, **bỏ `page`** (về trang 1); tab / phân trang mang theo mọi tham số (tab bỏ `page`). Dữ liệu: quét ≤ 1000 dự án công khai rồi lọc / đếm / sắp ở bộ nhớ (chạm trần ghi cảnh báo log), MỘT truy vấn lấy trường thẻ; ≤ 5 dự án `isFeatured` khớp lọc là thẻ nổi bật (trang 1) và bị loại khỏi lưới ở mọi trang; số đếm tab / ô tích theo quy tắc "khớp mọi lọc khác trừ chính chiều đó". Không migration, không endpoint mới.
 
 ### 3.10. Tham số URL trang `/cho-thue` (BL-052, as-built)
 

@@ -62,6 +62,7 @@ describe("fallbackCounterpartPath", () => {
   it("chi tiết/danh mục → danh sách ngôn ngữ đích; không có danh sách (dịch vụ) → trang chủ", () => {
     expect(fallbackCounterpartPath("/cho-thue/[slug]", "en")).toBe("/en/for-rent");
     expect(fallbackCounterpartPath("/tin-tuc/danh-muc/[category]", "vi")).toBe("/tin-tuc");
+    expect(fallbackCounterpartPath("/du-an/danh-muc/[category]", "en")).toBe("/en/projects");
     expect(fallbackCounterpartPath("/dich-vu/[slug]", "en")).toBe("/en");
   });
 });

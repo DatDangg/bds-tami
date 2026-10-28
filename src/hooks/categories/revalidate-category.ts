@@ -10,13 +10,13 @@ type PathnameKey = keyof typeof pathnames;
 
 /**
  * Trang công khai phụ thuộc danh mục của từng scope (ERD §2): danh sách của loại nội dung (chip/tab danh mục nằm ở đây) và trang
- * danh mục (`/danh-muc/[category]`, chỉ ba loại có). Scope chưa có trang thì chỉ làm mới danh sách khi trang đó được làm.
+ * danh mục (`/danh-muc/[category]`, bốn loại có: tin tức, cho thuê, tin BĐS, dự án). Scope chưa có trang thì chỉ làm mới danh sách khi trang đó được làm.
  */
 const SCOPE_PAGES: Record<CategoryScope, { list: PathnameKey; category?: PathnameKey }> = {
   news: { list: "/tin-tuc", category: "/tin-tuc/danh-muc/[category]" },
   rental: { list: "/cho-thue", category: "/cho-thue/danh-muc/[category]" },
   property_post: { list: "/tin-bds", category: "/tin-bds/danh-muc/[category]" },
-  project: { list: "/du-an" },
+  project: { list: "/du-an", category: "/du-an/danh-muc/[category]" },
   job: { list: "/tuyen-dung" },
 };
 

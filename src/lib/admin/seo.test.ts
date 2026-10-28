@@ -200,11 +200,11 @@ describe("seoPagePathKey: bản ghi → khoá đường dẫn công khai", () =>
     expect(seoPagePathKey({ collectionSlug: "pages" })).toBeUndefined();
   });
 
-  it("Danh mục: theo `scope` — 3 scope có trang danh mục công khai, Dự án/Tuyển dụng/chưa chọn → không có (T06)", () => {
+  it("Danh mục: theo `scope` — 4 scope có trang danh mục công khai (Dự án từ BL-090), Tuyển dụng/chưa chọn → không có (T06)", () => {
     expect(seoPagePathKey({ collectionSlug: "categories", scope: "rental" })).toBe("/cho-thue/danh-muc/[category]");
     expect(seoPagePathKey({ collectionSlug: "categories", scope: "property_post" })).toBe("/tin-bds/danh-muc/[category]");
     expect(seoPagePathKey({ collectionSlug: "categories", scope: "news" })).toBe("/tin-tuc/danh-muc/[category]");
-    expect(seoPagePathKey({ collectionSlug: "categories", scope: "project" })).toBeUndefined();
+    expect(seoPagePathKey({ collectionSlug: "categories", scope: "project" })).toBe("/du-an/danh-muc/[category]");
     expect(seoPagePathKey({ collectionSlug: "categories", scope: "job" })).toBeUndefined();
     expect(seoPagePathKey({ collectionSlug: "categories" })).toBeUndefined();
     expect(seoPagePathKey({ collectionSlug: "categories", scope: 42 })).toBeUndefined();
@@ -212,12 +212,12 @@ describe("seoPagePathKey: bản ghi → khoá đường dẫn công khai", () =>
 });
 
 describe("seoNoPublicPageNote: Danh mục không có trang riêng (T06)", () => {
-  it("Dự án / Tuyển dụng → câu tiếng Việt có nhãn loại nội dung, không lộ thuật ngữ dev", () => {
-    const project = seoNoPublicPageNote({ collectionSlug: "categories", scope: "project" });
-    expect(project).toContain("Dự án");
-    expect(project).toMatch(/không có trang riêng/);
-    expect(project).not.toMatch(/scope|slug|route|seo/i);
-    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "job" })).toContain("Tuyển dụng");
+  it("Tuyển dụng → câu tiếng Việt có nhãn loại nội dung, không lộ thuật ngữ dev; Dự án đã có trang danh mục (BL-090) nên không còn câu này", () => {
+    const job = seoNoPublicPageNote({ collectionSlug: "categories", scope: "job" });
+    expect(job).toContain("Tuyển dụng");
+    expect(job).toMatch(/không có trang riêng/);
+    expect(job).not.toMatch(/scope|slug|route|seo/i);
+    expect(seoNoPublicPageNote({ collectionSlug: "categories", scope: "project" })).toBeUndefined();
   });
 
   it("scope có trang, chưa chọn scope, scope lạ, hoặc collection khác → undefined (vẫn hiện khung xem trước)", () => {
@@ -270,6 +270,7 @@ describe("publicPageUrl: URL công khai thay cho canonical khi ô trống", () =
     ["rental", "https://tami.vn/cho-thue/danh-muc/can-ho", "https://tami.vn/en/for-rent/category/apartment"],
     ["property_post", "https://tami.vn/tin-bds/danh-muc/can-ho", "https://tami.vn/en/property-news/category/apartment"],
     ["news", "https://tami.vn/tin-tuc/danh-muc/can-ho", "https://tami.vn/en/news/category/apartment"],
+    ["project", "https://tami.vn/du-an/danh-muc/can-ho", "https://tami.vn/en/projects/category/apartment"],
   ])("Danh mục scope %s: tham số `[category]` điền slug của ngôn ngữ đang sửa; EN chỉ khi có bản EN (T06)", (scope, viUrl, enUrl) => {
     const pathKey = seoPagePathKey({ collectionSlug: "categories", scope });
     expect(publicPageUrl({ origin: ORIGIN, locale: "vi", pathKey, slug: "can-ho" })).toBe(viUrl);

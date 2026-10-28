@@ -61,6 +61,13 @@ export interface ProjectFilters {
   priceMax?: number;
 }
 
+/** Trang danh mục: danh mục nằm trong đường dẫn nên `?category=` trên URL bị bỏ qua (mọi bộ lọc khác vẫn nhận). */
+export function withoutCategoryParam(searchParams: RawProjectParams): RawProjectParams {
+  const rest = { ...searchParams };
+  delete rest.category;
+  return rest;
+}
+
 export function firstValue(value: string | string[] | undefined): string | undefined {
   const first = Array.isArray(value) ? value[0] : value;
   const trimmed = first?.trim();

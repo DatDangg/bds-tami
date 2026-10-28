@@ -10,10 +10,10 @@ interface FindArgs {
 }
 
 /** `payload.find` giả: ghi lại truy vấn và trả về các slug đang bị chiếm nằm trong danh sách `in`. */
-function fakeRequest(occupied: string[]) {
+function fakeRequest(occupied: string[], locale = "vi") {
   const queries: FindArgs[] = [];
   const req = {
-    locale: "vi",
+    locale,
     fallbackLocale: false,
     payload: {
       find: async (args: FindArgs) => {
@@ -28,16 +28,16 @@ function fakeRequest(occupied: string[]) {
 
 async function runSlugHook(
   options: SlugFieldOptions,
-  args: { value?: unknown; siblingData?: Record<string, unknown>; originalDoc?: Record<string, unknown>; occupied?: string[] },
+  args: { value?: unknown; siblingData?: Record<string, unknown>; originalDoc?: Record<string, unknown>; occupied?: string[]; collectionSlug?: string; locale?: string },
 ) {
-  const { req, queries } = fakeRequest(args.occupied ?? []);
+  const { req, queries } = fakeRequest(args.occupied ?? [], args.locale);
   const hook = slugField(options).hooks?.beforeValidate?.[0] as FieldHook;
   const result = await hook({
     value: args.value,
     siblingData: args.siblingData ?? {},
     originalDoc: args.originalDoc,
     req,
-    collection: { slug: "news", flattenedFields: [{ name: "scope", type: "select", options: ["news", "rental"] }] },
+    collection: { slug: args.collectionSlug ?? "news", flattenedFields: [{ name: "scope", type: "select", options: ["news", "rental"] }] },
   } as unknown as Parameters<FieldHook>[0]);
   return { result, queries };
 }
@@ -80,6 +80,31 @@ describe("slugField: kiểm trùng slug (n1)", () => {
     const long = "a".repeat(80);
     const { result } = await runSlugHook({}, { value: long, occupied: [long] });
     expect(result).toBe(`${"a".repeat(78)}-2`);
+  });
+});
+
+describe("slugField: slug dành riêng của Dự án (BL-090)", () => {
+  it("dự án vi 'danh-muc' → 'danh-muc-2' (trùng URL trang danh mục /du-an/danh-muc/[category]); en 'category' → 'category-2'", async () => {
+    const vi = await runSlugHook({}, { collectionSlug: "projects", value: "danh-muc" });
+    expect(vi.result).toBe("danh-muc-2");
+    const en = await runSlugHook({}, { collectionSlug: "projects", locale: "en", value: "category" });
+    expect(en.result).toBe("category-2");
+  });
+
+  it("sinh từ tiêu đề 'Danh mục' cũng bị đổi; 'danh-muc-2' đã bị chiếm thật thì lên 'danh-muc-3'", async () => {
+    expect((await runSlugHook({}, { collectionSlug: "projects", siblingData: { title: "Danh mục" } })).result).toBe("danh-muc-2");
+    expect((await runSlugHook({}, { collectionSlug: "projects", value: "danh-muc", occupied: ["danh-muc-2"] })).result).toBe("danh-muc-3");
+  });
+
+  it("chỉ chặn đúng ngôn ngữ: vi 'category' và en 'danh-muc' giữ nguyên; slug khác không đổi", async () => {
+    expect((await runSlugHook({}, { collectionSlug: "projects", value: "category" })).result).toBe("category");
+    expect((await runSlugHook({}, { collectionSlug: "projects", locale: "en", value: "danh-muc" })).result).toBe("danh-muc");
+    expect((await runSlugHook({}, { collectionSlug: "projects", value: "vinhomes" })).result).toBe("vinhomes");
+  });
+
+  it("collection khác (news, rentals) không bị ảnh hưởng", async () => {
+    expect((await runSlugHook({}, { collectionSlug: "news", value: "danh-muc" })).result).toBe("danh-muc");
+    expect((await runSlugHook({}, { collectionSlug: "rentals", locale: "en", value: "category" })).result).toBe("category");
   });
 });
 

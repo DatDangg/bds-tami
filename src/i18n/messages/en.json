@@ -350,6 +350,7 @@
       "gridLabel": "Project list",
       "emptyTitle": "No matching projects yet.",
       "noProjects": "No projects have been published yet.",
+      "noProjectsInCategory": "No projects in this category yet.",
       "salesStatus": {
         "upcoming": "Coming soon",
         "selling": "Now selling",

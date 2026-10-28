@@ -44,6 +44,12 @@ const COLLECTION_SECTIONS = {
     param: "category",
     extraWhere: () => ({ scope: { equals: "property_post" } }),
   },
+  "categories-projects": {
+    collection: "categories",
+    route: "/du-an/danh-muc/[category]",
+    param: "category",
+    extraWhere: () => ({ scope: { equals: "project" } }),
+  },
   "categories-rentals": {
     collection: "categories",
     route: "/cho-thue/danh-muc/[category]",

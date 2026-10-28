@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { StrengthsBlock } from "@/components/home/StrengthsBlock";
@@ -14,6 +13,7 @@ import { countActiveFilters } from "@/components/listing/listing-params";
 import { SpotlightSlider } from "@/components/listing/SpotlightSlider";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectListBody } from "@/components/projects/ProjectListBody";
+import { projectCategoryPath } from "@/components/projects/project-list-metadata";
 import { loadProjectListData } from "@/components/projects/project-list-data";
 import { toFilterOptions, toFilterParams, toFilterValues } from "@/components/projects/project-list-state";
 import { ProjectSortControl } from "@/components/projects/ProjectSortControl";
@@ -21,24 +21,23 @@ import { ProjectSpotlightContent } from "@/components/projects/ProjectSpotlightC
 import { projectCategoryIcon } from "@/components/projects/project-category-icon";
 import { publicPath } from "@/lib/content/content-paths";
 import type { ListingLearnMoreView } from "@/lib/content/load-listing-page";
-import { parsePagination } from "@/lib/content/pagination";
-import { loadSiteIdentity } from "@/lib/content/site-identity";
 import { hasFilterParams, projectQueryString, type RawProjectParams } from "@/lib/projects/project-filters";
 import type { ProjectFacets } from "@/lib/projects/project-queries";
 import { type ProjectCardData, toProjectCards } from "@/lib/projects/project-view";
-import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Locale } from "@/i18n/routing";
 import type { Category } from "@/payload-types";
 
-interface ProjectListPageProps {
+export interface ProjectListPageProps {
   locale: Locale;
   searchParams: RawProjectParams;
+  /** Slug danh mục của trang S05 (`/du-an/danh-muc/[category]`); bỏ trống = S02 `/du-an`. Danh mục này bị KHOÁ: `?category=` bị bỏ qua. */
+  categorySlug?: string;
 }
 
 /** Badge "Bộ lọc": các ô trong thẻ lọc (danh mục là tab, từ khoá là hero, sắp xếp ở hàng kết quả — không tính). */
 const ACTIVE_FILTER_SPEC = { single: ["status", "developer"], multi: ["province", "type", "feature"], ranges: [["priceMin", "priceMax"]] } as const;
-/** Tham số không có ô trong thẻ lọc: input ẩn của form GET không JS (danh mục là tab, từ khoá ở hero, sắp xếp ở hàng kết quả). */
-const HIDDEN_PARAMS = ["category", "q", "sort"];
+/** Tham số không có ô trong thẻ lọc: input ẩn của form GET không JS (từ khoá ở hero, sắp xếp ở hàng kết quả; danh mục nằm trong đường dẫn nên không lên URL). */
+const HIDDEN_PARAMS = ["q", "sort"];
 /** Ảnh thẻ lưới khi có cột lọc trái: ≥ xl ~300px, lg 3 cột trong ~70% khung, md 2 cột. */
 const GRID_CARD_SIZES = "(min-width: 1280px) 300px, (min-width: 1024px) 22vw, (min-width: 768px) 50vw, 100vw";
 
@@ -48,7 +47,7 @@ interface TabLabels {
   count: (count: number) => string;
 }
 
-/** Tab "Tất cả" + danh mục cấp 1 (link `?category=` giữ lọc khác, về trang 1), số đếm "trừ chiều danh mục", icon theo slug. */
+/** Tab "Tất cả" (`/du-an`) + danh mục cấp 1 (link trang danh mục `/du-an/danh-muc/<slug>`, giữ lọc khác, về trang 1), số đếm "trừ chiều danh mục", icon theo slug. */
 function buildTabs(roots: Category[], facets: ProjectFacets, labels: TabLabels, href: (category?: string) => string, currentRootId?: string): ListingCategoryTab[] {
   const named = roots.filter((root) => root.slug && root.name);
   if (named.length === 0) return [];
@@ -75,6 +74,9 @@ interface ProjectResultsProps {
   listPath: string;
   /** URL có lọc: trạng thái trống "không tìm thấy" + Xoá bộ lọc thay vì "chưa có dự án". */
   filtered: boolean;
+  /** Trang danh mục: trống thật thì nói "trong mục này" + link về `/du-an`. */
+  inCategory: boolean;
+  projectsPath: string;
   /** Tổng dự án khớp lọc (0 → trạng thái trống). */
   total: number;
   cards: ProjectCardData[];
@@ -92,13 +94,13 @@ function ProjectSpotlight({ cards }: { cards: ProjectCardData[] }) {
 }
 
 /** Lưới 3 cột + phân trang, hoặc trạng thái trống (có lọc / chưa có dự án). */
-function ProjectResults({ locale, listPath, filtered, total, cards, page, totalPages, buildHref, priorityFirst }: ProjectResultsProps) {
+function ProjectResults({ locale, listPath, filtered, inCategory, projectsPath, total, cards, page, totalPages, buildHref, priorityFirst }: ProjectResultsProps) {
   const t = useTranslations("page.projects");
   if (total === 0) {
     return filtered ? (
       <EmptyState variant="filtered" title={t("emptyTitle")} clearFiltersHref={listPath} adviceHref={publicPath("/lien-he", locale)} />
     ) : (
-      <EmptyState variant="empty" title={t("noProjects")} />
+      <EmptyState variant="empty" title={t(inCategory ? "noProjectsInCategory" : "noProjects")} {...(inCategory ? { backHref: projectsPath } : {})} />
     );
   }
   return (
@@ -120,29 +122,66 @@ function ProjectResults({ locale, listPath, filtered, total, cards, page, totalP
   );
 }
 
+/** Hero (ảnh + chữ `pageHeroes.projects`; trang danh mục: eyebrow "Dự án", tiêu đề + mô tả của danh mục) + breadcrumb (Dự án › cha › danh mục) + ô tìm `q` + "Tìm nhanh". */
+function ProjectListHero({ locale, data, listPath, projectsPath, params }: ProjectListHeroProps) {
+  const t = useTranslations("page.projects");
+  const tNav = useTranslations("layout.nav.items");
+  const { hero, content, context, q } = data;
+  const category = context?.category;
+  const breadcrumb = [
+    { label: tNav("projects"), href: projectsPath },
+    // Cha không có slug ở locale này thì không có trang để link tới (tránh `/du-an/danh-muc/`).
+    ...(context?.parent?.slug ? [{ label: context.parent.name ?? "", href: projectCategoryPath(locale, context.parent.slug) }] : []),
+    ...(category ? [{ label: category.name ?? "", href: listPath }] : []),
+  ];
+  const description = category ? (category.description ?? undefined) : hero.description;
+  const eyebrow = category ? tNav("projects") : hero.eyebrow;
+  return (
+    <ListingHero
+      title={category?.name ?? hero.title}
+      {...(!category && hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
+      {...(eyebrow ? { eyebrow } : {})}
+      {...(description ? { description } : {})}
+      {...(hero.image ? { image: hero.image } : {})}
+      breadcrumb={<Breadcrumb variant="overlay" items={breadcrumb} />}
+      search={{ action: listPath, ...(q ? { value: q } : {}), placeholder: t("keywordPlaceholder"), preservedParams: params }}
+      quickSearch={content.quickSearch}
+    />
+  );
+}
+
+interface ProjectListHeroProps {
+  locale: Locale;
+  data: Pick<Awaited<ReturnType<typeof loadProjectListData>>, "hero" | "content" | "context"> & { q: string | undefined };
+  listPath: string;
+  projectsPath: string;
+  params: Record<string, string>;
+}
+
 /**
- * S02 `/du-an` theo design BL-052 (`list-du-an.webp`): hero (ảnh + chữ `pageHeroes.projects`, ô tìm `q`, "Tìm nhanh") → tab danh mục cấp 1 (icon + số) → cột lọc trái
+ * S02 `/du-an` và S05 trang danh mục (`categorySlug`) theo design BL-052 (`list-du-an.webp`): hero (ảnh + chữ `pageHeroes.projects`, ô tìm `q`, "Tìm nhanh") → tab danh mục cấp 1 (icon + số) → cột lọc trái
  * (Tình trạng · Tỉnh/thành · Chủ đầu tư · Mức giá · Loại hình · Tiện ích; < lg là Sheet) | thẻ nổi bật (trang 1) → "N dự án phù hợp" + sắp xếp → lưới 3 cột → phân trang
  * → "Tìm hiểu thêm" + FAQ (`listingPages.projects`) → dải Điểm mạnh (cờ `showProjectStrengths`) → banner tư vấn. Lọc / sắp / trang trên `searchParams`
- * (`?category=&province=a,b&status=&q=&developer=&sort=&type=&feature=&priceMin=&priceMax=&page=`); slug / id lạ bị bỏ (không 404); trang vượt số trang → `notFound()`.
+ * (`?province=a,b&status=&q=&developer=&sort=&type=&feature=&priceMin=&priceMax=&page=`); slug / id lạ bị bỏ (không 404); trang vượt số trang → `notFound()`.
+ * Danh mục nằm trong đường dẫn: tab link `/du-an/danh-muc/<slug>`; link cũ `/du-an?category=<slug có thật>` → 308 sang đó (giữ tham số khác). Trang danh mục: danh mục không có /
+ * chưa có bản EN → `notFound()`; hero dùng tên + mô tả danh mục (không có mô tả thì không hiện mô tả chung của `/du-an`); FAQ JSON-LD chỉ ở `/du-an` sạch.
  */
-export async function ProjectListPage({ locale, searchParams }: ProjectListPageProps) {
-  const { page, filters, context, developers, resolved, listing, roots, hero, strengths, content } = await loadProjectListData(locale, searchParams);
-  const [t, tNav, tOptions] = await Promise.all([
+export async function ProjectListPage({ locale, searchParams: rawParams, categorySlug }: ProjectListPageProps) {
+  const { page, searchParams, filters, context, developers, resolved, listing, roots, hero, strengths, content } = await loadProjectListData(locale, rawParams, categorySlug);
+  const [t, tOptions] = await Promise.all([
     getTranslations({ locale, namespace: "page.projects" }),
-    getTranslations({ locale, namespace: "layout.nav.items" }),
     getTranslations({ locale, namespace: "listingOptions" }),
   ]);
 
-  const listPath = publicPath("/du-an", locale);
+  const projectsPath = publicPath("/du-an", locale);
+  const listPath = categorySlug ? projectCategoryPath(locale, categorySlug) : projectsPath;
   const filterParams = toFilterParams(resolved);
-  const categoryParam = context ? { category: context.slug } : {};
   const sortParam = filters.sort ? { sort: filters.sort } : {};
-  const current = Object.fromEntries(new URLSearchParams(projectQueryString({ ...categoryParam, ...filterParams, ...sortParam })));
+  const current = Object.fromEntries(new URLSearchParams(projectQueryString({ ...filterParams, ...sortParam })));
   const filtered = Object.keys(current).length > 0;
-  const cleanPage = page === 1 && !hasFilterParams(searchParams);
+  const cleanPage = !categorySlug && page === 1 && !hasFilterParams(searchParams);
   const tabLabels: TabLabels = { all: t("all"), count: (count) => t("resultTotal", { count }) };
-  const tabHref = (category?: string) => `${listPath}${projectQueryString({ ...(category ? { category } : {}), ...filterParams, ...sortParam })}`;
+  const tabHref = (category?: string) => `${category ? projectCategoryPath(locale, category) : projectsPath}${projectQueryString({ ...filterParams, ...sortParam })}`;
   const tabs = buildTabs(roots.docs, listing.facets, tabLabels, tabHref, context?.rootId);
   const options = toFilterOptions({
     facets: listing.facets,
@@ -153,20 +192,11 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
   });
   const featuredCards = toProjectCards(listing.featured, locale);
   const cards = toProjectCards(listing.docs, locale);
-  const buildHref = (target: number) => `${listPath}${projectQueryString({ ...categoryParam, ...filterParams, ...sortParam, page: target })}`;
+  const buildHref = (target: number) => `${listPath}${projectQueryString({ ...filterParams, ...sortParam, page: target })}`;
 
   return (
     <ListPendingProvider>
-      <ListingHero
-        title={hero.title}
-        {...(hero.titleAccent ? { titleAccent: hero.titleAccent } : {})}
-        {...(hero.eyebrow ? { eyebrow: hero.eyebrow } : {})}
-        {...(hero.description ? { description: hero.description } : {})}
-        {...(hero.image ? { image: hero.image } : {})}
-        breadcrumb={<Breadcrumb variant="overlay" items={[{ label: tNav("projects"), href: listPath }]} />}
-        search={{ action: listPath, ...(filters.q ? { value: filters.q } : {}), placeholder: t("keywordPlaceholder"), preservedParams: current }}
-        quickSearch={content.quickSearch}
-      />
+      <ProjectListHero locale={locale} data={{ hero, content, context, q: filters.q }} listPath={listPath} projectsPath={projectsPath} params={current} />
       <ListingCategoryTabs label={t("tabsLabel")} tabs={tabs} />
       <ProjectListBody
         path={listPath}
@@ -184,6 +214,8 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
           locale={locale}
           listPath={listPath}
           filtered={filtered}
+          inCategory={categorySlug !== undefined}
+          projectsPath={projectsPath}
           total={listing.totalDocs}
           cards={cards}
           page={page}
@@ -201,26 +233,4 @@ export async function ProjectListPage({ locale, searchParams }: ProjectListPageP
   );
 }
 
-/**
- * `generateMetadata` của `/du-an`. Có tham số lọc (`category`, `province`, `status`, `q`, `developer`, `type`, `feature`, `priceMin`, `priceMax`, `sort` khác mặc định)
- * → `noindex, follow` và canonical về trang sạch `/du-an`; không lọc: canonical là chính nó (kèm `?page=n` ở trang ≥ 2). Không tra danh mục nên không lặp truy vấn của trang.
- */
-export async function buildProjectListMetadata({ locale, searchParams }: ProjectListPageProps): Promise<Metadata> {
-  const { page } = parsePagination(searchParams.page, undefined);
-  const filtered = hasFilterParams(searchParams);
-  const [t, identity] = await Promise.all([getTranslations({ locale, namespace: "page.projects" }), loadSiteIdentity(locale)]);
-  const pathFor = (target: Locale) => {
-    const path = publicPath("/du-an", target);
-    return !filtered && page > 1 ? `${path}?page=${page}` : path;
-  };
-  return buildPageMetadata({
-    locale,
-    siteName: identity.siteName,
-    defaultImage: identity.logo,
-    forceNoindex: filtered,
-    title: t("title"),
-    description: t("description"),
-    paths: { vi: pathFor("vi"), en: pathFor("en") },
-    hasEnglish: true,
-  });
-}
+export { buildProjectListMetadata } from "./project-list-metadata";

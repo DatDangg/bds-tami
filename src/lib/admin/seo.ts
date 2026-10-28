@@ -54,13 +54,14 @@ export function seoIntroNote(collectionSlug: string | null | undefined): string 
 
 /**
  * Danh mục: `scope` → trang danh mục công khai (khoá `pathnames`), đúng route mà `buildRentalListMetadata` /
- * `buildPostListMetadata` / `buildNewsListMetadata` dựng canonical. Dự án và Tuyển dụng KHÔNG có trang danh mục riêng
+ * `buildPostListMetadata` / `buildNewsListMetadata` dựng canonical. Tuyển dụng KHÔNG có trang danh mục riêng
  * nên không có ở đây (xem `seoNoPublicPageNote`).
  */
 export const CATEGORY_PAGE_ROUTES = {
   rental: "/cho-thue/danh-muc/[category]",
   property_post: "/tin-bds/danh-muc/[category]",
   news: "/tin-tuc/danh-muc/[category]",
+  project: "/du-an/danh-muc/[category]",
 } as const satisfies Partial<Record<CategoryScope, keyof typeof pathnames>>;
 
 function categoryPagePathKey(scope: unknown): string | undefined {
@@ -68,7 +69,7 @@ function categoryPagePathKey(scope: unknown): string | undefined {
 }
 
 /**
- * Câu báo thay cho khung xem trước khi bản ghi không có trang công khai nào để xem trước: Danh mục scope Dự án / Tuyển dụng
+ * Câu báo thay cho khung xem trước khi bản ghi không có trang công khai nào để xem trước: Danh mục scope Tuyển dụng
  * (scope đã chọn và là scope thật nhưng không có route). Trả `undefined` khi có trang hoặc chưa đủ dữ liệu để kết luận.
  */
 export function seoNoPublicPageNote(input: { collectionSlug?: string | null; scope?: unknown }): string | undefined {
@@ -140,7 +141,7 @@ export function describeSeoDescriptionLength(value: unknown): SeoLengthHint {
 
 /**
  * Khoá `pathnames` của trang công khai tương ứng bản ghi đang sửa; `undefined` = không xác định được (hoặc không có trang:
- * Danh mục scope Dự án / Tuyển dụng, chưa chọn scope).
+ * Danh mục scope Tuyển dụng, chưa chọn scope).
  */
 export function seoPagePathKey(input: { collectionSlug?: string | null; globalSlug?: string | null; kind?: unknown; scope?: unknown }): string | undefined {
   if (input.globalSlug) return "/";

@@ -454,8 +454,9 @@ Routes:
 - Cho thuê: `/cho-thue/danh-muc/[category]` · `/en/for-rent/category/[category]`
 - Đăng tin BĐS: `/tin-bds/danh-muc/[category]` · `/en/property-news/category/[category]`
 - Tin tức: `/tin-tuc/danh-muc/[category]` · `/en/news/category/[category]`
+- Dự án (BL-090): `/du-an/danh-muc/[category]` · `/en/projects/category/[category]`
 
-Bố cục = màn danh sách cha tương ứng (S04, S08, S10) với khác biệt:
+Bố cục = màn danh sách cha tương ứng (S02, S04, S08, S10) với khác biệt:
 - Page banner: tiêu đề = `categories.name`, mô tả = `categories.description` (≤ 60ch, nếu có). Ảnh banner theo `pageBanners` của loại nội dung.
 - Breadcrumb: Trang chủ › <Loại> › <Danh mục cha nếu có> › <Danh mục>.
 - Danh mục có con: hàng chip danh mục con (chip "Tất cả" = chính danh mục cha, gồm cả bài của con) dưới banner.
@@ -463,6 +464,7 @@ Bố cục = màn danh sách cha tương ứng (S04, S08, S10) với khác biệ
 - Tab danh mục ở S08/S10 là **link** tới trang này (không lọc client), tab hiện tại `aria-current="page"`.
 - SEO: trang indexable, canonical chính nó, title/meta từ `categories.seo`. EN: danh mục không `hasEnglish` → 404 EN; slug danh mục theo locale.
 - Trống: "Chưa có bài viết trong mục này." + link về danh sách cha.
+- **Dự án (BL-090):** khung `/du-an` (BL-052) với danh mục khoá (gồm dự án của danh mục con): hero `h1` = tên danh mục, eyebrow "Dự án" / "Projects", mô tả = `categories.description` (nếu có), ảnh hero của `/du-an`; breadcrumb Trang chủ › Dự án › <Danh mục cha nếu có> › <Danh mục>; `<title>` "<Tên danh mục> – Dự án | <tên site>". Tab danh mục cấp 1 (cả ở `/du-an`) là link: "Tất cả" → `/du-an`, danh mục → trang này (giữ bộ lọc khác, về trang 1), tab đang xem `aria-current="page"` (danh mục con → đánh dấu tab cha). Cột lọc như S02 (không có ô danh mục); bộ lọc / sắp xếp / phân trang / ô tìm `q` ở lại trang danh mục. Link cũ `/du-an?category=<slug có thật>` → 308 sang trang này, giữ các tham số khác; slug lạ → bỏ. Không có dự án: trạng thái trống như S02 + link về `/du-an`. *As-built (BL-090 T01):* không có hàng chip danh mục con (như Cho thuê) — danh mục cấp 2 đánh dấu tab cha; hero không dùng mô tả hero chung khi danh mục không có mô tả (meta description thì rơi về mô tả `/du-an`); trống = "Chưa có dự án trong mục này." + nút "Về danh sách".
 
 Responsive: theo màn cha.
 

@@ -350,6 +350,7 @@
       "gridLabel": "Danh sách dự án",
       "emptyTitle": "Chưa có dự án phù hợp.",
       "noProjects": "Chưa có dự án nào được xuất bản.",
+      "noProjectsInCategory": "Chưa có dự án trong mục này.",
       "salesStatus": {
         "upcoming": "Sắp mở bán",
         "selling": "Đang mở bán",

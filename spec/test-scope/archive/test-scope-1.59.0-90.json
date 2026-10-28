@@ -1,0 +1,62 @@
+{
+  "specVersion": "1.59.0",
+  "scopeVersion": 90,
+  "generatedAt": "2026-10-28T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-088 BUG admin upload: ảnh > 10 MB ở tab Hình ảnh Dự án hiện cùng lúc \"An unknown error occurred.\" + \"Successfully saved 1 files\" (Payload bulk upload đếm 413 là thành công vì getFormState server action > 1 MB; build prod mất tên lớp APIError nên formatErrors trả fallback). Sửa: provider admin UploadSizeGuard chặn sớm ở client (chọn tệp/kéo-thả/dán) theo MEDIA_POLICY dùng chung (ảnh 10 MB, video 15 MB, PDF 20 MB, MIME lạ 20 MB), 1 toast tiếng Việt, không gửi request; server reject() giữ name APIError để REST trả đúng chữ tiếng Việt ở production. Không đổi requirement -> không bump spec_version. Reviewer STRICT PASS r2.",
+  "status": "published",
+  "workItem": "bug/admin-upload-oversize-toast",
+  "backlog": "BL-088",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-27-admin-upload-oversize-toast.md",
+  "task": "tasks/bug-admin-upload-oversize-toast/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-upload-oversize-toast-phase-1-task-01-round-2-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-89.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/lib/upload/media-limits.ts",
+      "src/lib/upload/validate-file.ts",
+      "src/lib/upload/validate-file-prod-name.test.ts",
+      "src/components/admin/UploadSizeGuard.tsx",
+      "src/components/admin/UploadSizeGuard.test.tsx",
+      "src/payload.config.ts",
+      "src/app/(payload)/admin/importMap.js"
+    ],
+    "modules": [
+      "UploadSizeGuard (mới, provider admin): chặn tệp quá dung lượng trước khi Payload gửi request",
+      "media-limits (mới): hằng số dung lượng dùng chung server/client",
+      "validate-file reject(): giữ name APIError ở build production"
+    ]
+  },
+  "screens": [
+    "/admin/collections/projects/<id> tab Hình ảnh (Thư viện ảnh, Tài liệu) — Tải lên / Thêm tệp / kéo-thả",
+    "/admin/collections/media/create",
+    "Ô upload ở Cho thuê, Tin BĐS, Tin tức, Dịch vụ, Trang chủ, ảnh đại diện Staff"
+  ],
+  "impact": {
+    "direct": [
+      "Chọn/kéo-thả/dán ảnh > 10 MB (video > 15 MB, PDF > 20 MB, tệp khác > 20 MB): 1 toast tiếng Việt nêu tên + dung lượng + giới hạn, không có POST /api/media, không có \"Successfully saved\"",
+      "Chọn nhiều tệp lẫn lộn: tệp hợp lệ vẫn vào drawer, tệp quá cỡ bị loại trong cùng 1 toast",
+      "Kéo-thả toàn tệp quá cỡ: dropzone không kẹt, Tải lên/Chọn tệp vẫn bấm được",
+      "REST POST /api/media trực tiếp ở build production: 413 trả \"File vượt quá 10MB.\" (415 \"Định dạng file không được hỗ trợ.\")"
+    ],
+    "dependents": [
+      "Mọi ô upload media trong admin (bulk upload drawer, upload đơn, màn tạo Ảnh, tệp)"
+    ],
+    "regression": [
+      "Ảnh ≤ 10 MB tải lên bình thường ở Dự án/Cho thuê/Tin BĐS/Tin tức, sinh thumb/card/large/og",
+      "Video ≤ 15 MB, PDF ≤ 20 MB tải lên được",
+      "SVG/HTML vẫn bị 415",
+      "Form nộp CV công khai (/tuyen-dung) không đổi"
+    ]
+  },
+  "acceptance": [
+    "Ảnh > 10 MB bị chặn, không thêm vào danh sách ảnh, không tạo media mồ côi",
+    "Chỉ 1 thông báo lỗi tiếng Việt nêu giới hạn; không có \"Successfully saved\"",
+    "Ảnh ≤ 10 MB vẫn tải lên bình thường ở các ô upload dùng chung"
+  ],
+  "risk": "medium",
+  "riskNote": "Provider admin dùng chung mọi ô upload (listener capture change/drop/paste). Residual: tệp đổi đuôi/MIME giả (vd JPEG 10–15 MB đặt .mp4) vẫn tới server 413 và có thể hiện toast kép của Payload (chữ đã đúng tiếng Việt); dán kèm chữ + ảnh quá cỡ chặn cả lượt dán."
+}
