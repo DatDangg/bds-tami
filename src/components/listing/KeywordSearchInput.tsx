@@ -3,7 +3,7 @@
 import { type ComponentProps, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 
-interface JobKeywordInputProps extends Omit<ComponentProps<typeof Input>, "defaultValue" | "value" | "ref"> {
+interface KeywordSearchInputProps extends Omit<ComponentProps<typeof Input>, "defaultValue" | "value" | "ref"> {
   /** Từ khoá đang trên URL (`?q=`). */
   keyword: string;
 }
@@ -13,7 +13,7 @@ interface JobKeywordInputProps extends Omit<ComponentProps<typeof Input>, "defau
  * dùng `key` theo từ khoá thì Enter trong ô làm input bị tạo lại → focus rơi về `body`.
  * Giữ `defaultValue` để SSR / no-JS vẫn có từ khoá.
  */
-export function JobKeywordInput({ keyword, ...props }: JobKeywordInputProps) {
+export function KeywordSearchInput({ keyword, ...props }: KeywordSearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   // Chỉ nạp lại khi từ khoá trên URL THẬT SỰ đổi (không chạy lúc mount: chữ gõ trước khi hydrate xong được giữ).
   const lastKeyword = useRef(keyword);

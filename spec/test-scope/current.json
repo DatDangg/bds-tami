@@ -1,43 +1,70 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 93,
-  "generatedAt": "2026-10-28T15:00:00+07:00",
+  "scopeVersion": 94,
+  "generatedAt": "2026-10-28T11:05:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-094 BUG tooling: `pnpm lint` (eslint .) toàn repo FAIL (3064 problems, 100% trong playwright-report/trace/ — bundle JS của trace viewer) vì eslint.config.mjs ignores thiếu output Playwright. Sửa: ignores thêm playwright-report/ + test-results/ (đều gitignore). Không đổi code app/requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer FAST PASS r1.",
+  "triggerNote": "BL-092 BUG (follow-up BL-089): ô tìm hero trang danh sách (ListingHero) bấm Tìm / Enter bị cuộn về đầu trang và Enter làm mất focus ô q (next/form scroll mặc định true + input có key theo q nên remount). Sửa: <Form scroll={false}>; JobKeywordInput chuyển thành KeywordSearchInput dùng chung (ListingHero + JobFilters). Không đổi requirement/API -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
   "status": "published",
-  "workItem": "bug/eslint-ignore-playwright-report",
-  "backlog": "BL-094",
+  "workItem": "bug/listing-hero-search-scroll-focus",
+  "backlog": "BL-092",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-28-eslint-ignore-playwright-report.md",
-  "task": "tasks/bug-eslint-ignore-playwright-report/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-eslint-ignore-playwright-report-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-92.json",
+  "changeDoc": "spec/changes/2026-10-28-listing-hero-search-scroll-focus.md",
+  "task": "tasks/bug-listing-hero-search-scroll-focus/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-listing-hero-search-scroll-focus-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-93.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "eslint.config.mjs"
+      "src/components/listing/ListingHero.tsx",
+      "src/components/listing/KeywordSearchInput.tsx",
+      "src/components/careers/JobFilters.tsx",
+      "src/components/listing/ListingHero.search.test.tsx"
     ],
     "modules": [
-      "ESLint flat config: ignores thêm output Playwright (playwright-report/, test-results/)"
+      "ListingHero: Form scroll={false} + ô q dùng KeywordSearchInput (bỏ key theo q)",
+      "KeywordSearchInput (đổi từ careers/JobKeywordInput): input từ khoá dùng chung, nạp lại giá trị khi q trên URL đổi mà không remount",
+      "JobFilters (/tuyen-dung): đổi import sang KeywordSearchInput"
     ]
   },
-  "screens": [],
+  "screens": [
+    "/du-an",
+    "/du-an/danh-muc/[category]",
+    "/cho-thue",
+    "/tin-bds",
+    "/tin-tuc",
+    "/en/projects",
+    "/en/projects/category/[category]",
+    "/en/for-rent",
+    "/en/property-news",
+    "/en/news",
+    "/tuyen-dung"
+  ],
   "impact": {
     "direct": [
-      "`pnpm lint` toàn repo exit 0 kể cả khi đã chạy Playwright (có playwright-report/, test-results/ trên đĩa)"
+      "Ô tìm hero các trang danh sách: bấm Tìm / Enter không cuộn về đầu trang (scrollY giữ nguyên) trên /du-an, /du-an/danh-muc/*, /cho-thue, /tin-bds, /tin-tuc và bản /en, ở desktop và mobile 390",
+      "Enter giữ focus ở ô q; bấm nút Tìm giữ focus ở nút",
+      "URL giữ q và các tham số được giữ lại (preservedParams)",
+      "Back trình duyệt / chip 'Tìm nhanh' đổi q -> ô tìm nạp lại đúng giá trị (back về trang gốc -> ô rỗng)"
     ],
     "dependents": [
-      "CI/verify command lint dùng `eslint .`"
+      "/cho-thue?q=... từ ô tìm header vẫn tự focus ô q (FocusListingSearch chọn form[role=search] input[name=q])",
+      "/tuyen-dung: JobFilters dùng chung KeywordSearchInput (BL-089) — Enter/TÌM không cuộn về đầu, giữ focus #job-filter-q, URL giữ q/province/category",
+      "SSR/no-JS: form GET + input name=q + giá trị ban đầu vẫn có trong HTML"
     ],
     "regression": [
-      "File nguồn (src/, tests/, các file gốc) vẫn được lint như trước — lỗi thật vẫn báo"
+      "Lọc/sắp xếp/phân trang các trang danh sách sau khi tìm (tham số giữ nguyên)",
+      "Chip 'Tìm nhanh' và liên kết danh mục trên hero",
+      "Ô tìm header toàn site (không đổi, chỉ kiểm không bị ảnh hưởng)"
     ]
   },
   "acceptance": [
-    "eslint.config.mjs ignores có playwright-report/ + test-results/, comment ngắn",
-    "`pnpm lint` toàn repo PASS"
+    "Cuộn 150px, gõ 'ha noi', Enter hoặc bấm Tìm: scrollY giữ nguyên trên /du-an, /cho-thue, /tin-tuc, /tin-bds, /en/projects (và 1 trang danh mục dự án nếu có), 1920 + 390",
+    "Enter: document.activeElement là input[name=q]; bấm nút: focus ở nút",
+    "URL ?q=ha+noi đúng, preservedParams giữ; back -> ô rỗng; chip đổi q -> ô nạp lại",
+    "/cho-thue?q=... từ header vẫn tự focus ô q",
+    "/tuyen-dung không hồi quy (test BL-089 PASS)"
   ],
-  "risk": "low",
-  "riskNote": "Chỉ cấu hình lint; không đổi runtime/build/test. Không có màn hình nào cần test thủ công."
+  "risk": "medium",
+  "riskNote": "ListingHero là component dùng chung 5 loại trang + bản /en, và KeywordSearchInput dùng chung với /tuyen-dung; không đổi API/schema/requirement. Reviewer STRICT PASS r1."
 }

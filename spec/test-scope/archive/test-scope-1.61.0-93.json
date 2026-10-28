@@ -1,0 +1,43 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 93,
+  "generatedAt": "2026-10-28T15:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-094 BUG tooling: `pnpm lint` (eslint .) toàn repo FAIL (3064 problems, 100% trong playwright-report/trace/ — bundle JS của trace viewer) vì eslint.config.mjs ignores thiếu output Playwright. Sửa: ignores thêm playwright-report/ + test-results/ (đều gitignore). Không đổi code app/requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer FAST PASS r1.",
+  "status": "published",
+  "workItem": "bug/eslint-ignore-playwright-report",
+  "backlog": "BL-094",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-28-eslint-ignore-playwright-report.md",
+  "task": "tasks/bug-eslint-ignore-playwright-report/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-eslint-ignore-playwright-report-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-92.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "eslint.config.mjs"
+    ],
+    "modules": [
+      "ESLint flat config: ignores thêm output Playwright (playwright-report/, test-results/)"
+    ]
+  },
+  "screens": [],
+  "impact": {
+    "direct": [
+      "`pnpm lint` toàn repo exit 0 kể cả khi đã chạy Playwright (có playwright-report/, test-results/ trên đĩa)"
+    ],
+    "dependents": [
+      "CI/verify command lint dùng `eslint .`"
+    ],
+    "regression": [
+      "File nguồn (src/, tests/, các file gốc) vẫn được lint như trước — lỗi thật vẫn báo"
+    ]
+  },
+  "acceptance": [
+    "eslint.config.mjs ignores có playwright-report/ + test-results/, comment ngắn",
+    "`pnpm lint` toàn repo PASS"
+  ],
+  "risk": "low",
+  "riskNote": "Chỉ cấu hình lint; không đổi runtime/build/test. Không có màn hình nào cần test thủ công."
+}

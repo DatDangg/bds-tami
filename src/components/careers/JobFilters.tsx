@@ -1,10 +1,10 @@
 import { useTranslations } from "next-intl";
 import Form from "next/form";
 import { MagnifyingGlass, MapPin } from "@/components/icons";
+import { KeywordSearchInput } from "@/components/listing/KeywordSearchInput";
 import { FormPendingMarker, PendingLink } from "@/components/layout/PendingRegion";
 import { Button } from "@/components/ui/button";
 import { OptionSelect } from "@/components/ui/option-select";
-import { JobKeywordInput } from "./JobKeywordInput";
 
 export interface JobProvinceOption {
   slug: string;
@@ -54,7 +54,7 @@ export function JobFilters({ actionPath, provinces, selectedProvince, keyword, h
           {tv("searchLabel")}
         </label>
         <MagnifyingGlass size={18} aria-hidden="true" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-text-muted" />
-        <JobKeywordInput
+        <KeywordSearchInput
           keyword={keyword ?? ""}
           id="job-filter-q"
           name="q"

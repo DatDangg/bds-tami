@@ -2,11 +2,11 @@ import { useTranslations } from "next-intl";
 import Form from "next/form";
 import { type ReactNode, useId } from "react";
 import { ArrowRight, MagnifyingGlass } from "@/components/icons";
+import { KeywordSearchInput } from "@/components/listing/KeywordSearchInput";
 import { PageHero } from "@/components/layout/PageHero";
 import { FormPendingMarker, PendingLink } from "@/components/layout/PendingRegion";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export interface ListingHeroSearch {
@@ -55,21 +55,20 @@ export function ListingHero({ title, titleAccent, eyebrow, description, image, b
     <PageHero size="list" overlap={false} title={title} titleAccent={titleAccent} eyebrow={eyebrow} description={description} image={image} breadcrumb={breadcrumb}>
       {search && (
         <div className="mt-3 flex w-full max-w-2xl flex-col gap-4">
-          {/* Thẻ tìm trắng trên ảnh: hero là `.theme-dark-block` (token surface/text bị đổi sang tối) nên ô dùng token cố định `on-dark` / `dark`. */}
-          <Form action={search.action} role="search" aria-label={t("searchLabel")} className="flex w-full flex-col gap-2 rounded-[28px] bg-on-dark p-1.5 sm:flex-row sm:items-center sm:rounded-pill">
+          {/* Thẻ tìm trắng trên ảnh: hero là `.theme-dark-block` (token surface/text bị đổi sang tối) nên ô dùng token cố định `on-dark` / `dark`. `scroll={false}` (BL-092): tìm xong không cuộn về đầu trang. */}
+          <Form action={search.action} scroll={false} role="search" aria-label={t("searchLabel")} className="flex w-full flex-col gap-2 rounded-[28px] bg-on-dark p-1.5 sm:flex-row sm:items-center sm:rounded-pill">
             {Object.entries(search.preservedParams ?? {}).map(([name, value]) => (value.trim() === "" || name === "q" ? null : <input key={name} type="hidden" name={name} value={value} />))}
             <div className="relative min-w-0 flex-1">
               <MagnifyingGlass size={20} aria-hidden="true" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-dark/60" />
-              {/* `key` theo từ khoá trên URL: chip "Tìm nhanh" / back đổi `q` thì ô nạp lại giá trị mới. */}
-              <Input
-                key={search.value ?? ""}
+              {/* Ô không remount khi `q` đổi (BL-092): Enter giữ focus; chip / back đổi `q` thì ô vẫn nạp lại giá trị mới. */}
+              <KeywordSearchInput
+                keyword={search.value ?? ""}
                 name="q"
                 type="search"
                 maxLength={100}
                 autoComplete="off"
                 aria-label={t("keywordLabel")}
                 placeholder={search.placeholder}
-                defaultValue={search.value ?? ""}
                 className="h-12 rounded-pill border-transparent bg-transparent pl-12 text-dark placeholder:text-dark/60 focus-visible:outline-dark"
               />
             </div>
