@@ -146,14 +146,14 @@ export async function NewsListPage({ locale, searchParams, categorySlug }: NewsL
 }
 
 /**
- * Form "Tư vấn nhu cầu" cuối `/tin-tuc` (nguồn `contact`, cùng LeadForm của trang Liên hệ): thẻ trắng bo 20px, đầu khối canh trái (`SectionHeading`).
+ * Form "Tư vấn nhu cầu" cuối `/tin-tuc` (nguồn `contact`, cùng LeadForm của trang Liên hệ): thẻ trắng bo 20px rộng tối đa 42rem canh giữa khung nội dung (BL-098), đầu khối canh trái (`SectionHeading`).
  * `id="lead-form"` giữ làm đích cuộn như `LeadFormSlot`.
  */
 function ConsultSection({ title, turnstileSiteKey }: { title: string; turnstileSiteKey: string | undefined }) {
   const headingId = useId();
   return (
     <section id="lead-form" aria-labelledby={headingId} className="mx-auto w-full max-w-container scroll-mt-[calc(var(--sticky-top)+1rem)] px-gutter pb-section-tight">
-      <div className="flex max-w-2xl flex-col gap-6 rounded-xl border border-border bg-surface p-6 lg:p-8">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 rounded-xl border border-border bg-surface p-6 lg:p-8">
         <SectionHeading id={headingId} title={title} />
         <LeadForm source="contact" {...(turnstileSiteKey ? { turnstileSiteKey } : {})} />
       </div>

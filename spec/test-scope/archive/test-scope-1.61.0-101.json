@@ -1,0 +1,48 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 101,
+  "generatedAt": "2026-10-29T00:20:00+00:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-097 BUG admin Tuyển dụng: ô 'Hạn nộp hồ sơ' (JobPostings.deadline) hiện 'thg 10 30' thay vì dd/MM/yyyy (QA sheet 28/10 dòng 18). Kiểm lại trên HEAD 7b0a315: KHÔNG còn lỗi — đã được sửa bởi commit af1e983 (BL-076, helper src/fields/admin-date.ts, adminDate(\"dayOnly\") -> displayFormat dd/MM/yyyy). Lần này KHÔNG đổi code. Root cause cũ: Payload DatePicker.js:53 mặc định 'MMM dd' + locale vi. Evidence Playwright: .context/review-reports/assets/bl097-{list,form-field,picker,form-reopened}-1920.png; lưu chọn 15/01/2027 -> mở lại 15/01/2027, API 2027-01-15T12:00Z (đúng ngày GMT+7). Fixed by af1e983, chờ deploy lên server test. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "status": "published",
+  "workItem": "bug/admin-job-deadline-date-format",
+  "backlog": "BL-097",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-28-admin-job-deadline-date-format.md",
+  "task": "tasks/bug-admin-job-deadline-date-format/phase-1-task-01.md",
+  "reviewReport": null,
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-100.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [],
+    "note": "Không đổi code — đã sửa bởi af1e983 (BL-076), chờ deploy lên server test.",
+    "modules": [
+      "Admin Tuyển dụng — trường Hạn nộp hồ sơ (form + date picker + cột danh sách)"
+    ]
+  },
+  "screens": [
+    "/admin/collections/job-postings (cột Hạn nộp hồ sơ)",
+    "/admin/collections/job-postings/<id> (ô Hạn nộp hồ sơ + date picker)"
+  ],
+  "impact": {
+    "direct": [
+      "Admin Tuyển dụng: cột danh sách, ô nhập và date picker của Hạn nộp hồ sơ hiện dd/MM/yyyy (không còn 'thg 10 30')"
+    ],
+    "dependents": [
+      "Các trường ngày dùng adminDate(\"dayOnly\") / adminDate khác (BL-076) — cùng helper src/fields/admin-date.ts"
+    ],
+    "regression": [
+      "Chọn ngày rồi lưu: mở lại đúng ngày theo GMT+7 (15/01/2027 -> 15/01/2027, API 2027-01-15T12:00Z)",
+      "Trang tuyển dụng public hiển thị hạn nộp hồ sơ đúng ngày"
+    ]
+  },
+  "acceptance": [
+    "Cột danh sách, ô nhập và date picker của Hạn nộp hồ sơ hiện dd/MM/yyyy",
+    "Chọn ngày, lưu, mở lại: hiển thị đúng ngày đã chọn theo GMT+7",
+    "Kiểm lại trên server test SAU KHI deploy af1e983"
+  ],
+  "testNotes": "Server test chưa chắc đã có af1e983 — deploy xong mới kiểm. Evidence local: .context/review-reports/assets/bl097-{list,form-field,picker,form-reopened}-1920.png.",
+  "risk": "low",
+  "riskNote": "Low: không đổi code/requirement; chỉ xác nhận lỗi đã được sửa bởi BL-076."
+}

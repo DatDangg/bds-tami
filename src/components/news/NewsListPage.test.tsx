@@ -247,6 +247,12 @@ describe("S10 /tin-tuc trang 1 (BL-054, design tin-tuc.webp)", () => {
     expect(consult.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it("BL-098: thẻ form Tư vấn nhu cầu canh giữa trong khung nội dung, rộng tối đa 42rem", async () => {
+    await render("vi");
+    const card = screen.getByRole("heading", { level: 2, name: "Tư vấn nhu cầu" }).closest("#lead-form > div") as HTMLElement;
+    expect(card).toHaveClass("mx-auto", "max-w-2xl");
+  });
+
   it("phân trang không đổi: trang 1 chỉ trỏ /tin-tuc?page=2, rel=next", async () => {
     await render("vi");
     const pagination = screen.getByRole("navigation", { name: "Phân trang" });

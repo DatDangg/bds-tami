@@ -4499,6 +4499,41 @@
       "report": null,
       "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-29"
+    },
+    {
+      "slug": "news-consult-form-layout",
+      "title": "Tin tức: form \"Tư vấn nhu cầu\" lệch trái, bên phải trống lớn (BL-098, QA bug 14)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-098",
+      "changeDoc": "spec/changes/archive/2026-10-28-news-consult-form-layout.md",
+      "startedAt": "2026-10-29",
+      "planApprovedAt": "2026-10-28 (user: batch BL-095→BL-100 auto proceed)",
+      "rootCause": "NewsListPage.tsx ConsultSection: thẻ max-w-2xl (42rem) không mx-auto trong khung max-w-container 80rem → ≥1280 dính trái, trống phải 576px; 768 lệch 23/73",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-news-consult-form-layout/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "FAST",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-news-consult-form-layout-phase-1-task-01-round-1-review.md",
+          "note": "Thẻ form canh giữa (mx-auto w-full max-w-2xl), giữ 42rem theo design-spec S10; LeadForm/source contact không đổi; test BL-098.",
+          "verify": "Playwright Edge /tin-tuc + /en/news: trước khe 32/576 (1920,1440), 23/73 (768) → sau 304/304, 48/48; 390 không đổi; không cuộn ngang. typecheck/lint PASS, pnpm test 4816 PASS",
+          "completedAt": "2026-10-29"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 102,
+      "review": "FAST PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-news-consult-form-layout-phase-1-task-01-round-1-review.md",
+      "docImpact": ".context/design-spec.md S10 (1 dòng as-built); no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-29"
     }
   ],
   "projectName": "tami-website",
@@ -5152,7 +5187,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-29",
+  "lastUpdated": "2026-10-28T17:30:46.590Z",
   "approvalMilestones": [
     {
       "id": "M1",
