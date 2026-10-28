@@ -13,8 +13,45 @@ const stampFirstPublish: FieldHook = ({ value, data, originalDoc, previousValue 
   return status === "published" ? new Date().toISOString() : value;
 };
 
-/** Chỉ đọc với mọi người ở Must (hẹn giờ mở ở task riêng, FR-ADM-16); hệ thống ghi qua hook. */
-export function publishedAtField(): DateField {
+/**
+ * Bản cho Tin tức (hẹn giờ, BL-091): giá trị người dùng gửi lên được dùng nguyên (kể cả quá khứ / tương lai); không gửi (`undefined`, vd cập nhật
+ * từng phần qua API) → giữ giá trị đã lưu; để trống (`null` / "") mà `status = published` → bây giờ; để trống khi chưa xuất bản → để trống.
+ */
+const stampScheduledPublish: FieldHook = ({ value, data, originalDoc, previousValue }) => {
+  const submitted = value === undefined ? previousValue : value;
+  if (submitted) return submitted;
+  const status = data?.status ?? originalDoc?.status;
+  if (status === "published") return new Date().toISOString();
+  return submitted === undefined ? value : null;
+};
+
+export interface PublishedAtOptions {
+  /** Chỉ Tin tức: ô sửa được để hẹn giờ xuất bản (FR-ADM-16). Các collection khác giữ chỉ-đọc + hệ thống ghi qua hook. */
+  scheduled?: boolean;
+}
+
+const SCHEDULED_COMPONENTS = {
+  Cell: "/components/admin/ScheduledPublishDisplay#ScheduledPublishCell",
+  afterInput: ["/components/admin/ScheduledPublishDisplay#ScheduledPublishNotice"],
+};
+
+/** Mặc định chỉ đọc với mọi người (hệ thống ghi qua hook); `scheduled` mở cho ai sửa được bài (access cấp collection quyết định). */
+export function publishedAtField({ scheduled = false }: PublishedAtOptions = {}): DateField {
+  if (scheduled) {
+    return {
+      name: "publishedAt",
+      type: "date",
+      label: "Ngày xuất bản",
+      index: true,
+      hooks: { beforeChange: [stampScheduledPublish] },
+      admin: {
+        position: "sidebar",
+        description: "Để trống thì tự điền khi xuất bản lần đầu; chọn giờ trong tương lai để hẹn giờ.",
+        date: { pickerAppearance: "dayAndTime" },
+        components: SCHEDULED_COMPONENTS,
+      },
+    };
+  }
   return {
     name: "publishedAt",
     type: "date",

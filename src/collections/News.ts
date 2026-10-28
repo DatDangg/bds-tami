@@ -70,7 +70,7 @@ export function createNews(revalidate?: RevalidatePaths, revalidateTags?: Revali
         ]),
       ],
     },
-    { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate },
+    { englishRequiredFields: ["title", "slug", "excerpt", "content"], revalidate, scheduledPublish: true },
   );
   // Chỉ để lại trường nghiệp vụ trong "Thêm bộ lọc" (BL-021 #06): tags ẩn thêm ngoài quy tắc theo kiểu trường + SEO/bản dịch/slug.
   return hideTechnicalListFields(collection, ["tags"]);

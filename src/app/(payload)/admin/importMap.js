@@ -62,6 +62,8 @@ import { RoomsAreaCell as RoomsAreaCell_62403afdb557857f9ec056a2cf5b4bd1 } from 
 import { RentalCodeBanner as RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2 } from '../../../components/admin/RentalCodeDisplay'
 import { RentalQuickFilterSlot as RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000 } from '../../../components/admin/RentalQuickFilterSlot'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { ScheduledPublishCell as ScheduledPublishCell_d32f0cd9e49c1b94ea90220968997856 } from '../../../components/admin/ScheduledPublishDisplay'
+import { ScheduledPublishNotice as ScheduledPublishNotice_d32f0cd9e49c1b94ea90220968997856 } from '../../../components/admin/ScheduledPublishDisplay'
 import { ApproveEnglishButton as ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3 } from '../../../components/admin/ApproveEnglishButton'
 import { JobDeadlineCell as JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
 import { JobDeadlineNotice as JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8 } from '../../../components/admin/JobDeadlineDisplay'
@@ -152,6 +154,8 @@ export const importMap = {
   "/components/admin/RentalCodeDisplay#RentalCodeBanner": RentalCodeBanner_77a1e7112ecc4108b767b0d795703ee2,
   "/components/admin/RentalQuickFilterSlot#RentalQuickFilterSlot": RentalQuickFilterSlot_64c13794a01fed34be40c477f5386000,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "/components/admin/ScheduledPublishDisplay#ScheduledPublishCell": ScheduledPublishCell_d32f0cd9e49c1b94ea90220968997856,
+  "/components/admin/ScheduledPublishDisplay#ScheduledPublishNotice": ScheduledPublishNotice_d32f0cd9e49c1b94ea90220968997856,
   "/components/admin/ApproveEnglishButton#ApproveEnglishButton": ApproveEnglishButton_0c46be883e0bccaec51a37e5486404f3,
   "/components/admin/JobDeadlineDisplay#JobDeadlineCell": JobDeadlineCell_63f1b3cb2c2d0ad0d2d7ff98476b01c8,
   "/components/admin/JobDeadlineDisplay#JobDeadlineNotice": JobDeadlineNotice_63f1b3cb2c2d0ad0d2d7ff98476b01c8,

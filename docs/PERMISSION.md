@@ -39,7 +39,7 @@ Ký hiệu: ✔ = được · **Mình** = chỉ bản ghi do mình đăng (`auth
 | `projects` | Đã xuất bản | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
 | `rentals` | Đã xuất bản + Đã thuê | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
 | `property-posts` | Đã xuất bản | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
-| `news` | Đã xuất bản | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
+| `news` | Đã xuất bản và `publishedAt` trống hoặc ≤ now (hẹn giờ, BL-091) | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
 | `job-postings` | Đã xuất bản | ✔ | ✔ tất cả | Mình ⚠️ | Mình ⚠️ | ✔ |
 | `services` | Đã xuất bản | — | ✔ | — | — | ✔ |
 | `pages` | Đã xuất bản | — | ✔ | — | — | ✔ |

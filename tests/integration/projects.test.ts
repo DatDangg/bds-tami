@@ -287,6 +287,19 @@ describe.skipIf(!baseUrl)("integration: projects (DB tạm)", () => {
     });
   });
 
+  describe("không có hẹn giờ xuất bản (BL-091 chỉ cho Tin tức)", () => {
+    it("dự án published có publishedAt tương lai vẫn hiện với khách; publishedAt vẫn chỉ đọc (admin sửa tay bị bỏ qua)", async () => {
+      const doc = await createProject({ title: "Dự án không hẹn giờ bl091", status: "published", gallery: [mediaIds[0], mediaIds[1]] });
+      await withDatabase((client) => client.query(`UPDATE "projects" SET published_at = now() + interval '30 days' WHERE id = $1`, [doc.id]));
+      const guest = await payload.find({ collection: "projects", where: { id: { equals: doc.id } }, locale: "vi", overrideAccess: false, depth: 0 });
+      expect(guest.docs.map((found) => found.id)).toEqual([doc.id]);
+
+      const stored = (await payload.findByID({ collection: "projects", id: doc.id, overrideAccess: true, depth: 0 })).publishedAt;
+      const attempted = await updateProject(doc.id, { publishedAt: "1999-01-01T00:00:00.000Z" });
+      expect(attempted.publishedAt).toBe(stored);
+    });
+  });
+
   describe("gallery bắt buộc khi published", () => {
     it("published thiếu gallery (hoặc gallery rỗng) → 400; nháp được; có gallery → xuất bản; không gỡ hết ảnh được", async () => {
       expect(await statusOf(createProject({ title: "Xuất bản thiếu ảnh", status: "published" }))).toBe(400);

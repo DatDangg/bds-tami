@@ -14,8 +14,8 @@ import { vietnamDayStart } from "./view-dedupe";
 export const MOST_READ_LIMIT = 5;
 /** Cửa sổ tính lượt xem: 30 ngày theo giờ Việt Nam, gồm cả hôm nay. */
 export const MOST_READ_WINDOW_DAYS = 30;
-/** Cache ngắn (spec: ≤ 1 giờ). Xuất bản / ẩn / xoá bài làm mới ngay qua tag `NEWS_MOST_READ_TAG`. */
-const MOST_READ_CACHE_SECONDS = 600;
+/** Cache ngắn. Xuất bản / ẩn / xoá bài làm mới ngay qua tag `NEWS_MOST_READ_TAG`; 60s giữ mức trễ của tin hẹn giờ tới giờ (BL-091) ngang ISR. */
+const MOST_READ_CACHE_SECONDS = 60;
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Cùng thứ tự "mới nhất" của danh sách tin (`news-queries.ts`). */
 const NEWEST_SORT = ["-publishedAt", "-createdAt"];
@@ -34,7 +34,7 @@ export function mostReadWindowStart(now: Date): Date {
  * bài đã ẩn không chiếm suất; quyết định cuối vẫn là `findPublicList` ở `findMostReadNews`. Quét theo `day` rồi gộp theo
  * `news_id` (index `news_views_daily_day_idx` / `news_day_idx`).
  */
-export async function rankNewsByViews(payload: Payload, locale: Locale, since: Date, limit: number): Promise<string[]> {
+export async function rankNewsByViews(payload: Payload, locale: Locale, since: Date, limit: number, now: Date = new Date()): Promise<string[]> {
   const statuses = sql.join(PUBLIC_STATUSES.default.map((status) => sql`${status}`), sql`, `);
   const english = locale === "en" ? sql` AND n."has_english" = true` : sql``;
   const adapter = payload.db as unknown as PostgresAdapter;
@@ -42,7 +42,8 @@ export async function rankNewsByViews(payload: Payload, locale: Locale, since: D
     SELECT v."news_id"::text AS id, SUM(v."views") AS total
     FROM "news_views_daily" v
     JOIN "news" n ON n."id" = v."news_id"
-    WHERE v."day" >= ${since.toISOString()} AND n."status" IN (${statuses}) AND n."deleted_at" IS NULL${english}
+    WHERE v."day" >= ${since.toISOString()} AND n."status" IN (${statuses}) AND n."deleted_at" IS NULL
+      AND (n."published_at" IS NULL OR n."published_at" <= ${now.toISOString()}::timestamptz)${english}
     GROUP BY v."news_id", n."published_at"
     ORDER BY total DESC, n."published_at" DESC NULLS LAST, v."news_id"
     LIMIT ${limit}
@@ -88,7 +89,7 @@ export async function findMostReadNews(
       if (item) items.push(item);
     }
   };
-  const rankedIds = await rankNewsByViews(payload, locale, mostReadWindowStart(options.now ?? new Date()), limit * OVERFETCH_FACTOR);
+  const rankedIds = await rankNewsByViews(payload, locale, mostReadWindowStart(options.now ?? new Date()), limit * OVERFETCH_FACTOR, options.now);
   if (rankedIds.length > 0) {
     const byId = new Map((await listCards(payload, locale, { id: { in: rankedIds } }, rankedIds.length)).map((doc) => [doc.id, doc]));
     take(rankedIds.flatMap((id) => byId.get(id) ?? []));
@@ -102,7 +103,7 @@ export async function findMostReadNews(
   return items;
 }
 
-/** Khối "Đọc nhiều" cho trang công khai: cache theo (locale, limit), tag `NEWS_MOST_READ_TAG`, tối đa 10 phút. */
+/** Khối "Đọc nhiều" cho trang công khai: cache theo (locale, limit), tag `NEWS_MOST_READ_TAG`, tối đa 60 giây. */
 export function loadMostReadNews(locale: Locale, limit: number = MOST_READ_LIMIT): Promise<MostReadNewsItem[]> {
   return unstable_cache(
     async () => {

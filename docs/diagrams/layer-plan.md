@@ -48,7 +48,7 @@
 | 13 | Should: dashboard, redirect UI, trang khu vực, đối tác | 4 | `01` Dashboard admin (FR-ADM-14): lead, nội dung, lượt bấm, cảnh báo dịch, chi phí dịch<br>`02` Quản lý chuyển hướng 301 trong admin (FR-ADM-15): kiểm tra hợp lệ, chống vòng/chuỗi<br>`03` Trang đích khu vực Cho thuê (FR-PUB-16, S06)<br>`04` Khối Đối tác / chủ đầu tư trên trang chủ (FR-PUB-17) | ⏸ M4 |
 | 14 | Hardening: header bảo mật, CWV/a11y | 2 | `01` Header bảo mật: CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy<br>`02` Kiểm tra CWV, WCAG AA, responsive trên các trang chính và sửa lỗi nhỏ | ⏸ M5 |
 | 15 | Release: deploy production | 1 | `01` Deploy production (cần user duyệt, mốc M5) + kiểm tra AI-readiness + bàn giao | — |
-| 16 | Could: hẹn giờ xuất bản (lên production ở lần deploy kế tiếp) | 1 | `01` Hẹn giờ xuất bản (FR-ADM-16, Could): `publishedAt ≤ now` + job revalidate mỗi phút | — |
+| 16 | Could: hẹn giờ xuất bản (SUPERSEDED bởi BL-091 — chỉ Tin tức, không cron) | 1 | `01` Hẹn giờ xuất bản (FR-ADM-16, Could) — không chạy | — |
 
 ## Sơ đồ layer (Mermaid)
 
@@ -582,7 +582,7 @@ flowchart LR
 
 ## Ghi chú đã xử lý
 
-- **M4 (hẹn giờ xuất bản):** `publicWhere` (task `layer-4-task-03`) là nơi duy nhất dựng điều kiện công khai; điều kiện `publishedAt ≤ now` + job revalidate mỗi phút nằm trong task Could `layer-16-task-01`. Ở Must, `publishedAt` tự gán khi xuất bản lần đầu và chỉ đọc.
+- **M4 (hẹn giờ xuất bản) — SUPERSEDED bởi BL-091 (2026-10-28): chỉ Tin tức, không cron; `layer-16-task-01` không chạy.** `publicWhere` (task `layer-4-task-03`) là nơi duy nhất dựng điều kiện công khai; điều kiện `publishedAt ≤ now` + job revalidate mỗi phút nằm trong task Could `layer-16-task-01`. Ở Must, `publishedAt` tự gán khi xuất bản lần đầu và chỉ đọc.
 - **Session 8 giờ không hoạt động:** task `layer-2-task-04` (`tokenExpiration` 8 giờ + admin provider làm mới token khi có thao tác, throttle 15 phút). Không làm được thì ghi residual risk và hỏi user.
 - **Tokens / Phosphor / cookie banner:** `layer-1-task-04` (tokens → Tailwind v4, Phosphor, chặn lucide), `layer-5-task-07` (GA4 chỉ sau đồng ý).
 - **CI chạy từ đầu:** `layer-1-task-01` ngay Layer 1. **Staging sớm** `layer-6-task-01` (sau L5), **redeploy staging đủ Must + E2E** `layer-12-task-01`, **production** `layer-15-task-01` (mốc M5, sau Should + hardening). **Could** `layer-16-task-01` là layer cuối, lên production ở lần deploy kế tiếp; production không phụ thuộc Could.

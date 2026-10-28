@@ -625,4 +625,77 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       for (const fields of bad) expect(await statusOf(createNews({ title: `Khối hỏng ${String(fields.blockType)}`, content: withBlocks(fields) })), JSON.stringify(fields)).toBe(400);
     });
   });
+
+  describe("hẹn giờ xuất bản (BL-091)", () => {
+    const HOUR = 60 * 60 * 1000;
+    const future = () => new Date(Date.now() + 48 * HOUR).toISOString();
+    const past = () => new Date(Date.now() - 48 * HOUR).toISOString();
+    const publish = (title: string, data: Record<string, unknown> = {}) =>
+      createNews({ title, status: "published", cover: mediaId, content: lexical(`Nội dung ${title}`), ...data });
+    const guestTitles = async (locale: Locale = "vi") =>
+      (await payload.find({ collection: "news", locale, overrideAccess: false, limit: 200, depth: 0 })).docs.map((doc) => doc.title as string);
+    const publicTitles = async () => (await publicQueries.findPublicList<{ title: string }>(payload, "news", "vi", { limit: 200 })).docs.map((doc) => doc.title);
+
+    it("khách (access.read) và truy vấn công khai: tin published hẹn giờ tương lai bị ẩn; quá khứ / trống hiện; staff vẫn đọc", async () => {
+      const scheduled = await publish("Hẹn giờ ẩn bl091", { publishedAt: future() });
+      const earlier = await publish("Đã qua giờ bl091", { publishedAt: past() });
+      const noDate = await publish("Không ngày bl091");
+      await withDatabase((client) => client.query(`UPDATE "news" SET published_at = NULL WHERE id = $1`, [noDate.id]));
+
+      for (const titles of [await guestTitles(), await publicTitles()]) {
+        expect(titles).not.toContain("Hẹn giờ ẩn bl091");
+        expect(titles).toEqual(expect.arrayContaining(["Đã qua giờ bl091", "Không ngày bl091"]));
+      }
+      expect(await publicQueries.findPublicBySlug(payload, "news", "vi", "hen-gio-an-bl091")).toBeNull();
+      expect(await publicQueries.findPublicBySlug(payload, "news", "vi", "da-qua-gio-bl091")).not.toBeNull();
+      expect(await statusOf(payload.findByID({ collection: "news", id: scheduled.id, locale: "vi", overrideAccess: false }))).toBe(404);
+
+      // Staff (admin + sale) vẫn đọc được tin hẹn giờ.
+      for (const staff of [admin, sale]) {
+        const found = await payload.findByID({ collection: "news", id: scheduled.id, locale: "vi", user: asUser(staff), overrideAccess: false, depth: 0 });
+        expect(found.id).toBe(scheduled.id);
+      }
+      expect(earlier.publishedAt).toBeTruthy();
+    });
+
+    it("tới giờ: đưa publishedAt về quá khứ thì tin hiện (không thao tác thêm)", async () => {
+      const scheduled = await publish("Sắp tới giờ bl091", { publishedAt: future() });
+      expect(await guestTitles()).not.toContain("Sắp tới giờ bl091");
+      await withDatabase((client) => client.query(`UPDATE "news" SET published_at = now() - interval '1 minute' WHERE id = $1`, [scheduled.id]));
+      expect(await guestTitles()).toContain("Sắp tới giờ bl091");
+      expect(await publicQueries.findPublicBySlug(payload, "news", "vi", "sap-toi-gio-bl091")).not.toBeNull();
+    });
+
+    it("ô publishedAt sửa được (sale sửa tin của mình): dùng đúng giá trị gửi lên; trống → now khi published; giữ khi cập nhật từng phần", async () => {
+      const target = future();
+      const created = await publish("Ô ngày sửa được bl091", { publishedAt: target });
+      expect(new Date(created.publishedAt as string).toISOString()).toBe(target);
+      const renamed = await updateNews(created.id, { excerpt: "Chỉ đổi tóm tắt" }, { as: sale });
+      expect(new Date(renamed.publishedAt as string).toISOString()).toBe(target);
+      const moved = await updateNews(created.id, { publishedAt: past() }, { as: sale });
+      expect(new Date(moved.publishedAt as string).getTime()).toBeLessThan(Date.now());
+      const cleared = await updateNews(created.id, { publishedAt: null }, { as: sale });
+      expect(Math.abs(new Date(cleared.publishedAt as string).getTime() - Date.now())).toBeLessThan(60_000);
+
+      const draft = await createNews({ title: "Nháp chưa ngày bl091", publishedAt: null });
+      expect(draft.publishedAt ?? null).toBeNull();
+      const firstPublish = await updateNews(draft.id, { status: "published", cover: mediaId, publishedAt: null }, { as: sale });
+      expect(Math.abs(new Date(firstPublish.publishedAt as string).getTime() - Date.now())).toBeLessThan(60_000);
+    });
+
+    it("SQL thô: tìm q / tag và khối Chủ đề bỏ tin hẹn giờ chưa tới giờ", async () => {
+      const search = await import("../../src/lib/news/news-search");
+      const scope = await createCategory("Hẹn giờ BL091", "news");
+      const live = await publish("Hiện zh91", { category: scope.id, tags: ["thẻ-hẹn-zh91"] });
+      const hiddenYet = await publish("Chờ giờ zh91", { category: scope.id, tags: ["thẻ-hẹn-zh91", "chỉ-hẹn-zh91"], publishedAt: future() });
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zh91" })).toEqual([live.id]);
+      expect(await search.findFilteredNewsIds(payload, "vi", { tag: "thẻ-hẹn-zh91" })).toEqual([live.id]);
+      const tags = await search.listTopNewsTags(payload, "vi");
+      expect(tags).toContain("thẻ-hẹn-zh91");
+      expect(tags).not.toContain("chỉ-hẹn-zh91");
+      // Mốc "bây giờ" ở sau giờ hẹn → hiện lại (mới nhất trước).
+      const later = new Date(Date.now() + 96 * HOUR);
+      expect(await search.findFilteredNewsIds(payload, "vi", { q: "zh91" }, later)).toEqual([hiddenYet.id, live.id]);
+    });
+  });
 });

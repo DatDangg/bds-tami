@@ -52,6 +52,11 @@ export interface ContentOptions {
    * trường đó và DB giữ UNIQUE (`_locale`, trường, `slug`) qua trường phụ `scopeSlug`. Không dùng chung với `omit: ["slug"]`.
    */
   scopeField?: string;
+  /**
+   * Hẹn giờ xuất bản (FR-ADM-16, BL-091) — chỉ `news` bật: ô `publishedAt` sửa được (hook + nhãn danh sách + ghi chú múi giờ) và `access.read` của khách
+   * thêm điều kiện `publishedAt` trống / ≤ now (cùng option với `publicWhere`). Không bật = chỉ đọc, hành vi như cũ.
+   */
+  scheduledPublish?: boolean;
   /** Trường EN bắt buộc để bật `hasEnglish` (mặc định `title`, `slug`; thêm mô tả ngắn + nội dung chính theo collection). */
   englishRequiredFields?: readonly string[];
   /**
@@ -94,7 +99,7 @@ function buildSharedFields(options: ContentOptions): Array<[SharedFieldName, Fie
   const part = (name: string) => translation.filter((field) => "name" in field && field.name === name);
   return [
     ["status", [statusField(options.statuses ?? CONTENT_STATUSES)]],
-    ["publishedAt", [publishedAtField()]],
+    ["publishedAt", [publishedAtField({ scheduled: options.scheduledPublish })]],
     ["author", [authorField(), authorNameField()]],
     ["isFeatured", [isFeaturedField()]],
     ["slug", [slugField({ sourceField: options.slugSource, scopeField: options.scopeField }), ...(options.scopeField ? [scopeSlugField(options.scopeField)] : [])]],
@@ -227,7 +232,7 @@ export function withContentDefaults(collection: CollectionConfig, options: Conte
     custom: { ...collection.custom, englishRequiredFields: options.englishRequiredFields ?? ["title", "slug"] },
     versions: collection.versions ?? { maxPerDoc: MAX_VERSIONS_PER_DOC, drafts: false },
     access: {
-      read: makePublishedOnly(publicStatuses),
+      read: makePublishedOnly(publicStatuses, { scheduled: options.scheduledPublish }),
       create: isStaff,
       update: isAuthorOrAdmin,
       delete: deleteAccess,

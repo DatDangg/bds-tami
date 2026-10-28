@@ -348,6 +348,11 @@
   gap: 8px;
 }
 
+.tami-schedule-cell {
+  font-weight: 600;
+  color: var(--admin-badge-warning-fg, inherit);
+}
+
 .tami-deadline-cell {
   display: inline-flex;
   flex-wrap: wrap;

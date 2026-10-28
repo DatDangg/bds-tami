@@ -203,3 +203,22 @@ describe("withContentDefaults: màn lịch sử chỉnh sửa (BL-058)", () => {
     expect(kept.admin?.components?.views?.edit?.api).toEqual({ Component: "/y#Api" });
   });
 });
+
+describe("withContentDefaults: scheduledPublish (BL-091)", () => {
+  const publishedAt = (config: CollectionConfig) => findLayoutField(config.fields, "publishedAt") as { admin?: { readOnly?: boolean }; access?: unknown };
+  const guestRead = (config: CollectionConfig) => (config.access?.read as (args: unknown) => unknown)({ req: { user: null } });
+
+  it("mặc định (Dự án / Cho thuê / Tin BĐS...): publishedAt chỉ đọc + deny-all, where khách không có điều kiện hẹn giờ", () => {
+    const config = withContentDefaults(base);
+    expect(publishedAt(config).admin?.readOnly).toBe(true);
+    expect(publishedAt(config).access).toBeDefined();
+    expect(JSON.stringify(guestRead(config))).not.toContain("publishedAt");
+  });
+
+  it("scheduledPublish: ô sửa được và where khách thêm publishedAt trống / ≤ now", () => {
+    const config = withContentDefaults(base, { scheduledPublish: true });
+    expect(publishedAt(config).admin?.readOnly).toBeFalsy();
+    expect(publishedAt(config).access).toBeUndefined();
+    expect(JSON.stringify(guestRead(config))).toContain("less_than_equal");
+  });
+});

@@ -15,12 +15,12 @@ const adapterOf = (payload: Payload) => payload.db as unknown as PostgresAdapter
 
 /**
  * Bài công khai (bí danh `n`) ở mức SQL: cùng nghĩa `publicWhere("news", locale)` — trạng thái công khai, chưa xoá mềm, `/en` thì `hasEnglish`
- * (như `rankNewsByViews`). Chỉ để lọc sơ bộ: kết quả cuối vẫn đi qua `findPublicList` (`listPublicNews`), nên lệch ở đây không lộ bài nào.
+ * (như `rankNewsByViews`) + hẹn giờ (BL-091): `published_at` trống hoặc ≤ `now`. Chỉ để lọc sơ bộ: kết quả cuối vẫn đi qua `findPublicList` (`listPublicNews`), nên lệch ở đây không lộ bài nào.
  */
-function publicNewsSql(locale: Locale) {
+function publicNewsSql(locale: Locale, now: Date) {
   const statuses = sql.join(PUBLIC_STATUSES.default.map((status) => sql`${status}`), sql`, `);
   const english = locale === "en" ? sql` AND n."has_english" = true` : sql``;
-  return sql`n."status" IN (${statuses}) AND n."deleted_at" IS NULL${english}`;
+  return sql`n."status" IN (${statuses}) AND n."deleted_at" IS NULL AND (n."published_at" IS NULL OR n."published_at" <= ${now.toISOString()}::timestamptz)${english}`;
 }
 
 /**
@@ -35,13 +35,14 @@ export async function findFilteredNewsIds(
   payload: Payload,
   locale: Locale,
   filters: { q?: string | undefined; tag?: string | undefined; categoryIds?: readonly string[] | undefined },
+  now: Date = new Date(),
 ): Promise<string[] | null> {
   const terms = searchTerms(filters.q);
   if (terms.length === 0 && !filters.tag) return null;
   if (filters.categoryIds?.length === 0) return [];
   const haystack = unaccentSql(sql`coalesce(nl."title", '') || ' ' || coalesce(nl."excerpt", '')`);
   const conditions = [
-    publicNewsSql(locale),
+    publicNewsSql(locale, now),
     ...(filters.categoryIds ? [sql`n."category_id"::text IN (${sql.join(filters.categoryIds.map((id) => sql`${id}`), sql`, `)})`] : []),
     ...terms.map((term) => sql`${haystack} LIKE ${`%${escapeLike(term)}%`}`),
     ...(filters.tag ? [sql`EXISTS (SELECT 1 FROM "news_texts" t WHERE t."parent_id" = n."id" AND t."path" = 'tags' AND btrim(t."text") = ${filters.tag})`] : []),
@@ -63,12 +64,12 @@ export async function findFilteredNewsIds(
  * Khối "Chủ đề" (BL-054): ≤ `NEWS_TOP_TAGS_LIMIT` thẻ dùng nhiều nhất trong bài công khai (nhiều bài trước, hoà theo chữ). Chỉ `/vi`:
  * `news.tags` chưa có bản EN (BR-07) nên `/en` luôn rỗng (khối ẩn).
  */
-export async function listTopNewsTags(payload: Payload, locale: Locale): Promise<string[]> {
+export async function listTopNewsTags(payload: Payload, locale: Locale, now: Date = new Date()): Promise<string[]> {
   if (locale === "en") return [];
   const result = await adapterOf(payload).drizzle.execute(sql`
     SELECT btrim(t."text") AS tag, COUNT(DISTINCT t."parent_id") AS uses
     FROM "news_texts" t JOIN "news" n ON n."id" = t."parent_id"
-    WHERE t."path" = 'tags' AND btrim(coalesce(t."text", '')) <> '' AND ${publicNewsSql(locale)}
+    WHERE t."path" = 'tags' AND btrim(coalesce(t."text", '')) <> '' AND ${publicNewsSql(locale, now)}
     GROUP BY btrim(t."text")
     ORDER BY uses DESC, tag
     LIMIT ${NEWS_TOP_TAGS_LIMIT}

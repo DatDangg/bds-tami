@@ -26,7 +26,7 @@
 | `rentals` | `draft` · `published` · `hidden` · `rented` |
 | `projects`, `property-posts`, `news`, `services`, `job-postings`, `pages` | `draft` · `published` · `hidden` |
 
-Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm; với bài có `publishedAt` thì còn phải `publishedAt ≤ now` (hẹn giờ, FR-ADM-16). Bản tiếng Anh (`/en`) còn phải có `hasEnglish = true` (§1.1).
+Website công khai chỉ đọc bản ghi có `status` ∈ {`published`, `rented`} (với `rentals`) hoặc `published` (các loại khác), và chưa bị xoá mềm; riêng `news` (hẹn giờ FR-ADM-16, BL-091) còn phải `publishedAt` trống hoặc `≤ now` (lọc lúc truy vấn ở `buildPublicWhere(…, { scheduled: true })` + SQL thô `news-search.ts` / `most-read.ts`; không job). Các loại khác không xét `publishedAt` (luôn tự điền khi xuất bản lần đầu, chỉ đọc). Bản tiếng Anh (`/en`) còn phải có `hasEnglish = true` (§1.1).
 
 ### 1.1. Song ngữ (Payload localization)
 
@@ -368,7 +368,7 @@ Dữ liệu mặc định (seed, admin sửa được):
 | `content` | richText | R | Localized. BL-054 P1-T02: editor có thêm node `block` (Lexical `BlocksFeature`, `NEWS_CONTENT_BLOCKS` ở `src/blocks/news/index.ts`) — `statHighlights` (Số liệu nổi bật, `items[] {value, label}` ≤ 4), `projectMention` (Dự án nhắc đến, `project` = id dự án), `imageText` (Ảnh cạnh chữ, `image` = id media, `text`, `imagePosition` `left`/`right`). Khối nằm TRONG JSON `content` (không bảng / cột / migration riêng); web chỉ render 3 `blockType` này (khối lạ bị bỏ), dự án chưa công khai / chưa có EN thì ẩn khối |
 | `tags` | text hasMany | | Không localized; lưu ở bảng `news_texts` (as-built L5-T03) |
 | `status` | select | R, I | |
-| `publishedAt` | date | I | Cho phép hẹn giờ (FR-ADM-16) |
+| `publishedAt` | date | I | Hẹn giờ (FR-ADM-16, BL-091): sửa được (ngày + giờ, giờ VN), trống → tự điền khi `published` (kể cả xoá trống); `> now` thì khách chưa thấy. Collection khác: chỉ đọc, tự điền lần đầu |
 | `author` | `rel→staff` | R, I | |
 | `seo` | group | | |
 

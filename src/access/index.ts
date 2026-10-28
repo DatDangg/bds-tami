@@ -10,6 +10,7 @@ export {
   buildPublicWhere,
   makePublishedOnly,
   PUBLIC_STATUSES,
+  type PublicWhereOptions,
   publishedOnly,
   rentalsPublishedOnly,
 } from "./publishedOnly";

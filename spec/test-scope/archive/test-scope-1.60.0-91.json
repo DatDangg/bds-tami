@@ -1,0 +1,106 @@
+{
+  "specVersion": "1.60.0",
+  "scopeVersion": 91,
+  "generatedAt": "2026-10-28T12:30:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-090 MODIFY (user chốt cách B 2026-10-27): trang danh mục Dự án /du-an/danh-muc/[category] (title/breadcrumb/H1/mô tả theo danh mục), tab danh mục thành link, ?category= cũ 308 giữ tham số khác, sitemap/canonical/hreflang, chặn slug dự án danh-muc/category. v91 as-built sau phase 1 (T01 STRICT PASS r1; spec-validation post-build PASS): changed.files bổ sung 4 source + 11 test theo diff thật, không đổi scopeVersion.",
+  "status": "published — phase 1 done (as-built)",
+  "workItem": "feature-projects-category-page",
+  "backlog": "BL-090",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-10-27-projects-category-breadcrumb-title.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.59.0-90.json",
+  "specUpdate": "spec/updates/2026-10-28-projects-category-page.md",
+  "specRefs": [
+    "SPECIFICATIONS.md: /du-an",
+    "SPECIFICATIONS.md: Trang danh mục Dự án (BL-090)"
+  ],
+  "changed": {
+    "files": [
+      "src/app/(frontend)/[locale]/du-an/danh-muc/[category]/page.tsx",
+      "src/components/projects/ProjectListPage.tsx",
+      "src/components/projects/project-list-data.ts",
+      "src/i18n/routing.ts",
+      "src/lib/seo/sitemap-data.ts",
+      "src/lib/i18n/counterpart-url.ts",
+      "src/lib/content/resolve-missing-page.ts",
+      "src/lib/admin/seo.ts",
+      "src/hooks/categories/revalidate-category.ts",
+      "src/fields/slug.ts",
+      "src/components/projects/project-list-metadata.ts",
+      "src/lib/projects/project-filters.ts",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      "src/app/(frontend)/[locale]/du-an/danh-muc/[category]/page.test.tsx",
+      "src/components/projects/ProjectListPage.test.tsx",
+      "src/app/(frontend)/[locale]/list-no-loading.test.ts",
+      "src/components/admin/SeoPreview.test.tsx",
+      "src/fields/slug.test.ts",
+      "src/i18n/routing.test.ts",
+      "src/lib/seo/sitemap-data.test.ts",
+      "src/lib/admin/seo.test.ts",
+      "src/lib/content/resolve-missing-page.test.ts",
+      "src/lib/i18n/counterpart-url.test.ts",
+      "src/hooks/categories/revalidate-category.test.ts"
+    ],
+    "modules": [
+      "Trang danh mục Dự án (route mới VI/EN)",
+      "ProjectListPage: danh mục khoá, tab link + aria-current, form/sort/page/q giữ danh mục",
+      "project-list-data",
+      "i18n routing pathnames",
+      "sitemap-data",
+      "counterpart-url (chuyển ngôn ngữ)",
+      "resolve-missing-page",
+      "admin seo",
+      "revalidate-category",
+      "slug field: chặn slug dự án danh-muc/category",
+      "project-list-metadata",
+      "project-filters (withoutCategoryParam)",
+      "i18n messages (noProjectsInCategory)"
+    ]
+  },
+  "screens": [
+    "/du-an",
+    "/du-an/danh-muc/<slug>",
+    "/en/projects",
+    "/en/projects/category/<slug>"
+  ],
+  "impact": {
+    "direct": [
+      "Route VI/EN trang danh mục dự án; title '<Danh mục> – Dự án | TAMI' (EN '<Name> – Projects | TAMI')",
+      "Breadcrumb Trang chủ › Dự án › <cha> › <Danh mục>, H1 = tên danh mục, mô tả categories.description",
+      "Tab danh mục là link, aria-current đúng tab, 'Tất cả' về /du-an",
+      "Bộ lọc/sort/phân trang/q giữ danh mục",
+      "308 ?category= cũ giữ tham số khác; slug lạ bỏ",
+      "404 slug không có / EN chưa dịch",
+      "Sitemap VI/EN, canonical/hreflang, noindex khi lọc",
+      "Slug dự án danh-muc/category bị chặn"
+    ],
+    "dependents": [
+      "Chuyển ngôn ngữ VI<->EN ở trang danh mục",
+      "Revalidate khi sửa danh mục",
+      "Hero/breadcrumb dùng chung ListingHero",
+      "SEO admin của danh mục"
+    ],
+    "regression": [
+      "/du-an (lọc, tab, FAQ JSON-LD)",
+      "Chi tiết /du-an/[slug]",
+      "/cho-thue/danh-muc",
+      "/tin-bds/danh-muc",
+      "Sitemap",
+      "Chuyển ngôn ngữ"
+    ]
+  },
+  "acceptance": [
+    "Route /du-an/danh-muc/<slug> và /en/projects/category/<slug> hiển thị đúng danh sách dự án của danh mục (gồm danh mục con)",
+    "title '<Danh mục> – Dự án | TAMI'; breadcrumb Trang chủ › Dự án › <Danh mục cha nếu có> › <Danh mục>; H1 = tên danh mục; mô tả nếu có; VI/EN đúng tên",
+    "Tab danh mục trên /du-an link sang trang danh mục, tab đang xem aria-current, 'Tất cả' về /du-an",
+    "Bộ lọc / sắp xếp / phân trang / ô tìm q giữ danh mục",
+    "/du-an?category=<slug> → 308 sang trang danh mục, giữ tham số khác; slug lạ bỏ, không lỗi",
+    "/du-an/danh-muc/<slug-không-có> và slug EN chưa dịch → 404",
+    "Sitemap có trang danh mục dự án VI/EN; canonical + hreflang đúng; noindex khi có bộ lọc",
+    "Slug dự án 'danh-muc' / 'category' bị chặn"
+  ],
+  "risk": "high",
+  "riskNote": "Routing + SEO dùng chung (redirect 308, sitemap, hreflang, slug validation, chuyển ngôn ngữ)."
+}

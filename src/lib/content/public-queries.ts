@@ -17,12 +17,12 @@ const COLLECTIONS_WITHOUT_STATUS: ReadonlySet<string> = new Set(["categories", "
  * Điều kiện "khách thấy được" của một collection nội dung, và là NƠI DUY NHẤT dựng nó cho truy vấn trang công khai
  * (ERD §1, BR-07): trạng thái công khai (`published`, `rentals` thêm `rented`), chưa xoá mềm, và ở `en` thì `hasEnglish = true`.
  * Phần trạng thái + xoá mềm lấy từ `buildPublicWhere` (cũng là `access.read` của khách), nên hai nơi không lệch nhau.
- * Hẹn giờ `publishedAt ≤ now` (FR-ADM-16) sẽ thêm ở `buildPublicWhere`, tự áp cho cả access lẫn truy vấn.
+ * Hẹn giờ `publishedAt` trống / ≤ now (FR-ADM-16, BL-091) CHỈ áp cho `news` (option `scheduled` của `buildPublicWhere`, cùng option với `access.read` của khách).
  */
 export function publicWhere(collection: string, locale: Locale): Where {
   const base: Where = COLLECTIONS_WITHOUT_STATUS.has(collection)
     ? { deletedAt: { exists: false } }
-    : buildPublicWhere(collection === "rentals" ? PUBLIC_STATUSES.rentals : PUBLIC_STATUSES.default);
+    : buildPublicWhere(collection === "rentals" ? PUBLIC_STATUSES.rentals : PUBLIC_STATUSES.default, { scheduled: collection === "news" });
   return locale === "en" ? { and: [base, { hasEnglish: { equals: true } }] } : base;
 }
 

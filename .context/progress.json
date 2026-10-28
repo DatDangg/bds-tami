@@ -3293,6 +3293,40 @@
       "report": ".context/review-reports/feature-projects-category-page-phase-1-task-01-round-1-review.md",
       "docImpact": "SPECIFICATIONS 1.60.0, design-spec S05, docs/API_SPEC.md §3.9, docs/DESIGN.md, docs/ARCHITECTURE.md, .context/decisions.md Decision 11",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "news-scheduled-publish",
+      "title": "Tin tức: hẹn giờ xuất bản (FR-ADM-16 thu hẹp cho news) — lọc publishedAt ≤ now lúc truy vấn, không cron, không email (BL-091, QA dòng 13)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-091",
+      "changeDoc": "spec/changes/archive/2026-10-27-news-scheduled-publish.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-27 (user: \"Chạy change cho BL-088, BL-089, BL-090, BL-091 (scope đã chốt: … 091 chỉ Tin tức, chưa gửi mail)\" — auto proceed)",
+      "specVersion": "1.61.0",
+      "scopeVersion": 92,
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-news-scheduled-publish/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-news-scheduled-publish-phase-1-task-01-round-1-review.md",
+          "note": "r1 STRICT PASS, 0 CRITICAL/MAJOR; MINOR-1..3 sửa trước commit (cảnh báo ẩn tin khi publishedAt trống, bỏ lặp GMT+7, live region chỉ quanh cảnh báo động).",
+          "verify": "typecheck PASS · pnpm test 452 file / 4748 PASS (unit+ui+integration Postgres) · sau Fix MINOR vitest 69 PASS + eslint file đổi 0 · reviewer: 7 unit 63 + integration 87 PASS · pnpm lint toàn repo FAIL baseline playwright-report/ · Playwright Edge 3100 admin 1920 + public 1440/390: nhãn/cảnh báo, 404/list/sitemap/llms/api ẩn, +80s tự hiện",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specValidation": ".context/review-reports/feature-news-scheduled-publish-phase-1-validation.md (PASS; pre-plan r1 FAIL 3 warning → r2 PASS)",
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/feature-news-scheduled-publish-phase-1-task-01-round-1-review.md",
+      "docImpact": "SPECIFICATIONS 1.61.0, docs/ERD.md §1 + news.publishedAt, docs/PERMISSION.md §3.1, docs/API_SPEC.md (Đọc nhiều), docs/diagrams/layer-plan.md + tasks/tami-website/layer-16-task-01.md (superseded)",
+      "completedAt": "2026-10-28"
     }
   ],
   "bugs": [
@@ -4803,7 +4837,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-28T02:45:36.821Z",
+  "lastUpdated": "2026-10-28T03:29:16.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

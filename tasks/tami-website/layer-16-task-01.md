@@ -1,5 +1,7 @@
 # Task 01: Hẹn giờ xuất bản (FR-ADM-16, Could): `publishedAt ≤ now` + job revalidate mỗi phút
 
+> **SUPERSEDED (2026-10-28, BL-091):** user chốt 2026-10-27 chỉ làm hẹn giờ cho **Tin tức**, **không** job/cron (lọc `publishedAt ≤ now` lúc truy vấn, ISR 60s), không email. Đã build ở `tasks/feature-news-scheduled-publish/phase-1-task-01.md`. Task này **không chạy** khi loop tới layer 16 (Dự án / Cho thuê / Tin BĐS giữ ô chỉ đọc); muốn mở rộng → change request mới.
+
 ## Layer
 16 — Could: hẹn giờ xuất bản (lên production ở lần deploy kế tiếp)
 

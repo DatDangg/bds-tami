@@ -1116,7 +1116,7 @@ export interface News {
   };
   status: 'draft' | 'published' | 'hidden';
   /**
-   * Tự điền khi xuất bản lần đầu.
+   * Để trống thì tự điền khi xuất bản lần đầu; chọn giờ trong tương lai để hẹn giờ.
    */
   publishedAt?: string | null;
   author: string | Staff;

@@ -297,5 +297,23 @@ describe.skipIf(!baseUrl || !hasRedis)("integration: news-views + Đọc nhiều
       const items = await mostRead.findMostReadNews(payload, "vi", { now });
       expect(items.map((item) => item.id)).toEqual([ids.a, ids.b, ids.d, ids.c, ids.e]);
     });
+
+    it("tin hẹn giờ chưa tới giờ (published_at > now) không chiếm hạng dù nhiều lượt xem, không lọt phần bù; trống / đã qua vẫn tính (BL-091)", async () => {
+      const scheduled = await createNews("Hẹn giờ tương lai", { publishedAt: "2099-01-01T00:00:00.000Z" });
+      await setViews(scheduled, 0, 9_999);
+      const ranked = await mostRead.rankNewsByViews(payload, "vi", mostRead.mostReadWindowStart(now), 20, now);
+      expect(ranked).not.toContain(scheduled);
+      expect(ranked).toContain(ids.a);
+      const items = await mostRead.findMostReadNews(payload, "vi", { now, limit: 20 });
+      expect(items.map((item) => item.id)).not.toContain(scheduled);
+      expect(items.map((item) => item.id)).toContain(ids.a);
+      // Tới giờ (mốc "bây giờ" qua published_at) thì lại được xếp hạng.
+      expect(await mostRead.rankNewsByViews(payload, "vi", mostRead.mostReadWindowStart(now), 20, new Date("2100-01-01T00:00:00.000Z"))).toContain(scheduled);
+      // published_at trống (bài cũ chưa có ngày) vẫn hiện như trước.
+      const noDate = await createNews("Không ngày xuất bản");
+      await withDatabase((client) => client.query(`UPDATE news SET published_at = NULL WHERE id = $1`, [noDate]));
+      await setViews(noDate, 0, 9_000);
+      expect(await mostRead.rankNewsByViews(payload, "vi", mostRead.mostReadWindowStart(now), 20, now)).toContain(noDate);
+    });
   });
 });
