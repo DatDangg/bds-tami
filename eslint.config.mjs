@@ -12,6 +12,8 @@ const eslintConfig = [
       ".import-tmp/", // script/ảnh nhập nội dung một lần, gitignore (bản chính thức: scripts/import-content.ts, BL-072)
       ".local-seed/", // script seed cục bộ, git exclude
       "coverage/",
+      "playwright-report/", // báo cáo HTML Playwright, gitignore
+      "test-results/", // output Playwright (trace/ảnh lỗi), gitignore
       "skills/",
       ".agent/",
       ".claude/",

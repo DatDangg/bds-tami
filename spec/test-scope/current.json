@@ -1,92 +1,43 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 92,
-  "generatedAt": "2026-10-28T14:00:00+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-091 ADDITIVE (user chốt 2026-10-27): hẹn giờ xuất bản chỉ cho Tin tức — ô publishedAt sửa được (giờ VN), khách chỉ thấy tin published có publishedAt trống/≤ now (lọc lúc truy vấn, không cron, trễ ≤ ~60s), staff vẫn xem, nhãn 'Đã hẹn giờ' + cảnh báo ở admin. Dự án/Cho thuê/Tin BĐS không đổi. v92 as-built sau phase 1 (T01 STRICT PASS r1; spec-validation PASS): changed.files theo diff thật, không đổi scopeVersion.",
-  "status": "published — phase 1 done (as-built)",
-  "workItem": "feature-news-scheduled-publish",
-  "backlog": "BL-091",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/archive/2026-10-27-news-scheduled-publish.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.60.0-91.json",
-  "specUpdate": "spec/updates/2026-10-28-news-scheduled-publish.md",
-  "specRefs": [
-    "FR-ADM-16 (BL-091)",
-    "SPECIFICATIONS.md: Hẹn giờ xuất bản (FR-ADM-16 — BL-091)"
-  ],
+  "scopeVersion": 93,
+  "generatedAt": "2026-10-28T15:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-094 BUG tooling: `pnpm lint` (eslint .) toàn repo FAIL (3064 problems, 100% trong playwright-report/trace/ — bundle JS của trace viewer) vì eslint.config.mjs ignores thiếu output Playwright. Sửa: ignores thêm playwright-report/ + test-results/ (đều gitignore). Không đổi code app/requirement -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer FAST PASS r1.",
+  "status": "published",
+  "workItem": "bug/eslint-ignore-playwright-report",
+  "backlog": "BL-094",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-28-eslint-ignore-playwright-report.md",
+  "task": "tasks/bug-eslint-ignore-playwright-report/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-eslint-ignore-playwright-report-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-92.json",
+  "specUpdate": null,
+  "specRefs": [],
   "changed": {
     "files": [
-      "src/access/publishedOnly.ts",
-      "src/access/index.ts",
-      "src/lib/content/public-queries.ts",
-      "src/lib/news/news-search.ts",
-      "src/lib/news/most-read.ts",
-      "src/fields/published-at.ts",
-      "src/collections/_shared/content-defaults.ts",
-      "src/collections/News.ts",
-      "src/lib/admin/scheduled-publish.ts",
-      "src/components/admin/ScheduledPublishDisplay.tsx",
-      "src/components/admin/styles/_forms.scss",
-      "src/app/(payload)/admin/importMap.js",
-      "src/payload-types.ts",
-      "src/access/publishedOnly.test.ts",
-      "src/lib/content/public-queries.test.ts",
-      "src/lib/news/scheduled-publish-sql.test.ts",
-      "src/fields/published-at.test.ts",
-      "src/collections/_shared/content-defaults.test.ts",
-      "src/lib/admin/scheduled-publish.test.ts",
-      "src/components/admin/ScheduledPublishDisplay.test.tsx",
-      "tests/integration/news.test.ts",
-      "tests/integration/news-views.test.ts",
-      "tests/integration/projects.test.ts"
+      "eslint.config.mjs"
     ],
     "modules": [
-      "buildPublicWhere / makePublishedOnly option scheduled (chỉ news)",
-      "ContentOptions.scheduledPublish (News)",
-      "trường publishedAt scheduled (sửa được, hook mới) — collection khác giữ readOnly/denyAll",
-      "SQL Tin tức: tìm q/tag, Chủ đề, Đọc nhiều (published_at IS NULL OR <= now); cache Đọc nhiều 60s",
-      "admin News: Cell \"Đã hẹn giờ · …\" + notice GMT+7 / cảnh báo ẩn tin"
+      "ESLint flat config: ignores thêm output Playwright (playwright-report/, test-results/)"
     ]
   },
-  "screens": [
-    "/tin-tuc",
-    "/tin-tuc/danh-muc/<slug>",
-    "/tin-tuc/<slug>",
-    "/en/news",
-    "/en/news/category/<slug>",
-    "/en/news/<slug>",
-    "/",
-    "/admin/collections/news"
-  ],
+  "screens": [],
   "impact": {
     "direct": [
-      "Route Tin tức VI/EN: danh sách, danh mục, chi tiết (tin chưa tới giờ → 404), tìm q, tag, Được quan tâm nhiều, tin liên quan",
-      "Trang chủ khối Tin tức",
-      "Sitemap, llms.txt, JSON-LD",
-      "API /api/news khách",
-      "Admin /admin/collections/news: ô Ngày xuất bản sửa được (giờ VN), nhãn 'Đã hẹn giờ · <ngày giờ>', cảnh báo đẩy tin đang hiện sang tương lai"
+      "`pnpm lint` toàn repo exit 0 kể cả khi đã chạy Playwright (có playwright-report/, test-results/ trên đĩa)"
     ],
     "dependents": [
-      "Chuyển ngôn ngữ VI<->EN của tin hẹn giờ",
-      "Đếm lượt xem",
-      "Revalidate Tin tức"
+      "CI/verify command lint dùng `eslint .`"
     ],
     "regression": [
-      "Dự án / Cho thuê / Tin BĐS không đổi (publishedAt chỉ đọc, điều kiện công khai không đổi) — test khoá",
-      "Access staff (vẫn xem/sửa tin hẹn giờ)",
-      "Revalidate",
-      "Tin tức đã published publishedAt trống/quá khứ vẫn hiện bình thường"
+      "File nguồn (src/, tests/, các file gốc) vẫn được lint như trước — lỗi thật vẫn báo"
     ]
   },
   "acceptance": [
-    "Chỉ ở Tin tức: ô 'Ngày xuất bản' sửa được, chọn ngày + giờ (giờ Việt Nam), lưu đúng; để trống → như cũ (tự điền khi xuất bản lần đầu)",
-    "Tin published có publishedAt > now không hiện với khách ở: danh sách + danh mục, chi tiết (404), tìm q, tag, 'Được quan tâm nhiều', tin liên quan, trang chủ, sitemap, JSON-LD",
-    "Đến giờ tự hiện, không thao tác thêm; trễ tối đa ~60s ở trang có cache",
-    "Staff đăng nhập vẫn xem được tin hẹn giờ; danh sách admin có nhãn 'Đã hẹn giờ · <ngày giờ>'",
-    "Sửa ngày của tin đã lên web sang tương lai → có cảnh báo (tin sẽ bị ẩn tới giờ đó)",
-    "Dự án / Cho thuê / Tin BĐS không đổi hành vi (test khoá)"
+    "eslint.config.mjs ignores có playwright-report/ + test-results/, comment ngắn",
+    "`pnpm lint` toàn repo PASS"
   ],
-  "risk": "medium-high",
-  "riskNote": "Dùng chung buildPublicWhere/access đọc khách và nhiều route public; sai điều kiện có thể ẩn nhầm hoặc lộ sớm tin."
+  "risk": "low",
+  "riskNote": "Chỉ cấu hình lint; không đổi runtime/build/test. Không có màn hình nào cần test thủ công."
 }
