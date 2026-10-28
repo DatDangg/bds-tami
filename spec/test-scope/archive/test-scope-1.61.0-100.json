@@ -1,0 +1,60 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 100,
+  "generatedAt": "2026-10-29T09:00:00+00:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-096 BUG UI: chi tiết dự án, mục Mặt bằng — dải tab tầng/mặt bằng bị cắt ở mép phải (768-1920), không fade/nút, người dùng chuột không tới được các tab bên phải. Fix: tablist FloorPlans bọc trong ListingTabsScroller (nút ‹ › ngoài vùng cuộn từ md + fade mép); ListingTabsScroller thêm 2 prop tùy chọn `labelNamespace` (mặc định page.listing.tabs) và `currentSelector` (mặc định [aria-current=\"page\"]) — consumer cũ không đổi. < md: >= 6 mặt bằng giữ ô chọn, < 6 dải tab vuốt. Không đổi API/schema/route. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "status": "published",
+  "workItem": "bug/project-floorplan-tabs-clipped",
+  "backlog": "BL-096",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-28-project-floorplan-tabs-clipped.md",
+  "task": "tasks/bug-project-floorplan-tabs-clipped/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-99.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/projects/FloorPlans.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      ".context/design-spec.md"
+    ],
+    "modules": [
+      "Chi tiết dự án — mục Mặt bằng (FloorPlans)",
+      "Shared ListingTabsScroller (thanh danh mục danh sách)",
+      "i18n page.projectDetail.floorPlans.previous/next"
+    ]
+  },
+  "screens": [
+    "/du-an/<slug> (mục Mặt bằng)",
+    "/en/projects/<slug> (mục Floor plans)"
+  ],
+  "impact": {
+    "direct": [
+      "Chi tiết dự án /du-an/<slug>, /en/projects/<slug>, mục Mặt bằng: dải tab tràn có nút ‹ › 'Mặt bằng trước/sau' (EN 'Previous/Next floor plans') từ md + fade mép phía còn nội dung; mọi tab tới được bằng chuột, bàn phím (← → Home End, tab chọn không nằm dưới fade) và vuốt",
+      "< md: >= 6 mặt bằng giữ ô chọn (không tablist); < 6 mặt bằng dải tab vuốt + fade, không nút",
+      "Không tràn (ít mặt bằng) -> không nút/fade, layout như trước; trang không tràn ngang"
+    ],
+    "dependents": [
+      "Thanh danh mục ListingCategoryTabs ở /cho-thue, /du-an, /tin-bds (+ danh mục con, bản EN): nút 'Danh mục trước/sau', fade mép, aria-disabled ở mép, focus/nudge bàn phím — hành vi và nhãn không đổi"
+    ],
+    "regression": [
+      "ARIA tabs của FloorPlans: role tablist/tab, roving tabindex, aria-selected, lightbox mặt bằng đổi index",
+      "Nút ‹ › giữ focus sau khi bấm, aria-disabled ở mép cuộn",
+      "VI/EN: nhãn nút đúng ngôn ngữ"
+    ]
+  },
+  "acceptance": [
+    "Mọi tab mặt bằng truy cập được bằng chuột (nút >= 44px, không đè tab), bàn phím và vuốt ở 1920/1440/1024/768; 390 ô chọn vẫn hoạt động",
+    "Có gợi ý tràn (fade + nút) khi tràn; không tràn -> không nút/fade",
+    "ListingCategoryTabs (/cho-thue, /du-an, /tin-bds) không đổi hành vi, giữ nhãn 'Danh mục trước/sau'",
+    "Test jsdom: FloorPlans render trong scroller, nhãn nút mặt bằng, tablist không tự overflow"
+  ],
+  "testNotes": "Dữ liệu mẫu: dự án có >= 7 mặt bằng tên dài (dev local: Astor 1, 12 mặt bằng). Kiểm bằng trình duyệt ở 1920/1440/1024/768/390 cả VI và EN, và /cho-thue, /du-an, /tin-bds (+ danh mục con) để soát hồi quy thanh danh mục.",
+  "risk": "medium",
+  "riskNote": "Medium: sửa component dùng chung ListingTabsScroller (STRICT review PASS r1); không đổi requirement/schema/API."
+}

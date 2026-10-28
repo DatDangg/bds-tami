@@ -4464,6 +4464,41 @@
       "report": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
       "docImpact": ".context/design-spec.md S03 khối 7 (1 dòng as-built); no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-29"
+    },
+    {
+      "slug": "admin-job-deadline-date-format",
+      "title": "Admin Tuyển dụng: \"Hạn nộp hồ sơ\" hiện \"thg 10 30\" thay vì dd/MM/yyyy (BL-097, QA bug 18)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-097",
+      "changeDoc": "spec/changes/archive/2026-10-28-admin-job-deadline-date-format.md",
+      "startedAt": "2026-10-29",
+      "planApprovedAt": "2026-10-28 (user: batch BL-095→BL-100 auto proceed)",
+      "rootCause": "Trước af1e983: deadline dayOnly không displayFormat → Payload DatePicker.js:53 mặc định \"MMM dd\" + locale vi = \"thg 10 30\". Đã sửa bởi af1e983 (BL-076, adminDate(\"dayOnly\") → dd/MM/yyyy); server test chưa deploy",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-job-deadline-date-format/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 0,
+          "round": 0,
+          "reviewLevel": null,
+          "reviewerResult": null,
+          "report": null,
+          "note": "Không đổi code — fixed by af1e983, chờ deploy; không builder/reviewer",
+          "verify": "Playwright Edge 1920 TZ Asia/Ho_Chi_Minh trên HEAD 7b0a315: cột danh sách dd/MM/yyyy, ô 16/12/2026, picker không \"thg\", chọn 15/01/2027 → lưu/reload 15/01/2027, API 2027-01-15T12:00Z; dữ liệu dev khôi phục. lint/typecheck/test: skip, no code change",
+          "completedAt": "2026-10-29"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 101,
+      "review": "n/a (no code change)",
+      "round": 0,
+      "report": null,
+      "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-29"
     }
   ],
   "projectName": "tami-website",

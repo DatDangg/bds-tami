@@ -1,60 +1,48 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 100,
-  "generatedAt": "2026-10-29T09:00:00+00:00",
+  "scopeVersion": 101,
+  "generatedAt": "2026-10-29T00:20:00+00:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-096 BUG UI: chi tiết dự án, mục Mặt bằng — dải tab tầng/mặt bằng bị cắt ở mép phải (768-1920), không fade/nút, người dùng chuột không tới được các tab bên phải. Fix: tablist FloorPlans bọc trong ListingTabsScroller (nút ‹ › ngoài vùng cuộn từ md + fade mép); ListingTabsScroller thêm 2 prop tùy chọn `labelNamespace` (mặc định page.listing.tabs) và `currentSelector` (mặc định [aria-current=\"page\"]) — consumer cũ không đổi. < md: >= 6 mặt bằng giữ ô chọn, < 6 dải tab vuốt. Không đổi API/schema/route. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "triggerNote": "BL-097 BUG admin Tuyển dụng: ô 'Hạn nộp hồ sơ' (JobPostings.deadline) hiện 'thg 10 30' thay vì dd/MM/yyyy (QA sheet 28/10 dòng 18). Kiểm lại trên HEAD 7b0a315: KHÔNG còn lỗi — đã được sửa bởi commit af1e983 (BL-076, helper src/fields/admin-date.ts, adminDate(\"dayOnly\") -> displayFormat dd/MM/yyyy). Lần này KHÔNG đổi code. Root cause cũ: Payload DatePicker.js:53 mặc định 'MMM dd' + locale vi. Evidence Playwright: .context/review-reports/assets/bl097-{list,form-field,picker,form-reopened}-1920.png; lưu chọn 15/01/2027 -> mở lại 15/01/2027, API 2027-01-15T12:00Z (đúng ngày GMT+7). Fixed by af1e983, chờ deploy lên server test. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
   "status": "published",
-  "workItem": "bug/project-floorplan-tabs-clipped",
-  "backlog": "BL-096",
+  "workItem": "bug/admin-job-deadline-date-format",
+  "backlog": "BL-097",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-28-project-floorplan-tabs-clipped.md",
-  "task": "tasks/bug-project-floorplan-tabs-clipped/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-99.json",
+  "changeDoc": "spec/changes/archive/2026-10-28-admin-job-deadline-date-format.md",
+  "task": "tasks/bug-admin-job-deadline-date-format/phase-1-task-01.md",
+  "reviewReport": null,
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-100.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
-    "files": [
-      "src/components/listing/ListingTabsScroller.tsx",
-      "src/components/projects/FloorPlans.tsx",
-      "src/components/projects/project-detail.test.tsx",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
-      ".context/design-spec.md"
-    ],
+    "files": [],
+    "note": "Không đổi code — đã sửa bởi af1e983 (BL-076), chờ deploy lên server test.",
     "modules": [
-      "Chi tiết dự án — mục Mặt bằng (FloorPlans)",
-      "Shared ListingTabsScroller (thanh danh mục danh sách)",
-      "i18n page.projectDetail.floorPlans.previous/next"
+      "Admin Tuyển dụng — trường Hạn nộp hồ sơ (form + date picker + cột danh sách)"
     ]
   },
   "screens": [
-    "/du-an/<slug> (mục Mặt bằng)",
-    "/en/projects/<slug> (mục Floor plans)"
+    "/admin/collections/job-postings (cột Hạn nộp hồ sơ)",
+    "/admin/collections/job-postings/<id> (ô Hạn nộp hồ sơ + date picker)"
   ],
   "impact": {
     "direct": [
-      "Chi tiết dự án /du-an/<slug>, /en/projects/<slug>, mục Mặt bằng: dải tab tràn có nút ‹ › 'Mặt bằng trước/sau' (EN 'Previous/Next floor plans') từ md + fade mép phía còn nội dung; mọi tab tới được bằng chuột, bàn phím (← → Home End, tab chọn không nằm dưới fade) và vuốt",
-      "< md: >= 6 mặt bằng giữ ô chọn (không tablist); < 6 mặt bằng dải tab vuốt + fade, không nút",
-      "Không tràn (ít mặt bằng) -> không nút/fade, layout như trước; trang không tràn ngang"
+      "Admin Tuyển dụng: cột danh sách, ô nhập và date picker của Hạn nộp hồ sơ hiện dd/MM/yyyy (không còn 'thg 10 30')"
     ],
     "dependents": [
-      "Thanh danh mục ListingCategoryTabs ở /cho-thue, /du-an, /tin-bds (+ danh mục con, bản EN): nút 'Danh mục trước/sau', fade mép, aria-disabled ở mép, focus/nudge bàn phím — hành vi và nhãn không đổi"
+      "Các trường ngày dùng adminDate(\"dayOnly\") / adminDate khác (BL-076) — cùng helper src/fields/admin-date.ts"
     ],
     "regression": [
-      "ARIA tabs của FloorPlans: role tablist/tab, roving tabindex, aria-selected, lightbox mặt bằng đổi index",
-      "Nút ‹ › giữ focus sau khi bấm, aria-disabled ở mép cuộn",
-      "VI/EN: nhãn nút đúng ngôn ngữ"
+      "Chọn ngày rồi lưu: mở lại đúng ngày theo GMT+7 (15/01/2027 -> 15/01/2027, API 2027-01-15T12:00Z)",
+      "Trang tuyển dụng public hiển thị hạn nộp hồ sơ đúng ngày"
     ]
   },
   "acceptance": [
-    "Mọi tab mặt bằng truy cập được bằng chuột (nút >= 44px, không đè tab), bàn phím và vuốt ở 1920/1440/1024/768; 390 ô chọn vẫn hoạt động",
-    "Có gợi ý tràn (fade + nút) khi tràn; không tràn -> không nút/fade",
-    "ListingCategoryTabs (/cho-thue, /du-an, /tin-bds) không đổi hành vi, giữ nhãn 'Danh mục trước/sau'",
-    "Test jsdom: FloorPlans render trong scroller, nhãn nút mặt bằng, tablist không tự overflow"
+    "Cột danh sách, ô nhập và date picker của Hạn nộp hồ sơ hiện dd/MM/yyyy",
+    "Chọn ngày, lưu, mở lại: hiển thị đúng ngày đã chọn theo GMT+7",
+    "Kiểm lại trên server test SAU KHI deploy af1e983"
   ],
-  "testNotes": "Dữ liệu mẫu: dự án có >= 7 mặt bằng tên dài (dev local: Astor 1, 12 mặt bằng). Kiểm bằng trình duyệt ở 1920/1440/1024/768/390 cả VI và EN, và /cho-thue, /du-an, /tin-bds (+ danh mục con) để soát hồi quy thanh danh mục.",
-  "risk": "medium",
-  "riskNote": "Medium: sửa component dùng chung ListingTabsScroller (STRICT review PASS r1); không đổi requirement/schema/API."
+  "testNotes": "Server test chưa chắc đã có af1e983 — deploy xong mới kiểm. Evidence local: .context/review-reports/assets/bl097-{list,form-field,picker,form-reopened}-1920.png.",
+  "risk": "low",
+  "riskNote": "Low: không đổi code/requirement; chỉ xác nhận lỗi đã được sửa bởi BL-076."
 }
