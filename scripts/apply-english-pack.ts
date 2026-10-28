@@ -23,15 +23,18 @@ console.log(`Gói EN "${args.pack}" — chế độ ${args.apply ? "APPLY (ghi t
 console.log(`APP_ENV=${process.env.APP_ENV ?? "(chưa đặt)"} · DB ${describeDatabaseTarget(process.env.DATABASE_URL)}`);
 
 const payload = await getPayload({ config });
+let exitCode = 0;
 try {
   const result = await runEnglishPack(payload, { pack: args.pack, apply: args.apply, overwrite: args.overwrite });
   for (const line of result.lines) console.log(formatPackLine(line, args.apply));
   const count = (status: string) => result.lines.filter((line) => line.status === status).length;
   console.log(`Tổng: ${args.apply ? `đã ghi ${result.written}` : `sẽ ghi ${count("write")}`}, không đổi ${count("unchanged")}, bỏ qua ${count("skip")}, thiếu bản vi ${count("missing")}`);
-  if (result.problems > 0) process.exitCode = 1;
+  exitCode = result.problems > 0 ? 1 : 0;
 } catch (error) {
   console.error((error as Error).message);
-  process.exitCode = 1;
+  exitCode = 1;
 } finally {
   await payload.destroy();
 }
+// `payload run` tự process.exit(0) sau script → phải thoát tường minh, nếu không exit code bị ghi đè.
+process.exit(exitCode);

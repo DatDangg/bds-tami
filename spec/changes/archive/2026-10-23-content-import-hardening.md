@@ -1,7 +1,7 @@
 ---
 id: content-import-hardening
 type: bug
-status: pending
+status: done
 created: 2026-10-23
 ---
 
@@ -22,10 +22,10 @@ Ba lỗi lộ ra khi nhập 3 dự án + 8 tin lên production (BL-072 phase-2-t
 - Actual: (1) exit 137 giữa chừng; (2) exit 0; (3) bảo chạy `pnpm seed`.
 
 ## Acceptance (bắt buộc)
-- [ ] Root cause RAM được ghi rõ (buffer nào giữ, ở đâu); nhập bộ 2026-10-23 (~90 ảnh) trên DB trống với giới hạn 1 GB không bị kill (đo peak RSS, ghi số).
-- [ ] Dry-run có ít nhất một dòng `LỖI` → exit code ≠ 0; không lỗi → exit 0. Có test.
-- [ ] Thông báo thiếu danh mục `project` không còn bảo chạy `pnpm seed` ở staging/prod; runbook có bước tạo danh mục dự án cho prod (admin tạo tay, hoặc cách có kiểm soát được chốt), kèm tên EN cho các danh mục gói EN không phủ.
-- [ ] Vẫn giữ: mặc định dry-run, `apply` cần `IMPORT_CONFIRM`, chạy lại idempotent (test hiện có PASS).
+- [x] Root cause RAM được ghi rõ (buffer nào giữ, ở đâu); nhập bộ 2026-10-23 (~90 ảnh) trên DB trống với giới hạn 1 GB không bị kill (đo peak RSS, ghi số).
+- [x] Dry-run có ít nhất một dòng `LỖI` → exit code ≠ 0; không lỗi → exit 0. Có test.
+- [x] Thông báo thiếu danh mục `project` không còn bảo chạy `pnpm seed` ở staging/prod; runbook có bước tạo danh mục dự án cho prod (admin tạo tay, hoặc cách có kiểm soát được chốt), kèm tên EN cho các danh mục gói EN không phủ.
+- [x] Vẫn giữ: mặc định dry-run, `apply` cần `IMPORT_CONFIRM`, chạy lại idempotent (test hiện có PASS).
 
 ## Ghi chú
 - Liên quan BL-070 (SeaweedFS 256 MB OOM): cùng lần nhập, nhưng là container khác, xử lý riêng.

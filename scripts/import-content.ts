@@ -1,17 +1,15 @@
 // `pnpm content:import [apply]` = `payload run scripts/import-content.ts [apply]` (BL-072): nhập 3 dự án + 8 tin pháp lý (seed/content/2026-10-23/) vào DB hiện tại.
-// Mặc định DRY-RUN (chỉ đọc): in kế hoạch `sẽ tạo` / `đã có, bỏ qua`, kiểm đủ ảnh trong IMPORT_IMG_DIR, đủ ảnh bìa, không còn "[CẦN KIỂM TRA]"; exit 1 khi có lỗi.
+// Mặc định DRY-RUN (chỉ đọc): in kế hoạch `sẽ tạo` / `đã có, bỏ qua`, kiểm đủ ảnh trong IMPORT_IMG_DIR, đủ ảnh bìa, không còn "[CẦN KIỂM TRA]"; exit 1 khi có lỗi (script tự process.exit vì `payload run` ghi đè exitCode).
 // `apply` chỉ ghi khi env IMPORT_CONFIRM=2026-10-23 (chạy được cả production, theo docs/runbooks/english-pack.md: backup + dry-run trước). Chỉ tạo mới, chỉ locale vi.
 // Env: IMPORT_IMG_DIR (bắt buộc; thư mục ảnh ngoài repo, chứa manifest.json), IMPORT_STATUS (published|draft, mặc định published).
 // `payload run` nuốt cờ `--x` nên `apply` là tham số vị trí. Kiểm tham số + confirm + thư mục ảnh TRƯỚC khi mở DB.
+// Launcher: trên Linux glibc tự chạy lại chính nó với env malloc (đo 1 GB: ~921 → ~603 MB cả cha + con, xem mallocTuningEnv). Process cha KHÔNG import payload/engine
+// (import tĩnh bị hoist) để RSS cha thấp; phần nặng nạp bằng await import() sau nhánh re-exec.
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { getPayload } from "payload";
-
-import config from "../src/payload.config";
-import { describeDatabaseTarget } from "../seed/english/pack-plan";
-import { runContentImport } from "../seed/content/import";
-import { CONTENT_DATASET, formatImportLine, importConfirmProblem, parseImportArgs } from "../seed/content/import-plan";
+import { CONTENT_DATASET, formatImportLine, importConfirmProblem, importExitCode, mallocTuningEnv, parseImportArgs } from "../seed/content/import-plan";
 
 const args = parseImportArgs(process.argv.slice(2).filter((arg) => !arg.endsWith(".ts") && !arg.endsWith(".js")));
 const imgDir = process.env.IMPORT_IMG_DIR?.trim();
@@ -29,11 +27,31 @@ if (failure) {
   process.exit(1);
 }
 
+const glibcVersion = (process.report?.getReport() as { header?: { glibcVersionRuntime?: string } } | undefined)?.header?.glibcVersionRuntime;
+const mallocEnv = mallocTuningEnv(process.platform, glibcVersion, process.env);
+if (mallocEnv) {
+  // process.argv[1] = payload bin (payload run đã bỏ "run" + đường dẫn script khỏi argv); child có MALLOC_ARENA_MAX nên không re-exec nữa.
+  const child = spawnSync(process.execPath, [process.argv[1]!, "run", fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+    stdio: "inherit",
+    env: { ...process.env, ...mallocEnv },
+  });
+  if (child.status === null) console.error(`Tiến trình nhập dừng bất thường: ${child.signal ?? child.error?.message ?? "không rõ"}${child.signal === "SIGKILL" ? " (có thể bị OOM-kill)" : ""}`);
+  process.exit(child.status ?? 1);
+}
+
+const [{ getPayload }, { default: config }, { describeDatabaseTarget }, { runContentImport }] = await Promise.all([
+  import("payload"),
+  import("../src/payload.config"),
+  import("../seed/english/pack-plan"),
+  import("../seed/content/import"),
+]);
+
 const dataDir = fileURLToPath(new URL(`../seed/content/${CONTENT_DATASET}/`, import.meta.url));
 console.log(`Nhập nội dung ${CONTENT_DATASET} — chế độ ${args.apply ? "APPLY (ghi thật)" : "dry-run (không ghi)"}`);
 console.log(`APP_ENV=${process.env.APP_ENV ?? "(chưa đặt)"} · DB ${describeDatabaseTarget(process.env.DATABASE_URL)} · ảnh ${path.resolve(imgDir!)}`);
 
 const payload = await getPayload({ config });
+let exitCode = 0;
 try {
   const report = await runContentImport(payload, {
     dataDir,
@@ -46,10 +64,12 @@ try {
   for (const line of report.lines) console.log(formatImportLine(line, report.applied));
   if (args.apply && !report.applied) console.error("Dry-run còn lỗi → CHƯA ghi gì. Sửa rồi chạy lại.");
   console.log(`Tổng: ${report.lines.filter((line) => line.status === "create").length} ${report.applied ? "đã tạo" : "sẽ tạo"}, ${report.lines.filter((line) => line.status === "exists").length} đã có, ${report.problems} lỗi`);
-  if (report.problems > 0) process.exitCode = 1;
+  exitCode = importExitCode(report.problems);
 } catch (error) {
   console.error((error as Error).message);
-  process.exitCode = 1;
+  exitCode = 1;
 } finally {
   await payload.destroy();
 }
+// `payload run` tự process.exit(0) sau script → phải thoát tường minh, nếu không exit code bị ghi đè.
+process.exit(exitCode);

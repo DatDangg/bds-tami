@@ -1,52 +1,54 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 98,
-  "generatedAt": "2026-10-28T07:53:13+00:00",
+  "scopeVersion": 99,
+  "generatedAt": "2026-10-28T09:00:00+00:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-078 BUG: tab \"Lịch sử chăm sóc\" trong form Lead (join `activities`) không hiện Trạng thái trước / Trạng thái sau cho dòng \"Đổi trạng thái\". Fix: join `activities` thêm admin.defaultColumns [type, fromStatus, toStatus, content, actor, createdAt], bỏ cột lead. Unit test tests/unit/lead-activities-join-columns.test.ts. Không đổi schema/DB/API/quyền. Nghi vấn \"khách chưa đăng nhập tải được CV\" là báo nhầm: rerun 2026-10-28 anon -> 401, admin -> 200 PDF. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "triggerNote": "BL-073 BUG tooling vận hành: (1) `pnpm content:import` bị OOM-kill trong container 1 GB -> launcher re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (cgroup peak 603 MB, trước 875-881 MB); (2) dry-run/apply có LỖI vẫn exit 0 -> exit code != 0 khi có LỖI ở 3 script (content:import, english:pack, seed:english; payload run ghi đè exitCode); (3) thông báo/runbook thiếu danh mục dự án/tỉnh không còn bảo `pnpm seed` (cấm ở prod) -> runbook bước danh mục dự án VI/EN. Không đổi UI/route/API công khai/schema. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
   "status": "published",
-  "workItem": "bug/lead-status-history",
-  "backlog": "BL-078",
+  "workItem": "bug/content-import-hardening",
+  "backlog": "BL-073",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-26-lead-status-history.md",
-  "task": "tasks/bug-lead-status-history/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-97.json",
+  "changeDoc": "spec/changes/2026-10-23-content-import-hardening.md",
+  "task": "tasks/bug-content-import-hardening/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-98.json",
   "specUpdate": null,
-  "specRefs": [
-    "ERD §4.11 lead-activities (status_change fromStatus/toStatus)",
-    "BR-11"
-  ],
+  "specRefs": [],
   "changed": {
     "files": [
-      "src/collections/Leads.ts",
-      "tests/unit/lead-activities-join-columns.test.ts"
+      "scripts/import-content.ts",
+      "scripts/apply-english-pack.ts",
+      "scripts/seed-english.ts",
+      "seed/content/import-plan.ts",
+      "seed/content/import.ts",
+      "tests/unit/import-content-plan.test.ts",
+      "tests/integration/import-content.test.ts",
+      "docs/runbooks/english-pack.md"
     ],
     "modules": [
-      "Leads: join activities admin.defaultColumns thêm fromStatus/toStatus, bỏ cột lead"
+      "CLI vận hành `pnpm content:import` / `pnpm english:pack` / `pnpm seed:english` (không có UI/route/API công khai đổi)"
     ]
   },
-  "screens": [
-    "/admin/collections/leads/:id (tab Lịch sử chăm sóc)"
-  ],
+  "screens": [],
   "impact": {
     "direct": [
-      "Form Lead tab \"Lịch sử chăm sóc\": dòng \"Đổi trạng thái\" hiện Trạng thái trước / Trạng thái sau với nhãn Việt"
+      "Launcher content:import: re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (giảm RAM peak)",
+      "Exit code != 0 khi có LỖI ở content:import, english:pack, seed:english (payload run ghi đè exitCode); 0 khi sạch",
+      "Thông báo thiếu danh mục dự án/tỉnh không còn chỉ `pnpm seed`; runbook english-pack có bước danh mục dự án VI/EN"
     ],
-    "dependents": [
-      "Sale xem lead được giao: quyền đọc activity không đổi, chỉ thấy lịch sử lead của mình"
-    ],
+    "dependents": [],
     "regression": [
-      "Thêm ghi chú / cuộc gọi trong tab vẫn hoạt động",
-      "Đổi trạng thái sang Không thành + lý do",
-      "Phân công lead",
-      "CV private: khách chưa đăng nhập 401, admin 200 PDF (giữ case regression)"
+      "Dry-run là mặc định (không ghi DB)",
+      "Apply cần IMPORT_CONFIRM=2026-10-23",
+      "Idempotent: chạy lại không tạo trùng"
     ]
   },
   "acceptance": [
-    "Đổi Mới -> Đã liên hệ: bảng lịch sử có dòng Đổi trạng thái với \"Mới\" và \"Đã liên hệ\"",
-    "Sale chỉ thấy lịch sử của lead được giao"
+    "RAM 1 GB: cgroup peak 603 MB khi nhập (trước 875-881 MB)",
+    "Có LỖI -> exit 1; sạch -> exit 0 (3 script)",
+    "Runbook english-pack mô tả bước danh mục dự án VI/EN, không bảo chạy `pnpm seed` ở prod"
   ],
+  "testNotes": "Không có ca UI/e2e trình duyệt. Kiểm qua vitest: tests/unit/import-content-plan.test.ts, tests/integration/import-content.test.ts. Không chạy script ghi trên staging/prod.",
   "risk": "medium",
-  "riskNote": "Medium: chỉ đổi cột hiển thị của join trong admin Lead; không đổi schema/API/quyền/requirement."
+  "riskNote": "Medium: tooling vận hành chạy được ở prod (apply cần IMPORT_CONFIRM); không đổi requirement/schema/API/UI."
 }

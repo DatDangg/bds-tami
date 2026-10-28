@@ -6,6 +6,8 @@ import {
   countImportProblems,
   formatImportLine,
   importConfirmProblem,
+  importExitCode,
+  mallocTuningEnv,
   normaliseMarkdown,
   parseFrontmatter,
   parseImportArgs,
@@ -80,5 +82,28 @@ describe("báo cáo kế hoạch", () => {
     expect(formatImportLine(lines[0]!, false)).toBe("[project] sẽ tạo: p — 3 ảnh");
     expect(formatImportLine(lines[0]!, true)).toBe("[project] đã tạo: p — 3 ảnh");
     expect(formatImportLine(lines[1]!, false)).toBe("[news] đã có, bỏ qua: n");
+  });
+});
+
+describe("importExitCode", () => {
+  it("0 khi không lỗi, 1 khi còn ít nhất một lỗi", () => {
+    expect(importExitCode(0)).toBe(0);
+    expect(importExitCode(1)).toBe(1);
+    expect(importExitCode(7)).toBe(1);
+  });
+});
+
+describe("mallocTuningEnv", () => {
+  it("Linux glibc chưa đặt MALLOC_ARENA_MAX → đặt arena + ngưỡng mmap", () => {
+    expect(mallocTuningEnv("linux", "2.36", {})).toEqual({ MALLOC_ARENA_MAX: "2", MALLOC_MMAP_THRESHOLD_: "131072" });
+  });
+  it("không re-exec: không phải Linux, không phải glibc (musl), hoặc người vận hành đã đặt MALLOC_ARENA_MAX", () => {
+    expect(mallocTuningEnv("win32", undefined, {})).toBeNull();
+    expect(mallocTuningEnv("darwin", undefined, {})).toBeNull();
+    expect(mallocTuningEnv("linux", undefined, {})).toBeNull();
+    expect(mallocTuningEnv("linux", "2.36", { MALLOC_ARENA_MAX: "4" })).toBeNull();
+  });
+  it("giữ MALLOC_MMAP_THRESHOLD_ do người vận hành đặt", () => {
+    expect(mallocTuningEnv("linux", "2.36", { MALLOC_MMAP_THRESHOLD_: "65536" })).toEqual({ MALLOC_ARENA_MAX: "2", MALLOC_MMAP_THRESHOLD_: "65536" });
   });
 });

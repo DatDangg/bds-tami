@@ -96,3 +96,16 @@ export const formatImportLine = (line: ImportLine, applied: boolean): string => 
   const label = line.status === "create" && applied ? "đã tạo" : STATUS_LABEL[line.status];
   return `[${line.kind}] ${label}: ${line.key}${line.detail ? ` — ${line.detail}` : ""}`;
 };
+
+/** Exit code của script: `payload run` gọi `process.exit(0)` sau script nên `process.exitCode` bị ghi đè — script phải `process.exit(code)` tường minh. */
+export const importExitCode = (problems: number): 0 | 1 => (problems > 0 ? 1 : 0);
+
+/**
+ * Env malloc để re-exec trên Linux glibc, hoặc `null` nếu không cần (không phải glibc, hoặc người vận hành đã tự đặt `MALLOC_ARENA_MAX`).
+ * Lý do: libvips (sharp) cấp/giải phóng pixel buffer lớn trên thread libuv; glibc không trả về OS → RSS tăng đơn điệu (~920 MB sau 83 ảnh,
+ * container 1 GB bị OOM-kill). Đo cùng bộ ảnh: với 2 env này ~546 MB.
+ */
+export function mallocTuningEnv(platform: string, glibcVersion: string | undefined, env: Record<string, string | undefined>): Record<string, string> | null {
+  if (platform !== "linux" || !glibcVersion || env.MALLOC_ARENA_MAX !== undefined) return null;
+  return { MALLOC_ARENA_MAX: "2", MALLOC_MMAP_THRESHOLD_: env.MALLOC_MMAP_THRESHOLD_ ?? "131072" };
+}

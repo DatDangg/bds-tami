@@ -15,9 +15,12 @@ try {
 
 const only = process.argv.slice(2).filter((arg) => !arg.endsWith(".ts") && !arg.endsWith(".js"));
 const payload = await getPayload({ config });
+let exitCode = 0;
 try {
   const { problems } = await runSeedEnglish(payload, only);
-  if (problems > 0) process.exitCode = 1;
+  exitCode = problems > 0 ? 1 : 0;
 } finally {
   await payload.destroy();
 }
+// `payload run` tự process.exit(0) sau script → phải thoát tường minh, nếu không exit code bị ghi đè.
+process.exit(exitCode);

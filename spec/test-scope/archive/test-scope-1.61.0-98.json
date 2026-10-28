@@ -1,0 +1,52 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 98,
+  "generatedAt": "2026-10-28T07:53:13+00:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-078 BUG: tab \"Lịch sử chăm sóc\" trong form Lead (join `activities`) không hiện Trạng thái trước / Trạng thái sau cho dòng \"Đổi trạng thái\". Fix: join `activities` thêm admin.defaultColumns [type, fromStatus, toStatus, content, actor, createdAt], bỏ cột lead. Unit test tests/unit/lead-activities-join-columns.test.ts. Không đổi schema/DB/API/quyền. Nghi vấn \"khách chưa đăng nhập tải được CV\" là báo nhầm: rerun 2026-10-28 anon -> 401, admin -> 200 PDF. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "status": "published",
+  "workItem": "bug/lead-status-history",
+  "backlog": "BL-078",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-26-lead-status-history.md",
+  "task": "tasks/bug-lead-status-history/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-97.json",
+  "specUpdate": null,
+  "specRefs": [
+    "ERD §4.11 lead-activities (status_change fromStatus/toStatus)",
+    "BR-11"
+  ],
+  "changed": {
+    "files": [
+      "src/collections/Leads.ts",
+      "tests/unit/lead-activities-join-columns.test.ts"
+    ],
+    "modules": [
+      "Leads: join activities admin.defaultColumns thêm fromStatus/toStatus, bỏ cột lead"
+    ]
+  },
+  "screens": [
+    "/admin/collections/leads/:id (tab Lịch sử chăm sóc)"
+  ],
+  "impact": {
+    "direct": [
+      "Form Lead tab \"Lịch sử chăm sóc\": dòng \"Đổi trạng thái\" hiện Trạng thái trước / Trạng thái sau với nhãn Việt"
+    ],
+    "dependents": [
+      "Sale xem lead được giao: quyền đọc activity không đổi, chỉ thấy lịch sử lead của mình"
+    ],
+    "regression": [
+      "Thêm ghi chú / cuộc gọi trong tab vẫn hoạt động",
+      "Đổi trạng thái sang Không thành + lý do",
+      "Phân công lead",
+      "CV private: khách chưa đăng nhập 401, admin 200 PDF (giữ case regression)"
+    ]
+  },
+  "acceptance": [
+    "Đổi Mới -> Đã liên hệ: bảng lịch sử có dòng Đổi trạng thái với \"Mới\" và \"Đã liên hệ\"",
+    "Sale chỉ thấy lịch sử của lead được giao"
+  ],
+  "risk": "medium",
+  "riskNote": "Medium: chỉ đổi cột hiển thị của join trong admin Lead; không đổi schema/API/quyền/requirement."
+}

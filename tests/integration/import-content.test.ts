@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import type { EventEmitter } from "node:events";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -155,4 +156,18 @@ describe.skipIf(!baseUrl)("integration: scripts/import-content (BL-072) — dry-
     expect(again).toMatchObject({ applied: true, problems: 0 });
     expect([await count("projects"), await count("media"), await count("developers")]).toEqual([1, 2, 1]);
   });
+
+  it("script thật (payload run): thư mục ảnh rỗng → dry-run báo LỖI và exit ≠ 0 (payload run không được nuốt exit code)", () => {
+    const emptyImgDir = join(workDir, "ảnh-rỗng");
+    const run = spawnSync(process.execPath, ["node_modules/payload/bin.js", "run", "scripts/import-content.ts"], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      env: { ...process.env, DATABASE_URL: testUrl, IMPORT_IMG_DIR: emptyImgDir },
+      timeout: 110_000,
+    });
+    expect(run.status, `${run.stdout}
+${run.stderr}`).toBe(1);
+    expect(run.stdout).toContain("LỖI");
+    expect(run.stdout).toMatch(/Tổng: .*[1-9]\d* lỗi/);
+  }, 120_000);
 });

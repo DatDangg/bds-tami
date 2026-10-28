@@ -4394,6 +4394,41 @@
       "report": ".context/review-reports/bug-lead-status-history-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "content-import-hardening",
+      "title": "content:import: OOM trong container 1 GB khi nhập ~90 ảnh, dry-run LỖI vẫn exit 0, thông báo/runbook bảo pnpm seed khi thiếu danh mục project (BL-073)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-073",
+      "changeDoc": "spec/changes/archive/2026-10-23-content-import-hardening.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-28 (user chat: \"dở thì làm nốt đi, rồi làm tiếp mấy cái 73 76 78\")",
+      "rootCause": "(1) Không phải buffer JS bị giữ (đo Linux 1 GB: heapUsed ~88 MB, arrayBuffers ≤ 70 MB phẳng, RSS tăng đơn điệu 207→846 MB): glibc malloc (arena/thread + ngưỡng mmap động) giữ/phân mảnh bộ nhớ native libvips khi Payload tạo 4 cỡ ảnh Media; MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 → 546 MB. (2) payload run gọi process.exit(0) sau script (node_modules/payload/dist/bin/index.js:68) ghi đè process.exitCode. (3) pnpm seed nền không tạo danh mục project (seed/categories.ts), seed --sample cấm ở prod.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-content-import-hardening/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
+          "note": "launcher re-exec Linux glibc + env malloc (parent không import payload), process.exit tường minh ở 3 script, thông báo danh mục/tỉnh không còn pnpm seed, runbook bước danh mục dự án VI/EN; MINOR-1..4 sửa trước commit (log tín hiệu child, test kiểm LỖI, runbook số 603 MB + kiểm docker stats, bỏ coupling importExitCode).",
+          "verify": "Linux 1 GB DB trống bộ 2026-10-23 apply: cgroup peak 875–881 → 603 MB (child 542, parent 125), oom_kill 0; dry-run LỖI exit 0 → 1, sạch exit 0, chạy lại 16 đã có; pnpm lint toàn repo exit 0, typecheck exit 0, pnpm test exit 0 (builder), import unit+integration 25 PASS",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 99,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
+      "docImpact": "docs/runbooks/english-pack.md bước 2 (danh mục dự án, RAM, exit code); no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-28"
     }
   ],
   "projectName": "tami-website",
@@ -5047,7 +5082,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-28T04:24:25.227Z",
+  "lastUpdated": "2026-10-28T08:42:26.148Z",
   "approvalMilestones": [
     {
       "id": "M1",

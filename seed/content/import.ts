@@ -140,7 +140,7 @@ async function loadDependencies(pass: Pass, developers: Record<string, { name: s
   const author = await first(pass.payload, "staff", { role: { equals: "admin" } });
   const province = await first(pass.payload, "provinces", { slug: { equals: "ha-noi" } });
   if (!author) note(pass, "project", "(tác giả)", "error", "chưa có tài khoản admin làm tác giả");
-  if (!province) note(pass, "project", "(tỉnh)", "error", "thiếu tỉnh ha-noi: chạy pnpm seed trước");
+  if (!province) note(pass, "project", "(tỉnh)", "error", "thiếu tỉnh ha-noi (nạp địa giới lúc khởi tạo môi trường: docs/runbooks/deploy.md)");
   if (!author || !province) return null;
   const ward = await first(pass.payload, "wards", { and: [{ slug: { equals: "phuong-phu-thuong" } }, { province: { equals: province.id } }] });
   return { authorId: author.id, provinceId: province.id, wardId: ward?.id, developerIds: await importDevelopers(pass, developers), manifest };
@@ -158,7 +158,7 @@ async function importProject(pass: Pass, deps: Dependencies, p: ProjectData): Pr
   }
   const category = await first(pass.payload, "categories", { and: [{ scope: { equals: "project" } }, { name: { equals: p.category } }] });
   if (!category) {
-    note(pass, "project", p.slug, "error", `thiếu danh mục dự án "${p.category}": chạy pnpm seed trước`);
+    note(pass, "project", p.slug, "error", `thiếu danh mục dự án "${p.category}": tạo trong /admin → Danh mục (phạm vi Dự án, đúng tên này), xem docs/runbooks/english-pack.md bước 2`);
     return;
   }
   const errorsBefore = errorCount(pass);

@@ -19,12 +19,21 @@ Cả hai in `APP_ENV` + `host:port/tên-db` (không in mật khẩu) trước kh
    docker exec $PG pg_dump -U $U -Fc $DB > "$OUT/$DB-pre-content-$(date +%F-%H%M).dump"
    ```
    Chỉ bảng liên quan cũng được, nhưng dump cả DB đơn giản hơn và restore được hết (`docs/runbooks/restore.md`).
-2. **Nhập nội dung (nếu DB chưa có dự án/tin)** — ảnh (184 MB) không nằm trong repo:
+2. **Nhập nội dung (nếu DB chưa có dự án/tin)** — ảnh (184 MB) không nằm trong repo. Cần sẵn: tài khoản admin, tỉnh `ha-noi` (địa giới nạp lúc khởi tạo môi trường, `deploy.md`) và **danh mục dự án** (`pnpm seed` không tạo danh mục `project`). Tạo trong `/admin` → Danh mục, phạm vi **Dự án**, tên đúng như cột VI:
+
+   | Danh mục (VI) | Bản EN | Ghi chú |
+   |---|---|---|
+   | Căn hộ chung cư | Apartments | bắt buộc; EN do gói ghi ở bước 3 |
+   | Nhà phố, biệt thự | Townhouses and villas | bắt buộc; EN do gói ghi ở bước 3 |
+   | Khu đô thị | Urban areas | tuỳ chọn, khớp staging; gói **không** phủ → admin nhập EN + bật bản EN tay |
+   | Nghỉ dưỡng | Resorts | tuỳ chọn, khớp staging; như trên |
+
    ```bash
    docker cp <thư-mục-ảnh-trên-server>/. $APP:/tmp/import-img      # chứa manifest.json + ảnh
    docker exec -e IMPORT_IMG_DIR=/tmp/import-img $APP pnpm content:import          # dry-run
    ```
-   Đọc từng dòng: `sẽ tạo` / `đã có, bỏ qua`; dòng `LỖI` (thiếu file ảnh, thiếu ảnh bìa, còn `[CẦN KIỂM TRA]`, thiếu danh mục/tỉnh/admin) → sửa rồi chạy lại, exit code ≠ 0 khi còn lỗi. Production DB trống cần đã chạy `pnpm seed` (tỉnh, danh mục) và có tài khoản admin.
+   Đọc từng dòng: `sẽ tạo` / `đã có, bỏ qua`; dòng `LỖI` (thiếu file ảnh, thiếu ảnh bìa, còn `[CẦN KIỂM TRA]`, thiếu danh mục/tỉnh/admin) → sửa rồi chạy lại, exit code ≠ 0 khi còn lỗi.
+   Trên Linux (glibc) script tự chạy lại với `MALLOC_ARENA_MAX=2` + `MALLOC_MMAP_THRESHOLD_=131072` (glibc giữ bộ nhớ libvips sau mỗi ảnh; đo bộ 2026-10-23, 83 ảnh, container 1 GB chỉ chạy script: ~921 MB → ~603 MB tính cả tiến trình cha + con) nên thường **không cần nâng RAM container**. `$APP` còn chạy `next start` trong cùng 1 GB: trước `apply` xem `docker stats --no-stream $APP`, còn trống < ~650 MB thì tạm nâng RAM như lần 2026-10-23. Đã đặt sẵn `MALLOC_ARENA_MAX` thì script giữ nguyên env đó; tiến trình con bị kill thì script in tín hiệu (vd `SIGKILL`, có thể OOM) và exit 1. `content:import`, `english:pack` thoát exit code ≠ 0 đúng khi còn lỗi.
    **Hỏi người duyệt (user) "ok" sau dry-run**, rồi:
    ```bash
    docker exec -e IMPORT_IMG_DIR=/tmp/import-img -e IMPORT_CONFIRM=2026-10-23 $APP pnpm content:import apply
