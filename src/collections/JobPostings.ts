@@ -1,6 +1,7 @@
 import type { CollectionConfig, NumberFieldSingleValidation, SelectField } from "payload";
 import { number } from "payload/shared";
 
+import { adminDate } from "../fields/admin-date";
 import { withPriceInWords } from "../fields/form-hints";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
@@ -95,7 +96,7 @@ export function createJobPostings(revalidate?: RevalidatePaths): CollectionConfi
                 required: true,
                 index: true,
                 admin: {
-                  date: { pickerAppearance: "dayOnly" },
+                  date: adminDate("dayOnly"),
                   // BL-042 #14: badge "Đã quá hạn" ở form và danh sách (cùng mốc giờ VN với chip "Hết hạn"); dữ liệu/lọc không đổi.
                   components: { Cell: "/components/admin/JobDeadlineDisplay#JobDeadlineCell", afterInput: ["/components/admin/JobDeadlineDisplay#JobDeadlineNotice"] },
                 },

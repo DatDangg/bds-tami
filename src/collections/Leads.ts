@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field, FieldAccess, RelationshipFieldSingleValidation, TextField } from "payload";
 
 import { denyAll, isAdmin, isAssignedOrAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { auditContentPurge, auditContentTrash } from "../hooks/audit-content-delete";
 import { guardTrashedEdit } from "../hooks/guard-trashed-edit";
 import { expandPhoneSearch } from "../hooks/leads/expand-phone-search";
@@ -35,7 +36,7 @@ const customerFieldAccess = { update: isAdmin };
 /** Dấu và khoá do hệ thống ghi (hook hoặc endpoint công khai bằng Local API): không ai sửa qua API, kể cả admin. */
 const systemFieldAccess = { create: denyAll, update: denyAll };
 const readOnlyInAdmin = { readOnly: true } as const;
-const dateTimeInAdmin = { pickerAppearance: "dayAndTime" } as const;
+const dateTimeInAdmin = adminDate("dayAndTime");
 
 /** Chỉ admin xem (dấu vết kỹ thuật của form). `ipHash` thì không ai xem qua API, như `job-applications`. */
 const adminOnlyRead: FieldAccess = ({ req }) => req.user?.role === ROLES.admin && req.user.active === true;

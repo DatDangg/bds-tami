@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { titleField } from "../fields/title";
 import { createRevalidatePage } from "../hooks/pages/revalidate-page";
@@ -60,7 +61,7 @@ export function createPages(revalidate?: RevalidatePaths): CollectionConfig {
         titleField({ placeholder: "VD: Giới thiệu" }),
         markRequired({ name: "content", type: "richText", label: "Nội dung", localized: true, validate: requiredByLocale("Nội dung không được để trống.") }),
         { name: "version", type: "text", label: "Phiên bản", required: true, admin: { description: "Phiên bản văn bản, vd 1.0. Phiên bản chính sách bảo mật đang xuất bản được lưu kèm mỗi lần khách đồng ý trên form." } },
-        { name: "effectiveDate", type: "date", label: "Ngày hiệu lực", required: true, admin: { date: { pickerAppearance: "dayOnly" } } },
+        { name: "effectiveDate", type: "date", label: "Ngày hiệu lực", required: true, admin: { date: adminDate("dayOnly") } },
       ],
     },
     {

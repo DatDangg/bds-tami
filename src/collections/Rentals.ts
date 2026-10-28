@@ -1,6 +1,7 @@
 import type { CollectionConfig, DateField, FieldAccess, GroupField, NumberField, SelectField, TextField } from "payload";
 
 import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { withPriceInWords } from "../fields/form-hints";
 import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
@@ -102,7 +103,7 @@ const rentedAtField: DateField = {
   label: "Ngày cho thuê",
   access: { create: denyAll, update: denyAll },
   hooks: { beforeChange: [stampRentedAt] },
-  admin: { position: "sidebar", readOnly: true, date: { pickerAppearance: "dayAndTime" } },
+  admin: { position: "sidebar", readOnly: true, date: adminDate("dayAndTime") },
 };
 
 /**
@@ -131,7 +132,7 @@ const rentalTermsGroup: GroupField = {
     nonNegativeNumber("depositMonths", "Đặt cọc (số tháng)"),
     { name: "paymentCycle", type: "select", label: "Chu kỳ thanh toán", options: selectOptions(PAYMENT_CYCLES, PAYMENT_CYCLE_LABELS) },
     { name: "includedServices", type: "select", label: "Dịch vụ bao gồm", hasMany: true, options: selectOptions(INCLUDED_SERVICES, SERVICE_LABELS) },
-    { name: "availableFrom", type: "date", label: "Có thể dọn vào từ", admin: { date: { pickerAppearance: "dayOnly" } } },
+    { name: "availableFrom", type: "date", label: "Có thể dọn vào từ", admin: { date: adminDate("dayOnly") } },
   ],
 };
 

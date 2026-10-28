@@ -2,6 +2,7 @@ import type { CollectionConfig, EmailFieldValidation, Field } from "payload";
 import { email as validateEmail } from "payload/shared";
 
 import { denyAll, isAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { auditApplicationPurge, deleteApplicationCv } from "../hooks/job-applications/delete-cv-and-audit";
 import { collectionLabels } from "../lib/admin/collection-labels";
 
@@ -51,7 +52,7 @@ const submittedFields: Field[] = [
     label: "Tải CV",
     admin: { components: { Field: "/components/admin/CvDownloadButton#CvDownloadButton" } },
   },
-  { name: "consentAt", type: "date", label: "Ngày đồng ý chính sách", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: { pickerAppearance: "dayAndTime" } } },
+  { name: "consentAt", type: "date", label: "Ngày đồng ý chính sách", required: true, access: submittedFieldAccess, admin: { ...readOnlyInAdmin, date: adminDate("dayAndTime") } },
   { name: "consentVersion", type: "text", label: "Phiên bản chính sách đã đồng ý", required: true, maxLength: 40, access: submittedFieldAccess, admin: readOnlyInAdmin },
   {
     name: "locale",
@@ -107,6 +108,6 @@ export const JobApplications: CollectionConfig = {
     },
     { name: "note", type: "textarea", label: "Ghi chú nội bộ", maxLength: 2000, admin: { description: "Ghi chú nội bộ, ứng viên không thấy." } },
     { name: "ipHash", type: "text", access: { read: denyAll, create: denyAll, update: denyAll }, admin: { hidden: true } },
-    { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar" } },
+    { name: "anonymizedAt", type: "date", label: "Ngày xoá thông tin cá nhân", access: submittedFieldAccess, admin: { ...readOnlyInAdmin, position: "sidebar", date: adminDate("dayAndTime") } },
   ],
 };

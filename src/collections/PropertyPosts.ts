@@ -2,6 +2,7 @@ import type { CollapsibleField, CollectionConfig, DateFieldValidation, GroupFiel
 import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { withPriceInWords, withSummaryCounter } from "../fields/form-hints";
 import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
@@ -35,7 +36,7 @@ const validateOfferEnd: DateFieldValidation = (value, options) => {
   return new Date(value).getTime() < new Date(startAt).getTime() ? "Ngày kết thúc ưu đãi không được trước ngày bắt đầu." : true;
 };
 
-const dayOnly = { date: { pickerAppearance: "dayOnly" } } as const;
+const dayOnly = { date: adminDate("dayOnly") };
 
 /**
  * Ưu đãi (ERD §4.7, BR-06): `endAt` là NGÀY kết thúc giờ VN; "Đã kết thúc" tính bởi `isOfferEnded` (`lib/content/offer-status`), không lưu cờ

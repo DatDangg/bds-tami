@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { COLLECTION_NAME_ADMIN } from "../components/admin/collection-name-admin";
 import { CLICK_TYPE_LABELS, CLICK_TYPES } from "../lib/click-stats/click-types";
@@ -42,7 +43,7 @@ export const ClickEvents: CollectionConfig = {
       type: "date",
       label: "Ngày gộp thống kê",
       index: true,
-      admin: { readOnly: true, position: "sidebar" },
+      admin: { readOnly: true, position: "sidebar", date: adminDate() },
     },
   ],
 };

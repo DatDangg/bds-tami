@@ -1,6 +1,7 @@
 import type { DateField, FieldHook } from "payload";
 
 import { denyAll } from "../access";
+import { adminDate } from "./admin-date";
 
 /**
  * Gán thời điểm xuất bản ở lần đầu `status` thành `published`; đã có giá trị thì giữ (ẩn rồi xuất bản lại không
@@ -47,7 +48,7 @@ export function publishedAtField({ scheduled = false }: PublishedAtOptions = {})
       admin: {
         position: "sidebar",
         description: "Để trống thì tự điền khi xuất bản lần đầu; chọn giờ trong tương lai để hẹn giờ.",
-        date: { pickerAppearance: "dayAndTime" },
+        date: adminDate("dayAndTime"),
         components: SCHEDULED_COMPONENTS,
       },
     };
@@ -59,6 +60,6 @@ export function publishedAtField({ scheduled = false }: PublishedAtOptions = {})
     index: true,
     access: { create: denyAll, update: denyAll },
     hooks: { beforeChange: [stampFirstPublish] },
-    admin: { position: "sidebar", readOnly: true, description: "Tự điền khi xuất bản lần đầu.", date: { pickerAppearance: "dayAndTime" } },
+    admin: { position: "sidebar", readOnly: true, description: "Tự điền khi xuất bản lần đầu.", date: adminDate("dayAndTime") },
   };
 }

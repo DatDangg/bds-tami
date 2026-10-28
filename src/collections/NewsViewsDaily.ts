@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { denyAll, isAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { collectionLabels } from "../lib/admin/collection-labels";
 
 /**
@@ -22,7 +23,7 @@ export const NewsViewsDaily: CollectionConfig = {
   indexes: [{ fields: ["news", "day"], unique: true }],
   fields: [
     { name: "news", type: "relationship", label: "Tin tức", relationTo: "news", required: true, index: true },
-    { name: "day", type: "date", label: "Ngày", required: true, index: true, admin: { date: { pickerAppearance: "dayOnly" } } },
+    { name: "day", type: "date", label: "Ngày", required: true, index: true, admin: { date: adminDate("dayOnly") } },
     { name: "views", type: "number", label: "Lượt xem", required: true, min: 0, defaultValue: 0 },
   ],
 };

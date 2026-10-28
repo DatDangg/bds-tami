@@ -8,6 +8,7 @@ import sharp from "sharp";
 
 import { contentRedirectsPlugin } from "./collections/redirects-plugin";
 import { ADMIN_COLLECTIONS, ADMIN_GLOBALS } from "./collections/admin-collections";
+import { VN_DATE_TIME_FORMAT } from "./fields/admin-date";
 import { Staff } from "./collections/Staff";
 import { adminNavGroupsPlugin } from "./components/admin/admin-groups";
 import { migrations } from "../migrations";
@@ -44,7 +45,7 @@ export default buildConfig({
   admin: {
     user: Staff.slug,
     // Ngày giờ admin dạng Việt Nam (mặc định Payload là "tháng 10 19 2026, 5:47 PM").
-    dateFormat: "dd/MM/yyyy HH:mm",
+    dateFormat: VN_DATE_TIME_FORMAT,
     components: {
       providers: ["/components/admin/SessionKeepAlive#SessionKeepAlive", "/components/admin/NavigationToastGuard#NavigationToastGuard", "/components/admin/NavAdvancedCollapse#NavAdvancedCollapse", "/components/admin/UploadButtonLabel#UploadButtonLabel", "/components/admin/UploadSizeGuard#UploadSizeGuard", "/components/admin/AdminRoleAttribute#AdminRoleAttribute", "/components/admin/FormErrorFocus#FormErrorFocus"],
       // Nút "Xem website" ở header (BL-041).

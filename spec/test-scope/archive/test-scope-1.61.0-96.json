@@ -1,0 +1,65 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 96,
+  "generatedAt": "2026-10-28T14:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-077 BUG: admin form Dự án / Cho thuê / Tin BĐS — ô Phường/xã dùng custom client field src/components/admin/WardField.tsx (gắn admin.components.Field qua WARD_FIELD_COMPONENT trong src/fields/ward-in-province.ts): lọc danh sách phường theo tỉnh đang chọn ngay ở client; đổi tỉnh A->B (hoặc bỏ tỉnh) thì bỏ chọn phường; nạp bản ghi có sẵn / chọn tỉnh lần đầu không xoá phường. Validator server validateWardInProvince kiểm thuộc tỉnh trước validator relationship mặc định -> lỗi \"Phường/xã không thuộc tỉnh/thành đã chọn.\" không lộ UUID; validateWardWithOptionalProvince (Tin BĐS) kiểm thiếu tỉnh trước. Không đổi schema/DB/API contract. Requirement G22 (lọc phường theo tỉnh) không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1 (4 MINOR; MINOR-2 đã sửa trước commit).",
+  "status": "published",
+  "workItem": "bug/admin-province-ward-cascade",
+  "backlog": "BL-077",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-26-admin-province-ward-cascade.md",
+  "task": "tasks/bug-admin-province-ward-cascade/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-province-ward-cascade-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-95.json",
+  "specUpdate": null,
+  "specRefs": ["G22"],
+  "changed": {
+    "files": [
+      "src/components/admin/WardField.tsx",
+      "src/fields/ward-in-province.ts",
+      "src/collections/Projects.ts",
+      "src/collections/PropertyPosts.ts",
+      "src/collections/Rentals.ts"
+    ],
+    "modules": [
+      "WardField: custom client field lọc Phường/xã theo tỉnh đang chọn, bỏ chọn phường khi đổi/bỏ tỉnh",
+      "ward-in-province: WARD_FIELD_COMPONENT, validateWardInProvince (kiểm thuộc tỉnh trước relationship mặc định), validateWardWithOptionalProvince (kiểm thiếu tỉnh trước)",
+      "Collections Projects / Rentals / PropertyPosts: gắn admin.components.Field cho ô Phường/xã"
+    ]
+  },
+  "screens": [
+    "/admin/collections/projects (tạo/sửa)",
+    "/admin/collections/rentals (tạo/sửa)",
+    "/admin/collections/property-posts (tạo/sửa)",
+    "REST PATCH/POST /api/projects, /api/rentals, /api/property-posts"
+  ],
+  "impact": {
+    "direct": [
+      "Dự án / Cho thuê / Tin BĐS: chọn tỉnh rồi mở ô Phường/xã ngay -> chỉ hiện phường thuộc tỉnh đó",
+      "Đổi tỉnh A->B (hoặc bỏ tỉnh) -> phường đã chọn bị bỏ chọn",
+      "Mở bản ghi có sẵn -> giữ nguyên phường; chọn tỉnh lần đầu không xoá phường",
+      "API PATCH đổi tỉnh nhưng giữ phường cũ -> 400 \"Phường/xã không thuộc tỉnh/thành đã chọn.\" (không lộ UUID)",
+      "Tin BĐS chọn phường mà không có tỉnh -> \"Chọn tỉnh/thành trước khi chọn phường/xã.\""
+    ],
+    "dependents": [
+      "Mọi form dùng chung field ward-in-province (shared field) trên 3 collection",
+      "Lưu bản ghi (draft/publish) qua validator server mới",
+      "Hiển thị Phường/xã ở trang public (Dự án, Cho thuê, Tin BĐS) và bộ lọc theo tỉnh/phường"
+    ],
+    "regression": [
+      "Lọc phường theo tỉnh ở bộ lọc public không đổi",
+      "Tạo/sửa bản ghi hợp lệ (tỉnh + phường khớp) vẫn lưu được",
+      "Bản ghi cũ không có phường vẫn mở/lưu được; Tin BĐS không có tỉnh và không có phường vẫn hợp lệ"
+    ]
+  },
+  "acceptance": [
+    "3 collection: sau khi chọn tỉnh, mở ô Phường/xã chỉ liệt kê phường của tỉnh đó",
+    "Đổi tỉnh A->B hoặc bỏ tỉnh -> phường bị bỏ chọn; mở bản ghi có sẵn giữ phường",
+    "PATCH đổi tỉnh giữ phường cũ -> 400 câu tiếng Việt, không chứa UUID",
+    "Tin BĐS có phường mà không có tỉnh -> \"Chọn tỉnh/thành trước khi chọn phường/xã.\"",
+    "Không đổi schema/DB/API contract"
+  ],
+  "risk": "medium",
+  "riskNote": "Medium-high: custom field dùng chung trên 3 collection (shared field) và validator server; không đổi schema/API/requirement. Reviewer STRICT PASS r1."
+}

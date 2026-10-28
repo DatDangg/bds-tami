@@ -9,6 +9,7 @@ import type {
 } from "payload";
 
 import { DEFAULT_ROLE, isAdmin, isStaff, ownedByUserOrAdmin, ROLE_VALUES, type Role } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { auditFailedLogin } from "../hooks/staff/audit-login-failed";
 import { auditStaffChanges, auditStaffDelete } from "../hooks/staff/audit-staff-changes";
 import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-reset";
@@ -173,7 +174,7 @@ export const Staff: CollectionConfig = {
       name: "lastLoginAt",
       type: "date",
       label: "Đăng nhập gần nhất",
-      admin: { readOnly: true },
+      admin: { readOnly: true, date: adminDate("dayAndTime") },
       access: { create: () => false, update: () => false },
     },
   ],

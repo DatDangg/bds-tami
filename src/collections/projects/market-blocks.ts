@@ -1,6 +1,7 @@
 import type { ArrayField, DateField, Field, NumberField, NumberFieldSingleValidation, SelectField, SelectFieldSingleValidation, TextField } from "payload";
 import { number, select } from "payload/shared";
 
+import { adminDate } from "../../fields/admin-date";
 import { selectOptions } from "../../fields/listing-field-helpers";
 import { DISTANCE_UNITS, type DistanceUnit } from "../../lib/units/legacy-parse";
 import { withPriceInWords, withTodayButton } from "../../fields/form-hints";
@@ -164,7 +165,7 @@ const priceUpdatedAtField: DateField = withTodayButton({
   name: "priceUpdatedAt",
   type: "date",
   label: "Ngày cập nhật bảng giá",
-  admin: { date: { pickerAppearance: "dayOnly" }, description: "Hiển thị cạnh bảng giá để khách biết giá còn mới hay cũ." },
+  admin: { date: adminDate("dayOnly"), description: "Hiển thị cạnh bảng giá để khách biết giá còn mới hay cũ." },
 });
 
 const faqsField: ArrayField = {

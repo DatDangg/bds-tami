@@ -1,6 +1,7 @@
 import type { CollectionConfig, FieldHook } from "payload";
 
 import { denyAll, isAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { collectionLabels } from "../lib/admin/collection-labels";
 
 export const NEWSLETTER_STATUSES = ["active", "unsubscribed"] as const;
@@ -71,7 +72,7 @@ export const NewsletterSubscribers: CollectionConfig = {
       index: true,
       options: NEWSLETTER_STATUSES.map((value) => ({ label: NEWSLETTER_STATUS_LABELS[value], value })),
     },
-    { name: "consentAt", type: "date", label: "Thời điểm đồng ý", access: lockedAfterCreate, admin: { readOnly: true, date: { pickerAppearance: "dayAndTime" } } },
+    { name: "consentAt", type: "date", label: "Thời điểm đồng ý", access: lockedAfterCreate, admin: { readOnly: true, date: adminDate("dayAndTime") } },
     { name: "privacyPolicyVersion", type: "text", label: "Phiên bản chính sách bảo mật", access: lockedAfterCreate, admin: { readOnly: true } },
     { name: "sourcePath", type: "text", label: "Trang đăng ký", access: lockedAfterCreate, admin: { readOnly: true } },
   ],

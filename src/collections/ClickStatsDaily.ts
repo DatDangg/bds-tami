@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { isAdmin, ROLES } from "../access";
+import { adminDate } from "../fields/admin-date";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { COLLECTION_NAME_ADMIN } from "../components/admin/collection-name-admin";
 import { CLICK_TYPE_LABELS, CLICK_TYPES } from "../lib/click-stats/click-types";
@@ -26,7 +27,7 @@ export const ClickStatsDaily: CollectionConfig = {
   disableDuplicate: true,
   indexes: [{ fields: ["date", "type", "refCollection", "refId"], unique: true }],
   fields: [
-    { name: "date", type: "date", label: "Ngày", required: true, index: true, admin: { date: { pickerAppearance: "dayOnly" } } },
+    { name: "date", type: "date", label: "Ngày", required: true, index: true, admin: { date: adminDate("dayOnly") } },
     {
       name: "type",
       type: "select",

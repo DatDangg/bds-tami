@@ -1,6 +1,7 @@
 import type { CheckboxField, Field, FieldHook, GroupField } from "payload";
 
 import { denyAll } from "../access";
+import { adminDate } from "./admin-date";
 
 const readOnlyForEveryone = { create: denyAll, update: denyAll };
 
@@ -74,7 +75,7 @@ function buildTranslationGroup(showInForm: boolean): GroupField {
       { name: "enSource", type: "select", label: "Nguồn bản tiếng Anh", options: options(["ai", "manual"], EN_SOURCE_LABELS), hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       { name: "viChangedAfterManual", type: "checkbox", label: "Bản tiếng Việt đã sửa sau khi sửa tay bản tiếng Anh", defaultValue: false, index: true, hooks: { beforeDuplicate: [resetOnDuplicate(false)] }, admin: { hidden: true } },
       { name: "sourceHash", type: "json", label: "Mã kiểm tra bản đã dịch (hệ thống)", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
-      { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
+      { name: "translatedAt", type: "date", label: "Ngày dịch", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true, date: adminDate() } },
       { name: "model", type: "text", label: "Mô hình AI", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       { name: "lastError", type: "text", label: "Lỗi gần nhất", hooks: { beforeDuplicate: [resetOnDuplicate(null)] }, admin: { hidden: true } },
       ...(showInForm ? translationBlockFields() : []),

@@ -4324,6 +4324,41 @@
       "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-28",
       "decision": "Cách B: 1 hook config.hooks.afterError (restorePublicErrorMessage) thay vì helper ở từng điểm ném (không phủ ~103 new APIError của Payload) hay tắt serverMinification (đổi build toàn app)"
+    },
+    {
+      "slug": "admin-date-format-vi",
+      "title": "Admin: ô ngày/giờ ở form chi tiết + cột phải hiện định dạng tiếng Anh (\"Oct 19, 2026 10:29 AM\") → dd/MM/yyyy HH:mm (BL-076)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-076",
+      "changeDoc": "spec/changes/archive/2026-10-26-admin-date-format-vi.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-28 (user chat: \"dở thì làm nốt đi, rồi làm tiếp mấy cái 73 76 78\")",
+      "rootCause": "Payload 3.91 DatePicker (@payloadcms/ui elements/DatePicker) bỏ qua admin.dateFormat toàn cục: lấy field.admin.date.displayFormat, thiếu thì hard-code kiểu Mỹ theo pickerAppearance (dayAndTime \"MMM d, yyy h:mm a\", dayOnly \"MMM dd\", default \"MM/dd/yyyy\") + timeFormat \"h:mm aa\"; không field date nào đặt displayFormat",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-date-format-vi/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-admin-date-format-vi-phase-1-task-01-round-1-review.md",
+          "note": "helper dùng chung src/fields/admin-date.ts adminDate(pickerAppearance) → displayFormat VN + timeFormat HH:mm, áp mọi field type date (38 field quét được); giữ pickerAppearance (trừ Staff.lastLoginAt + JobApplications.anonymizedAt default→dayAndTime theo review MINOR-1 để cột danh sách giữ giờ); BL-091 publishedAt hẹn giờ giữ nguyên. r1 PASS 3 MINOR, cả 3 sửa trước commit.",
+          "verify": "e2e collection-suite \"07 mở bản ghi có sẵn\" :3100 trước 4 failed (Dự án/Tin BĐS/Trang pháp lý/Tuyển dụng) → sau 10 passed 2 skipped; probe: Trang pháp lý 17/10/2026, Lead list 19/10/2026 11:33, Tin tức picker giờ 24h, gõ 30/11/2026 09:15 parse đúng; pnpm lint toàn repo, typecheck, pnpm test 455 files/4807 PASS; generate:types không đổi",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 97,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-admin-date-format-vi-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-28"
     }
   ],
   "projectName": "tami-website",
