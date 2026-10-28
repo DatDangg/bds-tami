@@ -1,0 +1,54 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 99,
+  "generatedAt": "2026-10-28T09:00:00+00:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-073 BUG tooling vận hành: (1) `pnpm content:import` bị OOM-kill trong container 1 GB -> launcher re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (cgroup peak 603 MB, trước 875-881 MB); (2) dry-run/apply có LỖI vẫn exit 0 -> exit code != 0 khi có LỖI ở 3 script (content:import, english:pack, seed:english; payload run ghi đè exitCode); (3) thông báo/runbook thiếu danh mục dự án/tỉnh không còn bảo `pnpm seed` (cấm ở prod) -> runbook bước danh mục dự án VI/EN. Không đổi UI/route/API công khai/schema. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "status": "published",
+  "workItem": "bug/content-import-hardening",
+  "backlog": "BL-073",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-10-23-content-import-hardening.md",
+  "task": "tasks/bug-content-import-hardening/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-98.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "scripts/import-content.ts",
+      "scripts/apply-english-pack.ts",
+      "scripts/seed-english.ts",
+      "seed/content/import-plan.ts",
+      "seed/content/import.ts",
+      "tests/unit/import-content-plan.test.ts",
+      "tests/integration/import-content.test.ts",
+      "docs/runbooks/english-pack.md"
+    ],
+    "modules": [
+      "CLI vận hành `pnpm content:import` / `pnpm english:pack` / `pnpm seed:english` (không có UI/route/API công khai đổi)"
+    ]
+  },
+  "screens": [],
+  "impact": {
+    "direct": [
+      "Launcher content:import: re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (giảm RAM peak)",
+      "Exit code != 0 khi có LỖI ở content:import, english:pack, seed:english (payload run ghi đè exitCode); 0 khi sạch",
+      "Thông báo thiếu danh mục dự án/tỉnh không còn chỉ `pnpm seed`; runbook english-pack có bước danh mục dự án VI/EN"
+    ],
+    "dependents": [],
+    "regression": [
+      "Dry-run là mặc định (không ghi DB)",
+      "Apply cần IMPORT_CONFIRM=2026-10-23",
+      "Idempotent: chạy lại không tạo trùng"
+    ]
+  },
+  "acceptance": [
+    "RAM 1 GB: cgroup peak 603 MB khi nhập (trước 875-881 MB)",
+    "Có LỖI -> exit 1; sạch -> exit 0 (3 script)",
+    "Runbook english-pack mô tả bước danh mục dự án VI/EN, không bảo chạy `pnpm seed` ở prod"
+  ],
+  "testNotes": "Không có ca UI/e2e trình duyệt. Kiểm qua vitest: tests/unit/import-content-plan.test.ts, tests/integration/import-content.test.ts. Không chạy script ghi trên staging/prod.",
+  "risk": "medium",
+  "riskNote": "Medium: tooling vận hành chạy được ở prod (apply cần IMPORT_CONFIRM); không đổi requirement/schema/API/UI."
+}

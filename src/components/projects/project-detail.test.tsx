@@ -1,4 +1,4 @@
-import { act, screen, within } from "@testing-library/react";
+import { act, cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { chooseOption, fakeMedia, renderWithIntl } from "@/components/media/test-utils";
@@ -626,6 +626,33 @@ describe("FloorPlans", () => {
     expect(screen.queryByRole("combobox")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Phóng to mặt bằng Căn 1PN" }));
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("BL-096: tablist nằm trong vùng cuộn của scroller (không tự overflow ẩn); tràn → nút ‹ › nhãn mặt bằng nằm NGOÀI tablist, không tràn → không nút", () => {
+    renderWithIntl(<FloorPlans plans={plans(3)} />);
+    const tablist = screen.getByRole("tablist");
+    expect(tablist.className).not.toContain("overflow-x-auto");
+    expect(tablist.closest("[data-tabs-scroller]")).not.toBeNull();
+    expect(screen.queryByRole("button", { name: "Mặt bằng sau" })).toBeNull();
+    cleanup();
+
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+      return this.hasAttribute("data-tabs-frame") ? 500 : this.hasAttribute("data-tabs-scroller") ? 400 : 0;
+    });
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (this: HTMLElement) {
+      return this.hasAttribute("data-tabs-scroller") ? 2500 : 0;
+    });
+    try {
+      renderWithIntl(<FloorPlans plans={plans(12)} />);
+      for (const name of ["Mặt bằng trước", "Mặt bằng sau"]) {
+        const button = screen.getByRole("button", { name });
+        expect(screen.getByRole("tablist").contains(button)).toBe(false);
+        expect(button.closest("[data-tabs-lane]")).not.toBeNull();
+      }
+      expect(document.querySelector("[data-tabs-fade='end']")).not.toBeNull();
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 
   it(">= 6 mặt bằng: có ô chọn cho mobile dùng chung state với tab", async () => {

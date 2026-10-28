@@ -547,6 +547,8 @@
       "floorPlans": {
         "tabs": "Chọn mặt bằng",
         "select": "Chọn mặt bằng",
+        "previous": "Mặt bằng trước",
+        "next": "Mặt bằng sau",
         "open": "Phóng to mặt bằng {title}"
       },
       "documents": {

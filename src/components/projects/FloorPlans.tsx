@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { ListingTabsScroller } from "@/components/listing/ListingTabsScroller";
 import { Lightbox } from "@/components/media/Lightbox";
 import { ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { OptionSelect } from "@/components/ui/option-select";
@@ -54,36 +55,37 @@ export function FloorPlans({ plans }: { plans: FloorPlanView[] }) {
           />
         </div>
       )}
-      <div
-        role="tablist"
-        aria-label={t("tabs")}
-        className={cn("flex gap-2 overflow-x-auto [scrollbar-width:none]", useSelectOnMobile && "hidden md:flex")}
-      >
-        {plans.map((plan, index) => {
-          const selected = index === activeIndex;
-          return (
-            <button
-              key={plan.id}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              type="button"
-              role="tab"
-              id={`${baseId}-tab-${index}`}
-              aria-selected={selected}
-              aria-controls={`${baseId}-panel`}
-              tabIndex={selected ? 0 : -1}
-              onClick={() => setActiveIndex(index)}
-              onKeyDown={(event) => handleTabKeyDown(event, index)}
-              className={cn(
-                "inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-pill border px-5 text-small font-semibold transition-colors duration-(--duration-fast)",
-                selected ? "border-text bg-text text-surface" : "border-border bg-surface text-text hover:border-text",
-              )}
-            >
-              {plan.title}
-            </button>
-          );
-        })}
+      {/* Bọc ngoài để < md ẩn cả khung (không để lại phần tử rỗng cộng thêm gap) khi dùng ô chọn. */}
+      <div className={cn(useSelectOnMobile && "hidden md:block")}>
+        <ListingTabsScroller labelNamespace="page.projectDetail.floorPlans" currentSelector='[aria-selected="true"]'>
+          <div role="tablist" aria-label={t("tabs")} className={cn("flex w-max min-w-full gap-2", useSelectOnMobile && "hidden md:flex")}>
+            {plans.map((plan, index) => {
+              const selected = index === activeIndex;
+              return (
+                <button
+                  key={plan.id}
+                  ref={(node) => {
+                    tabRefs.current[index] = node;
+                  }}
+                  type="button"
+                  role="tab"
+                  id={`${baseId}-tab-${index}`}
+                  aria-selected={selected}
+                  aria-controls={`${baseId}-panel`}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => setActiveIndex(index)}
+                  onKeyDown={(event) => handleTabKeyDown(event, index)}
+                  className={cn(
+                    "inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-pill border px-5 text-small font-semibold transition-colors duration-(--duration-fast)",
+                    selected ? "border-text bg-text text-surface" : "border-border bg-surface text-text hover:border-text",
+                  )}
+                >
+                  {plan.title}
+                </button>
+              );
+            })}
+          </div>
+        </ListingTabsScroller>
       </div>
       <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-tab-${activeIndex}`} className="mx-auto w-full max-w-4xl">
         <button

@@ -547,6 +547,8 @@
       "floorPlans": {
         "tabs": "Choose a floor plan",
         "select": "Choose a floor plan",
+        "previous": "Previous floor plans",
+        "next": "Next floor plans",
         "open": "Enlarge floor plan {title}"
       },
       "documents": {

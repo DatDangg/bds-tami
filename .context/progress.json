@@ -4429,6 +4429,41 @@
       "report": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
       "docImpact": "docs/runbooks/english-pack.md bước 2 (danh mục dự án, RAM, exit code); no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "project-floorplan-tabs-clipped",
+      "title": "Chi tiết dự án: dãy tab Mặt bằng bị cắt ở mép phải 768–1920 (BL-096, QA bug 15)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-096",
+      "changeDoc": "spec/changes/archive/2026-10-28-project-floorplan-tabs-clipped.md",
+      "startedAt": "2026-10-28",
+      "planApprovedAt": "2026-10-28 (user: batch BL-095→BL-099 auto proceed)",
+      "rootCause": "FloorPlans.tsx:57-61 tablist overflow-x-auto + ẩn scrollbar, không fade/nút: 12 tab ~2550px trong cột 522–728px → tab mép phải cắt cụt, chuột không tới được tab bên phải",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-project-floorplan-tabs-clipped/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
+          "note": "ListingTabsScroller thêm prop tùy chọn labelNamespace/currentSelector; FloorPlans bọc tablist trong scroller (nút ‹ › 'Mặt bằng trước/sau' làn ngoài vùng cuộn từ md + fade); MINOR-1..3 sửa trước commit.",
+          "verify": "Playwright Edge /du-an/astor-1 1920/1440/1024/768: trước 8–9/12 tab ngoài vùng nhìn, không fade/nút → sau nút 44px không đè vùng cuộn, bấm 'sau' tới mép giữ focus, End → tab 12 hiện đủ; 390 ô chọn; /cho-thue nhãn cũ. typecheck/lint/build PASS, pnpm test 4815 PASS",
+          "completedAt": "2026-10-29"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 100,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
+      "docImpact": ".context/design-spec.md S03 khối 7 (1 dòng as-built); no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-29"
     }
   ],
   "projectName": "tami-website",
@@ -5082,7 +5117,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-28T08:42:26.148Z",
+  "lastUpdated": "2026-10-29",
   "approvalMilestones": [
     {
       "id": "M1",

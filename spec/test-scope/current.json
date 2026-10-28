@@ -1,54 +1,60 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 99,
-  "generatedAt": "2026-10-28T09:00:00+00:00",
+  "scopeVersion": 100,
+  "generatedAt": "2026-10-29T09:00:00+00:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-073 BUG tooling vận hành: (1) `pnpm content:import` bị OOM-kill trong container 1 GB -> launcher re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (cgroup peak 603 MB, trước 875-881 MB); (2) dry-run/apply có LỖI vẫn exit 0 -> exit code != 0 khi có LỖI ở 3 script (content:import, english:pack, seed:english; payload run ghi đè exitCode); (3) thông báo/runbook thiếu danh mục dự án/tỉnh không còn bảo `pnpm seed` (cấm ở prod) -> runbook bước danh mục dự án VI/EN. Không đổi UI/route/API công khai/schema. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
+  "triggerNote": "BL-096 BUG UI: chi tiết dự án, mục Mặt bằng — dải tab tầng/mặt bằng bị cắt ở mép phải (768-1920), không fade/nút, người dùng chuột không tới được các tab bên phải. Fix: tablist FloorPlans bọc trong ListingTabsScroller (nút ‹ › ngoài vùng cuộn từ md + fade mép); ListingTabsScroller thêm 2 prop tùy chọn `labelNamespace` (mặc định page.listing.tabs) và `currentSelector` (mặc định [aria-current=\"page\"]) — consumer cũ không đổi. < md: >= 6 mặt bằng giữ ô chọn, < 6 dải tab vuốt. Không đổi API/schema/route. Requirement không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG.",
   "status": "published",
-  "workItem": "bug/content-import-hardening",
-  "backlog": "BL-073",
+  "workItem": "bug/project-floorplan-tabs-clipped",
+  "backlog": "BL-096",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-23-content-import-hardening.md",
-  "task": "tasks/bug-content-import-hardening/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-content-import-hardening-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-98.json",
+  "changeDoc": "spec/changes/2026-10-28-project-floorplan-tabs-clipped.md",
+  "task": "tasks/bug-project-floorplan-tabs-clipped/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-project-floorplan-tabs-clipped-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-99.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "scripts/import-content.ts",
-      "scripts/apply-english-pack.ts",
-      "scripts/seed-english.ts",
-      "seed/content/import-plan.ts",
-      "seed/content/import.ts",
-      "tests/unit/import-content-plan.test.ts",
-      "tests/integration/import-content.test.ts",
-      "docs/runbooks/english-pack.md"
+      "src/components/listing/ListingTabsScroller.tsx",
+      "src/components/projects/FloorPlans.tsx",
+      "src/components/projects/project-detail.test.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json",
+      ".context/design-spec.md"
     ],
     "modules": [
-      "CLI vận hành `pnpm content:import` / `pnpm english:pack` / `pnpm seed:english` (không có UI/route/API công khai đổi)"
+      "Chi tiết dự án — mục Mặt bằng (FloorPlans)",
+      "Shared ListingTabsScroller (thanh danh mục danh sách)",
+      "i18n page.projectDetail.floorPlans.previous/next"
     ]
   },
-  "screens": [],
+  "screens": [
+    "/du-an/<slug> (mục Mặt bằng)",
+    "/en/projects/<slug> (mục Floor plans)"
+  ],
   "impact": {
     "direct": [
-      "Launcher content:import: re-exec Linux glibc với MALLOC_ARENA_MAX=2 + MALLOC_MMAP_THRESHOLD_=131072 (giảm RAM peak)",
-      "Exit code != 0 khi có LỖI ở content:import, english:pack, seed:english (payload run ghi đè exitCode); 0 khi sạch",
-      "Thông báo thiếu danh mục dự án/tỉnh không còn chỉ `pnpm seed`; runbook english-pack có bước danh mục dự án VI/EN"
+      "Chi tiết dự án /du-an/<slug>, /en/projects/<slug>, mục Mặt bằng: dải tab tràn có nút ‹ › 'Mặt bằng trước/sau' (EN 'Previous/Next floor plans') từ md + fade mép phía còn nội dung; mọi tab tới được bằng chuột, bàn phím (← → Home End, tab chọn không nằm dưới fade) và vuốt",
+      "< md: >= 6 mặt bằng giữ ô chọn (không tablist); < 6 mặt bằng dải tab vuốt + fade, không nút",
+      "Không tràn (ít mặt bằng) -> không nút/fade, layout như trước; trang không tràn ngang"
     ],
-    "dependents": [],
+    "dependents": [
+      "Thanh danh mục ListingCategoryTabs ở /cho-thue, /du-an, /tin-bds (+ danh mục con, bản EN): nút 'Danh mục trước/sau', fade mép, aria-disabled ở mép, focus/nudge bàn phím — hành vi và nhãn không đổi"
+    ],
     "regression": [
-      "Dry-run là mặc định (không ghi DB)",
-      "Apply cần IMPORT_CONFIRM=2026-10-23",
-      "Idempotent: chạy lại không tạo trùng"
+      "ARIA tabs của FloorPlans: role tablist/tab, roving tabindex, aria-selected, lightbox mặt bằng đổi index",
+      "Nút ‹ › giữ focus sau khi bấm, aria-disabled ở mép cuộn",
+      "VI/EN: nhãn nút đúng ngôn ngữ"
     ]
   },
   "acceptance": [
-    "RAM 1 GB: cgroup peak 603 MB khi nhập (trước 875-881 MB)",
-    "Có LỖI -> exit 1; sạch -> exit 0 (3 script)",
-    "Runbook english-pack mô tả bước danh mục dự án VI/EN, không bảo chạy `pnpm seed` ở prod"
+    "Mọi tab mặt bằng truy cập được bằng chuột (nút >= 44px, không đè tab), bàn phím và vuốt ở 1920/1440/1024/768; 390 ô chọn vẫn hoạt động",
+    "Có gợi ý tràn (fade + nút) khi tràn; không tràn -> không nút/fade",
+    "ListingCategoryTabs (/cho-thue, /du-an, /tin-bds) không đổi hành vi, giữ nhãn 'Danh mục trước/sau'",
+    "Test jsdom: FloorPlans render trong scroller, nhãn nút mặt bằng, tablist không tự overflow"
   ],
-  "testNotes": "Không có ca UI/e2e trình duyệt. Kiểm qua vitest: tests/unit/import-content-plan.test.ts, tests/integration/import-content.test.ts. Không chạy script ghi trên staging/prod.",
+  "testNotes": "Dữ liệu mẫu: dự án có >= 7 mặt bằng tên dài (dev local: Astor 1, 12 mặt bằng). Kiểm bằng trình duyệt ở 1920/1440/1024/768/390 cả VI và EN, và /cho-thue, /du-an, /tin-bds (+ danh mục con) để soát hồi quy thanh danh mục.",
   "risk": "medium",
-  "riskNote": "Medium: tooling vận hành chạy được ở prod (apply cần IMPORT_CONFIRM); không đổi requirement/schema/API/UI."
+  "riskNote": "Medium: sửa component dùng chung ListingTabsScroller (STRICT review PASS r1); không đổi requirement/schema/API."
 }

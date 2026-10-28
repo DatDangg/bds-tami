@@ -30,9 +30,20 @@ function isKeyboardFocus(element: HTMLElement) {
  * Tràn khung → từ md hai làn nút ‹ › (≥ 44px) nằm NGOÀI vùng cuộn (vùng cuộn thu hẹp nhường chỗ, nút không bao giờ đè tab), fade ở mép trong vùng cuộn
  * phía còn nội dung (cả < md, nơi chỉ vuốt); nút ở mép giữ nguyên + `aria-disabled` (không unmount → không mất focus). Tab `aria-current` được cuộn vào giữa khi mount (chỉ theo chiều ngang).
  * Không tràn → không làn/fade/nút. Không JS → vẫn là danh sách link cuộn ngang được.
+ * Dùng lại cho dải tab ARIA (BL-096, `FloorPlans`): `labelNamespace` đổi nhãn hai nút, `currentSelector` (`[aria-selected="true"]`) chọn phần tử căn giữa khi mount.
  */
-export function ListingTabsScroller({ children }: { children: ReactNode }) {
-  const t = useTranslations("page.listing.tabs");
+export function ListingTabsScroller({
+  children,
+  labelNamespace = "page.listing.tabs",
+  currentSelector = '[aria-current="page"]',
+}: {
+  children: ReactNode;
+  /** Namespace i18n chứa `previous`/`next` cho nhãn hai nút (mặc định: danh mục danh sách). */
+  labelNamespace?: string;
+  /** Selector phần tử đang chọn để căn giữa khi mount (tab ARIA dùng `[aria-selected="true"]`). */
+  currentSelector?: string;
+}) {
+  const t = useTranslations(labelNamespace);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const frameRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -77,13 +88,13 @@ export function ListingTabsScroller({ children }: { children: ReactNode }) {
     const scroller = scrollerRef.current;
     if (!edges.overflowing || centeredRef.current || !scroller) return;
     centeredRef.current = true;
-    const current = scroller.querySelector<HTMLElement>('[aria-current="page"]');
+    const current = scroller.querySelector<HTMLElement>(currentSelector);
     if (!current) return;
     const scrollerBox = scroller.getBoundingClientRect();
     const currentBox = current.getBoundingClientRect();
     const hidden = currentBox.left < scrollerBox.left || currentBox.right > scrollerBox.right;
     if (hidden) scroller.scrollLeft += currentBox.left - scrollerBox.left - (scrollerBox.width - currentBox.width) / 2;
-  }, [edges.overflowing]);
+  }, [edges.overflowing, currentSelector]);
 
   const scrollByPage = useCallback(
     (direction: 1 | -1) => {
