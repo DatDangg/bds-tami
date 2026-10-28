@@ -3327,6 +3327,41 @@
       "report": ".context/review-reports/feature-news-scheduled-publish-phase-1-task-01-round-1-review.md",
       "docImpact": "SPECIFICATIONS 1.61.0, docs/ERD.md §1 + news.publishedAt, docs/PERMISSION.md §3.1, docs/API_SPEC.md (Đọc nhiều), docs/diagrams/layer-plan.md + tasks/tami-website/layer-16-task-01.md (superseded)",
       "completedAt": "2026-10-28"
+    },
+    {
+      "slug": "admin-province-ward-cascade",
+      "title": "Admin: Tỉnh/thành → Phường/xã — danh sách phường chưa lọc ngay, đổi tỉnh giữ phường cũ, lỗi sai tỉnh lộ UUID (Dự án / Cho thuê / Tin BĐS) (BL-077)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-077",
+      "changeDoc": "spec/changes/archive/2026-10-26-admin-province-ward-cascade.md",
+      "startedAt": "2026-10-26",
+      "planApprovedAt": "2026-10-26 (user chat: \"sửa đi\"); resume 2026-10-28 (\"dở thì làm nốt đi\")",
+      "rootCause": "ward-in-province.ts: filterOptions chỉ chạy server (client trễ 1 form-state round-trip) + không cascade reset ward khi đổi province + validateWardInProvince gọi relationship() mặc định trước → câu i18n có UUID",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-province-ward-cascade/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-admin-province-ward-cascade-phase-1-task-01-round-1-review.md",
+          "note": "builder bị dừng 2026-10-26 (interrupted, không tăng attempt); 2026-10-28 kiểm trên đĩa đủ. WardField client (RelationshipInput + filterOptions theo tỉnh + reset khi đổi tỉnh) gắn 3 collection; validator kiểm thuộc tỉnh trước. r1 PASS 4 MINOR; MINOR-2 (Tin BĐS thiếu tỉnh kiểm trước validator mặc định) sửa trước commit, MINOR-1/3/4 residual.",
+          "verify": "e2e location-ward.spec.ts :3100 trước 9 FAILED → sau 11 passed; probe 3 collection: list sau tải 10/10 phường Hà Nội, bản ghi có sẵn giữ ward, PATCH đổi tỉnh → 400 \"Phường/xã không thuộc tỉnh/thành đã chọn.\" không UUID; pnpm lint toàn repo, typecheck, pnpm test 454 files/4760 PASS",
+          "completedAt": "2026-10-28"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 96,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-admin-province-ward-cascade-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-28"
     }
   ],
   "bugs": [

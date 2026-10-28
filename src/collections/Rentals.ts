@@ -16,7 +16,7 @@ import {
   validatePriceMonthly,
   validateVideoUrl,
 } from "../hooks/rentals/field-validators";
-import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { validateWardInProvince, WARD_FIELD_COMPONENT, wardFilterOptions } from "../fields/ward-in-province";
 import { stampRentedAt } from "../hooks/rentals/stamp-rented-at";
 import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnListing } from "../hooks/homepage/revalidate-homepage-on-service";
@@ -191,7 +191,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
                   relationTo: "wards",
                   required: true,
                   index: true,
-                  filterOptions: wardFilterOptions,
+                  filterOptions: wardFilterOptions, admin: { components: { Field: WARD_FIELD_COMPONENT } },
                   validate: validateWardInProvince,
                 },
               ),

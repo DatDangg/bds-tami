@@ -1,64 +1,65 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 95,
-  "generatedAt": "2026-10-28T12:30:00+07:00",
+  "scopeVersion": 96,
+  "generatedAt": "2026-10-28T14:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-093 BUG (follow-up BL-088): ở build production mọi new APIError(...) do repo ném (guard-delete 409 Tỉnh/Phường/Danh mục/Tin tuyển dụng/Media, Staff reset-password 400, slug 400, privacy 400, upload 413/415) trả \"An unknown error occurred.\" vì minify làm name rỗng -> payload formatErrors rơi về fallback. Sửa chung: hook config.hooks.afterError restorePublicErrorMessage khôi phục message cho APIError public, không data, name rỗng (không đổi mã HTTP); validate-file reject() bỏ vá name riêng. Không đổi requirement/API -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1.",
+  "triggerNote": "BL-077 BUG: admin form Dự án / Cho thuê / Tin BĐS — ô Phường/xã dùng custom client field src/components/admin/WardField.tsx (gắn admin.components.Field qua WARD_FIELD_COMPONENT trong src/fields/ward-in-province.ts): lọc danh sách phường theo tỉnh đang chọn ngay ở client; đổi tỉnh A->B (hoặc bỏ tỉnh) thì bỏ chọn phường; nạp bản ghi có sẵn / chọn tỉnh lần đầu không xoá phường. Validator server validateWardInProvince kiểm thuộc tỉnh trước validator relationship mặc định -> lỗi \"Phường/xã không thuộc tỉnh/thành đã chọn.\" không lộ UUID; validateWardWithOptionalProvince (Tin BĐS) kiểm thiếu tỉnh trước. Không đổi schema/DB/API contract. Requirement G22 (lọc phường theo tỉnh) không đổi -> không bump spec_version, không có spec/updates/ và dòng CHANGELOG. Reviewer STRICT PASS r1 (4 MINOR; MINOR-2 đã sửa trước commit).",
   "status": "published",
-  "workItem": "bug/api-error-name-minified",
-  "backlog": "BL-093",
+  "workItem": "bug/admin-province-ward-cascade",
+  "backlog": "BL-077",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-28-api-error-name-minified.md",
-  "task": "tasks/bug-api-error-name-minified/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-api-error-name-minified-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-94.json",
+  "changeDoc": "spec/changes/archive/2026-10-26-admin-province-ward-cascade.md",
+  "task": "tasks/bug-admin-province-ward-cascade/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-province-ward-cascade-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-95.json",
   "specUpdate": null,
-  "specRefs": [],
+  "specRefs": ["G22"],
   "changed": {
     "files": [
-      "src/hooks/restore-public-error-message.ts",
-      "src/hooks/restore-public-error-message.test.ts",
-      "src/payload.config.ts",
-      "src/lib/upload/validate-file.ts",
-      "src/lib/upload/validate-file-prod-name.test.ts"
+      "src/components/admin/WardField.tsx",
+      "src/fields/ward-in-province.ts",
+      "src/collections/Projects.ts",
+      "src/collections/PropertyPosts.ts",
+      "src/collections/Rentals.ts"
     ],
     "modules": [
-      "restorePublicErrorMessage: hook afterError toàn cục (REST) khôi phục message lỗi APIError công khai bị mất name do minify",
-      "payload.config: hooks.afterError",
-      "validate-file reject(): bỏ gán name riêng (dùng cách chung)"
+      "WardField: custom client field lọc Phường/xã theo tỉnh đang chọn, bỏ chọn phường khi đổi/bỏ tỉnh",
+      "ward-in-province: WARD_FIELD_COMPONENT, validateWardInProvince (kiểm thuộc tỉnh trước relationship mặc định), validateWardWithOptionalProvince (kiểm thiếu tỉnh trước)",
+      "Collections Projects / Rentals / PropertyPosts: gắn admin.components.Field cho ô Phường/xã"
     ]
   },
   "screens": [
-    "/admin (toast lỗi khi thao tác bị chặn)",
-    "REST /api/**"
+    "/admin/collections/projects (tạo/sửa)",
+    "/admin/collections/rentals (tạo/sửa)",
+    "/admin/collections/property-posts (tạo/sửa)",
+    "REST PATCH/POST /api/projects, /api/rentals, /api/property-posts"
   ],
   "impact": {
     "direct": [
-      "Build production: xoá Tỉnh/thành đang có phường/tin -> toast/REST 409 \"Không xoá được tỉnh/thành đang có N …\"",
-      "Xoá danh mục đang có danh mục con / nội dung -> 409 chữ Việt",
-      "Xoá hẳn phường/xã đang có tin, tin tuyển dụng có hồ sơ, ảnh/video đang dùng ở trang chủ -> 409 chữ Việt",
-      "Staff reset-password thiếu mật khẩu -> 400 \"Thiếu mật khẩu mới.\"",
-      "Slug ghi với locale all -> 400 chữ Việt; Trang pháp lý thiếu tên site -> 400 chữ Việt",
-      "Upload > giới hạn REST -> 413 \"File vượt quá 10MB.\" (và 415 định dạng)"
+      "Dự án / Cho thuê / Tin BĐS: chọn tỉnh rồi mở ô Phường/xã ngay -> chỉ hiện phường thuộc tỉnh đó",
+      "Đổi tỉnh A->B (hoặc bỏ tỉnh) -> phường đã chọn bị bỏ chọn",
+      "Mở bản ghi có sẵn -> giữ nguyên phường; chọn tỉnh lần đầu không xoá phường",
+      "API PATCH đổi tỉnh nhưng giữ phường cũ -> 400 \"Phường/xã không thuộc tỉnh/thành đã chọn.\" (không lộ UUID)",
+      "Tin BĐS chọn phường mà không có tỉnh -> \"Chọn tỉnh/thành trước khi chọn phường/xã.\""
     ],
     "dependents": [
-      "Mọi phản hồi lỗi REST /api/** đi qua hook (chỉ đổi đúng ca APIError public, không data, name rỗng)",
-      "Đăng nhập sai (401), không quyền (403), không tìm thấy (404), ValidationError có data (field errors) giữ nguyên",
-      "Nộp CV công khai (job-applications) dùng instanceof + status, không đổi"
+      "Mọi form dùng chung field ward-in-province (shared field) trên 3 collection",
+      "Lưu bản ghi (draft/publish) qua validator server mới",
+      "Hiển thị Phường/xã ở trang public (Dự án, Cho thuê, Tin BĐS) và bộ lọc theo tỉnh/phường"
     ],
     "regression": [
-      "Admin xoá/xoá mềm Danh mục, Phường/xã, Tỉnh/thành, Tin tuyển dụng, Ảnh/tệp: hành vi chặn và mã HTTP không đổi, dữ liệu còn nguyên",
-      "Lỗi 500/không công khai vẫn không lộ message",
-      "Tải ảnh trong admin (UploadSizeGuard BL-088) vẫn 1 toast tiếng Việt"
+      "Lọc phường theo tỉnh ở bộ lọc public không đổi",
+      "Tạo/sửa bản ghi hợp lệ (tỉnh + phường khớp) vẫn lưu được",
+      "Bản ghi cũ không có phường vẫn mở/lưu được; Tin BĐS không có tỉnh và không có phường vẫn hợp lệ"
     ]
   },
   "acceptance": [
-    "Trên build production (staging): DELETE /api/provinces/<tỉnh có phường> -> 409 + message tiếng Việt (không còn \"An unknown error occurred.\")",
-    "DELETE /api/categories/<đang dùng> -> 409 tiếng Việt; admin xoá danh mục đang dùng -> toast tiếng Việt",
-    "POST /api/staff/reset-password thiếu password -> 400 \"Thiếu mật khẩu mới.\"",
-    "401/403/404 và ValidationError (data.errors) không đổi",
-    "Mã HTTP không đổi, không bản ghi nào bị xoá khi bị chặn"
+    "3 collection: sau khi chọn tỉnh, mở ô Phường/xã chỉ liệt kê phường của tỉnh đó",
+    "Đổi tỉnh A->B hoặc bỏ tỉnh -> phường bị bỏ chọn; mở bản ghi có sẵn giữ phường",
+    "PATCH đổi tỉnh giữ phường cũ -> 400 câu tiếng Việt, không chứa UUID",
+    "Tin BĐS có phường mà không có tỉnh -> \"Chọn tỉnh/thành trước khi chọn phường/xã.\"",
+    "Không đổi schema/DB/API contract"
   ],
   "risk": "medium",
-  "riskNote": "Hook afterError toàn cục chạm mọi phản hồi lỗi REST nhưng điều kiện hẹp (APIError, isPublic true, data null, name rỗng); không đổi status/API/schema/requirement. Đo trên build production trước/sau. Reviewer STRICT PASS r1."
+  "riskNote": "Medium-high: custom field dùng chung trên 3 collection (shared field) và validator server; không đổi schema/API/requirement. Reviewer STRICT PASS r1."
 }

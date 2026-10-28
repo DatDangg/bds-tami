@@ -8,7 +8,7 @@ import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helper
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
-import { validateWardWithOptionalProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { validateWardWithOptionalProvince, WARD_FIELD_COMPONENT, wardFilterOptions } from "../fields/ward-in-province";
 import { createRevalidateProjectOnListing } from "../hooks/projects/revalidate-project-on-listing";
 import { createRevalidateHomepageOnUnpublish } from "../hooks/homepage/revalidate-homepage-on-service";
 import type { RevalidatePaths } from "../hooks/revalidate-content";
@@ -120,7 +120,7 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
               ),
               formRow(
                 { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
-                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardWithOptionalProvince },
+                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, admin: { components: { Field: WARD_FIELD_COMPONENT } }, validate: validateWardWithOptionalProvince },
               ),
               formRow(
                 { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },

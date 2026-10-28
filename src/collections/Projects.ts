@@ -14,7 +14,7 @@ import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
 import { SUMMARY_PLACEHOLDER, titleField } from "../fields/title";
-import { validateWardInProvince, wardFilterOptions } from "../fields/ward-in-province";
+import { validateWardInProvince, WARD_FIELD_COMPONENT, wardFilterOptions } from "../fields/ward-in-province";
 import { reindexRentalsOnProjectRename } from "../hooks/projects/reindex-rentals";
 import { validateVideoUrl } from "../hooks/rentals/field-validators";
 import { trimText } from "../hooks/trim-text";
@@ -202,7 +202,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
               // Phường phải thuộc `province` đã chọn: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn).
               formRow(
                 { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", required: true, index: true },
-                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, validate: validateWardInProvince },
+                { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, admin: { components: { Field: WARD_FIELD_COMPONENT } }, validate: validateWardInProvince },
               ),
               { name: "address", type: "text", label: "Địa chỉ", admin: { placeholder: "VD: Phường Long Thạnh Mỹ, TP Thủ Đức" } },
               { name: "location", type: "point", label: "Toạ độ bản đồ" },
