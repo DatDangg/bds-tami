@@ -296,7 +296,8 @@ Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
 
 | Biến | Production | Staging | Ghi chú |
 |---|---|---|---|
-| `APP_ENV` | `production` (**bắt buộc**) | `staging` | Khác `production` thì email chỉ gửi tới `EMAIL_ALLOWLIST` |
+| `APP_ENV` | `production` (**bắt buộc**) | `staging` | Khác `production` thì email chỉ gửi tới `EMAIL_ALLOWLIST` (lọc ở adapter `src/lib/email/transport.ts`: mọi mail, gồm quên mật khẩu admin — BL-100) |
+| `SMTP_HOST` / `SMTP_USER` | Brevo thật | Brevo thật | Giá trị giữ chỗ (`smtp.invalid`, rỗng, `*.example`/`*.test`, `placeholder`) → app + jobs log cảnh báo lúc khởi động (`onInit`), không chặn khởi động (BL-100) |
 | `EMAIL_ALLOWLIST` | — | danh sách email nội bộ | Rỗng ở môi trường không phải production → runner log lỗi |
 | `TRUST_CF_CONNECTING_IP` | `false` (chưa Cloudflare) / `true` (sau Cloudflare) — **bắt buộc khai** trong `prod.env` | `false` (sslip.io) / `true` (sau Cloudflare) | Chỉ bật khi Nginx chỉ nhận traffic từ IP Cloudflare; thiếu cả hai cờ IP → mọi khách chung 1 bucket rate limit |
 | `TRUST_X_REAL_IP` | `true` (chưa Cloudflare) / `false` (sau Cloudflare) — **bắt buộc khai** trong `prod.env` | `true` (sslip.io) / `false` (sau Cloudflare) | Chỉ bật khi Nginx cùng host ghi đè `X-Real-IP` và app bind `127.0.0.1`; không bật cùng `TRUST_CF_CONNECTING_IP` |

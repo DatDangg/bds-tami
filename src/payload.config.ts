@@ -33,6 +33,7 @@ import { logger } from "./lib/logger";
 import { resolveProdMigrations } from "./lib/payload/prod-migrations";
 import { registerDbPool, type PoolStats } from "./lib/monitoring/metrics";
 import { getS3ClientConfig } from "./lib/s3-config";
+import { findSmtpConfigProblems } from "./lib/email/smtp-config";
 import { createEmailAdapter } from "./lib/email/transport";
 import { MAX_UPLOAD_BYTES } from "./lib/upload/validate-file";
 
@@ -77,7 +78,13 @@ export default buildConfig({
   // Logger của Payload dùng chung pino JSON + redact PII với app (stdout -> Loki).
   logger,
   // Pool pg của adapter -> metrics kết nối DB (/api/metrics).
-  onInit: (payload) => registerDbPool((payload.db as { pool?: PoolStats }).pool),
+  onInit: (payload) => {
+    registerDbPool((payload.db as { pool?: PoolStats }).pool);
+    // Chỉ cảnh báo (không throw): dev/test chạy với SMTP giữ chỗ vẫn khởi động bình thường. Báo ở đây để cả web app và jobs đều thấy.
+    for (const problem of findSmtpConfigProblems({ host: env.SMTP_HOST, user: env.SMTP_USER })) {
+      payload.logger.warn({ component: "email" }, `Email: cấu hình SMTP: ${problem}`);
+    }
+  },
   secret: env.PAYLOAD_SECRET,
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
   // Giai đoạn 1 chỉ dùng REST + Local API (ARCHITECTURE §3).

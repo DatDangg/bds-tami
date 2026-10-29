@@ -4569,6 +4569,41 @@
       "report": ".context/review-reports/bug-admin-media-list-columns-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact (comment as-built _media-grid.scss); no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-29"
+    },
+    {
+      "slug": "admin-forgot-password-hardening",
+      "title": "Quên mật khẩu admin: chống dò tài khoản (500 vs 200 + thời gian), log lỗi gửi mail, cảnh báo SMTP placeholder, reset mail theo EMAIL_ALLOWLIST (BL-100, follow-up BL-095)",
+      "type": "BUG",
+      "severity": "high",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-100",
+      "changeDoc": "spec/changes/archive/2026-10-28-admin-forgot-password-hardening.md",
+      "startedAt": "2026-10-29",
+      "planApprovedAt": "2026-10-28 (user: Có, thêm task; batch auto proceed)",
+      "rootCause": "Payload 3.91 forgotPasswordOperation await email.sendEmail trực tiếp: SMTP lỗi → 500 khi email tồn tại vs 200 khi không + nhánh tồn tại chậm hơn (ghi token + SMTP); adapter transport.ts không lọc EMAIL_ALLOWLIST (chỉ job lọc); không kiểm SMTP_HOST placeholder lúc khởi động",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-forgot-password-hardening/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-admin-forgot-password-hardening-phase-1-task-01-round-1-review.md",
+          "note": "endpoint staff /forgot-password đứng trước handler mặc định: parse body trên req.clone (400 giữ), email chuỗi → 200 Thành công ngay, handler mặc định chạy nền, lỗi log field whitelist; adapter lọc to/cc/bcc theo EMAIL_ALLOWLIST (không-prod); onInit warn SMTP placeholder. 5 MINOR chấp nhận (follow-up).",
+          "verify": "dev smtp.invalid: 4 cặp 200 cùng body, tồn tại 10–13ms vs không tồn tại 9–13ms; {} → 400; log EDNS/CONN không email/token; warn khởi động 2 dòng; typecheck/lint PASS, pnpm test 4842 PASS",
+          "completedAt": "2026-10-29"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 104,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-admin-forgot-password-hardening-phase-1-task-01-round-1-review.md",
+      "docImpact": "docs/API_SPEC.md §4 as-built BL-100; docs/ARCHITECTURE.md §6.3 bảng env (APP_ENV lọc ở adapter, SMTP placeholder warn); no spec change (giữ 1.61.0)",
+      "completedAt": "2026-10-29"
     }
   ],
   "projectName": "tami-website",
@@ -5222,7 +5257,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-29",
+  "lastUpdated": "2026-10-29T02:53:54.630Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -16,6 +16,7 @@ import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-res
 import { flagPasswordChange } from "../hooks/staff/flag-password-change";
 import { guardLastAdminOnDelete, guardLastAdminOnUpdate, rejectBulkChangeOfActiveAdmins } from "../hooks/staff/last-admin-guard";
 import { collectionLabels } from "../lib/admin/collection-labels";
+import { forgotPasswordUniformResponse } from "../endpoints/admin/staff-forgot-password";
 import { SESSION_TTL_SECONDS } from "../lib/session/keepalive";
 
 const MIN_PASSWORD_LENGTH = 10;
@@ -123,7 +124,7 @@ export const Staff: CollectionConfig = {
     delete: isAdmin,
     unlock: isAdmin,
   },
-  endpoints: [resetPasswordWithLengthCheck],
+  endpoints: [resetPasswordWithLengthCheck, forgotPasswordUniformResponse],
   hooks: {
     beforeValidate: [enforcePasswordLength, flagPasswordChange],
     // Guard chạy TRƯỚC khi ghi (cả byID lẫn bulk) nên thao tác bị chặn không đổi gì và không để lại audit.

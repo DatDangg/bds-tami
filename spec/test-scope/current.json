@@ -1,57 +1,75 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 103,
-  "generatedAt": "2026-10-29T00:56:00+07:00",
+  "scopeVersion": 104,
+  "generatedAt": "2026-10-29T10:30:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-099 BUG: admin /admin/collections/media (lưới thẻ A9, BL-051) ẩn mọi cột trừ chọn/tên tệp/alt/loại tệp bằng CSS nên các cột bật trong 'Hiển thị cột' (Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo) không bao giờ hiện. Fix chỉ CSS: cột bật thêm hiện dạng dòng nhãn/giá trị nhỏ, mờ ở cuối mỗi thẻ (nhãn qua ::before; ô ID đã là 'ID: …'); thẻ 4 ô mặc định không đổi trừ 'Người tải lên' (cột mặc định) nay hiện; drawer chọn ảnh trong form giữ bảng Payload; collection khác không đổi. Khôi phục hành vi 'Hiển thị cột' đúng kỳ vọng; SPECIFICATIONS A9 không bắt buộc ẩn cột -> không mâu thuẫn, không đổi requirement/API/schema/access -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098). Review NORMAL PASS round 1 (2 MINOR chấp nhận: thiếu đệm đáy nếu admin sắp xếp cột phụ lên trên Loại tệp; regex test rộng).",
+  "triggerNote": "BL-100 BUG/security (follow-up BL-095): quên mật khẩu admin. (1) POST /api/staff/forgot-password với email dạng chuỗi luôn trả 200 {message:'Thành công'} ngay, bất kể tài khoản có tồn tại hay SMTP lỗi (trước: 500 khi tài khoản tồn tại + SMTP lỗi -> dò được tài khoản; chênh thời gian). Handler mặc định của Payload chạy nền; lỗi gửi chỉ log server (chỉ field whitelist: errorName, code, responseCode, command, collection; không email/token/SMTP_PASS/stack). Thiếu email hoặc sai kiểu -> 400 như cũ. (2) Mọi email của Payload (gồm mail đặt lại mật khẩu) lọc theo EMAIL_ALLOWLIST ở non-production qua email adapter (trước chỉ job thông báo). (3) Khởi động cảnh báo (warn, không chặn boot) khi SMTP_HOST/SMTP_USER là giá trị giữ chỗ (smtp.invalid, rỗng, example…). SPECIFICATIONS.md / docs không nêu quên mật khẩu hay allowlist cho mail Payload -> không đổi requirement documented -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098/BL-099). Review STRICT PASS round 1 (5 MINOR chấp nhận: trùng logic tìm endpoint mặc định, chưa có throttle toàn cục cho việc nền, to dạng chuỗi bị tách theo dấu phẩy ở production, email toàn khoảng trắng nay 200 thay vì 400, test chưa khẳng định tường minh không lộ SMTP_PASS).",
   "status": "published",
-  "workItem": "bug/admin-media-list-columns",
-  "backlog": "BL-099",
+  "workItem": "bug/admin-forgot-password-hardening",
+  "backlog": "BL-100",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-28-admin-media-list-columns.md",
-  "task": "tasks/bug-admin-media-list-columns/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-admin-media-list-columns-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-102.json",
+  "changeDoc": "spec/changes/2026-10-28-admin-forgot-password-hardening.md",
+  "task": "tasks/bug-admin-forgot-password-hardening/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-admin-forgot-password-hardening-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-103.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/admin/styles/_media-grid.scss",
-      "src/components/admin/media-grid-style.test.ts"
+      "src/endpoints/admin/staff-forgot-password.ts",
+      "src/endpoints/admin/staff-forgot-password.test.ts",
+      "src/collections/Staff.ts",
+      "src/lib/email/transport.ts",
+      "src/lib/email/transport.test.ts",
+      "src/lib/email/smtp-config.ts",
+      "src/lib/email/smtp-config.test.ts",
+      "src/lib/email/send-error-fields.ts",
+      "src/lib/email/send-error-fields.test.ts",
+      "src/payload.config.ts"
     ],
-    "note": "Chỉ CSS lưới thẻ media admin: cột phụ được bật trong 'Hiển thị cột' hiện dạng dòng nhãn/giá trị nhỏ mờ ở đáy thẻ. Không đổi API/schema/access.",
+    "note": "Endpoint POST /api/staff/forgot-password phản hồi đồng nhất (gửi mail chạy nền), email adapter lọc EMAIL_ALLOWLIST cho mọi mail, onInit cảnh báo SMTP placeholder. Không đổi schema/UI/env server.",
     "modules": [
-      "Admin Thư viện ảnh (media) — danh sách dạng lưới thẻ (A9) và bộ chọn 'Hiển thị cột'"
+      "Auth admin — quên mật khẩu nhân viên (Staff)",
+      "Email adapter dùng chung (mọi mail Payload + job send-notification-email)",
+      "Khởi động ứng dụng (onInit)"
     ]
   },
   "screens": [
-    "/admin/collections/media?depth=1&columns=[\"filename\",\"alt\",\"mimeType\",\"uploadedBy\",\"id\",\"caption\",\"updatedAt\",\"createdAt\"]&limit=5 (1920, 390)",
-    "/admin/collections/media (cột mặc định)",
-    "Drawer chọn ảnh (image picker) trong form"
+    "/admin/forgot (form Quên mật khẩu)",
+    "/admin/reset/<token> (đặt lại mật khẩu)",
+    "POST /api/staff/forgot-password",
+    "Log khởi động server"
   ],
   "impact": {
     "direct": [
-      "Bật đủ 8 cột trong 'Hiển thị cột' ở lưới media: Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo hiện dạng nhãn + giá trị ở đáy mỗi thẻ",
-      "Cột mặc định: thẻ vẫn gồm ảnh, tên tệp, alt, loại tệp; thêm 'Người tải lên' (cột mặc định)"
+      "POST /api/staff/forgot-password: email tồn tại và email không tồn tại trả cùng HTTP 200 + cùng body {message:'Thành công'}, kể cả khi SMTP lỗi/không tới được; thời gian phản hồi hai nhánh tương đương (không chờ SMTP)",
+      "POST /api/staff/forgot-password thiếu email hoặc email sai kiểu -> 400 như cũ",
+      "Lỗi gửi mail đặt lại mật khẩu chỉ xuất hiện ở log server (1 dòng, không chứa email/token/SMTP_PASS/stack)",
+      "Staging/non-production có EMAIL_ALLOWLIST: mail đặt lại mật khẩu tới địa chỉ ngoài allowlist không được gửi; địa chỉ trong allowlist vẫn gửi; production gửi tự do",
+      "Khởi động với SMTP_HOST/SMTP_USER giữ chỗ (smtp.invalid, rỗng, example…) -> log warn, ứng dụng vẫn lên bình thường; host thật/localhost/mailpit không bị cảnh báo"
     ],
     "dependents": [
-      "Drawer chọn ảnh trong form giữ bảng Payload (không chuyển sang lưới thẻ)"
+      "Job send-notification-email (lead/thông báo) vẫn lọc allowlist như cũ, không đổi hành vi",
+      "Form 'Quên mật khẩu' trong admin luôn toast thành công (không đổi UI)"
     ],
     "regression": [
-      "Các collection admin khác (bảng danh sách) không đổi",
-      "Lưới thẻ A9 vẫn đúng: ảnh thu nhỏ ≥ 120px, chọn thẻ, thanh thao tác hàng loạt A6, không cuộn ngang ở 390",
-      "Tắt cột trong 'Hiển thị cột' thì dòng tương ứng biến mất khỏi thẻ"
+      "Luồng đặt lại mật khẩu: nhận mail (địa chỉ trong allowlist/production) -> mở link /admin/reset/<token> -> đặt mật khẩu mới -> đăng nhập (endpoint reset-password kiểm độ dài mật khẩu không đổi)",
+      "Giới hạn 15s giữa hai lần quên mật khẩu cùng tài khoản vẫn hoạt động; gửi lỗi thì token không bị ghi mồ côi",
+      "Các mail khác của Payload và mail thông báo lead vẫn gửi đúng người nhận ở production",
+      "Đăng nhập admin, các endpoint Staff khác không đổi"
     ]
   },
   "acceptance": [
-    "URL QA với 8 cột ở 1920: mỗi thẻ hiện đủ Người tải lên, ID, Chú thích, Ngày cập nhật, Ngày tạo (nhãn tiếng Việt) và nhãn không bị cắt",
-    "Cùng URL ở 390: thẻ hiển thị đủ dòng, không tràn ngang, không chồng chữ",
-    "Cột mặc định: thẻ chỉ có tên tệp, alt, loại tệp, Người tải lên; không dòng thừa",
-    "Tắt một cột phụ thì dòng đó biến mất; bật lại thì hiện",
-    "Drawer chọn ảnh trong form vẫn là bảng Payload, chọn ảnh bình thường",
-    "Collection khác (vd Dự án, Bài viết) không đổi giao diện danh sách"
+    "Gửi POST /api/staff/forgot-password với email staff có thật và email không tồn tại: cùng status 200, cùng body, kể cả khi SMTP_HOST=smtp.invalid",
+    "Gửi POST không có email (hoặc email không phải chuỗi): 400 'Missing email.' như trước",
+    "Thời gian phản hồi hai nhánh (tồn tại / không tồn tại) không chênh theo thời gian SMTP (cùng cỡ vài chục ms khi đã làm nóng kết nối)",
+    "Khi SMTP lỗi: log server có đúng 1 dòng lỗi (component forgot-password, chỉ errorName/code/command/collection), không lộ email, token, SMTP_PASS",
+    "Staging (APP_ENV khác production) với EMAIL_ALLOWLIST: yêu cầu quên mật khẩu cho email ngoài allowlist không gửi mail; email trong allowlist nhận được mail reset",
+    "Production (hoặc không bật allowlist): mail reset gửi tới mọi email staff như bình thường",
+    "Khởi động server với SMTP_HOST=smtp.invalid hoặc rỗng và SMTP_USER=placeholder: log có warn nêu tên biến, không in SMTP_PASS/SMTP_USER; server vẫn chạy",
+    "Luồng reset-password end-to-end vẫn đặt được mật khẩu mới và đăng nhập được"
   ],
-  "testNotes": "Chỉ kiểm hiển thị (CSS). Mở URL QA ở 1920 và 390, đối chiếu từng nhãn; sau đó bỏ/bật cột trong 'Hiển thị cột'. Mở drawer chọn ảnh từ 1 form để xác nhận vẫn là bảng. Lưu ý đã biết (MINOR): nếu sắp xếp cột phụ lên trên Loại tệp thì thiếu đệm đáy thẻ.",
-  "risk": "low",
-  "riskNote": "Low: chỉ đổi CSS admin cho 1 collection, không đổi logic/API/schema/access; review NORMAL PASS round 1."
+  "testNotes": "Test API là chính: so sánh status/body/thời gian của hai email, đọc log server. Rate limit 15s/tài khoản của Payload: cách nhau >15s giữa hai lần thử cùng email. Để thử allowlist cần môi trường non-production có EMAIL_ALLOWLIST (staging). Lưu ý đã biết (MINOR): email toàn khoảng trắng nay trả 200 (log lỗi nền) thay vì 400; chưa có throttle toàn cục cho việc nền; BL-095 (cấu hình SMTP thật trên staging) vẫn chờ user nên mail reset thật chưa gửi được trên staging.",
+  "risk": "medium",
+  "riskNote": "Medium: chạm auth flow công khai và email adapter dùng chung (mọi mail Payload + job thông báo) + onInit; không đổi schema/UI/env server; review STRICT PASS round 1 (không CRITICAL/MAJOR), verify typecheck/lint/test PASS (460 files / 4842 tests), đã đo live dev; việc gửi nền chưa kiểm trong bản production standalone."
 }
