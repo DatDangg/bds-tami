@@ -77,3 +77,8 @@ _Errors encountered during this project will be logged below._
 ## 2026-10-21 · feature-admin-ux-audit-2 · phase-2-task-03 · attempt 1 FAIL
 - Reviewer r1 FAIL: builder's verification summary claimed a new `DashboardParts.test.tsx` case that was never written (file unchanged, test count unchanged); new transitions ignored `prefers-reduced-motion`.
 - Lesson: change-request cross-checks "test added" claims against `git status` and the test count before calling the reviewer.
+
+## 2026-10-29 — Audit allowlist GHSA-x8rm-f576-gq67 (graphql-scalars) — BL-102
+- CI run 40818271106 (@ 9c7e578) fail bước "Audit phụ thuộc": advisory high mới `graphql-scalars@1.22.2` (scalar PhoneNumber, vá ≥ 2.0.1), transitive `@payloadcms/next@3.91.0` → Deploy staging skipped.
+- Không chạm được: `graphQL: { disable: true }` + Payload không dùng PhoneNumber; 2.0.1 là major Payload chưa hỗ trợ → user chọn allowlist có lý do (2026-10-29), không override.
+- **Xem lại trước 2026-12-29** hoặc khi Payload nâng graphql-scalars ≥ 2.0.1 → gỡ khỏi allowlist.

@@ -175,5 +175,8 @@ jobs:
       # Allowlist advisory nằm ở package.json -> pnpm.auditConfig.ignoreGhsas:
       #   GHSA-vfj7-8cjw-p6xm (braces@3.0.3, high, ReDoS/stack exhaustion): transitive qua sass > chokidar,
       #   chỉ build-time, chưa có bản vá. Xem lại trước 2026-12-16 (hoặc khi có bản vá) rồi gỡ khỏi allowlist.
+      #   GHSA-x8rm-f576-gq67 (graphql-scalars@1.22.2, high, scalar PhoneNumber): transitive qua @payloadcms/next@3.91.0;
+      #   không chạm được — GraphQL tắt (payload.config.ts graphQL.disable) và Payload không dùng PhoneNumber. Bản vá 2.0.1
+      #   là major chưa được Payload hỗ trợ. Xem lại trước 2026-12-29 hoặc khi Payload nâng graphql-scalars >= 2.0.1 (BL-102).
       - name: Audit phụ thuộc
         run: pnpm audit --audit-level high
