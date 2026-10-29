@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { type KeyboardEvent, useId, useRef, useState } from "react";
 import { RentalCard } from "@/components/rentals/RentalCard";
-import { Button } from "@/components/ui/button";
 import type { RentalTabView } from "@/lib/home/home-view-listings";
 import { cn } from "@/lib/utils";
 import { SliderArrow, useSnapSlider } from "@/components/layout/use-snap-slider";
+import { SectionHeading } from "./SectionHeading";
+import { SectionMoreLink } from "./SectionMoreLink";
 
 /** 80% < sm (lộ thẻ kế), 2 thẻ ≥ sm, 4 thẻ ≥ lg (gap 16/24px). */
 const SLIDE_WIDTH = "w-[80%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-4.5rem)/4)]";
@@ -74,9 +74,7 @@ export function RentalsTabs({ title, tabs }: { title: string; tabs: RentalTabVie
 
   return (
     <div className="mx-auto w-full max-w-container px-gutter">
-      <h2 id={headingId} className="mb-8 text-center font-display text-h2">
-        {heading}
-      </h2>
+      <SectionHeading id={headingId} title={heading} className="mb-8" />
       {hasTabs && (
         <div role="tablist" aria-label={t("tabs")} className="mb-8 flex flex-wrap justify-center gap-2">
           {tabs.map((tab) => (
@@ -110,9 +108,7 @@ export function RentalsTabs({ title, tabs }: { title: string; tabs: RentalTabVie
         >
           <RentalsSlider cards={tab.cards} labelledBy={hasTabs ? tabId(tab.id) : headingId} />
           <div className="mt-8 flex justify-center">
-            <Button asChild variant="outline">
-              <Link href={tab.href}>{t("viewMore")}</Link>
-            </Button>
+            <SectionMoreLink href={tab.href}>{t("viewMore")}</SectionMoreLink>
           </div>
         </div>
       ))}

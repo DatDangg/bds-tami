@@ -1,75 +1,69 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 104,
-  "generatedAt": "2026-10-29T10:30:00+07:00",
+  "scopeVersion": 105,
+  "generatedAt": "2026-10-29T12:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-100 BUG/security (follow-up BL-095): quên mật khẩu admin. (1) POST /api/staff/forgot-password với email dạng chuỗi luôn trả 200 {message:'Thành công'} ngay, bất kể tài khoản có tồn tại hay SMTP lỗi (trước: 500 khi tài khoản tồn tại + SMTP lỗi -> dò được tài khoản; chênh thời gian). Handler mặc định của Payload chạy nền; lỗi gửi chỉ log server (chỉ field whitelist: errorName, code, responseCode, command, collection; không email/token/SMTP_PASS/stack). Thiếu email hoặc sai kiểu -> 400 như cũ. (2) Mọi email của Payload (gồm mail đặt lại mật khẩu) lọc theo EMAIL_ALLOWLIST ở non-production qua email adapter (trước chỉ job thông báo). (3) Khởi động cảnh báo (warn, không chặn boot) khi SMTP_HOST/SMTP_USER là giá trị giữ chỗ (smtp.invalid, rỗng, example…). SPECIFICATIONS.md / docs không nêu quên mật khẩu hay allowlist cho mail Payload -> không đổi requirement documented -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098/BL-099). Review STRICT PASS round 1 (5 MINOR chấp nhận: trùng logic tìm endpoint mặc định, chưa có throttle toàn cục cho việc nền, to dạng chuỗi bị tách theo dấu phẩy ở production, email toàn khoảng trắng nay 200 thay vì 400, test chưa khẳng định tường minh không lộ SMTP_PASS).",
+  "triggerNote": "BL-101 BUG/UI (QA sheet 28/10 bug 19, 20, 21, mức Thấp): trang chủ `/` và `/en` — đầu khối và nút 'xem thêm' không đồng bộ giữa các khối. Thêm thành phần dùng chung SectionHeading (căn giữa: eyebrow, h2, gạch vàng 48x2, mô tả) cho Dự án nổi bật, Dịch vụ (trước: căn trái, không gạch), Ưu đãi nổi bật (+gạch), Thuê nhà ở & kinh doanh (+gạch); thêm SectionMoreLink (Button ghost + mũi tên ->) cho Dự án 'Xem tất cả dự án', Ưu đãi 'Xem thêm', Cho thuê 'Xem thêm' (từng tab), Tin tức 'Xem tất cả' (trước: outline, không mũi tên). Tin tức giữ bố cục 2 cột + heading căn trái. Href/nhãn không đổi; không đổi API/schema/dữ liệu. User chốt 2026-10-29 ghi đè design-spec S01.4 'căn trái' và S01.5/8/9 'Nút Outline'; design-spec S01 đã cập nhật as-built. SPECIFICATIONS.md không quy định căn lề đầu khối/biến thể nút trang chủ (chi tiết trình bày nằm ở design-spec) -> không đổi requirement -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098/BL-099/BL-100). Review NORMAL PASS round 1.",
   "status": "published",
-  "workItem": "bug/admin-forgot-password-hardening",
-  "backlog": "BL-100",
+  "workItem": "bug/home-section-heading-consistency",
+  "backlog": "BL-101",
   "classification": "BUG",
-  "changeDoc": "spec/changes/2026-10-28-admin-forgot-password-hardening.md",
-  "task": "tasks/bug-admin-forgot-password-hardening/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-admin-forgot-password-hardening-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-103.json",
+  "changeDoc": "spec/changes/archive/2026-10-29-home-section-heading-consistency.md",
+  "task": "tasks/bug-home-section-heading-consistency/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-home-section-heading-consistency-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-104.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/endpoints/admin/staff-forgot-password.ts",
-      "src/endpoints/admin/staff-forgot-password.test.ts",
-      "src/collections/Staff.ts",
-      "src/lib/email/transport.ts",
-      "src/lib/email/transport.test.ts",
-      "src/lib/email/smtp-config.ts",
-      "src/lib/email/smtp-config.test.ts",
-      "src/lib/email/send-error-fields.ts",
-      "src/lib/email/send-error-fields.test.ts",
-      "src/payload.config.ts"
+      "src/components/home/SectionHeading.tsx",
+      "src/components/home/SectionHeading.test.tsx",
+      "src/components/home/SectionMoreLink.tsx",
+      "src/components/home/FeaturedProjects.tsx",
+      "src/components/home/ServicesBento.tsx",
+      "src/components/home/FeaturedOffers.tsx",
+      "src/components/home/RentalsTabs.tsx",
+      "src/components/home/HomeNews.tsx",
+      "src/components/home/HomeBlocks.test.tsx",
+      "src/components/home/HomeRentals.test.tsx",
+      "src/components/home/HomeNews.test.tsx",
+      ".context/design-spec.md"
     ],
-    "note": "Endpoint POST /api/staff/forgot-password phản hồi đồng nhất (gửi mail chạy nền), email adapter lọc EMAIL_ALLOWLIST cho mọi mail, onInit cảnh báo SMTP placeholder. Không đổi schema/UI/env server.",
+    "note": "Giao diện trang chủ: đầu khối dùng chung (căn giữa + gạch 48x2) và nút xem thêm dùng chung (ghost + mũi tên). Không đổi API/schema/dữ liệu/link đích.",
     "modules": [
-      "Auth admin — quên mật khẩu nhân viên (Staff)",
-      "Email adapter dùng chung (mọi mail Payload + job send-notification-email)",
-      "Khởi động ứng dụng (onInit)"
+      "Trang chủ (/, /en) — khối Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh, Tin tức"
     ]
   },
   "screens": [
-    "/admin/forgot (form Quên mật khẩu)",
-    "/admin/reset/<token> (đặt lại mật khẩu)",
-    "POST /api/staff/forgot-password",
-    "Log khởi động server"
+    "/ (Trang chủ VI)",
+    "/en (Trang chủ EN)"
   ],
   "impact": {
     "direct": [
-      "POST /api/staff/forgot-password: email tồn tại và email không tồn tại trả cùng HTTP 200 + cùng body {message:'Thành công'}, kể cả khi SMTP lỗi/không tới được; thời gian phản hồi hai nhánh tương đương (không chờ SMTP)",
-      "POST /api/staff/forgot-password thiếu email hoặc email sai kiểu -> 400 như cũ",
-      "Lỗi gửi mail đặt lại mật khẩu chỉ xuất hiện ở log server (1 dòng, không chứa email/token/SMTP_PASS/stack)",
-      "Staging/non-production có EMAIL_ALLOWLIST: mail đặt lại mật khẩu tới địa chỉ ngoài allowlist không được gửi; địa chỉ trong allowlist vẫn gửi; production gửi tự do",
-      "Khởi động với SMTP_HOST/SMTP_USER giữ chỗ (smtp.invalid, rỗng, example…) -> log warn, ứng dụng vẫn lên bình thường; host thật/localhost/mailpit không bị cảnh báo"
+      "Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh: h2 căn giữa (tâm h2 trùng tâm khung nội dung) + gạch vàng 48x2 ngay dưới tiêu đề, cùng kiểu ở cả 4 khối",
+      "Nút 'xem thêm' của Dự án ('Xem tất cả dự án'), Ưu đãi ('Xem thêm'), Cho thuê ('Xem thêm' ở từng tab), Tin tức ('Xem tất cả'): cùng kiểu ghost + mũi tên ->, nhãn và href không đổi",
+      "Tin tức: giữ bố cục 2 cột, heading căn trái (không có gạch căn giữa), chỉ nút đổi sang ghost + mũi tên",
+      "Khối Dịch vụ không có nút xem thêm (không thêm mới)"
     ],
     "dependents": [
-      "Job send-notification-email (lead/thông báo) vẫn lọc allowlist như cũ, không đổi hành vi",
-      "Form 'Quên mật khẩu' trong admin luôn toast thành công (không đổi UI)"
+      "aria-labelledby của từng khối vẫn trỏ đúng id h2; thứ tự heading không đổi",
+      "Focus-visible ring của nút xem thêm như Button chung; nút trên nền tối (Tin tức) đủ tương phản"
     ],
     "regression": [
-      "Luồng đặt lại mật khẩu: nhận mail (địa chỉ trong allowlist/production) -> mở link /admin/reset/<token> -> đặt mật khẩu mới -> đăng nhập (endpoint reset-password kiểm độ dài mật khẩu không đổi)",
-      "Giới hạn 15s giữa hai lần quên mật khẩu cùng tài khoản vẫn hoạt động; gửi lỗi thì token không bị ghi mồ côi",
-      "Các mail khác của Payload và mail thông báo lead vẫn gửi đúng người nhận ở production",
-      "Đăng nhập admin, các endpoint Staff khác không đổi"
+      "Slider Dự án nổi bật, slider Ưu đãi, tab Cho thuê (chuyển tab, link theo tab) hoạt động như cũ",
+      "Hero, About, Banner CTA, các khối khác trang chủ không đổi",
+      "Không tràn ngang ở 390 và 768",
+      "Trang chủ EN hiển thị đúng nhãn EN, không mất khối"
     ]
   },
   "acceptance": [
-    "Gửi POST /api/staff/forgot-password với email staff có thật và email không tồn tại: cùng status 200, cùng body, kể cả khi SMTP_HOST=smtp.invalid",
-    "Gửi POST không có email (hoặc email không phải chuỗi): 400 'Missing email.' như trước",
-    "Thời gian phản hồi hai nhánh (tồn tại / không tồn tại) không chênh theo thời gian SMTP (cùng cỡ vài chục ms khi đã làm nóng kết nối)",
-    "Khi SMTP lỗi: log server có đúng 1 dòng lỗi (component forgot-password, chỉ errorName/code/command/collection), không lộ email, token, SMTP_PASS",
-    "Staging (APP_ENV khác production) với EMAIL_ALLOWLIST: yêu cầu quên mật khẩu cho email ngoài allowlist không gửi mail; email trong allowlist nhận được mail reset",
-    "Production (hoặc không bật allowlist): mail reset gửi tới mọi email staff như bình thường",
-    "Khởi động server với SMTP_HOST=smtp.invalid hoặc rỗng và SMTP_USER=placeholder: log có warn nêu tên biến, không in SMTP_PASS/SMTP_USER; server vẫn chạy",
-    "Luồng reset-password end-to-end vẫn đặt được mật khẩu mới và đăng nhập được"
+    "Trang chủ VI và EN ở 1920/1440/768/390: h2 Dự án, Dịch vụ, Ưu đãi, Cho thuê căn giữa, mỗi h2 có gạch vàng 48x2 ngay dưới",
+    "Nút xem thêm của 4 khối Dự án/Ưu đãi/Cho thuê/Tin tức cùng kiểu ghost + mũi tên ->, click đi đúng đích như trước",
+    "Tin tức: heading vẫn căn trái, bố cục 2 cột giữ nguyên",
+    "Không có thanh cuộn ngang ở 390 và 768 (scrollWidth = viewport)",
+    "Bàn phím: Tab tới nút xem thêm thấy vòng focus rõ ràng"
   ],
-  "testNotes": "Test API là chính: so sánh status/body/thời gian của hai email, đọc log server. Rate limit 15s/tài khoản của Payload: cách nhau >15s giữa hai lần thử cùng email. Để thử allowlist cần môi trường non-production có EMAIL_ALLOWLIST (staging). Lưu ý đã biết (MINOR): email toàn khoảng trắng nay trả 200 (log lỗi nền) thay vì 400; chưa có throttle toàn cục cho việc nền; BL-095 (cấu hình SMTP thật trên staging) vẫn chờ user nên mail reset thật chưa gửi được trên staging.",
-  "risk": "medium",
-  "riskNote": "Medium: chạm auth flow công khai và email adapter dùng chung (mọi mail Payload + job thông báo) + onInit; không đổi schema/UI/env server; review STRICT PASS round 1 (không CRITICAL/MAJOR), verify typecheck/lint/test PASS (460 files / 4842 tests), đã đo live dev; việc gửi nền chưa kiểm trong bản production standalone."
+  "testNotes": "Dev DB đã bật Dịch vụ / Ưu đãi nổi bật / Cho thuê (blockOrder + 3 dịch vụ); khối Tin tức chưa bật trên dev nên kiểm Tin tức bằng test đơn vị hoặc sau khi bật. Ảnh trước/sau: .context/review-reports/assets/bl101-{before,after}-{vi,en}-{1920,1440,768,390}.png. Kiểm 1920/1440/768/390 cả VI + EN: heading căn giữa + gạch, nút ghost + mũi tên, không tràn ngang, Tin tức heading còn căn trái. Đây là thay đổi trình bày theo quyết định user (ghi đè design-spec S01.4/S01.5/8/9), không phải theo SPECIFICATIONS.md.",
+  "risk": "low",
+  "riskNote": "Low: chỉ thành phần giao diện trong src/components/home/ (Server Component, không client mới), không đổi API/schema/dữ liệu/link; review NORMAL PASS round 1; verify typecheck/lint/test PASS (461 files / 4847 tests); đã đo Playwright VI+EN ở 4 độ rộng."
 }

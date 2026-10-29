@@ -28,6 +28,14 @@ describe("HomeNews", () => {
     expect(within(section).getByRole("link", { name: "Xem tất cả" })).toHaveAttribute("href", "/tin-tuc");
   });
 
+  it("BL-101: 'Xem tất cả' ghost + mũi tên; heading giữ căn trái (không gạch giữa)", () => {
+    renderWithIntl(<HomeNews block={block()} />);
+    const more = screen.getByRole("link", { name: "Xem tất cả" });
+    expect(more).toHaveAttribute("data-variant", "ghost");
+    expect(more.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("heading", { level: 2 }).parentElement).not.toHaveClass("text-center");
+  });
+
   it("title CMS trống → chữ mặc định theo ngôn ngữ; có viền dưới tách khỏi footer tối", () => {
     renderWithIntl(<HomeNews block={block({ title: "" })} />);
     expect(screen.getByRole("heading", { level: 2, name: "Tin tức" })).toBeInTheDocument();

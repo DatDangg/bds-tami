@@ -55,6 +55,16 @@ describe("HomeRentals", () => {
     expect(panels[0]).toHaveAttribute("aria-labelledby", items[0]?.id);
   });
 
+  it("BL-101: h2 căn giữa kèm gạch; 'Xem thêm' ghost + mũi tên", () => {
+    renderWithIntl(<HomeRentals title="Cho thuê" tabs={tabs} />);
+    const heading = screen.getByRole("heading", { level: 2, name: "Cho thuê" });
+    expect(heading.parentElement).toHaveClass("items-center", "text-center", "mb-8");
+    expect(heading.nextElementSibling).toHaveClass("h-0.5", "w-12", "bg-primary");
+    const more = within(screen.getByRole("tabpanel", { name: "Thuê nhà ở" })).getByRole("link", { name: "Xem thêm" });
+    expect(more).toHaveAttribute("data-variant", "ghost");
+    expect(more.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("không-JS: tab đầu hiện sẵn, thẻ là link thật và 'Xem thêm' trỏ trang danh mục", () => {
     renderWithIntl(<HomeRentals title="Cho thuê" tabs={tabs} />);
     const panel = screen.getByRole("tabpanel", { name: "Thuê nhà ở" });

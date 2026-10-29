@@ -46,8 +46,28 @@ const homepage = (overrides: Partial<Homepage> = {}): Homepage =>
 const renderHome = (page: Homepage, locale: "vi" | "en" = "vi", content: HomeDocs = docs) =>
   renderWithIntl(<HomeBlocks view={buildHomeView(page, content, locale, NOW)} siteName="TAMI HOMES" />, locale);
 
+/** BL-101: nút xem thêm mọi khối dùng chung ghost + mũi tên →. */
+const expectMoreLink = (link: HTMLElement) => {
+  expect(link).toHaveAttribute("data-variant", "ghost");
+  expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+};
+/** BL-101: đầu khối căn giữa kèm gạch trang trí. */
+const expectCenteredHeading = (heading: HTMLElement) => {
+  expect(heading.parentElement).toHaveClass("items-center", "text-center");
+  expect(heading.nextElementSibling).toHaveClass("h-0.5", "w-12", "bg-primary");
+};
+
 /** Tiêu đề h2 của các khối theo thứ tự trong DOM. */
 const blockHeadings = () => screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
+
+describe("HomeBlocks: đầu khối + nút xem thêm đồng bộ (BL-101)", () => {
+  it("Dự án / Dịch vụ / Ưu đãi: h2 căn giữa kèm gạch; nút Xem thêm / Xem tất cả cùng ghost + mũi tên", () => {
+    renderHome(homepage());
+    for (const name of ["Dự án nổi bật", "Dịch vụ của TAMI", "Ưu đãi nổi bật"]) expectCenteredHeading(screen.getByRole("heading", { level: 2, name }));
+    expectMoreLink(screen.getByRole("link", { name: "Xem tất cả dự án" }));
+    expectMoreLink(screen.getByRole("link", { name: "Xem thêm" }));
+  });
+});
 
 describe("HomeBlocks: thứ tự và bật/tắt khối", () => {
   it("render theo blockOrder mặc định: hero, Về TAMI, dự án, dịch vụ, ưu đãi, CTA (đối tác chưa có giao diện)", () => {

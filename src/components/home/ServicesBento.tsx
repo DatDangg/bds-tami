@@ -2,6 +2,7 @@ import { useId } from "react";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import type { ServiceCardData } from "@/lib/services/service-view";
 import { cn } from "@/lib/utils";
+import { SectionHeading } from "./SectionHeading";
 
 /** Khung từng thẻ theo số mục (design-spec S01.4): 1 → ngang 21:9 · 2 → 7/5 · 3 → bento (lớn cao 2 hàng + 2 nhỏ) · ≥ 4 → hàng cuộn ngang. */
 const BENTO_THREE = [
@@ -39,15 +40,13 @@ function Cards({ items, labelledBy }: { items: ServiceCardData[]; labelledBy: st
   );
 }
 
-/** Dịch vụ dạng bento bất đối xứng (design-spec S01.4), tiêu đề căn trái. Mỗi thẻ là MỘT link tới trang dịch vụ. Server Component. */
+/** Dịch vụ dạng bento bất đối xứng (design-spec S01.4), tiêu đề căn giữa kèm gạch (SectionHeading). Mỗi thẻ là MỘT link tới trang dịch vụ. Server Component. */
 export function ServicesBento({ title, items }: { title: string; items: ServiceCardData[] }) {
   const headingId = useId();
   return (
     <section aria-labelledby={headingId} className="bg-bg py-section">
       <div className="mx-auto w-full max-w-container px-gutter">
-        <h2 id={headingId} className="mb-10 font-display text-h2">
-          {title}
-        </h2>
+        <SectionHeading id={headingId} title={title} />
         <Cards items={items} labelledBy={headingId} />
       </div>
     </section>

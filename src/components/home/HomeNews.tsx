@@ -1,9 +1,8 @@
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useId } from "react";
 import { NewsCard } from "@/components/news/NewsCard";
-import { Button } from "@/components/ui/button";
 import type { NewsBlockView } from "@/lib/home/home-view-listings";
+import { SectionMoreLink } from "./SectionMoreLink";
 
 /** Cột phải rộng ~2/3 container chia 3 từ sm (≥ lg: ~230px mỗi thẻ), 1 cột < sm. */
 const NEWS_IMAGE_SIZES = "(min-width: 1280px) 230px, (min-width: 1024px) 18vw, (min-width: 640px) 30vw, 100vw";
@@ -23,9 +22,9 @@ export function HomeNews({ block }: { block: NewsBlockView }) {
             {block.title || t("defaultTitle")}
           </h2>
           {block.intro && <p className="max-w-[48ch] text-lead text-text-secondary">{block.intro}</p>}
-          <Button asChild variant="outline" className="mt-2">
-            <Link href={block.href}>{t("viewAll")}</Link>
-          </Button>
+          <SectionMoreLink href={block.href} className="mt-2">
+            {t("viewAll")}
+          </SectionMoreLink>
         </div>
         <ul className="grid gap-6 sm:grid-cols-3">
           {block.posts.map((post) => (

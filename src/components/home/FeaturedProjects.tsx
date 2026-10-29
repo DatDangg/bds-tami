@@ -1,12 +1,11 @@
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { useId } from "react";
-import { ArrowRight } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 import { resolveNavLink } from "@/lib/content/nav-link";
 import type { ProjectSlideView } from "@/lib/home/home-view";
 import type { Locale } from "@/i18n/routing";
 import { ProjectsSlider } from "./ProjectsSlider";
+import { SectionHeading } from "./SectionHeading";
+import { SectionMoreLink } from "./SectionMoreLink";
 
 interface FeaturedProjectsProps {
   title: string;
@@ -23,24 +22,14 @@ export function FeaturedProjects({ title, eyebrow, description, slides }: Featur
   const headingId = useId();
   return (
     <section className="relative isolate overflow-hidden bg-bg-alt pt-section pb-10 [[data-block=about]+&]:pt-4">
-      <div className="mx-auto mb-10 flex w-full max-w-container flex-col items-center gap-3 px-gutter text-center">
-        {eyebrow && <p className="text-eyebrow font-semibold tracking-[0.12em] text-accent-text uppercase">{eyebrow}</p>}
-        <h2 id={headingId} className="font-display text-h2">
-          {title}
-        </h2>
-        <span aria-hidden="true" className="h-0.5 w-12 bg-primary" />
-        {description && <p className="max-w-[80ch] text-lead text-text-secondary">{description}</p>}
+      <div className="mx-auto w-full max-w-container px-gutter">
+        <SectionHeading id={headingId} title={title} eyebrow={eyebrow} description={description} />
       </div>
       <div className="mx-auto w-full max-w-container">
         <ProjectsSlider slides={slides} labelledBy={headingId} />
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-container justify-center px-gutter">
-        <Button asChild variant="ghost">
-          <Link href={resolveNavLink("projects", locale)?.href ?? "/"}>
-            {t("viewAll")}
-            <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </Button>
+        <SectionMoreLink href={resolveNavLink("projects", locale)?.href ?? "/"}>{t("viewAll")}</SectionMoreLink>
       </div>
     </section>
   );
