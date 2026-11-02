@@ -45,13 +45,20 @@ export function jobQueryString(params: { category?: string; province?: string; q
 /** Số từ tối đa của `q` được xét (như ô tìm `/cho-thue`). */
 const MAX_KEYWORD_TERMS = 8;
 
+const escapeRegExp = (term: string): string => term.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+
+/** ≥ 2 từ (BL-103): các từ liền nhau đúng thứ tự, cách nhau bởi ký tự không phải chữ/số, từ đầu ở đầu từ (như `phraseRegex` phía SQL). */
+const phrasePattern = (terms: readonly string[]): RegExp =>
+  new RegExp(`(?:^|[^\\p{L}\\p{N}])${terms.map(escapeRegExp).join("[^\\p{L}\\p{N}]+")}`, "u");
+
 /**
- * Khớp từ khoá với tên vị trí theo kiểu không dấu (`normalizeSearchText`, cùng quy tắc `searchText` ERD §6): MỌI từ của `q` phải có trong tên (AND),
+ * Khớp từ khoá với tên vị trí theo kiểu không dấu (`normalizeSearchText`, cùng quy tắc `searchText` ERD §6): 1 từ là chuỗi con; ≥ 2 từ (BL-103) cả cụm liền nhau đúng thứ tự ở đầu từ,
  * không phân biệt hoa thường / dấu / "đ". Từ khoá rỗng khớp mọi tên. Thuần, dùng ở `listOpenJobs` (lọc trên tập đã quét, không thêm cột).
  */
 export function matchesJobKeyword(title: string | null | undefined, q: string | undefined): boolean {
   const terms = q ? normalizeSearchText(q).split(" ").filter(Boolean).slice(0, MAX_KEYWORD_TERMS) : [];
   if (terms.length === 0) return true;
   const haystack = normalizeSearchText(title ?? "");
-  return terms.every((term) => haystack.includes(term));
+  if (terms.length === 1) return haystack.includes(terms[0] as string);
+  return phrasePattern(terms).test(haystack);
 }

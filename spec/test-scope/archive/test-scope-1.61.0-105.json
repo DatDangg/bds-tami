@@ -1,0 +1,69 @@
+{
+  "specVersion": "1.61.0",
+  "scopeVersion": 105,
+  "generatedAt": "2026-10-29T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-101 BUG/UI (QA sheet 28/10 bug 19, 20, 21, mức Thấp): trang chủ `/` và `/en` — đầu khối và nút 'xem thêm' không đồng bộ giữa các khối. Thêm thành phần dùng chung SectionHeading (căn giữa: eyebrow, h2, gạch vàng 48x2, mô tả) cho Dự án nổi bật, Dịch vụ (trước: căn trái, không gạch), Ưu đãi nổi bật (+gạch), Thuê nhà ở & kinh doanh (+gạch); thêm SectionMoreLink (Button ghost + mũi tên ->) cho Dự án 'Xem tất cả dự án', Ưu đãi 'Xem thêm', Cho thuê 'Xem thêm' (từng tab), Tin tức 'Xem tất cả' (trước: outline, không mũi tên). Tin tức giữ bố cục 2 cột + heading căn trái. Href/nhãn không đổi; không đổi API/schema/dữ liệu. User chốt 2026-10-29 ghi đè design-spec S01.4 'căn trái' và S01.5/8/9 'Nút Outline'; design-spec S01 đã cập nhật as-built. SPECIFICATIONS.md không quy định căn lề đầu khối/biến thể nút trang chủ (chi tiết trình bày nằm ở design-spec) -> không đổi requirement -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098/BL-099/BL-100). Review NORMAL PASS round 1.",
+  "status": "published",
+  "workItem": "bug/home-section-heading-consistency",
+  "backlog": "BL-101",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-10-29-home-section-heading-consistency.md",
+  "task": "tasks/bug-home-section-heading-consistency/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-home-section-heading-consistency-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-104.json",
+  "specUpdate": null,
+  "specRefs": [],
+  "changed": {
+    "files": [
+      "src/components/home/SectionHeading.tsx",
+      "src/components/home/SectionHeading.test.tsx",
+      "src/components/home/SectionMoreLink.tsx",
+      "src/components/home/FeaturedProjects.tsx",
+      "src/components/home/ServicesBento.tsx",
+      "src/components/home/FeaturedOffers.tsx",
+      "src/components/home/RentalsTabs.tsx",
+      "src/components/home/HomeNews.tsx",
+      "src/components/home/HomeBlocks.test.tsx",
+      "src/components/home/HomeRentals.test.tsx",
+      "src/components/home/HomeNews.test.tsx",
+      ".context/design-spec.md"
+    ],
+    "note": "Giao diện trang chủ: đầu khối dùng chung (căn giữa + gạch 48x2) và nút xem thêm dùng chung (ghost + mũi tên). Không đổi API/schema/dữ liệu/link đích.",
+    "modules": [
+      "Trang chủ (/, /en) — khối Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh, Tin tức"
+    ]
+  },
+  "screens": [
+    "/ (Trang chủ VI)",
+    "/en (Trang chủ EN)"
+  ],
+  "impact": {
+    "direct": [
+      "Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh: h2 căn giữa (tâm h2 trùng tâm khung nội dung) + gạch vàng 48x2 ngay dưới tiêu đề, cùng kiểu ở cả 4 khối",
+      "Nút 'xem thêm' của Dự án ('Xem tất cả dự án'), Ưu đãi ('Xem thêm'), Cho thuê ('Xem thêm' ở từng tab), Tin tức ('Xem tất cả'): cùng kiểu ghost + mũi tên ->, nhãn và href không đổi",
+      "Tin tức: giữ bố cục 2 cột, heading căn trái (không có gạch căn giữa), chỉ nút đổi sang ghost + mũi tên",
+      "Khối Dịch vụ không có nút xem thêm (không thêm mới)"
+    ],
+    "dependents": [
+      "aria-labelledby của từng khối vẫn trỏ đúng id h2; thứ tự heading không đổi",
+      "Focus-visible ring của nút xem thêm như Button chung; nút trên nền tối (Tin tức) đủ tương phản"
+    ],
+    "regression": [
+      "Slider Dự án nổi bật, slider Ưu đãi, tab Cho thuê (chuyển tab, link theo tab) hoạt động như cũ",
+      "Hero, About, Banner CTA, các khối khác trang chủ không đổi",
+      "Không tràn ngang ở 390 và 768",
+      "Trang chủ EN hiển thị đúng nhãn EN, không mất khối"
+    ]
+  },
+  "acceptance": [
+    "Trang chủ VI và EN ở 1920/1440/768/390: h2 Dự án, Dịch vụ, Ưu đãi, Cho thuê căn giữa, mỗi h2 có gạch vàng 48x2 ngay dưới",
+    "Nút xem thêm của 4 khối Dự án/Ưu đãi/Cho thuê/Tin tức cùng kiểu ghost + mũi tên ->, click đi đúng đích như trước",
+    "Tin tức: heading vẫn căn trái, bố cục 2 cột giữ nguyên",
+    "Không có thanh cuộn ngang ở 390 và 768 (scrollWidth = viewport)",
+    "Bàn phím: Tab tới nút xem thêm thấy vòng focus rõ ràng"
+  ],
+  "testNotes": "Dev DB đã bật Dịch vụ / Ưu đãi nổi bật / Cho thuê (blockOrder + 3 dịch vụ); khối Tin tức chưa bật trên dev nên kiểm Tin tức bằng test đơn vị hoặc sau khi bật. Ảnh trước/sau: .context/review-reports/assets/bl101-{before,after}-{vi,en}-{1920,1440,768,390}.png. Kiểm 1920/1440/768/390 cả VI + EN: heading căn giữa + gạch, nút ghost + mũi tên, không tràn ngang, Tin tức heading còn căn trái. Đây là thay đổi trình bày theo quyết định user (ghi đè design-spec S01.4/S01.5/8/9), không phải theo SPECIFICATIONS.md.",
+  "risk": "low",
+  "riskNote": "Low: chỉ thành phần giao diện trong src/components/home/ (Server Component, không client mới), không đổi API/schema/dữ liệu/link; review NORMAL PASS round 1; verify typecheck/lint/test PASS (461 files / 4847 tests); đã đo Playwright VI+EN ở 4 độ rộng."
+}

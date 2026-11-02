@@ -104,14 +104,14 @@ describe("PostgresRentalSearch.listing (BL-052)", () => {
 describe("PostgresRentalSearch: độ liên quan từ khoá (BL-080)", () => {
   const pageQuery = (queries: string[]) => queries.find((sql) => sql.includes("WITH page AS") && !sql.includes("NOT IN"))!;
 
-  it("q ≥ 2 từ + sort mặc định: CTE trả cột phrase_match, ORDER BY ngoài ưu tiên nó; đếm dùng cùng điều kiện đầu từ", async () => {
+  it("q ≥ 2 từ + sort mặc định: CTE trả cột phrase_match, ORDER BY ngoài ưu tiên nó; đếm dùng cùng điều kiện cụm (BL-103)", async () => {
     const { executor, queries } = fakeExecutor({ total: 1, featuredCount: 0, featured: [], grid: ["a"] });
     await new PostgresRentalSearch(executor).search(parse({ q: "can ho" }));
     const page = pageQuery(queries);
     expect(page).toContain(`AS "phrase_match"`);
     expect(page).toMatch(/ORDER BY page."phrase_match" DESC, page."published_at" DESC NULLS LAST, page."id" DESC$/);
     const count = queries.find((sql) => sql.includes("count(*)::int AS total"))!;
-    expect(count.match(/rl\."search_text" ~ \$/g)).toHaveLength(2);
+    expect(count.match(/rl\."search_text" ~ \$/g)).toHaveLength(1);
   });
 
   it("ORDER BY TRONG CTE (trước LIMIT/OFFSET) cũng ưu tiên cụm — nếu không, trang cắt theo newest rồi mới sắp lại", async () => {

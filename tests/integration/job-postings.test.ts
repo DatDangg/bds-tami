@@ -620,7 +620,7 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
       expect(await titlesOf("en", now)).toContain("Job in other group");
     });
 
-    it("BL-054 q: tìm tên vị trí không dấu (AND mọi từ), vẫn chỉ tin còn hạn + công khai, kết hợp lọc tỉnh; trả isUrgent + phòng ban; phân trang 12/trang", async () => {
+    it("BL-054 q: tìm tên vị trí không dấu (1 từ: chuỗi con; ≥ 2 từ: nguyên cụm, BL-103), vẫn chỉ tin còn hạn + công khai, kết hợp lọc tỉnh; trả isUrgent + phòng ban; phân trang 12/trang", async () => {
       const now = new Date();
       const marker = `qz${runId}`;
       await createJob({ title: `Chuyên viên tư vấn bất động sản ${marker}`, status: "published", isUrgent: true, province: provinceId, deadline: pickerDeadline(10, now) });
@@ -629,13 +629,17 @@ describe.skipIf(!baseUrl)("integration: job-postings + job-applications (DB tạ
       await createJob({ title: `Tư vấn nháp ${marker}`, deadline: pickerDeadline(10, now) });
       const search = (q: string, extra: Record<string, unknown> = {}) => careers.listOpenJobs(payload, "vi", { page: 1, now, q, ...extra });
 
-      const both = await search(`tu van ${marker.toUpperCase()}`);
+      const both = await search(marker.toUpperCase());
       expect(both.docs.map((doc) => doc.title).sort()).toEqual([`Chuyên viên tư vấn bất động sản ${marker}`, `Tư vấn cho thuê căn hộ ${marker}`].sort());
       expect(both.totalDocs).toBe(2);
-      expect((await search(`bat dong ${marker}`)).docs.map((doc) => doc.title)).toEqual([`Chuyên viên tư vấn bất động sản ${marker}`]);
-      expect((await search(`tu van ${marker}`, { provinceId })).totalDocs).toBe(1);
+      expect((await search(`bat dong san ${marker}`)).docs.map((doc) => doc.title)).toEqual([`Chuyên viên tư vấn bất động sản ${marker}`]);
+      // BL-103: các từ rời rạc / sai thứ tự không còn khớp.
+      expect((await search(`bat dong ${marker}`)).totalDocs).toBe(0);
+      expect((await search(`san bat dong ${marker}`)).totalDocs).toBe(0);
+      expect((await search(`tu van ${marker}`)).totalDocs).toBe(0);
+      expect((await search(marker, { provinceId })).totalDocs).toBe(1);
       expect((await search(`marketing ${marker}`)).totalDocs).toBe(0);
-      const urgent = (await search(`bat dong ${marker}`)).docs[0];
+      const urgent = (await search(`bat dong san ${marker}`)).docs[0];
       expect(urgent?.isUrgent).toBe(true);
       expect(typeof urgent?.category === "object" && urgent.category !== null ? urgent.category.id : urgent?.category).toBe(categoryId);
 

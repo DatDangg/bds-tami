@@ -402,7 +402,7 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
         listing.loadNewsListing(payload, locale, { page: 1, filters: { sort: "newest", ...filters }, ...(categoryIds ? { categoryIds } : {}) });
       const ids = (result: Awaited<ReturnType<typeof load>>) => result.items.map((item) => item.id);
 
-      const byQ = await load({ q: "dong ANH zq54" });
+      const byQ = await load({ q: "dong ANH" });
       expect(ids(byQ)).toEqual([a.id, b.id]);
       expect(byQ).toMatchObject({ featured: [], totalDocs: 2, isEmpty: false });
       expect(ids(await load({ q: "zq54", sort: "oldest" }))).toEqual([c.id, b.id, a.id]);
@@ -426,7 +426,13 @@ describe.skipIf(!baseUrl)("integration: news (DB tạm)", () => {
       expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [categoryId] })).toEqual([]);
       expect(await search.findFilteredNewsIds(payload, "vi", { tag: "quy hoạch", categoryIds: [categoryId, scope.id] })).toEqual([a.id, c.id]);
       expect(await search.findFilteredNewsIds(payload, "vi", { q: "zq54", categoryIds: [] })).toEqual([]);
-      expect(ids(await load({ q: "dong anh zq54" }, "vi", [scope.id]))).toEqual([a.id, b.id]);
+      expect(ids(await load({ q: "dong anh" }, "vi", [scope.id]))).toEqual([a.id, b.id]);
+      // BL-103: ≥ 2 từ phải liền nhau đúng thứ tự ở đầu từ (không khớp từ lẻ rải rác / giữa từ).
+      expect(ids(await load({ q: "len quan" }))).toEqual([a.id]);
+      expect(ids(await load({ q: "quan len" }))).toEqual([]);
+      expect(ids(await load({ q: "dong zq54" }))).toEqual([]);
+      expect(ids(await load({ q: "ong anh" }))).toEqual([]);
+      expect(ids(await load({ q: "ong" }))).toEqual([a.id, b.id]);
       const tags = await search.listTopNewsTags(payload, "vi");
       expect(tags.length).toBeLessThanOrEqual(12);
       expect(tags).toContain("quy hoạch");

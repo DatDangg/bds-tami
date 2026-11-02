@@ -3,7 +3,7 @@ import type { Payload } from "payload";
 
 import { PUBLIC_STATUSES } from "../../access";
 import type { Locale } from "../../i18n/routing";
-import { escapeLike, searchTerms } from "../search/rental-search-sql";
+import { escapeLike, phraseRegex, searchTerms } from "../search/rental-search-sql";
 import { unaccentSql } from "../search/unaccent-sql";
 
 /** Trần số bài khớp `q` / `tag` được phân trang (id đưa vào `IN`); vượt thì phần cũ nhất bị cắt và có cảnh báo trong log. */
@@ -23,8 +23,14 @@ function publicNewsSql(locale: Locale, now: Date) {
   return sql`n."status" IN (${statuses}) AND n."deleted_at" IS NULL AND (n."published_at" IS NULL OR n."published_at" <= ${now.toISOString()}::timestamptz)${english}`;
 }
 
+/** ≥ 2 từ (BL-103): ngoài `LIKE` từng từ, cả cụm phải liền nhau đúng thứ tự, từ đầu ở đầu từ (cùng `phraseRegex` của Cho thuê). 1 từ: giữ substring. */
+function phraseConditions(haystack: ReturnType<typeof unaccentSql>, terms: readonly string[]) {
+  const phrase = phraseRegex(terms);
+  return phrase === undefined ? [] : [sql`${haystack} ~ ${phrase}`];
+}
+
 /**
- * Id bài khớp từ khoá `q` (tiêu đề + tóm tắt của ngôn ngữ đang xem, không dấu; mọi từ phải có — cùng `searchTerms` / `LIKE` của tìm kiếm cho thuê,
+ * Id bài khớp từ khoá `q` (tiêu đề + tóm tắt của ngôn ngữ đang xem, không dấu; mọi từ phải có, ≥ 2 từ thì cả cụm liền nhau ở đầu từ (BL-103) — cùng `searchTerms` / `LIKE` / `phraseRegex` của tìm kiếm cho thuê,
  * phía cột bỏ dấu bằng `unaccentSql`, không thêm cột / migration) VÀ có thẻ `tag` (khớp đúng chuỗi). Không có `q` lẫn `tag` → `null` (không lọc).
  * `categoryIds` (trang danh mục: danh mục + con) lọc ngay trong SQL, TRƯỚC trần, để bài ngoài danh mục không chiếm chỗ trong `NEWS_FILTER_MAX_IDS`.
  * Thứ tự trả về: (1) không có `q` lẫn `tag` → `null` (kể cả khi có `categoryIds`; nơi gọi tự lọc danh mục qua `listPublicNews`); (2) có lọc và
@@ -45,6 +51,7 @@ export async function findFilteredNewsIds(
     publicNewsSql(locale, now),
     ...(filters.categoryIds ? [sql`n."category_id"::text IN (${sql.join(filters.categoryIds.map((id) => sql`${id}`), sql`, `)})`] : []),
     ...terms.map((term) => sql`${haystack} LIKE ${`%${escapeLike(term)}%`}`),
+    ...phraseConditions(haystack, terms),
     ...(filters.tag ? [sql`EXISTS (SELECT 1 FROM "news_texts" t WHERE t."parent_id" = n."id" AND t."path" = 'tags' AND btrim(t."text") = ${filters.tag})`] : []),
   ];
   const result = await adapterOf(payload).drizzle.execute(sql`

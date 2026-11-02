@@ -235,11 +235,31 @@ describe("rentalConditions / filterConditions (số đếm BL-052)", () => {
 const toJsRegex = (pattern: string) => new RegExp(pattern.replaceAll("[^[:alnum:]]", "[^a-z0-9]"));
 
 describe("BL-080: khớp đầu từ", () => {
-  it("giữ LIKE trên search_text (index trigram) và thêm điều kiện đầu từ cho từng từ", () => {
+  it("1 từ: LIKE trên search_text (index trigram) + điều kiện đầu từ", () => {
+    const { sql: text, params } = render(rentalWhere(parse({ q: "can" })));
+    expect(text.match(/rl\."search_text" LIKE \$/g)).toHaveLength(1);
+    expect(text.match(/rl\."search_text" ~ \$/g)).toHaveLength(1);
+    expect(params).toEqual(expect.arrayContaining(["%can%", wordStartRegex("can")]));
+  });
+
+  it("BL-103: ≥ 2 từ giữ LIKE từng từ + MỘT regex cụm (thay đầu từ từng từ)", () => {
     const { sql: text, params } = render(rentalWhere(parse({ q: "can ho" })));
     expect(text.match(/rl\."search_text" LIKE \$/g)).toHaveLength(2);
-    expect(text.match(/rl\."search_text" ~ \$/g)).toHaveLength(2);
-    expect(params).toEqual(expect.arrayContaining(["%can%", "%ho%", wordStartRegex("can"), wordStartRegex("ho")]));
+    expect(text.match(/rl\."search_text" ~ \$/g)).toHaveLength(1);
+    expect(params).toEqual(expect.arrayContaining(["%can%", "%ho%", phraseRegex(["can", "ho"])]));
+    expect(params).not.toContain(wordStartRegex("can"));
+  });
+
+  it("BL-103: 'ba dinh' không khớp 'my dinh … ba phong ngu' / 'gia dinh'; khớp 'quan ba dinh', 'ba-dinh', 'ba di'", () => {
+    const phrase = toJsRegex(phraseRegex(["ba", "dinh"]) as string);
+    expect(phrase.test("can ho my dinh 2, nam tu liem, 3 phong ngu ba phong ngu")).toBe(false);
+    expect(phrase.test("nha pho gia dinh ba phong ngu")).toBe(false);
+    expect(phrase.test("quyet dinh ba")).toBe(false);
+    expect(phrase.test("ba phong ngu dinh thu")).toBe(false);
+    expect(phrase.test("can ho quan ba dinh ha noi")).toBe(true);
+    expect(phrase.test("duong ba-dinh, ha noi")).toBe(true);
+    expect(phrase.test("tuba dinh")).toBe(false);
+    expect(toJsRegex(phraseRegex(["ba", "di"]) as string).test("quan ba dinh")).toBe(true);
   });
 
   it("'can ho' không khớp tin chỉ chứa can/cho rời rạc, khớp 'can ho vinhomes'", () => {
@@ -292,7 +312,7 @@ describe("BL-080: sort mặc định ưu tiên khớp nguyên cụm", () => {
   });
 
   it("đếm/facet dùng cùng điều kiện với danh sách (nằm trong `other`); không q thì không có điều kiện từ khoá", () => {
-    expect(rentalConditions(parse({ q: "can ho" })).other).toHaveLength(4);
+    expect(rentalConditions(parse({ q: "can ho" })).other).toHaveLength(3);
     expect(render(allOf(filterConditions(rentalConditions(parse({}))))).sql).not.toContain("search_text");
   });
 });

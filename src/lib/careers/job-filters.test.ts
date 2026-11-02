@@ -30,12 +30,28 @@ describe("hasJobFilterParams / jobQueryString", () => {
 });
 
 describe("matchesJobKeyword", () => {
-  it("không dấu, không phân biệt hoa thường, đ = d; mọi từ phải có (AND, không theo thứ tự)", () => {
+  it("không dấu, không phân biệt hoa thường, đ = d; 1 từ là chuỗi con", () => {
     expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "tu van")).toBe(true);
     expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "BẤT ĐỘNG")).toBe(true);
-    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "dong san chuyen")).toBe(true);
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "dong san")).toBe(true);
     expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "tu van marketing")).toBe(false);
     expect(matchesJobKeyword("Nhân viên hành chính", "Hành   chính")).toBe(true);
+  });
+
+  it("BL-103: ≥ 2 từ phải liền nhau đúng thứ tự ở đầu từ; 1 từ vẫn là chuỗi con", () => {
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "tư vấn")).toBe(true);
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "viên tư")).toBe(true);
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "tu van bat")).toBe(true);
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "van tu")).toBe(false);
+    expect(matchesJobKeyword("Chuyên viên tư vấn bất động sản", "viên vấn")).toBe(false);
+    expect(matchesJobKeyword("Nhân viên Ba Đình", "ba đình")).toBe(true);
+    expect(matchesJobKeyword("Quản lý gia đình ba phòng", "ba đình")).toBe(false);
+    expect(matchesJobKeyword("Quyết định ba", "ba đình")).toBe(false);
+    expect(matchesJobKeyword("Sale (BĐS) - HN", "bds hn")).toBe(true);
+    expect(matchesJobKeyword("C++ dev", "c++ dev")).toBe(true);
+    expect(matchesJobKeyword("a.b dev", "a.b dev")).toBe(true);
+    expect(matchesJobKeyword("axb dev", "a.b dev")).toBe(false);
+    expect(matchesJobKeyword("Chuyên viên", "uyên")).toBe(true);
   });
 
   it("từ khoá rỗng khớp mọi tên; tên trống không khớp từ khoá có chữ", () => {

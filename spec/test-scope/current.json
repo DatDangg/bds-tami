@@ -1,69 +1,74 @@
 {
   "specVersion": "1.61.0",
-  "scopeVersion": 105,
-  "generatedAt": "2026-10-29T12:00:00+07:00",
+  "scopeVersion": 106,
+  "generatedAt": "2026-11-02T12:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-101 BUG/UI (QA sheet 28/10 bug 19, 20, 21, mức Thấp): trang chủ `/` và `/en` — đầu khối và nút 'xem thêm' không đồng bộ giữa các khối. Thêm thành phần dùng chung SectionHeading (căn giữa: eyebrow, h2, gạch vàng 48x2, mô tả) cho Dự án nổi bật, Dịch vụ (trước: căn trái, không gạch), Ưu đãi nổi bật (+gạch), Thuê nhà ở & kinh doanh (+gạch); thêm SectionMoreLink (Button ghost + mũi tên ->) cho Dự án 'Xem tất cả dự án', Ưu đãi 'Xem thêm', Cho thuê 'Xem thêm' (từng tab), Tin tức 'Xem tất cả' (trước: outline, không mũi tên). Tin tức giữ bố cục 2 cột + heading căn trái. Href/nhãn không đổi; không đổi API/schema/dữ liệu. User chốt 2026-10-29 ghi đè design-spec S01.4 'căn trái' và S01.5/8/9 'Nút Outline'; design-spec S01 đã cập nhật as-built. SPECIFICATIONS.md không quy định căn lề đầu khối/biến thể nút trang chủ (chi tiết trình bày nằm ở design-spec) -> không đổi requirement -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098/BL-099/BL-100). Review NORMAL PASS round 1.",
+  "triggerNote": "BL-103 BUG (QA sheet 30/10 bug 22, mức Trung bình): từ khoá tìm kiếm >= 2 từ phải khớp NGUYÊN CỤM liền nhau theo thứ tự gõ, đầu từ, không phân biệt dấu/hoa-thường. Trước: Cho thuê/Tin tức/Tuyển dụng khớp từng từ rải rác (\"ba đình\" khớp \"Mỹ Đình ... ba phòng ngủ\", \"gia đình\", \"quyết định\"). Sau: Cho thuê (rental-search-sql.ts keywordConditions) = LIKE từng từ + một regex cụm; Tin tức (news-search.ts) = LIKE từng từ + regex cụm; Tuyển dụng (job-filters.ts) = regex JS Unicode cụm. 1 từ giữ nguyên. Không đổi API contract/schema/migration. SPECIFICATIONS.md không quy định cách khớp từ khoá nhiều từ (chi tiết nằm ở docs/API_SPEC.md as-built, đã cập nhật) -> không đổi requirement -> không bump spec_version (1.61.0), không có spec/updates/ và dòng CHANGELOG (theo tiền lệ BL-096/BL-098..BL-101). Review STRICT PASS round 1.",
   "status": "published",
-  "workItem": "bug/home-section-heading-consistency",
-  "backlog": "BL-101",
+  "workItem": "bug/search-multiword-phrase",
+  "backlog": "BL-103",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-10-29-home-section-heading-consistency.md",
-  "task": "tasks/bug-home-section-heading-consistency/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/bug-home-section-heading-consistency-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-104.json",
+  "changeDoc": "spec/changes/2026-11-02-search-multiword-phrase.md",
+  "task": "tasks/bug-search-multiword-phrase/phase-1-task-01.md",
+  "reviewReport": ".context/review-reports/bug-search-multiword-phrase-phase-1-task-01-round-1-review.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-105.json",
   "specUpdate": null,
   "specRefs": [],
   "changed": {
     "files": [
-      "src/components/home/SectionHeading.tsx",
-      "src/components/home/SectionHeading.test.tsx",
-      "src/components/home/SectionMoreLink.tsx",
-      "src/components/home/FeaturedProjects.tsx",
-      "src/components/home/ServicesBento.tsx",
-      "src/components/home/FeaturedOffers.tsx",
-      "src/components/home/RentalsTabs.tsx",
-      "src/components/home/HomeNews.tsx",
-      "src/components/home/HomeBlocks.test.tsx",
-      "src/components/home/HomeRentals.test.tsx",
-      "src/components/home/HomeNews.test.tsx",
-      ".context/design-spec.md"
+      "src/lib/search/rental-search-sql.ts",
+      "src/lib/search/rental-search-sql.test.ts",
+      "src/lib/search/search-service.test.ts",
+      "src/lib/news/news-search.ts",
+      "src/lib/careers/job-filters.ts",
+      "src/lib/careers/job-filters.test.ts",
+      "tests/integration/rental-search.test.ts",
+      "tests/integration/news.test.ts",
+      "tests/integration/job-postings.test.ts",
+      "docs/API_SPEC.md"
     ],
-    "note": "Giao diện trang chủ: đầu khối dùng chung (căn giữa + gạch 48x2) và nút xem thêm dùng chung (ghost + mũi tên). Không đổi API/schema/dữ liệu/link đích.",
+    "note": "Điều kiện từ khoá q khi >= 2 từ: khớp nguyên cụm liền nhau, đúng thứ tự, đầu từ (từ cuối có thể là tiền tố). 1 từ không đổi. Đếm tổng/facet dùng cùng WHERE với danh sách. Không đổi API/schema/migration.",
     "modules": [
-      "Trang chủ (/, /en) — khối Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh, Tin tức"
+      "Cho thuê (/cho-thue, GET /api/public/rentals): danh sách + đếm + facet",
+      "Tin tức (/tin-tuc + trang danh mục tin)",
+      "Tuyển dụng (/tuyen-dung)"
     ]
   },
   "screens": [
-    "/ (Trang chủ VI)",
-    "/en (Trang chủ EN)"
+    "/cho-thue?q=",
+    "/en/cho-thue?q=",
+    "/tin-tuc?q= và trang danh mục tin",
+    "/tuyen-dung?q="
   ],
   "impact": {
     "direct": [
-      "Dự án nổi bật, Dịch vụ, Ưu đãi nổi bật, Thuê nhà ở & kinh doanh: h2 căn giữa (tâm h2 trùng tâm khung nội dung) + gạch vàng 48x2 ngay dưới tiêu đề, cùng kiểu ở cả 4 khối",
-      "Nút 'xem thêm' của Dự án ('Xem tất cả dự án'), Ưu đãi ('Xem thêm'), Cho thuê ('Xem thêm' ở từng tab), Tin tức ('Xem tất cả'): cùng kiểu ghost + mũi tên ->, nhãn và href không đổi",
-      "Tin tức: giữ bố cục 2 cột, heading căn trái (không có gạch căn giữa), chỉ nút đổi sang ghost + mũi tên",
-      "Khối Dịch vụ không có nút xem thêm (không thêm mới)"
+      "/cho-thue?q=ba đình (có/không dấu, hoa/thường): chỉ trả tin chứa cụm \"ba dinh\" liền nhau ở đầu từ; không trả \"Mỹ Đình ... ba phòng ngủ\", \"gia đình\"; danh sách, tổng số và facet khớp nhau",
+      "GET /api/public/rentals?q=<>=2 từ>: cùng quy tắc cụm",
+      "/tin-tuc?q=ba đình và trang danh mục tin: không khớp bài chỉ chứa \"quyết định\"/\"gia đình\"; khớp cụm + đầu từ trên tiêu đề + tóm tắt",
+      "/tuyen-dung?q=<>=2 từ>: khớp cụm + đầu từ trên tên vị trí",
+      "Đảo thứ tự (\"dinh ba\") không trả kết quả"
     ],
     "dependents": [
-      "aria-labelledby của từng khối vẫn trỏ đúng id h2; thứ tự heading không đổi",
-      "Focus-visible ring của nút xem thêm như Button chung; nút trên nền tối (Tin tức) đủ tương phản"
+      "Ô tìm kiếm trang chủ / hero và các liên kết sang /cho-thue?q=, /tin-tuc?q=, /tuyen-dung?q= dùng cùng quy tắc",
+      "Phân trang kết quả tìm kiếm Cho thuê (số đếm giảm so với trước, trang cuối đúng)",
+      "Xếp hạng BL-080 (phrase_match) giữ nguyên, nay vô hại vì mọi tin khớp đều chứa cụm"
     ],
     "regression": [
-      "Slider Dự án nổi bật, slider Ưu đãi, tab Cho thuê (chuyển tab, link theo tab) hoạt động như cũ",
-      "Hero, About, Banner CTA, các khối khác trang chủ không đổi",
-      "Không tràn ngang ở 390 và 768",
-      "Trang chủ EN hiển thị đúng nhãn EN, không mất khối"
+      "Từ khoá 1 từ giữ hành vi cũ (Cho thuê: LIKE + đầu từ BL-080; Tin tức: substring; Tuyển dụng: includes)",
+      "Tìm theo mã tin (CT-xxxxxx) trên Cho thuê",
+      "Bộ lọc khác (tỉnh, phường, dự án, giá, diện tích) kết hợp với q vẫn đúng",
+      "Từ khoá rỗng / chỉ khoảng trắng / ký tự đặc biệt (regex metachar) không gây lỗi",
+      "Tối đa 8 từ, vượt thì cắt như cũ"
     ]
   },
   "acceptance": [
-    "Trang chủ VI và EN ở 1920/1440/768/390: h2 Dự án, Dịch vụ, Ưu đãi, Cho thuê căn giữa, mỗi h2 có gạch vàng 48x2 ngay dưới",
-    "Nút xem thêm của 4 khối Dự án/Ưu đãi/Cho thuê/Tin tức cùng kiểu ghost + mũi tên ->, click đi đúng đích như trước",
-    "Tin tức: heading vẫn căn trái, bố cục 2 cột giữ nguyên",
-    "Không có thanh cuộn ngang ở 390 và 768 (scrollWidth = viewport)",
-    "Bàn phím: Tab tới nút xem thêm thấy vòng focus rõ ràng"
+    "\"ba đình\" (không phân biệt dấu/hoa-thường) ở Cho thuê, Tin tức, Tuyển dụng chỉ khớp cụm liền nhau ở đầu từ; không khớp \"Mỹ Đình ... ba phòng ngủ\", \"gia đình\", \"quyết định\"",
+    "Đảo thứ tự \"dinh ba\" không trả kết quả",
+    "Từ khoá 1 từ không đổi so với trước",
+    "Số đếm tổng và facet Cho thuê khớp với danh sách; phân trang đúng",
+    "Mã tin CT-xxxxxx vẫn tìm được; ký tự đặc biệt trong q không gây lỗi 500"
   ],
-  "testNotes": "Dev DB đã bật Dịch vụ / Ưu đãi nổi bật / Cho thuê (blockOrder + 3 dịch vụ); khối Tin tức chưa bật trên dev nên kiểm Tin tức bằng test đơn vị hoặc sau khi bật. Ảnh trước/sau: .context/review-reports/assets/bl101-{before,after}-{vi,en}-{1920,1440,768,390}.png. Kiểm 1920/1440/768/390 cả VI + EN: heading căn giữa + gạch, nút ghost + mũi tên, không tràn ngang, Tin tức heading còn căn trái. Đây là thay đổi trình bày theo quyết định user (ghi đè design-spec S01.4/S01.5/8/9), không phải theo SPECIFICATIONS.md.",
-  "risk": "low",
-  "riskNote": "Low: chỉ thành phần giao diện trong src/components/home/ (Server Component, không client mới), không đổi API/schema/dữ liệu/link; review NORMAL PASS round 1; verify typecheck/lint/test PASS (461 files / 4847 tests); đã đo Playwright VI+EN ở 4 độ rộng."
+  "testNotes": "Test hồi quy: vitest unit (rental-search-sql, search-service, job-filters) + integration DB tami (rental-search, news, job-postings) 16 file / 246 test PASS; typecheck PASS; 8 test hồi quy mới fail trên HEAD cũ. Nên kiểm tay trên trình duyệt: /cho-thue?q=ba+đình, /tin-tuc?q=ba+đình, /tuyen-dung?q=<2 từ>, kèm trường hợp không dấu và đảo thứ tự. Lưu ý: cụm tin tức có thể vắt qua ranh giới tiêu đề/tóm tắt (chấp nhận).",
+  "risk": "medium",
+  "riskNote": "Medium: truy vấn SQL công khai dùng chung danh sách + đếm + facet Cho thuê và lọc Tin tức/Tuyển dụng; input người dùng vào regex/SQL (đi qua tham số/escape). Review STRICT PASS round 1. Không đổi schema."
 }

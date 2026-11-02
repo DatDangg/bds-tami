@@ -251,6 +251,19 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(await titlesOf({ q: "can ho khong ton tai" })).toEqual([]);
     });
 
+    it("BL-103: ≥ 2 từ phải liền nhau đúng thứ tự (cụm), đếm tổng khớp danh sách; 1 từ giữ khớp đầu từ", async () => {
+      // Tin c "Nhà phố Ba Đình rộng": "ba rong" / "pho dinh" từng khớp vì AND từng từ rời rạc.
+      expect(await titlesOf({ q: "ba dinh" })).toEqual(["Nhà phố Ba Đình rộng"]);
+      expect(await titlesOf({ q: "BA ĐÌNH" })).toEqual(["Nhà phố Ba Đình rộng"]);
+      expect(await titlesOf({ q: "pho ba" })).toEqual(["Nhà phố Ba Đình rộng"]);
+      for (const q of ["ba rong", "pho dinh", "dinh ba"]) {
+        expect(await titlesOf({ q })).toEqual([]);
+        expect((await search({ q })).total).toBe(0);
+      }
+      expect((await search({ q: "ba dinh" })).total).toBe(1);
+      expect(await titlesOf({ q: "dinh" })).toEqual(["Nhà phố Ba Đình rộng"]);
+    });
+
     it("tiếng Anh: tìm theo searchText bản en, vẫn gõ địa danh tiếng Việt không dấu", async () => {
       expect((await search({ locale: "en", q: "serviced" })).total).toBe(1);
       expect((await search({ locale: "en", q: "ben nghe" })).total).toBe(1);
@@ -759,19 +772,19 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     it("'can ho' không khớp tin chỉ chứa 'cần…cho'; 'ho' không khớp giữa từ 'cho'", async () => {
       const titlesFound = await titlesOf({ province, limit: 48, q: "can ho" });
       expect(titlesFound).not.toContain("Cần cho thuê mặt bằng");
-      expect(titlesFound).toHaveLength(5);
+      // BL-103: chỉ tin chứa nguyên cụm "căn hộ"; tin rời rạc (căn … hộ) bị loại.
+      expect(titlesFound).toHaveLength(2);
+      for (const key of looseKeys) expect(titlesFound).not.toContain(titles.get(ids[key]!) ?? "");
       expect(await titlesOf({ province, q: "ho thue" })).not.toContain("Cần cho thuê mặt bằng");
     });
 
-    it("sort mặc định: tin khớp nguyên cụm đứng trước TOÀN CỤC (limit nhỏ hơn số tin khớp); ghép các trang không lặp/sót", async () => {
-      const first = await inProvince({ q: "can ho", limit: 2, page: 1 });
-      expect(first.total).toBe(5);
-      expect(first.items.map((card) => card.id).sort()).toEqual(phraseKeys.map((key) => ids[key]).sort());
-      const pages = [first, await inProvince({ q: "can ho", limit: 2, page: 2 }), await inProvince({ q: "can ho", limit: 2, page: 3 })];
-      const all = pages.flatMap((page) => page.items.map((card) => card.id));
-      expect(all).toHaveLength(5);
-      expect(new Set(all).size).toBe(5);
-      expect(new Set(all)).toEqual(new Set([...phraseKeys, ...looseKeys].map((key) => ids[key])));
+    it("sort mặc định: chỉ tin khớp nguyên cụm (BL-103); phân trang limit 1 không lặp/sót", async () => {
+      const first = await inProvince({ q: "can ho", limit: 1, page: 1 });
+      expect(first.total).toBe(2);
+      const second = await inProvince({ q: "can ho", limit: 1, page: 2 });
+      const all = [...first.items, ...second.items].map((card) => card.id);
+      expect(new Set(all)).toEqual(new Set(phraseKeys.map((key) => ids[key])));
+      expect((await inProvince({ q: "can ho", limit: 1, page: 3 })).items).toEqual([]);
     });
 
     it("sort giá vẫn theo giá (không ưu tiên cụm); đếm tổng khớp danh sách", async () => {
@@ -783,7 +796,7 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
 
     it("listing: lưới và số đếm cùng điều kiện đầu từ", async () => {
       const listing = await service.listing(rentalSearchParamsSchema.parse({ province, q: "can ho", limit: 2 }));
-      expect(listing.total).toBe(5);
+      expect(listing.total).toBe(2);
       expect(listing.items.map((card) => card.id).sort()).toEqual(phraseKeys.map((key) => ids[key]).sort());
     });
 

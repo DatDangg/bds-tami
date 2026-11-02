@@ -40,6 +40,18 @@ export function phraseRegex(terms: readonly string[]): string | undefined {
   return `${WORD_START}${terms.map(escapeRegex).join("[^[:alnum:]]+")}`;
 }
 
+/**
+ * Điều kiện từ khoá trên `rl."search_text"`. Mỗi từ luôn có `LIKE '%t%'` (planner thu hẹp bằng GIN trigram). 1 từ: thêm khớp đầu từ (BL-080).
+ * ≥ 2 từ (BL-103): MỘT regex cụm — các từ liền nhau đúng thứ tự, từ đầu ở đầu từ — thay cho khớp đầu từ từng từ (cụm đã bao hàm), để "ba đình"
+ * không khớp "Mỹ Đình … ba phòng ngủ" hay "gia đình".
+ */
+export function keywordConditions(terms: readonly string[]): SqlFragment[] {
+  const likes = terms.map((term) => sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`);
+  const phrase = phraseRegex(terms);
+  if (phrase !== undefined) return [...likes, sql`rl."search_text" ~ ${phrase}`];
+  return terms.length === 1 ? [...likes, sql`rl."search_text" ~ ${wordStartRegex(terms[0] as string)}`] : likes;
+}
+
 /** Danh mục theo slug của `locale` cùng danh mục con của nó (tối đa 2 cấp, ERD §4.3); chỉ tính danh mục scope `rental` chưa xoá mềm. */
 function categoryCondition(slug: string, locale: string): SqlFragment {
   const matched = sql`SELECT cl."_parent_id" FROM "categories_locales" cl JOIN "categories" t ON t."id" = cl."_parent_id" AND t."scope" = 'rental' AND t."deleted_at" IS NULL WHERE cl."_locale" = ${locale} AND cl."slug" = ${slug}`;
@@ -117,9 +129,7 @@ export function rentalConditions(params: RentalSearchParams): RentalConditions {
   if (params.province) province.push(sql`r."province_id" IN (SELECT "id" FROM "provinces" WHERE "slug" = ${params.province})`);
   if (params.ward) province.push(wardCondition(params.ward, params.province));
   const other: SqlFragment[] = [];
-  for (const term of searchTerms(params.q)) {
-    other.push(sql`rl."search_text" LIKE ${`%${escapeLike(term)}%`}`, sql`rl."search_text" ~ ${wordStartRegex(term)}`);
-  }
+  other.push(...keywordConditions(searchTerms(params.q)));
   if (params.project) other.push(projectCondition(params.project, locale));
   if (params.priceMin !== undefined) other.push(sql`r."price_monthly_vnd" >= ${params.priceMin}`);
   if (params.priceMax !== undefined) other.push(sql`r."price_monthly_vnd" <= ${params.priceMax}`);

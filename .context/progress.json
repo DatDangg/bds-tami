@@ -4639,6 +4639,41 @@
       "report": ".context/review-reports/bug-home-section-heading-consistency-phase-1-task-01-round-1-review.md",
       "docImpact": ".context/design-spec.md S01 (ghi chú as-built BL-101 + khối 3/4/5/8/9); no spec change (giữ 1.61.0)",
       "completedAt": "2026-10-29"
+    },
+    {
+      "slug": "search-multiword-phrase",
+      "title": "Tìm kiếm nhiều từ phải khớp nguyên cụm liền nhau ở đầu từ — Cho thuê, Tin tức, Tuyển dụng (BL-103, QA sheet 30/10 bug 22)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-103",
+      "changeDoc": "spec/changes/archive/2026-11-02-search-multiword-phrase.md",
+      "startedAt": "2026-11-02",
+      "planApprovedAt": "2026-11-02 (user: ok, làm luôn ở đây)",
+      "rootCause": "Từ khoá tách từ, mỗi từ một điều kiện AND riêng không cần liền nhau: rental-search-sql.ts:120 (LIKE + đầu từ từng từ; phraseMatch chỉ xếp hạng), news-search.ts:47 (LIKE chuỗi con từng từ), job-filters.ts:56 (includes từng từ)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-search-multiword-phrase/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/bug-search-multiword-phrase-phase-1-task-01-round-1-review.md",
+          "note": "keywordConditions (≥2 từ: LIKE từng từ + 1 regex cụm phraseRegex) cho Cho thuê; news thêm regex cụm; jobs regex JS Unicode; 1 từ giữ nguyên. 5 MINOR (doc đã reconcile, comment news đã sửa; phrase_match thừa + regex job dựng mỗi tên để follow-up).",
+          "verify": "typecheck PASS; vitest search/careers/news + integration rental-search/news/job-postings (DB tami) 319 PASS; eslint file đổi sạch; build PASS (builder)",
+          "completedAt": "2026-11-02"
+        }
+      ],
+      "specVersion": "1.61.0",
+      "scopeVersion": 106,
+      "review": "STRICT PASS",
+      "round": 1,
+      "report": ".context/review-reports/bug-search-multiword-phrase-phase-1-task-01-round-1-review.md",
+      "docImpact": "docs/API_SPEC.md (q Cho thuê, Tuyển dụng, Tin tức); DESIGN no impact; no spec change (giữ 1.61.0)",
+      "completedAt": "2026-11-02"
     }
   ],
   "projectName": "tami-website",
@@ -5292,7 +5327,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-10-29T04:02:38.278Z",
+  "lastUpdated": "2026-11-02T04:16:26.471Z",
   "approvalMilestones": [
     {
       "id": "M1",
