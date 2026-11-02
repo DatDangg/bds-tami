@@ -52,6 +52,14 @@ describe("rentalWhere", () => {
     expect(render(rentalWhere(parse({}))).sql).not.toContain("rentals_amenities");
   });
 
+  it("bathrooms (BL-104): 4 là >= 4, số khác là bằng; không truyền thì không có điều kiện", () => {
+    expect(render(rentalWhere(parse({ bathrooms: 4 }))).sql).toContain(`r."bathrooms" >= 4`);
+    const two = render(rentalWhere(parse({ bathrooms: 2 })));
+    expect(two.sql).toContain(`r."bathrooms" = $`);
+    expect(two.params).toContain(2);
+    expect(render(rentalWhere(parse({}))).sql).not.toContain(`r."bathrooms"`);
+  });
+
   it("bedrooms 4 là >= 4, số khác là bằng", () => {
     expect(render(rentalWhere(parse({ bedrooms: 4 }))).sql).toContain(`r."bedrooms" >= 4`);
     expect(render(rentalWhere(parse({ bedrooms: 2 }))).sql).toContain(`r."bedrooms" = $`);

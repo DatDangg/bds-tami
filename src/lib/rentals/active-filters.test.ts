@@ -12,6 +12,7 @@ const all: RentalFilters = {
   priceMax: 2,
   areaMin: 3,
   bedrooms: 2,
+  bathrooms: 3,
   furnishing: "full",
   amenities: ["pool", "gym"],
   sort: "price_asc",
@@ -24,11 +25,17 @@ describe("activeFilterKinds", () => {
   });
 
   it("theo thứ tự ô lọc; khoảng giá/diện tích là một chip", () => {
-    expect(activeFilterKinds(all)).toEqual(["q", "category", "province", "ward", "price", "area", "bedrooms", "furnishing", "amenity:pool", "amenity:gym"]);
+    expect(activeFilterKinds(all)).toEqual(["q", "category", "province", "ward", "price", "area", "bedrooms", "bathrooms", "furnishing", "amenity:pool", "amenity:gym"]);
   });
 });
 
 describe("filtersWithout", () => {
+  it("bỏ chip bathrooms: chỉ bỏ bathrooms, giữ bedrooms, về trang 1 (BL-104)", () => {
+    const next = filtersWithout(all, "bathrooms");
+    expect(next).not.toHaveProperty("bathrooms");
+    expect(next).toMatchObject({ bedrooms: 2, furnishing: "full", page: 1 });
+  });
+
   it("bỏ đúng một nhóm, giữ sort, về trang 1", () => {
     expect(filtersWithout(all, "q")).not.toHaveProperty("q");
     expect(filtersWithout(all, "q")).toMatchObject({ category: "can-ho", sort: "price_asc", page: 1 });

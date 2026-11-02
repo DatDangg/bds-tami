@@ -161,12 +161,12 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     ).id;
 
     // Dữ liệu: 6 tin công khai khác nhau + các tin khách không được thấy.
-    await createRental("a", "Căn hộ dịch vụ Bến Nghé", { category: childCategoryId, priceMonthlyVnd: 12_000_000, areaM2: 45, bedrooms: 1, furnishing: "full", amenities: ["pool", "gym", "elevator"] });
-    await createRental("b", "Studio gần chợ", { priceMonthlyVnd: 6_000_000, areaM2: 25, bedrooms: 0, furnishing: "none", address: "5 Phố Bí Mật", showExactAddress: true, amenities: ["gym"] });
-    await createRental("c", "Nhà phố Ba Đình rộng", { category: houseCategoryId, province: hnId, ward: baDinhWardId, priceMonthlyVnd: 30_000_000, areaM2: 120, bedrooms: 4, furnishing: "basic" });
-    await createRental("d", "Biệt thự năm phòng ngủ", { category: houseCategoryId, priceMonthlyVnd: 55_000_000, areaM2: 300, bedrooms: 5, furnishing: "full" });
+    await createRental("a", "Căn hộ dịch vụ Bến Nghé", { category: childCategoryId, priceMonthlyVnd: 12_000_000, areaM2: 45, bedrooms: 1, bathrooms: 1, furnishing: "full", amenities: ["pool", "gym", "elevator"] });
+    await createRental("b", "Studio gần chợ", { priceMonthlyVnd: 6_000_000, areaM2: 25, bedrooms: 0, bathrooms: 1, furnishing: "none", address: "5 Phố Bí Mật", showExactAddress: true, amenities: ["gym"] });
+    await createRental("c", "Nhà phố Ba Đình rộng", { category: houseCategoryId, province: hnId, ward: baDinhWardId, priceMonthlyVnd: 30_000_000, areaM2: 120, bedrooms: 4, bathrooms: 4, furnishing: "basic" });
+    await createRental("d", "Biệt thự năm phòng ngủ", { category: houseCategoryId, priceMonthlyVnd: 55_000_000, areaM2: 300, bedrooms: 5, bathrooms: 6, furnishing: "full" });
     await createRental("e", "Căn hộ thương lượng", { priceMonthlyVnd: undefined, priceNegotiable: true, areaM2: 60, bedrooms: 2 });
-    const rented = await createRental("f", "Căn hộ đã cho thuê", { priceMonthlyVnd: 9_000_000, areaM2: 50, bedrooms: 2 });
+    const rented = await createRental("f", "Căn hộ đã cho thuê", { priceMonthlyVnd: 9_000_000, areaM2: 50, bedrooms: 2, bathrooms: 2 });
     await payload.update({ collection: "rentals", id: rented.id, data: { status: "rented" }, locale: "vi", user: admin as never, overrideAccess: false, depth: 0 });
     await createRental("draft", "Tin nháp căn hộ", { status: "draft", gallery: [] });
     const hidden = await createRental("hidden", "Tin ẩn căn hộ");
@@ -326,6 +326,13 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect((await titlesOf({ priceMin: 6_000_000, priceMax: 12_000_000, sort: "price_asc" }))).toEqual(["Studio gần chợ", "Căn hộ đã cho thuê", "Căn hộ dịch vụ Bến Nghé"]);
       expect(await titlesOf({ priceMin: 40_000_000 })).toEqual(["Biệt thự năm phòng ngủ"]);
       expect((await titlesOf({ areaMin: 25, areaMax: 45, sort: "price_asc" }))).toEqual(["Studio gần chợ", "Căn hộ dịch vụ Bến Nghé"]);
+    });
+
+    it("bathrooms (BL-104): số đúng; 4 nghĩa là 4 trở lên; tin không nhập (NULL) không khớp", async () => {
+      expect(await titlesOf({ bathrooms: 1, sort: "price_asc" })).toEqual(["Studio gần chợ", "Căn hộ dịch vụ Bến Nghé"]);
+      expect(await titlesOf({ bathrooms: 2 })).toEqual(["Căn hộ đã cho thuê"]);
+      expect(await titlesOf({ bathrooms: 3 })).toEqual([]);
+      expect(await titlesOf({ bathrooms: 4, sort: "price_asc" })).toEqual(["Nhà phố Ba Đình rộng", "Biệt thự năm phòng ngủ"]);
     });
 
     it("bedrooms: số đúng; 4 nghĩa là 4 trở lên; 0 là studio", async () => {
@@ -494,7 +501,7 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     });
 
     it("tham số sai -> 400 (không cache); khoá lạ và giá trị rỗng được bỏ qua", async () => {
-      for (const query of ["limit=49", "limit=0", "page=0", "locale=fr", "sort=random", "bedrooms=5", "priceMin=abc", "priceMin=10&priceMax=5", "furnishing=x", "ward=ba-dinh", "available=yes"]) {
+      for (const query of ["limit=49", "limit=0", "page=0", "locale=fr", "sort=random", "bedrooms=5", "bathrooms=5", "bathrooms=-1", "priceMin=abc", "priceMin=10&priceMax=5", "furnishing=x", "ward=ba-dinh", "available=yes"]) {
         const response = await getHandler(query, newIp());
         expect(response.status, query).toBe(400);
         expect(response.headers.get("Cache-Control")).toBe("no-store");

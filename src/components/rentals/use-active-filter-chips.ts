@@ -45,6 +45,8 @@ export function useActiveFilterChips({ filters, options, listPath, limit }: Acti
         return t("active.area", { value: range(filters.areaMin, filters.areaMax, (value) => `${formatNumber(value, locale)} m²`) });
       case "bedrooms":
         return t("active.bedrooms", { value: t(`bedroomsOption.${filters.bedrooms ?? 1}`) });
+      case "bathrooms":
+        return t("active.bathrooms", { value: t(`bathroomsOption.${filters.bathrooms ?? 1}`) });
       case "furnishing":
         return t("active.furnishing", { value: t(`furnishingOption.${filters.furnishing ?? "none"}`) });
     }

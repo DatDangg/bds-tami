@@ -170,7 +170,7 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
     expect(loadListingStrengths).toHaveBeenCalledWith("vi", "propertyPosts");
   });
 
-  it("cột lọc: Loại hình · Tỉnh/thành · Mức giá · Diện tích · Phòng ngủ · Hướng · Tình trạng bàn giao; ô tích có số, chip Phòng ngủ KHÔNG số; 'Xoá tất cả' → /tin-bds", async () => {
+  it("cột lọc: Loại hình · Tỉnh/thành · Mức giá · Diện tích · Phòng ngủ · Phòng tắm · Hướng · Tình trạng bàn giao; ô tích có số, chip Phòng ngủ / Phòng tắm KHÔNG số; 'Xoá tất cả' → /tin-bds", async () => {
     await render("vi");
     const aside = sidebar();
     expect(within(aside).getAllByRole("group").map((group) => group.querySelector("legend")?.textContent)).toEqual([
@@ -179,6 +179,7 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
       "Mức giá",
       "Diện tích",
       "Phòng ngủ",
+      "Phòng tắm",
       "Hướng",
       "Tình trạng bàn giao",
     ]);
@@ -187,7 +188,7 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
     expect(within(aside).getByRole("checkbox", { name: "Hồ Chí Minh(12)" })).toBeInTheDocument();
     expect(within(aside).getByRole("checkbox", { name: "Đông Nam(4)" })).toBeInTheDocument();
     expect(within(aside).getByRole("checkbox", { name: "Nội thất đầy đủ(3)" })).toBeInTheDocument();
-    expect(within(aside).getAllByRole("radio").map((radio) => radio.getAttribute("aria-label") ?? radio.closest("label")?.textContent)).toEqual(["Tất cả", "1", "2", "3", "4+"]);
+    expect(within(aside).getAllByRole("radio").map((radio) => radio.getAttribute("aria-label") ?? radio.closest("label")?.textContent)).toEqual(["Tất cả", "1", "2", "3", "4+", "Tất cả", "1", "2", "3", "4+"]);
     expect(within(aside).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["0 tỷ", "50+ tỷ", "0 m²", "500+ m²"]);
     expect(within(aside).getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/tin-bds");
   });
@@ -201,15 +202,17 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
   });
 
   it("tham số lọc: parse + bỏ giá trị lạ → loader; tab / phân trang / form không JS giữ bộ lọc; ô tích đã chọn được tích", async () => {
-    await render("vi", { type: "apartment,bogus", province: "ha-noi", priceMin: "2", bedrooms: "2", direction: "SE", sort: "price_asc", q: "Láng", page: "2" });
-    expect(lastOptions()).toMatchObject({ page: 2, filters: { q: "Láng", types: ["apartment"], provinceSlugs: ["ha-noi"], priceMin: 2, bedrooms: 2, directions: ["SE"], sort: "price_asc" } });
-    const query = "?q=L%C3%A1ng&type=apartment&province=ha-noi&priceMin=2&bedrooms=2&direction=SE&sort=price_asc";
+    await render("vi", { type: "apartment,bogus", province: "ha-noi", priceMin: "2", bedrooms: "2", bathrooms: "3", direction: "SE", sort: "price_asc", q: "Láng", page: "2" });
+    expect(lastOptions()).toMatchObject({ page: 2, filters: { q: "Láng", types: ["apartment"], provinceSlugs: ["ha-noi"], priceMin: 2, bedrooms: 2, bathrooms: 3, directions: ["SE"], sort: "price_asc" } });
+    const query = "?q=L%C3%A1ng&type=apartment&province=ha-noi&priceMin=2&bedrooms=2&bathrooms=3&direction=SE&sort=price_asc";
     expect(tabs()[2]).toHaveAttribute("href", `/tin-bds/danh-muc/voucher${query}`);
     const pager = within(screen.getByRole("navigation", { name: "Phân trang" }));
     expect(pager.getAllByRole("link").map((link) => link.getAttribute("href"))).toContain(`/tin-bds${query}&page=3`);
     const form = sidebar().querySelector("form")!;
     expect(form.querySelector('input[name=type][value="apartment"]')).toHaveAttribute("checked");
     expect(form.querySelector('input[name=province][value="ha-noi"]')).toHaveAttribute("checked");
+    expect(form.querySelector('input[name=bathrooms][value="3"]')).toHaveAttribute("checked");
+    expect(form.querySelector('input[name=bedrooms][value="2"]')).toHaveAttribute("checked");
     expect([...form.querySelectorAll<HTMLInputElement>(":scope > input[type=hidden]")].map((input) => `${input.name}=${input.value}`)).toEqual(["q=Láng", "sort=price_asc"]);
   });
 
@@ -288,6 +291,7 @@ describe("S08 /tin-bds (BL-052): khung danh sách chung", () => {
       "Price",
       "Area",
       "Bedrooms",
+      "Bathrooms",
       "Direction",
       "Handover condition",
     ]);

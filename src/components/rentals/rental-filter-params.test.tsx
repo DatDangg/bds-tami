@@ -17,11 +17,12 @@ const full: RentalFilters = {
   areaMin: 20,
   areaMax: 50,
   bedrooms: 2,
+  bathrooms: 3,
   furnishing: "full",
   sort: "price_asc",
   page: 3,
 };
-const golden = "q=studio&category=can-ho&province=ha-noi&ward=ba-dinh&priceMin=5000000&priceMax=10000000&areaMin=20&areaMax=50&bedrooms=2&furnishing=full&sort=price_asc";
+const golden = "q=studio&category=can-ho&province=ha-noi&ward=ba-dinh&priceMin=5000000&priceMax=10000000&areaMin=20&areaMax=50&bedrooms=2&bathrooms=3&furnishing=full&sort=price_asc";
 const parseHref = (href: string) => parseRentalFilters(Object.fromEntries(new URL(href, "http://x").searchParams));
 
 describe("tham số URL của /cho-thue không đổi với bộ lọc BL-052", () => {
@@ -32,7 +33,7 @@ describe("tham số URL của /cho-thue không đổi với bộ lọc BL-052", 
 
   it("đổi một ô lọc: giữ mọi tham số khác, bỏ page, giá trị VNĐ / m² nguyên như cũ; đọc lại ra đúng bộ lọc", () => {
     const href = listingHref("/cho-thue", toCurrentParams(full), { priceMin: "3000000", priceMax: null, bedrooms: "4" });
-    expect(href).toBe("/cho-thue?q=studio&category=can-ho&province=ha-noi&ward=ba-dinh&priceMin=3000000&areaMin=20&areaMax=50&bedrooms=4&furnishing=full&sort=price_asc");
+    expect(href).toBe("/cho-thue?q=studio&category=can-ho&province=ha-noi&ward=ba-dinh&priceMin=3000000&areaMin=20&areaMax=50&bedrooms=4&bathrooms=3&furnishing=full&sort=price_asc");
     expect(parseHref(href)).toEqual({ ...full, priceMin: 3_000_000, priceMax: undefined, bedrooms: 4, page: 1 });
   });
 
@@ -53,8 +54,8 @@ describe("tham số URL của /cho-thue không đổi với bộ lọc BL-052", 
   it("form không JS giữ danh mục (link cũ), từ khoá, sắp xếp bằng input ẩn; badge chỉ đếm ô trong thẻ lọc (khoảng tính 1, mỗi tiện ích 1)", () => {
     const current = toCurrentParams({ ...full, amenities: ["pool", "gym"] });
     expect(toPreservedParams(current)).toEqual({ q: "studio", category: "can-ho", sort: "price_asc" });
-    // tỉnh + phường + phòng ngủ + nội thất + giá + diện tích + 2 tiện ích
-    expect(countActiveFilters(current, RENTAL_ACTIVE_FILTER_SPEC)).toBe(8);
+    // tỉnh + phường + phòng ngủ + phòng tắm + nội thất + giá + diện tích + 2 tiện ích
+    expect(countActiveFilters(current, RENTAL_ACTIVE_FILTER_SPEC)).toBe(9);
     expect(countActiveFilters(toCurrentParams({ q: "x", category: "c", sort: "price_asc", page: 2 }), RENTAL_ACTIVE_FILTER_SPEC)).toBe(0);
   });
 });

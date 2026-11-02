@@ -310,6 +310,7 @@
           "price": "Mức giá",
           "area": "Diện tích",
           "bedrooms": "Phòng ngủ",
+          "bathrooms": "Phòng tắm",
           "direction": "Hướng",
           "handover": "Tình trạng bàn giao"
         },
@@ -323,6 +324,12 @@
         "areaLow": "Diện tích nhỏ nhất",
         "areaHigh": "Diện tích lớn nhất",
         "bedroomsOption": {
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4+"
+        },
+        "bathroomsOption": {
           "1": "1",
           "2": "2",
           "3": "3",
@@ -397,6 +404,7 @@
         "ward": "Phường/xã",
         "allWards": "Tất cả phường/xã",
         "bedrooms": "Phòng ngủ",
+        "bathrooms": "Phòng tắm",
         "furnishing": "Nội thất",
         "amenities": "Tiện ích"
       },
@@ -425,6 +433,12 @@
         "3": "3",
         "4": "4+"
       },
+      "bathroomsOption": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4+"
+      },
       "furnishingOption": {
         "none": "Không",
         "basic": "Cơ bản",
@@ -440,6 +454,7 @@
         "price": "Giá: {value}",
         "area": "Diện tích: {value}",
         "bedrooms": "Phòng ngủ: {value}",
+        "bathrooms": "Phòng tắm: {value}",
         "furnishing": "Nội thất: {value}",
         "amenity": "Tiện ích: {value}",
         "from": "từ {value}",

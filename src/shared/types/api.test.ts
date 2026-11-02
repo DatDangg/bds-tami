@@ -28,6 +28,12 @@ describe("rentalSearchParamsSchema (API_SPEC §3.3)", () => {
     });
   });
 
+  it("bathrooms (BL-104): 0..4 như bedrooms, ép kiểu từ chuỗi", () => {
+    expect(rentalSearchParamsSchema.parse({ bathrooms: "4" }).bathrooms).toBe(4);
+    expect(rentalSearchParamsSchema.parse({ bathrooms: "0" }).bathrooms).toBe(0);
+    expect(rentalSearchParamsSchema.parse({ bathrooms: "" }).bathrooms).toBeUndefined();
+  });
+
   it("amenities: `a,b` hoặc mảng → mảng theo thứ tự RENTAL_AMENITIES, bỏ trùng; giá trị lạ BỊ BỎ (khác furnishing: tham số danh sách, phần hợp lệ còn lại vẫn có nghĩa); toàn lạ/rỗng → không có khoá", () => {
     expect(rentalSearchParamsSchema.parse({ amenities: "gym,pool,foo,gym" }).amenities).toEqual(["pool", "gym"]);
     expect(rentalSearchParamsSchema.parse({ amenities: ["gym", "pool"] }).amenities).toEqual(["pool", "gym"]);
@@ -38,7 +44,7 @@ describe("rentalSearchParamsSchema (API_SPEC §3.3)", () => {
 
   it.each([
     { limit: "49" }, { limit: "0" }, { page: "0" }, { page: "501" }, { locale: "fr" }, { sort: "random" }, { furnishing: "luxury" },
-    { bedrooms: "5" }, { bedrooms: "-1" }, { bedrooms: "1.5" }, { priceMin: "abc" }, { priceMin: "-1" }, { areaMin: "NaN" },
+    { bedrooms: "5" }, { bedrooms: "-1" }, { bedrooms: "1.5" }, { bathrooms: "5" }, { bathrooms: "-1" }, { bathrooms: "1.5" }, { bathrooms: "abc" }, { priceMin: "abc" }, { priceMin: "-1" }, { areaMin: "NaN" },
     { priceMin: "10", priceMax: "5" }, { areaMin: "50", areaMax: "20" }, { q: "x".repeat(101) },
   ])("từ chối %j", (input) => {
     expect(rentalSearchParamsSchema.safeParse(input).success).toBe(false);

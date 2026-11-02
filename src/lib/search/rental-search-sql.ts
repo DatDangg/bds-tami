@@ -139,6 +139,10 @@ export function rentalConditions(params: RentalSearchParams): RentalConditions {
   if (params.bedrooms !== undefined) {
     other.push(params.bedrooms >= 4 ? sql`r."bedrooms" >= 4` : sql`r."bedrooms" = ${params.bedrooms}`);
   }
+  // BL-104: cùng quy ước với phòng ngủ; `bathrooms` NULL không khớp phép so sánh nào.
+  if (params.bathrooms !== undefined) {
+    other.push(params.bathrooms >= 4 ? sql`r."bathrooms" >= 4` : sql`r."bathrooms" = ${params.bathrooms}`);
+  }
   if (params.furnishing) other.push(sql`r."furnishing" = ${params.furnishing}`);
   // Tin phải có ĐỦ mọi tiện ích (AND): mỗi tiện ích một EXISTS trên bảng hasMany `rentals_amenities` (cột `parent_id`/`value`, index `parent_id` do Payload tạo).
   const amenity = (params.amenities ?? []).map((value) => sql`EXISTS (SELECT 1 FROM "rentals_amenities" ra WHERE ra."parent_id" = r."id" AND ra."value" = ${value})`);

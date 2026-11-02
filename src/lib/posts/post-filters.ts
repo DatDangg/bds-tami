@@ -3,7 +3,7 @@ import type { RawPageParam } from "../content/pagination";
 
 /**
  * Tham số URL của danh sách Tin BĐS `/tin-bds` (+ trang danh mục) — BL-052:
- * `?q=&type=&province=&priceMin=&priceMax=&areaMin=&areaMax=&bedrooms=&direction=&handover=&sort=&page=`.
+ * `?q=&type=&province=&priceMin=&priceMax=&areaMin=&areaMax=&bedrooms=&bathrooms=&direction=&handover=&sort=&page=`.
  * Danh mục đi theo route (`/tin-bds/danh-muc/[category]`), không phải tham số.
  */
 export interface RawPostParams {
@@ -16,6 +16,7 @@ export interface RawPostParams {
   areaMin?: string | string[];
   areaMax?: string | string[];
   bedrooms?: string | string[];
+  bathrooms?: string | string[];
   direction?: string | string[];
   handover?: string | string[];
   sort?: string | string[];
@@ -32,6 +33,9 @@ export const POST_AREA_MAX_M2 = 500;
 /** Chip "Phòng ngủ": 1, 2, 3, 4+ (4 = từ 4 phòng trở lên). */
 export const POST_BEDROOM_VALUES = [1, 2, 3, 4] as const;
 export type PostBedrooms = (typeof POST_BEDROOM_VALUES)[number];
+/** BL-104: chip "Phòng tắm" cùng giá trị với phòng ngủ (4 = từ 4 phòng tắm trở lên). */
+export const POST_BATHROOM_VALUES = POST_BEDROOM_VALUES;
+export type PostBathrooms = PostBedrooms;
 
 /** `newest` là mặc định và không lên URL. */
 export const POST_SORT_VALUES = ["newest", "price_asc", "price_desc"] as const;
@@ -55,6 +59,8 @@ export interface PostFilters {
   areaMax?: number;
   /** 1–3 = đúng số phòng; 4 = từ 4 phòng trở lên. */
   bedrooms?: PostBedrooms;
+  /** 1–3 = đúng số phòng tắm; 4 = từ 4 phòng tắm trở lên. */
+  bathrooms?: PostBathrooms;
   /** Hướng nhà hợp lệ, theo thứ tự `DIRECTIONS` (OR). */
   directions?: Direction[];
   /** Tình trạng bàn giao hợp lệ, theo thứ tự `HANDOVER_CONDITIONS` (OR). */
@@ -104,7 +110,8 @@ function parseRange(rawMin: string | string[] | undefined, rawMax: string | stri
   return { ...(min !== undefined && min > 0 ? { min } : {}), ...(max !== undefined && max < cap ? { max } : {}) };
 }
 
-function parseBedrooms(value: string | string[] | undefined): PostBedrooms | undefined {
+/** Số phòng 1–4 (dùng cho phòng ngủ và phòng tắm); khác → bỏ. */
+function parseRoomCount(value: string | string[] | undefined): PostBedrooms | undefined {
   const first = firstValue(value);
   return POST_BEDROOM_VALUES.find((count) => String(count) === first);
 }
@@ -119,7 +126,8 @@ export function parsePostFilters(raw: RawPostParams): PostFilters {
   const provinceSlugs = listValues(raw.province).sort().slice(0, MAX_PROVINCE_SLUGS);
   const price = parseRange(raw.priceMin, raw.priceMax, POST_PRICE_MAX_BILLION);
   const area = parseRange(raw.areaMin, raw.areaMax, POST_AREA_MAX_M2);
-  const bedrooms = parseBedrooms(raw.bedrooms);
+  const bedrooms = parseRoomCount(raw.bedrooms);
+  const bathrooms = parseRoomCount(raw.bathrooms);
   const directions = pickKnown(listValues(raw.direction), DIRECTIONS);
   const handovers = pickKnown(listValues(raw.handover), HANDOVER_CONDITIONS);
   const sort = parseSort(raw.sort);
@@ -132,6 +140,7 @@ export function parsePostFilters(raw: RawPostParams): PostFilters {
     ...(area.min !== undefined ? { areaMin: area.min } : {}),
     ...(area.max !== undefined ? { areaMax: area.max } : {}),
     ...(bedrooms !== undefined ? { bedrooms } : {}),
+    ...(bathrooms !== undefined ? { bathrooms } : {}),
     ...(directions.length > 0 ? { directions } : {}),
     ...(handovers.length > 0 ? { handovers } : {}),
     ...(sort !== DEFAULT_POST_SORT ? { sort } : {}),
@@ -143,13 +152,13 @@ export function parsePostFilters(raw: RawPostParams): PostFilters {
  * trang như vậy là `noindex, follow`, canonical về trang sạch. `sort=newest` hay `sort` lạ không tính; `page` không tính.
  */
 export function hasPostFilterParams(raw: RawPostParams): boolean {
-  const single = [raw.q, raw.priceMin, raw.priceMax, raw.areaMin, raw.areaMax, raw.bedrooms].some((value) => firstValue(value) !== undefined);
+  const single = [raw.q, raw.priceMin, raw.priceMax, raw.areaMin, raw.areaMax, raw.bedrooms, raw.bathrooms].some((value) => firstValue(value) !== undefined);
   const multi = [raw.type, raw.province, raw.direction, raw.handover].some((value) => listValues(value).length > 0);
   return single || multi || parseSort(raw.sort) !== DEFAULT_POST_SORT;
 }
 
 /**
- * Chuỗi truy vấn theo thứ tự cố định (`q`, `type`, `province`, `priceMin`, `priceMax`, `areaMin`, `areaMax`, `bedrooms`, `direction`, `handover`, `sort`, `page`)
+ * Chuỗi truy vấn theo thứ tự cố định (`q`, `type`, `province`, `priceMin`, `priceMax`, `areaMin`, `areaMax`, `bedrooms`, `bathrooms`, `direction`, `handover`, `sort`, `page`)
  * → cùng bộ lọc luôn cùng URL. Trang 1, `sort=newest`, đầu thanh trượt ở mép không lên URL; dấu phẩy phân cách giữ nguyên (không `%2C`). Rỗng → `""`.
  */
 export function postQueryString(filters: PostFilters, page = 1): string {
@@ -165,6 +174,7 @@ export function postQueryString(filters: PostFilters, page = 1): string {
   if (filters.areaMin !== undefined && filters.areaMin > 0) set("areaMin", filters.areaMin);
   if (filters.areaMax !== undefined && filters.areaMax < POST_AREA_MAX_M2) set("areaMax", filters.areaMax);
   set("bedrooms", filters.bedrooms);
+  set("bathrooms", filters.bathrooms);
   set("direction", DIRECTIONS.filter((direction) => filters.directions?.includes(direction)).join(","));
   set("handover", HANDOVER_CONDITIONS.filter((handover) => filters.handovers?.includes(handover)).join(","));
   if (filters.sort && filters.sort !== DEFAULT_POST_SORT) set("sort", filters.sort);

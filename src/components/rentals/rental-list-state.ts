@@ -13,7 +13,7 @@ import type { RentalFilterOptionsView, RentalFilterValues } from "./RentalListBo
 
 /** Badge "Bộ lọc" (< lg): các ô trong thẻ lọc. Danh mục là tab, từ khoá ở hero, sắp xếp ở hàng kết quả: không tính. */
 export const RENTAL_ACTIVE_FILTER_SPEC: ActiveFilterSpec = {
-  single: ["province", "ward", "project", "bedrooms", "furnishing"],
+  single: ["province", "ward", "project", "bedrooms", "bathrooms", "furnishing"],
   multi: ["amenities"],
   ranges: [
     ["priceMin", "priceMax"],
@@ -41,6 +41,7 @@ export function toFilterValues(filters: RentalFilters): RentalFilterValues {
     price: [filters.priceMin ?? null, filters.priceMax ?? null],
     area: [filters.areaMin ?? null, filters.areaMax ?? null],
     bedrooms: filters.bedrooms === undefined ? "" : String(filters.bedrooms),
+    bathrooms: filters.bathrooms === undefined ? "" : String(filters.bathrooms),
     furnishing: filters.furnishing ?? "",
     amenities: filters.amenities ?? [],
   };

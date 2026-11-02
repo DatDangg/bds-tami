@@ -4,17 +4,21 @@ import { isOfferEnded } from "../content/offer-status";
 import { relationId } from "../payload/relation-id";
 import { BILLION_VND } from "../projects/project-price";
 import { normalizeSearchText } from "../search/normalize";
-import type { PostBedrooms, PostSortKey } from "./post-filters";
+import type { PostBathrooms, PostBedrooms, PostSortKey } from "./post-filters";
 
 /**
  * Lọc + đếm + sắp danh sách Tin BĐS trên tập đã quét ở bộ nhớ (`/tin-bds`, BL-052) — cùng cách `/du-an` (`project-list-facets.ts`).
  * Thuần (không đụng Payload): `post-queries.ts` quét rồi gọi các hàm ở đây.
  * Quy tắc số đếm (spec "Trang danh sách (khung chung)"): mỗi chiều = số tin khớp MỌI bộ lọc khác TRỪ chính chiều đó.
- * Lọc thuộc tính (giá, diện tích, phòng ngủ, loại hình, hướng, bàn giao) tự loại tin không có giá trị đó.
+ * Lọc thuộc tính (giá, diện tích, phòng ngủ, phòng tắm, loại hình, hướng, bàn giao) tự loại tin không có giá trị đó.
  */
 
-/** Phòng ngủ ≥ giá trị này khi chọn chip cuối ("4+"). */
-const BEDROOMS_OPEN_ENDED = 4;
+/** Phòng ngủ / phòng tắm ≥ giá trị này khi chọn chip cuối ("4+"). */
+const ROOMS_OPEN_ENDED = 4;
+
+/** `value` null/lạ không khớp chip nào; chip cuối là "từ n trở lên". */
+const matchesRoomCount = (value: number | null | undefined, chip: number): boolean =>
+  typeof value === "number" && (chip >= ROOMS_OPEN_ENDED ? value >= chip : value === chip);
 
 export interface PostFilterCriteria {
   /** Danh mục + con (theo route danh mục). Bỏ trống = mọi danh mục. */
@@ -31,6 +35,7 @@ export interface PostFilterCriteria {
   areaMin?: number;
   areaMax?: number;
   bedrooms?: PostBedrooms;
+  bathrooms?: PostBathrooms;
   directions?: readonly Direction[];
   handovers?: readonly HandoverCondition[];
 }
@@ -54,7 +59,7 @@ export interface PostProvinceFacet {
 }
 
 /**
- * Số đếm cho tab + ô tích. Chip đơn chọn (Phòng ngủ) KHÔNG có số đếm (quyết định user 2026-10-22, `phase-2-task-04.md` § Quyết định);
+ * Số đếm cho tab + ô tích. Chip đơn chọn (Phòng ngủ, Phòng tắm) KHÔNG có số đếm (quyết định user 2026-10-22, `phase-2-task-04.md` § Quyết định);
  * thanh trượt (giá, diện tích) cũng không.
  */
 export interface PostFacets {
@@ -70,7 +75,7 @@ export interface PostFacets {
   provinces: PostProvinceFacet[];
 }
 
-type FilterDimension = "category" | "province" | "keyword" | "type" | "price" | "area" | "bedrooms" | "direction" | "handover";
+type FilterDimension = "category" | "province" | "keyword" | "type" | "price" | "area" | "bedrooms" | "bathrooms" | "direction" | "handover";
 type PostPredicate = (post: PropertyPost) => boolean;
 export type PostPredicates = Partial<Record<FilterDimension, PostPredicate>>;
 
@@ -118,9 +123,10 @@ export function buildPostPredicates(criteria: PostFilterCriteria): PostPredicate
   }
   const bedrooms = criteria.bedrooms;
   if (bedrooms !== undefined) {
-    predicates.bedrooms = (post) =>
-      typeof post.bedrooms === "number" && (bedrooms >= BEDROOMS_OPEN_ENDED ? post.bedrooms >= bedrooms : post.bedrooms === bedrooms);
+    predicates.bedrooms = (post) => matchesRoomCount(post.bedrooms, bedrooms);
   }
+  const bathrooms = criteria.bathrooms;
+  if (bathrooms !== undefined) predicates.bathrooms = (post) => matchesRoomCount(post.bathrooms, bathrooms);
   const directions = criteria.directions ?? [];
   if (directions.length > 0) predicates.direction = (post) => post.houseDirection != null && directions.includes(post.houseDirection);
   const handovers = criteria.handovers ?? [];

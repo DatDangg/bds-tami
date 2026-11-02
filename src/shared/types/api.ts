@@ -165,6 +165,8 @@ export const rentalSearchParamsSchema = z
     areaMin: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
     areaMax: optional(z.coerce.number().min(0).max(MAX_AREA_M2)),
     bedrooms: wholeNumber(4),
+    /** BL-104: như `bedrooms`, 0..4, `4` = 4 phòng tắm trở lên. */
+    bathrooms: wholeNumber(4),
     furnishing: optional(z.enum(RENTAL_FURNISHINGS)),
     /** Tin phải có ĐỦ mọi tiện ích (AND); giá trị lạ bị bỏ (xem `parseAmenityList`). */
     amenities: rentalAmenitiesParam,

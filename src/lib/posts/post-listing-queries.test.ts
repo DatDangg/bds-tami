@@ -25,11 +25,11 @@ type Row = Partial<Omit<PropertyPost, "province" | "category" | "ward">> & {
 
 /** Thứ tự = mới nhất trước (đúng thứ tự `-publishedAt` mà truy vấn quét trả). */
 const rows: Row[] = [
-  { id: "1", title: "Căn hộ Sông Sài Gòn", province: HCM, category: SALE, propertyType: "apartment", priceVnd: 3_500_000_000, areaM2: 75, bedrooms: 2, houseDirection: "SE", handoverCondition: "full" },
+  { id: "1", title: "Căn hộ Sông Sài Gòn", province: HCM, category: SALE, propertyType: "apartment", priceVnd: 3_500_000_000, areaM2: 75, bedrooms: 2, bathrooms: 1, houseDirection: "SE", handoverCondition: "full" },
   { id: "2", title: "Voucher mùa thu", category: VOUCHER, offer: ACTIVE },
-  { id: "3", title: "Biệt thự Tây Hồ", province: HN, ward: { name: "Tây Hồ" }, category: SALE_CHILD, propertyType: "villa", priceVnd: 20_000_000_000, areaM2: 300, bedrooms: 5, houseDirection: "S", handoverCondition: "raw" },
+  { id: "3", title: "Biệt thự Tây Hồ", province: HN, ward: { name: "Tây Hồ" }, category: SALE_CHILD, propertyType: "villa", priceVnd: 20_000_000_000, areaM2: 300, bedrooms: 5, bathrooms: 6, houseDirection: "S", handoverCondition: "raw" },
   { id: "4", title: "Ưu đãi đã hết", category: VOUCHER, offer: ENDED, isFeatured: true },
-  { id: "5", title: "Nhà phố Hải Châu", province: DN, category: SALE, propertyType: "townhouse", priceVnd: 8_000_000_000, areaM2: 120, bedrooms: 4, houseDirection: "SE", handoverCondition: "basic", address: "12 Lê Lợi" },
+  { id: "5", title: "Nhà phố Hải Châu", province: DN, category: SALE, propertyType: "townhouse", priceVnd: 8_000_000_000, areaM2: 120, bedrooms: 4, bathrooms: 2, houseDirection: "SE", handoverCondition: "basic", address: "12 Lê Lợi" },
   { id: "6", title: "Đất nền chưa có giá", province: DN, category: SALE, propertyType: "land", areaM2: 500, excerpt: "Gần biển Mỹ Khê" },
 ];
 
@@ -82,6 +82,15 @@ describe("listPublicPostListing: lọc", () => {
     expect(ids((await run({ bedrooms: 2 })).docs)).toEqual(["1"]);
     expect(ids((await run({ bedrooms: 4 })).docs)).toEqual(["3", "5"]);
     expect((await run({ bedrooms: 1 })).totalDocs).toBe(0);
+  });
+
+  it("phòng tắm (BL-104): 1–3 đúng số phòng, 4 = từ 4 trở lên; tin bathrooms trống (NULL) bị loại", async () => {
+    expect(ids((await run({ bathrooms: 1 })).docs)).toEqual(["1"]);
+    expect(ids((await run({ bathrooms: 2 })).docs)).toEqual(["5"]);
+    expect(ids((await run({ bathrooms: 4 })).docs)).toEqual(["3"]);
+    expect((await run({ bathrooms: 3 })).totalDocs).toBe(0);
+    expect(ids((await run({ bathrooms: 1, bedrooms: 2 })).docs)).toEqual(["1"]);
+    expect((await run({ bathrooms: 1, bedrooms: 4 })).totalDocs).toBe(0);
   });
 
   it("từ khoá không dấu khớp tiêu đề, tóm tắt, địa chỉ, phường, tỉnh", async () => {

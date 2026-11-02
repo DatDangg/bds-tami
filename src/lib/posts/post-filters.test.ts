@@ -49,6 +49,9 @@ describe("parsePostFilters", () => {
     ).toEqual({});
     expect(parsePostFilters({ bedrooms: "0" })).toEqual({});
     expect(parsePostFilters({ bedrooms: ["4", "1"] })).toEqual({ bedrooms: 4 });
+    for (const bad of ["0", "5", "abc", "-1", "1.5", ""]) expect(parsePostFilters({ bathrooms: bad })).toEqual({});
+    expect(parsePostFilters({ bathrooms: "2" })).toEqual({ bathrooms: 2 });
+    expect(parsePostFilters({ bathrooms: ["4", "1"] })).toEqual({ bathrooms: 4 });
   });
 
   it("thanh trượt: kẹp về trần, min > max đổi chỗ, đầu ở mép (0 / trần) bỏ", () => {
@@ -77,6 +80,7 @@ describe("hasPostFilterParams (→ noindex)", () => {
     expect(hasPostFilterParams({ q: "abc" })).toBe(true);
     expect(hasPostFilterParams({ type: "khong-co" })).toBe(true);
     expect(hasPostFilterParams({ bedrooms: "2" })).toBe(true);
+    expect(hasPostFilterParams({ bathrooms: "2" })).toBe(true);
     expect(hasPostFilterParams({ areaMax: "100" })).toBe(true);
     expect(hasPostFilterParams({ handover: "raw" })).toBe(true);
     expect(hasPostFilterParams({ sort: "price_asc" })).toBe(true);
@@ -93,9 +97,9 @@ describe("hasPostFilterParams (→ noindex)", () => {
 
 describe("postQueryString", () => {
   it("thứ tự khoá cố định, nhiều giá trị nối dấu phẩy không mã hoá; parse lại ra cùng bộ lọc", () => {
-    const filters = parsePostFilters({ sort: "price_desc", handover: "full", type: "villa,apartment", province: "ha-noi,da-nang", q: "nhà phố", bedrooms: "4", areaMax: "200" });
+    const filters = parsePostFilters({ sort: "price_desc", handover: "full", type: "villa,apartment", province: "ha-noi,da-nang", q: "nhà phố", bedrooms: "4", bathrooms: "2", areaMax: "200" });
     const query = postQueryString(filters, 2);
-    expect(query).toBe("?q=nh%C3%A0+ph%E1%BB%91&type=apartment,villa&province=da-nang,ha-noi&areaMax=200&bedrooms=4&handover=full&sort=price_desc&page=2");
+    expect(query).toBe("?q=nh%C3%A0+ph%E1%BB%91&type=apartment,villa&province=da-nang,ha-noi&areaMax=200&bedrooms=4&bathrooms=2&handover=full&sort=price_desc&page=2");
     const parsed = Object.fromEntries(new URLSearchParams(query.slice(1)));
     expect(parsePostFilters(parsed)).toEqual(filters);
   });

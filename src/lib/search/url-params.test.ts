@@ -26,6 +26,7 @@ describe("parseRentalFilters", () => {
       areaMin: "25",
       areaMax: "60.5",
       bedrooms: "4",
+      bathrooms: "3",
       furnishing: "full",
       sort: "price_desc",
       page: "3",
@@ -40,6 +41,7 @@ describe("parseRentalFilters", () => {
       areaMin: 25,
       areaMax: 60.5,
       bedrooms: 4,
+      bathrooms: 3,
       furnishing: "full",
       sort: "price_desc",
       page: 3,
@@ -101,6 +103,7 @@ describe("rentalListQueryString", () => {
     areaMin: 25,
     areaMax: 60,
     bedrooms: 2,
+    bathrooms: 3,
     furnishing: "basic",
     amenities: ["pool", "gym"],
     sort: "price_asc",
@@ -132,10 +135,25 @@ describe("rentalListQueryString", () => {
   });
 });
 
+describe("bathrooms (BL-104)", () => {
+  it("đọc 1..4 như phòng ngủ; 0/5/abc/âm/thập phân bị bỏ; khoá lặp lấy giá trị đầu", () => {
+    expect(parseRentalFilters({ bathrooms: "4" }).bathrooms).toBe(4);
+    expect(parseRentalFilters({ bathrooms: "1" }).bathrooms).toBe(1);
+    for (const bad of ["0", "5", "abc", "-1", "1.5", ""]) expect(parseRentalFilters({ bathrooms: bad })).not.toHaveProperty("bathrooms");
+    expect(parseRentalFilters({ bathrooms: ["2", "3"] }).bathrooms).toBe(2);
+  });
+
+  it("ghi ngay sau bedrooms; có lọc thì noindex (hasNarrowingParams) và tính vào huy hiệu", () => {
+    expect(rentalListQueryString({ bedrooms: 2, bathrooms: 3, furnishing: "full", sort: "newest", page: 1 })).toBe("?bedrooms=2&bathrooms=3&furnishing=full");
+    expect(activeFilterCount({ bathrooms: 2, sort: "newest", page: 1 })).toBe(1);
+    expect(hasNarrowingParams({ bathrooms: 2, sort: "newest", page: 1 })).toBe(true);
+  });
+});
+
 describe("activeFilterCount / hasNarrowingParams", () => {
   it("đếm điều kiện lọc (khoảng giá/diện tích tính 1), không đếm sort/page; phường tính", () => {
     expect(activeFilterCount({ sort: "price_asc", page: 4 })).toBe(0);
-    expect(activeFilterCount({ q: "x", province: "ha-noi", ward: "w", priceMin: 1, priceMax: 2, areaMin: 1, bedrooms: 3, furnishing: "none", category: "c", sort: "newest", page: 1 })).toBe(8);
+    expect(activeFilterCount({ q: "x", province: "ha-noi", ward: "w", priceMin: 1, priceMax: 2, areaMin: 1, bedrooms: 3, bathrooms: 2, furnishing: "none", category: "c", sort: "newest", page: 1 })).toBe(9);
   });
 
   it("mỗi tiện ích đếm 1", () => {

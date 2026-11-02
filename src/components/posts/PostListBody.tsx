@@ -9,7 +9,7 @@ import type { RawListingParams } from "@/components/listing/listing-params";
 import { RangeSliderFacet, type RangeValue } from "@/components/listing/RangeSliderFacet";
 import { ResultsBar } from "@/components/listing/ResultsBar";
 import { ListingNavigateContext, useListingFilterNav } from "@/components/listing/use-listing-filter-nav";
-import { POST_AREA_MAX_M2, POST_BEDROOM_VALUES, POST_PRICE_MAX_BILLION } from "@/lib/posts/post-filters";
+import { POST_AREA_MAX_M2, POST_BATHROOM_VALUES, POST_BEDROOM_VALUES, POST_PRICE_MAX_BILLION } from "@/lib/posts/post-filters";
 
 /** Thanh trượt Diện tích: bước 10 m² (spec BL-052 `/tin-bds`); Mức giá bước 1 tỷ. */
 const AREA_STEP_M2 = 10;
@@ -25,6 +25,7 @@ export interface PostFilterValues {
   /** m²; `null` = đầu ở mép. */
   area: RangeValue;
   bedrooms: string;
+  bathrooms: string;
   directions: readonly string[];
   handovers: readonly string[];
 }
@@ -47,7 +48,7 @@ const rangePatch = (names: readonly [string, string], [low, high]: RangeValue) =
 
 /**
  * Các nhóm lọc của `/tin-bds` (BL-052): Loại hình · Tỉnh/thành (ô tìm + ô tích, 6 + "Xem thêm") · Mức giá (thanh trượt 0 – 50+ tỷ) · Diện tích (0 – 500+ m²)
- * · Phòng ngủ (chip 1 · 2 · 3 · 4+, KHÔNG số đếm — quyết định user) · Hướng · Tình trạng bàn giao (ô tích + số). Mỗi ô có `name` (form GET không JS); có JS thì đổi là điều hướng ngay.
+ * · Phòng ngủ · Phòng tắm (chip 1 · 2 · 3 · 4+, KHÔNG số đếm — quyết định user) · Hướng · Tình trạng bàn giao (ô tích + số). Mỗi ô có `name` (form GET không JS); có JS thì đổi là điều hướng ngay.
  */
 function PostFilterFields({ values, options, navigate }: PostFilterFieldsProps) {
   const t = useTranslations("page.posts");
@@ -101,6 +102,14 @@ function PostFilterFields({ values, options, navigate }: PostFilterFieldsProps) 
           options={[{ value: "", label: t("all") }, ...POST_BEDROOM_VALUES.map((count) => ({ value: String(count), label: t(`list.bedroomsOption.${count}`) }))]}
           value={values.bedrooms}
           onChange={(bedrooms) => navigate({ bedrooms })}
+        />
+      </FilterGroup>
+      <FilterGroup title={t("list.filterGroups.bathrooms")}>
+        <ChipChoice
+          name="bathrooms"
+          options={[{ value: "", label: t("all") }, ...POST_BATHROOM_VALUES.map((count) => ({ value: String(count), label: t(`list.bathroomsOption.${count}`) }))]}
+          value={values.bathrooms}
+          onChange={(bathrooms) => navigate({ bathrooms })}
         />
       </FilterGroup>
       <FilterGroup title={t("list.filterGroups.direction")}>

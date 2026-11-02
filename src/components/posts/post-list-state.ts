@@ -14,7 +14,7 @@ import type { PostFilterOptions, PostFilterValues } from "./PostListBody";
 
 /** Badge "Bộ lọc" (< lg): các ô trong thẻ lọc. Danh mục là tab, từ khoá ở hero, sắp xếp ở hàng kết quả: không tính. */
 export const POST_ACTIVE_FILTER_SPEC: ActiveFilterSpec = {
-  single: ["bedrooms"],
+  single: ["bedrooms", "bathrooms"],
   multi: ["type", "province", "direction", "handover"],
   ranges: [
     ["priceMin", "priceMax"],
@@ -52,6 +52,7 @@ export function toFilterValues(filters: PostFilters): PostFilterValues {
     price: [filters.priceMin ?? null, filters.priceMax ?? null],
     area: [filters.areaMin ?? null, filters.areaMax ?? null],
     bedrooms: filters.bedrooms === undefined ? "" : String(filters.bedrooms),
+    bathrooms: filters.bathrooms === undefined ? "" : String(filters.bathrooms),
     directions: filters.directions ?? [],
     handovers: filters.handovers ?? [],
   };

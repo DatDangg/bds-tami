@@ -206,17 +206,21 @@ describe("S04 /cho-thue (BL-052): bố cục", () => {
     expect(lastParams()).toMatchObject({ locale: "vi", limit: 12, page: 1, sort: "newest", available: true });
   });
 
-  it("cột lọc: Tỉnh/thành (chọn một + số, chỉ tỉnh có tin, theo số tin) · Dự án · Giá thuê · Diện tích · Phòng ngủ · Nội thất · Tiện ích; không ô Loại hình; 'Xoá tất cả' → /cho-thue", async () => {
+  it("cột lọc: Tỉnh/thành (chọn một + số, chỉ tỉnh có tin, theo số tin) · Dự án · Giá thuê · Diện tích · Phòng ngủ · Phòng tắm · Nội thất · Tiện ích; không ô Loại hình; 'Xoá tất cả' → /cho-thue", async () => {
     projectRows.rows = [{ slug: "vinhomes", title: "Vinhomes Ocean Park" }];
     await render("vi");
     const aside = sidebar();
-    expect(within(aside).getAllByRole("group").map((group) => group.querySelector("legend")?.textContent)).toEqual(["Tỉnh/thành", "Dự án", "Giá thuê", "Diện tích", "Phòng ngủ", "Nội thất", "Tiện ích"]);
+    expect(within(aside).getAllByRole("group").map((group) => group.querySelector("legend")?.textContent)).toEqual(["Tỉnh/thành", "Dự án", "Giá thuê", "Diện tích", "Phòng ngủ", "Phòng tắm", "Nội thất", "Tiện ích"]);
     const provinceList = within(aside).getByRole("list", { name: "Tỉnh/thành" });
     expect(within(provinceList).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Tất cả tỉnh/thành", "Hà Nội(5)", "Hồ Chí Minh(2)"]);
     expect(within(provinceList).getByRole("radio", { name: "Tất cả tỉnh/thành" })).toBeChecked();
     expect(within(aside).queryByRole("group", { name: /Phường/ })).toBeNull();
     expect(within(aside).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["0 triệu", "100+ triệu", "0 m²", "300+ m²"]);
-    expect(within(aside).getAllByRole("radio", { name: /^(1|2|3|4\+)$/ })).toHaveLength(4);
+    for (const legend of ["Phòng ngủ", "Phòng tắm"]) {
+      const group = within(within(aside).getByRole("group", { name: legend }));
+      expect(group.getAllByRole("radio").map((radio) => radio.closest("label")?.textContent)).toEqual(["Tất cả", "1", "2", "3", "4+"]);
+    }
+    expect(aside.querySelector("input[name=bathrooms][value=\"4\"]")).not.toBeNull();
     expect(within(aside).getByRole("radio", { name: "Đầy đủ" })).toBeInTheDocument();
     expect(within(aside).getByRole("checkbox", { name: "Hồ bơi(3)" })).toBeInTheDocument();
     expect(within(aside).getByRole("link", { name: "Xoá tất cả" })).toHaveAttribute("href", "/cho-thue");
@@ -274,7 +278,7 @@ describe("S04 /cho-thue (BL-052): bố cục", () => {
     expect(resultsText("1 listing found")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Studio Ba Đình/ })).toHaveAttribute("href", "/en/for-rent/slug-1");
     expect(tabs().map((tab) => tab.getAttribute("href"))).toEqual(["/en/for-rent", "/en/for-rent/category/can-ho"]);
-    expect(within(sidebar()).getAllByRole("group").map((group) => group.querySelector("legend")?.textContent)).toEqual(["Province/city", "Monthly rent", "Floor area", "Bedrooms", "Furnishing", "Amenities"]);
+    expect(within(sidebar()).getAllByRole("group").map((group) => group.querySelector("legend")?.textContent)).toEqual(["Province/city", "Monthly rent", "Floor area", "Bedrooms", "Bathrooms", "Furnishing", "Amenities"]);
     expect(within(sidebar()).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["VND 0M", "VND 100M+", "0 m²", "300+ m²"]);
     expect(screen.getByLabelText("Sort by")).toBeInTheDocument();
   });
@@ -292,6 +296,7 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
       priceMax: "15000000",
       areaMin: "25",
       bedrooms: "2",
+      bathrooms: "3",
       furnishing: "full",
       amenities: "pool,gym,foo",
       sort: "price_asc",
@@ -311,6 +316,7 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
       priceMax: 15_000_000,
       areaMin: 25,
       bedrooms: 2,
+      bathrooms: 3,
       furnishing: "full",
       amenities: ["pool", "gym"],
       sort: "price_asc",
@@ -320,12 +326,13 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     expect(within(aside).getByRole("radio", { name: /Hà Nội/ })).toBeChecked();
     expect(within(aside).getByRole("group", { name: "Phường/xã" })).toBeInTheDocument();
     expect(within(aside).getAllByRole("slider").map((slider) => slider.getAttribute("aria-valuetext"))).toEqual(["5 triệu", "15 triệu", "25 m²", "300+ m²"]);
-    expect(within(aside).getByRole("radio", { name: "2" })).toBeChecked();
+    expect(within(within(aside).getByRole("group", { name: "Phòng ngủ" })).getByRole("radio", { name: "2" })).toBeChecked();
+    expect(within(within(aside).getByRole("group", { name: "Phòng tắm" })).getByRole("radio", { name: "3" })).toBeChecked();
     expect(within(aside).getByRole("radio", { name: "Đầy đủ" })).toBeChecked();
     expect(within(aside).getByRole("checkbox", { name: "Hồ bơi(3)" })).toBeChecked();
     expect(within(aside).getByRole("checkbox", { name: "Phòng gym(1)" })).toBeChecked();
-    // Badge < lg: tỉnh + phường + dự án + phòng ngủ + nội thất + giá + diện tích + 2 tiện ích = 9 (từ khoá, sắp xếp không tính).
-    expect(screen.getByRole("button", { name: "Bộ lọc (9)" })).toBeInTheDocument();
+    // Badge < lg: tỉnh + phường + dự án + phòng ngủ + phòng tắm + nội thất + giá + diện tích + 2 tiện ích = 10 (từ khoá, sắp xếp không tính).
+    expect(screen.getByRole("button", { name: "Bộ lọc (10)" })).toBeInTheDocument();
     expect(screen.getByLabelText("Sắp xếp theo")).toHaveTextContent("Giá tăng dần");
   });
 
@@ -371,7 +378,7 @@ describe("S04 /cho-thue (BL-052): tham số URL", () => {
     expect(kitchen).toBeEnabled();
     expect(kitchen.closest("li")).toHaveAttribute("data-empty", "true");
     expect(within(aside).getByRole("radio", { name: "Đầy đủ" }).closest("label")).toHaveTextContent(/^Đầy đủ$/);
-    expect(within(aside).getByRole("radio", { name: "2" }).closest("label")).toHaveTextContent(/^2$/);
+    expect(within(within(aside).getByRole("group", { name: "Phòng ngủ" })).getByRole("radio", { name: "2" }).closest("label")).toHaveTextContent(/^2$/);
   });
 
   it("BL-055 C-1: link cũ CHỈ có ?category=<slug có thật> → 308 (permanentRedirect) sang trang danh mục theo ngôn ngữ; không truy vấn tin", async () => {
@@ -447,6 +454,15 @@ describe("S04 /cho-thue (BL-052): trạng thái", () => {
     expect(screen.queryByRole("region", { name: "Danh sách tin cho thuê" })).toBeNull();
   });
 
+  it("BL-104: gợi ý bỏ điều kiện có chip Phòng tắm; bỏ chip chỉ bỏ bathrooms, giữ các lọc khác", async () => {
+    search.mockResolvedValue(result([]));
+    await render("vi", { bedrooms: "2", bathrooms: "4" });
+    const suggestions = within(screen.getByTestId("empty-suggestions")).getAllByRole("link");
+    expect(suggestions.map((link) => link.textContent)).toEqual(["Phòng ngủ: 2", "Phòng tắm: 4+"]);
+    expect(suggestions[1]).toHaveAttribute("href", "/cho-thue?bedrooms=2");
+    expect(suggestions[0]).toHaveAttribute("href", "/cho-thue?bathrooms=4");
+  });
+
   it("chưa có tin nào và không lọc: trạng thái trống thật (không nút xoá bộ lọc)", async () => {
     search.mockResolvedValue(result([]));
     await render("vi");
@@ -488,7 +504,7 @@ describe("S04 /cho-thue (BL-052): không JS", () => {
     const form = host.querySelector<HTMLFormElement>("aside form")!;
     expect(form).toHaveAttribute("method", "get");
     expect(form).toHaveAttribute("action", "/cho-thue");
-    for (const name of ["province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "q", "sort"]) expect(form.querySelector(`[name=${name}]`), name).not.toBeNull();
+    for (const name of ["province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "bathrooms", "furnishing", "amenities", "q", "sort"]) expect(form.querySelector(`[name=${name}]`), name).not.toBeNull();
     expect(form.querySelector('input[name=province][value="ha-noi"]')).toHaveAttribute("checked");
     expect(form.querySelector('input[name=amenities][value="pool"]')).toHaveAttribute("checked");
     expect(form.querySelector("input[type=number][name=priceMin]")).not.toBeNull();

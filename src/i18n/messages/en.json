@@ -310,6 +310,7 @@
           "price": "Price",
           "area": "Area",
           "bedrooms": "Bedrooms",
+          "bathrooms": "Bathrooms",
           "direction": "Direction",
           "handover": "Handover condition"
         },
@@ -323,6 +324,12 @@
         "areaLow": "Minimum area",
         "areaHigh": "Maximum area",
         "bedroomsOption": {
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4+"
+        },
+        "bathroomsOption": {
           "1": "1",
           "2": "2",
           "3": "3",
@@ -397,6 +404,7 @@
         "ward": "Ward/commune",
         "allWards": "All wards/communes",
         "bedrooms": "Bedrooms",
+        "bathrooms": "Bathrooms",
         "furnishing": "Furnishing",
         "amenities": "Amenities"
       },
@@ -425,6 +433,12 @@
         "3": "3",
         "4": "4+"
       },
+      "bathroomsOption": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4+"
+      },
       "furnishingOption": {
         "none": "Unfurnished",
         "basic": "Basic",
@@ -440,6 +454,7 @@
         "price": "Price: {value}",
         "area": "Floor area: {value}",
         "bedrooms": "Bedrooms: {value}",
+        "bathrooms": "Bathrooms: {value}",
         "furnishing": "Furnishing: {value}",
         "amenity": "Amenity: {value}",
         "from": "from {value}",

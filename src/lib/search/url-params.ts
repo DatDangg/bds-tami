@@ -24,6 +24,8 @@ export interface RentalFilters {
   areaMin?: number;
   areaMax?: number;
   bedrooms?: number;
+  /** BL-104: như `bedrooms` (1..4, `4` = từ 4 phòng tắm trở lên); URL `0` bị bỏ (không có chip "0"). */
+  bathrooms?: number;
   furnishing?: NonNullable<RentalSearchParams["furnishing"]>;
   /** Tiện ích phải có đủ (AND); thứ tự theo `RENTAL_AMENITIES`. */
   amenities?: RentalAmenity[];
@@ -35,7 +37,7 @@ export interface RentalFilters {
 export type RawRentalParams = Record<string, string | string[] | undefined>;
 
 /** Thứ tự khoá khi dựng query string (cố định để URL ổn định, dễ cache/so sánh). */
-const QUERY_KEYS = ["q", "category", "province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "furnishing", "amenities", "sort", "page"] as const;
+const QUERY_KEYS = ["q", "category", "province", "ward", "project", "priceMin", "priceMax", "areaMin", "areaMax", "bedrooms", "bathrooms", "furnishing", "amenities", "sort", "page"] as const;
 type QueryKey = (typeof QUERY_KEYS)[number];
 
 export const DEFAULT_RENTAL_SORT: RentalSort = "newest";
@@ -50,6 +52,9 @@ function readParam(raw: RawRentalParams, key: QueryKey): unknown {
   const parsed = rentalSearchParamsSchema.shape[key].safeParse(value);
   return parsed.success ? parsed.data : undefined;
 }
+
+/** API nhận `bathrooms` 0..4 nhưng trang chỉ có chip 1..4: `0` trên URL coi như không lọc. */
+const bathroomsFromUrl = (value: unknown): number | undefined => (typeof value === "number" && value >= 1 ? value : undefined);
 
 const orderedPair = (low: number | undefined, high: number | undefined): [number | undefined, number | undefined] =>
   low !== undefined && high !== undefined && low > high ? [high, low] : [low, high];
@@ -76,6 +81,7 @@ export function parseRentalFilters(raw: RawRentalParams): RentalFilters {
     areaMin,
     areaMax,
     bedrooms: read("bedrooms") as number | undefined,
+    bathrooms: bathroomsFromUrl(read("bathrooms")),
     furnishing: read("furnishing") as RentalFilters["furnishing"],
     amenities: read("amenities") as RentalFilters["amenities"],
   };
@@ -113,7 +119,7 @@ const amenityCount = (filters: RentalFilters): number => filters.amenities?.leng
 export function activeFilterCount(filters: RentalFilters): number {
   const priced = filters.priceMin !== undefined || filters.priceMax !== undefined;
   const sized = filters.areaMin !== undefined || filters.areaMax !== undefined;
-  const singles = [filters.q, filters.category, filters.province, filters.ward, filters.project, filters.bedrooms, filters.furnishing];
+  const singles = [filters.q, filters.category, filters.province, filters.ward, filters.project, filters.bedrooms, filters.bathrooms, filters.furnishing];
   return singles.filter((value) => value !== undefined).length + (priced ? 1 : 0) + (sized ? 1 : 0) + amenityCount(filters);
 }
 
@@ -138,7 +144,7 @@ export const AREA_HINT_RANGES = [
 
 /**
  * Trang này có nên `noindex, follow` không (design-spec S04, tránh trùng lặp): trang gốc, trang chỉ lọc MỘT danh mục hoặc MỘT tỉnh
- * (kèm `page`) vẫn index; mọi tổ hợp sâu hơn (từ khoá, phường, giá, diện tích, phòng ngủ, nội thất, danh mục + tỉnh) hoặc đổi sắp xếp thì không.
+ * (kèm `page`) vẫn index; mọi tổ hợp sâu hơn (từ khoá, phường, giá, diện tích, phòng ngủ, phòng tắm, nội thất, danh mục + tỉnh) hoặc đổi sắp xếp thì không.
  */
 export function hasNarrowingParams(filters: RentalFilters): boolean {
   if (filters.sort !== DEFAULT_RENTAL_SORT) return true;

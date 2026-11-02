@@ -19,7 +19,7 @@ const RENTAL_PRICE_STEP_VND = 1_000_000;
 /** Thanh trượt Diện tích: 0 – 300+ m², bước 5. */
 export const RENTAL_AREA_MAX_M2 = 300;
 const RENTAL_AREA_STEP_M2 = 5;
-/** Chip Phòng ngủ 1 · 2 · 3 · 4+ (`bedrooms=4` = từ 4 phòng, như hiện tại). */
+/** Chip Phòng ngủ / Phòng tắm (BL-104) 1 · 2 · 3 · 4+ (`4` = từ 4 phòng, như hiện tại). */
 const BEDROOM_VALUES = ["1", "2", "3", "4"] as const;
 /** Tỉnh hiện sẵn trước "Xem thêm" (như `/du-an`). */
 const PROVINCES_VISIBLE = 6;
@@ -34,6 +34,7 @@ export interface RentalFilterValues {
   /** m²; `null` = đầu ở mép. */
   area: RangeValue;
   bedrooms: string;
+  bathrooms: string;
   furnishing: string;
   amenities: readonly string[];
 }
@@ -120,6 +121,14 @@ function RentalFilterFields({ values, options, navigate }: RentalFilterFieldsPro
           options={[{ value: "", label: t("all") }, ...BEDROOM_VALUES.map((value) => ({ value, label: t(`bedroomsOption.${value}`) }))]}
           value={values.bedrooms}
           onChange={(bedrooms) => navigate({ bedrooms })}
+        />
+      </FilterGroup>
+      <FilterGroup title={t("fields.bathrooms")}>
+        <ChipChoice
+          name="bathrooms"
+          options={[{ value: "", label: t("all") }, ...BEDROOM_VALUES.map((value) => ({ value, label: t(`bathroomsOption.${value}`) }))]}
+          value={values.bathrooms}
+          onChange={(bathrooms) => navigate({ bathrooms })}
         />
       </FilterGroup>
       <FilterGroup title={t("fields.furnishing")}>

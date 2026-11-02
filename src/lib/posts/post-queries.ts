@@ -91,6 +91,7 @@ const POST_SCAN_FIELDS = {
   priceVnd: true,
   areaM2: true,
   bedrooms: true,
+  bathrooms: true,
   houseDirection: true,
   handoverCondition: true,
   isFeatured: true,
