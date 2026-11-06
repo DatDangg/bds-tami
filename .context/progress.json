@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "production-new-server-tamihomes",
-    "phaseTask": "phase-4-task-01"
+    "phaseTask": "phase-3-task-02"
   },
   "features": [
     {
@@ -3601,6 +3601,19 @@
           "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-4-task-01-round-2-review.md",
           "note": "gỡ job record-staging-pass + mode record-staging của ssh-deploy (trở về fd524e26~1); giữ deploy.sh record-staging làm lệnh tay; runbook §1/§11/§12 + ARCHITECTURE 1 dòng",
           "verify": "deploy.test.sh PASS; grep .github sạch; còn verify sau push"
+        },
+        {
+          "file": "tasks/feature-production-new-server-tamihomes/phase-3-task-02.md",
+          "task": "phase-3-task-02",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-3-task-02-round-1-review.md",
+          "note": "smoke tamihomes.vn PASS: cert LE apex+www, HSTS 1 năm, không noindex, 301 www/http/tên miền cũ giữ path, robots/sitemap/canonical/og/hreflang tamihomes.vn, /api/metrics+/internal 404, IP thật trong nginx log, backup prom =1, OOM 0",
+          "verify": "reviewer tự kiểm lại mẫu; residual: admin login/CV, RAM 24h, SMTP giả",
+          "completedAt": "2026-11-06"
         }
       ]
     }
@@ -5568,7 +5581,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T08:46:41.796Z",
+  "lastUpdated": "2026-11-06T08:56:45.678Z",
   "approvalMilestones": [
     {
       "id": "M1",
