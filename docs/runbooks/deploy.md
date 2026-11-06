@@ -388,7 +388,9 @@ Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục
 4. `[XÁC NHẬN]` Site cổng 443: copy `tami-staging-tamihomes.conf` + `tami-default-reject.conf` → `sites-available/`, symlink, `sudo nginx -t` PASS rồi `sudo systemctl reload nginx`.
    `tami-default-reject.conf` (default_server 443, `ssl_reject_handshake`) chỉ cài trên host mới này, **không** cài lên server cũ. Cổng 80 giữ site `default` của gói nginx.
 5. Dữ liệu: chuyển postgres + SeaweedFS từ staging cũ sang (phase-2-task-02; ~147 MB + ~457 MB), không clone dữ liệu giữa staging và production.
-6. GitHub Environment `staging`: `DEPLOY_HOST=179.197.242.57`, `DEPLOY_SSH_KNOWN_HOSTS` như 11.1 (phase-2-task-03); deploy lần đầu theo mục 1.
+6. GitHub Environment `staging`: `DEPLOY_HOST=179.197.242.57`, `DEPLOY_USER=deploy`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` như 11.1 (phase-2-task-03); deploy lần đầu theo mục 1.
+   Thực tế 2026-11-06: Deploy run 42163804119 (commit `55e52730`) xanh cả 3 job; guard postgres qua (container dựng sẵn ở bước 5, không tạo lại), migrate xong, health OK; `staging.history` server cũ có dòng mới (job `record-staging-pass`). Dump tạm `/opt/tami/transfer` đã xoá sau review PASS.
+7. Smoke trước khi có DNS: tunnel `ssh -N -L 13011:127.0.0.1:3011 server` + `curl -H 'Host: staging.tamihomes.vn' http://127.0.0.1:13011/...`. Đóng tunnel bằng **PID của chính tiến trình ssh đó** (không `taskkill /IM ssh.exe` / `pkill ssh` — làm rơi mọi phiên SSH khác, kể cả tới production). Qua tunnel không có Nginx nên app log cảnh báo "không xác định IP khách / chung 1 bucket rate limit" — bình thường, phải hết khi đi qua Nginx 443 (11.4).
 
 ### 11.4 Smoke
 - `curl -sI http://staging.tamihomes.vn/` → 301 sang https; `curl -sI https://staging.tamihomes.vn/` → 200 + `X-Robots-Tag: noindex, nofollow, noarchive` + HSTS `max-age=86400`.

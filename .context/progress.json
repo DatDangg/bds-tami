@@ -3411,7 +3411,7 @@
       "title": "Chuyển staging sang server mới 179.197.242.57 + Nginx/Let's Encrypt staging.tamihomes.vn (BL-111)",
       "type": "MODIFY",
       "status": "in-progress",
-      "currentPhase": 2,
+      "currentPhase": 3,
       "backlog": "BL-111",
       "changeDoc": "spec/changes/2026-11-06-staging-new-server-nginx-tamihomes.md",
       "startedAt": "2026-11-06",
@@ -3472,8 +3472,15 @@
         {
           "task": "phase-2-task-03",
           "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-2-task-03.md",
-          "status": "blocked",
-          "blockedReason": "chờ user: GitHub secrets Environment staging (U3) + cho phép push staging"
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-03-round-1-review.md",
+          "note": "user đặt secrets staging + push 55e52730; Deploy run 42163804119 xanh 3 job (build, deploy staging server mới, record staging.history server cũ); guard postgres qua, migrate xong, health OK; smoke tunnel: VI/EN/list 200, media 200, canonical/sitemap staging.tamihomes.vn, robots Disallow, private file 401/403; dump transfer đã xoá. Chờ user: login admin + tải CV thật",
+          "verify": "gh run view + state files 2 server + smoke tunnel",
+          "completedAt": "2026-11-06"
         },
         {
           "task": "phase-3-task-01",
@@ -5452,7 +5459,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T04:18:52.390Z",
+  "lastUpdated": "2026-11-06T05:00:06.622Z",
   "approvalMilestones": [
     {
       "id": "M1",
