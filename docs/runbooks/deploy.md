@@ -334,6 +334,8 @@ nội dung nhập lại qua admin.
 | Cache ảnh | giữ header của app (`public, immutable`), không CDN |
 | Thiếu so với Cloudflare | cache CDN, WAF/DDoS, lớp xác thực thứ 2 cho `/admin` (Cloudflare Access) |
 
+> Từ BL-112 production chuyển sang server mới + `tamihomes.vn`: xem §12 (mục này thành lịch sử sau khi hoàn tất).
+
 ### 10.1 Thứ tự
 1. `[XÁC NHẬN]` GitHub Environment `production` (gói Free: không có required reviewers, production chỉ chạy khi bấm tay `Deploy production`): thêm secret `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (mục 2.2–2.3).
 2. `[XÁC NHẬN]` Kiểm (chỉ đọc): `ss -ltnp | grep ':3010'` trống, `df -h /`, `docker ps --format '{{.Names}}' | grep '^tami-'` (chỉ thấy `tami-staging-*`).
@@ -399,3 +401,45 @@ Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục
 - `curl -sk --resolve x.invalid:443:179.197.242.57 https://x.invalid/` (hostname lạ) → lỗi TLS handshake (không phải trang staging).
 - Gửi form liên hệ thử: cột đầu `/var/log/nginx/tami-staging.access.log` là IP thật; 2 IP khác nhau → 2 bucket rate limit.
 - Rollback cấu hình nginx: gỡ symlink `tami-staging-sslip-179*` + `tami-default-reject.conf`, `nginx -t` + reload. Staging sslip cũ vẫn phục vụ.
+
+## 12. Production trên server mới (179.197.242.57, `tamihomes.vn`)
+
+> NHÁP (BL-112, phase-1-task-01): hoàn thiện sau khi chạy thật ở phase-4-task-02. Tiến độ + lệnh thực tế: `tasks/feature-production-new-server-tamihomes/`.
+
+Quyết định user 2026-11-06: production chuyển từ server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục 10) sang **cùng server mới với staging** (mục 11), tên miền `https://tamihomes.vn`
+(`www.tamihomes.vn` → 301 apex). Tên miền cũ `tami.genieplatform.cloud` → 301 `https://tamihomes.vn`. Không Cloudflare/CDN. Server cũ chỉ dừng container, không xoá dữ liệu.
+Nguyên tắc host dùng chung, quyền `deploy`, fingerprint host: §11.1. Mọi bước chạm server/GitHub: `[XÁC NHẬN]` của user trong chat.
+
+| Hạng mục | Giá trị |
+|---|---|
+| Compose | `docker/docker-compose.prod.yml`, project `tami`, app `127.0.0.1:3010` (staging `tami-staging` ở 3011, volume/network/container khác tên) |
+| Nginx | `docker/nginx/tami-prod-tamihomes-http.conf` (80: ACME + 301) + `tami-prod-tamihomes.conf` (443, `http2 on;`, www → apex, log_format `tami_prod`, upstream `tami_prod_app`) cùng `tami-staging-sslip-179*.conf` + `tami-default-reject.conf` |
+| Chứng chỉ | `certbot --cert-name tamihomes.vn`, SAN apex + www, `/etc/letsencrypt/live/tamihomes.vn/` |
+| HSTS / robots | HSTS `max-age=31536000` (không includeSubDomains/preload); production **không** `X-Robots-Tag` |
+| Postgres RAM | `mem_limit 1g`, `shared_buffers=256MB`, `effective_cache_size=768MB` (DB ~166 MB; host 7.7 GB dùng chung) |
+| Backup | pgBackRest + restic → R2 bucket `tami-prod-backup`, path MỚI `/tami-prod-s2` + `tami-prod-files-s2` (không ghi lẫn kho `/tami-prod` của server cũ; kho cũ giữ ≥ 30 ngày) |
+| Cổng deploy | `staging.history` cùng máy: staging ghi, production đọc đúng file đó (job `record-staging-pass` thừa → phase-4-task-01) |
+
+### 12.1 Thứ tự (phase-2 → phase-4)
+1. **P2.T01 — chuẩn bị server mới** (prod cũ vẫn chạy): kiểm `ss -ltnp | grep :3010` trống, `docker volume ls | grep '^tami_'` trống;
+   `/opt/tami/prod.env` chép từ server cũ qua pipe SSH (`ssh server-old 'sudo cat /opt/tami/prod.env' | ssh server 'sudo install -m 600 -o deploy -g deploy /dev/stdin /opt/tami/prod.env'`, không lưu trên máy dev, không in giá trị), chỉ đổi `NEXT_PUBLIC_SITE_URL=https://tamihomes.vn`; kiểm (chỉ tên biến/giá trị không bí mật) `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`, `BACKUP_ENV_DIR=/opt/tami/backup/production`;
+   `/opt/tami/backup/production/{pgbackrest.env,restic.env,ssh/}` chép tương tự, **đổi** `PGBACKREST_REPO1_PATH=/tami-prod-s2` và `RESTIC_REPOSITORY=…/tami-prod-files-s2` (`chown 999:999 ssh/`);
+   chép release `docker/` vào `/opt/tami/releases/production/<sha>/`, `$C build postgres backup`;
+   Nginx 80: copy `tami-prod-tamihomes-http.conf` → `sites-available/` + symlink, `sudo nginx -t`, `sudo systemctl reload nginx`;
+   cert: `sudo certbot certonly --webroot -w /var/www/certbot --cert-name tamihomes.vn -d tamihomes.vn -d www.tamihomes.vn --agree-tos --register-unsafely-without-email --non-interactive`,
+   kiểm `sudo certbot renew --dry-run --cert-name tamihomes.vn --no-random-sleep-on-renew` (KHÔNG `renew --dry-run` trần). 443 chưa bật.
+2. **P2.T02 — chạy thử**: `pg_dump -Fc` prod cũ (chỉ đọc) + chép 2 bucket → server mới, `$C up -d postgres redis seaweedfs seaweedfs-init` (chưa bật `backup`), `pg_restore`, đối chiếu (151 bảng, count các bảng chính, object/byte bucket);
+   `gh secret set -R DatDangg/bds-tami --env production` cho `DEPLOY_HOST=179.197.242.57`, `DEPLOY_USER=deploy`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` (như §11.1);
+   Actions → **Deploy production** với SHA đã có trong `staging.history` server mới; bật 443: copy `tami-prod-tamihomes.conf` → `sites-available/` + symlink, `nginx -t`, reload.
+3. **P2.T03 — backup + diễn tập restore**: `$C up -d backup`, `pg-backup.sh stanza-create` + `check`, `restic-backup.sh init`, `pg-backup.sh full`, `restic-backup.sh backup`; restore thử theo `docs/runbooks/restore.md` §3.1 + §4; kho cũ không bị đụng.
+4. **P3.T01 — cắt chuyển (downtime ~20–30 phút, user không sửa admin trong lúc này)**: server cũ `docker stop tami-app tami-jobs` (khoá ghi) → dump cuối + chép bucket →
+   server mới `docker stop tami-app tami-jobs tami-backup` (lịch pgBackRest không chạy giữa lúc restore), DROP + CREATE database `tami` (giữ cluster/system-id, stanza vẫn hợp lệ), `pg_restore`, thay object → **đối chiếu 100%** (lệch ⇒ DỪNG, không bật 301) →
+   `FLUSHALL` redis prod + ` up -d --force-recreate app jobs backup` (bỏ cache trang/Redis của dữ liệu thử P2.T02), health 200 → server cũ: thay symlink `sites-enabled/tami-prod-direct.conf` bằng `tami-prod-genieplatform-redirect.conf` (giữ bản sao), `nginx -t`, reload (cổng 80 + cert cũ giữ nguyên) → `pg-backup.sh full` + `restic-backup.sh backup`.
+5. **P3.T02 — smoke**: `https://tamihomes.vn/` 200 không `X-Robots-Tag`, `www`/http/tên miền cũ → 301, robots/sitemap/canonical dùng `https://tamihomes.vn`, `/api/metrics` + `/api/internal/x` → 404,
+   log `/var/log/nginx/tami-prod.access.log` cột đầu là IP thật, hostname lạ → TLS reject, outfitai vẫn 200, backup `OK wal`, theo dõi RAM/swap + `OOMKilled=false`.
+6. **P4**: gỡ job `record-staging-pass` (P4.T01); sau ≥ 1 ngày ổn định, `docker stop` + `docker update --restart=no` toàn bộ `tami-*` và `tami-staging-*` trên server cũ (không `down -v`, không xoá volume/`/opt/tami`); giữ vhost 301 + cổng 80 ACME trên server cũ.
+
+### 12.2 Rollback
+- Trước P3.T01: gỡ symlink 80/443 `tami-prod-tamihomes*` trên server mới, `$C down` (không `-v` nếu giữ dữ liệu thử). Secret Environment `production` cũ (khoá `tami-ci-deploy-prod`) đã bị ghi đè: muốn CI deploy lại server cũ phải đặt lại `DEPLOY_HOST=187.52.119.50` + known_hosts cũ và thêm `tami_ci_deploy.pub` vào `authorized_keys` server cũ; không cần CI để khôi phục prod cũ (bước kế).
+- Sau P3.T01 (prod cũ chưa dừng hẳn): server cũ trả symlink `tami-prod-direct.conf`, `nginx -t` + reload, `docker start tami-app tami-jobs` → `tami.genieplatform.cloud` chạy lại với dữ liệu cũ. Dữ liệu nhập trên `tamihomes.vn` sau cắt chuyển không có ở bản cũ (chép ngược tay nếu cần). `tamihomes.vn`: gỡ symlink 443 hoặc để nguyên; DNS không đổi.
+- Restore từ kho: `docs/runbooks/restore.md` (path kho mới `-s2`; kho cũ `/tami-prod`, `tami-prod-files` còn nguyên tới khi user quyết xoá).

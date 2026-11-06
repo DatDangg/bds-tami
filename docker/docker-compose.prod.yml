@@ -153,12 +153,14 @@ services:
       - ${BACKUP_ENV_DIR:?BACKUP_ENV_DIR bắt buộc (thư mục chứa pgbackrest.env, restic.env, ssh/; xem docs/runbooks/restore.md)}/pgbackrest.env
     # `DATABASE_URL_PROD` phải trỏ tới host `postgres`, cùng user/mật khẩu/db ở trên.
     # archive_timeout 300s: WAL đang ghi dở được đẩy lên kho tối đa mỗi 5 phút => RPO <= 15 phút kể cả khi một lần đẩy lỗi/chậm.
+    # Bộ nhớ: host prod mới (179.197.242.57, 7.7GB dùng chung staging + prod + dự án khác, available ~4.8GB) -> postgres trần 1g, shared_buffers 256MB,
+    # effective_cache_size 768MB. DB prod ~166MB nên vẫn dư; tăng lại (và mem_limit) khi DB lớn lên hoặc chuyển host rộng hơn.
     command:
       - postgres
       - -c
-      - shared_buffers=512MB
+      - shared_buffers=256MB
       - -c
-      - effective_cache_size=1536MB
+      - effective_cache_size=768MB
       - -c
       - max_connections=100
       - -c
@@ -181,7 +183,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    mem_limit: 2g
+    mem_limit: 1g
     restart: unless-stopped
     logging: *default-logging
     networks: [internal]
