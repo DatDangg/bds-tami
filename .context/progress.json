@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "production-new-server-tamihomes",
-    "phaseTask": "phase-3-task-01"
+    "phaseTask": "phase-4-task-01"
   },
   "features": [
     {
@@ -3589,6 +3589,18 @@
           "note": "cắt chuyển 08:28–08:33Z: khoá ghi cũ, dump cuối, DROP/CREATE (template0) + pg_restore, seaweedfs tar, đối chiếu 100% (149 bảng count, 43 migration, bucket 1595 chunk), FLUSHALL + force-recreate, tami.genieplatform.cloud 301 → tamihomes.vn; downtime cũ ~5m22s, mới ~4m12s; full 20261106-153347F + restic d1620215",
           "verify": "reviewer tự đếm lại: count/sequence/index/constraint khớp, system-id = stanza, 301 giữ path, nginx -t cũ OK",
           "completedAt": "2026-11-06"
+        },
+        {
+          "file": "tasks/feature-production-new-server-tamihomes/phase-4-task-01.md",
+          "task": "phase-4-task-01",
+          "status": "awaiting_push_verify",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-4-task-01-round-2-review.md",
+          "note": "gỡ job record-staging-pass + mode record-staging của ssh-deploy (trở về fd524e26~1); giữ deploy.sh record-staging làm lệnh tay; runbook §1/§11/§12 + ARCHITECTURE 1 dòng",
+          "verify": "deploy.test.sh PASS; grep .github sạch; còn verify sau push"
         }
       ]
     }
@@ -5556,7 +5568,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T08:46:30.741Z",
+  "lastUpdated": "2026-11-06T08:46:41.796Z",
   "approvalMilestones": [
     {
       "id": "M1",

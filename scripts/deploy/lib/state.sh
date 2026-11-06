@@ -21,8 +21,8 @@ record_success() {
   fi
 }
 
-# Chế độ record-staging (BL-111): staging và production ở 2 server khác nhau => staging.history của server production không còn do deploy staging ghi.
-# Job `record-staging-pass` (deploy.yml) chạy chế độ này trên server production sau khi staging deploy thành công: CHỈ thêm dòng
+# Chế độ record-staging (BL-111): dành cho khi staging và production ở 2 server khác nhau (staging.history của server production không còn do deploy staging ghi).
+# Từ BL-112 staging và production cùng máy nên không còn job CI nào gọi; đây là lệnh chạy tay (deploy.sh record-staging) trên server production: CHỈ thêm dòng
 # "<digest> <thời điểm> <sha>" vào staging.history dưới khoá chung. Không docker, không pull, không đụng release/symlink/container.
 # Đã có đúng cặp digest+SHA thì bỏ qua (không thêm dòng trùng): giữ nguyên vị trí dòng đầu => thứ tự "cũ hơn" trong history_line_of không đổi.
 # Cần: log, die, DRY_RUN, STATE_DIR, LOCK_WAIT_SECONDS, TARGET_IMAGE, RELEASE_SHA.

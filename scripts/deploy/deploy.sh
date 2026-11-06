@@ -9,7 +9,7 @@
 #             [--dry-run]                                        # chỉ in các bước, không chạy gì
 #             [--allow-older]                                    # CHỈ chạy tay: cho production nhận digest cũ hơn đang chạy (rollback)
 #   deploy.sh record-staging --release-sha <40 hex> --image ghcr.io/<owner>/<repo>@sha256:<64 hex> [--dry-run]
-#             # CHỈ ghi dòng vào staging.history (staging ở server khác; job record-staging-pass). Không docker/pull/release.
+#             # Công cụ CHỈ chạy tay (không còn job CI gọi từ BL-112; dùng lại nếu tách staging/production khác máy): ghi dòng vào staging.history. Không docker/pull/release.
 #
 # Thứ tự (migration chạy TRƯỚC khi đổi app/jobs):
 #   khoá -> kiểm release -> (production: digest+SHA đã qua staging, không cũ hơn) -> đổi symlink current -> compose config -> pull

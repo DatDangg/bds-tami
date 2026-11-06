@@ -9,7 +9,6 @@ Kiến trúc: `docs/ARCHITECTURE.md` §6.4. Quyết định: `.context/decisions
 push staging → CI (ci.yml) PASS → [workflow_run] Deploy:
   build   : GitHub runner build image, tag = commit SHA, push GHCR, lấy DIGEST
   staging : (tự động, Environment `staging`) SSH → deploy.sh staging  --image <repo>@<digest>
-  record-staging-pass : (Environment `production`, chỉ khi staging xanh) SSH → server PRODUCTION → deploy.sh record-staging  --image <repo>@<digest>  (chỉ ghi staging.history)
   (job summary in commit + digest vừa qua staging)
 
 chạy TAY: Actions → Deploy production → Run workflow (nhánh staging) → nhập commit SHA  [deploy-production.yml]
@@ -21,16 +20,11 @@ chạy TAY: Actions → Deploy production → Run workflow (nhánh staging) → 
   Thêm lớp bảo vệ ở server: `deploy.sh production` chỉ nhận cặp **digest + commit SHA** có trong `/opt/tami/state/staging.history`
   (dòng `<digest> <thời điểm> <sha>` do chính lần deploy staging **thành công** ghi), và **từ chối digest cũ hơn** `production.current`
   (trừ `--allow-older`, chỉ dùng tay, mục 5). Kiểm này chạy **trước khi pull**.
-- **Hai server (BL-111, từ khi staging chuyển sang server mới `179.197.242.57`, production giữ `187.52.119.50`)**: Environment `staging` và `production`
-  có bộ secret `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`/`DEPLOY_SSH_KNOWN_HOSTS` riêng, nên deploy staging **không còn** ghi `staging.history` trên server production.
-  Job `record-staging-pass` (`deploy.yml`, `needs: [build, deploy-staging]`, chỉ chạy khi cả hai xanh, cùng điều kiện nguồn như job `build`, `environment: production`)
-  SSH vào server production và chạy `deploy.sh record-staging --release-sha <sha> --image <repo>@<digest>` qua action `ssh-deploy` `mode: record-staging`:
-  chỉ thêm dòng `<digest> <thời điểm> <sha>` vào `/opt/tami/state/staging.history` dưới khoá `deploy.lock` chung, sau khi kiểm định dạng (image `ghcr.io/…@sha256:<64 hex>`, SHA 40 hex).
-  Không pull, không đụng docker/container/release/symlink; `scripts/deploy` đẩy vào thư mục tạm dưới `state/` và xoá ngay. Cặp digest+SHA đã có thì **bỏ qua** (không dòng trùng)
-  nên khi staging và production cùng một server (setup cũ) job này vô hại. Cổng thật vẫn là `deploy.sh production` (kiểm cặp digest+SHA + không cũ hơn). Hệ quả: Environment `production`
-  phải cho phép nhánh `staging` (nếu có deployment branch policy); job record fail thì production **từ chối** commit đó (đúng hướng an toàn) — chạy lại job `record-staging-pass` (Re-run) là đủ.
-  Rủi ro nhỏ: hai run staging liên tiếp có thể ghi history sai thứ tự, khi đó production báo "cũ hơn" và cần `--allow-older` chạy tay (mục 5).
-  `environment: production` trên job record tạo một mục deployment "production" trên GitHub ở MỖI lần push staging (không phải release thật). Nếu thêm wait timer / required reviewers / branch policy loại `staging` cho Environment `production` thì job này bị chặn hoặc treo chờ duyệt.
+- **Một server cho staging + production (BL-112, từ 2026-11-06)**: Environment `staging` và `production` cùng trỏ `179.197.242.57` (vẫn là hai bộ secret `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`/`DEPLOY_SSH_KNOWN_HOSTS` riêng),
+  nên `/opt/tami/state/staging.history` là **một file chung**: deploy staging thành công ghi trực tiếp dòng `<digest> <thời điểm> <sha>`, `deploy.sh production` đọc đúng file đó. Cổng "production chỉ nhận bản đã qua staging" giữ nguyên.
+  Không còn job CI nào dùng secret production khi push staging (job `record-staging-pass` của BL-111 đã gỡ ở BL-112 phase-4-task-01).
+  `deploy.sh record-staging --release-sha <sha> --image <repo>@<digest>` (+ `lib/state.sh record_staging_pass`, có test) được **giữ làm lệnh chạy tay**, chỉ dùng nếu sau này staging và production tách máy lần nữa:
+  chạy trên server production, thêm dòng vào `staging.history` dưới khoá `deploy.lock` chung (kiểm định dạng image/SHA, bỏ qua cặp đã có, không docker/release/symlink); khi đó phải dựng lại cơ chế ghi tự động (xem `git show fd524e26`).
 - **Release bất biến theo môi trường + SHA**: mã triển khai (`docker/`, `scripts/deploy/`) được upload vào
   `/opt/tami/releases/<env>/<sha>/` (giải nén sạch vào thư mục tạm rồi `mv -T` nguyên tử; SHA đã có thì giữ nguyên, **không ghi đè**),
   và `deploy.sh` chạy **từ chính release đó** (từ chối nếu script không nằm đúng `releases/<env>/<sha>`). Nhờ vậy production luôn
@@ -358,7 +352,7 @@ nội dung nhập lại qua admin.
 
 Quyết định user 2026-11-06 (BL-111, decisions.md Decision 12): staging chuyển sang server mới, Nginx host + Let's Encrypt, không Cloudflare/Tunnel, **không basic auth** (công khai + `noindex`). Hostname staging là sslip.io (`tamihomes.vn` dành cho production = BL-112, chưa làm).
 Staging sslip trên server cũ 187.52.119.50 (mục 9) chạy song song làm dự phòng tới khi user tắt.
-Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục 10);  cổng staging.history giữa 2 server: xem §1 (job record-staging-pass, BL-111 phase-1-task-02).
+Production ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục 10) tới BL-112 (nay cùng server mới, mục 12);  cổng staging.history giữa 2 server: xem §1 (một server từ BL-112; job record-staging-pass của BL-111 phase-1-task-02 đã gỡ).
 
 > Mọi bước chạm server thật: chỉ làm sau khi user xác nhận (`[XÁC NHẬN]`). Server dùng chung với dự án khác.
 
@@ -391,7 +385,7 @@ Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục
    `tami-default-reject.conf` (default_server 443, `ssl_reject_handshake`) chỉ cài trên host mới này, **không** cài lên server cũ. Cổng 80 giữ site `default` của gói nginx.
 5. Dữ liệu: chuyển postgres + SeaweedFS từ staging cũ sang (phase-2-task-02; ~147 MB + ~457 MB), không clone dữ liệu giữa staging và production.
 6. GitHub Environment `staging`: `DEPLOY_HOST=179.197.242.57`, `DEPLOY_USER=deploy`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` như 11.1 (phase-2-task-03); deploy lần đầu theo mục 1.
-   Thực tế 2026-11-06: Deploy run 42163804119 (commit `55e52730`) xanh cả 3 job; guard postgres qua (container dựng sẵn ở bước 5, không tạo lại), migrate xong, health OK; `staging.history` server cũ có dòng mới (job `record-staging-pass`). Dump tạm `/opt/tami/transfer` đã xoá sau review PASS.
+   Thực tế 2026-11-06: Deploy run 42163804119 (commit `55e52730`) xanh cả 3 job; guard postgres qua (container dựng sẵn ở bước 5, không tạo lại), migrate xong, health OK; `staging.history` server cũ có dòng mới (job `record-staging-pass`, đã gỡ ở BL-112). Dump tạm `/opt/tami/transfer` đã xoá sau review PASS.
 7. Smoke trước khi có Nginx/cert: tunnel `ssh -N -L 13011:127.0.0.1:3011 server` + `curl -H 'Host: 179-197-242-57.sslip.io' http://127.0.0.1:13011/...`. Đóng tunnel bằng **PID của chính tiến trình ssh đó** (không `taskkill /IM ssh.exe` / `pkill ssh` — làm rơi mọi phiên SSH khác, kể cả tới production). Qua tunnel không có Nginx nên app log cảnh báo "không xác định IP khách / chung 1 bucket rate limit" — bình thường, phải hết khi đi qua Nginx 443 (11.4).
 8. Turnstile: staging dùng **test key Cloudflare** (`1x00…`, luôn pass, chạy mọi hostname) → không cần khai hostname. Chỉ khi staging đổi sang site key thật mới phải thêm hostname `179-197-242-57.sslip.io` (Cloudflare → Turnstile → Hostname management).
 
@@ -418,7 +412,7 @@ Nguyên tắc host dùng chung, quyền `deploy`, fingerprint host: §11.1. Mọ
 | HSTS / robots | HSTS `max-age=31536000` (không includeSubDomains/preload); production **không** `X-Robots-Tag` |
 | Postgres RAM | `mem_limit 1g`, `shared_buffers=256MB`, `effective_cache_size=768MB` (DB ~166 MB; host 7.7 GB dùng chung) |
 | Backup | pgBackRest + restic → R2 bucket `tami-prod-backup`, path MỚI `/tami-prod-s2` + `tami-prod-files-s2` (không ghi lẫn kho `/tami-prod` của server cũ; kho cũ giữ ≥ 30 ngày) |
-| Cổng deploy | `staging.history` cùng máy: staging ghi, production đọc đúng file đó (job `record-staging-pass` thừa → phase-4-task-01) |
+| Cổng deploy | `staging.history` cùng máy: staging ghi, production đọc đúng file đó (job `record-staging-pass` đã gỡ ở phase-4-task-01) |
 
 ### 12.1 Thứ tự (phase-2 → phase-4)
 1. **P2.T01 — chuẩn bị server mới** (prod cũ vẫn chạy): kiểm `ss -ltnp | grep :3010` trống, `docker volume ls | grep '^tami_'` trống;
@@ -437,9 +431,15 @@ Nguyên tắc host dùng chung, quyền `deploy`, fingerprint host: §11.1. Mọ
    `FLUSHALL` redis prod + ` up -d --force-recreate app jobs backup` (bỏ cache trang/Redis của dữ liệu thử P2.T02), health 200 → server cũ: thay symlink `sites-enabled/tami-prod-direct.conf` bằng `tami-prod-genieplatform-redirect.conf` (giữ bản sao), `nginx -t`, reload (cổng 80 + cert cũ giữ nguyên) → `pg-backup.sh full` + `restic-backup.sh backup`.
 5. **P3.T02 — smoke**: `https://tamihomes.vn/` 200 không `X-Robots-Tag`, `www`/http/tên miền cũ → 301, robots/sitemap/canonical dùng `https://tamihomes.vn`, `/api/metrics` + `/api/internal/x` → 404,
    log `/var/log/nginx/tami-prod.access.log` cột đầu là IP thật, hostname lạ → TLS reject, outfitai vẫn 200, backup `OK wal`, theo dõi RAM/swap + `OOMKilled=false`.
-6. **P4**: gỡ job `record-staging-pass` (P4.T01); sau ≥ 1 ngày ổn định, `docker stop` + `docker update --restart=no` toàn bộ `tami-*` và `tami-staging-*` trên server cũ (không `down -v`, không xoá volume/`/opt/tami`); giữ vhost 301 + cổng 80 ACME trên server cũ.
+6. **P4**: gỡ job `record-staging-pass` (P4.T01, xong); sau ≥ 1 ngày ổn định, `docker stop` + `docker update --restart=no` toàn bộ `tami-*` và `tami-staging-*` trên server cũ (không `down -v`, không xoá volume/`/opt/tami`); giữ vhost 301 + cổng 80 ACME trên server cũ.
 
 ### 12.1a Deploy production đầu tiên trên server mới (thực tế 2026-11-06, BL-112 P2.T02)
+- **SHA bắt buộc `b75ff984540748a54dced24b87285d6512799bda`** (có trong `staging.history` server mới; schema = prod cũ `678b3568`). Release `/opt/tami/releases/production/b75ff984…/` + symlink `current` được dựng sẵn ở P2.T01 (`ssh-deploy` giữ nguyên thư mục release đã có; `deploy.sh` đòi script đúng đường dẫn này). Đổi SHA ⇒ phải dựng lại release + `$C build postgres backup` trước, nếu không guard postgres chặn.
+- Compose của `b75ff984` còn postgres `mem_limit 2g` / `shared_buffers 512MB`; mức 1g/256MB (bảng §12) chỉ áp dụng khi deploy commit >= `884e0ae2`.
+- Chạy thực: Actions **Deploy production** run `42183151702` (ref `staging`, input sha trên) xanh, 07:47:08Z → 07:48:10Z (~1 phút, 1 job). `production.current` = digest `sha256:edf4b378…`; `127.0.0.1:3010/api/health` 200.
+- Lưu ý: `deploy.sh` chạy `up -d` toàn stack nên **tự bật `tami-backup`** dù kho R2 mới chưa có stanza/repo restic: container ghi lỗi `FileMissingError backup.info` / `repository does not exist` và `archive_command` của postgres báo fail cho tới khi P2.T03 chạy `stanza-create` + `restic init`. Chỉ ảnh hưởng giai đoạn thử.
+- Trước khi deploy phải `$C up -d postgres redis seaweedfs seaweedfs-init` + restore dữ liệu (bản thử), như P2.T02.
+
 ### 12.1b Cắt chuyển thực tế (2026-11-06, BL-112 P3.T01)
 - Mốc UTC: khoá ghi server cũ (`docker stop tami-app tami-jobs`) 08:28:18 → dump cuối 08:28:48–08:28:51 (1 577 037 B, `pg_dump -Fc` pipe ssh→ssh) → server mới dừng app/jobs/backup/seaweedfs 08:29:05 → DROP + CREATE database + `pg_restore` xong 08:29:50 → tar seaweedfs (dừng seaweedfs cũ 08:30:12, chạy lại 08:32:30; ~226 MB qua pipe ssh mất ~2 phút) → đối chiếu 08:32:43 → `up -d --force-recreate app jobs backup` 08:33:12, health 200 08:33:17 → nginx server cũ 301 08:33:40.
 - **Downtime thực tế**: `tami.genieplatform.cloud` 08:28:18 → 08:33:40 (~5 phút 22 giây); `tamihomes.vn` (app mới) 08:29:05 → 08:33:17 (~4 phút 12 giây). Nhanh hơn ước tính 20–30 phút.
@@ -448,12 +448,6 @@ Nguyên tắc host dùng chung, quyền `deploy`, fingerprint host: §11.1. Mọ
 - Server cũ: `sites-enabled/tami-prod-direct.conf` được thay bằng symlink `tami-prod-genieplatform-redirect.conf` (file gốc vẫn ở `sites-available/`); cổng 80 + site staging sslip cũ không đổi. `curl -sI https://tami.genieplatform.cloud/du-an/x` → 301 `https://tamihomes.vn/du-an/x`.
 - Backup sau cắt chuyển: `pg-backup.sh full` 08:33:47→08:41:19 (full `20261106-153347F`, 82 MB, ~7,5 phút), `restic-backup.sh backup` 08:41:20 (snapshot `d1620215`, 245 MiB), `pgbackrest check` OK, WAL archive tiếp tục (`failed_count` đứng yên 44).
 - Dump cuối `/opt/tami/transfer/prod-final.dump` đã xoá sau review PASS (08:46Z).
-
-- **SHA bắt buộc `b75ff984540748a54dced24b87285d6512799bda`** (có trong `staging.history` server mới; schema = prod cũ `678b3568`). Release `/opt/tami/releases/production/b75ff984…/` + symlink `current` được dựng sẵn ở P2.T01 (`ssh-deploy` giữ nguyên thư mục release đã có; `deploy.sh` đòi script đúng đường dẫn này). Đổi SHA ⇒ phải dựng lại release + `$C build postgres backup` trước, nếu không guard postgres chặn.
-- Compose của `b75ff984` còn postgres `mem_limit 2g` / `shared_buffers 512MB`; mức 1g/256MB (bảng §12) chỉ áp dụng khi deploy commit >= `884e0ae2`.
-- Chạy thực: Actions **Deploy production** run `42183151702` (ref `staging`, input sha trên) xanh, 07:47:08Z → 07:48:10Z (~1 phút, 1 job). `production.current` = digest `sha256:edf4b378…`; `127.0.0.1:3010/api/health` 200.
-- Lưu ý: `deploy.sh` chạy `up -d` toàn stack nên **tự bật `tami-backup`** dù kho R2 mới chưa có stanza/repo restic: container ghi lỗi `FileMissingError backup.info` / `repository does not exist` và `archive_command` của postgres báo fail cho tới khi P2.T03 chạy `stanza-create` + `restic init`. Chỉ ảnh hưởng giai đoạn thử.
-- Trước khi deploy phải `$C up -d postgres redis seaweedfs seaweedfs-init` + restore dữ liệu (bản thử), như P2.T02.
 
 ### 12.2 Rollback
 - Trước P3.T01: gỡ symlink 80/443 `tami-prod-tamihomes*` trên server mới, `$C down` (không `-v` nếu giữ dữ liệu thử). Secret Environment `production` cũ (khoá `tami-ci-deploy-prod`) đã bị ghi đè: muốn CI deploy lại server cũ phải đặt lại `DEPLOY_HOST=187.52.119.50` + known_hosts cũ và thêm `tami_ci_deploy.pub` vào `authorized_keys` server cũ; không cần CI để khôi phục prod cũ (bước kế).
