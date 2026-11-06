@@ -439,6 +439,13 @@ Nguyên tắc host dùng chung, quyền `deploy`, fingerprint host: §11.1. Mọ
    log `/var/log/nginx/tami-prod.access.log` cột đầu là IP thật, hostname lạ → TLS reject, outfitai vẫn 200, backup `OK wal`, theo dõi RAM/swap + `OOMKilled=false`.
 6. **P4**: gỡ job `record-staging-pass` (P4.T01); sau ≥ 1 ngày ổn định, `docker stop` + `docker update --restart=no` toàn bộ `tami-*` và `tami-staging-*` trên server cũ (không `down -v`, không xoá volume/`/opt/tami`); giữ vhost 301 + cổng 80 ACME trên server cũ.
 
+### 12.1a Deploy production đầu tiên trên server mới (thực tế 2026-11-06, BL-112 P2.T02)
+- **SHA bắt buộc `b75ff984540748a54dced24b87285d6512799bda`** (có trong `staging.history` server mới; schema = prod cũ `678b3568`). Release `/opt/tami/releases/production/b75ff984…/` + symlink `current` được dựng sẵn ở P2.T01 (`ssh-deploy` giữ nguyên thư mục release đã có; `deploy.sh` đòi script đúng đường dẫn này). Đổi SHA ⇒ phải dựng lại release + `$C build postgres backup` trước, nếu không guard postgres chặn.
+- Compose của `b75ff984` còn postgres `mem_limit 2g` / `shared_buffers 512MB`; mức 1g/256MB (bảng §12) chỉ áp dụng khi deploy commit >= `884e0ae2`.
+- Chạy thực: Actions **Deploy production** run `42183151702` (ref `staging`, input sha trên) xanh, 07:47:08Z → 07:48:10Z (~1 phút, 1 job). `production.current` = digest `sha256:edf4b378…`; `127.0.0.1:3010/api/health` 200.
+- Lưu ý: `deploy.sh` chạy `up -d` toàn stack nên **tự bật `tami-backup`** dù kho R2 mới chưa có stanza/repo restic: container ghi lỗi `FileMissingError backup.info` / `repository does not exist` và `archive_command` của postgres báo fail cho tới khi P2.T03 chạy `stanza-create` + `restic init`. Chỉ ảnh hưởng giai đoạn thử.
+- Trước khi deploy phải `$C up -d postgres redis seaweedfs seaweedfs-init` + restore dữ liệu (bản thử), như P2.T02.
+
 ### 12.2 Rollback
 - Trước P3.T01: gỡ symlink 80/443 `tami-prod-tamihomes*` trên server mới, `$C down` (không `-v` nếu giữ dữ liệu thử). Secret Environment `production` cũ (khoá `tami-ci-deploy-prod`) đã bị ghi đè: muốn CI deploy lại server cũ phải đặt lại `DEPLOY_HOST=187.52.119.50` + known_hosts cũ và thêm `tami_ci_deploy.pub` vào `authorized_keys` server cũ; không cần CI để khôi phục prod cũ (bước kế).
 - Sau P3.T01 (prod cũ chưa dừng hẳn): server cũ trả symlink `tami-prod-direct.conf`, `nginx -t` + reload, `docker start tami-app tami-jobs` → `tami.genieplatform.cloud` chạy lại với dữ liệu cũ. Dữ liệu nhập trên `tamihomes.vn` sau cắt chuyển không có ở bản cũ (chép ngược tay nếu cần). `tamihomes.vn`: gỡ symlink 443 hoặc để nguyên; DNS không đổi.

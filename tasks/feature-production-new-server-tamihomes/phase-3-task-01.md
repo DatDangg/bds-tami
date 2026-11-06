@@ -12,6 +12,7 @@
 - User **không sửa nội dung trong /admin** từ lúc bắt đầu tới khi báo xong.
 
 ## Việc
+0. (review P2.T02 MINOR) Trước khi restore: đếm `leads` + bảng có `updated_at` mới trên prod MỚI so với bản thử (P2.T02 Evidence) — có dữ liệu nhập trên tamihomes.vn sau 07:47Z thì báo/giữ lại trước khi ghi đè.
 1. Server cũ — khoá ghi: `docker stop tami-app tami-jobs` (không `down`, không `-v`). Site cũ tạm lỗi 502.
 2. Dump cuối `pg_dump -Fc` + chép 2 bucket prod → server mới (`/opt/tami/transfer`).
 3. Server mới: `docker stop tami-app tami-jobs tami-backup`; DROP + CREATE database `tami` trong cùng cluster (giữ system-id ⇒ stanza backup vẫn hợp lệ) rồi `pg_restore`; xoá object cũ + chép object mới vào 2 bucket.
