@@ -79,10 +79,8 @@
     "Rate limit tính theo IP thật của client (không phải IP proxy)",
     "Link chia sẻ Zalo/Facebook chứa host mới"
   ],
-  "knownBlockers": [
-    "Turnstile DỰ KIẾN FAIL (form liên hệ/ứng tuyển/newsletter) cho tới khi user thêm hostname 179-197-242-57.sslip.io vào site key staging — đánh dấu known blocker, không báo bug"
-  ],
-  "testNotes": "Nội dung (không phải code): menu header 'Dự án 1/2' link tuyệt đối tới host sslip cũ — đã biết, không báo bug code. Dữ liệu staging là bản copy lúc ~04:09Z/04:11Z 2026-11-06.",
+  "knownBlockers": [],
+  "testNotes": "Turnstile staging dùng test key Cloudflare (1x00…, luôn pass, mọi hostname) — form liên hệ/ứng tuyển/newsletter phải chạy bình thường. Nội dung (không phải code): menu header 'Dự án 1/2' link tuyệt đối tới host sslip cũ — đã biết, không báo bug code. Dữ liệu staging là bản copy lúc ~04:09Z/04:11Z 2026-11-06.",
   "risk": "medium",
   "riskNote": "Thay đổi môi trường/hạ tầng, không đổi code ứng dụng.",
   "reviewReport": [

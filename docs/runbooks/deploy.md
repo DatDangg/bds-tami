@@ -391,7 +391,7 @@ Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục
 6. GitHub Environment `staging`: `DEPLOY_HOST=179.197.242.57`, `DEPLOY_USER=deploy`, `DEPLOY_SSH_KEY`, `DEPLOY_SSH_KNOWN_HOSTS` như 11.1 (phase-2-task-03); deploy lần đầu theo mục 1.
    Thực tế 2026-11-06: Deploy run 42163804119 (commit `55e52730`) xanh cả 3 job; guard postgres qua (container dựng sẵn ở bước 5, không tạo lại), migrate xong, health OK; `staging.history` server cũ có dòng mới (job `record-staging-pass`). Dump tạm `/opt/tami/transfer` đã xoá sau review PASS.
 7. Smoke trước khi có Nginx/cert: tunnel `ssh -N -L 13011:127.0.0.1:3011 server` + `curl -H 'Host: 179-197-242-57.sslip.io' http://127.0.0.1:13011/...`. Đóng tunnel bằng **PID của chính tiến trình ssh đó** (không `taskkill /IM ssh.exe` / `pkill ssh` — làm rơi mọi phiên SSH khác, kể cả tới production). Qua tunnel không có Nginx nên app log cảnh báo "không xác định IP khách / chung 1 bucket rate limit" — bình thường, phải hết khi đi qua Nginx 443 (11.4).
-8. `[USER]` Turnstile: site key staging phải cho phép hostname `179-197-242-57.sslip.io` (Cloudflare dashboard → Turnstile → site → Hostname management). Thiếu thì form liên hệ/ứng tuyển/newsletter lỗi xác minh trên host mới. Trạng thái 2026-11-06: **chưa thêm** (BACKLOG BL-111 residual).
+8. Turnstile: staging dùng **test key Cloudflare** (`1x00…`, luôn pass, chạy mọi hostname) → không cần khai hostname. Chỉ khi staging đổi sang site key thật mới phải thêm hostname `179-197-242-57.sslip.io` (Cloudflare → Turnstile → Hostname management).
 
 ### 11.4 Smoke
 - `curl -sI http://179-197-242-57.sslip.io/` → 301 sang https; `curl -sI https://179-197-242-57.sslip.io/` → 200 + `X-Robots-Tag: noindex, nofollow, noarchive` + HSTS `max-age=86400`.

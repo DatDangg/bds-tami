@@ -62,4 +62,6 @@ Classification dự kiến: MODIFY (hạ tầng deploy/runbook, không đổi be
 
 ## Kết quả (close-out 2026-11-06)
 - Done: P1.01 `940ab50c`, P1.02 `fd524e26`, P2.01 `e49d01f2`, P2.02 `55e52730`, P2.03 `0bcab51d`, P3.01 `98c08b2a`, P3.02 close-out. Mọi task Reviewer PASS (P3.01 PASS r2). Spec-validation PASS (`.context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-spec-validation.md`). Spec 1.62.1 (PATCH), test-scope v108 (base URL staging `https://179-197-242-57.sslip.io`).
-- Residual chờ user: Turnstile hostname `179-197-242-57.sslip.io` (U2); đăng nhập admin + tải CV thật; menu CMS link tuyệt đối tới sslip cũ; báo chủ outfitai (443 default/ACME account/hook dùng chung); quyết định tắt staging cũ (đang đóng băng ở `678b3568`).
+- Residual chờ user: đăng nhập admin + tải CV thật; menu CMS link tuyệt đối tới sslip cũ; báo chủ outfitai (443 default/ACME account/hook dùng chung); quyết định tắt staging cũ (đang đóng băng ở `678b3568`).
+
+- 2026-11-06 đính chính: staging dùng Turnstile test key Cloudflare (`1x00…`, mọi hostname) → U2 (thêm hostname) KHÔNG cần.
