@@ -20,6 +20,7 @@
 6. Bật 443: `tami-prod-tamihomes.conf` → sites-available + symlink, `nginx -t`, reload.
 
 ## Verify
+- (review P2.T01 MINOR) Bổ sung runbook §12: deploy prod đầu tiên PHẢI là SHA `b75ff984` (release dựng sẵn; đổi SHA thì dựng lại), compose b75ff984 còn postgres 2g/512MB — 1g/256MB áp dụng khi deploy commit ≥ 884e0ae2.
 - Run Deploy production xanh; `curl -s http://127.0.0.1:3010/api/health` = 200 trên server; `/opt/tami/state/production.current` có digest đúng.
 - `curl -sI https://tamihomes.vn/` 200, không `X-Robots-Tag`; `https://www.tamihomes.vn/x` → 301 `https://tamihomes.vn/x`; staging `https://179-197-242-57.sslip.io` vẫn 200 + noindex.
 - `docker stats` tổng RAM tami (staging + prod) + `free -h` (swap không tăng liên tục sau 15 phút).

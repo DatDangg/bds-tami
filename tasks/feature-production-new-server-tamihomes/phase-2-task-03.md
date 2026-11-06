@@ -22,4 +22,4 @@
 - [ ] Backup production chạy + restore thử PASS trên server mới (acceptance change doc).
 
 ## Retry / Escalation
-stanza/check lỗi do system-id → kiểm đúng path mới, KHÔNG `stanza-delete` kho cũ. 3 attempt fail → `architecture_review_needed`.
+stanza/check lỗi do system-id → kiểm đúng path mới, KHÔNG `stanza-delete` kho cũ. `stanza-create` / `restic init` báo kho `-s2` đã có dữ liệu → DỪNG, không `--force` (review P2.T01 MINOR). 3 attempt fail → `architecture_review_needed`.
