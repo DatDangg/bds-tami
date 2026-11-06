@@ -2,7 +2,7 @@
 
 - Change doc: `spec/changes/2026-11-06-staging-new-server-nginx-tamihomes.md` (user chốt: chuyển DB + media public + CV private; staging cũ giữ chạy, không xoá).
 - Phụ thuộc: phase-2-task-01. Không cần DNS.
-- Trạng thái: `pending`. Thực thi qua SSH `server-old` (CHỈ ĐỌC + `pg_dump` + 1 lần dừng ngắn seaweedfs) và `server`.
+- Trạng thái: `done` — STRICT PASS r1 (`.context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-02-round-1-review.md`), 2026-11-06; dữ liệu chốt lúc ~04:09Z (DB) / 04:11Z (media). Thực thi qua SSH `server-old` (CHỈ ĐỌC + `pg_dump` + 1 lần dừng ngắn seaweedfs) và `server`.
 
 ## Classification / Risk
 - Type: MODIFY hạ tầng — sao dữ liệu staging (KHÔNG phải staging→prod; prod không đụng).
@@ -39,3 +39,17 @@ Số dòng bảng cũ/mới, sha256 dump, số object/bucket, `docker ps` 2 serv
 
 ## Retry / Escalation
 pg_restore/tar lỗi → dừng, báo; không thử biến thể quá 2 lần. 3 attempt fail → `architecture_review_needed`.
+
+## Evidence (builder, 2026-11-06)
+- Env: pipe server-old → server, `deploy:deploy 600`; `NEXT_PUBLIC_SITE_URL=https://staging.tamihomes.vn` (grep -c = 1); `TRUST_|BACKUP_|APP_ENV` = 0 dòng. Không in giá trị.
+- Release: tar pipe `678b3568…` (docker/ + scripts/, 300K) → cùng đường dẫn, chủ deploy; `releases/staging/current` → symlink tuyệt đối `/opt/tami/releases/staging/678b3568…` (khớp `activate_release`: `ln -sfn $REPO_DIR`).
+- Dựng: `TAMI_IMAGE=placeholder@sha256:000…` (chỉ interpolate); build `tami-postgis:17-3.5-bookworm`; up postgres/redis/seaweedfs/seaweedfs-init → healthy; init exit 0. Lưu ý: `sudo -u deploy docker compose` phải `cd /opt/tami` trước (cwd /root → "stat .: permission denied").
+- Postgres: dump `-Fc` 2 248 713 B, sha256 `0587057a402e0d4d1b18a75166b183686f3379e7dd3011985fe430467ac7a963`, file `/opt/tami/transfer/staging-20261106110953.dump` (700/600 deploy; giữ tới sau phase-2-task-03).
+  - Decision log: init.sql đã tạo 6 extension + schema tiger/tiger_data/topology → `pg_restore --exit-on-error` xung đột. Vì DB mới trống: `DROP EXTENSION … CASCADE` + `DROP SCHEMA tiger,tiger_data,topology CASCADE` rồi restore nguyên dump (extension do dump tạo lại, cùng image/phiên bản). Lần 2 restore OK, không lỗi.
+  - Đếm hàng toàn bộ 157 bảng public cũ vs mới: IDENTICAL (diff rỗng). leads 34, media 829, news 38, private_files 2, projects 71, rentals 59, payload_migrations 43, spatial_ref_sys 8500. Migration cuối cả hai: `20261017_031052_categories_developers`. 7 extension giống nhau.
+- SeaweedFS: dừng cũ lúc 04:11:35Z, start lại 04:12:41Z ⇒ **downtime ≈ 66 s** (+ ~vài giây health warmup; healthy sau ~40 s). Volume mới xoá nội dung khởi tạo trước, untar nguyên (tar rc 0/0).
+  - `s3.bucket.list`/`fs.du` cũ = mới: public size 454412160 / logical 453069295 / 3540 chunk; private size 26696 / 2 chunk.
+  - Tải thử 1 ảnh public qua filer nội bộ: cũ và mới cùng 469803 B, sha256 (16 đầu) `de3d958d86fc5555`. CV private: chỉ so chunk/size (không tải nội dung).
+- Server mới sau cùng: tami-staging-postgres/redis/seaweedfs healthy (mem 110/5/152 MiB); `free`: used 3.4Gi, available 4.3Gi, swap dùng ít; đĩa 36%; container dự án khác: supabase/airoom như trước; RIÊNG outfit-changer-api-1 + worker-1 crash-loop (exit 1, ~17 restart) và caddy-1 created chưa start — do chủ dự án đó dựng lại /opt/outfit-changer lúc 04:01Z (thư mục cũ đổi tên outfit-changer-old-20261106-0401), KHÔNG do TAMI (reviewer r1 MINOR-1) (airoom-b1-api, supabase-storage, supabase-rest `unhealthy` có sẵn từ trước).
+- Server cũ sau cùng: tami-staging-app healthy (`/api/health` 200), postgres/redis healthy, seaweedfs healthy sau start lại; prod không đụng; không xoá gì.
+- Chưa chạy app/jobs/migrate trên server mới (phase-2-task-03).
