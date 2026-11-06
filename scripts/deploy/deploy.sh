@@ -8,6 +8,8 @@
 #             [--registry-user <user> --registry-token-stdin]   # token đọc từ stdin, không qua argv/log
 #             [--dry-run]                                        # chỉ in các bước, không chạy gì
 #             [--allow-older]                                    # CHỈ chạy tay: cho production nhận digest cũ hơn đang chạy (rollback)
+#   deploy.sh record-staging --release-sha <40 hex> --image ghcr.io/<owner>/<repo>@sha256:<64 hex> [--dry-run]
+#             # CHỈ ghi dòng vào staging.history (staging ở server khác; job record-staging-pass). Không docker/pull/release.
 #
 # Thứ tự (migration chạy TRƯỚC khi đổi app/jobs):
 #   khoá -> kiểm release -> (production: digest+SHA đã qua staging, không cũ hơn) -> đổi symlink current -> compose config -> pull
@@ -70,7 +72,7 @@ run() {
 }
 
 usage() {
-  sed -n '2,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
   exit 2
 }
 
@@ -327,7 +329,28 @@ deploy() {
   exit "$ROLLBACK_FAILED_EXIT"
 }
 
+# record-staging: parse tối giản, cùng kiểm định dạng digest/SHA như deploy; không preflight (không cần docker/env file/release layout).
+record_staging_main() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --image | --release-sha) [[ $# -ge 2 ]] || die "$1 cần giá trị" ;;&
+      --image) TARGET_IMAGE="$2"; shift 2 ;;
+      --release-sha) RELEASE_SHA="$2"; shift 2 ;;
+      --dry-run) DRY_RUN=true; shift ;;
+      *) die "tham số lạ: $1" ;;
+    esac
+  done
+  [[ $TARGET_IMAGE =~ $IMAGE_PATTERN ]] || die "--image phải theo digest: ghcr.io/<repo>@sha256:<64 hex> (không dùng tag/latest)"
+  [[ $RELEASE_SHA =~ $SHA_PATTERN ]] || die "--release-sha phải là commit SHA đầy đủ (40 hex)"
+  record_staging_pass
+}
+
 main() {
+  if [[ ${1:-} == record-staging ]]; then
+    shift
+    record_staging_main "$@"
+    return
+  fi
   parse_args "$@"
   configure_env
   if [[ $DRY_RUN == false ]]; then

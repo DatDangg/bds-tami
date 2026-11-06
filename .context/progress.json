@@ -1,6 +1,11 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": null,
+  "activeWorkItem": {
+    "type": "feature",
+    "slug": "staging-new-server-nginx-tamihomes",
+    "phaseTask": "phase-1",
+    "journal": ".context/runs/feature-staging-new-server-nginx-tamihomes-intake.md"
+  },
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3400,6 +3405,71 @@
       "report": ".context/review-reports/feature-bathrooms-filter-phase-1-task-01-round-1-review.md",
       "docImpact": "docs/API_SPEC.md (§3.3 bathrooms, khoá trang Cho thuê, bảng Tin BĐS); .context/design-spec.md (BL-052 Theo màn S04/S05, S08)",
       "completedAt": "2026-11-02"
+    },
+    {
+      "slug": "staging-new-server-nginx-tamihomes",
+      "title": "Chuyển staging sang server mới 179.197.242.57 + Nginx/Let's Encrypt staging.tamihomes.vn (BL-111)",
+      "type": "MODIFY",
+      "status": "in-progress",
+      "currentPhase": 2,
+      "backlog": "BL-111",
+      "changeDoc": "spec/changes/2026-11-06-staging-new-server-nginx-tamihomes.md",
+      "startedAt": "2026-11-06",
+      "planApprovedAt": "2026-11-06 (user: cứ làm đi, đến đâu cần thì bảo — Q1 không basic auth, Q2 phương án A, Q3 dừng seaweedfs cũ, Q4 builder sinh key CI)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-01-round-1-review.md",
+          "note": "vhost tami-staging-tamihomes{,-http}.conf + tami-default-reject.conf (ssl_reject_handshake), http2 on, không basic auth (Q1); runbook §11, ARCHITECTURE §6.1–6.3, Decision 12, project-config, .env.example; 5 MINOR doc sửa trước commit",
+          "verify": "nginx -t nginx:1.28-alpine PASS (cert giả) + chạy thử container; deploy.test.sh PASS; compose config -q PASS",
+          "completedAt": "2026-11-06"
+        },
+        {
+          "task": "phase-1-task-02",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-1-task-02.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-02-round-1-review.md",
+          "note": "job record-staging-pass (environment production) + ssh-deploy mode record-staging + deploy.sh record-staging (validate image/SHA, flock, bỏ qua dòng trùng); M2–M5 sửa trước commit, M1 (thứ tự history khi 2 push liền) đã ghi runbook",
+          "verify": "deploy.test.sh PASS (20 ca mới) local + trên server Linux mới (kể cả ca lock); bash -n; YAML parse",
+          "completedAt": "2026-11-06"
+        },
+        {
+          "task": "phase-2-task-01",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-2-task-01.md",
+          "status": "in_review",
+          "attempt": 1
+        },
+        {
+          "task": "phase-2-task-02",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-2-task-02.md",
+          "status": "pending"
+        },
+        {
+          "task": "phase-2-task-03",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-2-task-03.md",
+          "status": "pending"
+        },
+        {
+          "task": "phase-3-task-01",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-3-task-01.md",
+          "status": "pending"
+        },
+        {
+          "task": "phase-3-task-02",
+          "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-3-task-02.md",
+          "status": "pending"
+        }
+      ]
     }
   ],
   "bugs": [
@@ -5365,7 +5435,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-02T04:39:02.630Z",
+  "lastUpdated": "2026-11-06T04:02:24.449Z",
   "approvalMilestones": [
     {
       "id": "M1",

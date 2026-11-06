@@ -2,7 +2,7 @@
 # Test nhỏ cho deploy.sh + lib/*.sh, không cần Docker/server: `bash scripts/deploy/deploy.test.sh` (phần symlink chỉ chạy trên Linux).
 # Phủ: cổng HIGH_RISK_MIGRATION (kể cả DB đích trống không chặn), kiểm tra tham số (cấm tag/latest, --release-sha), thứ tự --dry-run, chọn đúng release theo env+SHA
 # (từ chối SHA/env lệch), production chỉ nhận digest+SHA đã qua staging và không cũ hơn, rollback khi `compose up` lỗi (exit 1/3),
-# jobs ổn định, container tạm luôn bị xoá, guard image postgres (container chạy image khác compose => die, không tự đổi image trên volume cũ;
+# record-staging (BL-111: chỉ ghi staging.history, không docker, có khoá, dry-run), jobs ổn định, container tạm luôn bị xoá, guard image postgres (container chạy image khác compose => die, không tự đổi image trên volume cũ;
 # không container nhưng volume postgres-data đã có => die trừ PG_IMAGE_SWITCH_CONFIRMED=1).
 # shellcheck disable=SC2016,SC2034,SC2329 # bash -c nhận tham số vị trí; biến/hàm stub được dùng gián tiếp bởi deploy.sh đã source
 set -euo pipefail
@@ -456,6 +456,77 @@ test_gate_removes_temp_container() {
   expect "docker cp lỗi => container tạm vẫn bị xoá" grep -q 'docker rm -f cid123' "$WORK/calls"
 }
 
+
+# --- record-staging (BL-111): chỉ ghi staging.history, không docker/release, có khoá, không trùng ---
+run_record() { # run_record <state-dir> <args...> ; docker/flock-thật: PATH có stub docker ghi vào $WORK/docker_calls
+  local state="$1"
+  shift
+  STATE_DIR="$state" PATH="$WORK/stubbin:$PATH" bash "$SCRIPT" record-staging "$@"
+}
+
+test_record_staging() {
+  local st="$WORK/rec-state" out rc
+  mkdir -p "$WORK/stubbin"
+  printf '#!/bin/sh\necho "$@" >> "%s/docker_calls"\nexit 1\n' "$WORK" > "$WORK/stubbin/docker"
+  chmod +x "$WORK/stubbin/docker"
+  # flock: ghi lại lệnh gọi rồi dùng flock thật nếu có (Git Bash/Windows không có flock => coi như lấy được khoá)
+  printf '#!/bin/sh
+echo "$@" >> "%s/flock_calls"
+PATH="${PATH#*stubbin:}"
+real="$(command -v flock)" && exec "$real" "$@"
+exit 0
+' "$WORK" > "$WORK/stubbin/flock"
+  chmod +x "$WORK/stubbin/flock"
+  : > "$WORK/flock_calls"
+  : > "$WORK/docker_calls"
+  run_record "$st" --release-sha "$SHA1" --image "$IMAGE" > /dev/null 2>&1
+  expect "record-staging: ghi đúng 1 dòng '<digest> <time> <sha>'" bash -c '[[ "$(wc -l < "$1")" == 1 ]] && grep -Eq "^$2 [0-9T:Z-]+ $3$" "$1"' _ "$st/staging.history" "$DIGEST" "$SHA1"
+  run_record "$st" --release-sha "$SHA1" --image "$IMAGE" > /dev/null 2>&1
+  expect "record-staging: cùng digest+SHA => bỏ qua, không thêm dòng trùng" test "$(wc -l < "$st/staging.history")" == 1
+  run_record "$st" --release-sha "$SHA2" --image "ghcr.io/example/tami@$DIGEST_B" > /dev/null 2>&1
+  expect "record-staging: cặp khác => thêm dòng mới ở cuối" test "$(wc -l < "$st/staging.history")" == 2 -a "$(tail -n1 "$st/staging.history" | cut -d' ' -f1,3)" == "$DIGEST_B $SHA2"
+  expect "record-staging: lấy khoá chung (flock trên deploy.lock)" test -s "$WORK/flock_calls"
+  expect "record-staging: không gọi docker" test ! -s "$WORK/docker_calls"
+  expect "record-staging: không tạo release/symlink/state khác ngoài history + lock" test "$(ls -A "$st" | sort | tr '\n' ' ')" == "deploy.lock staging.history "
+  expect "record-staging: dòng ghi qua record được production chấp nhận (digest+SHA)" bash -c '
+    source "$1"; STATE_DIR="$2" TARGET_ENV=production DRY_RUN=false RELEASE_SHA="$4" TARGET_IMAGE="ghcr.io/example/tami@$3" ALLOW_OLDER=false
+    require_staging_passed' _ "$SCRIPT" "$st" "$DIGEST_B" "$SHA2"
+  expect "record-staging: history_line_of thấy thứ tự theo dòng append" test "$(STATE_DIR="$st" history_line_of "$DIGEST_B")" == 2
+  local bad
+  for bad in "ghcr.io/example/tami:latest" "ghcr.io/example/tami@sha256:abc" "docker.io/x/y@$DIGEST" "ghcr.io/example/tami@sha256:$(printf 'A%.0s' {1..64})"; do
+    rc=0
+    run_record "$WORK/rec-bad" --release-sha "$SHA1" --image "$bad" > /dev/null 2>&1 || rc=$?
+    expect "record-staging: từ chối image sai định dạng: ${bad:0:40}" test "$rc" != 0 -a ! -e "$WORK/rec-bad"
+  done
+  for bad in "" "abc" "${SHA1}0" "$(printf 'G%.0s' {1..40})"; do
+    rc=0
+    run_record "$WORK/rec-bad" --release-sha "$bad" --image "$IMAGE" > /dev/null 2>&1 || rc=$?
+    expect "record-staging: từ chối SHA sai định dạng: '${bad:0:12}'" test "$rc" != 0 -a ! -e "$WORK/rec-bad"
+  done
+  rc=0
+  run_record "$WORK/rec-bad" --image "$IMAGE" > /dev/null 2>&1 || rc=$?
+  expect "record-staging: thiếu --release-sha => từ chối" test "$rc" != 0 -a ! -e "$WORK/rec-bad"
+  rc=0
+  run_record "$WORK/rec-bad" --release-sha "$SHA1" --image "$IMAGE" --registry-token-stdin > /dev/null 2>&1 || rc=$?
+  expect "record-staging: tham số của deploy (--registry-token-stdin) bị từ chối" test "$rc" != 0
+  out="$(run_record "$WORK/rec-dry" --release-sha "$SHA1" --image "$IMAGE" --dry-run)"
+  expect "record-staging: dry-run chỉ in, không tạo file/thư mục" bash -c 'grep -q "^\[dry-run\]" <<< "$1" && [[ ! -e "$2" ]]' _ "$out" "$WORK/rec-dry"
+  # Khoá: giữ deploy.lock ở process khác => record chờ rồi die (LOCK_WAIT_SECONDS ngắn), không ghi history.
+  if command -v flock > /dev/null; then
+    mkdir -p "$WORK/rec-lock"
+    (
+      exec 8> "$WORK/rec-lock/deploy.lock"
+      flock 8
+      rc=0
+      STATE_DIR="$WORK/rec-lock" LOCK_WAIT_SECONDS=1 bash "$SCRIPT" record-staging --release-sha "$SHA1" --image "$IMAGE" > /dev/null 2>&1 || rc=$?
+      printf '%s' "$rc" > "$WORK/rec-lock.rc"
+    )
+    expect "record-staging: dùng deploy.lock chung (lock bị giữ => die, không ghi)" test "$(< "$WORK/rec-lock.rc")" != 0 -a ! -e "$WORK/rec-lock/staging.history"
+  else
+    printf 'SKIP  record-staging lock: không có flock\n'
+  fi
+}
+
 make_migrations
 test_find_high_risk
 test_gate
@@ -474,6 +545,7 @@ test_deploy_base_services_call_site
 test_guard_postgres_image
 test_jobs_running
 test_gate_removes_temp_container
+test_record_staging
 
 if [[ $FAILURES -gt 0 ]]; then
   printf '%s test FAIL\n' "$FAILURES"

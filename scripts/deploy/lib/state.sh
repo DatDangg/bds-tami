@@ -21,6 +21,29 @@ record_success() {
   fi
 }
 
+# Chế độ record-staging (BL-111): staging và production ở 2 server khác nhau => staging.history của server production không còn do deploy staging ghi.
+# Job `record-staging-pass` (deploy.yml) chạy chế độ này trên server production sau khi staging deploy thành công: CHỈ thêm dòng
+# "<digest> <thời điểm> <sha>" vào staging.history dưới khoá chung. Không docker, không pull, không đụng release/symlink/container.
+# Đã có đúng cặp digest+SHA thì bỏ qua (không thêm dòng trùng): giữ nguyên vị trí dòng đầu => thứ tự "cũ hơn" trong history_line_of không đổi.
+# Cần: log, die, DRY_RUN, STATE_DIR, LOCK_WAIT_SECONDS, TARGET_IMAGE, RELEASE_SHA.
+record_staging_pass() {
+  local digest="${TARGET_IMAGE#*@}" file="$STATE_DIR/staging.history"
+  if [[ $DRY_RUN == true ]]; then
+    printf '[dry-run] (khoá %s/deploy.lock) thêm "%s <thời điểm> %s" vào %s nếu chưa có; không chạm docker/release\n' "$STATE_DIR" "$digest" "$RELEASE_SHA" "$file"
+    return 0
+  fi
+  command -v flock > /dev/null || die "thiếu lệnh: flock"
+  mkdir -p "$STATE_DIR"
+  exec 9> "$STATE_DIR/deploy.lock"
+  flock -w "$LOCK_WAIT_SECONDS" 9 || die "deploy khác đang chạy (khoá $STATE_DIR/deploy.lock)"
+  if awk -v d="$digest" -v s="$RELEASE_SHA" '$1 == d && $3 == s { found = 1 } END { exit !found }' "$file" 2> /dev/null; then
+    log "staging.history đã có digest $digest + SHA $RELEASE_SHA: bỏ qua"
+    return 0
+  fi
+  printf '%s %s %s\n' "$digest" "$(date -u +%FT%TZ)" "$RELEASE_SHA" >> "$file"
+  log "đã ghi staging.history: $digest + SHA $RELEASE_SHA"
+}
+
 # Chỉ xoá image của repo tami (theo tên repo trong --image), giữ current + previous của CẢ HAI môi trường.
 # Không `docker image prune` / `docker builder prune` toàn cục: server dùng chung với dự án khác.
 prune_old_tami_images() {

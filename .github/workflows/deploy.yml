@@ -135,3 +135,40 @@ jobs:
             echo "- digest: \`$DIGEST\`"
             echo "Lên production: Actions → **Deploy production** → Run workflow → nhập commit trên."
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # BL-111: staging và production ở 2 server KHÁC nhau => deploy staging không còn ghi /opt/tami/state/staging.history của server production.
+  # Job này (chỉ chạy khi build + deploy-staging đều thành công, cùng điều kiện nguồn như job build) SSH vào server PRODUCTION bằng secret
+  # của Environment `production` và chỉ ghi dòng "<digest> <thời điểm> <sha>" qua `deploy.sh record-staging` (không pull, không chạm container).
+  # Cổng thật vẫn ở deploy.sh production: chỉ nhận cặp digest+SHA có trong staging.history. Cùng server (staging = production): bỏ qua dòng trùng.
+  # Environment `production` phải cho phép nhánh `staging` (nếu có deployment branch policy).
+  record-staging-pass:
+    name: Ghi staging.history trên server production
+    needs: [build, deploy-staging]
+    if: >-
+      success() &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'staging' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/ssh-deploy
+        with:
+          mode: record-staging
+          environment: production
+          image: ${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          user: ${{ secrets.DEPLOY_USER }}
+          port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          deploy-root: ${{ env.TAMI_DEPLOY_ROOT }}
+          release-sha: ${{ github.event.workflow_run.head_sha }}

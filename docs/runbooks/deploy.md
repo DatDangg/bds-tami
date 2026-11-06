@@ -9,6 +9,7 @@ Kiến trúc: `docs/ARCHITECTURE.md` §6.4. Quyết định: `.context/decisions
 push staging → CI (ci.yml) PASS → [workflow_run] Deploy:
   build   : GitHub runner build image, tag = commit SHA, push GHCR, lấy DIGEST
   staging : (tự động, Environment `staging`) SSH → deploy.sh staging  --image <repo>@<digest>
+  record-staging-pass : (Environment `production`, chỉ khi staging xanh) SSH → server PRODUCTION → deploy.sh record-staging  --image <repo>@<digest>  (chỉ ghi staging.history)
   (job summary in commit + digest vừa qua staging)
 
 chạy TAY: Actions → Deploy production → Run workflow (nhánh staging) → nhập commit SHA  [deploy-production.yml]
@@ -20,6 +21,16 @@ chạy TAY: Actions → Deploy production → Run workflow (nhánh staging) → 
   Thêm lớp bảo vệ ở server: `deploy.sh production` chỉ nhận cặp **digest + commit SHA** có trong `/opt/tami/state/staging.history`
   (dòng `<digest> <thời điểm> <sha>` do chính lần deploy staging **thành công** ghi), và **từ chối digest cũ hơn** `production.current`
   (trừ `--allow-older`, chỉ dùng tay, mục 5). Kiểm này chạy **trước khi pull**.
+- **Hai server (BL-111, từ khi staging chuyển sang server mới `179.197.242.57`, production giữ `187.52.119.50`)**: Environment `staging` và `production`
+  có bộ secret `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`/`DEPLOY_SSH_KNOWN_HOSTS` riêng, nên deploy staging **không còn** ghi `staging.history` trên server production.
+  Job `record-staging-pass` (`deploy.yml`, `needs: [build, deploy-staging]`, chỉ chạy khi cả hai xanh, cùng điều kiện nguồn như job `build`, `environment: production`)
+  SSH vào server production và chạy `deploy.sh record-staging --release-sha <sha> --image <repo>@<digest>` qua action `ssh-deploy` `mode: record-staging`:
+  chỉ thêm dòng `<digest> <thời điểm> <sha>` vào `/opt/tami/state/staging.history` dưới khoá `deploy.lock` chung, sau khi kiểm định dạng (image `ghcr.io/…@sha256:<64 hex>`, SHA 40 hex).
+  Không pull, không đụng docker/container/release/symlink; `scripts/deploy` đẩy vào thư mục tạm dưới `state/` và xoá ngay. Cặp digest+SHA đã có thì **bỏ qua** (không dòng trùng)
+  nên khi staging và production cùng một server (setup cũ) job này vô hại. Cổng thật vẫn là `deploy.sh production` (kiểm cặp digest+SHA + không cũ hơn). Hệ quả: Environment `production`
+  phải cho phép nhánh `staging` (nếu có deployment branch policy); job record fail thì production **từ chối** commit đó (đúng hướng an toàn) — chạy lại job `record-staging-pass` (Re-run) là đủ.
+  Rủi ro nhỏ: hai run staging liên tiếp có thể ghi history sai thứ tự, khi đó production báo "cũ hơn" và cần `--allow-older` chạy tay (mục 5).
+  `environment: production` trên job record tạo một mục deployment "production" trên GitHub ở MỖI lần push staging (không phải release thật). Nếu thêm wait timer / required reviewers / branch policy loại `staging` cho Environment `production` thì job này bị chặn hoặc treo chờ duyệt.
 - **Release bất biến theo môi trường + SHA**: mã triển khai (`docker/`, `scripts/deploy/`) được upload vào
   `/opt/tami/releases/<env>/<sha>/` (giải nén sạch vào thư mục tạm rồi `mv -T` nguyên tử; SHA đã có thì giữ nguyên, **không ghi đè**),
   và `deploy.sh` chạy **từ chính release đó** (từ chối nếu script không nằm đúng `releases/<env>/<sha>`). Nhờ vậy production luôn
