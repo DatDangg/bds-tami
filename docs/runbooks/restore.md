@@ -94,7 +94,7 @@ IMG=tami-postgres:17-3.5-bookworm-pgbackrest2.59   # phải cùng glibc với im
 NET=tami-net                               # mạng của stack production
 VOL=drill_pg_$(date +%Y%m%d%H%M)
 docker volume create $VOL
-time ./pg-restore.sh --volume $VOL --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network $NET \
+time bash ./pg-restore.sh --volume $VOL --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network $NET \
   --target-time "YYYY-MM-DD HH:MM:SS+00"                    # hoặc bỏ dòng này để lấy mới nhất
 # Bật container tạm. BẮT BUỘC archive_mode=off: bản khôi phục KHÔNG được đẩy WAL (timeline mới) vào kho đang dùng.
 docker run -d --name drill-pg --network $NET --env-file $BK/pgbackrest.env -e POSTGRES_PASSWORD=unused \
@@ -113,7 +113,7 @@ SFTP: tài khoản chỉ đọc) và luôn `archive_mode=off`. **Không bao gi�
    (`<project>` = `tami`). Cần ổ trống ≈ kích thước DB.
 3. Khôi phục đè lên volume (delta: chỉ ghi lại file khác biệt, nhanh hơn):
    ```bash
-   ./pg-restore.sh --volume <project>_postgres-data --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network <mạng compose> \
+   bash ./pg-restore.sh --volume <project>_postgres-data --image $IMG --env-file $BK/pgbackrest.env --ssh-dir $BK/ssh --network <mạng compose> \
      --delta --target-time "YYYY-MM-DD HH:MM:SS+00"       # bỏ --target-time để lấy điểm mới nhất
    ```
 4. `$C up -d postgres` — postgres chạy recovery (đọc WAL từ kho), tới target thì tự promote (timeline mới); `archive_mode=on` của compose có hiệu lực sau promote nên WAL timeline mới tiếp tục lên kho.
@@ -217,7 +217,7 @@ Diễn tập đầu tiên: ngay sau khi bật backup trên production (mục 2.6
 
 | Ngày | Môi trường | Người làm | Thời điểm đích | pgBackRest restore | Recovery | restic restore | Tổng | Kết quả kiểm tra (mục 6) |
 |---|---|---|---|---|---|---|---|---|
-| _chưa diễn tập trên server_ | | | | | | | | |
+| 2026-11-06 | production server mới (`server`, 179.197.242.57; kho R2 `/tami-prod-s2` + restic `tami-prod-files-s2`, tách khỏi kho cũ `/tami-prod`, `tami-prod-files` của server cũ) | builder (BL-112 P2.T03) | mới nhất (full `20261106-145540F`, không PITR) | 240 s (83,5MB, 3291 file; chậm do nhiều file nhỏ tới R2) | 8 s | 9 s (1596 mục, 245MiB) | ≈ 4 phút 20 s (lần gọi đầu `./pg-restore.sh` lỗi rc=126 vì file không có bit exec; gọi đúng: `bash ./pg-restore.sh`) | 149 bảng + 2 view; `count(*)` 149 bảng IDENTICAL với DB đang chạy; 7 extension; PostGIS đọc được; sha256 300 file khớp; `pg_is_in_recovery()=f`; `failed_count` WAL không tăng |
 
 ## 9. Giới hạn đã biết / việc chỉ kiểm được khi lên server
 

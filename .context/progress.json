@@ -3567,8 +3567,15 @@
         {
           "file": "tasks/feature-production-new-server-tamihomes/phase-2-task-03.md",
           "task": "phase-2-task-03",
-          "status": "in_progress",
-          "attempt": 1
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-2-task-03-round-2-review.md",
+          "note": "pgBackRest stanza /tami-prod-s2 + full 20261106-145540F (459s), restic repo tami-prod-files-s2 snapshot 569520db (1593 file); WAL archive OK; diễn tập restore pgBackRest (240s, 149 bảng count khớp) + restic (1593 file) PASS; restore.md bash ./pg-restore.sh",
+          "verify": "info/snapshots/prom wal,pg_full,pg_diff,files=1; server cũ vẫn OK wal; dọn drill; OOMKilled=false",
+          "completedAt": "2026-11-06"
         }
       ]
     }
@@ -5536,7 +5543,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T08:16:29.026Z",
+  "lastUpdated": "2026-11-06T08:26:26.624Z",
   "approvalMilestones": [
     {
       "id": "M1",
