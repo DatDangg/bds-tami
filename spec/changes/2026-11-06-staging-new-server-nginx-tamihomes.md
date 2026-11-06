@@ -5,7 +5,7 @@ status: pending
 created: 2026-11-06
 ---
 
-# Chuyển staging sang server mới 179.197.242.57 + Nginx + tên miền staging.tamihomes.vn
+# Chuyển staging sang server mới 179.197.242.57 + Nginx + HTTPS `179-197-242-57.sslip.io` (ban đầu dự kiến staging.tamihomes.vn — đổi, xem "Đổi quyết định")
 
 ## Yêu cầu
 User 2026-11-06: chuyển staging tami từ server cũ (187.52.119.50, `https://187-52-119-50.sslip.io`) sang server mới
@@ -41,7 +41,7 @@ Classification dự kiến: MODIFY (hạ tầng deploy/runbook, không đổi be
 - Liên quan: BL-105 (Zalo share, có ghi chú domain sslip.io); BL-095/BL-106 (chờ SMTP — có domain thật thì có thể làm email `@tamihomes.vn`, ngoài scope).
 
 ## Acceptance
-- [ ] `https://staging.tamihomes.vn` HTTPS hợp lệ, công khai (không basic auth — Q1), noindex, trỏ server mới
+- [ ] `https://179-197-242-57.sslip.io` HTTPS hợp lệ, công khai (không basic auth — Q1), noindex, trỏ server mới
 - [ ] CI deploy staging chạy vào server mới, health check PASS
 - [ ] Rate limit lấy đúng IP thật qua Nginx
 - [ ] Runbook/ARCHITECTURE/project-config cập nhật; không còn tham chiếu sslip.io cho staging
@@ -53,3 +53,9 @@ Classification dự kiến: MODIFY (hạ tầng deploy/runbook, không đổi be
 - Q4: builder sinh key CI ed25519 trên máy dev (`~/.ssh/tami_ci_deploy`, ngoài repo); user tự dán private key vào GitHub secret.
 - Mục 4 "thư mục backup env": không áp dụng cho staging (staging không backup — runbook §9.5).
 - Phase plan: `tasks/feature-staging-new-server-nginx-tamihomes/` (P1.01, P1.02, P2.01–P2.03, P3.01–P3.02).
+
+## Đổi quyết định (user 2026-11-06, sau P2.03)
+- **Staging KHÔNG dùng subdomain** `staging.tamihomes.vn`. Staging dùng IP: `https://179-197-242-57.sslip.io` (giống mô hình staging cũ `187-52-119-50.sslip.io`; sslip.io cho hostname để Let's Encrypt cấp cert — cert cho IP trần không dùng).
+- `tamihomes.vn` (+ `www`) dành cho **production**, chuyển production sang server mới = **BL-112** (change doc riêng).
+- Hệ quả BL-111: đổi vhost/server_name, `NEXT_PUBLIC_SITE_URL` trong `/opt/tami/staging.env`, docs (runbook §11, ARCHITECTURE §6, project-config, Decision 12) từ `staging.tamihomes.vn` → `179-197-242-57.sslip.io`; P3.01 không còn chờ DNS Mắt Bão. Turnstile: thêm hostname `179-197-242-57.sslip.io` vào site key staging (U2 đổi giá trị).
+- Let's Encrypt: user đồng ý ToS, không email; gia hạn bằng certbot.timer + deploy hook reload nginx.

@@ -27,8 +27,8 @@ x-logging: &default-logging
 
 x-app-environment: &app-environment
   APP_ENV: staging
-  # IP khách cho rate limit (thiếu cả hai cờ thì mọi khách chung 1 bucket). Mặc định = staging KHÔNG Cloudflare (staging.tamihomes.vn): Nginx host
-  # (docker/nginx/tami-staging-tamihomes.conf) ghi đè X-Real-IP và app chỉ bind 127.0.0.1:3011 -> tin X-Real-IP, KHÔNG tin CF-Connecting-IP.
+  # IP khách cho rate limit (thiếu cả hai cờ thì mọi khách chung 1 bucket). Mặc định = staging KHÔNG Cloudflare (179-197-242-57.sslip.io): Nginx host
+  # (docker/nginx/tami-staging-sslip-179.conf) ghi đè X-Real-IP và app chỉ bind 127.0.0.1:3011 -> tin X-Real-IP, KHÔNG tin CF-Connecting-IP.
   # Staging sau Cloudflare (docker/nginx/tami.conf kiểu staging.<domain>): đặt TRUST_CF_CONNECTING_IP=true + TRUST_X_REAL_IP=false trong env file.
   # Không bật cả hai (khi đó chỉ CF-Connecting-IP được xét).
   TRUST_CF_CONNECTING_IP: ${TRUST_CF_CONNECTING_IP:-false}
@@ -58,7 +58,7 @@ x-app-environment: &app-environment
   TRANSLATION_MODEL: ${TRANSLATION_MODEL:?}
   # Staging: 0 = tắt dịch AI (quyết định user 2026-10-18). Đặt số > 0 + ANTHROPIC_API_KEY trong env file khi cần bật.
   TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:-0}
-  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://staging.tamihomes.vn)}
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://179-197-242-57.sslip.io)}
   GLITCHTIP_DSN: ${GLITCHTIP_DSN:-}
   GLITCHTIP_PUBLIC_DSN: ${GLITCHTIP_PUBLIC_DSN:-}
   METRICS_TOKEN: ${METRICS_TOKEN:-}

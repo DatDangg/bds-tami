@@ -3408,7 +3408,7 @@
     },
     {
       "slug": "staging-new-server-nginx-tamihomes",
-      "title": "Chuyển staging sang server mới 179.197.242.57 + Nginx/Let's Encrypt staging.tamihomes.vn (BL-111)",
+      "title": "Chuyển staging sang server mới 179.197.242.57 + Nginx/Let's Encrypt https://179-197-242-57.sslip.io (BL-111; ban đầu dự kiến staging.tamihomes.vn — user đổi 2026-11-06, tamihomes.vn dành production BL-112)",
       "type": "MODIFY",
       "status": "in-progress",
       "currentPhase": 3,
@@ -3485,13 +3485,20 @@
         {
           "task": "phase-3-task-01",
           "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-3-task-01.md",
-          "status": "blocked",
-          "blockedReason": "chờ DNS A staging.tamihomes.vn (U1, NXDOMAIN 2026-11-06), Turnstile hostname (U2), email Let's Encrypt (U4)"
+          "status": "done",
+          "attempt": 1,
+          "round": 2,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-task-01-round-2-review.md",
+          "note": "đổi hostname staging → 179-197-242-57.sslip.io (conf tami-staging-sslip-179{,-http}.conf, staging.env NEXT_PUBLIC_SITE_URL, tạo lại app/jobs); certbot webroot (ToS, không email, account ACME có sẵn của outfitai) + hook renewal-hooks/deploy reload nginx, renew --dry-run --cert-name PASS; 443 + default-reject; smoke ngoài PASS (HTTPS, noindex, HSTS, robots, sitemap/canonical, 404 internal, 301, 413, media no-store, 2 IP 2 bucket, hết cảnh báo IP). r1 FAIL MAJOR-1 tài liệu host dùng chung outfitai → r2 PASS. Residual: Turnstile chờ U2; link menu CMS trỏ sslip cũ",
+          "verify": "curl ngoài + nginx -t + certbot renew --dry-run --cert-name + access log 2 IP",
+          "completedAt": "2026-11-06"
         },
         {
           "task": "phase-3-task-02",
           "file": "tasks/feature-staging-new-server-nginx-tamihomes/phase-3-task-02.md",
-          "status": "pending"
+          "status": "in_progress"
         }
       ]
     }
@@ -5459,7 +5466,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T05:00:06.622Z",
+  "lastUpdated": "2026-11-06T05:28:41.006Z",
   "approvalMilestones": [
     {
       "id": "M1",
