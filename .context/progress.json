@@ -3,7 +3,7 @@
   "activeWorkItem": {
     "type": "feature",
     "slug": "production-new-server-tamihomes",
-    "phaseTask": "phase-2-task-03"
+    "phaseTask": "phase-3-task-01"
   },
   "features": [
     {
@@ -3519,7 +3519,7 @@
       "title": "Chuyển production sang server mới 179.197.242.57 + tên miền https://tamihomes.vn (BL-112)",
       "type": "MODIFY",
       "status": "in_progress",
-      "currentPhase": 2,
+      "currentPhase": 3,
       "backlog": "BL-112",
       "changeDoc": "spec/changes/2026-11-06-production-new-server-tamihomes.md",
       "startedAt": "2026-11-06",
@@ -3575,6 +3575,19 @@
           "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-2-task-03-round-2-review.md",
           "note": "pgBackRest stanza /tami-prod-s2 + full 20261106-145540F (459s), restic repo tami-prod-files-s2 snapshot 569520db (1593 file); WAL archive OK; diễn tập restore pgBackRest (240s, 149 bảng count khớp) + restic (1593 file) PASS; restore.md bash ./pg-restore.sh",
           "verify": "info/snapshots/prom wal,pg_full,pg_diff,files=1; server cũ vẫn OK wal; dọn drill; OOMKilled=false",
+          "completedAt": "2026-11-06"
+        },
+        {
+          "file": "tasks/feature-production-new-server-tamihomes/phase-3-task-01.md",
+          "task": "phase-3-task-01",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "STRICT",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-3-task-01-round-1-review.md",
+          "note": "cắt chuyển 08:28–08:33Z: khoá ghi cũ, dump cuối, DROP/CREATE (template0) + pg_restore, seaweedfs tar, đối chiếu 100% (149 bảng count, 43 migration, bucket 1595 chunk), FLUSHALL + force-recreate, tami.genieplatform.cloud 301 → tamihomes.vn; downtime cũ ~5m22s, mới ~4m12s; full 20261106-153347F + restic d1620215",
+          "verify": "reviewer tự đếm lại: count/sequence/index/constraint khớp, system-id = stanza, 301 giữ path, nginx -t cũ OK",
           "completedAt": "2026-11-06"
         }
       ]
@@ -5543,7 +5556,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-06T08:26:26.624Z",
+  "lastUpdated": "2026-11-06T08:46:30.741Z",
   "approvalMilestones": [
     {
       "id": "M1",
