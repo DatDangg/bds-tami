@@ -245,7 +245,7 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 
 | Hạng mục | Giá trị | Đánh giá |
 |---|---|---|
-| Truy cập | SSH alias `server` (`root@187.52.119.50`, key `id_ed25519_trungpq`) | — |
+| Truy cập | SSH alias `server-old` (`root@187.52.119.50`, key `id_ed25519_trungpq`; trước 2026-11-06 gọi là `server` — nay `server` = server staging mới 179.197.242.57, BL-111) | — |
 | Máy | VPS KVM, Ubuntu 24.04 LTS | ✅ |
 | CPU | 4 vCPU AMD EPYC 9354P, tải ~0.3 | ✅ Đủ |
 | RAM | 15GB, trống ~11GB, **chưa có swap** | ✅ Đủ; ⚠️ nên thêm swap 4GB |

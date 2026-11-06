@@ -1,7 +1,7 @@
 ---
 id: staging-new-server-nginx-tamihomes
 type: feature
-status: pending
+status: done
 created: 2026-11-06
 ---
 
@@ -41,10 +41,10 @@ Classification dự kiến: MODIFY (hạ tầng deploy/runbook, không đổi be
 - Liên quan: BL-105 (Zalo share, có ghi chú domain sslip.io); BL-095/BL-106 (chờ SMTP — có domain thật thì có thể làm email `@tamihomes.vn`, ngoài scope).
 
 ## Acceptance
-- [ ] `https://179-197-242-57.sslip.io` HTTPS hợp lệ, công khai (không basic auth — Q1), noindex, trỏ server mới
-- [ ] CI deploy staging chạy vào server mới, health check PASS
-- [ ] Rate limit lấy đúng IP thật qua Nginx
-- [ ] Runbook/ARCHITECTURE/project-config cập nhật; không còn tham chiếu sslip.io cho staging
+- [x] `https://179-197-242-57.sslip.io` HTTPS hợp lệ, công khai (không basic auth — Q1), noindex, trỏ server mới
+- [x] CI deploy staging chạy vào server mới, health check PASS
+- [x] Rate limit lấy đúng IP thật qua Nginx
+- [x] Runbook/ARCHITECTURE/project-config cập nhật; không còn tham chiếu `staging.tamihomes.vn` hay sslip cũ (`187-52-119-50.sslip.io`) như staging HIỆN HÀNH (sslip cũ chỉ còn ở mục dự phòng)
 
 ## Quyết định khi duyệt plan (user 2026-11-06)
 - Q1: KHÔNG basic auth (mở công khai + noindex như staging hiện tại).
@@ -59,3 +59,7 @@ Classification dự kiến: MODIFY (hạ tầng deploy/runbook, không đổi be
 - `tamihomes.vn` (+ `www`) dành cho **production**, chuyển production sang server mới = **BL-112** (change doc riêng).
 - Hệ quả BL-111: đổi vhost/server_name, `NEXT_PUBLIC_SITE_URL` trong `/opt/tami/staging.env`, docs (runbook §11, ARCHITECTURE §6, project-config, Decision 12) từ `staging.tamihomes.vn` → `179-197-242-57.sslip.io`; P3.01 không còn chờ DNS Mắt Bão. Turnstile: thêm hostname `179-197-242-57.sslip.io` vào site key staging (U2 đổi giá trị).
 - Let's Encrypt: user đồng ý ToS, không email; gia hạn bằng certbot.timer + deploy hook reload nginx.
+
+## Kết quả (close-out 2026-11-06)
+- Done: P1.01 `940ab50c`, P1.02 `fd524e26`, P2.01 `e49d01f2`, P2.02 `55e52730`, P2.03 `0bcab51d`, P3.01 `98c08b2a`, P3.02 close-out. Mọi task Reviewer PASS (P3.01 PASS r2). Spec-validation PASS (`.context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-spec-validation.md`). Spec 1.62.1 (PATCH), test-scope v108 (base URL staging `https://179-197-242-57.sslip.io`).
+- Residual chờ user: Turnstile hostname `179-197-242-57.sslip.io` (U2); đăng nhập admin + tải CV thật; menu CMS link tuyệt đối tới sslip cũ; báo chủ outfitai (443 default/ACME account/hook dùng chung); quyết định tắt staging cũ (đang đóng băng ở `678b3568`).

@@ -1,102 +1,100 @@
 {
-  "specVersion": "1.62.0",
-  "scopeVersion": 107,
-  "generatedAt": "2026-11-02T14:00:00+07:00",
+  "specVersion": "1.62.1",
+  "scopeVersion": 108,
+  "generatedAt": "2026-11-06T12:00:00+07:00",
   "trigger": "feature-update",
-  "triggerNote": "BL-104 ADDITIVE (QA sheet 30/10 dòng 23): thêm bộ lọc Phòng tắm `bathrooms` (chip 1·2·3·4+, 4 = từ 4 trở lên, giá trị lạ bỏ qua) cho /cho-thue (+ danh mục, F3) và /tin-bds (+ danh mục, F4), giống phòng ngủ; chip đang lọc + nút xoá, giữ khi phân trang/sort; GET /api/public/rentals nhận `bathrooms` như `bedrooms`. Không schema/migration (cột bathrooms có sẵn ở rentals + property_posts). Bump spec 1.61.0 -> 1.62.0.",
+  "triggerNote": "BL-111 MODIFY hạ tầng: staging chuyển sang server mới 179.197.242.57. Không đổi code ứng dụng (chỉ infra/config/docs). Bump PATCH 1.62.0 -> 1.62.1 (làm rõ hạ tầng, không đổi requirement sản phẩm).",
   "status": "published",
-  "workItem": "feature/bathrooms-filter",
-  "backlog": "BL-104",
-  "classification": "ADDITIVE",
-  "changeDoc": "spec/changes/2026-11-02-bathrooms-filter.md",
-  "task": "tasks/feature-bathrooms-filter/phase-1-task-01.md",
-  "reviewReport": ".context/review-reports/feature-bathrooms-filter-phase-1-task-01-round-1-review.md",
-  "previousScope": "spec/test-scope/archive/test-scope-1.61.0-106.json",
-  "specUpdate": "spec/updates/2026-11-02-bathrooms-filter.md",
+  "workItem": "feature/staging-new-server-nginx-tamihomes",
+  "backlog": "BL-111",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-11-06-staging-new-server-nginx-tamihomes.md",
+  "task": "tasks/feature-staging-new-server-nginx-tamihomes/",
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.0-107.json",
+  "specUpdate": "spec/updates/2026-11-06-staging-new-server-nginx-tamihomes.md",
   "specRefs": [
-    "F3 / FR-PUB-04 (bộ lọc Cho thuê)",
-    "F4 / FR-PUB-06 (bộ lọc Tin BĐS)",
-    "BL-104"
+    "SPECIFICATIONS.md § Deployment (As-built BL-111)",
+    "NFR-05 (hạ tầng)",
+    "BL-111"
   ],
+  "environment": {
+    "stagingBaseUrl": "https://179-197-242-57.sslip.io",
+    "stagingServer": "179.197.242.57",
+    "oldStagingFrozen": "https://187-52-119-50.sslip.io (đóng băng ở commit 678b3568 — KHÔNG test ở đó)",
+    "dataCopiedFromOldStaging": {
+      "db": "~04:09Z 2026-11-06",
+      "media": "~04:11Z 2026-11-06"
+    },
+    "access": "công khai + noindex, không basic auth"
+  },
   "changed": {
     "files": [
-      "src/lib/search/url-params.ts",
-      "src/lib/search/rental-search-sql.ts",
-      "src/shared/types/api.ts",
-      "src/lib/rentals/active-filters.ts",
-      "src/components/rentals/use-active-filter-chips.ts",
-      "src/components/rentals/rental-list-state.ts",
-      "src/components/rentals/RentalListBody.tsx",
-      "src/lib/posts/post-filters.ts",
-      "src/lib/posts/post-list-facets.ts",
-      "src/lib/posts/post-queries.ts",
-      "src/components/posts/post-list-state.ts",
-      "src/components/posts/PostListBody.tsx",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json",
-      "docs/API_SPEC.md",
-      ".context/design-spec.md"
+      "docker/nginx/tami-staging-sslip-179.conf",
+      "docker/nginx/tami-staging-sslip-179-http.conf",
+      "docker/nginx/tami-default-reject.conf",
+      ".github/workflows/deploy.yml",
+      ".github/actions/ssh-deploy/action.yml",
+      "scripts/deploy/deploy.sh",
+      "scripts/deploy/lib/state.sh",
+      "docs (runbooks/deploy.md §11, .context/decisions.md Decision 12)",
+      "docker/docker-compose.staging.yml (comment)",
+      ".env.example (comment/ví dụ)",
+      "scripts/deploy/deploy.test.sh",
+      "docker/nginx/tami-staging-sslip.conf + tami-staging-sslip-http.conf (comment: server cũ dự phòng)",
+      "SPECIFICATIONS.md (§Deployment as-built)",
+      "docs/ARCHITECTURE.md §6"
     ],
-    "note": "Danh sách file thực tế sau build (STRICT PASS r1). Thêm tham số `bathrooms` (parse URL, điều kiện lọc SQL / predicate facet, select cột bathrooms ở post-queries, chip Cho thuê, nhãn VI/EN). Không đổi schema/migration, không index mới (bedrooms cũng không có).",
     "modules": [
-      "Cho thuê (/cho-thue, danh mục, GET /api/public/rentals): bộ lọc Phòng tắm",
-      "Tin BĐS (/tin-bds, danh mục): bộ lọc Phòng tắm"
+      "hạ tầng staging (Nginx host, Let's Encrypt)",
+      "CI deploy staging + record-staging-pass"
     ],
-    "tests": [
-      "src/lib/search/url-params.test.ts",
-      "src/lib/search/rental-search-sql.test.ts",
-      "src/shared/types/api.test.ts",
-      "src/lib/rentals/active-filters.test.ts",
-      "src/lib/posts/post-filters.test.ts",
-      "src/lib/posts/post-listing-queries.test.ts",
-      "src/components/rentals/rental-filter-params.test.tsx",
-      "src/components/rentals/RentalListPage.test.tsx",
-      "src/components/posts/PostListPage.test.tsx",
-      "tests/integration/rental-search.test.ts"
-    ]
+    "note": "Không có thay đổi code ứng dụng. Commits: 940ab50c, fd524e26, e49d01f2, 55e52730, 0bcab51d, 98c08b2a."
   },
-  "screens": [
-    "/cho-thue",
-    "/cho-thue/danh-muc/[category]",
-    "/tin-bds",
-    "/tin-bds/danh-muc/[category]",
-    "/en/for-rent",
-    "/en/property-news"
-  ],
   "impact": {
     "direct": [
-      "/cho-thue?bathrooms=1|2|3|4: chỉ trả tin có số phòng tắm tương ứng; 4 = từ 4 trở lên; tin không nhập phòng tắm không khớp",
-      "/tin-bds?bathrooms=1|2|3|4: cùng quy tắc",
-      "/cho-thue: chip \"Phòng tắm\" ở gợi ý bỏ lọc (khi rỗng) + nút xoá bỏ riêng bathrooms; tính vào huy hiệu \"Bộ lọc (n)\" và noindex. /tin-bds không có chip đang lọc (như phòng ngủ), chỉ tính huy hiệu + noindex",
-      "bathrooms giữ khi phân trang và đổi sắp xếp",
-      "Trang (URL): giá trị lạ (0, 5, abc, âm, thập phân) bị bỏ qua, không lỗi — trang chỉ nhận 1–4",
-      "GET /api/public/rentals?bathrooms=: nhận 0–4 như bedrooms (0 hợp lệ); 5 / -1 / abc → 400"
+      "Đổi base URL staging sang https://179-197-242-57.sslip.io — cập nhật cấu hình test (baseURL) trước khi chạy",
+      "Smoke toàn site trên base URL mới: trang VI/EN, danh sách, chi tiết, ảnh media, sitemap/canonical/og host đúng host mới, robots Disallow (noindex)"
     ],
     "dependents": [
-      "Trang danh mục Cho thuê / Tin BĐS có cùng bộ lọc",
-      "Bản EN /en/for-rent và /en/property-news (nhãn EN)",
-      "Sheet bộ lọc trên mobile",
-      "Đếm tổng và facet khớp với danh sách"
+      "Form liên hệ / ứng tuyển / newsletter (Turnstile)",
+      "Upload (<=20MB ok, >25MB trả 413)",
+      "Rate limit theo IP thật",
+      "Admin login + tải CV riêng tư (cần auth)",
+      "Link chia sẻ Zalo/Facebook dùng host mới"
     ],
     "regression": [
-      "Các bộ lọc khác của Cho thuê / Tin BĐS (danh mục, tỉnh, phường, giá, diện tích, nội thất, tiện ích, từ khoá) kết hợp với bathrooms vẫn đúng",
-      "Bộ lọc phòng ngủ không đổi hành vi",
-      "Đếm facet theo bộ lọc",
-      "Phân trang và sắp xếp",
-      "Chip bộ lọc hiện có",
-      "API rentals: 400 / zod với tham số sai giữ nguyên",
-      "Responsive các ô lọc"
+      "Full-site smoke VI/EN",
+      "Forms contact/apply/newsletter",
+      "Upload giới hạn kích thước",
+      "Rate limit theo IP thật",
+      "Admin login + private CV download",
+      "Share links dùng host mới"
     ]
   },
   "acceptance": [
-    "/cho-thue và /tin-bds có ô lọc số phòng tắm cùng kiểu và cùng giá trị với phòng ngủ (1/2/3/4+; 4 = từ 4 trở lên)",
-    "Tham số URL bathrooms đọc/ghi giống bedrooms (giá trị sai bị bỏ qua), có chip đang bật + nút xoá, giữ khi phân trang/đổi sort",
-    "Lọc đúng trên dữ liệu; tin không nhập số phòng tắm không khớp khi đang lọc",
-    "Nhãn VI/EN đủ; responsive như các ô lọc hiện có",
-    "Có test cho parse URL + điều kiện lọc; API_SPEC có tham số mới"
+    "Mọi test chạy trên https://179-197-242-57.sslip.io, không dùng staging cũ",
+    "Sitemap/canonical/og:url/hreflang dùng host mới; robots.txt Disallow",
+    "Ảnh media (public) hiển thị; CV riêng tư chỉ tải được khi đã đăng nhập",
+    "Upload 20MB OK, >25MB nhận 413",
+    "Rate limit tính theo IP thật của client (không phải IP proxy)",
+    "Link chia sẻ Zalo/Facebook chứa host mới"
   ],
-  "testNotes": "Kiểm tay sau khi build: /cho-thue và /tin-bds chọn từng chip 1/2/3/4+, đối chiếu dữ liệu; URL ?bathrooms=abc/0/9; chuyển trang + đổi sort giữ bộ lọc; xoá chip; EN; mobile Sheet; trang danh mục; GET /api/public/rentals?bathrooms=2.",
+  "knownBlockers": [
+    "Turnstile DỰ KIẾN FAIL (form liên hệ/ứng tuyển/newsletter) cho tới khi user thêm hostname 179-197-242-57.sslip.io vào site key staging — đánh dấu known blocker, không báo bug"
+  ],
+  "testNotes": "Nội dung (không phải code): menu header 'Dự án 1/2' link tuyệt đối tới host sslip cũ — đã biết, không báo bug code. Dữ liệu staging là bản copy lúc ~04:09Z/04:11Z 2026-11-06.",
   "risk": "medium",
-  "riskNote": "Medium: thêm điều kiện lọc SQL công khai + tham số API công khai dùng chung với phòng ngủ; không schema/migration; input đi qua parse/whitelist giá trị.",
-  "specValidation": ".context/review-reports/feature-bathrooms-filter-phase-1-spec-validation.md"
+  "riskNote": "Thay đổi môi trường/hạ tầng, không đổi code ứng dụng.",
+  "reviewReport": [
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-02-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-01-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-02-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-03-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-task-01-round-2-review.md"
+  ],
+  "specValidation": {
+    "verdict": "PASS",
+    "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-spec-validation.md"
+  }
 }
