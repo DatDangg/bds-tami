@@ -105,7 +105,7 @@ Sao `.env.example` (khối Docker Compose staging/prod) → điền giá trị t
 `RETENTION_ORPHAN_OBJECT_SCAN` (`off` | `dry-run` | `delete`, mặc định `dry-run`): bước quét object CV mồ côi của job `data-retention` xoá object private không còn dòng `private-files`. Để `dry-run` (chỉ đếm, audit `system.data_retention` ghi `orphanObjectsFound`) cho tới khi xác nhận bucket private chỉ phục vụ đúng DB này (không dùng chung giữa môi trường) và số mồ côi báo cáo hợp lý; khi đó mới đặt `delete` bằng tay trong env file. Dù ở `delete`, quá 100 object hoặc quá 20% số object đã liệt kê thì job không xoá và báo lỗi (`failedSteps`). Không tự bật `delete` cho prod.
 
 ### 3.4 Nginx / Cloudflare
-Theo `docker/nginx/` và ARCHITECTURE §6 (không thuộc pipeline này). Staging chưa có tên miền: dùng biến thể sslip.io không Cloudflare, xem mục 9.
+Theo `docker/nginx/` và ARCHITECTURE §6 (không thuộc pipeline này). Staging chưa có tên miền: dùng biến thể sslip.io không Cloudflare, xem mục 9. **Cập nhật 2026-11-06 (BL-111): staging nay ở server mới `staging.tamihomes.vn`, xem mục 11; mục 9 mô tả staging sslip trên server cũ (dự phòng song song).**
 Production chưa dùng Cloudflare (2026-10-23): `tami.genieplatform.cloud` trỏ thẳng về server, biến thể Let's Encrypt, xem mục 10.
 
 ## 4. Migration
@@ -215,6 +215,8 @@ Mục đích: stack lỗi trình duyệt trên GlitchTip hiện đúng file/dòn
 - Chạy tay (sau `GLITCHTIP_AUTH_TOKEN=... GLITCHTIP_URL=... GLITCHTIP_ORG=... GLITCHTIP_PROJECT=... pnpm build`): `node scripts/upload-sourcemaps.mjs`.
 
 ## 9. Staging trên sslip.io (không Cloudflare)
+
+> **Server cũ, dự phòng (BL-111, 2026-11-06):** staging chính đã chuyển sang `staging.tamihomes.vn` trên server mới (mục 11). Mục này giữ làm mô tả staging sslip trên 187.52.119.50, chạy song song tới khi user tắt.
 
 Quyết định của user (2026-10-18): chưa có tên miền và chưa dùng Cloudflare. Staging = `https://187-52-119-50.sslip.io` (IP server 187.52.119.50),
 HTTPS bằng Let's Encrypt trên Nginx host, bảo vệ bằng HTTP basic auth + `X-Robots-Tag: noindex` + robots `Disallow` (app trả khi `APP_ENV=staging`), không CDN.
@@ -338,3 +340,48 @@ nội dung nhập lại qua admin.
    Rollback: gỡ symlink `tami-prod-direct*`, chép lại hai file staging cũ (giữ bản sao trước khi đè), `nginx -t` + reload.
 7. Kiểm: `curl -sI https://tami.genieplatform.cloud/` → 200, **không** có `X-Robots-Tag`; `/robots.txt` không `Disallow: /`; `curl -sI https://187-52-119-50.sslip.io/` → có `X-Robots-Tag: noindex`;
    `sudo certbot renew --dry-run --cert-name tami.genieplatform.cloud` PASS; gửi form liên hệ thử, log `/var/log/nginx/tami.access.log` cột đầu là IP thật.
+
+## 11. Staging trên server mới (179.197.242.57, `staging.tamihomes.vn`)
+
+Quyết định user 2026-11-06 (BL-111, decisions.md Decision 12): staging chuyển sang server mới, Nginx host + Let's Encrypt, không Cloudflare/Tunnel, **không basic auth** (công khai + `noindex`).
+Staging sslip trên server cũ 187.52.119.50 (mục 9) chạy song song làm dự phòng tới khi user tắt.
+Production vẫn ở server cũ 187.52.119.50 (`tami.genieplatform.cloud`, mục 10);  cổng staging.history giữa 2 server: xem §1 (job record-staging-pass, BL-111 phase-1-task-02).
+
+> Mọi bước chạm server thật: chỉ làm sau khi user xác nhận (`[XÁC NHẬN]`). Server dùng chung với dự án khác.
+
+### 11.1 Bố cục server và nguyên tắc host dùng chung
+- SSH alias `server` (`179.197.242.57`, Hostinger, Ubuntu 26.04, 2 vCPU, 7.7 GB RAM, SSD 96 GB, Docker 29.9 / Compose 5.6). Chi tiết ARCHITECTURE §6.1.
+- Dự án khác (supabase, airoom, outfit-changer, babyai, ai-rid, nextlevel-dashboard...) ra Internet bằng cloudflared quick tunnel; không ai dùng 80/443.
+- **Cấm:** bật ufw, `apt upgrade`/`dist-upgrade`, reboot, sửa sshd / mật khẩu root, đụng container hoặc thư mục dự án khác, `docker system prune`.
+- **Được:** nginx + certbot do TAMI cài nên TAMI được `nginx -t` + `systemctl reload nginx`. Thư mục `/opt/tami/` (env file, `releases/`), container `tami-staging-*`, app chỉ bind `127.0.0.1:3011`.
+- Known hosts / fingerprint host ED25519: `SHA256:5uzqgi5o4/BsMUm9/Fy39nXoMNQP/x1MvzYtJKXIs94`. `DEPLOY_SSH_KNOWN_HOSTS` lấy bằng `ssh-keyscan -t ed25519 179.197.242.57` rồi đối chiếu fingerprint này (`ssh-keygen -lf -`).
+- DNS: bản ghi **A** `staging.tamihomes.vn` → `179.197.242.57`. **Không tạo AAAA** (host có IPv6 `2a02:4780:5e:9625::1` nhưng nginx/certbot chỉ kiểm bằng IPv4; thêm AAAA khi đã kiểm cổng 80/443 qua IPv6).
+
+### 11.2 Cài nginx + certbot (không nâng cấp gói khác)
+
+1. `[XÁC NHẬN]` Swap 4 GB (phase-2-task-01), Docker đã có sẵn.
+   Trước bước 2 phải mô phỏng: `sudo apt-get install -s --no-upgrade nginx certbot | grep '^Inst'`. `--no-upgrade` không bảo vệ thư viện dùng chung của gói phụ thuộc mới: nếu có dòng `Inst <gói> [<phiên bản cũ>]` của gói ĐÃ cài (tức bị nâng cấp) thì DỪNG và hỏi user; chỉ gói mới (không có `[...]`) mới được tiếp tục.
+2. `[XÁC NHẬN]` `sudo NEEDRESTART_MODE=l DEBIAN_FRONTEND=noninteractive apt-get install -y --no-upgrade nginx certbot` (`NEEDRESTART_MODE=l` chỉ liệt kê, không tự restart dịch vụ khác). Kiểm `nginx -v` (1.28.x), `certbot --version` (4.0.x), `systemctl is-active nginx`.
+3. `sudo install -d -o root -g root -m 755 /var/www/certbot`.
+4. Không firewall: chỉ báo nếu cổng 80/443 từ ngoài không tới được (nhà cung cấp có thể chặn ở tầng khác).
+5. `[XÁC NHẬN]` User `deploy` cho CI (phase-2-task-01): trên máy dev tạo khoá riêng cho CI `ssh-keygen -t ed25519 -f ~/.ssh/tami_ci_deploy -N ""` (private key chỉ vào secret `DEPLOY_SSH_KEY`, không vào chat/log). Trên server:
+   `sudo adduser --disabled-password --gecos "" deploy`; `sudo usermod -aG docker deploy`; `sudo install -d -o deploy -g deploy -m 700 /home/deploy/.ssh`;
+   ghi nội dung `~/.ssh/tami_ci_deploy.pub` (khoá công khai) vào `/home/deploy/.ssh/authorized_keys` (`chown deploy:deploy`, `chmod 600`). Không sửa sshd_config, không đặt mật khẩu.
+
+### 11.3 Dựng stack (thứ tự)
+1. `[XÁC NHẬN]` `/opt/tami/` như mục 3.1; `/opt/tami/staging.env` (`chmod 600`, chủ `deploy`) theo 9.2 bước 3 nhưng `NEXT_PUBLIC_SITE_URL=https://staging.tamihomes.vn`; không đặt `TRUST_*`, `APP_ENV`, `BACKUP_ENV_DIR`. `DATABASE_URL_STAGING` ≠ `DATABASE_URL_PROD`.
+2. `[XÁC NHẬN]` Site cổng 80: copy `docker/nginx/tami-staging-tamihomes-http.conf` → `/etc/nginx/sites-available/`, symlink `sites-enabled/`, `sudo nginx -t` PASS rồi `sudo systemctl reload nginx`.
+3. `[XÁC NHẬN]` Sau khi DNS A đã phân giải đúng (`dig +short staging.tamihomes.vn`), cấp chứng chỉ (user cung cấp email + đồng ý điều khoản):
+   `sudo certbot certonly --webroot -w /var/www/certbot -d staging.tamihomes.vn --cert-name staging.tamihomes.vn --email <email> --agree-tos --no-eff-email --deploy-hook "nginx -t && systemctl reload nginx"`.
+   Hook gắn riêng cho chứng chỉ này; **không** tạo file trong `/etc/letsencrypt/renewal-hooks/deploy/`. Cert ở `/etc/letsencrypt/live/staging.tamihomes.vn/{fullchain,privkey}.pem`. Thử `sudo certbot renew --dry-run --cert-name staging.tamihomes.vn`.
+4. `[XÁC NHẬN]` Site cổng 443: copy `tami-staging-tamihomes.conf` + `tami-default-reject.conf` → `sites-available/`, symlink, `sudo nginx -t` PASS rồi `sudo systemctl reload nginx`.
+   `tami-default-reject.conf` (default_server 443, `ssl_reject_handshake`) chỉ cài trên host mới này, **không** cài lên server cũ. Cổng 80 giữ site `default` của gói nginx.
+5. Dữ liệu: chuyển postgres + SeaweedFS từ staging cũ sang (phase-2-task-02; ~147 MB + ~457 MB), không clone dữ liệu giữa staging và production.
+6. GitHub Environment `staging`: `DEPLOY_HOST=179.197.242.57`, `DEPLOY_SSH_KNOWN_HOSTS` như 11.1 (phase-2-task-03); deploy lần đầu theo mục 1.
+
+### 11.4 Smoke
+- `curl -sI http://staging.tamihomes.vn/` → 301 sang https; `curl -sI https://staging.tamihomes.vn/` → 200 + `X-Robots-Tag: noindex, nofollow, noarchive` + HSTS `max-age=86400`.
+- `/robots.txt` có `Disallow: /`; `/api/metrics` và `/api/internal/x` → 404; trên server `curl -s http://127.0.0.1:3011/api/health` → 200.
+- `curl -sk --resolve x.invalid:443:179.197.242.57 https://x.invalid/` (hostname lạ) → lỗi TLS handshake (không phải trang staging).
+- Gửi form liên hệ thử: cột đầu `/var/log/nginx/tami-staging.access.log` là IP thật; 2 IP khác nhau → 2 bucket rate limit.
+- Rollback cấu hình nginx: gỡ symlink `tami-staging-tamihomes*` + `tami-default-reject.conf`, `nginx -t` + reload. Staging sslip cũ vẫn phục vụ.

@@ -261,11 +261,23 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 - Đặt giới hạn RAM cho từng container (`mem_limit`) để không ảnh hưởng dự án khác.
 - Thêm site bằng file riêng trong `/etc/nginx/sites-available/` + symlink `sites-enabled/`; chạy `nginx -t` trước khi `reload`, **không sửa file của site khác**.
 
+**Server staging (từ 2026-11-06, BL-111)** — `staging.tamihomes.vn`; server cũ ở trên giờ chỉ còn **production** (`tami.genieplatform.cloud`) + staging sslip dự phòng.
+
+| Hạng mục | Giá trị |
+|---|---|
+| Truy cập | SSH alias `server` (`179.197.242.57`, Hostinger); host key ED25519 `SHA256:5uzqgi5o4/BsMUm9/Fy39nXoMNQP/x1MvzYtJKXIs94` |
+| Máy | Ubuntu 26.04, 2 vCPU, RAM 7.7 GB + swap 4 GB (phase-2-task-01), SSD 96 GB |
+| Docker | Docker 29.9 + Compose 5.6 |
+| Reverse proxy | **Nginx host do TAMI cài** (1.28, certbot 4.0) giữ cổng 80/443, Let's Encrypt `--cert-name staging.tamihomes.vn`, không Cloudflare/Tunnel (decisions.md Decision 12); vhost `tami-staging-tamihomes{,-http}.conf` + `tami-default-reject.conf` |
+| Dự án khác | Chạy chung host (supabase, airoom, ...), ra Internet bằng cloudflared quick tunnel; không ai dùng 80/443. Không ufw, không `apt upgrade`/reboot, không đụng container/thư mục dự án khác |
+
+Chi tiết dựng lại: `docs/runbooks/deploy.md` §11.
+
 ### 6.2. Các service của TAMI
 
 | Service | Production | Staging | RAM ước tính |
 |---|---|---|---|
-| nginx (host) | có sẵn, thêm `tami-prod-direct{,-http}.conf` (chưa Cloudflare, 2026-10-23) / `tami.conf` (sau Cloudflare) | thêm `tami-staging-sslip{,-http}.conf` / `tami-staging.conf` (sau Cloudflare) | — |
+| nginx (host) | có sẵn, thêm `tami-prod-direct{,-http}.conf` (chưa Cloudflare, 2026-10-23) / `tami.conf` (sau Cloudflare) | server mới (BL-111): Nginx do TAMI cài, `tami-staging-tamihomes{,-http}.conf` + `tami-default-reject.conf`; server cũ: `tami-staging-sslip{,-http}.conf` (dự phòng) / `tami-staging.conf` (sau Cloudflare) | — |
 | `app` | **đúng 1 bản** (chạy 2+ bản cần cache handler dùng chung trước — §9.1, G9) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
 | `postgres` | riêng (prod: `tami-postgres:17-3.5-bookworm-pgbackrest2.59` = `postgres:17.11-bookworm` + PostGIS 3.5.2 + pgbackrest, build từ `docker/backup/Dockerfile` target `postgres`; bật `archive_mode`, `archive_timeout=300`) | riêng (`tami-postgis:17-3.5-bookworm`, cùng Dockerfile target `postgis`, không pgbackrest) | `mem_limit` 2g / 512m |
@@ -281,15 +293,15 @@ Tổng trần `mem_limit` as-built: prod ≈ 4,2GB (app 1g + jobs 384m + postgre
 - Compose project `tami` / `tami-staging`, container `tami-*` / `tami-staging-*`, network `tami-net` / `tami-staging-net`. Chỉ `app` publish `127.0.0.1:3010` / `127.0.0.1:3011`; log `json-file` xoay vòng cho Promtail/Alloy → Loki (không dùng driver loki vì cần plugin trên host dùng chung).
 - **Migrate là bước riêng:** `docker compose ... --profile tools run --rm migrate` (`payload migrate`) chạy trước khi bật `app`/`jobs`. `payload.config.ts` chỉ bật `prodMigrations` (tự migrate lúc khởi động ở production) khi `AUTO_MIGRATE_ON_START=true`; compose không truyền biến này.
 - Secret nằm ở env file trên server (`--env-file`), compose chỉ tham chiếu `${BIẾN}`; `docker compose config` fail nếu thiếu biến bắt buộc.
-- Nginx: `snippets/tami-cloudflare-ips.conf` (allow dải IP Cloudflare + `deny all`) và site `tami.conf` / `tami-staging.conf`. IP khách đến app qua header `CF-Connecting-IP` (không dùng `real_ip_header` vì module realip ghi đè `$remote_addr` trước pha access, làm `allow`/`deny` so sánh IP khách). Không mở cổng 80. `listen 443 ssl http2;` (không dùng `http2 on;`) để chạy được trên nginx 1.18 (Ubuntu 22.04) và 1.24 (24.04); bản >= 1.25.1 chỉ cảnh báo deprecated.
+- Nginx: `snippets/tami-cloudflare-ips.conf` (allow dải IP Cloudflare + `deny all`) và site `tami.conf` / `tami-staging.conf`. IP khách đến app qua header `CF-Connecting-IP` (không dùng `real_ip_header` vì module realip ghi đè `$remote_addr` trước pha access, làm `allow`/`deny` so sánh IP khách). Không mở cổng 80. `listen 443 ssl http2;` (không dùng `http2 on;`) để chạy được trên nginx 1.18 (Ubuntu 22.04) và 1.24 (24.04); bản >= 1.25.1 chỉ cảnh báo deprecated. Server staging mới (nginx 1.28, chỉ TAMI dùng 443) dùng `http2 on;` riêng từng server (`tami-staging-tamihomes.conf`).
 
 ### 6.3. Môi trường
 
 | | Production | Staging |
 |---|---|---|
-| Tên miền | `tami.genieplatform.cloud` (DNS A thẳng về server, chưa Cloudflare — 2026-10-23) | `187-52-119-50.sslip.io` (sau này `staging.<domain>`) |
+| Tên miền | `tami.genieplatform.cloud` (DNS A thẳng về server, chưa Cloudflare — 2026-10-23) | `staging.tamihomes.vn` (server mới 179.197.242.57, BL-111; `187-52-119-50.sslip.io` trên server cũ chạy dự phòng) |
 | DB | `DATABASE_URL_PROD` | `DATABASE_URL_STAGING` |
-| Truy cập | Công khai | Cloudflare Access hoặc mật khẩu, `noindex` |
+| Truy cập | Công khai | Công khai + `noindex` (không basic auth, Decision 12) |
 | Email | Gửi thật | Chỉ gửi tới danh sách email nội bộ |
 
 Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
@@ -330,6 +342,7 @@ Các dự án khác trên server deploy bằng GitHub Actions self-hosted runner
 - Runner GitHub build image (tag = commit SHA, label OCI) → push GHCR → job SSH vào server (host key ghim bằng secret `DEPLOY_SSH_KNOWN_HOSTS`, `StrictHostKeyChecking=yes`) chạy `deploy.sh`. Deploy **theo digest** (`ghcr.io/<repo>@sha256:…`), không dùng `latest`.
 - Kích hoạt bằng `workflow_run` của CI: chỉ khi CI PASS cho push vào `staging` của chính repo (không `main`, không PR/fork). Nhánh mặc định repo phải là `staging`.
 - Staging tự động; production **chạy tay** bằng workflow `deploy-production.yml` (`workflow_dispatch` nhập commit SHA thuộc nhánh `staging`; repo private gói Free không có required reviewers — 2026-10-23), không build lại mà lấy digest của image tag = SHA; server còn kiểm cặp digest + commit SHA có trong `/opt/tami/state/staging.history` (dòng `<digest> <thời điểm> <sha>`) và từ chối digest cũ hơn `production.current` (trừ `--allow-older`, chỉ chạy tay).
+- Khi staging và production ở 2 server khác nhau, job `record-staging-pass` (`deploy.yml`) ghi cặp digest + SHA vào `staging.history` trên server production (`deploy.sh record-staging`, chỉ append dưới khoá chung, không đụng container).
 - Mã triển khai (`docker/`, `scripts/deploy/`) upload vào **release bất biến theo môi trường + SHA** `/opt/tami/releases/<env>/<sha>/` (không ghi đè release khác); `deploy.sh` chạy từ chính release đó và đổi symlink `releases/<env>/current` nguyên tử trong khoá. Production vì thế luôn dùng compose/config của đúng commit đã duyệt. Giữ 5 release mới nhất mỗi môi trường.
 - `deploy.sh`: khoá `flock` chung → kiểm release (+ production: digest/SHA đã qua staging) → đổi `current` → pull → cổng `HIGH_RISK_MIGRATION` (production bị chặn khi có migration chưa apply mang dấu) → `payload migrate` → up `app`/`jobs` → health `/api/health` (retry/timeout) + `jobs` ổn định → mọi lỗi sau khi bắt đầu đổi container (kể cả `compose up` lỗi) quay về image + release trước (exit 1; rollback cũng lỗi → exit 3) (state ở `/opt/tami/state`). Migration đã chạy không rollback được nên phải backward-compatible.
 - Không build trên server nên không có `docker builder prune`; script chỉ xoá image `tami` cũ (giữ current/previous của cả hai môi trường), không prune toàn cục.
