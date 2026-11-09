@@ -1,7 +1,7 @@
 import type { CollapsibleField, Field, TabsField } from "payload";
 import { describe, expect, it } from "vitest";
 
-import { createHomepage } from "./Homepage";
+import { createHomepage, FEATURED_PROJECTS_MAX, HERO_CHIP_PROJECTS_MAX, HERO_SLIDES_MAX } from "./Homepage";
 import { enabledField } from "./homepage/blocks";
 
 /** Đường dẫn dữ liệu của cây field (tab/row/collapsible không tên không thêm cấp; group/array thêm cấp theo `name`). */
@@ -173,5 +173,33 @@ describe("Global Trang chủ: 5 tab không tên (BL-051 A14)", () => {
     expect(order).toMatchObject({ name: "blockOrder", type: "array", label: "Thứ tự các khối" });
     expect(order.admin?.description).toContain("Dịch vụ, Ưu đãi, Cho thuê, Tin tức, Đối tác");
     expect(order.admin?.description).toContain("Hiện khối này trên web");
+  });
+});
+
+describe("Global Trang chủ: mô tả nêu giới hạn tối đa (BL-115)", () => {
+  /** Tìm field relationship theo name, đi qua tab/collapsible/group. */
+  function findRelationship(fields: readonly Field[], name: string, type: "relationship" | "array" = "relationship"): Field | undefined {
+    for (const field of fields) {
+      if ("name" in field && field.name === name && field.type === type) return field;
+      const children = field.type === "tabs" ? field.tabs.flatMap((tab) => tab.fields) : "fields" in field ? field.fields : [];
+      const found = findRelationship(children, name, type);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  it.each([
+    ["projects", FEATURED_PROJECTS_MAX],
+    ["chipProjects", HERO_CHIP_PROJECTS_MAX],
+  ])("\"%s\": maxRows = hằng và description ghi \"Tối đa <hằng> dự án\"", (name, max) => {
+    const field = findRelationship(homepageFields, name) as { maxRows?: number; admin?: { description?: string } } | undefined;
+    expect(field?.maxRows).toBe(max);
+    expect(field?.admin?.description).toContain(`Tối đa ${max} dự án`);
+  });
+
+  it("\"slides\" (mảng): maxRows = hằng và description ghi \"Tối đa <hằng> slide\"", () => {
+    const field = findRelationship(homepageFields, "slides", "array") as { maxRows?: number; admin?: { description?: string } } | undefined;
+    expect(field?.maxRows).toBe(HERO_SLIDES_MAX);
+    expect(field?.admin?.description).toContain(`Tối đa ${HERO_SLIDES_MAX} slide`);
   });
 });

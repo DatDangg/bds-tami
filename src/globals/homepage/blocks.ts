@@ -86,7 +86,7 @@ export const heroSearchBlock: GroupField = {
     enabledField,
     { name: "placeholder", type: "text", label: "Chữ gợi ý trong ô tìm kiếm", localized: true, admin: { description: "Để trống thì dùng chữ mặc định của website." } },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
-    { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án nổi bật mới nhất." } },
+    { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: `Tối đa ${HERO_CHIP_PROJECTS_MAX} dự án. Để trống thì tự lấy các dự án nổi bật mới nhất.` } },
   ],
 };
 
@@ -133,7 +133,7 @@ export const rentalsBlock: GroupField = {
       maxRows: RENTAL_CATEGORIES_MAX,
       filterOptions: { scope: { equals: "rental" } },
       validate: validateRentalCategories,
-      admin: { description: "Tối đa 4. Để trống thì tự lấy các danh mục cho thuê đang có tin." },
+      admin: { description: `Tối đa ${RENTAL_CATEGORIES_MAX}. Để trống thì tự lấy các danh mục cho thuê đang có tin.` },
     },
   ],
 };
@@ -148,6 +148,6 @@ export const newsBlock: GroupField = {
     titleField,
     { name: "intro", type: "textarea", label: "Giới thiệu ngắn", localized: true },
     // Trống thì phía hiển thị lấy 3 bài mới nhất.
-    { name: "posts", type: "relationship", label: "Bài viết hiển thị", relationTo: "news", hasMany: true, maxRows: HOME_NEWS_POSTS_MAX, admin: { description: "Tối đa 3. Để trống thì tự lấy 3 bài mới nhất." } },
+    { name: "posts", type: "relationship", label: "Bài viết hiển thị", relationTo: "news", hasMany: true, maxRows: HOME_NEWS_POSTS_MAX, admin: { description: `Tối đa ${HOME_NEWS_POSTS_MAX}. Để trống thì tự lấy ${HOME_NEWS_POSTS_MAX} bài mới nhất.` } },
   ],
 };

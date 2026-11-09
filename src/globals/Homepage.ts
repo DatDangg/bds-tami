@@ -128,7 +128,10 @@ const heroBlock: GroupField = {
       required: true,
       minRows: HERO_SLIDES_MIN,
       maxRows: HERO_SLIDES_MAX,
-      admin: { components: { RowLabel: textRowLabel({ field: "title", fallback: "Slide" }) } },
+      admin: {
+        description: `Tối đa ${HERO_SLIDES_MAX} slide.`,
+        components: { RowLabel: textRowLabel({ field: "title", fallback: "Slide" }) },
+      },
       fields: [
         // Poster + ảnh mobile; video chỉ phát ở ≥ 1024px.
         imageUpload("image", "Ảnh nền", true),
@@ -196,7 +199,7 @@ const featuredProjectsBlock: GroupField = {
     titleField,
     { name: "description", type: "textarea", label: "Mô tả dưới tiêu đề", localized: true },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
-    { name: "projects", type: "relationship", label: "Dự án hiển thị", relationTo: "projects", hasMany: true, maxRows: FEATURED_PROJECTS_MAX, admin: { description: "Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất." } },
+    { name: "projects", type: "relationship", label: "Dự án hiển thị", relationTo: "projects", hasMany: true, maxRows: FEATURED_PROJECTS_MAX, admin: { description: `Tối đa ${FEATURED_PROJECTS_MAX} dự án. Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.` } },
   ],
 };
 

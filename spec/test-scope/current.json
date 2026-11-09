@@ -1,50 +1,51 @@
 {
   "specVersion": "1.62.3",
-  "scopeVersion": 111,
-  "generatedAt": "2026-11-09T03:45:21.302Z",
+  "scopeVersion": 112,
+  "generatedAt": "2026-11-09T03:45:52.769Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-117 BUG: logo footer không phải link. Bọc link về trang chủ theo locale. Không đổi requirement — giữ spec_version.",
+  "triggerNote": "BL-115 BUG: mô tả admin 'Dự án hiển thị' thiếu giới hạn tối đa 6; đồng bộ mô tả giới hạn các field khác của global homepage. Chỉ admin.description — giữ spec_version.",
   "status": "published",
-  "workItem": "bug/footer-logo-not-linked",
-  "backlog": "BL-117",
+  "workItem": "bug/homepage-featured-projects-max-hint",
+  "backlog": "BL-115",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-09-footer-logo-not-linked.md",
-  "task": "tasks/bug-footer-logo-not-linked/phase-1-task-01.md",
+  "changeDoc": "spec/changes/archive/2026-11-09-homepage-featured-projects-max-hint.md",
+  "task": "tasks/bug-homepage-featured-projects-max-hint/phase-1-task-01.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Khung trang (footer)",
-    "BL-117"
+    "SPECIFICATIONS.md § F1 Trang chủ (global homepage admin)",
+    "BL-115"
   ],
   "changed": {
     "files": [
-      "src/components/layout/Footer.tsx",
-      "src/components/layout/Footer.test.tsx"
+      "src/globals/Homepage.ts",
+      "src/globals/Homepage.test.ts",
+      "src/globals/homepage/blocks.ts (chỉ 3 chuỗi description)"
     ],
     "modules": [
-      "Footer công khai (mọi trang VI/EN)"
+      "Admin Cấu hình Trang chủ (/admin/globals/homepage)"
     ]
   },
   "impact": {
     "direct": [
-      "Mọi trang /vi: bấm logo footer -> về / ; mọi trang /en: bấm logo footer -> về /en",
-      "Logo footer có tên truy cập 'TAMI, về trang chủ' (EN tương ứng), Tab tới được, viền focus nhìn thấy trên nền tối, vùng bấm >= 44px"
+      "/admin/globals/homepage 'Dự án hiển thị': mô tả 'Tối đa 6 dự án. Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.'",
+      "Hero 'slides': mô tả 'Tối đa 8 slide.'",
+      "Ô tìm kiếm trên banner 'Dự án gợi ý dưới ô tìm kiếm': 'Tối đa 6 dự án. …'",
+      "Cho thuê 'Danh mục' và Tin tức 'Bài viết hiển thị': mô tả lấy số từ hằng (4 / 3)"
     ],
-    "dependents": [
-      "Footer: giới thiệu, mạng xã hội, cột link accordion < md không đổi bố cục"
-    ],
+    "dependents": [],
     "regression": [
-      "Logo header vẫn về trang chủ",
-      "Footer < md accordion cột link vẫn mở/đóng"
+      "Lưu global homepage như trước (maxRows không đổi)"
     ]
   },
   "acceptance": [
-    "Bấm logo footer về trang chủ đúng ngôn ngữ"
+    "Mô tả 'Dự án hiển thị' nêu tối đa 6"
   ],
   "knownBlockers": [],
-  "testNotes": "Chưa kiểm trình duyệt thật; test jsdom vi/en.",
+  "testNotes": "'Tin ưu đãi hiển thị' chưa nêu giới hạn hiển thị (FEATURED_OFFERS_MAX ở home-view.ts, import ngược tạo vòng) — residual.",
   "risk": "low",
-  "riskNote": "Chỉ bọc link quanh logo footer; FAST PASS round 1.",
+  "riskNote": "Chỉ chuỗi mô tả admin; FAST PASS round 2.",
   "reviewReport": [
-    ".context/review-reports/bug-footer-logo-not-linked-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/bug-homepage-featured-projects-max-hint-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/bug-homepage-featured-projects-max-hint-phase-1-task-01-round-2-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-110.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-111.json"
 }
