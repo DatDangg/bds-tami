@@ -261,32 +261,32 @@ CV ứng viên lưu vào bucket `private`. Chỉ tải được qua endpoint có
 - Đặt giới hạn RAM cho từng container (`mem_limit`) để không ảnh hưởng dự án khác.
 - Thêm site bằng file riêng trong `/etc/nginx/sites-available/` + symlink `sites-enabled/`; chạy `nginx -t` trước khi `reload`, **không sửa file của site khác**.
 
-**Server staging (từ 2026-11-06, BL-111)** — `179-197-242-57.sslip.io`; server cũ ở trên giờ chỉ còn **production** (`tami.genieplatform.cloud`) + staging sslip dự phòng.
+**Server mới — staging + production cùng một host (staging từ 2026-11-06 BL-111; production từ 2026-11-06 BL-112, Decision 13)** — staging `179-197-242-57.sslip.io` (app `127.0.0.1:3011`) + production `tamihomes.vn` (app `127.0.0.1:3010`, `www` → 301 apex). Server cũ ở trên (`server-old`) từ 2026-11-09 chỉ còn Nginx: vhost 301 `tami.genieplatform.cloud` → `https://tamihomes.vn` + cổng 80 ACME; stack `tami-*`/`tami-staging-*` đã `docker stop` + `restart=no`, volume/`/opt/tami` giữ nguyên.
 
 | Hạng mục | Giá trị |
 |---|---|
 | Truy cập | SSH alias `server` (`179.197.242.57`, Hostinger); host key ED25519 `SHA256:5uzqgi5o4/BsMUm9/Fy39nXoMNQP/x1MvzYtJKXIs94` |
 | Máy | Ubuntu 26.04, 2 vCPU, RAM 7.7 GB + swap 4 GB (phase-2-task-01), SSD 96 GB |
 | Docker | Docker 29.9 + Compose 5.6 |
-| Reverse proxy | **Nginx host do TAMI cài** (1.28, certbot 4.0) giữ cổng 80/443, Let's Encrypt `--cert-name 179-197-242-57.sslip.io`, không Cloudflare/Tunnel (decisions.md Decision 12); vhost `tami-staging-sslip-179{,-http}.conf` + `tami-default-reject.conf` |
+| Reverse proxy | **Nginx host do TAMI cài** (1.28, certbot 4.0) giữ cổng 80/443, Let's Encrypt `--cert-name 179-197-242-57.sslip.io` (staging) + `--cert-name tamihomes.vn` (apex + www, production), không Cloudflare/Tunnel (decisions.md Decision 12, 13); vhost `tami-staging-sslip-179{,-http}.conf` + `tami-prod-tamihomes{,-http}.conf` + `tami-default-reject.conf` |
 | Dự án khác | Chạy chung host (supabase, airoom, ...), ra Internet bằng cloudflared quick tunnel, trừ `outfitai.genieplatform.cloud` (có site Nginx 443 + cert riêng nên 443/certbot dùng chung). Không ufw, không `apt upgrade`/reboot, không đụng container/thư mục dự án khác |
 
-Chi tiết dựng lại: `docs/runbooks/deploy.md` §11.
+Chi tiết dựng lại: `docs/runbooks/deploy.md` §11 (staging), §12 (production).
 
 ### 6.2. Các service của TAMI
 
 | Service | Production | Staging | RAM ước tính |
 |---|---|---|---|
-| nginx (host) | có sẵn, thêm `tami-prod-direct{,-http}.conf` (chưa Cloudflare, 2026-10-23) / `tami.conf` (sau Cloudflare) | server mới (BL-111): Nginx do TAMI cài, `tami-staging-sslip-179{,-http}.conf` + `tami-default-reject.conf`; server cũ: `tami-staging-sslip{,-http}.conf` (dự phòng) / `tami-staging.conf` (sau Cloudflare) | — |
+| nginx (host) | server mới (BL-112): `tami-prod-tamihomes{,-http}.conf` (`tamihomes.vn`, www → 301 apex); server cũ: chỉ `tami-prod-genieplatform-redirect.conf` (301 tên miền cũ) + `tami-prod-direct-http.conf` (cổng 80 ACME); `tami-prod-direct.conf` là lịch sử; `tami.conf` (sau Cloudflare) | server mới (BL-111): Nginx do TAMI cài, `tami-staging-sslip-179{,-http}.conf` + `tami-default-reject.conf`; server cũ: chỉ còn `tami-staging-sslip-http.conf` (cổng 80, gia hạn cert; 443 đã gỡ 2026-11-09) / `tami-staging.conf` (sau Cloudflare) | — |
 | `app` | **đúng 1 bản** (chạy 2+ bản cần cache handler dùng chung trước — §9.1, G9) | 1 bản | `mem_limit` 1g / 768m (heap Node 768 / 576MB) |
 | `jobs` | cùng image app, lệnh `node node_modules/payload/bin.js run scripts/jobs-runner.ts` (tương đương `pnpm jobs` nhưng không qua pnpm để node là PID 1 nhận SIGTERM; poll 5s, dừng an toàn bằng SIGTERM/SIGINT; `stop_grace_period: 60s`). **Chỉ 1 bản** (job gộp click không nguyên tử): compose đặt `container_name` cố định nên không `--scale` được; không tạo bản thứ hai ở môi trường nào | cùng image | `mem_limit` 384m (đo thực ~190MB khi rảnh; 256MB không đủ dư địa) |
-| `postgres` | riêng (prod: `tami-postgres:17-3.5-bookworm-pgbackrest2.59` = `postgres:17.11-bookworm` + PostGIS 3.5.2 + pgbackrest, build từ `docker/backup/Dockerfile` target `postgres`; bật `archive_mode`, `archive_timeout=300`) | riêng (`tami-postgis:17-3.5-bookworm`, cùng Dockerfile target `postgis`, không pgbackrest) | `mem_limit` 2g / 512m |
+| `postgres` | riêng (prod: `tami-postgres:17-3.5-bookworm-pgbackrest2.59` = `postgres:17.11-bookworm` + PostGIS 3.5.2 + pgbackrest, build từ `docker/backup/Dockerfile` target `postgres`; bật `archive_mode`, `archive_timeout=300`) | riêng (`tami-postgis:17-3.5-bookworm`, cùng Dockerfile target `postgis`, không pgbackrest) | `mem_limit` 1g (BL-112: host mới 7.7 GB dùng chung; `shared_buffers=256MB`) / 512m |
 | `backup` (sidecar, chỉ prod; staging không có) | 1 bản: lịch + pgBackRest (diff/full/check) + restic, kho đích ngoài server cấu hình bằng env | 1 bản, kho riêng | `mem_limit` 384m / 256m |
 | `redis` | riêng (có mật khẩu, `maxmemory 100mb`, `volatile-lru`) | riêng | 128m |
 | `seaweedfs` | **As-built:** mỗi môi trường 1 instance riêng trong compose của mình (không publish cổng, khoá S3 lấy từ env), bucket riêng (`tami-prod-*`) — thay cho phương án dùng chung ban đầu, để prod/staging không chia sẻ dữ liệu hay khoá | instance riêng, bucket `tami-staging-*` | 256m |
 | giám sát | dùng chung | dùng chung | ~1GB |
 
-Tổng trần `mem_limit` as-built: prod ≈ 4,2GB (app 1g + jobs 384m + postgres 2g + redis 128m + seaweedfs 256m + backup 384m) + staging ≈ 2,3GB (768m + 384m + 512m + 128m + 256m + backup 256m) + giám sát dùng chung ~1GB ≈ 7,5GB; chưa tính các container chạy một lần (`migrate` 512m, `seaweedfs-init` 128m). Mức dùng thực thường thấp hơn trần, nằm gọn trong ~11GB đang trống.
+Tổng trần `mem_limit` as-built: prod ≈ 3,1GB (app 1g + jobs 384m + postgres 1g + redis 128m + seaweedfs 256m + backup 384m) + staging ≈ 2,3GB (768m + 384m + 512m + 128m + 256m + backup 256m) + giám sát dùng chung ~1GB ≈ 6,4GB; chưa tính các container chạy một lần (`migrate` 512m, `seaweedfs-init` 128m). Mức dùng thực thường thấp hơn trần. Từ BL-112 cả hai môi trường cùng server mới (RAM 7.7 GB + swap 4 GB, dùng chung với dự án khác): theo dõi RAM/swap + `OOMKilled`.
 
 **As-built (`docker/Dockerfile`, `docker/docker-compose.{prod,staging}.yml`, `docker/nginx/`):**
 - Một image (`docker/Dockerfile`, Node 22, user `node`, `HEALTHCHECK /api/health`) chạy cả `app` (`next start`) và `jobs`; không dùng `output: standalone` vì `jobs` và `payload migrate` cần `payload` CLI + loader TS + toàn bộ dependency production. Không chứa `.env`, source map hay devDependencies.
@@ -299,7 +299,7 @@ Tổng trần `mem_limit` as-built: prod ≈ 4,2GB (app 1g + jobs 384m + postgre
 
 | | Production | Staging |
 |---|---|---|
-| Tên miền | `tami.genieplatform.cloud` (DNS A thẳng về server, chưa Cloudflare — 2026-10-23) | `179-197-242-57.sslip.io` (server mới 179.197.242.57, BL-111; staging sslip cũ `187-52-119-50.sslip.io` trên server cũ chạy dự phòng) |
+| Tên miền | `tamihomes.vn` (server mới 179.197.242.57, DNS A thẳng, chưa Cloudflare — BL-112, 2026-11-06; `www` → 301 apex; `tami.genieplatform.cloud` cũ → 301) | `179-197-242-57.sslip.io` (server mới 179.197.242.57, BL-111; staging sslip cũ `187-52-119-50.sslip.io` trên server cũ đã dừng 2026-11-09) |
 | DB | `DATABASE_URL_PROD` | `DATABASE_URL_STAGING` |
 | Truy cập | Công khai | Công khai + `noindex` (không basic auth, Decision 12) |
 | Email | Gửi thật | Chỉ gửi tới danh sách email nội bộ |
@@ -318,9 +318,9 @@ Biến cấu hình theo môi trường (đã có trong code, `src/lib/env.ts`):
 | `METRICS_TOKEN` | ≥ 32 ký tự | ≥ 32 ký tự | Bearer cho `/api/metrics`; chưa đặt thì endpoint trả 404 |
 | `LOG_LEVEL` | `info` | `info` | Mặc định `info` (`silent` khi test) |
 
-**Ngoại lệ staging (as-built, 2026-10-18): chưa có tên miền/Cloudflare.** Staging chạy tại `https://187-52-119-50.sslip.io`, HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-staging-sslip*.conf`), basic auth + `noindex`, không CDN; IP khách lấy từ `X-Real-IP` do Nginx đặt (`TRUST_X_REAL_IP=true`). Runbook: `docs/runbooks/deploy.md` §9.
+**Ngoại lệ staging (as-built, 2026-10-18): chưa có tên miền/Cloudflare.** Staging chạy tại `https://187-52-119-50.sslip.io`, HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-staging-sslip*.conf`), basic auth + `noindex`, không CDN; IP khách lấy từ `X-Real-IP` do Nginx đặt (`TRUST_X_REAL_IP=true`). Runbook: `docs/runbooks/deploy.md` §9 (lịch sử: staging sslip cũ đã dừng 2026-11-09; staging hiện tại §11).
 
-**Ngoại lệ production (quyết định user 2026-10-23): chưa dùng Cloudflare.** Production chạy tại `https://tami.genieplatform.cloud` (DNS A thẳng về server; tên miền này gắn tạm cho staging từ 2026-10-21, nay chuyển hẳn sang production), HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-prod-direct{,-http}.conf`, chứng chỉ dùng chung với staging sslip), không CDN/WAF; IP khách lấy từ `X-Real-IP` (`prod.env`: `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`). Hệ quả chưa có Cloudflare: không có cache CDN (header `s-maxage` không tác dụng, mọi request tới app), không WAF/chống DDoS, **chưa có lớp xác thực thứ 2 cho `/admin`** (Cloudflare Access ở §9) — chỉ còn mật khẩu mạnh + khoá tạm sau 5 lần sai. Khi bật Cloudflare: đổi sang `tami.conf` + origin cert + đảo hai cờ `TRUST_*`. Production DB khởi đầu trống (không clone dữ liệu staging), nội dung nhập lại qua admin. Runbook: `docs/runbooks/deploy.md` §10.
+**Ngoại lệ production (quyết định user 2026-10-23): chưa dùng Cloudflare.** Production chạy tại `https://tamihomes.vn` trên server mới 179.197.242.57 từ 2026-11-06 (BL-112; trước đó `https://tami.genieplatform.cloud` trên server cũ, nay 301 sang tên miền mới), HTTPS Let's Encrypt trên Nginx host (`docker/nginx/tami-prod-tamihomes{,-http}.conf`, cert `tamihomes.vn` apex + www), không CDN/WAF; IP khách lấy từ `X-Real-IP` (`prod.env`: `TRUST_CF_CONNECTING_IP=false`, `TRUST_X_REAL_IP=true`). Hệ quả chưa có Cloudflare: không có cache CDN (header `s-maxage` không tác dụng, mọi request tới app), không WAF/chống DDoS, **chưa có lớp xác thực thứ 2 cho `/admin`** (Cloudflare Access ở §9) — chỉ còn mật khẩu mạnh + khoá tạm sau 5 lần sai. Khi bật Cloudflare: đổi sang `tami.conf` + origin cert + đảo hai cờ `TRUST_*`. Production DB khởi đầu trống ở lần dựng đầu 2026-10-23 (không clone dữ liệu staging, nội dung nhập qua admin); prod trên server mới là dữ liệu chuyển nguyên từ prod cũ lúc cắt chuyển (BL-112, đối chiếu 100%). Runbook: `docs/runbooks/deploy.md` §12 (§10 là lịch sử server cũ).
 
 Staging cũng **không backup** (compose staging: image `tami-postgis:17-3.5-bookworm` — Dockerfile `docker/backup` target `postgis`, không pgbackrest — `archive_mode=off`, không dịch vụ `backup`, không cần `BACKUP_ENV_DIR`), **không alert** tới M3 và **tắt dịch AI** (`TRANSLATION_MONTHLY_BUDGET_USD=0`, `ANTHROPIC_API_KEY` để trống) theo quyết định user 2026-10-18; production giữ backup + WAL archive như §8. Dữ liệu staging là dữ liệu mẫu, mất thì migrate + seed lại.
 

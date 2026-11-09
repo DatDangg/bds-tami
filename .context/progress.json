@@ -1,10 +1,6 @@
 {
   "mode": "maintenance",
-  "activeWorkItem": {
-    "type": "feature",
-    "slug": "production-new-server-tamihomes",
-    "phaseTask": "phase-3-task-02"
-  },
+  "activeWorkItem": null,
   "features": [
     {
       "slug": "legal-en-edit-requires-reapproval",
@@ -3518,10 +3514,10 @@
       "slug": "production-new-server-tamihomes",
       "title": "Chuyển production sang server mới 179.197.242.57 + tên miền https://tamihomes.vn (BL-112)",
       "type": "MODIFY",
-      "status": "in_progress",
-      "currentPhase": 3,
+      "status": "done",
+      "currentPhase": 4,
       "backlog": "BL-112",
-      "changeDoc": "spec/changes/2026-11-06-production-new-server-tamihomes.md",
+      "changeDoc": "spec/changes/archive/2026-11-06-production-new-server-tamihomes.md",
       "startedAt": "2026-11-06",
       "planApprovedAt": "2026-11-06T07:45Z (user: Ok, làm đi — Q1–Q5 mặc định)",
       "tasks": [
@@ -3593,14 +3589,15 @@
         {
           "file": "tasks/feature-production-new-server-tamihomes/phase-4-task-01.md",
           "task": "phase-4-task-01",
-          "status": "awaiting_push_verify",
+          "status": "done",
           "attempt": 1,
           "round": 2,
           "reviewLevel": "STRICT",
           "reviewerResult": "PASS",
           "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-4-task-01-round-2-review.md",
           "note": "gỡ job record-staging-pass + mode record-staging của ssh-deploy (trở về fd524e26~1); giữ deploy.sh record-staging làm lệnh tay; runbook §1/§11/§12 + ARCHITECTURE 1 dòng",
-          "verify": "deploy.test.sh PASS; grep .github sạch; còn verify sau push"
+          "verify": "deploy.test.sh PASS; grep .github sạch; sau push (kiểm 2026-11-09): Deploy 42193343151 chỉ build + deploy-staging, staging.history dòng e80b2e14, cổng awk require_staging_passed: e80b2e14 PASS / 9aaf11d2 REJECT",
+          "completedAt": "2026-11-09"
         },
         {
           "file": "tasks/feature-production-new-server-tamihomes/phase-3-task-02.md",
@@ -3614,8 +3611,30 @@
           "note": "smoke tamihomes.vn PASS: cert LE apex+www, HSTS 1 năm, không noindex, 301 www/http/tên miền cũ giữ path, robots/sitemap/canonical/og/hreflang tamihomes.vn, /api/metrics+/internal 404, IP thật trong nginx log, backup prom =1, OOM 0",
           "verify": "reviewer tự kiểm lại mẫu; residual: admin login/CV, RAM 24h, SMTP giả",
           "completedAt": "2026-11-06"
+        },
+        {
+          "file": "tasks/feature-production-new-server-tamihomes/phase-4-task-02.md",
+          "task": "phase-4-task-02",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "reviewerResult": "PASS",
+          "report": ".context/review-reports/feature-production-new-server-tamihomes-phase-4-task-02-round-1-review.md",
+          "note": "server cũ 04:42–04:43Z: docker stop + restart=no 13 container tami*/tami-staging-* (exit 0, 9 volume + /opt/tami + kho R2 cũ giữ); gỡ symlink 443 tami-staging-sslip.conf (nginx -t + reload), giữ 301 tên miền cũ + cổng 80 ACME; docs deploy §9/§10/§12(+12.1c), restore, ARCHITECTURE §6, project-config, Decision 13; tách BL-118 Turnstile (SMTP = BL-095)",
+          "verify": "docker ps | grep tami rỗng; tami.genieplatform.cloud/du-an 301 → tamihomes.vn/du-an; tamihomes.vn 200; certbot dry-run cert cũ PASS; sync-claude --check OK; 4 MINOR review sửa trước commit",
+          "completedAt": "2026-11-09"
         }
-      ]
+      ],
+      "specVersion": "1.63.1",
+      "scopeVersion": 118,
+      "review": "NORMAL PASS (P4.T02 r1); STRICT PASS các task chạm server/CI",
+      "specValidation": [
+        ".context/review-reports/feature-production-new-server-tamihomes-phase-4-spec-validation.md (r1 FAIL: gap close-out)",
+        ".context/review-reports/feature-production-new-server-tamihomes-phase-4-spec-validation-round-2.md (r2 PASS)"
+      ],
+      "completedAt": "2026-11-09",
+      "residual": "chờ user: quyết xoá kho R2 cũ /tami-prod + tami-prod-files và volume/opt/tami server cũ sau 2026-12-06; BL-118 Turnstile key thật; BL-095 SMTP; login admin + tải CV thật trên tamihomes.vn; theo dõi RAM/swap host chung; https://187-52-119-50.sslip.io rơi vào site 443 dự án khác"
     },
     {
       "slug": "homepage-partners-block",
@@ -5819,7 +5838,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T04:21:23.103Z",
+  "lastUpdated": "2026-11-09T05:05:00.000Z",
   "approvalMilestones": [
     {
       "id": "M1",

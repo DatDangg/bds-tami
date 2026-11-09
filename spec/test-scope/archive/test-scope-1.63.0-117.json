@@ -1,0 +1,77 @@
+{
+  "specVersion": "1.63.0",
+  "scopeVersion": 117,
+  "generatedAt": "2026-11-09T04:21:23.103Z",
+  "trigger": "feature-update",
+  "triggerNote": "BL-107 ADDITIVE: trang chủ không hiện khối Đối tác dù đã cấu hình (QA 26) — khối chưa từng có giao diện. Dựng dải logo chạy ngang. Bump MINOR 1.62.6 -> 1.63.0.",
+  "status": "published",
+  "workItem": "feature/homepage-partners-block",
+  "backlog": "BL-107",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-11-05-homepage-partners-block-missing.md",
+  "task": "tasks/feature-homepage-partners-block/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-homepage-partners-block.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § F1 — Đối tác (FR-PUB-17, BL-107)",
+    "FR-PUB-17",
+    "BR-07",
+    "BL-107"
+  ],
+  "changed": {
+    "files": [
+      "src/components/home/PartnersMarquee.tsx (mới, + test)",
+      "src/components/home/PartnersMarqueeShell.tsx (mới, client: nút Dừng/Phát)",
+      "src/lib/home/home-view-partners.ts (mới)",
+      "src/lib/home/home-view.ts (+ test)",
+      "src/lib/home/home-queries.ts (+ test, loadPartners)",
+      "src/lib/home/load-home.ts",
+      "src/components/home/HomeBlocks.tsx (+ test)",
+      "src/hooks/developers/revalidate-developer.ts (mới, + test)",
+      "src/collections/Developers.ts (gắn hook)",
+      "src/app/(frontend)/globals.css (keyframes partners-marquee)",
+      "src/i18n/messages/vi.json, en.json (page.home.partners.*)"
+    ],
+    "modules": [
+      "Trang chủ / và /en — khối Đối tác",
+      "Admin Chủ đầu tư (làm mới trang chủ khi lưu/xoá đối tác)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Admin: bật 'Hiện ở khối đối tác trang chủ' cho ≥ 1 chủ đầu tư + khối Đối tác có trong 'Thứ tự các khối' và bật → trang chủ hiện khối đúng vị trí",
+      "≥ 5 đối tác: dải logo + tên chạy ngang; hover dừng; bấm logo có website mở tab mới, dải không nhảy; Tab vào dải → dải về đầu, viền focus rõ; nút Dừng/Phát hoạt động (cả màn cảm ứng)",
+      "≤ 4 đối tác: hàng tĩnh căn giữa, không nút",
+      "Hệ điều hành bật giảm chuyển động: dải không chạy, xuống dòng, không nút",
+      "0 đối tác / tắt khối / không có trong thứ tự: khối ẩn",
+      "Tiêu đề trống → 'Đối tác' / 'Partners'",
+      "/en: chỉ đối tác đã có bản EN",
+      "Lưu/xoá chủ đầu tư đang/vừa là đối tác → trang chủ cập nhật ngay (không chờ ISR)",
+      "390 / 768 / 1440: không tràn ngang, tên dài xuống dòng khi tĩnh"
+    ],
+    "dependents": [
+      "Các khối trang chủ khác giữ thứ tự / hiển thị",
+      "Admin Chủ đầu tư lưu/xoá bình thường (hook không lỗi ngoài Next)"
+    ],
+    "regression": [
+      "Trang chủ không có đối tác hiển thị như trước",
+      "Chi tiết dự án hiển thị chủ đầu tư không đổi"
+    ]
+  },
+  "acceptance": [
+    "Có đối tác + khối bật → trang chủ hiện khối Đối tác đúng thứ tự",
+    "Dải chạy, dừng khi hover/focus, nút Dừng/Phát, reduced-motion tĩnh",
+    "Không đối tác → ẩn khối",
+    "Responsive 390/768/1440 không tràn ngang"
+  ],
+  "knownBlockers": [],
+  "testNotes": "Chưa kiểm trình duyệt thật (390/768/1440, CLS, vòng lặp liền mạch ở 1440, click chuột giữa vòng trên Chrome, Tab tới link xa). Đổi ảnh logo trong Media không làm mới ngay (chờ ISR 60s). Cửa sổ mất focus thì scroll dải reset. Bản ghi homepage staging/prod đang có partners trong thứ tự + bật sẽ hiện khối ngay sau deploy.",
+  "risk": "medium",
+  "riskNote": "Trang chủ + hook revalidate mới + animation a11y; STRICT PASS round 3 (attempt 4 bổ sung do user duyệt), spec-validation phase PASS.",
+  "reviewReport": [
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-2-review.md",
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-3-review.md",
+    ".context/review-reports/spec-validation-feature-homepage-partners-block-phase-1.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.6-116.json"
+}

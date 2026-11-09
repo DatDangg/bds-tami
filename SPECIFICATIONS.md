@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.63.0
+- **spec_version:** 1.63.1
 - **updated_at:** 2026-11-09
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -351,7 +351,8 @@ Các quy tắc dưới đây là ⚠️ giả định mặc định để build,
 - Docker Compose (`app`, `jobs`, `postgres`, `redis`, `seaweedfs`, giám sát), tiền tố `tami-`. Container chỉ bind `127.0.0.1` (prod `:3010`, staging `:3011`); DB/Redis/file không mở cổng ra host.
 - Reverse proxy: **Nginx có sẵn trên host**, thêm file `tami.conf` / `tami-staging.conf`, không đụng site khác.
 - Production và staging tách biệt (DB, Redis, bucket, tên miền riêng; `staging_db ≠ prod_db`). Staging chặn truy cập công khai + `noindex`.
-  - **As-built (BL-111, 2026-11-06):** staging chạy trên **server riêng** (179.197.242.57, dùng chung với dự án khác), `https://179-197-242-57.sslip.io`, Nginx host do TAMI cài + Let's Encrypt (không Cloudflare/Tunnel), mở công khai + `noindex` (không basic auth — quyết định user). Production vẫn trên server cũ `tami.genieplatform.cloud` (chuyển sang `tamihomes.vn` = BL-112). Cổng "production chỉ nhận bản đã qua staging" giữ được khi 2 server tách nhau (job `record-staging-pass`). Chi tiết: `docs/runbooks/deploy.md` §11, `.context/decisions.md` Decision 12.
+  - **As-built (BL-111, 2026-11-06):** staging chạy trên **server riêng** (179.197.242.57, dùng chung với dự án khác), `https://179-197-242-57.sslip.io`, Nginx host do TAMI cài + Let's Encrypt (không Cloudflare/Tunnel), mở công khai + `noindex` (không basic auth — quyết định user). Production lúc đó vẫn trên server cũ `tami.genieplatform.cloud` (đã chuyển sang `tamihomes.vn` — xem bullet BL-112 dưới). Cổng "production chỉ nhận bản đã qua staging" giữ được khi 2 server tách nhau (job `record-staging-pass`; job này đã gỡ ở BL-112 vì staging + production nay cùng server, dùng chung `staging.history`). Chi tiết: `docs/runbooks/deploy.md` §11, `.context/decisions.md` Decision 12.
+  - **As-built (BL-112, 2026-11-09):** production chạy trên **server mới 179.197.242.57** (cùng host với staging), tên miền `https://tamihomes.vn` (`www.tamihomes.vn` → 301 apex). Cắt chuyển 2026-11-06 08:28Z, đối chiếu dữ liệu 100%. `https://tami.genieplatform.cloud/*` → 301 `https://tamihomes.vn/*` (giữ path). Stack cũ (prod `tami-*` + staging cũ) trên server cũ 187.52.119.50 đã dừng 2026-11-09 (dữ liệu giữ); `https://187-52-119-50.sslip.io` không còn là môi trường TAMI. Backup prod: R2 `/tami-prod-s2` + `tami-prod-files-s2`. Cổng "production chỉ nhận bản đã qua staging" đọc trực tiếp `staging.history` chung (job CI `record-staging-pass` đã gỡ). Còn lại (backlog riêng): Turnstile prod vẫn test key (BL-118), SMTP prod vẫn `smtp.invalid` (BL-095). Không đổi code ứng dụng/schema/API. Chi tiết: `docs/runbooks/deploy.md` §12, `.context/decisions.md` Decision 13.
 - Cloudflare phía trước; server chỉ nhận traffic từ IP Cloudflare.
 - CI/CD: lint/typecheck/test/build → image theo SHA → staging (`payload migrate`, health check) → **duyệt tay** → production đúng image đó.
 - Backup ngoài server: pgBackRest (liên tục) + restic (file hằng ngày), diễn tập khôi phục 6 tháng/lần.

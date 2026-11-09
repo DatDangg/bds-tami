@@ -42,7 +42,7 @@ prod_db: DATABASE_URL_PROD       # TÊN ENV VAR; phải khác staging_db
 destructive_migration_policy: HIGH_RISK_MIGRATION
 
 # ── Deploy / CI-CD (từ brainstorm; secret nằm ở .env.local) ──
-deploy_platform: docker-vps    # Docker Compose + Nginx host + Let's Encrypt, không Cloudflare. STAGING = server mới 179.197.242.57 (SSH alias `server`, https://179-197-242-57.sslip.io, runbook deploy §11); PRODUCTION = server cũ 187.52.119.50 (tami.genieplatform.cloud, runbook §10). Staging sslip trên server cũ chạy dự phòng. ARCHITECTURE §6
+deploy_platform: docker-vps    # Docker Compose + Nginx host + Let's Encrypt, không Cloudflare. MỘT server 179.197.242.57 (SSH alias `server`) cho cả STAGING (https://179-197-242-57.sslip.io, app 127.0.0.1:3011, runbook deploy §11) và PRODUCTION (https://tamihomes.vn, www → 301 apex, app 127.0.0.1:3010, runbook §12; BL-112). Server cũ 187.52.119.50 (`server-old`): chỉ Nginx 301 tami.genieplatform.cloud → tamihomes.vn, stack tami-*/tami-staging-* đã dừng 2026-11-09 (dữ liệu giữ). ARCHITECTURE §6, decisions Decision 13
 ci_cd: github-actions          # staging → duyệt tay → production (ARCHITECTURE §6.4); runner chốt ở bước DevOps
 
 # ── Monitoring ──

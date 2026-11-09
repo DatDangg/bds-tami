@@ -1,7 +1,10 @@
 # feature-production-new-server-tamihomes · phase-4-task-01 — Gỡ job record-staging-pass (staging + production cùng máy) (BL-112)
 
 - Phụ thuộc: phase-2-task-02 (secret production đã trỏ server mới). Làm được song song P3/P4.T02.
-- Trạng thái: `review PASS` (STRICT FAIL r1 → PASS r2) — còn verify sau push (run Deploy 2 job, staging.history dòng mới, dry-run từ chối SHA chưa qua staging).
+- Trạng thái: `done` — review PASS (STRICT FAIL r1 → PASS r2); verify sau push xong (kiểm lại 2026-11-09 ở P4.T02):
+  - Deploy run `42193343151` (sha `e80b2e14`, sau commit `986a4594`): `success`, chỉ 2 job `Build image + push GHCR` + `Deploy staging` (không còn `record-staging-pass`).
+  - `/opt/tami/state/staging.history` server mới có dòng `… 2026-11-06T09:18:04Z e80b2e14…` do deploy staging ghi trực tiếp; `production.current` = digest đó (Deploy production 42194365495).
+  - Cổng từ chối SHA chưa qua staging: `deploy.sh --dry-run` **bỏ qua** kiểm này (`lib/release.sh` `require_staging_passed` chỉ in khi dry-run), nên kiểm bằng đúng biểu thức awk của `require_staging_passed` trên file thật: `e80b2e14` → PASS-gate, `9aaf11d2` (chưa deploy staging) → REJECT.
 
 ## Vấn đề
 Từ P2.T02, staging và production cùng `/opt/tami/state/staging.history` trên 179.197.242.57: deploy staging tự ghi dòng, job `record-staging-pass`
@@ -21,7 +24,7 @@ Từ P2.T02, staging và production cùng `/opt/tami/state/staging.history` trê
 - Deploy production SHA đó → PASS; SHA chưa qua staging → bị từ chối (thử dry-run trên server, không deploy thật).
 
 ## Acceptance
-- [ ] Gate "production chỉ nhận bản đã qua staging" vẫn đúng, không còn job dùng secret production trên push.
+- [x] Gate "production chỉ nhận bản đã qua staging" vẫn đúng, không còn job dùng secret production trên push.
 
 ## Retry / Escalation
 3 attempt fail → `architecture_review_needed`.
@@ -35,5 +38,5 @@ Từ P2.T02, staging và production cùng `/opt/tami/state/staging.history` trê
 - `grep -rn record-staging .github` rỗng; `bash scripts/deploy/deploy.test.sh` PASS (ca flock SKIP trên Windows, đã PASS trên Linux ở BL-111).
 - `action.yml`, `deploy.yml` byte-identical với `fd524e26~1` (đã chạy CI trước BL-111) — reviewer r1 xác nhận.
 - Server (chỉ đọc): dòng cuối `staging.history` (`edf4b378…`/`b75ff984`) = `production.current` → production đọc đúng file staging ghi.
-- Còn sau push (change-request làm): run Deploy chỉ có `build` + `deploy-staging` xanh; dòng mới trong `staging.history`; `deploy.sh production --dry-run` từ chối SHA chưa qua staging.
+- Sau push (kiểm 2026-11-09 ở P4.T02, xem dòng Trạng thái): run Deploy 42193343151 chỉ `build` + `deploy-staging` xanh; dòng mới `e80b2e14` trong `staging.history`; cổng từ chối SHA chưa qua staging kiểm bằng biểu thức awk của `require_staging_passed` (`--dry-run` bỏ qua kiểm này).
 - Review r1 FAIL (MAJOR: ARCHITECTURE:498 + task file thiếu log) → đã sửa; r2.

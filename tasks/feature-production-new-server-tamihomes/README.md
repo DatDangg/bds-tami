@@ -1,6 +1,6 @@
 # feature-production-new-server-tamihomes (BL-112) — phase plan
 
-- Change doc: `spec/changes/2026-11-06-production-new-server-tamihomes.md`
+- Change doc: `spec/changes/archive/2026-11-06-production-new-server-tamihomes.md`
 - Classification: **MODIFY** (hạ tầng deploy production: server + tên miền + backup + pipeline gate). Không đổi behavior app, không migration schema.
 - Risk tổng: **HIGH** (dữ liệu production, secret production, cổng deploy production, host dùng chung). Review: **STRICT** cho mọi task chạm server/CI.
 - Trạng thái: plan DUYỆT 2026-11-06T07:45Z ("Ok, làm đi") — Q1 www 301 apex; Q2 tên miền cũ 301; Q3 cắt chuyển ngay sau P2; Q4 R2 cũ path `-s2`, kho cũ giữ ≥ 30 ngày; Q5 Turnstile test key + SMTP giả giữ nguyên, tách backlog riêng ở close-out.

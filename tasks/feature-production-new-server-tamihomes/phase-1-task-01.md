@@ -1,6 +1,6 @@
 # feature-production-new-server-tamihomes · phase-1-task-01 — Repo: vhost tamihomes.vn, redirect tên miền cũ, RAM postgres prod, runbook nháp (BL-112)
 
-- Change doc: `spec/changes/2026-11-06-production-new-server-tamihomes.md`
+- Change doc: `spec/changes/archive/2026-11-06-production-new-server-tamihomes.md`
 - Phụ thuộc: không. Không chạm server.
 - Trạng thái: `done` — reviewer STRICT PASS round 1 (3 MINOR runbook §12.1 đã sửa trước commit).
 

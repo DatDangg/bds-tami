@@ -4,6 +4,11 @@ Phạm vi: `docker/backup/*` (image, lịch, script, mẫu env), `docker/docker-
 `docker/backup/test/e2e.sh` (test thật). Kiến trúc: `docs/ARCHITECTURE.md` §8. Quyết định: `.context/decisions.md` Decision 5.
 Mục tiêu: **RPO ≤ 15 phút** (đo được: ghi xong, WAL lên kho ≤ 300 giây), **RTO ≤ 4 giờ**, diễn tập khôi phục (vào container `drill-pg`, không đụng DB thật) **6 tháng/lần**.
 
+**As-built (BL-112, từ 2026-11-06):** production chạy trên server mới `179.197.242.57` (SSH alias `server`, `https://tamihomes.vn`), `BACKUP_ENV_DIR=/opt/tami/backup/production`.
+Kho hiện hành: Cloudflare R2 bucket `tami-prod-backup`, pgBackRest `PGBACKREST_REPO1_PATH=/tami-prod-s2`, restic `RESTIC_REPOSITORY=…/tami-prod-files-s2`.
+Kho **cũ** của server cũ 187.52.119.50 (`/tami-prod`, `tami-prod-files`; dữ liệu tới mốc cắt chuyển 2026-11-06 08:28Z) chỉ còn để tra cứu, **không ghi vào** (ngoại lệ: rollback bật lại stack cũ theo `docs/runbooks/deploy.md` §12.2 thì stack cũ ghi tiếp vào kho của chính nó), giữ ≥ 30 ngày rồi user quyết xoá;
+stack cũ đã dừng 2026-11-09 (volume giữ nguyên, `docs/runbooks/deploy.md` §12.1c). Khi khôi phục luôn kiểm `$BK/pgbackrest.env` + `$BK/restic.env` trỏ path `-s2`.
+
 Quy ước dòng lệnh dưới đây (chạy trên server, user `deploy`):
 ```bash
 E=production                    # backup chỉ có ở production (staging không backup)
@@ -123,7 +128,7 @@ SFTP: tài khoản chỉ đọc) và luôn `archive_mode=off`. **Không bao gi�
    $C run --rm --no-deps --entrypoint bash backup /opt/backup/pg-backup.sh check
    ```
 6. Kiểm tra (mục 6), rồi `$C up -d backup` và chạy app/jobs bằng `deploy.sh` (hoặc `$C up -d app jobs`; nếu schema DB cũ hơn image thì chạy `$C --profile tools run --rm migrate` trước).
-Mất cả server: dựng server mới theo `docs/runbooks/deploy.md` §3, đặt lại env file + `$BK` (từ bản cất riêng), `$C build postgres backup`, **không** `up postgres` bằng volume rỗng
+Mất cả server: dựng server mới theo `docs/runbooks/deploy.md` §3 + §12.1 bước 1 (production hiện tại), đặt lại env file + `$BK` (từ bản cất riêng; path kho `-s2`), `$C build postgres backup`, **không** `up postgres` bằng volume rỗng
 rồi để app chạy; làm bước 3 vào volume rỗng (không `--delta`), rồi tiếp từ bước 4.
 
 ## 4. Khôi phục file (restic)
