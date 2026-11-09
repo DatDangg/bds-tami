@@ -1,0 +1,78 @@
+{
+  "specVersion": "1.62.2",
+  "scopeVersion": 109,
+  "generatedAt": "2026-11-09T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-113 BUG: toast lỗi validate trong admin chuyển sang tiếng Việt nêu thẳng lý do; xoá hồ sơ ứng tuyển khi S3 lỗi trả 502 tiếng Việt. Không đổi luật validate/schema/API shape. Bump PATCH 1.62.1 -> 1.62.2 (as-built bug-fix).",
+  "status": "published",
+  "workItem": "bug/admin-validation-error-english-toast",
+  "backlog": "BL-113",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-11-06-admin-validation-error-english-toast.md",
+  "task": "tasks/bug-admin-validation-error-english-toast/phase-1-task-01.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.1-108.json",
+  "specUpdate": "spec/updates/2026-11-09-admin-validation-error-english-toast.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § F10 (Lỗi validate trong admin bằng tiếng Việt, BL-113)",
+    "FR-ADM-19",
+    "BL-113"
+  ],
+  "changed": {
+    "files": [
+      "src/lib/errors/vi-validation-error.ts (+ .test.ts)",
+      "src/collections/Staff.ts (+ staff-password-length.test.ts)",
+      "src/hooks/staff/last-admin-guard.ts",
+      "src/hooks/require-english-fields.ts (+ .test.ts)",
+      "src/hooks/leads/sync-phone-normalized.ts",
+      "src/hooks/leads/lead-activity-hooks.ts",
+      "src/hooks/categories/validate-tree.ts",
+      "src/hooks/job-applications/delete-cv-and-audit.ts (+ .test.ts)"
+    ],
+    "modules": [
+      "Admin Staff (tạo/đổi/reset mật khẩu, guard admin cuối)",
+      "Hook bật hasEnglish (content collections)",
+      "Lead (ẩn danh, lead-activity)",
+      "Danh mục (cây 2 cấp)",
+      "Hồ sơ ứng tuyển (xoá + xoá CV S3)"
+    ],
+    "note": "Chỉ đổi chữ message lỗi + status xoá hồ sơ ứng tuyển khi S3 lỗi (502). Không đổi luật validate, schema, access, shape lỗi {errors:[{name,message,data}]}."
+  },
+  "impact": {
+    "direct": [
+      "Admin Staff: tạo Staff với mật khẩu < 10 ký tự (vd 7/9 ký tự) -> toast tiếng Việt chứa 'Mật khẩu tối thiểu 10 ký tự.', không còn chuỗi 'The following field is invalid'",
+      "Admin Staff: đổi mật khẩu < 10 ký tự và endpoint /reset-password mật khẩu < 10 ký tự -> lỗi tiếng Việt nêu lý do",
+      "Guard admin cuối: hạ role / tắt active admin cuối cùng (sửa đơn) và sửa/xoá hàng loạt chạm admin cuối -> toast tiếng Việt nêu lý do (không còn 'invalid: where')",
+      "Bật hasEnglish khi thiếu bản EN (title, ...) -> toast tiếng Việt nêu trường thiếu, hiện cả khi đang ở tab vi",
+      "Lead ẩn danh: sửa thông tin khách (họ tên/SĐT/email) -> toast tiếng Việt",
+      "Lead-activity với mã lead sai -> lỗi tiếng Việt",
+      "Danh mục: gán cha tạo cây > 2 cấp hoặc khác scope -> toast tiếng Việt",
+      "Xoá hồ sơ ứng tuyển khi kho lưu trữ S3 lỗi -> 502 'Không xoá được CV trên kho lưu trữ, vui lòng thử lại sau.' (không còn 'Something went wrong.')"
+    ],
+    "dependents": [
+      "Form ứng tuyển công khai / newsletter (bắt instanceof ValidationError, đọc error.data.errors) vẫn trả lỗi đúng",
+      "Job dịch translate-content (đọc data.errors) vẫn chạy",
+      "Lỗi hiển thị dưới ô (path/message) vẫn như cũ, test lỗi từng ô BL-058"
+    ],
+    "regression": [
+      "Staff: tạo/đổi mật khẩu >= 10 ký tự vẫn thành công",
+      "Hạ role/tắt active admin khi còn admin khác vẫn được",
+      "Bật hasEnglish khi đủ bản EN vẫn lưu được",
+      "Danh mục 2 cấp hợp lệ vẫn lưu được",
+      "Xoá hồ sơ ứng tuyển khi S3 bình thường vẫn xoá CV + ghi audit",
+      "Các APIError tiếng Việt sẵn có (xoá media/phường/tỉnh/tin tuyển dụng đang dùng) không đổi"
+    ]
+  },
+  "acceptance": [
+    "Mọi lỗi validate trên 7 chỗ hook/collection hiện toast tiếng Việt nêu thẳng lý do; không còn chuỗi 'The following field is invalid' trên màn hình",
+    "Tạo Staff mật khẩu 9 ký tự: người dùng thấy 'Mật khẩu tối thiểu 10 ký tự.' (trong toast hoặc dưới ô)",
+    "Xoá hồ sơ ứng tuyển khi S3 lỗi trả HTTP 502 kèm message tiếng Việt công khai",
+    "Luật validate không đổi (mật khẩu vẫn tối thiểu 10 ký tự); shape lỗi API giữ nguyên"
+  ],
+  "knownBlockers": [],
+  "testNotes": "Chưa kiểm trên trình duyệt admin thật (builder/reviewer dựa test formatErrors + endpoint /reset-password); nên kiểm toast thật ở admin. Gợi ý 'Tối thiểu 10 ký tự' dưới ô mật khẩu không thuộc phạm vi bắt buộc.",
+  "risk": "medium",
+  "riskNote": "Đụng hook auth/RBAC (Staff, last-admin-guard) và hook dùng chung (require-english-fields) nhưng chỉ đổi chữ message; reviewer STRICT PASS round 2.",
+  "reviewReport": [
+    ".context/review-reports/bug-admin-validation-error-english-toast-phase-1-task-01-round-2-review.md"
+  ]
+}

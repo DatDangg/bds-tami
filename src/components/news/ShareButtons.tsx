@@ -37,8 +37,9 @@ function useCanNativeShare(): boolean {
 }
 
 /**
- * Chia sẻ bài: Facebook, Zalo, sao chép liên kết (+ "thêm" ở biến thể `icons`). Facebook/Zalo là link mở tab mới (không cần JS, không tải SDK
- * của bên thứ ba nên không lộ dữ liệu khách trước khi họ bấm). Chỉ nút sao chép / "thêm" cần JS; kết quả sao chép báo qua vùng `aria-live` (biến thể `icons`: vùng đó chỉ cho trình đọc màn hình, nút đổi sang dấu tích khi đã chép).
+ * Chia sẻ bài: Facebook (link mở tab mới, không tải SDK bên thứ ba), nút thứ hai tuỳ thiết bị, sao chép liên kết. Có Web Share API → nút "Chia sẻ" mở
+ * menu chia sẻ của hệ điều hành (người dùng chọn Zalo...); không có (desktop) → nút Zalo sao chép link + báo "dán vào Zalo" (Zalo hết hỗ trợ link chia sẻ web).
+ * Kết quả sao chép báo qua vùng `aria-live`; biến thể `icons`: chỉ thông báo Zalo hiện ra mắt, còn "đã sao chép" thường chỉ cho trình đọc màn hình (nút đổi sang dấu tích).
  * Nút chia sẻ ở khối tiêu đề trang chi tiết (`DetailShareButton`: Dự án, Cho thuê, Đăng tin BĐS) tái dùng component này làm menu dự phòng khi trình duyệt không có Web Share.
  */
 export function ShareButtons({ url, title, variant = "default", tone = "default" }: ShareButtonsProps) {
@@ -47,6 +48,18 @@ export function ShareButtons({ url, title, variant = "default", tone = "default"
   const { copyState, copyLink } = useCopyLink(url);
   const icons = variant === "icons";
   const canNativeShare = useCanNativeShare();
+  // Zalo không còn trang chia sẻ qua link (sp.zalo.me/plugins/share trả trang trắng): desktop sao chép link để người dùng dán vào Zalo.
+  const zaloCopy = useCopyLink(url);
+  const zaloActive = zaloCopy.copyState !== "idle";
+  const statusMessage = zaloActive
+    ? zaloCopy.copyState === "copied"
+      ? t("zaloCopied")
+      : t("copyFailed")
+    : copyState === "copied"
+      ? t("copied")
+      : copyState === "failed"
+        ? t("copyFailed")
+        : "";
 
   async function nativeShare() {
     try {
@@ -79,28 +92,34 @@ export function ShareButtons({ url, title, variant = "default", tone = "default"
             <FacebookLogo size={18} aria-hidden="true" />
             {!icons && <span>Facebook</span>}
           </a>
-          <a
-            href={`https://sp.zalo.me/plugins/share?dl=${encoded}&type=link`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={t("zalo")}
-            title={icons ? t("zalo") : title}
-            className={actionClass}
-          >
-            <span aria-hidden={icons ? "true" : undefined}>Zalo</span>
-          </a>
         </>
+      )}
+      {canNativeShare ? (
+        <button
+          type="button"
+          onClick={() => void nativeShare()}
+          className={actionClass}
+          {...(icons ? { "aria-label": tDetail("shareMore"), title: tDetail("shareMore") } : {})}
+        >
+          <ShareNetwork size={18} aria-hidden="true" />
+          {!icons && <span>{t("native")}</span>}
+        </button>
+      ) : (
+        encoded && (
+          <button type="button" onClick={zaloCopy.copyLink} aria-label={t("zalo")} title={icons ? t("zalo") : title} className={actionClass}>
+            <span aria-hidden={icons ? "true" : undefined}>Zalo</span>
+          </button>
+        )
       )}
       <button type="button" onClick={copyLink} className={actionClass} {...(icons ? { "aria-label": t("copy"), title: t("copy") } : {})}>
         {!icons ? t("copy") : copyState === "copied" ? <Check size={18} aria-hidden="true" className={onDark ? "text-primary" : "text-success-text"} /> : <LinkSimple size={18} aria-hidden="true" />}
       </button>
-      {icons && canNativeShare && (
-        <button type="button" onClick={() => void nativeShare()} aria-label={tDetail("shareMore")} title={tDetail("shareMore")} className={actionClass}>
-          <ShareNetwork size={18} aria-hidden="true" />
-        </button>
-      )}
-      <span role="status" aria-live="polite" className={icons ? "sr-only" : "text-small text-text-secondary"}>
-        {copyState === "copied" ? t("copied") : copyState === "failed" ? t("copyFailed") : ""}
+      <span
+        role="status"
+        aria-live="polite"
+        className={cn(icons && !zaloActive ? "sr-only" : "text-small", icons && zaloActive && "w-full", onDark ? "text-on-dark" : "text-text-secondary")}
+      >
+        {statusMessage}
       </span>
     </div>
   );

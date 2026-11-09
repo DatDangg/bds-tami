@@ -214,6 +214,8 @@
         "label": "Share this article",
         "facebook": "Share on Facebook",
         "zalo": "Share via Zalo",
+        "zaloCopied": "Link copied: paste it into Zalo to share",
+        "native": "Share",
         "copy": "Copy link",
         "copied": "Link copied",
         "copyFailed": "Could not copy"

@@ -4954,6 +4954,32 @@
       "report": ".context/review-reports/bug-admin-validation-error-english-toast-phase-1-task-01-round-2-review.md",
       "docImpact": "no doc impact (as-built SPECIFICATIONS F10 + spec 1.62.2 / scope v109)",
       "completedAt": "2026-11-09"
+    },
+    {
+      "slug": "zalo-share-blank-page",
+      "title": "Chia sẻ Zalo: sp.zalo.me/plugins/share ra trang trắng (BL-105, QA 24)",
+      "type": "BUG",
+      "severity": "high",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-105",
+      "changeDoc": "spec/changes/archive/2026-11-05-zalo-share-blank-page.md",
+      "startedAt": "2026-11-05",
+      "rootCause": "src/components/news/ShareButtons.tsx:83 dùng endpoint sp.zalo.me/plugins/share?dl= mà Zalo không còn hỗ trợ (HTTP 200 body rỗng với mọi domain)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-zalo-share-blank-page/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "verdict": "PASS"
+        }
+      ],
+      "report": ".context/review-reports/bug-zalo-share-blank-page-phase-1-task-01-round-1-review.md",
+      "docImpact": "SPECIFICATIONS (As-built BL-105); docs/DESIGN.md no impact; .context/design-spec.md (~dòng 553, 608 còn mô tả Zalo là link) chưa sửa — file đang bẩn ngoài scope · spec 1.62.3 / scope v110",
+      "completedAt": "2026-11-09"
     }
   ],
   "projectName": "tami-website",
@@ -5607,7 +5633,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T02:37:40.249Z",
+  "lastUpdated": "2026-11-09T03:36:18.475Z",
   "approvalMilestones": [
     {
       "id": "M1",

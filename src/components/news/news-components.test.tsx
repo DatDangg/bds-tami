@@ -201,7 +201,33 @@ describe("ShareButtons", () => {
     expect(facebook).toHaveAttribute("href", `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://tami.example/tin-tuc/a?x=1&y=2")}`);
     expect(facebook).toHaveAttribute("target", "_blank");
     expect(facebook.getAttribute("rel")).toContain("noopener");
-    expect(screen.getByRole("link", { name: "Chia sẻ qua Zalo" }).getAttribute("href")).toContain(encodeURIComponent("https://tami.example/tin-tuc/a?x=1&y=2"));
+    // BL-105: Zalo không còn là link tới sp.zalo.me (trang trắng) mà là nút sao chép.
+    expect(screen.queryByRole("link", { name: "Chia sẻ qua Zalo" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Chia sẻ qua Zalo" })).toBeInTheDocument();
+    expect(document.body.innerHTML).not.toContain("sp.zalo.me");
+  });
+
+  it("BL-105 desktop (không Web Share): nút Zalo sao chép đúng URL + thông báo nhìn thấy 'dán vào Zalo'; lỗi clipboard báo lỗi", async () => {
+    const writeText = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error("denied"));
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    renderWithIntl(<ShareButtons variant="icons" url="https://tami.example/tin-tuc/a" title="A" />);
+    fireEvent.click(screen.getByRole("button", { name: "Chia sẻ qua Zalo" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Đã sao chép liên kết: dán vào Zalo để chia sẻ"));
+    expect(writeText).toHaveBeenCalledWith("https://tami.example/tin-tuc/a");
+    expect(screen.getByRole("status").className).not.toContain("sr-only");
+    fireEvent.click(screen.getByRole("button", { name: "Chia sẻ qua Zalo" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Không sao chép được"));
+    vi.unstubAllGlobals();
+  });
+
+  it("BL-105 có Web Share (default): nút 'Chia sẻ' thay Zalo, gọi navigator.share với title + url, không còn nút Zalo", async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { clipboard: { writeText: vi.fn() }, share });
+    renderWithIntl(<ShareButtons url="https://tami.example/tin-tuc/a" title="Bài A" />);
+    expect(screen.queryByRole("button", { name: "Chia sẻ qua Zalo" })).toBeNull();
+    fireEvent.click(await screen.findByRole("button", { name: "Chia sẻ" }));
+    expect(share).toHaveBeenCalledWith({ title: "Bài A", url: "https://tami.example/tin-tuc/a" });
+    vi.unstubAllGlobals();
   });
 
   it("không có URL gốc: chỉ còn nút sao chép (không link chia sẻ tới URL sai)", () => {
@@ -233,7 +259,7 @@ describe("ShareButtons variant=icons (hàng tác giả chi tiết tin tức, BL-
     const facebook = within(group).getByRole("link", { name: "Chia sẻ lên Facebook" });
     expect(facebook.className).toContain("rounded-full");
     expect(facebook).not.toHaveTextContent("Facebook");
-    expect(within(group).getByRole("link", { name: "Chia sẻ qua Zalo" })).toBeInTheDocument();
+    expect(within(group).getByRole("button", { name: "Chia sẻ qua Zalo" })).toBeInTheDocument();
     expect(within(group).getByRole("button", { name: "Sao chép liên kết" })).not.toHaveTextContent("Sao chép");
     expect(within(group).queryByRole("button", { name: "Chia sẻ qua ứng dụng khác" })).toBeNull();
   });

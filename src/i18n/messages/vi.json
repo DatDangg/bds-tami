@@ -214,6 +214,8 @@
         "label": "Chia sẻ bài viết",
         "facebook": "Chia sẻ lên Facebook",
         "zalo": "Chia sẻ qua Zalo",
+        "zaloCopied": "Đã sao chép liên kết: dán vào Zalo để chia sẻ",
+        "native": "Chia sẻ",
         "copy": "Sao chép liên kết",
         "copied": "Đã sao chép liên kết",
         "copyFailed": "Không sao chép được"

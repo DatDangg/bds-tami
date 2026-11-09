@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.62.2
+- **spec_version:** 1.62.3
 - **updated_at:** 2026-11-09
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -97,6 +97,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
   - **Schema:** `site-settings` thêm 1 trường chữ localized cho khung liên hệ cuối bài tin (migration versioned **chỉ ADD** cột nullable — SAFE_ADDITIVE). Không đổi API / quyền / URL / JSON-LD / beacon lượt xem.
   - **As-built BL-062 (close-out, spec-validation phase 1 PASS):** mục lục đánh số chỉ `h2` (`h3` thụt, không số); hero cao **tối thiểu** ≈ 420–460px (nội dung dài thì cao hơn), sapo `text-on-dark` đặc (AA ≥ 5:1 trên ảnh trắng sau scrim), < lg cắt 4 dòng, ≥ lg đủ chữ; ngày EN "Published: MM/DD/YYYY" (formatter theo locale sẵn có); `news-prose` bỏ giới hạn 46rem, ≥ md mọi khối sau `h2` đầu tiên thụt 3.25rem (trừ `h2`); `site-settings` tab "Tin tức" → `newsDetail.contactNote` (textarea, localized, ≤ 500 ký tự, trim; migration `20261022_172224_news_detail_contact_note` ADD 1 cột nullable) — nằm trong danh sách trường tự dịch (EN điền bởi AI, "TAMI REAL ESTATE" thuộc danh sách giữ nguyên của prompt), đọc lỗi → câu mặc định; khung liên hệ `role="note"` icon `Info`, link `/lien-he#lead-form` (thẻ tư vấn trái giữ `/lien-he`); thứ tự nút chia sẻ hero Facebook · Zalo · sao chép · thêm (design vẽ sao chép trước — chấp nhận); `Breadcrumb variant="overlay"` > 3 mục < md chỉ hiện "← mục cha" (sửa bug `inline-flex` đè `hidden`). Component: bỏ `NewsArticleCover` / `NewsArticleHeader`; mới `NewsArticleHero`, `NewsArticleContactNote`, `NewsCard variant="related"`, `ShareButtons tone="on-dark"`. Chưa xem bằng trình duyệt (DB local thiếu dữ liệu): `/en/news/[slug]`, hero không ảnh bìa, lưu trường ở admin → kiểm trên staging.
   - **As-built BL-067 (mục lục gọn, user 2026-10-23, PATCH 1.55.1 — UI only):** ≥ lg cột mục lục trái **16rem** (≥ xl **18rem**); mục ≥ 32px, số tròn 24px, cấp 3 thụt thẳng chữ cấp 2; mục lục chiếm phần cao còn lại của cột dính (thẻ "Tư vấn miễn phí" luôn thấy), chỉ tự cuộn (theo mục active) khi bài dài; bản gập < lg không đổi. Không đổi API / schema / URL.
+  - **As-built BL-105 (chia sẻ Zalo, quyết định user 2026-11-09, PATCH 1.62.3):** bỏ link `sp.zalo.me/plugins/share` (Zalo trả trang trắng), không dùng SDK / OA ID. Cụm `ShareButtons` (chi tiết tin tức, tuyển dụng, menu dự phòng `DetailShareButton` của Dự án / Cho thuê / Tin BĐS): trình duyệt **có Web Share** (`navigator.share`) → **một nút "Chia sẻ" / "Share"** mở menu chia sẻ của hệ điều hành (thay cả nút Zalo lẫn nút "thêm"; người dùng chọn Zalo trong menu; huỷ không báo lỗi); **không có Web Share** → nút **"Chia sẻ qua Zalo" / "Share via Zalo"** sao chép link bài + thông báo nhìn thấy "Đã sao chép liên kết: dán vào Zalo để chia sẻ" (vùng `role="status"`, tự ẩn ~3s; lỗi clipboard báo "Không sao chép được"). Facebook + sao chép liên kết giữ nguyên. Chrome Windows / Safari macOS có Web Share nên cũng thấy nút "Chia sẻ". Không đổi API / schema.
   - **Doc impact:** `.context/design-spec.md` (S10 / S11), `docs/DESIGN.md` (Tin tức, Chi tiết tin tức), `docs/ERD.md` (site-settings).
 
 ## Tech Stack
