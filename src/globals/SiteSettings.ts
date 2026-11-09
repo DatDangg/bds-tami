@@ -10,6 +10,7 @@ import { ADMIN_GLOBAL_LABELS } from "../lib/admin/collection-labels";
 import { formTabs } from "../lib/admin/form-layout";
 import { textRowLabel } from "../lib/admin/row-label";
 import { isHttpUrl } from "../lib/content/nav-link";
+import { createValidatePlatform, validateSocialUrl } from "./site-settings/social-links";
 import { listingPagesField } from "./site-settings/listing-pages";
 import { newsDetailField } from "./site-settings/news-detail";
 import { officesField, workingHoursField } from "./site-settings/contact-offices";
@@ -138,9 +139,10 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
                   type: "select",
                   label: "Nền tảng",
                   required: true,
+                  validate: createValidatePlatform(SOCIAL_PLATFORM_LABELS),
                   options: SOCIAL_PLATFORMS.map((value) => ({ label: SOCIAL_PLATFORM_LABELS[value], value })),
                 },
-                { name: "url", type: "text", label: "Link trang", required: true, validate: validateHttpUrl, hooks: { beforeValidate: [trimText] } },
+                { name: "url", type: "text", label: "Link trang", required: true, validate: validateSocialUrl, hooks: { beforeValidate: [trimText] } },
               ],
             },
             workingHoursField,

@@ -1,51 +1,64 @@
 {
-  "specVersion": "1.62.3",
-  "scopeVersion": 112,
-  "generatedAt": "2026-11-09T03:45:52.769Z",
+  "specVersion": "1.62.4",
+  "scopeVersion": 113,
+  "generatedAt": "2026-11-09T03:47:58.409Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-115 BUG: mô tả admin 'Dự án hiển thị' thiếu giới hạn tối đa 6; đồng bộ mô tả giới hạn các field khác của global homepage. Chỉ admin.description — giữ spec_version.",
+  "triggerNote": "BL-108 + BL-109 BUG: Mạng xã hội — thêm mới trống Link = Unknown error, sửa xoá Link vẫn lưu; 2 dòng Instagram trùng link vẫn lưu. Bump PATCH 1.62.3 -> 1.62.4.",
   "status": "published",
-  "workItem": "bug/homepage-featured-projects-max-hint",
-  "backlog": "BL-115",
+  "workItem": "bug/site-settings-social-links",
+  "backlog": "BL-108, BL-109",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-09-homepage-featured-projects-max-hint.md",
-  "task": "tasks/bug-homepage-featured-projects-max-hint/phase-1-task-01.md",
+  "changeDoc": [
+    "spec/changes/archive/2026-11-05-site-settings-social-link-validation.md",
+    "spec/changes/archive/2026-11-05-site-settings-social-duplicate.md"
+  ],
+  "task": "tasks/bug-site-settings-social-links/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-site-settings-social-links.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F1 Trang chủ (global homepage admin)",
-    "BL-115"
+    "SPECIFICATIONS.md § F10 — Mạng xã hội trong Cài đặt chung (BL-108 + BL-109)",
+    "BL-108",
+    "BL-109"
   ],
   "changed": {
     "files": [
-      "src/globals/Homepage.ts",
-      "src/globals/Homepage.test.ts",
-      "src/globals/homepage/blocks.ts (chỉ 3 chuỗi description)"
+      "src/globals/SiteSettings.ts",
+      "src/globals/site-settings/social-links.ts (mới)",
+      "src/globals/site-settings/social-links.test.ts (mới)",
+      "tests/integration/site-settings-social-links.test.ts (mới, chưa chạy — cần Postgres)"
     ],
     "modules": [
-      "Admin Cấu hình Trang chủ (/admin/globals/homepage)"
+      "Admin Cài đặt chung > Mạng xã hội (global site-settings)"
     ]
   },
   "impact": {
     "direct": [
-      "/admin/globals/homepage 'Dự án hiển thị': mô tả 'Tối đa 6 dự án. Để trống thì tự lấy các dự án đánh dấu nổi bật mới nhất.'",
-      "Hero 'slides': mô tả 'Tối đa 8 slide.'",
-      "Ô tìm kiếm trên banner 'Dự án gợi ý dưới ô tìm kiếm': 'Tối đa 6 dự án. …'",
-      "Cho thuê 'Danh mục' và Tin tức 'Bài viết hiển thị': mô tả lấy số từ hằng (4 / 3)"
+      "Thêm mới dòng Mạng xã hội để trống Link trang -> Lưu: lỗi 'Vui lòng nhập Link trang' dưới ô, không 'Unknown error'",
+      "Sửa dòng cũ, xoá Link trang -> Lưu: bị chặn cùng lỗi",
+      "2 dòng Instagram (cùng hoặc khác link) -> Lưu: chặn, dòng 2 báo 'Nền tảng Instagram đã có ở dòng 1.'",
+      "2 dòng 'Khác' link khác nhau -> lưu được; trùng link (chỉ khác www. / '/' cuối / hoa thường host / http-https) -> 'Link trang trùng với dòng N.'",
+      "Link không bắt đầu http(s) -> lỗi như cũ"
     ],
-    "dependents": [],
+    "dependents": [
+      "Lưu các tab khác của site-settings: nếu dữ liệu socialLinks đang trùng/rỗng sẽ bị chặn tới khi sửa",
+      "Footer / trang Liên hệ / JSON-LD sameAs hiển thị mạng xã hội không đổi",
+      "Ô zaloUrl / fanpageUrl vẫn không bắt buộc"
+    ],
     "regression": [
-      "Lưu global homepage như trước (maxRows không đổi)"
+      "Lưu site-settings hợp lệ vẫn thành công",
+      "Sắp xếp / xoá dòng mạng xã hội vẫn lưu được"
     ]
   },
   "acceptance": [
-    "Mô tả 'Dự án hiển thị' nêu tối đa 6"
+    "Link trang bắt buộc ở cả thêm mới và sửa, thông báo tiếng Việt",
+    "Chặn trùng nền tảng (trừ Khác) và trùng link sau chuẩn hoá, lỗi tại dòng bị trùng"
   ],
   "knownBlockers": [],
-  "testNotes": "'Tin ưu đãi hiển thị' chưa nêu giới hạn hiển thị (FEATURED_OFFERS_MAX ở home-view.ts, import ngược tạo vòng) — residual.",
-  "risk": "low",
-  "riskNote": "Chỉ chuỗi mô tả admin; FAST PASS round 2.",
+  "testNotes": "Lỗi trùng chỉ hiện sau khi bấm Lưu (form admin không truyền path khi onChange). Integration test Local API chưa chạy (Postgres dev tắt). Chưa kiểm trên admin UI thật.",
+  "risk": "medium",
+  "riskNote": "Validate mới trên global dùng chung; NORMAL PASS round 2 (r1 FAIL đã sửa).",
   "reviewReport": [
-    ".context/review-reports/bug-homepage-featured-projects-max-hint-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/bug-homepage-featured-projects-max-hint-phase-1-task-01-round-2-review.md"
+    ".context/review-reports/bug-site-settings-social-links-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/bug-site-settings-social-links-phase-1-task-01-round-2-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-111.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-112.json"
 }
