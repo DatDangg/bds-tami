@@ -5185,6 +5185,27 @@
       "report": ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-2-review.md",
       "docImpact": "SPECIFICATIONS (Danh sách Tuyển dụng — BL-114); docs/DESIGN.md no impact · spec 1.62.6 / scope v116",
       "completedAt": "2026-11-09"
+    },
+    {
+      "slug": "ci-integration-tests-stale",
+      "title": "CI đỏ: 6 test integration lỗi thời sau BL-110 (tên phường cũ) + BL-109 (fixture thiếu siteName) — chặn deploy staging 2a6f47da",
+      "type": "BUG",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-09",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-ci-integration-tests-stale/phase-1-task-01.md",
+          "status": "done",
+          "reviewer": {
+            "result": "PASS",
+            "level": "FAST",
+            "round": 1,
+            "report": ".context/review-reports/bug-ci-integration-tests-stale-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
     }
   ],
   "projectName": "tami-website",
@@ -5838,7 +5859,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T05:05:00.000Z",
+  "lastUpdated": "2026-11-09T09:21:53.788Z",
   "approvalMilestones": [
     {
       "id": "M1",

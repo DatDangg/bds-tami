@@ -243,8 +243,9 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
       expect(await titlesOf({ q: "  dịch   VỤ " })).toEqual(withAccent);
     });
 
-    it("khớp tên cũ của phường, mã tin và từ trong địa chỉ; nhiều từ là AND", async () => {
-      expect(await titlesOf({ q: "quan 1", limit: 48 })).toHaveLength(5);
+    it("khớp mã tin và từ trong địa chỉ; nhiều từ là AND; tên cũ của phường KHÔNG khớp (BL-110)", async () => {
+      expect(await titlesOf({ q: "quan 1", limit: 48 })).toEqual([]);
+      expect(await titlesOf({ q: "phuong sai gon", limit: 48 })).toHaveLength(5);
       const code = (await payload.findByID({ collection: "rentals", id: ids.b!, depth: 0, overrideAccess: true })).code;
       expect(await titlesOf({ q: code.toLowerCase() })).toEqual(["Studio gần chợ"]);
       expect(await titlesOf({ q: "bi mat" })).toEqual(["Studio gần chợ"]);
@@ -538,18 +539,22 @@ describe.skipIf(!baseUrl)("integration: SearchService + GET /api/public/rentals 
     const searchTextOf = async (key: string, locale: "vi" | "en") =>
       (await payload.findByID({ collection: "rentals", id: ids[key]!, locale, fallbackLocale: false, depth: 0, overrideAccess: true, showHiddenFields: true })).searchText;
 
-    it("đổi tên cũ của phường làm mới searchText của tin thuộc phường (cả vi và en), tìm được ngay", async () => {
-      expect(await searchTextOf("a", "en")).toContain("ben nghe");
+    it("đổi tên cũ của phường KHÔNG ghi lại searchText và tên cũ không tìm được (BL-110)", async () => {
+      await withDatabase((client) => client.query(`UPDATE "rentals_locales" SET "search_text" = 'cu' WHERE "_parent_id" = $1 AND "_locale" = 'vi'`, [ids.a]));
       await payload.update({
         collection: "wards",
         id: sgWardId,
         data: { legacyNames: [{ name: "Phường Bến Thành, Quận 1" }] },
         overrideAccess: true,
       });
-      expect(await searchTextOf("a", "vi")).toContain("ben thanh");
-      expect(await searchTextOf("a", "vi")).not.toContain("phuong ben nghe");
-      expect(await searchTextOf("a", "en")).toContain("ben thanh");
-      expect((await search({ q: "ben thanh", limit: 48 })).total).toBe(5);
+      expect(await searchTextOf("a", "vi")).toBe("cu");
+      expect(await searchTextOf("b", "vi")).not.toContain("ben thanh");
+      expect((await search({ q: "ben thanh", limit: 48 })).total).toBe(0);
+      // Trả tên cũ cho các test sau, rồi dựng lại searchText đã đặt thành 'cu'.
+      await payload.update({ collection: "wards", id: sgWardId, data: { legacyNames: [{ name: "Phường Bến Nghé, Quận 1" }] }, overrideAccess: true });
+      expect(await searchTextOf("a", "vi")).toBe("cu");
+      await reindexRentalSearchText(payload, "all");
+      expect(await searchTextOf("a", "vi")).toContain("can ho dich vu");
     });
 
     it("đổi tên tỉnh làm mới searchText của tin thuộc tỉnh, tìm được bằng tên mới (không dấu); đổi shortName thì không ghi lại", async () => {

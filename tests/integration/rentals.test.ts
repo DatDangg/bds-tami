@@ -377,7 +377,7 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
   });
 
   describe("searchText theo từng ngôn ngữ", () => {
-    it("vi: mã + tiêu đề + địa chỉ + phường + tỉnh + tên phường cũ + tên dự án, không dấu, chữ thường", async () => {
+    it("vi: mã + tiêu đề + địa chỉ + phường + tỉnh + tên dự án (không có tên phường cũ), không dấu, chữ thường", async () => {
       const project = await payload.create({
         collection: "projects",
         data: {
@@ -401,20 +401,21 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
         "12 duong test",
         "phuong sai gon",
         "thanh pho ho chi minh",
-        "phuong ben nghe, quan 1",
-        "phuong ben thanh, quan 1",
         "vinhomes grand park",
       ]) {
         expect(text).toContain(fragment);
       }
+      // BL-110: tên phường cũ (legacyNames) không vào searchText.
+      expect(text).not.toContain("ben nghe");
+      expect(text).not.toContain("ben thanh");
       expect(text).toBe(text.toLowerCase());
       expect(text).not.toMatch(/[đàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹ]/i);
     });
 
-    it("tìm bằng tên phường cũ (searchText chứa legacyNames[].name)", async () => {
+    it("tìm bằng tên phường cũ không ra tin (BL-110: searchText không chứa legacyNames[].name)", async () => {
       const doc = await createRental({ title: "Studio tên cũ" });
       const keyword = "Phường Bến Nghé".normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-      expect(await searchTextOf(doc.id, "vi")).toContain(keyword);
+      expect(await searchTextOf(doc.id, "vi")).not.toContain(keyword);
       const hit = await payload.find({
         collection: "rentals",
         where: { searchText: { contains: keyword } },
@@ -422,7 +423,7 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
         depth: 0,
         overrideAccess: true,
       });
-      expect(hit.docs.map((found) => found.id)).toContain(doc.id);
+      expect(hit.docs.map((found) => found.id)).not.toContain(doc.id);
     });
 
     it("mỗi ngôn ngữ có searchText riêng theo tiêu đề của nó; đổi phường/địa chỉ ở vi làm mới cả bản en", async () => {
@@ -440,7 +441,7 @@ describe.skipIf(!baseUrl)("integration: rentals (DB tạm)", () => {
       expect(vi).not.toContain("bilingual");
       expect(en).toContain("bilingual apartment");
       expect(en).not.toContain("song ngu");
-      expect(en).toContain("phuong ben nghe, quan 1");
+      expect(en).toContain("phuong sai gon");
       expect(en).toContain(doc.code.toLowerCase());
 
       await updateRental(doc.id, { province: otherProvinceId, ward: otherProvinceWardId, address: "99 Phố Mới" });

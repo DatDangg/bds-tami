@@ -17,7 +17,8 @@ describe.skipIf(!baseUrl)("integration: site-settings socialLinks validate (DB t
   const save = (socialLinks: unknown[]) =>
     payload.updateGlobal({
       slug: "site-settings",
-      data: { socialLinks } as never,
+      // siteName bắt buộc: global mới tạo chưa có giá trị, thiếu thì test hợp lệ cũng bị chặn ở trường này.
+      data: { siteName: "Tami Homes", socialLinks } as never,
       locale: "vi",
       user: { ...admin, collection: "staff" as const } as never,
       overrideAccess: false,
