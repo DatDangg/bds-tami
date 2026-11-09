@@ -1,4 +1,3 @@
-import { ValidationError } from "payload";
 import type {
   CollectionBeforeChangeHook,
   CollectionBeforeDeleteHook,
@@ -9,6 +8,7 @@ import type {
 import type { PostgresAdapter } from "@payloadcms/db-postgres";
 
 import { ROLES } from "../../access";
+import { createViValidationError } from "../../lib/errors/vi-validation-error";
 import { ADVISORY_LOCK_KEYS } from "../../lib/db/advisory-lock-keys";
 
 /** Khoá advisory của Postgres dùng để tuần tự hoá mọi thay đổi làm giảm số admin (giá trị tuỳ ý, cố định). */
@@ -58,7 +58,7 @@ async function assertAnotherActiveAdminExists(
     req,
   });
   if (totalDocs === 0) {
-    throw new ValidationError({ collection: "staff", errors: [{ path: errorPath, message: LAST_ADMIN_MESSAGE }] });
+    throw createViValidationError({ collection: "staff", errors: [{ path: errorPath, message: LAST_ADMIN_MESSAGE }], req });
   }
 }
 
@@ -105,9 +105,10 @@ export const rejectBulkChangeOfActiveAdmins: CollectionBeforeOperationHook = asy
     overrideAccess: true,
   });
   if (touched.totalDocs > 0) {
-    throw new ValidationError({
+    throw createViValidationError({
       collection: "staff",
       errors: [{ path: "where", message: `${LAST_ADMIN_MESSAGE} Sửa/xoá quản trị viên phải làm từng người một.` }],
+      req,
     });
   }
   return args;

@@ -1,5 +1,6 @@
-import { type CollectionBeforeValidateHook, type PayloadRequest, ValidationError } from "payload";
+import { type CollectionBeforeValidateHook, type PayloadRequest } from "payload";
 
+import { createViValidationError } from "../../lib/errors/vi-validation-error";
 import { preserveRequestLocale } from "../../lib/payload/preserve-request-locale";
 
 type Id = string | number;
@@ -66,6 +67,6 @@ export const validateCategoryTree: CollectionBeforeValidateHook = async ({ data,
   if (parentId === null) return data;
   const scope = data?.scope ?? originalDoc?.scope;
   const problem = await findParentProblem(req, parentId, scope, originalDoc?.id);
-  if (problem) throw new ValidationError({ collection: "categories", errors: [{ path: "parent", message: problem }] });
+  if (problem) throw createViValidationError({ collection: "categories", errors: [{ path: "parent", message: problem }], req });
   return data;
 };

@@ -1,98 +1,78 @@
 {
-  "specVersion": "1.62.1",
-  "scopeVersion": 108,
-  "generatedAt": "2026-11-06T12:00:00+07:00",
-  "trigger": "feature-update",
-  "triggerNote": "BL-111 MODIFY hạ tầng: staging chuyển sang server mới 179.197.242.57. Không đổi code ứng dụng (chỉ infra/config/docs). Bump PATCH 1.62.0 -> 1.62.1 (làm rõ hạ tầng, không đổi requirement sản phẩm).",
+  "specVersion": "1.62.2",
+  "scopeVersion": 109,
+  "generatedAt": "2026-11-09T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-113 BUG: toast lỗi validate trong admin chuyển sang tiếng Việt nêu thẳng lý do; xoá hồ sơ ứng tuyển khi S3 lỗi trả 502 tiếng Việt. Không đổi luật validate/schema/API shape. Bump PATCH 1.62.1 -> 1.62.2 (as-built bug-fix).",
   "status": "published",
-  "workItem": "feature/staging-new-server-nginx-tamihomes",
-  "backlog": "BL-111",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-11-06-staging-new-server-nginx-tamihomes.md",
-  "task": "tasks/feature-staging-new-server-nginx-tamihomes/",
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.0-107.json",
-  "specUpdate": "spec/updates/2026-11-06-staging-new-server-nginx-tamihomes.md",
+  "workItem": "bug/admin-validation-error-english-toast",
+  "backlog": "BL-113",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/2026-11-06-admin-validation-error-english-toast.md",
+  "task": "tasks/bug-admin-validation-error-english-toast/phase-1-task-01.md",
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.1-108.json",
+  "specUpdate": "spec/updates/2026-11-09-admin-validation-error-english-toast.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Deployment (As-built BL-111)",
-    "NFR-05 (hạ tầng)",
-    "BL-111"
+    "SPECIFICATIONS.md § F10 (Lỗi validate trong admin bằng tiếng Việt, BL-113)",
+    "FR-ADM-19",
+    "BL-113"
   ],
-  "environment": {
-    "stagingBaseUrl": "https://179-197-242-57.sslip.io",
-    "stagingServer": "179.197.242.57",
-    "oldStagingFrozen": "https://187-52-119-50.sslip.io (đóng băng ở commit 678b3568 — KHÔNG test ở đó)",
-    "dataCopiedFromOldStaging": {
-      "db": "~04:09Z 2026-11-06",
-      "media": "~04:11Z 2026-11-06"
-    },
-    "access": "công khai + noindex, không basic auth"
-  },
   "changed": {
     "files": [
-      "docker/nginx/tami-staging-sslip-179.conf",
-      "docker/nginx/tami-staging-sslip-179-http.conf",
-      "docker/nginx/tami-default-reject.conf",
-      ".github/workflows/deploy.yml",
-      ".github/actions/ssh-deploy/action.yml",
-      "scripts/deploy/deploy.sh",
-      "scripts/deploy/lib/state.sh",
-      "docs (runbooks/deploy.md §11, .context/decisions.md Decision 12)",
-      "docker/docker-compose.staging.yml (comment)",
-      ".env.example (comment/ví dụ)",
-      "scripts/deploy/deploy.test.sh",
-      "docker/nginx/tami-staging-sslip.conf + tami-staging-sslip-http.conf (comment: server cũ dự phòng)",
-      "SPECIFICATIONS.md (§Deployment as-built)",
-      "docs/ARCHITECTURE.md §6"
+      "src/lib/errors/vi-validation-error.ts (+ .test.ts)",
+      "src/collections/Staff.ts (+ staff-password-length.test.ts)",
+      "src/hooks/staff/last-admin-guard.ts",
+      "src/hooks/require-english-fields.ts (+ .test.ts)",
+      "src/hooks/leads/sync-phone-normalized.ts",
+      "src/hooks/leads/lead-activity-hooks.ts",
+      "src/hooks/categories/validate-tree.ts",
+      "src/hooks/job-applications/delete-cv-and-audit.ts (+ .test.ts)"
     ],
     "modules": [
-      "hạ tầng staging (Nginx host, Let's Encrypt)",
-      "CI deploy staging + record-staging-pass"
+      "Admin Staff (tạo/đổi/reset mật khẩu, guard admin cuối)",
+      "Hook bật hasEnglish (content collections)",
+      "Lead (ẩn danh, lead-activity)",
+      "Danh mục (cây 2 cấp)",
+      "Hồ sơ ứng tuyển (xoá + xoá CV S3)"
     ],
-    "note": "Không có thay đổi code ứng dụng. Commits: 940ab50c, fd524e26, e49d01f2, 55e52730, 0bcab51d, 98c08b2a."
+    "note": "Chỉ đổi chữ message lỗi + status xoá hồ sơ ứng tuyển khi S3 lỗi (502). Không đổi luật validate, schema, access, shape lỗi {errors:[{name,message,data}]}."
   },
   "impact": {
     "direct": [
-      "Đổi base URL staging sang https://179-197-242-57.sslip.io — cập nhật cấu hình test (baseURL) trước khi chạy",
-      "Smoke toàn site trên base URL mới: trang VI/EN, danh sách, chi tiết, ảnh media, sitemap/canonical/og host đúng host mới, robots Disallow (noindex)"
+      "Admin Staff: tạo Staff với mật khẩu < 10 ký tự (vd 7/9 ký tự) -> toast tiếng Việt chứa 'Mật khẩu tối thiểu 10 ký tự.', không còn chuỗi 'The following field is invalid'",
+      "Admin Staff: đổi mật khẩu < 10 ký tự và endpoint /reset-password mật khẩu < 10 ký tự -> lỗi tiếng Việt nêu lý do",
+      "Guard admin cuối: hạ role / tắt active admin cuối cùng (sửa đơn) và sửa/xoá hàng loạt chạm admin cuối -> toast tiếng Việt nêu lý do (không còn 'invalid: where')",
+      "Bật hasEnglish khi thiếu bản EN (title, ...) -> toast tiếng Việt nêu trường thiếu, hiện cả khi đang ở tab vi",
+      "Lead ẩn danh: sửa thông tin khách (họ tên/SĐT/email) -> toast tiếng Việt",
+      "Lead-activity với mã lead sai -> lỗi tiếng Việt",
+      "Danh mục: gán cha tạo cây > 2 cấp hoặc khác scope -> toast tiếng Việt",
+      "Xoá hồ sơ ứng tuyển khi kho lưu trữ S3 lỗi -> 502 'Không xoá được CV trên kho lưu trữ, vui lòng thử lại sau.' (không còn 'Something went wrong.')"
     ],
     "dependents": [
-      "Form liên hệ / ứng tuyển / newsletter (Turnstile)",
-      "Upload (<=20MB ok, >25MB trả 413)",
-      "Rate limit theo IP thật",
-      "Admin login + tải CV riêng tư (cần auth)",
-      "Link chia sẻ Zalo/Facebook dùng host mới"
+      "Form ứng tuyển công khai / newsletter (bắt instanceof ValidationError, đọc error.data.errors) vẫn trả lỗi đúng",
+      "Job dịch translate-content (đọc data.errors) vẫn chạy",
+      "Lỗi hiển thị dưới ô (path/message) vẫn như cũ, test lỗi từng ô BL-058"
     ],
     "regression": [
-      "Full-site smoke VI/EN",
-      "Forms contact/apply/newsletter",
-      "Upload giới hạn kích thước",
-      "Rate limit theo IP thật",
-      "Admin login + private CV download",
-      "Share links dùng host mới"
+      "Staff: tạo/đổi mật khẩu >= 10 ký tự vẫn thành công",
+      "Hạ role/tắt active admin khi còn admin khác vẫn được",
+      "Bật hasEnglish khi đủ bản EN vẫn lưu được",
+      "Danh mục 2 cấp hợp lệ vẫn lưu được",
+      "Xoá hồ sơ ứng tuyển khi S3 bình thường vẫn xoá CV + ghi audit",
+      "Các APIError tiếng Việt sẵn có (xoá media/phường/tỉnh/tin tuyển dụng đang dùng) không đổi"
     ]
   },
   "acceptance": [
-    "Mọi test chạy trên https://179-197-242-57.sslip.io, không dùng staging cũ",
-    "Sitemap/canonical/og:url/hreflang dùng host mới; robots.txt Disallow",
-    "Ảnh media (public) hiển thị; CV riêng tư chỉ tải được khi đã đăng nhập",
-    "Upload 20MB OK, >25MB nhận 413",
-    "Rate limit tính theo IP thật của client (không phải IP proxy)",
-    "Link chia sẻ Zalo/Facebook chứa host mới"
+    "Mọi lỗi validate trên 7 chỗ hook/collection hiện toast tiếng Việt nêu thẳng lý do; không còn chuỗi 'The following field is invalid' trên màn hình",
+    "Tạo Staff mật khẩu 9 ký tự: người dùng thấy 'Mật khẩu tối thiểu 10 ký tự.' (trong toast hoặc dưới ô)",
+    "Xoá hồ sơ ứng tuyển khi S3 lỗi trả HTTP 502 kèm message tiếng Việt công khai",
+    "Luật validate không đổi (mật khẩu vẫn tối thiểu 10 ký tự); shape lỗi API giữ nguyên"
   ],
   "knownBlockers": [],
-  "testNotes": "Turnstile staging dùng test key Cloudflare (1x00…, luôn pass, mọi hostname) — form liên hệ/ứng tuyển/newsletter phải chạy bình thường. Nội dung (không phải code): menu header 'Dự án 1/2' link tuyệt đối tới host sslip cũ — đã biết, không báo bug code. Dữ liệu staging là bản copy lúc ~04:09Z/04:11Z 2026-11-06.",
+  "testNotes": "Chưa kiểm trên trình duyệt admin thật (builder/reviewer dựa test formatErrors + endpoint /reset-password); nên kiểm toast thật ở admin. Gợi ý 'Tối thiểu 10 ký tự' dưới ô mật khẩu không thuộc phạm vi bắt buộc.",
   "risk": "medium",
-  "riskNote": "Thay đổi môi trường/hạ tầng, không đổi code ứng dụng.",
+  "riskNote": "Đụng hook auth/RBAC (Staff, last-admin-guard) và hook dùng chung (require-english-fields) nhưng chỉ đổi chữ message; reviewer STRICT PASS round 2.",
   "reviewReport": [
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-02-round-1-review.md",
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-01-round-1-review.md",
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-02-round-1-review.md",
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-03-round-1-review.md",
-    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-task-01-round-2-review.md"
-  ],
-  "specValidation": {
-    "verdict": "PASS",
-    "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-spec-validation.md"
-  }
+    ".context/review-reports/bug-admin-validation-error-english-toast-phase-1-task-01-round-2-review.md"
+  ]
 }

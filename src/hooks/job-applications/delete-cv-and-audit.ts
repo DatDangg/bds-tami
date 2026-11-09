@@ -1,4 +1,4 @@
-import type { CollectionAfterDeleteHook } from "payload";
+import { APIError, type CollectionAfterDeleteHook } from "payload";
 
 import { writeAuditLog } from "../../lib/audit/write-audit-log";
 
@@ -18,7 +18,9 @@ export const deleteApplicationCv: CollectionAfterDeleteHook = async ({ doc, req 
     req,
   });
   if (result.errors.length > 0) {
-    throw new Error(`Không xoá được CV của hồ sơ ứng tuyển ${doc.id}`);
+    // Public: thông báo tiếng Việt hiện cho admin (không chứa PII); id hồ sơ chỉ ghi log nội bộ.
+    req.payload.logger.error(`Không xoá được CV của hồ sơ ứng tuyển ${doc.id}`);
+    throw new APIError("Không xoá được CV trên kho lưu trữ, vui lòng thử lại sau.", 502, undefined, true);
   }
   return doc;
 };

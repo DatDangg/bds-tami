@@ -1,0 +1,98 @@
+{
+  "specVersion": "1.62.1",
+  "scopeVersion": 108,
+  "generatedAt": "2026-11-06T12:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-111 MODIFY hạ tầng: staging chuyển sang server mới 179.197.242.57. Không đổi code ứng dụng (chỉ infra/config/docs). Bump PATCH 1.62.0 -> 1.62.1 (làm rõ hạ tầng, không đổi requirement sản phẩm).",
+  "status": "published",
+  "workItem": "feature/staging-new-server-nginx-tamihomes",
+  "backlog": "BL-111",
+  "classification": "MODIFY",
+  "changeDoc": "spec/changes/archive/2026-11-06-staging-new-server-nginx-tamihomes.md",
+  "task": "tasks/feature-staging-new-server-nginx-tamihomes/",
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.0-107.json",
+  "specUpdate": "spec/updates/2026-11-06-staging-new-server-nginx-tamihomes.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § Deployment (As-built BL-111)",
+    "NFR-05 (hạ tầng)",
+    "BL-111"
+  ],
+  "environment": {
+    "stagingBaseUrl": "https://179-197-242-57.sslip.io",
+    "stagingServer": "179.197.242.57",
+    "oldStagingFrozen": "https://187-52-119-50.sslip.io (đóng băng ở commit 678b3568 — KHÔNG test ở đó)",
+    "dataCopiedFromOldStaging": {
+      "db": "~04:09Z 2026-11-06",
+      "media": "~04:11Z 2026-11-06"
+    },
+    "access": "công khai + noindex, không basic auth"
+  },
+  "changed": {
+    "files": [
+      "docker/nginx/tami-staging-sslip-179.conf",
+      "docker/nginx/tami-staging-sslip-179-http.conf",
+      "docker/nginx/tami-default-reject.conf",
+      ".github/workflows/deploy.yml",
+      ".github/actions/ssh-deploy/action.yml",
+      "scripts/deploy/deploy.sh",
+      "scripts/deploy/lib/state.sh",
+      "docs (runbooks/deploy.md §11, .context/decisions.md Decision 12)",
+      "docker/docker-compose.staging.yml (comment)",
+      ".env.example (comment/ví dụ)",
+      "scripts/deploy/deploy.test.sh",
+      "docker/nginx/tami-staging-sslip.conf + tami-staging-sslip-http.conf (comment: server cũ dự phòng)",
+      "SPECIFICATIONS.md (§Deployment as-built)",
+      "docs/ARCHITECTURE.md §6"
+    ],
+    "modules": [
+      "hạ tầng staging (Nginx host, Let's Encrypt)",
+      "CI deploy staging + record-staging-pass"
+    ],
+    "note": "Không có thay đổi code ứng dụng. Commits: 940ab50c, fd524e26, e49d01f2, 55e52730, 0bcab51d, 98c08b2a."
+  },
+  "impact": {
+    "direct": [
+      "Đổi base URL staging sang https://179-197-242-57.sslip.io — cập nhật cấu hình test (baseURL) trước khi chạy",
+      "Smoke toàn site trên base URL mới: trang VI/EN, danh sách, chi tiết, ảnh media, sitemap/canonical/og host đúng host mới, robots Disallow (noindex)"
+    ],
+    "dependents": [
+      "Form liên hệ / ứng tuyển / newsletter (Turnstile)",
+      "Upload (<=20MB ok, >25MB trả 413)",
+      "Rate limit theo IP thật",
+      "Admin login + tải CV riêng tư (cần auth)",
+      "Link chia sẻ Zalo/Facebook dùng host mới"
+    ],
+    "regression": [
+      "Full-site smoke VI/EN",
+      "Forms contact/apply/newsletter",
+      "Upload giới hạn kích thước",
+      "Rate limit theo IP thật",
+      "Admin login + private CV download",
+      "Share links dùng host mới"
+    ]
+  },
+  "acceptance": [
+    "Mọi test chạy trên https://179-197-242-57.sslip.io, không dùng staging cũ",
+    "Sitemap/canonical/og:url/hreflang dùng host mới; robots.txt Disallow",
+    "Ảnh media (public) hiển thị; CV riêng tư chỉ tải được khi đã đăng nhập",
+    "Upload 20MB OK, >25MB nhận 413",
+    "Rate limit tính theo IP thật của client (không phải IP proxy)",
+    "Link chia sẻ Zalo/Facebook chứa host mới"
+  ],
+  "knownBlockers": [],
+  "testNotes": "Turnstile staging dùng test key Cloudflare (1x00…, luôn pass, mọi hostname) — form liên hệ/ứng tuyển/newsletter phải chạy bình thường. Nội dung (không phải code): menu header 'Dự án 1/2' link tuyệt đối tới host sslip cũ — đã biết, không báo bug code. Dữ liệu staging là bản copy lúc ~04:09Z/04:11Z 2026-11-06.",
+  "risk": "medium",
+  "riskNote": "Thay đổi môi trường/hạ tầng, không đổi code ứng dụng.",
+  "reviewReport": [
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-1-task-02-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-01-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-02-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-2-task-03-round-1-review.md",
+    ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-task-01-round-2-review.md"
+  ],
+  "specValidation": {
+    "verdict": "PASS",
+    "report": ".context/review-reports/feature-staging-new-server-nginx-tamihomes-phase-3-spec-validation.md"
+  }
+}

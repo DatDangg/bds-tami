@@ -1,4 +1,4 @@
-import { addDataAndFileToRequest, APIError, AuthenticationError, ValidationError } from "payload";
+import { addDataAndFileToRequest, APIError, AuthenticationError } from "payload";
 import type {
   CollectionAfterLoginHook,
   CollectionBeforeLoginHook,
@@ -15,6 +15,7 @@ import { auditStaffChanges, auditStaffDelete } from "../hooks/staff/audit-staff-
 import { auditTokenPasswordReset } from "../hooks/staff/audit-token-password-reset";
 import { flagPasswordChange } from "../hooks/staff/flag-password-change";
 import { guardLastAdminOnDelete, guardLastAdminOnUpdate, rejectBulkChangeOfActiveAdmins } from "../hooks/staff/last-admin-guard";
+import { createViValidationError } from "../lib/errors/vi-validation-error";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { forgotPasswordUniformResponse } from "../endpoints/admin/staff-forgot-password";
 import { SESSION_TTL_SECONDS } from "../lib/session/keepalive";
@@ -27,11 +28,12 @@ const LOCK_TIME_MS = 10 * 60 * 1000;
 /** Chỉ admin xem/sửa mọi hồ sơ; sale chỉ hồ sơ của chính mình (so khớp `id`). */
 const selfOrAdmin = ownedByUserOrAdmin("id");
 
-function assertPasswordLength(password: unknown, collectionSlug: string): void {
+function assertPasswordLength(password: unknown, collectionSlug: string, req: PayloadRequest): void {
   if (typeof password === "string" && password.length < MIN_PASSWORD_LENGTH) {
-    throw new ValidationError({
+    throw createViValidationError({
       collection: collectionSlug,
       errors: [{ path: "password", message: `Mật khẩu tối thiểu ${MIN_PASSWORD_LENGTH} ký tự.` }],
+      req,
     });
   }
 }
@@ -40,8 +42,8 @@ function assertPasswordLength(password: unknown, collectionSlug: string): void {
  * Payload không cho cấu hình độ dài mật khẩu. Hook này chỉ bắt được tạo tài khoản và đổi mật khẩu
  * (lúc đó `data.password` còn là chữ thường). Luồng đặt lại mật khẩu do endpoint dưới đây chặn.
  */
-const enforcePasswordLength: CollectionBeforeValidateHook = ({ data, collection }) => {
-  assertPasswordLength(data?.password, collection.slug);
+export const enforcePasswordLength: CollectionBeforeValidateHook = ({ data, collection, req }) => {
+  assertPasswordLength(data?.password, collection.slug, req);
   return data;
 };
 
@@ -67,7 +69,7 @@ const resetPasswordWithLengthCheck: Endpoint = {
     await addDataAndFileToRequest(copy);
     const password: unknown = copy.data?.password;
     if (typeof password !== "string") throw new APIError("Thiếu mật khẩu mới.", 400);
-    assertPasswordLength(password, Staff.slug);
+    assertPasswordLength(password, Staff.slug, req);
 
     const endpoints = req.payload.collections[Staff.slug as "staff"].config.endpoints;
     const list = Array.isArray(endpoints) ? endpoints : [];

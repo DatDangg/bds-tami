@@ -104,5 +104,9 @@ describe("requireEnglishFields — bản EN chỉ có paragraph rỗng", () => {
     } as unknown as Parameters<CollectionBeforeValidateHook>[0];
 
     await expect(hook(args)).rejects.toBeInstanceOf(ValidationError);
+    const error = await hook(args).catch((caught: unknown) => caught as ValidationError);
+    expect(error.message).not.toContain("The following field");
+    expect(error.message).toContain("Cần nhập bản tiếng Anh");
+    expect(error.data.errors.map((entry: { path: string }) => entry.path)).toEqual(["content"]);
   });
 });

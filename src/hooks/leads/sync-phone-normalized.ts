@@ -1,5 +1,6 @@
-import { type CollectionBeforeValidateHook, type Validate, ValidationError } from "payload";
+import { type CollectionBeforeValidateHook, type Validate } from "payload";
 
+import { createViValidationError } from "../../lib/errors/vi-validation-error";
 import { ANONYMIZED_PLACEHOLDER } from "../../lib/leads/lead-values";
 import { normalizePhone } from "../../lib/phone";
 
@@ -31,12 +32,13 @@ const CUSTOMER_FIELDS = ["fullName", "phone", "email", "message"] as const;
  * Lead đã ẩn danh (BR-32) không nhận lại dữ liệu khách: đổi `fullName`/`phone`/`email`/`message` bị từ chối. Giá trị trùng bản
  * hiện có (form admin gửi lại nguyên trạng, hoặc ghi lại placeholder) vẫn được chấp nhận.
  */
-export const guardAnonymizedCustomerData: CollectionBeforeValidateHook = ({ data, originalDoc, operation }) => {
+export const guardAnonymizedCustomerData: CollectionBeforeValidateHook = ({ data, originalDoc, operation, req }) => {
   if (!data || operation !== "update" || !originalDoc?.anonymizedAt) return data;
   const changed = CUSTOMER_FIELDS.filter((name) => name in data && (data[name] ?? null) !== (originalDoc[name] ?? null));
   if (changed.length === 0) return data;
-  throw new ValidationError({
+  throw createViValidationError({
     collection: "leads",
     errors: changed.map((path) => ({ path, message: "Lead đã xoá thông tin cá nhân, không thể sửa thông tin khách" })),
+    req,
   });
 };

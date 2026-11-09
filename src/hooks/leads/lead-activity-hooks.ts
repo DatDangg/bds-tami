@@ -1,6 +1,7 @@
-import { Forbidden, ValidationError, type CollectionAfterChangeHook, type CollectionBeforeDeleteHook, type CollectionBeforeValidateHook, type PayloadRequest } from "payload";
+import { Forbidden, type CollectionAfterChangeHook, type CollectionBeforeDeleteHook, type CollectionBeforeValidateHook, type PayloadRequest } from "payload";
 
 import { isAdmin, isStaff } from "../../access";
+import { createViValidationError } from "../../lib/errors/vi-validation-error";
 import { isUuid } from "../../lib/uuid";
 import { MANUAL_ACTIVITY_TYPES, type LeadActivityType } from "../../lib/leads/lead-values";
 import type { LeadActivity } from "../../payload-types";
@@ -42,7 +43,7 @@ export const guardManualActivity: CollectionBeforeValidateHook<LeadActivity> = a
   if (isAdmin({ req })) {
     // Thiếu hẳn (undefined/null) để Payload báo lỗi "bắt buộc" như thường.
     if (leadId !== undefined && leadId !== null && !isUuid(leadId)) {
-      throw new ValidationError({ collection: "lead-activities", errors: [{ path: "lead", message: "Mã lead không hợp lệ" }] });
+      throw createViValidationError({ collection: "lead-activities", errors: [{ path: "lead", message: "Mã lead không hợp lệ" }], req });
     }
     return data;
   }

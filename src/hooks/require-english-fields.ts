@@ -1,5 +1,6 @@
-import { type CollectionBeforeValidateHook, type CollectionSlug, ValidationError } from "payload";
+import { type CollectionBeforeValidateHook, type CollectionSlug } from "payload";
 
+import { createViValidationError } from "../lib/errors/vi-validation-error";
 import { preserveRequestLocale } from "../lib/payload/preserve-request-locale";
 
 /**
@@ -98,9 +99,10 @@ export function requireEnglishFields(requiredFields: readonly string[]): Collect
     const english = await resolveEnglishDoc(args);
     const missing = missingEnglishFields(requiredFields, english);
     if (missing.length > 0) {
-      throw new ValidationError({
+      throw createViValidationError({
         collection: collection.slug,
         errors: missing.map((path) => ({ path, message: "Cần nhập bản tiếng Anh trước khi bật hasEnglish." })),
+        req,
       });
     }
     return data;
