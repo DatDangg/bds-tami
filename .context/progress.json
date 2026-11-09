@@ -3616,6 +3616,36 @@
           "completedAt": "2026-11-06"
         }
       ]
+    },
+    {
+      "slug": "homepage-partners-block",
+      "title": "Trang chủ: khối Đối tác (FR-PUB-17) — dải logo chạy ngang (BL-107, QA 26)",
+      "type": "ADDITIVE",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-107",
+      "changeDoc": "spec/changes/archive/2026-11-05-homepage-partners-block-missing.md",
+      "startedAt": "2026-11-09",
+      "specValidation": [
+        ".context/review-reports/spec-validation-feature-homepage-partners-block.md (delta r1 FAIL)",
+        ".context/review-reports/spec-validation-feature-homepage-partners-block-round-2.md (delta r2 PASS)",
+        ".context/review-reports/spec-validation-feature-homepage-partners-block-phase-1.md (phase PASS)"
+      ],
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-homepage-partners-block/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 4,
+          "round": 3,
+          "reviewLevel": "STRICT",
+          "verdict": "PASS",
+          "note": "attempt 4 + review round 3 bổ sung do user duyệt ngoài giới hạn ('Cho sửa thêm', 2026-11-09)"
+        }
+      ],
+      "report": ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-3-review.md",
+      "docImpact": "SPECIFICATIONS F1; .context/design-spec.md S01 khối 6 + bảng mốc (commit phần BL-107); docs/DESIGN.md (câu cache trang chủ) sửa trong working tree, CHƯA commit — DESIGN.md đang có bản viết lại ngoài scope, HEAD không có câu tương ứng · spec 1.63.0 / scope v117",
+      "completedAt": "2026-11-09"
     }
   ],
   "bugs": [
@@ -5789,7 +5819,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T03:51:23.069Z",
+  "lastUpdated": "2026-11-09T04:21:23.103Z",
   "approvalMilestones": [
     {
       "id": "M1",

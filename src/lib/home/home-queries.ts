@@ -11,6 +11,7 @@ import { listProvinces } from "../projects/project-queries";
 import { listRentalCategoryOptions } from "../rentals/rental-list-queries";
 import { PostgresRentalSearch, sqlExecutorOf } from "../search/search-service";
 import { rentalSearchParamsSchema } from "../../shared/types/api";
+import type { PartnerDoc } from "./home-view-partners";
 import { FEATURED_OFFERS_MAX, type HomeBlockKey, type HomeDocs } from "./home-view";
 import { HOME_RENTALS_PER_TAB_MAX, type HomeRentalTabDocs } from "./home-view-listings";
 
@@ -18,6 +19,9 @@ import { HOME_RENTALS_PER_TAB_MAX, type HomeRentalTabDocs } from "./home-view-li
 export const FEATURED_PROJECTS_MAX = 6;
 /** Dịch vụ không có trần ở global; trần hiển thị để hàng cuộn ngang không dài vô hạn. */
 export const HOME_SERVICES_MAX = 12;
+
+/** Trần số đối tác trên dải logo (CMS không có trần; quá nhiều làm một vòng chạy quá dài). */
+export const HOME_PARTNERS_MAX = 24;
 
 const NEWEST_FIRST = ["-publishedAt", "-createdAt"];
 
@@ -110,6 +114,21 @@ function loadOffers(payload: Payload, locale: Locale, homepage: Homepage, now: D
     : findFeaturedFallback<PropertyPost>(payload, "property-posts", locale, { where, limit: FEATURED_OFFERS_MAX, sort: NEWEST_FIRST, select: POST_CARD_FIELDS });
 }
 
+/**
+ * Đối tác: chủ đầu tư `showAsPartner`, theo `sortOrder` rồi tên, qua `findPublicList` nên `/en` chỉ gồm đối tác đã có bản EN,
+ * không lấy tên Việt thay (BR-07; Spec § F1, Đối tác).
+ */
+async function loadPartners(payload: Payload, locale: Locale): Promise<PartnerDoc[]> {
+  const { docs } = await findPublicList<PartnerDoc>(payload, "developers", locale, {
+    where: { showAsPartner: { equals: true } },
+    sort: ["sortOrder", "name"],
+    limit: HOME_PARTNERS_MAX,
+    depth: 1,
+    select: { name: true, logo: true, website: true },
+  });
+  return docs;
+}
+
 async function loadNews(payload: Payload, locale: Locale, homepage: Homepage): Promise<News[]> {
   const ids = selectedIds(homepage.news?.posts, HOME_NEWS_POSTS_MAX);
   if (ids.length > 0) {
@@ -177,7 +196,7 @@ async function loadRentalTabs(payload: Payload, locale: Locale, homepage: Homepa
 export async function loadHomeDocs(payload: Payload, locale: Locale, homepage: Homepage, visible: readonly HomeBlockKey[], now: Date): Promise<HomeDocs> {
   const has = (block: HomeBlockKey) => visible.includes(block);
   const heroSearch = needsHeroSearchData(homepage);
-  const [projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news] = await Promise.all([
+  const [projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news, partners] = await Promise.all([
     has("featuredProjects") ? loadProjects(payload, locale, homepage) : [],
     has("services") ? loadServices(payload, locale, homepage) : [],
     has("featuredOffers") ? loadOffers(payload, locale, homepage, now) : [],
@@ -186,6 +205,7 @@ export async function loadHomeDocs(payload: Payload, locale: Locale, homepage: H
     heroSearch ? loadRentalCategoryChoices(payload, locale) : [],
     has("rentals") ? loadRentalTabs(payload, locale, homepage) : [],
     has("news") ? loadNews(payload, locale, homepage) : [],
+    has("partners") ? loadPartners(payload, locale) : [],
   ]);
-  return { projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news };
+  return { projects, services, offers, chipProjects, provinces, rentalCategories, rentalTabs, news, partners };
 }

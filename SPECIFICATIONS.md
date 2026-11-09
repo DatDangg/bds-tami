@@ -6,7 +6,7 @@
   Nguồn: docs/BRD.md v1.5 · docs/ARCHITECTURE.md · docs/ERD.md · docs/PERMISSION.md · docs/API_SPEC.md · docs/DESIGN.md
 -->
 
-- **spec_version:** 1.62.6
+- **spec_version:** 1.63.0
 - **updated_at:** 2026-11-09
 - **Trạng thái:** đã build (initial build xong), đang vận hành — mọi thay đổi qua `/change` (Change Request); BL-020 đã build đủ P1–P5
 
@@ -149,6 +149,7 @@ Các khối Hero slide (1–8; ảnh bắt buộc, video tuỳ chọn từng sli
 - **Ưu đãi nổi bật** = slider thẻ tin + "Xem thêm" → `/tin-bds`. Đây cũng là "slider banner ưu đãi" của bố cục market — không có khối riêng.
 - **Cho thuê** ("Thuê nhà ở & kinh doanh"): tab theo danh mục cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server; trống → các danh mục đang có tin), mỗi tab slider ≤ 8 tin còn trống + "Xem thêm" → `/cho-thue/danh-muc/<slug>`; không JS hiện tab đầu.
 - **Tin tức** (khối tối): intro + 3 bài (CMS ≤ 3, trống → 3 bài mới nhất) + "Xem tất cả".
+- **Đối tác (FR-PUB-17, BL-107 — ADDITIVE, quyết định user 2026-11-09, MINOR 1.63.0):** khối `partners` có giao diện (trước đây chỉ có cấu hình admin, trang chủ bỏ qua). **Thay thiết kế khối 6 "Đối tác" của design-spec S01** (lưới chỉ logo, "không marquee") ở hai điểm user chốt: dải chạy ngang + logo kèm tên; các điểm khác của thiết kế đó giữ (tiêu đề căn giữa, logo grayscale + mờ, hover/focus về màu gốc, mục có `website` hợp lệ là link mở tab mới `rel="noopener noreferrer"`). Nguồn: chủ đầu tư `developers.showAsPartner = true`, sắp theo `sortOrder` rồi tên, tối đa 24; vị trí + bật/tắt theo `blockOrder` / `partners.enabled` như các khối khác. Hiển thị **dải logo chạy ngang tự động** (marquee): mỗi mục logo (`developers.logo`, ảnh tối ưu, khung kích thước đồng đều, giữ tỉ lệ) + tên đối tác; thiếu logo → chỉ tên. **Dừng chạy khi hover hoặc focus** bàn phím trong dải + **nút Dừng / Phát** nhìn thấy (như hero; cho màn cảm ứng, WCAG 2.2.2); **`prefers-reduced-motion: reduce` → không chạy** (dải tĩnh xuống dòng, không nút, vẫn đọc được hết); **≤ 4 đối tác → không chạy**, hàng tĩnh căn giữa. Bản nhân đôi phục vụ vòng lặp `aria-hidden` + `inert` (trình đọc màn hình và Tab chỉ gặp mỗi đối tác 1 lần). Không có đối tác nào → **ẩn cả khối**. Tiêu đề: `partners.title` (localized) — trống → chữ mặc định i18n "Đối tác" / "Partners" (khối không bị ẩn vì thiếu tiêu đề). `/en` theo BR-07: chỉ đối tác đã có bản EN (như mọi nội dung `/en`, không lấy chữ VI thay). Lưu / xoá chủ đầu tư đang hoặc vừa là đối tác → làm mới trang chủ `/` và `/en` (ISR là lưới an toàn). Responsive 390 / 768 / 1440, không tràn ngang trang. Không đổi schema (không migration), không đổi API / quyền.
 - **Banner CTA "Đăng ký tham quan"**: ảnh tràn viền tuỳ chọn (`ctaBanner.image`, thiếu → ảnh nền cũ) qua scrim, chữ trắng đạt AA; nút chính + nút phụ tuỳ chọn (chỉ hiện khi đủ nhãn + link hợp lệ).
 - Thẻ dịch vụ (trang chủ + "Dịch vụ khác") bo 20px, chữ trên khung kính.
 - `rentals`, `news` tham gia `blockOrder`; khối không nằm trong "Thứ tự khối" thì không hiện — bản ghi trang chủ có sẵn cần admin thêm hai khối này sau khi deploy (không tự thêm, không data migration). Thanh thông báo và ô tìm kiếm có bật/tắt, vị trí cố định.

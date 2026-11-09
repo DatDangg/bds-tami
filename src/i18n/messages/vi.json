@@ -1057,6 +1057,12 @@
       "news": {
         "defaultTitle": "Tin tức",
         "viewAll": "Xem tất cả"
+      },
+      "partners": {
+        "defaultTitle": "Đối tác",
+        "region": "Danh sách đối tác",
+        "pause": "Dừng dải đối tác",
+        "play": "Phát dải đối tác"
       }
     },
     "postDetail": {

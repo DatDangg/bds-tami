@@ -1,0 +1,59 @@
+{
+  "specVersion": "1.62.6",
+  "scopeVersion": 116,
+  "generatedAt": "2026-11-09T03:51:23.069Z",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-114 BUG: bấm 'Gửi CV tới <email>' không phản ứng trên máy không có mail client. Giữ mailto + thêm nút Sao chép email. Bump PATCH 1.62.5 -> 1.62.6.",
+  "status": "published",
+  "workItem": "bug/careers-cv-mailto-no-action",
+  "backlog": "BL-114",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-11-09-careers-cv-mailto-no-action.md",
+  "task": "tasks/bug-careers-cv-mailto-no-action/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-careers-cv-mailto-no-action.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § Giao diện — Danh sách Tuyển dụng, Sao chép email nhận CV (BL-114)",
+    "F6",
+    "BL-114"
+  ],
+  "changed": {
+    "files": [
+      "src/components/careers/CopyEmailButton.tsx (mới, + test)",
+      "src/components/careers/JobListPage.tsx (+ test)",
+      "src/components/careers/CareersCvBanner.tsx",
+      "src/components/layout/CtaBanner.tsx (+ test, prop extraAction)",
+      "src/i18n/messages/vi.json, en.json (page.careers.v2.cvCopy/cvCopied/cvCopyFailed)"
+    ],
+    "modules": [
+      "Tuyển dụng /tuyen-dung (trạng thái chưa có vị trí + banner Gửi CV ngay)",
+      "CtaBanner dùng chung"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/tuyen-dung khi chưa có vị trí: có 'Gửi CV tới <email>' + 'Sao chép email'; bấm sao chép -> clipboard = email, hiện 'Đã sao chép' ~3s",
+      "Banner 'Chưa tìm thấy vị trí phù hợp? Gửi CV ngay': có nút 'Sao chép email' cạnh nút gửi CV; Tab tới thấy viền focus trắng rõ trên ảnh",
+      "Clipboard lỗi -> 'Không sao chép được, email: <email>'",
+      "Bản EN: 'Copy email' / 'Copied'"
+    ],
+    "dependents": [
+      "Các trang khác dùng CtaBanner (dịch vụ, trang chủ, liên hệ…) không đổi giao diện"
+    ],
+    "regression": [
+      "Nút mailto vẫn mở ứng dụng email trên máy có mail client",
+      "Không cấu hình email -> không có cả hai nút"
+    ]
+  },
+  "acceptance": [
+    "Máy không có mail client vẫn lấy được email (copy) + có phản hồi"
+  ],
+  "knownBlockers": [],
+  "testNotes": "Chưa kiểm trình duyệt thật 375/768/1280; clipboard cần HTTPS. MINOR: trên mobile nút sao chép không rộng bằng nút chính ở banner.",
+  "risk": "low",
+  "riskNote": "UI nhỏ + slot tuỳ chọn ở CtaBanner; NORMAL PASS round 2.",
+  "reviewReport": [
+    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-2-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.5-115.json"
+}

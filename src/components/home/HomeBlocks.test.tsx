@@ -4,7 +4,7 @@ import { renderWithIntl } from "@/components/media/test-utils";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 import { buildHomeView, type HomeDocs } from "@/lib/home/home-view";
-import type { Category, Homepage, Media, News, Project, PropertyPost, Service } from "@/payload-types";
+import type { Category, Developer, Homepage, Media, News, Project, PropertyPost, Service } from "@/payload-types";
 import { HomeBlocks } from "./HomeBlocks";
 
 const NOW = new Date("2026-10-18T03:00:00.000Z");
@@ -23,6 +23,7 @@ const docs: HomeDocs = {
   rentalCategories: [],
   rentalTabs: [],
   news: [],
+  partners: [],
 };
 
 const richText = {
@@ -343,5 +344,31 @@ describe("HomeBlocks: banner CTA ảnh tràn viền + 2 nút (BL-020 #7)", () =>
     renderHome(homepage({ ctaBanner: { enabled: true, title: "Cần tư vấn?", secondaryLabel: "Đặt lịch tham quan", secondaryLink: null } }));
     expect(screen.queryByTestId("cta-scrim")).toBeNull();
     expect(screen.queryByRole("link", { name: "Đặt lịch tham quan" })).toBeNull();
+  });
+});
+
+describe("HomeBlocks: khối Đối tác (BL-107)", () => {
+  const partnerDocs = (names: string[]): HomeDocs => ({ ...docs, partners: names.map((name, index) => ({ id: `d${index}`, name, logo: media(`logo${index}`), updatedAt: stamp, createdAt: stamp }) as Developer) });
+  const partnersPage = (partners: Homepage["partners"] = { enabled: true, title: "Đối tác" }) =>
+    homepage({ partners, blockOrder: ["about", "partners", "ctaBanner"].map((block) => ({ block })) as Homepage["blockOrder"] });
+
+  it("render đúng vị trí giữa Về TAMI và CTA, kèm h2 căn giữa", () => {
+    renderHome(partnersPage(), "vi", partnerDocs(["Vinhomes", "Sun Group"]));
+    expect(blockHeadings()).toEqual(["Về TAMI", "Đối tác", "Cần tư vấn?"]);
+    expectCenteredHeading(screen.getByRole("heading", { level: 2, name: "Đối tác" }));
+  });
+
+  it("không có đối tác → không có khối", () => {
+    renderHome(partnersPage(), "vi", docs);
+    expect(screen.queryByRole("region", { name: "Danh sách đối tác" })).toBeNull();
+    expect(blockHeadings()).toEqual(["Về TAMI", "Cần tư vấn?"]);
+  });
+
+  it("tiêu đề trống → chữ mặc định theo ngôn ngữ", () => {
+    const vi = renderHome(partnersPage({ enabled: true, title: "" }), "vi", partnerDocs(["Vinhomes"]));
+    expect(screen.getByRole("heading", { level: 2, name: "Đối tác" })).toBeInTheDocument();
+    vi.unmount();
+    renderHome(partnersPage({ enabled: true, title: "" }), "en", partnerDocs(["Vinhomes"]));
+    expect(screen.getByRole("heading", { level: 2, name: "Partners" })).toBeInTheDocument();
   });
 });

@@ -19,7 +19,7 @@ vi.mock("../search/search-service", () => ({
   },
 }));
 
-import { FEATURED_PROJECTS_MAX, loadHomeDocs } from "./home-queries";
+import { FEATURED_PROJECTS_MAX, HOME_PARTNERS_MAX, loadHomeDocs } from "./home-queries";
 
 const NOW = new Date("2026-10-18T03:00:00.000Z");
 const payload = {} as Payload;
@@ -264,5 +264,28 @@ describe("loadHomeDocs: khối Tin tức (BL-020 #11)", () => {
   it("khối không hiển thị thì không truy vấn", async () => {
     await loadHomeDocs(payload, "vi", newsPage(), [], NOW);
     expect(findPublicList).not.toHaveBeenCalled();
+  });
+});
+
+describe("loadHomeDocs: khối Đối tác (BL-107)", () => {
+  beforeEach(() => findPublicList.mockResolvedValue({ docs: [{ id: "d1", name: "Vinhomes" }] }));
+
+  it("khối không hiển thị thì không truy vấn", async () => {
+    await loadHomeDocs(payload, "vi", emptyHomepage, ["about"], NOW);
+    expect(findPublicList).not.toHaveBeenCalled();
+  });
+
+  it("qua truy vấn công khai (/en chỉ đối tác có bản EN, BR-07), theo sortOrder rồi tên, trần 24, chỉ trường cần", async () => {
+    const docs = await loadHomeDocs(payload, "en", emptyHomepage, ["partners"], NOW);
+    expect(docs.partners.map((doc) => doc.id)).toEqual(["d1"]);
+    const call = callFor("developers") ?? [];
+    expect(call[2]).toBe("en");
+    expect(optionsOf(call)).toMatchObject({
+      where: { showAsPartner: { equals: true } },
+      sort: ["sortOrder", "name"],
+      limit: HOME_PARTNERS_MAX,
+      select: { name: true, logo: true, website: true },
+    });
+    expect(HOME_PARTNERS_MAX).toBe(24);
   });
 });

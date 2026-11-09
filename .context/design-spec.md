@@ -273,7 +273,7 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 | 3 | Dự án nổi bật | Slider thẻ lớn ~464×600 bo 20px + khung kính | `--color-bg-alt` | Không |
 | 4 | Dịch vụ | Bento bất đối xứng, thẻ ảnh bo 20px + khung kính | `--color-bg` | Không |
 | 5 | Ưu đãi nổi bật | Slider thẻ | `--color-bg-alt` | Không |
-| 6 | Đối tác (FR-PUB-17, Should; **chưa có giao diện**) | Lưới logo | `--color-bg` | Không |
+| 6 | Đối tác (FR-PUB-17, Should; BL-107) | Dải logo + tên chạy ngang (≤ 4: hàng tĩnh) | `--color-bg` | Không |
 | 7 | Banner CTA (đề xuất §6.1; BL-020 #7 "Đăng ký tham quan") | Khối tối full-width; có ảnh → ảnh tràn viền + scrim, 2 nút | `.theme-dark-block` `--color-dark-deep`; ảnh `ctaBanner.image` + `--color-banner-scrim` | Không |
 | 8 | Cho thuê (`rentals`, BL-020 #8) | Tab danh mục + slider thẻ | `--color-bg` | Không |
 | 9 | Tin tức (`news`, BL-020 #11) | Split intro trái / 3 thẻ phải | `.theme-dark-block` (nền tối thương hiệu) | Không |
@@ -331,9 +331,9 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 - Heading căn giữa + gạch vàng 48px (`SectionHeading`, BL-101). **Slider thẻ** (trong container): cuộn ngang scroll-snap, vuốt/phím mũi tên, không autoplay; thẻ = `PostCard` (bo 20px, ảnh 16:10 lazy, badge ưu đãi, loại, tiêu đề, giá). Rộng 80% < sm · 2 thẻ ≥ sm · 3 thẻ ≥ lg; tối đa 6 thẻ. Nút trước/sau tròn 44px từ md (≥ 2 thẻ), cuộn ~90% bề rộng. Bài hết hạn **không** xuất hiện (BR-06). 0 bài: ẩn khối.
 - Nút **Xem thêm →** (`SectionMoreLink`: `ghost` + mũi tên, *BL-101 thay Outline*) dưới slider → `/tin-bds` (theo ngôn ngữ).
 
-**6. Đối tác** (`partners`, `developers.showAsPartner`) — **chưa dựng giao diện** (FR-PUB-17 Should; `partners` nằm trong thứ tự/bật tắt nhưng bị bỏ qua khi render, không phải placeholder). Thiết kế dưới đây áp dụng khi làm.
-- Tiêu đề `--text-h2` căn giữa. Lưới logo **chỉ logo** (không chữ dưới logo), ô cao 80px, logo `max-height: 48px`, grayscale + opacity 0.7, hover/focus về màu gốc. Logo có link `website` (tab mới) nếu có, `alt` = tên chủ đầu tư.
-- < sm 2 cột · sm 3 · md 4 · lg 6. Không marquee. 0 đối tác: ẩn khối.
+**6. Đối tác** (`partners`, `developers.showAsPartner`, sắp `sortOrder` rồi tên, tối đa 24) — **đã dựng (BL-107, user 2026-11-09 thay lưới chỉ logo / "không marquee")**. Code: `home/PartnersMarquee.tsx` + `PartnersMarqueeShell.tsx`, view `lib/home/home-view-partners.ts`.
+- Tiêu đề `--text-h2` căn giữa (`partners.title`, trống → "Đối tác" / "Partners"). Mỗi mục: logo khung 96×48 `object-contain` (grayscale + opacity 0.7, hover/focus về màu gốc; logo trang trí, alt rỗng) + tên; thiếu logo → chỉ tên. Có `website` http(s) → link tab mới `rel="noopener noreferrer"`.
+- ≥ 5 đối tác: dải chạy ngang (CSS keyframes, thời lượng theo số mục, mép mờ), bản lặp `aria-hidden` + `inert`; hover / focus chuột → dừng; focus bàn phím → về đầu dải + tắt mép mờ; nút Dừng / Phát 44px. ≤ 4 đối tác: hàng tĩnh căn giữa, xuống dòng. `prefers-reduced-motion`: không chạy, xuống dòng, không nút. 0 đối tác: ẩn khối. `/en`: chỉ đối tác có bản EN (BR-07).
 
 **7. Banner CTA** (đề xuất §6.1; BL-020 #7 "Đăng ký tham quan"): `.theme-dark-block`, tiêu đề `h2` (≤ 8 từ), câu phụ ≤ 20 từ, nút Primary **Nhận tư vấn** → `/lien-he` (hoặc `ctaLink`) + nút phụ tuỳ chọn (`secondaryLabel` + `secondaryLink`, biến thể `chip` viên thuốc viền trắng — chỉ hiện khi có CẢ nhãn lẫn link hợp lệ qua `resolveNavLink`). Căn giữa, padding `--space-section`.
 - **Có ảnh** (`ctaBanner.image`; chưa đặt thì dùng `backgroundImage` cũ): ảnh tràn viền phủ kín khung cao `clamp(26rem, 60svh, 40rem)` (cố định → không CLS), lazy, `sizes="100vw"`, ảnh trang trí (`alt=""`), phủ scrim `--color-banner-scrim` (đúng token của PageBanner, 0.6) → tiêu đề, câu phụ (`--color-on-dark`, KHÔNG dùng on-dark-muted) và chữ nút phụ trắng đạt 4.5:1 kể cả ảnh trắng tinh (`contrast.test`); khung cao có `min-h-[26rem]` dự phòng cho trình duyệt chưa hiểu `svh`; vòng focus của link trong khối có ảnh dùng `outline-on-dark` (trắng; vòng mặc định của khối tối `--color-on-dark-accent` #E0BF89 chỉ ~2.95:1 trên scrim đè ảnh trắng). Nút chính giữ nền vàng + chữ tối. **Không ảnh:** khối tối đặc như cũ, câu phụ `--color-text-secondary` của khối tối.
@@ -356,10 +356,10 @@ Thẻ ảnh và khung thẻ bo `--radius-xl` (20px); nút bo viên thuốc `--ra
 
 | Mốc | Thay đổi |
 |---|---|
-| 375 | Mọi khối 1 cột; hero chữ `--text-display` 32px, nút full-width tối đa 320px; slider dự án slide 88% + khung chữ dưới ảnh; dịch vụ xếp dọc; ưu đãi 1 cột; đối tác 2 cột |
-| 640 | Ưu đãi 2 cột; đối tác 3 cột |
-| 768 | Về TAMI split 5/7; dịch vụ 2 thẻ đầu 50/50 + thẻ 3 full; đối tác 4 cột; mũi tên slider dự án |
-| 1024 | Hero mũi tên; video hero bật (nếu có); slider dự án khung chữ đè ảnh; dịch vụ bento 7/5; ưu đãi 3 cột; đối tác 6 cột |
+| 375 | Mọi khối 1 cột; hero chữ `--text-display` 32px, nút full-width tối đa 320px; slider dự án slide 88% + khung chữ dưới ảnh; dịch vụ xếp dọc; ưu đãi 1 cột; đối tác dải chạy (≤ 4: hàng tĩnh xuống dòng) |
+| 640 | Ưu đãi 2 cột |
+| 768 | Về TAMI split 5/7; dịch vụ 2 thẻ đầu 50/50 + thẻ 3 full; mũi tên slider dự án |
+| 1024 | Hero mũi tên; video hero bật (nếu có); slider dự án khung chữ đè ảnh; dịch vụ bento 7/5; ưu đãi 3 cột |
 | 1280 | Menu ngang; nội dung đạt container 1280 |
 | 1536 | Chỉ nới khoảng trắng; hero vẫn tràn viền, hero tối đa 1080px cao; slider dự án nổi bật trong khung `max-w-container` (BL-075) |
 

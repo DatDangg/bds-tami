@@ -138,6 +138,14 @@
   --animate-dialog-out: dialog-out var(--duration-base) var(--ease-out);
   --animate-sheet-in: sheet-in var(--duration-slow) var(--ease-out);
   --animate-sheet-out: sheet-out var(--duration-base) var(--ease-out);
+  /* Dải logo Đối tác (BL-107): hai bản danh sách nối nhau nên một vòng = dịch đúng 50%; thời lượng thật đặt inline theo số mục ở component (40s chỉ là mặc định). */
+  --animate-partners-marquee: partners-marquee 40s linear infinite;
+
+  @keyframes partners-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 
   @keyframes fade-in {
     from {

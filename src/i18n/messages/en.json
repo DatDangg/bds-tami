@@ -1057,6 +1057,12 @@
       "news": {
         "defaultTitle": "News",
         "viewAll": "View all"
+      },
+      "partners": {
+        "defaultTitle": "Partners",
+        "region": "Partner list",
+        "pause": "Pause partner strip",
+        "play": "Play partner strip"
       }
     },
     "postDetail": {

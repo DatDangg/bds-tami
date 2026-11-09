@@ -1,59 +1,77 @@
 {
-  "specVersion": "1.62.6",
-  "scopeVersion": 116,
-  "generatedAt": "2026-11-09T03:51:23.069Z",
-  "trigger": "bug-fix",
-  "triggerNote": "BL-114 BUG: bấm 'Gửi CV tới <email>' không phản ứng trên máy không có mail client. Giữ mailto + thêm nút Sao chép email. Bump PATCH 1.62.5 -> 1.62.6.",
+  "specVersion": "1.63.0",
+  "scopeVersion": 117,
+  "generatedAt": "2026-11-09T04:21:23.103Z",
+  "trigger": "feature-update",
+  "triggerNote": "BL-107 ADDITIVE: trang chủ không hiện khối Đối tác dù đã cấu hình (QA 26) — khối chưa từng có giao diện. Dựng dải logo chạy ngang. Bump MINOR 1.62.6 -> 1.63.0.",
   "status": "published",
-  "workItem": "bug/careers-cv-mailto-no-action",
-  "backlog": "BL-114",
-  "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-09-careers-cv-mailto-no-action.md",
-  "task": "tasks/bug-careers-cv-mailto-no-action/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-09-careers-cv-mailto-no-action.md",
+  "workItem": "feature/homepage-partners-block",
+  "backlog": "BL-107",
+  "classification": "ADDITIVE",
+  "changeDoc": "spec/changes/archive/2026-11-05-homepage-partners-block-missing.md",
+  "task": "tasks/feature-homepage-partners-block/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-homepage-partners-block.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Giao diện — Danh sách Tuyển dụng, Sao chép email nhận CV (BL-114)",
-    "F6",
-    "BL-114"
+    "SPECIFICATIONS.md § F1 — Đối tác (FR-PUB-17, BL-107)",
+    "FR-PUB-17",
+    "BR-07",
+    "BL-107"
   ],
   "changed": {
     "files": [
-      "src/components/careers/CopyEmailButton.tsx (mới, + test)",
-      "src/components/careers/JobListPage.tsx (+ test)",
-      "src/components/careers/CareersCvBanner.tsx",
-      "src/components/layout/CtaBanner.tsx (+ test, prop extraAction)",
-      "src/i18n/messages/vi.json, en.json (page.careers.v2.cvCopy/cvCopied/cvCopyFailed)"
+      "src/components/home/PartnersMarquee.tsx (mới, + test)",
+      "src/components/home/PartnersMarqueeShell.tsx (mới, client: nút Dừng/Phát)",
+      "src/lib/home/home-view-partners.ts (mới)",
+      "src/lib/home/home-view.ts (+ test)",
+      "src/lib/home/home-queries.ts (+ test, loadPartners)",
+      "src/lib/home/load-home.ts",
+      "src/components/home/HomeBlocks.tsx (+ test)",
+      "src/hooks/developers/revalidate-developer.ts (mới, + test)",
+      "src/collections/Developers.ts (gắn hook)",
+      "src/app/(frontend)/globals.css (keyframes partners-marquee)",
+      "src/i18n/messages/vi.json, en.json (page.home.partners.*)"
     ],
     "modules": [
-      "Tuyển dụng /tuyen-dung (trạng thái chưa có vị trí + banner Gửi CV ngay)",
-      "CtaBanner dùng chung"
+      "Trang chủ / và /en — khối Đối tác",
+      "Admin Chủ đầu tư (làm mới trang chủ khi lưu/xoá đối tác)"
     ]
   },
   "impact": {
     "direct": [
-      "/tuyen-dung khi chưa có vị trí: có 'Gửi CV tới <email>' + 'Sao chép email'; bấm sao chép -> clipboard = email, hiện 'Đã sao chép' ~3s",
-      "Banner 'Chưa tìm thấy vị trí phù hợp? Gửi CV ngay': có nút 'Sao chép email' cạnh nút gửi CV; Tab tới thấy viền focus trắng rõ trên ảnh",
-      "Clipboard lỗi -> 'Không sao chép được, email: <email>'",
-      "Bản EN: 'Copy email' / 'Copied'"
+      "Admin: bật 'Hiện ở khối đối tác trang chủ' cho ≥ 1 chủ đầu tư + khối Đối tác có trong 'Thứ tự các khối' và bật → trang chủ hiện khối đúng vị trí",
+      "≥ 5 đối tác: dải logo + tên chạy ngang; hover dừng; bấm logo có website mở tab mới, dải không nhảy; Tab vào dải → dải về đầu, viền focus rõ; nút Dừng/Phát hoạt động (cả màn cảm ứng)",
+      "≤ 4 đối tác: hàng tĩnh căn giữa, không nút",
+      "Hệ điều hành bật giảm chuyển động: dải không chạy, xuống dòng, không nút",
+      "0 đối tác / tắt khối / không có trong thứ tự: khối ẩn",
+      "Tiêu đề trống → 'Đối tác' / 'Partners'",
+      "/en: chỉ đối tác đã có bản EN",
+      "Lưu/xoá chủ đầu tư đang/vừa là đối tác → trang chủ cập nhật ngay (không chờ ISR)",
+      "390 / 768 / 1440: không tràn ngang, tên dài xuống dòng khi tĩnh"
     ],
     "dependents": [
-      "Các trang khác dùng CtaBanner (dịch vụ, trang chủ, liên hệ…) không đổi giao diện"
+      "Các khối trang chủ khác giữ thứ tự / hiển thị",
+      "Admin Chủ đầu tư lưu/xoá bình thường (hook không lỗi ngoài Next)"
     ],
     "regression": [
-      "Nút mailto vẫn mở ứng dụng email trên máy có mail client",
-      "Không cấu hình email -> không có cả hai nút"
+      "Trang chủ không có đối tác hiển thị như trước",
+      "Chi tiết dự án hiển thị chủ đầu tư không đổi"
     ]
   },
   "acceptance": [
-    "Máy không có mail client vẫn lấy được email (copy) + có phản hồi"
+    "Có đối tác + khối bật → trang chủ hiện khối Đối tác đúng thứ tự",
+    "Dải chạy, dừng khi hover/focus, nút Dừng/Phát, reduced-motion tĩnh",
+    "Không đối tác → ẩn khối",
+    "Responsive 390/768/1440 không tràn ngang"
   ],
   "knownBlockers": [],
-  "testNotes": "Chưa kiểm trình duyệt thật 375/768/1280; clipboard cần HTTPS. MINOR: trên mobile nút sao chép không rộng bằng nút chính ở banner.",
-  "risk": "low",
-  "riskNote": "UI nhỏ + slot tuỳ chọn ở CtaBanner; NORMAL PASS round 2.",
+  "testNotes": "Chưa kiểm trình duyệt thật (390/768/1440, CLS, vòng lặp liền mạch ở 1440, click chuột giữa vòng trên Chrome, Tab tới link xa). Đổi ảnh logo trong Media không làm mới ngay (chờ ISR 60s). Cửa sổ mất focus thì scroll dải reset. Bản ghi homepage staging/prod đang có partners trong thứ tự + bật sẽ hiện khối ngay sau deploy.",
+  "risk": "medium",
+  "riskNote": "Trang chủ + hook revalidate mới + animation a11y; STRICT PASS round 3 (attempt 4 bổ sung do user duyệt), spec-validation phase PASS.",
   "reviewReport": [
-    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-2-review.md"
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-2-review.md",
+    ".context/review-reports/feature-homepage-partners-block-phase-1-task-01-round-3-review.md",
+    ".context/review-reports/spec-validation-feature-homepage-partners-block-phase-1.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.5-115.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.6-116.json"
 }

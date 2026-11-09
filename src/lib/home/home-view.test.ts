@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Category, Homepage, Media, News, Project, PropertyPost, Province, Service } from "../../payload-types";
+import type { Category, Developer, Homepage, Media, News, Project, PropertyPost, Province, Service } from "../../payload-types";
 import type { RentalCard as RentalSearchCard } from "../../shared/types/api";
 import { buildAnnouncementView, buildHomeView, type HomeDocs, visibleBlockKeys } from "./home-view";
 import type { HomeRentalTabDocs } from "./home-view-listings";
@@ -41,13 +41,14 @@ const docs = (overrides: Partial<HomeDocs> = {}): HomeDocs => ({
   rentalCategories: [],
   rentalTabs: [],
   news: [],
+  partners: [],
   ...overrides,
 });
 
 const kinds = (page: Homepage, d: HomeDocs = docs(), locale: "vi" | "en" = "vi") => buildHomeView(page, d, locale, NOW).blocks.map((block) => block.kind);
 
 describe("buildHomeView: thứ tự và bật/tắt khối", () => {
-  it("theo blockOrder; partners chưa có giao diện nên bị bỏ qua", () => {
+  it("theo blockOrder; partners không có đối tác nào thì ẩn", () => {
     expect(kinds(homepage())).toEqual(["about", "featuredProjects", "services", "featuredOffers", "ctaBanner"]);
     const reordered = homepage({ blockOrder: [{ block: "ctaBanner" }, { block: "services" }, { block: "about" }] });
     expect(kinds(reordered)).toEqual(["ctaBanner", "services", "about"]);
@@ -73,7 +74,10 @@ describe("buildHomeView: thứ tự và bật/tắt khối", () => {
   });
 
   it("visibleBlockKeys: chỉ khối bật, có giao diện và có tiêu đề (quyết định truy vấn nào cần chạy)", () => {
-    expect(visibleBlockKeys(homepage({ services: { enabled: false, title: "Dịch vụ" } }))).toEqual(["about", "featuredProjects", "featuredOffers", "ctaBanner"]);
+    expect(visibleBlockKeys(homepage({ services: { enabled: false, title: "Dịch vụ" } }))).toEqual(["about", "featuredProjects", "featuredOffers", "partners", "ctaBanner"]);
+    // Đối tác có chữ mặc định nên tiêu đề CMS trống vẫn hiện; tắt thì ẩn.
+    expect(visibleBlockKeys(homepage({ partners: { enabled: true, title: "" } }))).toContain("partners");
+    expect(visibleBlockKeys(homepage({ partners: { enabled: false, title: "Đối tác" } }))).not.toContain("partners");
   });
 
   it("visibleBlockKeys: rentals/news hiện theo blockOrder khi đã bật + có tiêu đề; homepage cũ thiếu khối mới (không có trong blockOrder) vẫn render như cũ", () => {
@@ -485,5 +489,63 @@ describe("buildHomeView: banner CTA ảnh + nút phụ (BL-020 #7)", () => {
     expect(ctaOf({ secondaryLabel: "", secondaryLink: "projects" })?.secondary).toBeNull();
     expect(ctaOf({ secondaryLabel: "X", secondaryLink: "javascript:alert(1)" })?.secondary).toBeNull();
     expect(ctaOf({ secondaryLabel: "View", secondaryLink: "projects" }, "en")?.secondary).toEqual({ label: "View", href: "/en/projects" });
+  });
+});
+
+describe("buildHomeView: khối Đối tác (BL-107, FR-PUB-17)", () => {
+  const developer = (id: string, extra: Partial<Developer> = {}): Developer => ({ id, name: `Đối tác ${id}`, logo: media(`dev${id}`), updatedAt: stamp, createdAt: stamp, ...extra }) as Developer;
+  const partnersPage = (overrides: Partial<Homepage> = {}) => homepage({ blockOrder: [{ block: "about" }, { block: "partners" }, { block: "ctaBanner" }] as Homepage["blockOrder"], ...overrides });
+  const partnersOf = (page: Homepage, d: HomeDocs, locale: "vi" | "en" = "vi") => {
+    const block = buildHomeView(page, d, locale, NOW).blocks.find((item) => item.kind === "partners");
+    return block?.kind === "partners" ? block : null;
+  };
+
+  it("hiện đúng vị trí theo blockOrder, giữ thứ tự docs, chỉ lộ trường công khai của logo", () => {
+    const d = docs({ partners: [developer("b"), developer("a")] });
+    expect(kinds(partnersPage(), d)).toEqual(["about", "partners", "ctaBanner"]);
+    const block = partnersOf(partnersPage(), d);
+    expect(block?.items.map((item) => item.name)).toEqual(["Đối tác b", "Đối tác a"]);
+    expect(block?.items[0]?.logo?.url).toBe("/api/media/file/devb.jpg");
+    expect(block?.items[0]?.logo).not.toHaveProperty("uploadedBy");
+  });
+
+  it("không có đối tác → ẩn khối; enabled=false hoặc không có trong blockOrder → ẩn", () => {
+    expect(partnersOf(partnersPage(), docs())).toBeNull();
+    const d = docs({ partners: [developer("a")] });
+    expect(kinds(partnersPage({ partners: { enabled: false, title: "Đối tác" } }), d)).toEqual(["about", "ctaBanner"]);
+    expect(kinds(partnersPage({ blockOrder: [{ block: "about" }] }), d)).toEqual(["about"]);
+  });
+
+  it("thiếu logo (hoặc logo chỉ còn id) → mục chỉ có tên; thiếu tên → bỏ mục", () => {
+    const d = docs({ partners: [developer("a", { logo: null }), developer("b", { logo: "id-only" }), developer("c", { name: " " })] });
+    const block = partnersOf(partnersPage(), d);
+    expect(block?.items.map((item) => [item.name, item.logo])).toEqual([["Đối tác a", null], ["Đối tác b", null]]);
+  });
+
+  it("tiêu đề trống không ẩn khối (chữ mặc định ở nơi hiển thị), cả vi lẫn en", () => {
+    const d = docs({ partners: [developer("a")] });
+    for (const locale of ["vi", "en"] as const) {
+      expect(partnersOf(partnersPage({ partners: { enabled: true, title: "" } }), d, locale)).toMatchObject({ title: "" });
+    }
+    expect(partnersOf(partnersPage({ partners: { enabled: true, title: "Our partners" } }), d, "en")?.title).toBe("Our partners");
+  });
+
+  it("website http(s) hợp lệ → link; thiếu / không hợp lệ / giao thức nguy hiểm → không link", () => {
+    const d = docs({
+      partners: [
+        developer("a", { website: " https://vinhomes.vn " }),
+        developer("b", { website: null }),
+        developer("c", { website: "javascript:alert(1)" }),
+        developer("d", { website: "không phải url" }),
+      ],
+    });
+    const block = partnersOf(partnersPage(), d);
+    expect(block?.items.map((item) => item.website)).toEqual(["https://vinhomes.vn", null, null, null]);
+  });
+
+  it("/en: view giữ nguyên các mục query trả về (query đã lọc đối tác chưa có bản EN)", () => {
+    const block = partnersOf(partnersPage(), docs({ partners: [developer("a", { name: "Vinhomes" })] }), "en");
+    expect(block?.items).toHaveLength(1);
+    expect(block?.items[0]?.name).toBe("Vinhomes");
   });
 });

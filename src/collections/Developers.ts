@@ -2,6 +2,7 @@ import type { CollectionConfig, TextFieldSingleValidation } from "payload";
 
 import { isAdmin, readUnlessTrashed } from "../access";
 import { nameField } from "../fields/name";
+import { createRevalidateDeveloper } from "../hooks/developers/revalidate-developer";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { withContentDefaults } from "./_shared/content-defaults";
 
@@ -15,6 +16,8 @@ const validateWebsite: TextFieldSingleValidation = (value) => {
     return "Địa chỉ web không hợp lệ.";
   }
 };
+
+const revalidation = createRevalidateDeveloper();
 
 /**
  * Chủ đầu tư (ERD §4.4, FR-ADM-07). Khách và sale đọc, chỉ admin ghi (PERMISSION §3.2; mở quyền tạo cho sale
@@ -33,6 +36,7 @@ export const Developers: CollectionConfig = withContentDefaults(
     defaultSort: "sortOrder",
     access: { read: readUnlessTrashed, create: isAdmin, update: isAdmin, delete: isAdmin },
     versions: false,
+    hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
     fields: [
       nameField(),
       {

@@ -8,6 +8,7 @@ import { HeroSearch } from "./HeroSearch";
 import { HeroSlider } from "./HeroSlider";
 import { HomeNews } from "./HomeNews";
 import { HomeRentals } from "./HomeRentals";
+import { PartnersMarquee } from "./PartnersMarquee";
 import { ServicesBento } from "./ServicesBento";
 import { StrengthsBlock } from "./StrengthsBlock";
 
@@ -29,6 +30,8 @@ function renderBlock(block: HomeBlockView) {
       return <HomeRentals title={block.title} tabs={block.tabs} />;
     case "news":
       return <HomeNews block={block} />;
+    case "partners":
+      return <PartnersMarquee block={block} />;
   }
 }
 

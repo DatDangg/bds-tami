@@ -9,6 +9,7 @@ import { isOfferEnded } from "../content/offer-status";
 import type { SalesStatus } from "../../collections/Projects";
 import { populatedMedia } from "../news/news-view";
 import { type HomeRentalTabDocs, type NewsBlockView, type RentalsBlockView, toNewsBlock, toRentalsBlock } from "./home-view-listings";
+import { type PartnerDoc, type PartnersBlockView, toPartnersBlock } from "./home-view-partners";
 import { type PostCardData, toPostCards, toPublicImage } from "../posts/post-view";
 import { renderableImage } from "../projects/project-detail-view";
 import { toProjectCardData } from "../projects/project-view";
@@ -17,11 +18,11 @@ import { type ServiceCardData, toServiceCards } from "../services/service-view";
 /** Khối của trang chủ (không gồm hero, luôn đứng đầu). */
 export type HomeBlockKey = (typeof HOMEPAGE_BLOCKS)[number];
 
-/** Khối ĐÃ có giao diện. `partners` (FR-PUB-17, Should) làm ở task riêng: tới lúc đó thứ tự/bật tắt của nó được bỏ qua. */
-/** Khối có chữ mặc định theo ngôn ngữ (rentals/news) hoặc không có tiêu đề khối (strengths) nên KHÔNG bị ẩn khi CMS chưa đặt tiêu đề. */
-const TITLE_OPTIONAL_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "rentals", "news"]);
+/** Khối có chữ mặc định theo ngôn ngữ (rentals/news/partners) hoặc không có tiêu đề khối (strengths) nên KHÔNG bị ẩn khi CMS chưa đặt tiêu đề. */
+const TITLE_OPTIONAL_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "rentals", "news", "partners"]);
 
-const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "about", "featuredProjects", "services", "featuredOffers", "ctaBanner", "rentals", "news"]);
+/** Khối ĐÃ có giao diện (hiện là mọi khối của `HOMEPAGE_BLOCKS`; khối mới thêm mà chưa làm giao diện thì chưa đưa vào đây). */
+const RENDERED_BLOCKS: ReadonlySet<HomeBlockKey> = new Set(["strengths", "about", "featuredProjects", "services", "featuredOffers", "partners", "ctaBanner", "rentals", "news"]);
 
 export const FEATURED_OFFERS_MAX = 6;
 /** Khối Điểm mạnh cần ≥ 2 mục hiển thị được (BL-044). */
@@ -138,6 +139,7 @@ export type HomeBlockView =
   | { kind: "featuredOffers"; title: string; cards: PostCardData[] }
   | RentalsBlockView
   | NewsBlockView
+  | PartnersBlockView
   | CtaBannerView;
 
 export interface HomeView {
@@ -165,6 +167,8 @@ export interface HomeDocs {
   rentalTabs: HomeRentalTabDocs[];
   /** Bài của khối Tin tức, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
   news: News[];
+  /** Chủ đầu tư `showAsPartner` của khối Đối tác, theo thứ tự hiển thị (rỗng khi khối không hiển thị). */
+  partners: PartnerDoc[];
 }
 
 const text = (value: string | null | undefined): string => value?.trim() ?? "";
@@ -352,9 +356,8 @@ function toBlock(block: HomeBlockKey, homepage: Homepage, docs: HomeDocs, locale
       return toRentalsBlock(title, docs.rentalTabs, locale);
     case "news":
       return toNewsBlock(title, homepage.news?.intro, docs.news, locale);
-    // Chưa có giao diện (FR-PUB-17, Should): không nằm trong RENDERED_BLOCKS nên không bao giờ tới đây.
     case "partners":
-      return null;
+      return toPartnersBlock(title, docs.partners);
   }
 }
 
