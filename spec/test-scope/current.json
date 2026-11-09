@@ -1,64 +1,59 @@
 {
-  "specVersion": "1.62.5",
-  "scopeVersion": 115,
-  "generatedAt": "2026-11-09T03:49:31.411Z",
+  "specVersion": "1.62.6",
+  "scopeVersion": 116,
+  "generatedAt": "2026-11-09T03:51:23.069Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-110 BUG: tìm 'ba đình' ở /cho-thue ra tin ngoài Ba Đình vì searchText gộp legacyNames của phường. Bỏ legacyNames khỏi searchText. Bump PATCH 1.62.4 -> 1.62.5.",
+  "triggerNote": "BL-114 BUG: bấm 'Gửi CV tới <email>' không phản ứng trên máy không có mail client. Giữ mailto + thêm nút Sao chép email. Bump PATCH 1.62.5 -> 1.62.6.",
   "status": "published",
-  "workItem": "bug/search-area-still-fails",
-  "backlog": "BL-110",
+  "workItem": "bug/careers-cv-mailto-no-action",
+  "backlog": "BL-114",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-05-search-area-still-fails.md",
-  "task": "tasks/bug-search-area-still-fails/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-09-search-area-still-fails.md",
+  "changeDoc": "spec/changes/archive/2026-11-09-careers-cv-mailto-no-action.md",
+  "task": "tasks/bug-careers-cv-mailto-no-action/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-careers-cv-mailto-no-action.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Quy tắc biên — Đổi tên tỉnh / phường (tên) / dự án (BL-110)",
-    "F3",
-    "BL-110"
+    "SPECIFICATIONS.md § Giao diện — Danh sách Tuyển dụng, Sao chép email nhận CV (BL-114)",
+    "F6",
+    "BL-114"
   ],
   "changed": {
     "files": [
-      "src/hooks/rentals/build-search-text.ts",
-      "src/hooks/rentals/build-search-text.test.ts (mới)",
-      "src/hooks/wards/reindex-rentals.ts",
-      "src/hooks/wards/reindex-rentals.test.ts",
-      "src/collections/Wards.ts (comment + admin.description)",
-      "docs/ERD.md (§4.2 wards, §6 searchText — 4 câu; sửa trong working tree, chưa commit vì ERD đang có bản viết lại ngoài scope)"
+      "src/components/careers/CopyEmailButton.tsx (mới, + test)",
+      "src/components/careers/JobListPage.tsx (+ test)",
+      "src/components/careers/CareersCvBanner.tsx",
+      "src/components/layout/CtaBanner.tsx (+ test, prop extraAction)",
+      "src/i18n/messages/vi.json, en.json (page.careers.v2.cvCopy/cvCopied/cvCopyFailed)"
     ],
     "modules": [
-      "Tìm kiếm Cho thuê (q)",
-      "Admin Phường (tên cũ)",
-      "Dựng lại chỉ mục tìm kiếm tin cho thuê"
+      "Tuyển dụng /tuyen-dung (trạng thái chưa có vị trí + banner Gửi CV ngay)",
+      "CtaBanner dùng chung"
     ]
   },
   "impact": {
     "direct": [
-      "Sau reindex: /cho-thue?q=ba+đình không còn ra tin phường Hồng Hà (tên cũ 'Phường Phúc Xá, Quận Ba Đình'); tin thuộc phường Ba Đình hiện hành vẫn ra",
-      "Gõ tên phường/quận cũ (vd 'phuc xa') không còn ra tin của phường mới (quyết định user)",
-      "Admin Phường: sửa 'Tên cũ' không xếp job dựng lại chỉ mục; sửa tên phường vẫn dựng lại"
+      "/tuyen-dung khi chưa có vị trí: có 'Gửi CV tới <email>' + 'Sao chép email'; bấm sao chép -> clipboard = email, hiện 'Đã sao chép' ~3s",
+      "Banner 'Chưa tìm thấy vị trí phù hợp? Gửi CV ngay': có nút 'Sao chép email' cạnh nút gửi CV; Tab tới thấy viền focus trắng rõ trên ảnh",
+      "Clipboard lỗi -> 'Không sao chép được, email: <email>'",
+      "Bản EN: 'Copy email' / 'Copied'"
     ],
     "dependents": [
-      "/en tìm Cho thuê (searchText bản en cùng nguồn)",
-      "Lệnh pnpm reindex:rentals-search + job reindex-rentals-search dùng chung buildForLocale"
+      "Các trang khác dùng CtaBanner (dịch vụ, trang chủ, liên hệ…) không đổi giao diện"
     ],
     "regression": [
-      "Tìm theo mã tin / tiêu đề / địa chỉ / tên phường / tỉnh / dự án vẫn ra",
-      "Tìm nhiều từ khớp cụm (BL-103) không đổi",
-      "Đổi tên tỉnh / dự án vẫn dựng lại chỉ mục"
+      "Nút mailto vẫn mở ứng dụng email trên máy có mail client",
+      "Không cấu hình email -> không có cả hai nút"
     ]
   },
   "acceptance": [
-    "searchText không chứa tên cũ phường",
-    "q='ba đình' không ra tin chỉ khớp qua tên cũ (sau reindex)"
+    "Máy không có mail client vẫn lấy được email (copy) + có phản hồi"
   ],
-  "knownBlockers": [
-    "Dữ liệu staging/prod giữ searchText cũ tới khi chạy `pnpm reindex:rentals-search` sau deploy — test trước khi reindex sẽ vẫn thấy lỗi"
-  ],
-  "testNotes": "Test unit buildForLocale (mock); chưa có integration q=ba đình. Dữ liệu mẫu CT-000019/020/048 (tiêu đề Tây Hồ nhưng phường Ba Đình) ngoài scope.",
-  "risk": "medium",
-  "riskNote": "Đổi dữ liệu dẫn xuất mọi tin (cần reindex); NORMAL PASS round 1.",
+  "knownBlockers": [],
+  "testNotes": "Chưa kiểm trình duyệt thật 375/768/1280; clipboard cần HTTPS. MINOR: trên mobile nút sao chép không rộng bằng nút chính ở banner.",
+  "risk": "low",
+  "riskNote": "UI nhỏ + slot tuỳ chọn ở CtaBanner; NORMAL PASS round 2.",
   "reviewReport": [
-    ".context/review-reports/bug-search-area-still-fails-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-1-review.md",
+    ".context/review-reports/bug-careers-cv-mailto-no-action-phase-1-task-01-round-2-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.4-114.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.5-115.json"
 }

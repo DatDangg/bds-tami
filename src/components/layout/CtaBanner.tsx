@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 import { ArrowRight } from "@/components/icons";
 import { type MediaImage, ResponsiveImage } from "@/components/media/ResponsiveImage";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ interface CtaBannerProps {
   /** Nút phụ (chip viên thuốc): chỉ dựng khi có CẢ nhãn lẫn link. */
   secondaryLabel?: string;
   secondaryHref?: string;
+  /** Hành động phụ tuỳ ý (vd nút "Sao chép email", BL-114) đặt sau các nút trên; chỉ dựng khi truyền. */
+  extraAction?: ReactNode;
   /** `start`: chữ + nút canh trái (banner trang chủ theo mockup BL-044); mặc định `center` (S14 dịch vụ không đổi). */
   align?: "center" | "start";
   /** `compact`: dải thấp (~290px ở 1440) + nút chính có mũi tên, như mockup trang chủ (BL-044); mặc định `default` (dịch vụ, chi tiết dự án) không đổi. */
@@ -29,7 +31,7 @@ interface CtaBannerProps {
  * Không ảnh: khối tối (tokens §0) như cũ. Có ảnh: ảnh phủ kín khung cao cố định (không CLS, lazy, `sizes="100vw"`) + scrim; khối vẫn là
  * `.theme-dark-block` nên nút `chip` (chỉ dùng trên nền tối/scrim) đúng màu. Server Component; nút là link thật nên chạy không cần JS.
  */
-export function CtaBanner({ title, eyebrow, description, actionLabel, actionHref, backgroundImage, secondaryLabel, secondaryHref, align = "center", size = "default" }: CtaBannerProps) {
+export function CtaBanner({ title, eyebrow, description, actionLabel, actionHref, backgroundImage, secondaryLabel, secondaryHref, extraAction, align = "center", size = "default" }: CtaBannerProps) {
   const headingId = useId();
   const isCompact = size === "compact";
   return (
@@ -55,7 +57,7 @@ export function CtaBanner({ title, eyebrow, description, actionLabel, actionHref
         </h2>
         {/* muted (#b3b3b3) không đạt 4.5:1 trên ảnh trắng dưới scrim → trên ảnh dùng on-dark. */}
         {description && <p className={cn("max-w-[60ch] text-lead", backgroundImage ? "text-on-dark" : "text-text-secondary")}>{description}</p>}
-        {((actionLabel && actionHref) || (secondaryLabel && secondaryHref)) && (
+        {((actionLabel && actionHref) || (secondaryLabel && secondaryHref) || extraAction) && (
           <div className={cn("flex w-full flex-col gap-3 sm:w-auto sm:flex-row", align === "start" ? "items-start justify-start" : "items-center justify-center")}>
             {actionLabel && actionHref && (
               <Button asChild size="lg" className="w-full max-w-xs sm:w-auto">
@@ -70,6 +72,7 @@ export function CtaBanner({ title, eyebrow, description, actionLabel, actionHref
                 <Link href={secondaryHref}>{secondaryLabel}</Link>
               </Button>
             )}
+            {extraAction}
           </div>
         )}
       </div>

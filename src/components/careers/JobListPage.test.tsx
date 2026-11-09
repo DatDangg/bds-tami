@@ -218,6 +218,7 @@ describe("S12 /tuyen-dung: render", () => {
     await render("vi");
     expect(screen.getByRole("status")).toHaveTextContent("Hiện TAMI chưa có vị trí đang tuyển.");
     expect(screen.getByRole("link", { name: "Gửi CV tới tuyendung@tami.example" })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
+    expect(within(screen.getByRole("status")).getByRole("button", { name: "Sao chép email" })).toBeInTheDocument();
   });
 
   it("không có vị trí và site-settings lỗi → vẫn dựng trang, chỉ không có link email", async () => {
@@ -226,6 +227,7 @@ describe("S12 /tuyen-dung: render", () => {
     await render("vi");
     expect(screen.getByRole("status")).toHaveTextContent("Hiện TAMI chưa có vị trí đang tuyển.");
     expect(screen.queryByRole("link", { name: /^Gửi CV tới/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Sao chép email" })).toBeNull();
   });
 
   it("không có kết quả khi lọc: 'Chưa có vị trí phù hợp.', bộ lọc vẫn hiện, nút Xoá bộ lọc", async () => {
@@ -349,11 +351,14 @@ describe("hero + dải ý trang Tuyển dụng (BL-045)", () => {
     const banner = screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" });
     expect(within(banner).getByText("Gia nhập TAMI HOMES")).toBeInTheDocument();
     expect(within(banner).getByRole("link", { name: /Gửi CV ngay/ })).toHaveAttribute("href", "mailto:tuyendung@tami.example");
+    expect(within(banner).getByRole("button", { name: "Sao chép email" })).toBeInTheDocument();
     expect(banner.compareDocumentPosition(screen.getByTestId("consult-banner")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     first.unmount();
     getSiteSettings.mockResolvedValue({});
     await render("vi");
-    expect(within(screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" })).queryByRole("link")).toBeNull();
+    const noEmailBanner = within(screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" }));
+    expect(noEmailBanner.queryByRole("link")).toBeNull();
+    expect(noEmailBanner.queryByRole("button")).toBeNull();
   });
 
   it("kết thúc bằng banner tư vấn", async () => {

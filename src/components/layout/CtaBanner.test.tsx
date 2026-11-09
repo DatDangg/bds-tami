@@ -66,4 +66,12 @@ describe("CtaBanner dùng chung", () => {
     expect(wrapper).not.toHaveClass("text-center");
     expect(screen.getByRole("link", { name: "Nhận tư vấn" }).parentElement).toHaveClass("justify-start");
   });
+
+  it("extraAction: render sau các nút; chỉ truyền extraAction vẫn dựng khối nút; không truyền thì không có khối nút", () => {
+    const { container, rerender } = render(<CtaBanner title="T" extraAction={<button type="button">Sao chép</button>} />);
+    expect(screen.getByRole("button", { name: "Sao chép" })).toBeInTheDocument();
+    rerender(<CtaBanner title="T" />);
+    expect(container.querySelector("button")).toBeNull();
+    expect(container.querySelector("section .flex.w-full.flex-col.gap-3")).toBeNull();
+  });
 });

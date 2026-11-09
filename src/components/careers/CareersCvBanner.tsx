@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { CopyEmailButton } from "@/components/careers/CopyEmailButton";
 import { CtaBanner } from "@/components/layout/CtaBanner";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 
@@ -20,7 +21,7 @@ export function CareersCvBanner({ email, image }: CareersCvBannerProps) {
       eyebrow={t("cvEyebrow")}
       title={t("cvTitle")}
       description={t("cvDescription")}
-      {...(email ? { actionLabel: t("cvCta"), actionHref: `mailto:${email}` } : {})}
+      {...(email ? { actionLabel: t("cvCta"), actionHref: `mailto:${email}`, extraAction: <CopyEmailButton email={email} tone="onDark" /> } : {})}
       backgroundImage={image ?? null}
       align="start"
       size="compact"

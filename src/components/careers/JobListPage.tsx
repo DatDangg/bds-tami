@@ -6,6 +6,7 @@ import { getPayload, type Payload } from "payload";
 import { CareersCvBanner } from "@/components/careers/CareersCvBanner";
 import { CareersPerks } from "@/components/careers/CareersPerks";
 import { CareersProcess } from "@/components/careers/CareersProcess";
+import { CopyEmailButton } from "@/components/careers/CopyEmailButton";
 import { JobFilters } from "@/components/careers/JobFilters";
 import { JobRow } from "@/components/careers/JobRow";
 import { ArrowRight } from "@/components/icons";
@@ -122,9 +123,12 @@ function NoJobsPanel({ title, description, mailto }: { title: string; descriptio
       <h3 className="text-h3 font-semibold">{title}</h3>
       <p className="max-w-[60ch] text-body text-text-secondary">{description}</p>
       {mailto && (
-        <a href={`mailto:${mailto.email}`} className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
-          {mailto.label}
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <a href={`mailto:${mailto.email}`} className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
+            {mailto.label}
+          </a>
+          <CopyEmailButton email={mailto.email} />
+        </div>
       )}
     </div>
   );

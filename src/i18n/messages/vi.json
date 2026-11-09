@@ -840,7 +840,10 @@
         "cvEyebrow": "Gia nhập TAMI HOMES",
         "cvTitle": "Chưa tìm thấy vị trí phù hợp?",
         "cvDescription": "Gửi CV của bạn, chúng tôi sẽ liên hệ khi có cơ hội phù hợp.",
-        "cvCta": "Gửi CV ngay"
+        "cvCta": "Gửi CV ngay",
+        "cvCopy": "Sao chép email",
+        "cvCopied": "Đã sao chép",
+        "cvCopyFailed": "Không sao chép được, email: {email}"
       }
     },
     "careerDetail": {

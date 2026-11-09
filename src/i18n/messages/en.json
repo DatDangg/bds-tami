@@ -840,7 +840,10 @@
         "cvEyebrow": "Join TAMI HOMES",
         "cvTitle": "Haven't found the right role?",
         "cvDescription": "Send us your CV and we will get in touch when a suitable opportunity opens.",
-        "cvCta": "Send your CV"
+        "cvCta": "Send your CV",
+        "cvCopy": "Copy email",
+        "cvCopied": "Copied",
+        "cvCopyFailed": "Could not copy, email: {email}"
       }
     },
     "careerDetail": {
