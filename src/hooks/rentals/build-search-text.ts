@@ -19,7 +19,7 @@ interface RentalSearchSource {
 const asText = (value: unknown): string => (typeof value === "string" ? value : "");
 
 /**
- * Chuỗi tìm kiếm không dấu (ERD §6): mã + tiêu đề + địa chỉ + phường + tỉnh + tên cũ của phường + tên dự án. Phần rỗng bị bỏ.
+ * Chuỗi tìm kiếm không dấu (ERD §6): mã + tiêu đề + địa chỉ + phường + tỉnh + tên dự án. Phần rỗng bị bỏ.
  * Dùng chung `normalizeSearchText` với từ khoá người dùng nhập để hai phía luôn khớp.
  */
 export function composeSearchText(parts: ReadonlyArray<string | null | undefined>): string {
@@ -45,19 +45,21 @@ async function readName(req: PayloadRequest, collection: "provinces" | "projects
   return asText("name" in doc ? doc.name : (doc as { title?: unknown }).title);
 }
 
-/** Tên phường + `legacyNames[].name` (mảng `{ name }`, ERD §4.2: "<phường cũ>, <quận/huyện cũ>"). */
-async function readWardNames(req: PayloadRequest, id: string): Promise<string[]> {
+/**
+ * Chỉ tên phường hiện hành. Cố ý KHÔNG đọc `legacyNames`: tên cũ có đuôi quận/huyện cũ ("Phường Phúc Xá, Quận Ba Đình") nên đưa vào
+ * sẽ làm tin của phường mới (Hồng Hà) khớp khi tìm "ba đình" dù không thuộc Ba Đình (BL-110).
+ */
+async function readWardName(req: PayloadRequest, id: string): Promise<string> {
   const ward = await req.payload.findByID({
     collection: "wards",
     id,
     depth: 0,
-    select: { name: true, legacyNames: true },
+    select: { name: true },
     overrideAccess: true,
     disableErrors: true,
     req,
   });
-  if (!ward) return [];
-  return [ward.name, ...(ward.legacyNames ?? []).map((legacy) => asText(legacy.name))];
+  return ward ? asText(ward.name) : "";
 }
 
 /** Dựng `searchText` của MỘT ngôn ngữ từ nguồn đã gộp (tiêu đề của ngôn ngữ đó, còn lại dùng chung). Tên dự án thiếu bản `locale` thì lấy bản `vi`. */
@@ -72,7 +74,7 @@ export async function buildForLocale(req: PayloadRequest, source: RentalSearchSo
     asText(source.code),
     asText(source.title),
     asText(source.address),
-    ...(wardId ? await readWardNames(req, wardId) : []),
+    wardId ? await readWardName(req, wardId) : "",
     provinceId ? await readName(req, "provinces", provinceId, locale) : "",
     projectName,
   ]);
@@ -128,7 +130,7 @@ const sharedSourceChanged = (before: RentalSearchSource, after: RentalSearchSour
  * `afterChange`: lần lưu chỉ ghi ngôn ngữ của request, nên khi đổi phường/tỉnh/dự án/địa chỉ (dùng chung hai bản) `searchText`
  * của ngôn ngữ còn lại sẽ lệch. Dựng lại bản đó (chỉ khi nó đã có tiêu đề) bằng UPDATE trực tiếp trên `rentals_locales` và dòng phiên bản mới nhất (`created_at` lớn nhất) `_rentals_v_locales`,
  * cùng transaction, thay vì `payload.update` lồng nhau (kéo theo audit, revalidate, redirect, phiên bản).
- * Đổi tên dự án/tên cũ của phường làm mới tin đã có ở hook của `projects`/`wards` và lệnh `reindex:rentals-search` (xem `reindex-rental-search-text.ts`).
+ * Đổi tên dự án/tên phường làm mới tin đã có ở hook của `projects`/`wards` và lệnh `reindex:rentals-search` (xem `reindex-rental-search-text.ts`).
  */
 export const refreshOtherLocaleSearchText: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   if (operation !== "update" || !previousDoc || !sharedSourceChanged(previousDoc as RentalSearchSource, doc as RentalSearchSource)) return doc;

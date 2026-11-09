@@ -1,50 +1,64 @@
 {
-  "specVersion": "1.62.4",
-  "scopeVersion": 114,
-  "generatedAt": "2026-11-09T03:48:41.263Z",
+  "specVersion": "1.62.5",
+  "scopeVersion": 115,
+  "generatedAt": "2026-11-09T03:49:31.411Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-116 BUG: 'Danh mục cho thuê hiển thị' chọn được quá 4, không lỗi tại trường. Validate kiểm số lượng cả onChange. Không đổi requirement (CMS ≤ 4 đã có) — giữ spec_version.",
+  "triggerNote": "BL-110 BUG: tìm 'ba đình' ở /cho-thue ra tin ngoài Ba Đình vì searchText gộp legacyNames của phường. Bỏ legacyNames khỏi searchText. Bump PATCH 1.62.4 -> 1.62.5.",
   "status": "published",
-  "workItem": "bug/homepage-rental-categories-max-validation",
-  "backlog": "BL-116",
+  "workItem": "bug/search-area-still-fails",
+  "backlog": "BL-110",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-09-homepage-rental-categories-max-validation.md",
-  "task": "tasks/bug-homepage-rental-categories-max-validation/phase-1-task-01.md",
+  "changeDoc": "spec/changes/archive/2026-11-05-search-area-still-fails.md",
+  "task": "tasks/bug-search-area-still-fails/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-09-search-area-still-fails.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F1 — Cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server)",
-    "BL-116"
+    "SPECIFICATIONS.md § Quy tắc biên — Đổi tên tỉnh / phường (tên) / dự án (BL-110)",
+    "F3",
+    "BL-110"
   ],
   "changed": {
     "files": [
-      "src/globals/homepage/blocks.ts (validateRentalCategories)",
-      "src/globals/homepage/blocks.test.ts (mới)"
+      "src/hooks/rentals/build-search-text.ts",
+      "src/hooks/rentals/build-search-text.test.ts (mới)",
+      "src/hooks/wards/reindex-rentals.ts",
+      "src/hooks/wards/reindex-rentals.test.ts",
+      "src/collections/Wards.ts (comment + admin.description)",
+      "docs/ERD.md (§4.2 wards, §6 searchText — 4 câu; sửa trong working tree, chưa commit vì ERD đang có bản viết lại ngoài scope)"
     ],
     "modules": [
-      "Admin Cấu hình Trang chủ > Cho thuê"
+      "Tìm kiếm Cho thuê (q)",
+      "Admin Phường (tên cũ)",
+      "Dựng lại chỉ mục tìm kiếm tin cho thuê"
     ]
   },
   "impact": {
     "direct": [
-      "/admin/globals/homepage > Cho thuê > 'Danh mục cho thuê hiển thị': chọn mục thứ 5 -> lỗi 'Tối đa 4 danh mục.' tại trường + viền đỏ ngay",
-      "Lưu khi có 5 danh mục -> bị chặn, lỗi tiếng Việt tại trường"
+      "Sau reindex: /cho-thue?q=ba+đình không còn ra tin phường Hồng Hà (tên cũ 'Phường Phúc Xá, Quận Ba Đình'); tin thuộc phường Ba Đình hiện hành vẫn ra",
+      "Gõ tên phường/quận cũ (vd 'phuc xa') không còn ra tin của phường mới (quyết định user)",
+      "Admin Phường: sửa 'Tên cũ' không xếp job dựng lại chỉ mục; sửa tên phường vẫn dựng lại"
     ],
     "dependents": [
-      "Chọn danh mục khác loại Cho thuê -> lúc lưu vẫn báo 'Chỉ chọn danh mục thuộc loại \"Cho thuê\".'"
+      "/en tìm Cho thuê (searchText bản en cùng nguồn)",
+      "Lệnh pnpm reindex:rentals-search + job reindex-rentals-search dùng chung buildForLocale"
     ],
     "regression": [
-      "1-4 danh mục cho thuê lưu được",
-      "Để trống -> trang chủ tự lấy danh mục đang có tin"
+      "Tìm theo mã tin / tiêu đề / địa chỉ / tên phường / tỉnh / dự án vẫn ra",
+      "Tìm nhiều từ khớp cụm (BL-103) không đổi",
+      "Đổi tên tỉnh / dự án vẫn dựng lại chỉ mục"
     ]
   },
   "acceptance": [
-    "Chọn mục thứ 5 -> lỗi tại trường + viền đỏ; lưu bị chặn"
+    "searchText không chứa tên cũ phường",
+    "q='ba đình' không ra tin chỉ khớp qua tên cũ (sau reindex)"
   ],
-  "knownBlockers": [],
-  "testNotes": "Chưa kiểm viền đỏ trên admin thật; test mock req/payload.",
-  "risk": "low",
-  "riskNote": "Validate 1 field; NORMAL PASS round 1.",
+  "knownBlockers": [
+    "Dữ liệu staging/prod giữ searchText cũ tới khi chạy `pnpm reindex:rentals-search` sau deploy — test trước khi reindex sẽ vẫn thấy lỗi"
+  ],
+  "testNotes": "Test unit buildForLocale (mock); chưa có integration q=ba đình. Dữ liệu mẫu CT-000019/020/048 (tiêu đề Tây Hồ nhưng phường Ba Đình) ngoài scope.",
+  "risk": "medium",
+  "riskNote": "Đổi dữ liệu dẫn xuất mọi tin (cần reindex); NORMAL PASS round 1.",
   "reviewReport": [
-    ".context/review-reports/bug-homepage-rental-categories-max-validation-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/bug-search-area-still-fails-phase-1-task-01-round-1-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.4-113.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.4-114.json"
 }

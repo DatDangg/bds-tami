@@ -18,12 +18,17 @@ beforeEach(() => {
 });
 
 describe("reindexRentalsOnWardChange", () => {
-  it("đổi tên hoặc tên cũ → dựng lại tin của phường (scope wardId, nguồn 'wards'); đồng bộ xong trả doc nguyên vẹn", async () => {
+  it("đổi tên → dựng lại tin của phường (scope wardId, nguồn 'wards'); đồng bộ xong trả doc nguyên vẹn", async () => {
     const req = reqAs("admin");
     await expect(run(req, doc, { ...doc, name: "cũ" })).resolves.toBe(doc);
-    await run(req, doc, { ...doc, legacyNames: [] });
-    expect(reindexRentalsFromHook).toHaveBeenCalledTimes(2);
+    expect(reindexRentalsFromHook).toHaveBeenCalledTimes(1);
     expect(reindexRentalsFromHook).toHaveBeenCalledWith(req, { wardId: "w1" }, "wards");
+  });
+
+  it("chỉ đổi tên cũ (legacyNames) → KHÔNG dựng lại: tên cũ không còn là nguồn tìm kiếm (BL-110)", async () => {
+    await run(reqAs("admin"), doc, { ...doc, legacyNames: [] });
+    await run(reqAs("admin"), doc, { ...doc, legacyNames: [{ name: "Phường khác, Quận Ba Đình" }] });
+    expect(reindexRentalsFromHook).not.toHaveBeenCalled();
   });
 
   it("xếp job nền ('queued') + admin → doc trả về có searchReindexPending: true", async () => {

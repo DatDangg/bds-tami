@@ -5084,6 +5084,32 @@
       "report": ".context/review-reports/bug-homepage-rental-categories-max-validation-phase-1-task-01-round-1-review.md",
       "docImpact": "no doc impact; no spec change · spec 1.62.4 / scope v114",
       "completedAt": "2026-11-09"
+    },
+    {
+      "slug": "search-area-still-fails",
+      "title": "Tìm kiếm khu vực Cho thuê vẫn lọc sai sau BL-103 — bỏ tên cũ phường khỏi searchText (BL-110, QA 22)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-110",
+      "changeDoc": "spec/changes/archive/2026-11-05-search-area-still-fails.md",
+      "startedAt": "2026-11-05",
+      "rootCause": "buildRentalSearchText (src/hooks/rentals/build-search-text.ts:60) gộp ward.legacyNames vào searchText; tên cũ có đuôi ', Quận Ba Đình' → mọi tin phường Hồng Hà khớp 'ba đình'",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-search-area-still-fails/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "verdict": "PASS"
+        }
+      ],
+      "report": ".context/review-reports/bug-search-area-still-fails-phase-1-task-01-round-1-review.md",
+      "docImpact": "docs/ERD.md §4.2 + §6 (4 câu) đã sửa trong working tree nhưng CHƯA commit — ERD đang có bản viết lại ngoài scope chưa commit, bản HEAD khác cấu trúc (dòng 154/304/306/683); SPECIFICATIONS quy tắc biên; vận hành: pnpm reindex:rentals-search staging → prod sau deploy (chưa chạy) · spec 1.62.5 / scope v115",
+      "completedAt": "2026-11-09"
     }
   ],
   "projectName": "tami-website",
@@ -5737,7 +5763,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T03:48:41.263Z",
+  "lastUpdated": "2026-11-09T03:49:31.411Z",
   "approvalMilestones": [
     {
       "id": "M1",

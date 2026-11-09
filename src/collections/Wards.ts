@@ -14,14 +14,14 @@ const WARD_TYPE_LABELS: Record<WardType, string> = { phuong: "Phường", xa: "X
 
 /**
  * Phường/xã/đặc khu sau 01/07/2025 (ERD §4.2, LGL-01), `code` = mã TMS 8 số. `legacyNames` là tên đơn vị cũ
- * ("Phường Bến Nghé, Quận 1") để tìm kiếm. Slug duy nhất trong cùng tỉnh: DB giữ UNIQUE (`province`, `slug`).
+ * ("Phường Bến Nghé, Quận 1") chỉ để tra cứu, KHÔNG dùng cho tìm kiếm (BL-110). Slug duy nhất trong cùng tỉnh: DB giữ UNIQUE (`province`, `slug`).
  * Khách/sale chỉ đọc, chỉ admin ghi; hook `beforeDelete` chặn xoá phường còn tin cho thuê tham chiếu (409). Không localized, không status/soft delete (như `provinces`).
- * Đổi tên/tên cũ dựng lại `searchText` của tin thuộc phường (hook `afterChange`); nhiều tin thì job nền + cảnh báo trên form (`searchReindexPendingField`).
+ * Đổi tên dựng lại `searchText` của tin thuộc phường (hook `afterChange`); nhiều tin thì job nền + cảnh báo trên form (`searchReindexPendingField`).
  */
 export const Wards: CollectionConfig = {
   slug: "wards",
   labels: collectionLabels("wards"),
-  admin: { useAsTitle: "name", defaultColumns: ["name", "province", "type", "code"], description: "Phường/xã/đặc khu sau sáp nhập 01/07/2025; kèm tên cũ để tìm kiếm." },
+  admin: { useAsTitle: "name", defaultColumns: ["name", "province", "type", "code"], description: "Phường/xã/đặc khu sau sáp nhập 01/07/2025; kèm tên cũ để tra cứu." },
   defaultSort: "name",
   access: { read: () => true, create: isAdmin, update: isAdmin, delete: isAdmin },
   hooks: { beforeDelete: [blockDeleteWhileHasRentals], afterChange: [reindexRentalsOnWardChange] },
@@ -44,7 +44,7 @@ export const Wards: CollectionConfig = {
       type: "array",
       label: "Tên cũ",
       labels: { singular: "Tên cũ", plural: "Tên cũ" },
-      admin: { description: "Tên đơn vị cũ trước 01/07/2025, dùng cho tìm kiếm.", components: { RowLabel: textRowLabel({ field: "name", fallback: "Tên cũ" }) } },
+      admin: { description: "Tên đơn vị cũ trước 01/07/2025, chỉ để tra cứu — không dùng cho tìm kiếm.", components: { RowLabel: textRowLabel({ field: "name", fallback: "Tên cũ" }) } },
       fields: [{ name: "name", type: "text", label: "Tên đơn vị cũ", required: true }],
     },
   ],

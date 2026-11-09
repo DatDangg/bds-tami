@@ -1,0 +1,50 @@
+{
+  "specVersion": "1.62.4",
+  "scopeVersion": 114,
+  "generatedAt": "2026-11-09T03:48:41.263Z",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-116 BUG: 'Danh mục cho thuê hiển thị' chọn được quá 4, không lỗi tại trường. Validate kiểm số lượng cả onChange. Không đổi requirement (CMS ≤ 4 đã có) — giữ spec_version.",
+  "status": "published",
+  "workItem": "bug/homepage-rental-categories-max-validation",
+  "backlog": "BL-116",
+  "classification": "BUG",
+  "changeDoc": "spec/changes/archive/2026-11-09-homepage-rental-categories-max-validation.md",
+  "task": "tasks/bug-homepage-rental-categories-max-validation/phase-1-task-01.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § F1 — Cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server)",
+    "BL-116"
+  ],
+  "changed": {
+    "files": [
+      "src/globals/homepage/blocks.ts (validateRentalCategories)",
+      "src/globals/homepage/blocks.test.ts (mới)"
+    ],
+    "modules": [
+      "Admin Cấu hình Trang chủ > Cho thuê"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/admin/globals/homepage > Cho thuê > 'Danh mục cho thuê hiển thị': chọn mục thứ 5 -> lỗi 'Tối đa 4 danh mục.' tại trường + viền đỏ ngay",
+      "Lưu khi có 5 danh mục -> bị chặn, lỗi tiếng Việt tại trường"
+    ],
+    "dependents": [
+      "Chọn danh mục khác loại Cho thuê -> lúc lưu vẫn báo 'Chỉ chọn danh mục thuộc loại \"Cho thuê\".'"
+    ],
+    "regression": [
+      "1-4 danh mục cho thuê lưu được",
+      "Để trống -> trang chủ tự lấy danh mục đang có tin"
+    ]
+  },
+  "acceptance": [
+    "Chọn mục thứ 5 -> lỗi tại trường + viền đỏ; lưu bị chặn"
+  ],
+  "knownBlockers": [],
+  "testNotes": "Chưa kiểm viền đỏ trên admin thật; test mock req/payload.",
+  "risk": "low",
+  "riskNote": "Validate 1 field; NORMAL PASS round 1.",
+  "reviewReport": [
+    ".context/review-reports/bug-homepage-rental-categories-max-validation-phase-1-task-01-round-1-review.md"
+  ],
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.4-113.json"
+}
