@@ -4980,6 +4980,32 @@
       "report": ".context/review-reports/bug-zalo-share-blank-page-phase-1-task-01-round-1-review.md",
       "docImpact": "SPECIFICATIONS (As-built BL-105); docs/DESIGN.md no impact; .context/design-spec.md (~dòng 553, 608 còn mô tả Zalo là link) chưa sửa — file đang bẩn ngoài scope · spec 1.62.3 / scope v110",
       "completedAt": "2026-11-09"
+    },
+    {
+      "slug": "footer-logo-not-linked",
+      "title": "Footer: bấm logo TAMI Homes không về trang chủ (BL-117, QA 34)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-117",
+      "changeDoc": "spec/changes/archive/2026-11-09-footer-logo-not-linked.md",
+      "startedAt": "2026-11-09",
+      "rootCause": "src/components/layout/Footer.tsx:55 render BrandLogo không bọc link (Header có)",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-footer-logo-not-linked/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "FAST",
+          "verdict": "PASS"
+        }
+      ],
+      "report": ".context/review-reports/bug-footer-logo-not-linked-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change · spec 1.62.3 / scope v111",
+      "completedAt": "2026-11-09"
     }
   ],
   "projectName": "tami-website",
@@ -5633,7 +5659,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T03:36:18.475Z",
+  "lastUpdated": "2026-11-09T03:45:21.302Z",
   "approvalMilestones": [
     {
       "id": "M1",

@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import en_ from "@/i18n/messages/en.json";
 import vi_ from "@/i18n/messages/vi.json";
 import { Footer, SocialLinks } from "./Footer";
 
@@ -83,6 +84,26 @@ describe("Footer: logo nền tối", () => {
       .map((img) => new URLSearchParams(img.getAttribute("src")?.split("?")[1]).get("url"));
     expect(sources).toContain("/brand/tami-logo-white.png");
     expect(sources).not.toContain("/brand/tami-logo-gold.png");
+  });
+});
+
+describe("Footer: logo là link về trang chủ (BL-117)", () => {
+  beforeEach(() => stubViewport(true));
+
+  it.each([
+    ["vi", vi_, "/"],
+    ["en", en_, "/en"],
+  ])("locale %s: logo bọc link về %s, có tên truy cập, ảnh alt rỗng", (locale, messages, href) => {
+    render(
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <Footer logo={{}} columns={columns} tagline="Giới thiệu" copyright="© TAMI" socials={[]} showCookieSettings={false} />
+      </NextIntlClientProvider>,
+    );
+    const footer = screen.getByRole("contentinfo");
+    const home = within(footer).getByRole("link", { name: messages.layout.header.home });
+    expect(home).toHaveAttribute("href", href);
+    expect(home).toHaveClass("min-h-11");
+    expect(home.querySelector("img")).toHaveAttribute("alt", "");
   });
 });
 

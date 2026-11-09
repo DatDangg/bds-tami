@@ -1,4 +1,5 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import type { ComponentType, CSSProperties } from "react";
 import {
   ChatCircleDots,
@@ -10,6 +11,8 @@ import {
   XLogo,
   YoutubeLogo,
 } from "@/components/icons";
+import { resolveNavLink } from "@/lib/content/nav-link";
+import type { Locale } from "@/i18n/routing";
 import { BrandLogo } from "./BrandLogo";
 import { CookieSettingsButton } from "./CookieSettingsButton";
 import { FooterLinkColumn } from "./FooterLinkColumn";
@@ -43,6 +46,9 @@ const SOCIAL_PLATFORMS: Record<string, { name: string; Icon: ComponentType<{ siz
  * nằm ở nút nổi, menu di động và trang Liên hệ. Nút "lên đầu trang" là `BackToTop` nổi của khung trang, không dựng lại ở đây.
  */
 export function Footer({ logo, columns, tagline, copyright, socials, showCookieSettings }: FooterProps) {
+  const tHeader = useTranslations("layout.header");
+  const locale = useLocale() as Locale;
+  const homeHref = resolveNavLink("home", locale)?.href ?? "/";
   return (
     <footer className="theme-dark-block py-section-tight print:hidden">
       <div className="mx-auto flex w-full max-w-container flex-col gap-10 px-gutter">
@@ -52,7 +58,14 @@ export function Footer({ logo, columns, tagline, copyright, socials, showCookieS
           className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1.4fr)_repeat(var(--footer-cols),minmax(0,1fr))] md:gap-10"
         >
           <div className="flex flex-col gap-4">
-            <BrandLogo tone="on-dark" image={logo.onDark} className="self-start" />
+            {/* Logo là link về trang chủ đúng ngôn ngữ như Header (BL-117); alt ảnh rỗng vì tên truy cập nằm ở aria-label của link. */}
+            <Link
+              href={homeHref}
+              aria-label={tHeader("home")}
+              className="inline-flex min-h-11 min-w-11 items-center self-start rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
+            >
+              <BrandLogo tone="on-dark" image={logo.onDark} />
+            </Link>
             <p className="max-w-text text-small whitespace-pre-line text-text-secondary">{tagline}</p>
             <SocialLinks socials={socials} variant="circle" />
           </div>

@@ -1,63 +1,50 @@
 {
   "specVersion": "1.62.3",
-  "scopeVersion": 110,
-  "generatedAt": "2026-11-09T03:36:18.475Z",
+  "scopeVersion": 111,
+  "generatedAt": "2026-11-09T03:45:21.302Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-105 BUG: nút chia sẻ Zalo chuyển tới sp.zalo.me/plugins/share trả trang trắng. Fix theo quyết định user: Web Share (mobile) / sao chép link + thông báo (desktop). Bump PATCH 1.62.2 -> 1.62.3.",
+  "triggerNote": "BL-117 BUG: logo footer không phải link. Bọc link về trang chủ theo locale. Không đổi requirement — giữ spec_version.",
   "status": "published",
-  "workItem": "bug/zalo-share-blank-page",
-  "backlog": "BL-105",
+  "workItem": "bug/footer-logo-not-linked",
+  "backlog": "BL-117",
   "classification": "BUG",
-  "changeDoc": "spec/changes/archive/2026-11-05-zalo-share-blank-page.md",
-  "task": "tasks/bug-zalo-share-blank-page/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-09-zalo-share-blank-page.md",
+  "changeDoc": "spec/changes/archive/2026-11-09-footer-logo-not-linked.md",
+  "task": "tasks/bug-footer-logo-not-linked/phase-1-task-01.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Giao diện — Tin tức v2, As-built BL-105",
-    "F7",
-    "BL-105"
+    "SPECIFICATIONS.md § Khung trang (footer)",
+    "BL-117"
   ],
   "changed": {
     "files": [
-      "src/components/news/ShareButtons.tsx",
-      "src/components/news/news-components.test.tsx",
-      "src/i18n/messages/vi.json (page.news.share.native, zaloCopied)",
-      "src/i18n/messages/en.json (page.news.share.native, zaloCopied)"
+      "src/components/layout/Footer.tsx",
+      "src/components/layout/Footer.test.tsx"
     ],
     "modules": [
-      "Chi tiết tin tức (cụm chia sẻ hero)",
-      "Chi tiết tuyển dụng (cụm chia sẻ)",
-      "Menu chia sẻ dự phòng Dự án / Cho thuê / Tin BĐS (DetailShareButton)"
+      "Footer công khai (mọi trang VI/EN)"
     ]
   },
   "impact": {
     "direct": [
-      "Desktop không có Web Share (vd Firefox desktop): chi tiết tin tức bấm 'Chia sẻ qua Zalo' -> clipboard có đúng URL bài + hiện 'Đã sao chép liên kết: dán vào Zalo để chia sẻ', tự ẩn ~3s; không mở tab sp.zalo.me",
-      "Mobile có Web Share (iOS Safari / Android Chrome): bấm 'Chia sẻ' -> mở menu chia sẻ hệ điều hành với đúng link + tiêu đề; huỷ không báo lỗi",
-      "Bản /en: nhãn 'Share via Zalo' / 'Share' + thông báo tiếng Anh",
-      "Clipboard bị chặn -> báo 'Không sao chép được'"
+      "Mọi trang /vi: bấm logo footer -> về / ; mọi trang /en: bấm logo footer -> về /en",
+      "Logo footer có tên truy cập 'TAMI, về trang chủ' (EN tương ứng), Tab tới được, viền focus nhìn thấy trên nền tối, vùng bấm >= 44px"
     ],
     "dependents": [
-      "Chi tiết tuyển dụng: cụm chia sẻ biến thể default (Facebook, Zalo/Chia sẻ, sao chép)",
-      "Dự án / Cho thuê / Tin BĐS: nút chia sẻ ở khối tiêu đề -> menu dự phòng (khi không có Web Share) có nút Zalo sao chép link",
-      "Hero chi tiết tin tức tone on-dark: thông báo đọc được trên ảnh tối"
+      "Footer: giới thiệu, mạng xã hội, cột link accordion < md không đổi bố cục"
     ],
     "regression": [
-      "Nút Facebook mở sharer.php đúng URL",
-      "Nút 'Sao chép liên kết' vẫn sao chép + báo đã sao chép",
-      "Không có URL gốc -> chỉ còn nút sao chép"
+      "Logo header vẫn về trang chủ",
+      "Footer < md accordion cột link vẫn mở/đóng"
     ]
   },
   "acceptance": [
-    "Không còn link sp.zalo.me trên mọi trang",
-    "Desktop: bấm Zalo sao chép link + thông báo dán vào Zalo",
-    "Mobile: bấm Chia sẻ mở menu chia sẻ hệ điều hành"
+    "Bấm logo footer về trang chủ đúng ngôn ngữ"
   ],
   "knownBlockers": [],
-  "testNotes": "Chưa kiểm trên trình duyệt/mobile thật (jsdom). Chrome Windows / Safari macOS có Web Share nên desktop đó thấy nút 'Chia sẻ' thay 'Chia sẻ qua Zalo'. MINOR m1: bấm Zalo rồi bấm 'Sao chép liên kết' trong 3s vẫn hiện câu Zalo.",
-  "risk": "medium",
-  "riskNote": "Component chia sẻ dùng chung 3 loại trang; NORMAL PASS round 1.",
+  "testNotes": "Chưa kiểm trình duyệt thật; test jsdom vi/en.",
+  "risk": "low",
+  "riskNote": "Chỉ bọc link quanh logo footer; FAST PASS round 1.",
   "reviewReport": [
-    ".context/review-reports/bug-zalo-share-blank-page-phase-1-task-01-round-1-review.md"
+    ".context/review-reports/bug-footer-logo-not-linked-phase-1-task-01-round-1-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.2-109.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-110.json"
 }
