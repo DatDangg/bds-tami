@@ -47,7 +47,9 @@ export const enabledField = { name: "enabled", type: "checkbox", label: "Hiện 
 export const titleField = { name: "title", type: "text", label: "Tiêu đề khối", localized: true } as const satisfies Field;
 
 /** Danh mục của khối Cho thuê phải thuộc scope `rental`: `filterOptions` cho ô chọn trong admin, `validate` kiểm lại ở server (API/seed cũng bị chặn). */
-const validateRentalCategories: RelationshipFieldManyValidation = async (value, options) => {
+export const validateRentalCategories: RelationshipFieldManyValidation = async (value, options) => {
+  // Kiểm số lượng trước, đồng bộ và không truy vấn: onChange cần báo lỗi (viền đỏ) ngay khi chọn mục thứ 5; lúc lưu thì thay thông điệp tiếng Anh mặc định của `maxRows`.
+  if (Array.isArray(value) && value.length > RENTAL_CATEGORIES_MAX) return `Tối đa ${RENTAL_CATEGORIES_MAX} danh mục.`;
   if (options.event === "onChange") return true;
   const base = await relationship(value, options);
   if (base !== true) return base;

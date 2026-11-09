@@ -1,64 +1,50 @@
 {
   "specVersion": "1.62.4",
-  "scopeVersion": 113,
-  "generatedAt": "2026-11-09T03:47:58.409Z",
+  "scopeVersion": 114,
+  "generatedAt": "2026-11-09T03:48:41.263Z",
   "trigger": "bug-fix",
-  "triggerNote": "BL-108 + BL-109 BUG: Mạng xã hội — thêm mới trống Link = Unknown error, sửa xoá Link vẫn lưu; 2 dòng Instagram trùng link vẫn lưu. Bump PATCH 1.62.3 -> 1.62.4.",
+  "triggerNote": "BL-116 BUG: 'Danh mục cho thuê hiển thị' chọn được quá 4, không lỗi tại trường. Validate kiểm số lượng cả onChange. Không đổi requirement (CMS ≤ 4 đã có) — giữ spec_version.",
   "status": "published",
-  "workItem": "bug/site-settings-social-links",
-  "backlog": "BL-108, BL-109",
+  "workItem": "bug/homepage-rental-categories-max-validation",
+  "backlog": "BL-116",
   "classification": "BUG",
-  "changeDoc": [
-    "spec/changes/archive/2026-11-05-site-settings-social-link-validation.md",
-    "spec/changes/archive/2026-11-05-site-settings-social-duplicate.md"
-  ],
-  "task": "tasks/bug-site-settings-social-links/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-09-site-settings-social-links.md",
+  "changeDoc": "spec/changes/archive/2026-11-09-homepage-rental-categories-max-validation.md",
+  "task": "tasks/bug-homepage-rental-categories-max-validation/phase-1-task-01.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F10 — Mạng xã hội trong Cài đặt chung (BL-108 + BL-109)",
-    "BL-108",
-    "BL-109"
+    "SPECIFICATIONS.md § F1 — Cho thuê (CMS ≤ 4 danh mục scope cho thuê, kiểm ở server)",
+    "BL-116"
   ],
   "changed": {
     "files": [
-      "src/globals/SiteSettings.ts",
-      "src/globals/site-settings/social-links.ts (mới)",
-      "src/globals/site-settings/social-links.test.ts (mới)",
-      "tests/integration/site-settings-social-links.test.ts (mới, chưa chạy — cần Postgres)"
+      "src/globals/homepage/blocks.ts (validateRentalCategories)",
+      "src/globals/homepage/blocks.test.ts (mới)"
     ],
     "modules": [
-      "Admin Cài đặt chung > Mạng xã hội (global site-settings)"
+      "Admin Cấu hình Trang chủ > Cho thuê"
     ]
   },
   "impact": {
     "direct": [
-      "Thêm mới dòng Mạng xã hội để trống Link trang -> Lưu: lỗi 'Vui lòng nhập Link trang' dưới ô, không 'Unknown error'",
-      "Sửa dòng cũ, xoá Link trang -> Lưu: bị chặn cùng lỗi",
-      "2 dòng Instagram (cùng hoặc khác link) -> Lưu: chặn, dòng 2 báo 'Nền tảng Instagram đã có ở dòng 1.'",
-      "2 dòng 'Khác' link khác nhau -> lưu được; trùng link (chỉ khác www. / '/' cuối / hoa thường host / http-https) -> 'Link trang trùng với dòng N.'",
-      "Link không bắt đầu http(s) -> lỗi như cũ"
+      "/admin/globals/homepage > Cho thuê > 'Danh mục cho thuê hiển thị': chọn mục thứ 5 -> lỗi 'Tối đa 4 danh mục.' tại trường + viền đỏ ngay",
+      "Lưu khi có 5 danh mục -> bị chặn, lỗi tiếng Việt tại trường"
     ],
     "dependents": [
-      "Lưu các tab khác của site-settings: nếu dữ liệu socialLinks đang trùng/rỗng sẽ bị chặn tới khi sửa",
-      "Footer / trang Liên hệ / JSON-LD sameAs hiển thị mạng xã hội không đổi",
-      "Ô zaloUrl / fanpageUrl vẫn không bắt buộc"
+      "Chọn danh mục khác loại Cho thuê -> lúc lưu vẫn báo 'Chỉ chọn danh mục thuộc loại \"Cho thuê\".'"
     ],
     "regression": [
-      "Lưu site-settings hợp lệ vẫn thành công",
-      "Sắp xếp / xoá dòng mạng xã hội vẫn lưu được"
+      "1-4 danh mục cho thuê lưu được",
+      "Để trống -> trang chủ tự lấy danh mục đang có tin"
     ]
   },
   "acceptance": [
-    "Link trang bắt buộc ở cả thêm mới và sửa, thông báo tiếng Việt",
-    "Chặn trùng nền tảng (trừ Khác) và trùng link sau chuẩn hoá, lỗi tại dòng bị trùng"
+    "Chọn mục thứ 5 -> lỗi tại trường + viền đỏ; lưu bị chặn"
   ],
   "knownBlockers": [],
-  "testNotes": "Lỗi trùng chỉ hiện sau khi bấm Lưu (form admin không truyền path khi onChange). Integration test Local API chưa chạy (Postgres dev tắt). Chưa kiểm trên admin UI thật.",
-  "risk": "medium",
-  "riskNote": "Validate mới trên global dùng chung; NORMAL PASS round 2 (r1 FAIL đã sửa).",
+  "testNotes": "Chưa kiểm viền đỏ trên admin thật; test mock req/payload.",
+  "risk": "low",
+  "riskNote": "Validate 1 field; NORMAL PASS round 1.",
   "reviewReport": [
-    ".context/review-reports/bug-site-settings-social-links-phase-1-task-01-round-1-review.md",
-    ".context/review-reports/bug-site-settings-social-links-phase-1-task-01-round-2-review.md"
+    ".context/review-reports/bug-homepage-rental-categories-max-validation-phase-1-task-01-round-1-review.md"
   ],
-  "previousScope": "spec/test-scope/archive/test-scope-1.62.3-112.json"
+  "previousScope": "spec/test-scope/archive/test-scope-1.62.4-113.json"
 }

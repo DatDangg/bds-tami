@@ -5058,6 +5058,32 @@
       "report": ".context/review-reports/bug-site-settings-social-links-phase-1-task-01-round-2-review.md",
       "docImpact": "SPECIFICATIONS F10 (BL-108 + BL-109); no doc impact API/ERD · spec 1.62.4 / scope v113",
       "completedAt": "2026-11-09"
+    },
+    {
+      "slug": "homepage-rental-categories-max-validation",
+      "title": "Admin Homepage: \"Danh mục cho thuê hiển thị\" chọn được quá 4, không viền đỏ (BL-116, QA 33)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "backlog": "BL-116",
+      "changeDoc": "spec/changes/archive/2026-11-09-homepage-rental-categories-max-validation.md",
+      "startedAt": "2026-11-09",
+      "rootCause": "validateRentalCategories (src/globals/homepage/blocks.ts:51) return true khi event onChange → bỏ cả kiểm maxRows lúc đang chọn; lúc lưu chỉ thông điệp maxRows mặc định",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-homepage-rental-categories-max-validation/phase-1-task-01.md",
+          "status": "done",
+          "attempt": 1,
+          "round": 1,
+          "reviewLevel": "NORMAL",
+          "verdict": "PASS"
+        }
+      ],
+      "report": ".context/review-reports/bug-homepage-rental-categories-max-validation-phase-1-task-01-round-1-review.md",
+      "docImpact": "no doc impact; no spec change · spec 1.62.4 / scope v114",
+      "completedAt": "2026-11-09"
     }
   ],
   "projectName": "tami-website",
@@ -5711,7 +5737,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-09T03:47:58.409Z",
+  "lastUpdated": "2026-11-09T03:48:41.263Z",
   "approvalMilestones": [
     {
       "id": "M1",
