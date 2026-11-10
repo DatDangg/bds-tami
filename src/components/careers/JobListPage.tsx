@@ -1,6 +1,7 @@
 import config from "@payload-config";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPayload, type Payload } from "payload";
 import { CareersCvBanner } from "@/components/careers/CareersCvBanner";
@@ -116,19 +117,38 @@ async function loadContactEmail(locale: Locale): Promise<string | undefined> {
   }
 }
 
-/** Panel trống không có bộ lọc (design-spec S12): "Hiện TAMI chưa có vị trí đang tuyển." + "Gửi CV tới <email>" (chỉ khi có email). */
-function NoJobsPanel({ title, description, mailto }: { title: string; description: string; mailto?: { email: string; label: string } }) {
+const NO_JOBS_LINK_CLASS = "inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text";
+
+interface NoJobsPanelProps {
+  title: string;
+  /** Câu mời gửi CV: chỉ truyền khi có `mailto` (không có cách gửi thì không mời, BL-120). */
+  invite: string;
+  /** Câu trung tính khi không có email. */
+  neutral: string;
+  mailto?: { email: string; label: string };
+  contact: { href: string; label: string };
+}
+
+/**
+ * Panel trống không có bộ lọc (design-spec S12): "Hiện TAMI chưa có vị trí đang tuyển." Có email → câu mời gửi CV + "Gửi CV tới <email>" + "Sao chép email";
+ * thiếu email (hoặc đọc site-settings lỗi) → câu trung tính + link "Liên hệ TAMI" (BL-120), không mời gửi CV khi không có nút gửi.
+ */
+function NoJobsPanel({ title, invite, neutral, mailto, contact }: NoJobsPanelProps) {
   return (
     <div role="status" className="flex flex-col items-center gap-3 px-4 py-section-tight text-center">
       <h3 className="text-h3 font-semibold">{title}</h3>
-      <p className="max-w-[60ch] text-body text-text-secondary">{description}</p>
-      {mailto && (
+      <p className="max-w-[60ch] text-body text-text-secondary">{mailto ? invite : neutral}</p>
+      {mailto ? (
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href={`mailto:${mailto.email}`} className="inline-flex min-h-11 items-center font-semibold text-accent-text transition-colors duration-(--duration-fast) hover:text-text">
+          <a href={`mailto:${mailto.email}`} className={NO_JOBS_LINK_CLASS}>
             {mailto.label}
           </a>
           <CopyEmailButton email={mailto.email} />
         </div>
+      ) : (
+        <Link href={contact.href} className={NO_JOBS_LINK_CLASS}>
+          {contact.label}
+        </Link>
       )}
     </div>
   );
@@ -137,7 +157,7 @@ function NoJobsPanel({ title, description, mailto }: { title: string; descriptio
 /**
  * Dữ liệu + bố cục `/tuyen-dung` (BL-054, design `tuyen-dung.webp`; lọc `?category=&province=&q=&page=`): hero ảnh (breadcrumb, eyebrow, `h1`, mô tả,
  * nút neo "Xem vị trí đang tuyển") → "Môi trường để bạn phát triển" (`careersPerks`, ẩn khi < 2 mục) → "Vị trí đang tuyển" `#open-positions` (chip phòng ban,
- * ô khu vực + tìm tên vị trí, "N vị trí", hàng `JobRow`, phân trang) → "Quy trình ứng tuyển" (`careersProcess`, ẩn khi rỗng) → banner "Gửi CV ngay"
+ * ô khu vực + tìm tên vị trí, "N vị trí", hàng `JobRow`, phân trang) → "Quy trình ứng tuyển" (`careersProcess`, ẩn khi rỗng) → banner "Gửi CV ngay" (chỉ khi có email, BL-120)
  * → banner tư vấn (giữ dù design không vẽ). CHỈ vị trí còn hạn (`listOpenJobs`: `deadline >= hôm nay giờ VN`). Slug danh mục/tỉnh lạ bị bỏ qua (danh sách
  * không lọc, không 404); trang vượt số trang → `notFound()`. Đọc `searchParams` nên render theo request (không ISR); CDN giữ theo `Cache-Control`.
  */
@@ -221,7 +241,9 @@ export async function JobListPage({ locale, searchParams }: JobListPageProps) {
                 ) : (
                   <NoJobsPanel
                     title={t("noJobs")}
-                    description={t("noJobsDescription")}
+                    invite={t("noJobsDescription")}
+                    neutral={t("noJobsNoEmailDescription")}
+                    contact={{ href: publicPath("/lien-he", locale), label: t("contactCta") }}
                     {...(email ? { mailto: { email, label: t("sendCv", { email }) } } : {})}
                   />
                 )
@@ -242,7 +264,7 @@ export async function JobListPage({ locale, searchParams }: JobListPageProps) {
         </ListPendingProvider>
       </section>
       <CareersProcess steps={steps} />
-      <CareersCvBanner {...(email ? { email } : {})} {...(hero.image ? { image: hero.image } : {})} />
+      {email && <CareersCvBanner email={email} {...(hero.image ? { image: hero.image } : {})} />}
       <ConsultBanner locale={locale} />
     </>
   );

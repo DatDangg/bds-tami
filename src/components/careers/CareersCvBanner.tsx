@@ -4,8 +4,8 @@ import { CtaBanner } from "@/components/layout/CtaBanner";
 import type { MediaImage } from "@/components/media/ResponsiveImage";
 
 interface CareersCvBannerProps {
-  /** Email nhận CV (`site-settings.email`, cùng đích "Gửi CV tới <email>" của trạng thái trống). Thiếu → banner không có nút. */
-  email?: string;
+  /** Email nhận CV (`site-settings.email`, cùng đích "Gửi CV tới <email>" của trạng thái trống). Trang chỉ render banner khi có email (BL-120). */
+  email: string;
   /** Ảnh nền: ảnh hero Tuyển dụng (`pageHeroes.careers`); thiếu → nền tối token. */
   image?: MediaImage;
 }
@@ -21,7 +21,9 @@ export function CareersCvBanner({ email, image }: CareersCvBannerProps) {
       eyebrow={t("cvEyebrow")}
       title={t("cvTitle")}
       description={t("cvDescription")}
-      {...(email ? { actionLabel: t("cvCta"), actionHref: `mailto:${email}`, extraAction: <CopyEmailButton email={email} tone="onDark" /> } : {})}
+      actionLabel={t("cvCta")}
+      actionHref={`mailto:${email}`}
+      extraAction={<CopyEmailButton email={email} tone="onDark" />}
       backgroundImage={image ?? null}
       align="start"
       size="compact"

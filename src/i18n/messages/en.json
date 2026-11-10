@@ -809,6 +809,8 @@
       "emptyTitle": "No matching positions.",
       "noJobs": "TAMI has no open positions right now.",
       "noJobsDescription": "You can still send us your CV and we will get in touch when a suitable role opens.",
+      "noJobsNoEmailDescription": "Please check back later or contact TAMI for advice.",
+      "contactCta": "Contact TAMI",
       "sendCv": "Send your CV to {email}",
       "deadlineToday": "Closes today",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",

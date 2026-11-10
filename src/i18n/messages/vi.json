@@ -809,6 +809,8 @@
       "emptyTitle": "Chưa có vị trí phù hợp.",
       "noJobs": "Hiện TAMI chưa có vị trí đang tuyển.",
       "noJobsDescription": "Bạn vẫn có thể gửi CV để TAMI liên hệ khi có vị trí phù hợp.",
+      "noJobsNoEmailDescription": "Hãy quay lại sau hoặc liên hệ TAMI để được tư vấn.",
+      "contactCta": "Liên hệ TAMI",
       "sendCv": "Gửi CV tới {email}",
       "deadlineToday": "Hạn nộp hôm nay",
       "daysLeft": "Còn {count} ngày",

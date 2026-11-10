@@ -1,77 +1,46 @@
 {
-  "specVersion": "1.63.1",
-  "scopeVersion": 118,
-  "generatedAt": "2026-11-09T04:50:00.000Z",
-  "trigger": "feature-update",
-  "triggerNote": "BL-112 MODIFY hạ tầng: production chuyển sang server mới 179.197.242.57, tên miền https://tamihomes.vn. Không đổi code app. PATCH 1.63.0 -> 1.63.1.",
+  "specVersion": "1.63.2",
+  "scopeVersion": 119,
+  "generatedAt": "2026-11-10T09:00:00.000Z",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-120 bug-fix công khai: /tuyen-dung thiếu email nhận CV không còn mời gửi CV / banner Gửi CV ngay. PATCH 1.63.1 -> 1.63.2.",
   "status": "published",
-  "workItem": "feature/production-new-server-tamihomes",
-  "backlog": "BL-112",
-  "classification": "MODIFY",
-  "changeDoc": "spec/changes/archive/2026-11-06-production-new-server-tamihomes.md",
-  "task": "tasks/feature-production-new-server-tamihomes/phase-4-task-02.md",
-  "specUpdate": "spec/updates/2026-11-09-production-new-server-tamihomes.md",
+  "workItem": "bug-careers-empty-state-no-cta",
+  "backlog": "BL-120",
+  "classification": "BUG",
+  "task": "tasks/bug-careers-empty-state-no-cta/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-10-careers-empty-state-no-cta.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Hạ tầng/Deployment — As-built BL-112",
-    "BL-112"
+    "SPECIFICATIONS.md § Tuyển dụng — Thiếu email nhận CV (BL-120)",
+    "BL-120"
   ],
   "changed": {
     "files": [
-      "docs/runbooks/deploy.md §9/§10/§12",
-      "docs/runbooks/restore.md",
-      "docs/ARCHITECTURE.md §6",
-      ".context/project-config.md",
-      ".context/decisions.md (Decision 13)",
-      "SPECIFICATIONS.md (as-built Deployment)"
+      "src/components/careers/JobListPage.tsx",
+      "src/components/careers/CareersCvBanner.tsx",
+      "src/components/careers/JobListPage.test.tsx",
+      "src/i18n/messages/vi.json",
+      "src/i18n/messages/en.json"
     ],
-    "modules": [
-      "Hạ tầng production (server, DNS, Nginx, backup)"
-    ]
-  },
-  "environment": {
-    "productionBaseUrl": "https://tamihomes.vn",
-    "productionServer": "179.197.242.57",
-    "stagingBaseUrl": "https://179-197-242-57.sslip.io",
-    "stagingServer": "179.197.242.57",
-    "oldProductionRedirect": "https://tami.genieplatform.cloud/* -> 301 https://tamihomes.vn/* (giữ path)",
-    "oldServerStopped": "187.52.119.50 — stack cũ đã dừng 2026-11-09; https://187-52-119-50.sslip.io KHÔNG còn là môi trường TAMI, KHÔNG test ở đó",
-    "cutover": "2026-11-06 08:28Z, đối chiếu dữ liệu 100%"
+    "modules": ["careers (public /tuyen-dung, /en/careers)"]
   },
   "impact": {
     "direct": [
-      "GET https://tamihomes.vn/ -> 200, trang chủ hiển thị bình thường",
-      "https://www.tamihomes.vn/<path> -> 301 https://tamihomes.vn/<path>",
-      "http://tamihomes.vn/<path> và http://www.tamihomes.vn/<path> -> 301 sang https apex, giữ path",
-      "https://tami.genieplatform.cloud/<path>?<query> -> 301 https://tamihomes.vn/<path> giữ path (thử /, /du-an, /en, 1 trang chi tiết)",
-      "robots.txt, sitemap.xml: URL tuyệt đối dùng https://tamihomes.vn (không còn genieplatform / sslip)",
-      "canonical, hreflang (vi/en/x-default), og:url, JSON-LD trên /, /en, 1 trang chi tiết: host tamihomes.vn",
-      "/api/metrics và /api/internal/* -> 404 từ ngoài",
-      "Response production không có header X-Robots-Tag: noindex (staging mới có)"
+      "Panel \"chưa có vị trí\" khi không có email nhận CV",
+      "Banner \"Gửi CV ngay\" (CareersCvBanner) khi không có email"
     ],
-    "dependents": [
-      "Staging https://179-197-242-57.sslip.io vẫn hoạt động, noindex, canonical theo staging",
-      "Form liên hệ/ứng tuyển/newsletter prod (Turnstile test key — pass; SMTP smtp.invalid nên email không gửi thật)"
-    ],
+    "dependents": [],
     "regression": [
-      "Đăng nhập /admin trên tamihomes.vn",
-      "Ảnh/media tải được (không trỏ host cũ)",
-      "Tìm kiếm Cho thuê, /cho-thue, /du-an, /tin-tuc mở được"
+      "Có email: BL-114 giữ nguyên (mailto \"Gửi CV tới <email>\" + nút \"Sao chép email\", banner Gửi CV ngay có nút)",
+      "Panel lọc không kết quả (nút \"Xoá bộ lọc\") không đổi",
+      "ConsultBanner vẫn hiển thị"
     ]
   },
   "acceptance": [
-    "Trang chủ production 200 tại https://tamihomes.vn",
-    "www / http / tên miền cũ đều 301 về https://tamihomes.vn giữ path",
-    "robots/sitemap/canonical/hreflang dùng tamihomes.vn",
-    "/api/metrics và /api/internal 404; không X-Robots-Tag ở production"
+    "Không email + 0 vị trí còn hạn: không có câu mời gửi CV; có \"Hãy quay lại sau hoặc liên hệ TAMI để được tư vấn.\" + link \"Liên hệ TAMI\" → /lien-he (EN: \"Please check back later or contact TAMI for advice.\" + \"Contact TAMI\" → /en/contact)",
+    "Không email: không có banner \"Chưa tìm thấy vị trí phù hợp?\" (Gửi CV ngay)",
+    "Có email: hành vi như BL-114"
   ],
-  "knownBlockers": [],
-  "testNotes": "Chỉ smoke hạ tầng, không có thay đổi hành vi app. Turnstile prod còn test key và SMTP prod còn smtp.invalid (backlog riêng) — không báo bug nếu email không đến. Không test trên 187-52-119-50.sslip.io. Staging base URL giữ nguyên 179-197-242-57.sslip.io.",
-  "risk": "low-medium",
-  "riskNote": "Hạ tầng/DNS/redirect, không đổi code ứng dụng, schema, migration; đã đối chiếu dữ liệu 100% khi cắt chuyển.",
-  "previousScope": "spec/test-scope/archive/test-scope-1.63.0-117.json",
-  "reviewReport": [
-    ".context/review-reports/feature-production-new-server-tamihomes-phase-4-task-02-round-1-review.md",
-    ".context/review-reports/feature-production-new-server-tamihomes-phase-4-spec-validation.md",
-    ".context/review-reports/feature-production-new-server-tamihomes-phase-4-spec-validation-round-2.md"
-  ]
+  "manualTestNote": "Cần môi trường có 0 vị trí còn hạn và Cài đặt website trống email (hoặc dùng staging sau khi xoá email tạm).",
+  "risk": "low"
 }

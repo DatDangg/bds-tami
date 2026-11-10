@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/components/media/test-utils";
 import { isPastDeadline } from "@/lib/careers/deadline";
 import { matchesJobKeyword } from "@/lib/careers/job-filters";
+import { publicPath } from "@/lib/content/content-paths";
 import type { Category, JobPosting, Province } from "@/payload-types";
 
 const now = "2026-01-01T00:00:00.000Z";
@@ -221,11 +222,39 @@ describe("S12 /tuyen-dung: render", () => {
     expect(within(screen.getByRole("status")).getByRole("button", { name: "Sao chép email" })).toBeInTheDocument();
   });
 
-  it("không có vị trí và site-settings lỗi → vẫn dựng trang, chỉ không có link email", async () => {
+  it("có email: câu mời gửi CV vẫn hiện, không có link Liên hệ TAMI (BL-114 giữ nguyên)", async () => {
+    listOpenJobs.mockResolvedValueOnce({ docs: [], page: 1, limit: 12, totalDocs: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+    await render("vi");
+    expect(screen.getByRole("status")).toHaveTextContent("Bạn vẫn có thể gửi CV");
+    expect(within(screen.getByRole("status")).queryByRole("link", { name: "Liên hệ TAMI" })).toBeNull();
+  });
+
+  it.each([
+    ["vi", "Hiện TAMI chưa có vị trí đang tuyển.", "Hãy quay lại sau hoặc liên hệ TAMI để được tư vấn.", "Liên hệ TAMI", "Bạn vẫn có thể gửi CV", "Gửi CV tới", "Sao chép email", "Chưa tìm thấy vị trí phù hợp?"],
+    ["en", "TAMI has no open positions right now.", "Please check back later or contact TAMI for advice.", "Contact TAMI", "You can still send us your CV", "Send your CV to", "Copy email", "Haven't found the right role?"],
+  ] as const)("BL-120 %s: không có vị trí, không lọc, thiếu email → không mời gửi CV, có câu trung tính + link Liên hệ, không banner Gửi CV", async (locale, title, neutral, contactLabel, invite, sendCvPrefix, copyLabel, bannerName) => {
+    listOpenJobs.mockResolvedValueOnce({ docs: [], page: 1, limit: 12, totalDocs: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+    getSiteSettings.mockResolvedValue({});
+    await render(locale);
+    const panel = screen.getByRole("status");
+    expect(panel).toHaveTextContent(title);
+    expect(panel).toHaveTextContent(neutral);
+    expect(panel).not.toHaveTextContent(invite);
+    expect(within(panel).getByRole("link", { name: contactLabel })).toHaveAttribute("href", publicPath("/lien-he", locale));
+    expect(screen.queryByRole("link", { name: new RegExp(`^${sendCvPrefix}`) })).toBeNull();
+    expect(screen.queryByRole("button", { name: copyLabel })).toBeNull();
+    expect(screen.queryByRole("region", { name: bannerName })).toBeNull();
+  });
+
+  it("không có vị trí và site-settings lỗi → vẫn dựng trang, câu trung tính + link Liên hệ, không link email", async () => {
     listOpenJobs.mockResolvedValueOnce({ docs: [], page: 1, limit: 12, totalDocs: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
     getSiteSettings.mockRejectedValue(new Error("db down"));
     await render("vi");
-    expect(screen.getByRole("status")).toHaveTextContent("Hiện TAMI chưa có vị trí đang tuyển.");
+    const panel = screen.getByRole("status");
+    expect(panel).toHaveTextContent("Hiện TAMI chưa có vị trí đang tuyển.");
+    expect(panel).toHaveTextContent("Hãy quay lại sau hoặc liên hệ TAMI để được tư vấn.");
+    expect(panel).not.toHaveTextContent("Bạn vẫn có thể gửi CV");
+    expect(within(panel).getByRole("link", { name: "Liên hệ TAMI" })).toHaveAttribute("href", "/lien-he");
     expect(screen.queryByRole("link", { name: /^Gửi CV tới/ })).toBeNull();
     expect(screen.queryByRole("button", { name: "Sao chép email" })).toBeNull();
   });
@@ -346,7 +375,7 @@ describe("hero + dải ý trang Tuyển dụng (BL-045)", () => {
     expect(screen.getByRole("region", { name: "1 simple step" })).toBeInTheDocument();
   });
 
-  it("banner 'Chưa tìm thấy vị trí phù hợp?' → nút Gửi CV ngay mailto email tuyển dụng; thiếu email → banner không có nút; trước banner tư vấn", async () => {
+  it("banner 'Chưa tìm thấy vị trí phù hợp?' → nút Gửi CV ngay mailto email tuyển dụng; thiếu email → không render banner (BL-120); trước banner tư vấn", async () => {
     const first = await render("vi");
     const banner = screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" });
     expect(within(banner).getByText("Gia nhập TAMI HOMES")).toBeInTheDocument();
@@ -356,9 +385,8 @@ describe("hero + dải ý trang Tuyển dụng (BL-045)", () => {
     first.unmount();
     getSiteSettings.mockResolvedValue({});
     await render("vi");
-    const noEmailBanner = within(screen.getByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" }));
-    expect(noEmailBanner.queryByRole("link")).toBeNull();
-    expect(noEmailBanner.queryByRole("button")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Chưa tìm thấy vị trí phù hợp?" })).toBeNull();
+    expect(screen.getByTestId("consult-banner")).toBeInTheDocument();
   });
 
   it("kết thúc bằng banner tư vấn", async () => {
