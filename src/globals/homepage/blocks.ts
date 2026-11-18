@@ -1,6 +1,7 @@
 import type { Field, GroupField, RelationshipFieldManyValidation } from "payload";
 import { relationship } from "payload/shared";
 
+import { withMaxSelection } from "../../fields/max-selection";
 import { navLinkField } from "../../fields/nav-link";
 
 export const HERO_CHIP_PROJECTS_MAX = 6;
@@ -88,7 +89,11 @@ export const heroSearchBlock: GroupField = {
     enabledField,
     { name: "placeholder", type: "text", label: "Chữ gợi ý trong ô tìm kiếm", localized: true, admin: { description: "Để trống thì dùng chữ mặc định của website." } },
     // Trống thì phía hiển thị lấy dự án `isFeatured` mới nhất.
-    { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, maxRows: HERO_CHIP_PROJECTS_MAX, admin: { description: `Tối đa ${HERO_CHIP_PROJECTS_MAX} dự án. Để trống thì tự lấy các dự án nổi bật mới nhất.` } },
+    withMaxSelection(
+      { name: "chipProjects", type: "relationship", label: "Dự án gợi ý dưới ô tìm kiếm", relationTo: "projects", hasMany: true, admin: { description: `Tối đa ${HERO_CHIP_PROJECTS_MAX} dự án. Để trống thì tự lấy các dự án nổi bật mới nhất.` } },
+      HERO_CHIP_PROJECTS_MAX,
+      "dự án",
+    ),
   ],
 };
 
@@ -126,17 +131,20 @@ export const rentalsBlock: GroupField = {
     enabledField,
     titleField,
     // Trống thì phía hiển thị lấy các danh mục cho thuê đang có tin.
-    {
-      name: "categories",
-      type: "relationship",
-      label: "Danh mục cho thuê hiển thị",
-      relationTo: "categories",
-      hasMany: true,
-      maxRows: RENTAL_CATEGORIES_MAX,
-      filterOptions: { scope: { equals: "rental" } },
-      validate: validateRentalCategories,
-      admin: { description: `Tối đa ${RENTAL_CATEGORIES_MAX}. Để trống thì tự lấy các danh mục cho thuê đang có tin.` },
-    },
+    withMaxSelection(
+      {
+        name: "categories",
+        type: "relationship",
+        label: "Danh mục cho thuê hiển thị",
+        relationTo: "categories",
+        hasMany: true,
+        filterOptions: { scope: { equals: "rental" } },
+        validate: validateRentalCategories,
+        admin: { description: `Tối đa ${RENTAL_CATEGORIES_MAX}. Để trống thì tự lấy các danh mục cho thuê đang có tin.` },
+      },
+      RENTAL_CATEGORIES_MAX,
+      "danh mục",
+    ),
   ],
 };
 
@@ -150,6 +158,10 @@ export const newsBlock: GroupField = {
     titleField,
     { name: "intro", type: "textarea", label: "Giới thiệu ngắn", localized: true },
     // Trống thì phía hiển thị lấy 3 bài mới nhất.
-    { name: "posts", type: "relationship", label: "Bài viết hiển thị", relationTo: "news", hasMany: true, maxRows: HOME_NEWS_POSTS_MAX, admin: { description: `Tối đa ${HOME_NEWS_POSTS_MAX}. Để trống thì tự lấy ${HOME_NEWS_POSTS_MAX} bài mới nhất.` } },
+    withMaxSelection(
+      { name: "posts", type: "relationship", label: "Bài viết hiển thị", relationTo: "news", hasMany: true, admin: { description: `Tối đa ${HOME_NEWS_POSTS_MAX}. Để trống thì tự lấy ${HOME_NEWS_POSTS_MAX} bài mới nhất.` } },
+      HOME_NEWS_POSTS_MAX,
+      "bài viết",
+    ),
   ],
 };

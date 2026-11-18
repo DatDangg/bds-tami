@@ -74,6 +74,7 @@ import { CollectionNameCell as CollectionNameCell_ebbbd7848e3521f42b6c144797a789
 import { CollectionNameHint as CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d } from '../../../components/admin/CollectionNameHint'
 import { PrivacyPolicyVersionField as PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2 } from '../../../components/admin/SiteSettingsDisplay'
 import { NavLinkField as NavLinkField_5b70182912a394dcf8f11fc75e8b5bb1 } from '../../../components/admin/NavLinkField'
+import { MaxSelectionHint as MaxSelectionHint_26187696c8c488bc96ea3fe5ff529031 } from '../../../components/admin/MaxSelectionHint'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { SiteLink as SiteLink_a231a25015c6e0b284665d827f035a95 } from '../../../components/admin/SiteLink'
@@ -167,6 +168,7 @@ export const importMap = {
   "/components/admin/CollectionNameHint#CollectionNameHint": CollectionNameHint_7b9e5a7e064ddb76a89eeb23dd01764d,
   "/components/admin/SiteSettingsDisplay#PrivacyPolicyVersionField": PrivacyPolicyVersionField_8208b80a2da7ad0ab8fa26fb3dcb24f2,
   "/components/admin/NavLinkField#NavLinkField": NavLinkField_5b70182912a394dcf8f11fc75e8b5bb1,
+  "/components/admin/MaxSelectionHint#MaxSelectionHint": MaxSelectionHint_26187696c8c488bc96ea3fe5ff529031,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/SiteLink#SiteLink": SiteLink_a231a25015c6e0b284665d827f035a95,

@@ -65,6 +65,36 @@ describe("restorePublicErrorMessage (afterError toàn cục)", () => {
     expect(response.errors?.[0]?.message).toBe("Bình thường");
   });
 
+  describe("khôi phục data của lỗi validate (BL-119)", () => {
+    const data = { collection: undefined, global: "homepage", errors: [{ label: "Danh mục", message: "Tối đa 4 danh mục.", path: "rentals.categories" }] };
+    const run = (error: unknown, result: unknown) => restorePublicErrorMessage({ error, result } as unknown as AfterErrorHookArgs);
+
+    it("ValidationError lệch bản sao payload (formatErrors rơi nhánh { message }): trả lại data", async () => {
+      // Không phải instance của lớp nào: mô phỏng bản sao khác trong bundle production.
+      const error = { name: "ValidationError", status: 400, isPublic: true, message: "Trường sau chưa hợp lệ: Danh mục", data };
+      const hook = await run(error, { errors: [{ message: error.message }] });
+      expect(hook?.response).toEqual({ errors: [{ name: "ValidationError", data, message: error.message }] });
+      expect(hook?.status).toBeUndefined();
+    });
+
+    it("giữ `stack` của response", async () => {
+      const error = { status: 400, isPublic: true, message: "m", data };
+      const hook = await run(error, { errors: [{ message: "m" }], stack: "trace" });
+      expect(hook?.response).toMatchObject({ stack: "trace", errors: [{ name: "ValidationError", data }] });
+    });
+
+    it("không đụng: 500, không public, data sai hình dạng, result đã có data", async () => {
+      const base = { status: 400, isPublic: true, message: "m", data };
+      const plain = { errors: [{ message: "m" }] };
+      expect(await run({ ...base, status: 500 }, plain)).toBeUndefined();
+      expect(await run({ ...base, isPublic: false }, plain)).toBeUndefined();
+      expect(await run({ ...base, data: { errors: [{ message: "x" }] } }, plain)).toBeUndefined();
+      expect(await run({ ...base, data: { errors: [] } }, plain)).toBeUndefined();
+      expect(await run({ ...base, data: undefined }, plain)).toBeUndefined();
+      expect(await run(base, { errors: [{ message: "m", data }] })).toBeUndefined();
+    });
+  });
+
   it("message rỗng hoặc không phải APIError: không đụng", async () => {
     const empty = minified(new APIError("", 400, undefined, true));
     expect(await restorePublicErrorMessage({ error: empty, result: format(empty) } as unknown as AfterErrorHookArgs)).toBeUndefined();

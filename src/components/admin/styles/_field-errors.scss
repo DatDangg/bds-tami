@@ -52,6 +52,27 @@
   }
 }
 
+// Nhắc giới hạn số lượng dưới ô chọn nhiều (BL-119, MaxSelectionHint): vượt giới hạn → chữ + viền đỏ như lỗi theo ô.
+.tami-max-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+
+  &[data-over-max] {
+    color: var(--admin-badge-danger-fg);
+    font-weight: 500;
+  }
+}
+
+.field-type.relationship:has(.tami-max-hint[data-over-max]) .rs__control {
+  border-color: var(--admin-badge-danger-fg);
+}
+
+// Đủ giới hạn: ẩn nút "+ Thêm mới" cạnh ô (tạo mới trong drawer sẽ tự thêm vào lựa chọn → vượt giới hạn).
+.field-type.relationship:has(.tami-max-hint) .relationship-add-new {
+  display: none;
+}
+
 // ---- Thông báo gom danh sách lỗi: bỏ hẳn (lỗi đã ở dưới từng ô + số lỗi ở nhãn tab) ----
 // Toast "Các trường sau chưa hợp lệ (N): …" có markup riêng (data-testid) nên chỉ ẩn đúng loại này;
 // lỗi không gắn ô (quyền/mạng/500) và toast thành công không có marker → vẫn hiện; toast có marker nhưng không ô nào hiện lỗi
