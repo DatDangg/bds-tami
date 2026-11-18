@@ -1,46 +1,53 @@
 {
-  "specVersion": "1.63.2",
-  "scopeVersion": 119,
-  "generatedAt": "2026-11-10T09:00:00.000Z",
+  "specVersion": "1.64.2",
+  "scopeVersion": 123,
+  "generatedAt": "2026-11-18T16:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-120 bug-fix công khai: /tuyen-dung thiếu email nhận CV không còn mời gửi CV / banner Gửi CV ngay. PATCH 1.63.1 -> 1.63.2.",
+  "triggerNote": "BL-124: nút \"Sao chép email\" bằng nút \"Gửi CV ngay\" trên mobile ở banner CTA Tuyển dụng. PATCH 1.64.1 -> 1.64.2.",
   "status": "published",
-  "workItem": "bug-careers-empty-state-no-cta",
-  "backlog": "BL-120",
+  "workItem": "bug/careers-cv-buttons-uneven",
+  "backlog": "BL-124",
   "classification": "BUG",
-  "task": "tasks/bug-careers-empty-state-no-cta/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-10-careers-empty-state-no-cta.md",
+  "phaseTask": "phase-1-task-01",
+  "task": "tasks/bug-careers-cv-buttons-uneven/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-18-careers-cv-buttons-uneven.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Tuyển dụng — Thiếu email nhận CV (BL-120)",
-    "BL-120"
+    "SPECIFICATIONS.md § Tuyển dụng — Hai nút CTA banner đều nhau trên mobile (BL-124)",
+    "BL-124"
   ],
   "changed": {
     "files": [
-      "src/components/careers/JobListPage.tsx",
-      "src/components/careers/CareersCvBanner.tsx",
-      "src/components/careers/JobListPage.test.tsx",
-      "src/i18n/messages/vi.json",
-      "src/i18n/messages/en.json"
+      "src/components/careers/CopyEmailButton.tsx",
+      "src/components/careers/CopyEmailButton.test.tsx",
+      "SPECIFICATIONS.md"
     ],
-    "modules": ["careers (public /tuyen-dung, /en/careers)"]
+    "modules": [
+      "careers/CopyEmailButton"
+    ]
   },
   "impact": {
     "direct": [
-      "Panel \"chưa có vị trí\" khi không có email nhận CV",
-      "Banner \"Gửi CV ngay\" (CareersCvBanner) khi không có email"
+      "/tuyen-dung và /en/careers banner \"Chưa tìm thấy vị trí phù hợp?\" ở 375/390: \"Gửi CV ngay\" và \"Sao chép email\" cùng rộng, cùng cao >= 44px (52px), xếp dọc"
     ],
-    "dependents": [],
+    "dependents": [
+      "Thông báo \"Đã sao chép\" / \"Copied\" xuống dòng dưới nút, không thụt lề trên mobile"
+    ],
     "regression": [
-      "Có email: BL-114 giữ nguyên (mailto \"Gửi CV tới <email>\" + nút \"Sao chép email\", banner Gửi CV ngay có nút)",
-      "Panel lọc không kết quả (nút \"Xoá bộ lọc\") không đổi",
-      "ConsultBanner vẫn hiển thị"
+      "768/1440: hai nút cạnh nhau, rộng theo nội dung như cũ",
+      "Sao chép email vẫn hoạt động và hiện thông báo (BL-114)",
+      "Panel trống \"chưa có vị trí\" (tone light) không đổi",
+      "Trạng thái không có email (BL-120): không banner, có link \"Liên hệ TAMI\" (/lien-he, /en/contact)"
     ]
   },
   "acceptance": [
-    "Không email + 0 vị trí còn hạn: không có câu mời gửi CV; có \"Hãy quay lại sau hoặc liên hệ TAMI để được tư vấn.\" + link \"Liên hệ TAMI\" → /lien-he (EN: \"Please check back later or contact TAMI for advice.\" + \"Contact TAMI\" → /en/contact)",
-    "Không email: không có banner \"Chưa tìm thấy vị trí phù hợp?\" (Gửi CV ngay)",
-    "Có email: hành vi như BL-114"
+    "375/390: hai nút cùng chiều rộng (full width tối đa 320px) và cùng chiều cao >= 44px, xếp dọc",
+    "768/1440: không đổi (rộng theo nội dung, cạnh nhau)",
+    "Bấm \"Sao chép email\": email vào clipboard, thông báo hiện dưới nút",
+    "Không có email trong Cài đặt website: không banner CV, panel hiện link \"Liên hệ TAMI\""
   ],
-  "manualTestNote": "Cần môi trường có 0 vị trí còn hạn và Cài đặt website trống email (hoặc dùng staging sau khi xoá email tạm).",
+  "evidence": {
+    "review": ".context/review-reports/bug-careers-cv-buttons-uneven-phase-1-task-01-round-1-review.md",
+    "note": "Verify theo class + unit test; chưa đo bằng trình duyệt thật (không có dev server)."
+  },
   "risk": "low"
 }

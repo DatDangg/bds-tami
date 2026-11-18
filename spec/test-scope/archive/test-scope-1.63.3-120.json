@@ -1,0 +1,52 @@
+{
+  "specVersion": "1.63.3",
+  "scopeVersion": 120,
+  "generatedAt": "2026-11-18T02:32:27.298Z",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-121 bug-fix: bản đồ công khai chuyển nền từ OSM raster (bị DNS VNPT chặn, nền xám) sang OpenFreeMap vector. PATCH 1.63.2 -> 1.63.3.",
+  "status": "published",
+  "workItem": "bug-admin-map-gray-tiles",
+  "backlog": "BL-121",
+  "classification": "BUG",
+  "task": "tasks/bug-admin-map-gray-tiles/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-18-map-openfreemap-basemap.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § Công nghệ — Bản đồ (BL-121)",
+    "BL-121"
+  ],
+  "changed": {
+    "files": [
+      "src/components/media/LazyMap.tsx",
+      "src/components/media/LazyMap.test.tsx"
+    ],
+    "modules": [
+      "media/LazyMap (dùng ở ProjectLocation, RentalDetail, PostDetail, OfficeSystem)"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Nền bản đồ hiển thị trên chi tiết dự án (/du-an/<slug> → Xem bản đồ)",
+      "Nền bản đồ chi tiết cho thuê, gồm vòng tròn khu vực gần đúng bán kính 300 m khi ẩn địa chỉ",
+      "Nền bản đồ chi tiết tin đăng BĐS",
+      "Nền bản đồ văn phòng ở trang Liên hệ (/lien-he, /en/contact)",
+      "Attribution OpenFreeMap hiển thị"
+    ],
+    "dependents": [
+      "Marker, điểm tiện ích phụ, fitBounds, link Google Maps, locale control, cooperative gestures"
+    ],
+    "regression": [
+      "Lazy load: bản đồ chỉ dựng khi vào viewport / bấm Xem bản đồ",
+      "Chế độ approximate không lộ toạ độ chính xác",
+      "Admin không có bản đồ (point field 2 ô số) không đổi"
+    ]
+  },
+  "acceptance": [
+    "Staging: nền bản đồ (đường, sông, địa danh) hiển thị đầy đủ trên chi tiết dự án, chi tiết cho thuê (kể cả vòng tròn 300 m), tin đăng BĐS và trang Liên hệ, kể cả máy dùng DNS VNPT",
+    "Attribution \"OpenFreeMap © OpenMapTiles Data from OpenStreetMap\" hiển thị; link hoạt động",
+    "DevTools Network: không có request nào tới openstreetmap.org; style/tile chỉ từ tiles.openfreemap.org (200)",
+    "Mobile 375px: attribution xuống dòng gọn, không tràn ngang, không che marker/điều khiển",
+    "Marker đúng vị trí; nhãn địa danh có thể là tiếng Anh/không dấu (đã biết, ngoài scope)"
+  ],
+  "manualTestNote": "Cần staging đã deploy bản fix; kiểm trên mạng/DNS VNPT nếu có. Tin cho thuê cần có toạ độ để thấy chế độ approximate.",
+  "risk": "medium"
+}

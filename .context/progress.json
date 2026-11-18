@@ -5230,6 +5230,106 @@
           }
         }
       ]
+    },
+    {
+      "slug": "admin-map-gray-tiles",
+      "title": "Bản đồ chỉ hiện nền xám, marker vẫn hiện: DNS VNPT chặn *.openstreetmap.org → LazyMap đổi sang OpenFreeMap (style liberty) (BL-121, QA 40)",
+      "type": "BUG",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-17",
+      "completedAt": "2026-11-18",
+      "specVersion": "1.63.3",
+      "scopeVersion": 120,
+      "note": "Reviewer PASS; user test local OK 2026-11-18 → commit + push staging.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-admin-map-gray-tiles/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "STRICT",
+            "round": 1,
+            "report": ".context/review-reports/bug-admin-map-gray-tiles-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "mobile-card-carousel-nav",
+      "title": "Dãy thẻ cuộn ngang: mũi tên trước/sau mọi breakpoint + chấm chỉ vị trí cho mọi dãy CardSlider (Cho thuê chuyển sang CardSlider), thẻ mobile vẫn lộ thẻ kế (BL-122, QA 36)",
+      "type": "MODIFY",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-17",
+      "completedAt": "2026-11-18",
+      "specVersion": "1.64.0",
+      "scopeVersion": 121,
+      "note": "Reviewer PASS; user test local OK 2026-11-18 → commit + push staging.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/feature-mobile-card-carousel-nav/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "STRICT",
+            "round": 1,
+            "report": ".context/review-reports/feature-mobile-card-carousel-nav-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "lead-form-name-validation",
+      "title": "Form tư vấn + ứng tuyển chặn họ tên có ký tự đặc biệt / số: chỉ chữ cái mọi ngôn ngữ, khoảng trắng, ' ’ - . ; ≥ 2 chữ cái; trim + gộp khoảng trắng; cùng luật client + API (BL-123, QA 38 + 39)",
+      "type": "BUG",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-18",
+      "completedAt": "2026-11-18",
+      "specVersion": "1.64.1",
+      "scopeVersion": 122,
+      "note": "Reviewer PASS; user test local OK 2026-11-18 → commit + push staging.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-lead-form-name-validation/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "STRICT",
+            "round": 1,
+            "report": ".context/review-reports/bug-lead-form-name-validation-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "careers-cv-buttons-uneven",
+      "title": "Tuyển dụng mobile: banner \"Gửi CV ngay\" — nút \"Sao chép email\" cùng rộng (w-full max-w-xs) và cùng cao 52px với nút chính dưới sm; từ sm không đổi (BL-124, QA 37)",
+      "type": "BUG",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-18",
+      "completedAt": "2026-11-18",
+      "specVersion": "1.64.2",
+      "scopeVersion": 123,
+      "note": "Reviewer PASS; user test local OK 2026-11-18 → commit + push staging.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-careers-cv-buttons-uneven/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "NORMAL",
+            "round": 1,
+            "report": ".context/review-reports/bug-careers-cv-buttons-uneven-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
     }
   ],
   "projectName": "tami-website",
@@ -5883,7 +5983,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-10",
+  "lastUpdated": "2026-11-18",
   "approvalMilestones": [
     {
       "id": "M1",
