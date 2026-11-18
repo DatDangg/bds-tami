@@ -29,6 +29,21 @@ describe("CopyEmailButton", () => {
     await waitFor(() => expect(container.querySelector("[aria-live=polite]")).toHaveTextContent("Copied"));
   });
 
+  it("BL-124 onDark: wrapper + nút cùng quy ước với nút chính của CtaBanner (w-full max-w-xs, sm:w-auto)", () => {
+    const { container } = renderWithIntl(<CopyEmailButton email="a@b.example" tone="onDark" />, "vi");
+    const wrapper = container.firstElementChild as HTMLElement;
+    for (const cls of ["w-full", "max-w-xs", "sm:w-auto", "sm:max-w-none"]) expect(wrapper.className).toContain(cls);
+    const button = screen.getByRole("button");
+    expect(button.className).toContain("w-full");
+    expect(button.className).toContain("sm:w-auto");
+  });
+
+  it("BL-124 light: panel trống không đổi, không ép w-full", () => {
+    const { container } = renderWithIntl(<CopyEmailButton email="a@b.example" />, "vi");
+    expect((container.firstElementChild as HTMLElement).className).not.toContain("w-full");
+    expect(screen.getByRole("button").className).not.toContain("w-full");
+  });
+
   it("focus ring: tone onDark dùng outline-on-dark, tone light dùng focus-ring", () => {
     const dark = renderWithIntl(<CopyEmailButton email="a@b.example" tone="onDark" />, "vi");
     expect(screen.getByRole("button").className).toContain("focus-visible:outline-on-dark");

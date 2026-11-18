@@ -37,7 +37,7 @@ export function CopyEmailButton({ email, tone = "light" }: CopyEmailButtonProps)
 
   const message = state === "copied" ? t("cvCopied") : state === "failed" ? t("cvCopyFailed", { email }) : "";
   return (
-    <div className="flex flex-wrap items-center gap-y-2">
+    <div className={cn("flex flex-wrap items-center gap-y-2", tone === "onDark" && "w-full max-w-xs sm:w-auto sm:max-w-none")}>
       <Button
         onClick={copy}
         variant={tone === "onDark" ? "chip" : "secondary"}
@@ -45,13 +45,14 @@ export function CopyEmailButton({ email, tone = "light" }: CopyEmailButtonProps)
         className={cn(
           "min-w-11 focus-visible:outline-2 focus-visible:outline-offset-2",
           // Trên banner có ảnh vòng focus mặc định chỉ ~2.9:1 trên scrim đè ảnh trắng (contrast.test.ts) → dùng outline-on-dark.
-          tone === "onDark" ? "focus-visible:outline-on-dark" : "focus-visible:outline-focus-ring",
+          // BL-124: dưới sm khớp bề rộng nút chính của CtaBanner (w-full max-w-xs); từ sm theo nội dung như cũ.
+          tone === "onDark" ? "w-full focus-visible:outline-on-dark sm:w-auto" : "focus-visible:outline-focus-ring",
         )}
       >
         {t("cvCopy")}
       </Button>
       {/* aria-live thay vì role="status": ở trạng thái trống nút nằm trong panel đã là role="status", lồng thêm sẽ thành hai vùng trùng vai trò. */}
-      <span aria-live="polite" aria-atomic="true" className={cn("text-small", message && "ms-3", tone === "onDark" ? "text-on-dark" : "text-text-secondary")}>
+      <span aria-live="polite" aria-atomic="true" className={cn("text-small", message && (tone === "onDark" ? "sm:ms-3" : "ms-3"), tone === "onDark" ? "text-on-dark" : "text-text-secondary")}>
         {message}
       </span>
     </div>
