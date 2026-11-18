@@ -12,15 +12,9 @@ const APPROXIMATE_RADIUS_M = 300;
 const MAPLIBRE_WORKER_URL = "/vendor/maplibre/maplibre-gl-worker.mjs";
 // Màu cho layer MapLibre (không đọc được CSS var): --color-accent-text trong skills/react-nodejs/design-tokens.md.
 const ACCENT = "#8c6733";
-// Chính sách OSM (https://operations.osmfoundation.org/policies/tiles/): bắt buộc attribution, không dùng cho traffic lớn.
-const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
-const OSM_STYLE = {
-  version: 8 as const,
-  sources: {
-    osm: { type: "raster" as const, tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256, maxzoom: 19, attribution: OSM_ATTRIBUTION },
-  },
-  layers: [{ id: "osm", type: "raster" as const, source: "osm" }],
-};
+// OpenFreeMap thay tile OSM: DNS VNPT chặn *.openstreetmap.org nên nền bản đồ xám (BL-121).
+// Attribution bắt buộc của OpenFreeMap đến từ TileJSON → giữ attributionControl, không tự viết lại.
+const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
 /** Điểm phụ (vd tiện ích quanh dự án) vẽ nhỏ hơn ghim chính; chỉ dùng khi không `approximate`. */
 export type MapMarker = { lat: number; lng: number; label: string };
@@ -70,7 +64,7 @@ async function mountMap(container: HTMLElement, { location, approximate, locale,
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
   const map = new maplibre.Map({
     container,
-    style: OSM_STYLE,
+    style: MAP_STYLE_URL,
     center: [location.lng, location.lat],
     zoom: approximate ? 14.5 : 15,
     // Bản đồ không bẫy cuộn: 2 ngón (mobile) / Ctrl + cuộn (desktop).

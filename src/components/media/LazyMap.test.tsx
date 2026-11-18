@@ -107,7 +107,7 @@ describe("LazyMap", () => {
     expect(maplibre.constructed).not.toHaveBeenCalled();
   });
 
-  it("vào viewport thì import động maplibre, dựng bản đồ OSM không cần API key và có attribution", async () => {
+  it("vào viewport thì import động maplibre, dựng bản đồ OpenFreeMap không cần API key và giữ attribution", async () => {
     renderWithIntl(<LazyMap location={location} />);
     await act(async () => observer().intersect());
     await vi.waitFor(() => expect(maplibre.constructed).toHaveBeenCalledTimes(1));
@@ -116,9 +116,9 @@ describe("LazyMap", () => {
     const options = maplibre.constructed.mock.lastCall?.[0];
     expect(options.center).toEqual([location.lng, location.lat]);
     expect(options.cooperativeGestures).toBe(true);
-    const source = options.style.sources.osm;
-    expect(source.tiles).toEqual(["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]);
-    expect(source.attribution).toContain("OpenStreetMap");
+    // BL-121: DNS VNPT chặn *.openstreetmap.org → dùng style OpenFreeMap (attribution lấy từ TileJSON).
+    expect(options.style).toBe("https://tiles.openfreemap.org/styles/liberty");
+    expect(JSON.stringify({ ...options, container: undefined })).not.toContain("tile.openstreetmap.org");
     expect(JSON.stringify(options.style)).not.toMatch(/key|token/i);
     expect(options.attributionControl).toEqual({ compact: false });
     expect(options.locale["NavigationControl.ZoomIn"]).toBe("Phóng to");

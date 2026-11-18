@@ -117,7 +117,7 @@ Website thương hiệu TAMI (BĐS: phân phối, môi giới, khai thác căn h
 | Tác vụ nền | Payload Jobs Queue |
 | Hạ tầng | Docker Compose trên server công ty (dùng chung), Nginx có sẵn trên host, Cloudflare (free) |
 | Email | Brevo SMTP |
-| Bản đồ | OpenStreetMap + MapLibre GL (không cần API key trả phí) |
+| Bản đồ | OpenFreeMap (vector style `liberty`, `tiles.openfreemap.org`) + MapLibre GL — không cần API key; attribution "OpenFreeMap © OpenMapTiles Data from OpenStreetMap" bắt buộc hiển thị (BL-121) |
 | Analytics | Google Analytics 4 + Google Search Console (banner đồng ý cookie; chỉ tải GA4 sau khi khách đồng ý, chốt 16/10/2026) |
 | Giám sát | Prometheus, Grafana, Loki, GlitchTip, Uptime Kuma |
 | CI/CD | GitHub Actions (staging → duyệt → production) |
