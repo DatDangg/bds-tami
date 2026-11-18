@@ -1054,7 +1054,9 @@
         "viewMore": "See more",
         "slide": "Listing {index} of {total}",
         "previous": "Previous listings",
-        "next": "Next listings"
+        "next": "Next listings",
+        "dots": "Choose a listing",
+        "goTo": "Go to listing {index}"
       },
       "news": {
         "defaultTitle": "News",

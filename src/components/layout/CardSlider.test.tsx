@@ -91,12 +91,41 @@ describe("CardSlider", () => {
     expect(list.className.split(/\s+/)).not.toContain("justify-center");
   });
 
+  it("BL-122: mũi tên trước/sau hiện ở mọi breakpoint (không `hidden`), 44×44; chấm cao 44, rộng 24 < md và 44 từ md", () => {
+    renderSlider(3);
+    for (const name of ["Trước", "Sau"]) {
+      const arrow = screen.getByRole("button", { name });
+      expect(arrow).toHaveClass("inline-flex", "size-11");
+      expect(arrow).not.toHaveClass("hidden");
+    }
+    const dot = screen.getByRole("button", { name: "Tới thẻ 1" });
+    expect(dot).toHaveClass("h-11", "w-6", "md:w-11");
+    expect(screen.getAllByRole("button", { name: /^Tới thẻ/ })).toHaveLength(3);
+  });
+
+  it("BL-122: slideClassName / listClassName thay bề rộng thẻ + đệm vùng cuộn; mặc định giữ w-[82%] và px-gutter", () => {
+    const { unmount } = renderSlider(3);
+    expect(screen.getByRole("group", { name: "Thẻ 1 / 3" })).toHaveClass("w-[82%]");
+    expect(screen.getByRole("list", { name: "Tiêu đề" })).toHaveClass("px-gutter");
+    unmount();
+    render(
+      <>
+        <h2 id="h">Tiêu đề</h2>
+        <CardSlider slideClassName="w-[80%]" listClassName="-mx-2 px-2" labelledBy="h" labels={labels} items={[1, 2].map((n) => <a key={n} href={`/x/${n}`}>Thẻ {n}</a>)} />
+      </>,
+    );
+    expect(screen.getByRole("group", { name: "Thẻ 1 / 2" })).toHaveClass("w-[80%]");
+    expect(screen.getByRole("group", { name: "Thẻ 1 / 2" })).not.toHaveClass("w-[82%]");
+    expect(screen.getByRole("list", { name: "Tiêu đề" })).toHaveClass("-mx-2", "px-2");
+    expect(screen.getByRole("list", { name: "Tiêu đề" })).not.toHaveClass("px-gutter");
+  });
+
   it("một thẻ: không mũi tên, không chấm", () => {
     renderSlider(1);
     expect(screen.queryByRole("button")).toBeNull();
   });
 
-  it('arrows="sides" (BL-052): mũi tên đè hai mép vùng carousel, hàng dưới chỉ còn chấm; mặc định giữ mũi tên cạnh chấm', () => {
+  it('arrows="sides" (BL-052 + BL-122): từ md mũi tên đè hai mép vùng carousel; < md vẫn nằm trong hàng ‹ chấm ›; mặc định mũi tên cạnh chấm', () => {
     const { unmount } = renderSlider(3);
     expect(screen.getByRole("button", { name: "Trước" }).parentElement).toBe(screen.getByRole("group", { name: "Chọn thẻ" }).parentElement);
     unmount();
@@ -110,8 +139,11 @@ describe("CardSlider", () => {
     expect(region).toHaveClass("relative");
     for (const name of ["Trước", "Sau"]) {
       const arrow = screen.getByRole("button", { name });
-      expect(arrow.parentElement).toBe(region);
-      expect(arrow).toHaveClass("absolute");
+      // Cùng một nút: hàng chấm không `relative` nên từ md `absolute` lấy region làm khối chứa.
+      expect(arrow.parentElement).toBe(screen.getByRole("group", { name: "Chọn thẻ" }).parentElement);
+      expect(region).toContainElement(arrow);
+      expect(arrow).toHaveClass("md:absolute");
+      expect(arrow).not.toHaveClass("hidden");
     }
     expect(screen.getAllByRole("button", { name: /^Tới thẻ/ })).toHaveLength(3);
   });

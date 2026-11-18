@@ -26,29 +26,38 @@ interface CardSliderProps {
   arrows?: "below" | "sides";
   /** BL-075: ít thẻ hơn một hàng thì căn giữa hàng thẻ (`safe center`: khi tràn tự rơi về căn trái nên thẻ đầu vẫn cuộn tới được). Mặc định tắt, consumer khác giữ nguyên. */
   centerWhenFits?: boolean;
+  /** BL-122: bề rộng mỗi slide (mặc định `SLIDE_WIDTH`). Cho thuê trang chủ cần 80% < sm · 2 thẻ ≥ sm · 4 thẻ ≥ lg. */
+  slideClassName?: string;
+  /** BL-122: gap + đệm + scroll-padding của vùng cuộn (mặc định `LIST_GUTTER`: đệm `px-gutter`). Cho thuê nằm trong khung `px-gutter` nên dùng `-mx-2 px-2`. */
+  listClassName?: string;
 }
 
 /** 82% < sm (lộ thẻ kế), 320px ≥ sm, 272px ≥ lg (khung 1280 vừa 4 thẻ). */
 const SLIDE_WIDTH = "w-[82%] sm:w-[320px] lg:w-[272px]";
 
-/** Mũi tên hai mép: giữa chiều cao danh sách (trừ hàng chấm 44px + khe 24px bên dưới), nền trắng + bóng để nổi trên thẻ. */
-const SIDE_ARROW_CLASS = "absolute top-[calc(50%-2.125rem)] z-10 -translate-y-1/2 border-border bg-surface shadow-md";
+/** Mặc định của vùng cuộn: gap 16px, đệm `px-gutter` (+ scroll-padding cùng giá trị). */
+const LIST_GUTTER = "gap-4 px-gutter pt-1 pb-2 [scroll-padding-inline:var(--spacing-gutter)]";
+
+/**
+ * Mũi tên biến thể `sides`: < md nằm trong hàng `‹ chấm ›` dưới slider (BL-122, như `below`); từ md tròn nền trắng đè hai mép danh sách
+ * (giữa chiều cao danh sách, trừ hàng chấm 44px + khe 24px bên dưới), bóng để nổi trên thẻ. Khối chứa định vị là `region` (hàng chấm không `relative`).
+ */
+const SIDE_ARROW_CLASS = "md:absolute md:top-[calc(50%-2.125rem)] md:z-10 md:-translate-y-1/2 md:border-border md:bg-surface md:shadow-md md:hover:bg-text";
 
 const fill = (template: string, values: Record<string, number>) => template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match));
 
 /**
  * Slider thẻ DÙNG CHUNG (trang chủ "Dự án nổi bật", "Dự án tương tự", "Căn tương tự"; BL-045): cuộn ngang CSS scroll-snap (vuốt/phím mũi tên, KHÔNG autoplay),
- * mũi tên tròn (từ md) + chấm giữa dưới. Số chấm = số vị trí cuộn thật (`pageCount`, BL-038), không phải số thẻ; mũi tên/chấm chỉ hiện khi `pageCount > 1`.
+ * mũi tên tròn (mọi breakpoint, BL-122: < md trong hàng `‹ chấm ›` dưới slider) + chấm giữa dưới. Số chấm = số vị trí cuộn thật (`pageCount`, BL-038), không phải số thẻ; mũi tên/chấm chỉ hiện khi `pageCount > 1`.
  * Slider không biết loại thẻ: nhận thẻ qua `items`.
  */
-export function CardSlider({ items, labelledBy, labels, arrows = "below", centerWhenFits = false }: CardSliderProps) {
+export function CardSlider({ items, labelledBy, labels, arrows = "below", centerWhenFits = false, slideClassName = SLIDE_WIDTH, listClassName = LIST_GUTTER }: CardSliderProps) {
   const count = items.length;
   const { listRef, current, pageCount, scrollToSlide } = useSnapSlider(count, true);
   const sides = arrows === "sides";
-  const previousArrow = (className?: string) => (
-    <SliderArrow direction="previous" label={labels.previous} onClick={() => scrollToSlide(current - 1)} {...(className ? { className } : {})} />
-  );
-  const nextArrow = (className?: string) => <SliderArrow direction="next" label={labels.next} onClick={() => scrollToSlide(current + 1)} {...(className ? { className } : {})} />;
+  // Mũi tên hiện ở mọi breakpoint (BL-122); `sides` thêm class đè hai mép từ md.
+  const previousClass = cn(sides && SIDE_ARROW_CLASS, sides && "md:left-0");
+  const nextClass = cn(sides && SIDE_ARROW_CLASS, sides && "md:right-0");
 
   return (
     <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy} className={sides ? "relative" : undefined}>
@@ -58,7 +67,8 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below", center
         tabIndex={0}
         aria-labelledby={labelledBy}
         className={cn(
-          "flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-gutter pt-1 pb-2 [scroll-padding-inline:var(--spacing-gutter)] [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden",
+          "flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden",
+          listClassName,
           centerWhenFits && "justify-center-safe",
         )}
       >
@@ -70,23 +80,17 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below", center
             aria-roledescription="slide"
             aria-label={fill(labels.slide, { index: position + 1, total: count })}
             // `relative`: phần tử định vị tuyệt đối trong thẻ (vd nhãn `sr-only` phòng ngủ/tắm) lấy slide làm khối chứa, không thoát vùng cuộn ngang làm trang rộng ra (P3-T06).
-            className={cn("relative shrink-0 snap-start", SLIDE_WIDTH)}
+            className={cn("relative shrink-0 snap-start", slideClassName)}
           >
             {item}
           </li>
         ))}
       </ul>
 
-      {sides && pageCount > 1 && (
-        <>
-          {previousArrow(cn(SIDE_ARROW_CLASS, "left-0"))}
-          {nextArrow(cn(SIDE_ARROW_CLASS, "right-0"))}
-        </>
-      )}
-
       {pageCount > 1 && (
-        <div className="mx-auto mt-6 flex w-full max-w-container items-center justify-center gap-4 px-gutter">
-          {!sides && previousArrow()}
+        // < md: gap 8px, không đệm ngang để `‹ 8 chấm ›` (44 + 8×24 + 44 + 2×8 = 296px) vừa 320px; từ md giữ gap 16px + px-gutter.
+        <div className="mx-auto mt-6 flex w-full max-w-container items-center justify-center gap-2 md:gap-4 md:px-gutter">
+          <SliderArrow direction="previous" label={labels.previous} onClick={() => scrollToSlide(current - 1)} showOnMobile className={previousClass} />
           <div role="group" aria-label={labels.dots} className="flex items-center">
             {Array.from({ length: pageCount }, (_, position) => (
               <button
@@ -95,7 +99,7 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below", center
                 aria-label={fill(labels.goTo, { index: position + 1 })}
                 aria-current={position === current ? "true" : undefined}
                 onClick={() => scrollToSlide(position)}
-                className="group inline-flex size-11 cursor-pointer items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-focus-ring"
+                className="group inline-flex h-11 w-6 cursor-pointer md:w-11 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-focus-ring"
               >
                 <span
                   aria-hidden="true"
@@ -104,7 +108,7 @@ export function CardSlider({ items, labelledBy, labels, arrows = "below", center
               </button>
             ))}
           </div>
-          {!sides && nextArrow()}
+          <SliderArrow direction="next" label={labels.next} onClick={() => scrollToSlide(current + 1)} showOnMobile className={nextClass} />
         </div>
       )}
     </div>

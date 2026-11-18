@@ -1054,7 +1054,9 @@
         "viewMore": "Xem thêm",
         "slide": "Tin {index} / {total}",
         "previous": "Tin trước",
-        "next": "Tin sau"
+        "next": "Tin sau",
+        "dots": "Chọn tin cho thuê",
+        "goTo": "Chuyển tới tin {index}"
       },
       "news": {
         "defaultTitle": "Tin tức",

@@ -5,42 +5,23 @@ import { type KeyboardEvent, useId, useRef, useState } from "react";
 import { RentalCard } from "@/components/rentals/RentalCard";
 import type { RentalTabView } from "@/lib/home/home-view-listings";
 import { cn } from "@/lib/utils";
-import { SliderArrow, useSnapSlider } from "@/components/layout/use-snap-slider";
+import { CardSlider, type CardSliderLabels } from "@/components/layout/CardSlider";
 import { SectionHeading } from "./SectionHeading";
 import { SectionMoreLink } from "./SectionMoreLink";
 
 /** 80% < sm (lộ thẻ kế), 2 thẻ ≥ sm, 4 thẻ ≥ lg (gap 16/24px). */
 const SLIDE_WIDTH = "w-[80%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-4.5rem)/4)]";
+/** Vùng cuộn nằm trong khung `px-gutter` của khối: kéo ra 8px mỗi bên để bóng thẻ không bị cắt, gap 16 / 24px (lg). */
+const LIST_INSET = "-mx-2 gap-4 px-2 py-2 [scroll-padding-inline:0.5rem] lg:gap-6";
 const TAB_BASE =
   "inline-flex h-11 cursor-pointer items-center justify-center rounded-pill px-5 font-sans text-button-sm font-semibold uppercase transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
 
-/** Slider của một tab: cuộn ngang scroll-snap (vuốt/phím mũi tên, không autoplay); nút trước/sau từ md khi có > 1 thẻ. */
+/** Slider của một tab (BL-122): `CardSlider` dùng chung (mũi tên + chấm ở mọi breakpoint, đi từng vị trí), hình học Cho thuê giữ nguyên. */
 function RentalsSlider({ cards, labelledBy }: { cards: RentalTabView["cards"]; labelledBy: string }) {
   const t = useTranslations("page.home.rentals");
-  const { listRef, scrollByPage } = useSnapSlider(cards.length, false);
-  return (
-    <div role="region" aria-roledescription="carousel" aria-labelledby={labelledBy}>
-      <ul
-        ref={listRef}
-        // `tabIndex=0`: vùng cuộn ngang dùng được bằng bàn phím (mũi tên).
-        tabIndex={0}
-        aria-labelledby={labelledBy}
-        className="-mx-2 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 py-2 [scroll-padding-inline:0.5rem] [scrollbar-width:none] motion-reduce:scroll-auto lg:gap-6 [&::-webkit-scrollbar]:hidden"
-      >
-        {cards.map((card, position) => (
-          <li key={card.id} role="group" aria-roledescription="slide" aria-label={t("slide", { index: position + 1, total: cards.length })} className={`shrink-0 snap-start ${SLIDE_WIDTH}`}>
-            <RentalCard data={card} variant="home" headingLevel={3} />
-          </li>
-        ))}
-      </ul>
-      {cards.length > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-4">
-          <SliderArrow direction="previous" label={t("previous")} onClick={() => scrollByPage(-1)} />
-          <SliderArrow direction="next" label={t("next")} onClick={() => scrollByPage(1)} />
-        </div>
-      )}
-    </div>
-  );
+  const labels: CardSliderLabels = { slide: t.raw("slide") as string, previous: t("previous"), next: t("next"), dots: t("dots"), goTo: t.raw("goTo") as string };
+  const items = cards.map((card) => <RentalCard key={card.id} data={card} variant="home" headingLevel={3} />);
+  return <CardSlider items={items} labelledBy={labelledBy} labels={labels} slideClassName={SLIDE_WIDTH} listClassName={LIST_INSET} />;
 }
 
 /**

@@ -105,13 +105,27 @@ export function useSnapSlider(count: number, trackCurrent: boolean) {
 }
 
 const ARROW_BUTTON =
-  "hidden size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-text text-text transition-colors duration-(--duration-fast) hover:bg-text hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring md:inline-flex";
+  "size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-text text-text transition-colors duration-(--duration-fast) hover:bg-text hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
 
-/** Nút trước/sau tròn 44px, chỉ hiện từ md (mobile dùng vuốt). `disabled` dùng `aria-disabled` (không `disabled` gốc) để nút đang focus ở mép vẫn giữ focus. */
-export function SliderArrow({ direction, label, onClick, className, disabled }: { direction: "previous" | "next"; label: string; onClick: () => void; className?: string; disabled?: boolean }) {
+/** Nút trước/sau tròn 44px. Mặc định chỉ hiện từ md (mobile dùng vuốt); `showOnMobile` (BL-122, chỉ `CardSlider`) hiện ở mọi breakpoint. `disabled` dùng `aria-disabled` (không `disabled` gốc) để nút đang focus ở mép vẫn giữ focus. */
+export function SliderArrow({
+  direction,
+  label,
+  onClick,
+  className,
+  disabled,
+  showOnMobile = false,
+}: {
+  direction: "previous" | "next";
+  label: string;
+  onClick: () => void;
+  className?: string;
+  disabled?: boolean;
+  showOnMobile?: boolean;
+}) {
   const Icon = direction === "previous" ? CaretLeft : CaretRight;
   return (
-    <button type="button" aria-label={label} aria-disabled={disabled || undefined} onClick={disabled ? undefined : onClick} className={cn(ARROW_BUTTON, className)}>
+    <button type="button" aria-label={label} aria-disabled={disabled || undefined} onClick={disabled ? undefined : onClick} className={cn(ARROW_BUTTON, showOnMobile ? "inline-flex" : "hidden md:inline-flex", className)}>
       <Icon size={20} aria-hidden="true" />
     </button>
   );
