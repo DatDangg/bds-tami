@@ -157,6 +157,37 @@ describe("LeadForm: kết quả", () => {
     expect(screen.getByText("SĐT sai")).toBeInTheDocument();
   });
 
+  it.each([
+    ["vi", "Nguyễn @An#", "Họ tên chỉ gồm chữ cái"],
+    ["vi", "090777123", "Họ tên chỉ gồm chữ cái"],
+    ["vi", "A.", "Họ tên chỉ gồm chữ cái"],
+    ["en", "Nguyễn @An#", "Name may contain only letters"],
+    ["en", "090777123", "Name may contain only letters"],
+  ] as const)("(BL-123) %s: họ tên %j sai luật -> lỗi dưới ô họ tên, không gọi API", async (locale, name, message) => {
+    const fetchMock = stubFetch(jsonResponse(200, {}));
+    const user = userEvent.setup();
+    renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, locale);
+    await user.type(screen.getByLabelText(/Họ và tên|Full name/), name);
+    await user.type(screen.getByLabelText(/Số điện thoại|Phone number/), "0901234567");
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: locale === "vi" ? "Nhận tư vấn" : "Get advice" }));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/Họ và tên|Full name/)).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByText(new RegExp(message))).toBeInTheDocument();
+  });
+
+  it("(BL-123) họ tên hợp lệ có dấu ’ và khoảng trắng hai đầu: không bị chặn, gửi bản đã trim", async () => {
+    const fetchMock = stubFetch(jsonResponse(200, { success: true, data: { received: true } }));
+    const user = userEvent.setup();
+    renderWithIntl(<LeadForm source="contact" turnstileSiteKey="site" />, "vi");
+    await user.type(screen.getByLabelText(/Họ và tên/), "  O’Brien An  ");
+    await user.type(screen.getByLabelText(/Số điện thoại/), "0901234567");
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: "Nhận tư vấn" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(sentBody(fetchMock).fullName).toBe("O’Brien An");
+  });
+
   it("thiếu consent hoặc SĐT sai: không gọi API", async () => {
     const fetchMock = stubFetch(jsonResponse(200, {}));
     const user = userEvent.setup();

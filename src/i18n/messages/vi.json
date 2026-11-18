@@ -142,7 +142,7 @@
       "submit": "Nhận tư vấn",
       "submitNow": "Nhận tư vấn ngay",
       "errors": {
-        "fullName": "Vui lòng nhập họ tên (ít nhất 2 ký tự).",
+        "fullName": "Họ tên chỉ gồm chữ cái, khoảng trắng và các dấu ' - . (ít nhất 2 chữ cái).",
         "phone": "Số điện thoại chưa hợp lệ.",
         "email": "Email chưa hợp lệ."
       }
@@ -870,7 +870,7 @@
         "expired": "Vị trí này đã hết hạn nhận hồ sơ.",
         "viewOpenJobs": "Xem các vị trí đang tuyển",
         "errors": {
-          "fullName": "Vui lòng nhập họ tên (ít nhất 2 ký tự).",
+          "fullName": "Họ tên chỉ gồm chữ cái, khoảng trắng và các dấu ' - . (ít nhất 2 chữ cái).",
           "phone": "Số điện thoại chưa hợp lệ.",
           "email": "Email chưa hợp lệ.",
           "cvMissing": "Vui lòng đính kèm CV.",

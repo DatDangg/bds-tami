@@ -11,6 +11,7 @@ import { usePublicForm, type FormFields } from "@/components/forms/use-public-fo
 import { Button } from "@/components/ui/button";
 import { readUtm } from "@/lib/leads/utm";
 import { hasSourceRecord, type LeadSource } from "@/lib/leads/lead-values";
+import { isValidPersonName } from "@/lib/person-name";
 import { normalizePhone } from "@/lib/phone";
 
 const ENDPOINT = "/api/public/leads";
@@ -95,7 +96,7 @@ export function LeadForm({ source, sourceId, turnstileSiteKey, hotline, layout =
     validate: (fields: FormFields) => {
       const errors: Record<string, string> = {};
       const { fullName, phone, email } = fields;
-      if (typeof fullName !== "string" || fullName.length < 2) errors.fullName = t("errors.fullName");
+      if (typeof fullName !== "string" || !isValidPersonName(fullName)) errors.fullName = t("errors.fullName");
       if (typeof phone !== "string" || normalizePhone(phone) === null) errors.phone = t("errors.phone");
       if (typeof email === "string" && !EMAIL_SHAPE.test(email)) errors.email = t("errors.email");
       return errors;

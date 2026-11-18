@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { hasSourceRecord, LEAD_SOURCES } from "@/lib/leads/lead-values";
 import { normalizePhone } from "@/lib/phone";
+import { personNameSchema } from "@/lib/person-name";
 
 /** Khung response API tuỳ biến (API_SPEC §2). Helper dựng response nằm ở `src/lib/http/response.ts`. */
 export const apiErrorSchema = z.object({
@@ -32,7 +33,7 @@ export type ApplicantLocale = z.infer<typeof applicantLocaleSchema>;
 /** Trường chữ trong multipart của `POST /api/public/job-applications` (API_SPEC §3.2). `cv` (file) kiểm riêng theo nội dung. */
 export const jobApplicationFieldsSchema = z.object({
   jobPostingId: z.uuid(),
-  fullName: z.string().trim().min(2).max(120),
+  fullName: personNameSchema(120),
   // Lưu dạng E.164 để admin gọi lại trực tiếp; cùng chuẩn hoá với BR-15.
   phone: z
     .string()
@@ -78,7 +79,7 @@ export const leadInputSchema = z
   .object({
     source: z.enum(LEAD_SOURCES),
     sourceId: z.preprocess(emptyToUndefined, z.uuid().optional()),
-    fullName: z.string().trim().min(2).max(100),
+    fullName: personNameSchema(100),
     phone: z
       .string()
       .trim()

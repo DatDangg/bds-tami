@@ -142,7 +142,7 @@
       "submit": "Get advice",
       "submitNow": "Get advice now",
       "errors": {
-        "fullName": "Please enter your name (at least 2 characters).",
+        "fullName": "Name may contain only letters, spaces and ' - . (at least 2 letters).",
         "phone": "Please enter a valid phone number.",
         "email": "Please enter a valid email address."
       }
@@ -870,7 +870,7 @@
         "expired": "This position is no longer accepting applications.",
         "viewOpenJobs": "View open positions",
         "errors": {
-          "fullName": "Please enter your name (at least 2 characters).",
+          "fullName": "Name may contain only letters, spaces and ' - . (at least 2 letters).",
           "phone": "This phone number is not valid.",
           "email": "This email is not valid.",
           "cvMissing": "Please attach your CV.",

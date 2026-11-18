@@ -130,6 +130,10 @@ describe("POST /api/public/leads (handler)", () => {
     ["consent là chuỗi true", { consent: "true" }],
     ["SĐT không phải VN", { phone: "12345" }],
     ["tên 1 ký tự", { fullName: "A" }],
+    ["tên có ký tự đặc biệt (BL-123)", { fullName: "Nguyễn @An#" }],
+    ["tên toàn số (BL-123)", { fullName: "090777123" }],
+    ["tên chứa chữ số (BL-123)", { fullName: "Nguyễn 2" }],
+    ["tên chỉ có 1 chữ cái và dấu chấm (BL-123)", { fullName: "A." }],
     ["tên quá 100 ký tự", { fullName: "a".repeat(101) }],
     ["email sai", { email: "khong-phai-email" }],
     ["message quá 1000", { message: "x".repeat(1001) }],
@@ -141,6 +145,29 @@ describe("POST /api/public/leads (handler)", () => {
     expect(response.status).toBe(400);
     expect(createOrMerge).not.toHaveBeenCalled();
     expect(JSON.stringify(body)).not.toContain("khach@example.test");
+  });
+
+  it("tên sai luật (BL-123) -> 400, details field fullName theo locale vi/en, không tạo lead", async () => {
+    for (const fullName of ["Nguyễn @An#", "090777123"]) {
+      const vietnamese = await submit({ ...baseBody, fullName });
+      expect(vietnamese.response.status).toBe(400);
+      expect(vietnamese.body.details).toEqual([{ field: "fullName", message: expect.stringContaining("Họ tên chỉ gồm chữ cái") }]);
+      const english = await submit({ ...baseBody, fullName, locale: "en" });
+      expect(english.body.details).toEqual([{ field: "fullName", message: expect.stringContaining("Name may contain only letters") }]);
+    }
+    expect(createOrMerge).not.toHaveBeenCalled();
+  });
+
+  it.each(["Nguyễn Văn A", "O'Brien", "Anne-Marie", "Lê Thị Ngọc Ánh", "J. R. Smith"])("tên hợp lệ %j (BL-123) -> 200", async (fullName) => {
+    const { response } = await submit({ ...baseBody, fullName });
+    expect(response.status).toBe(200);
+  });
+
+  it("tên được chuẩn hoá khoảng trắng trước khi lưu (BL-123)", async () => {
+    createOrMerge.mockClear();
+    const { response } = await submit({ ...baseBody, fullName: "  Nguyễn   Văn  A  " });
+    expect(response.status).toBe(200);
+    expect(createOrMerge.mock.calls[0]?.[1]).toMatchObject({ fullName: "Nguyễn Văn A" });
   });
 
   it("body không phải JSON hoặc quá lớn -> 400", async () => {

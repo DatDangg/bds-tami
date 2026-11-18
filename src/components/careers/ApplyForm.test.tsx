@@ -133,6 +133,25 @@ describe("ApplyForm: chọn file CV", () => {
     expect(chooseFile).toHaveAccessibleDescription(/Vui lòng đính kèm CV\./);
   });
 
+  it.each([
+    ["vi", "Nguyễn @An#", /Họ tên chỉ gồm chữ cái/, /Họ và tên/, "Gửi hồ sơ"],
+    ["vi", "090777123", /Họ tên chỉ gồm chữ cái/, /Họ và tên/, "Gửi hồ sơ"],
+    ["en", "090777123", /Name may contain only letters/, /Full name/, "Send application"],
+  ] as const)("(BL-123) %s: họ tên %j sai luật -> lỗi dưới ô họ tên, không gọi API", async (locale, name, message, label, submitName) => {
+    const Xhr = stubUpload(200, { success: true, data: {} });
+    const user = userEvent.setup();
+    renderForm(locale);
+    await user.type(screen.getByLabelText(label), name);
+    await user.type(screen.getByLabelText(/Số điện thoại|Phone/), "0901234567");
+    await user.type(screen.getByLabelText(/Email/), "a@example.com");
+    await user.upload(screen.getByLabelText(/CV/), pdf());
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: submitName }));
+    expect(Xhr.sent).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(label)).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByText(message)).toBeInTheDocument();
+  });
+
   it("CV hợp lệ thì nút Chọn tệp không mang aria-invalid", async () => {
     const user = userEvent.setup();
     renderForm();

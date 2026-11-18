@@ -10,6 +10,7 @@ import { TurnstileWidget } from "@/components/forms/TurnstileWidget";
 import { EnvelopeSimple, Phone, User } from "@/components/icons";
 import { usePublicForm, type FormFields } from "@/components/forms/use-public-form";
 import { Button } from "@/components/ui/button";
+import { isValidPersonName } from "@/lib/person-name";
 import { normalizePhone } from "@/lib/phone";
 import { API_ERROR_CODES } from "@/shared/types/api";
 
@@ -52,7 +53,7 @@ export function ApplyForm({ jobPostingId, listPath, turnstileSiteKey, hotline }:
     validate: (fields: FormFields) => {
       const errors: Record<string, string> = {};
       const fullName = fields.fullName;
-      if (typeof fullName !== "string" || fullName.length < 2) errors.fullName = t("errors.fullName");
+      if (typeof fullName !== "string" || !isValidPersonName(fullName)) errors.fullName = t("errors.fullName");
       const phone = fields.phone;
       if (typeof phone !== "string" || normalizePhone(phone) === null) errors.phone = t("errors.phone");
       const email = fields.email;

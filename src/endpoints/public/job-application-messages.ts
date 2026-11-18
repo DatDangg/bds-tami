@@ -1,3 +1,4 @@
+import { PERSON_NAME_RULE_MESSAGE } from "@/lib/person-name";
 import type { ApplicantLocale } from "@/shared/types/api";
 
 const MESSAGES = {
@@ -40,6 +41,7 @@ export function applicantMessage(locale: ApplicantLocale, key: ApplicantMessageK
 }
 
 export function fieldMessage(locale: ApplicantLocale, field: string): string {
+  if (field === "fullName") return PERSON_NAME_RULE_MESSAGE[locale];
   return applicantMessage(locale, field === "consent" ? "consentRequired" : "fieldInvalid");
 }
 

@@ -221,6 +221,8 @@ describe("POST /api/public/job-applications (handler)", () => {
 
   it.each([
     ["thiếu họ tên", { fullName: "" }],
+    ["họ tên có ký tự đặc biệt (BL-123)", { fullName: "Nguyễn @An#" }],
+    ["họ tên toàn số (BL-123)", { fullName: "090777123" }],
     ["SĐT không phải Việt Nam", { phone: "12345" }],
     ["jobPostingId không phải UUID", { jobPostingId: "1; DROP TABLE" }],
     ["message quá 2000 ký tự", { message: "a".repeat(2001) }],
@@ -229,6 +231,16 @@ describe("POST /api/public/job-applications (handler)", () => {
     const { response, calls } = await submit({ fields });
     expect(response.status).toBe(400);
     expect(calls.create).not.toHaveBeenCalled();
+  });
+
+  it("họ tên sai luật (BL-123): details field fullName nêu luật theo locale, không lưu CV/hồ sơ", async () => {
+    const vietnamese = await submit({ fields: { fullName: "090777123" } });
+    expect(vietnamese.response.status).toBe(400);
+    expect(vietnamese.body.details).toEqual([{ field: "fullName", message: expect.stringContaining("Họ tên chỉ gồm chữ cái") }]);
+    const english = await submit({ fields: { fullName: "Nguyễn @An#", locale: "en" } });
+    expect(english.body.details).toEqual([{ field: "fullName", message: expect.stringContaining("Name may contain only letters") }]);
+    expect(vietnamese.calls.create).not.toHaveBeenCalled();
+    expect(english.calls.create).not.toHaveBeenCalled();
   });
 
   it("thiếu file cv -> 400", async () => {
