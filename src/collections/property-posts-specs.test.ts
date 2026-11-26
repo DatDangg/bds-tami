@@ -1,13 +1,13 @@
 import type { CollapsibleField, Field, SelectField } from "payload";
 import { describe, expect, it } from "vitest";
 
-import { flattenLayoutFields } from "../lib/admin/form-layout";
+import { findLayoutField, flattenLayoutFields } from "../lib/admin/form-layout";
 import { DIRECTIONS, HANDOVER_CONDITIONS, PROPERTY_TYPES } from "../shared/listing-options";
 import { createPropertyPosts } from "./PropertyPosts";
 
 type Named = Field & { name: string; localized?: boolean; required?: boolean; index?: boolean; min?: number };
 
-const SPEC_FIELDS = ["propertyType", "areaM2", "bedrooms", "bathrooms", "houseDirection", "handoverCondition", "frontageM", "floors", "address", "location"];
+const SPEC_FIELDS = ["propertyType", "areaM2", "bedrooms", "bathrooms", "houseDirection", "handoverCondition", "frontageM", "floors"];
 const NUMBER_FIELDS = ["areaM2", "bedrooms", "bathrooms", "frontageM", "floors"];
 
 const config = createPropertyPosts();
@@ -49,10 +49,21 @@ describe("property-posts: thông số bất động sản (BL-052)", () => {
     for (const name of ["propertyType", "houseDirection", "handoverCondition"]) expect(fieldOf<SelectField>(name).hasMany, name).toBeFalsy();
   });
 
-  it("address text + location point công khai (không có access đọc riêng như tin cho thuê)", () => {
-    expect(fieldOf("address").type).toBe("text");
-    expect(fieldOf("location").type).toBe("point");
-    expect((fieldOf("address") as { access?: unknown }).access).toBeUndefined();
-    expect((fieldOf("location") as { access?: unknown }).access).toBeUndefined();
+  it("address text + location point công khai (không có access đọc riêng như tin cho thuê), ở cấp gốc", () => {
+    const address = findLayoutField(config.fields, "address") as Named | undefined;
+    const location = findLayoutField(config.fields, "location") as Named | undefined;
+    expect(address?.type).toBe("text");
+    expect(location?.type).toBe("point");
+    expect((address as { access?: unknown }).access).toBeUndefined();
+    expect((location as { access?: unknown }).access).toBeUndefined();
+  });
+
+  it("address + location không nằm trong khối thông số, mà ngay sau hàng Tỉnh/Phường và trước hàng Dự án/Tin cho thuê liên quan (BL-131)", () => {
+    expect(specFields.map((field) => field.name)).not.toContain("address");
+    expect(specFields.map((field) => field.name)).not.toContain("location");
+    const topLevel = (infoTab?.fields ?? []).map((field) => (field.type === "row" ? flattenLayoutFields(field.fields).map((inner) => ("name" in inner ? inner.name : "")).join("+") : "name" in field ? (field.name ?? "") : field.type));
+    const wardRow = topLevel.indexOf("province+ward");
+    expect(wardRow).toBeGreaterThanOrEqual(0);
+    expect(topLevel.slice(wardRow + 1, wardRow + 4)).toEqual(["address", "location", "relatedProject+relatedRental"]);
   });
 });

@@ -1,4 +1,4 @@
-import type { CollapsibleField, CollectionConfig, DateFieldValidation, GroupField } from "payload";
+import type { CollapsibleField, CollectionConfig, DateFieldValidation, Field, GroupField } from "payload";
 import { date } from "payload/shared";
 
 import { PUBLIC_STATUSES } from "../access";
@@ -57,7 +57,8 @@ const offerGroup: GroupField = {
 /**
  * Thông số bất động sản (BL-052): toàn bộ tuỳ chọn, không localized, không nằm trong `englishRequiredFields` nên tin cũ / tin voucher để
  * trống vẫn lưu và xuất bản được (UI công khai ẩn ô trống). Vỏ `collapsible` không tên nên trường nằm ở cấp gốc (`propertyType`, `areaM2`…),
- * không đổi đường dẫn dữ liệu. `address` + `location` công khai — tin BĐS không có cơ chế ẩn địa chỉ như tin cho thuê.
+ * không đổi đường dẫn dữ liệu. `address` + `location` (công khai, không có cơ chế ẩn như tin cho thuê) KHÔNG nằm trong khối này mà ở ngay
+ * dưới hàng Tỉnh/Phường (BL-131).
  */
 const specsSection: CollapsibleField = {
   type: "collapsible",
@@ -74,10 +75,12 @@ const specsSection: CollapsibleField = {
       { name: "handoverCondition", type: "select", label: "Tình trạng bàn giao", options: selectOptions(HANDOVER_CONDITIONS, HANDOVER_CONDITION_ADMIN_LABELS) },
     ),
     formRow(nonNegativeNumber("frontageM", "Mặt tiền (m)"), nonNegativeNumber("floors", "Số tầng")),
-    { name: "address", type: "text", label: "Địa chỉ", admin: { description: "Hiện công khai trên trang tin. Vd: 12 Nguyễn Huệ, Phường Sài Gòn." } },
-    { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Hiện công khai trên bản đồ trang tin." } },
   ],
 };
+
+/** Địa chỉ + toạ độ (công khai) nằm ngay dưới hàng Tỉnh/Phường để nhập liền mạch; vẫn ở cấp gốc dữ liệu (`address`, `location`). */
+const addressField: Field = { name: "address", type: "text", label: "Địa chỉ", admin: { description: "Hiện công khai trên trang tin. Vd: 12 Nguyễn Huệ, Phường Sài Gòn." } };
+const locationField: Field = { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Hiện công khai trên bản đồ trang tin." } };
 
 /**
  * Đăng tin BĐS (ERD §4.7, FR-ADM-03): tin, voucher, ưu đãi. Sale tạo và sửa/xoá mềm bài của mình, admin sửa mọi bài và là người duy nhất
@@ -123,6 +126,8 @@ export function createPropertyPosts(revalidate?: RevalidatePaths, revalidateTags
                 { name: "province", type: "relationship", label: "Tỉnh/thành", relationTo: "provinces", index: true },
                 { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, admin: { components: { Field: WARD_FIELD_COMPONENT } }, validate: validateWardWithOptionalProvince },
               ),
+              addressField,
+              locationField,
               formRow(
                 { name: "relatedProject", type: "relationship", label: "Dự án liên quan", relationTo: "projects", index: true },
                 { name: "relatedRental", type: "relationship", label: "Tin cho thuê liên quan", relationTo: "rentals", index: true },
