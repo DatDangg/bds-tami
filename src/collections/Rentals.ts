@@ -4,6 +4,7 @@ import { denyAll, isStaff, PUBLIC_STATUSES } from "../access";
 import { adminDate } from "../fields/admin-date";
 import { withPriceInWords } from "../fields/form-hints";
 import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
+import { mapLocationField } from "../fields/map-location";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { RENTAL_STATUSES } from "../fields/status";
@@ -198,7 +199,7 @@ export function createRentals(revalidate?: RevalidatePaths): CollectionConfig {
               ),
               { name: "address", type: "text", label: "Địa chỉ chính xác", required: true, access: { read: readExactAddress } },
               { name: "showExactAddress", type: "checkbox", label: "Cho khách xem địa chỉ chính xác", defaultValue: false },
-              { name: "location", type: "point", label: "Toạ độ bản đồ", access: { read: readExactAddress } },
+              mapLocationField({ access: { read: readExactAddress } }),
               formRow(
                 withPriceInWords({ name: "priceMonthlyVnd", type: "number", label: "Giá thuê/tháng (VNĐ)", min: 0, validate: validatePriceMonthly, admin: { components: { Cell: "/components/admin/VndCell#VndCell" } } }),
                 { name: "priceNegotiable", type: "checkbox", label: "Giá thương lượng", defaultValue: false },

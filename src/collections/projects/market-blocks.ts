@@ -3,6 +3,7 @@ import { number, select } from "payload/shared";
 
 import { adminDate } from "../../fields/admin-date";
 import { selectOptions } from "../../fields/listing-field-helpers";
+import { mapLocationField } from "../../fields/map-location";
 import { DISTANCE_UNITS, type DistanceUnit } from "../../lib/units/legacy-parse";
 import { withPriceInWords, withTodayButton } from "../../fields/form-hints";
 import { formRow } from "../../lib/admin/form-layout";
@@ -125,7 +126,7 @@ const nearbyAmenitiesField: ArrayField = {
     { name: "name", type: "text", label: "Tên địa điểm", localized: true, required: true },
     formRow(distanceValueField, distanceUnitField),
     legacyDistanceField,
-    { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Tuỳ chọn, dùng để hiện điểm trên bản đồ." } },
+    mapLocationField({ description: "Tuỳ chọn, dùng để hiện điểm trên bản đồ." }),
   ],
 };
 

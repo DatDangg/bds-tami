@@ -5,6 +5,7 @@ import { PUBLIC_STATUSES } from "../access";
 import { adminDate } from "../fields/admin-date";
 import { validateCoverWhenPublished } from "../fields/cover-image";
 import { withPriceInWords, withSummaryCounter } from "../fields/form-hints";
+import { mapLocationField } from "../fields/map-location";
 import { nonNegativeNumber, selectOptions } from "../fields/listing-field-helpers";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
@@ -80,7 +81,7 @@ const specsSection: CollapsibleField = {
 
 /** Địa chỉ + toạ độ (công khai) nằm ngay dưới hàng Tỉnh/Phường để nhập liền mạch; vẫn ở cấp gốc dữ liệu (`address`, `location`). */
 const addressField: Field = { name: "address", type: "text", label: "Địa chỉ", admin: { description: "Hiện công khai trên trang tin. Vd: 12 Nguyễn Huệ, Phường Sài Gòn." } };
-const locationField: Field = { name: "location", type: "point", label: "Toạ độ bản đồ", admin: { description: "Hiện công khai trên bản đồ trang tin." } };
+const locationField: Field = mapLocationField({ description: "Hiện công khai trên bản đồ trang tin." });
 
 /**
  * Đăng tin BĐS (ERD §4.7, FR-ADM-03): tin, voucher, ưu đãi. Sale tạo và sửa/xoá mềm bài của mình, admin sửa mọi bài và là người duy nhất

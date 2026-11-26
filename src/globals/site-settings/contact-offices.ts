@@ -1,5 +1,6 @@
 import type { Field } from "payload";
 
+import { mapLocationField } from "../../fields/map-location";
 import { formRow } from "../../lib/admin/form-layout";
 import { textRowLabel } from "../../lib/admin/row-label";
 
@@ -18,7 +19,7 @@ export const officesField: Field = {
     { name: "name", type: "text", label: "Tên văn phòng", localized: true, required: true, admin: { placeholder: "VD: Trụ sở Hà Nội" } },
     { name: "address", type: "text", label: "Địa chỉ", localized: true, required: true },
     { name: "image", type: "upload", label: "Ảnh văn phòng", relationTo: "media", filterOptions: { mimeType: { contains: "image/" } } },
-    { name: "location", type: "point", label: "Toạ độ bản đồ" },
+    mapLocationField(),
     formRow({ name: "phone", type: "text", label: "Điện thoại" }, { name: "email", type: "email", label: "Email" }),
   ],
 };

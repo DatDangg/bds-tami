@@ -10,6 +10,7 @@ import { upload } from "payload/shared";
 import { withSummaryCounter } from "../fields/form-hints";
 import { withPriceInWords } from "../fields/form-hints";
 import { nonNegativeNumber } from "../fields/listing-field-helpers";
+import { mapLocationField } from "../fields/map-location";
 import { markRequired, requiredByLocale } from "../fields/required-by-locale";
 import { scopedCategoryField } from "../fields/scoped-category";
 import { searchReindexPendingField } from "../fields/search-reindex-pending";
@@ -205,7 +206,7 @@ export function createProjects(revalidate?: RevalidatePaths, revalidateTags?: Re
                 { name: "ward", type: "relationship", label: "Phường/xã", relationTo: "wards", index: true, filterOptions: wardFilterOptions, admin: { components: { Field: WARD_FIELD_COMPONENT } }, validate: validateWardInProvince },
               ),
               { name: "address", type: "text", label: "Địa chỉ", admin: { placeholder: "VD: Phường Long Thạnh Mỹ, TP Thủ Đức" } },
-              { name: "location", type: "point", label: "Toạ độ bản đồ" },
+              mapLocationField(),
               locationMediaGroup,
               formRow(vndNumber("priceFromVnd", "Giá từ (VNĐ)"), vndNumber("priceToVnd", "Giá đến (VNĐ)")),
               formRow(nonNegativeNumber("areaFromM2", "Diện tích từ (m²)"), nonNegativeNumber("areaToM2", "Diện tích đến (m²)")),

@@ -2,6 +2,7 @@ import type { GlobalAfterReadHook, GlobalConfig, TextFieldSingleValidation, Uplo
 
 import { denyAll, hideFromNonAdmin, isAdmin } from "../access";
 import { translationGroup } from "../fields/translation";
+import { mapLocationField } from "../fields/map-location";
 import { createRevalidateGlobal, type RevalidateTags } from "../hooks/revalidate-global";
 import { detectManualEnglishGlobal } from "../hooks/translation/detect-manual-en";
 import { enqueueTranslation } from "../hooks/translation/enqueue-translation";
@@ -89,7 +90,7 @@ export function createSiteSettings(revalidate?: RevalidateTags): GlobalConfig {
             imageUpload("logoDark", "Logo trên nền tối"),
             imageUpload("favicon", "Favicon"),
             { name: "address", type: "text", label: "Địa chỉ công ty", localized: true },
-            { name: "mapLocation", type: "point", label: "Toạ độ bản đồ" },
+            mapLocationField({ name: "mapLocation" }),
           ],
         },
         {
