@@ -229,12 +229,22 @@ describe.skipIf(!baseUrl)("integration: bộ field + hook nội dung dùng chung
       expect(duplicate.slug).toBe("slug-go-tay-2");
     });
 
-    it("giữ slug khi đổi title mà không gửi slug; xoá trống slug thì sinh lại từ title", async () => {
-      const doc = await createDoc({ title: "Tiêu đề cũ" });
+    it("bản đã xuất bản: giữ slug khi đổi title mà không gửi slug; xoá trống slug thì sinh lại từ title", async () => {
+      const doc = await createDoc({ title: "Tiêu đề cũ", status: "published" });
       const renamed = await updateDoc(doc.id, { title: "Tiêu đề mới" });
       expect(renamed.slug).toBe("tieu-de-cu");
       const regenerated = await updateDoc(doc.id, { slug: "" });
       expect(regenerated.slug).toBe("tieu-de-moi");
+    });
+
+    it("bản nháp chưa từng xuất bản còn slug tự sinh: đổi title thì slug theo title mới (BL-128); slug gõ tay thì giữ", async () => {
+      const draft = await createDoc({ title: "Nháp tiêu đề cũ" });
+      const renamed = await updateDoc(draft.id, { title: "Nháp tiêu đề mới" });
+      expect(renamed.slug).toBe("nhap-tieu-de-moi");
+
+      const custom = await createDoc({ title: "Nháp gõ tay", slug: "duong-dan-rieng" });
+      const kept = await updateDoc(custom.id, { title: "Nháp gõ tay đổi tên" });
+      expect(kept.slug).toBe("duong-dan-rieng");
     });
 
     it("slug của bản đã xoá mềm vẫn tính là đã dùng", async () => {
