@@ -2,6 +2,27 @@
 // Ô nhập kế thừa kiểu input chung của `.field-type` (_controls.scss); file này chỉ lo bố cục và chữ phụ.
 
 .tami-map-location {
+  // Gốc không mang class `text`/`number` nên không ăn khung input của Payload (`.field-type.number input`): _controls.scss chỉ
+  // đổi màu viền → trình duyệt vẽ viền `inset` 2px và bề rộng mặc định. Khai khung đủ ở đây; màu/cao/bo góc vẫn từ _controls.scss.
+  input {
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    background: var(--theme-input-bg);
+    font-family: var(--font-body);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  // Nền ô lỗi như `.field-type.text.error input` của Payload (sáng error-50, tối error-100); chỉ hai ô số, không tô ô dán.
+  &.error &__coords input {
+    background-color: var(--theme-error-50);
+  }
+
+  html[data-theme="dark"] &.error &__coords input {
+    background-color: var(--theme-error-100);
+  }
+
   &__sublabel {
     display: block;
     margin-bottom: 0.25rem;

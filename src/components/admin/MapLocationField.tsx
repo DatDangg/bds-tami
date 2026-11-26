@@ -45,8 +45,11 @@ const PASTE_MESSAGES = {
  */
 export function MapLocationField({ field, path: pathFromProps, readOnly, validate }: PointFieldClientProps) {
   const { admin: { className, description, step } = {}, label, localized, required } = field;
-  const memoizedValidate = useCallback<NonNullable<PointFieldClientProps["validate"]>>(
-    (value, validationOptions) => (typeof validate === "function" ? validate(value, { ...validationOptions, required } as Parameters<typeof validate>[1]) : true),
+  // Không có validate phía client (validate tuỳ biến chỉ chạy server) → trả `undefined` như ô point mặc định của Payload: useField giữ nguyên
+  // lỗi server trả về sau khi Lưu. Trả `true` sẽ ghi đè thành hợp lệ → lỗi "nhập ngược" / "ngoài Việt Nam" không hiện dưới ô.
+  const memoizedValidate = useCallback(
+    (value: PointValue | null, validationOptions: Parameters<NonNullable<PointFieldClientProps["validate"]>>[1]) =>
+      typeof validate === "function" ? validate(value as never, { ...validationOptions, required } as Parameters<typeof validate>[1]) : undefined,
     [validate, required],
   );
   // Payload tự ép kiểu validate ở đây (PointFieldValidation và Validate lệch tham số options, không có kiểu chung đúng).
