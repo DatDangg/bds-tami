@@ -61,3 +61,10 @@ describe("publishedAtField({ scheduled: true }) (Tin tức, BL-091)", () => {
     expect(run(field, { data: { status: "draft" } })).toBeUndefined();
   });
 });
+
+describe("beforeDuplicate (BL-128)", () => {
+  it.each([["mặc định", publishedAtField()], ["scheduled", publishedAtField({ scheduled: true })]])("%s: bản sao bỏ ngày xuất bản của bản gốc", (_name, field) => {
+    const hook = field.hooks?.beforeDuplicate?.[0] as FieldHook;
+    expect(hook({ value: "2026-10-18T00:00:00.000Z" } as unknown as HookArgs)).toBeNull();
+  });
+});

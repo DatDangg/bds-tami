@@ -45,6 +45,35 @@ async function findFreeSlug(base: string, findTaken: (candidates: string[]) => P
   }
 }
 
+const TRAILING_NUMBER = /-(\d+)$/;
+
+/** Trạng thái chưa công khai ở mọi collection (`rented` của Cho thuê vẫn là công khai nên không nằm trong danh sách này). */
+const NEVER_PUBLIC_STATUSES: readonly unknown[] = ["draft", "hidden"];
+
+/** Slug đúng là kết quả tự sinh từ `oldSource`: `slugify(oldSource)` hoặc `suffixedSlug(slugify(oldSource), n)` với n lấy từ hậu tố `-N`. */
+function isAutoDerivedSlug(slug: string, oldSource: string): boolean {
+  const autoBase = slugify(oldSource);
+  if (autoBase === "") return false;
+  if (slug === autoBase) return true;
+  const suffix = TRAILING_NUMBER.exec(slug);
+  return suffix !== null && Number(suffix[1]) >= 2 && slug === suffixedSlug(autoBase, Number(suffix[1]));
+}
+
+/**
+ * Bản ghi CHƯA từng có URL công khai (trạng thái `draft`/`hidden` VÀ chưa có ngày xuất bản) mà slug đang lưu CHÍNH XÁC là slug tự sinh từ
+ * tiêu đề đã lưu (`slugify(title)` hoặc `suffixedSlug(slugify(title), N)`, kể cả khi phần gốc bị cắt ngắn): đổi tiêu đề thì sinh lại slug theo
+ * tiêu đề mới. Cần cho "Tạo bản sao": Payload tạo bản sao NGAY nên slug sinh từ tiêu đề cũ; form lần lưu sau gửi lại slug đó, giữ nguyên thì
+ * URL mãi theo tiêu đề cũ. Slug người dùng tự sửa (kể cả rút gọn tiền tố của slug tự sinh), bản đã/đang công khai (`published`, `rented`...)
+ * hoặc đã từng xuất bản thì không đụng tới (URL ổn định).
+ */
+function shouldRegenerateFromNewTitle(typed: string, originalDoc: Record<string, unknown> | undefined, sourceField: string, newSource: string): boolean {
+  if (!originalDoc || typed === "" || typed !== originalDoc.slug) return false;
+  if (originalDoc.publishedAt || !NEVER_PUBLIC_STATUSES.includes(originalDoc.status)) return false;
+  const oldSource = originalDoc[sourceField];
+  if (typeof oldSource !== "string" || oldSource === newSource) return false;
+  return isAutoDerivedSlug(typed, oldSource);
+}
+
 /** `scope` thuộc danh sách chọn của trường nhóm (trường không phải `select` thì không giới hạn). */
 function isAllowedScope(collection: SanitizedCollectionConfig, scopeField: string, scope: unknown): boolean {
   const field = collection.flattenedFields.find((candidate) => candidate.name === scopeField);
@@ -55,7 +84,8 @@ function isAllowedScope(collection: SanitizedCollectionConfig, scopeField: strin
 /**
  * Sinh slug khi trống, chuẩn hoá bản gõ tay, rồi thêm hậu tố nếu trùng trong cùng collection + locale (BR-05).
  * Bản gõ tay cũng qua `slugify` nên không thể chứa ký tự ngoài [a-z0-9-]. Slug đã lưu mà request không gửi lại
- * thì giữ nguyên (không đổi theo tiêu đề), để URL ổn định. Chưa tạo redirect khi đổi slug (task redirects-slug).
+ * thì giữ nguyên (không đổi theo tiêu đề), để URL ổn định; ngoại lệ duy nhất: bản chưa từng công khai còn giữ đúng slug tự sinh (xem
+ * `shouldRegenerateFromNewTitle`) thì sinh lại theo tiêu đề mới. Chưa tạo redirect khi đổi slug (task redirects-slug).
  * Kiểm tra trùng gồm cả bản đã xoá mềm: khôi phục không được đẻ ra hai bản cùng URL.
  */
 function makeSlugHook(sourceField: string, scopeField: string | undefined): FieldHook {
@@ -67,7 +97,8 @@ function makeSlugHook(sourceField: string, scopeField: string | undefined): Fiel
     // Cập nhật một phần không gửi lại title: lấy title đã lưu của locale này.
     const sourceValue = siblingData[sourceField] ?? originalDoc?.[sourceField];
     const source = typeof sourceValue === "string" ? sourceValue : "";
-    const base = slugify(typed || source);
+    const regenerate = shouldRegenerateFromNewTitle(typed, originalDoc, sourceField, source);
+    const base = slugify(regenerate ? source : typed || source);
     if (base === "") return null;
 
     // Thiếu giá trị nhóm thì để bước validate của chính trường nhóm báo lỗi; chưa so trùng được.

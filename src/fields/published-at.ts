@@ -26,6 +26,9 @@ const stampScheduledPublish: FieldHook = ({ value, data, originalDoc, previousVa
   return submitted === undefined ? value : null;
 };
 
+/** Bản sao là bài mới chưa xuất bản: bỏ ngày xuất bản của bản gốc (xuất bản lần đầu sẽ đóng dấu lại). */
+const resetOnDuplicate: FieldHook = () => null;
+
 export interface PublishedAtOptions {
   /** Chỉ Tin tức: ô sửa được để hẹn giờ xuất bản (FR-ADM-16). Các collection khác giữ chỉ-đọc + hệ thống ghi qua hook. */
   scheduled?: boolean;
@@ -44,7 +47,7 @@ export function publishedAtField({ scheduled = false }: PublishedAtOptions = {})
       type: "date",
       label: "Ngày xuất bản",
       index: true,
-      hooks: { beforeChange: [stampScheduledPublish] },
+      hooks: { beforeChange: [stampScheduledPublish], beforeDuplicate: [resetOnDuplicate] },
       admin: {
         position: "sidebar",
         description: "Để trống thì tự điền khi xuất bản lần đầu; chọn giờ trong tương lai để hẹn giờ.",
@@ -59,7 +62,7 @@ export function publishedAtField({ scheduled = false }: PublishedAtOptions = {})
     label: "Ngày xuất bản",
     index: true,
     access: { create: denyAll, update: denyAll },
-    hooks: { beforeChange: [stampFirstPublish] },
+    hooks: { beforeChange: [stampFirstPublish], beforeDuplicate: [resetOnDuplicate] },
     admin: { position: "sidebar", readOnly: true, description: "Tự điền khi xuất bản lần đầu.", date: adminDate("dayAndTime") },
   };
 }

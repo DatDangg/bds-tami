@@ -23,6 +23,8 @@ export function statusField(values: readonly ContentStatus[] = CONTENT_STATUSES)
     required: true,
     index: true,
     defaultValue: "draft",
+    // Bản sao ("Tạo bản sao") không được tự công khai: luôn về nháp.
+    hooks: { beforeDuplicate: [() => "draft"] },
     options: values.map((value) => ({ label: CONTENT_STATUS_LABELS[value], value })),
     admin: { position: "sidebar", components: { Cell: "/components/admin/StatusBadge#StatusBadgeCell" } },
   };

@@ -1,0 +1,57 @@
+{
+  "specVersion": "1.64.5",
+  "scopeVersion": 126,
+  "generatedAt": "2026-11-26T14:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-127 (QA 44): lead rời trạng thái 'Không thành' vẫn giữ lostReason cũ. PATCH 1.64.4 -> 1.64.5.",
+  "status": "published",
+  "workItem": "bug/lead-lost-reason-not-cleared",
+  "backlog": "BL-127",
+  "classification": "BUG",
+  "phaseTask": "phase-1-task-01",
+  "task": "tasks/bug-lead-lost-reason-not-cleared/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-lead-lost-reason-not-cleared.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § F9 Lead — Lý do \"Không thành\" chỉ tồn tại khi lead đang lost (BL-127)",
+    "BR-11",
+    "BL-127"
+  ],
+  "changed": {
+    "files": [
+      "src/hooks/leads/status-activity.ts",
+      "src/collections/Leads.ts",
+      "src/hooks/leads/status-activity.test.ts",
+      "SPECIFICATIONS.md"
+    ],
+    "modules": [
+      "hooks/leads/status-activity (clearLostReasonWhenNotLost, beforeChange)",
+      "collections/Leads"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "Admin > Lead: đặt 'Không thành' + lý do, lưu; đổi sang Mới/Đang tư vấn/Đã chốt..., lưu -> lostReason rỗng ở DB (mở lại lead, và xuất Excel sau khi lưu, không còn lý do cũ)",
+      "Đổi lại 'Không thành' -> ô lý do trống, vẫn bắt buộc nhập (BR-11): lưu không có lý do bị chặn",
+      "Sửa hàng loạt (bulk edit) / API cập nhật lead: status != lost cũng xoá lostReason"
+    ],
+    "dependents": [
+      "Lịch sử chăm sóc / activity khi đổi trạng thái (lost -> khác): không đổi",
+      "Lead ở 'Không thành' lưu lại không đổi lý do: lý do giữ nguyên"
+    ],
+    "regression": [
+      "Chuyển sang 'Không thành' bắt buộc lý do như cũ (BR-11)",
+      "Giao lại sale (BR-13), email/audit ở hook afterChange không đổi",
+      "Chip lọc nhanh + xuất Excel lead (BL-021/022) không đổi; lead cũ chưa lưu lại vẫn hiện lý do tồn đọng trong export (không backfill)"
+    ]
+  },
+  "acceptance": [
+    "Lưu lead status != lost -> lostReason = null ở DB (UI, API, bulk edit)",
+    "Đổi lại 'Không thành' -> ô lý do trống, vẫn bắt buộc",
+    "Test hook clearLostReasonWhenNotLost PASS"
+  ],
+  "evidence": {
+    "review": ".context/review-reports/bug-lead-lost-reason-not-cleared-phase-1-task-01-round-1-review.md",
+    "note": "STRICT PASS r1. Không backfill dữ liệu cũ (xoá ở lần lưu kế tiếp)."
+  },
+  "risk": "medium"
+}

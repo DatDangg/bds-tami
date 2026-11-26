@@ -48,7 +48,7 @@ Cấu hình: `localization: { locales: [{ code: 'vi', label: 'Tiếng Việt' },
 | `model` | text | Model đã dùng |
 | `lastError` | text | Lỗi lần dịch gần nhất (không chứa nội dung bài) |
 - Trường bắt buộc (**R**) chỉ bắt buộc ở bản `vi`; bản `en` chỉ bắt buộc khi `hasEnglish = true`.
-- **Slug**: unique theo cặp (`_locale`, `slug`) trong cùng collection (với `categories`: theo (`_locale`, `scope`, `slug`)). Bản `en` sinh từ `title` tiếng Anh.
+- **Slug**: unique theo cặp (`_locale`, `slug`) trong cùng collection (với `categories`: theo (`_locale`, `scope`, `slug`)). Bản `en` sinh từ `title` tiếng Anh. Nhân bản (BL-128): bản sao `status = draft`, `publishedAt` trống (xuất bản lần đầu đóng dấu ngày mới), slug sinh lại; bản ghi chưa từng công khai (`draft`/`hidden`, `publishedAt` trống) có slug đúng dạng tự sinh từ tiêu đề đã lưu (`slugify(title)` hoặc `-N`) mà người dùng không sửa → đổi tiêu đề thì slug theo tiêu đề mới; bản đã công khai / slug gõ tay giữ nguyên.
 
 ---
 

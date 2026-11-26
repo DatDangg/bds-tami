@@ -2,6 +2,7 @@ import type { FieldHook, Where } from "payload";
 import { describe, expect, it } from "vitest";
 
 import { scopeSlugField } from "./scope-slug";
+import { slugify, suffixedSlug } from "../lib/slug";
 import { type SlugFieldOptions, slugField } from "./slug";
 
 interface FindArgs {
@@ -170,5 +171,80 @@ describe("scopeSlugField", () => {
   it("chưa có slug (bản en chưa dịch): null để nhiều bản trống không đụng UNIQUE", async () => {
     expect(await run({ scope: "rental", slug: null })).toBeNull();
     expect(await run({ scope: "rental" })).toBeNull();
+  });
+});
+
+describe("slugField: nhân bản rồi đổi tiêu đề (BL-128)", () => {
+  const draftCopy = { id: "d-2", title: "Trưởng nhóm kinh doanh đã đóng", slug: "truong-nhom-kinh-doanh-da-dong-3", status: "draft", publishedAt: null };
+
+  it("bản sao chưa xuất bản, slug tự sinh từ tiêu đề cũ, đổi tiêu đề → slug theo tiêu đề mới", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: draftCopy });
+    expect(result).toBe("chuyen-vien-tu-van");
+  });
+
+  it("slug mới trùng thì vẫn thêm hậu tố", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: draftCopy, occupied: ["chuyen-vien-tu-van"] });
+    expect(result).toBe("chuyen-vien-tu-van-2");
+  });
+
+  it("slug tự sinh không hậu tố cũng sinh lại", async () => {
+    const { result } = await runSlugHook({}, { value: "a-b", siblingData: { title: "C D" }, originalDoc: { id: "x", title: "A B", slug: "a-b", status: "draft" } });
+    expect(result).toBe("c-d");
+  });
+
+  it("bản đã xuất bản đổi tiêu đề: giữ slug (URL ổn định)", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, status: "published" } });
+    expect(result).toBe(draftCopy.slug);
+  });
+
+  it("đã từng xuất bản (có publishedAt) rồi chuyển nháp: giữ slug", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, publishedAt: "2026-10-18T00:00:00.000Z" } });
+    expect(result).toBe(draftCopy.slug);
+  });
+
+  it("bản nháp người dùng tự sửa slug: giữ slug tự sửa", async () => {
+    const { result } = await runSlugHook({}, { value: "slug-tu-chon", siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, slug: "slug-tu-chon" } });
+    expect(result).toBe("slug-tu-chon");
+  });
+
+  it("người dùng gõ slug mới khác slug đã lưu: dùng slug gõ", async () => {
+    const { result } = await runSlugHook({}, { value: "tu-go", siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: draftCopy });
+    expect(result).toBe("tu-go");
+  });
+
+  it("slug tự rút gọn (tiền tố của slug tự sinh): giữ khi đổi tiêu đề", async () => {
+    const { result } = await runSlugHook({}, { value: "truong-nhom", siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, slug: "truong-nhom" } });
+    expect(result).toBe("truong-nhom");
+  });
+
+  it("slug tự sinh dài bị cắt kèm hậu tố: vẫn sinh lại", async () => {
+    const longTitle = "tuyendung".repeat(10);
+    const storedSlug = suffixedSlug(slugify(longTitle), 3);
+    expect(storedSlug.length).toBeLessThanOrEqual(80);
+    expect(storedSlug.startsWith(slugify(longTitle))).toBe(false);
+    const { result } = await runSlugHook({}, { value: storedSlug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { id: "x", title: longTitle, slug: storedSlug, status: "draft" } });
+    expect(result).toBe("chuyen-vien-tu-van");
+  });
+
+  it("bản Cho thuê trạng thái rented chưa có publishedAt: giữ slug", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, status: "rented" } });
+    expect(result).toBe(draftCopy.slug);
+  });
+
+  it("bản hidden chưa có publishedAt: sinh lại", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: "Chuyên viên tư vấn" }, originalDoc: { ...draftCopy, status: "hidden" } });
+    expect(result).toBe("chuyen-vien-tu-van");
+  });
+
+  it("tiêu đề không đổi: giữ slug", async () => {
+    const { result } = await runSlugHook({}, { value: draftCopy.slug, siblingData: { title: draftCopy.title }, originalDoc: draftCopy });
+    expect(result).toBe(draftCopy.slug);
+  });
+});
+
+describe("slugField: beforeDuplicate vẫn bỏ slug", () => {
+  it("trả undefined", () => {
+    const hook = slugField().hooks?.beforeDuplicate?.[0] as FieldHook;
+    expect(hook({} as Parameters<FieldHook>[0])).toBeUndefined();
   });
 });
