@@ -82,3 +82,7 @@ _Errors encountered during this project will be logged below._
 - CI run 40818271106 (@ 9c7e578) fail bước "Audit phụ thuộc": advisory high mới `graphql-scalars@1.22.2` (scalar PhoneNumber, vá ≥ 2.0.1), transitive `@payloadcms/next@3.91.0` → Deploy staging skipped.
 - Không chạm được: `graphQL: { disable: true }` + Payload không dùng PhoneNumber; 2.0.1 là major Payload chưa hỗ trợ → user chọn allowlist có lý do (2026-10-29), không override.
 - **Xem lại trước 2026-12-29** hoặc khi Payload nâng graphql-scalars ≥ 2.0.1 → gỡ khỏi allowlist.
+
+## 2026-11-26 — BL-131 T03 MapLocationField (review r1 FAIL)
+- Controlled `<input type="number">` nhận `value` là CHUỖI đã chuẩn hoá ("106.7") → React so lỏng `"106.70" != "106.7"` → ghi đè ô khi đang gõ → mất chữ số 0 (106.7009 → 106.79), lưu lệch mà vẫn trong VN. Bài học: ô số controlled truyền number (như Payload Point), test bằng harness có state gõ từng ký tự.
+- Ô dán parse theo onChange mỗi phím → setValue sớm + xoá ô khi gõ tay. Chỉ tự điền khi paste (onPaste / insertFromPaste); gõ tay áp dụng ở Enter/blur.

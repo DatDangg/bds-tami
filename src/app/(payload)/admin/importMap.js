@@ -42,6 +42,7 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { WardField as WardField_e831752bf2844b08735f611d7b8d8451 } from '../../../components/admin/WardField'
+import { MapLocationField as MapLocationField_7d8479e039bfac361234fdd2061c3f89 } from '../../../components/admin/MapLocationField'
 import { VndCell as VndCell_fbd7cf2a56609098ead873f2758dcced } from '../../../components/admin/VndCell'
 import { PriceInWords as PriceInWords_e0b2be2f43b038dd1156aa747ad96870 } from '../../../components/admin/PriceInWords'
 import { TextRowLabel as TextRowLabel_094f023cacb69c1944e46df5e27a47c8 } from '../../../components/admin/row-labels/TextRowLabel'
@@ -136,6 +137,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/WardField#WardField": WardField_e831752bf2844b08735f611d7b8d8451,
+  "/components/admin/MapLocationField#MapLocationField": MapLocationField_7d8479e039bfac361234fdd2061c3f89,
   "/components/admin/VndCell#VndCell": VndCell_fbd7cf2a56609098ead873f2758dcced,
   "/components/admin/PriceInWords#PriceInWords": PriceInWords_e0b2be2f43b038dd1156aa747ad96870,
   "/components/admin/row-labels/TextRowLabel#TextRowLabel": TextRowLabel_094f023cacb69c1944e46df5e27a47c8,

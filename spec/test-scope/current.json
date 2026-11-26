@@ -1,57 +1,78 @@
 {
-  "specVersion": "1.64.8",
-  "scopeVersion": 129,
-  "generatedAt": "2026-11-26T17:00:00+07:00",
-  "trigger": "bug-fix",
-  "triggerNote": "BL-130: ô Phường/xã co bé tí cạnh ô Tỉnh/thành trong form admin (WardField không truyền flex style). PATCH 1.64.7 -> 1.64.8.",
+  "specVersion": "1.65.0",
+  "scopeVersion": 130,
+  "generatedAt": "2026-11-26T19:00:00+07:00",
+  "trigger": "feature-update",
+  "triggerNote": "BL-131: nhập địa chỉ / toạ độ bản đồ trong admin — Tin BĐS đưa Địa chỉ + Toạ độ ra ngoài, validate toạ độ VN ở server cho 6 ô point, ô dán Google Maps. MINOR 1.64.8 -> 1.65.0.",
   "status": "published",
-  "workItem": "bug/admin-ward-field-narrow-in-row",
-  "backlog": "BL-130",
-  "classification": "BUG",
-  "phaseTask": "phase-1-task-01",
-  "task": "tasks/bug-admin-ward-field-narrow-in-row/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-26-admin-ward-field-narrow-in-row.md",
+  "workItem": "feature/admin-address-map-location-input",
+  "backlog": "BL-131",
+  "classification": "MODIFY",
+  "tasks": ["phase-1-task-01", "phase-1-task-02", "phase-1-task-03"],
+  "changeDoc": "spec/changes/2026-11-26-admin-address-map-location-input.md",
+  "specUpdate": "spec/updates/2026-11-26-admin-address-map-location-input.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F10 — Hàng Tỉnh/thành · Phường/xã trong form admin chia đều bề rộng (BL-130)",
-    "BL-130"
+    "SPECIFICATIONS.md § F10 — Nhập địa chỉ / toạ độ bản đồ trong admin (BL-131)",
+    "SPECIFICATIONS.md § F4 — Tin BĐS (vị trí ô Địa chỉ/Toạ độ)",
+    "docs/ERD.md — Toạ độ bản đồ (BL-131)",
+    "BL-131"
   ],
   "changed": {
     "files": [
-      "src/components/admin/WardField.tsx",
-      "src/components/admin/WardField.test.tsx",
-      "SPECIFICATIONS.md"
+      "src/collections/PropertyPosts.ts",
+      "src/collections/property-posts-specs.test.ts",
+      "src/fields/map-location.ts",
+      "src/fields/map-location.test.ts",
+      "src/collections/Rentals.ts",
+      "src/collections/Projects.ts",
+      "src/collections/projects/market-blocks.ts",
+      "src/globals/SiteSettings.ts",
+      "src/globals/site-settings/contact-offices.ts",
+      "src/lib/admin/map-location-parse.ts",
+      "src/lib/admin/map-location-parse.test.ts",
+      "src/components/admin/MapLocationField.tsx",
+      "src/components/admin/MapLocationField.test.tsx",
+      "src/components/admin/styles/_map-location.scss",
+      "src/app/(payload)/custom.scss",
+      "src/app/(payload)/admin/importMap.js",
+      "SPECIFICATIONS.md",
+      "docs/ERD.md"
     ],
     "modules": [
-      "components/admin/WardField (style = mergeFieldStyles(field))"
+      "collections/PropertyPosts (Địa chỉ + Toạ độ ra dưới hàng Tỉnh/Phường)",
+      "fields/map-location (trường dùng chung + validate server)",
+      "collections/Rentals, Projects, projects/market-blocks, globals/SiteSettings, site-settings/contact-offices (6 ô point)",
+      "lib/admin/map-location-parse (parser cặp số / link Google Maps)",
+      "components/admin/MapLocationField (ô dán, Vĩ độ trước, link Xem trên Google Maps)"
     ]
   },
   "impact": {
     "direct": [
-      "Admin > Cho thuê > form: hàng Tỉnh/thành · Phường/xã chia đều bề rộng ở 1440 (≥ mid-break), mỗi ô 100% ở 390",
-      "Admin > Dự án > form: như trên",
-      "Admin > Tin BĐS > form: như trên",
-      "Dropdown Phường/xã đủ rộng, tên phường hiển thị 1 dòng, không có thanh cuộn ngang"
+      "Admin > Tin BĐS > tab 'Thông tin tin đăng': Địa chỉ + Toạ độ bản đồ hiện ngay dưới Tỉnh/thành · Phường/xã, ngoài khối 'Thông số bất động sản'; tin cũ giữ nguyên dữ liệu",
+      "Cả 6 ô toạ độ (Cho thuê, Dự án, Dự án > Tiện ích xung quanh, Tin BĐS, Cài đặt website mapLocation, Hệ thống văn phòng) dùng chung 1 trường",
+      "Validate server (UI + API/seed): trống lưu được; toạ độ trong VN lưu được (kể cả Hoàng Sa/Trường Sa); đảo kinh/vĩ -> 'Có vẻ bạn nhập ngược kinh độ và vĩ độ.'; ngoài VN -> 'Toạ độ không nằm ở Việt Nam, kiểm tra lại.'",
+      "Ô 'Dán từ Google Maps': cặp số '10.7769, 106.7009' (có/không dấu cách, số âm), link đầy đủ (@lat,lng / ?q= / !3d!4d) tự điền đúng; link rút gọn maps.app.goo.gl -> nhắc dán cặp số",
+      "Hai ô số hiển thị Vĩ độ trước, Kinh độ sau; dữ liệu lưu vẫn GeoJSON [lng, lat]; link 'Xem trên Google Maps' mở đúng điểm"
     ],
     "dependents": [
-      "Các hàng 2 ô khác trong form admin (không bị ảnh hưởng, so sánh bề rộng)",
-      "Hỗ trợ admin.width / admin.style trên ô Phường/xã"
+      "Giữ access readExactAddress của Cho thuê + mô tả riêng từng ô (Tin BĐS, Tiện ích)",
+      "Form admin 1440 & 390, sáng/tối: layout hàng Tỉnh/Phường/Địa chỉ/Toạ độ, ô custom field không vỡ"
     ],
     "regression": [
-      "Phường/xã lọc theo Tỉnh/thành đã chọn",
-      "Đổi Tỉnh/thành tự bỏ chọn Phường/xã",
-      "Validate phường thuộc tỉnh (ward-in-province) khi lưu",
-      "Lưu/mở lại bản ghi giữ đúng tỉnh + phường"
+      "Trang công khai có bản đồ (chi tiết Dự án / Cho thuê / Tin BĐS, trang Liên hệ - văn phòng) vẫn hiển thị đúng với dữ liệu cũ (isValidLocation không đổi)",
+      "Cho thuê ẩn địa chỉ chính xác vẫn làm tròn toạ độ (LazyMap) như cũ",
+      "Job / hook / API cập nhật bản ghi có toạ độ cũ sai nay bị validate chặn (dev DB quét 551 toạ độ: 0 sai; staging/prod chưa quét)",
+      "Lưu/mở lại bản ghi giữ đúng toạ độ; GIST index và kiểu point không đổi; không migration"
     ]
   },
   "acceptance": [
-    "Hàng Tỉnh/thành · Phường/xã chia đều bề rộng như các hàng 2 ô khác (≥ mid-break); dưới mid-break mỗi ô 100%",
-    "Dropdown Phường/xã đủ rộng, tên phường 1 dòng, không thanh cuộn ngang",
-    "Lọc theo tỉnh + tự bỏ chọn khi đổi tỉnh không đổi",
-    "Áp dụng cho cả Cho thuê, Dự án, Tin BĐS"
+    "T01: Form Tin BĐS hiện Địa chỉ + Toạ độ ngay dưới Tỉnh/Phường, ngoài khối 'Thông số bất động sản'; tin cũ giữ nguyên dữ liệu; không migration",
+    "T02: Cả 6 ô toạ độ dùng chung 1 trường; trống lưu được; toạ độ VN lưu được; đảo kinh/vĩ -> lỗi 'nhập ngược'; ngoài VN -> lỗi; validate chạy cả server (API/seed)",
+    "T02: Báo cáo quét toạ độ hiện có ngoài vùng (dev: 0/551 sai)",
+    "T03: Dán cặp số / link đầy đủ Google Maps điền đúng vĩ độ/kinh độ; link rút gọn -> thông báo hướng dẫn; Vĩ độ đứng trước Kinh độ; link 'Xem trên Google Maps' mở đúng điểm",
+    "Unit test parser (cặp số, các dạng link, khoảng trắng, số âm, chuỗi rác) + validator (trống / VN / đảo / ngoài VN)",
+    "Kiểm admin thật (Tin BĐS + Cho thuê) 1440 & 390, sáng/tối; bản đồ trang công khai vẫn hiện đúng với dữ liệu cũ"
   ],
-  "evidence": {
-    "review": ".context/review-reports/bug-admin-ward-field-narrow-in-row-phase-1-task-01-round-1-review.md",
-    "note": "NORMAL PASS round 1. Chưa kiểm tra trực quan trên trình duyệt (DB/Docker tắt) — test cần kiểm 1440/390."
-  },
-  "risk": "low"
+  "risk": "medium",
+  "riskNote": "Luật validate mới chạy ở server nên chặn lưu bản ghi có toạ độ cũ nằm ngoài VN; staging/prod chưa quét."
 }

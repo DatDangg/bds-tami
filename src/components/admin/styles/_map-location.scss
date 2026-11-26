@@ -1,0 +1,51 @@
+// Ô "Toạ độ bản đồ" (BL-131, src/components/admin/MapLocationField.tsx): ô dán + hai ô số Vĩ độ / Kinh độ cạnh nhau, xếp dọc ở màn hẹp.
+// Ô nhập kế thừa kiểu input chung của `.field-type` (_controls.scss); file này chỉ lo bố cục và chữ phụ.
+
+.tami-map-location {
+  &__sublabel {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--admin-text-muted);
+    font-size: 0.875rem;
+  }
+
+  &__paste {
+    margin-bottom: 0.75rem;
+  }
+
+  &__note {
+    margin: 0;
+    min-height: 0;
+    color: var(--admin-text-muted);
+    font-size: 0.875rem;
+  }
+
+  &__coords {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  &__link {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    min-height: 2.75rem; // vùng bấm >= 44px
+    margin-top: 0.25rem;
+    color: var(--admin-accent);
+    font-size: 0.875rem;
+    text-decoration: underline;
+  }
+}

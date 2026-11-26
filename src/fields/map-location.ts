@@ -66,6 +66,6 @@ export function mapLocationField({ name = "location", access, description }: Map
     label: "Toạ độ bản đồ",
     validate: validateMapLocation,
     ...(access ? { access } : {}),
-    ...(description ? { admin: { description } } : {}),
+    admin: { ...(description ? { description } : {}), components: { Field: "/components/admin/MapLocationField#MapLocationField" } },
   };
 }

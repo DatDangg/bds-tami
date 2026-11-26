@@ -61,11 +61,12 @@ describe("validateMapLocation ([lng, lat])", () => {
 });
 
 describe("mapLocationField", () => {
-  it("mặc định: name location, nhãn, validate chung, không access/description", () => {
+  it("mặc định: name location, nhãn, validate chung, ô nhập riêng, không access/description", () => {
     const field = mapLocationField();
     expect(field).toMatchObject({ name: "location", type: "point", label: "Toạ độ bản đồ", validate: validateMapLocation });
     expect("access" in field).toBe(false);
-    expect("admin" in field).toBe(false);
+    expect(field.admin?.description).toBeUndefined();
+    expect(field.admin?.components?.Field).toBe("/components/admin/MapLocationField#MapLocationField");
   });
 
   it("giữ name/access/description truyền vào", () => {
@@ -74,6 +75,7 @@ describe("mapLocationField", () => {
     expect(field.name).toBe("mapLocation");
     expect(field.access?.read).toBe(read);
     expect(field.admin?.description).toBe("mô tả");
+    expect(field.admin?.components?.Field).toBe("/components/admin/MapLocationField#MapLocationField");
   });
 });
 
