@@ -491,7 +491,7 @@ As-built (BL-054 P1-T04): `email`, `locale`, `consentAt`, `privacyPolicyVersion`
 | `email` | email | | |
 | `message` | textarea | | Nhu cầu / lời nhắn |
 | `status` | select | R, I | `new` · `contacted` · `consulting` · `won` · `lost` · `spam` |
-| `lostReason` | textarea | R khi `status=lost` | |
+| `lostReason` | textarea | R khi `status=lost` | Rời `lost` → hệ thống xoá (`null`, hook `clearLostReasonWhenNotLost`, BL-127) |
 | `assignedTo` | `rel→staff` | I | |
 | `assignedAt` | date | | |
 | `firstContactedAt` | date | | Lần đầu chuyển khỏi `new` |

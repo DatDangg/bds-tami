@@ -8,7 +8,7 @@ import { expandPhoneSearch } from "../hooks/leads/expand-phone-search";
 import { assignLeadCode } from "../hooks/leads/generate-code";
 import { purgeLeadActivities } from "../hooks/leads/lead-activity-hooks";
 import { assigneeId, recordAssignmentChange, stampAssignedAt } from "../hooks/leads/on-assignment-change";
-import { computeAssigneeInactive, computeAssigneeName, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
+import { clearLostReasonWhenNotLost, computeAssigneeInactive, computeAssigneeName, recordStatusChange, stampLeadTimestamps } from "../hooks/leads/status-activity";
 import { guardAnonymizedCustomerData, syncPhoneNormalized, validatePhone } from "../hooks/leads/sync-phone-normalized";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { formRow, formTabs } from "../lib/admin/form-layout";
@@ -258,7 +258,7 @@ export const Leads: CollectionConfig = hideTechnicalListFields({
   hooks: {
     beforeOperation: [expandPhoneSearch],
     beforeValidate: [guardTrashedEdit, assignLeadCode, guardAnonymizedCustomerData, syncPhoneNormalized],
-    beforeChange: [stampLeadTimestamps, stampAssignedAt],
+    beforeChange: [stampLeadTimestamps, clearLostReasonWhenNotLost, stampAssignedAt],
     afterChange: [auditContentTrash, recordStatusChange, recordAssignmentChange],
     beforeDelete: [purgeLeadActivities],
     afterDelete: [auditContentPurge],

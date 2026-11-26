@@ -1,56 +1,57 @@
 {
-  "specVersion": "1.64.4",
-  "scopeVersion": 125,
-  "generatedAt": "2026-11-26T13:00:00+07:00",
+  "specVersion": "1.64.5",
+  "scopeVersion": 126,
+  "generatedAt": "2026-11-26T14:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-126: /cho-thue sắp theo giá, tin Thương lượng (cờ bật còn giá số cũ) / không giá rải rác giữa các trang. PATCH 1.64.3 -> 1.64.4.",
+  "triggerNote": "BL-127 (QA 44): lead rời trạng thái 'Không thành' vẫn giữ lostReason cũ. PATCH 1.64.4 -> 1.64.5.",
   "status": "published",
-  "workItem": "bug/rentals-sort-price-negotiable",
-  "backlog": "BL-126",
+  "workItem": "bug/lead-lost-reason-not-cleared",
+  "backlog": "BL-127",
   "classification": "BUG",
   "phaseTask": "phase-1-task-01",
-  "task": "tasks/bug-rentals-sort-price-negotiable/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-26-rentals-sort-price-negotiable.md",
+  "task": "tasks/bug-lead-lost-reason-not-cleared/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-lead-lost-reason-not-cleared.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F3 Cho thuê — Sắp xếp theo giá, \"Thương lượng\" luôn ở cuối (BL-126)",
-    "BL-126"
+    "SPECIFICATIONS.md § F9 Lead — Lý do \"Không thành\" chỉ tồn tại khi lead đang lost (BL-127)",
+    "BR-11",
+    "BL-127"
   ],
   "changed": {
     "files": [
-      "src/lib/search/rental-search-sql.ts",
-      "src/lib/search/rental-search-sql.test.ts",
+      "src/hooks/leads/status-activity.ts",
+      "src/collections/Leads.ts",
+      "src/hooks/leads/status-activity.test.ts",
       "SPECIFICATIONS.md"
     ],
     "modules": [
-      "search/rental-search-sql (rentalOrderBy)"
+      "hooks/leads/status-activity (clearLostReasonWhenNotLost, beforeChange)",
+      "collections/Leads"
     ]
   },
   "impact": {
     "direct": [
-      "/cho-thue?sort=price_asc: tin có giá tăng dần liên tục, mọi tin Thương lượng (kể cả còn giá số cũ) và tin không giá/giá <= 0 ở cuối; kiểm qua trang 1 -> 4, không lặp/mất tin",
-      "/cho-thue?sort=price_desc: tin có giá giảm dần, Thương lượng/không giá vẫn ở cuối",
-      "GET /api/public/rentals?sort=price_asc|price_desc và /cho-thue/danh-muc/[category]: cùng thứ tự"
+      "Admin > Lead: đặt 'Không thành' + lý do, lưu; đổi sang Mới/Đang tư vấn/Đã chốt..., lưu -> lostReason rỗng ở DB (mở lại lead, và xuất Excel sau khi lưu, không còn lý do cũ)",
+      "Đổi lại 'Không thành' -> ô lý do trống, vẫn bắt buộc nhập (BR-11): lưu không có lý do bị chặn",
+      "Sửa hàng loạt (bulk edit) / API cập nhật lead: status != lost cũng xoá lostReason"
     ],
     "dependents": [
-      "Bản /en tương ứng của danh sách Cho thuê: cùng thứ tự",
-      "Kết hợp sắp giá với bộ lọc (danh mục, tỉnh, phòng ngủ...) và phân trang: thứ tự ổn định"
+      "Lịch sử chăm sóc / activity khi đổi trạng thái (lost -> khác): không đổi",
+      "Lead ở 'Không thành' lưu lại không đổi lý do: lý do giữ nguyên"
     ],
     "regression": [
-      "Các sort khác (mới nhất...) không đổi",
-      "Tin BĐS /tin-bds sắp theo giá không đổi (không giá cuối)",
-      "Bộ lọc khoảng giá Cho thuê không đổi (tin tick Thương lượng còn giá cũ vẫn có thể khớp lọc giá — follow-up, không phải lỗi mới)",
-      "Hiển thị 'Thương lượng' trên thẻ và chi tiết không đổi"
+      "Chuyển sang 'Không thành' bắt buộc lý do như cũ (BR-11)",
+      "Giao lại sale (BR-13), email/audit ở hook afterChange không đổi",
+      "Chip lọc nhanh + xuất Excel lead (BL-021/022) không đổi; lead cũ chưa lưu lại vẫn hiện lý do tồn đọng trong export (không backfill)"
     ]
   },
   "acceptance": [
-    "price_asc: giá tăng dần, Thương lượng ở cuối, nhất quán qua phân trang",
-    "price_desc: giá giảm dần, Thương lượng ở cuối",
-    "Tie-breaker published_at DESC NULLS LAST, id DESC: không lặp/mất tin giữa trang",
-    "Tin BĐS không đổi"
+    "Lưu lead status != lost -> lostReason = null ở DB (UI, API, bulk edit)",
+    "Đổi lại 'Không thành' -> ô lý do trống, vẫn bắt buộc",
+    "Test hook clearLostReasonWhenNotLost PASS"
   ],
   "evidence": {
-    "review": ".context/review-reports/bug-rentals-sort-price-negotiable-phase-1-task-01-round-1-review.md",
-    "note": "STRICT PASS r1 (SQL ORDER BY dùng chung). Verify bằng SQL render + vitest; chưa chạy trên DB thật (không Docker)."
+    "review": ".context/review-reports/bug-lead-lost-reason-not-cleared-phase-1-task-01-round-1-review.md",
+    "note": "STRICT PASS r1. Không backfill dữ liệu cũ (xoá ở lần lưu kế tiếp)."
   },
   "risk": "medium"
 }

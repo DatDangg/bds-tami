@@ -18,6 +18,17 @@ export const stampLeadTimestamps: CollectionBeforeChangeHook<Lead> = ({ data, or
 };
 
 /**
+ * Lý do "Không thành" chỉ có nghĩa khi lead đang `lost` (BR-11): trạng thái sau khi lưu = `data.status ?? originalDoc.status`;
+ * khác `lost` thì xoá `lostReason`, kể cả update một phần chỉ gửi `status` (lý do cũ nằm ở `originalDoc`). Vẫn `lost` → giữ nguyên.
+ * Chạy ở server nên phủ cả form admin, API và sửa hàng loạt. Lead cũ còn lý do thừa chỉ được dọn ở lần lưu kế tiếp (không backfill).
+ */
+export const clearLostReasonWhenNotLost: CollectionBeforeChangeHook<Lead> = ({ data, originalDoc }) => {
+  const statusAfterSave = data.status ?? originalDoc?.status;
+  if (statusAfterSave === "lost") return data;
+  return { ...data, lostReason: null };
+};
+
+/**
  * Đổi `status` → đúng 1 activity `status_change` (ERD §4.11), cùng transaction với lần lưu lead (`req`): lưu lead lỗi thì
  * không còn activity mồ côi. `actor` = người đổi (trống nếu hệ thống). Không ghi PII vào activity, chỉ trạng thái và lý do.
  */

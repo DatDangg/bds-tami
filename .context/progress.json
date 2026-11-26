@@ -5382,6 +5382,32 @@
           }
         }
       ]
+    },
+    {
+      "slug": "lead-lost-reason-not-cleared",
+      "title": "Admin Lead: rời trạng thái Không thành → hook beforeChange clearLostReasonWhenNotLost xoá lostReason (UI/API/bulk); chọn lại Không thành ô trống, vẫn bắt buộc (BL-127, QA 44)",
+      "type": "BUG",
+      "severity": "low",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-26",
+      "completedAt": "2026-11-26",
+      "specVersion": "1.64.5",
+      "scopeVersion": 126,
+      "note": "Reviewer STRICT PASS r1; không backfill — lead cũ xoá lý do ở lần lưu kế tiếp; chưa test DB thật.",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-lead-lost-reason-not-cleared/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "STRICT",
+            "round": 1,
+            "report": ".context/review-reports/bug-lead-lost-reason-not-cleared-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
     }
   ],
   "projectName": "tami-website",
@@ -6035,7 +6061,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-26T03:32:04.376Z",
+  "lastUpdated": "2026-11-26T03:37:33.464Z",
   "approvalMilestones": [
     {
       "id": "M1",
