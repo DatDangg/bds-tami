@@ -1,0 +1,53 @@
+{
+  "specVersion": "1.64.2",
+  "scopeVersion": 123,
+  "generatedAt": "2026-11-18T16:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-124: nút \"Sao chép email\" bằng nút \"Gửi CV ngay\" trên mobile ở banner CTA Tuyển dụng. PATCH 1.64.1 -> 1.64.2.",
+  "status": "published",
+  "workItem": "bug/careers-cv-buttons-uneven",
+  "backlog": "BL-124",
+  "classification": "BUG",
+  "phaseTask": "phase-1-task-01",
+  "task": "tasks/bug-careers-cv-buttons-uneven/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-18-careers-cv-buttons-uneven.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § Tuyển dụng — Hai nút CTA banner đều nhau trên mobile (BL-124)",
+    "BL-124"
+  ],
+  "changed": {
+    "files": [
+      "src/components/careers/CopyEmailButton.tsx",
+      "src/components/careers/CopyEmailButton.test.tsx",
+      "SPECIFICATIONS.md"
+    ],
+    "modules": [
+      "careers/CopyEmailButton"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/tuyen-dung và /en/careers banner \"Chưa tìm thấy vị trí phù hợp?\" ở 375/390: \"Gửi CV ngay\" và \"Sao chép email\" cùng rộng, cùng cao >= 44px (52px), xếp dọc"
+    ],
+    "dependents": [
+      "Thông báo \"Đã sao chép\" / \"Copied\" xuống dòng dưới nút, không thụt lề trên mobile"
+    ],
+    "regression": [
+      "768/1440: hai nút cạnh nhau, rộng theo nội dung như cũ",
+      "Sao chép email vẫn hoạt động và hiện thông báo (BL-114)",
+      "Panel trống \"chưa có vị trí\" (tone light) không đổi",
+      "Trạng thái không có email (BL-120): không banner, có link \"Liên hệ TAMI\" (/lien-he, /en/contact)"
+    ]
+  },
+  "acceptance": [
+    "375/390: hai nút cùng chiều rộng (full width tối đa 320px) và cùng chiều cao >= 44px, xếp dọc",
+    "768/1440: không đổi (rộng theo nội dung, cạnh nhau)",
+    "Bấm \"Sao chép email\": email vào clipboard, thông báo hiện dưới nút",
+    "Không có email trong Cài đặt website: không banner CV, panel hiện link \"Liên hệ TAMI\""
+  ],
+  "evidence": {
+    "review": ".context/review-reports/bug-careers-cv-buttons-uneven-phase-1-task-01-round-1-review.md",
+    "note": "Verify theo class + unit test; chưa đo bằng trình duyệt thật (không có dev server)."
+  },
+  "risk": "low"
+}

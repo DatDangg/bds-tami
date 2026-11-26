@@ -55,11 +55,11 @@ function HeroText({ headingId, title, badges, address, summary, children }: Pick
   return (
     <div className="flex min-w-0 flex-col justify-end gap-4">
       {badges && <div className="flex flex-wrap items-center gap-2">{badges}</div>}
-      <h1 id={headingId} className="max-w-[40rem] font-display text-h1 text-balance">
+      <h1 id={headingId} className="max-w-[40rem] font-display text-h1 text-balance break-words [overflow-wrap:anywhere]">
         {title}
       </h1>
       {address && (
-        <p className="flex items-start gap-1.5 text-small text-on-dark/90">
+        <p className="flex items-start gap-1.5 text-small text-on-dark/90 break-words [overflow-wrap:anywhere]">
           <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-on-dark-accent" />
           {address}
         </p>

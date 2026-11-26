@@ -5330,6 +5330,32 @@
           }
         }
       ]
+    },
+    {
+      "slug": "rental-detail-long-title-overflow",
+      "title": "Chi tiết Cho thuê / Tin BĐS / Dự án 390px: tiêu đề chuỗi dài liền bị cắt + trang tràn ngang — h1/địa chỉ hero + mô tả DetailSection thêm break-words [overflow-wrap:anywhere] (BL-125, QA 42)",
+      "type": "BUG",
+      "severity": "medium",
+      "status": "done",
+      "currentPhase": 1,
+      "startedAt": "2026-11-26",
+      "completedAt": "2026-11-26",
+      "specVersion": "1.64.3",
+      "scopeVersion": 124,
+      "note": "Reviewer STRICT PASS r1; chưa chụp ảnh / chưa đo scrollWidth (không dev server).",
+      "tasks": [
+        {
+          "task": "phase-1-task-01",
+          "file": "tasks/bug-rental-detail-long-title-overflow/phase-1-task-01.md",
+          "status": "review_passed",
+          "reviewer": {
+            "result": "PASS",
+            "level": "STRICT",
+            "round": 1,
+            "report": ".context/review-reports/bug-rental-detail-long-title-overflow-phase-1-task-01-round-1-review.md"
+          }
+        }
+      ]
     }
   ],
   "projectName": "tami-website",
@@ -5983,7 +6009,7 @@
       "decision": "Quyết định agent (user ủy quyền 2026-10-20): không đổi transition nav Payload (506/576 là số đo ở trang không render); sửa thanh chọn hàng loạt trong cùng task; không sửa --nav-width:100vw (residual)"
     }
   ],
-  "lastUpdated": "2026-11-18",
+  "lastUpdated": "2026-11-26T03:26:15.623Z",
   "approvalMilestones": [
     {
       "id": "M1",

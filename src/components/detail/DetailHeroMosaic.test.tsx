@@ -76,4 +76,12 @@ describe("DetailHeroMosaic", () => {
     expect(screen.getAllByRole("button", { name: "View all 3 photos" }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Watch the intro video" })).toBeInTheDocument();
   });
+
+  it("BL-125: h1 + địa chỉ chuỗi dài liền được phép ngắt từ (hero overflow-hidden không cắt chữ)", () => {
+    const longTitle = "test thu sale2546456565456000".repeat(4);
+    const longAddress = "Số1".repeat(40);
+    renderWithIntl(<DetailHeroMosaic images={images(2)} title={longTitle} address={longAddress} />);
+    expect(screen.getByRole("heading", { level: 1 }).className).toContain("[overflow-wrap:anywhere]");
+    expect(screen.getByText(longAddress).className).toContain("[overflow-wrap:anywhere]");
+  });
 });

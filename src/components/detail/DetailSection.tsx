@@ -42,7 +42,7 @@ export function DetailSection({ id, title, tone = "default", eyebrow, descriptio
       <h2 id={headingId} className={cn("font-display", description ? "mb-2" : eyebrow ? "mb-5" : "mb-8", eyebrow ? "text-h3" : "text-h2")}>
         {title}
       </h2>
-      {description && <p className={cn("text-text-secondary", eyebrow ? "mb-5" : "mb-8")}>{description}</p>}
+      {description && <p className={cn("text-text-secondary break-words [overflow-wrap:anywhere]", eyebrow ? "mb-5" : "mb-8")}>{description}</p>}
       {children}
     </section>
   );

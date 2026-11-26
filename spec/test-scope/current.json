@@ -1,53 +1,57 @@
 {
-  "specVersion": "1.64.2",
-  "scopeVersion": 123,
-  "generatedAt": "2026-11-18T16:00:00+07:00",
+  "specVersion": "1.64.3",
+  "scopeVersion": 124,
+  "generatedAt": "2026-11-26T12:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-124: nút \"Sao chép email\" bằng nút \"Gửi CV ngay\" trên mobile ở banner CTA Tuyển dụng. PATCH 1.64.1 -> 1.64.2.",
+  "triggerNote": "BL-125: tiêu đề chuỗi dài liền ở trang chi tiết Cho thuê/Tin BĐS/Dự án bị cắt chữ + trang tràn ngang 390px. PATCH 1.64.2 -> 1.64.3.",
   "status": "published",
-  "workItem": "bug/careers-cv-buttons-uneven",
-  "backlog": "BL-124",
+  "workItem": "bug/rental-detail-long-title-overflow",
+  "backlog": "BL-125",
   "classification": "BUG",
   "phaseTask": "phase-1-task-01",
-  "task": "tasks/bug-careers-cv-buttons-uneven/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-18-careers-cv-buttons-uneven.md",
+  "task": "tasks/bug-rental-detail-long-title-overflow/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-rental-detail-long-title-overflow.md",
   "specRefs": [
-    "SPECIFICATIONS.md § Tuyển dụng — Hai nút CTA banner đều nhau trên mobile (BL-124)",
-    "BL-124"
+    "SPECIFICATIONS.md § Chi tiết Cho thuê / Tin BĐS / Dự án — tiêu đề chuỗi dài liền xuống dòng (BL-125)",
+    "BL-125"
   ],
   "changed": {
     "files": [
-      "src/components/careers/CopyEmailButton.tsx",
-      "src/components/careers/CopyEmailButton.test.tsx",
+      "src/components/detail/DetailHeroMosaic.tsx",
+      "src/components/detail/DetailSection.tsx",
+      "src/components/detail/DetailHeroMosaic.test.tsx",
+      "src/components/detail/DetailBlocks.test.tsx",
       "SPECIFICATIONS.md"
     ],
     "modules": [
-      "careers/CopyEmailButton"
+      "detail/DetailHeroMosaic",
+      "detail/DetailSection"
     ]
   },
   "impact": {
     "direct": [
-      "/tuyen-dung và /en/careers banner \"Chưa tìm thấy vị trí phù hợp?\" ở 375/390: \"Gửi CV ngay\" và \"Sao chép email\" cùng rộng, cùng cao >= 44px (52px), xếp dọc"
+      "/cho-thue/[slug] (và /en/...) ở 390px với tiêu đề chuỗi dài liền: h1 hero xuống dòng không cắt chữ; mô tả khối \"Hình ảnh của {tiêu đề}\" xuống dòng; document.documentElement.scrollWidth <= 390",
+      "Dòng địa chỉ trong hero và mô tả khối Vị trí (địa chỉ) cũng xuống dòng khi là chuỗi dài liền"
     ],
     "dependents": [
-      "Thông báo \"Đã sao chép\" / \"Copied\" xuống dòng dưới nút, không thụt lề trên mobile"
+      "/tin-bds/[slug] và /du-an/[slug] (cùng DetailHeroMosaic + DetailSection): cùng hành vi ngắt dòng",
+      "Breadcrumb overlay trong hero vẫn rút gọn (truncate), không làm rộng trang"
     ],
     "regression": [
-      "768/1440: hai nút cạnh nhau, rộng theo nội dung như cũ",
-      "Sao chép email vẫn hoạt động và hiện thông báo (BL-114)",
-      "Panel trống \"chưa có vị trí\" (tone light) không đổi",
-      "Trạng thái không có email (BL-120): không banner, có link \"Liên hệ TAMI\" (/lien-he, /en/contact)"
+      "Tiêu đề có khoảng trắng bình thường hiển thị như cũ (text-balance, max-w 40rem), desktop 1440 không đổi",
+      "Bố cục hero (mosaic ảnh, nút chia sẻ/video), khoảng cách khối chi tiết không đổi",
+      "Thông tin Sale (SaleContactBox), lưới thông tin (DetailInfoGrid), thẻ liên quan vẫn hiển thị đúng"
     ]
   },
   "acceptance": [
-    "375/390: hai nút cùng chiều rộng (full width tối đa 320px) và cùng chiều cao >= 44px, xếp dọc",
-    "768/1440: không đổi (rộng theo nội dung, cạnh nhau)",
-    "Bấm \"Sao chép email\": email vào clipboard, thông báo hiện dưới nút",
-    "Không có email trong Cài đặt website: không banner CV, panel hiện link \"Liên hệ TAMI\""
+    "390: trang chi tiết có tiêu đề chuỗi dài liền không cuộn ngang (scrollWidth <= 390)",
+    "H1 hero và mô tả khối xuống dòng, không bị cắt chữ",
+    "Chi tiết Tin BĐS và Dự án cùng hành vi",
+    "Desktop 1440 và tiêu đề thường: không đổi"
   ],
   "evidence": {
-    "review": ".context/review-reports/bug-careers-cv-buttons-uneven-phase-1-task-01-round-1-review.md",
-    "note": "Verify theo class + unit test; chưa đo bằng trình duyệt thật (không có dev server)."
+    "review": ".context/review-reports/bug-rental-detail-long-title-overflow-phase-1-task-01-round-1-review.md",
+    "note": "STRICT PASS r1 (component dùng chung). Verify theo class + unit test + lập luận CSS; chưa đo scrollWidth bằng trình duyệt thật (không có dev server/Docker)."
   },
-  "risk": "low"
+  "risk": "low-medium"
 }

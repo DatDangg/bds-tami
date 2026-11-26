@@ -144,6 +144,16 @@ describe("DetailSection (mô tả BL-052)", () => {
     );
     expect(screen.getByRole("region", { name: "Khác" }).querySelectorAll("p")).toHaveLength(1);
   });
+
+  it("BL-125: mô tả chứa chuỗi dài liền được phép ngắt từ (không tràn ngang trang)", () => {
+    const longName = "sale2546456565456000".repeat(5);
+    renderWithIntl(
+      <DetailSection id="g" title="Hình ảnh" description={`Hình ảnh của ${longName}.`}>
+        <p>Nội dung</p>
+      </DetailSection>,
+    );
+    expect(screen.getByText(`Hình ảnh của ${longName}.`).className).toContain("[overflow-wrap:anywhere]");
+  });
 });
 
 describe("DetailContactAside", () => {
