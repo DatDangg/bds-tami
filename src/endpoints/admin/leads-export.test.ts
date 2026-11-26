@@ -44,6 +44,18 @@ describe("handleLeadsExport", () => {
     expect(find).not.toHaveBeenCalled();
   });
 
+  it("tên file theo giờ VN: 17:23 UTC ngày 19 -> tami-leads-202611200023.xlsx", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-19T17:23:00Z"));
+    try {
+      const response = await handleLeadsExport(fakeRequest("admin", 0).req, allowed);
+      expect(response.headers.get("Content-Disposition")).toContain('filename="tami-leads-202611200023.xlsx"');
+      await response.arrayBuffer();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("Redis lỗi -> 503 (fail-closed), không đếm, không audit", async () => {
     const { req, create, countFn } = fakeRequest("admin");
     const response = await handleLeadsExport(req, async () => {

@@ -3,6 +3,7 @@ import type { Endpoint, PayloadRequest, Where } from "payload";
 import { isAdmin } from "@/access";
 import { LOCALE_LABELS, NEWSLETTER_STATUS_LABELS, NEWSLETTER_STATUSES, type NewsletterStatus } from "@/collections/NewsletterSubscribers";
 import { writeAuditLog } from "@/lib/audit/write-audit-log";
+import { exportFileStamp } from "@/lib/export/file-stamp";
 import { createXlsxStream, type CellValue } from "@/lib/export/xlsx-stream";
 import { buildAttachmentDisposition } from "@/lib/http/content-disposition";
 import { fail } from "@/lib/http/response";
@@ -76,8 +77,7 @@ async function* exportRows(req: PayloadRequest, where: Where, total: number, pag
 }
 
 function exportFileName(now: Date): string {
-  const stamp = now.toISOString().slice(0, 16).replace(/[-:T]/g, "");
-  return `tami-ban-tin-${stamp}.xlsx`;
+  return `tami-ban-tin-${exportFileStamp(now)}.xlsx`;
 }
 
 /**

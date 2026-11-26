@@ -50,6 +50,18 @@ describe("handleNewsletterExport", () => {
     await response.arrayBuffer();
   });
 
+  it("tên file theo giờ VN: 17:23 UTC ngày 19 -> tami-ban-tin-202611200023.xlsx", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-19T17:23:00Z"));
+    try {
+      const response = await handleNewsletterExport(fakeRequest(admin).req, allowed);
+      expect(response.headers.get("Content-Disposition")).toContain('filename="tami-ban-tin-202611200023.xlsx"');
+      await response.arrayBuffer();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("rate limit (chung `admin-export-excel`) chặn -> 429 trước khi đếm; quá trần -> 422 không audit", async () => {
     const limiter = vi.fn(async () => ({ allowed: false as const, retryAfterSeconds: 60 }));
     const limited = fakeRequest(admin);

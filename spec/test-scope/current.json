@@ -1,68 +1,60 @@
 {
-  "specVersion": "1.64.6",
-  "scopeVersion": 127,
-  "generatedAt": "2026-11-26T15:00:00+07:00",
+  "specVersion": "1.64.7",
+  "scopeVersion": 128,
+  "generatedAt": "2026-11-26T16:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-128 (QA 43): 'Tạo bản sao' giữ slug cũ + ngày xuất bản/trạng thái cũ. PATCH 1.64.5 -> 1.64.6.",
+  "triggerNote": "BL-129 (QA 45): tên file xuất Excel Lead/Bản tin theo giờ UTC thay vì giờ Việt Nam. PATCH 1.64.6 -> 1.64.7.",
   "status": "published",
-  "workItem": "bug/job-posting-duplicate-slug-date",
-  "backlog": "BL-128",
+  "workItem": "bug/lead-export-filename-timezone",
+  "backlog": "BL-129",
   "classification": "BUG",
   "phaseTask": "phase-1-task-01",
-  "task": "tasks/bug-job-posting-duplicate-slug-date/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-26-job-posting-duplicate-slug-date.md",
+  "task": "tasks/bug-lead-export-filename-timezone/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-lead-export-filename-timezone.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F12 — Slug / trạng thái / ngày xuất bản khi \"Tạo bản sao\" (BL-128)",
-    "BR-05",
-    "BL-128"
+    "SPECIFICATIONS.md § F9 — Tên file xuất Excel theo giờ Việt Nam (BL-129)",
+    "BL-129"
   ],
   "changed": {
     "files": [
-      "src/fields/status.ts",
-      "src/fields/published-at.ts",
-      "src/fields/slug.ts",
-      "src/fields/slug.test.ts",
-      "src/fields/published-at.test.ts",
-      "src/fields/status.test.ts",
+      "src/lib/export/file-stamp.ts",
+      "src/lib/export/file-stamp.test.ts",
+      "src/lib/format.ts",
+      "src/endpoints/admin/leads-export.ts",
+      "src/endpoints/admin/newsletter-export.ts",
+      "src/endpoints/admin/leads-export.test.ts",
+      "src/endpoints/admin/newsletter-export.test.ts",
       "SPECIFICATIONS.md"
     ],
     "modules": [
-      "fields/status (beforeDuplicate -> draft)",
-      "fields/published-at (beforeDuplicate -> null, gồm bản hẹn giờ News)",
-      "fields/slug (makeSlugHook: slug tự sinh của bản chưa từng công khai theo tiêu đề mới)",
-      "collections dùng withContentDefaults: news, projects, rentals, property-posts, job-postings, services, developers"
+      "lib/export/file-stamp (exportFileStamp, Asia/Ho_Chi_Minh)",
+      "endpoints/admin/leads-export",
+      "endpoints/admin/newsletter-export"
     ]
   },
   "impact": {
     "direct": [
-      "Admin > mọi collection nội dung: 'Tạo bản sao' bản đang published -> bản sao là Nháp, ô Ngày xuất bản trống; xuất bản lần đầu -> ngày = thời điểm xuất bản (>= ngày tạo)",
-      "Bản sao đổi tiêu đề -> Lưu -> slug theo tiêu đề mới (unique, hậu tố nếu trùng)",
-      "Bản nháp/ẩn chưa từng xuất bản có slug tự sinh, đổi tiêu đề (form hoặc API cập nhật một phần) -> slug theo tiêu đề mới",
-      "News hẹn giờ: bản sao không mang ngày hẹn cũ"
+      "Admin > Lead > Xuất Excel: tên file tami-leads-YYYYMMDDHHmm.xlsx theo giờ VN (vd 00:23 20/11 VN -> 202611200023, không phải 202611191723)",
+      "Admin > Bản tin > Xuất Excel: tên file tami-ban-tin-YYYYMMDDHHmm.xlsx theo giờ VN",
+      "Thời điểm qua nửa đêm UTC 17:23 -> VN 00:23 hôm sau: ngày trong tên file là ngày VN"
     ],
     "dependents": [
-      "Bản sao không còn công khai ngay (không xuất hiện ở danh sách/sitemap public tới khi xuất bản)",
-      "Slug EN vẫn bị bỏ khi nhân bản, hasEnglish=false (translation) không đổi",
-      "Redirect slug (create-slug-redirect) không đổi; đổi slug bản chưa công khai không tạo redirect rác"
+      "Header Content-Disposition của 2 endpoint export",
+      "Audit log export không đổi"
     ],
     "regression": [
-      "Bản published/rented/đã từng có ngày xuất bản đổi tiêu đề -> slug KHÔNG đổi (URL ổn định)",
-      "Slug người dùng tự sửa tay (kể cả rút gọn) được giữ khi đổi tiêu đề",
-      "Tạo mới thường: slug tự sinh từ tiêu đề, trùng thì hậu tố -N; ngày xuất bản đóng dấu lần xuất bản đầu, giữ khi xuất bản lại",
-      "Hẹn giờ xuất bản Tin tức (BL-091) và đóng tin tuyển dụng hết hạn không đổi",
-      "Cho thuê: mã code sinh mới khi nhân bản không đổi"
+      "Nội dung file xuất (cột ngày/giờ đã giờ VN, bộ lọc, quyền admin, audit log) không đổi",
+      "Tên file đúng định dạng 12 chữ số, đuôi .xlsx, độc lập TZ server"
     ]
   },
   "acceptance": [
-    "Bản sao: status = draft, publishedAt trống; xuất bản lần đầu -> ngày mới",
-    "Bản sao chưa công khai đổi tiêu đề -> slug theo tiêu đề mới (unique)",
-    "Bản đã xuất bản / slug sửa tay đổi tiêu đề -> slug giữ nguyên",
-    "Áp dụng chung 7 collection nội dung",
-    "Test fields (slug/published-at/status) PASS"
+    "Tên file xuất Lead và Bản tin đóng dấu giờ Asia/Ho_Chi_Minh, độc lập TZ server",
+    "2026-11-19T17:23Z -> 202611200023",
+    "Nội dung file không đổi"
   ],
   "evidence": {
-    "review": ".context/review-reports/bug-job-posting-duplicate-slug-date-phase-1-task-01-round-2-review.md",
-    "note": "Round 1 FAIL, round 2 STRICT PASS. Integration Payload/DB (duplicate thật) chưa chạy (không Docker)."
+    "review": ".context/review-reports/bug-lead-export-filename-timezone-phase-1-task-01-round-1-review.md",
+    "note": "STRICT PASS round 1."
   },
-  "risk": "medium"
+  "risk": "low"
 }

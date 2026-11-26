@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/routing";
 
-const TIME_ZONE = "Asia/Ho_Chi_Minh";
+export const TIME_ZONE = "Asia/Ho_Chi_Minh";
 // Mã vùng cố định để kết quả giống nhau giữa Node/trình duyệt, không phụ thuộc locale máy.
 const INTL_TAG: Record<Locale, string> = { vi: "vi-VN", en: "en-US" };
 
