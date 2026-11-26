@@ -7,12 +7,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // `@payloadcms/ui/shared` (mergeFieldStyles thật) không kéo .css nên dùng bản thật.
 const fieldState = vi.hoisted(() => ({ value: null as unknown }));
 const setValue = vi.hoisted(() => vi.fn());
+// Giữ tham số useField để kiểm hàm validate truyền vào (lỗi server phải còn sau khi Lưu).
+const useFieldMock = vi.hoisted(() =>
+  vi.fn<(args: { validate?: (value: unknown, options: Record<string, unknown>) => unknown }) => object>(() => ({ path: "location", value: fieldState.value, setValue, showError: false, customComponents: {} })),
+);
 vi.mock("@payloadcms/ui", () => ({
   FieldDescription: () => null,
   FieldError: () => null,
   FieldLabel: ({ label }: { label: string }) => <span>{label}</span>,
   RenderCustomComponent: ({ Fallback }: { Fallback: React.ReactNode }) => Fallback,
-  useField: () => ({ path: "location", value: fieldState.value, setValue, showError: false, customComponents: {} }),
+  useField: useFieldMock,
 }));
 
 import { googleMapsUrl, MapLocationField, nextPointValue } from "./MapLocationField";
@@ -51,6 +55,24 @@ describe("MapLocationField render", () => {
     expect(link.getAttribute("href")).toBe("https://www.google.com/maps?q=10.7769,106.7009");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+  });
+});
+
+describe("MapLocationField validate client", () => {
+  const passedValidate = () => useFieldMock.mock.lastCall?.[0].validate;
+
+  it("không có validate client → trả undefined để useField giữ lỗi server (trả true sẽ xoá lỗi 'nhập ngược' sau khi Lưu)", () => {
+    renderField([10.7769, 106.7009]);
+    expect(passedValidate()?.([10.7769, 106.7009], {})).toBeUndefined();
+  });
+
+  it("có validate client → gọi kèm required của field", () => {
+    const validate = vi.fn(() => "lỗi");
+    fieldState.value = null;
+    const props = { field: { name: "location", type: "point", label: "x", required: true }, path: "location", validate } as unknown as Parameters<typeof MapLocationField>[0];
+    render(<MapLocationField {...props} />);
+    expect(passedValidate()?.([1, 2], { event: "submit" })).toBe("lỗi");
+    expect(validate).toHaveBeenCalledWith([1, 2], expect.objectContaining({ event: "submit", required: true }));
   });
 });
 

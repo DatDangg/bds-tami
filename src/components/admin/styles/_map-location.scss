@@ -12,6 +12,11 @@
     font-family: var(--font-body);
     -webkit-appearance: none;
     appearance: none;
+
+    // Ô bị khoá (chỉ đọc / không có quyền sửa): nền xám như `.field-type.text input:disabled` của Payload.
+    &:disabled {
+      background: var(--theme-elevation-100);
+    }
   }
 
   // Nền ô lỗi như `.field-type.text.error input` của Payload (sáng error-50, tối error-100); chỉ hai ô số, không tô ô dán.
