@@ -116,7 +116,7 @@ Query params (đồng bộ với URL trang `/cho-thue` để chia sẻ được)
 | `furnishing` | `full` | |
 | `amenities` | `pool,gym` | BL-044. Nhiều giá trị phân cách dấu phẩy; khoá lặp `amenities=pool&amenities=gym` được gộp tương đương (riêng tham số này — các khoá khác lặp chỉ lấy giá trị đầu), trong `RENTAL_AMENITIES`; tin phải có **đủ** mọi tiện ích (AND). Giá trị ngoài danh sách **bị bỏ** (không 400, khác `furnishing` — tham số danh sách nên phần hợp lệ còn lại vẫn có nghĩa); không còn giá trị nào = không lọc |
 | `available` | `true` | Chỉ tin còn trống (`published`), bỏ tin `rented`. Mặc định (hoặc `false`) trả cả `published` lẫn `rented`. Trang `/cho-thue` dùng `true` (design-spec S04) |
-| `sort` | `newest` \| `price_asc` \| `price_desc` | Mặc định `newest` |
+| `sort` | `newest` \| `price_asc` \| `price_desc` | Mặc định `newest`; `price_*` theo giá hiệu lực: tin "Thương lượng" / không giá / giá ≤ 0 luôn cuối cả 2 chiều, hoà → `publishedAt` mới trước, `id` (BL-126) |
 | `page`, `limit` | `1`, `12` | `limit` tối đa 48 |
 
 Kết quả: `{ success: true, data: { items: RentalCard[], total, page, totalPages } }`. `RentalCard` chỉ gồm trường công khai (mã tin, tiêu đề, slug, ảnh đại diện, giá, diện tích, phòng ngủ, phòng tắm, nội thất, khu vực, danh mục, trạng thái), chữ và slug theo `locale`. `category` (BL-052, thêm — additive) = `{ name, slug }` của danh mục CỦA TIN (có thể là danh mục con) theo `locale`, hoặc `null` khi tin không có danh mục / danh mục đã xoá mềm / `/en` mà danh mục chưa có bản EN. **Không** trả `address` khi `showExactAddress = false`. Không bao giờ trả trường nội bộ.

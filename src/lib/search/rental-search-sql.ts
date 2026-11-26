@@ -171,15 +171,17 @@ export function phraseMatchExpression(query: string | undefined): SqlFragment | 
 }
 
 /**
- * ORDER BY theo `sort` (giá trị đã kiểm bởi zod, chọn từ bảng cố định). Tin thương lượng không có giá nên xếp cuối ở cả hai chiều giá;
+ * ORDER BY theo `sort` (giá trị đã kiểm bởi zod, chọn từ bảng cố định). Tin thương lượng / không giá xếp cuối ở cả hai chiều giá (theo giá hiệu lực, không theo cột thô);
  * `id` chốt thứ tự để phân trang không lặp/sót. `alias` là hằng nội bộ ("r" hoặc "page"), không phải đầu vào người dùng.
  * Sort mặc định (`newest`) có `query` ≥ 2 từ thì tin chứa nguyên cụm xếp trước (BL-080): alias "r" tính trực tiếp, "page" đọc cột `phrase_match` của CTE.
  */
 export function rentalOrderBy(sort: RentalSort, alias: "r" | "page", query?: string): SqlFragment {
   const col = (name: string) => sql.raw(`${alias}."${name}"`);
   const newest = sql`${col("published_at")} DESC NULLS LAST, ${col("id")} DESC`;
-  if (sort === "price_asc") return sql`ORDER BY ${col("price_monthly_vnd")} ASC NULLS LAST, ${newest}`;
-  if (sort === "price_desc") return sql`ORDER BY ${col("price_monthly_vnd")} DESC NULLS LAST, ${newest}`;
+  // BL-126: giá hiệu lực như `rental-view` — cờ Thương lượng (kể cả còn giá số cũ) hoặc giá ≤ 0 → NULL → xếp cuối ở cả hai chiều.
+  const effectivePrice = sql`CASE WHEN ${col("price_negotiable")} = true THEN NULL WHEN ${col("price_monthly_vnd")} > 0 THEN ${col("price_monthly_vnd")} END`;
+  if (sort === "price_asc") return sql`ORDER BY ${effectivePrice} ASC NULLS LAST, ${newest}`;
+  if (sort === "price_desc") return sql`ORDER BY ${effectivePrice} DESC NULLS LAST, ${newest}`;
   const phrase = phraseMatchExpression(query);
   if (phrase === undefined) return sql`ORDER BY ${newest}`;
   return sql`ORDER BY ${alias === "r" ? phrase : col("phrase_match")} DESC, ${newest}`;

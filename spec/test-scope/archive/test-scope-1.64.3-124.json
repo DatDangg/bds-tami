@@ -1,0 +1,57 @@
+{
+  "specVersion": "1.64.3",
+  "scopeVersion": 124,
+  "generatedAt": "2026-11-26T12:00:00+07:00",
+  "trigger": "bug-fix",
+  "triggerNote": "BL-125: tiêu đề chuỗi dài liền ở trang chi tiết Cho thuê/Tin BĐS/Dự án bị cắt chữ + trang tràn ngang 390px. PATCH 1.64.2 -> 1.64.3.",
+  "status": "published",
+  "workItem": "bug/rental-detail-long-title-overflow",
+  "backlog": "BL-125",
+  "classification": "BUG",
+  "phaseTask": "phase-1-task-01",
+  "task": "tasks/bug-rental-detail-long-title-overflow/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-rental-detail-long-title-overflow.md",
+  "specRefs": [
+    "SPECIFICATIONS.md § Chi tiết Cho thuê / Tin BĐS / Dự án — tiêu đề chuỗi dài liền xuống dòng (BL-125)",
+    "BL-125"
+  ],
+  "changed": {
+    "files": [
+      "src/components/detail/DetailHeroMosaic.tsx",
+      "src/components/detail/DetailSection.tsx",
+      "src/components/detail/DetailHeroMosaic.test.tsx",
+      "src/components/detail/DetailBlocks.test.tsx",
+      "SPECIFICATIONS.md"
+    ],
+    "modules": [
+      "detail/DetailHeroMosaic",
+      "detail/DetailSection"
+    ]
+  },
+  "impact": {
+    "direct": [
+      "/cho-thue/[slug] (và /en/...) ở 390px với tiêu đề chuỗi dài liền: h1 hero xuống dòng không cắt chữ; mô tả khối \"Hình ảnh của {tiêu đề}\" xuống dòng; document.documentElement.scrollWidth <= 390",
+      "Dòng địa chỉ trong hero và mô tả khối Vị trí (địa chỉ) cũng xuống dòng khi là chuỗi dài liền"
+    ],
+    "dependents": [
+      "/tin-bds/[slug] và /du-an/[slug] (cùng DetailHeroMosaic + DetailSection): cùng hành vi ngắt dòng",
+      "Breadcrumb overlay trong hero vẫn rút gọn (truncate), không làm rộng trang"
+    ],
+    "regression": [
+      "Tiêu đề có khoảng trắng bình thường hiển thị như cũ (text-balance, max-w 40rem), desktop 1440 không đổi",
+      "Bố cục hero (mosaic ảnh, nút chia sẻ/video), khoảng cách khối chi tiết không đổi",
+      "Thông tin Sale (SaleContactBox), lưới thông tin (DetailInfoGrid), thẻ liên quan vẫn hiển thị đúng"
+    ]
+  },
+  "acceptance": [
+    "390: trang chi tiết có tiêu đề chuỗi dài liền không cuộn ngang (scrollWidth <= 390)",
+    "H1 hero và mô tả khối xuống dòng, không bị cắt chữ",
+    "Chi tiết Tin BĐS và Dự án cùng hành vi",
+    "Desktop 1440 và tiêu đề thường: không đổi"
+  ],
+  "evidence": {
+    "review": ".context/review-reports/bug-rental-detail-long-title-overflow-phase-1-task-01-round-1-review.md",
+    "note": "STRICT PASS r1 (component dùng chung). Verify theo class + unit test + lập luận CSS; chưa đo scrollWidth bằng trình duyệt thật (không có dev server/Docker)."
+  },
+  "risk": "low-medium"
+}

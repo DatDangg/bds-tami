@@ -174,13 +174,27 @@ describe("điều kiện công khai khớp buildPublicWhere", () => {
   });
 });
 
+const effectivePrice = (alias: string) => `CASE WHEN ${alias}."price_negotiable" = true THEN NULL WHEN ${alias}."price_monthly_vnd" > 0 THEN ${alias}."price_monthly_vnd" END`;
+
 describe("rentalOrderBy", () => {
   it("mỗi kiểu sắp xếp có id chốt thứ tự; giá đặt tin không giá cuối", () => {
     expect(render(rentalOrderBy("newest", "r")).sql).toBe(`ORDER BY r."published_at" DESC NULLS LAST, r."id" DESC`);
     expect(render(rentalOrderBy("price_asc", "page")).sql).toBe(
-      `ORDER BY page."price_monthly_vnd" ASC NULLS LAST, page."published_at" DESC NULLS LAST, page."id" DESC`,
+      `ORDER BY ${effectivePrice("page")} ASC NULLS LAST, page."published_at" DESC NULLS LAST, page."id" DESC`,
     );
-    expect(render(rentalOrderBy("price_desc", "r")).sql).toContain(`"price_monthly_vnd" DESC NULLS LAST`);
+    expect(render(rentalOrderBy("price_desc", "r")).sql).toBe(
+      `ORDER BY ${effectivePrice("r")} DESC NULLS LAST, r."published_at" DESC NULLS LAST, r."id" DESC`,
+    );
+  });
+
+  // BL-126: sắp theo giá HIỆU LỰC như hiển thị (rental-view): cờ Thương lượng hoặc giá ≤ 0 → không giá → cuối, kể cả khi còn giá số cũ.
+  it.each(["r", "page"] as const)("giá: tin Thương lượng / giá ≤ 0 là NULL (xếp cuối cả hai chiều) — alias %s", (alias) => {
+    for (const sort of ["price_asc", "price_desc"] as const) {
+      const { sql } = render(rentalOrderBy(sort, alias));
+      expect(sql).toContain(`WHEN ${alias}."price_negotiable" = true THEN NULL`);
+      expect(sql).toContain(`WHEN ${alias}."price_monthly_vnd" > 0 THEN ${alias}."price_monthly_vnd"`);
+      expect(sql).toContain("NULLS LAST");
+    }
   });
 });
 
@@ -314,7 +328,7 @@ describe("BL-080: sort mặc định ưu tiên khớp nguyên cụm", () => {
     expect(render(rentalOrderBy("newest", "r", "can")).sql).toBe(`ORDER BY r."published_at" DESC NULLS LAST, r."id" DESC`);
     expect(render(rentalOrderBy("newest", "r", undefined)).sql).toBe(`ORDER BY r."published_at" DESC NULLS LAST, r."id" DESC`);
     expect(render(rentalOrderBy("price_asc", "page", "can ho")).sql).toBe(
-      `ORDER BY page."price_monthly_vnd" ASC NULLS LAST, page."published_at" DESC NULLS LAST, page."id" DESC`,
+      `ORDER BY ${effectivePrice("page")} ASC NULLS LAST, page."published_at" DESC NULLS LAST, page."id" DESC`,
     );
     expect(render(rentalOrderBy("price_desc", "r", "can ho")).sql).not.toContain("search_text");
   });
