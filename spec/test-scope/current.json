@@ -1,60 +1,57 @@
 {
-  "specVersion": "1.64.7",
-  "scopeVersion": 128,
-  "generatedAt": "2026-11-26T16:00:00+07:00",
+  "specVersion": "1.64.8",
+  "scopeVersion": 129,
+  "generatedAt": "2026-11-26T17:00:00+07:00",
   "trigger": "bug-fix",
-  "triggerNote": "BL-129 (QA 45): tên file xuất Excel Lead/Bản tin theo giờ UTC thay vì giờ Việt Nam. PATCH 1.64.6 -> 1.64.7.",
+  "triggerNote": "BL-130: ô Phường/xã co bé tí cạnh ô Tỉnh/thành trong form admin (WardField không truyền flex style). PATCH 1.64.7 -> 1.64.8.",
   "status": "published",
-  "workItem": "bug/lead-export-filename-timezone",
-  "backlog": "BL-129",
+  "workItem": "bug/admin-ward-field-narrow-in-row",
+  "backlog": "BL-130",
   "classification": "BUG",
   "phaseTask": "phase-1-task-01",
-  "task": "tasks/bug-lead-export-filename-timezone/phase-1-task-01.md",
-  "specUpdate": "spec/updates/2026-11-26-lead-export-filename-timezone.md",
+  "task": "tasks/bug-admin-ward-field-narrow-in-row/phase-1-task-01.md",
+  "specUpdate": "spec/updates/2026-11-26-admin-ward-field-narrow-in-row.md",
   "specRefs": [
-    "SPECIFICATIONS.md § F9 — Tên file xuất Excel theo giờ Việt Nam (BL-129)",
-    "BL-129"
+    "SPECIFICATIONS.md § F10 — Hàng Tỉnh/thành · Phường/xã trong form admin chia đều bề rộng (BL-130)",
+    "BL-130"
   ],
   "changed": {
     "files": [
-      "src/lib/export/file-stamp.ts",
-      "src/lib/export/file-stamp.test.ts",
-      "src/lib/format.ts",
-      "src/endpoints/admin/leads-export.ts",
-      "src/endpoints/admin/newsletter-export.ts",
-      "src/endpoints/admin/leads-export.test.ts",
-      "src/endpoints/admin/newsletter-export.test.ts",
+      "src/components/admin/WardField.tsx",
+      "src/components/admin/WardField.test.tsx",
       "SPECIFICATIONS.md"
     ],
     "modules": [
-      "lib/export/file-stamp (exportFileStamp, Asia/Ho_Chi_Minh)",
-      "endpoints/admin/leads-export",
-      "endpoints/admin/newsletter-export"
+      "components/admin/WardField (style = mergeFieldStyles(field))"
     ]
   },
   "impact": {
     "direct": [
-      "Admin > Lead > Xuất Excel: tên file tami-leads-YYYYMMDDHHmm.xlsx theo giờ VN (vd 00:23 20/11 VN -> 202611200023, không phải 202611191723)",
-      "Admin > Bản tin > Xuất Excel: tên file tami-ban-tin-YYYYMMDDHHmm.xlsx theo giờ VN",
-      "Thời điểm qua nửa đêm UTC 17:23 -> VN 00:23 hôm sau: ngày trong tên file là ngày VN"
+      "Admin > Cho thuê > form: hàng Tỉnh/thành · Phường/xã chia đều bề rộng ở 1440 (≥ mid-break), mỗi ô 100% ở 390",
+      "Admin > Dự án > form: như trên",
+      "Admin > Tin BĐS > form: như trên",
+      "Dropdown Phường/xã đủ rộng, tên phường hiển thị 1 dòng, không có thanh cuộn ngang"
     ],
     "dependents": [
-      "Header Content-Disposition của 2 endpoint export",
-      "Audit log export không đổi"
+      "Các hàng 2 ô khác trong form admin (không bị ảnh hưởng, so sánh bề rộng)",
+      "Hỗ trợ admin.width / admin.style trên ô Phường/xã"
     ],
     "regression": [
-      "Nội dung file xuất (cột ngày/giờ đã giờ VN, bộ lọc, quyền admin, audit log) không đổi",
-      "Tên file đúng định dạng 12 chữ số, đuôi .xlsx, độc lập TZ server"
+      "Phường/xã lọc theo Tỉnh/thành đã chọn",
+      "Đổi Tỉnh/thành tự bỏ chọn Phường/xã",
+      "Validate phường thuộc tỉnh (ward-in-province) khi lưu",
+      "Lưu/mở lại bản ghi giữ đúng tỉnh + phường"
     ]
   },
   "acceptance": [
-    "Tên file xuất Lead và Bản tin đóng dấu giờ Asia/Ho_Chi_Minh, độc lập TZ server",
-    "2026-11-19T17:23Z -> 202611200023",
-    "Nội dung file không đổi"
+    "Hàng Tỉnh/thành · Phường/xã chia đều bề rộng như các hàng 2 ô khác (≥ mid-break); dưới mid-break mỗi ô 100%",
+    "Dropdown Phường/xã đủ rộng, tên phường 1 dòng, không thanh cuộn ngang",
+    "Lọc theo tỉnh + tự bỏ chọn khi đổi tỉnh không đổi",
+    "Áp dụng cho cả Cho thuê, Dự án, Tin BĐS"
   ],
   "evidence": {
-    "review": ".context/review-reports/bug-lead-export-filename-timezone-phase-1-task-01-round-1-review.md",
-    "note": "STRICT PASS round 1."
+    "review": ".context/review-reports/bug-admin-ward-field-narrow-in-row-phase-1-task-01-round-1-review.md",
+    "note": "NORMAL PASS round 1. Chưa kiểm tra trực quan trên trình duyệt (DB/Docker tắt) — test cần kiểm 1440/390."
   },
   "risk": "low"
 }

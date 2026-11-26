@@ -1,6 +1,7 @@
 "use client";
 
 import { RelationshipInput, useField, useFormFields } from "@payloadcms/ui";
+import { mergeFieldStyles } from "@payloadcms/ui/shared";
 import type { RelationshipFieldClientProps, Where } from "payload";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -51,6 +52,8 @@ export function WardField({ field, path: pathFromProps, readOnly, validate }: Re
 
   // Ổn định theo tỉnh: Input.js xoá + tải lại danh sách mỗi khi tham chiếu filterOptions đổi.
   const filterOptions = useMemo(() => wardFilterForProvince(provinceId), [provinceId]);
+  // Như ô quan hệ mặc định: không có admin.width → flex 1 1 auto, nếu không hàng Row co ô về bề rộng nội dung.
+  const fieldStyle = useMemo(() => mergeFieldStyles(field), [field]);
 
   const previousProvinceId = useRef<string | null>(provinceId);
   useEffect(() => {
@@ -89,7 +92,7 @@ export function WardField({ field, path: pathFromProps, readOnly, validate }: Re
       relationTo={WARD_RELATION}
       required={required}
       showError={showError}
-      style={undefined}
+      style={fieldStyle}
       value={toOption(value) as never}
     />
   );
