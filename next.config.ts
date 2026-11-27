@@ -1,6 +1,7 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
+import { readFileSync } from "node:fs";
 
 import { cacheControlHeaders } from "./src/lib/http/cache-policy";
 import { shouldEmitBrowserSourceMaps } from "./src/lib/monitoring/browser-sourcemaps";
@@ -9,8 +10,19 @@ import { shouldEmitBrowserSourceMaps } from "./src/lib/monitoring/browser-source
 // agentRules: false — `next dev` không tự chèn block `nextjs-agent-rules` vào AGENTS.md (AGENTS.md do template quản lý).
 // Không đưa APP_ENV/DSN vào bundle qua `env`/NEXT_PUBLIC_*: một image build 1 lần rồi promote staging -> prod (ARCHITECTURE §6.4).
 // productionBrowserSourceMaps: chỉ khi có GLITCHTIP_AUTH_TOKEN (build release): `scripts/upload-sourcemaps.mjs` upload lên GlitchTip rồi xoá `.map`.
+/** Số phiên bản hiện ở sidebar admin = `spec_version` trong SPECIFICATIONS.md lúc build (spec-publisher tăng mỗi thay đổi). `next start` trong image không có file này nên trả rỗng — giá trị đã được nhúng lúc build. */
+function readAppVersion(): string {
+  try {
+    return /spec_version:\*\*\s*([\d.]+)/.exec(readFileSync("SPECIFICATIONS.md", "utf8"))?.[1] ?? "";
+  } catch {
+    return "";
+  }
+}
+
 const nextConfig: NextConfig = {
   agentRules: false,
+  // Nhúng lúc build (không phải bí mật): hiện ở cuối sidebar admin (AdminVersion).
+  env: { APP_VERSION: readAppVersion() },
   // Chỉ có tác dụng ở `next dev`: cho phép mở dev server qua IP LAN/VPN (HMR + dev resource), không ảnh hưởng build prod.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*", "26.*.*.*"],
   experimental: { globalNotFound: true },

@@ -28,7 +28,7 @@ AGENTS.md
 CLAUDE.md
 BRIEF.md
 README.md
-SPECIFICATIONS.md
+# SPECIFICATIONS.md được đưa vào: next.config.ts đọc `spec_version` lúc build để hiện "Phiên bản" ở sidebar admin (chỉ stage builder, không vào image chạy).
 opencode.jsonc
 docker
 

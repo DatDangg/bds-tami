@@ -53,6 +53,8 @@ export default buildConfig({
       actions: ["/components/admin/SiteLink#SiteLink"],
       // Mục "Tổng quan" đầu sidebar: Payload DefaultNav không có lối vào dashboard (BL-050).
       beforeNavLinks: ["/components/admin/NavDashboardLink#NavDashboardLink"],
+      // Dòng "Phiên bản x.y.z" cuối sidebar để biết staging/prod đang chạy bản nào.
+      afterNavLinks: ["/components/admin/AdminVersion#AdminVersion"],
       // Banner dịch lỗi (TranslationFailedBanner) do view dashboard tự render: beforeDashboard chỉ chạy ở dashboard mặc định.
       views: { dashboard: { Component: "/components/admin/dashboard/DashboardView#DashboardView" } },
       graphics: { Logo: "/components/admin/Logo#Logo", Icon: "/components/admin/Icon#Icon" },

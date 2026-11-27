@@ -341,3 +341,11 @@ $group-indent: $group-indent-margin + $group-indent-padding + $group-indent-bord
     padding-inline: 12px;
   }
 }
+
+// Dòng "Phiên bản x.y.z" cuối sidebar (AdminVersion).
+.tami-admin-version {
+  margin: 24px 0 0;
+  padding: 0 12px;
+  color: var(--admin-text-subtle);
+  font-size: 12px;
+}
