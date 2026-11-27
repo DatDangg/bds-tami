@@ -164,20 +164,6 @@
       border-bottom-color: var(--admin-badge-info-fg);
     }
   }
-
-  &__status {
-    padding: 1px 8px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-
-    @each $tone in neutral, info, success, warning, danger {
-      &--#{$tone} {
-        background: var(--admin-badge-#{$tone}-bg);
-        color: var(--admin-badge-#{$tone}-fg);
-      }
-    }
-  }
 }
 
 // Câu tiếng Việt gốc dưới ô khi sửa bản tiếng Anh (ViSourceHint, BL-133).

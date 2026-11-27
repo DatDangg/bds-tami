@@ -1,7 +1,6 @@
 import type { CollectionConfig, Field } from "payload";
 import { describe, expect, it } from "vitest";
 
-import { englishTabStatus } from "../translation/admin-ui";
 import { withLanguageTabs } from "./language-tabs";
 
 const HINT = "/components/admin/ViSourceHint#ViSourceHint";
@@ -32,17 +31,5 @@ describe("withLanguageTabs", () => {
   it("collection không có nhóm translation giữ nguyên", () => {
     const plain = { slug: "leads", fields: [{ name: "name", type: "text", localized: true }] } as CollectionConfig;
     expect(withLanguageTabs(plain)).toBe(plain);
-  });
-});
-
-describe("englishTabStatus", () => {
-  it("nhãn theo trạng thái dịch", () => {
-    expect(englishTabStatus({ status: "none" })?.label).toBe("Chưa dịch");
-    expect(englishTabStatus({ status: "queued" })?.label).toBe("Đang dịch");
-    expect(englishTabStatus({ status: "done", enSource: "ai" })?.label).toBe("AI đã dịch");
-    expect(englishTabStatus({ status: "done", enSource: "manual" })?.label).toBe("Sửa tay");
-    expect(englishTabStatus({ status: "done", enSource: "manual", viChangedAfterManual: true })?.label).toBe("Cần xem lại");
-    expect(englishTabStatus({ status: "failed" })?.label).toBe("Dịch lỗi");
-    expect(englishTabStatus({ status: "pending_review" })?.label).toBe("Chờ duyệt");
   });
 });
