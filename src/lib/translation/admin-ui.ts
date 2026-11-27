@@ -124,6 +124,19 @@ function formatVietnamDateTime(value: unknown): string | null {
   return `${parts.day}/${parts.month}/${parts.year} ${parts.hour}:${parts.minute}`;
 }
 
+export type EnglishTabTone = "neutral" | "info" | "success" | "warning" | "danger";
+
+/** BL-133: nhãn ngắn cạnh tab "Tiếng Anh" đầu form. `null` khi chưa có dữ liệu dịch (form tạo mới). */
+export function englishTabStatus(input: { status?: unknown; enSource?: unknown; viChangedAfterManual?: unknown }): { label: string; tone: EnglishTabTone } | null {
+  if (input.status === "failed") return { label: "Dịch lỗi", tone: "danger" };
+  if (input.status === "queued") return { label: "Đang dịch", tone: "info" };
+  if (input.status === "pending_review") return { label: "Chờ duyệt", tone: "warning" };
+  if (input.enSource === "manual") return input.viChangedAfterManual === true ? { label: "Cần xem lại", tone: "warning" } : { label: "Sửa tay", tone: "info" };
+  if (input.status === "done") return { label: "AI đã dịch", tone: "success" };
+  if (input.status === "none" || input.status === undefined || input.status === null) return { label: "Chưa dịch", tone: "neutral" };
+  return null;
+}
+
 /**
  * Một dòng tóm tắt trạng thái bản tiếng Anh cho form (BL-042) thay cho 7 trường hệ thống đã ẩn.
  * `warning` có khi bản tiếng Việt đã sửa sau khi người dùng sửa tay bản tiếng Anh.

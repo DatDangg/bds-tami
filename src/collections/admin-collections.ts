@@ -6,6 +6,7 @@ import { Homepage } from "../globals/Homepage";
 import { SiteSettings } from "../globals/SiteSettings";
 import { hideTechnicalListFields } from "../lib/admin/list-filter";
 import { withDocumentNavSlot } from "../lib/admin/document-nav-slot";
+import { withLanguageTabs } from "../lib/admin/language-tabs";
 import { withAdminUxDefaults } from "../lib/admin/master-data-relations";
 import { withRowActionsColumn } from "../lib/admin/row-actions";
 import { AuditLogs } from "./AuditLogs";
@@ -66,10 +67,10 @@ export const LIST_SEARCHABLE_FIELDS: Readonly<Record<string, readonly string[]>>
  */
 export const ADMIN_COLLECTIONS: CollectionConfig[] = [
   Staff, Media, PrivateFiles, AuditLogs, ClickEvents, ClickStatsDaily, NewsViewsDaily, TranslationUsage, Categories, Developers, Provinces, Wards, Services, Pages, News, Projects, Rentals, PropertyPosts, JobPostings, JobApplications, Leads, LeadActivities, NewsletterSubscribers,
-].map((collection) => withDocumentNavSlot(withAdminUxDefaults(withListSearchableFields(hideTechnicalListFields(withRowActionsColumn(collection), [], EXTRA_HIDDEN_COLUMNS[collection.slug])))));
+].map((collection) => withDocumentNavSlot(withAdminUxDefaults(withListSearchableFields(hideTechnicalListFields(withRowActionsColumn(withLanguageTabs(collection)), [], EXTRA_HIDDEN_COLUMNS[collection.slug])))));
 
 /** Mọi global admin, áp cùng mặc định UX như collection (ẩn nút API, tắt "+ Thêm mới" ô dữ liệu nền — BL-051). */
-export const ADMIN_GLOBALS: GlobalConfig[] = [SiteSettings, Homepage, Header, Footer].map((global) => withAdminUxDefaults(global));
+export const ADMIN_GLOBALS: GlobalConfig[] = [SiteSettings, Homepage, Header, Footer].map((global) => withLanguageTabs(withAdminUxDefaults(global)));
 
 function withListSearchableFields(collection: CollectionConfig): CollectionConfig {
   const fields = LIST_SEARCHABLE_FIELDS[collection.slug];

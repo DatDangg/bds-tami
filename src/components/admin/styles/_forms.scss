@@ -119,6 +119,77 @@
   }
 }
 
+// ---- Tab ngôn ngữ đầu form (LanguageTabs, BL-133) ----
+.tami-lang-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--admin-border);
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-bottom: -1px;
+    padding: 8px 16px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: none;
+    color: var(--admin-text-muted);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--admin-text);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--admin-focus);
+      outline-offset: -2px;
+    }
+
+    &.is-active {
+      color: var(--admin-text);
+      font-weight: 600;
+      cursor: default;
+    }
+
+    &--vi.is-active {
+      border-bottom-color: var(--admin-accent);
+    }
+
+    &--en.is-active {
+      border-bottom-color: var(--admin-badge-info-fg);
+    }
+  }
+
+  &__status {
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+
+    @each $tone in neutral, info, success, warning, danger {
+      &--#{$tone} {
+        background: var(--admin-badge-#{$tone}-bg);
+        color: var(--admin-badge-#{$tone}-fg);
+      }
+    }
+  }
+}
+
+// Câu tiếng Việt gốc dưới ô khi sửa bản tiếng Anh (ViSourceHint, BL-133).
+.tami-vi-source {
+  margin: 6px 0 0;
+
+  &__label {
+    margin-right: 4px;
+    font-weight: 500;
+  }
+}
+
 // ---- Dòng tóm tắt bản dịch (TranslationSummary) ----
 .tami-translation-summary {
   margin-bottom: 16px;
