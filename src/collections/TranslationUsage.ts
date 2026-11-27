@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { denyAll, isAdmin, ROLES } from "../access";
+import { denyAll, isAdmin } from "../access";
 import { collectionLabels } from "../lib/admin/collection-labels";
 import { MONTH_PATTERN } from "../lib/translation/budget";
 
@@ -14,7 +14,9 @@ export const TranslationUsage: CollectionConfig = {
   admin: {
     useAsTitle: "month",
     defaultColumns: ["month", "requests", "inputTokens", "outputTokens", "estimatedCostUsd"],
-    hidden: ({ user }) => user?.role !== ROLES.admin,
+    // Ẩn khỏi menu với mọi người (user 2026-11-27): dịch bằng OpenCode Go là gói thuê bao, số USD ước tính không phải tiền bị trừ.
+    // Dữ liệu vẫn ghi để giữ hạn mức tháng. Cần xem lại thì trả về `({ user }) => user?.role !== ROLES.admin`.
+    hidden: true,
     description: "Mức dùng dịch tự động theo tháng (số lần dịch, lượng chữ, chi phí ước tính) để theo dõi hạn mức.",
   },
   access: { read: isAdmin, create: denyAll, update: denyAll, delete: denyAll },
