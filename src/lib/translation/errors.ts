@@ -26,6 +26,14 @@ export class TranslationError extends Error {
   }
 }
 
+/** Lỗi HTTP từ provider không dùng SDK (OpenCode Go): chỉ giữ status, không giữ body/header (có thể chứa khoá hoặc nội dung bài). */
+export class ProviderHttpError extends Error {
+  constructor(readonly status: number) {
+    super(`Provider HTTP ${status}`);
+    this.name = "ProviderHttpError";
+  }
+}
+
 /** Giá trị an toàn để ghi vào `translation.lastError` cho MỌI loại lỗi (lỗi lạ -> `provider_unavailable`, không lộ chi tiết). */
 export function toLastError(error: unknown): TranslationErrorCode {
   return error instanceof TranslationError ? error.code : "provider_unavailable";

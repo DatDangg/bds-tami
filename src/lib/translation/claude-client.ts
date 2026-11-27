@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 
-import { TranslationError } from "./errors";
+import { ProviderHttpError, TranslationError } from "./errors";
 
 /** Số token tối đa model được sinh mỗi lần (non-streaming): đủ cho một bài dài, và là mức chặn trên của chi phí một lần gọi. */
 export const MAX_OUTPUT_TOKENS = 16_000;
@@ -99,6 +99,12 @@ export function createAnthropicClient(options: AnthropicClientOptions): Translat
  */
 export function mapProviderError(error: unknown): TranslationError {
   if (error instanceof TranslationError) return error;
+  if (error instanceof ProviderHttpError) {
+    if (error.status === 429) return new TranslationError("rate_limited");
+    if (error.status === 401 || error.status === 403) return new TranslationError("auth_failed");
+    if (error.status === 400 || error.status === 404 || error.status === 422) return new TranslationError("bad_request");
+    return new TranslationError("provider_unavailable");
+  }
   if (error instanceof Anthropic.RateLimitError) return new TranslationError("rate_limited");
   if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
     return new TranslationError("auth_failed");

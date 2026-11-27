@@ -21,6 +21,8 @@ export const MODEL_PRICES_USD_PER_MILLION = {
   "claude-opus-5": { input: 5, output: 25 },
   "claude-sonnet-5": { input: 2, output: 10 },
   "claude-haiku-4-5": { input: 1, output: 5 },
+  // OpenCode Go (models API 2026-11-27): 0.15 / 0.6, nhân 2 giờ cao điểm T2–T6 (01–04h, 06–10h UTC) → lấy mức cao điểm cho an toàn.
+  "deepseek-v4.1-flash": { input: 0.3, output: 1.2 },
 } as const satisfies Record<string, { input: number; output: number }>;
 
 /** Model không có trong bảng: lấy mức cao nhất của từng chiều, để hạn mức không bị vượt âm thầm (thà dừng sớm). */

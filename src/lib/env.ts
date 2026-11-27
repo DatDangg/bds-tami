@@ -34,7 +34,10 @@ const emptyToUndefined = (value: unknown) => (value === "" ? undefined : value);
  * (D7: Claude API lỗi không làm sập website). Hạn mức 0 = tắt dịch (mọi lần dịch bị `budget_exceeded`).
  */
 const translationEnvShape = {
+  /** `anthropic` (mặc định, Claude API) hoặc `opencode-go` (OpenCode Go, vd model `deepseek-v4.1-flash`, khoá `OPENCODE_API_KEY`). */
+  TRANSLATION_PROVIDER: z.preprocess(emptyToUndefined, z.enum(["anthropic", "opencode-go"]).default("anthropic")),
   ANTHROPIC_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  OPENCODE_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   TRANSLATION_MODEL: nonEmpty,
   TRANSLATION_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative(),
 };
@@ -42,7 +45,7 @@ const translationEnvSchema = z.object(translationEnvShape);
 
 export type TranslationEnv = z.infer<typeof translationEnvSchema>;
 
-/** Chỉ đọc 3 biến dịch AI (service không cần cả bộ env của app). Lỗi chỉ nêu tên biến, không in giá trị. */
+/** Chỉ đọc các biến dịch AI (service không cần cả bộ env của app). Lỗi chỉ nêu tên biến, không in giá trị. */
 export function parseTranslationEnv(source: Record<string, string | undefined>): TranslationEnv {
   const result = translationEnvSchema.safeParse(source);
   if (result.success) return result.data;

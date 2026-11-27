@@ -120,14 +120,18 @@ describe("parseEnv: dịch AI", () => {
     expect(() => parseEnv({ ...validEnv, TRANSLATION_MONTHLY_BUDGET_USD: "abc" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
   });
 
-  it("parseTranslationEnv chỉ đọc 3 biến dịch, lỗi không in giá trị", () => {
+  it("parseTranslationEnv chỉ đọc biến dịch (provider mặc định anthropic), lỗi không in giá trị", () => {
     expect(parseTranslationEnv({ TRANSLATION_MODEL: "claude-opus-5-5", TRANSLATION_MONTHLY_BUDGET_USD: "5" })).toEqual({
+      TRANSLATION_PROVIDER: "anthropic",
       ANTHROPIC_API_KEY: undefined,
+      OPENCODE_API_KEY: undefined,
       TRANSLATION_MODEL: "claude-opus-5-5",
       TRANSLATION_MONTHLY_BUDGET_USD: 5,
     });
     expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).toThrow(/TRANSLATION_MONTHLY_BUDGET_USD/);
     expect(() => parseTranslationEnv({ TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "sk-secret-oops" })).not.toThrow(/sk-secret-oops/);
+    expect(parseTranslationEnv({ TRANSLATION_PROVIDER: "opencode-go", OPENCODE_API_KEY: "oc", TRANSLATION_MODEL: "deepseek-v4.1-flash", TRANSLATION_MONTHLY_BUDGET_USD: "1" })).toMatchObject({ TRANSLATION_PROVIDER: "opencode-go", OPENCODE_API_KEY: "oc" });
+    expect(() => parseTranslationEnv({ TRANSLATION_PROVIDER: "openai", TRANSLATION_MODEL: "m", TRANSLATION_MONTHLY_BUDGET_USD: "1" })).toThrow(/TRANSLATION_PROVIDER/);
   });
 });
 

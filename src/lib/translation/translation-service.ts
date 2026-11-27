@@ -1,16 +1,21 @@
 import type { Logger } from "pino";
 import type { Payload } from "payload";
 
-import { EnvValidationError, parseTranslationEnv } from "../env";
+import { EnvValidationError, parseTranslationEnv, type TranslationEnv } from "../env";
 import { logger as appLogger } from "../logger";
 import { assertTranslatable, type TranslationTarget } from "./allowlist";
 import { assertWithinBudget, estimateCostUsd, isPricedModel, monthKey, recordUsage } from "./budget";
 import { createAnthropicClient, mapProviderError, type TranslationClient } from "./claude-client";
+import { createOpenCodeClient } from "./opencode-client";
 import { TranslationError } from "./errors";
 import { buildSystemPrompt, buildUserContent, type GlossaryEntry, loadGlossary } from "./prompt";
 import { planItems, type Segment, splitIntoBatches, type TranslatedValue, type TranslationItem, validateModelOutput } from "./segments";
 
+export type TranslationProvider = "anthropic" | "opencode-go";
+
 export interface TranslationConfig {
+  /** Thiếu = `anthropic`. */
+  provider?: TranslationProvider;
   /** Thiếu = dịch trả `not_configured`, app vẫn chạy. */
   apiKey?: string;
   model: string;
@@ -19,7 +24,7 @@ export interface TranslationConfig {
 
 export interface TranslationServiceDeps {
   payload: Payload;
-  /** Mặc định đọc từ env (`ANTHROPIC_API_KEY`, `TRANSLATION_MODEL`, `TRANSLATION_MONTHLY_BUDGET_USD`). */
+  /** Mặc định đọc từ env (`TRANSLATION_PROVIDER`, `ANTHROPIC_API_KEY`/`OPENCODE_API_KEY`, `TRANSLATION_MODEL`, `TRANSLATION_MONTHLY_BUDGET_USD`). */
   config?: TranslationConfig;
   /** Mặc định tạo client Claude API lười, chỉ sau khi qua allowlist + hạn mức. Test truyền bản giả. */
   client?: TranslationClient;
@@ -41,9 +46,19 @@ export interface TranslationResult {
   costUsd: number;
 }
 
+/** Cấu hình dịch từ env đã parse: khoá lấy theo provider đang chọn. */
+export function translationConfigFromEnv(env: TranslationEnv): TranslationConfig {
+  const apiKey = env.TRANSLATION_PROVIDER === "opencode-go" ? env.OPENCODE_API_KEY : env.ANTHROPIC_API_KEY;
+  return { provider: env.TRANSLATION_PROVIDER, apiKey, model: env.TRANSLATION_MODEL, monthlyBudgetUsd: env.TRANSLATION_MONTHLY_BUDGET_USD };
+}
+
 function readConfigFromEnv(): TranslationConfig {
-  const env = parseTranslationEnv(process.env);
-  return { apiKey: env.ANTHROPIC_API_KEY, model: env.TRANSLATION_MODEL, monthlyBudgetUsd: env.TRANSLATION_MONTHLY_BUDGET_USD };
+  return translationConfigFromEnv(parseTranslationEnv(process.env));
+}
+
+function createClient(config: TranslationConfig): TranslationClient {
+  const apiKey = config.apiKey!;
+  return config.provider === "opencode-go" ? createOpenCodeClient({ apiKey }) : createAnthropicClient({ apiKey });
 }
 
 /** Chỉ `end_turn` là kết quả đầy đủ; cắt cụt hoặc bị từ chối thì không lưu gì. */
@@ -100,7 +115,7 @@ export function createTranslationService(deps: TranslationServiceDeps) {
     if (!isPricedModel(config.model)) log.warn({ model: config.model }, "Model dịch không có trong bảng giá, tính theo mức cao nhất");
 
     const system = buildSystemPrompt(deps.glossary ?? (await loadGlossary(payload)));
-    const client = deps.client ?? createAnthropicClient({ apiKey: config.apiKey! });
+    const client = deps.client ?? createClient(config);
     const translatedTexts: string[] = [];
     let costUsd = 0;
     for (const batch of batches) {

@@ -10,7 +10,7 @@ import { revalidateFromJob } from "../lib/revalidate/internal-revalidate";
 import { TRANSLATION_ERROR_MESSAGES, TranslationError, type TranslationErrorCode } from "../lib/translation/errors";
 import { TRANSLATE_CONTENT_SLUG, type TranslateContentInput } from "../lib/translation/job-input";
 import { hashLeaves, hasSourceChanged, readAtPath, type SourceHashes, type TranslatableLeaf } from "../lib/translation/leaves";
-import { createTranslationService, type TranslationConfig } from "../lib/translation/translation-service";
+import { createTranslationService, type TranslationConfig, translationConfigFromEnv } from "../lib/translation/translation-service";
 import { type Context, type Doc, patchTranslationGroup, readDoc, type TranslateContentDeps } from "./translate-content-context";
 import { recordFailure } from "./translate-content-failure";
 import { saveTranslatedLeaves } from "./translate-content-save";
@@ -37,7 +37,7 @@ function resolveConfig(deps: TranslateContentDeps): TranslationConfig {
   if (deps.config) return deps.config;
   try {
     const env = parseTranslationEnv(process.env);
-    return { apiKey: env.ANTHROPIC_API_KEY, model: env.TRANSLATION_MODEL, monthlyBudgetUsd: env.TRANSLATION_MONTHLY_BUDGET_USD };
+    return translationConfigFromEnv(env);
   } catch {
     throw new TranslationError("not_configured");
   }
