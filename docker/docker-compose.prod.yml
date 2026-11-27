@@ -54,7 +54,10 @@ x-app-environment: &app-environment
   EMAIL_FROM_ADDRESS:
   EMAIL_ALLOWLIST: ${EMAIL_ALLOWLIST:-}   # production gửi email thật, biến này không có tác dụng
   # Tuỳ chọn: prod tắt dịch AI lúc đầu (TRANSLATION_MONTHLY_BUDGET_USD=0, user 2026-10-23); env.ts coi chuỗi rỗng = chưa đặt.
+  # Provider dịch: anthropic (mặc định) | opencode-go (OPENCODE_API_KEY, model deepseek-v4.1-flash) — BL-132.
+  TRANSLATION_PROVIDER: ${TRANSLATION_PROVIDER:-anthropic}
   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  OPENCODE_API_KEY: ${OPENCODE_API_KEY:-}
   TRANSLATION_MODEL: ${TRANSLATION_MODEL:?}
   TRANSLATION_MONTHLY_BUDGET_USD: ${TRANSLATION_MONTHLY_BUDGET_USD:?}
   NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL bắt buộc (vd https://<domain>)}
